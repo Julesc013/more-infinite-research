@@ -1,0 +1,515 @@
+{
+  "kind": "ConfiguredSteel512IndependentActualResultReviewV1",
+  "reviewed_at_utc": "2026-11-10T06:37:57.649887+00:00",
+  "decision": "PASS for exact current12 configured-steel destination/save/two-cold scope",
+  "findings": [],
+  "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+  "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "candidate_publication_status": "unpublished",
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01\\more-infinite-research_5.0.21012.zip",
+    "exists": true,
+    "bytes": 1022087,
+    "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+  },
+  "manifest": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\manifest.json",
+    "bytes": 20907,
+    "sha256": "E6228DFBA587CFCB0B6765298C756F6291639E07BB24F01E512082DF8376CE7D"
+  },
+  "caller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\Invoke-ConfiguredSteelDestination.ps1",
+    "bytes": 23767,
+    "sha256": "11CDC3353EB5991A2A3FC78C2FE8257F14B5F9D7DF591DD12006BA4D6B244C26"
+  },
+  "composition": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\composition.json",
+    "bytes": 20560,
+    "sha256": "F9D1B077864374A60F1BEBB6632F223CD6C440F110F81873E07196415254AB20"
+  },
+  "native_admission": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-native-admission-independent-review-r01.json",
+    "bytes": 4863,
+    "sha256": "F0EE28B89063AB80B92890363738669CCA6A6FC3EAE5AD4D48C91FB1A4733125"
+  },
+  "actual_custody": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\execute-custody.json",
+    "bytes": 46378,
+    "sha256": "6373B116CFC09D763B9E9E6D73E3CB44632E7D20CC3680DA96843FDF22761D83"
+  },
+  "actual_stdout": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\execute.stdout.json",
+    "bytes": 46378,
+    "sha256": "6373B116CFC09D763B9E9E6D73E3CB44632E7D20CC3680DA96843FDF22761D83"
+  },
+  "historical_original_source_actual": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-owner511-forward-native-custody-r01\\source\\execute-custody.json",
+    "bytes": 38922,
+    "sha256": "00561E796184FBF7B4269AE9F67709FA6A0796616B18DB9504D2FB49E1DC554C"
+  },
+  "original_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-owner511-forward-native-custody-r01\\source\\protected\\native-owner511-forward-source-complete.zip",
+    "exists": true,
+    "bytes": 826984,
+    "sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514"
+  },
+  "control_only_derivative": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\inputs\\native-owner510-earned-control512.zip",
+    "exists": true,
+    "bytes": 785177,
+    "sha256": "A21B8070FD46A5E317F6B7AA65061C0CE8A49092E86FC3A763BEEA35503C537E"
+  },
+  "processes": [
+    {
+      "stage": "production",
+      "pid": 41924,
+      "exit_code": -1,
+      "completion_predicate_observed": true,
+      "timed_out": false,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\production.factorio.log",
+        "bytes": 17279,
+        "sha256": "527CCB14B40AEE8D09C632A8BF75451C258A46D4C557A9B1BC8F4DA7BD72B56C"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.resources.jsonl",
+        "bytes": 2622,
+        "sha256": "A59935256D7CBEEEE5CAE8F30517107023D27845684C344431DA48B44379E834"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.stdout.txt",
+        "bytes": 17421,
+        "sha256": "D98059F61B295A9D2F988C09FDD3716C7BDB433838E49CCCC9A472BFEF0B304F"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "loaded_mods": {
+        "recycler": "2.1.23",
+        "more-infinite-research": "5.0.21012",
+        "base": "2.1.23",
+        "elevated-rails": "2.1.23",
+        "quality": "2.1.23",
+        "space-age": "2.1.23",
+        "mir-fixture-native-owner-settings": "0.2.0",
+        "core": "0.0.0"
+      },
+      "marker_stage": "upgrade-complete",
+      "marker_equals_record": true,
+      "peak_working_set_bytes": 425787392
+    },
+    {
+      "stage": "reload-1",
+      "pid": 37584,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timed_out": false,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\reload-1.factorio.log",
+        "bytes": 15178,
+        "sha256": "E01A8C2BCADBAA5CFEEA15B128CE4EE5107878B2AD0B8A578B1189AFAB93A486"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.resources.jsonl",
+        "bytes": 2614,
+        "sha256": "8FA7F6EF52529249362BD35FAA4C109E8F88248E55A83EA92AAEBAA44FB7172F"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.stdout.txt",
+        "bytes": 106,
+        "sha256": "8ED6E77575A76DF944D16F71C5346C20DD951932BBDFAFAD01B2A01FD7D7B4C5"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "loaded_mods": {
+        "recycler": "2.1.23",
+        "more-infinite-research": "5.0.21012",
+        "base": "2.1.23",
+        "elevated-rails": "2.1.23",
+        "quality": "2.1.23",
+        "space-age": "2.1.23",
+        "mir-fixture-native-owner-settings": "0.2.0",
+        "core": "0.0.0"
+      },
+      "marker_stage": "upgrade-cold-complete",
+      "marker_equals_record": true,
+      "peak_working_set_bytes": 530792448
+    },
+    {
+      "stage": "reload-2",
+      "pid": 6528,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timed_out": false,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\reload-2.factorio.log",
+        "bytes": 15178,
+        "sha256": "46CC0B153612C4F78872DD6C86CD0883B19D7B601F4346E7CC55D9E2E60CC405"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.resources.jsonl",
+        "bytes": 2002,
+        "sha256": "DA6CA3DBFA80F26D6A019E3238948224AD35368A60C0884A17423465B01BD621"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.stdout.txt",
+        "bytes": 106,
+        "sha256": "2958BBAFA703DCCDEC11947B859D6A6263EF837F907ED5B9A8CF9CD429513DC3"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "loaded_mods": {
+        "recycler": "2.1.23",
+        "more-infinite-research": "5.0.21012",
+        "base": "2.1.23",
+        "elevated-rails": "2.1.23",
+        "quality": "2.1.23",
+        "space-age": "2.1.23",
+        "mir-fixture-native-owner-settings": "0.2.0",
+        "core": "0.0.0"
+      },
+      "marker_stage": "upgrade-cold-complete",
+      "marker_equals_record": true,
+      "peak_working_set_bytes": 165273600
+    }
+  ],
+  "historical_source_lab_completions_counted_once": 1,
+  "new_lab_completions": 0,
+  "historical_completion": {
+    "name": "steel-plate-productivity",
+    "by_script": false,
+    "tick": 119
+  },
+  "entry": {
+    "event_order": "level -> more-infinite-research",
+    "player": {
+      "name": "player",
+      "index": 1,
+      "level": 2,
+      "researched": false,
+      "enabled": true,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0.17,
+      "casting": 0.17,
+      "bullet": 0.07,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    },
+    "foreign": {
+      "name": "native-owner-settings-control",
+      "index": 4,
+      "level": 1,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0,
+      "casting": 0,
+      "bullet": 0,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    },
+    "completions": 1,
+    "remaining_science": {
+      "automation-science-pack": 4,
+      "logistic-science-pack": 4,
+      "chemical-science-pack": 4,
+      "production-science-pack": 4
+    }
+  },
+  "actual": {
+    "player": {
+      "name": "player",
+      "index": 1,
+      "level": 2,
+      "researched": false,
+      "enabled": true,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0.17,
+      "casting": 0.17,
+      "bullet": 0.07,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    },
+    "foreign": {
+      "name": "native-owner-settings-control",
+      "index": 4,
+      "level": 1,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0,
+      "casting": 0,
+      "bullet": 0,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    }
+  },
+  "actual_selected_settings_guarded_by_unchanged_actor": {
+    "base": 2,
+    "increment": 3,
+    "growth": 1.25,
+    "time": 1,
+    "effect": 17
+  },
+  "science_remaining": {
+    "automation-science-pack": 4,
+    "logistic-science-pack": 4,
+    "chemical-science-pack": 4,
+    "production-science-pack": 4
+  },
+  "native_cost_formula": "(2+3*(L-1))*1.25^(L-1)",
+  "native_effective_units": 6,
+  "private_effective_units": 2,
+  "save": {
+    "complete": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\saves\\native-owner511-forward-upgrade-complete.zip",
+      "bytes": 827351,
+      "sha256": "DE1D0301EE28D8C0F0DDB1753846088BBAA62D1876C12CB8B0D1E2D7A30C9591"
+    },
+    "protected": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\protected\\native-owner512-upgrade-complete.zip",
+      "bytes": 827351,
+      "sha256": "DE1D0301EE28D8C0F0DDB1753846088BBAA62D1876C12CB8B0D1E2D7A30C9591"
+    },
+    "both_CRC_pass": true,
+    "embedded_actor_sha256": "F9F350D9798C8ECF758381F220F09A0E33F3513F828FC473F0BB8DE6E1A211FB",
+    "members": [
+      {
+        "member": "native-owner511-forward-upgrade-complete/control.lua",
+        "bytes": 11860,
+        "sha256": "F9F350D9798C8ECF758381F220F09A0E33F3513F828FC473F0BB8DE6E1A211FB"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/level-init.dat",
+        "bytes": 1075120,
+        "sha256": "33B8CDCBDB975F92E528A5705660E72035EEE316609BEB4D130B390AC3AA1EEA"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/level.dat1",
+        "bytes": 53476,
+        "sha256": "516A286D0967EAD7EE2AEC8B244E627F6318F0BDBE23B423D79335B3F6E2E379"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/level.dat0",
+        "bytes": 381217,
+        "sha256": "BA5B08362F9C6E65C477BD4C7A019BEAA993E9D64DBBC95523300EECBDAC2290"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/level.datmetadata",
+        "bytes": 8,
+        "sha256": "AA9A7FE2272785C9C90C363D84670C035F05C4278B5167E9DAD828D7B466FF89"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/script.dat",
+        "bytes": 14321,
+        "sha256": "0365F0FC1DE7643B2CC776ED6CAD41398794AC2DE354015D7D1FBD2743BAB23F"
+      },
+      {
+        "member": "native-owner511-forward-upgrade-complete/info.json",
+        "bytes": 5,
+        "sha256": "38E0B9DE817F645C4BEC37C0D4A3E58BAECCCB040F5718DC069A72C7385A0BED"
+      }
+    ],
+    "two_readonly_one_update_colds_same_save_hash": true,
+    "cold_markers_identical": true
+  },
+  "restoration": {
+    "original_8A04_and_derivative_unchanged": true,
+    "all36_bound_inputs_unchanged": true,
+    "prior_controls_live_rehashed": 2,
+    "prior_MIR_archives_live_rehashed": 19,
+    "exact_prior_archive_set": true,
+    "temporary_archives_removed": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-native-owner-settings_0.2.0.zip",
+        "action": "removed-temporary"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+        "action": "removed-temporary"
+      }
+    ],
+    "activation_status": "restored-direct-library-controls",
+    "Factorio_processes": 0
+  },
+  "native_artifact_custody": {
+    "files": 24,
+    "bytes": 2165588,
+    "members": [
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\config.ini",
+        "bytes": 289,
+        "sha256": "99FD97D64231267028A2AF298FC117672A981D3A8E7A7A4D2FDCA45310EE6556"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\input-predecessor.zip",
+        "bytes": 785177,
+        "sha256": "A21B8070FD46A5E317F6B7AA65061C0CE8A49092E86FC3A763BEEA35503C537E"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.resources.jsonl",
+        "bytes": 2622,
+        "sha256": "A59935256D7CBEEEE5CAE8F30517107023D27845684C344431DA48B44379E834"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-1.stdout.txt",
+        "bytes": 17421,
+        "sha256": "D98059F61B295A9D2F988C09FDD3716C7BDB433838E49CCCC9A472BFEF0B304F"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.resources.jsonl",
+        "bytes": 2614,
+        "sha256": "8FA7F6EF52529249362BD35FAA4C109E8F88248E55A83EA92AAEBAA44FB7172F"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-2.stdout.txt",
+        "bytes": 106,
+        "sha256": "8ED6E77575A76DF944D16F71C5346C20DD951932BBDFAFAD01B2A01FD7D7B4C5"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.resources.jsonl",
+        "bytes": 2002,
+        "sha256": "DA6CA3DBFA80F26D6A019E3238948224AD35368A60C0884A17423465B01BD621"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\process-3.stdout.txt",
+        "bytes": 106,
+        "sha256": "2958BBAFA703DCCDEC11947B859D6A6263EF837F907ED5B9A8CF9CD429513DC3"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\production.factorio.log",
+        "bytes": 17279,
+        "sha256": "527CCB14B40AEE8D09C632A8BF75451C258A46D4C557A9B1BC8F4DA7BD72B56C"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\reload-1.factorio.log",
+        "bytes": 15178,
+        "sha256": "E01A8C2BCADBAA5CFEEA15B128CE4EE5107878B2AD0B8A578B1189AFAB93A486"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\reload-2.factorio.log",
+        "bytes": 15178,
+        "sha256": "46CC0B153612C4F78872DD6C86CD0883B19D7B601F4346E7CC55D9E2E60CC405"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\result.json",
+        "bytes": 46379,
+        "sha256": "52BD97CD1566E4C6FD9BEFFD8B796675733728EC03C9247D613035FD94F20F97"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\server-settings.json",
+        "bytes": 3699,
+        "sha256": "51EFF84B4BBCB65CE43CD8B4DAB5BFBA7179684DE88A5C20AF57FB7839C0F8EB"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\factorio-current.log",
+        "bytes": 15178,
+        "sha256": "46CC0B153612C4F78872DD6C86CD0883B19D7B601F4346E7CC55D9E2E60CC405"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\player-data.json",
+        "bytes": 13757,
+        "sha256": "8A069BEF1C79B3E4645FA51F3B08D891A3FA7105C8CAAFC633F7BA6B9D8C4D67"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\saves\\native-owner511-forward-upgrade-complete.zip",
+        "bytes": 827351,
+        "sha256": "DE1D0301EE28D8C0F0DDB1753846088BBAA62D1876C12CB8B0D1E2D7A30C9591"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\scenarios\\native-owner511-forward-source\\blueprint.zip",
+        "bytes": 376990,
+        "sha256": "CCACED6A91EDC01C7ADEC283A010790DEA5F89AE0F50DC27CBE5B0E7387EE5F8"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\scenarios\\native-owner511-forward-source\\control.lua",
+        "bytes": 11860,
+        "sha256": "F9F350D9798C8ECF758381F220F09A0E33F3513F828FC473F0BB8DE6E1A211FB"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\scenarios\\native-owner511-forward-source\\info.json",
+        "bytes": 2,
+        "sha256": "44136FA355B3678A1146AD16F7E8649E94FB4FC21FE77E8310C060F61CAAFF8A"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\scenarios\\native-owner511-forward-target\\control.lua",
+        "bytes": 11860,
+        "sha256": "F9F350D9798C8ECF758381F220F09A0E33F3513F828FC473F0BB8DE6E1A211FB"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\native\\write-data\\script-output\\more-infinite-research\\mir.log",
+        "bytes": 540,
+        "sha256": "E16BC9D752DB7B120E848C50F545999984462AC073F2619704CCD1F16EC4AD13"
+      }
+    ]
+  },
+  "limits": "Exact SpaceAge2.1.23+observer0.2.0 / genuine10 earned8A04\u2192unpublished12 Source47537 configured17percent steel/native17percent casting/foreign7percent bullet/empty private/internal unearned foreign force; historical source one ordinary completion at tick119 preserved, not repeated. No current/queued/detached partial research exists in this case. No new labs/manufacturing/provider/settings expansion/client/menu/performance/stable/release verdict. Historical forward-10-to-11 actor role is only its retained label.",
+  "reviewer_actions": "Read-only source/raw/ledger/ZIP/hash/live restoration review; no tests/builds/native/input mutations. Only this outside-controller receipt is written."
+}

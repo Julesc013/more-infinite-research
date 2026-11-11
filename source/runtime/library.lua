@@ -124,10 +124,25 @@ local function ensure_state()
   return value
 end
 
+-- A valid UTF-8 input must remain valid when a byte budget is applied.
+local function utf8_prefix(value, limit)
+  local last = math.min(#value, limit)
+  local lead = last
+  while lead > 0 do
+    local byte = string.byte(value, lead)
+    if byte < 128 or byte > 191 then break end
+    lead = lead - 1
+  end
+  if lead == 0 then return "" end
+  local first = string.byte(value, lead)
+  local size = first < 128 and 1 or first < 224 and 2 or first < 240 and 3 or 4
+  if lead + size - 1 > last then last = lead - 1 end
+  return string.sub(value, 1, last)
+end
+
 local function text(value)
   if type(value) ~= "string" then return "" end
-  if #value > MAX_QUERY then return string.sub(value, 1, MAX_QUERY) end
-  return value
+  return utf8_prefix(value, MAX_QUERY)
 end
 
 local function technology_id(value)
@@ -1257,7 +1272,7 @@ local function library_section(parent, name, caption, width)
   -- followed by a short bold heading rather than another paragraph.
   local divider = add(parent, {type = "line", name = PREFIX .. name .. "_divider", direction = "horizontal"})
   divider.style.width = math.max(1, width - 16)
-  divider.style.top_margin, divider.style.bottom_margin = 10, 4
+  divider.style.top_margin, divider.style.bottom_margin = library_layout.section_gap, library_layout.control_gap
   local heading = add(parent, {type = "label", name = PREFIX .. name, caption = {caption}})
   heading.style.font, heading.style.bottom_margin = "default-bold", 4
 end
@@ -1448,8 +1463,10 @@ local function research_filters_ready(filters)
   local grid = valid(filters) and filters[PREFIX .. "filter_grid"]
   local query = research_filter_control(filters, "query")
   if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
-      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2
+      or not valid(grid) or grid.type ~= "table"
       or not valid(query) or query.type ~= "textfield" then return false end
+  local columns = grid.column_count
+  if columns ~= 1 and columns ~= 2 and columns ~= 3 and columns ~= 5 then return false end
   for _, name in ipairs({"family", "status", "mode", "sort", "visibility"}) do
     local field = grid[PREFIX .. name .. "_field"]
     local control = research_filter_control(filters, name)
@@ -1525,7 +1542,8 @@ local function update_research_content(content, player, view, context, translati
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
-  if valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"])
+  if valid(content[PREFIX .. "availability_viewport"])
+      or valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"])
       or valid(content[PREFIX .. "actions"]) or valid(content[PREFIX .. "results"]) then
     content.clear()
   end
@@ -1662,13 +1680,7 @@ local function setting_display(name, value)
   if #shown > 120 then
     -- Keep the authored compact preview without splitting a UTF-8 character.
     -- Configuration and profile export continue to use the original value.
-    local last = 117
-    while last > 0 do
-      local next_byte = string.byte(shown, last + 1)
-      if next_byte < 128 or next_byte > 191 then break end
-      last = last - 1
-    end
-    return string.sub(shown, 1, last) .. "..."
+    return utf8_prefix(shown, 117) .. "..."
   end
   return shown
 end
@@ -1830,7 +1842,10 @@ local function update_settings_content(content, view, preserve_query, translatio
     if valid(button) and button.style then
       button.style.width = style_pixels((width - 24 - (toolbar_columns - 1) * 8) / toolbar_columns)
       button.style.height = 28
-      if name == "settings_research" or name == "settings_options" then button.tooltip = button.caption end
+      if name == "settings_research" or name == "settings_options" then
+        button.tooltip = button.caption
+        button.toggled = view.settings_scope == (name == "settings_research" and "research" or "options")
+      end
     end
   end
   if query.style then query.style.width = math.max(1, width - 24) end
@@ -1996,6 +2011,7 @@ local function update_queue_content(content, player, view)
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
   update_list_items(list, items, selected_index)
+  list.visible = #items > 0
   content[PREFIX .. "queue_empty"].visible = #items == 0
 end
 
@@ -2008,18 +2024,30 @@ local function update_availability_content(content, player, view)
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
   local rows = availability.rows(active_mods, target, player and player.force, view and view.query, effective_streams)
+  -- One full-width child owns scrolling; explanations are not Research table
+  -- columns. Leave the same scrollbar/padding budget as the other panes.
+  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
+  local height = content.style and content.style.maximal_height or 220
+  local viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
+    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  viewport.style.width, viewport.style.height = width, height
+  local entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
+  local entry_width = math.max(1, width - 16)
+  entries.style.width, entries.style.vertical_spacing = entry_width, library_layout.section_gap
   if #rows == 0 then
-    add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+    local label = add(entries, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+    label.style.width = entry_width
     return
   end
   for index, row in ipairs(rows) do
-    add(content, {
+    local label = add(entries, {
       type = "label",
       name = PREFIX .. "availability_" .. index,
       caption = {"mir-browser.availability-entry",
         {"technology-name.more-infinite-research." .. row.family},
         {"mir-browser.availability-" .. row.reason}}
     })
+    label.style.width = entry_width
   end
 end
 
@@ -2158,31 +2186,47 @@ end
 
 local function icon_button(parent, name, sprite, tooltip)
   local control = add(parent, {type = "sprite-button", name = PREFIX .. name,
-    style = "tool_button", sprite = sprite, tooltip = tooltip})
-  if control.style then control.style.width, control.style.height = 30, 30 end
+    style = "frame_action_button", sprite = sprite, tooltip = tooltip})
   return control
 end
 
-local function create_filters(frame, player, view, width)
-  local _, control_width = library_layout.filter_layout(width)
-  local _, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
-  local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "vertical"})
-  filters.style.width = math.max(1, width - 64)
-  local search = add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
-  search.style.font = "default-semibold"
-  local query = add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
-    tooltip = {"mir-browser.search-label"}})
-  query.style.width = math.max(1, width - 64)
-  local grid = add(filters, {type = "table", name = PREFIX .. "filter_grid", column_count = 2})
-  grid.style.width, grid.style.horizontal_spacing = math.max(1, width - 64), 12
+local function sync_titlebar(frame, width)
+  local title = frame[PREFIX .. "title"]
+  if not valid(title) then return end
+  title.drag_target = frame
+  local caption, drag = title[PREFIX .. "title_label"], title[PREFIX .. "drag"]
+  if valid(caption) then
+    caption.ignored_by_interaction = true
+    caption.style.maximal_width = library_layout.title_caption_width(width)
+  end
+  if valid(drag) then
+    drag.ignored_by_interaction = true
+    drag.style.height, drag.style.right_margin = library_layout.titlebar_action_size, 4
+  end
+  for _, name in ipairs({"layout_smaller", "layout_larger", "layout_reset", "close"}) do
+    local button = title[PREFIX .. name]
+    if valid(button) and button.style then
+      if button.style.name ~= "frame_action_button" then button.style = "frame_action_button" end
+      local size = library_layout.titlebar_action_size
+      if button.style.minimal_width ~= size or button.style.maximal_width ~= size then button.style.width = size end
+      if button.style.minimal_height ~= size or button.style.maximal_height ~= size then button.style.height = size end
+    end
+  end
+end
+
+local function create_filter_grid(filters, player, view, width)
+  local columns, control_width = library_layout.filter_layout(width)
+  local grid = add(filters, {type = "table", name = PREFIX .. "filter_grid", column_count = columns})
+  grid.style.width, grid.style.horizontal_spacing = math.max(1, width - 64), library_layout.section_gap
+  grid.style.vertical_spacing = library_layout.filter_gap
   local function choice(name, caption, items, selected)
     local field = add(grid, {type = "flow", name = PREFIX .. name .. "_field", direction = "vertical"})
-    field.style.width = control_width
-    local label = add(field, {type = "label", name = PREFIX .. name .. "_label", caption = {caption}})
-    label.visible = height >= 600
+    field.style.width, field.style.vertical_spacing = control_width, library_layout.control_gap
+    local label = add(field, {type = "label", name = PREFIX .. name .. "_label", caption = {caption}, tooltip = {caption}})
+    label.style.maximal_width = control_width
     local control = add(field, {type = "drop-down", name = PREFIX .. name, items = items,
       selected_index = selected, tooltip = {caption}})
-    control.style.width = control_width
+    control.style.width, control.style.height = control_width, library_layout.control_height
   end
   local families = family_values()
   choice("family", "mir-browser.filter-scope", family_items(families, player), family_index(families, view.family) or 1)
@@ -2193,6 +2237,18 @@ local function create_filters(frame, player, view, width)
     {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, SORT_INDEX[view.sort] or 1)
   choice("visibility", "mir-browser.visibility", {{"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"},
     {"mir-browser.not-added"}}, view.visibility)
+  return grid
+end
+
+local function create_filters(frame, player, view, width)
+  local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "vertical"})
+  filters.style.width, filters.style.vertical_spacing = math.max(1, width - 64), library_layout.control_gap
+  local search = add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
+  search.style.font = "default-semibold"
+  local query = add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
+    tooltip = {"mir-browser.search-label"}})
+  query.style.width, query.style.height = math.max(1, width - 64), library_layout.control_height
+  create_filter_grid(filters, player, view, width)
   return filters
 end
 
@@ -2223,6 +2279,7 @@ end
 
 local function sync_frame_layout(player, view, frame)
   local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  sync_titlebar(frame, width)
   local pairs_per_row, control_width = library_layout.filter_layout(width)
   local content_width = style_pixels(width - 48)
   local content_height = style_pixels(library_layout.content_height(height, pairs_per_row))
@@ -2252,13 +2309,20 @@ local function sync_frame_layout(player, view, frame)
     local query = research_filter_control(filters, "query")
     if valid(query) then query.style.width = math.max(1, width - 64) end
     local grid = filters[PREFIX .. "filter_grid"]
+    if valid(grid) and grid.column_count ~= pairs_per_row then
+      -- column_count is native read-only. Keep the query/caret and rebuild
+      -- only this small container, restoring choices from the retained view.
+      grid.destroy()
+      grid = create_filter_grid(filters, player, view, width)
+    end
     if valid(grid) then grid.style.width = math.max(1, width - 64) end
     for _, name in ipairs({"family", "status", "mode", "sort", "visibility"}) do
       local control = research_filter_control(filters, name)
       local field = valid(grid) and grid[PREFIX .. name .. "_field"]
       if valid(field) then
         field.style.width = control_width
-        field[PREFIX .. name .. "_label"].visible = height >= 600
+        field[PREFIX .. name .. "_label"].visible = true
+        field[PREFIX .. name .. "_label"].style.maximal_width = control_width
       end
       if valid(control) then control.style.width = control_width end
     end
@@ -2292,16 +2356,16 @@ local function create_frame(player, view)
   if view.location then frame.location = view.location
   elseif type(frame.force_auto_center) == "function" then frame.force_auto_center() end
 
-  local title = add(frame, {type = "flow", name = PREFIX .. "title", direction = "horizontal"})
+  local title = add(frame, {type = "flow", name = PREFIX .. "title", direction = "horizontal", tooltip = {"mir-browser.title"}})
   add(title, {type = "label", name = PREFIX .. "title_label", caption = {"mir-browser.title"}, style = "frame_title"})
   local drag = add(title, {type = "empty-widget", name = PREFIX .. "drag", style = "draggable_space_header"})
   drag.style.horizontally_stretchable = true
-  drag.style.height = 24
+  drag.style.height = library_layout.titlebar_action_size
   drag.drag_target = frame
 
-  icon_button(title, "layout_smaller", "utility/left_arrow", {"mir-browser.layout-smaller"})
-  icon_button(title, "layout_larger", "utility/right_arrow", {"mir-browser.layout-larger"})
-  icon_button(title, "layout_reset", "utility/reset", {"mir-browser.layout-reset"})
+  icon_button(title, "layout_smaller", "utility/backward_arrow", {"mir-browser.layout-smaller"})
+  icon_button(title, "layout_larger", "utility/forward_arrow", {"mir-browser.layout-larger"})
+  icon_button(title, "layout_reset", "utility/reset_white", {"mir-browser.layout-reset"})
   icon_button(title, "close", "utility/close", {"mir-browser.close"})
 
   create_tabs(frame, player, view)

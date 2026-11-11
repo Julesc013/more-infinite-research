@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "kind": "MIR512APITwoConsumerPhysicalIndependentR02AdmissionV1",
+  "reviewed_utc": "2026-11-10T06:00:12.997138+00:00",
+  "verdict": "GO: exact serial four-process F200 then four-process F210 API physical/init/save/two-cold unit;8native processes maximum;stopfirstfailure/no retries",
+  "findings": [],
+  "prior_method_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-independent-offline-review.json",
+    "bytes": 7368,
+    "sha256": "FB4E9230ABDAA593A68F82FDDE570B126CAF22AEAF0DCED5DE1B49FDC44AD4CC"
+  },
+  "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+  "player_source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "publication_status": "unpublished12",
+  "harness": "Properclean203e0af5/Source93d historical harness; unchanged5FF07FF2 native fixture helper and eight frozen helper bodies. It executes independently pinned current Source47537 playerZIP, not its own historical player source.",
+  "cases": [
+    {
+      "target": "f200",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\packet.json",
+        "bytes": 473713,
+        "sha256": "478D33E55712EBEF4C1BF6D7203D693C716EB00D529C44D06981E30EB647E8E7"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\Invoke-Owned.ps1",
+        "bytes": 32320,
+        "sha256": "4094AFF343A8D3386FD17F3751D620ECBDC8E983FDF82E7F43BB964E6288B3EA"
+      },
+      "local_custody_helper": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\Existing-OwnedArchiveFunctions.ps1",
+        "bytes": 4973,
+        "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\composition.json",
+        "bytes": 16927,
+        "sha256": "920D66FE8609D74801D617FA14AFB3A78023312D0390BEDBA7DEF31A702559F6"
+      },
+      "profile": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f200/profile.json",
+        "bytes": 2041,
+        "sha256": "2D85B21D4D41BAC6E8943A322E097F514C1D75110445540FC1CE4CCE1C549381"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77"
+      },
+      "loaded_candidate": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.20012.zip",
+          "bytes": 1021663,
+          "sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "mod_rows": 9,
+      "selected_archive_rows": 5,
+      "composed_roles": [
+        "create",
+        "production",
+        "cold1",
+        "cold2"
+      ],
+      "controls_restored": 8,
+      "native_processes_in_composition": 0,
+      "factorio_processes_after_composition": 0,
+      "native_output": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200",
+      "native_output_absent_before_GO": true,
+      "compose_output": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200-compose-r02",
+      "maximum_native_processes": 4
+    },
+    {
+      "target": "f210",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\packet.json",
+        "bytes": 528704,
+        "sha256": "899C665887C3F1292A91B2325525B731FE6232F21B3DFF586946D02F5DD64F78"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\Invoke-Owned.ps1",
+        "bytes": 32493,
+        "sha256": "6CDA58B84E307C7D1A3CDAC8B5543B63CB6258D4A201ED6240697AAC123603E2"
+      },
+      "local_custody_helper": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\Existing-OwnedArchiveFunctions.ps1",
+        "bytes": 4973,
+        "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\composition.json",
+        "bytes": 18405,
+        "sha256": "144174F8017BE475B00C5CDE3C68413AF57A47F93FB8A12B447ECA0837623FF5"
+      },
+      "profile": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f210/profile.json",
+        "bytes": 2129,
+        "sha256": "9579B34781633728FCF9981FF55756FB81800696E9DAB6EEFE58CFF191FAC767"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "version": "2.1.23",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "loaded_candidate": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.21012.zip",
+          "bytes": 1022087,
+          "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "mod_rows": 10,
+      "selected_archive_rows": 5,
+      "composed_roles": [
+        "create",
+        "production",
+        "cold1",
+        "cold2"
+      ],
+      "controls_restored": 8,
+      "native_processes_in_composition": 0,
+      "factorio_processes_after_composition": 0,
+      "native_output": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210",
+      "native_output_absent_before_GO": true,
+      "compose_output": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210-compose-r02",
+      "maximum_native_processes": 4
+    }
+  ],
+  "delta": {
+    "deep_structural_comparison": "From corrected A4CE/2915 packets, only caller.path, the matching fixed_inputs caller.path and fresh compose_output ending-r02 differ. Native output remains the exact original unused contained literal. Callers4094/6CDA, profiles2D85/9579, allfixtures, engines, playerpackages, guards/oracles and resource policy are byte-identical.",
+    "binding_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\corrected-r02-binding.json",
+      "bytes": 3539,
+      "sha256": "7F7574E8BC58BCFFE90593E12CDB36CD7E95CA59592D300B7C5A542076F2948A"
+    },
+    "local_dependency_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\corrected-r02-local-dependency.json",
+      "bytes": 979,
+      "sha256": "5AC22EB39F102D5A9A8DA098C52F48C44B7BB2F56CAB4A8233B59A36D7EB7D25"
+    },
+    "initial_preflight_refusal": "First r02 VerifyOnly stopped before library/native because the freshdirectory lacked its packet-local custody helper. Identical4973B/65C8F23A helper copied; Root records bothVerifyOnly passes. Independently read bothactualCompose preflights and finalrestoration; no Source fix or native adverse implied.",
+    "old_packet_boundary": "Old51C6/DF4B compositions8812/75A9 remain bound solely to their original packets. Draft overwrite/prose correction is preserved in FB4E offline review. New920D/1441 compositions are fresh actualzero-engine receipts of exact478D/899C packets; no historical receipt rebinding."
+  },
+  "actual_composition_readback": {
+    "status": "both passed-real-composition-zero-native",
+    "native_processes": 0,
+    "factorio_processes": 0,
+    "profiles": "Exact ordered9F200/10F210 selected rows and fivearchivehashes match declared profiles. Selected identity/path/hash/bytes fields match restoration receipts; their intentionally omitted info objects are not required to be duplicated.",
+    "cli": "Allfour actual CLI declarations verified: createfreshseed; productionserver on127.0.0.1; twoseparate sanitized1-update coldreads of completedsave. Config and write-data paths are freshcontained children of the executing203checkout/build/tmp; configbodyhashes match.",
+    "restoration": "All16beforestates rechecked against currentdirect2.0/2.1libraries with exactexistence/hash/length. Eachfivearchive journal restores/removes originals; temporary12archive removed. Activationrestoration reports0dependencycopy/0links/0extractions/0hiddenunownedarchives.",
+    "freshness": "AtGO bothnative outputs, execution-record, native-captures and controller-captures were absent. No game was launched by reviewer."
+  },
+  "admitted_contract": {
+    "schedule": "Eachengine:create\u2192production/save\u2192cold1\u2192cold2; oneenginefamily atatime. No additionalAPI/method/fixtureversion or Source edits during run.",
+    "physical": "Real100plates\u2192200cable baseline and100plates\u2192202after nativefinite setter, exact+0.01recipebonus; empty modules/no beacons/generalassemblerproductivity0. Zeroordinarylabs.",
+    "api": "Twoindependent Alpha/Beta consumers, uniqueexpected stage markers, readonlydetachedqueries and publicfinite/native status remain unchanged.",
+    "process_and_save": "Trusted helper requires livefixture/save/Savingfinished predicate even when productionexit0. Outerproduction0-or-predicate is not a bypass. Createandbothcolds strictnatural0; positivepassed/nontimeout/indexguards apply. CompletedZIPhash immutable acrossbothseparate1-update colds; actualCRC/embeddedactor/fullphysical/API/selection/custody evidence reviewed afterrun.",
+    "resources": "Unchanged4096MiB sampled-watchdog,180s,128MiB and30s boundedadmissionwait, defaultcadence, direct-librarylease/restore. These are not reduced or converted into hardmemorycaps.",
+    "required_after_run": "Retain all4actualprocesses/engine inclfailure, rawmarkers/ledgers/closedZIP/CRC/sourceandactorhashes,200/202scalars+bothconsumerresults,2freshcoldframes/sameZIPhash, fullcontrol/archive restoration andFactorio0."
+  },
+  "limits": [
+    "This is finite launch admission, not an actual API/native pass.",
+    "Closes only the named current12 affected init/basis/save/cold gap if actual results pass; unchanged API code and old11 results alone do not close it.",
+    "No universalAPI1stability, ordinaryresearchlab, historicalsave, reporter, wholeproduct/performance/release/stable verdict."
+  ],
+  "new_native_build_host_compose_or_lease_activity_by_reviewer": 0,
+  "actual_native_acceptance": false,
+  "stable_acceptance": false
+}

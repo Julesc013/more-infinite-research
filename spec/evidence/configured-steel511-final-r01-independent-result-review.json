@@ -1,0 +1,43 @@
+{
+  "kind": "ConfiguredSteel511FinalDestinationIndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:55:11Z",
+  "verdict": "PASS for the exact protected genuine10 configured-steel source to current published511 destination/save/two-cold route. The destination applicability gap identified in F82FBADD is closed for this named case. No findings.",
+  "identity": {
+    "frozen_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "published511_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+    "published511_bytes": 1006768,
+    "engine": "Factorio2.1.23 / 8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "manifest_sha256": "EDC5EC42CCE2B70764B37A2621B8575237C54DE786700B1C95D0FCC2BE12FD2C",
+    "caller_sha256": "7B81BD094AA76DFCE33741892772723B8140AC3F9682D67953B91E941B834A92",
+    "composition_sha256": "BB4479BDB9AD52FFE42C6022532AA95A6D8AAA193221C07C3B9073AAC2F3EAB2",
+    "actor_sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "same_observer_sha256": "15A6D3100E3CFCD7A0D1EB34ECE4CA2249F3C75E623608907F3E9930A37EA9F5",
+    "execute_custody_path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/configured-steel511-final-r01/execute-custody.json",
+    "execute_custody_bytes": 46308,
+    "execute_custody_sha256": "1B599F6F1FC9AC5A4932860DA12DAA7EC9866AFFCC6AA0178555DF911445D26E"
+  },
+  "actual_processes": [
+    {"stage": "production", "pid": 48592, "exit_code": -1, "passed": true, "completion_predicate_observed": true, "timed_out": false},
+    {"stage": "reload-1", "pid": 43824, "exit_code": 0, "passed": true, "timed_out": false},
+    {"stage": "reload-2", "pid": 37956, "exit_code": 0, "passed": true, "timed_out": false}
+  ],
+  "counting": "Three new destination processes, zero new laboratory completions. The source's one ordinary steel-plate-productivity completion at tick119/by_script=false remains exactly the same object in source, current production and both colds. It is counted once under the original genuine10 source identity, not once per cold marker. Original source construction and two source cold loads were reused without rerun.",
+  "independent_actual_checks": {
+    "input_and_selection": "Actual packet matches admitted current manifest/caller/product and source8A04. Non-library fixed input bodies rehashed; publishedC3CB, staged predecessor copy and protected original Source8A04 remain exact. All three raw logs show actual2.1.23 and the exact seven-mod closure: five official modules, MIR5.0.21011 and unchanged observer0.2.0.",
+    "configuration_boundary": "One actual MIR5_NATIVE_OWNER_ENTRY precedes upgrade-complete and Saving finished. Raw engine-reported event_order is level -> more-infinite-research. The byte-identical actor strictly guards only MIR21010-to21011, startup settings changed=false and no other mod changes before storing entry; the event table itself is guard-validated rather than separately serialized. Entry is after engine prototype loading but before MIR's callback, not a pre-engine observation.",
+    "earned_and_foreign_frames": "Current actual player and foreign frames exactly equal the original source's accepted actual frames, and equal the new entry and both cold frames. Player native owner remains level2/unresearched/currentnone/progress0/saved0/queueempty, steel0.17/casting0.17 and the foreign-appended bullet effect0.07. The separate control force stays level1, disabled/invisible/unearned with all three rewards0. Mining and lab-speed values remain0. No approximate expected frame is substituted for raw observations.",
+    "private_and_cost": "Historical steel private main recipe-prod-research_steel-1 remains hidden, unearned level1/saved0, enabled=true/visible=false exactly as before; its native effects are empty under the unchanged actor shape guard. Native owner units6/private units2 and both formula(2+3*(L-1))*1.25^(L-1) values remain exact. Selected tuple base2/increment3/growth1.25/time1/effect17 and map multiplier1 remain. Original science/time/effect/shape predicates and1e-7 numeric comparison are unchanged.",
+    "lab_and_science": "Stopped, valid, disabled laboratory and completion provenance pass the unchanged actor checks. Four each of automation/logistic/chemical/production science remain in the actual inventory. The target actor performs no reseeding or new research in this phase.",
+    "cold_and_diagnostics": "Each distinct cold naturally exits0 and stdout reports exactly one update. Raw cold markers equal current production except stage, preserving entry/state/settings/completion/science. No cold save lines, fatal log/stdout/stderr diagnostics or timeouts; all three stderr files empty. Production supervised-1 is accepted only with its actual save-completion predicate.",
+    "save_and_custody": "Original protected8A04 and staged copy retain their source hash. New native and protected827261-byte save bodies are identical, CRC-pass, and contain exact39CEE actor. Both cold processes pass the caller's unchanged-byte checks against the closed save; current bytes retain its1567FF2E hash. All31 native-custody members in primary native-captures equal their source bodies, declared size and SHA256.",
+    "recorded_restoration": "Closed execution has no failure/cleanup failure. Trusted activation reports restored-direct-library-controls and zero dependency copies/links/extractions; both temporary product/observer archives are removed. Completed caller assertions cover the original two controls and nineteen MIR archives.",
+    "post_lease_live_restoration": "Root explicitly handed2.1 to the pending repair worker for zero-native Compose. Reviewer did not sample intermediate leased controls. After that worker explicitly confirmed CLOSED/restored, one independent live readback verified all21 original control/archive sizes/hashes, exact19 prior MIR filenames, both steel temporaries absent and active-profile journal absent. Independent current Factorio count0. A later leased profile was never classified as a steel failure."
+  },
+  "protected_saves": {
+    "original_genuine10": {"bytes": 826984, "sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514"},
+    "current511_destination": {"bytes": 827261, "sha256": "1567FF2EE6C90DB702A46AA5F6E6354CC2BCF63FAE44666678A89DC26F97B4D4"}
+  },
+  "reader_correction": "An initial read-only check looked for the one-update benchmark summary in factorio.log; this engine prints it in stdout. The corrected location was verified for both colds before this verdict. No engine rerun or native oracle change occurred.",
+  "limits": "Exact configured17%-steel earned10-to-current11 preservation only, with zero partial investment. The old early11/7441 destination05BBC and strict968A save remain under original identities. This result does not qualify arbitrary settings/providers, unknown historical masks, direct private-storage interpretation, manufacturing, worker routes, clients/GUI, performance, full catalogue or whole-product stable acceptance. Only this new receipt was written by reviewer; no Source/docs/controller/fixture/native/library mutation or engine launch."
+}

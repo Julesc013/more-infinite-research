@@ -1,0 +1,183 @@
+{
+  "kind": "MIR511VerifiedGitHubPrereleaseDeliveryV1",
+  "status": "DELIVERED-qualified-GitHub-prerelease-not-stable",
+  "verified_at_utc": "2026-11-09T09:50:30.782478+00:00",
+  "release": {
+    "id": 438952550,
+    "tag_name": "v5.0.11",
+    "name": "MIR 5.0.11",
+    "html_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.11",
+    "published_at": "2026-11-09T09:46:12Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false
+  },
+  "source": {
+    "kind": "MIR511CheckedMainReadbackV1",
+    "main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+    "tree": "02dc515326990ba9f7560853ebf16d20b4b5b7a9",
+    "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "dev": "b22963ad589108ac8f02d93c21a6e972e25b49a7",
+    "reviewed_head": "ccd74a35d747c87a47a0849b632b82a64960fbfa",
+    "promotion": "a41bca89add5113ce49f45cc4bf5bcea012a6c57",
+    "entire_tree_equal": true,
+    "required_PR_checks": "all SUCCESS exactccd/a41",
+    "postmerge_CI": "not claimed; new merge identities retain identical reviewed tree"
+  },
+  "frozen_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+  "frozen_inventory": "build/packages/mir511-cumulative-assets-r04/MIR5ReleaseAssetInventoryV1.json",
+  "frozen_inventory_sha256": "4CBBD915044002ACB2003F7B4293D5D190A7FEE8AD79443E039F545DC455CB5C",
+  "public_assets_verified": 19,
+  "local_delivery_files_verified": 21,
+  "anonymous_download_verdict": "PASS",
+  "prior_v5_releases_unchanged": 11,
+  "prior_v5_tag_ref_lines_unchanged": 22,
+  "local_dist": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.11",
+  "files": [
+    {
+      "name": "more-infinite-research_5.0.01311.zip",
+      "bytes": 665524,
+      "sha256": "c866ea38666f42df903512069e49acfcf75386253a8be84fd9328fd2ac68ba68",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01411.zip",
+      "bytes": 665527,
+      "sha256": "60f4032f14f93cffd7eb134dd0e2234dcb1b81ab63d8bf112b0c7c1d531a7435",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01511.zip",
+      "bytes": 665525,
+      "sha256": "73e798739c75c900d12027a8ac034ccd9ae2bc669ade8147b53bb33707fabab1",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01611.zip",
+      "bytes": 665526,
+      "sha256": "26a8f7190745eb760cd9e3a34769f2201870bbc6eb89eb25f87ec1a4b5e91f20",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01711.zip",
+      "bytes": 665526,
+      "sha256": "2dde03b680e25a8325c5cb42afe86e716bb4d2a30d8edf7dcd6646941bf91281",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01811.zip",
+      "bytes": 665528,
+      "sha256": "7ae68b2bc10aeb93e9fd81172030b8b7e8f966181de12fc0691062e157a69e96",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.10011.zip",
+      "bytes": 665519,
+      "sha256": "f66b9e2f63cfea55d4944b40689dff8fe6433a12c753345551674f8accc4bc92",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.11011.zip",
+      "bytes": 665828,
+      "sha256": "6f9edd414015f488b408922cb0c8a566295af4df7d4f50aba19c5967bc233f66",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.20011.zip",
+      "bytes": 1006342,
+      "sha256": "78d673a8ca3360d0bf843447322cf4d3d6c453256a44cab1748ee3128a08c5fc",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.21011.zip",
+      "bytes": 1006768,
+      "sha256": "c3cb6462e3285da222664d2174eaa16e63577bf9970804e410b127a43c773d14",
+      "verified": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "45250d7bc91c39d94a40ed3da7871df2684444e35788a00344ca71e137265390",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00611.zip",
+      "bytes": 138704,
+      "sha256": "5ee9d05728ea4ac5ddd1ec8189b3264df4000295699a8f47f4848aad2ee30035",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00711.zip",
+      "bytes": 138704,
+      "sha256": "eec3bdf4b81ed022c1f6b6e9f42840509a53ab779c7242b69bab9c3d6aa8f953",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00811.zip",
+      "bytes": 138702,
+      "sha256": "11836191dee14aacf7ab432bc311fcdd3cc9b533554906f8d365e4d5d90b6420",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.00911.zip",
+      "bytes": 138704,
+      "sha256": "17f4359243da4f0f38c7d16e400c2b93c02da28943fbe94348f0256c083fac56",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01011.zip",
+      "bytes": 138703,
+      "sha256": "b8cbbec9a330885dee8989c794dd35ef3a11cfd6ac1347e748581d990bb7bc2c",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01111.zip",
+      "bytes": 138702,
+      "sha256": "a55e5728a0a923a0d4dca6eadfb394be9913af43b3afc7253d747a6fb012f1cd",
+      "verified": true
+    },
+    {
+      "name": "more-infinite-research_5.0.01211.zip",
+      "bytes": 138706,
+      "sha256": "36156f2c5d1b3a5671f880611334cf8375d2bc8cc8e9202994fd4c5b0d729516",
+      "verified": true
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "5fe3d5b3a5fee5d24ff1e3f269e25f5565bc95316cbc45b7852143418cc310b0",
+      "verified": true
+    }
+  ],
+  "notes": {
+    "release-notes.md": {
+      "bytes": 2230,
+      "sha256": "D955AFB767FBB31023653260E654EEC299545E3F9322A9F841E56328B1E2CE16"
+    },
+    "upload-text.txt": {
+      "bytes": 2071,
+      "sha256": "6C130F7BDD265ECF6F31140A6B7BD94AE7DFE649679B217B1A13F6B558AC47A7"
+    }
+  },
+  "latest_stable": {
+    "draft": false,
+    "id": 422732162,
+    "prerelease": false,
+    "tag_name": "v4.7.3"
+  },
+  "final_independent_verdict": {
+    "path": "build/qualification/mir511-beta-independent-final-verdict-r02.json",
+    "sha256": "EF2517F9BA42C1F4573DFDBA55EFA5514BEC0C9A03C1FB35A573056378EB65B6"
+  },
+  "private_worker_raw_custody": {
+    "commit": "e0839a636e39be908e031273c523b1e8da67400d",
+    "receipt": "build/qualification/worker511-post-custody-remote-readback-r01.json"
+  },
+  "limits": [
+    "GitHub beta only; remaining stable Library/client/export/performance/history/API acceptance continues",
+    "Full Ferrum dependency/runtime and Factorio2.0 worker-recovery qualification remain open",
+    "Post cases use scripted native precursors and six ordinary endpoint labs; original7+R07five distinct ordinary labs remain separately named",
+    "No exact reporter-save, physical cargo or repeated provider change qualification; no Portal upload"
+  ],
+  "primary_clean_remote_equal": true
+}

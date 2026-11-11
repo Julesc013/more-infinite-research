@@ -2,6 +2,30 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.12] - 2026-11-11
+
+### Bugfixes
+
+- Prevent worker cargo upgrade failures when the map research price multiplier differs from 1.
+- Keep Ferrum robotics science in continued worker robot cargo research on Factorio 2.0 and 2.1.
+- Keep default worker cargo research in permanent native research on Factorio 2.0 and 2.1, preserving earned levels and unfinished work on admitted upgrades.
+- Preserve earlier MIR 5 default worker cargo research when upgrading and later adding a supported provider.
+- Retain worker cargo history across supported engine patch updates, Factorio 2.0-to-2.1 upgrades and provider updates that leave the research contract unchanged.
+- Keep ordinary research queue changes safe after a force finishes its preserved worker cargo research.
+- Allow Bob's Warfare with mods that set recipe productivity caps, preserving their configured limits.
+- Preserve known Base-only research history from 5.0.0–5.0.2 when upgrading and adding mods.
+- Keep Secretas robot research history across successive MIR updates.
+- Preserve complete productivity credit effects when other mods expand native recipe research.
+- Restore 485 missing startup-setting labels from published translations across 49 languages.
+- Keep unavailable research explanations in separate, wrapping rows in the Research Library.
+- Preserve complete characters when limiting Library search text, including previously saved searches.
+
+### Changes
+
+- Use `mir-worker-storage-default-4` for native default worker research queries; `worker-robots-storage-4` retains its separate prerequisite or finite-stage meaning.
+- Use responsive Research Library filters, native title-bar controls and clearer empty-queue and settings-scope states.
+- Label the support page Help and improve German Library wording.
+
 ## [5.0.11] - 2026-11-09
 
 ### Bugfixes

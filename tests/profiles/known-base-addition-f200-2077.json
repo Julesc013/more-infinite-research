@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "mir5-known-base-addition-native",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Unchanged saved startup settings",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20012",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-known-base-addition",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20012.zip": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E",
+    "mir-fixture-mir5-known-base-addition_0.1.0.zip": "354407A86961A80F8144F8DB398464775C1ACD40A0FDC993AFF6AC0A6AECD0B8"
+  },
+  "protected_input_requirement": {
+    "status": "qualified-pure-source-owner-binds-local-input",
+    "old_mir": "5.0.20001",
+    "old_mods": [
+      "base",
+      "more-infinite-research"
+    ],
+    "parent_receipt": "spec/evidence/beta501-f200-successor-native-chain-r01.json",
+    "parent_save_sha256": "0C783E41265F9A0EF818E92B5B44435A4585329C06AC959FE988310CDFF3FBEA",
+    "parent_save_bytes": 2650701,
+    "warning": "Original instrumented parent remains NOT directly admissible. Bind the independently qualified pure source and its separately reviewed transition copy through an exact native owner; no local save locator or dispatch authority is supplied here.",
+    "game_speed": 16,
+    "startup_changed_on_successor": false,
+    "qualified_source_save_sha256": "D38CD57B0C2310569DD3039AD9109EB7F6F19930E27BA73A8E86E9869F000CA2",
+    "qualified_source_save_bytes": 2663230,
+    "source_review": "spec/evidence/known-base501-normalization-independent-result-review-r01.json",
+    "transition_input_sha256": "1FD23C73DFBCFB10F5D1D1F6808BDDA10B0E20F46137BBBB42649DD10B532AF7",
+    "transition_input_disposition": "Separate copy restores only original48B Base freeplay control; all58 other native/script payloads exact. Protected engine-produced source remains immutable.",
+    "known_gear_work": {
+      "old_count": 1,
+      "normal_level_one_count": 8000,
+      "foreign_current_units": 0.42,
+      "detached_saved_units": 0.27,
+      "unit_tolerance": 1e-09,
+      "original_percentages_or_elapsed_time_claimed_preserved": false
+    }
+  },
+  "scope": "Portable selection for the named Base501 to512 synthetic-provider mechanism. Three forces, all875 unchanged startup values, actual startup_changed=false and clock16; compare current/suspended gear research-unit work .42/8000 and .27/8000, complete the ordinary gear/plastic queue, save and two immutable cold reads. Scripted carrier bookkeeping is recorded separately. Source qualification and target result retain separate exact receipts; no reporter save, real provider, F210 or stable verdict follows from this profile."
+}

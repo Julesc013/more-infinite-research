@@ -9,6 +9,7 @@ import unittest
 from historical_sources import read_published_source
 import test_generator as scaffold
 import test_lifecycle as lifecycle_fixture
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
@@ -284,6 +285,81 @@ class SecretasContinuationTests(unittest.TestCase):
                 ["more-infinite-research"]={new_version=target.distribution_version}}})
               handlers.configuration({mod_changes={secretas={old_version="1.0.33",new_version="1.0.37"}}})
             ''')
+
+    def test_unchanged_unrecorded_nine_and_eleven_persist_history_before_next_configuration(self):
+        for target_id in ("f200", "f210"):
+            for old_patch in (9, 11):
+                with self.subTest(target=target_id, predecessor=old_patch):
+                    lua = LuaRuntime(unpack_returned_tuples=True)
+                    lua.globals().player_root = (ROOT / "source").as_posix()
+                    lua.globals().history_target = target_id
+                    lua.globals().history_old_patch = old_patch
+                    lua.globals().source_patch = int(SOURCE_VERSION.split(".")[-1]) % 100
+                    lua.execute('''
+                      package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
+                      package.loaded["platform.target"]={id=history_target,
+                        minimum_base=history_target=="f200"and"2.0.77"or"2.1.23"}
+                      local codec=tonumber(history_target:sub(2))*100
+                      local mir="more-infinite-research"
+                      local current=string.format("5.0.%05d",codec+source_patch)
+                      local old=string.format("5.0.%05d",codec+history_old_patch)
+                      script={active_mods={base=history_target=="f200" and "2.0.77" or "2.1.24",
+                        secretas="1.0.38",[mir]=current}}
+                      storage={};game={forces={}}
+                      function secretas_route()
+                        local finite={}
+                        for level=4,8 do finite[#finite+1]={name="worker-robots-storage-"..level,
+                          max_level=level,provider="secretas"} end
+                        return {technology="worker-robots-storage-9",level=9,
+                          predecessor="worker-robots-storage-8",owned=true,finite=finite}
+                      end
+                      function mir_update()
+                        return {mod_startup_settings_changed=false,
+                          mod_changes={[mir]={old_version=old,new_version=current}}}
+                      end
+                    ''')
+                    lua.execute(MINIMAL_NATIVE_FACTS)
+                    lua.execute('''
+                      install_worker_recovery_facts()
+                      settings={startup={}} -- Native control always supplies this global.
+                      local history=require("runtime.worker_robot_storage")
+                      local selected=secretas_route()
+                      local plan=history.preflight(mir_update(),selected)
+                      assert(plan~=nil and storage.mir_worker_storage_route==nil)
+                      history.apply(plan)
+                      local saved=storage.mir_worker_storage_route
+                      assert(saved and saved.route.technology=="worker-robots-storage-9")
+                      assert(saved.route~=selected and saved.route.finite~=selected.finite)
+                      selected.finite[1].provider="caller-mutated"
+                      assert(saved.route.finite[1].provider=="secretas")
+                      history.apply(history.preflight({mod_startup_settings_changed=false,
+                        mod_changes={unrelated={new_version="1.0"}}},secretas_route()))
+                      assert(storage.mir_worker_storage_route==saved)
+                      for _=1,2 do
+                        package.loaded["runtime.worker_robot_storage"]=nil
+                        history=require("runtime.worker_robot_storage")
+                        history.on_load(secretas_route())
+                        assert(storage.mir_worker_storage_route==saved)
+                      end
+
+                      for _,opponent in ipairs({"unknown-version","settings","provider-added",
+                          "provider-updated","foreign-owner"}) do
+                        storage={}
+                        local event=mir_update()
+                        local route=secretas_route()
+                        if opponent=="unknown-version" then
+                          event.mod_changes["more-infinite-research"].old_version=
+                            string.format("5.0.%05d",tonumber(history_target:sub(2))*100+8)
+                        elseif opponent=="settings" then event.mod_startup_settings_changed=true
+                        elseif opponent=="provider-added" then event.mod_changes.secretas={new_version="1.0.38"}
+                        elseif opponent=="provider-updated" then
+                          event.mod_changes.secretas={old_version="1.0.37",new_version="1.0.38"}
+                        else route.owned=false;route.provider="foreign-infinite" end
+                        local ok,message=pcall(history.preflight,event,route)
+                        assert(not ok and tostring(message):find("MIR-WORKER-HISTORY",1,true),opponent)
+                        assert(next(storage)==nil,opponent.." wrote history before refusal")
+                      end
+                    ''')
 
     def test_existing_paid_nine_and_foreign_current_work_keep_owned_cap_restoration(self):
         for target_id in ("f200", "f210"):

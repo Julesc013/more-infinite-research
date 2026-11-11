@@ -477,6 +477,8 @@ class CompetingProductivityTests(unittest.TestCase):
           package.preload["platform.target"] = function() return {id="f200", factorio_version="2.0"} end
           package.preload["runtime.lifecycle"] = function()
             local module = {caps_active=function() return false end, cap_limits=function() return {} end,
+              preflight_worker_storage_split_caps=function(plan) assert(plan==nil);return nil end,
+              apply_worker_storage_split_caps=function(plan) assert(plan==nil)end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end}
             for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
               module[name] = function(event) cleanup_calls[name] = (cleanup_calls[name] or 0) + 1 end

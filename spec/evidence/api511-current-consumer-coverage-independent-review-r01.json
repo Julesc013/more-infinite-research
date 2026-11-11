@@ -1,0 +1,59 @@
+{
+  "kind": "MIR511CurrentAPIConsumerCoverageIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:31:06Z",
+  "specific_requirement": "spec/verification.md:69: Two independent API consumer mods must pass before API1.0 stability; host mocks, native load and actual effects/state are separate.",
+  "specific_verdict": "CLOSED for the two independently installed Alpha/Beta consumers in the named published511 F2002.0.77 and F2102.1.23 Space Age cases. This is the specific consumer prerequisite, not a blanket new API1-stability or whole-product stable verdict.",
+  "candidate": {
+    "published_main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+    "frozen_execution_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "F200_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+    "F210_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+    "F200_independent_actual_receipt_sha256": "248B37FF808BAF68DD38F98D3462C9E4F3554214215CFBE152B0AC5F214531B2",
+    "F210_independent_actual_receipt_sha256": "7781C7AB2854F2B2CE622A9850D6BC354442C4A3A3F1372A8D474526DAD1754F"
+  },
+  "consumer_basis": "Alpha and Beta are distinct installable mods, with required versus guarded optional dependency handling, separate data-stage/final-fixes callers, distinct native technology IDs and independent runtime markers. Alpha uses public add_technology and checks native crafting-speed effect; Beta uses public add_productivity for cable and checks its native effect. Both query the public remote interface, test detached results and native state, and survive both actual cold loads. Each current engine case has four actual processes and100-plate physical200/202-cable phases; native researched setters are explicit and contribute zero ordinary lab claims. The shared production observer does not substitute for either consumer.",
+  "method_applicability_to_11": {
+    "prior_record": "spec/evidence/candidate510-api-method-applicability-aero-r01.json",
+    "original_contract_decision": "spec/evidence/api1-documented-subset-qualification-r01.json at original42032477 source; its documented modern subset qualification and frozen contract retain that original identity.",
+    "actual_package_readback": "Independently compared both delivered510/511 archive pairs. api/v1/data.lua, api/v1/runtime.lua, research/generator.lua, control.lua and runtime/configuration.lua are byte-identical per target. platform/target.lua differs only in distribution_version. API registration table and register_interface collision helper are exact between published510 and511 source. Thus510's method-local applicability carries forward; whole bootstrap identity does not.",
+    "data_module_sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+    "runtime_module_sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+    "generator_sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717",
+    "named_methods": ["get_version", "get_capabilities", "add_technology", "add_technologies", "add_productivity", "get_research"],
+    "closure": "Data API imports only its fully qualified Generator and target. Runtime API imports target. The original-to510 Generator change was already independently restricted to duplicate-diagnostic wording;511 leaves that Generator unchanged. Target capabilities/floors are unchanged and product version advances intentionally. Existing ordered-family, invalid/duplicate-before-write, unsupported capability, alias/isolation and finite budget results remain under their original host/native identities; current physical cases add fresh11 initialization/effect/query/save observations, not new native batch-negative executions."
+  },
+  "coverage_matrix": [
+    {
+      "obligation": "Two independently named consumers, late final-fixes call, native effects/read-only queries and physical/save behavior",
+      "status": "Current named F200/F210511 evidence closes this scope",
+      "remaining": "None for this specific prerequisite. No need to repeat another two-consumer campaign merely to obtain a broader label."
+    },
+    {
+      "obligation": "Documented six-method semantics, ordered batch admission and rejection/no-write/alias boundaries",
+      "status": "Original qualified subset reused through510 and independently confirmed unchanged511 method inputs",
+      "remaining": "No newly missing method-local scenario identified. Original host-only versus native scopes and numeric-count schema/budget limits remain. This does not qualify arbitrary schema, consumers, engines or maximum-input native speed."
+    },
+    {
+      "obligation": "Optional consumer absence",
+      "status": "Original F200D3 CreateOnly and F210SteamFE4 two-mod guards retain their explicitly accepted limited applicability",
+      "remaining": "MIR is absent and therefore511 player code is not consumed; both original first-line guards precede changed present-MIR code. Do not invent a new standalone8DC absence requirement solely for511. Do not relabel FE4 as8DC, repair its retained dirty-source/missing-profile limits, or claim absence save/client gameplay."
+    },
+    {
+      "obligation": "Actual joining/rejoining clients after saved-host restart and affected Library/personal-state lifecycle",
+      "status": "Current eight headless API processes do not close this existing integration/client work",
+      "remaining": "Final93d applicability or affected actual checks remain for the existing Base/Space Age client/lifecycle routes. Changed runtime/bootstrap.lua registration/event lifecycle, runtime/library.lua selection/state and runtime/library_translations.lua are consumed there. Original API client pairs retain their successful original packages/engines; module identity cannot relabel them current511. Named11 single-client7441 observations use earlier4bcdf source and explicitly exclude rejoin/simultaneous-client/full saved-personal-view coverage; the existing corrected-selection positives do not establish whole lifecycle. This is the existing Library/client worklist, not a new generic API campaign."
+    },
+    {
+      "obligation": "Existing named SIF entry-save and configured-steel state evidence under the API/state worklist",
+      "status": "The two510 chains remain valid for their original scopes; current API physical cases do not establish their final93d applicability",
+      "remaining": "Perform scoped consumed-input applicability or the affected named check for spec/evidence/sif510-entry-boundary-native-chain-r01.json and native-owner510-configured-steel-native-chain-r01.json. Shared runtime/bootstrap.lua/native_credits.lua and changed modern catalogue/data emission paths must be considered against their actual saved paid state/provider/settings; unchanged query methods alone do not prove those states. Already accepted current credit/worker routes retain their own separate applicability and are not reopened by this API review."
+    },
+    {
+      "obligation": "Foreign-interface collision and externally consumed older contract transition",
+      "status": "Existing collision evidence is host-only and remains so; bounded31-archive literal audit found no named old consumers",
+      "remaining": "Do not turn that bounded audit into universal absence of computed/external consumers. No identified retired external contract or new native collision scenario is invented here. Preserve the original conditional transition obligation and existing historical reconciliation limits."
+    }
+  ],
+  "limits": "This five-minute read-only reconciliation maps only named requirements/methods and concrete consumed paths. It adds no test, native run, API contract, stability programme or dispatch assignment. Current two-consumer evidence is sufficient for its specific prerequisite while changed client/global-state applicability and the wider stable worklist remain separate. Only this new qualification receipt was written; Source/docs/packets/libraries are unchanged."
+}

@@ -1,0 +1,205 @@
+{
+  "kind": "MIRWorker511PostR04IndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T09:38:11.481113+00:00",
+  "verdict": "PASS all mandatory named post-transition cases;16actual processes and6distinct ordinary endpoint completions, with8read-only colds",
+  "candidate_source": "203e0af5/93d30a2",
+  "package": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+  "pins": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\execution-Execute-r01\\terminal.json",
+      "bytes": 2578769,
+      "sha256": "35218833B312B2A3FCD4279701B98FCDFC3B7D9C5B67C80D1D01D7B94D43EA9A"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\packet.json",
+      "bytes": 613181,
+      "sha256": "D62C8A97535B768A8038974B669214CE75D655F7863672606F5A19578126AACC"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\Invoke-PostTransition.ps1",
+      "bytes": 16322,
+      "sha256": "345FA137532058BC0596D370F56028601A58AF884C061FB569CE530167E13EA2"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\composition.json",
+      "bytes": 173157,
+      "sha256": "76EF0BF9D1D28E03542C9679EB14FB5227566756DF1F3837995C9571A9A501CD"
+    },
+    "scenario": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\inputs\\control.lua",
+      "exists": true,
+      "bytes": 11480,
+      "sha256": "72F2B874FD8E9E3E758914D8B15C99F89A8ACEF3A86BDD65A22EB8E0F074B49C"
+    }
+  },
+  "cases": [
+    {
+      "id": "first-source",
+      "roles": [
+        "server"
+      ],
+      "ordinary_cumulative": {},
+      "player_bonus": 8,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\first-source.zip",
+        "exists": true,
+        "bytes": 831279,
+        "sha256": "EB96B15E18626A0DF39EA8FB406369F37ED053E642DB49CE3AC0BB563A17A9DA"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "first-add",
+      "roles": [
+        "server",
+        "cold1",
+        "cold2"
+      ],
+      "ordinary_cumulative": {
+        "mir-post-sentinel": 1,
+        "worker-robots-storage-9": 1
+      },
+      "player_bonus": 9,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\first-add.zip",
+        "exists": true,
+        "bytes": 856019,
+        "sha256": "65503144824B438A0A8E663BDBA7A2CC74E18D73EAA069D1EF0C674DD63625C1"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "unchanged-source",
+      "roles": [
+        "server"
+      ],
+      "ordinary_cumulative": {},
+      "player_bonus": 10,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\unchanged-source.zip",
+        "exists": true,
+        "bytes": 691829,
+        "sha256": "35B2080D8BC5D0255AA847009DCAAE8460BC3CCAAC5A960786349FA6E9BE2C6A"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "unchanged-upgrade",
+      "roles": [
+        "server",
+        "cold1",
+        "cold2"
+      ],
+      "ordinary_cumulative": {
+        "worker-robots-storage-9": 1
+      },
+      "player_bonus": 11,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\unchanged-upgrade.zip",
+        "exists": true,
+        "bytes": 697610,
+        "sha256": "2091F442193297860B776DB4DE9F08E9A66775980676C1DABB1B032104C607FC"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "caps-seed",
+      "roles": [
+        "server"
+      ],
+      "ordinary_cumulative": {},
+      "player_bonus": 7,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\caps-seed.zip",
+        "exists": true,
+        "bytes": 755230,
+        "sha256": "ECA02BD0425B7A01436C7157624859FFE0B0189CF7371467CE9E2957A6C350C0"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "caps-provider",
+      "roles": [
+        "server"
+      ],
+      "ordinary_cumulative": {
+        "mir-worker-storage-preservation-4": 1
+      },
+      "player_bonus": 8,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\caps-provider.zip",
+        "exists": true,
+        "bytes": 758914,
+        "sha256": "97107DC110AC5365B58375FF57913A1416D3F9FBE7101AB2844FF4CC927FB583"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "caps-enable",
+      "roles": [
+        "server",
+        "cold1",
+        "cold2"
+      ],
+      "ordinary_cumulative": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1
+      },
+      "player_bonus": 8,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\caps-enable.zip",
+        "exists": true,
+        "bytes": 758940,
+        "sha256": "5A99DAA250B9396083E6F053E6986ED83D4E2B3BD061E89D106FB0D60C095FB0"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    },
+    {
+      "id": "caps-disable",
+      "roles": [
+        "server",
+        "cold1",
+        "cold2"
+      ],
+      "ordinary_cumulative": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1,
+        "mir-post-sentinel-two": 1
+      },
+      "player_bonus": 8,
+      "save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r04-controller\\protected\\caps-disable.zip",
+        "exists": true,
+        "bytes": 759548,
+        "sha256": "4504D0C8881CC3BD4E11047DA92A0847B6F5ABD44F5894F9FF9D366E11ABD6B3"
+      },
+      "all_crc_actor_raw_hashes_valid": true
+    }
+  ],
+  "actual_totals": {
+    "servers": 8,
+    "colds": 8,
+    "distinct_ordinary_completions": 6,
+    "breakdown": "firstadd2(S+MIR9), unchanged5101(MIR9), caps3(P+S+T). Source native level/research_recursive seeding explicitly scripted, not ordinary-paid proof.",
+    "protected_saves": 8,
+    "all_source_to_target_hashes_crc_actor_and_cold_frames_exact": true,
+    "raw_custody_members": 150,
+    "all_original_and_retained_bodies_match_recorded_hashes": true
+  },
+  "qualification": [
+    "Actual Secretas before firstMIR: finite4..8/benefit8/currentS.125/queue preserved throughMIRadd, emptyprivate4; ordinaryS thenMIR9 yieldsbonus9/next10, save+2colds.",
+    "Actual published510 with unchangedSecretas: finiteearned benefit10/currentN11.27/queueN,S andallfinite/oldtailcontracts retained; ordinaryN11 yieldsbonus11/next12 andS.125 retained, save+2colds.",
+    "After scriptednative default precursor andactualprepare/provider ordinaryP completion: retiredPnext9/disabled/saved0/bonus8. Actual cap8->9 restorespublicNenabledtrue/visiblefalse; laterfamilydisable atcap9 setsenabledfalse/visiblefalse. Private/foreign/benefit/work/allotherframes exact. OrdinaryS/T endpoints plus2coldseach passed.",
+    "Serverexit-1 acceptedonlyclosed-save completion predicates; eightcoldsexit0/nontimeout andaddnoordinarycompletions.",
+    "All8prior control/archive restorationrecords successful andterminalFactorio0. No live-library transaction by reviewer."
+  ],
+  "retained_adverses": [
+    "Postr01/r02fixturevisibility expectations remainadverse, with exactsource/nativepolicycorrection documented.",
+    "Postr03NoMIRfixture missing settingscategory remainsdata-stage adverse; r04guardsbothcategory/row, actualNoMIR nowpasses.",
+    "Earlier production r04/r05/r06 failures remainrecorded undertheir exactoldsource/diagnostic identities; R07 andthisfreshSource93d result areseparate."
+  ],
+  "limits": [
+    "Named2.1.23/Secretas1.0.38 profiles only. FullFerrum/reporter saves,2.0workerrecovery,physicalrobotcargo,repeatedproviders,overhauls/performance/stable remainunqualified.",
+    "No Source/docs edits/build/native/hostsuite by reviewer. Finalbeta tree/CI/promotion/publication verdict separate."
+  ]
+}

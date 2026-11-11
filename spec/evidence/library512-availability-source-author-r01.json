@@ -1,0 +1,103 @@
+{
+  "kind": "AvailabilityPolishTwoFileAuthorHandoffV1",
+  "head": "44cf4f44b77d3de873e021c0cab29e8d7b478dae",
+  "tree": "41fe077f2be6af1cca18a23025f5b0a04b0a781c",
+  "source": "b4f301846cf6e897cd2cb440916170a38d9ecfd2",
+  "parent": "fed3bad36382401be90c529a4928bbd09b07c38f",
+  "branch": "fix/mir512-availability-polish-r01",
+  "changed_paths": [
+    "source/runtime/library.lua",
+    "tests/test_library.py"
+  ],
+  "remote_ref_tree_source_and_runtime_body_readback": true,
+  "runtime_body": {
+    "git_blob": "7edf60e36862060565c6dadd8b7e0ef2499306d2",
+    "bytes": 152600,
+    "sha256": "57ECE6D795BBF49B22176AE7EDEC5A0BCDB7DF945433F3C368EEE46C5E16A2C9"
+  },
+  "source_delta": "19-line focused diff: new Availability owner in Research cleanup, single bounded scroll viewport, vertical flow using section_gap12, full-width wrapping labels; unchanged captions/order/filtering/native state/common dimensions.",
+  "tests": "Original independent assertions retained with strict private child-path changes. New24-entry/three-width/empty-state structural test. Recursive GUI-double destruction models both exact SDKs and caches name before invalidation; strict invalid-object resize opponent retained.121 Library controls pass.",
+  "evidence": [
+    {
+      "name": "health.json",
+      "bytes": 39544,
+      "sha256": "A7B30AE032A9861798CB2EA3E73AF45F6BD95B419942F26767B0F92F1B9BCCB8"
+    },
+    {
+      "name": "host-plan.json",
+      "bytes": 16065,
+      "sha256": "C4A790C6F78A7EF5B4F2A031CADFCAA482EC150F5F0E077E8076A8CFA6394B16"
+    },
+    {
+      "name": "installed-widget-style-api.json",
+      "bytes": 11392,
+      "sha256": "8F5417E4BE3F5D926E39429FA87865343AAC6D5B776B0BD2E24F1D657B202EF5"
+    },
+    {
+      "name": "old-horizontal-source-red.log",
+      "bytes": 1575,
+      "sha256": "82F2D2106560F3ED945C394E57A7303B7593903DEF9BCB48F8477BB76E1A8B65"
+    },
+    {
+      "name": "availability-narrow-green.log",
+      "bytes": 863,
+      "sha256": "D8E80AE411FA040E43ECF562E9DB489D545CF26C00F159BE084E507E1FBA57D0"
+    },
+    {
+      "name": "library-full-green.log",
+      "bytes": 24282,
+      "sha256": "B1648E087E671F3E3D0200B18B4B9947C46195C6698A19F86787E4256D9BC35A"
+    },
+    {
+      "name": "recursive-double-and-availability-green.log",
+      "bytes": 657,
+      "sha256": "10612A9C46AE959B3727E51EA27BD0EA1799E8FA5A3F0FD92AB71CC8F6DD409D"
+    },
+    {
+      "name": "library-full-final-green.log",
+      "bytes": 22427,
+      "sha256": "294CCAD4200D6D95C74E89EA704FE1676489DBC0268DE51E630CA49577317ED9"
+    },
+    {
+      "name": "static.log",
+      "bytes": 460,
+      "sha256": "94150CDACF1DA520CB77ED58FC9DB40FB8C6F6A7FA428C9469C2EDE1753D8D80"
+    },
+    {
+      "name": "changelog.log",
+      "bytes": 68,
+      "sha256": "74AAF05A7AD2FE2850B8FCF71FF1FE15A674C818DC5CFA53A5F6867D3A2EC9B3"
+    },
+    {
+      "name": "validation.json",
+      "bytes": 1029,
+      "sha256": "AA110017584F40EAC5E23F2B693BAC89B9F0D95D6314A9F5B23A9F419BFF9E86"
+    }
+  ],
+  "native_runs": 0,
+  "Compose": 0,
+  "builds": 0,
+  "CI_dispatched": 0,
+  "remaining": [
+    "Non-author exact two-file review",
+    "Actual corrected Availability page06 render and native scrolling/input at existing engine/locale/geometry endpoints",
+    "Other UI/input/export/lifecycle/multiplayer/performance/stable obligations remain separate"
+  ],
+  "other_work_preserved": [
+    "M CHANGELOG.md",
+    " M docs/progress.md",
+    " M source/changelog.txt",
+    "?? spec/evidence/api512-two-consumer-scoped-applicability-aero-r01.json",
+    "?? spec/evidence/configured-steel512-scoped-applicability-aero-r01.json",
+    "?? spec/evidence/ferrum512-worker-cargo-f210-independent-packet-review-r01.json",
+    "?? spec/evidence/ferrum512-worker-cargo-f210-independent-result-review-r01.json",
+    "?? spec/evidence/ferrum512-worker-cargo-f210-remote-readback-r01.json",
+    "?? spec/evidence/library512-polish-b-checked-merge-readback-r01.json",
+    "?? spec/evidence/library512-polish-b-r08-independent-pixel-review-r01.json",
+    "?? spec/evidence/library512-polish-b-r08-remote-readback-r01.json",
+    "?? spec/evidence/library512-polish-b-r08-root-actual-readback-r01.json",
+    "?? spec/evidence/library512-polish-b-titlebar-pixels-independent-review-r01.json",
+    "?? spec/evidence/mir512-b-actual-package-evidence-adoption-r01.json"
+  ],
+  "custody": "Raw red/green and API receipts remain in this worktree build/tmp/availability-polish-r01-controls; preserve before any disposable-worktree cleanup. Root owns later docs/evidence integration."
+}

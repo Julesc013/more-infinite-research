@@ -1,0 +1,414 @@
+{
+  "schema": 1,
+  "kind": "MIR512APITwoConsumerPhysicalIndependentActualResultV1",
+  "reviewed_utc": "2026-11-10T06:07:11.850651+00:00",
+  "verdict": "PASS: both exact current12 F200/F210 two-consumer physical/init/save/two-cold cases",
+  "findings": [],
+  "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+  "player_source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "candidate_publication_status": "unpublished12",
+  "prior_offline_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-independent-offline-review.json",
+    "bytes": 7368,
+    "sha256": "FB4E9230ABDAA593A68F82FDDE570B126CAF22AEAF0DCED5DE1B49FDC44AD4CC"
+  },
+  "prior_exact_r02_admission": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r02-independent-admission-r01.json",
+    "bytes": 11370,
+    "sha256": "8A9F1DFDA035446FA18ED10C3AEC8E9E5E29514620CB5663FC749316A55AD3FA"
+  },
+  "root_independent_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\root-actual-readback-r01.json",
+    "bytes": 6780,
+    "sha256": "E64D9D48FA74F82940BD3426247564BFC1A3FC4FCB3613E2AF32D8EC81D91ABF"
+  },
+  "cases": [
+    {
+      "target": "f200",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\packet.json",
+        "bytes": 473713,
+        "sha256": "478D33E55712EBEF4C1BF6D7203D693C716EB00D529C44D06981E30EB647E8E7"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\Invoke-Owned.ps1",
+        "bytes": 32320,
+        "sha256": "4094AFF343A8D3386FD17F3751D620ECBDC8E983FDF82E7F43BB964E6288B3EA"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\composition.json",
+        "bytes": 16927,
+        "sha256": "920D66FE8609D74801D617FA14AFB3A78023312D0390BEDBA7DEF31A702559F6"
+      },
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\execution-record\\terminal.json",
+        "bytes": 9620,
+        "sha256": "59474433841C991FA26C7686EC46B4BE1843B3D14B8B8B4ADDCE8B13805BE1A7"
+      },
+      "native_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\result.json",
+        "bytes": 49752,
+        "sha256": "7749B14F6FF0EEBF3152FC1191F743800C5C0F5004FBC23FE9FBDAAE50E5C396"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77"
+      },
+      "loaded_player": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.20012.zip",
+          "bytes": 1021663,
+          "sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "profile": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f200/profile.json",
+        "bytes": 2041,
+        "sha256": "2D85B21D4D41BAC6E8943A322E097F514C1D75110445540FC1CE4CCE1C549381"
+      },
+      "processes": [
+        {
+          "role": "create",
+          "pid": 19448,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 3.831529,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\create.factorio.log",
+            "bytes": 8499,
+            "sha256": "24B2A8BAC87CCB9776242404E7D825320B89E17A7667D7B1576F05741FBA8DA3"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\process-1.resources.jsonl",
+            "bytes": 3219,
+            "sha256": "05D3650F4C0AF12967C05DE28352116853030C3AFF8626D3C5E8207156E847EF"
+          }
+        },
+        {
+          "role": "production",
+          "pid": 51764,
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "timed_out": false,
+          "duration_seconds_descriptive": 7.88193,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\production.factorio.log",
+            "bytes": 10516,
+            "sha256": "26F78BA4E6B242A3E7377A652AD54AFF09436CD55DA5E03B468885761FC90C04"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\process-2.resources.jsonl",
+            "bytes": 5066,
+            "sha256": "1BBFA4C4C3A855D36D8341385466A5D058464AA3AFFC3379CD7BE6E4F2F2295A"
+          }
+        },
+        {
+          "role": "cold1",
+          "pid": 48856,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 2.060055,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\reload-1.factorio.log",
+            "bytes": 9421,
+            "sha256": "BFDB71E2DF0C48CBFE975A8F767FA9E7F88BF8CE070B65D108B9F46A21A07A9B"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\process-3.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "F7E9073AC22EADBC1BACC1E7C1B7B7429125031A4B22F2ACD4FA02D892039E1B"
+          }
+        },
+        {
+          "role": "cold2",
+          "pid": 47952,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 2.04255,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\reload-2.factorio.log",
+            "bytes": 9421,
+            "sha256": "48A1AABBCAF34124348570E93613A3B4425303EFAD84659C1DF3AEF65E8C3659"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\process-4.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "7696D74C954D06436EFF49AAED15DA4F08A8A6602A26414D45BF6B1660D0CD12"
+          }
+        }
+      ],
+      "zip_proof": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\write-data\\saves\\seed.zip",
+          "bytes": 574522,
+          "sha256": "A5AB8D67FEA19FA1B25F25F0E6A5067A62EDEEB1FAC2F09FBFC77AA6BC930357",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\write-data\\saves\\mir5-native-complete.zip",
+          "bytes": 580224,
+          "sha256": "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        }
+      ],
+      "cold_save_hashes": [
+        "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242",
+        "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242"
+      ],
+      "cold_readonly_native_frames": "Both cold process witnesses freshly reread native Beta finitelevel1/researchedtrue/recipe+0.01, Alpha researchedtrue/+0.05crafting, and persisted physicalcounts200/202. Both emitted load-deferred checks and natural0 afterexact1update. Countsarehistory,notnewcrafting.",
+      "actual_crafting": {
+        "baseline_plates": 100,
+        "baseline_cables": 200,
+        "researched_plates": 100,
+        "researched_cables": 202,
+        "recipe_productivity_bonus": 0.01,
+        "assembler_productivity_bonus": 0,
+        "modules_empty": true,
+        "beacons_created": false
+      },
+      "ordinary_labs": 0,
+      "source_save_input": null,
+      "custody": [
+        {
+          "kind": "native_custody",
+          "source": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200",
+          "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures",
+          "members": 23,
+          "bytes": 1301181,
+          "every_original_copy_hash_and_length_verified": true
+        },
+        {
+          "kind": "controller_custody",
+          "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\execution-record",
+          "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\controller-captures",
+          "members": 5,
+          "bytes": 12259,
+          "every_original_copy_hash_and_length_verified": true
+        }
+      ],
+      "live_restored_states": 8
+    },
+    {
+      "target": "f210",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\packet.json",
+        "bytes": 528704,
+        "sha256": "899C665887C3F1292A91B2325525B731FE6232F21B3DFF586946D02F5DD64F78"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\Invoke-Owned.ps1",
+        "bytes": 32493,
+        "sha256": "6CDA58B84E307C7D1A3CDAC8B5543B63CB6258D4A201ED6240697AAC123603E2"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\composition.json",
+        "bytes": 18405,
+        "sha256": "144174F8017BE475B00C5CDE3C68413AF57A47F93FB8A12B447ECA0837623FF5"
+      },
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\execution-record\\terminal.json",
+        "bytes": 9687,
+        "sha256": "3376E70FBFD567E49A8FF54ACD970F91637A52EEC877CC3EE34AAC46E2DD64A2"
+      },
+      "native_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\result.json",
+        "bytes": 50201,
+        "sha256": "980928D3E73345EE0A5E7DD32EEF3F3EDB1BD70187DC37D63B778B35840CBE2B"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "version": "2.1.23",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "loaded_player": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.21012.zip",
+          "bytes": 1022087,
+          "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "profile": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f210/profile.json",
+        "bytes": 2129,
+        "sha256": "9579B34781633728FCF9981FF55756FB81800696E9DAB6EEFE58CFF191FAC767"
+      },
+      "processes": [
+        {
+          "role": "create",
+          "pid": 44572,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 3.449024,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\create.factorio.log",
+            "bytes": 13705,
+            "sha256": "659F4D6EE437D3F4C261EED4A319672E1CDEFA42781B9C791B22B5DA0D3FBF7D"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\process-1.resources.jsonl",
+            "bytes": 3215,
+            "sha256": "0CE399D3CF53A462C3CF61C8FC54315A07D100AB049462C90CDC7E0DDEE4FBE3"
+          }
+        },
+        {
+          "role": "production",
+          "pid": 46088,
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "timed_out": false,
+          "duration_seconds_descriptive": 7.856386,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\production.factorio.log",
+            "bytes": 15700,
+            "sha256": "27C2EFDEA96789FE35F82B1AAD0893FAED8E62CDB4D88529BDB6871123A59B36"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\process-2.resources.jsonl",
+            "bytes": 5066,
+            "sha256": "BD2577574A55A11A1CE7D86E6C99D8178873F56806C27C6F7FFE2E84A558FDBC"
+          }
+        },
+        {
+          "role": "cold1",
+          "pid": 18256,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 1.983605,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\reload-1.factorio.log",
+            "bytes": 14605,
+            "sha256": "BF1990A748E2036EC6EAAEF9E72D6D08B303C3268580A146F94C980FC77C6764"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\process-3.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "838385F9052F29546FE8D133300B0547A08074AE39A333343CAEA8C03E19CEA7"
+          }
+        },
+        {
+          "role": "cold2",
+          "pid": 34124,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "timed_out": false,
+          "duration_seconds_descriptive": 2.09699,
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\reload-2.factorio.log",
+            "bytes": 14605,
+            "sha256": "DC57B082AAC6E023B989F2D95DE1A28858EE821E6306CDA0F2B787720377C3F5"
+          },
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\process-4.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "B910444688AEB406F053A22E31E581D5E9C981E383FCE7CCF1F72EA77674571F"
+          }
+        }
+      ],
+      "zip_proof": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\write-data\\saves\\seed.zip",
+          "bytes": 572792,
+          "sha256": "F197E2CB6572D8541AE68B94D74682394D708B6DE886DF9944F7DF95E93E4386",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\write-data\\saves\\mir5-native-complete.zip",
+          "bytes": 578373,
+          "sha256": "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        }
+      ],
+      "cold_save_hashes": [
+        "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D",
+        "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D"
+      ],
+      "cold_readonly_native_frames": "Both cold process witnesses freshly reread native Beta finitelevel1/researchedtrue/recipe+0.01, Alpha researchedtrue/+0.05crafting, and persisted physicalcounts200/202. Both emitted load-deferred checks and natural0 afterexact1update. Countsarehistory,notnewcrafting.",
+      "actual_crafting": {
+        "baseline_plates": 100,
+        "baseline_cables": 200,
+        "researched_plates": 100,
+        "researched_cables": 202,
+        "recipe_productivity_bonus": 0.01,
+        "assembler_productivity_bonus": 0,
+        "modules_empty": true,
+        "beacons_created": false
+      },
+      "ordinary_labs": 0,
+      "source_save_input": null,
+      "custody": [
+        {
+          "kind": "native_custody",
+          "source": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210",
+          "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures",
+          "members": 23,
+          "bytes": 1334502,
+          "every_original_copy_hash_and_length_verified": true
+        },
+        {
+          "kind": "controller_custody",
+          "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\execution-record",
+          "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\controller-captures",
+          "members": 5,
+          "bytes": 12334,
+          "every_original_copy_hash_and_length_verified": true
+        }
+      ],
+      "live_restored_states": 8
+    }
+  ],
+  "actual_counts": {
+    "native_processes": 8,
+    "unique_numeric_pids": 8,
+    "creates_natural0": 2,
+    "servers_supervised_predicate_stop_minus1": 2,
+    "colds_natural0": 4,
+    "ordinary_laboratory_completions": 0,
+    "independent_consumer_mods_per_case": 2,
+    "physical_batches": 4,
+    "new_cold_crafting_batches": 0
+  },
+  "independent_checks": [
+    "Verified exact478D/4094/920D and899C/6CDA/1441 packet/caller/composition terminal bindings and allprocess indexes/passed/nontimeout results. Eight distinct rawgovernor PID ledgers agree with0/-1/0/0 exitmodes for eachengine. Productionis supervisedclosed-savepredicate,notnatural0; trustedhelper alwaysrequired thatpredicate.",
+    "All eight rawcanonical logs are fatal-free and hash-pinned, with complete A15A tuple exactlymatching9F200/10F210mods; exact engines, currentplayerarchivehash, profile and unchangedfixtures match. Harness203e0af5/Source93d is explicitly distinct from loadedSource47537.",
+    "Both Alpha/Beta initandload consumer markers parsed independently from each actualstage. Alpha nativefinitelevel1/researchedtrue/craftingmodifier0.05; Beta false before production andtrue onbothcompleted-savecolds. Publicquery/destructuredreturn/detachment and nativeeffect assertions run in unchanged independently reviewed actors.",
+    "Physicalplate/outputscalars are actual recorded insertions and drained nativeassembler inventorycounts, not substituted expectednumbers. Each100plate batchhas exact200then202cables. Recipeeffect/nativeaggregate, empty-modules/no-beacon/generalassembler0 guards executed before acceptance. The marker reports constants for some asserted rewardfields; thisreview doesnot claim bitwise rawgetter dumps for thosefields.",
+    "Productionmarkers precede actualSavingfinished messages; four seed/completed ZIPs pass fullCRC and duplicate-member checks, with distinct nlink1files. Each completedsave hash equalsbothactualcoldreceipts andcurrentoriginal/mirror bytes.",
+    "Rehashed every native/controller custody member in bothoriginal andcopy:46native+10controllerfilepairs. Nativeinventories are complete, copiedinventoriesexact. Terminals are separately bound because theyarewritten afterthecontrollercopy.",
+    "All16before/after control/archive states are identical and matchlive2.0/2.1libraries. Fourfixturearchives/engine restored asrecorded; temporary12candidate archives removed; no dependencycopy/extraction/links. Factorio0 confirmed afterbothcases."
+  ],
+  "changed_credit_path_scope": {
+    "disposition": "The missing current12 API-world initialization/save/cold integration check is nowobserved under exactnewSource; old11 gameplaywasnotrelabelled.",
+    "source_reason": "Loaded native_credits.lua on_init explicitly invokes preflight_family_transition(nil,true), reconcile_all andapply_family_plans; preflightusesfamily_observations/preflight_basis and recordsobservation.basis. The actualfreshAPIworld initializes andsaves/loads successfully withthatcode.",
+    "limit": "No fullprivatecreditledger/basisdecoder or directinspection ofeveryserializedbasisrecord wasperformed. These cases do not prove expanded97componenthistory, paid-mask upgrades, pendingcredittransfer, providertransition or force-merge correctness; their separate named evidence keepsitsidentity."
+  },
+  "preserved_preparation_adverses": "Frozen51C6/DF4B oldCompose8812/75A9 receipts, prose-only correctedcanonical A4CE/2915 and the fresh-r02 missing-localhelper VerifyOnly refusal remain separate and preserved. Actualsuccess belongs only to r02native478D/899C tuple.",
+  "limits": [
+    "Two exact Base+SpaceAge APIconsumer worlds on2.0.77/D3 and2.1.23/8DC; no arbitrarymodpack/engine/reporter or historicalsave inference.",
+    "Researchusesdocumentednative researchedsetter, notordinarylabs. Scriptedassembly/item/energy setup isfixture work; physicalcrafting is observed. Coldreadsmake no newcrafting/ordinarycompletion claims.",
+    "Covers the named twoindependentconsumer requirement and physical/state endpoint evidence only. No blanketAPI1stability, maximuminputbudget/latency, cross-interfacecollision, multiplayer/client lifecycle, wholeproduct/performance, publication orstable acceptance.",
+    "No newgame,hosttests,builds,Source/controller/library changes or private-repository mutations byreviewer. Rawprivatebackup isRootownedandnotclaimed completed here."
+  ],
+  "API1_general_stability": false,
+  "performance_acceptance": false,
+  "stable_acceptance": false
+}

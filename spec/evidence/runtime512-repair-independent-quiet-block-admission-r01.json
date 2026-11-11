@@ -1,0 +1,33 @@
+{
+  "kind": "MIR512RepairIndependentConditionalQuietBlockAdmissionV1",
+  "reviewed_at_utc": "2026-11-10T05:15:28.606426+00:00",
+  "verdict": "CONDITIONAL GO exact complete20process repair block ONLY AFTER Root establishes quietwindow and explicitly dispatches AcceptedQuietBlock on exactE165preparation. This receipt is not a performance result.",
+  "pins": {
+    "packet": "4FB70A4B9BDD5FC0049F91EAEAADAA7D12023DB2BAF87590C2AA65417BC6543B",
+    "caller": "691319A003A048A666C4CE1D23C5AE198329A59450CFFE1FC4E77B81F00285D2",
+    "composition": "E59440E8E36044F945D968F7E637FCA31B11A233FB3001775A0B777AB5710087",
+    "preparation": "E16553489C597DC286926D6D4B846E1D5287FD101D6B5324A1D68483F2EAB1BB",
+    "independent_preparation_review": "FCD8A3A41EA03A0B949816B3276BF3F4731575FA30D3A9ADB0DEB25098C95CF1",
+    "schedule_sha256": "C3864D68067DC40E24631E23898DE77F4CA36A69423CD0AD27C86D1C18796BA5",
+    "candidate_Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "candidate_archive": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "candidate_pending_seed": "6C3C8D20DE4F719FDFB1E693790D44D0FC2D25AEC6B91A089A36830D1DC984C7",
+    "reference_archive": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "reference_pending_seed": "D3E04D1D54D0D3E6AE319753F023E04553989EB32DAF1BEBA0B511704E46948B",
+    "engine": "2.1.23/8DC"
+  },
+  "finite_schedule": "Exact20serialprocesses:2unscoredwarmupsperarm(4total),then8pairedscoredblocks/16processes;oddpairs published\u2192candidate,even candidate\u2192published.10fresh launchesperarm,25000updates/1run each. Sameprofile/workload/nativephysicalendpoint andunchangedmethod/tolerances;no oldmeasuredvalues substitute.",
+  "preconditions": [
+    "Root sole native/direct2.1library owner;allother workers idle;stop local builds/host suites/inference/other native/largecopy or analysis activity for the entireblock. Root records quiet admission before dispatch;this reviewer goes idle aftersealing.",
+    "Use unchanged ModeMeasure with exactpacket/composition/preparation SHA and explicitAcceptedQuietBlock. Currentfreshseed/refseed/archive/helper/profile/source identities mustmatch before andaftereachsample. Actualkernel resourceadmission remainsmandatory;old memorysnapshot grants no futurecapacity.",
+    "All20 freshsamplepaths andmeasurementroot remainunused;physicallydistinct ownedseed perprocess,counterbalancing/warmups unchanged. Stop firstfailure,preservepartial/adverse andrestorecontrols;no unchanged retry,favorableprefix or pooling."
+  ],
+  "resources": "Perprocess4096MiB expectedpeak watchdog,900seconds/120MiB;memorysampler250mstarget/max900s12000observations/8MiBreceipt unchanged. ExactPID/starttime/source/ownedseed hashes and loaded9modselection/nativephysicalmarkers mandatory eachsample.",
+  "analysis_contract": "Only complete16scored observations qualify paired medians. Fourmetrics:engineaverage ms/tick,rootOSpeakworking set,maxsampledworking set,maxsampledprivate bytes. Time boundmedianref+max(10percent,0.25ms/tick);each memorymetric medianref+max(10percent,64MiB). KeepOS/sampled/governor roles distinct;allphysicalwitnesses/seedintegrity/restoration first. Uncertainty/repair-only limits remain.",
+  "not_admitted": [
+    "No agriculture/all68cells/fullperformanceobjective/stable/UI/API/release acceptance.",
+    "No additionalpreparation/nativecase,guardrelaxation,newsource orfixturechange,retry orcampaignextension.",
+    "Current12APIconsumerfreshcase remains a separate future assignment after thisquietblock;do notqueue/prepare it duringtiming."
+  ],
+  "operation_scope": "Read-only independent admission;reviewer launched no process/native/host/build/Compose/CI. Root ownsactual quiet-state observation/dispatch. Atwrite,time20unexecuted."
+}

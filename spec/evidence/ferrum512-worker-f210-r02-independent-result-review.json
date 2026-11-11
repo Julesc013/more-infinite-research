@@ -1,0 +1,565 @@
+{
+  "kind": "ferrum512-worker-f210-r02-independent-result-review",
+  "reviewed_at_utc": "2026-11-09T18:17:55.019175+00:00",
+  "verdict": "PASS_NAMED_F210_FULL_FERRUM_NO_MIR_EARNED_SOURCE_TO_FIRST_MIR_ORDINARY6_SAVE_AND_TWO_ONE_UPDATE_COLD_LOADS",
+  "findings": [],
+  "identity": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\packet.json",
+      "bytes": 580457,
+      "sha256": "DF29E64864ED9ABFD98766BEA3CE1F38103F516B0EF5CA455CD3B8DF6B905C80"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Invoke-FerrumWorker.ps1",
+      "bytes": 20148,
+      "sha256": "A781931A726540E342D99C314A67286F057A257D396C304383C15A88A7F7D59C"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\composition.json",
+      "bytes": 50332,
+      "sha256": "61EA3EFF3938F693CCC93ACE6DC9B0869DC8C04193305434D588A7E884740F80"
+    },
+    "admission_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-independent-packet-review-r02.json",
+      "bytes": 10137,
+      "sha256": "1BD48629CC653C978BBBF9A405997B968FCE9EE09A06BF90A37CDEB861D49B73"
+    },
+    "root_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\root-admission.json",
+      "bytes": 506,
+      "sha256": "19F4640EB64F172F4F06B0B4C7262646B78F0E9CB9A17A2B7B72F5B0D88E45EE"
+    },
+    "actual_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\execution-Execute-r02\\terminal.json",
+      "bytes": 827525,
+      "sha256": "1DC53F19B07A1A3E50185A85A5AF0CC70446C9D52EE7D3A7F93960F18DB70407"
+    },
+    "runner": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01",
+    "runner_commit": "f2ea5e9986768073a04aba47fffcd50254a1a5ad",
+    "Source": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+    "player": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-visual-qualification-r01\\original\\more-infinite-research_5.0.21012.zip",
+      "exists": true,
+      "bytes": 1017812,
+      "sha256": "AA26E473C87CAA49CBBB43C09C343AC8FD129F79460C30BCDF88D9B6B0CA5365"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "exists": true,
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "scenario_commit": "cb652f7cdfb89bbcde574ac8b6d393133b7114e3",
+    "scenario": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\inputs\\control.lua",
+      "exists": true,
+      "bytes": 18470,
+      "sha256": "68A8746806653A95374381971B9409B06403BA739BBD9A503DA7AF35E385EB4E"
+    },
+    "lab": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\inputs\\mir-fixture-ferrum-worker-storage-native-lab_0.1.0.zip",
+      "exists": true,
+      "bytes": 1163,
+      "sha256": "4EFF7A7BC8C8919A25CE3CCE9DD5BEDF161CAEF9105733599F29DC4F4B11BE40"
+    }
+  },
+  "actual_processes": 4,
+  "stages": [
+    {
+      "id": "source",
+      "processes": [
+        {
+          "role": "server",
+          "pid": 51464,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 10.106092,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\source\\process-1.resources.jsonl",
+            "bytes": 6284,
+            "sha256": "6CCF7BDF8F201EA5F57502102551AEDFB5DB673762D26A9FC6888640082B7608"
+          }
+        }
+      ],
+      "selected_mods": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-ferrum-worker-storage-native-lab@0.1.0",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "server_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Execute-r02-source\\server.log",
+        "bytes": 124822,
+        "sha256": "0832D06FA9C06A487A8A4F83555C7060B3E6C7D4350DA2D5DDB3180C939BA3E4"
+      },
+      "markers": [
+        {
+          "stage": "administrative-setup-only",
+          "tick": 0,
+          "phase": "source-init",
+          "player_bonus": 3,
+          "ordinary": {}
+        },
+        {
+          "stage": "lab-start",
+          "tick": 0,
+          "phase": "earning",
+          "player_bonus": 3,
+          "ordinary": {}
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 2427,
+          "phase": "completion-pending",
+          "player_bonus": 4,
+          "ordinary": {
+            "worker-robots-storage-4": 1
+          }
+        },
+        {
+          "stage": "lab-start",
+          "tick": 2428,
+          "phase": "earning",
+          "player_bonus": 4,
+          "ordinary": {
+            "worker-robots-storage-4": 1
+          }
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 6067,
+          "phase": "completion-pending",
+          "player_bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "source-saved",
+          "tick": 6068,
+          "phase": "source-saved",
+          "player_bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        }
+      ],
+      "closed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\source\\write-data\\saves\\mir-ferrum-worker-source.zip",
+        "exists": true,
+        "bytes": 865986,
+        "sha256": "91EBB9686C027F626E8BBD60BEE834C2DC11AC0ED4C03F2CDEF97B23927B6D85"
+      },
+      "native_original_root": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\source",
+      "primary_copy_root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Execute-r02-source",
+      "copied_member_count": 17,
+      "raw_bytes": 3645168
+    },
+    {
+      "id": "destination",
+      "processes": [
+        {
+          "role": "server",
+          "pid": 41996,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 8.870419,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\destination\\process-1.resources.jsonl",
+            "bytes": 5675,
+            "sha256": "74F053F36037E3B3D23440DEBE83BAAD172345010ED7F0D0EBDE1FFA5000B29F"
+          }
+        },
+        {
+          "role": "cold1",
+          "pid": 46704,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.089197,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\destination\\process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "EA6B04031D14BA0A603E283AB5A0D6797FBEF5AB26DE32EFB6148A32677BBF9D"
+          }
+        },
+        {
+          "role": "cold2",
+          "pid": 35864,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.075294,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\destination\\process-3.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "631231F8F45AB2AEA809BBFC203AA20201B2751011F19E08CB5C87DFDC5E4718"
+          }
+        }
+      ],
+      "selected_mods": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-ferrum-worker-storage-native-lab@0.1.0",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21012",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "server_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Execute-r02-destination\\server.log",
+        "bytes": 144223,
+        "sha256": "0E721DC6F1F124FA04E13D35348E068965A2094274A3E3108D87956EE1BD4F5A"
+      },
+      "markers": [
+        {
+          "stage": "level-pre-MIR-configuration",
+          "tick": 6070,
+          "phase": "source-saved",
+          "player_bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "post-MIR-configuration",
+          "tick": 6070,
+          "phase": "destination-entry",
+          "player_bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "lab-start",
+          "tick": 6070,
+          "phase": "earning",
+          "player_bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 11529,
+          "phase": "completion-pending",
+          "player_bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "destination-saved",
+          "tick": 11530,
+          "phase": "destination-saved",
+          "player_bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        }
+      ],
+      "closed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\destination\\write-data\\saves\\mir-ferrum-worker-destination.zip",
+        "exists": true,
+        "bytes": 888104,
+        "sha256": "35765733F30AE9D1EEAEC10C94118A9B08526811B549E4BE76297656FFF3CA0B"
+      },
+      "native_original_root": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\ferrum512-worker-f210-r02-private\\native\\destination",
+      "primary_copy_root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Execute-r02-destination",
+      "copied_member_count": 26,
+      "raw_bytes": 4566531
+    }
+  ],
+  "native_endpoints": {
+    "distinct_ordinary_completions": 3,
+    "ordinary_counts": {
+      "worker-robots-storage-4": 1,
+      "worker-robots-storage-5": 1,
+      "worker-robots-storage-6": 1
+    },
+    "administrative_prerequisite_completions": 68,
+    "administrative_scope": "Scripted worker1..3 and science/prerequisite setup are explicitly separate. None of worker4/5/6 appears among the68 administrative events. The same administrative list persists across addition/colds; those events are not counted as ordinary labs.",
+    "source": "Native finite4/5 completed once each at ticks2427/6067, bonus3 to4 to5; closed source tick6068. No MIR/P/6 existed in source technology frames.",
+    "addition": "Original level on_configuration_changed pre-MIR marker and later post-MIR marker occur at tick6070, bonus5. Entire four-force frame dictionaries equal before/after MIR callbacks. Removing only newly introduced6/P rows recovers the original closed source frames exactly; no force, queue/current, suspended, native4/5 or foreign flag change.",
+    "ordinary6": "Ordinary6 finishes tick11529, closed destination11530, bonus6. Native continuation is actually level7/researchedfalse, count2278 for the next level, not an invented cursor representation. No separate public7 prototype exists.",
+    "cold_loads": "Two distinct processes, separately copied same-byte protected destination input, benchmark1 update each. Each log contains exactly one cold marker, no additional ordinary completion. Both full frame dictionaries, ordinary counts and consumption records equal the closed destination exactly."
+  },
+  "science_and_native_numeric_evidence": {
+    "raw_formula_coefficient": 1518.75,
+    "formula": "1518.75*1.5^(L-6)",
+    "independent_native_calibration_count": 1518,
+    "calibration_row": {
+      "level": 6,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "count": 1518,
+      "first": 6,
+      "maximum": 6,
+      "hidden": true,
+      "formula": "1518.75",
+      "time": 3600,
+      "effects": {},
+      "science": [
+        {
+          "name": "automation-science-pack",
+          "amount": 1
+        }
+      ],
+      "prerequisites": {},
+      "creator": "mir-fixture-ferrum-worker-storage-native-lab"
+    },
+    "consumption": [
+      {
+        "id": "worker-robots-storage-4",
+        "units": 675,
+        "budgets": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "ferrum-robotics-science-pack": 675
+        },
+        "inserted": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "ferrum-robotics-science-pack": 675
+        },
+        "progress_seen": true
+      },
+      {
+        "id": "worker-robots-storage-5",
+        "units": 1012,
+        "budgets": {
+          "automation-science-pack": 1012,
+          "logistic-science-pack": 1012,
+          "chemical-science-pack": 1012,
+          "production-science-pack": 1012,
+          "utility-science-pack": 1012,
+          "ferrum-robotics-science-pack": 1012
+        },
+        "inserted": {
+          "automation-science-pack": 1012,
+          "logistic-science-pack": 1012,
+          "chemical-science-pack": 1012,
+          "production-science-pack": 1012,
+          "utility-science-pack": 1012,
+          "ferrum-robotics-science-pack": 1012
+        },
+        "progress_seen": true
+      },
+      {
+        "id": "worker-robots-storage-6",
+        "units": 1518,
+        "budgets": {
+          "automation-science-pack": 1518,
+          "logistic-science-pack": 1518,
+          "chemical-science-pack": 1518,
+          "production-science-pack": 1518,
+          "utility-science-pack": 1518,
+          "electromagnetic-science-pack": 1518,
+          "ferrum-robotics-science-pack": 1518
+        },
+        "inserted": {
+          "automation-science-pack": 1518,
+          "logistic-science-pack": 1518,
+          "chemical-science-pack": 1518,
+          "production-science-pack": 1518,
+          "utility-science-pack": 1518,
+          "electromagnetic-science-pack": 1518,
+          "ferrum-robotics-science-pack": 1518
+        },
+        "progress_seen": true
+      }
+    ],
+    "unit_amounts": "All required native ingredient amounts equal1. Source4/5 each use six science types (official five plus Ferrum robotics), target6 uses those six plus electromagnetic. Inserted equals exact budget per ingredient; progress_seen is true in all3 records.",
+    "depletion_and_by_script": "Saved actor68A8 checked event.by_script==false, partial progress previously observed, exact inserted budget and actual inventory.get_item_count(name)==0 before recording each ordinary completion. Endpoint markers and valid closed saves establish those executed guards; there is no separately printed residual-inventory scalar, so this review does not invent one. Calibration remains hidden, disabled, unresearched, saved0 with no effects.",
+    "time_units": "Runtime energy3600 ticks for finite4/5/public6/privateP/calibration; authored raw60 seconds remains distinct. No rounding of1518.75 to1518 in the authored formula.",
+    "map_price": "Actor closure requires technology_price_multiplier1; source setup assigns1. No settings override or alternate cost policy admitted.",
+    "physical_scope": "Science items are scripted into a void-powered fast fixture lab, then genuinely consumed by ordinary native research. This does not test planetary science manufacture, robot item transport or performance."
+  },
+  "foreign_and_private_state": {
+    "forces": [
+      "player",
+      "enemy",
+      "neutral",
+      "mir-ferrum-foreign"
+    ],
+    "player_current": "mir-ferrum-sentinel",
+    "player_queue": [
+      "mir-ferrum-sentinel",
+      "mir-ferrum-detached"
+    ],
+    "player_progress": 0.375,
+    "player_detached_saved_progress": 0.27,
+    "foreign_current": "mir-ferrum-sentinel",
+    "foreign_queue": [
+      "mir-ferrum-sentinel",
+      "mir-ferrum-detached"
+    ],
+    "foreign_progress_actual": 0.42000000000000004,
+    "foreign_detached_saved_progress": 0.27,
+    "foreign_native4_enabled": false,
+    "float_scope": "Foreign actual0.42000000000000004 is preserved exactly between raw frames and represents the authored.42 scripted sentinel; actor numeric comparison remains the admitted1e-9 bound. Player.375 and detached.27 remain unchanged. No oracle was changed after native execution.",
+    "strict_frame_checks": "All nonplayer destination frames equal their initial post-addition frames exactly. After masking only legitimately earned player bonus+1 and introduced6/P, destination player source-owned frame equals original source exactly. Player scripted sentinel queue/progress restoration after ordinary6 is labelled fixture cleanup; pre/post-init equality is observed before that cleanup and is independently preserved.",
+    "private_holder": {
+      "level": 4,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "count": 675,
+      "first": 4,
+      "maximum": 4294967295,
+      "hidden": true,
+      "formula": "675*1.5^(L-4)",
+      "time": 3600,
+      "effects": [
+        {
+          "hidden": false,
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "science": [
+        {
+          "name": "automation-science-pack",
+          "amount": 1
+        },
+        {
+          "name": "logistic-science-pack",
+          "amount": 1
+        },
+        {
+          "name": "chemical-science-pack",
+          "amount": 1
+        },
+        {
+          "name": "production-science-pack",
+          "amount": 1
+        },
+        {
+          "name": "utility-science-pack",
+          "amount": 1
+        },
+        {
+          "name": "electromagnetic-science-pack",
+          "amount": 1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "chemical-science-pack",
+        "electromagnetic-science-pack",
+        "logistic-science-pack",
+        "production-science-pack",
+        "utility-science-pack",
+        "worker-robots-storage-2",
+        "worker-robots-storage-3"
+      ],
+      "creator": "more-infinite-research"
+    },
+    "all_force_private_contract": "All four forces retain level4, unresearched, disabled, hidden, saved0, count675/time3600. Actual runtime direct map contains all8 prerequisites including worker2 and worker3; full player private row equals post-addition baseline. There is no native prerequisite pruning evidence or relaxed alternate shape.",
+    "native_owner_rows": "Finite4/5 retain planet-ferrum creator, count675/1012, six science amount1, effect1, exact prerequisites and earned state. Continuation6 retains MIR creator, seven science amount1, effect1, maxUINT32, formula1518.75*1.5^(L-6)."
+  },
+  "custody_and_restoration": {
+    "originals_and_primary_copies_independently_hashed": 43,
+    "raw_original_bytes": 8211699,
+    "exact_member_sets_on_both_sides": true,
+    "native_saved_zip_crc_and_embedded_actor_checks": 5,
+    "protected_zip_crc_checks": 2,
+    "saved_actor_sha256": "68A8746806653A95374381971B9409B06403BA739BBD9A503DA7AF35E385EB4E",
+    "protected_saves": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\protected\\source.zip",
+        "exists": true,
+        "bytes": 865986,
+        "sha256": "91EBB9686C027F626E8BBD60BEE834C2DC11AC0ED4C03F2CDEF97B23927B6D85"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\protected\\destination.zip",
+        "exists": true,
+        "bytes": 888104,
+        "sha256": "35765733F30AE9D1EEAEC10C94118A9B08526811B549E4BE76297656FFF3CA0B"
+      }
+    ],
+    "source_parent_binding": "Destination predecessor-copy equals protected source91EB...865986B exactly; source native original and protected copy remain unchanged.",
+    "cold_input_binding": "Both physically distinct cold inputs equal protected destination3576...888104B exactly; protected/native original save hashes remain unchanged. Cold input copies are not the protected source file.",
+    "closed_frame_sha256": "1852646023CD4AEE7DC4454B0EB335CA24A81C03169D3D5E8EC171239AAF571F",
+    "cold_frame_sha256s": [
+      "1852646023CD4AEE7DC4454B0EB335CA24A81C03169D3D5E8EC171239AAF571F",
+      "1852646023CD4AEE7DC4454B0EB335CA24A81C03169D3D5E8EC171239AAF571F"
+    ],
+    "loaded_selection": "Actual observer closure10source/11destination and both colds matches selected archives and each native marker mods map. Engine/current player/scenario/source definitions/config body hashes independently checked. All non-temporary selected archive bodies still match bound hashes.",
+    "server_termination": "Both servers exit-1 only after completion_predicate_observed=true, passed=true, timed_out=false. Actual named final markers precede Saving finished (source lines157→159, destination168→170), saveZIPs close and CRC-pass. These are governed owned stops, not natural exit0. Both cold processes naturally exit0.",
+    "fatal_checks": "No fatal/error/stack trace pattern in the actual server/cold logs, stdout or stderr custody; exact markers/load selection and admitted actor guards remain satisfied.",
+    "prior_control_and_archive_states_independently_rechecked_live": 44,
+    "state_mismatches": 0,
+    "temporary_lab_and_MIR_archives_removed": true,
+    "actual_final_factorio_process_count": 0
+  },
+  "preserved_adverses": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-independent-packet-review-r01.json",
+      "bytes": 11163,
+      "sha256": "5D99E83A5183F3859FA9022C3066F3C0CD27A46BA131543C8FBA12B8B3B225D2"
+    },
+    "Original fe694/2F4/A881 missing-worker2 fixture-oracle refusal",
+    "Original raw60/runtime3600, missing icon and Compose projection preparation adverses remain under original identities",
+    "Published11 Ferrum science adverse remains unchanged; this result uses candidate12 AA26/Source9b"
+  ],
+  "limits": [
+    "Named F2102.1.23 full Ferrum0.1.5 route only, with exact PL2.4/spider2.9.87/default settings/fixture/callback endpoints.",
+    "Two one-update cold loads are exact scoped loads, not extended soak or multiplayer/rejoin evidence.",
+    "Zero additional ordinary completions in colds;3 distinct ordinary completions total.",
+    "No physical robot cargo/delivery, general planetary manufacture, F200 counterpart, UI/export/client, multiplayer, elapsed-speed/performance or stable acceptance.",
+    "Inputs are A9b/AA26; Root separate coherent UI B is not automatically qualified by relabelling this result."
+  ],
+  "reviewer_activity": {
+    "independent_read_only_raw_evidence": true,
+    "native_processes_launched": 0,
+    "builds": 0,
+    "host_tests": 0,
+    "library_or_controller_mutations": 0,
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-independent-result-review.json"
+    ],
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 86744,
+      "bounded_scan_advisory": true
+    },
+    "inspection_corrections": "Initial ad-hoc reader assumptions of exact decimal.42, guessed administrative count69 and list-as-dictionary were corrected to retained raw scalar0.42000000000000004/count68/list shape. These were reviewer extraction issues; no native oracle, actor, output or product changed."
+  }
+}

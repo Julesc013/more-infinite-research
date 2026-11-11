@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -85,9 +85,15 @@ source_of_truth_for:
 
 ### Preparing worker cargo research before adding a provider
 
-- This candidate adds an administrator/server preparation command for the ordinary Base-game and Space Age default worker cargo contract beginning at level 4. K2, Space Exploration and other overhaul preparation are outside this recovery scope; their ordinary public research is retained. A different authored worker contract has an empty supporting holder and cannot be prepared. The named Factorio 2.1.23 test adds Secretas 1.0.38 to a prepared copy, preserves earned bonuses and current/queued/suspended work, completes further research, and passes two cold reloads. Factorio 2.0 recovery and the full Ferrum profile remain unqualified; keep the protected original and test a disposable copy.
+- First upgrade a copy with the protected original's previous enabled mods and exact MIR settings, then save separately before changing a provider or settings. MIR 5.0.12 transfers admitted default worker cargo history automatically to permanent native research on Factorio 2.0 and 2.1. The legacy preparation command is not needed after that transfer.
 
-1. Keep the protected original save, previous enabled mods and exact MIR settings. Load a copy with this MIR candidate before adding the worker cargo provider.
+- Provider additions from the new permanent owner remain under qualification; the retained legacy test below does not establish that route. MIR cannot infer erased levels or progress from an older, unknown or already-clamped save. Keep the protected pre-change original; do not grant levels manually to bypass a refusal.
+
+- The legacy procedure below applies only to compatible older MIR default-source sessions that provide the command and have no permanent-owner record. It covers the ordinary Base-game and Space Age worker cargo contract beginning at level 4. K2, Space Exploration and other overhaul preparation are outside this legacy recovery scope; their ordinary public research is retained. A different authored worker contract has an empty supporting holder and cannot be prepared.
+
+- The named Factorio 2.1.23 test adds Secretas 1.0.38 to a prepared copy, preserves earned bonuses and current/queued/suspended work, completes further research, and passes two cold reloads. Legacy preparation on Factorio 2.0 and the full Ferrum profile remain unqualified; keep the protected original and test a disposable copy.
+
+1. Keep the protected original save, previous enabled mods and exact MIR settings. Use a compatible older default-source copy without a permanent-owner record before adding the worker cargo provider.
 2. Run `/mir-worker-storage-recovery prepare`. It checks every force and the native research contract before moving earned and unfinished work to supporting native research. A refusal leaves the original recovery path necessary; do not grant levels manually.
 3. On success, save under a new name and exit immediately. Do not research the reset public worker level 4 or otherwise continue that preparation session.
 4. Add the intended finite worker cargo provider while retaining the MIR settings, including its worker enable switch and level cap. Load the prepared copy and check cargo capacity, all forces, unrelated current progress and queue order before saving and reloading it.
@@ -169,7 +175,7 @@ source_of_truth_for:
 - Exporting and checking a profile never applies settings or changes research. Profiles do not back up other mods, map settings or research.
 
 - **Export Diagnostics** or `/mir-diagnostics-export` replaces the latest support report at `script-output/more-infinite-research/mir.log` and exports the full settings profile.
-- In Library **Debug**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
+- In Library **Help**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
 - Attach `factorio-current.log` separately for startup or crash problems; MIR cannot copy the engine log.
 - File-write errors leave gameplay unchanged. A partial export may still leave its already-written settings file.
 

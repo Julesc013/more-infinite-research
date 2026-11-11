@@ -1,0 +1,59 @@
+{
+  "kind": "ConfiguredSteel511FinalConsumedInputIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:36:33Z",
+  "verdict": "Original configured-steel forward result remains accepted for its original early11 destination. Reuse the unchanged genuine10 predecessor/source-cold evidence. Published511 destination applicability is not established; the smallest missing native check is the existing target load/save/two-cold leg only, three processes and zero new labs. No product defect is inferred.",
+  "original_evidence": {
+    "chain": "spec/evidence/mir511-configured-steel-forward-native-chain-r01.json",
+    "independent_result": "spec/evidence/native-owner511-forward-independent-result-review-r01.json",
+    "independent_result_sha256": "CABA4A5912977376B7C22954407624EAF81EF5E8D17A6E8151E01C1B4D4C4B62",
+    "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "source_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "source_archive_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "old_target_commit": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+    "old_target_player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "old_target_archive_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+    "old_target_published": false,
+    "source_original_lab": "One ordinary by_script=false steel-plate-productivity completion at tick119. Source save and two source cold loads carry this same completion once.",
+    "old_target_scope": "MIR-only10-to11 upgrade, unchanged startup/other mods, entry callback before MIR, preserved state, distinct upgraded save and two cold loads. Zero new target completions. Six processes total are not six labs."
+  },
+  "published_target": {
+    "main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+    "source_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "archive": "dist/v5.0.11/more-infinite-research_5.0.21011.zip",
+    "bytes": 1006768,
+    "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+  },
+  "actual_case_reached": "Space Age on2.1.23/8DC with five official modules plus identical observer0.2.0. Observer selects steel base2/linear3/growth1.25/time1second/reward17%, map price1, four sciences. Native owner has formula(2+3*(L-1))*1.25^(L-1), level2/effective units6, recipe rewards0.17 for steel and casting and an independently added foreign bullet reward0.07. Historical private main stays hidden/empty-effects/level1/saved0/effective units2. Foreign force owner remains level1/disabled/invisible/unearned. No current or detached partial work; lab stopped with four of each science remaining. Neither arbitrary settings nor physical manufacturing is the tested endpoint.",
+  "independent_input_comparison": {
+    "custody": "Rehashed all93 retained files/8,158,997 bytes against unchanged manifestA6C91A73B13426A05D5F415EC48898052104194A754F2F15EF34F940E2EC1C79. Protected source826984 bytes/8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514 passes CRC and contains exact39CEE actor. Prior non-author result is used for its accepted actual semantics; no native re-execution was performed.",
+    "exact_unchanged_payloads_old7441_to_currentC3CB": ["settings.lua", "platform/target.lua", "research/native_credit_definitions.lua", "research/native_credit_contracts.lua", "research/native_adoption.lua", "research/product_target_extension.lua", "research/generator.lua", "research/modern.lua", "compatibility/modern_catalogue/space_age.lua", "compatibility/product_bindings.lua", "runtime/configuration.lua", "runtime/catalogue.lua", "runtime/lifecycle.lua", "runtime/caps.lua", "runtime/cap_admission.lua", "runtime/settings_profile.lua", "runtime/spoilage_contribution.lua"],
+    "changed_code_payloads": ["compatibility/modern_catalogue.lua", "data-final-fixes.lua", "research/catalogue.lua", "research/worker_storage_recovery.lua", "runtime/bootstrap.lua", "runtime/library.lua", "runtime/library_translations.lua", "runtime/native_credits.lua", "runtime/worker_robot_storage.lua"],
+    "steel_credit_boundary": "research_steel is explicitly one of the five collected native-credit families. inspect_with_mask now calls target-specific native_effect_change_matches instead of the old broad close check, with a separate effective-zero path. At this configured F21017% value, normalization produces0.17 and zero handling is not entered; no numeric mismatch is predicted. Structural/signed-pair/history guards remain strict. However original actor logs the empty private main and public rewards, not every carrier/ledger/mask observation reached by this changed preflight.",
+    "shared_configuration_boundary": "New bootstrap performs the changed all-force worker preflight before the native-credit/lifecycle writes. Modern data now emits a private worker-preservation prototype and runtime worker history code is materially changed. This source has no prepared worker work, but the original result does not itself prove the new all-force/load/prototype path against its exact configured steel/foreign-disablement state. The existing current credit33 and worker passes retain their valid named settings/source scopes; they do not silently become this exact17%-steel source8A04 destination observation.",
+    "decision_basis": "Unchanged steel definitions/settings/native-adoption/caps code alone cannot establish the complete changed configuration/save closure under VER-06. The uncertainty is bounded to the current destination, not the valid predecessor, and is not evidence of regression."
+  },
+  "retained_exact_inputs": {
+    "primary_source_save": "build/qualification/native-owner511-forward-native-custody-r01/source/protected/native-owner511-forward-source-complete.zip",
+    "original_source_save": "D:/Projects/Factorio/.task-builds/native-owner510-public-r01/build/tmp/owner511-source-r01/protected/native-owner511-forward-source-complete.zip",
+    "source_sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514",
+    "source_bytes": 826984,
+    "retained_controller": "build/qualification/native-owner511-forward-native-custody-r01/raw-controller/Invoke-NativeOwner511Forward.ps1",
+    "original_controller": "D:/Projects/Factorio/.task-builds/native-owner511-forward-r01/Invoke-NativeOwner511Forward.ps1",
+    "private_controller_revision": "336b435776192c97fdd13de568c9d7459382535d",
+    "controller_sha256": "C6AB7DF2AC19818B490AE4CA41B4BC5A132996C94062B56DAE1309F6CBF54127",
+    "retained_actor": "build/qualification/native-owner511-forward-native-custody-r01/raw-controller/fixtures/native-owner511-forward-r01/control.lua",
+    "actor_sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "observer": "build/qualification/native-owner511-forward-source-inputs-r01/mir-fixture-native-owner-settings_0.2.0.zip",
+    "observer_bytes": 2130,
+    "observer_sha256": "15A6D3100E3CFCD7A0D1EB34ECE4CA2249F3C75E623608907F3E9930A37EA9F5",
+    "old_target_manifest": "build/qualification/native-owner511-forward-target-inputs-r01/manifest.json",
+    "old_target_profile": "build/qualification/native-owner511-forward-target-inputs-r01/profile.json",
+    "old_target_actual_packet": "build/qualification/native-owner511-forward-native-custody-r01/target/native/result.json",
+    "old_public_runner": "D:/Projects/Factorio/.task-builds/native-owner510-public-r01",
+    "old_public_runner_revision": "21be82a8c0637db49722c3c20bbf9c05080ba095",
+    "availability": "Both original public21be and private336b checkouts still resolve to their declared HEADs. This observation is not a new launch admission."
+  },
+  "minimal_future_rebind": "A separately reviewed NEW target-only manifest/profile/controller copy should replace only hard-coded old7441/995123 archive expectations with publishedC3CB/1006768 and bind product Source203/93d plus existing delivery provenance. Refresh its sealed manifest/profile/caller/composition pins and fresh execution/protected/backup paths. Use a clean admitted executing runner and scratch children under its own build/tmp or build/p; retain original21be tool identity if reused, or explicitly rebind helper/runner identities if203 is chosen. All engine/API/official data/settings/observer/actor/source-save pins stay exact. The actor already admits numeric versions21010->21011 and observer works for both legs, so no actor/observer/version/oracle edit is needed. Compose before Execute and preserve exact current controls/archive set. Load a derivative copy of8A04, observe unchanged actual startup settings and only MIR mod-change, guard actual level-before-MIR callback order, compare source/entry/post-MIR frames, save to a NEW destination and perform two unchanged-byte read-only colds. No new lab is required or claimed. Do not use the old upgraded05BBC save as the source for this10-to11 contract, recreate the10 source, use the earlier strict968A save, or overwrite any old manifest/output.",
+  "limits": "No new native packet, queue, launch, tests, build, Source/docs/controller/library edit or stable verdict. The accepted old destination05BBC and original strict968A/adverses remain unchanged. This task identifies one exact missing destination check and does not authorize dispatch or expand configured-steel coverage."
+}

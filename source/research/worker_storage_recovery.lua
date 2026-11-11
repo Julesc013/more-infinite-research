@@ -1,6 +1,10 @@
 -- One authored native holder for explicitly prepared default worker-storage4.
 -- Data callers supply the ordinary MIR default, never a foreign prototype.
 local M = {id="mir-worker-storage-preservation-4", canonical="worker-robots-storage-4"}
+M.ordinary_default_id = "mir-worker-storage-default-4"
+M.ordinary_provider_id = "mir-worker-storage-provider-4"
+M.provider_debit_id = "mir-worker-storage-provider-debit-4"
+M.head_id = "mir-worker-storage-head-4"
 local target = require("platform.target")
 local MAX = 4294967295
 
@@ -129,6 +133,127 @@ function M.matches_default(emitted, authored)
   local expected = emitted_contract(authored)
   local ok, actual = pcall(emitted_contract, emitted)
   return ok and actual == expected
+end
+
+-- Draft constructors only: callers own admission, settings and publication.
+-- Neither constructor normalizes a provider's level, price or paid basis.
+local function owner_copy(value, stack)
+  local kind = type(value)
+  assert(kind == "table" or kind == "string" or kind == "boolean" or kind == "number",
+    "MIR worker owner requires plain authored data")
+  if kind == "number" then assert(finite(value), "MIR worker owner has a nonfinite value") end
+  if kind ~= "table" then return value end
+  stack = stack or {}
+  assert(getmetatable(value) == nil and not stack[value], "MIR worker owner has a metatable or cycle")
+  stack[value] = true
+  local out = {}
+  for key, item in pairs(value) do
+    assert(type(key) == "string" or type(key) == "number" and finite(key), "MIR worker owner has an invalid key")
+    out[key] = owner_copy(item, stack)
+  end
+  stack[value] = nil
+  return out
+end
+
+local function owner_array(value, limit)
+  assert(type(value) == "table" and #value <= limit, "MIR worker owner array is invalid")
+  local count = 0
+  for key in pairs(value) do
+    assert(type(key) == "number" and key % 1 == 0 and key >= 1 and key <= #value,
+      "MIR worker owner array is not dense")
+    count = count + 1
+  end
+  assert(count == #value, "MIR worker owner array is not dense")
+end
+
+local function owner_source(authored, id)
+  assert(type(authored) == "table" and authored.type == "technology"
+    and type(authored.name) == "string" and authored.name:match("%-4$")
+    and authored.name ~= M.id and authored.name ~= M.ordinary_default_id
+    and authored.name ~= M.ordinary_provider_id and authored.name ~= M.provider_debit_id and authored.name ~= M.head_id
+    and authored.level == 4 and authored.max_level == "infinite",
+    "MIR worker owner requires an authored infinite level4 source")
+  for _, field in ipairs({"hidden", "enabled", "visible_when_disabled", "ignore_tech_cost_multiplier"}) do
+    assert(authored[field] == nil or type(authored[field]) == "boolean", "MIR worker owner boolean is invalid")
+  end
+  owner_array(authored.effects, 1)
+  assert(#authored.effects == 1 and type(authored.effects[1]) == "table"
+    and authored.effects[1].type == "worker-robot-storage"
+    and finite(authored.effects[1].modifier) and authored.effects[1].modifier >= 0,
+    "MIR worker owner requires one authored nonnegative worker effect")
+  local unit = authored.unit
+  assert(type(unit) == "table" and finite(unit.time) and unit.time > 0
+    and ((unit.count == nil and type(unit.count_formula) == "string" and unit.count_formula ~= "")
+      or (unit.count_formula == nil and finite(unit.count) and unit.count > 0
+        and unit.count < 18446744073709551616 and unit.count % 1 == 0)),
+    "MIR worker owner unit contract is invalid")
+  owner_array(unit.ingredients, 32)
+  assert(#unit.ingredients > 0, "MIR worker owner requires science")
+  for _, ingredient in ipairs(unit.ingredients) do
+    owner_array(ingredient, 2)
+    assert(#ingredient == 2 and type(ingredient[1]) == "string" and ingredient[1] ~= ""
+      and finite(ingredient[2]) and ingredient[2] > 0 and ingredient[2] <= 65535 and ingredient[2] % 1 == 0,
+      "MIR worker owner science entry is invalid")
+  end
+  owner_array(authored.prerequisites or {}, 32)
+  local seen = {}
+  for _, name in ipairs(authored.prerequisites or {}) do
+    assert(type(name) == "string" and name ~= "" and name ~= authored.name and name ~= id and not seen[name],
+      "MIR worker owner prerequisite is invalid")
+    seen[name] = true
+  end
+  return owner_copy(authored)
+end
+
+function M.ordinary(authored, id)
+  assert(id == M.ordinary_provider_id, "MIR worker ordinary identity is invalid")
+  local out = owner_source(authored, id)
+  out.name, out.hidden = id, false
+  return out
+end
+
+function M.default_owner(authored)
+  assert(type(authored) == "table" and authored.name == M.canonical,
+    "MIR worker default owner requires authored canonical4")
+  local out = owner_source(authored, M.ordinary_default_id)
+  out.name, out.hidden = M.ordinary_default_id, false
+  return out
+end
+
+function M.head_debit(authored, modifier)
+  assert(type(authored) == "table" and authored.name == M.canonical,
+    "MIR worker head debit requires authored canonical4")
+  local out = owner_source(authored, M.head_id)
+  if modifier == nil then modifier = out.effects[1].modifier end
+  assert(finite(modifier) and modifier >= 0, "MIR worker head debit requires a nonnegative scalar")
+  -- Keep the earned debit in a native level. A finite researched flag does
+  -- not preserve this negative worker effect through configuration loading.
+  out.name, out.max_level = M.head_id, "infinite"
+  out.hidden, out.enabled, out.visible_when_disabled = true, false, false
+  out.effects[1].modifier = modifier == 0 and 0 or -modifier
+  out.prerequisites = {}
+  out.unit = {count=1, time=1, ingredients={{authored.unit.ingredients[1][1], 1}}}
+  out.ignore_tech_cost_multiplier = true
+  return out
+end
+
+-- The detached owner starts at the same native level and retains the entire
+-- work contract. Public names and force flags confer no historical authority.
+function M.matches_default_owner(source, owner)
+  local ok, matches = pcall(function()
+    assert(source and source.name == M.canonical and source.level == 4)
+    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX)
+    return M.fingerprint(source) == M.fingerprint(owner)
+  end)
+  return ok and matches
+end
+
+function M.debit(authored)
+  local out = owner_source(authored, M.provider_debit_id)
+  out.name, out.hidden, out.enabled, out.visible_when_disabled = M.provider_debit_id, true, false, false
+  local modifier = out.effects[1].modifier
+  out.effects[1].modifier = modifier == 0 and 0 or -modifier
+  return out
 end
 
 return M

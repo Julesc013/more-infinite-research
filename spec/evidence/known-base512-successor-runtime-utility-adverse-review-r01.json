@@ -1,0 +1,59 @@
+{
+  "kind": "KnownBase512SuccessorRuntimeUtilityIndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-10T04:22:08.826648+00:00",
+  "verdict": "ADVERSE fixture runtime utility defect verified; local-copy correction justified. No product defect or completed target endpoint established.",
+  "tuple": {
+    "packet": "A815BE587F0546543218D6B5C980FD7FE6386ACCCE1A82013AEF59E0A6CC8AED",
+    "owner": "CD11998C1575581F0309BA5421B2D5ADBEECACC3166C3BB5E380F9C21D6EC362",
+    "fixture": "9ADF17306B21676F0A3A035726F3F4702E3E9DE4647084F1C7BF00A6EB9D93F1",
+    "fixture_commit": "56b8b81d327cacb9649eb5fcb0a7521a9169a015",
+    "player": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E",
+    "source": "128/47537",
+    "engine": "2.0.77/D3"
+  },
+  "actual": {
+    "pid": 11304,
+    "processes": 1,
+    "exit_code": 1,
+    "exit_mode": "natural completed ledger,no timeout/completion predicate",
+    "error": "attempt to call field deepcopy (a nil value)",
+    "event": "mir-fixture-mir5-known-base-addition::on_configuration_changed",
+    "fixture_line": 238,
+    "terminal_sha256": "F50B0530A302702594E505DB70F35DFD264C7168CBF0D251A6D9FFAAFAB51473",
+    "canonical_log_sha256": "3529210F9FF3A357D54627B410A21AE34DEAC13197452B6A7AA2C69DF688EC7E",
+    "accepted_saves": 0,
+    "cold_processes": 0
+  },
+  "attribution": [
+    "Actual failure is inside the test mod control at copying event.mod_changes,not a MIR Source exception. Prelaunch review missed this global runtime utility assumption; prior admissionAFC remains preserved with exact original scope/identity.",
+    "Host controller prelude incorrectly installed global table.deepcopy,masking native absence. Factorio data-stage fixture cloning successfully executed earlier and is a separate environment; do not remove valid data-stage prototype cloning as a speculative fix.",
+    "Code position shows state.initial=entry(event) at237 returned before238 failed. Its required startup-count/clock/target event/native-entry/carrier predicates therefore passed in that execution path. No full raw initial marker,ordinary lab,closed save or owner baseline validation was reached; this prefix does not qualify the completed transition."
+  ],
+  "narrow_utility_inventory": {
+    "runtime_deepcopy_sites": [
+      "157 script.active_mods snapshot",
+      "157 state.event snapshot",
+      "197 research_unit_ingredients ledger",
+      "238 event.mod_changes copy",
+      "284 state.initial final expected frame"
+    ],
+    "count": 5,
+    "supported_remaining_calls": "Lua52 math/pairs/type/next are standard. All15 named game/surface/lab/inventory/bootstrap/gun-speed methods checked through pinned2.0.77 inheritance; LuaEntity.get_inventory is inherited from LuaControl. get_researching_speed(normal),disabled_by_script and relevant native fields were previously checked. helpers.table_to_json is actual-qualified on sameD3 by accepted r05. No second unavailable global utility was found in this bounded actor scan.",
+    "sdk_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+  },
+  "correction_requirements": [
+    "Use one local recursive copy for the five known acyclic plain-table/scalar snapshots. Preserve all entry/math/policy/completion/supply/ordinary/native/cold predicates and actor state authority. No Source fallback or new package/version/quantum change.",
+    "Runtime host double must leave global table.deepcopy absent and use an independently scoped test snapshot copier; ensure positive complete lab/save/cold and refusal paths execute with nil runtime global. Data-only model may keep legitimate prototype-stage helper separately.",
+    "Fresh r02 packet/fixture/profile/contained roots must bind corrected commit/body; same CD119 owner may be reused only byte-identically. Old A815 fixture/adverse/input and acceptedD38/1FD/78F baseline remain untouched. Actual Compose/binding closures and separate bounded admission required."
+  ],
+  "integrity": {
+    "fixed_input_pins_verified": 14,
+    "actual_original_to_retained_copies_verified": 11,
+    "expected_live_controls_verified": 3,
+    "prior_MIR_archives_verified": 18,
+    "recorded_and_live_restoration": true,
+    "factorio_processes": 0,
+    "protected_source_and_derivative_unchanged": true
+  },
+  "limits": "No target server save/cold/reporter/knownBase incident closure or stable verdict. The Source/product ZIP remains unchanged. No additional native/host/build/Compose/CI or Source/controller/library/private mutation performed by reviewer; only this receipt written."
+}

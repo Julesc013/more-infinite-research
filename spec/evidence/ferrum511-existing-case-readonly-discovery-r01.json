@@ -1,0 +1,98 @@
+{
+  "kind": "Ferrum511ExistingCaseReadOnlyDiscoveryV1",
+  "status": "no-existing-full-Ferrum-executable-found-in-bounded-retained-search",
+  "scope": "Read-only discovery only. RepairR02 remains sole prepared pending native assignment. No packet/native/library/Source/docs/privateGit edits.",
+  "private_search": {
+    "repo": "D:\\Projects\\Factorio\\.task-builds\\library511-native-evidence-private-r01",
+    "head": "73b1fac3ac13bb17b5eee8f716f430f644b3c8a3",
+    "distinct_local_and_remote_ref_tips": 291,
+    "tip_text_search": "git grep -n -i ferrum across all291 distinct tips, *.ps1/*.json/*.md/*.lua",
+    "tip_matches": 5,
+    "match_category": "Only incident/custody disclaimer text explicitly excludes Ferrum; zero executable/profile/oracle definition.",
+    "all_history_ferrum_named_paths": 0,
+    "commit_subject_ferrum_matches": 0,
+    "limits": "This establishes absence in searched retained refs/names/plain executable content, not unbounded remote/unreachable object absence."
+  },
+  "public_search": {
+    "typed_paths": "tests/spec evidence Ferrum names are archiveintakes only; no fullmod fixture/profile/controller.",
+    "synthetic_definition": {
+      "readme": "tests/fixtures/worker-storage-native-observer/README.md:16",
+      "scope": "Explicitly synthetic finite fourth owner, original4.7.3/2.1.24 Linux observations; not full Ferrum. Never relabel as Ferrum/current511.",
+      "frozen_observation": {
+        "path": "D:/Projects/Factorio/more-infinite-research/tests/fixtures/worker-storage-published-473.json",
+        "bytes": 3269,
+        "sha256": "4FA049438527DBEC0696ABABE183D726AB63B368988635E4CB4BCB40A228BFD9"
+      }
+    }
+  },
+  "current_inputs": {
+    "complete_dependency_intake": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/ferrum511-complete-dependency-archive-intake-r01.json",
+      "bytes": 3558,
+      "sha256": "C3651E7F5A3678EABF93D14D74871B10F08395EE68FDCBB9807C5E062816E6CF"
+    },
+    "families": {
+      "F200": [
+        "Ferrum0.0.5",
+        "PlanetsLib1.18.0",
+        "spider-launcher2.9.86",
+        "Factorio2.0.77D3BC",
+        "published51178D673"
+      ],
+      "F210": [
+        "Ferrum0.1.5",
+        "PlanetsLib2.4.0",
+        "spider-launcher2.9.87",
+        "Factorio2.1.238DC3",
+        "published511C3CB"
+      ]
+    },
+    "upstream_shared_techs_member_sha256": "031FFD69E6B335F428EB3DB3B05C91020BFC11A1A25184C30EC006F02B04F434",
+    "upstream_definition": "Both real archives techs.lua199\u2013209 deep-copy native3 into finite4/5, count floor(previous_count*(native3_count/native2_count)), exact predecessor, native copied effects/time plus robotics science. Root separately read data-final robotics addition."
+  },
+  "static_expected_contract": {
+    "source_revision": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "route": "compatibility/worker_robot_storage.lua111\u2013171 advances4,5 to first free6 and preserves supplied4/5; owned public infinite6.",
+    "default_curve": "modern_catalogue.lua342ff defaultsbase200/growth1.5/increment0/time60/effect1. cost.lua41ff atfirst6 produces1518.75*1.5^(L-6); this is static expected authored default, not observed fullmod data.",
+    "inheritance": "Explicit zero cost/growth/time settings use terminal native5 and native4 costs, terminal time/effect/science vector. Default authored cost/time remain setting-controlled. Global science policy follows. Preserve all foreign4/5 bytes/flags, no earned grants from current prototypes.",
+    "independent_host_expectation": "tests/test_worker_storage_continuation.py:test_science_effect_and_cost_settings_inherit_without_aliasing independently expects synthetic finite4/5->6 formula4000*2^(L-6),time37 and preserved mixedeffects; this is host/synthetic only."
+  },
+  "reusable_kernels": [
+    {
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-storage511-recovery-native-r07-controller/packet.json",
+        "bytes": 596649,
+        "sha256": "7A3BC9CF45BBC4206106088CC558C084DFC9CA11CD76DC1F9B70D57E2EED7D59"
+      },
+      "caller": "Invoke-ProviderContinuation.ps1",
+      "actor_sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD",
+      "scope": "ActualF210 Secretas provider continuation and two colds; actor hardcodes Secretas/firsttail9. Cannot feed Ferrum into existing embedded save or claim actor unchanged."
+    },
+    {
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/f200-worker511-preservation-r01-controller/packet.json",
+        "bytes": 538911,
+        "sha256": "AA46764C4BB25313DCE7870D00E346A8205B890B0D27B41030F79D7BB84E194B"
+      },
+      "caller": "Invoke-WorkerRecovery.ps1",
+      "actor_sha256": "2563486D3F07F67EBDC4919990860A884A624EB7481577835395EEEBE25467D9",
+      "scope": "ActualF2007 fresh source/cold,preparetwice/preparedcold,provider/cold/cold; same native physical source4/3 and pendingwork kernel, currently Secretas-specific."
+    },
+    {
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-storage511-post-transition-r04-controller/packet.json",
+        "bytes": 613181,
+        "sha256": "D62C8A97535B768A8038974B669214CE75D655F7863672606F5A19578126AACC"
+      },
+      "caller": "Invoke-PostTransition.ps1",
+      "actor_sha256": "72F2B874FD8E9E3E758914D8B15C99F89A8ACEF3A86BDD65A22EB8E0F074B49C",
+      "scope": "ActualF210 Secretas firstMir/unchangedprovider upgrade/retired capenable-disable; scriptedprecursors separately labelled. This is reusable machinery, not Ferrum evidence."
+    }
+  ],
+  "missing_executable_check": "No current511 fullFerrum selected-profile/data/runtime/save qualification exists. Need actual dependency-valid fullmod prototype readback preserving4/5 andexpected6, then a freshly authored named-Ferrum actor prefix for actual511 native preservation/continuation and save+two colds. No existingFerrumpass or retrievableFerrumpacket found.",
+  "smallest_next_proposal": "After Root starts/retires repair as appropriate and explicitly assigns Ferrum, reuse existing7-stage worker recovery kernel for ONE enginefamily first: fresh legal510MIR-default ordinary source +cold; corrected511 unchangedselection preparetwice +preparedcold; add actualFerrum+PlanetsLib+spider, actualmatchingprivate/pending/foreign4/5/public6 ordinarylabs,closed save+two colds. Rebind only named provider identity, first public6, exact actual science/labinputs and independent4/5/6 row expectations. Keep explicit four-force current/orderedqueue/suspended/flags/bonus/mapprice1.25/cap8/oldcounts oracles; no manualbonus or MIRstorage imports. Freshprefix required because retained actor embedsSecretas9 identities. Otherfamily and provideralready-firstMir/unchangedprovider upgrade remain separate mandatory route gates until actually run. No framework or second packet prepared now.",
+  "native_processes": 0,
+  "library_writes": 0,
+  "only_written_file": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-existing-case-readonly-discovery-r01.json"
+}

@@ -1,0 +1,72 @@
+{
+  "kind": "NativeCreditVector512IndependentSourceReviewV1",
+  "verdict": "GO bounded Source64a for qualification; no source blocker found. Native/reporter/release acceptance pending.",
+  "head": "64a0cc1e151bc4112cdf358410295e86635b4edd",
+  "player_source": "096000eb3613fd5c6d09eb7a5d33d3c9bf9945e3",
+  "base": "947ff673e48ed317d636d6fb6cd27454ca440e67",
+  "integrated": "Three reviewed bodies byte-identical atb07854e17 and candidateb05a551778c5db44c3fc6011152dbd1e3ccdfe5b/Source47537eb97e4ea481540fdca7ef7f63aa4c43ba7f; candidate ZIP members also match.",
+  "handoff": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\HANDOFF-64a.json",
+    "bytes": 5964,
+    "sha256": "61971858718BF4E7B04B902FE40B34D196AB069315E178DFA58A25E19D564B41"
+  },
+  "findings": [],
+  "checks": [
+    "native_credit_vectors.lua effects() requires dense unique named finite productivity maps. pair() requires complete equal recipe sets and positive independent public coefficients; component positive values use unchanged exact F200/F210 normalization. Every negative matches its opposite,with exact negative0 when positive quantizes0. No effect-array first-entry adoption.",
+    "native_credits.lua241-256 accepts expanded collected holders only with explicit scrap/family public prototype reference,exact public identity/native shape/non-MIR creator; MIR holder/main creation custody and all scalar shape/count/history checks remain. Singletons retain existing path plus sparse-extra refusal.",
+    "Per named main,full map equals sum of included descriptor vectors. Independent anchors determine each inclusion; within-main coupled anchors allow complete all/none and refuse ambiguity. Cross-family contributions add independently. Public reference levels/effects are never written.",
+    "Saved detached basis map records relative coefficients. PaidA→expandedAB cannot grant newB: preflight refuses unknown/changed basis unless zero completed/net carrier/queued/saved/pending work. Four oldA units require(.4,0),outside span of only±(.1,.1); the saved-basis guard is necessary. This conservative refusal remains a support limit,not an automatic paid-history repair.",
+    "Family preflight covers every affected force before apply/state writes. Pending completion checks saved basis before offset updates. Force creation/reset preflight zero native state before ledger clearing; force merge preflights destination saved history and rebuilds records with basis after clearing. on_load only refreshes local pending registration. No new prototype/aggregate-effect mutation or paid-count multiplication by vector length.",
+    "Current-main sum uses existing tolerance; component native legality is exact target normalization. Weighted ratios compare exactly,so representation/basis changes may conservatively refuse. Zero-component followup closes prior tolerance residual hole."
+  ],
+  "verification": {
+    "Plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\independent-host-plan-r01.json",
+      "bytes": 121,
+      "sha256": "D6DFF5C5DC5714EA40E8A41A6B4EE5274525E921BDC473E231C5BD9058905E0C"
+    },
+    "focused14": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\independent-vector-controls-r01.log",
+      "bytes": 2758,
+      "sha256": "0602A27CCA8C64F9B63E7EB3A1EBC98A4E35AE2D2DD18A32A8327724D6F0D8ED"
+    },
+    "actual": "14 complete-module controls PASS in0.581s using pinnedLua52FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899;Plan materialized before tests. No broad suite/native.",
+    "author_evidence_read": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\actual-cerys-red-green-followup.json",
+        "bytes": 3738,
+        "sha256": "B3EE1FAF00202F9EB35664F4E1E5208EABF782FE29720867321958B7DF31D730"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\paid-basis-opponent.json",
+        "bytes": 1983,
+        "sha256": "D8277F85AE4AD068D4BF6CD2B7CDF788991D55BA48B14B81544DB0C4FB249CA7"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\core-64a.log",
+        "bytes": 3350,
+        "sha256": "02CFF56C591C6406EC8B192455BBA3A56D5AF93D0A3C34CB179DA5D3437322FA"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-bg-r01\\family-64a.log",
+        "bytes": 157,
+        "sha256": "1409B8B828BD36AD355CE1B2409301DEB577C2EED7335E347FF27E6EC63F11F7"
+      }
+    ],
+    "distinction": "Actual Cerys source mutator executed only in synthetic host world (2effects).97-recipe/totals and paid-basis mutant are host controls; existing17core/52family author logs read,not rerun or relabeled native."
+  },
+  "limits": [
+    "Expanded init uninvested and subsequently known saved basis only; independent public reference required.",
+    "Unknown paid/unfinished expanded basis,ambiguous within-main mixed inclusion and unsupported references remain refusal. No native97 reporter profile/culprit or issue closure.",
+    "Affected full native totals/init/config/paid-positive-negative/save/reload/lifecycle checks remain required."
+  ],
+  "operations": {
+    "Source_edits": 0,
+    "focused_host_tests": 14,
+    "native": 0,
+    "builds": 0,
+    "CI": 0,
+    "children": 0
+  },
+  "reviewed_at_utc": "2026-11-10T00:53:55.999154+00:00"
+}

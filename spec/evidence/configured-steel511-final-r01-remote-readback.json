@@ -1,0 +1,26 @@
+{
+  "kind": "RemoteExactOriginalBodyReadbackV1",
+  "repo": "Julesc013/scratchpad",
+  "commit": "73b1fac3ac13bb17b5eee8f716f430f644b3c8a3",
+  "all_exact": true,
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/configured-steel-final-destination-r01-originals/.gitattributes",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/configured-steel-final-destination-r01-originals/MANIFEST.json",
+      "bytes": 33476,
+      "sha256": "85318E97F8979F415DB36EDCE95976C893A6B237C73C51AF7D217ECE43D94816",
+      "git_blob": "6eccf082301a4bd109c1aeb6833277993c597e9e"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/configured-steel-final-destination-r01-originals/original-bodies.json.gz",
+      "bytes": 4001996,
+      "sha256": "C0DFA018B7E19D57A211B9D6320EB0B0DA53EBAB56D9F48A147BC49EB84E4D36",
+      "git_blob": "49aaa7764e44e0b238eb72f07855edcfa9c50263"
+    }
+  ]
+}

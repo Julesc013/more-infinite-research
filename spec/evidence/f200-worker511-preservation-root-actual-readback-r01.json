@@ -1,0 +1,34 @@
+{
+  "kind": "RootF200Worker511ActualReadbackV1",
+  "status": "named2.0.77-Secretas1.0.33-preservation-route-passed",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "product_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+  "terminal_sha256": "6331A0EF02F8D4217E9078C028918F970CE626A9105868592DFA3A839BDEDD33",
+  "actual_processes": 7,
+  "ordinary_source_completions": 7,
+  "new_ordinary_provider_completions": 5,
+  "scripted_transfers_are_not_labs": true,
+  "readonly_colds": 4,
+  "protected_saves": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\source.zip",
+      "exists": true,
+      "bytes": 658255,
+      "sha256": "AF769B814E8C7F603C2265AB6DF7DBF62EEA6CB1A4E0C9401192E5B201390C4E"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\prepare.zip",
+      "exists": true,
+      "bytes": 658789,
+      "sha256": "C61D7447FA5BA256B3ECFD975BFAA076F40C34B814F9C350B4EDBDC96B6BEA38"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\provider.zip",
+      "exists": true,
+      "bytes": 665138,
+      "sha256": "DEB392F7D89D5DC1DD6BC3D88322CE8023D0BC640FA8335A1500FB9FE04C5F82"
+    }
+  ],
+  "independent_review_sha256": "12F415DE4D8CE10B7393DC202EB5541CE9DE7B4B1142F55CF22EA81F48322DCD",
+  "limits": "NamedactualSpaceAge2.0.77/Secretas1.0.33+pretty-frozeta0.1.0 only; fullFerrum, cap/enable/firstMir/unchangedprovider andphysicalcargo followups remain unqualified; publishedbytesunchanged; no stable verdict"
+}

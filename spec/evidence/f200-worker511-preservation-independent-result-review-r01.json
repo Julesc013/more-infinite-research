@@ -1,0 +1,152 @@
+{
+  "kind": "MIRF200Worker511IndependentActualResultV1",
+  "reviewed_at_utc": "2026-11-09T10:24:33.026407+00:00",
+  "verdict": "PASS named F2002.0.77/Secretas1.0.33 fresh510->511 preparation/provider/save route; no general stable verdict",
+  "source": "203e0af5/93d30a2",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "exists": true,
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "published_source510": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.10\\more-infinite-research_5.0.20010.zip",
+    "exists": true,
+    "bytes": 996531,
+    "sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB"
+  },
+  "published_target511": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.11\\more-infinite-research_5.0.20011.zip",
+    "exists": true,
+    "bytes": 1006342,
+    "sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC"
+  },
+  "pins": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\execution-Execute-r01\\terminal.json",
+      "bytes": 889728,
+      "sha256": "6331A0EF02F8D4217E9078C028918F970CE626A9105868592DFA3A839BDEDD33"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\packet.json",
+      "bytes": 538911,
+      "sha256": "AA46764C4BB25313DCE7870D00E346A8205B890B0D27B41030F79D7BB84E194B"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\Invoke-WorkerRecovery.ps1",
+      "bytes": 16300,
+      "sha256": "48043178992DBF3C1F85D941823D9D6A670918BE76F9718A8FD0A1BCF56EDD53"
+    },
+    "scenario": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\inputs\\control.lua",
+      "exists": true,
+      "bytes": 18953,
+      "sha256": "2563486D3F07F67EBDC4919990860A884A624EB7481577835395EEEBE25467D9"
+    }
+  },
+  "actual": {
+    "processes": 7,
+    "servers": 3,
+    "colds": 4,
+    "ordinary_source": 7,
+    "ordinary_after_provider": 5,
+    "distinct_ordinary_total": 12,
+    "final_cumulative": {
+      "player": 7,
+      "worker-suspended": 5
+    },
+    "scripted_transfer_callbacks": 7,
+    "transfer_is_not_new_labwork": true,
+    "prepare_twice_actual": true,
+    "native_bonuses_source_prepared": [
+      7,
+      6,
+      3
+    ],
+    "native_bonuses_final": [
+      9,
+      7,
+      3
+    ],
+    "player_current_fraction_retained": 0.3500596399489772,
+    "suspended_fraction_retained": 0.27004693049212736,
+    "matching_cap": 8,
+    "map_price": 1.25,
+    "retired_private": "player next9/suspendednext8, disabled/saved0; onlyplayer foreignfinite4earned,5..8remainunearned",
+    "uninvested_disabled_flag_retained": true,
+    "all_other_force_frames_equal_provider_entry": true,
+    "cases": [
+      {
+        "id": "source",
+        "roles": [
+          "server",
+          "cold1"
+        ],
+        "saved": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\source.zip",
+          "exists": true,
+          "bytes": 658255,
+          "sha256": "AF769B814E8C7F603C2265AB6DF7DBF62EEA6CB1A4E0C9401192E5B201390C4E"
+        },
+        "ordinary_cumulative": {
+          "worker-suspended": 3,
+          "player": 4
+        },
+        "all_raw_crc_actor_and_cold_checks": true
+      },
+      {
+        "id": "prepare",
+        "roles": [
+          "server",
+          "cold1"
+        ],
+        "saved": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\prepare.zip",
+          "exists": true,
+          "bytes": 658789,
+          "sha256": "C61D7447FA5BA256B3ECFD975BFAA076F40C34B814F9C350B4EDBDC96B6BEA38"
+        },
+        "ordinary_cumulative": {
+          "worker-suspended": 3,
+          "player": 4
+        },
+        "all_raw_crc_actor_and_cold_checks": true
+      },
+      {
+        "id": "provider",
+        "roles": [
+          "server",
+          "cold1",
+          "cold2"
+        ],
+        "saved": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-preservation-r01-controller\\protected\\provider.zip",
+          "exists": true,
+          "bytes": 665138,
+          "sha256": "DEB392F7D89D5DC1DD6BC3D88322CE8023D0BC640FA8335A1500FB9FE04C5F82"
+        },
+        "ordinary_cumulative": {
+          "worker-suspended": 5,
+          "player": 7
+        },
+        "all_raw_crc_actor_and_cold_checks": true
+      }
+    ],
+    "raw_custody_members": 54,
+    "raw_original_primary_hashes_exact": true,
+    "all3saved_ZIP_CRC_and_actor_valid": true,
+    "all4cold_frames_counters_and_savebytes_equal": true,
+    "all_stages_recorded_controls_archives_restored_and_Factorio0": true
+  },
+  "scope": [
+    "Fresh F200 source produced by actual7ordinary labs; no reused F210save or nativelevel-seeded paid predecessor.",
+    "Observed native2.0API/hidden-effect shape and event handoff work in this exact published-source/package/profile. No expectation normalization or postload flag reapplication.",
+    "Known2.0unowned-flag-reset risk did not occur for these selected locks/transition; not a universal engine/mod-setting fix.",
+    "Published511 bytes remain unchanged. This adds named postpublication qualification and does not rewrite historicalbeta disclosures."
+  ],
+  "remaining": [
+    "No F200 cap/enable-after-retirement/first-add/unchangedprovider/removal/readdition/fullFerrum/physicalrobotcargo/overhaul/performance or stable-acceptance claim.",
+    "Global Library/input/export/client/historical/API/stable work remains open."
+  ],
+  "reviewer_actions": "Read-only packet/SDK/Git/rawJSON/CRC/hash checks; no engine/build/Source/docs/library changes."
+}

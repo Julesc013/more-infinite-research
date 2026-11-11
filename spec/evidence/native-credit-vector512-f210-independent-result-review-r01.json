@@ -1,0 +1,163 @@
+{
+  "kind": "MIRVectorF210FollowupIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-10T01:51:39.778683+00:00",
+  "verdict": "PASS exact F210 remaining F2 continuation and two immutable final colds. Combined named F0/F1/F2 mechanism qualified only through separately identified accepted prefix.",
+  "tuple": {
+    "packet_sha256": "E6E1F0C10C760E288E2CFFE9D4BEEEF68A5E9C8190BF15D122A9E72AF94D9BD3",
+    "owner_sha256": "97D57D07E61F182BB56EB08C6AFC551DA1F19D120D457E218CFA605E163C8096",
+    "composition_sha256": "ADEEAF08A6C13047555FB52C272AAD6FE403D7A5DFFFBA0219F27ED690167944",
+    "admission_sha256": "5F92B430E75A944BBCE30679C09C3590A60B3B31BC98810191EDB6EE7746E200",
+    "terminal_sha256": "1BFAA0FA7EF0FC27A31056DA04364EED8630BB44DFD1B67C59D324D3E7A239E9",
+    "harness": "e54470ad1b22f074609e35610ff991529e478804",
+    "player_Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "player_zip": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "engine": "2.1.23/8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "scenario": "0C50A54939EAAD69FF2DA3C791FFB620880EFC13510F44677B87B3FACE616765",
+    "original_pending": "39BAF39376A826F9EC1339F7C32DE57ACDB8505939D8A373ABA5179CA04614B9",
+    "observer_derivative": "84D6EDBFA808117F843BD1F69149AC2DDE3B2715B652D89027B0213FAFB4E944"
+  },
+  "actual_processes": [
+    {
+      "role": "server",
+      "pid": 35816,
+      "exit_code": -1,
+      "completion_predicate_observed": true,
+      "timed_out": false
+    },
+    {
+      "role": "cold1",
+      "pid": 42396,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timed_out": false
+    },
+    {
+      "role": "cold2",
+      "pid": 24736,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timed_out": false
+    }
+  ],
+  "actual_observations": {
+    "pre_entry_tick": 2505,
+    "positive_checkpoint_tick": 2505,
+    "final_tick": 4374,
+    "cold_ticks": [
+      4375,
+      4375
+    ],
+    "ordinary_before": 3,
+    "ordinary_after": 4,
+    "new_ordinary_completions": 1,
+    "server_continue_commands": 1,
+    "main_pending_before_and_after_MIR": {
+      "next_level": 4,
+      "researched": false,
+      "force_enabled": true,
+      "visible": false,
+      "saved": 0,
+      "count": 64000,
+      "formula": "8000*2^(L-1)",
+      "time_ticks": 3600,
+      "current": "recipe-prod-research_low_density_structure-1",
+      "queue": [
+        "recipe-prod-research_low_density_structure-1",
+        "mir-vector-sentinel"
+      ],
+      "progress": 0.20008880642361318
+    },
+    "retired_main_prototype": {
+      "hidden": true,
+      "enabled": false,
+      "effects": "empty"
+    },
+    "postMIR_positive_counts": {
+      "Scrap": 1,
+      "LDS": 3,
+      "casting_LDS": 3
+    },
+    "postMIR_negative_counts": [
+      0,
+      0,
+      0
+    ],
+    "final_positive_counts": {
+      "Scrap": 2,
+      "LDS": 4,
+      "casting_LDS": 4
+    },
+    "final_negative_counts": [
+      0,
+      0,
+      0
+    ],
+    "final_main": {
+      "next_level": 5,
+      "researched": false,
+      "force_enabled": true,
+      "visible": false,
+      "saved": 0
+    },
+    "final_current": "mir-vector-sentinel",
+    "final_queue": [
+      "mir-vector-sentinel"
+    ],
+    "final_progress": 0,
+    "all97_Scrap_recipe_totals_at_positive": 0.1,
+    "all97_Scrap_recipe_totals_at_final": 0.2,
+    "both_LDS_recipe_totals_at_positive": 0.3,
+    "both_LDS_recipe_totals_at_final": 0.4,
+    "cumulative_inserted_minus_inventory_each_of_four_packs": 120000,
+    "source_setup_not_counted": "Finite prerequisite grants/entity/void-lab/science supply remain labelled; only by_script=false main completions enter ordinary4. No direct force reward/level/progress setter."
+  },
+  "native_carrier_flag_boundary": "Raw pre-MIR configuration entry temporarily shows incoming negative Scrap force-enabled=true. Source then re-disables its OWN named signed holders; every accepted positive/final checkpoint and cold carrier is disabled/hidden with exact signs/counts. Do not conflate this owned-carrier normalization with the retained main forceflag, which stays exactlytrue. Prototype flags remain hidden+disabled throughout.",
+  "checkpoint": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-credit-vector-bg-r01\\build\\tmp\\native-vector-f210-f2-followup-r03-native\\write-data\\saves\\native-vector-f2-positive.zip",
+    "exists": true,
+    "bytes": 869137,
+    "sha256": "BC5EB9872E410F77BA9E34354E64F04984F3037BABB2EED15F9898D13F24AEC8"
+  },
+  "final_protected_save": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-native-r01-controller\\f210-followup-r03\\protected\\f2.zip",
+    "exists": true,
+    "bytes": 869165,
+    "sha256": "070B553645A8CA7D8363044A2F3560D72A6BF2B5C3DBA056168AF62B26496975"
+  },
+  "independent_checks": {
+    "original_to_primary_raw_members_rehashed": 22,
+    "fixed_input_hashes_rechecked": 23,
+    "positive_and_final_ZIP_full_CRC_and_embedded_0C50_actor": true,
+    "actual_copied_derivative_parent_and_original_native_script_immutability": true,
+    "complete97_effect_public_reference_and_both_signed_vectors_checked": true,
+    "all99_recipe_component_totals_checked": true,
+    "all_other_public_sentinel_statuses_preserved": true,
+    "three_seven_mod_loaded_and_marker_tuples_exact": true,
+    "both_entire_cold_frames_equal_final_frame": true,
+    "final_hash_unchanged_both_colds": "070B553645A8CA7D8363044A2F3560D72A6BF2B5C3DBA056168AF62B26496975",
+    "checkpoint_hash_unchanged_after_continuation": "BC5EB9872E410F77BA9E34354E64F04984F3037BABB2EED15F9898D13F24AEC8",
+    "all_three_ledger_PIDs_match": true,
+    "recorded_restoration_and_live_prior_controls_19MIRarchives_match": true,
+    "factorio_processes_after_followup": 0
+  },
+  "combined_identity_and_counts": {
+    "prefix_receipt_sha256": "3AAABB199071280A50BA305615E1F66FDE09293283B6F26EBF7318B314566582",
+    "prefix_applicability_sha256": "D1FB06B50A5662252BADA4CAB53D5DA279385C087C8AB3ACEE066027AE10A904",
+    "prefix_original_actor": "392A15B03C3E6B76AF9431D09424DE81284ACC075AB333918053786C227EFF93",
+    "prefix_original_harness": "3bbe21fd35fe93ba998a85b6501c906d73cf3626",
+    "prefix_successful_processes": 5,
+    "this_followup_successful_processes": 3,
+    "accepted_processes_total": 8,
+    "ordinary_completions_total": 4,
+    "negative_endpoint_colds": 2,
+    "final_endpoint_colds": 2,
+    "actual_attempts_including_retained_adverses": 10,
+    "adverses_preserved": "Original sixth-process wrong-forceflag fixture assertion plus separate natural1 diagnostic retained. No eight-success result retroactively replaces those failures; prefix not relabelled as e544 execution."
+  },
+  "limits": [
+    "Synthetic97 mechanism with original45-line Cerys loop plus95synthetic aliases only; not full Cerys or the unknown reporter profile/save.",
+    "Fresh zero basis/known staged masks only; no admission of ambiguous historical A→AB paid vectors.",
+    "F200 is separately admitted/running and no F200 outcome inferred here. No physical-cargo/UI/performance/stable/release verdict.",
+    "No reviewer Source/test/controller/library/native edits, engine reruns, builds or CI launches."
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "kind": "Worker511PostOriginalBodiesRemoteReadbackV1",
+  "status": "pushed-three-remote-blobs-and609-origin-bodies-verified",
+  "repository": "Julesc013/scratchpad",
+  "branch": "evidence/mir511-incident-native-blackglass-r01",
+  "commit": "e0839a636e39be908e031273c523b1e8da67400d",
+  "tree": "33c00df69bfbdaad846a59585be43ca75fa9ec00",
+  "parent": "6fb713bb7eb2a39bc062f4de7feb41b5604dbf23",
+  "working_tree_clean": true,
+  "remote_ref_equal": true,
+  "archive_records": 609,
+  "decoded_origin_bodies_verified": 609,
+  "blobs": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-post-r01-r04-originals/original-bodies.json.gz",
+      "git_blob": "32caebc4d35eb777b1eccdc23c3ab57b87d5d44d",
+      "bytes": 38535528,
+      "sha256": "E87C6F753EE187A3BF42B0059038F00528F23179BE9413F6221A7F6B076A76AC",
+      "raw_response": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-post-custody-remote-r01\\remote-blob-1.json",
+        "bytes": 53093686,
+        "sha256": "35FC60A959119696A78BF3678B761C0BA686054BD863D14BB0BDB4936CDF4B3A"
+      },
+      "origin_byte_equal": true
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-post-r01-r04-originals/MANIFEST.json",
+      "git_blob": "fa104bd1b56d75938c7d3c4de1bc92aa1ea548df",
+      "bytes": 261634,
+      "sha256": "B12D1C58AC5DAE0B46117A6793416792BF69182E958E736E2633B784573B5E97",
+      "raw_response": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-post-custody-remote-r01\\remote-blob-2.json",
+        "bytes": 360766,
+        "sha256": "7EECA9A2513331F985B54D4B020338783D70E3189F2B0C42B0AB7859A61D4942"
+      },
+      "origin_byte_equal": true
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/MANIFEST.json",
+      "git_blob": "763e94aab3f555e2af98bba0c9f73f5cbbfedefd",
+      "bytes": 276869,
+      "sha256": "C6B1BAC9A708EEA531A96A5D90B6060013A6C09C377EC7B09F75CF6AD6CCEDA2",
+      "raw_response": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-post-custody-remote-r01\\remote-blob-3.json",
+        "bytes": 381754,
+        "sha256": "D1CDB08C6FE3DA7EE1335756C6AB378147A4002D4C6084F9481803822A5534A4"
+      },
+      "origin_byte_equal": true
+    }
+  ],
+  "remote_commit_response": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-post-custody-remote-r01\\remote-commit.json",
+    "bytes": 1808,
+    "sha256": "77E8565D459BA4C6C1A683D2822C24965F2BEE43DC0D8E443B2E5848662C033F"
+  },
+  "remote_tree_response": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-post-custody-remote-r01\\remote-tree.json",
+    "bytes": 196993,
+    "sha256": "694C630E2361A00822F65ED8A093DBD2B307433FDFB8EECA3EAA98FC51356C65"
+  },
+  "independent_final_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-r04-independent-native-result-review-r01.json",
+    "bytes": 8732,
+    "sha256": "B18C7849919CB2CCFAB8A0D7BCBF54DDDF2A98178E1FF9B94C82F2D2C0B5534C"
+  },
+  "no_source_native_docs_changes": true,
+  "limits": "Custody only. Retained independent native review owns its exact functional verdict; no added release/stable/Ferrum/physical-cargo/performance acceptance."
+}
