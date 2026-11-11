@@ -14,7 +14,20 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Active incident batch (2026-11-11)
+## Active incident release candidate (2026-11-11)
+
+The cumulative5.0.12 player source is `0efb446b5bdadec2be7d1bee1b68b5065a85134f`, checked through [PR1876](https://github.com/Julesc013/more-infinite-research/pull/1876) and integrated at `5777c819a559fb2ed2ba07b32faa5b4b1edae045`. The [exact remote freeze readback](../spec/evidence/mir512-multiplier-freeze-remote-readback-r01.json) verifies all17 prepared player archives and CRCs against Aero's original freeze. Player contents stay fixed during affected qualification and checked promotion. The current release decision, exact native results and public delivery state belong to [incident1845](https://github.com/Julesc013/more-infinite-research/issues/1845); this preparation record supplies no publication verdict.
+
+The [independent earned5.0.8 result](../spec/evidence/worker512-earned08-sourcec-independent-result-r01.json) accepts the authentic six-process1× precursor chain: nine ordinary predecessor completions, preservation into permanent native ownership, provider addition, two further ordinary completions, save and two cold loads. Its exact player source is the preceding `a1a1a50f8cec5e5d021a40602add41d8e62d1036`; the subsequent [multiplier impact review](../spec/evidence/worker512-multiplier-source-impact-independent-review-r01.json) retains that identity and requires separate current-source2×/4× qualification. The [two-line source correction](../spec/evidence/worker512-private-head-multiplier-source-review-r01.json) exempts only the private debit head and its runtime contract, preserving ordinary/public costs. Raw predecessor, upgrade, provider and adverse originals are retained in private scratchpad commit `f26da88cd6b59038f9313cd8661e68643a761748`.
+
+The actual Bob's Warfare plus Remove Productivity Cap startup passed on2.1.24 under its original Source4fdb identity; its independent result and preserved public11 refusal remain in that same private custody. The previously accepted complete97-component cases on both modern engines, unchanged-Secretas persistence and known-Base transitions retain their named inputs and limits below. Before publication, the current-source real Rigor mechanism and2×/4× worker work/save/cold outcomes require exact recorded verdicts, followed by independent beta review, required promotion checks and complete delivery verification. Passing CI alone is insufficient.
+
+Ryutavi's protected save/log/list are retained;230 of233 exact third-party archives are available. Three original versions remain unavailable, so the smaller real Rigor cohort cannot claim his entire modpack/save. Jivaii1871 supplies the actual Ferrum log but no predecessor save or old earned/work state;1806's unknown actual paid-mask history remains unverified. A supported mechanism result does not automatically close either reporter's historical issue. Existing Library/client/export, wider historical coverage and whole-product performance acceptance remain in the stable queue after incident delivery.
+
+<details>
+<summary>Earlier11November checkpoint retained as history</summary>
+
+### Retained earlier11November checkpoint
 
 5.0.12 remains unpublished. The maintainer has authorized the necessary permanent native worker identity with compatibility handling and exact migration tests; that decision is no longer pending. Black Glass retains native execution, integration and publication. The [current incident checkpoint](https://github.com/Julesc013/more-infinite-research/issues/1845#issuecomment-6781983923) records the bounded work and remaining inputs; the older checkpoint below retains its historical scope.
 
@@ -27,6 +40,9 @@ The bounded successor correction makes explicit queued observations read-only af
 The supplied Ryutavi save, log and enabled list are protected and verified. The official2.1.24 standalone engine is downloaded, SHA256/CRC/metadata checked and installed separately; Steam depots and the existing2.1.23 test engine are unchanged.230 of233 exact third-party archives are verified in the direct2.1 library. The exact original `factorio-resource-formatter-mod0.0.2`, `steam-condenser0.1.0` and `universal-transmuter0.1.0` remain unavailable from the Portal and checked local locators; no newer version substitutes for them. The separate Jivaii1871 log confirms2.1.24/Ferrum but supplies no predecessor save or previous paid/work state. These are explicit reporter-coverage limits, not authentication failures or passing save tests.
 
 The next native assignment is the corrected finite-provider route on one frozen successor package, retaining the protected predecessor, exact upstream provider, independent price/science assertions, two ordinary completions, save and two cold reads. Independent source/result review, applicable reporter dispositions, required CI, complete package and checked GitHub delivery remain open. The existing Library/client/export/performance stable queue resumes after verified incident delivery; no completed campaign restarts merely because the patch number changes.
+
+
+</details>
 
 ## Previous incident checkpoint (2026-11-10)
 
