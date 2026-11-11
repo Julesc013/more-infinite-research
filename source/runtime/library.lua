@@ -750,10 +750,7 @@ local function context_for(force)
   }
   local multilingual_to_lower = helpers and helpers.multilingual_to_lower
   if type(multilingual_to_lower) == "function" then
-    context.search_normalizer = function(value)
-      local ok, normalized = pcall(multilingual_to_lower, value)
-      return ok and type(normalized) == "string" and normalized or nil
-    end
+    context.search_normalizer = multilingual_to_lower
   end
   if DISCOVERY_TREE and type(discovery_visibility_provider) == "function" then
     context.discovery_visibility = discovery_visibility_provider(force)
@@ -2697,17 +2694,18 @@ function M.on_gui_selection_state_changed(event)
     if groups == nil then return end
     local view = view_for(player.index)
     local translations = translated_labels(translation_caches[player.index])
+    local context = context_for(player.force)
     local visible = {}
     for _, group in ipairs(groups) do
       if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations,
-          context_for(player.force)) then
+          context) then
         visible[#visible + 1] = group
       end
     end
     local group = visible[element.selected_index]
     if group == nil then return end
     view.setting_selected = group.key
-    render(player, view)
+    render(player, view, context)
   elseif element.name == PREFIX .. "queue_list" then
     if not owns_element(player, element, {
       PREFIX .. "queue_list", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT
