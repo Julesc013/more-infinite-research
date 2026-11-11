@@ -615,10 +615,17 @@ end
 -- Native research remains authoritative after this one-time identity transfer.
 -- The older route/preparation key and legacy private holder keep their meanings.
 local OWNER_KEY = "mir_worker_storage_native_owner"
+-- Public MIR5 default C4 has one unchanged native earning/settings contract.
+-- This set does not authorize provider routes or new direct engine-hop origins.
 local DEFAULT_ORIGINS = {
-  f200 = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
-  f210 = {["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
+  f200 = {["5.0.20000"]=true, ["5.0.20001"]=true, ["5.0.20002"]=true, ["5.0.20003"]=true,
+    ["5.0.20004"]=true, ["5.0.20005"]=true, ["5.0.20006"]=true, ["5.0.20007"]=true,
+    ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
+  f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
+    ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
+    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
+local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -630,7 +637,7 @@ local function exact_base_hop(event, old_version, owned)
   local active = script and script.active_mods or {}
   local changes = event and event.mod_changes
   local base = type(changes) == "table" and changes.base
-  local known = old_version == "4.7.20003" or DEFAULT_ORIGINS.f200[old_version]
+  local known = old_version == "4.7.20003" or DIRECT_DEFAULT_HOP_ORIGINS[old_version]
     or owned and producer_edition(old_version) == "f200"
       and tonumber(old_version:sub(-2)) <= tonumber(target.distribution_version:sub(-2))
   if not known or target.id ~= "f210" or target.minimum_base ~= "2.1.23" or active.base ~= "2.1.23"
@@ -704,7 +711,8 @@ local function owner_record()
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
-          or old_edition ~= edition and not (old_edition == "f200" and edition == "f210")) then
+          or old_edition ~= edition and not (old_edition == "f200" and edition == "f210"
+            and DIRECT_DEFAULT_HOP_ORIGINS[value.producer.old_version])) then
     recover_error("unknown default native-owner producer")
   end
   if type(value.forces) ~= "table" or getmetatable(value.forces) ~= nil then
@@ -717,9 +725,9 @@ local function owner_record()
   return value
 end
 
--- These two older Base producers have separate, narrower native predicates.
--- Neither belongs to the qualified9--11 producer set. New observer additions
--- are excluded when proving the previous Base+MIR closure, never old mods.
+-- These older Base transitions have separate, narrower native predicates.
+-- MIR501 with a new selection remains empty-only; unchanged-selection MIR501
+-- uses the common default contract. Observer additions never stand for old mods.
 local function older_default_origin(event, change, active, base_hop)
   if not base_hop and (target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
       or event.mod_startup_settings_changed ~= false) then
@@ -781,7 +789,12 @@ local function default_origin(event, initializing, state)
       and not (base_hop and change.old_version == "4.7.20003") then
     recover_error("unrecorded default source requires unchanged startup settings")
   end
-  if state == nil and change and (change.old_version == "5.0.20001" or change.old_version == "4.7.20003") then
+  local new_selection = false
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR and type(item) == "table" and item.old_version == nil then new_selection = true end
+  end
+  if state == nil and change and (change.old_version == "4.7.20003"
+      or change.old_version == "5.0.20001" and new_selection) then
     return older_default_origin(event, change, active, base_hop)
   end
   local engine_patch_valid = same_family_engine_patch(event)
@@ -1196,8 +1209,8 @@ end
 
 local function plan_provider_handover(event, route)
   local owned, state = owner_record(), checked_state()
-  if not owned or owned.kind ~= "full-default" or not state or state.schema ~= 2 or state.kind ~= "route"
-      or state.current.kind ~= "default" then recover_error("finite handover has no full default authority", route) end
+  if not owned or owned.kind ~= "full-default" or state ~= nil and (state.schema ~= 2 or state.kind ~= "route"
+      or state.current.kind ~= "default") then recover_error("finite handover has no full default authority", route) end
   local current, contract, public_prototype = finite_provider_contract(route)
   if contract ~= owned.contract then recover_error("native full default contract changed before provider handover", route) end
   provider_addition(event, route, owned)
