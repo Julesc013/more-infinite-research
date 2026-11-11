@@ -350,7 +350,9 @@ local function local_view(raw)
     selected = value.selected
   })
   if type(normalized) == "table" then
-    value.query = text(normalized.search or value.query)
+    -- Retain exactly what the player typed. The model receives a detached,
+    -- normalized search view during rendering; storing that value would lose
+    -- case and prevent a native multilingual normalizer from seeing it later.
     value.family = family_option(normalized.family) or "mir"
     value.mode = whole_option(normalized.mode, 1, 3) or 1
     value.status = type(normalized.status) == "number" and normalized.status or 1
@@ -724,7 +726,7 @@ local function legacy_marker(player, frame)
   return type_ok and marker_type == "tabbed-pane" and marker or nil
 end
 
-local function model_view(view)
+local function model_view(view, context)
   return library_model.normalize({
     search = view.query,
     family = view.family,
@@ -736,7 +738,7 @@ local function model_view(view)
     visibility = view.visibility,
     hidden = view.hidden,
     selected = view.selected
-  })
+  }, context)
 end
 
 local function context_for(force)
@@ -746,6 +748,13 @@ local function context_for(force)
     research_triggers_supported = target.id == "f200" or target.id == "f210",
     recipe_productivity_supported = target.recipe_productivity == true
   }
+  local multilingual_to_lower = helpers and helpers.multilingual_to_lower
+  if type(multilingual_to_lower) == "function" then
+    context.search_normalizer = function(value)
+      local ok, normalized = pcall(multilingual_to_lower, value)
+      return ok and type(normalized) == "string" and normalized or nil
+    end
+  end
   if DISCOVERY_TREE and type(discovery_visibility_provider) == "function" then
     context.discovery_visibility = discovery_visibility_provider(force)
   end
@@ -962,14 +971,14 @@ local function update_discovery_indicator(content, record)
 end
 
 local function rows_for(player, view, context, labels)
-  local rows = library_model.rows(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  local rows = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
   if type(rows) ~= "table" then return {} end
   return rows
 end
 
 local function selected_detail(player, view, context, labels)
   if not view.selected then return nil end
-  return library_model.detail(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  return library_model.detail(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
 end
 
 local function set_shortcut(player, toggled)
@@ -1778,7 +1787,7 @@ local function setting_catalogue()
   return setting_groups_cache
 end
 
-local function setting_search_matches(group, query, translations)
+local function setting_search_matches(group, query, translations, context)
   if query == "" then return true end
   local haystack = group.search
   if type(translations) == "table" then
@@ -1787,8 +1796,9 @@ local function setting_search_matches(group, query, translations)
       if type(label) == "string" and label ~= "" then haystack = haystack .. " " .. label end
     end
   end
-  haystack = haystack:lower():gsub("[-_]", " ")
-  return haystack:find(query:lower():gsub("[-_]", " "), 1, true) ~= nil
+  haystack = library_model.search_text(haystack, context):gsub("[-_]", " ")
+  query = library_model.search_text(query, context):gsub("[-_]", " ")
+  return haystack:find(query, 1, true) ~= nil
 end
 
 local function settings_group_key(setting_name)
@@ -1799,7 +1809,7 @@ local function settings_group_key(setting_name)
   return stream and type(stream.key) == "string" and stream.key or setting_name
 end
 
-local function update_settings_content(content, view, preserve_query, translations)
+local function update_settings_content(content, view, preserve_query, translations, context)
   if not valid(content) then return end
   local width = content.style and (content.style.maximal_width or content.style.width) or 592
   local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
@@ -1878,7 +1888,7 @@ local function update_settings_content(content, view, preserve_query, translatio
   end
   local visible, items = {}, {}
   for _, group in ipairs(groups) do
-    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
+    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations, context) then
       visible[#visible + 1], items[#items + 1] = group, group.title
     end
   end
@@ -2431,7 +2441,7 @@ local function render(player, view, context, preserve_query)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
     local labels = translated_labels(translations)
-    update_settings_content(content, view, preserve_query, labels)
+    update_settings_content(content, view, preserve_query, labels, context)
     dispatch_translations(player, translations)
   else
     -- A closed Research tab must not retain a local catalogue or spend more
@@ -2689,7 +2699,8 @@ function M.on_gui_selection_state_changed(event)
     local translations = translated_labels(translation_caches[player.index])
     local visible = {}
     for _, group in ipairs(groups) do
-      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
+      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations,
+          context_for(player.force)) then
         visible[#visible + 1] = group
       end
     end

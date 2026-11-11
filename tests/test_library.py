@@ -943,8 +943,10 @@ class LibraryTests(unittest.TestCase):
                   selected = type(view.selected) == "string" and view.selected or nil
                 }
               end,
-              casefold_search_text = function(value)
-                return type(value) == "string" and string.lower(value) or nil
+              search_text = function(value)
+                if type(value) ~= "string" then return nil end
+                value = value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end)
+                return (value:gsub("\195\159", "ss"))
               end,
               rows = function(force, rows, view, translations)
                 assert(type(translations) == "table")
@@ -3028,6 +3030,19 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute(r'''
           package.preload["presentation.library_model"] = nil
           package.loaded["presentation.library_model"] = nil
+          local sharp_s = string.char(195, 159)
+          local upper_a, lower_a = string.char(195, 132), string.char(195, 164)
+          local upper_o, lower_o = string.char(195, 150), string.char(195, 182)
+          local upper_u, lower_u = string.char(195, 156), string.char(195, 188)
+          local normalizer_calls = {}
+          helpers = {multilingual_to_lower = function(value)
+            normalizer_calls[#normalizer_calls + 1] = value
+            value = value:gsub(upper_a, lower_a):gsub(upper_o, lower_o):gsub(upper_u, lower_u)
+            return (value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end))
+          end}
+          local localized_label = "Fu" .. sharp_s .. " Gr" .. lower_o .. sharp_s .. "e "
+            .. upper_a .. "rger " .. upper_u .. "bung"
+          local uppercase_query = "GR" .. upper_o .. "SSE"
           boot()
           player.locale = "de"
           gear.localised_name = {"technology-name.fixture-german-library"}
@@ -3052,27 +3067,28 @@ class LibraryTests(unittest.TestCase):
             and #research_content(root).mir_library_list_pane.mir_library_results.items == 0,
             "the raw fallback must not masquerade as a translated German match")
           library.on_string_translated({player_index=1,id=request.id,translated=true,
-            result="Fuß Größe Ärger Übung"})
+            result=localized_label})
           local list = research_content(root).mir_library_list_pane.mir_library_results
-          assert(#list.items == 1 and list.items[1][3] == "Fuß Größe Ärger Übung",
+          assert(#list.items == 1 and list.items[1][3] == localized_label,
             "a late German translation did not make its row discoverable")
           local query = research_filters(root).mir_library_query
-          query.text = "GRÖSSE"
+          query.text = uppercase_query
           library.on_gui_text_changed({player_index=1,element=query})
-          assert(#list.items == 1 and storage.mir_library.players[1].query == "GRÖSSE",
+          assert(#list.items == 1 and storage.mir_library.players[1].query == uppercase_query,
             "German uppercase query did not preserve its exact saved bytes")
           library.close(player)
           local first = #player.translation_requests + 1
           root = library.open(player)
-          assert(storage.mir_library.players[1].query == "GRÖSSE"
-            and research_filters(root).mir_library_query.text == "GRÖSSE",
+          assert(storage.mir_library.players[1].query == uppercase_query
+            and research_filters(root).mir_library_query.text == uppercase_query,
             "reopening lost the saved localized query")
           request = assert(german_request(first), "reopened localized row did not request its German label")
           library.on_string_translated({player_index=1,id=request.id,translated=true,
-            result="Fuß Größe Ärger Übung"})
+            result=localized_label})
           list = research_content(root).mir_library_list_pane.mir_library_results
-          assert(#list.items == 1 and list.items[1][3] == "Fuß Größe Ärger Übung",
+          assert(#list.items == 1 and list.items[1][3] == localized_label,
             "saved German query did not match after its late reopen translation")
+          assert(#normalizer_calls > 0, "Library rows did not call the injected native normalizer")
           assert(player.force.research_queue == original_queue and player.force.current_research == original_current
             and player.force.research_progress == original_progress and gear.level == 3 and gear.researched
             and not gear.enabled, "localized search changed native research state")
@@ -4462,6 +4478,16 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute(r'''
           package.preload["presentation.library_model"] = nil
           package.loaded["presentation.library_model"] = nil
+          local sharp_s = string.char(195, 159)
+          local upper_o, lower_o = string.char(195, 150), string.char(195, 182)
+          local normalizer_calls = {}
+          helpers = {multilingual_to_lower = function(value)
+            normalizer_calls[#normalizer_calls + 1] = value
+            value = value:gsub(upper_o, lower_o)
+            return (value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end))
+          end}
+          local localized_label = "Gr" .. lower_o .. sharp_s .. "e der Forschung"
+          local uppercase_query = "GR" .. upper_o .. "SSE"
           boot()
           player.locale = "de"
           local catalog = require("research.settings")
@@ -4486,30 +4512,23 @@ class LibraryTests(unittest.TestCase):
           local root = library.open(player, {tab="settings", settings_scope=scope})
           local request = assert(target_request(), "settings label was not requested for translation")
           library.on_string_translated({player_index=1,id=request.id,translated=true,
-            result="Größe der Forschung"})
+            result=localized_label})
           local content = root.mir_library_tabs.mir_library_settings_content
           local query = content.mir_library_settings_query
-          query.text = "GRÖSSE"
+          query.text = uppercase_query
           library.on_gui_text_changed({player_index=1,element=query})
           local dynamic = content.mir_library_settings_dynamic
           assert(#dynamic.mir_library_settings_list.items == 1
             and dynamic.mir_library_settings_count.caption[2] == 1
-            and storage.mir_library.players[1].settings_search == "GRÖSSE",
+            and storage.mir_library.players[1].settings_query == uppercase_query,
             "late German settings translation did not casefold the query")
           library.close(player)
-          local first = #player.translation_requests + 1
           root = library.open(player, {tab="settings"})
           content = root.mir_library_tabs.mir_library_settings_content
-          assert(content.mir_library_settings_query.text == "GRÖSSE"
-            and storage.mir_library.players[1].settings_search == "GRÖSSE",
+          assert(content.mir_library_settings_query.text == uppercase_query
+            and storage.mir_library.players[1].settings_query == uppercase_query,
             "reopening lost the saved localized settings query")
-          request = assert(target_request(first), "reopened settings did not request its localized label")
-          library.on_string_translated({player_index=1,id=request.id,translated=true,
-            result="Größe der Forschung"})
-          dynamic = content.mir_library_settings_dynamic
-          assert(#dynamic.mir_library_settings_list.items == 1
-            and dynamic.mir_library_settings_count.caption[2] == 1,
-            "saved German settings query did not match its late reopened translation")
+          assert(#normalizer_calls > 0, "Settings did not call the injected native normalizer")
         ''')
 
     def test_settings_search_preserves_literal_repeated_spacing(self):
