@@ -3836,6 +3836,91 @@ class LibraryTests(unittest.TestCase):
           assert(research_content(player.gui.screen["mir_research_browser"])["mir_library_detail"] ~= nil)
         ''')
 
+    def test_real_catalogue_library_handoff_keeps_the_default_worker_tail_literal(self):
+        self.lua.execute(r'''
+          -- Parse the same admitted default-worker route that control.lua
+          -- retains: its finite retired head, public tail and private debit
+          -- all have separate native identities.
+          package.preload["research.catalogue"] = nil
+          package.preload["presentation.library_model"] = nil
+          package.loaded["research.catalogue"] = nil
+          package.loaded["presentation.library_model"] = nil
+          package.loaded["runtime.catalogue"] = nil
+          package.loaded["runtime.library"] = nil
+          script = {active_mods={base="2.1.23"}}
+
+          local retired_id = "worker-robots-storage-4"
+          local tail_id = "mir-worker-storage-default-4"
+          local debit_id = "mir-worker-storage-head-4"
+          local function prototype(name, hidden)
+            return {name=name, level=4, max_level=4294967295, hidden=hidden == true,
+              enabled=hidden ~= true, effects={{type="worker-robot-storage", modifier=1}}}
+          end
+          local retired_prototype = prototype(retired_id, false)
+          local tail_prototype = prototype(tail_id, false)
+          local debit_prototype = prototype(debit_id, true)
+          prototypes = {
+            mod_data={["more-infinite-research-native-adoptions"]={data={
+              schema=1, owners={}, worker_default_split=true
+            }}},
+            technology={[retired_id]=retired_prototype, [tail_id]=tail_prototype, [debit_id]=debit_prototype},
+            get_history=function(kind, name)
+              assert(kind == "technology")
+              assert(name == retired_id or name == tail_id or name == debit_id)
+              return {created="more-infinite-research"}
+            end
+          }
+          boot()
+
+          local retired = {valid=true, name=retired_id, level=4, researched=true, enabled=false,
+            visible_when_disabled=true, localised_name="Retired worker storage head", prototype=retired_prototype}
+          local tail = {valid=true, name=tail_id, level=7, researched=false, enabled=true,
+            visible_when_disabled=true, localised_name="Current worker storage tail", prototype=tail_prototype,
+            research_unit_count=9100, research_unit_energy=60,
+            research_unit_ingredients={{name="automation-science-pack", amount=1}}}
+          local queue = {tail, tail}
+          player.force.technologies[retired_id] = retired
+          player.force.technologies[tail_id] = tail
+          player.force.research_queue, player.force.current_research, player.force.research_progress = queue, tail, .625
+          player.force.worker_robots_storage_bonus = 11
+
+          local declarations = require("runtime.catalogue").declared()
+          local declared = {}
+          for _, row in ipairs(declarations) do declared[row.id] = row end
+          assert(declared[retired_id] ~= nil and declared[tail_id] ~= nil,
+            "the real default worker route lost a literal public identity")
+          assert(declared[retired_id].fixed_maximum == 4 and declared[tail_id].fixed_maximum == nil,
+            "the retired finite head and ordinary tail lost their separate contracts")
+
+          -- After parse, callbacks must consume those retained rows and never
+          -- re-import a model or reconstruct a substituted ownership route.
+          require = function(name) error("Library callback imported " .. tostring(name)) end
+          local root = library.open(player, {family="worker-robots-storage", selected=tail_id})
+          local state = storage.mir_library.players[1]
+          local content = research_content(root)
+          local detail = content["mir_library_detail"]
+          assert(state.selected == tail_id and detail["mir_library_research_facts"]
+            ["mir_library_detail_heading"]["mir_library_detail_title"].caption == tail.localised_name,
+            "Library selection or detail relabeled the ordinary default worker tail")
+
+          local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
+          local head_level, tail_level = retired.level, tail.level
+          local bonus, current, progress = player.force.worker_robots_storage_bonus,
+            player.force.current_research, player.force.research_progress
+          local actions = content["mir_library_list_pane"]["mir_library_actions"]
+          library.on_gui_click({player_index=1, element=actions["mir_library_open_native"]})
+          assert(player.opened_technology == tail and player.opened_technology ~= retired,
+            "native Library handoff opened the retired worker head instead of the selected tail")
+          assert(player.force.technologies[retired_id] == head_object and player.force.technologies[tail_id] == tail_object
+            and retired.prototype == retired_prototype and tail.prototype == tail_prototype
+            and retired.level == head_level and tail.level == tail_level
+            and player.force.worker_robots_storage_bonus == bonus
+            and player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress
+            and queue[1] == tail and queue[2] == tail,
+            "Library navigation changed literal worker objects, levels, bonus or native queue state")
+        ''')
+
     def _assert_real_selected_catalogue_opens_without_runtime_imports(self, profile_name, target_id, expected_id):
         editions = json.loads((ROOT / "targets/editions.json").read_text(encoding="utf-8"))["targets"]
         profile = json.loads((ROOT / f"tests/profiles/{profile_name}.json").read_text(encoding="utf-8"))
