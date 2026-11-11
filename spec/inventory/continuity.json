@@ -7463,6 +7463,16 @@
           "evidence": "spec/evidence/historical-frontier-current-oracle-applicability-aero-r01.json",
           "related_record": "CONT-11 historical-frontier-current-oracle-coverage-2026-11-02",
           "scope": "Use the exact seven original snapshot hashes and per-capture declared/available runtime version facts rather than a broad4.7-era label. Current27 F015/F016 after-vector expectations are covered by existing independent host projections; these snapshots do not become later-package or MIR5 native results. Final exact-package/profile/state obligations and experimental F018 limits remain unchanged."
+        },
+        {
+          "id": "public512-f100-f110-narrow-consumed-input-correspondence",
+          "source": [
+            "source/adapters/reduced",
+            "source/research/historical_direct.lua",
+            "source/research/historical_continuations.lua"
+          ],
+          "evidence": "spec/evidence/historical-public512-f100-f110-scoped-correspondence-aero-r01.json",
+          "scope": "The two named Base-only F100/F110 4.7.3 to 7a2 native observations have scoped consumed-path correspondence with exact public 5.0.12 ZIPs. Keep original engines, archives, protected saves, ordinary versus scripted state, fixtures, controller and cold-load identities. F100 has character mining speed/current/queue observations without detached/foreign work; F110 additionally retains its seeded rows and injected detached/foreign state. This is no new public12 run, other route, API-version, client, GUI, performance or stable verdict."
         }
       ],
       "test_subjects": [

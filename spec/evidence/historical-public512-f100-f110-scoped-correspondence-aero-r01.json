@@ -1,0 +1,376 @@
+{
+  "schema": 1,
+  "kind": "MIRPublic512F100F110ScopedCorrespondenceV1",
+  "reviewed_utc": "2026-11-11T21:34:32.146965+00:00",
+  "verdict": "Reuse only the two original named Base-only same-edition observations under their original execution identities through the authenticated public 5.0.12 consumed-path correspondence. No new native pass or whole-edition/stable verdict.",
+  "authority": [
+    "spec/verification.md VER-06 and VER-07",
+    "spec/migrations.md MIG-03"
+  ],
+  "public_identity": {
+    "commit": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+    "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+    "release_id": 441736666
+  },
+  "original_source": {
+    "commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6"
+  },
+  "cases": [
+    {
+      "target": "f100",
+      "executed_archive": {
+        "path": "build\\qualification\\aero-migration-501-inputs-r01\\reconstructed7a2\\more-infinite-research_5.0.10000.zip",
+        "bytes": 453703,
+        "sha256": "6bae382dbd0aec7199474921887cfbac61016b8bf5e8fb990656493a8a174b6c",
+        "members": 127,
+        "crc_passed": true
+      },
+      "public_archive": {
+        "path": "build\\qualification\\mir512-public-delivery-aero-r01\\anonymous-downloads\\more-infinite-research_5.0.10012.zip",
+        "bytes": 676362,
+        "sha256": "5dde0e619a42deae842b1c1a0ea76da8a2ae29efdabb4edd2c7ea385a7686db4",
+        "members": 127,
+        "crc_passed": true
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+        "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+        "file_version": "1.0.0.54889",
+        "product_version": "1.0.0",
+        "base_version": "1.0.0"
+      },
+      "original_controller_commit": "ba750fd662a03b8233c717ed58714b3e92772f37",
+      "original_packet": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/packet.json",
+        "bytes": 10538,
+        "sha256": "338A0612D4E8AFB7E382C8E08F942B5E5D50CD00C1A6BEA76A317ADB9C8AE8A7"
+      },
+      "original_terminal": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 32080,
+        "sha256": "F4279280432833DB72EFA3E970694F5D9535E253AE4A672DB4217BE4EDFC2C44"
+      },
+      "published_source_archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\published\\library\\more-infinite-research_4.7.10003.zip",
+        "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+        "local_authenticated_path": "dist/more-infinite-research_4.7.10003.zip",
+        "bytes": 709722
+      },
+      "protected_source": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 656574,
+        "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+      },
+      "completed_successor": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/write-data/saves/mir5-native-complete.zip",
+        "bytes": 657518,
+        "sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3"
+      },
+      "published_observation": {
+        "case": "historical-transition",
+        "stage": "initial",
+        "transition_stage": "published",
+        "status": "passed",
+        "target": "f100",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 0,
+        "mining_bonus": 0.05,
+        "current_research": "recipe-prod-research_character_mining_speed-1",
+        "research_progress": 0.42,
+        "queue_api": true,
+        "research_queue_enabled": true,
+        "foreign_saved_progress": null,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "successor_observation": {
+        "case": "historical-transition",
+        "stage": "initial",
+        "transition_stage": "mir5",
+        "status": "passed",
+        "target": "f100",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "mining_bonus": 0.1,
+        "current_research": "braking-force-1",
+        "research_progress": 0,
+        "queue_api": true,
+        "research_queue_enabled": true,
+        "foreign_saved_progress": null,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "original_cold_proof": [
+        {
+          "stage": "published",
+          "ordinal": 1,
+          "save_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+          "save_byte_identical": true
+        },
+        {
+          "stage": "published",
+          "ordinal": 2,
+          "save_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+          "save_byte_identical": true
+        },
+        {
+          "stage": "mir5",
+          "ordinal": 1,
+          "save_sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3",
+          "save_byte_identical": true
+        },
+        {
+          "stage": "mir5",
+          "ordinal": 2,
+          "save_sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3",
+          "save_byte_identical": true
+        }
+      ],
+      "original_processes": 7,
+      "original_lab_completions": 2,
+      "original_cold_reloads": 4,
+      "scope": "Character mining speed, not mining drill productivity or physical output. One ordinary source and one ordinary successor completion establish +0.05 to +0.10; 42% current progress is scripted setup. Queue selection, saved successor and two immutable read-only colds at each stage are observed. Replayed counters are not additional completions. foreign_saved_progress is null; no detached or foreign-work preservation claim.",
+      "original_caller": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/Invoke-OwnedF100Pair.ps1",
+        "bytes": 4927,
+        "sha256": "16A9211BEEAABDDD00BC831559BE5E94F7C153032140B6BC43C4096B05705DB0"
+      }
+    },
+    {
+      "target": "f110",
+      "public_archive": {
+        "path": "build\\qualification\\mir512-public-delivery-aero-r01\\anonymous-downloads\\more-infinite-research_5.0.11012.zip",
+        "bytes": 676673,
+        "sha256": "5e5577fe468c89c10a0195cf18826901402bb9fd36a658719ba41eb7675bab98",
+        "members": 128
+      },
+      "original_execution": {
+        "source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+        "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+        "archive": {
+          "path": "build\\qualification\\aero-migration-501-inputs-r01\\reconstructed7a2\\more-infinite-research_5.0.11000.zip",
+          "bytes": 454014,
+          "sha256": "1c3d982cd048d3c83bf75108f1f9ac769ce0dc833a2de056cde16ef8ae2925a9",
+          "members": 128
+        },
+        "engine": {
+          "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+          "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+          "file_version": "1.1.110.62357",
+          "product_version": "1.1.110",
+          "base_version": "1.1.110"
+        },
+        "protected_source": {
+          "path": "build/mir5/recovery-historical/f110-f200-transition-published-f110-source-r05/native-output/write-data/saves/mir5-native-complete.zip",
+          "bytes": 821571,
+          "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253"
+        },
+        "completed_save": {
+          "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/write-data/saves/mir5-native-complete.zip",
+          "bytes": 822187,
+          "sha256": "FE1C8E726D0E532B1494A19769D9AB7E2C918C0C35914DAB047CAE09C87336B9"
+        },
+        "source_actual_lab_completions_reused_not_new": 1,
+        "actual_new_successor_lab_completions": 1,
+        "actual_read_only_cold_reloads": 2,
+        "native_observation": {
+          "case": "f110-f200-transition",
+          "stage": "initial",
+          "status": "passed",
+          "source_direct_lab_completions": 1,
+          "successor_direct_lab_completions": 1,
+          "seeded_catalogue_rows": 16,
+          "retained_catalogue_rows": 17,
+          "queued_progress": 0.42,
+          "suspended_progress": 0.27,
+          "foreign_disabled": true,
+          "inserter_stack_size_bonus": 2,
+          "stack_inserter_capacity_bonus": 4,
+          "on_load_read_only": false
+        }
+      },
+      "scope": "Preserve 17 retained rows, including 16 scripted seeds, injected 42% queued and 27% detached work, foreign disablement and inserter/stack contributions 2/4. The separately real source character-mining-speed completion is counted once; one actual successor completion and its save/two immutable cold loads retain their original 7a2 identity. Scripted/injected state is not ordinary-earned.",
+      "original_controller_commit": "f93b1108d3801b6d03a60ffe72d94d1e9aa0b55a",
+      "original_packet": {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/packet.json",
+        "bytes": 4409,
+        "sha256": "D094F6702E2173BA3A1577B67CE9EB3E1A718C3DF02B55E032F65BC97E9DD480"
+      },
+      "original_caller": {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/Invoke-OwnedF110Successor.ps1",
+        "bytes": 3720,
+        "sha256": "4FE595390B136EF9F3AAB07CC5EA6D95EFC3A3964F8542B41FE38AD08D416B66"
+      },
+      "original_terminal": {
+        "path": "build/qualification/f110-473-current7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 15571,
+        "sha256": "0636C3A6C388C12E8EB0910CCC03AC868ACBA0C08C8062FC7EFCDFF4DCC7A26D"
+      },
+      "original_source_stage": {
+        "execution_source": "0aad86ed85d59935daef4afee79397c36c132f5d",
+        "published_mir": {
+          "version": "4.7.11003",
+          "archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+          "bytes": 709749,
+          "profile_sha256": "71E65087FF85D94EBA62FD9B7EFC96D05762365F92ED7E72BDE2DB3CB452D4D4"
+        },
+        "fixture": {
+          "name": "mir-fixture-mir5-f110-f200-transition",
+          "version": "0.1.0",
+          "archive_sha256": "DDE2B3ADD1D0231E9BEC07B510FEC85D41615FCA49912607108F28F2B59A93C7",
+          "raw_members": {
+            "catalogue.lua": "A358C983C3328CBABE2CF83A87F22FBA02EEAB61A8CABAD23FD9FDAC3FD08ACD",
+            "control.lua": "241F2A3287C9FCF7C32C0A1C85553E1D3FEC674234CFD1FB1809FFE0D2D12A35",
+            "data-final-fixes.lua": "50F77BAB1D3C6A769B195254A10D8CECD4B10648879E87DE4CE7913108FC0A3D",
+            "fixture_control.lua": "520E234E7C7DBDCE35BC0A1926D5E317FAB8812713042661C1F695714D7F7E12",
+            "fixture_data_final.lua": "7800724E366BB792AA4EDA0CE834C943463A83AA439D91F6B2A1F2D900ED6426",
+            "info.json": "D47B86573654B1DDA5E4362F97101CCEB01100521E9209762B939772AF3F4412",
+            "settings-updates.lua": "CFCD79ABBB2234F91E5A9685C76855F39B2B86EBF665EBF620E8545CE4EE6854"
+          }
+        },
+        "scope": "One exact Factorio 1.1.110 source-stage fixture using published MIR 4.7.11003. This is not an F110-to-F200 transition acceptance result."
+      }
+    }
+  ],
+  "member_correspondence": {
+    "selected_identical_lua": [
+      "adapters/reduced/control.lua",
+      "adapters/reduced/data-final-fixes.lua",
+      "adapters/reduced/data.lua",
+      "adapters/reduced/settings.lua",
+      "api/v1/data.lua",
+      "api/v1/runtime.lua",
+      "compatibility/historical_continuations.lua",
+      "compatibility/historical_direct.lua",
+      "control.lua",
+      "data-final-fixes.lua",
+      "data.lua",
+      "research/cost.lua",
+      "research/historical_continuations.lua",
+      "research/historical_direct.lua",
+      "research/historical_direct_settings.lua",
+      "research/native_direct_definitions.lua",
+      "settings.lua"
+    ],
+    "identical_migrations": {
+      "f100": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f110": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json",
+        "migrations/more-infinite-research_5.0.11000.json"
+      ]
+    },
+    "member_counts": {
+      "f100": 127,
+      "f110": 128
+    },
+    "shared_executable_differences": [
+      "compatibility/science_bindings.lua",
+      "research/generator.lua",
+      "research/science.lua"
+    ],
+    "changed_members_per_archive": 106,
+    "metadata": "Only info.version and platform.distribution_version change; exact Base floors remain 1.0.0 and 1.1.110.",
+    "branch_proof": [
+      "All 17 selected Lua bodies are byte-identical for each edition. Both actual F100 migration bodies and all three F110 migration bodies are identical; the full original/current 127/128-member maps are retained in the referenced private reviews.",
+      "Reduced control only applies the three-function API adapter, with no player event/configuration-change registration or script.active_mods branch. distribution_version is consumed by API get_version only; original fixture makes no remote/version query.",
+      "science_bindings has_retired_space_role requires F200/F210+SpaceAge+SIF; F110 is false. science.space_science_retired returns false before retired-source logic. Changed K2 phase and SpaceAge output paths are not selected by exact Base-only F110.",
+      "append_worker_storage_prerequisites is guarded by inherit_worker_storage_prerequisites; no selected historical F110 direct row has it.",
+      "Positive non-duplicate preflight predicate/emission is unchanged. The change separates duplicate rejection diagnostics/maximum text; accepted original non-duplicate path never evaluates it.",
+      "Metadata differs only by declared distribution version; Base floors remain 1.0.0 for F100 and 1.1.110 for F110. Neither original fixture queries API get_version. Locale/changelog differences do not establish native state/effect/research behavior."
+    ],
+    "f100_branch_limit": "F100 retains the authored tanks/Base-only binding. The same inactive modern/SIF/SpaceAge and rejected duplicate paths are outside this original accepted route; no arbitrary F100 configuration or API-version query is admitted.",
+    "locale_limit": "The 100 changed locale bodies and changelog are outside the original no-render/no-Library state/effect route. No translation, GUI or performance result follows."
+  },
+  "original_evidence": [
+    {
+      "path": "spec/evidence/f110-473-current7a2-native-chain-r01.json",
+      "bytes": 8151,
+      "sha256": "c1eac174c79f5dd2f10843769f683f66a3416cbbce1b7d1a9ca4812dc2b8039b"
+    },
+    {
+      "path": "spec/evidence/f110-473-current7a2-native-receipts-r01.json.gz",
+      "bytes": 8415,
+      "sha256": "22e15e011273cc41ae4182dfa5e2f2f6541843e1396bcd8cebc5896815380cd3"
+    },
+    {
+      "path": "spec/evidence/f110-f200-published-source-r05-native-chain.json",
+      "bytes": 6561,
+      "sha256": "bff56165fcb7b3f5f5faca29ee9a4e244dca92833c0a6ce247be40cf67e83ce2"
+    },
+    {
+      "path": "spec/evidence/f110-f200-published-source-r05-native-receipts-r01.json.gz",
+      "bytes": 71428,
+      "sha256": "b47c074ecb28cdbfc099f22681b16768d3f77f1357bdd15a2a684424d6ca8b4a"
+    },
+    {
+      "path": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+      "bytes": 31102,
+      "sha256": "8fb420f70ac828312664af1eb3388e04996c9571b2a538474e3b343248865b31"
+    },
+    {
+      "path": "spec/evidence/historical-473-f017-f100-7a2-native-receipts-r01.json.gz",
+      "bytes": 27842,
+      "sha256": "fac9bac791de7ac1b7a92ca208681e39962d95f8dc90a28beab407518e7ac969"
+    }
+  ],
+  "full_review_custody": [
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "5113f2856fa9db9635552543c8d6d76498c19147",
+      "original_full_member_maps_and_reviews": [
+        {
+          "path": "projects/mir/reviews/mir512-f110-consumed-path-aero-r01/review.json",
+          "bytes": 6717,
+          "sha256": "4E1B22FD163848A223354B9A5BAE26A6C18CE25BC8545D97B155DDE421B7670B"
+        },
+        {
+          "path": "projects/mir/reviews/mir512-f110-consumed-path-aero-r01/member-comparison.json",
+          "bytes": 35847,
+          "sha256": "8C3FBC60575C046ECC1AFEF0EFB0E0CBBDB8DD6979FE8F77725AC0E90F9E2D8B"
+        },
+        {
+          "path": "projects/mir/reviews/mir512-f110-consumed-path-aero-r01/three-executable-differences.patch",
+          "bytes": 19622,
+          "sha256": "85FB1202ED5415DF5BE3BE4507F442FDE8C8B29D7A51998B5821473BBB3B0EA6"
+        }
+      ]
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "74b97cd0cc4f944b330acd91e0ed206b4d586bb0",
+      "original_full_member_maps_and_reviews": [
+        {
+          "path": "projects/mir/reviews/mir512-f017-f100-consumed-path-aero-r01/review.json",
+          "bytes": 13985,
+          "sha256": "86FD03A4446527921BDA9440D901C7D83FE7B2C8673018743999C67A838FD6E1"
+        },
+        {
+          "path": "projects/mir/reviews/mir512-f017-f100-consumed-path-aero-r01/member-comparison-f100.json",
+          "bytes": 35466,
+          "sha256": "E195E5F4175DF3A8BF3B86620D266488ADAE964D735D93FBE9D18D52D8463AE1"
+        },
+        {
+          "path": "projects/mir/reviews/mir512-f017-f100-consumed-path-aero-r01/three-shared-executable-differences.patch",
+          "bytes": 19622,
+          "sha256": "85FB1202ED5415DF5BE3BE4507F442FDE8C8B29D7A51998B5821473BBB3B0EA6"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "No public 5.0.12 native rerun, new native process or rewritten original receipt.",
+    "No automatic F017, other historical same-edition, forward-engine, worker/provider/overhaul or modern transition adoption.",
+    "No complete catalogue, ordinary tuning, API-version behavior, client, GUI/localization, performance, release or stable qualification.",
+    "Further player/engine/mod/settings/save/harness/endpoint changes require their own consumed-path applicability assessment; stale exact-version fixture pins alone are not a product defect or reason to repeat a run."
+  ],
+  "new_native_execution_count": 0,
+  "new_package_count": 0,
+  "stable_acceptance": false
+}
