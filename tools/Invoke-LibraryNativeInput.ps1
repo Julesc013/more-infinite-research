@@ -11,6 +11,21 @@ Set-StrictMode -Version Latest
 
 function Assert-LibraryInput([bool]$Condition,[string]$Message){if(-not$Condition){throw "[mir-library-input] $Message"}}
 function Test-LibraryInputInteger($Value){return $Value-is[int] -or $Value-is[long]}
+function Test-LibraryInputUnicodeText([string]$Text){
+  if($Text.Length-lt1-or$Text.Length-gt32){return $false}
+  for($index=0;$index-lt$Text.Length;){
+    $character=$Text[$index]
+    if([char]::IsHighSurrogate($character)){
+      if($index+1-ge$Text.Length-or-not[char]::IsLowSurrogate($Text[$index+1])){return $false}
+      $index+=2;continue
+    }
+    if([char]::IsLowSurrogate($character)-or[char]::IsControl($character)){return $false}
+    $category=[Globalization.CharUnicodeInfo]::GetUnicodeCategory($character)
+    if($category-eq[Globalization.UnicodeCategory]::LineSeparator-or$category-eq[Globalization.UnicodeCategory]::ParagraphSeparator){return $false}
+    $index++
+  }
+  return $true
+}
 function Invoke-LibraryInputHardwareKey{
   param(
     [Parameter(Mandatory)][ValidateSet('escape','inventory','tab')][string]$Action,
@@ -83,11 +98,14 @@ function Invoke-LibraryInputDragSchedule{
 }
 function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $common=@('schema','kind','role','process_id','process_start_utc','engine_sha256','action','client_width','client_height')
-  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','tab','text','click','drag')) 'action differs'
+  $legacy=$Spec.kind-is[string]-and$Spec.kind-ceq'MIRLibraryNativeInputV1'
+  $unicodeText=$Spec.kind-is[string]-and$Spec.kind-ceq'MIRLibraryNativeUnicodeTextV1'
+  Assert-LibraryInput ($legacy-or$unicodeText) 'schema differs'
+  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $(if($unicodeText){$Spec.action-ceq'text'}else{$Spec.action-cin@('escape','inventory','tab','text','click','drag')})) 'action differs'
   $extra=switch($Spec.action){'text'{@('text')};'click'{@('x','y')};'drag'{@('x','y','target_x','target_y')};default{@()}}
   $expected=@($common)+@($extra)
   Assert-LibraryInput ($Spec.Count-eq$expected.Count -and ((@($Spec.Keys|Sort-Object)-join'|')-ceq(@($expected|Sort-Object)-join'|'))) 'fields differ'
-  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.schema) -and $Spec.schema-eq1 -and $Spec.kind-is[string] -and $Spec.kind-ceq'MIRLibraryNativeInputV1') 'schema differs'
+  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.schema) -and $Spec.schema-eq1) 'schema differs'
   Assert-LibraryInput ($Spec.role-is[string] -and $Spec.role-cin@('client-en','client-de')) 'client role differs'
   Assert-LibraryInput ((Test-LibraryInputInteger $Spec.process_id) -and $Spec.process_id-gt0 -and $Spec.process_id-le[int]::MaxValue) 'process identity differs'
   $parsed=[datetimeoffset]::MinValue
@@ -97,7 +115,7 @@ function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
     (($Spec.client_width-eq1280 -and $Spec.client_height-eq720) -or
      ($Spec.client_width-eq2560 -and $Spec.client_height-eq1440))) 'client geometry differs'
   if($Spec.action-ceq'text'){
-    Assert-LibraryInput ($Spec.text-is[string] -and $Spec.text.Length-ge1 -and $Spec.text.Length-le32 -and $Spec.text-cmatch'\A[A-Za-z0-9 -]+\z') 'text differs'
+    Assert-LibraryInput ($Spec.text-is[string] -and $(if($unicodeText){Test-LibraryInputUnicodeText $Spec.text}else{$Spec.text.Length-ge1 -and $Spec.text.Length-le32 -and $Spec.text-cmatch'\A[A-Za-z0-9 -]+\z'})) 'text differs'
   }
   if($Spec.action-cin@('click','drag')){
     foreach($name in @('x','y')){Assert-LibraryInput (Test-LibraryInputInteger $Spec[$name]) 'point type differs'}
@@ -117,7 +135,11 @@ Assert-LibraryInput ((Get-FileHash -LiteralPath $specFile -Algorithm SHA256).Has
 $spec=Get-Content -LiteralPath $specFile -Raw|ConvertFrom-Json -AsHashtable -DateKind String
 Assert-LibraryInputPlan $spec
 if($ValidateOnly){
-  [ordered]@{status='validated-schema-only';action=$spec.action;native_input_sent=$false;native_process_identity_checked=$false}|ConvertTo-Json
+  if($spec.kind-ceq'MIRLibraryNativeUnicodeTextV1'){
+    [ordered]@{kind='MIRLibraryNativeUnicodeTextReceiptV1';plan_kind=$spec.kind;status='validated-schema-only';action=$spec.action;native_input_sent=$false;native_process_identity_checked=$false}|ConvertTo-Json
+  }else{
+    [ordered]@{status='validated-schema-only';action=$spec.action;native_input_sent=$false;native_process_identity_checked=$false}|ConvertTo-Json
+  }
   return
 }
 $output=[IO.Path]::GetFullPath($OutputRoot)
@@ -173,7 +195,11 @@ $client=$null;$mouseHeld=$false;$heldHardwareScan=[uint16]0;$sent=0;$failure='';
 $physicalPointerPositions=[System.Collections.Generic.List[object]]::new()
 $hardwareKeyEvents=[System.Collections.Generic.List[object]]::new()
 $diagnostics=New-MIROwnedMenuObserverDiagnostics
-$result=[ordered]@{kind='MIRLibraryNativeInputReceiptV1';status='started';spec_sha256=$SpecSha256.ToUpperInvariant();role=$spec.role;process_id=$spec.process_id;process_start_utc=$spec.process_start_utc;engine_sha256=$spec.engine_sha256;action=$spec.action;native_game_observation=$false;release_qualification=$false}
+$result=if($spec.kind-ceq'MIRLibraryNativeUnicodeTextV1'){
+  [ordered]@{kind='MIRLibraryNativeUnicodeTextReceiptV1';plan_kind=$spec.kind;status='started';spec_sha256=$SpecSha256.ToUpperInvariant();role=$spec.role;process_id=$spec.process_id;process_start_utc=$spec.process_start_utc;engine_sha256=$spec.engine_sha256;action=$spec.action;native_game_observation=$false;release_qualification=$false}
+}else{
+  [ordered]@{kind='MIRLibraryNativeInputReceiptV1';status='started';spec_sha256=$SpecSha256.ToUpperInvariant();role=$spec.role;process_id=$spec.process_id;process_start_utc=$spec.process_start_utc;engine_sha256=$spec.engine_sha256;action=$spec.action;native_game_observation=$false;release_qualification=$false}
+}
 try{
   $client=Get-Process -Id ([int]$spec.process_id)
   $expectedStart=[datetimeoffset]::Parse($spec.process_start_utc).UtcDateTime
