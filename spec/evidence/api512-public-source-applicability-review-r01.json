@@ -1,0 +1,1088 @@
+{
+  "schema": 1,
+  "kind": "MIR512FinalSourceAPIApplicabilityReviewV1",
+  "reviewed_utc": "2026-11-11T16:00:41.828582+00:00",
+  "verdict": "GO scoped method/consumer semantics reuse; one affected two-engine API scenario remains required for public Source0efb lifecycle credit",
+  "blanket_result_reuse": false,
+  "new_native_execution_count": 0,
+  "execution_identity": "BLACKGLASS-WIN1\\Jules (read from WindowsIdentity in this review; no GitHub credential operation)",
+  "model_disclosure": "Parent configured this bounded review as gpt-6.1-sol/xhigh. No runtime API exposed an independently verified backend model identity or effort; none is asserted.",
+  "authority": [
+    "AGENTS.md: reuse native evidence only for exact trusted inputs",
+    "spec/api.md: final candidate consumed-input review; run affected documented methods and closures",
+    "spec/verification.md VER-06: all consumed inputs demonstrably unchanged; shared path or uncertain impact widens coverage; preserve original execution identity and oracle"
+  ],
+  "old_actual_result": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r02-independent-result-review-r01.json",
+    "bytes": 22981,
+    "sha256": "928A45C7E22EE80A50AACED5E5A54ECB752B950E68B077970176A06C6DA31E41"
+  },
+  "named_per_engine_spec_reviews_present": {
+    "f200": false,
+    "f210": false
+  },
+  "old_source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+  "old_player_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "public_main": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+  "public_player_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+  "public_packages_previously_accepted_not_requalified_here": {
+    "f200": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.12\\more-infinite-research_5.0.20012.zip",
+      "sha256": "76517C54FAE4B62DC1828350A8DEB32C39164822525AF51446369433C764C27D"
+    },
+    "f210": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.12\\more-infinite-research_5.0.21012.zip",
+      "sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7"
+    }
+  },
+  "source_member_comparison": [
+    {
+      "member": "api/v1/data.lua",
+      "old_bytes": 12993,
+      "new_bytes": 12993,
+      "old_sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "new_sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "equal": true
+    },
+    {
+      "member": "api/v1/runtime.lua",
+      "old_bytes": 3663,
+      "new_bytes": 3663,
+      "old_sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "new_sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "equal": true
+    },
+    {
+      "member": "control.lua",
+      "old_bytes": 248,
+      "new_bytes": 248,
+      "old_sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+      "new_sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+      "equal": true
+    },
+    {
+      "member": "research/generator.lua",
+      "old_bytes": 5802,
+      "new_bytes": 5802,
+      "old_sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717",
+      "new_sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717",
+      "equal": true
+    },
+    {
+      "member": "platform/target.lua",
+      "old_bytes": 502,
+      "new_bytes": 502,
+      "old_sha256": "9DBF075C36A09E096276FFE9DFEF4EC38B81D91E236D90EDFAF8A4AD6F2234FC",
+      "new_sha256": "9DBF075C36A09E096276FFE9DFEF4EC38B81D91E236D90EDFAF8A4AD6F2234FC",
+      "equal": true
+    },
+    {
+      "member": "runtime/configuration.lua",
+      "old_bytes": 347,
+      "new_bytes": 347,
+      "old_sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+      "new_sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+      "equal": true
+    },
+    {
+      "member": "runtime/native_credits.lua",
+      "old_bytes": 54427,
+      "new_bytes": 54427,
+      "old_sha256": "537F7E94FD515D449435A8E52FE86DCB4BB372C612418846C0575583D8A5B7B5",
+      "new_sha256": "537F7E94FD515D449435A8E52FE86DCB4BB372C612418846C0575583D8A5B7B5",
+      "equal": true
+    },
+    {
+      "member": "runtime/library.lua",
+      "old_bytes": 152920,
+      "new_bytes": 152920,
+      "old_sha256": "369403A8D4612F757F00D497361818256740F1290AC65D114A297157DC4B5504",
+      "new_sha256": "369403A8D4612F757F00D497361818256740F1290AC65D114A297157DC4B5504",
+      "equal": true
+    },
+    {
+      "member": "settings.lua",
+      "old_bytes": 55,
+      "new_bytes": 55,
+      "old_sha256": "74CA40A95F0B4F96F2D05F4ABC46725E761F8EDC4E142F82DCDB7643257A2121",
+      "new_sha256": "74CA40A95F0B4F96F2D05F4ABC46725E761F8EDC4E142F82DCDB7643257A2121",
+      "equal": true
+    },
+    {
+      "member": "changelog.txt",
+      "old_bytes": 138317,
+      "new_bytes": 139261,
+      "old_sha256": "E6708927E219DC83D76CC82F8CC265E55725D8BDE193F3DD22132FDF2A90CF38",
+      "new_sha256": "A9DD4ED5B56C6A4B19B01B3479D986011CF50F3B4CFA8766A2C8AC4C0174E759",
+      "equal": false
+    },
+    {
+      "member": "compatibility/modern_catalogue/bob_warfare.lua",
+      "old_bytes": 5707,
+      "new_bytes": 5663,
+      "old_sha256": "E2DFFAFEDD63A7A5AD2C131C0C8624A1B7C792380182E5EA49FB10A7993FC1F1",
+      "new_sha256": "356761F1526AA701E8C26717995FA576E12F1C052178F83A8B27D85CB7D569E5",
+      "equal": false
+    },
+    {
+      "member": "data-final-fixes.lua",
+      "old_bytes": 22609,
+      "new_bytes": 24473,
+      "old_sha256": "A584373F0EDD32D864A8865BBECCCFA18A2289547E3D9A5203681BC982845DEA",
+      "new_sha256": "39B25DFD41629E8765F95763B6F968F04BC5F74EAC4FD1F116FC0A355353152D",
+      "equal": false
+    },
+    {
+      "member": "research/catalogue.lua",
+      "old_bytes": 17567,
+      "new_bytes": 18679,
+      "old_sha256": "FBE14CE4AC989AC1A0BACA90D61BAE21F458DE26A57D619E5FFA6AE9464B35EC",
+      "new_sha256": "B40EC4E6F98C963861F5F9B8C7BC7BEE299D401BF269681B71F13052E0C6C195",
+      "equal": false
+    },
+    {
+      "member": "research/native_adoption.lua",
+      "old_bytes": 7390,
+      "new_bytes": 7938,
+      "old_sha256": "FE8D36252FC5F13ED3907E6259B8E0C02F9B8A95B7121AC0AFE23E1E9B0A3711",
+      "new_sha256": "47E5CB2D2985145A28D238DF515922B00D1EDF77D84C328A278C87296AB88827",
+      "equal": false
+    },
+    {
+      "member": "research/worker_storage_recovery.lua",
+      "old_bytes": 6819,
+      "new_bytes": 12792,
+      "old_sha256": "80FEB07F5C4D4D722D5ECD7BD2CCFF8C6768A11791CBDBBC855CF844328E1B93",
+      "new_sha256": "074D9EE66CFFC82DA30B6D1B950D7538A2E2C6E673C0E7B9D63BD36B12390381",
+      "equal": false
+    },
+    {
+      "member": "runtime/bootstrap.lua",
+      "old_bytes": 37369,
+      "new_bytes": 40048,
+      "old_sha256": "B34CB1F698C3AEF44B5E23ED58EDCCA83E751FF201AC28AEF58462577F8949A8",
+      "new_sha256": "17658C7DA77776E06F0D96B2D1D0A550145BACE9638081688C1B9663A83CF13B",
+      "equal": false
+    },
+    {
+      "member": "runtime/catalogue.lua",
+      "old_bytes": 9253,
+      "new_bytes": 10744,
+      "old_sha256": "E913D1940B684C7DA6F4F5BBAB3DAE0780BF8A1215F0DACA254793B15BE50467",
+      "new_sha256": "5DF05026B6932BCAD6608A0464A2494BB85CD0B9D2111C649D02421F4C78D39F",
+      "equal": false
+    },
+    {
+      "member": "runtime/lifecycle.lua",
+      "old_bytes": 36705,
+      "new_bytes": 43216,
+      "old_sha256": "E9ABE68A1032B314FB425D36ED58A7CA917A634FCC920A812942A5C59267BBC6",
+      "new_sha256": "A7845A9ABC56513C9F4057C06C0844D9ACCA364476900BF220321A6309EBBBAA",
+      "equal": false
+    },
+    {
+      "member": "runtime/worker_robot_storage.lua",
+      "old_bytes": 37165,
+      "new_bytes": 99883,
+      "old_sha256": "63C235C3DF5319343C19EB34B76F2DE9EE67D9D89013CD39AA85490DB31A8646",
+      "new_sha256": "5DBEC75BD85EA60FDE1A217F6FB6FFEC786EDC448C0246F815E22F6D1C269479",
+      "equal": false
+    }
+  ],
+  "original_cases": [
+    {
+      "target": "f200",
+      "bindings_rehashed": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\packet.json",
+          "bytes": 473713,
+          "sha256": "478D33E55712EBEF4C1BF6D7203D693C716EB00D529C44D06981E30EB647E8E7"
+        },
+        "caller": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\Invoke-Owned.ps1",
+          "bytes": 32320,
+          "sha256": "4094AFF343A8D3386FD17F3751D620ECBDC8E983FDF82E7F43BB964E6288B3EA"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\composition.json",
+          "bytes": 16927,
+          "sha256": "920D66FE8609D74801D617FA14AFB3A78023312D0390BEDBA7DEF31A702559F6"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\execution-record\\terminal.json",
+          "bytes": 9620,
+          "sha256": "59474433841C991FA26C7686EC46B4BE1843B3D14B8B8B4ADDCE8B13805BE1A7"
+        },
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\profile.json",
+          "bytes": 2041,
+          "sha256": "2D85B21D4D41BAC6E8943A322E097F514C1D75110445540FC1CE4CCE1C549381"
+        }
+      },
+      "original_native_result_mirror": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures\\result.json",
+        "bytes": 49752,
+        "sha256": "7749B14F6FF0EEBF3152FC1191F743800C5C0F5004FBC23FE9FBDAAE50E5C396"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77"
+      },
+      "profile_settings": "Defaults",
+      "profile_mods": [
+        {
+          "name": "base",
+          "version": "2.0.77",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.0.77",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.0.77",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.0.77",
+          "enabled": true
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.20012",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-alpha",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-beta",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-beta-production",
+          "version": "0.1.0",
+          "enabled": true
+        }
+      ],
+      "old_loaded_player": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.20012.zip",
+          "bytes": 1021663,
+          "sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "fixtures_verified_archive_and_source": [
+        {
+          "role": "active-mods-observer",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f200-r01-controller\\owned-fixtures\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+            "bytes": 833,
+            "sha256": "9158D3B9CF68C0C857EF3974C85E459B6AFC838CCC70BEEAA2BA6B14709A7E73"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200-inputs/fixture-sources/active-mods-observer",
+          "members": [
+            {
+              "member": "data-final-fixes.lua",
+              "bytes": 477,
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "member": "info.json",
+              "bytes": 231,
+              "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A"
+            }
+          ]
+        },
+        {
+          "role": "api-alpha",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f200-r01-controller\\owned-fixtures\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+            "bytes": 2773,
+            "sha256": "09317C92BA2C94AA18E3A67F68F8B961370673C22D288E04813CB5DB35041DE1"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200-inputs/fixture-sources/api-alpha",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 4989,
+              "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB"
+            },
+            {
+              "member": "data.lua",
+              "bytes": 736,
+              "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881"
+            },
+            {
+              "member": "graphics/icon.png",
+              "bytes": 137,
+              "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D"
+            },
+            {
+              "member": "info.json",
+              "bytes": 375,
+              "sha256": "8F1C8AD42C31C9FD3230E4446E0622D31B2780AAA8B3ED1C262CB0EA9E1D60CE"
+            }
+          ]
+        },
+        {
+          "role": "api-beta",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f200-r01-controller\\owned-fixtures\\mir-fixture-mir5-api-beta_0.1.0.zip",
+            "bytes": 2813,
+            "sha256": "C7110EFD2C3D8BEC08B165789C6FFB6586BA1197E99FED739AD87EF2C70D0C3B"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200-inputs/fixture-sources/api-beta",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 4428,
+              "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729"
+            },
+            {
+              "member": "data-final-fixes.lua",
+              "bytes": 952,
+              "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4"
+            },
+            {
+              "member": "graphics/icon.png",
+              "bytes": 137,
+              "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE"
+            },
+            {
+              "member": "info.json",
+              "bytes": 380,
+              "sha256": "40DA274C7B3A907BD9CB52561FB651D12A104BCDFA5DC28F2862C8EF9445E055"
+            }
+          ]
+        },
+        {
+          "role": "api-beta-production",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\owned-fixtures\\mir-fixture-mir5-api-beta-production_0.1.0.zip",
+            "bytes": 4295,
+            "sha256": "BCA8720B791A77AFECC5D10AA4F123919A723B3F011260DF29EF5443B9471964"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f200-inputs/fixture-sources/api-beta-production",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 14105,
+              "sha256": "A01DAEF248C78A9C73E67944955748AF2A940EC38950FC0C2B32393E73B9C9AB"
+            },
+            {
+              "member": "info.json",
+              "bytes": 432,
+              "sha256": "4B5693D05D85CCEBA10C00CC241A79590020FBC4C4A8C7A04D548B6A98CD02EF"
+            }
+          ]
+        }
+      ],
+      "original_witnesses_reparsed": [
+        {
+          "role": "create",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures\\create.factorio.log",
+            "bytes": 8499,
+            "sha256": "24B2A8BAC87CCB9776242404E7D825320B89E17A7667D7B1576F05741FBA8DA3"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": true,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": false,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "production",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures\\production.factorio.log",
+            "bytes": 10516,
+            "sha256": "26F78BA4E6B242A3E7377A652AD54AFF09436CD55DA5E03B468885761FC90C04"
+          },
+          "process_exit_code": -1,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "cold1",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures\\reload-1.factorio.log",
+            "bytes": 9421,
+            "sha256": "BFDB71E2DF0C48CBFE975A8F767FA9E7F88BF8CE070B65D108B9F46A21A07A9B"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "cold2",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\corrected-r02\\native-captures\\reload-2.factorio.log",
+            "bytes": 9421,
+            "sha256": "48A1AABBCAF34124348570E93613A3B4425303EFAD84659C1DF3AEF65E8C3659"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        }
+      ],
+      "physical_counts": {
+        "baseline_plates": 100,
+        "baseline_cables": 200,
+        "researched_plates": 100,
+        "researched_cables": 202,
+        "recipe_productivity_bonus": 0.01,
+        "assembler_productivity_bonus": 0,
+        "modules_empty": true,
+        "beacons_created": false
+      },
+      "save_identities": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\write-data\\saves\\seed.zip",
+          "bytes": 574522,
+          "sha256": "A5AB8D67FEA19FA1B25F25F0E6A5067A62EDEEB1FAC2F09FBFC77AA6BC930357",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f200\\write-data\\saves\\mir5-native-complete.zip",
+          "bytes": 580224,
+          "sha256": "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        }
+      ],
+      "cold_save_hashes": [
+        "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242",
+        "0AFB1B3E85EAC4EAD34351B4F17BD7512948810F44F3AFEAECC1966E987A7242"
+      ],
+      "harness_head": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+      "harness_source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+      "public_helpers": [
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "bytes": 95780,
+          "sha256": "5FF07FF2131DB29C42B25185CF8984824C010272FE6B1BB4CACE26189938B199"
+        },
+        {
+          "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+          "bytes": 20656,
+          "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+        },
+        {
+          "path": "tools/lib/compatibility/LibraryActivation.ps1",
+          "bytes": 36892,
+          "sha256": "74CC59A11E792F3CE3BC7DF135867806CFD928E2D2BAE37240554D53624CA3A4"
+        },
+        {
+          "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+          "bytes": 27979,
+          "sha256": "EC5E310D8C6A230D3EE107467A73B46F7A85898780C010BBFB4376F3A8EB0107"
+        },
+        {
+          "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+          "bytes": 25710,
+          "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeCommon.ps1",
+          "bytes": 4079,
+          "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeResources.ps1",
+          "bytes": 14020,
+          "sha256": "9A43E8109B08A6C56D3B716F24AB88816677A41403EF57A8FCF3D5409B8EAE9A"
+        },
+        {
+          "path": "tools/lib/validation/ResourceGovernor.ps1",
+          "bytes": 26117,
+          "sha256": "BF33D66549A22D8DEE34FCA705C9E717771249A692837EDDBC4EBA7B73F9D243"
+        }
+      ],
+      "custody_helper": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f200/Existing-OwnedArchiveFunctions.ps1",
+        "bytes": 4973,
+        "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+      },
+      "fixed_input_count": 2007,
+      "fixed_player_inputs": [
+        {
+          "path": "D:/Projects/Factorio/more-infinite-research/dist/v5.0.11/more-infinite-research_5.0.20011.zip",
+          "bytes": 1006342,
+          "sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC"
+        },
+        {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.20012.zip",
+          "bytes": 1021663,
+          "sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "bindings_rehashed": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\packet.json",
+          "bytes": 528704,
+          "sha256": "899C665887C3F1292A91B2325525B731FE6232F21B3DFF586946D02F5DD64F78"
+        },
+        "caller": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\Invoke-Owned.ps1",
+          "bytes": 32493,
+          "sha256": "6CDA58B84E307C7D1A3CDAC8B5543B63CB6258D4A201ED6240697AAC123603E2"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\composition.json",
+          "bytes": 18405,
+          "sha256": "144174F8017BE475B00C5CDE3C68413AF57A47F93FB8A12B447ECA0837623FF5"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\execution-record\\terminal.json",
+          "bytes": 9687,
+          "sha256": "3376E70FBFD567E49A8FF54ACD970F91637A52EEC877CC3EE34AAC46E2DD64A2"
+        },
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\profile.json",
+          "bytes": 2129,
+          "sha256": "9579B34781633728FCF9981FF55756FB81800696E9DAB6EEFE58CFF191FAC767"
+        }
+      },
+      "original_native_result_mirror": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures\\result.json",
+        "bytes": 50201,
+        "sha256": "980928D3E73345EE0A5E7DD32EEF3F3EDB1BD70187DC37D63B778B35840CBE2B"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "version": "2.1.23",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "profile_settings": "Defaults",
+      "profile_mods": [
+        {
+          "name": "base",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "recycler",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21012",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-alpha",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-beta",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-api-beta-production",
+          "version": "0.1.0",
+          "enabled": true
+        }
+      ],
+      "old_loaded_player": {
+        "archive": {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.21012.zip",
+          "bytes": 1022087,
+          "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+        },
+        "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+        "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f"
+      },
+      "fixtures_verified_archive_and_source": [
+        {
+          "role": "active-mods-observer",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f210-r01-controller\\owned-fixtures\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+            "bytes": 834,
+            "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210-inputs/fixture-sources/active-mods-observer",
+          "members": [
+            {
+              "member": "data-final-fixes.lua",
+              "bytes": 477,
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "member": "info.json",
+              "bytes": 231,
+              "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+            }
+          ]
+        },
+        {
+          "role": "api-alpha",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f210-r01-controller\\owned-fixtures\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+            "bytes": 2776,
+            "sha256": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210-inputs/fixture-sources/api-alpha",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 4989,
+              "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB"
+            },
+            {
+              "member": "data.lua",
+              "bytes": 736,
+              "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881"
+            },
+            {
+              "member": "graphics/icon.png",
+              "bytes": 137,
+              "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D"
+            },
+            {
+              "member": "info.json",
+              "bytes": 375,
+              "sha256": "CC8C9254B536C16B44A6F9E7B4B63250F1477C5ADAF2337C1A401A8E459DCF7F"
+            }
+          ]
+        },
+        {
+          "role": "api-beta",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-production511-f210-r01-controller\\owned-fixtures\\mir-fixture-mir5-api-beta_0.1.0.zip",
+            "bytes": 2815,
+            "sha256": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210-inputs/fixture-sources/api-beta",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 4428,
+              "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729"
+            },
+            {
+              "member": "data-final-fixes.lua",
+              "bytes": 952,
+              "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4"
+            },
+            {
+              "member": "graphics/icon.png",
+              "bytes": 137,
+              "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE"
+            },
+            {
+              "member": "info.json",
+              "bytes": 380,
+              "sha256": "5C2611225712DFD0B89B77DDCB13267F48AD5E6592BE535282C82015E8DB486C"
+            }
+          ]
+        },
+        {
+          "role": "api-beta-production",
+          "archive": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\owned-fixtures\\mir-fixture-mir5-api-beta-production_0.1.0.zip",
+            "bytes": 4297,
+            "sha256": "0F4047648425438ADD7FBA894198EE2803C9BFE6BAAD3CE4FD638330056B86CE"
+          },
+          "source_directory": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-production-r01-f210-inputs/fixture-sources/api-beta-production",
+          "members": [
+            {
+              "member": "control.lua",
+              "bytes": 14105,
+              "sha256": "3995C63C7524A1ED71C4CBC803D23BC235DA9F08FB6EFB949748BA11F967B281"
+            },
+            {
+              "member": "info.json",
+              "bytes": 432,
+              "sha256": "13B3CECC2121E6EB6D675274C9E7898B807F26E6CE1E117AE77A4D29C33C4778"
+            }
+          ]
+        }
+      ],
+      "original_witnesses_reparsed": [
+        {
+          "role": "create",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures\\create.factorio.log",
+            "bytes": 13705,
+            "sha256": "659F4D6EE437D3F4C261EED4A319672E1CDEFA42781B9C791B22B5DA0D3FBF7D"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": true,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": false,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "production",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures\\production.factorio.log",
+            "bytes": 15700,
+            "sha256": "27C2EFDEA96789FE35F82B1AAD0893FAED8E62CDB4D88529BDB6871123A59B36"
+          },
+          "process_exit_code": -1,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "cold1",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures\\reload-1.factorio.log",
+            "bytes": 14605,
+            "sha256": "BF1990A748E2036EC6EAAEF9E72D6D08B303C3268580A146F94C980FC77C6764"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        },
+        {
+          "role": "cold2",
+          "canonical_log": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\corrected-r02\\native-captures\\reload-2.factorio.log",
+            "bytes": 14605,
+            "sha256": "DC57B082AAC6E023B989F2D95DE1A28858EE821E6306CDA0F2B787720377C3F5"
+          },
+          "process_exit_code": 0,
+          "consumers": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        }
+      ],
+      "physical_counts": {
+        "baseline_plates": 100,
+        "baseline_cables": 200,
+        "researched_plates": 100,
+        "researched_cables": 202,
+        "recipe_productivity_bonus": 0.01,
+        "assembler_productivity_bonus": 0,
+        "modules_empty": true,
+        "beacons_created": false
+      },
+      "save_identities": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\write-data\\saves\\seed.zip",
+          "bytes": 572792,
+          "sha256": "F197E2CB6572D8541AE68B94D74682394D708B6DE886DF9944F7DF95E93E4386",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api512-production-r01-f210\\write-data\\saves\\mir5-native-complete.zip",
+          "bytes": 578373,
+          "sha256": "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D",
+          "members": 55,
+          "CRC": "allpassed",
+          "nlink": 1
+        }
+      ],
+      "cold_save_hashes": [
+        "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D",
+        "4E8F2CD35BDA0AC42C7C0EE176274ABE314E6F531BCB66660064B3292F50BF7D"
+      ],
+      "harness_head": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+      "harness_source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+      "public_helpers": [
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "bytes": 95780,
+          "sha256": "5FF07FF2131DB29C42B25185CF8984824C010272FE6B1BB4CACE26189938B199"
+        },
+        {
+          "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+          "bytes": 20656,
+          "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+        },
+        {
+          "path": "tools/lib/compatibility/LibraryActivation.ps1",
+          "bytes": 36892,
+          "sha256": "74CC59A11E792F3CE3BC7DF135867806CFD928E2D2BAE37240554D53624CA3A4"
+        },
+        {
+          "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+          "bytes": 27979,
+          "sha256": "EC5E310D8C6A230D3EE107467A73B46F7A85898780C010BBFB4376F3A8EB0107"
+        },
+        {
+          "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+          "bytes": 25710,
+          "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeCommon.ps1",
+          "bytes": 4079,
+          "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+        },
+        {
+          "path": "tools/lib/validation/NativeProbeResources.ps1",
+          "bytes": 14020,
+          "sha256": "9A43E8109B08A6C56D3B716F24AB88816677A41403EF57A8FCF3D5409B8EAE9A"
+        },
+        {
+          "path": "tools/lib/validation/ResourceGovernor.ps1",
+          "bytes": 26117,
+          "sha256": "BF33D66549A22D8DEE34FCA705C9E717771249A692837EDDBC4EBA7B73F9D243"
+        }
+      ],
+      "custody_helper": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-production-r01-controller/f210/Existing-OwnedArchiveFunctions.ps1",
+        "bytes": 4973,
+        "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+      },
+      "fixed_input_count": 2247,
+      "fixed_player_inputs": [
+        {
+          "path": "D:/Projects/Factorio/more-infinite-research/dist/v5.0.11/more-infinite-research_5.0.21011.zip",
+          "bytes": 1006768,
+          "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+        },
+        {
+          "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.21012.zip",
+          "bytes": 1022087,
+          "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+        }
+      ]
+    }
+  ],
+  "consumed_oracle_analysis": [
+    "Alpha creates alpha-1 and alpha-2 in data.lua by ordered family API; alpha-1 depends on alpha-2 and has +0.05 character crafting speed. Beta creates beta-cable-1 after MIR final fixes with +0.01 copper-cable productivity. API declarations, Generator, capability/version semantics and query implementation are unchanged.",
+    "Both independent consumer actors query only their named finite1 technology, an absent named technology and absent force2147483647. Their status assertions use name/force_index/researched/level/enabled/max_level and detached returns. No complete-catalogue row/count/schema oracle exists in these actors or production actor. Runtime get_research directly reads one native technology and has no consumer-only or private-ID filter; do not invent complete-catalogue API coverage.",
+    "The unchanged runner Read-ConsumerResults requires exactly one Alpha and Beta marker for each expected stage; this count is a marker count, not research/catalogue row count. Alpha/Beta do not create/reset/merge forces. Existing native result covers the player force only; force-created hooks receive no direct oracle here.",
+    "Production uses player.force.enable_all_prototypes(), then researches Beta via documented native researched setter (with prerequisites), not labs. It physically drains two100plate batches to200/202cables, saves, and checks persisted physical counts plus fresh native API/recipe state on two cold processes. Cold results are not new crafting.",
+    "Neither consumer declares, completes or queries worker storage. Consequently the new worker row cannot justify revising their IDs, finite1 expectations, marker count, effect thresholds or physical200/202 outputs. Existing results remain actual Source47537 observations, not public-package execution."
+  ],
+  "changed_shared_inputs_and_effect": [
+    {
+      "members": [
+        "data-final-fixes.lua",
+        "research/worker_storage_recovery.lua",
+        "research/native_adoption.lua"
+      ],
+      "effect": "Both closed Defaults+SpaceAge profiles select the MIR default worker route, with no foreign finite provider. New emission includes permanent mir-worker-storage-default-4 and private mir-worker-storage-head-4, and records worker_default_split in private mod-data. This path is active in the exact API worlds, not excluded by missing overhaul mods."
+    },
+    {
+      "members": [
+        "research/catalogue.lua",
+        "runtime/catalogue.lua"
+      ],
+      "effect": "Control parsing now validates MIR creation custody/level4/infinite shape for the default tail/debit and canonical head. The declared worker head gains fixed_maximum4 and an additional visible default-tail row; the debit is an internal-credit ID. Complete authored catalogue content changes even though the public query schema remains unchanged."
+    },
+    {
+      "members": [
+        "runtime/bootstrap.lua",
+        "runtime/lifecycle.lua",
+        "runtime/worker_robot_storage.lua"
+      ],
+      "effect": "New default_owner_on_init plans/applies native owner transfer and persistent schema3 force history before lifecycle init. The head fixed maximum explicitly activates CAPS_ACTIVE even with otherwise unlimited Defaults. Startup, force/research/effects callbacks therefore share new active code with the same API consumer native setters and enable_all_prototypes setup. On_load now validates/reconnects the owner record. Existing worker earning/upgrade/two-cold evidence supports worker scope but does not execute these independent API actors under that changed lifecycle."
+    },
+    {
+      "members": [
+        "compatibility/modern_catalogue/bob_warfare.lua"
+      ],
+      "effect": "Removal of the Bob armour maximum_productivity rejection is outside these exact closed profiles: neither includes Bob/Angel provider mods. It does not add an API-only Bob check to this obligation."
+    },
+    {
+      "members": [
+        "changelog.txt"
+      ],
+      "effect": "Player release text changed; no executable API semantic effect."
+    }
+  ],
+  "required_case": {
+    "id": "api512-public-source0efb-two-consumer-lifecycle",
+    "scope": "One existing api-beta-production scenario instantiated on both original pinned engines; eight native processes total: create, production/save, cold1, cold2 per engine. Root is sole native owner.",
+    "reuse_existing": "Derive a new bounded controller from each target/corrected-r02/Invoke-Owned.ps1 and packet.json; use the same retained public_repo203e0af5 / Source93d harness tools/Invoke-NativeFixture.ps1 and pinned public_helpers/custody helper. Preserve original records and output paths; create new output/custody directories.",
+    "unchanged": [
+      "All four original fixture ZIP bytes and projected source member bytes per engine; no fixture version substitution is needed because public release keeps5.0.20012/21012",
+      "Nine F200 / ten F210 enabled profile rows, their versions/order, Defaults settings mode, exact engine/base/SpaceAge/other dependency input bytes",
+      "CaseName api-beta-production; ConsumerMarkers MIR5_API_ALPHA and MIR5_API_BETA; CreateOnly false; no InputSavePath; original resource policy4096MiB/128MiB output/180seconds/30seconds admission",
+      "Original consumer status/detachment/missing-state assertions, native+0.05/+0.01 and physical200/202 oracles, complete-save predicate and two cold unchanged-save checks"
+    ],
+    "minimum_binding_updates": [
+      "Change candidate archive path/length/SHA to the accepted public dist/v5.0.12 package for each engine; update only that MIR archive hash in the copied profile and rebind the copied profile bytes/hash",
+      "Replace the old unpublished Source128/475 eligibility block with exact already-accepted public main0b20/source0efb inventory/integrity/delivery provenance. Adjust explicit owner Source/publication guards around lines133-144 accordingly; do not weaken equality/provenance checks",
+      "Update packet candidate/source/source_release_commit/candidate_publication_status/eligibility/prepared-input bindings and all transitive copied caller/packet/profile hash references; retain historical11/old12 origin receipts as historical",
+      "Replace the loaded old12 candidate entry in fixed_inputs with the public12 ZIP; keep unaffected historical11/engine/mod/harness/fixture entries. Include copied control/profile/eligibility inputs as actually consumed. Rebind changed owner/caller hashes and fresh compose output; do not silently relax fixed input checks",
+      "Use fresh output, execution/controller/native custody destinations and identifier guards (owner around line171); rebind projected owner/packet/caller/composition hashes. The nativeArguments around line231 already consume packet.candidate.archive.sha256, so retain the runner and scenario"
+    ],
+    "acceptance": "Independent readback must bind public package/source, exact profile/engine/fixtures/helpers and all eight actual executions; observe both independent consumer stages, physical200/202 save endpoint, and both fresh cold native/API witnesses. Retain 0/-1(predicate)/0/0 exit semantics. No complete-catalogue count or extra force case is added to this API-only obligation."
+  },
+  "limits": [
+    "Read-only applicability review with local receipt writes only; no tests, builds, native execution, activation, source/docs/branch changes or package-integrity rerun.",
+    "This review does not restart or withdraw unchanged documented API method/admission, absence or older consumer evidence; it refuses only blanket transfer of this Source47537 integration result to Source0efb.",
+    "New worker descriptors and shared callbacks create a concrete changed-input gap; this is not evidence of a known API failure. Existing worker results cannot substitute for an API fixture result.",
+    "No API whole-catalogue guarantee, worker earned-state/force-creation/merge expansion, multiplayer/client, UI, performance or stable whole-product verdict is supplied."
+  ]
+}
