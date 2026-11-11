@@ -1,21 +1,16 @@
-MIR 5.0.11
+MIR 5.0.12
 Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Fixes startup with fractional productivity rewards and adds preparation for worker cargo provider changes.
+Repairs worker cargo upgrade handling and compatibility with expanded productivity research on Factorio 2.0 and 2.1.
 
-- Fix valid productivity reward settings causing startup errors on Factorio 2.0 and 2.1, including very small rewards.
-- Retain the selected Library research while translated search results reload after changing tabs, and remove obsolete science advice from direct-effect descriptions.
-- Improve native bonus validation details and detect disabled Angel water-treatment prerequisites before publishing dependent research.
-- Add an administrator/server command to prepare earned worker cargo bonuses and unfinished research before adding a finite cargo provider. Preparation covers the ordinary Base-game and Space Age worker research contract. The tested Factorio 2.1.23 route adds Secretas 1.0.38, retains earned bonuses and unfinished work, and passes save/reload checks.
+- Preserve admitted earlier MIR 5 worker cargo levels and unfinished research in permanent native research, supporting later provider changes without guessing erased history.
+- Retain Secretas worker history across successive updates, and keep Ferrum robotics science in continued cargo research.
+- Preserve complete productivity credits when other mods expand recipe research effects.
+- Allow Bob's Warfare with mods that set recipe productivity caps, preserving their configured limits.
+- Restore missing translated startup-setting labels and improve Library filter layout, wrapping, search text and German wording.
 
-Before adding a worker cargo provider:
+Protect the original save and its matching mods/settings. First update a copy with the previous mod selection and settings, save separately, then make a supported provider change. After a successful native ownership transfer, the legacy worker preparation command is unnecessary. An already-clamped or unknown history can still require the protected original; keep it if the upgrade refuses.
 
-1. Protect the pre-change original save and its matching mods/settings. Load a copy with MIR 5.0.11 and the previous mod selection, then run /mir-worker-storage-recovery prepare as an administrator or server.
-2. On success, save under a new name and exit immediately. Keep the worker level cap and enable setting unchanged through the provider change and while preserved work remains.
-3. Add the intended provider to the prepared copy. Check cargo bonuses, current research and queue order before saving and reloading. Use /mir-worker-storage-recovery resume <force-name> to append detached partial work when needed.
+This is a GitHub beta. Full Library interaction/export/client and performance qualification remain unfinished. Not every reported save or mod combination has been reproduced.
 
-An already-clamped save requires the pre-change original. Preparation for overhauls and repeated provider changes remains unqualified.
-
-This is a GitHub beta with stable qualification unfinished. Full Ferrum-profile and Factorio 2.0 worker-recovery qualification remain unfinished.
-
-[Installation, preparation steps and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.11/docs/support.md).
+[Installation, upgrade procedures and support limits](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).
