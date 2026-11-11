@@ -1,0 +1,44 @@
+{
+  "kind": "MIR512CurrentBetaCandidateIndependentResultReviewV1",
+  "reviewer": "non-author",
+  "scope": "Adopt current source0efb private-head multiplier, available-Rigor, package-integrity and checked-promotion evidence for the authorized GitHub beta only. This is neither publication delivery nor stable acceptance.",
+  "candidate": {
+    "player_source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+    "player_integration_commit": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+    "player_zip": {"path": "D:/Projects/Factorio/mir5-freeze/mir512-multiplier-aero-1ca-r01/more-infinite-research_5.0.21012.zip", "bytes": 1038200, "sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7"},
+    "promotion": {"head": "1039f5c90a8ed1400aea30b819fd3f22233241f4", "tree": "cf7610597ee9715d76e2cca42182f2f1428674f2", "four_distinct_required_checks": "success at exact head; five recorded successes include a branch-policy duplicate", "record_sha256": "826CE79C97B01E71DCA20759BD0F082138B6A9ECAEBB59A6D2D059461F06B370"},
+    "assets": {"inventory_file_sha256": "494DF147D88A3547C3619A23B22DFA0F46F3E5402329D9CFE4EB4E4F54CC1C56", "canonical_payload_sha256": "6b00031ff29550a06100ec54f7f644c7dac0bf2b982916e940bdcfa5ca951890", "archives_checked": 17, "hash_mismatches": 0}
+  },
+  "current_multiplier_result": {
+    "terminal": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-private-head-multiplier512-r01/controller-r04/terminal.json", "sha256": "9E3B9F611F165D9DE89AFFF3820C8581FF708D5AC7660C2B43A31D384A7D8014", "status": "observed-two-multiplier-cases-final-review-required", "failure": null, "actual_processes": 12, "factorio_processes_after": 0},
+    "bindings": {"packet": "C2FBA1630E1CE893A8CEEDFC0B1AC70BC6C318EA2EEC0E048940ADA1D7A3B650", "owner": "5E48431C996D5D86AA941C09D578BB712BC11B5A14CEAACB3B4F8524CB49ABA8", "composition": "E97F144088B14F36880668C68635B70B37D35E1E67D25B3E6681DA65F6E17F09", "fixture": "120BBC0FB1BB0A93586B4F3EC3D848B7BAFFF544A0F55A1AD16512A0B2BE439E"},
+    "processes": {
+      "2x": {"pids": [36620, 9272, 49132, 31280, 20328, 45768], "roles": {"fresh": 1, "published11_source": 2, "current_upgrade": 3}, "all_restored": true},
+      "4x": {"pids": [43832, 23948, 31912, 38256, 47444, 37932], "roles": {"fresh": 1, "published11_source": 2, "current_upgrade": 3}, "all_restored": true}
+    },
+    "observed_contract": {
+      "fresh_current": "At 2x and4x the current private head is count1 and ignore_tech_cost_multiplier=true; public/default and private preservation rows remain multiplier-sensitive.",
+      "ordinary": "Each map has exactly one genuine published11 C4 completion and one genuine current default-owner T4 completion. Source science is1350/2700 of each of five packs; native L5/L6 counts are2024/3036 at2x and4048/6072 at4x. The current completion uses1265/2530 of each pack after the exact0.375 pending fraction.",
+      "state": "Four-force current, queues, .125/.19/.37 progress, .27/.23 saved work and native ownership reconcile at upgrade endpoints. The effect-owned finite foreign technology remains researched level1 with count2/4 and exact mining/manual/robot modifiers .125/.25/.5 for every force.",
+      "custody": "All six role records have exception:null, restored:true and restoration_error:null. Source protected saves are247AD4F20915BD0D54D2C34FB25169AC241EF63559DA41F36F17AB783D26A1C1 (2x) and3AFBC162511A28FBF81FAA8AA6FAF53C324486B449A5D8828B7AAEAE88DC2FFD (4x). Upgrade protected saves are33ABB1231199FA66C64DD94BBF16C72073745DAA78226EAB658F3B721C28F255 and2E160AAD3C653014D4BD0B9F385D02B34BDEAF39988A644077C865C8798187C7; each has55 entries, CRC passed and is the exact input to two immutable cold loads."
+    },
+    "r22_disposition": "The direct-scripted foreign-modifier adverse is preserved. r04 replaces it with a finite effect-owned non-MIR fixture technology, exact binary effect values and strict all-force assertions; no zero weakening, tolerance or source change was introduced."
+  },
+  "available_rigor": {
+    "terminal_sha256": "0311B73118C60B644DE2C7BBB3D25020E3F4541BF2AC963845D4E35055A39982",
+    "result": "Retained published11 PID43592 on_init refusal with expanded counts33/33, then current-Aero create/server/cold PIDs51960/42424/49600 on the real12-mod available SpaceAge/PlanetsLib/Rigor closure. The five native families include the actual33-component LDS scrap vector with complete signed maps, native frames, full zero force-bonus maps, closed server save and immutable cold input.",
+    "limit": "It is not Ryutavi's unavailable complete reporter modpack/save and does not establish a general expansion-mod result."
+  },
+  "evidence_reuse_and_limits": {
+    "sourcec08": "The earned08-to-SourceC one-times-six-process result remains valid only for its exact SourceC1x inputs and older default-route mechanism. It is supporting historical preservation evidence, not a current source0efb/private-head execution and is not relabelled.",
+    "maintained_prior_corrections": "Earlier exact Secretas, Ferrum, Bob, known-Base and vector observations retain their named inputs and limitations; no old result is silently broadened or replayed here.",
+    "reporters": "Three of Ryutavi's233 requested archives remain unavailable and the available Rigor cohort is narrower. Jivaii/Ferrum and other reporter saved histories lacking a protected predecessor remain personally unclosed. These facts do not invalidate the exact mechanism results.",
+    "editions": "All17 assets match their frozen inventory. F018 and early editions remain their declared experimental/best-effort/data-only distributions; this review supplies no new historical-engine gameplay qualification.",
+    "stable_queue": "Library interaction/export/client lifecycle, whole-product performance and remaining stable acceptance are still open."
+  },
+  "delivery_prerequisites": [
+    "Perform the normal checked GitHub beta delivery: final committed source/assets/docs freeze, release-administration and immutability probes, staged draft inventory/hash readback, publish and anonymous-download/local delivery verification.",
+    "Preserve all current and adverse raw custody; do not replace published assets or relabel historical evidence."
+  ],
+  "verdict": "GO_FOR_AUTHORIZED_MIR5.0.12_GITHUB_BETA_CANDIDATE_ONLY_AFTER_NORMAL_DELIVERY_GATES; NOT_STABLE_ACCEPTANCE"
+}

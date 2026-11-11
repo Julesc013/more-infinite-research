@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-12
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,28 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Active incident release candidate (2026-11-11)
+## Verified5.0.12 delivery and current stable queue (2026-11-12)
+
+[MIR5.0.12 GitHub beta](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.12) is delivered. The [exact receipt](../spec/evidence/candidate512-github-prerelease-delivery-r01.json) binds release441736666, main/tag `0b20bc472562ee22cb32393afab29f2a43c0c8ec`, player `0efb446b5bdadec2be7d1bee1b68b5065a85134f`, all19 anonymous public downloads and21 matching primary delivery files. The [independent public readback](../spec/evidence/candidate512-independent-verified-delivery-r01.json) checks live tag/main/metadata, all19 local inventory identities and fresh anonymous downloads of both modern ZIPs. All12 older MIR5 releases and24 prior tag-reference lines remain unchanged; latest stable stays4.7.3. [Issue1845](https://github.com/Julesc013/more-infinite-research/issues/1845) is closed for the completed incident release gate. Beta delivery does not complete stable acceptance.
+
+The [independent beta verdict](../spec/evidence/mir512-beta-independent-final-verdict-r01.json) adopts the exact current12-process Base2.1.23 multiplier sequence: genuine old11/current completions on2× and4×, source science1350/2700 and remaining target science1265/2530 per pack, private head count1/exempt with ordinary prices retained, exact four-force work/queues and nonzero native foreign effects, saving and two immutable cold reads per map. The [available-Rigor review](../spec/evidence/mir512-rigor-scoped-independent-review-r01.json) accepts published11's33-component refusal and current five-family initialization/server/save/cold on2.1.24. Its earlier provisional multiplier hold is resolved only by the later final verdict. The [script-marker adverse disposition](../spec/evidence/mir512-script-modifier-adverse-independent-disposition-r01.json) preserves the engine-reset observation and requires an effect-owned foreign witness; no expected-zero or tolerance weakening occurred. [Private remote readbacks](../spec/evidence/mir512-final-native-private-custody-readbacks-r01.json) preserve584 preceding SourceC,193 Rigor and536 multiplier originals, including failed attempts.
+
+The preceding earned08/provider SourceC1× result, both-engine97-component signed-credit results, unchanged-Secretas persistence, Bob/cap startup, known-Base and Ferrum results retain their exact earlier source identities and limits. Three of Ryutavi's exact archives remain unavailable; his complete239-mod save and Jivaii1871/1806's unidentified personal predecessors remain unverified. Published12 bytes stay fixed. Any changed player contents require the next unpublished patch13; documentation/evidence work consumes no patch number.
+
+| Ordered existing obligation | Applicable evidence | Exact remaining work | Owner |
+|---|---|---|---|
+| CONT-10 / RUN Library layout and native input | D/R10's eight Queue02/Availability06 endpoints and16 PNGs retain their exact source; ten presentation/runtime/EN-DE locale blobs match current12. | Current Startup settings/menu screenshots, Unicode and saved-query continuity, real scroll/search/dropdown/resize/keyboard/mouse input. Bind the existing0.3.11 observer and current public12 ZIP; screenshots alone supply no input verdict. | Native execution lead; independent visual review. |
+| Library exports and client/save lifecycle | Existing0.4.5 metadata and earlier scoped input/retention results are preparation or older-input evidence. | Actual export files/content/round-trip, peer-local views/settings scope, EN/DE join/rejoin and saved-host restart on a reviewed current packet. The7168MiB two-client guard remains13.341558GiB free physical memory plus commit; the separate4096MiB one-client subset is not its substitute. | Native execution lead; bounded fixture/review assistance. |
+| VER-06 / VER-07 historical, compatibility and API | Retain the named nine4.7.3 same-edition routes, seven older-contract groups, four forward journeys and accepted SDK/native chains. | Reconcile consumed-input applicability and exact missing supported-profile/reporter/API cases in the existing ledgers; run changed paths. Missing originals remain unverified, rather than fabricated. | Coverage/review lead when reachable; local fallback. |
+| Existing performance contract | Retain completed startup, active-script, physical repair/agriculture and adverse records under their original inputs. | Coherent final-source Base/SpaceAge/fixed-heavy cohorts on both modern engines; large active factories, first/open/closed Library cost, useful work/latency, event spikes and retained memory. Reuse unaffected evidence; no automatic MIR1–5 or whole-history rerun. | Sole native execution lead; independent intent/result review. |
+| Qualified stable delivery | Verified12 beta inventory/notes and checked publication procedure. | Close applicable stable verdicts and independent review; promote unchanged bytes only if they qualify, or release the next patch for changed contents. | Sole integrator/publisher; independent review. |
+
+The immediate native lane is a bounded one-client current12 Startup settings/input check while the existing two-client resource prerequisite is unresolved. At the last snapshot13.08GiB free physical memory was below13.341558GiB; recheck actual admission rather than lowering the guard or asking the same closed campaigns to run again. The current0.3.11 input/settings fixture requires peer assertions, so its complete two-client protocol cannot be relabelled as a one-client pass. Keep one active and one prepared native assignment, use the current worklist and existing issue/PR records, and continue without waiting on an unreachable second machine.
+
+<details>
+<summary>Pre-publication candidate checkpoint retained as history</summary>
+
+### Retained pre-publication candidate checkpoint
 
 The cumulative5.0.12 player source is `0efb446b5bdadec2be7d1bee1b68b5065a85134f`, checked through [PR1876](https://github.com/Julesc013/more-infinite-research/pull/1876) and integrated at `5777c819a559fb2ed2ba07b32faa5b4b1edae045`. The [exact remote freeze readback](../spec/evidence/mir512-multiplier-freeze-remote-readback-r01.json) verifies all17 prepared player archives and CRCs against Aero's original freeze. Player contents stay fixed during affected qualification and checked promotion. The current release decision, exact native results and public delivery state belong to [incident1845](https://github.com/Julesc013/more-infinite-research/issues/1845); this preparation record supplies no publication verdict.
 
@@ -40,6 +61,9 @@ The bounded successor correction makes explicit queued observations read-only af
 The supplied Ryutavi save, log and enabled list are protected and verified. The official2.1.24 standalone engine is downloaded, SHA256/CRC/metadata checked and installed separately; Steam depots and the existing2.1.23 test engine are unchanged.230 of233 exact third-party archives are verified in the direct2.1 library. The exact original `factorio-resource-formatter-mod0.0.2`, `steam-condenser0.1.0` and `universal-transmuter0.1.0` remain unavailable from the Portal and checked local locators; no newer version substitutes for them. The separate Jivaii1871 log confirms2.1.24/Ferrum but supplies no predecessor save or previous paid/work state. These are explicit reporter-coverage limits, not authentication failures or passing save tests.
 
 The next native assignment is the corrected finite-provider route on one frozen successor package, retaining the protected predecessor, exact upstream provider, independent price/science assertions, two ordinary completions, save and two cold reads. Independent source/result review, applicable reporter dispositions, required CI, complete package and checked GitHub delivery remain open. The existing Library/client/export/performance stable queue resumes after verified incident delivery; no completed campaign restarts merely because the patch number changes.
+
+
+</details>
 
 
 </details>
