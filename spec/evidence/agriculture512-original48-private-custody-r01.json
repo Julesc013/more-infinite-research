@@ -1,0 +1,16 @@
+{
+  "remote_head": "df2058bf21c2e49109155491d474205e1e18092d",
+  "path": "projects/mir/runs/agriculture512-original48-and-note-correction-r01",
+  "kind": "Agriculture512Original48PrivateCustodyV1",
+  "files": 852,
+  "bytes": 102417114,
+  "gzip_sha256": "34F44318B55C54651B27E0109EF718185AB26A245CCA78999E22B668311467F8",
+  "excluded": [
+    "player-data.json",
+    "dependency libraries",
+    "engine installations",
+    "credentials"
+  ],
+  "qualification": false,
+  "all_decoded_originals_reverified": true
+}

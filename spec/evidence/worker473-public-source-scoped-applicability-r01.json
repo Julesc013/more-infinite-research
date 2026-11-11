@@ -1,0 +1,946 @@
+{
+  "schema": 1,
+  "kind": "MIR512Pure473FinalSourceApplicabilityV1",
+  "reviewed_utc": "2026-11-11T16:45:03.710669+00:00",
+  "verdict": "GO: adopt the six genuine4.7.20003 idle-default transition observations narrowly under their original f967 execution identity, with later public0efb shared-path/head-price native evidence; no additional pure473 execution required by this diff",
+  "new_native_execution_count": 0,
+  "old_player_source_tree": "f967b7c6d4ae2a65bbffb083e713a5f96eeed635",
+  "public_player_source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+  "model_disclosure": "Configured Sol/xhigh per parent assignment; no independently verified backend model identity or effort is exposed.",
+  "authority": [
+    "spec/verification.md VER-06",
+    "spec/migrations.md MIG-03 and incremental exact-origin reuse",
+    "spec/runtime.md RUN-02 native worker identity exception"
+  ],
+  "original_cases": [
+    {
+      "target": "f200",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\terminal.json",
+        "bytes": 21912,
+        "sha256": "B5006069ACE1281AD18AB112CF8776238221C156569ABB603B9FB7AD8D84F561"
+      },
+      "bindings_verified": {
+        "source": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-default512-native-preparation-r01\\inputs\\pure473-original-1F7D.zip",
+          "bytes": 646159,
+          "sha256": "1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF"
+        },
+        "baseline": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\published473-state-72B02BA2.json",
+          "bytes": 140369,
+          "sha256": "72B02BA2A2BDD0D974A6E3C2E9124FAE24CCD21233295D128F44EECFA608B428"
+        },
+        "literal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\known473-literal-expectations.json",
+          "bytes": 34968,
+          "sha256": "67FF4469F4C3FE7189A5870E29A756F90C866136A4068913597C74ED697EAD12"
+        },
+        "expected": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\expected.json",
+          "bytes": 94501,
+          "sha256": "ECFA47321619BB83BAC5A50D47D18334FBDC64684BECE0F9AE713C355430ED3C"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\mod-settings473-875.dat",
+          "bytes": 57698,
+          "sha256": "4D6B8D8C4C3AD83410114A0C979F21BF967C00A382C1EC5444EE4D200694ED7F"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\Observe-473Successor.lua",
+          "bytes": 9386,
+          "sha256": "762704992185C35EE46A3FD80865FCF871E72C8C5991C2A7C91D87905C6FF4B2"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\Invoke-Pure473.ps1",
+          "bytes": 19100,
+          "sha256": "44C836438A78B8E02BE5332DF40CCE46F64803F138FE303369771EBE8F40D949"
+        },
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\profile.json",
+          "bytes": 482,
+          "sha256": "D461DB6CB90FE81EB34E55A3F129ADDC2E872367A4E7CAAC545B2F3BE7D8F1DD"
+        },
+        "player": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-provider-guard-r01\\more-infinite-research_5.0.20012.zip",
+          "bytes": 1036714,
+          "sha256": "ECFAF261DDA956CD1B6F862026B4043E19C7FD63A2D6809412BB86C9B1F4504D"
+        }
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "original_source_frames": [
+        {
+          "force": "player",
+          "worker": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1012
+          },
+          "worker_bonus": 1
+        },
+        {
+          "force": "mir5-full-catalogue-upgrade-paused",
+          "worker": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1012
+          },
+          "worker_bonus": 1
+        }
+      ],
+      "loaded_selection": [
+        {
+          "name": "base",
+          "version": "2.0.77"
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.20012"
+        }
+      ],
+      "protected": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f200\\protected-results\\successor473.zip",
+        "bytes": 648284,
+        "sha256": "60DC1482A78435D6F662432FF793206547398810029C1FF5A86729840A57028F"
+      },
+      "observations_rehashed": [
+        {
+          "phase": "first",
+          "pid": 39888,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\input\\original473.zip",
+            "sha256": "1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\first-observed.json",
+            "bytes": 186306,
+            "sha256": "2879E807F58F92098F6029233930311155673D1F16552892797C3F47D48E4E2A"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        },
+        {
+          "phase": "cold1",
+          "pid": 2868,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\input\\cold1.zip",
+            "sha256": "60DC1482A78435D6F662432FF793206547398810029C1FF5A86729840A57028F",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\cold1-observed.json",
+            "bytes": 186306,
+            "sha256": "2016F82E273A28EC6707FF82A5CA2E0E25F2F9265DB13F5547385DBC7B3BA567"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        },
+        {
+          "phase": "cold2",
+          "pid": 44144,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\input\\cold2.zip",
+            "sha256": "60DC1482A78435D6F662432FF793206547398810029C1FF5A86729840A57028F",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f200-r02-native\\cold2-observed.json",
+            "bytes": 186306,
+            "sha256": "B3415EC03E311FAC419ACE6E404FB021A29BAFE6ABC28DF669A2C26E6876C395"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        }
+      ],
+      "actual_processes": 3,
+      "restored": true,
+      "source_scope": "SCRIPTED predecessor; original one source gear lab only; no new lab or research command"
+    },
+    {
+      "target": "f210",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\terminal.json",
+        "bytes": 22464,
+        "sha256": "04631C13710FD81EDDDDF3ADB4BF829F6658952FC64C348211C7089ABE6BF2D0"
+      },
+      "bindings_verified": {
+        "source": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-default512-native-preparation-r01\\inputs\\pure473-original-1F7D.zip",
+          "bytes": 646159,
+          "sha256": "1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF"
+        },
+        "baseline": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\published473-state-72B02BA2.json",
+          "bytes": 140369,
+          "sha256": "72B02BA2A2BDD0D974A6E3C2E9124FAE24CCD21233295D128F44EECFA608B428"
+        },
+        "literal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\known473-literal-expectations.json",
+          "bytes": 34968,
+          "sha256": "67FF4469F4C3FE7189A5870E29A756F90C866136A4068913597C74ED697EAD12"
+        },
+        "expected": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\expected.json",
+          "bytes": 92729,
+          "sha256": "28995BFE9A895B0D219DB89065270C5275BB707CAA2DD54643B43D93B567B23E"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-older-infinite512-r01\\inputs\\mod-settings473-875.dat",
+          "bytes": 57698,
+          "sha256": "4D6B8D8C4C3AD83410114A0C979F21BF967C00A382C1EC5444EE4D200694ED7F"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\Observe-473Successor.lua",
+          "bytes": 9386,
+          "sha256": "D196B0D0B01CF7347E9EB741076995F1B6D53972D3C497FE5AA191265730195B"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\Invoke-Pure473.ps1",
+          "bytes": 19100,
+          "sha256": "122E1675AAAF79E5CAE6C86B5895AB1F21FA850919F7A3CFC4810E55B151898D"
+        },
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\profile.json",
+          "bytes": 482,
+          "sha256": "A9927AA2CA8D117C5391FE8C2738E7364057B3A61091B14202BDF48BB791FE82"
+        },
+        "player": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-provider-guard-r01\\more-infinite-research_5.0.21012.zip",
+          "bytes": 1037138,
+          "sha256": "EC971881AE3BAF0AFED8C36F816970747E3CA7E756908ABBA548086F53FF75EE"
+        }
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "original_source_frames": [
+        {
+          "force": "player",
+          "worker": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1012
+          },
+          "worker_bonus": 1
+        },
+        {
+          "force": "mir5-full-catalogue-upgrade-paused",
+          "worker": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1012
+          },
+          "worker_bonus": 1
+        }
+      ],
+      "loaded_selection": [
+        {
+          "name": "base",
+          "version": "2.1.23"
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21012"
+        }
+      ],
+      "protected": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-provider-guard512-r01\\older-native-r02\\f210\\protected-results\\successor473.zip",
+        "bytes": 650812,
+        "sha256": "104F32000D97A9932E2C8EA1A3EA748418C5656F2F4AE5517C4097A0F88D29A5"
+      },
+      "observations_rehashed": [
+        {
+          "phase": "first",
+          "pid": 30348,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\input\\original473.zip",
+            "sha256": "1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\first-observed.json",
+            "bytes": 186539,
+            "sha256": "8FAF9A69EFAAC052DC78B6921DE1C48F17E6FCC3872E277550D0B7558E7A413F"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        },
+        {
+          "phase": "cold1",
+          "pid": 29920,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\input\\cold1.zip",
+            "sha256": "104F32000D97A9932E2C8EA1A3EA748418C5656F2F4AE5517C4097A0F88D29A5",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\cold1-observed.json",
+            "bytes": 186539,
+            "sha256": "E7AF805B96B09BAB04950D37783F70FC9C00B7BC4EAD7600380E78915D412D20"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        },
+        {
+          "phase": "cold2",
+          "pid": 35584,
+          "input": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\input\\cold2.zip",
+            "sha256": "104F32000D97A9932E2C8EA1A3EA748418C5656F2F4AE5517C4097A0F88D29A5",
+            "crc": {
+              "entries": 55,
+              "crc_passed": true
+            }
+          },
+          "observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-provider-guard-native-r01\\build\\tmp\\worker-provider-guard-older-f210-r02-native\\cold2-observed.json",
+            "bytes": 186539,
+            "sha256": "C23ED05DB39A271C4D72B0F8F829970B6DAD2431631A69E7295F14418CD4AFE3"
+          },
+          "exit_code": -1,
+          "worker_frames": {
+            "player": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            },
+            "mir5-full-catalogue-upgrade-paused": {
+              "worker-robots-storage-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": true,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-default-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": true,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1012
+              },
+              "mir-worker-storage-head-4": {
+                "level": 5,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 1
+              },
+              "mir-worker-storage-preservation-4": {
+                "level": 4,
+                "researched": false,
+                "enabled": false,
+                "visible": false,
+                "saved": 0,
+                "maximum": 4294967295,
+                "count": 675
+              }
+            }
+          },
+          "worker_bonus": {
+            "player": 1,
+            "mir5-full-catalogue-upgrade-paused": 1
+          },
+          "head_ignore_price": false,
+          "map_price": 1
+        }
+      ],
+      "actual_processes": 3,
+      "restored": true,
+      "source_scope": "SCRIPTED predecessor; original one source gear lab only; no new lab or research command"
+    }
+  ],
+  "current_shared_path_evidence": [
+    {
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\terminal.json",
+        "bytes": 1329825,
+        "sha256": "3DC33C8F9C6DF9763E7C50E4E85995AB8B1E3C2813B4584A69E65769B14BDA3E"
+      },
+      "actual_processes": 12,
+      "status": "observed-two-multiplier-cases-final-review-required",
+      "independent_adoption": "Root reports both exact public Source0efb 2x/4x cases independently accepted; F210 also recorded in REVIEW-r23.json. This review checks these terminal identities and relies on that adoption, rather than re-auditing all24 later executions."
+    },
+    {
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-private-head-multiplier512-r01\\controller-r04\\terminal.json",
+        "bytes": 1337549,
+        "sha256": "9E3B9F611F165D9DE89AFFF3820C8581FF708D5AC7660C2B43A31D384A7D8014"
+      },
+      "actual_processes": 12,
+      "status": "observed-two-multiplier-cases-final-review-required",
+      "independent_adoption": "Root reports both exact public Source0efb 2x/4x cases independently accepted; F210 also recorded in REVIEW-r23.json. This review checks these terminal identities and relies on that adoption, rather than re-auditing all24 later executions."
+    }
+  ],
+  "prior_reviews": {
+    "REVIEW-r07.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-final-non-author-review-r01\\REVIEW-r07.json",
+      "bytes": 6096,
+      "sha256": "0EF9F85B3F09046BB89FC1766F2C03126373BF4D0A7C728FEBD21CC03A0F6695"
+    },
+    "REVIEW-r13.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-final-non-author-review-r01\\REVIEW-r13.json",
+      "bytes": 7880,
+      "sha256": "3F1E6184E8203153A8EBBA408E7E23A3AC314059B6143A250AEEBAEAFB58937B"
+    },
+    "REVIEW-r20.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-final-non-author-review-r01\\REVIEW-r20.json",
+      "bytes": 2754,
+      "sha256": "57385F8C2A918EE9B786DE56263715A600F343BAB75526DCA6166331C514516B"
+    },
+    "REVIEW-r23.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-final-non-author-review-r01\\REVIEW-r23.json",
+      "bytes": 6375,
+      "sha256": "56DA22707DE838E035B6897DD9C6F481452002B53C1F6E75BC20539B9D5FB764"
+    }
+  },
+  "changed_source_members": [
+    "changelog.txt",
+    "compatibility/modern_catalogue/bob_warfare.lua",
+    "research/worker_storage_recovery.lua",
+    "runtime/worker_robot_storage.lua"
+  ],
+  "function_body_comparison": [
+    {
+      "function": "older_default_origin",
+      "old_sha256": "1CCEC54DD5DEBE069C975B7B5924AD42651C69F33D91FD69079D00E54A377E06",
+      "new_sha256": "1CCEC54DD5DEBE069C975B7B5924AD42651C69F33D91FD69079D00E54A377E06",
+      "equal": true
+    },
+    {
+      "function": "M.plan_default_owner_transfer",
+      "old_sha256": "AA3D08F667BCCC2A3FC4B05B68739885BCE8397945479C4A29DE2D5881AFBFEE",
+      "new_sha256": "AA3D08F667BCCC2A3FC4B05B68739885BCE8397945479C4A29DE2D5881AFBFEE",
+      "equal": true
+    },
+    {
+      "function": "M.apply_default_owner_transfer",
+      "old_sha256": "91735FCE41F00E74653136FA6CF581C2E27CDC05FD8A371E9F8516BB9832A8F4",
+      "new_sha256": "91735FCE41F00E74653136FA6CF581C2E27CDC05FD8A371E9F8516BB9832A8F4",
+      "equal": true
+    },
+    {
+      "function": "M.default_owner_on_init",
+      "old_sha256": "B8770365BC095B8C306DA8CA5B9E61AF94C857264FC0E8DF0CCA105C615AF94E",
+      "new_sha256": "B8770365BC095B8C306DA8CA5B9E61AF94C857264FC0E8DF0CCA105C615AF94E",
+      "equal": true
+    },
+    {
+      "function": "M.default_owner_on_load",
+      "old_sha256": "23B692083A42F93153D803BB2A8D9276CE8B41AD6A046F4A064099DB06EFDE1C",
+      "new_sha256": "23B692083A42F93153D803BB2A8D9276CE8B41AD6A046F4A064099DB06EFDE1C",
+      "equal": true
+    },
+    {
+      "function": "M.default_owner_on_research_finished",
+      "old_sha256": "237349DB99452D66D413772C5F81EF8DF5B22AE2741314D0E84E2D662FDB58BD",
+      "new_sha256": "237349DB99452D66D413772C5F81EF8DF5B22AE2741314D0E84E2D662FDB58BD",
+      "equal": true
+    }
+  ],
+  "callpath_judgment": [
+    "Both old cases consume the same protected authentic4.7.20003/Base2.0.77 save1F7D,875settings,54literal research rows,85recipes,15native fields,7gun categories,two original forces and map price1. Both source forces have one paid worker level, no worker saved/queued/current work. These are Base+MIR only; no SpaceAge,DLC,Secretas or finite provider.",
+    "F200 runs2.0.77 directly; F210 runs the same2.0.77 predecessor through the explicitly admitted exact2.1.23 Base-only hop. exact_base_hop still admits literal4.7.20003. Its only producer-set change substitutes DIRECT_DEFAULT_HOP_ORIGINS for MIR5 DEFAULT_ORIGINS; the literal473 arm and exact Base/mod predicates are unchanged.",
+    "At default_origin, state=nil and old_version4.7.20003 still returns older_default_origin before the new same_family_engine_patch code. New selection detection changes only the MIR501 choice; the473 disjunct remains unconditional. older_default_origin and the all-force paid-idle/no-pending requirements remain identical. Added MIR5 origins and owner_record direct-hop limits do not alter the published473-idle-default producer branch.",
+    "Default plan/apply, bootstrap,cap/catalogue,migration and native-credit modules are unchanged from f967 to public0efb. The snapshot queue relaxation is conditional on queued_observation=true, supplied only in legacy prepared/private event handling; ordinary default snapshots pass nil. Private prepared-force retirement/queue settlement and provider nil-key handover changes are outside these no-provider idle default cases.",
+    "The one active private-head difference is real: head_debit now ignores technology_price_multiplier and head_gate_contract requires true. The original473 actor explicitly required ignore_price=false for every worker prototype; therefore blindly rebinding that actor or relabelling six old runs as public executions is invalid. Retain its original false-field observation. Later exact public0efb2x/4x11-to12 earning/upgrade/save/two-cold results on both engines execute the new true-field admission and the unchanged downstream all-force transfer/debit/cold bodies, at stricter price-sensitive endpoints. At the old473 map_price1 the private count and native debit remain1; no473-specific admission/work-preservation branch changed.",
+    "Bob Warfare cap admission is not loaded by either exact Base+MIR profile. Changelog changes have no runtime effect. The combined historical-admission evidence and later current shared-path evidence support this narrow slice without treating either as source equivalence or reopening other historical routes."
+  ],
+  "scope_correction": "Earlier r07 wording mentions subsequent ordinary/default-head completion. The actual six473 records and actor do not perform a new worker completion: source_higher_rows explicitly says SCRIPTED predecessor, original one source gear lab only, no new lab or research command. Adopt paid-IDLE transfer, saved state and two RCON cold observations only. Later current multiplier cases separately supply real source/current worker completions; their identity stays separate.",
+  "minimum_missing_case": null,
+  "limits": [
+    "No public0efb direct473 execution is claimed. Original package/source/actor/save identities remain in each case.",
+    "No unfinished473worker work, changed473settings,DLC/addition,2.1.24,finite-provider,other historical origin,ordinary source lab earning,client/UI/performance or stable whole-product acceptance is inferred.",
+    "Original adverse/preparation records and historical false private-head oracle are preserved; no candidate oracle or threshold was revised to claim a pass.",
+    "Read-only source/artifact review with receipts only; no tests,builds,native/library/activation/source/docs/branch changes."
+  ],
+  "health": "Report-only bounded health ran before output: exit0; main clean and origin/main equal; free72390MiB; advisory truncated/time-budget scans; checkpoint_required=false."
+}

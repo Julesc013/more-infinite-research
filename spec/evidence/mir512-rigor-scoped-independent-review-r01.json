@@ -1,0 +1,45 @@
+{
+  "kind": "MIR512CumulativeBetaPreliminaryIndependentReviewV1",
+  "reviewer": "non-author",
+  "status": "PRELIMINARY-HOLD-AWAITING-CURRENT-MULTIPLIER-RESULT",
+  "scope": "Read-only review of the completed available-Rigor current-Aero qualification, cumulative candidate package/docs and asset inventory. It does not adopt the in-progress current 2x/4x multiplier work or a full reporter-modpack reproduction.",
+  "inputs": {
+    "rigor_terminal": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/rigor512-available-native-r01/terminal.json", "sha256": "0311B73118C60B644DE2C7BBB3D25020E3F4541BF2AC963845D4E35055A39982"},
+    "rigor_packet": {"sha256": "5DE875185AC078020C9B06E038B0EC7DA24E1CECF7136F5AD35A1562084578D5"},
+    "rigor_owner": {"sha256": "9EDFCED6603D641A69A1C68A44E13729F29DABE9D74A297F5E6CBBC403298A9C"},
+    "rigor_observer_r06": {"sha256": "9F109C1A7F409498F9F15EB8E13AD37B1F557B15315A89924C62A168EB116BAC"},
+    "current_player": {"sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7", "bytes": 1038200, "source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f", "integration_commit": "5777c819a559fb2ed2ba07b32faa5b4b1edae045"},
+    "asset_inventory": {"path": "D:/Projects/Factorio/mir5-freeze/mir512-multiplier-aero-1ca-r01/MIR5ReleaseAssetInventoryV1.json", "file_sha256": "494DF147D88A3547C3619A23B22DFA0F46F3E5402329D9CFE4EB4E4F54CC1C56", "canonical_payload_sha256": "6b00031ff29550a06100ec54f7f644c7dac0bf2b982916e940bdcfa5ca951890"},
+    "promotion_checks": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/candidate512-publication-r01/promotion-checks-1039.json", "sha256": "826CE79C97B01E71DCA20759BD0F082138B6A9ECAEBB59A6D2D059461F06B370", "head": "1039f5c90a8ed1400aea30b819fd3f22233241f4"}
+  },
+  "review": {
+    "available_rigor": {
+      "verdict": "GO-FOR-EXACT-AVAILABLE-RIGOR-COHORT",
+      "published_prefix": "Retained actual published11 on_init refusal: PID43592, exit1, expanded positive/negative effect counts33/33; it is not overwritten by the corrected observer.",
+      "candidate": "Current-Aero package completed exactly three fresh native processes: create PID51960, server PID42424 and immutable cold PID49600. Terminal records failure:null, restored:true, factorio_processes:0 and four total observed processes including the retained prefix.",
+      "observations": "All three current frames use the real 12-mod official Space Age/PlanetsLib/Rigor closure. They retain five complete MIR families and the actual 33-component Rigor-expanded LDS scrap vector, signed positive/negative carrier maps, native frames, full zero force-bonus maps, protected server-save CRC and identical immutable cold input hash.",
+      "controller_observer": "The r06 observer's local on_load read-once flag is not persisted multiplayer state. It writes only its observer storage/files. Server reload and single save-request markers, then cold reload, are separately recorded. The 64MiB live-log reader keeps both large marker frames inside the controller completion predicate.",
+      "limit": "This is only Rigor Module1.1.24 with the available real 12-mod closure on Factorio2.1.24. It neither recreates Ryutavi's unavailable three-archive full modpack/save nor establishes a general expansion-mod or release-qualification result."
+    },
+    "player_assets": {
+      "verdict": "GO-FOR-BYTE-INTEGRITY-ONLY",
+      "result": "All 10 normal plus seven early inventory archives were independently present and matched the inventory's archive bytes/SHA256 values. The bound 5.0.21012 ZIP has one expected root and info.json member. Early assets remain explicitly best-effort data-only, not native-qualified.",
+      "limit": "Inventory integrity and checked promotion CI do not substitute for current-source gameplay qualification or publication delivery verification."
+    },
+    "source_docs_api": {
+      "result": "The current source's private debit head alone sets ignore_tech_cost_multiplier=true and runtime admission requires that exact true flag. Public/default cost identity remains separate. The API guide identifies mir-worker-storage-default-4 as the ordinary default owner and keeps worker-robots-storage-4 distinct. Player notes retain original-save/provider/settings precautions, reporter-modpack limits and beta-only Library/client/export/performance limits.",
+      "publication_condition": "The private-head change is price-sensitive. Do not treat the SourceC1x r19 chain as current-Aero native evidence; publish these cost-related statements only after the separate current 2x/4x work/save/cold result is independently adopted or the relevant claims are narrowed."
+    }
+  },
+  "active_hold": {
+    "case": "current 2x/4x multiplier qualification",
+    "known_adverse": "The initial current2x upgrade stopped after the fixture observed mining/manual/worker-robot-speed modifiers at zero. Source search finds no direct writes to those fields or reset_technology_effects; source does write LuaTechnology.level during transfer. Official API documents reset_technology_effects as losing custom force changes and level writes as research-equivalent. A protected early-before-MIR frame is required to distinguish configuration/engine recomputation from a MIR-caused preservation regression.",
+    "required_disposition": "Preserve the adverse and establish an effect-owned foreign witness (source technology/prototype history, level/researched state and force modifier before/after). Do not merely change expected modifiers to zero."
+  },
+  "limitations": [
+    "Private remote-custody readback was reported by Root; its private commit object was not locally materialized for this review, so this receipt does not independently re-adopt those raw bodies.",
+    "No claim is made for Ryutavi's complete save/modpack, Jivaii's unknown saved history, Library/client/export lifecycle, physical factory output, performance or stable acceptance.",
+    "The accepted SourceC 1x six-process r19 evidence remains historical exact-input evidence only and is not relabelled as current source0efb execution."
+  ],
+  "preliminary_verdict": "GO for exact completed available-Rigor qualification, candidate byte integrity and presently scoped docs/API guidance; HOLD cumulative beta/release decision for the multiplier adverse disposition and independently reviewed current 2x/4x terminal."
+}

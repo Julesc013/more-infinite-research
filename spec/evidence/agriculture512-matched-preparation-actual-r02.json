@@ -1,0 +1,44 @@
+{
+  "status": "actual-six-selections-prepared-and-unscored-pilots-complete",
+  "timing_launches": 0,
+  "native_processes": 18,
+  "pilot_processes": 6,
+  "kind": "MIR512AgriculturePreparationV1",
+  "composition_sha256": "3AB2E5D40A9B20326A89DEE27FEDA34530102686FF2CC36F2170657087A68FC6",
+  "packet_sha256": "D5B3AF90E9772343839F9DC6DFF6746850E35EDE1DD01CDE358F1764994EA871",
+  "performance_acceptance": false,
+  "capture_processes": 12,
+  "selections": {
+    "published-128": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-128-published.json",
+      "sha256": "209AAEF7FD8AF7394C4CBB372302165A5EAA708CAFCC9400CBBE95D074DB83AB",
+      "bytes": 56885
+    },
+    "published-32": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-32-published.json",
+      "sha256": "179BFA88606CC9218CA51E4893593A08CC8586311D2A2290ABF6FEA044B40526",
+      "bytes": 56446
+    },
+    "candidate-defaults-128": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-128-candidate-defaults.json",
+      "sha256": "5982D5A73872CB91CA3B121B5CBDC5F999D1BBD44F569253F32940C535074C55",
+      "bytes": 55503
+    },
+    "candidate-defaults-1": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-1-candidate-defaults.json",
+      "sha256": "DF5B7F243243B5403A02BF44DE1EC2C77EFFC136D8F0E865A1004F79B8D6938C",
+      "bytes": 55026
+    },
+    "published-1": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-1-published.json",
+      "sha256": "9DE6D6906856EA35538ED38DD8D0A2E27AA589EC851190FCAA808EE952B50368",
+      "bytes": 56761
+    },
+    "candidate-defaults-32": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-agriculture-current-final-r02\\preparation\\tier-32-candidate-defaults.json",
+      "sha256": "66C6FCBD869AD4A405E17BCA485BD687820E485BAB1993C66759AA023FAF5176",
+      "bytes": 55079
+    }
+  },
+  "release_qualification": false
+}

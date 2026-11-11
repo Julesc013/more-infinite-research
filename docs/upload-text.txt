@@ -1,21 +1,26 @@
-MIR 5.0.11
+MIR 5.0.12
 Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Fixes startup with fractional productivity rewards and adds preparation for worker cargo provider changes.
+Fixes recurring worker cargo save upgrades and expanded recipe-productivity credits on Factorio 2.0 and 2.1.
 
-- Fix valid productivity reward settings causing startup errors on Factorio 2.0 and 2.1, including very small rewards.
-- Retain the selected Library research while translated search results reload after changing tabs, and remove obsolete science advice from direct-effect descriptions.
-- Improve native bonus validation details and detect disabled Angel water-treatment prerequisites before publishing dependent research.
-- Add an administrator/server command to prepare earned worker cargo bonuses and unfinished research before adding a finite cargo provider. Preparation covers the ordinary Base-game and Space Age worker research contract. The tested Factorio 2.1.23 route adds Secretas 1.0.38, retains earned bonuses and unfinished work, and passes save/reload checks.
+- Preserve earned worker cargo research and unfinished work in permanent native research before adding a finite cargo provider. Eligible earlier MIR 5 default saves establish this history automatically when upgraded with their previous mods and settings.
+- Keep private worker bookkeeping independent of the map research price multiplier while preserving ordinary research prices.
+- Retain Secretas history across successive updates and worker history through supported engine patch updates. Keep ordinary queue changes safe after preserved work finishes.
+- Fix initialization with Rigor Module's expanded productivity effects, while retaining complete validation of recipe, sign and amount maps.
+- Allow Bob's Warfare with recipe-productivity-cap mods and preserve their configured caps.
+- Preserve known Base-only research history on supported earlier MIR 5 upgrades.
+- Restore missing translated startup-setting labels and improve Library wrapping, filters, title-bar controls and saved search text.
 
 Before adding a worker cargo provider:
 
-1. Protect the pre-change original save and its matching mods/settings. Load a copy with MIR 5.0.11 and the previous mod selection, then run /mir-worker-storage-recovery prepare as an administrator or server.
-2. On success, save under a new name and exit immediately. Keep the worker level cap and enable setting unchanged through the provider change and while preserved work remains.
-3. Add the intended provider to the prepared copy. Check cargo bonuses, current research and queue order before saving and reloading. Use /mir-worker-storage-recovery resume <force-name> to append detached partial work when needed.
+1. Protect the original save and its matching mods/settings. Update a copy to MIR 5.0.12 with the previous enabled mods and unchanged MIR settings, then save separately and exit.
+2. Add the provider to that saved copy. Keep the worker enable setting and level cap unchanged while preserved work remains. Check cargo bonuses, current research and queue order before saving again.
+3. If needed, `/mir-worker-storage-recovery resume <force-name>` appends detached partial work. The legacy `prepare` command is unnecessary once permanent native ownership is established.
 
-An already-clamped save requires the pre-change original. Preparation for overhauls and repeated provider changes remains unqualified.
+An older save already changed and clamped by a provider needs its protected pre-change original. Repeated provider changes and arbitrary overhaul transitions remain unqualified. The known failure mechanisms have focused qualification; this does not establish that every reporter's complete modpack has been tested.
 
-This is a GitHub beta with stable qualification unfinished. Full Ferrum-profile and Factorio 2.0 worker-recovery qualification remain unfinished.
+Script integrations should query `mir-worker-storage-default-4` for ordinary default cargo research. `worker-robots-storage-4` remains a separate prerequisite or foreign finite stage; see the [API guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/api.md).
 
-[Installation, preparation steps and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.11/docs/support.md).
+This is a GitHub beta. Library interaction/export/client-lifecycle and whole-product performance acceptance remain unfinished for stable.
+
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).

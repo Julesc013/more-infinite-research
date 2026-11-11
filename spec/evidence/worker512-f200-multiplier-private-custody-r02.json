@@ -1,0 +1,10 @@
+{
+  "kind": "MIR512F200MultiplierExactRemoteReadback",
+  "remote_head": "55012aa610b208af629dda1bf656a7bc9f59eaf2",
+  "path": "projects/mir/runs/f200512-private-head-multiplier-r02",
+  "files": 282,
+  "bytes": 8081017,
+  "archive_sha256": "F35F3AAF95B6F210F101DD38358EAC512B4086A6E6A35F225F81A2419216FEBB",
+  "all_decoded_bodies_verified": true,
+  "clean_remote_equal": true
+}
