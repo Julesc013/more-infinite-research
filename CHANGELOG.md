@@ -6,7 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Prevent worker cargo upgrade failures with non-default research costs.
+- Prevent worker cargo upgrade failures when the map research price multiplier differs from 1.
 - Keep Ferrum robotics science in continued worker robot cargo research on Factorio 2.0 and 2.1.
 - Keep default worker cargo research in permanent native research on Factorio 2.0 and 2.1, preserving earned levels and unfinished work on admitted upgrades.
 - Preserve earlier MIR 5 default worker cargo research when upgrading and later adding a supported provider.
