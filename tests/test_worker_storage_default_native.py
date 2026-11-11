@@ -54,6 +54,40 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
         self.assertEqual(["base >= 2.1.23", "more-infinite-research"], info["dependencies"])
         self.assertFalse((FIXTURE / "settings.lua").exists())
 
+    def test_exact_map_price_mode_selection_rejects_old_or_unsupported_routes(self):
+        self.lua.execute(r'''
+          assert(actor.select_mode("5.0.21011",1)=="old-source")
+          assert(actor.select_mode("5.0.20011",1)=="old-source")
+          assert(actor.select_mode("5.0.21012",1)=="first")
+          assert(actor.select_mode("5.0.20012",1)=="first")
+          assert(actor.select_mode("5.0.21012",2)=="first-map-price")
+          assert(actor.select_mode("5.0.20012",4)=="first-map-price")
+          for _,input in ipairs({{"5.0.21011",2},{"5.0.20011",4},{"5.0.21012",0},
+            {"5.0.21012",3},{"5.0.21012",1.5},{"5.0.21013",1}})do
+            assert(not pcall(actor.select_mode,input[1],input[2]))
+          end
+        ''')
+
+    def test_first_level4_map_price_witness_has_only_independent_integer_expectations(self):
+        self.lua.execute(r'''
+          assert(actor.first_level4_science(2)==1350 and actor.first_level4_science(4)==2700)
+          assert(not pcall(actor.first_level4_science,1) and not pcall(actor.first_level4_science,3))
+        ''')
+        text = (FIXTURE / "control.lua").read_text()
+        self.assertIn('p.ignore_tech_cost_multiplier == true', text)
+        self.assertIn('p.research_unit_count == 1', text)
+        self.assertIn('check(#s.ordinary == 1, "one actual first level4 completion")', text)
+        self.assertIn('"first-map-price-" .. s.map_price .. "x-level4-saved"', text)
+        for unproven_level5_count in ("3374", "6748", "3375", "6750"):
+            self.assertNotIn(unproven_level5_count, text)
+
+    def test_existing_one_x_first_and_old_routes_remain_separate_from_map_price_witness(self):
+        text = (FIXTURE / "control.lua").read_text()
+        self.assertIn('save("first-saved", frames)', text)
+        self.assertIn('675 + 1012', text)
+        self.assertIn('s.phase == "old-source-saved"', text)
+        self.assertIn('closure(false, "upgrade")', text)
+
     def test_data_is_four_detached_owned_prototypes_without_foreign_changes(self):
         self.lua.globals().data_source = (FIXTURE / "data.lua").read_text()
         self.lua.execute(r'''
@@ -163,10 +197,17 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
     def test_exact_first_tick_auto_mode_selection_does_not_reinitialize_saved_or_cold_state(self):
         self.lua.execute(r'''
           local calls={};actor.begin=function(mode)calls[#calls+1]=mode end
+          game={difficulty_settings={technology_price_multiplier=1}}
           for _,version in ipairs({"5.0.21011","5.0.20011","5.0.21012","5.0.20012"})do
             storage={};script.active_mods["more-infinite-research"]=version;actor.on_tick()
             assert(calls[#calls]==(version:sub(-2)=="11"and"old-source"or"first"))
           end
+          for _,multiplier in ipairs({2,4})do
+            storage={};game.difficulty_settings.technology_price_multiplier=multiplier
+            script.active_mods["more-infinite-research"]="5.0.21012";actor.on_tick()
+            assert(calls[#calls]=="first-map-price")
+          end
+          game.difficulty_settings.technology_price_multiplier=1
           script.active_mods["more-infinite-research"]="5.0.21013";storage={}
           assert(not pcall(actor.on_tick))
           local count=#calls;local state={phase="first-saved"};storage={worker_storage_default_native_fixture=state}

@@ -28,6 +28,23 @@ function M.same(a, b, path)
 end
 function M.next_level(t) return t.level + (t.researched and 1 or 0) end
 local function price(n) return math.floor(675 * 1.5 ^ (n - 4)) end
+local function select_mode(version, multiplier)
+  check(type(multiplier) == "number" and multiplier % 1 == 0, "map price multiplier is not an integer")
+  if version == "5.0.21011" or version == "5.0.20011" then
+    check(multiplier == 1, "published11 default route requires map price1")
+    return "old-source"
+  elseif version == "5.0.21012" or version == "5.0.20012" then
+    if multiplier == 1 then return "first" end
+    check(multiplier == 2 or multiplier == 4, "fresh-first witness supports only map price2 or4")
+    return "first-map-price"
+  end
+  check(false, "automatic start requires exact published11 or candidate12")
+end
+local function first_level4_science(multiplier)
+  check(multiplier == 2 or multiplier == 4, "fresh-first level4 witness requires map price2 or4")
+  return 675 * multiplier
+end
+M.select_mode, M.first_level4_science = select_mode, first_level4_science
 local function row(name, n, enabled, visible, saved, researched)
   return {name=name, level=n, researched=researched or false, enabled=enabled, visible=visible,
     saved=saved or 0, count=name == GATE and 1 or price(n)}
@@ -60,12 +77,15 @@ function M.assert_settled_flags(player)
   check(tail and tail.visible == false, "settled default tail visibility")
   check(gate and gate.enabled == false and gate.visible == false and gate.saved == 0, "settled bookkeeping gate flags/work")
 end
-local function closure(old)
+local function closure(old, mode)
   local versions = {['2.1.23']={old="5.0.21011", new="5.0.21012"}, ['2.0.77']={old="5.0.20011", new="5.0.20012"}}
   local active = script.active_mods; local v = versions[active.base]
   check(v and active[FIXTURE] == "0.1.0" and active["more-infinite-research"] == (old and v.old or v.new), "exact engine/MIR/fixture tuple")
   local count = 0; for name in pairs(active) do check(name == "base" or name == FIXTURE or name == "more-infinite-research", "unexpected active mod"); count = count + 1 end
-  check(count == 3 and game.speed == 1 and game.difficulty_settings.technology_price_multiplier == 1, "selection/clock/map-price control")
+  local multiplier = game.difficulty_settings.technology_price_multiplier
+  local map_price_ok = mode == "first-map-price" and (multiplier == 2 or multiplier == 4) or multiplier == 1
+  check(type(multiplier) == "number" and count == 3 and game.speed == 1 and map_price_ok, "selection/clock/map-price control")
+  return multiplier
 end
 local function native_row(t)
   return {name=t.name, level=t.level, researched=t.researched, enabled=t.enabled,
@@ -111,7 +131,7 @@ local function prototype_frames()
   return out
 end
 local function emit(stage, extra)
-  local s = storage[KEY]; local body = {schema=1, stage=stage, tick=game.tick, mode=s and s.mode,
+  local s = storage[KEY]; local body = {schema=1, stage=stage, tick=game.tick, mode=s and s.mode, map_price=s and s.map_price,
     mods=script.active_mods, frames=M.frames(), lab=lab_frame(), ordinary=s and s.ordinary, administrative=s and s.administrative,
     inserted=s and s.inserted, contracts=prototype_frames(), extra=extra}
   local text = helpers.table_to_json(body); log("MIR_WORKER_DEFAULT_NATIVE " .. text)
@@ -124,7 +144,8 @@ local function contract(id, first, maximum, modifier)
   check(prototypes.get_history("technology", id).created == "more-infinite-research", "MIR creation custody " .. id)
   if id == GATE then
     check(p.hidden and p.enabled == false and p.visible_when_disabled == false and p.research_unit_count == 1
-      and p.research_unit_count_formula == nil and p.research_unit_energy == 60 and next(p.prerequisites) == nil, "gate contract")
+      and p.research_unit_count_formula == nil and p.research_unit_energy == 60
+      and p.ignore_tech_cost_multiplier == true and next(p.prerequisites) == nil, "gate contract")
   else
     check(p.research_unit_count_formula == "675*1.5^(L-4)" and p.research_unit_energy == 3600
       and p.ignore_tech_cost_multiplier == false and #p.research_unit_ingredients == 5, "default full price/time/science contract")
@@ -145,14 +166,15 @@ local function contracts(old)
   else contract(TAIL, 4, 4294967295, 1); contract(GATE, 4, 4294967295, -1) end
 end
 local function setup(mode)
-  local old = mode == "old-source"; closure(old); contracts(old)
-  local s = {mode=mode, phase="setup", setting_up=true, ordinary={}, administrative={}, inserted={}}
+  local old = mode == "old-source"; local multiplier = closure(old, mode); contracts(old)
+  local s = {mode=mode, map_price=multiplier, phase="setup", setting_up=true, ordinary={}, administrative={}, inserted={}}
   storage[KEY] = s
   for i, name in ipairs(ROLES) do
     local force = game.forces[name] or game.create_force(name)
     local main = force.technologies[old and MAIN or TAIL]
     for _, prerequisite in pairs(main.prerequisites) do prerequisite.research_recursive() end
-    check(main.level == 4 and not main.researched and main.enabled and main.research_unit_count == 675, "initial unpaid head4")
+    local expected_count = mode == "first-map-price" and first_level4_science(multiplier) or 675
+    check(main.level == 4 and not main.researched and main.enabled and main.research_unit_count == expected_count, "initial unpaid head4")
     for _, id in ipairs({CURRENT, QUEUED, DETACHED}) do
       local t = force.technologies[id]; check(t and t.enabled and not t.researched and t.level == 1, "unearned independent sentinel")
     end
@@ -206,8 +228,8 @@ local function save(phase, frames)
   game.server_save("worker-default-" .. phase)
 end
 function M.begin(mode)
-  check(mode == "first" or mode == "old-source" or mode == "upgrade" or mode == "cold", "unknown mode")
-  if mode == "first" or mode == "old-source" then check(storage[KEY] == nil, "fixture already initialized"); setup(mode)
+  check(mode == "first" or mode == "first-map-price" or mode == "old-source" or mode == "upgrade" or mode == "cold", "unknown mode")
+  if mode == "first" or mode == "first-map-price" or mode == "old-source" then check(storage[KEY] == nil, "fixture already initialized"); setup(mode)
   elseif mode == "upgrade" then check(storage[KEY] and (storage[KEY].phase == "upgrade-ready"
     or storage[KEY].phase == "upgrade-saved"), "upgrade callback not observed")
   else M.cold() end
@@ -215,14 +237,15 @@ end
 function M.cold()
   local s = storage[KEY]; check(s and s.closed and s.phase:match("%-saved$"), "cold requires closed source")
   emit("cold-observed")
-  check(s.lab and s.lab.valid and s.lab.disabled_by_script and #s.ordinary == (s.mode == "first" and 2 or 0), "cold lab/count controls")
-  closure(s.phase == "old-source-saved"); contracts(s.phase == "old-source-saved")
+  local ordinary = s.mode == "first" and 2 or s.mode == "first-map-price" and 1 or 0
+  check(s.lab and s.lab.valid and s.lab.disabled_by_script and #s.ordinary == ordinary, "cold lab/count controls")
+  closure(s.phase == "old-source-saved", s.mode); contracts(s.phase == "old-source-saved")
   M.same(s.closed, M.frames()); M.same(s.closed_lab, lab_frame()); emit("cold")
 end
 function M.on_configuration_changed(event)
   local s = storage[KEY]; if not s then return end
   emit("configuration-observed", {event=event}) -- full actual frame before strict comparison.
-  check(s.phase == "old-source-saved", "unexpected configuration phase"); closure(false); contracts(false)
+  check(s.phase == "old-source-saved", "unexpected configuration phase"); closure(false, "upgrade"); contracts(false)
   local change = event.mod_changes["more-infinite-research"]
   check(change and change.old_version == (script.active_mods.base == "2.0.77" and "5.0.20011" or "5.0.21011")
     and change.new_version == script.active_mods["more-infinite-research"] and event.mod_startup_settings_changed == false, "exact unchanged-settings old11 transition")
@@ -242,7 +265,8 @@ function M.on_finished(event)
   end
   emit(s.phase == "head-research" and "completion-head-observed" or "completion-tail-observed",
     {name=id, by_script=event.by_script, force=event.research.force.name})
-  check(event.by_script == false and event.research.force == game.forces.player and s.mode == "first"
+  check(event.by_script == false and event.research.force == game.forces.player
+    and (s.mode == "first" or s.mode == "first-map-price")
     and (s.phase == "head-research" and id == TAIL or s.phase == "tail-research" and id == TAIL), "exact ordinary event order")
   s.ordinary[#s.ordinary + 1] = {name=id, tick=event.tick, by_script=false}
   local frames = M.frames(); foreign_unchanged(frames)
@@ -258,9 +282,7 @@ function M.on_tick()
   if not s then
     loaded = false
     local version = script.active_mods["more-infinite-research"]
-    if version == "5.0.21011" or version == "5.0.20011" then M.begin("old-source")
-    elseif version == "5.0.21012" or version == "5.0.20012" then M.begin("first")
-    else check(false, "automatic start requires exact published11 or candidate12") end
+    M.begin(select_mode(version, game.difficulty_settings.technology_price_multiplier))
     return
   end
   if loaded then loaded = false; if s.phase:match("%-saved$") then M.cold(); return end end
@@ -273,7 +295,16 @@ function M.on_tick()
       end
     end
   elseif s.phase == "head-finished" then
-    emit("head-settle-observed"); first_settled(false); s.phase = "tail-research"; emit("head-settled")
+    emit("head-settle-observed"); local frames = first_settled(false)
+    if s.mode == "first-map-price" then
+      local inventory, expected = lab_frame().inventory, first_level4_science(s.map_price)
+      for _, pack in ipairs(SCIENCE) do check(s.inserted[pack] - inventory[pack] == expected, "first level4 science depletion " .. pack) end
+      check(#s.ordinary == 1, "one actual first level4 completion")
+      local phase = "first-map-price-" .. s.map_price .. "x-level4-saved"
+      save(phase, frames)
+    else
+      s.phase = "tail-research"; emit("head-settled")
+    end
   elseif s.phase == "tail-finished" then
     emit("tail-settle-observed")
     local frames = first_settled(true); local inventory = lab_frame().inventory
