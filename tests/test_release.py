@@ -1,8 +1,11 @@
 """Offline MIR 5 release-freeze identities; no tags, publication, or network."""
 import copy
+import contextlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -27,9 +30,7 @@ class ReleaseTests(unittest.TestCase):
     @classmethod
     def _repository(cls, root, source_version="5.0.0"):
         cls._git(root, "init", "-q")
-        cls._git(root, "config", "user.name", "Release test")
-        cls._git(root, "config", "user.email", "release-test@example.invalid")
-        cls._git(root, "config", "core.autocrlf", "false")
+        cls._configure_fixture_repository(root)
         shutil.copytree(ROOT / "source", root / "source")
         record = root / release.package.TARGET_RECORD
         record.parent.mkdir(parents=True, exist_ok=True)
@@ -40,6 +41,37 @@ class ReleaseTests(unittest.TestCase):
         cls._git(root, "add", ".")
         cls._git(root, "commit", "-qm", "frozen player source")
         return root / "source", cls._git(root, "rev-parse", "HEAD").decode().strip()
+
+    @classmethod
+    def _configure_fixture_repository(cls, repository):
+        cls._git(repository, "config", "user.name", "Release test")
+        cls._git(repository, "config", "user.email", "release-test@example.invalid")
+        cls._git(repository, "config", "core.autocrlf", "false")
+
+    @classmethod
+    def _clone_fixture_repository(cls, source, destination):
+        subprocess.check_call([
+            "git", "-c", "core.autocrlf=false", "clone", "--no-hardlinks", "-q",
+            str(source), str(destination),
+        ])
+        cls._configure_fixture_repository(destination)
+
+    @staticmethod
+    @contextlib.contextmanager
+    def _without_global_git_config(root):
+        empty_global = root / "empty-global.gitconfig"
+        empty_global.write_text("", encoding="utf-8")
+        previous = {name: os.environ.get(name) for name in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")}
+        os.environ["GIT_CONFIG_GLOBAL"] = str(empty_global)
+        os.environ["GIT_CONFIG_NOSYSTEM"] = "1"
+        try:
+            yield
+        finally:
+            for name, value in previous.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
 
     @staticmethod
     def _set_source_release(source, source_version):
@@ -90,9 +122,16 @@ class ReleaseTests(unittest.TestCase):
     def _write_body(output, body):
         (output / release.INVENTORY_NAME).write_bytes(release._inventory_bytes(body))
 
-    def _assert_refused(self, source, output):
-        with self.assertRaises(ValueError):
+    def _assert_refused(self, source, output, reason):
+        """Require this exact verifier refusal, not an unrelated ValueError."""
+        with self.assertRaisesRegex(ValueError, re.escape(reason)):
             release.verify(source, output)
+
+    def _assert_freeze_refused(self, source, output, reason):
+        """Require this exact freeze-preflight refusal without creating output."""
+        with self.assertRaisesRegex(ValueError, re.escape(reason)):
+            release.freeze(source, output)
+        self.assertFalse(output.exists())
 
     def test_freeze_builds_ten_canonical_archives_and_repeats_across_roots(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -140,10 +179,11 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(release.verify(first_source, first_output), inventory)
 
             second_repository = temporary / "second-repository"
-            subprocess.check_call(["git", "clone", "--no-hardlinks", "-q", str(first_repository), str(second_repository)])
+            self._clone_fixture_repository(first_repository, second_repository)
             second_output = temporary / "second-output"
             second_source = second_repository / "source"
-            release.freeze(second_source, second_output, revision=commit)
+            second_inventory = release.freeze(second_source, second_output, revision=commit)
+            self.assertEqual(release.verify(second_source, second_output), second_inventory)
             self.assertEqual((first_output / release.INVENTORY_NAME).read_bytes(),
                              (second_output / release.INVENTORY_NAME).read_bytes())
             self.assertEqual(inventory["controller"], release._controller_identity())
@@ -284,34 +324,95 @@ class ReleaseTests(unittest.TestCase):
             path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
         cases = {
-            "wrong-edition-codec": lambda source: set_info_version(source, "5.0.21100"),
-            "invalid-six-digit-codec": lambda source: set_info_version(source, "5.0.210100"),
-            "mismatched-changelog": wrong_changelog,
-            "mismatched-source-minimum-base": mismatched_source_minimum_base,
-            "missing-target-id": lambda source: replace_target(source, b'  id="f210",\n', b""),
-            "duplicate-target-id": lambda source: duplicate_target(source, b'  id="f210",\n'),
-            "mismatched-target-id": lambda source: replace_target(source, b'  id="f210",\n', b'  id="f200",\n'),
-            "missing-target-version": lambda source: replace_target(
-                source, b'  distribution_version="5.0.21000",\n', b""),
-            "duplicate-target-version": lambda source: duplicate_target(
-                source, b'  distribution_version="5.0.21000",\n'),
-            "mismatched-target-version": lambda source: replace_target(
-                source, b'  distribution_version="5.0.21000",\n', b'  distribution_version="5.0.21001",\n'),
+            "wrong-edition-codec": (
+                lambda source: set_info_version(source, "5.0.21100"),
+                "Frozen player source is not canonical F210 MIR 5 metadata",
+            ),
+            "invalid-six-digit-codec": (
+                lambda source: set_info_version(source, "5.0.210100"),
+                "Frozen player source has an invalid MIR 5 distribution codec",
+            ),
+            "mismatched-changelog": (
+                wrong_changelog,
+                "Frozen player source changelog does not match its release version",
+            ),
+            "mismatched-source-minimum-base": (
+                mismatched_source_minimum_base,
+                "Frozen player source minimum base differs from canonical F210 metadata",
+            ),
+            "missing-target-id": (
+                lambda source: replace_target(source, b'  id="f210",\n', b""),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
+            "duplicate-target-id": (
+                lambda source: duplicate_target(source, b'  id="f210",\n'),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
+            "mismatched-target-id": (
+                lambda source: replace_target(source, b'  id="f210",\n', b'  id="f200",\n'),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
+            "missing-target-version": (
+                lambda source: replace_target(
+                    source, b'  distribution_version="5.0.21000",\n', b""),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
+            "duplicate-target-version": (
+                lambda source: duplicate_target(
+                    source, b'  distribution_version="5.0.21000",\n'),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
+            "mismatched-target-version": (
+                lambda source: replace_target(
+                    source, b'  distribution_version="5.0.21000",\n', b'  distribution_version="5.0.21001",\n'),
+                "Frozen player source target metadata does not match canonical F210 metadata",
+            ),
         }
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            for name, mutate in cases.items():
+            baseline_repository = temporary / "baseline-repository"
+            baseline_repository.mkdir()
+            baseline_source, baseline_commit = self._repository(baseline_repository)
+            baseline_output = temporary / "baseline-output"
+            baseline = release.freeze(baseline_source, baseline_output, revision=baseline_commit)
+            self.assertEqual(release.verify(baseline_source, baseline_output), baseline)
+            for name, (mutate, reason) in cases.items():
                 with self.subTest(name=name):
                     repository = temporary / ("repository-" + name)
-                    repository.mkdir()
-                    source, _ = self._repository(repository)
+                    self._clone_fixture_repository(baseline_repository, repository)
+                    source = repository / "source"
                     mutate(source)
                     self._git(repository, "add", "source")
                     self._git(repository, "commit", "-qm", name)
                     output = temporary / ("output-" + name)
-                    with self.assertRaises(ValueError):
-                        release.freeze(source, output)
-                    self.assertFalse(output.exists())
+                    self._assert_freeze_refused(source, output, reason)
+
+    def test_refusal_fixture_clones_have_local_identity_without_global_git_config(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            with self._without_global_git_config(temporary):
+                baseline_repository = temporary / "baseline-repository"
+                baseline_repository.mkdir()
+                baseline_source, baseline_commit = self._repository(baseline_repository)
+                baseline_output = temporary / "baseline-output"
+                baseline = release.freeze(baseline_source, baseline_output, revision=baseline_commit)
+                self.assertEqual(release.verify(baseline_source, baseline_output), baseline)
+
+                repository = temporary / "mutation-repository"
+                self._clone_fixture_repository(baseline_repository, repository)
+                self.assertEqual(self._git(repository, "config", "--local", "--get", "user.name"), b"Release test\n")
+                self.assertEqual(self._git(repository, "config", "--local", "--get", "user.email"),
+                                 b"release-test@example.invalid\n")
+                source = repository / "source"
+                info_path = source / "info.json"
+                info = json.loads(info_path.read_text(encoding="utf-8"))
+                info["version"] = "5.0.21100"
+                info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                self._git(repository, "add", "source")
+                self._git(repository, "commit", "-qm", "invalid canonical metadata")
+                output = temporary / "invalid-output"
+                self._assert_freeze_refused(
+                    source, output, "Frozen player source is not canonical F210 MIR 5 metadata")
 
     def test_early_cohort_refuses_wrong_record_missing_asset_and_changed_delivery(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -319,6 +420,10 @@ class ReleaseTests(unittest.TestCase):
             repository = temporary / "repository"
             repository.mkdir()
             source, commit = self._repository(repository)
+            frozen = temporary / "frozen"
+            inventory = release.freeze(source, frozen, revision=commit,
+                                       early_target_record=release.package.EARLY_TARGET_RECORD)
+            self.assertEqual(release.verify(source, frozen), inventory)
             wrong = temporary / "wrong-record"
             with self.assertRaisesRegex(ValueError, "early target record"):
                 release.freeze(source, wrong, revision=commit, target_record=release.package.TARGET_RECORD,
@@ -326,8 +431,8 @@ class ReleaseTests(unittest.TestCase):
             self.assertFalse(wrong.exists())
 
             broken_repository = temporary / "broken-repository"
-            broken_repository.mkdir()
-            broken_source, _ = self._repository(broken_repository)
+            self._clone_fixture_repository(repository, broken_repository)
+            broken_source = broken_repository / "source"
             (broken_source / "adapters/early/definitions.lua").unlink()
             self._git(broken_repository, "add", "-A")
             self._git(broken_repository, "commit", "-qm", "remove early adapter dependency")
@@ -338,18 +443,21 @@ class ReleaseTests(unittest.TestCase):
                                early_target_record=release.package.EARLY_TARGET_RECORD)
             self.assertFalse(broken.exists())
 
-            frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit,
-                           early_target_record=release.package.EARLY_TARGET_RECORD)
-            for name, mutate in {
-                "missing": lambda output: (output / self._archive_name("f006")).unlink(),
-                "delivery": lambda output: self._change_early_delivery(output),
+            for name, (mutate, reason) in {
+                "missing": (
+                    lambda output: (output / self._archive_name("f006")).unlink(),
+                    "Release output has absent or extra assets",
+                ),
+                "delivery": (
+                    lambda output: self._change_early_delivery(output),
+                    "Release inventory differs from frozen source or assets",
+                ),
             }.items():
                 with self.subTest(name=name):
                     output = temporary / ("early-" + name)
                     shutil.copytree(frozen, output)
                     mutate(output)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
     def test_verification_rejects_missing_extra_changed_and_duplicate_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -358,22 +466,35 @@ class ReleaseTests(unittest.TestCase):
             repository.mkdir()
             source, commit = self._repository(repository)
             frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit)
-            with self.assertRaises(FileExistsError):
+            inventory = release.freeze(source, frozen, revision=commit)
+            self.assertEqual(release.verify(source, frozen), inventory)
+            with self.assertRaisesRegex(FileExistsError, "Preserve existing release output"):
                 release.freeze(source, frozen, revision=commit)
 
             cases = {
-                "missing": lambda output: (output / self._archive_name("f013")).unlink(),
-                "extra": lambda output: (output / "unexpected.txt").write_text("not an asset", encoding="utf-8"),
-                "changed": lambda output: (output / self._archive_name("f013")).write_bytes(b"changed"),
-                "duplicate": lambda output: self._duplicate_asset(output),
+                "missing": (
+                    lambda output: (output / self._archive_name("f013")).unlink(),
+                    "Release output has absent or extra assets",
+                ),
+                "extra": (
+                    lambda output: (output / "unexpected.txt").write_text("not an asset", encoding="utf-8"),
+                    "Release output has absent or extra assets",
+                ),
+                "changed": (
+                    lambda output: (output / self._archive_name("f013")).write_bytes(b"changed"),
+                    "Archive bytes differ from the frozen source",
+                ),
+                "duplicate": (
+                    lambda output: self._duplicate_asset(output),
+                    "Release inventory differs from frozen source or assets",
+                ),
             }
-            for name, mutate in cases.items():
+            for name, (mutate, reason) in cases.items():
                 with self.subTest(name=name):
                     output = temporary / ("case-" + name)
                     shutil.copytree(frozen, output)
                     mutate(output)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
     def test_verification_rejects_release_source_target_and_controller_identity_mutations(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -382,7 +503,8 @@ class ReleaseTests(unittest.TestCase):
             repository.mkdir()
             source, commit = self._repository(repository, "5.0.2")
             frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit)
+            inventory = release.freeze(source, frozen, revision=commit)
+            self.assertEqual(release.verify(source, frozen), inventory)
 
             def alter(path, value):
                 def mutate(body):
@@ -392,41 +514,80 @@ class ReleaseTests(unittest.TestCase):
                 return mutate
 
             cases = {
-                "release-source-version": alter(("release", "source_version"), "5.0.3"),
-                "release-title": alter(("release", "title"), "MIR 5.0.3"),
-                "asset-label": alter(("assets", 0, "label"), "MIR 5.0.01302 for Factorio 0.13 (zip)"),
-                "release-tag": alter(("release", "tag"), "v5.0.3"),
-                "source-distribution-version": alter(("source", "source_distribution_version"), "5.0.21003"),
-                "source-tree": alter(("source", "tree"), "0" * 40),
-                "target-digest": alter(("target_record", "sha256"), "0" * 64),
-                "controller-tool": alter(("controller", "package_tool", "sha256"), "0" * 64),
-                "controller-runtime": alter(("controller", "runtime", "zlib_runtime_version"), "0.0.0"),
+                "release-source-version": (
+                    alter(("release", "source_version"), "5.0.3"),
+                    "Release title, tag, or source version differs",
+                ),
+                "release-title": (
+                    alter(("release", "title"), "MIR 5.0.3"),
+                    "Release title, tag, or source version differs",
+                ),
+                "asset-label": (
+                    alter(("assets", 0, "label"), "MIR 5.0.01302 for Factorio 0.13 (zip)"),
+                    "Release inventory differs from frozen source or assets",
+                ),
+                "release-tag": (
+                    alter(("release", "tag"), "v5.0.3"),
+                    "Release title, tag, or source version differs",
+                ),
+                "source-distribution-version": (
+                    alter(("source", "source_distribution_version"), "5.0.21003"),
+                    "Frozen source or target record identity differs",
+                ),
+                "source-tree": (
+                    alter(("source", "tree"), "0" * 40),
+                    "Frozen source or target record identity differs",
+                ),
+                "target-digest": (
+                    alter(("target_record", "sha256"), "0" * 64),
+                    "Frozen source or target record identity differs",
+                ),
+                "controller-tool": (
+                    alter(("controller", "package_tool", "sha256"), "0" * 64),
+                    "Local release controller or compression runtime differs",
+                ),
+                "controller-runtime": (
+                    alter(("controller", "runtime", "zlib_runtime_version"), "0.0.0"),
+                    "Local release controller or compression runtime differs",
+                ),
             }
-            for name, mutate in cases.items():
+            for name, (mutate, reason) in cases.items():
                 with self.subTest(name=name):
                     output = temporary / ("identity-" + name)
                     shutil.copytree(frozen, output)
                     body = self._body(output)
                     mutate(body)
                     self._write_body(output, body)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
             tampered = temporary / "inventory-tampered"
             shutil.copytree(frozen, tampered)
             path = tampered / release.INVENTORY_NAME
             path.write_bytes(path.read_bytes().replace(b'"schema":1', b'"schema":2', 1))
-            self._assert_refused(source, tampered)
+            self._assert_refused(source, tampered, "Release inventory self-digest differs")
 
     def test_verification_rejects_archive_name_and_root_inventory_mutations(self):
         self._assert_asset_inventory_mutations({
-            "asset-name": (("assets", 0, "name"), "wrong.zip"),
-            "archive-root": (("assets", 0, "root"), "wrong-root"),
+            "asset-name": (
+                ("assets", 0, "name"), "wrong.zip",
+                "Release inventory differs from frozen source or assets",
+            ),
+            "archive-root": (
+                ("assets", 0, "root"), "wrong-root",
+                "Release inventory differs from frozen source or assets",
+            ),
         })
 
     def test_verification_rejects_info_and_distribution_codec_inventory_mutations(self):
         self._assert_asset_inventory_mutations({
-            "info-title": (("assets", 0, "info", "title"), "Wrong title"),
-            "distribution-codec": (("assets", 0, "version"), "5.0.00000"),
+            "info-title": (
+                ("assets", 0, "info", "title"), "Wrong title",
+                "Release inventory differs from frozen source or assets",
+            ),
+            "distribution-codec": (
+                ("assets", 0, "version"), "5.0.00000",
+                "Release inventory differs from frozen source or assets",
+            ),
         })
 
     def test_verification_rejects_absent_or_changed_f018_support_disposition(self):
@@ -436,10 +597,17 @@ class ReleaseTests(unittest.TestCase):
             repository.mkdir()
             source, commit = self._repository(repository)
             frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit)
-            for name, mutate in {
-                "missing": lambda asset: asset.pop("support"),
-                "changed": lambda asset: asset.__setitem__("support", "stable"),
+            inventory = release.freeze(source, frozen, revision=commit)
+            self.assertEqual(release.verify(source, frozen), inventory)
+            for name, (mutate, reason) in {
+                "missing": (
+                    lambda asset: asset.pop("support"),
+                    "Release inventory differs from frozen source or assets",
+                ),
+                "changed": (
+                    lambda asset: asset.__setitem__("support", "stable"),
+                    "Release inventory differs from frozen source or assets",
+                ),
             }.items():
                 with self.subTest(name=name):
                     output = temporary / ("f018-support-" + name)
@@ -448,7 +616,7 @@ class ReleaseTests(unittest.TestCase):
                     asset = next(asset for asset in body["assets"] if asset["target"] == "f018")
                     mutate(asset)
                     self._write_body(output, body)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
     def _assert_asset_inventory_mutations(self, cases):
         with tempfile.TemporaryDirectory() as temporary:
@@ -457,8 +625,9 @@ class ReleaseTests(unittest.TestCase):
             repository.mkdir()
             source, commit = self._repository(repository)
             frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit)
-            for name, (path, value) in cases.items():
+            inventory = release.freeze(source, frozen, revision=commit)
+            self.assertEqual(release.verify(source, frozen), inventory)
+            for name, (path, value, reason) in cases.items():
                 with self.subTest(name=name):
                     output = temporary / ("identity-" + name)
                     shutil.copytree(frozen, output)
@@ -468,7 +637,7 @@ class ReleaseTests(unittest.TestCase):
                         cursor = cursor[key]
                     cursor[path[-1]] = value
                     self._write_body(output, body)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
     def test_verification_refuses_changed_archive_root_and_info_even_with_new_inventory_digests(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -477,11 +646,15 @@ class ReleaseTests(unittest.TestCase):
             repository.mkdir()
             source, commit = self._repository(repository)
             frozen = temporary / "frozen"
-            release.freeze(source, frozen, revision=commit)
-            for name, transform in {
-                "root": lambda member, data: (member.replace("more-infinite-research_5.0.01300", "wrong-root"), data),
-                "info": self._wrong_info,
-                "changelog": self._wrong_changelog,
+            inventory = release.freeze(source, frozen, revision=commit)
+            self.assertEqual(release.verify(source, frozen), inventory)
+            for name, (transform, reason) in {
+                "root": (
+                    lambda member, data: (member.replace("more-infinite-research_5.0.01300", "wrong-root"), data),
+                    "Archive bytes differ from the frozen source",
+                ),
+                "info": (self._wrong_info, "Archive bytes differ from the frozen source"),
+                "changelog": (self._wrong_changelog, "Archive bytes differ from the frozen source"),
             }.items():
                 with self.subTest(name=name):
                     output = temporary / ("archive-" + name)
@@ -496,7 +669,7 @@ class ReleaseTests(unittest.TestCase):
                     (output / release.SUMS_NAME).write_bytes(sums)
                     body["checksums"] = {"name": release.SUMS_NAME, "sha256": release.digest(sums), "bytes": len(sums)}
                     self._write_body(output, body)
-                    self._assert_refused(source, output)
+                    self._assert_refused(source, output, reason)
 
     @staticmethod
     def _duplicate_asset(output):
