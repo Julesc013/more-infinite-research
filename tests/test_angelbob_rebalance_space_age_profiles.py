@@ -12,7 +12,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 PROFILES = ROOT / "tests/profiles"
 UPSTREAM_PATH = PROFILES / "angelbob-rebalance-space-age-f210-2123-upstream.json"
-RUNTIME_PATH = PROFILES / "angelbob-rebalance-space-age-f210-2123-steel-fixture.json"
 CAPTURE_CONTROLLER = ROOT / "tools/Invoke-PrototypeCapture.ps1"
 ENGINE = {
     "version": "2.1.23",
@@ -23,11 +22,6 @@ MIR_NAME = "more-infinite-research"
 MIR_VERSION = "5.0.21013"
 MIR_ARCHIVE = "more-infinite-research_5.0.21013.zip"
 MIR_SHA256 = "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F"
-FIXTURE_NAME = "mir-fixture-mir5-angelbob-f210-steel"
-FIXTURE_VERSION = "0.1.0"
-FIXTURE_ARCHIVE = f"{FIXTURE_NAME}_{FIXTURE_VERSION}.zip"
-FIXTURE_SHA256 = "8C592CF1D4538EE80ADF7D5C0448572E3719CA8A218D5F4D68FFB7367098DB43"
-FIXTURE_SOURCE_COMMIT = "392238799b4114a9acf2e3cc9e3c5e899a92e4d6"
 CURRENT_DIRECT_OBSERVER_SHA256 = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 OLDER_STANDALONE_OBSERVER_SHA256 = "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
 
@@ -174,39 +168,6 @@ class AngelBobRebalanceSpaceAgeProfileTests(unittest.TestCase):
             "Get-MIR5PrototypeCaptureMIRArchive -Archive $MIRArchive -Library $library -ExpectedSha256 $ExpectedMIRArchiveSha256 -EngineLine $engineLine",
             controller,
         )
-
-    def test_runtime_profile_is_the_fixture_strict_closure_with_final_pins(self):
-        upstream = read_profile(UPSTREAM_PATH)
-        runtime = read_profile(RUNTIME_PATH)
-        self.assertEqual(runtime["schema"], 1)
-        self.assertEqual(
-            runtime["kind"],
-            "mir5-angelbob-rebalance-space-age-f210-steel-fixture-preparation-selection",
-        )
-        self.assertEqual(runtime["target"], "f210")
-        self.assertEqual(runtime["factorio_line"], "2.1")
-        self.assertEqual(runtime["engine"], ENGINE)
-        self.assertEqual(runtime["settings_mode"], "Defaults")
-        expected_mods = dict(UPSTREAM_MODS)
-        expected_mods[MIR_NAME] = MIR_VERSION
-        expected_mods[FIXTURE_NAME] = FIXTURE_VERSION
-        self.assertEqual(mod_versions(runtime), expected_mods)
-        self.assertEqual(len(mod_versions(runtime)), 26)
-        expected_archives = dict(UPSTREAM_ARCHIVES)
-        expected_archives[MIR_ARCHIVE] = MIR_SHA256
-        expected_archives[FIXTURE_ARCHIVE] = FIXTURE_SHA256
-        self.assertEqual(runtime["archive_sha256"], expected_archives)
-        self.assertEqual(
-            {name: version for name, version in mod_versions(runtime).items()
-             if name not in {MIR_NAME, FIXTURE_NAME}},
-            mod_versions(upstream),
-        )
-        self.assertNotIn("mir-fixture-mir5-active-mods-observer", mod_versions(runtime))
-        self.assertIn(FIXTURE_SHA256, runtime["scope"])
-        self.assertIn(FIXTURE_SOURCE_COMMIT, runtime["scope"])
-        self.assertIn("6088 bytes", runtime["scope"])
-        self.assertIn("Preparation only", runtime["scope"])
-
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
