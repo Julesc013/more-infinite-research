@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-preowned-steel",
+  "version": "0.1.0",
+  "title": "Controlled foreign steel ownership witness",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.23", "angelbob-spaceage-rebalance = 1.3.2"]
+}
