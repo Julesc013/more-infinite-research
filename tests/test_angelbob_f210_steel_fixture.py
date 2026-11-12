@@ -155,7 +155,8 @@ function run_control(active_mods, opponent)
     insert=function(stack) counts[stack.name]=(counts[stack.name] or 0)+stack.count;return stack.count end,
     get_item_count=function(name) return counts[name] or 0 end,
   }
-  local lab={valid=true,prototype={name="mir-fixture-mir5-angelbob-f210-steel-fast-lab",researching_speed=6000},
+  local lab={valid=true,quality={name="normal"},prototype={name="mir-fixture-mir5-angelbob-f210-steel-fast-lab",
+      get_researching_speed=function(quality) assert(quality=="normal");return 6000 end},
     get_inventory=function(kind) assert(kind==1);return inventory end,disabled_by_script=false}
   local game={tick=0,forces={player=player},surfaces={[1]={create_entity=function(spec)
     assert(spec.name=="mir-fixture-mir5-angelbob-f210-steel-fast-lab" and spec.force==player);return lab end}}}
@@ -290,6 +291,7 @@ end
         self.assertNotIn("owner.researched =", source)
         self.assertNotIn("enable_all_prototypes", source)
         self.assertNotIn("research_all", source)
+        self.assertIn('get_researching_speed("normal")', source)
 
     def test_real_lab_contract_counts_one_unscripted_completion_payment_save_and_cold_reads(self):
         result = self._control()

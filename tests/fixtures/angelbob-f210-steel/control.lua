@@ -65,7 +65,8 @@ end
 local function create_lab(force)
   local lab = game.surfaces[1].create_entity{name=facts.fast_lab, position={0, 0}, force=force}
   if lab == nil or lab.valid == false or lab.prototype == nil or lab.prototype.name ~= facts.fast_lab
-      or not facts.close(lab.prototype.researching_speed, facts.fast_lab_speed) then
+      or lab.quality == nil or lab.quality.name ~= "normal" or type(lab.prototype.get_researching_speed) ~= "function"
+      or not facts.close(lab.prototype.get_researching_speed("normal"), facts.fast_lab_speed) then
     fail("fixture fast laboratory differs")
   end
   local inventory = lab.get_inventory(defines.inventory.lab_input)
