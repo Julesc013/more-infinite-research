@@ -140,17 +140,11 @@ function Assert-FactorioConsoleStartup {
   $consoleRoot=Join-Path $Context.root 'factorio-console-startup';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null
   $actor=Join-Path $consoleRoot 'fake-factorio-console.ps1'
   [IO.File]::WriteAllText($actor,@'
-param([Parameter(Mandatory)][string]$Record,[Parameter(Mandatory)][string]$PidPath,[ValidateSet("ordinary","confirmation","failure","timeout","writer-failure")][string]$Mode="ordinary")
+param([Parameter(Mandatory)][string]$Record,[Parameter(Mandatory)][string]$PidPath,[ValidateSet("ordinary","confirmation","failure","timeout")][string]$Mode="ordinary")
 $utf8=[Text.UTF8Encoding]::new($false)
 [IO.File]::WriteAllText($PidPath,[string]$PID,$utf8)
 $reader=[IO.StreamReader]::new([Console]::OpenStandardInput(),[Text.UTF8Encoding]::new($false),$false,1024,$false)
 try {
-  if($Mode -ceq "writer-failure") {
-    $reader.Dispose()
-    [Console]::Out.WriteLine("MIR_CONSOLE_READY")
-    Start-Sleep -Seconds 10
-    return
-  }
   $first=$reader.ReadLineAsync()
   $early=$first.Wait(150)
   [Console]::Out.WriteLine("MIR_CONSOLE_EARLY_INPUT=$early")
@@ -174,6 +168,21 @@ try {
   $command='/c game.print("mir-native-console-probe")'
   $startup=[ordered]@{command=$command;ready_marker='MIR_CONSOLE_READY';confirmation_marker='MIR_CONSOLE_CONFIRMATION'}
   $expectedHash=Get-MIR441TextSha256 -Text $command
+  $burstReady=New-MIR441FactorioConsoleStartup -Definition $startup
+  $burstReadyPath=Join-Path $consoleRoot 'ready-burst.txt'
+  [IO.File]::WriteAllText($burstReadyPath,('MIR_CONSOLE_READY'+('x'*9000)),[Text.UTF8Encoding]::new($false))
+  Add-MIR441FactorioConsoleStartupOutput -State $burstReady -Kind stdout -Path $burstReadyPath
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $burstReady)-and$burstReady.ready_marker_seen) 'console-ready-burst-marker-retained'
+  $burstConfirmation=New-MIR441FactorioConsoleStartup -Definition $startup
+  $burstConfirmation.receipt.send_count=1
+  $burstConfirmationPath=Join-Path $consoleRoot 'confirmation-burst.txt'
+  [IO.File]::WriteAllText($burstConfirmationPath,('MIR_CONSOLE_CONFIRMATION'+('x'*9000)),[Text.UTF8Encoding]::new($false))
+  Add-MIR441FactorioConsoleStartupOutput -State $burstConfirmation -Kind stderr -Path $burstConfirmationPath
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $burstConfirmation)-and$burstConfirmation.confirmation_marker_seen) 'console-confirmation-burst-marker-retained'
+  $closedState=New-MIR441FactorioConsoleStartup -Definition $startup
+  $closedStream=[IO.MemoryStream]::new();$closedWriter=[IO.StreamWriter]::new($closedStream,[Text.UTF8Encoding]::new($false),1024,$true);$closedWriter.Dispose();$closedWriterError='';$closedTimer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $closedState -Writer $closedWriter -Timer $closedTimer -Kind command}catch{$closedWriterError=$_.Exception.Message}finally{$closedStream.Dispose()}
+  Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0) 'console-closed-writer-refusal'
   $ordinaryRecord=Join-Path $consoleRoot 'ordinary-input.txt';$ordinaryPid=Join-Path $consoleRoot 'ordinary.pid'
   $ordinary=Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$ordinaryRecord,'-PidPath',$ordinaryPid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup
   $ordinaryInput=@(Get-Content -LiteralPath $ordinaryRecord)
@@ -190,6 +199,7 @@ try {
   Assert-Probe ($confirmationReceipt.confirmation_marker_observed-and$confirmationReceipt.send_count-eq2-and$confirmationReceipt.sends.Count-eq2-and$confirmationReceipt.sends[0].kind-ceq'command'-and$confirmationReceipt.sends[1].kind-ceq'confirmation-replay'-and$confirmationReceipt.sends[1].order-eq2-and$confirmationReceipt.sends[1].command_sha256-ceq$expectedHash-and$confirmationReceipt.sends[1].elapsed_monotonic_milliseconds-ge$confirmationReceipt.confirmation_elapsed_monotonic_milliseconds) 'console-confirmation-bounded-receipt'
   $invalidLaunch=Join-Path $consoleRoot 'invalid-launch.txt';$invalidPid=Join-Path $consoleRoot 'invalid.pid';$beforeIndex=$Context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command="/c invalid`nsecond";ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-newline]'
+  Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command=('/c '+('x'*16382));ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-command]'
   Assert-Probe ($Context.process_index-eq$beforeIndex-and-not(Test-Path -LiteralPath $invalidLaunch)-and-not(Test-Path -LiteralPath $invalidPid)) 'console-invalid-refused-before-launch'
   $failureRecord=Join-Path $consoleRoot 'failure-input.txt';$failurePid=Join-Path $consoleRoot 'failure.pid';$failureError=''
   try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$failureRecord,'-PidPath',$failurePid,'-Mode','failure') -TimeoutSeconds 20 -ConsoleStartup $startup|Out-Null}catch{$failureError=$_.Exception.Message}
@@ -199,10 +209,13 @@ try {
   try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$timeoutRecord,'-PidPath',$timeoutPid,'-Mode','timeout') -TimeoutSeconds 2 -ConsoleStartup $startup|Out-Null}catch{$timeoutError=$_.Exception.Message}
   $timeoutRun=$Context.runs[$Context.runs.Count-1]
   Assert-Probe ($timeoutError.Contains('[mir441-process-timeout]')-and$timeoutRun.status-ceq'interrupted'-and$timeoutRun.console_startup.command_sha256-ceq$expectedHash-and$timeoutRun.console_startup.send_count-eq1-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $timeoutPid)) -ErrorAction SilentlyContinue)) 'console-timeout-propagates-and-cleans'
-  $writerRecord=Join-Path $consoleRoot 'writer-input.txt';$writerPid=Join-Path $consoleRoot 'writer.pid';$writerError=''
-  try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$writerRecord,'-PidPath',$writerPid,'-Mode','writer-failure') -TimeoutSeconds 20 -ConsoleStartup $startup|Out-Null}catch{$writerError=$_.Exception.Message}
-  $writerRun=$Context.runs[$Context.runs.Count-1]
-  Assert-Probe ($writerError.Contains('[mir441-factorio-console-write]')-and$writerRun.status-ceq'interrupted'-and$writerRun.console_startup.command_sha256-ceq$expectedHash-and$writerRun.console_startup.ready_marker_observed-and$writerRun.console_startup.send_count-eq0-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $writerPid)) -ErrorAction SilentlyContinue)) 'console-writer-failure-cleans'
+  $sender=${function:Send-MIR441FactorioConsoleStartupLine};$seamRecord=Join-Path $consoleRoot 'send-error-input.txt';$seamPid=Join-Path $consoleRoot 'send-error.pid';$seamError=''
+  try {
+    Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value {param($State,$Writer,$Timer,$Kind)throw '[mir5-native-probe-console-owned-send-error]'}
+    try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$seamRecord,'-PidPath',$seamPid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup|Out-Null}catch{$seamError=$_.Exception.Message}
+  } finally {Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $sender}
+  $seamRun=$Context.runs[$Context.runs.Count-1]
+  Assert-Probe ($seamError.Contains('[mir5-native-probe-console-owned-send-error]')-and$seamRun.status-ceq'interrupted'-and$seamRun.console_startup.command_sha256-ceq$expectedHash-and$seamRun.console_startup.ready_marker_observed-and$seamRun.console_startup.send_count-eq0-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $seamPid)) -ErrorAction SilentlyContinue)) 'console-writer-failure-cleans'
 }
 try {
   [IO.Directory]::CreateDirectory($root)|Out-Null

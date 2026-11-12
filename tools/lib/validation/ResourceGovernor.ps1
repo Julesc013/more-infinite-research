@@ -321,7 +321,9 @@ function New-MIR441FactorioConsoleStartup {
   }
   $utf8=[Text.UTF8Encoding]::new($false,$true)
   try {$commandBytes=$utf8.GetByteCount($command);$readyBytes=$utf8.GetByteCount($ready);$confirmationBytes=$utf8.GetByteCount($confirmation)}catch{throw '[mir441-factorio-console-startup-utf8]'}
-  if($commandBytes-lt4-or$commandBytes-gt4096-or-not$command.StartsWith('/c ',[StringComparison]::Ordinal)-or[string]::IsNullOrWhiteSpace($command.Substring(3))) {throw '[mir441-factorio-console-startup-command]'}
+  # Match the existing direct-Factorio argument payload ceiling. This remains
+  # one reviewed console line, not a transport for a command sequence.
+  if($commandBytes-lt4-or$commandBytes-gt16384-or-not$command.StartsWith('/c ',[StringComparison]::Ordinal)-or[string]::IsNullOrWhiteSpace($command.Substring(3))) {throw '[mir441-factorio-console-startup-command]'}
   if($readyBytes-lt1-or$readyBytes-gt512-or($confirmationBytes-ne0-and($confirmationBytes-lt1-or$confirmationBytes-gt512))){throw '[mir441-factorio-console-startup-marker]'}
   if($confirmationBytes-ne0-and$ready-ceq$confirmation){throw '[mir441-factorio-console-startup-marker]'}
   return [pscustomobject][ordered]@{
@@ -334,7 +336,7 @@ function New-MIR441FactorioConsoleStartup {
       confirmation_marker_observed=$false;confirmation_elapsed_monotonic_milliseconds=$null
       send_count=0;sends=[Collections.Generic.List[object]]::new()
     }
-    streams=[Collections.Generic.List[object]]::new()
+    streams=[Collections.Generic.List[object]]::new();ready_marker_seen=$false;confirmation_marker_seen=$false
   }
 }
 
@@ -357,25 +359,21 @@ function Update-MIR441FactorioConsoleStartupOutput {
       if($read-le0){continue}
       $stream.offset+=$read
       $text=$encoding.GetString($buffer,0,$read)
-      $stream.tail=($stream.tail+$text)
-      if($stream.tail.Length-gt8192){$stream.tail=$stream.tail.Substring($stream.tail.Length-8192)}
+      # Search the complete bounded read together with the retained overlap
+      # before trimming. A marker at the front of a log burst must not vanish
+      # merely because the tail only retains the newest 8192 characters.
+      $tail=($stream.tail+$text)
+      if(-not$State.ready_marker_seen-and$tail.IndexOf($State.ready_marker,[StringComparison]::Ordinal)-ge0){$State.ready_marker_seen=$true}
+      $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
       if($State.receipt.send_count-ge1){
-        $stream.confirmation_tail=($stream.confirmation_tail+$text)
-        if($stream.confirmation_tail.Length-gt8192){$stream.confirmation_tail=$stream.confirmation_tail.Substring($stream.confirmation_tail.Length-8192)}
+        $confirmationTail=($stream.confirmation_tail+$text)
+        if($State.confirmation_marker.Length-gt0-and-not$State.confirmation_marker_seen-and$confirmationTail.IndexOf($State.confirmation_marker,[StringComparison]::Ordinal)-ge0){$State.confirmation_marker_seen=$true}
+        $stream.confirmation_tail=if($confirmationTail.Length-gt8192){$confirmationTail.Substring($confirmationTail.Length-8192)}else{$confirmationTail}
       }
       $updated=$true
     } finally {if($null-ne$reader){$reader.Dispose()}}
   }
   return $updated
-}
-
-function Test-MIR441FactorioConsoleStartupMarker {
-  param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][string]$Marker,[switch]$ConfirmationOnly)
-  foreach($stream in $State.streams){
-    $text=if($ConfirmationOnly){[string]$stream.confirmation_tail}else{[string]$stream.tail}
-    if($text.IndexOf($Marker,[StringComparison]::Ordinal)-ge0){return $true}
-  }
-  return $false
 }
 
 function Send-MIR441FactorioConsoleStartupLine {
@@ -483,12 +481,12 @@ function Invoke-MIR441MonitoredProcess {
         break
       }
       if($null-ne$consoleStartup-and(Update-MIR441FactorioConsoleStartupOutput -State $consoleStartup)){
-        if(-not$consoleStartup.receipt.ready_marker_observed-and(Test-MIR441FactorioConsoleStartupMarker -State $consoleStartup -Marker $consoleStartup.ready_marker)){
+        if(-not$consoleStartup.receipt.ready_marker_observed-and$consoleStartup.ready_marker_seen){
           $consoleStartup.receipt.ready_marker_observed=$true
           $consoleStartup.receipt.ready_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
           Send-MIR441FactorioConsoleStartupLine -State $consoleStartup -Writer $inputWriter -Timer $timer -Kind command
         }
-        if($consoleStartup.receipt.send_count-eq1-and$consoleStartup.confirmation_marker.Length-gt0-and(Test-MIR441FactorioConsoleStartupMarker -State $consoleStartup -Marker $consoleStartup.confirmation_marker -ConfirmationOnly)){
+        if($consoleStartup.receipt.send_count-eq1-and$consoleStartup.confirmation_marker.Length-gt0-and$consoleStartup.confirmation_marker_seen){
           $consoleStartup.receipt.confirmation_marker_observed=$true
           $consoleStartup.receipt.confirmation_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
           Send-MIR441FactorioConsoleStartupLine -State $consoleStartup -Writer $inputWriter -Timer $timer -Kind confirmation-replay
