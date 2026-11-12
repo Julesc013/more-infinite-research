@@ -23,10 +23,10 @@
     "spec/verification.md",
     "spec/programmes/community-requests.json"
   ],
-  "review_method": "Eleven read-only textual predicates evaluated against the exact current and historical blobs; no Lua, Python host, Factorio-native or GUI process executed.",
+  "review_method": "Twelve read-only textual predicates evaluated against the exact current and historical blobs; no Lua, Python host, Factorio-native or GUI process executed.",
   "source_predicates": {
-    "executed": 11,
-    "passed": 11,
+    "executed": 12,
+    "passed": 12,
     "failed": 0,
     "scope": "presence/order/parentage/layout-loop/callback source text only; cannot prove native rendering"
   },
