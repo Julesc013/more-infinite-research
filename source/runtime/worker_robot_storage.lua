@@ -201,8 +201,8 @@ end
 -- Add/update rows retain an active string matching their new version; removal
 -- rows retain a prior string and no longer have an active entry. This rejects
 -- fabricated event rows before a durable route fact can be used.
-local function selection_change(item, active_version)
-  if type(item) ~= "table" then return nil end
+local function selection_change(name, item, active_version)
+  if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then return nil end
   local old, new = item.old_version, item.new_version
   if old ~= nil and (type(old) ~= "string" or old == "")
       or new ~= nil and (type(new) ~= "string" or new == "") then return nil end
@@ -216,16 +216,18 @@ local function selection_change(item, active_version)
   return old == new and "unchanged" or "updated"
 end
 
-local function history_context(event, route, state, current)
-  local function value(item)
-    if type(item) == "string" then
-      return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
-        return string.format("\\x%02X", string.byte(byte))
-      end))
-    end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "unknown"
+local function history_value(item, limit)
+  if type(item) == "string" then
+    return (item:sub(1, limit or 96):gsub("[%z\1-\32\127-\255]", function(byte)
+      return string.format("\\x%02X", string.byte(byte))
+    end))
   end
+  if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
+  return "unknown"
+end
+
+local function history_context(event, route, state, current, include_provider_changes)
+  local value = history_value
   local details = type(event) == "table" and event or {}
   local changes = details.mod_changes
   local mir = type(changes) == "table" and changes[MIR]
@@ -239,10 +241,12 @@ local function history_context(event, route, state, current)
     "startup_changed=" .. value(details.mod_startup_settings_changed),
     "saved_route=" .. value(saved),
     "current_route=" .. value(current and current.kind or route and "finite" or "unobserved")}
-  for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
-    local change = type(changes) == "table" and changes[name]
-    if type(change) == "table" then
-      parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+  if include_provider_changes ~= false then
+    for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
+      local change = type(changes) == "table" and changes[name]
+      if type(change) == "table" then
+        parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+      end
     end
   end
   return " [" .. table.concat(parts, " ") .. "]"
@@ -254,6 +258,20 @@ local function recover_error(reason, route, event, state, current)
     .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
     .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
     .. " verified history; this command cannot infer it", route)
+end
+
+local function default_selection_error(event, state, changes)
+  table.sort(changes)
+  local shown = {}
+  for index = 1, math.min(#changes, 6) do shown[index] = changes[index] end
+  refuse("default transfer requires the unchanged mod selection"
+    .. history_context(event, nil, state, {kind="default"}, false)
+    .. " [native_owner=absent changed_mod_count=" .. #changes .. " changed_mods=" .. table.concat(shown, ",")
+    .. " changes_omitted=" .. (#changes - #shown) .. "]"
+    .. "; keep the protected original COPY. For a supported older default-worker save, first update a separate"
+    .. " copy with its previous mods and matching MIR settings; this establishes native ownership automatically."
+    .. " Save separately and exit before changing mods. This cannot reconstruct an already changed predecessor",
+    {technology=recovery.canonical})
 end
 
 local function fields(value, allowed)
@@ -860,23 +878,23 @@ local function default_origin(event, initializing, state)
   end
   local engine_patch_valid = same_family_engine_patch(event)
   if not base_hop and not engine_patch_valid then recover_error("default transfer requires a supported same-family engine patch") end
-  local changed_selection = false
+  local changed_selection = {}
   for name, item in pairs(event.mod_changes) do
-    -- Once the saved route has proved the old MIR default and the *current*
-    -- default contract/frame checks below still hold, unrelated selection
-    -- changes cannot change the native worker work being transferred. Keep
-    -- the older cross-family Base hop strict: its separate proof depends on
-    -- the complete old selection rather than this modern route marker.
+    -- A saved default route and the current native contract authorize this
+    -- same-family transfer; the distinct Base-family hop remains strict.
     if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) then
-      local kind = selection_change(item, active[name])
+      local kind = selection_change(name, item, active[name])
       if kind == nil then recover_error("default transfer has an invalid mod-selection fact") end
       if kind ~= "unchanged" then
-        changed_selection = true
-        if not recorded_default or base_hop then recover_error("default transfer requires the unchanged mod selection") end
+        changed_selection[#changed_selection + 1] = history_value(name, 48) .. ":"
+          .. history_value(item.old_version or "absent", 24) .. "->" .. history_value(item.new_version or "absent", 24)
       end
     end
   end
-  if recorded_default and changed_selection and event.mod_startup_settings_changed ~= false then
+  if #changed_selection > 0 and (not recorded_default or base_hop) then
+    default_selection_error(event, state, changed_selection)
+  end
+  if recorded_default and #changed_selection > 0 and event.mod_startup_settings_changed ~= false then
     recover_error("recorded default source requires unchanged startup settings")
   end
   if recorded_default then

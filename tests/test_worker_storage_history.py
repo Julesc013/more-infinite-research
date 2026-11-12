@@ -2162,7 +2162,12 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                           elseif selection=="updated"then
                             script.active_mods["harmless-provider"]="0.1.1"
                             event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version="0.1.1"}
-                          else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
+                          elseif opponent=="entry-metatable"then setmetatable(event.mod_changes["harmless-provider"],{})
+              elseif opponent=="name-type"or opponent=="empty-name"then
+                local key=opponent=="name-type"and 42 or ""
+                event.mod_changes["harmless-provider"]=nil
+                script.active_mods[key]="0.1.0";event.mod_changes[key]={new_version="0.1.0"}
+              else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
                           if engine_patch then
                             local target=require("platform.target")
                             script.active_mods.base=engine_version
@@ -2215,7 +2220,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
     def test_recorded_default_still_refuses_changed_settings_unknown_foreign_or_invalid_selection_before_writes(self):
         for opponent in ("settings", "unknown", "unknown-producer", "foreign", "malformed-state",
                          "nontable", "wrong-new-version", "missing-active", "old-nonstring", "new-nonstring",
-                         "both-versions-missing", "removal-with-active"):
+                         "both-versions-missing", "removal-with-active", "entry-metatable", "name-type", "empty-name"):
             lua=self.world("f210", "5.0.21014");lua.globals().opponent=opponent
             lua.execute(r'''
               seed_owner()
@@ -2236,11 +2241,93 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
               elseif opponent=="new-nonstring"then event.mod_changes["harmless-provider"].new_version=1
               elseif opponent=="both-versions-missing"then script.active_mods["harmless-provider"]=nil
                 event.mod_changes["harmless-provider"]={old_version=nil,new_version=nil}
+              elseif opponent=="entry-metatable"then setmetatable(event.mod_changes["harmless-provider"],{})
+              elseif opponent=="name-type"or opponent=="empty-name"then
+                local key=opponent=="name-type"and 42 or ""
+                event.mod_changes["harmless-provider"]=nil
+                script.active_mods[key]="0.1.0";event.mod_changes[key]={new_version="0.1.0"}
               else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
               local prior=storage.mir_worker_storage_route;local before=all_frames();writes=0
               assert(not pcall(history.default_owner_preflight,event,nil,true))
               assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil
                 and storage.mir_worker_storage_route==prior)
+            ''')
+
+
+    def test_changed_selection_reports_actual_default_origin_and_automatic_upgrade_guidance(self):
+        for target in ("f200", "f210"):
+            # Recorded defaults are admitted; diagnostics cover the unrecorded refusal.
+            for recorded in (False,):
+                lua = self.world(target)
+                lua.globals().recorded = recorded
+                lua.execute(r'''
+                  seed_owner()
+                  local saved=recorded and {schema=2,kind="route",current={kind="default"}}or nil
+                  storage.mir_worker_storage_route=saved
+                  local old=package_family=="f200"and"5.0.20011"or"5.0.21011"
+                  local event=owner_event(old)
+                  script.active_mods.added="1.2.3";event.mod_changes.added={new_version="1.2.3"}
+                  event.mod_changes.removed={old_version="2.0.0"}
+                  script.active_mods.updated="3.0.1";event.mod_changes.updated={old_version="3.0.0",new_version="3.0.1"}
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                  assert(not ok and writes==0 and same(before,all_frames()))
+                  assert(storage.mir_worker_storage_route==saved and storage[OWNER_KEY]==nil)
+                  assert(message:find("previous_mir="..old,1,true))
+                  assert(message:find("new_mir="..script.active_mods["more-infinite-research"],1,true))
+                  assert(message:find("startup_changed=false",1,true))
+                  assert(message:find("saved_route="..(recorded and"default"or"absent"),1,true))
+                  assert(message:find("current_route=default",1,true))
+                  assert(message:find("technology=worker-robots-storage-4",1,true))
+                  assert(message:find("changed_mod_count=3",1,true))
+                  assert(message:find("changed_mods=added:absent->1.2.3,removed:2.0.0->absent,updated:3.0.0->3.0.1",1,true))
+                  assert(message:find("native ownership automatically",1,true))
+                  assert(not message:find("/mir-worker-storage-recovery prepare",1,true))
+                ''')
+
+    def test_changed_selection_context_is_sorted_bounded_printable_and_read_only(self):
+        for target in ("f200", "f210"):
+            lua = self.world(target)
+            lua.execute(r'''
+              seed_owner()
+              local old=package_family=="f200"and"5.0.20011"or"5.0.21011"
+              local prior
+              for _,reverse in ipairs{false,true}do
+                local event=owner_event(old)
+                for step=1,40 do
+                  local index=reverse and 41-step or step
+                  local name=string.format("helper-%02d-",index)..string.rep("\195\169",60).."\0\n"
+                  local version=string.rep("\195\169",60).."\0\n"
+                  script.active_mods[name]=version
+                  event.mod_changes[name]={old_version="old\0\n",new_version=version}
+                end
+                local before=all_frames();writes=0
+                local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                assert(not message:find("[%z\1-\31\127-\255]")and #message<4096)
+                assert(message:find("changed_mod_count=40",1,true)and message:find("changes_omitted=34",1,true))
+                assert(message:find("helper-01-",1,true)and message:find("helper-06-",1,true))
+                assert(not message:find("helper-07-",1,true))
+                assert(message:find("\\xC3",1,true)and message:find("\\x00",1,true))
+                local context=message:match("%[previous_mir=.*")
+                if prior then assert(context==prior,"context depends on mod-change insertion order")end
+                prior=context
+              end
+            ''')
+
+    def test_existing_native_owner_accepts_unrelated_mod_changes_without_reconverting(self):
+        for target in ("f200", "f210"):
+            lua = self.world(target)
+            lua.execute(r'''
+              seed_owner();assert(transfer());local owner=storage[OWNER_KEY]
+              local event={mod_startup_settings_changed=false,mod_changes={
+                added={new_version="1"},removed={old_version="2"},updated={old_version="3",new_version="4"}}}
+              script.active_mods.added="1";script.active_mods.updated="4"
+              local before=all_frames();writes=0
+              local plan=history.default_owner_preflight(event,nil,true)
+              assert(plan and plan.already_owned and not plan.changed)
+              assert(not history.default_owner_apply(plan))
+              assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner)
             ''')
 
 
