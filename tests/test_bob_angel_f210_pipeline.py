@@ -736,8 +736,12 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 deepcopy(raw["technology"]["steel-plate-productivity"]["effects"][0])),
              "steel-plate-productivity existing effect"),
             ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].append(
-                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.1}),
-             "steel-plate-productivity already owns Angel steel"),
+                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.2}),
+             "steel-plate-productivity Angel effect changed"),
+            ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].extend((
+                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.1},
+                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.1},
+            )), "steel-plate-productivity Angel effect changed"),
         )
         for case, mutate, expected in scenarios:
             with self.subTest(case=case, expected=expected):
@@ -781,6 +785,47 @@ class BobAngelF210PipelineTests(unittest.TestCase):
             {"steel-plate", "casting-steel", "angels-plate-steel", "angels-plate-steel-2"},
             {effect.get("recipe") for effect in steel["effects"] if effect.get("recipe") is not None},
         )
+
+    def test_space_age_steel_reuses_existing_angel_effects_and_appends_only_missing_route(self):
+        for present in (("angels-plate-steel",), ("angels-plate-steel-2",),
+                        ("angels-plate-steel", "angels-plate-steel-2")):
+            with self.subTest(present=present):
+                raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+                foreign = {"type": "unlock-recipe", "recipe": "foreign-steel-route"}
+                steel = raw["technology"]["steel-plate-productivity"]
+                steel["effects"] = [foreign] + steel["effects"] + [
+                    {"type": "change-recipe-productivity", "recipe": recipe, "change": 0.1}
+                    for recipe in present
+                ]
+                original_effects = deepcopy(steel["effects"])
+                expected_recipes = ["steel-plate", "casting-steel"] + list(present) + [
+                    recipe for recipe in ("angels-plate-steel", "angels-plate-steel-2") if recipe not in present
+                ]
+                default = self._rows(self.stage("space_age", raw=raw))["steel-plate-productivity"]["effects"]
+                self.assertEqual(foreign, default[0])
+                self.assertEqual(
+                    expected_recipes,
+                    [effect["recipe"] for effect in default if effect.get("type") == "change-recipe-productivity"],
+                )
+                self.assertEqual([0.1] * 4, [
+                    effect["change"] for effect in default if effect.get("type") == "change-recipe-productivity"
+                ])
+                rows = self._rows(self.stage("space_age", {
+                    "ips-effect-per-level-research_steel": 25,
+                }, raw=raw))
+                effects = rows["steel-plate-productivity"]["effects"]
+                self.assertEqual(foreign, effects[0])
+                self.assertEqual(
+                    expected_recipes,
+                    [effect["recipe"] for effect in effects if effect.get("type") == "change-recipe-productivity"],
+                )
+                self.assertEqual([0.25] * 4, [
+                    effect["change"] for effect in effects if effect.get("type") == "change-recipe-productivity"
+                ])
+                disabled = self._rows(self.stage("space_age", {
+                    "ips-enable-research_steel": False,
+                }, raw=raw))["steel-plate-productivity"]
+                self.assertEqual(original_effects, disabled["effects"])
 
     def test_space_age_productivity_denied_breeding_and_acid_routes_are_admitted_as_captured(self):
         raw = self.context["cases"]["space_age"]["raw"]

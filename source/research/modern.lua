@@ -347,8 +347,14 @@ local function named_owner_effects(owner, definition, inherited_change)
   end
   for index = 1, #admission.recipes do
     local recipe = admission.recipes[index]
-    local expected_count = appended[recipe] and 0 or 1
-    if found[recipe] ~= expected_count then owner_error(definition, "missing or duplicate effect for " .. recipe) end
+    -- An admitted compatibility patch may already own one of the explicit
+    -- appended routes.  Both absence (so MIR appends it) and one matching
+    -- native effect are valid; duplicates still make ownership ambiguous.
+    if appended[recipe] then
+      if found[recipe] > 1 then owner_error(definition, "missing or duplicate effect for " .. recipe) end
+    elseif found[recipe] ~= 1 then
+      owner_error(definition, "missing or duplicate effect for " .. recipe)
+    end
   end
 end
 
@@ -426,11 +432,16 @@ local function owner_effect_plan(owner, definition, stream)
   local replacement = configured_effect and stream.effect_percent / 100 or definition.expected.effect_change
   local admitted = {}
   for index = 1, #definition.admission.recipes do admitted[definition.admission.recipes[index]] = true end
+  local present = {}
   for _, effect in ipairs(effects) do
-    if effect.type == definition.admission.effect_type and admitted[effect.recipe] then effect.change = replacement end
+    if effect.type == definition.admission.effect_type and admitted[effect.recipe] then
+      effect.change, present[effect.recipe] = replacement, true
+    end
   end
   for _, recipe in ipairs(definition.append_recipes or {}) do
-    effects[#effects + 1] = {type=definition.admission.effect_type, recipe=recipe, change=replacement}
+    if not present[recipe] then
+      effects[#effects + 1] = {type=definition.admission.effect_type, recipe=recipe, change=replacement}
+    end
   end
   return effects
 end
