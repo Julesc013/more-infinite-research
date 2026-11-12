@@ -26,7 +26,7 @@ MIR_SHA256 = "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F"
 FIXTURE_NAME = "mir-fixture-mir5-angelbob-f210-steel"
 FIXTURE_VERSION = "0.1.0"
 FIXTURE_ARCHIVE = f"{FIXTURE_NAME}_{FIXTURE_VERSION}.zip"
-FIXTURE_SHA256 = "8DA7EED8E22F635EEF00E180102F77D2291F9DB8B3065B368C9C0CC3874038B2"
+FIXTURE_SHA256 = "B1255AD3F777F188721DFCF4F0655DE9D37531886D730F9A17148F548C2B4C34"
 PREOWNED_NAME = "mir-fixture-mir5-preowned-steel"
 PREOWNED_SHA256 = "77967A9E8A3F19CE11BF21BCF50AA0B481535ECDD2EA3E449F952603A2AD334B"
 CURRENT_DIRECT_OBSERVER_SHA256 = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
@@ -208,7 +208,7 @@ class AngelBobRebalanceSpaceAgeProfileTests(unittest.TestCase):
         )
         self.assertIn("mir-fixture-mir5-active-mods-observer", mod_versions(runtime))
         self.assertIn(FIXTURE_SHA256, runtime["scope"])
-        self.assertIn("7535bytes", runtime["scope"])
+        self.assertIn("7682bytes", runtime["scope"])
         self.assertIn("NOT the reporter modpack", runtime["scope"])
         self.assertIn("Preparation only", runtime["scope"])
 

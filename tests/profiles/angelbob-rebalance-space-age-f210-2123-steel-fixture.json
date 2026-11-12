@@ -171,10 +171,10 @@
     "bobpower_3.0.0.zip": "C33C7B521BEC061ADF695A14BF3A218259FC0548B5F5AB512E74ECEAEDA39831",
     "bobrevamp_3.0.0.zip": "AEFAC11F71AA82B2385D92FBAC1C22FD6CAEF12E751A85CA63472AE8A4DC5703",
     "bobtech_3.0.0.zip": "397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B",
-    "mir-fixture-mir5-angelbob-f210-steel_0.1.0.zip": "8DA7EED8E22F635EEF00E180102F77D2291F9DB8B3065B368C9C0CC3874038B2",
+    "mir-fixture-mir5-angelbob-f210-steel_0.1.0.zip": "B1255AD3F777F188721DFCF4F0655DE9D37531886D730F9A17148F548C2B4C34",
     "more-infinite-research_5.0.21013.zip": "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
     "mir-fixture-mir5-preowned-steel_0.1.0.zip": "77967A9E8A3F19CE11BF21BCF50AA0B481535ECDD2EA3E449F952603A2AD334B"
   },
-  "scope": "Exact28-mod steel witness: real1.3.2 closure, frozen MIR5.0.21013/E927, A15 observer, corrected full-bonus/native-science lab fixture 8DA7EED8E22F635EEF00E180102F77D2291F9DB8B3065B368C9C0CC3874038B2 (7535bytes), and explicitly controlled foreign preownership fixture 77967A9E8A3F19CE11BF21BCF50AA0B481535ECDD2EA3E449F952603A2AD334B (1211bytes). The latter installs two legitimate preowned effects before MIR and is NOT the reporter modpack. Preparation only; ordinary lab/payment/save/two-cold and exact raw-owner preservation require native results."
+  "scope": "Exact28-mod steel witness: real1.3.2 closure, frozen MIR5.0.21013/E927, A15 observer, corrected full-bonus/native-science lab fixture B1255AD3F777F188721DFCF4F0655DE9D37531886D730F9A17148F548C2B4C34 (7682bytes), and explicitly controlled foreign preownership fixture 77967A9E8A3F19CE11BF21BCF50AA0B481535ECDD2EA3E449F952603A2AD334B (1211bytes). The latter installs two legitimate preowned effects before MIR and is NOT the reporter modpack. Preparation only; ordinary lab/payment/save/two-cold and exact raw-owner preservation require native results."
 }
