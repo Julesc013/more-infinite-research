@@ -125,7 +125,8 @@ function Invoke-MIRNativeProbeProcess {
     [scriptblock]$OwnedProcessExitCallback=$null,
     [switch]$FactorioSteamIdentity,
     $PreStartAdmissionWait=$null,
-    [scriptblock]$CompletionPredicate
+    [scriptblock]$CompletionPredicate,
+    $FactorioConsoleStartup=$null
   )
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   $Context.process_index++
@@ -140,6 +141,10 @@ function Invoke-MIRNativeProbeProcess {
     # Do not add an unknown named parameter to existing non-Factorio mock
     # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
     if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
+    if($null-ne$FactorioConsoleStartup){
+      if(-not$FactorioSteamIdentity){throw '[mir441-factorio-console-identity-required]'}
+      $governorArguments.FactorioConsoleStartup=$FactorioConsoleStartup
+    }
     if($null -ne $PreStartAdmissionWait){$governorArguments.PreStartAdmissionWait=$PreStartAdmissionWait}
     if($SampleMilliseconds -ne 0){$governorArguments.SampleMilliseconds=$SampleMilliseconds}
     if($null -ne $OwnedProcessSampleCallback){$governorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
@@ -156,6 +161,8 @@ function Invoke-MIRNativeProbeProcess {
   } catch {
     $failure=$_
     $entry=[ordered]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$failure.Exception.Message}
+    $consoleReceipt=$failure.Exception.Data['mir441_factorio_console_startup']
+    if($consoleReceipt-is[Collections.IDictionary] -or $consoleReceipt-is[pscustomobject]){$entry.console_startup=$consoleReceipt}
     $terminal=$failure.Exception.Data['mir441_process_result']
     if($terminal-is[pscustomobject]-and
       @('status','exit_code','passed','timed_out','completion_predicate_observed'|Where-Object {$null-eq$terminal.PSObject.Properties[$_]}).Count-eq0-and
@@ -195,13 +202,22 @@ function Invoke-MIRNativeProbeFactorioProcess {
     [scriptblock]$OwnedProcessExitCallback=$null,
     [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
     [string]$AdmissionPhase='',
-    [scriptblock]$CompletionPredicate
+    [scriptblock]$CompletionPredicate,
+    $ConsoleStartup=$null
   )
   if($Arguments.Count -lt 1 -or $Arguments.Count -gt 128){throw '[mir-native-probe-argument-budget]'}
   # Retain the historical data-size guard even though the direct actor no
   # longer serializes its arguments through a PowerShell wrapper.
   $payload=[Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-Json -InputObject $Arguments -Compress))
   if($payload.Length -gt 16KB){throw '[mir-native-probe-argument-budget]'}
+  # The console primitive is direct-Factorio only. It admits one bounded /c
+  # command after a caller-owned ready marker and can replay that exact command
+  # once after an observed engine confirmation marker.
+  $consoleStartupDefinition=$null
+  if($null-ne$ConsoleStartup){
+    $validatedConsoleStartup=New-MIR441FactorioConsoleStartup -Definition $ConsoleStartup
+    $consoleStartupDefinition=[ordered]@{command=$validatedConsoleStartup.command;ready_marker=$validatedConsoleStartup.ready_marker;confirmation_marker=$validatedConsoleStartup.confirmation_marker}
+  }
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   # The same governed ProcessStartInfo already owns the process lifetime,
   # streamed stdout/stderr, process tree, timeout and cleanup. Start Factorio
@@ -212,6 +228,7 @@ function Invoke-MIRNativeProbeFactorioProcess {
   if($SampleMilliseconds -ne 0){$actorArguments.SampleMilliseconds=$SampleMilliseconds}
   if($null -ne $OwnedProcessSampleCallback){$actorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
   if($null -ne $OwnedProcessExitCallback){$actorArguments.OwnedProcessExitCallback=$OwnedProcessExitCallback}
+  if($null-ne$consoleStartupDefinition){$actorArguments.FactorioConsoleStartup=$consoleStartupDefinition}
   if($AdmissionWaitSeconds -gt 0){
     if([string]::IsNullOrWhiteSpace($AdmissionPhase)){throw '[mir-native-probe-admission-phase]'}
     $actorArguments.PreStartAdmissionWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase $AdmissionPhase
