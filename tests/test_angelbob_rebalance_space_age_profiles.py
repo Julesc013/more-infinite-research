@@ -12,7 +12,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 PROFILES = ROOT / "tests/profiles"
 UPSTREAM_PATH = PROFILES / "angelbob-rebalance-space-age-f210-2123-upstream.json"
-CANDIDATE_PATH = PROFILES / "angelbob-rebalance-space-age-f210-2123-candidate.json"
+CAPTURE_CONTROLLER = ROOT / "tools/Invoke-PrototypeCapture.ps1"
 ENGINE = {
     "version": "2.1.23",
     "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
@@ -139,33 +139,35 @@ class AngelBobRebalanceSpaceAgeProfileTests(unittest.TestCase):
         self.assertIn(OLDER_STANDALONE_OBSERVER_SHA256, profile["scope"])
         self.assertIn("Preparation only", profile["scope"])
 
-    def test_candidate_profile_changes_only_to_the_exact_candidate_archive(self):
+    def test_capture_controller_requires_the_upstream_profile_and_separate_mir_arguments(self):
+        """Keep the actual capture entry point, not a look-alike profile, honest.
+
+        Invoke-PrototypeCapture deliberately owns the MIR selection outside the
+        loaded profile. This keeps the one upstream profile reusable by the
+        no-MIR and candidate arms while retaining the exact candidate tuple the
+        caller must supply.
+        """
         upstream = read_profile(UPSTREAM_PATH)
-        candidate = read_profile(CANDIDATE_PATH)
-        self.assertEqual(candidate["schema"], 1)
-        self.assertEqual(candidate["kind"], "mir5-angelbob-rebalance-space-age-f210-candidate-preparation-selection")
-        self.assertEqual(candidate["target"], "f210-standalone")
-        self.assertEqual(candidate["factorio_line"], "2.1")
-        self.assertEqual(candidate["engine"], ENGINE)
-        self.assertEqual(candidate["settings_mode"], "Defaults")
-        expected_mods = dict(UPSTREAM_MODS)
-        expected_mods[MIR_NAME] = MIR_VERSION
-        self.assertEqual(mod_versions(candidate), expected_mods)
-        expected_archives = dict(UPSTREAM_ARCHIVES)
-        expected_archives[MIR_ARCHIVE] = MIR_SHA256
-        self.assertEqual(candidate["archive_sha256"], expected_archives)
-        self.assertEqual(
-            {name: version for name, version in mod_versions(candidate).items() if name != MIR_NAME},
-            mod_versions(upstream),
+        self.assertNotIn(MIR_NAME, mod_versions(upstream))
+        self.assertNotIn(MIR_ARCHIVE, upstream["archive_sha256"])
+        self.assertEqual(MIR_VERSION, "5.0.21013")
+        self.assertRegex(MIR_SHA256, r"^[A-F0-9]{64}$")
+
+        controller = CAPTURE_CONTROLLER.read_text(encoding="utf-8")
+        self.assertIn("[string]$MIRArchive = ''", controller)
+        self.assertIn("[string]$ExpectedMIRArchiveSha256 = ''", controller)
+        self.assertIn(
+            "profile must omit MIR; MIRArchive is the sole explicit MIR selection",
+            controller,
         )
-        self.assertEqual(
-            {name: digest for name, digest in candidate["archive_sha256"].items() if name != MIR_ARCHIVE},
-            upstream["archive_sha256"],
+        self.assertIn(
+            "$hasMIRArchive -eq (-not [string]::IsNullOrWhiteSpace($ExpectedMIRArchiveSha256))",
+            controller,
         )
-        self.assertNotIn("mir-fixture-mir5-active-mods-observer", mod_versions(candidate))
-        self.assertNotIn("mir-fixture-mir5-angelbob-f210-steel", mod_versions(candidate))
-        self.assertIn("source tree 32505443e929344affb2c7d691dd15bdb7fb2a4d", candidate["scope"])
-        self.assertIn("no profile parser", candidate["scope"])
+        self.assertIn(
+            "Get-MIR5PrototypeCaptureMIRArchive -Archive $MIRArchive -Library $library -ExpectedSha256 $ExpectedMIRArchiveSha256 -EngineLine $engineLine",
+            controller,
+        )
 
 
 if __name__ == "__main__":
