@@ -197,16 +197,18 @@ local function same_family_engine_patch(event)
   return true
 end
 
-local function history_context(event, route, state, current)
-  local function value(item)
-    if type(item) == "string" then
-      return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
-        return string.format("\\x%02X", string.byte(byte))
-      end))
-    end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "unknown"
+local function history_value(item, limit)
+  if type(item) == "string" then
+    return (item:sub(1, limit or 96):gsub("[%z\1-\32\127-\255]", function(byte)
+      return string.format("\\x%02X", string.byte(byte))
+    end))
   end
+  if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
+  return "unknown"
+end
+
+local function history_context(event, route, state, current, include_provider_changes)
+  local value = history_value
   local details = type(event) == "table" and event or {}
   local changes = details.mod_changes
   local mir = type(changes) == "table" and changes[MIR]
@@ -220,10 +222,12 @@ local function history_context(event, route, state, current)
     "startup_changed=" .. value(details.mod_startup_settings_changed),
     "saved_route=" .. value(saved),
     "current_route=" .. value(current and current.kind or route and "finite" or "unobserved")}
-  for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
-    local change = type(changes) == "table" and changes[name]
-    if type(change) == "table" then
-      parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+  if include_provider_changes ~= false then
+    for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
+      local change = type(changes) == "table" and changes[name]
+      if type(change) == "table" then
+        parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+      end
     end
   end
   return " [" .. table.concat(parts, " ") .. "]"
@@ -235,6 +239,20 @@ local function recover_error(reason, route, event, state, current)
     .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
     .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
     .. " verified history; this command cannot infer it", route)
+end
+
+local function default_selection_error(event, state, changes)
+  table.sort(changes)
+  local shown = {}
+  for index = 1, math.min(#changes, 6) do shown[index] = changes[index] end
+  refuse("default transfer requires the unchanged mod selection"
+    .. history_context(event, nil, state, {kind="default"}, false)
+    .. " [native_owner=absent changed_mod_count=" .. #changes .. " changed_mods=" .. table.concat(shown, ",")
+    .. " changes_omitted=" .. (#changes - #shown) .. "]"
+    .. "; keep the protected original COPY. For a supported older default-worker save, first update a separate"
+    .. " copy with its previous mods and matching MIR settings; this establishes native ownership automatically."
+    .. " Save separately and exit before changing mods. This cannot reconstruct an already changed predecessor",
+    {technology=recovery.canonical})
 end
 
 local function fields(value, allowed)
@@ -819,12 +837,17 @@ local function default_origin(event, initializing, state)
   end
   local engine_patch_valid = same_family_engine_patch(event)
   if not base_hop and not engine_patch_valid then recover_error("default transfer requires a supported same-family engine patch") end
+  local changed_selection = {}
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
         or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
-      recover_error("default transfer requires the unchanged mod selection")
+      local old = type(item) == "table" and (item.old_version or "absent") or nil
+      local new = type(item) == "table" and (item.new_version or "absent") or nil
+      changed_selection[#changed_selection + 1] = history_value(name, 48) .. ":"
+        .. history_value(old, 24) .. "->" .. history_value(new, 24)
     end
   end
+  if #changed_selection > 0 then default_selection_error(event, state, changed_selection) end
   if state ~= nil then
     if state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default" then
       recover_error("legacy prepared/finite conversion is not a default-owner transfer")
