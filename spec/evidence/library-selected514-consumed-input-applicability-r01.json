@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "kind": "MIRSelected514LibrarySourceAndObserverApplicabilityV1",
+  "date": "2026-11-13",
+  "scope": "Read-only comparison for the selected integrated 5.0.14 head, not the unselected alternative #1914; no new GUI, native, worker, test execution or delivery verdict.",
+  "refs": {
+    "published13": {
+      "tag": "v5.0.13",
+      "commit": "f208b853a6e59fdcafd9209219150965576637d7",
+      "tree": "f208b853a6e59fdcafd9209219150965576637d7"
+    },
+    "selected14": {
+      "pr": 1917,
+      "commit": "5ab4facb7d774e6fae806009b78b9d95bc45c9ce",
+      "tree": "5ab4facb7d774e6fae806009b78b9d95bc45c9ce",
+      "player_tree": "e35961ca94c68300d0843b3a3a5270db81d3241a"
+    },
+    "reviewed_dev": "d1e36234eee17776a450ca3abff988ae2c7e9048"
+  },
+  "method": {
+    "git_tree": "Untruncated recursive Git trees; compare exact raw content blob identity by identical file path. Reproducible against the commit SHAs, not moving branch names.",
+    "patterns": {
+      "locales": "^source/locale/.*\\.cfg$",
+      "library_runtime": "^source/runtime/(library.*|settings_commands|settings_profile|diagnostics)\\.lua$",
+      "library_presentation": "^source/presentation/library.*\\.lua$",
+      "research_settings": "^source/research/settings(/.*)?\\.lua$|^source/research/settings_profile\\.lua$"
+    },
+    "counts": {
+      "locales": 100,
+      "library_runtime": 6,
+      "library_presentation": 4,
+      "research_settings": 3
+    },
+    "identical_total": 113,
+    "exact_nonlocale_blobs": {
+      "source/runtime/diagnostics.lua": "1948aca50e2b81045c85a7d24c0137728c326d69",
+      "source/runtime/library.lua": "54ae09e769dda2ad40c24312252b34412ddf1563",
+      "source/runtime/library_production.lua": "2ba3ef9175f0163ca815854520433d00f104c6ab",
+      "source/runtime/library_translations.lua": "45b334fa8b6a9f7a7f626ae613b73ecd58b597c7",
+      "source/runtime/settings_commands.lua": "084504a1bf21272ae64da0276588aaf089e68be8",
+      "source/runtime/settings_profile.lua": "8097c366671b1c9c6e35f1e16b85eeca487d9406",
+      "source/presentation/library_effects.lua": "cbbe4fa7735747bcdb9aa25965c03e56009cf4ed",
+      "source/presentation/library_layout.lua": "1649e248a7697d23a36565a134f98451ea9cbaca",
+      "source/presentation/library_localization.lua": "ea20c29581c990a398480d2be143abdc2c4f2c15",
+      "source/presentation/library_model.lua": "6288349c8178ff0dd6c55dfae0245277f9e37d39",
+      "source/research/settings.lua": "a75009d137c24ef5c46b161690f134adcbac667e",
+      "source/research/settings/space_age_scripted.lua": "021bd34d2cf64a66bdefb05bd072517f1eb3f4c7",
+      "source/research/settings_profile.lua": "87522d4c648543cb83138014aa24edcd835cb657"
+    }
+  },
+  "fixture": {
+    "folder": "tests/fixtures/library-native-input/",
+    "selected_path_count": 45,
+    "unchanged_since_published13": 38,
+    "changed_since_published13": [
+      {
+        "path": "tests/fixtures/library-native-input/README.md",
+        "published13_blob": "130b0fdc27c4048e7befef3127288a20cce0ee15",
+        "selected14_blob": "5a2fef29d92da75495c2010a2c8964756e3fb5e2"
+      },
+      {
+        "path": "tests/fixtures/library-native-input/control.lua",
+        "published13_blob": "1f0a11cdcd392658c773f5c1469575f3fe8ad900",
+        "selected14_blob": "1494b60141aa666ef510fa79ab5e321163bc46cd"
+      },
+      {
+        "path": "tests/fixtures/library-native-input/support-exports.lua",
+        "published13_blob": "237d609e03665c325513504bdea6b775e79128ae",
+        "selected14_blob": "baf5113782fa8e30b841866ca4efe91c5bddac2b"
+      }
+    ],
+    "added_since_published13": [
+      {
+        "path": "tests/fixtures/library-native-input/info-exports-513-f200.json",
+        "selected14_blob": "84198670f0e586bc31b3dd7fc8a2249040114604"
+      },
+      {
+        "path": "tests/fixtures/library-native-input/info-exports-513-f210.json",
+        "selected14_blob": "19a5da4007870f420a88bd9fa3e3f5476b9e760e"
+      },
+      {
+        "path": "tests/fixtures/library-native-input/info-input-513-settings-api-f200.json",
+        "selected14_blob": "829d25aca8623567c14dc81e4a4fd9a667e42807"
+      },
+      {
+        "path": "tests/fixtures/library-native-input/info-input-513-settings-api-f210.json",
+        "selected14_blob": "3e294c6b7846e02de1c1e044b99392dd2d37ea5e"
+      }
+    ],
+    "selected_control_blob": "1494b60141aa666ef510fa79ab5e321163bc46cd",
+    "controller_checks": {
+      "declared-0.3.12": true,
+      "declared-0.4.6": true,
+      "exact-5.0.20013": true,
+      "exact-5.0.21013": true,
+      "absent-514-gate": true
+    },
+    "settings_observer_version": "0.3.12",
+    "export_observer_version": "0.4.6",
+    "versions_explicitly_bound": [
+      "5.0.20013",
+      "5.0.21013"
+    ],
+    "candidate14_observer": "not-prepared",
+    "consequence": "The newer committed fixture cannot be re-labelled a selected-14 observer; its exact 13 version/dependency/engine gates and historical result identity remain unchanged."
+  },
+  "retained_evidence": [
+    "spec/evidence/library-507-to-513-export-path-applicability-r01.json",
+    "spec/evidence/library-mir4-tab-anchor-current513-source-review-r01.json",
+    "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+    "spec/evidence/library-authored-layout-native-r01.json"
+  ],
+  "review_result": {
+    "source_identity": "113/113 byte-identical; 100 locales, six runtime, four presentation, three research settings",
+    "fixture_identity": "38 same, three changed, four added between published13 and selected14",
+    "native_checks_run": 0,
+    "gameplay_checks_run": 0,
+    "actual_client_input_checks_run": 0
+  },
+  "reuse_policy": "Reuse source-level findings from exactly identical Library/locale/settings paths, not historical native verdicts. Candidate14 changed other player paths, so a full save/GUI/export/whole-product verdict requires separately bound actual context and accepted candidate results.",
+  "next_qualification": [
+    "Version-locked 14 input and export observer metadata/controller reviewed independently, preserving 13 fixture originals.",
+    "EN/DE two real clients, native input and complete tab/geometry/scroll/Unicode/selection screenshots and original MIR4 visual parity.",
+    "13 actual export clicks, file bytes/errors/zero/false/privacy boundaries and two server commands plus joins/rejoins/restart.",
+    "Whole-product Base/SpaceAge/heavy performance with existing measurements reused by consumed-input identity.",
+    "Keep worker earned work/partial/queue/bonus, ordinary completion, save and two cold loads as independent 14 incident requirements."
+  ],
+  "limits": "No evidence that selected14 has resolved Library tab movement or passed any current native interface or lifecycle obligation. No second native lane or release authority.",
+  "release_qualification": false,
+  "stable_qualification": false
+}
