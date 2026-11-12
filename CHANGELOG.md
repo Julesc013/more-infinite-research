@@ -6,6 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Fix startup with Angel's and Bob's Space Age Compatibility & Rebalance when native steel productivity already covers Angel's steel recipes.
 - Preserve earned and unfinished default worker cargo research from supported MIR 4.7.3 Base saves on Factorio 2.0 and 2.1.
 - Match multilingual Research Library searches using Factorio's native text handling while retaining the typed query.
 
