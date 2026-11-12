@@ -1,0 +1,8 @@
+{
+  "kind": "MIR513PriorPublishedObjectsPreservationV1",
+  "unchanged": true,
+  "release_count": 102,
+  "tag_ref_count": 180,
+  "before_sha256": "8b945f19bcc5eb04974530013cd258956b298b8dabb3a66823ba93a1f1623ceb",
+  "scope": "All102 earlier release metadata/asset identities and180 tag refs exactly equal before/after; download counts excluded. No older published bytes or tags changed."
+}
