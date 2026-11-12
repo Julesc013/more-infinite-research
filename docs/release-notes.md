@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.12 beta release notes"
+title: "MIR 5.0.13 beta release notes"
 status: current
-applies_to: "MIR 5.0.12 GitHub prerelease"
+applies_to: "MIR 5.0.13 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,29 +9,17 @@ last_reviewed: 2026-11-12
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-512-release-notes
+  - mir-513-release-notes
 ---
 
-Fixes recurring worker cargo save upgrades and expanded recipe-productivity credits on Factorio 2.0 and 2.1.
+Fixes Angel/Bob startup compatibility, supported older worker research upgrades, and multilingual Research Library searches.
 
-- Preserve earned worker cargo research and unfinished work in permanent native research before adding a finite cargo provider. Eligible earlier MIR 5 default saves establish this history automatically when upgraded with their previous mods and settings.
-- Keep private worker bookkeeping independent of the map research price multiplier while preserving ordinary research prices.
-- Retain Secretas history across successive updates and worker history through supported engine patch updates. Keep ordinary queue changes safe after preserved work finishes.
-- Fix initialization with Rigor Module's expanded productivity effects, while retaining complete validation of recipe, sign and amount maps.
-- Allow Bob's Warfare with recipe-productivity-cap mods and preserve their configured caps.
-- Preserve known Base-only research history on supported earlier MIR 5 upgrades.
-- Restore missing translated startup-setting labels and improve Library wrapping, filters, title-bar controls and saved search text.
+- Fix startup on Factorio 2.1 with Angel's and Bob's Space Age Compatibility & Rebalance 1.3.2 when native steel productivity already covers Angel's steel recipes.
+- Preserve earned worker cargo levels and unfinished research from supported MIR 4.7.3 Base-only saves on Factorio 2.0 and 2.1.
+- Match multilingual Library searches using Factorio's native text handling while keeping the query you typed.
 
-Before adding a worker cargo provider:
+Back up your save and matching mods/settings before updating. For an older worker-research save, first update a copy without changing its enabled mods or MIR settings, then save separately.
 
-1. Protect the original save and its matching mods/settings. Update a copy to MIR 5.0.12 with the previous enabled mods and unchanged MIR settings, then save separately and exit.
-2. Add the provider to that saved copy. Keep the worker enable setting and level cap unchanged while preserved work remains. Check cargo bonuses, current research and queue order before saving again.
-3. If needed, `/mir-worker-storage-recovery resume <force-name>` appends detached partial work. The legacy `prepare` command is unnecessary once permanent native ownership is established.
+This is a GitHub beta. Library input/export/client-lifecycle checks and broader performance acceptance remain unfinished for stable.
 
-An older save already changed and clamped by a provider needs its protected pre-change original. Repeated provider changes and arbitrary overhaul transitions remain unqualified. The known failure mechanisms have focused qualification; this does not establish that every reporter's complete modpack has been tested.
-
-Script integrations should query `mir-worker-storage-default-4` for ordinary default cargo research. `worker-robots-storage-4` remains a separate prerequisite or foreign finite stage; see the [API guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/api.md).
-
-This is a GitHub beta. Library interaction/export/client-lifecycle and whole-product performance acceptance remain unfinished for stable.
-
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.13/docs/support.md).
