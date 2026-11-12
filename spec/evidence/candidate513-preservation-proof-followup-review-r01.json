@@ -1,0 +1,20 @@
+{
+  "kind": "RecordedIndependentMIR513PreservationProofFollowupV1",
+  "recorded_by": "BlackGlass execution lead",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "verdict": "GO documentation-only preservation proof gap closed",
+  "actual_observation": "Direct raw before519449B SHA8B945F19BCC5EB04974530013CD258956B298B8DABB3A66823BA93A1F1623CEB and after511819B SHA3BC5FCCB14E9A498A77EE29B7E6340FE9B155494C6A4096B65DD71289A66EF82 each parse to102release/180tag rows. Full recursive comparison has0differences; both canonical sorted-key serializations are436755bytes SHA64AE710E6690AAF576CEF3644EBA4E48B6F5062097396FC8B811CB6393DFC3BC. Durable capsule binding and original recorded independent19-download payload are accurate. No source or acceptance scope expansion.",
+  "custody": {
+    "kind": "ActualRemoteDecodedPublicationOriginalReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "aada74920183e7625019dabb656558c0e6c59723",
+    "path": "projects/mir/runs/mir513-publication-and-next-stable-inputs-r01/original-bodies.json.gz",
+    "git_blob": "f730780ba373006ae13e906aa11ab54d3afbf9ae",
+    "packed_bytes": 8931132,
+    "packed_sha256": "496B260B4F6E914FC26A1516216AC54A157B83C6FDACFB7DBC59FC3D2B1A613D",
+    "actual_originals_verified": 109,
+    "actual_original_bytes": 26682001,
+    "method": "Exact remote branch readback, authenticated GitBlob body download, decode/hash and actual-byte compare every original file. Includes both full prior-object projections and independent all19 anonymous downloads."
+  },
+  "scope": "Independent read-only review result recorded by execution lead; no new gameplay, performance or stable qualification."
+}
