@@ -1,0 +1,20 @@
+{
+  "kind": "RootRecordedIndependentAgriculture18ReviewV1",
+  "verdict": "GO for exact matched18 unscored preparation",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "configured_role": "mir_terra_review_xhigh",
+  "backend_identity_independently_verified": false,
+  "preparation_sha256": "16E28BBD20C7C9EB3B3DA9CAEDFFC71C0C9A3CC279E1E2D7D362F61F774B4F9A",
+  "packet_sha256": "D5B3AF90E9772343839F9DC6DFF6746850E35EDE1DD01CDE358F1764994EA871",
+  "composition_sha256": "3AB2E5D40A9B20326A89DEE27FEDA34530102686FF2CC36F2170657087A68FC6",
+  "actual_native_processes": 18,
+  "checks": [
+    "All6selection receipts and capture/pilot raw logs match bound hashes",
+    "Two real labs each;1/32/128player and foreign towers;2/64/256plant events; native growth18000/spoil4/baseline1 and arm science intact",
+    "Six exactly25000update pilots explicitly unscored",
+    "Twelve source/owned seed ZIP streams clean56members; immutable source/owned hashes after sampling",
+    "All6outer journals passed; every recorded11control/archive states currently equals before bytes/existence/hash;0Factorio"
+  ],
+  "limits": "Exact2.1.23 matched unscored preparation only; no timing/performance/stable/release or otherengine verdict",
+  "recorded_by": "Root from independent review message; not a reviewer-authored artifact"
+}

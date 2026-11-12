@@ -1,0 +1,8 @@
+{
+  "remote_head": "f4a6da3f7b49375896932c04f429cbe7f892f975",
+  "path": "projects/mir/runs/api512-current-and-ready-capture-r01",
+  "files": 202,
+  "bytes": 10076027,
+  "gzip_sha256": "E5B175A8CBDF5FDFFDF61FFDCA09D0E9C57EEE5B04D67968D21F4CCF7BF9B4DA",
+  "all_decoded_originals_reverified": true
+}

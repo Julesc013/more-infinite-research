@@ -1,0 +1,277 @@
+{
+  "kind": "F200Multiplier512RootActualReadback",
+  "status": "Observed; independent final review required",
+  "packet_sha256": "CBE3E7EF82803797D7547B61C5E0987A66FCB9F3B436143375F96C08C04B9E39",
+  "terminal_sha256": "3DC33C8F9C6DF9763E7C50E4E85995AB8B1E3C2813B4584A69E65769B14BDA3E",
+  "all34_fixed_inputs_rehashed": true,
+  "all6_restored": true,
+  "unique_pids": [
+    40452,
+    45040,
+    21428,
+    17412,
+    33104,
+    42828,
+    44452,
+    51552,
+    37776,
+    49540,
+    22584,
+    1372
+  ],
+  "actual_native_logs": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-fresh-2x\\process-1.stdout.txt",
+      "sha256": "0857948509D9B410340DCEACF2B424F7E2639CCB711D5DD294BFF448415908BA",
+      "pid": 40452
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-source-2x\\process-1.stdout.txt",
+      "sha256": "45434290B109A08D7C38FB388DC4EFF1DE10998FE14E793E5781C764D5A174F8",
+      "pid": 45040
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-source-2x\\process-2.stdout.txt",
+      "sha256": "8C767DDD578DFA6038E6375317F0CF5EA4C285BDB7EA5A7B4BF08775DDA60B85",
+      "pid": 21428
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-2x\\process-1.stdout.txt",
+      "sha256": "D25BED1783F15EBB5F5CA326D0F316ABFEE3368B7858E7354C9D53B27DD82124",
+      "pid": 17412
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-2x\\cold1.log",
+      "sha256": "2F23E58A61265C25D3D5B89D13A4D13CF854E4DD03F0501CDE3BB027BCFFBAA5",
+      "pid": 33104
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-2x\\cold2.log",
+      "sha256": "43B85B8668B17E80D9BC4E13BCC97E9281697DF8B9D5BE144BCCC2C7402F0477",
+      "pid": 42828
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-fresh-4x\\process-1.stdout.txt",
+      "sha256": "4631A79DA5A96489355E10060C79F3F72BA66FCB2EFFDDEE75512606D74309A6",
+      "pid": 44452
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-source-4x\\process-1.stdout.txt",
+      "sha256": "BAFD71A21C4410810F494F3CCC6111255BB7AF1B97379359B004307E53A31A39",
+      "pid": 51552
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-source-4x\\process-2.stdout.txt",
+      "sha256": "40128AD128A8B1F0DCBDEAB6C62955BD96459791B2AF9E30465E8D672E2BF903",
+      "pid": 37776
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-4x\\process-1.stdout.txt",
+      "sha256": "3472406E691F6940C43D9944B9CC073BC8E33CEA8AD0E2CE9A52759109BCE854",
+      "pid": 49540
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-4x\\cold1.log",
+      "sha256": "4488E02C4BCDD5197676B75FB0D20DEF501A301E057D8EC6B9E3D3B5F4D69739",
+      "pid": 22584
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-4x\\cold2.log",
+      "sha256": "D79C2F4D798FDDA3A80655536AE86758ED8EB978C5BD7F14B15AB3EE457C0191",
+      "pid": 1372
+    }
+  ],
+  "protected_and_cold_inputs": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\source-2x.zip",
+      "bytes": 174503,
+      "sha256": "53514F7EB57B8BD7CFCD37769088B52870C36959E92F02336437E3A84F01B0A0",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\upgrade-2x.zip",
+      "bytes": 175694,
+      "sha256": "816C75762A7D1C56579FA0680EB0119220034C8D32B5A75B997F2E4084C07A43",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-2x\\input\\cold1.zip",
+      "bytes": 175694,
+      "sha256": "816C75762A7D1C56579FA0680EB0119220034C8D32B5A75B997F2E4084C07A43",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-2x\\input\\cold2.zip",
+      "bytes": 175694,
+      "sha256": "816C75762A7D1C56579FA0680EB0119220034C8D32B5A75B997F2E4084C07A43",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\source-4x.zip",
+      "bytes": 174500,
+      "sha256": "D686BA123F3041C874648498FC77EDF59DB6B857B2A01771F68CF5498E91C83B",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\upgrade-4x.zip",
+      "bytes": 175715,
+      "sha256": "55EC8D91E03BB44BE6C9941F22686D152AC50B94249404EF9620DAB1CCB2EF62",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-4x\\input\\cold1.zip",
+      "bytes": 175715,
+      "sha256": "55EC8D91E03BB44BE6C9941F22686D152AC50B94249404EF9620DAB1CCB2EF62",
+      "crc_entries": 55
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\worker-head-multiplier512-f200-r02-upgrade-4x\\input\\cold2.zip",
+      "bytes": 175715,
+      "sha256": "55EC8D91E03BB44BE6C9941F22686D152AC50B94249404EF9620DAB1CCB2EF62",
+      "crc_entries": 55
+    }
+  ],
+  "literal_science_and_events": [
+    {
+      "role": "source-2x",
+      "source_science_per_pack": 1350,
+      "target_net_science_per_pack": null,
+      "prices": {
+        "first": 1350,
+        "five": 2024,
+        "six": 3036,
+        "source_science": {
+          "automation-science-pack": 1350,
+          "logistic-science-pack": 1350,
+          "chemical-science-pack": 1350,
+          "production-science-pack": 1350,
+          "utility-science-pack": 1350
+        }
+      },
+      "ordinary": [
+        {
+          "name": "worker-robots-storage-4",
+          "force": "player",
+          "tick": 1350,
+          "by_script": false
+        }
+      ],
+      "protected": {
+        "crc": {
+          "entries": 55,
+          "crc_passed": true
+        },
+        "bytes": 174503,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\source-2x.zip",
+        "sha256": "53514F7EB57B8BD7CFCD37769088B52870C36959E92F02336437E3A84F01B0A0"
+      }
+    },
+    {
+      "role": "upgrade-2x",
+      "source_science_per_pack": 1350,
+      "target_net_science_per_pack": 1265,
+      "prices": {
+        "first": 1350,
+        "five": 2024,
+        "six": 3036,
+        "source_science": {
+          "automation-science-pack": 1350,
+          "logistic-science-pack": 1350,
+          "chemical-science-pack": 1350,
+          "production-science-pack": 1350,
+          "utility-science-pack": 1350
+        }
+      },
+      "ordinary": [
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "player",
+          "tick": 2617,
+          "by_script": false
+        }
+      ],
+      "protected": {
+        "crc": {
+          "entries": 55,
+          "crc_passed": true
+        },
+        "bytes": 175694,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\upgrade-2x.zip",
+        "sha256": "816C75762A7D1C56579FA0680EB0119220034C8D32B5A75B997F2E4084C07A43"
+      }
+    },
+    {
+      "role": "source-4x",
+      "source_science_per_pack": 2700,
+      "target_net_science_per_pack": null,
+      "prices": {
+        "first": 2700,
+        "five": 4048,
+        "six": 6072,
+        "source_science": {
+          "automation-science-pack": 2700,
+          "logistic-science-pack": 2700,
+          "chemical-science-pack": 2700,
+          "production-science-pack": 2700,
+          "utility-science-pack": 2700
+        }
+      },
+      "ordinary": [
+        {
+          "name": "worker-robots-storage-4",
+          "force": "player",
+          "tick": 2700,
+          "by_script": false
+        }
+      ],
+      "protected": {
+        "crc": {
+          "entries": 55,
+          "crc_passed": true
+        },
+        "bytes": 174500,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\source-4x.zip",
+        "sha256": "D686BA123F3041C874648498FC77EDF59DB6B857B2A01771F68CF5498E91C83B"
+      }
+    },
+    {
+      "role": "upgrade-4x",
+      "source_science_per_pack": 2700,
+      "target_net_science_per_pack": 2530,
+      "prices": {
+        "first": 2700,
+        "five": 4048,
+        "six": 6072,
+        "source_science": {
+          "automation-science-pack": 2700,
+          "logistic-science-pack": 2700,
+          "chemical-science-pack": 2700,
+          "production-science-pack": 2700,
+          "utility-science-pack": 2700
+        }
+      },
+      "ordinary": [
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "player",
+          "tick": 5232,
+          "by_script": false
+        }
+      ],
+      "protected": {
+        "crc": {
+          "entries": 55,
+          "crc_passed": true
+        },
+        "bytes": 175715,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-f200-multiplier-native-r01\\controller-r02\\protected-results\\upgrade-4x.zip",
+        "sha256": "55EC8D91E03BB44BE6C9941F22686D152AC50B94249404EF9620DAB1CCB2EF62"
+      }
+    }
+  ],
+  "limits": [
+    "Default-owner 2x/4x on 2.0.77 only; no provider/reporter/performance/fullstable verdict",
+    "Scripted prerequisite/foreign setup distinct from genuine lab completions",
+    "Prior map-schema and root-reader assumptions remain separate adverses"
+  ]
+}

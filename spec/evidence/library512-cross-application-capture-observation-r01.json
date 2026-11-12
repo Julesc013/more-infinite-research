@@ -1,0 +1,19 @@
+{
+  "kind": "MIR512SupportedCaptureCrossApplicationProbeV1",
+  "recorded": "2026-11-12T05:16:20.1744751+11:00",
+  "method": "Computer Use skill @oai/sky through Node REPL; no alternative capture/helper",
+  "app": "Fresh unused Windows Notepad, returned Untitled - Notepad window13439122",
+  "captures": [
+    "window capture timed out: timed out waiting on channel",
+    "window capture timed out: timed out waiting on channel"
+  ],
+  "recovery": "Fresh returned window selection then one retry",
+  "accessibility_without_screenshot": "Successful; empty text editor Ln1Col1, focused edit control",
+  "coordinate_cleanup_attempt": "Refused: coordinate input geometry is unavailable; reobserved accessibility before further action",
+  "keyboard_cleanup": "Supported Alt_L+F4 after fresh observed focus; list_windows confirms zero probe windows",
+  "typed_characters": 0,
+  "factorio_launched": false,
+  "screenshots": 0,
+  "ui_acceptance": false,
+  "conclusion": "Capture failure also affects a fresh blank GDI app; it is not explained solely by Factorio initialization or rendering. Exact backend cause remains unknown. No repeated unchanged Factorio launch."
+}

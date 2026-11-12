@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-12
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -87,6 +87,8 @@ Use one implementer, one independent review responsibility and one test worker w
 ## Coordinate native execution and independent review through GitHub
 
 One integration owner coordinates the current branch, the sole native-test lane and release. The current branch and frozen test inputs are named in [progress](progress.md). An independent reviewer checks pushed commits and may prepare corrections on separate branches and PRs. Use a bounded file responsibility in each task/PR, fetch remote changes before integration, and reconcile overlapping edits explicitly. Never reset another worker's changes, force-push a shared review branch or substitute a moving branch head for a test's full source commit.
+
+Issue comments record assignments and results; they do not start an idle Codex session. Confirm execution through an actual session response or runner job and its result. If a session is unavailable, carry urgent work forward in a separate branch through the available authorized execution lane, retain one integration owner and reconcile any late work before integration. Do not wait for an unreachable session or assume its disconnected process stopped. The existing native runner executes its reviewed named tasks; its smoke result establishes readiness, not gameplay acceptance or agent steering.
 
 Push each reviewable unit promptly. Commit bodies and PR descriptions record the concrete defect or outcome, changed behavior, independent expected result, actual commands and results, exact source/package identities where applicable, and remaining limitations. Finish required checks and merge completed units into `dev` while later qualification continues. Merge updated `dev` into an already published work branch when needed; preserve the commit identities that reviewers and native workers consume. Keep frozen-input custody branches reachable until their jobs and evidence readback finish.
 

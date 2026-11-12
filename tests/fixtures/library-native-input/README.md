@@ -107,6 +107,8 @@ The fixture exposes only its own test interface `mir5-library-native-input`: `re
 
 The parent supplies one hash-bound actor JSON per action with schema1, kind `MIRLibraryNativeInputV1`, role `client-en` or `client-de`, exact process ID/startUTC/engine hash, client1280Ã—720 dimensions and action `escape`, `inventory`, `text`, `click` or `drag`. Text is bounded to32 ordinary ASCII characters; click/drag points are native client coordinates, and a drag is at most80pixels per axis. Before actual input, independently inspect a current owned-window capture and native geometry to freeze correct textbox/title/foreign-field points. Refuse a different physical client size or blocked foreground; do not treat the existing1280Ã—720 Factorio screenshot request as proof of actual desktop geometry. Capture preparation is functional qualification, not a timed dataset.
 
+A separate reviewed query-text plan may use kind `MIRLibraryNativeUnicodeTextV1`; it permits only nonempty `text` action content of at most32 UTF-16 code units with well-formed surrogate pairs and no control, line-separator or paragraph-separator characters. It has no mouse or hardware-key authority, normalizes nothing and does not use the clipboard. Root may use its hash-bound plan only after the existing case review and actual process/window/focus capture binding; its distinct receipt is not a native pass, does not alter the fixed two-client0.3.11 protocol, and still requires one bounded real Unicode case.
+
 ```powershell
 pwsh -NoProfile -File tools/Invoke-LibraryNativeInput.ps1 `
   -SpecPath $ExactOwnedInputSpec -SpecSha256 $ExactSpecSha256 `

@@ -1,0 +1,46 @@
+{
+  "kind": "Current512InitializedStartupCaptureFailure",
+  "verdict": "POST_INITIALIZATION_CAPTURE_BLOCKED; no UI acceptance",
+  "native_pid": 43748,
+  "process_creation_utc": "2026-11-11T15:46:23.5717500Z",
+  "engine_initialized_relative_seconds": 76.206,
+  "bindings": [
+    {
+      "utc": "2026-11-11T15:48:03.435Z",
+      "kind": "target-binding",
+      "window": {
+        "app": "process:D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "id": 35458552,
+        "title": "Factorio 2.1.23"
+      },
+      "pid": 43748,
+      "creation_utc": "2026-11-11T15:46:23.5717500Z",
+      "protocol_sha256": "7BCBEB14645991F51623EA86198F57D170C90A99865091C3581776D4E5CECCB3"
+    },
+    {
+      "utc": "2026-11-11T15:48:24.168Z",
+      "kind": "target-binding",
+      "window": {
+        "app": "process:D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "id": 35458552,
+        "title": "Factorio 2.1.23"
+      },
+      "pid": 43748,
+      "creation_utc": "2026-11-11T15:46:23.5717500Z",
+      "protocol_sha256": "7BCBEB14645991F51623EA86198F57D170C90A99865091C3581776D4E5CECCB3"
+    }
+  ],
+  "owner_sha256": "96941211A2A844EFB238DFD64014B421A12C7E7A92FE406FBC2C84931C116D08",
+  "protocol_sha256": "7BCBEB14645991F51623EA86198F57D170C90A99865091C3581776D4E5CECCB3",
+  "terminal_sha256": "7930D2DBD195BF3AD53A1E676BB1189E6BF2B84045EF164357DEC2955E69BDB1",
+  "errors": [
+    "window capture timed out: timed out waiting on channel",
+    "window capture timed out: timed out waiting on channel"
+  ],
+  "recovery": "One refreshed actual returned window selection, then one retry; no prior coordinates or inputs used. Stopped owned client through governor.",
+  "screenshots": 0,
+  "ui_inputs": 0,
+  "restored": true,
+  "remaining_factorio": 0,
+  "prior_cases": "r05 captures occurred before initialization; r06 startup metadata guard refused before initialization. Both retained, not relabelled as current post-init observations."
+}

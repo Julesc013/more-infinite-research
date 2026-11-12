@@ -1,0 +1,67 @@
+{
+  "kind": "MIR512IndependentPublicBetaDeliveryReadbackV1",
+  "reviewer": "non-author",
+  "scope": "Read-only public metadata/tag/main verification, frozen local distribution reconciliation and two fresh unauthenticated browser-download checks for the published GitHub beta. It is not a stable-acceptance, Mod Portal or whole-release redownload result.",
+  "public_release": {
+    "repository": "Julesc013/more-infinite-research",
+    "release_id": 441736666,
+    "tag": "v5.0.12",
+    "title": "MIR 5.0.12",
+    "published_at": "2026-11-11T13:33:07Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false,
+    "live_assets": 19,
+    "all_frozen_names_sizes_and_labels_match": true,
+    "all_live_assets_expose_sha256_digest": true,
+    "release_body_starts_with_summary": true,
+    "latest_stable_tag_remains": "v4.7.3"
+  },
+  "public_git": {
+    "main": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+    "main_tree": "cf7610597ee9715d76e2cca42182f2f1428674f2",
+    "player_source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+    "annotated_tag_object": "ec73f49976cfbf3173ec39be9fc45056ae8f3185",
+    "tag_peeled_commit": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+    "primary_checkout": {"branch": "main", "clean": true, "head_equals_origin_main": true}
+  },
+  "frozen_local_distribution": {
+    "inventory": {"path": "D:/Projects/Factorio/mir5-freeze/mir512-multiplier-aero-1ca-r01/MIR5ReleaseAssetInventoryV1.json", "file_sha256": "494DF147D88A3547C3619A23B22DFA0F46F3E5402329D9CFE4EB4E4F54CC1C56", "canonical_payload_sha256": "6b00031ff29550a06100ec54f7f644c7dac0bf2b982916e940bdcfa5ca951890"},
+    "dist_path": "D:/Projects/Factorio/more-infinite-research/dist/v5.0.12",
+    "frozen_public_assets": 19,
+    "local_files": 21,
+    "non_asset_files": ["release-notes.md", "upload-text.txt"],
+    "missing_assets": [],
+    "unexpected_public_assets": [],
+    "bytes_or_sha256_mismatches": []
+  },
+  "fresh_anonymous_downloads": [
+    {
+      "method": "direct public browser_download_url via curl without gh/authentication",
+      "asset": "more-infinite-research_5.0.21012.zip",
+      "bytes": 1038200,
+      "sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7",
+      "zip_entries": 245,
+      "zip_crc_passed": true,
+      "root": "more-infinite-research_5.0.21012",
+      "info_member": "more-infinite-research_5.0.21012/info.json"
+    },
+    {
+      "method": "direct public browser_download_url via curl without gh/authentication",
+      "asset": "more-infinite-research_5.0.20012.zip",
+      "bytes": 1037776,
+      "sha256": "76517C54FAE4B62DC1828350A8DEB32C39164822525AF51446369433C764C27D",
+      "zip_entries": 244,
+      "zip_crc_passed": true,
+      "root": "more-infinite-research_5.0.20012",
+      "info_member": "more-infinite-research_5.0.20012/info.json"
+    }
+  ],
+  "root_delivery_receipt": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/candidate512-publication-r01/verified-delivery.json", "sha256": "F8010038CE370A2E24055250F8AF326AA6461E27722BE19E84BD40B26AD79E4A", "use": "Read as Root's all19 delivery record; this independent receipt claims fresh downloads only for the two assets above."},
+  "limitations": [
+    "This verifies a GitHub prerelease only. Mod Portal publication remains maintainer-owned and was not reviewed.",
+    "The other17 release assets were reconciled against the frozen local distribution and public metadata, not freshly downloaded again by this reviewer.",
+    "Stable acceptance remains open for the recorded Library/client/export/performance and reporter-history limitations."
+  ],
+  "verdict": "GO_FOR_SCOPED_PUBLISHED_MIR5.0.12_GITHUB_BETA_DELIVERY; NOT_STABLE_ACCEPTANCE"
+}

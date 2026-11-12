@@ -1,0 +1,16 @@
+{
+  "remote_head": "355c97a831f3cb877a710bcf4ebf1860905b7a3b",
+  "path": "projects/mir/runs/agriculture512-setup-adverse-and-diagnostic-r01",
+  "kind": "Agriculture512AdverseDiagnosticPrivateCustodyV1",
+  "files": 150,
+  "bytes": 1249699,
+  "gzip_sha256": "17869BB8969960E1DAC618021CE29F334EF9041ACA0D8E31150503A1C3B3EF16",
+  "excluded": [
+    "player-data.json",
+    "dependency libraries",
+    "engine installations",
+    "credentials"
+  ],
+  "qualification": false,
+  "all_decoded_originals_reverified": true
+}
