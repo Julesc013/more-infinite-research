@@ -1,7 +1,9 @@
 """Offline MIR 5 release-freeze identities; no tags, publication, or network."""
 import copy
+import contextlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -28,9 +30,7 @@ class ReleaseTests(unittest.TestCase):
     @classmethod
     def _repository(cls, root, source_version="5.0.0"):
         cls._git(root, "init", "-q")
-        cls._git(root, "config", "user.name", "Release test")
-        cls._git(root, "config", "user.email", "release-test@example.invalid")
-        cls._git(root, "config", "core.autocrlf", "false")
+        cls._configure_fixture_repository(root)
         shutil.copytree(ROOT / "source", root / "source")
         record = root / release.package.TARGET_RECORD
         record.parent.mkdir(parents=True, exist_ok=True)
@@ -41,6 +41,37 @@ class ReleaseTests(unittest.TestCase):
         cls._git(root, "add", ".")
         cls._git(root, "commit", "-qm", "frozen player source")
         return root / "source", cls._git(root, "rev-parse", "HEAD").decode().strip()
+
+    @classmethod
+    def _configure_fixture_repository(cls, repository):
+        cls._git(repository, "config", "user.name", "Release test")
+        cls._git(repository, "config", "user.email", "release-test@example.invalid")
+        cls._git(repository, "config", "core.autocrlf", "false")
+
+    @classmethod
+    def _clone_fixture_repository(cls, source, destination):
+        subprocess.check_call([
+            "git", "-c", "core.autocrlf=false", "clone", "--no-hardlinks", "-q",
+            str(source), str(destination),
+        ])
+        cls._configure_fixture_repository(destination)
+
+    @staticmethod
+    @contextlib.contextmanager
+    def _without_global_git_config(root):
+        empty_global = root / "empty-global.gitconfig"
+        empty_global.write_text("", encoding="utf-8")
+        previous = {name: os.environ.get(name) for name in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")}
+        os.environ["GIT_CONFIG_GLOBAL"] = str(empty_global)
+        os.environ["GIT_CONFIG_NOSYSTEM"] = "1"
+        try:
+            yield
+        finally:
+            for name, value in previous.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
 
     @staticmethod
     def _set_source_release(source, source_version):
@@ -148,7 +179,7 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(release.verify(first_source, first_output), inventory)
 
             second_repository = temporary / "second-repository"
-            subprocess.check_call(["git", "clone", "--no-hardlinks", "-q", str(first_repository), str(second_repository)])
+            self._clone_fixture_repository(first_repository, second_repository)
             second_output = temporary / "second-output"
             second_source = second_repository / "source"
             second_inventory = release.freeze(second_source, second_output, revision=commit)
@@ -348,17 +379,40 @@ class ReleaseTests(unittest.TestCase):
             for name, (mutate, reason) in cases.items():
                 with self.subTest(name=name):
                     repository = temporary / ("repository-" + name)
-                    subprocess.check_call([
-                        "git", "-c", "core.autocrlf=false", "clone", "--no-hardlinks", "-q",
-                        str(baseline_repository), str(repository),
-                    ])
-                    self._git(repository, "config", "core.autocrlf", "false")
+                    self._clone_fixture_repository(baseline_repository, repository)
                     source = repository / "source"
                     mutate(source)
                     self._git(repository, "add", "source")
                     self._git(repository, "commit", "-qm", name)
                     output = temporary / ("output-" + name)
                     self._assert_freeze_refused(source, output, reason)
+
+    def test_refusal_fixture_clones_have_local_identity_without_global_git_config(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            with self._without_global_git_config(temporary):
+                baseline_repository = temporary / "baseline-repository"
+                baseline_repository.mkdir()
+                baseline_source, baseline_commit = self._repository(baseline_repository)
+                baseline_output = temporary / "baseline-output"
+                baseline = release.freeze(baseline_source, baseline_output, revision=baseline_commit)
+                self.assertEqual(release.verify(baseline_source, baseline_output), baseline)
+
+                repository = temporary / "mutation-repository"
+                self._clone_fixture_repository(baseline_repository, repository)
+                self.assertEqual(self._git(repository, "config", "--local", "--get", "user.name"), b"Release test\n")
+                self.assertEqual(self._git(repository, "config", "--local", "--get", "user.email"),
+                                 b"release-test@example.invalid\n")
+                source = repository / "source"
+                info_path = source / "info.json"
+                info = json.loads(info_path.read_text(encoding="utf-8"))
+                info["version"] = "5.0.21100"
+                info_path.write_text(json.dumps(info, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                self._git(repository, "add", "source")
+                self._git(repository, "commit", "-qm", "invalid canonical metadata")
+                output = temporary / "invalid-output"
+                self._assert_freeze_refused(
+                    source, output, "Frozen player source is not canonical F210 MIR 5 metadata")
 
     def test_early_cohort_refuses_wrong_record_missing_asset_and_changed_delivery(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -377,11 +431,7 @@ class ReleaseTests(unittest.TestCase):
             self.assertFalse(wrong.exists())
 
             broken_repository = temporary / "broken-repository"
-            subprocess.check_call([
-                "git", "-c", "core.autocrlf=false", "clone", "--no-hardlinks", "-q",
-                str(repository), str(broken_repository),
-            ])
-            self._git(broken_repository, "config", "core.autocrlf", "false")
+            self._clone_fixture_repository(repository, broken_repository)
             broken_source = broken_repository / "source"
             (broken_source / "adapters/early/definitions.lua").unlink()
             self._git(broken_repository, "add", "-A")
