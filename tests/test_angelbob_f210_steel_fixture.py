@@ -34,6 +34,7 @@ STRICT_MODS = {
     "boblogistics": "3.0.1", "bobmodules": "3.0.1", "bobores": "3.0.0", "bobplates": "3.0.2",
     "bobpower": "3.0.0", "bobrevamp": "3.0.0", "bobtech": "3.0.0",
     "more-infinite-research": "5.0.21013", NAME: "0.1.0",
+    "mir-fixture-mir5-active-mods-observer": "0.1.0",
 }
 
 _package_spec = importlib.util.spec_from_file_location("angelbob_steel_package", ROOT / "tools" / "package.py")
@@ -136,9 +137,12 @@ function run_control(active_mods, opponent, supplied_baselines)
   local effects={{type="unlock-recipe",recipe="foreign-unlock"}}
   local recipe_names={"steel-plate","casting-steel","angels-plate-steel","angels-plate-steel-2"}
   for _,name in ipairs(recipe_names) do effects[#effects+1]={type="change-recipe-productivity",recipe=name,change=.1} end
+  effects[#effects+1]={type="change-recipe-productivity",recipe="foreign-steel",change=.075}
+  effects[#effects+1]={type="change-recipe-productivity",recipe="foreign-steel",change=.125}
   if opponent=="missing" then table.remove(effects,#effects) end
+  if opponent=="missing" then table.remove(effects,5) end
   if opponent=="duplicate" then effects[#effects+1]={type="change-recipe-productivity",recipe="angels-plate-steel-2",change=.1} end
-  if opponent=="wrong-change" then effects[#effects].change=.2 end
+  if opponent=="wrong-change" then effects[5].change=.2 end
   local owner={name="steel-plate-productivity",valid=true,enabled=true,researched=false,level=1,
     prototype={level=1,max_level=4294967295,research_unit_count_formula="1.5^L*1000",effects=effects},
     research_unit_count=opponent=="wrong-count" and 1499 or 1500,research_unit_energy=opponent=="wrong-energy" and 60 or 3600,
@@ -154,6 +158,8 @@ function run_control(active_mods, opponent, supplied_baselines)
     if opponent=="nonfinite-baseline" and index==1 then baseline=math.huge end
     player.recipes[name]={productivity_bonus=baseline}
   end
+  player.recipes["foreign-steel"]={productivity_bonus=supplied_baselines["foreign-steel"] or .3}
+  player.recipes["unaffected-recipe"]={productivity_bonus=supplied_baselines["unaffected-recipe"] or .7}
   owner.force=player
   if opponent=="prerequisite-lab-modifier" then
     prerequisite.researched=nil
@@ -163,19 +169,27 @@ function run_control(active_mods, opponent, supplied_baselines)
     end})
   end
   function player.add_research(value) player.current_research=value;return true end
-  local counts={}
+  local counts,stored={},{}
   local inventory={
     insert=function(stack) counts[stack.name]=(counts[stack.name] or 0)+stack.count;return stack.count end,
     get_item_count=function(name) return counts[name] or 0 end,
   }
+  for index,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
+    inventory[index]=setmetatable({},{__index=function(_,key)
+      if key=="valid_for_read" then return (counts[name] or 0)>0 elseif key=="name" then return name
+      elseif key=="count" then return counts[name] or 0 elseif key=="quality" then return {name="normal"} end
+    end})
+  end
   local lab={valid=true,quality={name="normal"},prototype={name="mir-fixture-mir5-angelbob-f210-steel-fast-lab",
       get_researching_speed=function(quality) assert(quality=="normal");return 6000 end},
-    get_inventory=function(kind) assert(kind==1);return inventory end,disabled_by_script=false}
+    get_inventory=function(kind) assert(kind==1);return inventory end,disabled_by_script=false,
+    get_stored_durability=function(name)return {durability=stored[name] or 0,quality="normal"}end}
   local game={tick=0,forces={player=player},surfaces={[1]={create_entity=function(spec)
     assert(spec.name=="mir-fixture-mir5-angelbob-f210-steel-fast-lab" and spec.force==player);return lab end}}}
   function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
   local callbacks,storage={events={}},{}
-  local env={game=game,storage=storage,helpers={table_to_json=function(row) markers[#markers+1]=row;return "{}" end},
+  local env={game=game,storage=storage,prototypes={item=setmetatable({},{__index=function()return{type="item",science_capacity=1}end})},
+    helpers={table_to_json=function(row) markers[#markers+1]=row;return "{}" end},
     log=function() end,script={active_mods=active_mods,on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,
       on_event=function(event,fn)callbacks.events[event]=fn end},defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}}
   local cache={}
@@ -204,6 +218,11 @@ function run_control(active_mods, opponent, supplied_baselines)
         elseif opponent=="lost-baseline" then player.recipes[name].productivity_bonus=.1
         else player.recipes[name].productivity_bonus=baseline+.1 end
       end
+      player.recipes["foreign-steel"].productivity_bonus=(supplied_baselines["foreign-steel"] or .3)+.2
+      if opponent=="wrong-foreign-delta" then player.recipes["foreign-steel"].productivity_bonus=.3 end
+      if opponent=="wrong-unaffected-bonus" then player.recipes["unaffected-recipe"].productivity_bonus=.8 end
+      if opponent=="stored-fraction" then stored["automation-science-pack"]=.25 end
+      if opponent=="within-science-precision" then counts["automation-science-pack"]=counts["automation-science-pack"]-1;stored["automation-science-pack"]=.99995 end
       ok,result=pcall(callbacks.events[1],{research=owner,by_script=opponent=="scripted"})
       if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,premature=premature} end
     end
@@ -221,7 +240,7 @@ function run_control(active_mods, opponent, supplied_baselines)
   callbacks.load();game.tick=game.tick+1;ok,result=pcall(callbacks.events[2]);if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,premature=premature} end
   return {ok=true,saves=saves,markers=markers,premature=premature,settling_markers=settling_markers,
     phase=storage.mir5_angelbob_f210_steel.phase,
-    before_load_phase=before_load_phase,counts=counts,disabled=lab.disabled_by_script}
+    before_load_phase=before_load_phase,counts=counts,stored=stored,disabled=lab.disabled_by_script}
 end
 ''')
 
@@ -243,7 +262,7 @@ end
         declared = set(info["dependencies"])
         self.assertEqual({f"? {name} = {version}" for name, version in STRICT_MODS.items()
                           if name not in {"base", "more-infinite-research", "angelbob-spaceage-rebalance",
-                                          "space-age", NAME}}, declared - set(info["dependencies"][:4]))
+                                          "space-age", NAME, "mir-fixture-mir5-active-mods-observer"}}, declared - set(info["dependencies"][:4]))
         facts = (FIXTURE / "fixture_facts.lua").read_text(encoding="utf-8")
         self.assertIn('M.first_level_count = 1500', facts)
         self.assertIn('M.research_unit_energy = 3600', facts)
@@ -331,19 +350,28 @@ end
             self.assertEqual({name: .1 for name in RECIPES}, witness["named_productivity_deltas"])
             self.assertEqual({name: .1 for name in RECIPES}, witness["named_productivity_bonuses"])
             self.assertEqual({name: 1500 for name in SCIENCE}, witness["actual_paid_science"])
-            self.assertTrue(witness["broader_eligible_steel_recipes_unconstrained"])
+            self.assertFalse(witness["broader_eligible_steel_recipes_unconstrained"])
+            self.assertTrue(witness["all_recipe_productivity_verified"])
+            self.assertEqual(6, witness["recipe_productivity_count"])
+            self.assertAlmostEqual(.2, witness["owner_recipe_productivity_deltas"]["foreign-steel"])
+            self.assertEqual(2, witness["owner_recipe_productivity_effect_counts"]["foreign-steel"])
+            self.assertAlmostEqual(.5, witness["recipe_productivity_bonuses"]["foreign-steel"])
+            self.assertAlmostEqual(.7, witness["recipe_productivity_bonuses"]["unaffected-recipe"])
             self.assertTrue(witness["prototype_baseline_capture_required"])
             self.assertFalse(witness["physical_output_qualified"])
         self.assertEqual({name: 100 for name in SCIENCE}, result["counts"])
 
     def test_distinct_foreign_productivity_baselines_are_preserved_with_one_native_delta_across_colds(self):
         baselines = {"steel-plate": .2, "casting-steel": .35, "angels-plate-steel": .4,
-                     "angels-plate-steel-2": .55}
+                     "angels-plate-steel-2": .55, "foreign-steel": -.05, "unaffected-recipe": -.2}
         result = self._control(baselines=baselines)
         self.assertTrue(result["ok"], result.get("message", ""))
         for marker in result["markers"]:
             witness = marker["witnesses"]
-            self.assertEqual(baselines, witness["named_productivity_baselines"])
+            self.assertEqual({name: baselines[name] for name in RECIPES}, witness["named_productivity_baselines"])
+            self.assertEqual(baselines, witness["recipe_productivity_baselines"])
+            self.assertAlmostEqual(.15, witness["recipe_productivity_bonuses"]["foreign-steel"])
+            self.assertAlmostEqual(-.2, witness["recipe_productivity_bonuses"]["unaffected-recipe"])
             for recipe in RECIPES:
                 self.assertAlmostEqual(.1, witness["named_productivity_deltas"][recipe])
                 self.assertAlmostEqual(baselines[recipe] + .1, witness["named_productivity_bonuses"][recipe])
@@ -371,13 +399,41 @@ end
     def test_runtime_refuses_double_delta_or_lost_foreign_baseline_before_save(self):
         baselines = {"steel-plate": .2, "casting-steel": .35, "angels-plate-steel": .4,
                      "angels-plate-steel-2": .55}
-        for opponent in ("double-delta", "lost-baseline"):
+        for opponent in ("double-delta", "lost-baseline", "wrong-foreign-delta", "wrong-unaffected-bonus"):
             with self.subTest(opponent=opponent):
                 result = self._control(opponent, baselines=baselines)
                 self.assertFalse(result["ok"])
                 self.assertIn("native productivity bonus differs", result["message"])
                 self.assertEqual(0, result["saves"])
                 self.assertFalse(any(row.get("status") == "passed" for row in result["markers"]))
+
+    def test_physical_science_includes_stored_fraction_and_retains_precision_across_colds(self):
+        result = self._control("within-science-precision")
+        self.assertTrue(result["ok"], result.get("message", ""))
+        for marker in result["markers"]:
+            witness = marker["witnesses"]
+            row = witness["science_value"]["automation-science-pack"]
+            self.assertEqual("item", row["mode"])
+            self.assertAlmostEqual(.99995, row["stored_durability"])
+            self.assertAlmostEqual(1500.00005, witness["actual_paid_science"]["automation-science-pack"])
+            for event in witness["supply_events"]:
+                self.assertEqual((0, 200, 200), (event["count_before"], event["count_after"], event["inserted"]))
+        rejected = self._control("stored-fraction")
+        self.assertFalse(rejected["ok"])
+        self.assertIn("actual native science payment differs", rejected["message"])
+        self.assertEqual(0, rejected["saves"])
+
+    def test_exact_plain_or_preowned_closure_requires_observer_and_refuses_other_helpers(self):
+        self.assertEqual(27, len(STRICT_MODS))
+        witnessed = {**STRICT_MODS, "mir-fixture-mir5-preowned-steel": "0.1.0"}
+        self.assertTrue(self._control(mods=witnessed)["ok"])
+        for mods in ({name: version for name, version in STRICT_MODS.items()
+                      if name != "mir-fixture-mir5-active-mods-observer"},
+                     {**STRICT_MODS, "mir-fixture-mir5-preowned-steel": "0.2.0"},
+                     {**STRICT_MODS, "unrelated-test-helper": "0.1.0"}):
+            result = self._control(mods=mods)
+            self.assertFalse(result["ok"])
+            self.assertEqual(0, result["saves"])
 
 
 if __name__ == "__main__":

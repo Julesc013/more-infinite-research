@@ -26,8 +26,9 @@ MIR_SHA256 = "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F"
 FIXTURE_NAME = "mir-fixture-mir5-angelbob-f210-steel"
 FIXTURE_VERSION = "0.1.0"
 FIXTURE_ARCHIVE = f"{FIXTURE_NAME}_{FIXTURE_VERSION}.zip"
-FIXTURE_SHA256 = "6313F6C8665635E280D02C1E7F3184411AEE2A4CBEF5D825AAF597537DD1AC47"
-FIXTURE_SOURCE_COMMIT = "1ee94af0a042d03abda57032435537887009e5bd"
+FIXTURE_SHA256 = "8DA7EED8E22F635EEF00E180102F77D2291F9DB8B3065B368C9C0CC3874038B2"
+PREOWNED_NAME = "mir-fixture-mir5-preowned-steel"
+PREOWNED_SHA256 = "77967A9E8A3F19CE11BF21BCF50AA0B481535ECDD2EA3E449F952603A2AD334B"
 CURRENT_DIRECT_OBSERVER_SHA256 = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 OLDER_STANDALONE_OBSERVER_SHA256 = "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
 
@@ -60,6 +61,7 @@ UPSTREAM_MODS = {
     "quality": "2.1.23",
     "recycler": "2.1.23",
     "space-age": "2.1.23",
+    "mir-fixture-mir5-active-mods-observer": "0.1.0",
 }
 BUILTINS = {"base", "elevated-rails", "quality", "recycler", "space-age"}
 UPSTREAM_ARCHIVES = {
@@ -82,6 +84,7 @@ UPSTREAM_ARCHIVES = {
     "bobpower_3.0.0.zip": "C33C7B521BEC061ADF695A14BF3A218259FC0548B5F5AB512E74ECEAEDA39831",
     "bobrevamp_3.0.0.zip": "AEFAC11F71AA82B2385D92FBAC1C22FD6CAEF12E751A85CA63472AE8A4DC5703",
     "bobtech_3.0.0.zip": "397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OLDER_STANDALONE_OBSERVER_SHA256,
 }
 
 HARD_DEPENDENCIES = {
@@ -133,7 +136,7 @@ class AngelBobRebalanceSpaceAgeProfileTests(unittest.TestCase):
         self.assertEqual(mod_versions(profile), UPSTREAM_MODS)
         self.assertEqual(profile["archive_sha256"], UPSTREAM_ARCHIVES)
         self.assertNotIn(MIR_NAME, mod_versions(profile))
-        self.assertNotIn("mir-fixture-mir5-active-mods-observer", mod_versions(profile))
+        self.assertEqual("0.1.0", mod_versions(profile)["mir-fixture-mir5-active-mods-observer"])
         for depender, requirements in HARD_DEPENDENCIES.items():
             self.assertIn(depender, UPSTREAM_MODS)
             self.assertTrue(requirements <= UPSTREAM_MODS.keys(), depender)
@@ -190,22 +193,31 @@ class AngelBobRebalanceSpaceAgeProfileTests(unittest.TestCase):
         expected_mods = dict(UPSTREAM_MODS)
         expected_mods[MIR_NAME] = MIR_VERSION
         expected_mods[FIXTURE_NAME] = FIXTURE_VERSION
+        expected_mods[PREOWNED_NAME] = "0.1.0"
         self.assertEqual(mod_versions(runtime), expected_mods)
-        self.assertEqual(len(mod_versions(runtime)), 26)
+        self.assertEqual(len(mod_versions(runtime)), 28)
         expected_archives = dict(UPSTREAM_ARCHIVES)
         expected_archives[MIR_ARCHIVE] = MIR_SHA256
         expected_archives[FIXTURE_ARCHIVE] = FIXTURE_SHA256
+        expected_archives[PREOWNED_NAME + "_0.1.0.zip"] = PREOWNED_SHA256
         self.assertEqual(runtime["archive_sha256"], expected_archives)
         self.assertEqual(
             {name: version for name, version in mod_versions(runtime).items()
-             if name not in {MIR_NAME, FIXTURE_NAME}},
+             if name not in {MIR_NAME, FIXTURE_NAME, PREOWNED_NAME}},
             mod_versions(upstream),
         )
-        self.assertNotIn("mir-fixture-mir5-active-mods-observer", mod_versions(runtime))
+        self.assertIn("mir-fixture-mir5-active-mods-observer", mod_versions(runtime))
         self.assertIn(FIXTURE_SHA256, runtime["scope"])
-        self.assertIn(FIXTURE_SOURCE_COMMIT, runtime["scope"])
-        self.assertIn("6278 bytes", runtime["scope"])
+        self.assertIn("7535bytes", runtime["scope"])
+        self.assertIn("NOT the reporter modpack", runtime["scope"])
         self.assertIn("Preparation only", runtime["scope"])
+
+    def test_preowned_capture_adds_only_the_explicit_controlled_provider(self):
+        profile = read_profile(PROFILES / "angelbob-rebalance-space-age-f210-2123-preowned-upstream.json")
+        self.assertEqual(mod_versions(profile), {**UPSTREAM_MODS, PREOWNED_NAME: "0.1.0"})
+        self.assertEqual(profile["archive_sha256"], {**UPSTREAM_ARCHIVES, PREOWNED_NAME + "_0.1.0.zip": PREOWNED_SHA256})
+        self.assertNotIn(MIR_NAME, mod_versions(profile))
+        self.assertIn("not a full reporter-pack", profile["scope"])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

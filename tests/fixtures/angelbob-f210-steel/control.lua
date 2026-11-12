@@ -54,6 +54,10 @@ local function finite_nonnegative(value)
   return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge and value >= 0
 end
 
+local function finite(value)
+  return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
+end
+
 local function assert_lab_modifiers(force, phase)
   if force.laboratory_speed_modifier ~= 0 or force.laboratory_productivity_bonus ~= 0 then
     fail(phase .. " fixture requires unmodified force laboratory modifiers")
@@ -62,14 +66,61 @@ end
 
 local function baseline_bonuses(force)
   local baselines = {}
-  for _, recipe in ipairs(facts.named_recipes) do
-    local value = force.recipes and force.recipes[recipe]
-    if value == nil or not finite_nonnegative(value.productivity_bonus) then
+  for recipe, value in pairs(force.recipes) do
+    if value == nil or not finite(value.productivity_bonus) then
       fail("native productivity baseline differs: " .. recipe)
     end
     baselines[recipe] = value.productivity_bonus
   end
+  for _, recipe in ipairs(facts.named_recipes) do
+    if not finite_nonnegative(baselines[recipe]) then fail("native productivity baseline differs: " .. recipe) end
+  end
   return baselines
+end
+
+local function owner_deltas(force, owner)
+  local deltas, counts = {}, {}
+  for _, effect in ipairs(owner.prototype.effects) do
+    if effect.type == "change-recipe-productivity" then
+      local recipe, change = effect.recipe, effect.change
+      if type(recipe) ~= "string" or force.recipes[recipe] == nil or type(change) ~= "number"
+          or change ~= change or change == math.huge or change == -math.huge then
+        fail("native owner productivity effect differs: " .. tostring(recipe))
+      end
+      deltas[recipe] = (deltas[recipe] or 0) + change
+      counts[recipe] = (counts[recipe] or 0) + 1
+    end
+  end
+  return deltas, counts
+end
+
+-- Qualified F210 plain-item value: inventory plus the lab's stored durability.
+local function science_value(lab, pack)
+  local input = lab.get_inventory(defines.inventory.lab_input)
+  local prototype = prototypes.item[pack]
+  local maximum = prototype and prototype.science_capacity
+  if input == nil or prototype == nil or prototype.type ~= "item" or not finite_nonnegative(maximum)
+      or maximum == 0 then fail("plain science capacity differs: " .. pack) end
+  local out = {mode="item", maximum=maximum, count=input.get_item_count(pack), slots={}, inventory_units=0}
+  for index=1, #input do
+    local stack = input[index]
+    if stack.valid_for_read and stack.name == pack then
+      if stack.quality == nil or stack.quality.name ~= "normal" then fail("science quality differs: " .. pack) end
+      out.inventory_units = out.inventory_units + stack.count
+      out.slots[#out.slots+1] = {slot=index, count=stack.count, quality=stack.quality.name, units=stack.count}
+    end
+  end
+  if out.inventory_units ~= out.count then fail("science inventory count differs: " .. pack) end
+  local stored = lab.get_stored_durability(pack)
+  local quality = stored.quality
+  local quality_name = quality and (type(quality) == "string" and quality or quality.name) or false
+  if not finite_nonnegative(stored.durability) or quality_name ~= false and quality_name ~= "normal" then
+    fail("stored science durability or quality differs: " .. pack)
+  end
+  out.stored_quality, out.stored_durability = quality_name, stored.durability
+  out.stored_units = stored.durability / maximum
+  out.units = out.inventory_units + out.stored_units
+  return out
 end
 
 local function assert_owner(force, phase, require_first_level_count)
@@ -100,10 +151,17 @@ local function supply(state)
   local inventory = state.lab and state.lab.valid and state.lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("fixture laboratory input is absent") end
   for _, name in ipairs(facts.ingredients) do
-    if inventory.get_item_count(name) <= facts.refill_below then
+    local before = science_value(state.lab, name)
+    if before.count == 0 then
       local inserted = inventory.insert{name=name, count=facts.refill_amount}
       if inserted ~= facts.refill_amount then fail("fixture laboratory rejected science: " .. name) end
+      local after = science_value(state.lab, name)
+      if after.count ~= facts.refill_amount or math.abs(after.units - before.units - inserted) > .00000001
+          or after.stored_durability ~= before.stored_durability then fail("science refill merged partial value: " .. name) end
       state.supplied[name] = state.supplied[name] + inserted
+      state.supply_events[#state.supply_events+1] = {pack=name, count_before=before.count, count_after=after.count,
+        inserted=inserted, units_before=before.units, units_after=after.units,
+        stored_before=before.stored_durability, stored_after=after.stored_durability}
     end
   end
   return inventory
@@ -112,15 +170,16 @@ end
 local function assert_paid(state, phase)
   local inventory = state.lab and state.lab.valid and state.lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail(phase .. " fixture laboratory input is absent") end
-  local paid, remaining = {}, {}
+  local paid, remaining, science = {}, {}, {}
   for _, name in ipairs(facts.ingredients) do
-    remaining[name] = inventory.get_item_count(name)
+    science[name] = science_value(state.lab, name)
+    remaining[name] = science[name].units
     paid[name] = state.supplied[name] - remaining[name]
-    if paid[name] ~= facts.first_level_count then
+    if math.abs(paid[name] - facts.first_level_count) > facts.science_tolerance then
       fail(phase .. " actual native science payment differs: " .. name, {paid=paid, remaining=remaining, supplied=state.supplied})
     end
   end
-  return paid, remaining
+  return paid, remaining, science
 end
 
 local function assert_complete(state, phase)
@@ -129,19 +188,29 @@ local function assert_complete(state, phase)
   if state.finished ~= 1 or owner.level ~= 2 or owner.researched ~= false or force.current_research ~= nil then
     fail(phase .. " requires exactly one real native steel completion")
   end
-  local bonuses, deltas = {}, {}
-  for _, recipe in ipairs(facts.named_recipes) do
-    local value = force.recipes and force.recipes[recipe]
+  local effects, effect_counts = owner_deltas(force, owner)
+  for recipe, delta in pairs(state.owner_deltas) do
+    if not facts.close(effects[recipe], delta) or effect_counts[recipe] ~= state.owner_effect_counts[recipe] then
+      fail(phase .. " owner productivity delta map differs: " .. recipe)
+    end
+  end
+  for recipe in pairs(effects) do if state.owner_deltas[recipe] == nil then fail(phase .. " owner delta added: " .. recipe) end end
+  local bonuses, deltas, all_bonuses, all_deltas, recipe_count = {}, {}, {}, {}, 0
+  for recipe, value in pairs(force.recipes) do
     local baseline = state.baselines and state.baselines[recipe]
-    if value == nil or not finite_nonnegative(baseline) or not finite_nonnegative(value.productivity_bonus)
-        or not facts.close(value.productivity_bonus, baseline + facts.effect_change) then
+    local delta = state.owner_deltas[recipe] or 0
+    if value == nil or not finite(baseline) or not finite(value.productivity_bonus)
+        or not facts.close(value.productivity_bonus, baseline + delta) then
       fail(phase .. " native productivity bonus differs: " .. recipe)
     end
-    bonuses[recipe] = value.productivity_bonus
-    deltas[recipe] = value.productivity_bonus - baseline
+    recipe_count = recipe_count + 1
+    all_bonuses[recipe], all_deltas[recipe] = value.productivity_bonus, value.productivity_bonus - baseline
   end
-  local paid, remaining = assert_paid(state, phase)
-  return {level=owner.level, bonuses=bonuses, deltas=deltas, paid=paid, remaining=remaining}
+  for recipe in pairs(state.baselines) do if force.recipes[recipe] == nil then fail(phase .. " original recipe absent: " .. recipe) end end
+  for _, recipe in ipairs(facts.named_recipes) do bonuses[recipe], deltas[recipe] = all_bonuses[recipe], all_deltas[recipe] end
+  local paid, remaining, science = assert_paid(state, phase)
+  return {level=owner.level, bonuses=bonuses, deltas=deltas, all_bonuses=all_bonuses, all_deltas=all_deltas,
+    recipe_count=recipe_count, paid=paid, remaining=remaining, science=science}
 end
 
 local function marker(stage, state)
@@ -150,12 +219,18 @@ local function marker(stage, state)
     case="angelbob-f210-steel", stage=stage, status="passed",
     witnesses={actual_steel_laboratory_completions=state.finished, event_by_script=false,
       named_steel_recipes=facts.named_recipes, named_effect_count_each=1,
-      named_productivity_baselines=state.baselines, named_productivity_deltas=frame.deltas,
+      named_productivity_baselines=state.named_baselines, named_productivity_deltas=frame.deltas,
       named_productivity_bonuses=frame.bonuses, ordinary_first_level_count=facts.first_level_count,
+      recipe_productivity_baselines=state.baselines, owner_recipe_productivity_deltas=state.owner_deltas,
+      owner_recipe_productivity_effect_counts=state.owner_effect_counts, recipe_productivity_count=frame.recipe_count,
+      recipe_productivity_bonuses=frame.all_bonuses, recipe_productivity_deltas=frame.all_deltas,
       ordinary_research_unit_energy=facts.research_unit_energy, ordinary_science_vector=facts.ingredients,
-      actual_paid_science=frame.paid, remaining_science=frame.remaining,
+      actual_paid_science=frame.paid, remaining_science=frame.remaining, science_value=frame.science,
+      initial_science_value=state.initial_science, supply_events=state.supply_events,
+      science_abs_tolerance=facts.science_tolerance, scripted_finite_prerequisite_setup=true,
       settled_after_finished_tick=state.finish_tick + facts.settle_ticks, on_load_read_only=stage == "reload",
-      broader_eligible_steel_recipes_unconstrained=true, prototype_baseline_capture_required=true,
+      broader_eligible_steel_recipes_unconstrained=false, all_recipe_productivity_verified=true,
+      prototype_baseline_capture_required=true,
       physical_output_qualified=false, migration_qualification=false, release_qualification=false},
   }))
 end
@@ -171,14 +246,20 @@ script.on_init(function()
   local owner = assert_owner(force, "initial", true)
   if owner.enabled ~= true or owner.researched ~= false or owner.level ~= 1 then fail("fresh native steel owner differs") end
   local baselines = baseline_bonuses(force)
+  local deltas, effect_counts = owner_deltas(force, owner)
+  local named_baselines = {}
+  for _, recipe in ipairs(facts.named_recipes) do named_baselines[recipe] = baselines[recipe] end
   local lab, inventory = create_lab(force)
-  local supplied = {}
+  local supplied, initial_science = {}, {}
   for _, name in ipairs(facts.ingredients) do
+    if science_value(lab, name).units ~= 0 then fail("new fixture lab already contains science: " .. name) end
     local inserted = inventory.insert{name=name, count=facts.initial_stack}
     if inserted ~= facts.initial_stack then fail("fixture laboratory rejected initial science: " .. name) end
     supplied[name] = inserted
+    initial_science[name] = science_value(lab, name)
   end
-  storage[KEY] = {phase="starting", lab=lab, supplied=supplied, baselines=baselines, finished=0, started=false,
+  storage[KEY] = {phase="starting", lab=lab, supplied=supplied, baselines=baselines, named_baselines=named_baselines,
+    owner_deltas=deltas, owner_effect_counts=effect_counts, initial_science=initial_science, supply_events={}, finished=0, started=false,
     deadline=game.tick + facts.deadline_ticks}
 end)
 

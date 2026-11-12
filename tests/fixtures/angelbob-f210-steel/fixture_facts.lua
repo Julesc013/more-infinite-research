@@ -14,9 +14,9 @@ M.settle_ticks = 2
 M.fast_lab = "mir-fixture-mir5-angelbob-f210-steel-fast-lab"
 M.fast_lab_speed = 6000
 M.initial_stack = 200
-M.refill_below = 100
-M.refill_amount = 100
+M.refill_amount = 200
 M.first_level_count = 1500
+M.science_tolerance = .0001
 M.research_unit_energy = 3600
 M.effect_change = .1
 M.prerequisites = {"production-science-pack"}
@@ -33,7 +33,9 @@ M.strict_closure = {
   bobassembly="3.0.1", bobelectronics="3.0.1", boblibrary="3.0.1", boblogistics="3.0.1", bobmodules="3.0.1",
   bobores="3.0.0", bobplates="3.0.2", bobpower="3.0.0", bobrevamp="3.0.0", bobtech="3.0.0",
   [M.mir]=M.mir_version, [M.fixture]="0.1.0",
+  ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
 }
+M.optional_provider = "mir-fixture-mir5-preowned-steel"
 
 function M.close(actual, expected)
   return type(actual) == "number" and type(expected) == "number" and math.abs(actual - expected) <= .0000001
@@ -43,9 +45,14 @@ function M.assert_exact_mods(active_mods, fail)
   for name, version in pairs(M.strict_closure) do
     if active_mods[name] ~= version then fail("declared closure differs: " .. name) end
   end
-  for name in pairs(active_mods) do
-    if M.strict_closure[name] == nil then fail("unexpected declared mod: " .. name) end
+  local count = 0
+  for name, version in pairs(active_mods) do
+    count = count + 1
+    if name == M.optional_provider then
+      if version ~= "0.1.0" then fail("declared closure differs: " .. name) end
+    elseif M.strict_closure[name] == nil then fail("unexpected declared mod: " .. name) end
   end
+  if count ~= (active_mods[M.optional_provider] and 28 or 27) then fail("declared closure count differs") end
 end
 
 return M

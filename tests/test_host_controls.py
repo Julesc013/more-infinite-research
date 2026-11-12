@@ -97,6 +97,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_ironclad_f210_pipeline.py",
             "tests/test_bob_angel_f210_pipeline.py",
             "tests/test_angelbob_f210_steel_fixture.py",
+            "tests/test_angelbob_preowned_steel.py",
             "tests/test_bob_angel_f210_science_oil_fixture.py",
             "tests/test_py_f210_catalogue.py",
             "tests/test_py_f210_pipeline.py",
