@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-13
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,22 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Verified5.0.12 delivery and current stable queue (2026-11-12)
+## Released5.0.13 and current stable queue (2026-11-13)
+
+[MIR5.0.13 GitHub beta](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.13) is published with19 assets at14:26UTC12November (01:26AEDT13November), before the urgent beta deadline. Published player bytes remain fixed. A community beta does not complete stable acceptance.
+
+The [exact current13 API physical/save record](../spec/evidence/candidate513-api-physical-save-native-r01.json) now accepts one closed SpaceAge/Defaults two-consumer case on each actual Factorio2.0.77 and2.1.23 engine. Each ran four native processes, observed100 baseline and100 researched copper plates produce200 and202 cables at native recipe productivity0→0.01, saved the completed world and passed two byte-identical cold loads with Beta still researched. All eight original states (three control files and five owned archives) matched after restoration, with no Factorio process remaining in either terminal. Research used an explicit native setter. The original raw artifacts, independent result review, failed earlier F210 composition wrapper and checked reader correction retain distinct identities; this result grants no ordinary-laboratory, general API, client, performance or stable verdict.
+
+The remaining stable queue is:
+
+1. Complete actual Library Startup/runtime input, localized and Unicode search, scrolling/dropdowns/resizing, exports and round trips, and personal-view/settings continuity using the reviewed current13 fixtures. Their input bindings are preparation; their complete peer assertions still require the actual client protocol.
+2. Complete affected real-client joins/rejoins and saved-host restart checks, including exact current-candidate API/client consumed-input review. Retain accepted unchanged method evidence under its original identity through `VER-06`.
+3. Complete whole-product Base, SpaceAge and fixed-heavy factory performance/stress on both modern engines, including useful-work latency, Library first/open/closed costs, bursts and retained memory. Keep the completed48-run matched agriculture result; do not repeat it unchanged or lower resource reserves.
+4. Finish historical/request/compatibility reconciliation under `VER-07`, exact affected qualification for every stable delivered target subset, and the final reviewed-source/package/publication gates. Missing reporter saves/archive versions and uncertain histories remain explicit unresolved inputs. Agent publication remains GitHub-only; the maintainer owns Mod Portal publication.
+
+## Retained5.0.12 delivery and pre13 queue checkpoint (2026-11-12)
+
+The following dated checkpoint preserves its original planning and adverse statements, including then-unpublished5.0.13. The current release status and continuation queue are above.
 
 [MIR5.0.12 GitHub beta](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.12) is delivered. The [exact receipt](../spec/evidence/candidate512-github-prerelease-delivery-r01.json) binds release441736666, main/tag `0b20bc472562ee22cb32393afab29f2a43c0c8ec`, player `0efb446b5bdadec2be7d1bee1b68b5065a85134f`, all19 anonymous public downloads and21 matching primary delivery files. The [independent public readback](../spec/evidence/candidate512-independent-verified-delivery-r01.json) checks live tag/main/metadata, all19 local inventory identities and fresh anonymous downloads of both modern ZIPs. The [pre/post published-object manifest](../spec/evidence/candidate512-prior-published-objects-preservation-r01.json) verifies all12 older MIR5 releases and24 prior tag-reference object pairs remain unchanged; latest stable stays4.7.3. [Issue1845](https://github.com/Julesc013/more-infinite-research/issues/1845) is closed for the completed incident release gate. Beta delivery does not complete stable acceptance.
 
