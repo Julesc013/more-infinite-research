@@ -690,8 +690,9 @@ local function owner_record()
   fields(value.producer, {kind=true, old_version=true, new_version=true})
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
+  local published_default = value.producer.kind == "published473-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
-      and value.producer.kind ~= "unchanged-mir5-default" and not older_empty and not older_idle)
+      and value.producer.kind ~= "unchanged-mir5-default" and not older_empty and not older_idle and not published_default)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -706,6 +707,8 @@ local function owner_record()
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
       or older_idle and value.producer.old_version ~= "4.7.20003"
+      or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
+        or value.producer.old_version == "4.7.21003" and edition ~= "f210")
       or value.producer.kind == "unchanged-mir5-default" and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
@@ -729,9 +732,11 @@ end
 -- MIR501 with a new selection remains empty-only; unchanged-selection MIR501
 -- uses the common default contract. Observer additions never stand for old mods.
 local function older_default_origin(event, change, active, base_hop)
-  if not base_hop and (target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
-      or event.mod_startup_settings_changed ~= false) then
-    recover_error("older default source requires unchanged Base2.0.77 settings")
+  local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
+    or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
+    and active.base == target.minimum_base
+  if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false) then
+    recover_error("older default source requires its qualified Base engine and unchanged settings")
   end
   for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
     if active[name] ~= nil then recover_error("older default source requires its Base-only profile") end
@@ -746,7 +751,7 @@ local function older_default_origin(event, change, active, base_hop)
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR then
       if type(item) ~= "table" or item.new_version ~= active[name] or type(item.new_version) ~= "string"
-          or name == "base" and item.old_version ~= "2.0.77"
+          or name == "base" and item.old_version ~= (base_hop and "2.0.77" or target.minimum_base)
           or name ~= "base" and item.old_version ~= nil then
         recover_error("older default source changed a previous mod or engine")
       end
@@ -762,10 +767,25 @@ local function older_default_origin(event, change, active, base_hop)
       or values.linear_increment ~= 0 or values.research_time ~= 60 or values.effect_percent ~= 1
       or values.max_level ~= 0 or values.enabled ~= true or selected_cap ~= 0 or selected_enabled ~= true
       or prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
+      or prototype.ignore_tech_cost_multiplier ~= false
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
-    recover_error("published473 idle source requires the resolved default worker tuple")
+    recover_error("published473 source requires the resolved default worker work contract")
   end
-  return {kind="published473-idle-default", old_version=change.old_version, new_version=active[MIR]}
+  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
+    ["production-science-pack"]=1, ["utility-science-pack"]=1}
+  local ingredients = prototype.research_unit_ingredients
+  if type(ingredients) ~= "table" or #ingredients ~= 5 then recover_error("published473 default science differs") end
+  for _, ingredient in ipairs(ingredients) do
+    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
+      recover_error("published473 default science differs")
+    end
+    packs[ingredient.name] = nil
+  end
+  if next(packs) ~= nil then recover_error("published473 default science differs") end
+  -- The exact default tuple has the same native earning/work contract. Keep
+  -- pending work in the ordinary transfer path, not the older empty-only path.
+  return {kind="published473-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
 local function default_origin(event, initializing, state)
@@ -793,7 +813,7 @@ local function default_origin(event, initializing, state)
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR and type(item) == "table" and item.old_version == nil then new_selection = true end
   end
-  if state == nil and change and (change.old_version == "4.7.20003"
+  if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
       or change.old_version == "5.0.20001" and new_selection) then
     return older_default_origin(event, change, active, base_hop)
   end
