@@ -6,7 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Preserve default worker cargo research when an existing MIR save with a recorded default route adds or updates mods without changing its worker research contract.
+- Preserve default worker cargo research when an existing MIR save with a recorded default route adds, updates or removes mods without changing its worker research contract.
 
 ## [5.0.13] - 2026-11-12
 
