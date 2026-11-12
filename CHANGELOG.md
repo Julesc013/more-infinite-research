@@ -2,6 +2,13 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.14] - 2026-11-13
+
+### Bugfixes
+
+- Fix worker cargo save upgrades that reject changes to unrelated mods despite having saved MIR ownership history.
+- Include prior package and saved-route details when a worker transfer cannot be authenticated.
+
 ## [5.0.13] - 2026-11-12
 
 ### Bugfixes
