@@ -70,7 +70,7 @@ def owner_raw(opponent: str = ""):
         {"type": "change-recipe-productivity", "recipe": name, "change": .1} for name in RECIPES
     ]
     row = {
-        "type": "technology", "name": OWNER, "level": 1, "max_level": "infinite",
+        "type": "technology", "name": OWNER, "max_level": "infinite",
         "prerequisites": ["production-science-pack"],
         "effects": effects,
         "unit": {"count_formula": "1.5^L*1000", "time": 60,
@@ -246,6 +246,7 @@ end
         result = self._data()
         self.assertTrue(result["ok"], result["message"])
         owner = result["raw"]["technology"][OWNER]
+        self.assertNotIn("level", owner)  # native raw defaults level one at runtime
         self.assertEqual({"preserve": "verbatim"}, owner["foreign_marker"])
         self.assertEqual("foreign-unlock", owner["effects"][0]["recipe"])
         self.assertEqual(5, len(owner["effects"]))

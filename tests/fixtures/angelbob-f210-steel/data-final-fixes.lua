@@ -38,7 +38,7 @@ end
 
 facts.assert_exact_mods(mods, fail)
 local owner = data.raw.technology and data.raw.technology[facts.owner]
-if type(owner) ~= "table" or owner.name ~= facts.owner or owner.level ~= 1 or owner.max_level ~= "infinite"
+if type(owner) ~= "table" or owner.name ~= facts.owner or owner.max_level ~= "infinite"
     or type(owner.unit) ~= "table" or owner.unit.count ~= nil or owner.unit.count_formula ~= "1.5^L*1000"
     or owner.unit.time ~= 60 then
   fail("native steel owner identity or ordinary cost differs")
