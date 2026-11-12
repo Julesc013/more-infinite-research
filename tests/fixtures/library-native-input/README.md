@@ -5,12 +5,27 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-13
 supersedes: []
 superseded_by: []
 ---
 
 # Imported Library native input and lifecycle observation
+
+## Exact 5.0.13 preparation
+
+The following new identities bind the existing protocols to the published 5.0.13 beta. Earlier metadata, frozen archives and execution records retain their original versions and bytes; compose each new archive from one reviewed committed revision.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.12 | `info-input-513-settings-api-f200.json` or `info-input-513-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20013; Base 2.1.23 / MIR 5.0.21013 |
+| Support exports | 0.4.6 | `info-exports-513-f200.json` or `info-exports-513-f210.json` | Base 2.0.77 / MIR 5.0.20013; Base 2.1.23 / MIR 5.0.21013 |
+
+Include `control.lua` and the unchanged independent `catalogue.lua`. Input observer 0.3.12 additionally requires the unchanged canonical `library-legacy-settings-search/probe.lua` projected as `legacy-settings-search.lua`; export observer 0.4.6 requires `support-exports.lua`. Bind each member's raw Git bytes, its resulting archive hash, the accepted player ZIP and the protected save in the native execution owner's reviewed packet. The closure remains Base, MIR, active-mod observer 0.1.0 and the selected input/export observer; no historical migration controller is reactivated.
+
+The new input observer retains all fourteen EN/DE Settings prepare/check pairs, forty-eight queries, five joins, two resets, removal/replacement and the saved-host restart. The export observer retains thirteen actual clicks, two distinct server commands, peer-local files/errors, false/zero values, five joins and restart. Both preserve the complete three-force earned/native/foreign-work baseline and responsive native width/column checks. They reject earlier/later MIR versions, opposing editions, unqualified engine patches and old/new mismatched observer identities.
+
+This is test preparation, with no new native or stable verdict. The full two-client protocol keeps its existing memory admission and actual client/window/input requirements; a one-client subset or screenshot is not its substitute. Actual Unicode query continuity for 5.0.13's search correction still needs the separately reviewed real-input case. Preserve and reuse the completed historical forward journeys and all earlier failures instead of restarting those histories to prepare these observers.
 
 ## Current helper-free inputs
 
@@ -105,7 +120,7 @@ The fixture exposes only its own test interface `mir5-library-native-input`: `re
 
 `inspect` and each later private probe require empty private results/details and disabled native-open actions while retaining all imported native levels/flags/effects. Before the cold-host private probe, the fixture first verifies both already restored personal queries and the dragged location without opening either Library. The completed sequence has48 private queries, five actual joins, two keyboard-close events, at least one drag event, two requested native resets and one actual removal of the newly joined German test player. It never creates a fake player. Its two new saves are `mir5-library-native-input-restart` and `mir5-library-native-input-complete`. Keep owned native screenshots and actor receipts separately for every action and both final clients.
 
-The parent supplies one hash-bound actor JSON per action with schema1, kind `MIRLibraryNativeInputV1`, role `client-en` or `client-de`, exact process ID/startUTC/engine hash, client1280Ã—720 dimensions and action `escape`, `inventory`, `text`, `click` or `drag`. Text is bounded to32 ordinary ASCII characters; click/drag points are native client coordinates, and a drag is at most80pixels per axis. Before actual input, independently inspect a current owned-window capture and native geometry to freeze correct textbox/title/foreign-field points. Refuse a different physical client size or blocked foreground; do not treat the existing1280Ã—720 Factorio screenshot request as proof of actual desktop geometry. Capture preparation is functional qualification, not a timed dataset.
+The parent supplies one hash-bound actor JSON per action with schema1, kind `MIRLibraryNativeInputV1`, role `client-en` or `client-de`, exact process ID/startUTC/engine hash, client1280Ãƒâ€”720 dimensions and action `escape`, `inventory`, `text`, `click` or `drag`. Text is bounded to32 ordinary ASCII characters; click/drag points are native client coordinates, and a drag is at most80pixels per axis. Before actual input, independently inspect a current owned-window capture and native geometry to freeze correct textbox/title/foreign-field points. Refuse a different physical client size or blocked foreground; do not treat the existing1280Ãƒâ€”720 Factorio screenshot request as proof of actual desktop geometry. Capture preparation is functional qualification, not a timed dataset.
 
 A separate reviewed query-text plan may use kind `MIRLibraryNativeUnicodeTextV1`; it permits only nonempty `text` action content of at most32 UTF-16 code units with well-formed surrogate pairs and no control, line-separator or paragraph-separator characters. It has no mouse or hardware-key authority, normalizes nothing and does not use the clipboard. Root may use its hash-bound plan only after the existing case review and actual process/window/focus capture binding; its distinct receipt is not a native pass, does not alter the fixed two-client0.3.11 protocol, and still requires one bounded real Unicode case.
 
@@ -127,7 +142,7 @@ Host controls use native-shaped doubles and deliberately injected missing events
 
 The0.2 fixture variant reuses the same protected imported native-world,35-row/recipe/three-force and literal-credit assertions while preserving the frozen0.1 keyboard/drag protocol. Compose current `control.lua`, `support-exports.lua` and the appropriate `info-exports-f200.json` or `info-exports-f210.json` as `info.json`; retain the original corrected preservation fixture and exact five-mod Base closure. It imports no MIR code or saved state. Existing public validation checks profiles; native helpers only unpack returned data for independent value/metadata comparisons. The observer reads and writes no export files or engine logs.
 
-Use `remote.call("mir5-library-native-input", "prepare", ACTION)` before the actual owned Windows input click, then `check` with the same action after the event settles. Each successful check returns the exact bounded selectable preview string for external file comparison; it is not file-readback evidence. Use the existing hash-bound1280Ã—720 actor and actual inspected button coordinates, never synthetic Factorio GUI events. Prepare calls preserve an existing active export tab so repeated previews and failure retirement can be observed without rebuilding them first.
+Use `remote.call("mir5-library-native-input", "prepare", ACTION)` before the actual owned Windows input click, then `check` with the same action after the event settles. Each successful check returns the exact bounded selectable preview string for external file comparison; it is not file-readback evidence. Use the existing hash-bound1280Ãƒâ€”720 actor and actual inspected button coordinates, never synthetic Factorio GUI events. Prepare calls preserve an existing active export tab so repeated previews and failure retirement can be observed without rebuilding them first.
 
 | Ordered action | Native and external expectation |
 |---|---|
@@ -166,6 +181,6 @@ The next-release metadata below is test preparation for MIR 5.0.12. Keep every e
 
 Observer 0.3.11 requires the same fourteen prepare/check pairs from the unchanged `library-legacy-settings-search/probe.lua` body (SHA-256 `9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234`): all seven declared Settings search stages for EN and DE, before the full existing keyboard, drag, foreign-focus, removal/replacement, save and restart sequence. Observer 0.4.5 retains all thirteen click actions, two server commands, peer-local file and error checks, false/zero values, five joins and the saved-host lifecycle described above. Both retain strict earned/native/foreign-state preservation and exact engine, edition, player-version and observer closure checks; neither accepts a later release implicitly.
 
-The 12-only Research grid check follows the reviewed responsive layout: an owned frame's equal finite integer native minimum/maximum width bounds require five columns at width960 or above, three at620–959, two at440–619 and one below440. It reads the supported width bounds rather than the write-only `LuaStyle.width` convenience property. Earlier observers still require exactly two columns. Public element names, parent/type paths and mod ownership checks remain strict.
+The 12-only Research grid check follows the reviewed responsive layout: an owned frame's equal finite integer native minimum/maximum width bounds require five columns at width960 or above, three at620â€“959, two at440â€“619 and one below440. It reads the supported width bounds rather than the write-only `LuaStyle.width` convenience property. Earlier observers still require exactly two columns. Public element names, parent/type paths and mod ownership checks remain strict.
 
 These files do not establish native input, export, file, multiplayer or lifecycle acceptance. Static comparison covered the responsive hierarchy at `af5d96001f2d3e054986a20acfb867f2c8f2346a`; final coherent player-source review, exact package/fixture/controller bindings and native execution remain pending.
