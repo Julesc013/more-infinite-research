@@ -197,6 +197,25 @@ local function same_family_engine_patch(event)
   return true
 end
 
+-- A recorded default may relax only a factful unrelated selection change.
+-- Add/update rows retain an active string matching their new version; removal
+-- rows retain a prior string and no longer have an active entry. This rejects
+-- fabricated event rows before a durable route fact can be used.
+local function selection_change(item, active_version)
+  if type(item) ~= "table" then return nil end
+  local old, new = item.old_version, item.new_version
+  if old ~= nil and (type(old) ~= "string" or old == "")
+      or new ~= nil and (type(new) ~= "string" or new == "") then return nil end
+  if active_version ~= nil and (type(active_version) ~= "string" or active_version == "") then return nil end
+  if new == nil then
+    if old == nil or active_version ~= nil then return nil end
+    return "removed"
+  end
+  if new ~= active_version then return nil end
+  if old == nil then return "added" end
+  return old == new and "unchanged" or "updated"
+end
+
 local function history_context(event, route, state, current)
   local function value(item)
     if type(item) == "string" then
@@ -623,10 +642,22 @@ local DEFAULT_ORIGINS = {
     ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
   f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
     ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
-    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true,
-    ["5.0.21012"]=true, ["5.0.21013"]=true},
+    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
+}
+-- These later publications wrote the same schema2 default-route fact, but
+-- that fact is the extra authority. Never use this extension for a nil state.
+local RECORDED_DEFAULT_ORIGINS = {
+  f200 = {["5.0.20012"]=true, ["5.0.20013"]=true},
+  f210 = {["5.0.21012"]=true, ["5.0.21013"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
+
+local function known_recorded_default_origin(edition, version)
+  local common = DEFAULT_ORIGINS[edition]
+  if common and common[version] then return true end
+  local recorded = RECORDED_DEFAULT_ORIGINS[edition]
+  return recorded ~= nil and recorded[version] == true
+end
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -713,7 +744,7 @@ local function owner_record()
       or value.producer.kind == "unchanged-mir5-default" and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
-        and (not known or not known[value.producer.old_version]
+        and (not known_recorded_default_origin(old_edition, value.producer.old_version)
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
           or old_edition ~= edition and not (old_edition == "f200" and edition == "f210"
             and DIRECT_DEFAULT_HOP_ORIGINS[value.producer.old_version])) then
@@ -806,8 +837,8 @@ local function default_origin(event, initializing, state)
     recover_error("default transfer package-change event is inconsistent")
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
-  -- F2105.0.11 and later wrote this durable route fact while its live
-  -- canonical4 was still the MIR-owned default. It proves that precise old
+  -- Published MIR5 default routes wrote this durable fact while their live
+  -- canonical4 was still MIR-owned. It proves that precise old
   -- route; it is not a substitute for a current prototype, native work frame,
   -- or an unprepared finite-provider handover. Validate it before deciding
   -- whether a simultaneous non-worker selection change is relevant.
@@ -836,10 +867,13 @@ local function default_origin(event, initializing, state)
     -- changes cannot change the native worker work being transferred. Keep
     -- the older cross-family Base hop strict: its separate proof depends on
     -- the complete old selection rather than this modern route marker.
-    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
-        or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
-      changed_selection = true
-      if not recorded_default or base_hop then recover_error("default transfer requires the unchanged mod selection") end
+    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) then
+      local kind = selection_change(item, active[name])
+      if kind == nil then recover_error("default transfer has an invalid mod-selection fact") end
+      if kind ~= "unchanged" then
+        changed_selection = true
+        if not recorded_default or base_hop then recover_error("default transfer requires the unchanged mod selection") end
+      end
     end
   end
   if recorded_default and changed_selection and event.mod_startup_settings_changed ~= false then
@@ -850,8 +884,8 @@ local function default_origin(event, initializing, state)
       recover_error("recorded default source cannot be a first-install event")
     end
     local old = change and change.old_version or active[MIR]
-    local known = DEFAULT_ORIGINS[base_hop and "f200" or target.id]
-    if type(old) ~= "string" or old ~= active[MIR] and (not known or not known[old]) then
+    local edition = base_hop and "f200" or target.id
+    if type(old) ~= "string" or old ~= active[MIR] and not known_recorded_default_origin(edition, old) then
       recover_error("recorded default source has an inconsistent producer event")
     end
     return {kind="recorded-default", old_version=old, new_version=active[MIR]}

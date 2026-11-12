@@ -2140,48 +2140,82 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
-    def test_published_511_512_513_recorded_default_admits_nonworker_addition_and_engine_patch(self):
+    def test_published_recorded_default_admits_factful_nonworker_selection_and_engine_patch(self):
         """The published schema2 default fact survives a non-worker selection change."""
-        for old in ("5.0.21011", "5.0.21012", "5.0.21013"):
-            for engine_patch in (False, True):
-                lua=self.world("f210", "5.0.21014")
-                lua.globals().old=old;lua.globals().engine_patch=engine_patch
+        cases=(("f200", "5.0.20014", ("5.0.20012", "5.0.20013"), "2.0.78"),
+               ("f210", "5.0.21014", ("5.0.21011", "5.0.21012", "5.0.21013"), "2.1.24"))
+        for target, new, olds, engine_version in cases:
+            for old in olds:
+                for selection in ("added", "updated", "removed"):
+                    for engine_patch in (False, True):
+                        lua=self.world(target, new)
+                        lua.globals().old=old;lua.globals().selection=selection
+                        lua.globals().engine_patch=engine_patch;lua.globals().engine_version=engine_version
+                        lua.execute(r'''
+                          seed_owner()
+                          local saved={schema=2,kind="route",current={kind="default"}}
+                          storage.mir_worker_storage_route=saved
+                          local event=owner_event(old)
+                          if selection=="added"then
+                            script.active_mods["harmless-provider"]="0.1.0"
+                            event.mod_changes["harmless-provider"]={old_version=nil,new_version="0.1.0"}
+                          elseif selection=="updated"then
+                            script.active_mods["harmless-provider"]="0.1.1"
+                            event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version="0.1.1"}
+                          else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
+                          if engine_patch then
+                            local target=require("platform.target")
+                            script.active_mods.base=engine_version
+                            event.mod_changes.base={old_version=target.minimum_base,new_version=engine_version}
+                          end
+                          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                          -- route=nil is the actual route-unobserved/default case:
+                          -- the changed selection does not own worker-storage.
+                          local plan=history.default_owner_preflight(event,nil,true)
+                          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                          assert(plan.record.producer.kind=="recorded-default" and plan.record.producer.old_version==old
+                            and plan.record.producer.new_version==require("platform.target").distribution_version)
+                          assert(history.default_owner_apply(plan) and storage.mir_worker_storage_route==saved)
+                          for _,f in pairs(game.forces)do
+                            local a,b=frame(f),before[f.index]
+                            assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved
+                              and a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                            assert(a.source.level==(b.source.level>=5 and 5 or 4) and not a.source.researched
+                              and not a.source.enabled and a.source.saved==0)
+                            assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.private,b.private))
+                            local expected=copy(b.queue)
+                            for i,name in ipairs(expected)do if name==CANONICAL then expected[i]=ORDINARY end end
+                            assert(same(a.queue,expected) and a.progress==b.progress
+                              and a.current==(b.current==CANONICAL and ORDINARY or b.current))
+                          end
+                          -- Schema3 must retain the recorded-only producer through
+                          -- a storage-only cold load without touching native state.
+                          local owner=storage[OWNER_KEY];local native_game,native_prototypes=game,prototypes
+                          game=setmetatable({},{__index=function()error("cold native game read")end})
+                          prototypes=setmetatable({},{__index=function()error("cold native prototype read")end})
+                          writes=0;package.loaded["runtime.worker_robot_storage"]=nil
+                          history=require("runtime.worker_robot_storage");history.default_owner_on_load()
+                          assert(writes==0 and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==saved)
+                          game,prototypes=native_game,native_prototypes
+                        ''')
+
+    def test_later_published_default_origin_never_admits_nil_state(self):
+        cases=(("f200", "5.0.20014", ("5.0.20012", "5.0.20013")),
+               ("f210", "5.0.21014", ("5.0.21012", "5.0.21013")))
+        for target, new, olds in cases:
+            for old in olds:
+                lua=self.world(target, new);lua.globals().old=old
                 lua.execute(r'''
-                  seed_owner()
-                  local saved={schema=2,kind="route",current={kind="default"}}
-                  storage.mir_worker_storage_route=saved
-                  local event=owner_event(old)
-                  script.active_mods["harmless-provider"]="0.1.0"
-                  event.mod_changes["harmless-provider"]={old_version=nil,new_version="0.1.0"}
-                  if engine_patch then
-                    local target=require("platform.target")
-                    script.active_mods.base="2.1.24"
-                    event.mod_changes.base={old_version=target.minimum_base,new_version="2.1.24"}
-                  end
-                  local before=all_frames();writes=0;queue_writes={};progress_writes={}
-                  -- route=nil is the actual route-unobserved/default case:
-                  -- the added provider does not own worker-storage.
-                  local plan=history.default_owner_preflight(event,nil,true)
-                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
-                  assert(plan.record.producer.kind=="recorded-default" and plan.record.producer.old_version==old
-                    and plan.record.producer.new_version=="5.0.21014")
-                  assert(history.default_owner_apply(plan) and storage.mir_worker_storage_route==saved)
-                  for _,f in pairs(game.forces)do
-                    local a,b=frame(f),before[f.index]
-                    assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved
-                      and a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
-                    assert(a.source.level==(b.source.level>=5 and 5 or 4) and not a.source.researched
-                      and not a.source.enabled and a.source.saved==0)
-                    assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.private,b.private))
-                    local expected=copy(b.queue)
-                    for i,name in ipairs(expected)do if name==CANONICAL then expected[i]=ORDINARY end end
-                    assert(same(a.queue,expected) and a.progress==b.progress
-                      and a.current==(b.current==CANONICAL and ORDINARY or b.current))
-                  end
+                  seed_owner();local event=owner_event(old);local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil
+                    and storage.mir_worker_storage_route==nil)
                 ''')
 
-    def test_recorded_default_still_refuses_changed_settings_unknown_or_foreign_source_before_writes(self):
-        for opponent in ("settings", "unknown", "unknown-producer", "foreign", "malformed"):
+    def test_recorded_default_still_refuses_changed_settings_unknown_foreign_or_invalid_selection_before_writes(self):
+        for opponent in ("settings", "unknown", "unknown-producer", "foreign", "malformed-state",
+                         "nontable", "wrong-new-version", "missing-active", "old-nonstring", "new-nonstring",
+                         "both-versions-missing", "removal-with-active"):
             lua=self.world("f210", "5.0.21014");lua.globals().opponent=opponent
             lua.execute(r'''
               seed_owner()
@@ -2194,7 +2228,15 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
               elseif opponent=="unknown"then storage.mir_worker_storage_route=nil
               elseif opponent=="unknown-producer"then event.mod_changes["more-infinite-research"].old_version="5.0.21042"
               elseif opponent=="foreign"then creators[CANONICAL]="foreign-provider"
-              else saved.extra=true end
+              elseif opponent=="malformed-state"then saved.extra=true
+              elseif opponent=="nontable"then event.mod_changes["harmless-provider"]="0.1.0"
+              elseif opponent=="wrong-new-version"then event.mod_changes["harmless-provider"].new_version="0.1.1"
+              elseif opponent=="missing-active"then script.active_mods["harmless-provider"]=nil
+              elseif opponent=="old-nonstring"then event.mod_changes["harmless-provider"].old_version=1
+              elseif opponent=="new-nonstring"then event.mod_changes["harmless-provider"].new_version=1
+              elseif opponent=="both-versions-missing"then script.active_mods["harmless-provider"]=nil
+                event.mod_changes["harmless-provider"]={old_version=nil,new_version=nil}
+              else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
               local prior=storage.mir_worker_storage_route;local before=all_frames();writes=0
               assert(not pcall(history.default_owner_preflight,event,nil,true))
               assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil
