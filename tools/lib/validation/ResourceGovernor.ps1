@@ -319,6 +319,10 @@ function New-MIR441FactorioConsoleStartup {
   foreach($value in @($command,$ready,$confirmation)) {
     if($value.IndexOf([char]0)-ge0-or$value.IndexOf("`r")-ge0-or$value.IndexOf("`n")-ge0) {throw '[mir441-factorio-console-startup-newline]'}
   }
+  # Console log witnesses are fixed Factorio ASCII literals. Keeping marker
+  # matching ASCII avoids silently changing a split UTF-8 log sequence while
+  # the command itself remains valid bounded UTF-8.
+  if(@($ready.ToCharArray()+$confirmation.ToCharArray()|Where-Object {[int][char]$_-gt127}).Count-ne0){throw '[mir441-factorio-console-startup-marker]'}
   $utf8=[Text.UTF8Encoding]::new($false,$true)
   try {$commandBytes=$utf8.GetByteCount($command);$readyBytes=$utf8.GetByteCount($ready);$confirmationBytes=$utf8.GetByteCount($confirmation)}catch{throw '[mir441-factorio-console-startup-utf8]'}
   # Match the existing direct-Factorio argument payload ceiling. This remains
