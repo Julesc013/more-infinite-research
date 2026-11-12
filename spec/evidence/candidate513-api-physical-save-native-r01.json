@@ -1,0 +1,299 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate513ApiPhysicalSaveNativePairV1",
+  "status": "passed-two-exact-current13-cases-not-stable",
+  "observed_at_utc": "2026-11-12T19:31:26.385212+00:00",
+  "requirements": [
+    "API-04 native effect and save/reload subset",
+    "VER-06 exact current consumed inputs; older identities retained"
+  ],
+  "published_source": {
+    "tag": "v5.0.13",
+    "tag_commit": "f208b853a6e59fdcafd9209219150965576637d7",
+    "frozen_source_commit": "17b1eff6e840d7e43daf26476118ac55650a368c",
+    "player_source_tree": "32505443e929344affb2c7d691dd15bdb7fb2a4d",
+    "source_input_commit": "d6e0a4ce6cdfa37be5d8f3388a05f7900f09c0e2"
+  },
+  "controller": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "3bcc595a2b9815c4b106e0849ea1e9ce2ab97123",
+    "checked_pr": 144,
+    "retained_harness_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "retained_harness_player_source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "scope": "Harness source is a separate controller identity, not the tested player source"
+  },
+  "raw_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "2c7fc2e07e28b9f33e5bd194c5c62b1feb32abfc",
+    "path": "projects/mir/runs/api513-current-production-aero-r01",
+    "all11_actual_remote_original_bodies_verified": true,
+    "independent_review": "independent-paired-review.json"
+  },
+  "cases": [
+    {
+      "target": "f200",
+      "factorio_version": "2.0.77",
+      "profile": "closed SpaceAge/Defaults with two independent API consumers and production/observer fixtures",
+      "profile_selected_mods": 9,
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "player_version": "5.0.20013",
+      "player_archive_sha256": "4DD6562C42C296AFB0EF428643FBBEFCAD6D328CDDBEFD1ABB812F053D18F882",
+      "packet_sha256": "307571CBC6CD462640B9334E02FD621F2FBD788B5D5CFDC60D45640D45FF893D",
+      "caller_sha256": "7F003B642890EBC83A3BA3DD3198C5F426936FDF94EFBCB91AAE70A63FF01F1A",
+      "composition_sha256": "D7755A0697A1E1C32F37A55390B0ECC4A76FB46F14EFD1B1D4AAF93B62F9CEFF",
+      "run_url": "https://github.com/Julesc013/scratchpad/actions/runs/43285712558",
+      "job_id": 131418452189,
+      "artifact_id": 13973989287,
+      "artifact_sha256": "2f2698f5c4941887bbe0780eea4ac13dc3cb595a95e76795b4b364c9b4c0d5ba",
+      "raw_artifact_path": "projects/mir/runs/api513-current-production-aero-r01/f200/artifact.original.zip",
+      "raw_artifact_files": 133,
+      "verified_artifact_rows": 132,
+      "verified_owned_evidence_rows": 57,
+      "terminal_sha256": "e29db341d09fb62b00877955a2c3f28765cfbf3d45542b082d044edabd5b2997",
+      "runner_result_sha256": "04cabb55551a4326f8f6b93cfb2694ce20936b31458563f6916abe96412352c5",
+      "native_processes": [
+        {
+          "index": 1,
+          "observed_pids": [
+            35960
+          ]
+        },
+        {
+          "index": 2,
+          "observed_pids": [
+            20468
+          ]
+        },
+        {
+          "index": 3,
+          "observed_pids": [
+            44296
+          ]
+        },
+        {
+          "index": 4,
+          "observed_pids": [
+            51360
+          ]
+        }
+      ],
+      "process_outcomes": [
+        {
+          "index": 1,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 2,
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 3,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 4,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        }
+      ],
+      "physical_witnesses": {
+        "beta_consumer_marker_required": "MIR5_API_BETA",
+        "beta_technology": "mir-api-fixture-beta-cable-1",
+        "beta_public_query_before_research": true,
+        "beta_public_query_after_research": true,
+        "research_completed_by_native_setter": true,
+        "laboratory_research_used": false,
+        "native_effect_change": 0.01,
+        "baseline_recipe_productivity_bonus": 0,
+        "researched_recipe_productivity_bonus": 0.01,
+        "baseline_assembler_productivity_bonus": 0,
+        "researched_assembler_productivity_bonus": 0,
+        "assembler_modules_empty": true,
+        "beacon_entities_created": false,
+        "baseline_copper_plates_inserted": 100,
+        "researched_copper_plates_inserted": 100,
+        "baseline_copper_cables_output": 200,
+        "researched_copper_cables_output": 202,
+        "production_observation": "native-runner-readback-required",
+        "fixture_on_load_defers_native_checks": false
+      },
+      "cold_loads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "B33BD1FBEDF9EFFCC8BBAD2C640439DB53BBE5A5A6FA3E17DDB86EB211BDA491",
+          "beta_researched": true
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "B33BD1FBEDF9EFFCC8BBAD2C640439DB53BBE5A5A6FA3E17DDB86EB211BDA491",
+          "beta_researched": true
+        }
+      ],
+      "all8_original_states_restored": true,
+      "all5_owned_archive_states_preserved": true,
+      "no_factorio_remaining_in_terminal": true,
+      "readback_path": "projects/mir/runs/api513-current-production-aero-r01/f200/independent-readback.json",
+      "readback_sha256": "a3b3212f9505730bc7c2bbc3ea128dc9cb15ab33c4b4c1a97bd987274fae3daa"
+    },
+    {
+      "target": "f210",
+      "factorio_version": "2.1.23",
+      "profile": "closed SpaceAge/Defaults with two independent API consumers and production/observer fixtures",
+      "profile_selected_mods": 10,
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "player_version": "5.0.21013",
+      "player_archive_sha256": "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F",
+      "packet_sha256": "597C6CE48214223149C83389BB782A2228C4D5B690F155B05A3CA9DD691265B3",
+      "caller_sha256": "577BD64485796EF829E7106B436C61E2BDEDC5825045C33C2375B34AF522B06A",
+      "composition_sha256": "8F3AE34FDF2D31DC25E4C33B4DA988B136615B467BA0A1186D0F3B362B42A459",
+      "run_url": "https://github.com/Julesc013/scratchpad/actions/runs/43287625809",
+      "job_id": 131425099304,
+      "artifact_id": 13975532151,
+      "artifact_sha256": "40f77686e200a3577b4577d52f4e9c11d19a7fe8c739e792257f0b47f207185f",
+      "raw_artifact_path": "projects/mir/runs/api513-current-production-aero-r01/f210/artifact.original.zip",
+      "raw_artifact_files": 133,
+      "verified_artifact_rows": 132,
+      "verified_owned_evidence_rows": 57,
+      "terminal_sha256": "1d64ffe4b3c9f629ed1213767ab0a14b05fa5f0d3b39db95dccf92dab5fc2d72",
+      "runner_result_sha256": "6d31188ecc78b52c0ab3a98845f4dbe4b7613c4d05bec469090a5a97d8e0f06e",
+      "native_processes": [
+        {
+          "index": 1,
+          "observed_pids": [
+            49824
+          ]
+        },
+        {
+          "index": 2,
+          "observed_pids": [
+            33636
+          ]
+        },
+        {
+          "index": 3,
+          "observed_pids": [
+            43836
+          ]
+        },
+        {
+          "index": 4,
+          "observed_pids": [
+            12908
+          ]
+        }
+      ],
+      "process_outcomes": [
+        {
+          "index": 1,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 2,
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 3,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        },
+        {
+          "index": 4,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true,
+          "timed_out": false
+        }
+      ],
+      "physical_witnesses": {
+        "beta_consumer_marker_required": "MIR5_API_BETA",
+        "beta_technology": "mir-api-fixture-beta-cable-1",
+        "beta_public_query_before_research": true,
+        "beta_public_query_after_research": true,
+        "research_completed_by_native_setter": true,
+        "laboratory_research_used": false,
+        "native_effect_change": 0.01,
+        "baseline_recipe_productivity_bonus": 0,
+        "researched_recipe_productivity_bonus": 0.01,
+        "baseline_assembler_productivity_bonus": 0,
+        "researched_assembler_productivity_bonus": 0,
+        "assembler_modules_empty": true,
+        "beacon_entities_created": false,
+        "baseline_copper_plates_inserted": 100,
+        "researched_copper_plates_inserted": 100,
+        "baseline_copper_cables_output": 200,
+        "researched_copper_cables_output": 202,
+        "production_observation": "native-runner-readback-required",
+        "fixture_on_load_defers_native_checks": false
+      },
+      "cold_loads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "61BC4B9DF46A697DFEA3C6627CE05D4C85F7B88C3610CBC490B17089AA99E2D2",
+          "beta_researched": true
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "61BC4B9DF46A697DFEA3C6627CE05D4C85F7B88C3610CBC490B17089AA99E2D2",
+          "beta_researched": true
+        }
+      ],
+      "all8_original_states_restored": true,
+      "all5_owned_archive_states_preserved": true,
+      "no_factorio_remaining_in_terminal": true,
+      "readback_path": "projects/mir/runs/api513-current-production-aero-r01/f210/independent-readback.json",
+      "readback_sha256": "4233355736d406bf3a402446afb211f4bdaa4436384361544b3c12110a3d5c9a"
+    }
+  ],
+  "retained_adverses": [
+    {
+      "run_id": 43276028709,
+      "status": "original F210 composition wrapper failure retained",
+      "cause": "wrapper expected9 members; exact F210 profile has10 including Recycler",
+      "correction": "checked PR143 profile/name_version.zip/hash-map reader; separate read-only reconciliation, no native composition repeated",
+      "reconciliation_commit": "84715890c40ac1d67673542f8f79d14c496b74d9",
+      "scope": "This earlier composition job remains failed; later actual production run has its own identity"
+    }
+  ],
+  "verdict": {
+    "two_exact_native_physical_save_cases": true,
+    "native_process_count": 8,
+    "two_independent_consumers": true,
+    "ordinary_laboratory_research": false,
+    "actual_joining_client": false,
+    "whole_api_stability": false,
+    "performance_acceptance": false,
+    "stable_release_acceptance": false
+  },
+  "limits": [
+    "One closed SpaceAge/Defaults fixture case per exact modern engine; no arbitrary modpack or reporter save coverage",
+    "Research is completed by an explicit native researched setter; physical assembler output is then observed, saved and checked in two immutable cold loads",
+    "Production processes exit-1 only after the genuine completion predicate under the unchanged admitted runner; create/cold processes exit0",
+    "Recipe productivity changes0 to0.01; machine bonus remains0, with no modules or beacons",
+    "Original public12 evidence, r03 input checks, failed composition wrapper and correction remain under their original identities",
+    "No ordinary-lab, general API, client, Library interaction/export/personal-view, performance, historical or whole-product stable verdict follows"
+  ],
+  "api_contract_version": "1.0.0"
+}
