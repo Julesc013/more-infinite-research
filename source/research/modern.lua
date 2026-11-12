@@ -335,7 +335,10 @@ local function named_owner_effects(owner, definition, inherited_change)
   if type(owner.effects) ~= "table" then owner_error(definition, "missing effects") end
   local found = {}
   local appended = {}
-  for _, recipe in ipairs(definition.append_recipes or {}) do appended[recipe] = true end
+  for _, recipe in ipairs(definition.append_recipes or {}) do
+    if appended[recipe] then owner_error(definition, "duplicate append recipe " .. recipe) end
+    appended[recipe] = true
+  end
   for index = 1, #admission.recipes do found[admission.recipes[index]] = 0 end
   for _, effect in ipairs(owner.effects) do
     if effect.type == admission.effect_type and found[effect.recipe] ~= nil then
@@ -347,8 +350,11 @@ local function named_owner_effects(owner, definition, inherited_change)
   end
   for index = 1, #admission.recipes do
     local recipe = admission.recipes[index]
-    local expected_count = appended[recipe] and 0 or 1
-    if found[recipe] ~= expected_count then owner_error(definition, "missing or duplicate effect for " .. recipe) end
+    -- A supported upstream owner may already supply an authored extension.
+    -- Only its absence is optional; duplicates and a different scalar are not.
+    if found[recipe] ~= 1 and not (appended[recipe] and found[recipe] == 0) then
+      owner_error(definition, "missing or duplicate effect for " .. recipe)
+    end
   end
 end
 
@@ -424,15 +430,21 @@ local function owner_effect_plan(owner, definition, stream)
   if not configured_effect and definition.append_recipes == nil then return nil end
   local effects = copy(owner.effects)
   local replacement = configured_effect and stream.effect_percent / 100 or definition.expected.effect_change
-  local admitted = {}
+  local admitted, present, changed = {}, {}, configured_effect
   for index = 1, #definition.admission.recipes do admitted[definition.admission.recipes[index]] = true end
   for _, effect in ipairs(effects) do
-    if effect.type == definition.admission.effect_type and admitted[effect.recipe] then effect.change = replacement end
+    if effect.type == definition.admission.effect_type and admitted[effect.recipe] then
+      present[effect.recipe] = true
+      if configured_effect then effect.change = replacement end
+    end
   end
   for _, recipe in ipairs(definition.append_recipes or {}) do
-    effects[#effects + 1] = {type=definition.admission.effect_type, recipe=recipe, change=replacement}
+    if not present[recipe] then
+      effects[#effects + 1] = {type=definition.admission.effect_type, recipe=recipe, change=replacement}
+      present[recipe], changed = true, true
+    end
   end
-  return effects
+  return changed and effects or nil
 end
 
 -- Native owners are established technology prototypes. This bounded path only

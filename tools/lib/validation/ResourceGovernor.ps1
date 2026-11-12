@@ -286,6 +286,126 @@ function Invoke-MIR441OwnedProcessObservation {
   if ($output.Count -ne 0) { throw '[mir441-resource-observation-callback-output]' }
 }
 
+# A direct Factorio server accepts one stdin line as a console command. This is
+# deliberately one reviewed /c input, not a general command queue or callback
+# surface. The receipt keeps hashes and timing, never command or log text.
+function Get-MIR441TextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+  $bytes=[Text.UTF8Encoding]::new($false).GetBytes($Text)
+  $hash=[Security.Cryptography.SHA256]::HashData($bytes)
+  return ([Convert]::ToHexString($hash)).ToLowerInvariant()
+}
+
+function Get-MIR441FactorioConsoleStartupField {
+  param([Parameter(Mandatory)]$Definition,[Parameter(Mandatory)][string]$Name,[switch]$Optional)
+  if($Definition-is[Collections.IDictionary]) {
+    if(-not$Definition.Contains($Name)) {if($Optional){return $null};throw '[mir441-factorio-console-startup-field]'}
+    return $Definition[$Name]
+  }
+  $property=$Definition.PSObject.Properties[$Name]
+  if($null-eq$property) {if($Optional){return $null};throw '[mir441-factorio-console-startup-field]'}
+  return $property.Value
+}
+
+function New-MIR441FactorioConsoleStartup {
+  param([Parameter(Mandatory)]$Definition)
+  $names=if($Definition-is[Collections.IDictionary]){@($Definition.Keys|ForEach-Object {[string]$_})}else{@($Definition.PSObject.Properties.Name)}
+  if(@($names|Where-Object {$_-notin @('command','ready_marker','confirmation_marker')}).Count-ne0) {throw '[mir441-factorio-console-startup-field]'}
+  $command=Get-MIR441FactorioConsoleStartupField -Definition $Definition -Name command
+  $ready=Get-MIR441FactorioConsoleStartupField -Definition $Definition -Name ready_marker
+  $confirmation=Get-MIR441FactorioConsoleStartupField -Definition $Definition -Name confirmation_marker -Optional
+  if($command-isnot[string]-or$ready-isnot[string]-or($null-ne$confirmation-and$confirmation-isnot[string])) {throw '[mir441-factorio-console-startup-field]'}
+  if($null-eq$confirmation){$confirmation=''}
+  foreach($value in @($command,$ready,$confirmation)) {
+    if($value.IndexOf([char]0)-ge0-or$value.IndexOf("`r")-ge0-or$value.IndexOf("`n")-ge0) {throw '[mir441-factorio-console-startup-newline]'}
+  }
+  # Console log witnesses are fixed Factorio ASCII literals. Keeping marker
+  # matching ASCII avoids silently changing a split UTF-8 log sequence while
+  # the command itself remains valid bounded UTF-8.
+  if(@($ready.ToCharArray()+$confirmation.ToCharArray()|Where-Object {[int][char]$_-gt127}).Count-ne0){throw '[mir441-factorio-console-startup-marker]'}
+  $utf8=[Text.UTF8Encoding]::new($false,$true)
+  try {$commandBytes=$utf8.GetByteCount($command);$readyBytes=$utf8.GetByteCount($ready);$confirmationBytes=$utf8.GetByteCount($confirmation)}catch{throw '[mir441-factorio-console-startup-utf8]'}
+  # Match the existing direct-Factorio argument payload ceiling. This remains
+  # one reviewed console line, not a transport for a command sequence.
+  if($commandBytes-lt4-or$commandBytes-gt16384-or-not$command.StartsWith('/c ',[StringComparison]::Ordinal)-or[string]::IsNullOrWhiteSpace($command.Substring(3))) {throw '[mir441-factorio-console-startup-command]'}
+  if($readyBytes-lt1-or$readyBytes-gt512-or($confirmationBytes-ne0-and($confirmationBytes-lt1-or$confirmationBytes-gt512))){throw '[mir441-factorio-console-startup-marker]'}
+  if($confirmationBytes-ne0-and$ready-ceq$confirmation){throw '[mir441-factorio-console-startup-marker]'}
+  return [pscustomobject][ordered]@{
+    command=$command;ready_marker=$ready;confirmation_marker=$confirmation
+    receipt=[ordered]@{
+      schema=1;kind='MIR441FactorioConsoleStartupReceiptV1'
+      command_sha256=Get-MIR441TextSha256 $command;command_bytes=$commandBytes
+      ready_marker_sha256=Get-MIR441TextSha256 $ready;confirmation_marker_sha256=$(if($confirmationBytes-eq0){$null}else{Get-MIR441TextSha256 $confirmation})
+      ready_marker_observed=$false;ready_elapsed_monotonic_milliseconds=$null
+      confirmation_marker_observed=$false;confirmation_elapsed_monotonic_milliseconds=$null
+      send_count=0;sends=[Collections.Generic.List[object]]::new()
+    }
+    streams=[Collections.Generic.List[object]]::new();ready_marker_seen=$false;confirmation_marker_seen=$false
+  }
+}
+
+function Add-MIR441FactorioConsoleStartupOutput {
+  param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][string]$Kind,[Parameter(Mandatory)][string]$Path)
+  $State.streams.Add([pscustomobject]@{kind=$Kind;path=$Path;offset=0L;tail='';confirmation_tail='';confirmation_start_offset=$null})
+}
+
+function Update-MIR441FactorioConsoleStartupOutput {
+  param([Parameter(Mandatory)]$State,[ValidateRange(1024,1048576)][int]$MaximumBytes=65536)
+  $updated=$false;$buffer=[byte[]]::new($MaximumBytes);$encoding=[Text.UTF8Encoding]::new($false)
+  foreach($stream in $State.streams){
+    if(-not(Test-Path -LiteralPath $stream.path -PathType Leaf)){continue}
+    $reader=$null
+    try {
+      $reader=[IO.File]::Open($stream.path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+      if($reader.Length-lt$stream.offset){throw '[mir441-factorio-console-output-regressed]'}
+      $reader.Position=$stream.offset
+      $readOffset=[int64]$stream.offset
+      $read=$reader.Read($buffer,0,$buffer.Length)
+      if($read-le0){continue}
+      $stream.offset+=$read
+      $text=$encoding.GetString($buffer,0,$read)
+      # Search the complete bounded read together with the retained overlap
+      # before trimming. A marker at the front of a log burst must not vanish
+      # merely because the tail only retains the newest 8192 characters.
+      $tail=($stream.tail+$text)
+      if(-not$State.ready_marker_seen-and$tail.IndexOf($State.ready_marker,[StringComparison]::Ordinal)-ge0){$State.ready_marker_seen=$true}
+      $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
+      if($State.receipt.send_count-ge1){
+        # The first command establishes a per-stream byte boundary after its
+        # successful write.  Output already present at that boundary may have
+        # been emitted before the command even when the bounded reader has not
+        # reached it yet, so it cannot request a replay.
+        $confirmationStart=[int64]$stream.confirmation_start_offset
+        $confirmationOffset=[Math]::Max(0L,$confirmationStart-$readOffset)
+        if($confirmationOffset-lt$read){
+          $confirmationText=$encoding.GetString($buffer,[int]$confirmationOffset,$read-[int]$confirmationOffset)
+          $confirmationTail=($stream.confirmation_tail+$confirmationText)
+          if($State.confirmation_marker.Length-gt0-and-not$State.confirmation_marker_seen-and$confirmationTail.IndexOf($State.confirmation_marker,[StringComparison]::Ordinal)-ge0){$State.confirmation_marker_seen=$true}
+          $stream.confirmation_tail=if($confirmationTail.Length-gt8192){$confirmationTail.Substring($confirmationTail.Length-8192)}else{$confirmationTail}
+        }
+      }
+      $updated=$true
+    } finally {if($null-ne$reader){$reader.Dispose()}}
+  }
+  return $updated
+}
+
+function Send-MIR441FactorioConsoleStartupLine {
+  param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
+  if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
+  try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
+  if($Kind-ceq'command'){
+    foreach($stream in $State.streams){
+      try {
+        $stream.confirmation_start_offset=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+        $stream.confirmation_tail=''
+      } catch {throw '[mir441-factorio-console-baseline]'}
+    }
+  }
+  $State.receipt.send_count++
+  $State.receipt.sends.Add([ordered]@{order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command;elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)})
+}
+
 function Invoke-MIR441MonitoredProcess {
   param(
     [Parameter(Mandatory)][string]$FilePath,[Parameter(Mandatory)][string[]]$Arguments,
@@ -298,7 +418,8 @@ function Invoke-MIR441MonitoredProcess {
     [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
     [switch]$FactorioSteamIdentity,
     $PreStartAdmissionWait=$null,
-    [scriptblock]$CompletionPredicate=$null
+    [scriptblock]$CompletionPredicate=$null,
+    $FactorioConsoleStartup=$null
   )
   if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-callback-required]' }
   if ($SampleMilliseconds -eq 0 -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-cadence-required]' }
@@ -306,6 +427,12 @@ function Invoke-MIR441MonitoredProcess {
   # Benchmark observations close on natural exit; live marker endpoints keep
   # the existing completion-predicate path without observation callbacks.
   if ($null -ne $CompletionPredicate -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-completion-predicate]' }
+  $consoleStartup=$null
+  if($null-ne$FactorioConsoleStartup){
+    if(-not$FactorioSteamIdentity){throw '[mir441-factorio-console-identity-required]'}
+    $consoleStartup=New-MIR441FactorioConsoleStartup -Definition $FactorioConsoleStartup
+    if([string]::IsNullOrWhiteSpace($StdoutPath)-and[string]::IsNullOrWhiteSpace($StderrPath)){throw '[mir441-factorio-console-output-required]'}
+  }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
@@ -323,7 +450,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null
   try{
     # Check again under the lock, before any job output or worker is allocated.
     if($null -ne $PreStartAdmissionWait){
@@ -340,11 +467,24 @@ function Invoke-MIR441MonitoredProcess {
     if($FactorioSteamIdentity){$start.Environment['SteamAppId']='427520';$start.Environment['SteamGameId']='427520'}
     foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
     $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
+    $start.RedirectStandardInput=($null-ne$consoleStartup)
+    if($null-ne$consoleStartup){$start.StandardInputEncoding=[Text.UTF8Encoding]::new($false)}
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
     if(-not$process.Start()){throw '[mir441-process-start]'}
     $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew()
     # Streaming capture avoids retaining the complete child output in RAM.
-    foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){$stream=[IO.File]::Create($pair[0]);$streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)}}
+    foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){
+      # A console marker must become visible before the child exits. Keep the
+      # existing buffered capture for ordinary actors; the opt-in tail reader
+      # uses a one-byte destination buffer so its shared read observes writes.
+      $stream=if($null-ne$consoleStartup){[IO.FileStream]::new($pair[0],[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::Read,1,[IO.FileOptions]::Asynchronous)}else{[IO.File]::Create($pair[0])}
+      $streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)
+    }}
+    if($null-ne$consoleStartup){
+      $inputWriter=$process.StandardInput;$inputWriter.NewLine="`n";$inputWriter.AutoFlush=$true
+      if($StdoutPath){Add-MIR441FactorioConsoleStartupOutput -State $consoleStartup -Kind stdout -Path $StdoutPath}
+      if($StderrPath){Add-MIR441FactorioConsoleStartupOutput -State $consoleStartup -Kind stderr -Path $StderrPath}
+    }
     while($true){
       $tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children|Sort-Object id,started_utc -Unique);$peak=[Math]::Max($peak,[int64]$tree.working_set_bytes)
       $privatePeak=[Math]::Max($privatePeak,[int64]$tree.private_bytes)
@@ -360,6 +500,18 @@ function Invoke-MIR441MonitoredProcess {
       if($process.HasExited){
         Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
         break
+      }
+      if($null-ne$consoleStartup-and(Update-MIR441FactorioConsoleStartupOutput -State $consoleStartup)){
+        if(-not$consoleStartup.receipt.ready_marker_observed-and$consoleStartup.ready_marker_seen){
+          $consoleStartup.receipt.ready_marker_observed=$true
+          $consoleStartup.receipt.ready_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
+          Send-MIR441FactorioConsoleStartupLine -State $consoleStartup -Writer $inputWriter -Timer $timer -Kind command
+        }
+        if($consoleStartup.receipt.send_count-eq1-and$consoleStartup.confirmation_marker.Length-gt0-and$consoleStartup.confirmation_marker_seen){
+          $consoleStartup.receipt.confirmation_marker_observed=$true
+          $consoleStartup.receipt.confirmation_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
+          Send-MIR441FactorioConsoleStartupLine -State $consoleStartup -Writer $inputWriter -Timer $timer -Kind confirmation-replay
+        }
       }
       if($timer.Elapsed.TotalSeconds-ge$TimeoutSeconds){$timedOut=$true;throw '[mir441-process-timeout]'}
       if($null-ne$CompletionPredicate){
@@ -378,6 +530,7 @@ function Invoke-MIR441MonitoredProcess {
     Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
     $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
+    if($null-ne$consoleStartup){$completed|Add-Member -NotePropertyName console_startup -NotePropertyValue $consoleStartup.receipt}
     if($null -ne $PreStartAdmissionWait){$completed|Add-Member -NotePropertyName admission_wait -NotePropertyValue $PreStartAdmissionWait}
     if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){
       # Preserve the observed terminal before the same strict nonzero refusal.
@@ -389,6 +542,7 @@ function Invoke-MIR441MonitoredProcess {
     return $completed
   }catch{
     $failure=$_
+    if($null-ne$consoleStartup){$failure.Exception.Data['mir441_factorio_console_startup']=$consoleStartup.receipt}
     $isNaturalExitFailure=[object]::ReferenceEquals($failure.Exception,$naturalExitFailure)
     # A callback or unrelated failure cannot supply this reserved terminal.
     if(-not$isNaturalExitFailure){$failure.Exception.Data.Remove('mir441_process_result')}
@@ -402,7 +556,7 @@ function Invoke-MIR441MonitoredProcess {
     try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{
       try{
         foreach($copy in $copies){try{$null=$copy.Wait(3000)}catch{}}
-        foreach($stream in $streams){$stream.Dispose()};if($null-ne$process){$process.Dispose()}
+        foreach($stream in $streams){$stream.Dispose()};if($null-ne$inputWriter){$inputWriter.Dispose()};if($null-ne$process){$process.Dispose()}
         if(Test-Path -LiteralPath $temp){$null=Resolve-MIR441RecoveryScratchPath -Path $temp;Remove-Item -LiteralPath $temp -Recurse -Force}
       }finally{$lock.Dispose()}
     }
