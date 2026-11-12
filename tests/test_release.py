@@ -22,6 +22,7 @@ SPEC.loader.exec_module(release)
 class ReleaseTests(unittest.TestCase):
     NORMAL_TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
     BASE_DISTRIBUTION_VERSION = "5.0.21000"
+    _default_fixture_template = None
 
     @staticmethod
     def _git(repository, *arguments):
@@ -72,6 +73,43 @@ class ReleaseTests(unittest.TestCase):
                     os.environ.pop(name, None)
                 else:
                     os.environ[name] = value
+
+    @classmethod
+    def _default_fixture(cls):
+        """Build one immutable default fixture per test-process invocation."""
+        if cls._default_fixture_template is None:
+            temporary = tempfile.TemporaryDirectory()
+            root = Path(temporary.name)
+            repository = root / "repository"
+            repository.mkdir()
+            source, commit = cls._repository(repository)
+            output = root / "output"
+            release.freeze(source, output, revision=commit)
+            cls._default_fixture_template = (temporary, repository, output)
+        return cls._default_fixture_template
+
+    @classmethod
+    def _prepared_default_fixture(cls, root, name):
+        """Copy default inputs for one test; each caller verifies its own copy."""
+        _, template_repository, template_output = cls._default_fixture()
+        repository = root / (name + "-repository")
+        cls._clone_fixture_repository(template_repository, repository)
+        output = root / (name + "-output")
+        shutil.copytree(template_output, output, copy_function=shutil.copy2)
+        if (repository / "source" / "info.json").samefile(template_repository / "source" / "info.json"):
+            raise AssertionError("Release fixture source copy must not share files with its template")
+        if (output / release.INVENTORY_NAME).samefile(template_output / release.INVENTORY_NAME):
+            raise AssertionError("Release fixture output copy must not share files with its template")
+        source = repository / "source"
+        commit = cls._git(repository, "rev-parse", "HEAD").decode().strip()
+        return repository, source, commit, output
+
+    @classmethod
+    def tearDownClass(cls):
+        template = cls._default_fixture_template
+        cls._default_fixture_template = None
+        if template is not None:
+            template[0].cleanup()
 
     @staticmethod
     def _set_source_release(source, source_version):
@@ -370,12 +408,10 @@ class ReleaseTests(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            baseline_repository = temporary / "baseline-repository"
-            baseline_repository.mkdir()
-            baseline_source, baseline_commit = self._repository(baseline_repository)
-            baseline_output = temporary / "baseline-output"
-            baseline = release.freeze(baseline_source, baseline_output, revision=baseline_commit)
-            self.assertEqual(release.verify(baseline_source, baseline_output), baseline)
+            baseline_repository, baseline_source, baseline_commit, baseline_output = self._prepared_default_fixture(
+                temporary, "baseline")
+            baseline = release.verify(baseline_source, baseline_output)
+            self.assertEqual(baseline["kind"], release.KIND)
             for name, (mutate, reason) in cases.items():
                 with self.subTest(name=name):
                     repository = temporary / ("repository-" + name)
@@ -462,12 +498,9 @@ class ReleaseTests(unittest.TestCase):
     def test_verification_rejects_missing_extra_changed_and_duplicate_assets(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            repository = temporary / "repository"
-            repository.mkdir()
-            source, commit = self._repository(repository)
-            frozen = temporary / "frozen"
-            inventory = release.freeze(source, frozen, revision=commit)
-            self.assertEqual(release.verify(source, frozen), inventory)
+            repository, source, commit, frozen = self._prepared_default_fixture(temporary, "assets")
+            inventory = release.verify(source, frozen)
+            self.assertEqual(inventory["kind"], release.KIND)
             with self.assertRaisesRegex(FileExistsError, "Preserve existing release output"):
                 release.freeze(source, frozen, revision=commit)
 
@@ -593,12 +626,9 @@ class ReleaseTests(unittest.TestCase):
     def test_verification_rejects_absent_or_changed_f018_support_disposition(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            repository = temporary / "repository"
-            repository.mkdir()
-            source, commit = self._repository(repository)
-            frozen = temporary / "frozen"
-            inventory = release.freeze(source, frozen, revision=commit)
-            self.assertEqual(release.verify(source, frozen), inventory)
+            repository, source, commit, frozen = self._prepared_default_fixture(temporary, "f018-support")
+            inventory = release.verify(source, frozen)
+            self.assertEqual(inventory["kind"], release.KIND)
             for name, (mutate, reason) in {
                 "missing": (
                     lambda asset: asset.pop("support"),
@@ -621,12 +651,9 @@ class ReleaseTests(unittest.TestCase):
     def _assert_asset_inventory_mutations(self, cases):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            repository = temporary / "repository"
-            repository.mkdir()
-            source, commit = self._repository(repository)
-            frozen = temporary / "frozen"
-            inventory = release.freeze(source, frozen, revision=commit)
-            self.assertEqual(release.verify(source, frozen), inventory)
+            repository, source, commit, frozen = self._prepared_default_fixture(temporary, "asset-inventory")
+            inventory = release.verify(source, frozen)
+            self.assertEqual(inventory["kind"], release.KIND)
             for name, (path, value, reason) in cases.items():
                 with self.subTest(name=name):
                     output = temporary / ("identity-" + name)
@@ -642,12 +669,9 @@ class ReleaseTests(unittest.TestCase):
     def test_verification_refuses_changed_archive_root_and_info_even_with_new_inventory_digests(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            repository = temporary / "repository"
-            repository.mkdir()
-            source, commit = self._repository(repository)
-            frozen = temporary / "frozen"
-            inventory = release.freeze(source, frozen, revision=commit)
-            self.assertEqual(release.verify(source, frozen), inventory)
+            repository, source, commit, frozen = self._prepared_default_fixture(temporary, "archive-content")
+            inventory = release.verify(source, frozen)
+            self.assertEqual(inventory["kind"], release.KIND)
             for name, (transform, reason) in {
                 "root": (
                     lambda member, data: (member.replace("more-infinite-research_5.0.01300", "wrong-root"), data),
