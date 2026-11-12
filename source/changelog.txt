@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.14
+Date: 2026-11-13
+
+  Bugfixes:
+
+    - Fix worker cargo save upgrades that reject changes to unrelated mods despite having saved MIR ownership history.
+    - Include prior package and saved-route details when a worker transfer cannot be authenticated.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.13
 Date: 2026-11-12
 

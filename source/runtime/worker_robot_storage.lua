@@ -819,15 +819,26 @@ local function default_origin(event, initializing, state)
   end
   local engine_patch_valid = same_family_engine_patch(event)
   if not base_hop and not engine_patch_valid then recover_error("default transfer requires a supported same-family engine patch") end
-  for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
-        or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
-      recover_error("default transfer requires the unchanged mod selection")
-    end
-  end
   if state ~= nil then
     if state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default" then
       recover_error("legacy prepared/finite conversion is not a default-owner transfer")
+    end
+    -- This saved fact authenticates the old MIR default. The caller also
+    -- checks the surviving full native contract and every force's work.
+    -- Other mods may change without invalidating those independent facts.
+    for name, item in pairs(event.mod_changes) do
+      if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then
+        recover_error("recorded default has an invalid mod-change entry", nil, event, state, {kind="default"})
+      end
+      local old, new = item.old_version, item.new_version
+      if old ~= nil and (type(old) ~= "string" or old == "")
+          or new ~= nil and (type(new) ~= "string" or new == "")
+          or old == nil and new == nil or new ~= active[name] then
+        recover_error("recorded default mod-change entry disagrees with active mods", nil, event, state, {kind="default"})
+      end
+      if base_hop and name ~= MIR and name ~= "base" and old ~= new then
+        recover_error("recorded default engine hop requires the unchanged Base-only selection", nil, event, state, {kind="default"})
+      end
     end
     if change and type(change.old_version) ~= "string" then
       recover_error("recorded default source cannot be a first-install event")
@@ -838,6 +849,12 @@ local function default_origin(event, initializing, state)
       recover_error("recorded default source has an inconsistent producer event")
     end
     return {kind="recorded-default", old_version=old, new_version=active[MIR]}
+  end
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
+        or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
+      recover_error("default transfer requires the unchanged mod selection", nil, event, state, {kind="default"})
+    end
   end
   local known = DEFAULT_ORIGINS[target.id]
   if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
