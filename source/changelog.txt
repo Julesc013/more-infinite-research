@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.14
+Date: 2026-11-13
+
+  Bugfixes:
+
+    - Preserve default worker cargo research when an existing MIR save with a recorded default route adds or updates mods without
+      changing its worker research contract.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.13
 Date: 2026-11-12
 
