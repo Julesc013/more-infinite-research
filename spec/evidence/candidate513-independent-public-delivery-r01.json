@@ -1,0 +1,178 @@
+{
+  "kind": "RecordedIndependentMIR513PublicDeliveryReviewV1",
+  "recorded_by": "BlackGlass execution lead",
+  "recording_method": "Independent read-only reviewer supplied the unchanged actual-review payload and retained its downloaded original files. Root copied all19 original files from its supplied temporary directory and independently rehashed them against the frozen inventory. This is a recording of the reviewer result, not a new reviewer-authored file.",
+  "independent_original_download_directory": "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir513-anon-21ab1d0af6f64b8faa38fca1318572d8",
+  "actual_review": {
+    "kind": "IndependentMIR513PublicDeliveryReviewV1",
+    "reviewer": "/root/stable_ui_packet_review512",
+    "verdict": "GO published beta delivery; documentation-only preservation-proof limitation",
+    "public_git": {
+      "tag": "v5.0.13",
+      "tag_object": "d624506b6520e018d75165d3f0ba7fb0a4e162b6",
+      "peeled_commit": "f208b853a6e59fdcafd9209219150965576637d7",
+      "tree": "42e1b74186892bf06f0197d7263d307bd5406307",
+      "source": "32505443e929344affb2c7d691dd15bdb7fb2a4d"
+    },
+    "release": {
+      "id": 443040851,
+      "title": "MIR 5.0.13",
+      "published_at": "2026-11-12T14:26:00Z",
+      "draft": false,
+      "prerelease": true,
+      "immutable": false,
+      "asset_count": 19,
+      "body_lf_sha256": "B70F8B7684AD92344DB5CCA18AD217B3B546F7A209A8BB694449E2E1FE7C47D0"
+    },
+    "fresh_anonymous_method": "Invoke-WebRequest browser_download_url with no Authorization header; all19 files retained at temp path above",
+    "fresh_anonymous_summary": {
+      "count": 19,
+      "all_names_sizes_sha256_labels_github_digests_match_inventory": true,
+      "authorization_header": false
+    },
+    "local_delivery": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.13",
+      "count": 21,
+      "all_names_bytes_sha256_match": true
+    },
+    "inventory_sha256": "1C259B02FA6778C10C161DDD2B583DC4B4D2628E6DB95B91307F48E2A81D4B2F",
+    "main_checks": [
+      "branch-policy:success",
+      "host-controls:success",
+      "native-tooling-controls:success",
+      "verification-plan:success"
+    ],
+    "prior_objects": {
+      "live_release_total": 103,
+      "live_tag_total": 181,
+      "prior_release_count": 102,
+      "prior_tag_count": 180,
+      "latest_stable": {
+        "release_id": 422732162,
+        "tag": "v4.7.3",
+        "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+        "peeled_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "asset_count": 11
+      },
+      "finding": "Existing 389-byte candidate513 preservation receipt has only before_sha256, not a canonical before/after projection or current projection hash; it cannot independently prove historical object equality."
+    },
+    "scope": "Beta delivery only; no stable/UI/export/client/personal-view/performance/reporter-pack or gameplay acceptance."
+  },
+  "fresh_anonymous_downloads": [
+    {
+      "asset": "more-infinite-research_5.0.01313.zip",
+      "bytes": 676470,
+      "sha256": "676a0f553b73b29eded095936f3c41fd045512a8877bf903e393046535ff93b2",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01413.zip",
+      "bytes": 676474,
+      "sha256": "19091df0f07e1f03f5f2f6d259ca729209e4504591e0e1faf5de4a267b52f3d0",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01513.zip",
+      "bytes": 676473,
+      "sha256": "273c22d48c1b81a8595cc88ea7a8b47ae6156769e7d04d1d5ea1fc6ccea4bdbb",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01613.zip",
+      "bytes": 676474,
+      "sha256": "a92fe518428f8458565028460b1681c3562506e25b22f34e8317ba71916f90cc",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01713.zip",
+      "bytes": 676474,
+      "sha256": "8be244e59333092834b1e066166ebe55ea3d39c67c4b4bd102165f02489cdd25",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01813.zip",
+      "bytes": 676475,
+      "sha256": "a4ee8f2ae7b55ddad2ce6953e69ff58580e641aa17ce2719839d598e7cc20f15",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.10013.zip",
+      "bytes": 676466,
+      "sha256": "de5e98cda38093cb61b5e58cda25ec7019e028d98223c5c0b0be5f138acc7672",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.11013.zip",
+      "bytes": 676776,
+      "sha256": "6bbca467d0023bf652b2b4b633306016582afe69edc3c8660f550e1b5160346f",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.20013.zip",
+      "bytes": 1038837,
+      "sha256": "4dd6562c42c296afb0ef428643fbbefcad6d328cddbefd1abb812f053d18f882",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.21013.zip",
+      "bytes": 1039261,
+      "sha256": "e92714d1e25b5bf5927fd131ff39f51cbb4fb97c305ece722f7ea2797c88a38f",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.00613.zip",
+      "bytes": 139310,
+      "sha256": "128b6697bef352f70fd0cb436db7a21cb97fffcbd3ccc61ee72fae1c0174fa35",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.00713.zip",
+      "bytes": 139310,
+      "sha256": "48ddc1d1d5b025d5d50f6eda37eef9b57e084f35f850dd244cbdd6af9377de2f",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.00813.zip",
+      "bytes": 139309,
+      "sha256": "68382fea6c9fdf124d875234392b78ede72602734c060c442b64b09f5e3a5ba3",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.00913.zip",
+      "bytes": 139310,
+      "sha256": "899541c964988bf9a09c27d99809adc8272d2e0313c5d5b2a84a9f9475da5820",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01013.zip",
+      "bytes": 139310,
+      "sha256": "6ffd460cd6185c5233a55c03af5673403e6dd64a8568688e590cd73f959153c9",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01113.zip",
+      "bytes": 139310,
+      "sha256": "07dfc889dfbd1c55c49ada14e43f5bfbfe8fef0b85e1d567e9fc0756644637bb",
+      "authorization_header": false
+    },
+    {
+      "asset": "more-infinite-research_5.0.01213.zip",
+      "bytes": 139313,
+      "sha256": "c12a0daa22cb796f76c5c87e240577c9df5d9ebd0c797be1c3fa08e65cc90ac5",
+      "authorization_header": false
+    },
+    {
+      "asset": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "77f63f61ddddf01fa0cbdb49f179d885564202593a6dd7f439fc0d18d6902d63",
+      "authorization_header": false
+    },
+    {
+      "asset": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "040f21828c59045bae95e18c3739b44270be7e99cbb818587974fbef275735eb",
+      "authorization_header": false
+    }
+  ],
+  "preservation_finding_status": "Open documentation-only proof gap; Root is retaining full before/after projections with durable custody. Original independent observation remains unchanged."
+}

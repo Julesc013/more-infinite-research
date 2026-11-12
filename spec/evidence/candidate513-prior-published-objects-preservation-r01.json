@@ -4,5 +4,36 @@
   "release_count": 102,
   "tag_ref_count": 180,
   "before_sha256": "8b945f19bcc5eb04974530013cd258956b298b8dabb3a66823ba93a1f1623ceb",
-  "scope": "All102 earlier release metadata/asset identities and180 tag refs exactly equal before/after; download counts excluded. No older published bytes or tags changed."
+  "scope": "All102 earlier release metadata/asset identities and180 tag refs exactly equal before/after; download counts excluded. No older published bytes or tags changed.",
+  "full_before_after_projection": {
+    "kind": "MIR513ActualBeforeAfterPublishedObjectProjectionV1",
+    "unchanged": true,
+    "releases": 102,
+    "tag_refs": 180,
+    "method": "Root independently captured real-user GitHub API projections before and after publication. Parse both original JSON bodies, compare every projected field, and compare canonical sorted-key serialization. Download counters excluded; no prior release/tag/asset mutation.",
+    "before": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate513-publication-r01\\prior-objects-before.json",
+      "bytes": 519449,
+      "sha256": "8B945F19BCC5EB04974530013CD258956B298B8DABB3A66823BA93A1F1623CEB",
+      "canonical_projection_sha256": "64AE710E6690AAF576CEF3644EBA4E48B6F5062097396FC8B811CB6393DFC3BC"
+    },
+    "after": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate513-publication-r01\\prior-objects-after.json",
+      "bytes": 511819,
+      "sha256": "3BC5FCCB14E9A498A77EE29B7E6340FE9B155494C6A4096B65DD71289A66EF82",
+      "canonical_projection_sha256": "64AE710E6690AAF576CEF3644EBA4E48B6F5062097396FC8B811CB6393DFC3BC"
+    }
+  },
+  "durable_original_body_custody": {
+    "kind": "ActualRemoteDecodedPublicationOriginalReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "aada74920183e7625019dabb656558c0e6c59723",
+    "path": "projects/mir/runs/mir513-publication-and-next-stable-inputs-r01/original-bodies.json.gz",
+    "git_blob": "f730780ba373006ae13e906aa11ab54d3afbf9ae",
+    "packed_bytes": 8931132,
+    "packed_sha256": "496B260B4F6E914FC26A1516216AC54A157B83C6FDACFB7DBC59FC3D2B1A613D",
+    "actual_originals_verified": 109,
+    "actual_original_bytes": 26682001,
+    "method": "Exact remote branch readback, authenticated GitBlob body download, decode/hash and actual-byte compare every original file. Includes both full prior-object projections and independent all19 anonymous downloads."
+  }
 }
