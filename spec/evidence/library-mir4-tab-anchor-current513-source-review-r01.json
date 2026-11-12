@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryTabGeometryHistoricalSourceReconciliationV1",
+  "prepared_on": "2026-11-13",
+  "scope": "Independent read-only source/requirement reconciliation; no player code, fixture/native runner, observed GUI, provider, release, or ownership changes.",
+  "requirements": [
+    "CONT-10",
+    "VER-07"
+  ],
+  "current_inputs": {
+    "current_dev_commit": "9618af8ac030738792fae7096ef4a98403f23b8c",
+    "library_path": "source/runtime/library.lua",
+    "library_blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+    "layout_path": "source/presentation/library_layout.lua",
+    "layout_blob": "1649e248a7697d23a36565a134f98451ea9cbaca",
+    "historical_tag": "v4.7.3",
+    "historical_path": "source/prototypes/mir/runtime/research_browser.lua",
+    "historical_blob": "4c375e78aa53ae11a7c464f4ade8e1f370437da5"
+  },
+  "related_existing_evidence": [
+    "spec/evidence/library-cont10-layout-negative-control-r01.json",
+    "spec/evidence/library-authored-layout-native-r01.json",
+    "spec/verification.md",
+    "spec/programmes/community-requests.json"
+  ],
+  "review_method": "Twelve read-only textual predicates evaluated against the exact current and historical blobs; no Lua, Python host, Factorio-native or GUI process executed.",
+  "source_predicates": {
+    "executed": 12,
+    "passed": 12,
+    "failed": 0,
+    "scope": "presence/order/parentage/layout-loop/callback source text only; cannot prove native rendering"
+  },
+  "findings": [
+    {
+      "id": "S01",
+      "status": "pass-static",
+      "fact": "Both versions declare research, queue, settings, help in that order; names alone do not establish geometry.",
+      "source": "old lines 40-60; current lines 50-65"
+    },
+    {
+      "id": "S02",
+      "status": "pass-static",
+      "fact": "MIR4 renderer creates title before one tabbed-pane and attaches four flow pages using add_tab.",
+      "source": "old lines 1224-1255"
+    },
+    {
+      "id": "S03",
+      "status": "pass-static",
+      "fact": "MIR5 create_frame creates its title before create_tabs and creates one tabbed-pane with four scroll-pane pages.",
+      "source": "current lines 2263-2285, 2358-2382"
+    },
+    {
+      "id": "S04",
+      "status": "pass-static",
+      "fact": "MIR5 Research search/filter widgets are children of research_page, not siblings of the tabbed-pane. This is a structural correction of the moving-navigation class.",
+      "source": "current lines 2251-2283"
+    },
+    {
+      "id": "S05",
+      "status": "pass-static",
+      "fact": "sync_frame_layout applies identical viewport width/height to every tab page, while the Research content area alone subtracts its filter budget.",
+      "source": "current lines 2287-2354; presentation/library_layout.lua"
+    },
+    {
+      "id": "S06",
+      "status": "pass-static",
+      "fact": "Selected-tab callback only updates view.tab and invokes render; it neither directly modifies geometry nor destroys the frame.",
+      "source": "current lines 2582-2592"
+    },
+    {
+      "id": "S07",
+      "status": "pass-static",
+      "fact": "Library sizing uses resolution, scale and saved geometry; tab_content_height(frame_height) uses one shared frame-height budget; split_sizes has a narrow stacked fallback.",
+      "source": "presentation/library_layout.lua"
+    },
+    {
+      "id": "S08",
+      "status": "pass-static",
+      "fact": "Current render can still discard/rebuild a frame when frame_layout_ready fails, and sync_frame_layout can rebuild tabbed-pane if Research filters fail readiness. Stable source structure alone does not prove rendered retention across all lifecycle paths.",
+      "source": "current lines 2298-2313, 2393-2415"
+    }
+  ],
+  "qualification_matrix": [
+    {
+      "id": "UI-TAB-01",
+      "inputs": "Exact chosen candidate ZIP, one real Factorio GUI client, fixed display resolution/scale/geometry; EN",
+      "actions": "Open Research; capture tabs/frame rectangle; click Queue -> Settings -> Help -> Research; capture same rectangles after each click",
+      "oracle": "Title and four-tab navigation remain in the same pixel location and same size; no tab-dependent frame resize, no unexpected content overlap or loss of click target",
+      "status": "not-run"
+    },
+    {
+      "id": "UI-TAB-02",
+      "inputs": "Same candidate and geometry, DE with long localized labels",
+      "actions": "Repeat all four tabs plus one Search/dropdown interaction and scroll in Research",
+      "oracle": "Fixed navigation geometry; long labels wrap or clip only within owned panes, never relocate the tabs or obscure controls",
+      "status": "not-run"
+    },
+    {
+      "id": "UI-TAB-03",
+      "inputs": "At least 1280x720 and 2560x1440 physical resolution; include scale 1.0 and one >1.0; same candidate",
+      "actions": "Repeat tab navigation at each fixed display configuration; separately resize the frame across split/stacked boundary",
+      "oracle": "No movement when only tab changes; intentional layout changes only upon explicit geometry change, with valid list/detail and readable controls",
+      "status": "not-run"
+    },
+    {
+      "id": "UI-TAB-04",
+      "inputs": "Research selection/scroll, Settings query and personal filters before cross-tab visit",
+      "actions": "Switch tabs and return, close/reopen; save, reload and perform cold-load lifecycle where applicable",
+      "oracle": "Selected research and owned personal state retained per documented contract; native queue/research and other players' state unmodified; no unsupported authority introduced",
+      "status": "not-run"
+    },
+    {
+      "id": "UI-TAB-05",
+      "inputs": "Published 5.0.13 observers 0.3.12/0.4.6 only as historical separate inputs; require exact later candidate binding",
+      "actions": "Inspect observer/candidate version pin, native mouse/keyboard focus, tab rectangles and screenshots",
+      "oracle": "A 5.0.13 observer cannot be relabeled 5.0.14; controller screenshots and actual input receipt both required, no inferred GUI pass from scripted dispatch",
+      "status": "not-run"
+    },
+    {
+      "id": "UI-TAB-06",
+      "inputs": "Actual accepted MIR4 visual reference and exact new package visual output",
+      "actions": "Compare titlebar, tab strip, result/detail proportions, science/effect details, settings grouping and export access with approved MIR4 design",
+      "oracle": "Retain MIR4 usable hierarchy and split/detail behavior rather than merely matching tab names; document deliberate differences and actual visual evidence",
+      "status": "not-run"
+    }
+  ],
+  "separate_accepted_evidence": {
+    "historical_mir4": "Retained v4.7.3 reference capture and one bounded EN native retained-details run are separately recorded by library-authored-layout-native-r01; they do not prove current release UI.",
+    "prior_negative": "Old published 5.0.0 split-layout negative and later source-host positive are retained in library-cont10-layout-negative-control-r01; they are not input/pixel passes.",
+    "current_candidate": "At inspection, latest delivered public packages are 5.0.13 beta; 5.0.14 is not qualified or delivered by this review."
+  },
+  "explicit_nonclaims": [
+    "No actual fixed-tab pixel geometry or user-input behavior has been observed for current 5.0.13 or candidate 5.0.14.",
+    "No EN/DE two-client, resizing, search, export, persistence, accessibility, performance or stable result follows from textual structure.",
+    "Existing MIR4 design parity, native input/export/client lifecycle and whole-product performance remain open.",
+    "No inference of stable readiness, no replay of previously accepted work, and no change to the existing worker/native owners."
+  ],
+  "next_admission": "Owner of the later selected exact candidate must freeze input/pixel observer and controlled display before native tab-geometry qualification; compare evidence to this independent oracle without changing accepted historical inputs."
+}
