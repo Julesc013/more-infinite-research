@@ -180,7 +180,7 @@ try {
   Add-MIR441FactorioConsoleStartupOutput -State $burstConfirmation -Kind stderr -Path $burstConfirmationPath
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $burstConfirmation)-and$burstConfirmation.confirmation_marker_seen) 'console-confirmation-burst-marker-retained'
   $closedState=New-MIR441FactorioConsoleStartup -Definition $startup
-  $closedStream=[IO.MemoryStream]::new();$closedWriter=[IO.StreamWriter]::new($closedStream,[Text.UTF8Encoding]::new($false),1024,$true);$closedWriter.Dispose();$closedWriterError='';$closedTimer=[Diagnostics.Stopwatch]::StartNew()
+  $closedStream=[IO.MemoryStream]::new();$closedWriter=[IO.StreamWriter]::new($closedStream,[Text.UTF8Encoding]::new($false));$closedWriter.Dispose();$closedWriterError='';$closedTimer=[Diagnostics.Stopwatch]::StartNew()
   try {Send-MIR441FactorioConsoleStartupLine -State $closedState -Writer $closedWriter -Timer $closedTimer -Kind command}catch{$closedWriterError=$_.Exception.Message}finally{$closedStream.Dispose()}
   Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0) 'console-closed-writer-refusal'
   $ordinaryRecord=Join-Path $consoleRoot 'ordinary-input.txt';$ordinaryPid=Join-Path $consoleRoot 'ordinary.pid'
