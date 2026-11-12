@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-12
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # MIR documentation
 
-This is the current MIR5 implementation and qualification documentation for the canonical dev tree. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../source/README.md). The [progress record](progress.md) distinguishes exact-source host and native observations from remaining release work. MIR5.0.0 is not yet released.
+This is the current MIR5 implementation and qualification documentation for the canonical dev tree. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../source/README.md). [MIR5.0.12 beta](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.12) is delivered; MIR5 stable acceptance remains incomplete. The [progress record](progress.md) names the next fixed candidate, applicable evidence and remaining release work.
 
 | Need | Read |
 |---|---|
