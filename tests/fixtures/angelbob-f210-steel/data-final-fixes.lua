@@ -46,3 +46,9 @@ end
 exact_strings(owner.prerequisites, facts.prerequisites, "native steel prerequisites")
 exact_ingredients(owner.unit.ingredients, facts.ingredients, "native steel ingredients")
 named_effects(owner.effects)
+
+-- Angel's lab pass can add this after the clone's data stage. This fixture
+-- owns its non-minable lab; it must not inherit a foreign upgrade chain.
+local lab = data.raw.lab and data.raw.lab[facts.fast_lab]
+if type(lab) ~= "table" then fail("fixture fast laboratory is absent") end
+lab.next_upgrade = nil

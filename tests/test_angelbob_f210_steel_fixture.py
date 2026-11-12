@@ -245,7 +245,9 @@ end
 ''')
 
     def _data(self, opponent: str = "", mods=None):
-        raw = {"technology": {OWNER: owner_raw(opponent)}}
+        raw = {"technology": {OWNER: owner_raw(opponent)}, "lab": {
+            "mir-fixture-mir5-angelbob-f210-steel-fast-lab": {"next_upgrade": "bob-lab-2"},
+            "lab": {"next_upgrade": "bob-lab-2"}}}
         return plain(self.lua.eval("run_data")(lua_value(self.lua, raw), lua_value(self.lua, mods or STRICT_MODS)))
 
     def _control(self, opponent: str = "", mods=None, baselines=None):
@@ -273,7 +275,7 @@ end
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / f"{NAME}_0.1.0.zip"
             record = PACKAGE.build(FIXTURE, archive)
-            self.assertEqual(archive, Path(record["archive"]))
+            self.assertTrue(archive.samefile(Path(record["archive"])))
             self.assertEqual((NAME, "0.1.0"), (record["name"], record["version"]))
             self.assertEqual({"info.json", "fixture_facts.lua", "data.lua", "data-final-fixes.lua", "control.lua"},
                              {row["path"] for row in record["members"]})
@@ -293,6 +295,12 @@ end
         self.assertNotIn("owner.effects =", source)
         self.assertNotIn("owner.unit =", source)
         self.assertNotIn("owner.prerequisites =", source)
+
+    def test_final_lab_cleanup_removes_only_the_owned_invalid_upgrade(self):
+        result = self._data()
+        self.assertTrue(result["ok"], result["message"])
+        self.assertNotIn("next_upgrade", result["raw"]["lab"]["mir-fixture-mir5-angelbob-f210-steel-fast-lab"])
+        self.assertEqual("bob-lab-2", result["raw"]["lab"]["lab"]["next_upgrade"])
 
     def test_data_preflight_refuses_wrong_missing_duplicate_or_changed_named_owner_rows(self):
         for opponent, phrase in (
