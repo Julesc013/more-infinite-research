@@ -346,7 +346,7 @@ function New-MIR441FactorioConsoleStartup {
 
 function Add-MIR441FactorioConsoleStartupOutput {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][string]$Kind,[Parameter(Mandatory)][string]$Path)
-  $State.streams.Add([pscustomobject]@{kind=$Kind;path=$Path;offset=0L;tail='';confirmation_tail=''})
+  $State.streams.Add([pscustomobject]@{kind=$Kind;path=$Path;offset=0L;tail='';confirmation_tail='';confirmation_start_offset=$null})
 }
 
 function Update-MIR441FactorioConsoleStartupOutput {
@@ -359,6 +359,7 @@ function Update-MIR441FactorioConsoleStartupOutput {
       $reader=[IO.File]::Open($stream.path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
       if($reader.Length-lt$stream.offset){throw '[mir441-factorio-console-output-regressed]'}
       $reader.Position=$stream.offset
+      $readOffset=[int64]$stream.offset
       $read=$reader.Read($buffer,0,$buffer.Length)
       if($read-le0){continue}
       $stream.offset+=$read
@@ -370,9 +371,18 @@ function Update-MIR441FactorioConsoleStartupOutput {
       if(-not$State.ready_marker_seen-and$tail.IndexOf($State.ready_marker,[StringComparison]::Ordinal)-ge0){$State.ready_marker_seen=$true}
       $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
       if($State.receipt.send_count-ge1){
-        $confirmationTail=($stream.confirmation_tail+$text)
-        if($State.confirmation_marker.Length-gt0-and-not$State.confirmation_marker_seen-and$confirmationTail.IndexOf($State.confirmation_marker,[StringComparison]::Ordinal)-ge0){$State.confirmation_marker_seen=$true}
-        $stream.confirmation_tail=if($confirmationTail.Length-gt8192){$confirmationTail.Substring($confirmationTail.Length-8192)}else{$confirmationTail}
+        # The first command establishes a per-stream byte boundary after its
+        # successful write.  Output already present at that boundary may have
+        # been emitted before the command even when the bounded reader has not
+        # reached it yet, so it cannot request a replay.
+        $confirmationStart=[int64]$stream.confirmation_start_offset
+        $confirmationOffset=[Math]::Max(0L,$confirmationStart-$readOffset)
+        if($confirmationOffset-lt$read){
+          $confirmationText=$encoding.GetString($buffer,[int]$confirmationOffset,$read-[int]$confirmationOffset)
+          $confirmationTail=($stream.confirmation_tail+$confirmationText)
+          if($State.confirmation_marker.Length-gt0-and-not$State.confirmation_marker_seen-and$confirmationTail.IndexOf($State.confirmation_marker,[StringComparison]::Ordinal)-ge0){$State.confirmation_marker_seen=$true}
+          $stream.confirmation_tail=if($confirmationTail.Length-gt8192){$confirmationTail.Substring($confirmationTail.Length-8192)}else{$confirmationTail}
+        }
       }
       $updated=$true
     } finally {if($null-ne$reader){$reader.Dispose()}}
@@ -384,9 +394,16 @@ function Send-MIR441FactorioConsoleStartupLine {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
   if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
   try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
+  if($Kind-ceq'command'){
+    foreach($stream in $State.streams){
+      try {
+        $stream.confirmation_start_offset=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+        $stream.confirmation_tail=''
+      } catch {throw '[mir441-factorio-console-baseline]'}
+    }
+  }
   $State.receipt.send_count++
   $State.receipt.sends.Add([ordered]@{order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command;elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)})
-  if($Kind-ceq'command'){foreach($stream in $State.streams){$stream.confirmation_tail=''}}
 }
 
 function Invoke-MIR441MonitoredProcess {

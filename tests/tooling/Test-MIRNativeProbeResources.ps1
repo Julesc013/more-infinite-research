@@ -135,6 +135,27 @@ Write-Output 'PASS owned child exit race'
   Assert-Probe ($LASTEXITCODE-eq0) 'owned-child-exit-race'
   Assert-Probe (($output-join"`n").Contains('PASS owned child exit race')) 'owned-child-exit-race-output'
 }
+function Assert-FactorioConsoleConfirmationBoundary {
+  $consoleRoot=Join-Path $root 'factorio-console-boundary';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null
+  $startup=[ordered]@{command='/c game.print("mir-native-console-boundary")';ready_marker='MIR_CONSOLE_READY';confirmation_marker='MIR_CONSOLE_CONFIRMATION'}
+  $stdout=Join-Path $consoleRoot 'stdout.txt';$stderr=Join-Path $consoleRoot 'stderr.txt'
+  $ready=$startup.ready_marker;$confirmation=$startup.confirmation_marker
+  # Both files already contain their complete pre-command output.  Read only
+  # the first block before sending so the remaining stdout confirmation would
+  # have replayed the command before the byte-boundary correction.
+  [IO.File]::WriteAllText($stdout,($ready+('x'*(65536-$ready.Length))+$confirmation),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($stderr,$confirmation,[Text.UTF8Encoding]::new($false))
+  $state=New-MIR441FactorioConsoleStartup -Definition $startup
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stdout -Path $stdout
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stderr -Path $stderr
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.ready_marker_seen-and-not$state.confirmation_marker_seen) 'console-pre-send-markers-not-confirmed'
+  $memory=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false));$timer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command} finally {$writer.Dispose();$memory.Dispose()}
+  Assert-Probe ($state.receipt.send_count-eq1-and$state.streams[0].confirmation_start_offset-eq(Get-Item -LiteralPath $stdout).Length-and$state.streams[1].confirmation_start_offset-eq(Get-Item -LiteralPath $stderr).Length) 'console-command-baselines-both-streams'
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and-not$state.confirmation_marker_seen) 'console-pre-send-backlog-cannot-replay'
+  [IO.File]::AppendAllText($stderr,$confirmation,[Text.UTF8Encoding]::new($false))
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.confirmation_marker_seen) 'console-post-send-confirmation-observed'
+}
 function Assert-FactorioConsoleStartup {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$Child)
   $consoleRoot=Join-Path $Context.root 'factorio-console-startup';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null
@@ -236,6 +257,7 @@ try {
   } finally {if(Test-Path -LiteralPath $scanLink){[IO.Directory]::Delete($scanLink)}}
   Assert-ImportBoundary
   Assert-OwnedChildExitRace
+  Assert-FactorioConsoleConfirmationBoundary
   $child=(Get-Command pwsh -ErrorAction Stop).Source
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'zero') -ExpectedPeakMemoryMiB 0} '[mir441-resource-peak-budget-required]'
   $occupied=Join-Path $root 'occupied';[IO.Directory]::CreateDirectory($occupied)|Out-Null;[IO.File]::WriteAllText((Join-Path $occupied 'row'),'x')
