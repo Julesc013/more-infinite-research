@@ -760,15 +760,16 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
 class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
     """Independent native contribution and exact-work controls for full4 ownership."""
 
-    def world(self, target="f210"):
+    def world(self, target="f210", distribution_version=None):
         lua=LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root=(Path(__file__).resolve().parents[1]/"source").as_posix()
         lua.globals().package_family=target
+        lua.globals().distribution_version=distribution_version or ("5.0.20012" if target=="f200" else "5.0.21012")
         lua.execute(r'''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
           local f200=package_family=="f200"
           package.loaded["platform.target"]={id=package_family,minimum_base=f200 and "2.0.77"or"2.1.23",
-            distribution_version=f200 and "5.0.20012"or"5.0.21012"}
+            distribution_version=distribution_version}
         ''')
         lua.execute(RECOVERY_WORLD)
         lua.execute(r'''
@@ -2087,8 +2088,8 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
 
 
 class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
-    def world(self, target="f210"):
-        return WorkerDefaultNativeOwnerTransferTests.world(self,target)
+    def world(self, target="f210", distribution_version=None):
+        return WorkerDefaultNativeOwnerTransferTests.world(self,target,distribution_version)
 
     def test_known_nil_history_versions_preserve_paid_and_pending_work_with_unchanged_qol(self):
         for target in ("f200","f210"):
@@ -2138,6 +2139,109 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
+
+    def test_published_recorded_default_admits_factful_nonworker_selection_and_engine_patch(self):
+        """The published schema2 default fact survives a non-worker selection change."""
+        cases=(("f200", "5.0.20014", ("5.0.20012", "5.0.20013"), "2.0.78"),
+               ("f210", "5.0.21014", ("5.0.21011", "5.0.21012", "5.0.21013"), "2.1.24"))
+        for target, new, olds, engine_version in cases:
+            for old in olds:
+                for selection in ("added", "updated", "removed"):
+                    for engine_patch in (False, True):
+                        lua=self.world(target, new)
+                        lua.globals().old=old;lua.globals().selection=selection
+                        lua.globals().engine_patch=engine_patch;lua.globals().engine_version=engine_version
+                        lua.execute(r'''
+                          seed_owner()
+                          local saved={schema=2,kind="route",current={kind="default"}}
+                          storage.mir_worker_storage_route=saved
+                          local event=owner_event(old)
+                          if selection=="added"then
+                            script.active_mods["harmless-provider"]="0.1.0"
+                            event.mod_changes["harmless-provider"]={old_version=nil,new_version="0.1.0"}
+                          elseif selection=="updated"then
+                            script.active_mods["harmless-provider"]="0.1.1"
+                            event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version="0.1.1"}
+                          else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
+                          if engine_patch then
+                            local target=require("platform.target")
+                            script.active_mods.base=engine_version
+                            event.mod_changes.base={old_version=target.minimum_base,new_version=engine_version}
+                          end
+                          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                          -- route=nil is the actual route-unobserved/default case:
+                          -- the changed selection does not own worker-storage.
+                          local plan=history.default_owner_preflight(event,nil,true)
+                          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                          assert(plan.record.producer.kind=="recorded-default" and plan.record.producer.old_version==old
+                            and plan.record.producer.new_version==require("platform.target").distribution_version)
+                          assert(history.default_owner_apply(plan) and storage.mir_worker_storage_route==saved)
+                          for _,f in pairs(game.forces)do
+                            local a,b=frame(f),before[f.index]
+                            assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved
+                              and a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                            assert(a.source.level==(b.source.level>=5 and 5 or 4) and not a.source.researched
+                              and not a.source.enabled and a.source.saved==0)
+                            assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.private,b.private))
+                            local expected=copy(b.queue)
+                            for i,name in ipairs(expected)do if name==CANONICAL then expected[i]=ORDINARY end end
+                            assert(same(a.queue,expected) and a.progress==b.progress
+                              and a.current==(b.current==CANONICAL and ORDINARY or b.current))
+                          end
+                          -- Schema3 must retain the recorded-only producer through
+                          -- a storage-only cold load without touching native state.
+                          local owner=storage[OWNER_KEY];local native_game,native_prototypes=game,prototypes
+                          game=setmetatable({},{__index=function()error("cold native game read")end})
+                          prototypes=setmetatable({},{__index=function()error("cold native prototype read")end})
+                          writes=0;package.loaded["runtime.worker_robot_storage"]=nil
+                          history=require("runtime.worker_robot_storage");history.default_owner_on_load()
+                          assert(writes==0 and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==saved)
+                          game,prototypes=native_game,native_prototypes
+                        ''')
+
+    def test_later_published_default_origin_never_admits_nil_state(self):
+        cases=(("f200", "5.0.20014", ("5.0.20012", "5.0.20013")),
+               ("f210", "5.0.21014", ("5.0.21012", "5.0.21013")))
+        for target, new, olds in cases:
+            for old in olds:
+                lua=self.world(target, new);lua.globals().old=old
+                lua.execute(r'''
+                  seed_owner();local event=owner_event(old);local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil
+                    and storage.mir_worker_storage_route==nil)
+                ''')
+
+    def test_recorded_default_still_refuses_changed_settings_unknown_foreign_or_invalid_selection_before_writes(self):
+        for opponent in ("settings", "unknown", "unknown-producer", "foreign", "malformed-state",
+                         "nontable", "wrong-new-version", "missing-active", "old-nonstring", "new-nonstring",
+                         "both-versions-missing", "removal-with-active"):
+            lua=self.world("f210", "5.0.21014");lua.globals().opponent=opponent
+            lua.execute(r'''
+              seed_owner()
+              local saved={schema=2,kind="route",current={kind="default"}}
+              storage.mir_worker_storage_route=saved
+              local event=owner_event("5.0.21012")
+              script.active_mods["harmless-provider"]="0.1.0"
+              event.mod_changes["harmless-provider"]={old_version=nil,new_version="0.1.0"}
+              if opponent=="settings"then event.mod_startup_settings_changed=true
+              elseif opponent=="unknown"then storage.mir_worker_storage_route=nil
+              elseif opponent=="unknown-producer"then event.mod_changes["more-infinite-research"].old_version="5.0.21042"
+              elseif opponent=="foreign"then creators[CANONICAL]="foreign-provider"
+              elseif opponent=="malformed-state"then saved.extra=true
+              elseif opponent=="nontable"then event.mod_changes["harmless-provider"]="0.1.0"
+              elseif opponent=="wrong-new-version"then event.mod_changes["harmless-provider"].new_version="0.1.1"
+              elseif opponent=="missing-active"then script.active_mods["harmless-provider"]=nil
+              elseif opponent=="old-nonstring"then event.mod_changes["harmless-provider"].old_version=1
+              elseif opponent=="new-nonstring"then event.mod_changes["harmless-provider"].new_version=1
+              elseif opponent=="both-versions-missing"then script.active_mods["harmless-provider"]=nil
+                event.mod_changes["harmless-provider"]={old_version=nil,new_version=nil}
+              else event.mod_changes["harmless-provider"]={old_version="0.1.0",new_version=nil}end
+              local prior=storage.mir_worker_storage_route;local before=all_frames();writes=0
+              assert(not pcall(history.default_owner_preflight,event,nil,true))
+              assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil
+                and storage.mir_worker_storage_route==prior)
+            ''')
 
 
 class WorkerDefaultEditionContinuityTests(unittest.TestCase):
