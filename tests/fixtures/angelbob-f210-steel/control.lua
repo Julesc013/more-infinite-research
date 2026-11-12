@@ -50,6 +50,28 @@ local function assert_named_effects(value)
   end
 end
 
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge and value >= 0
+end
+
+local function assert_lab_modifiers(force, phase)
+  if force.laboratory_speed_modifier ~= 0 or force.laboratory_productivity_bonus ~= 0 then
+    fail(phase .. " fixture requires unmodified force laboratory modifiers")
+  end
+end
+
+local function baseline_bonuses(force)
+  local baselines = {}
+  for _, recipe in ipairs(facts.named_recipes) do
+    local value = force.recipes and force.recipes[recipe]
+    if value == nil or not finite_nonnegative(value.productivity_bonus) then
+      fail("native productivity baseline differs: " .. recipe)
+    end
+    baselines[recipe] = value.productivity_bonus
+  end
+  return baselines
+end
+
 local function assert_owner(force, phase, require_first_level_count)
   local owner = technology(force, facts.owner)
   if owner.prototype == nil or owner.prototype.level ~= 1 or owner.prototype.max_level ~= 4294967295
@@ -107,16 +129,19 @@ local function assert_complete(state, phase)
   if state.finished ~= 1 or owner.level ~= 2 or owner.researched ~= false or force.current_research ~= nil then
     fail(phase .. " requires exactly one real native steel completion")
   end
-  local bonuses = {}
+  local bonuses, deltas = {}, {}
   for _, recipe in ipairs(facts.named_recipes) do
     local value = force.recipes and force.recipes[recipe]
-    if value == nil or not facts.close(value.productivity_bonus, facts.effect_change) then
+    local baseline = state.baselines and state.baselines[recipe]
+    if value == nil or not finite_nonnegative(baseline) or not finite_nonnegative(value.productivity_bonus)
+        or not facts.close(value.productivity_bonus, baseline + facts.effect_change) then
       fail(phase .. " native productivity bonus differs: " .. recipe)
     end
     bonuses[recipe] = value.productivity_bonus
+    deltas[recipe] = value.productivity_bonus - baseline
   end
   local paid, remaining = assert_paid(state, phase)
-  return {level=owner.level, bonuses=bonuses, paid=paid, remaining=remaining}
+  return {level=owner.level, bonuses=bonuses, deltas=deltas, paid=paid, remaining=remaining}
 end
 
 local function marker(stage, state)
@@ -124,7 +149,8 @@ local function marker(stage, state)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case="angelbob-f210-steel", stage=stage, status="passed",
     witnesses={actual_steel_laboratory_completions=state.finished, event_by_script=false,
-      named_steel_recipes=facts.named_recipes, named_effect_count_each=1, native_productivity_delta=.1,
+      named_steel_recipes=facts.named_recipes, named_effect_count_each=1,
+      named_productivity_baselines=state.baselines, named_productivity_deltas=frame.deltas,
       named_productivity_bonuses=frame.bonuses, ordinary_first_level_count=facts.first_level_count,
       ordinary_research_unit_energy=facts.research_unit_energy, ordinary_science_vector=facts.ingredients,
       actual_paid_science=frame.paid, remaining_science=frame.remaining,
@@ -138,13 +164,13 @@ script.on_init(function()
   assert_closure()
   if storage[KEY] ~= nil then fail("fixture state already exists") end
   local force = game.forces.player
-  if force.laboratory_speed_modifier ~= 0 or force.laboratory_productivity_bonus ~= 0 then
-    fail("fixture requires unmodified force laboratory modifiers")
-  end
+  assert_lab_modifiers(force, "before prerequisite seed")
   local prerequisite = technology(force, facts.prerequisites[1])
   prerequisite.enabled, prerequisite.researched = true, true
+  assert_lab_modifiers(force, "after prerequisite seed")
   local owner = assert_owner(force, "initial", true)
   if owner.enabled ~= true or owner.researched ~= false or owner.level ~= 1 then fail("fresh native steel owner differs") end
+  local baselines = baseline_bonuses(force)
   local lab, inventory = create_lab(force)
   local supplied = {}
   for _, name in ipairs(facts.ingredients) do
@@ -152,7 +178,7 @@ script.on_init(function()
     if inserted ~= facts.initial_stack then fail("fixture laboratory rejected initial science: " .. name) end
     supplied[name] = inserted
   end
-  storage[KEY] = {phase="starting", lab=lab, supplied=supplied, finished=0, started=false,
+  storage[KEY] = {phase="starting", lab=lab, supplied=supplied, baselines=baselines, finished=0, started=false,
     deadline=game.tick + facts.deadline_ticks}
 end)
 

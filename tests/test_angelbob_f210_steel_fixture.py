@@ -130,8 +130,9 @@ function parse_control()
   return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
 end
 
-function run_control(active_mods, opponent)
+function run_control(active_mods, opponent, supplied_baselines)
   local markers,saves,settling_markers={},0,0
+  supplied_baselines=supplied_baselines or {}
   local effects={{type="unlock-recipe",recipe="foreign-unlock"}}
   local recipe_names={"steel-plate","casting-steel","angels-plate-steel","angels-plate-steel-2"}
   for _,name in ipairs(recipe_names) do effects[#effects+1]={type="change-recipe-productivity",recipe=name,change=.1} end
@@ -147,8 +148,20 @@ function run_control(active_mods, opponent)
   local prerequisite={name="production-science-pack",valid=true,enabled=true,researched=false}
   local player={technologies={["steel-plate-productivity"]=owner,["production-science-pack"]=prerequisite},recipes={},
     laboratory_speed_modifier=0,laboratory_productivity_bonus=0,current_research=nil}
-  for _,name in ipairs(recipe_names) do player.recipes[name]={productivity_bonus=0} end
+  for index,name in ipairs(recipe_names) do
+    local baseline=supplied_baselines[name] or 0
+    if opponent=="negative-baseline" and index==1 then baseline=-.1 end
+    if opponent=="nonfinite-baseline" and index==1 then baseline=math.huge end
+    player.recipes[name]={productivity_bonus=baseline}
+  end
   owner.force=player
+  if opponent=="prerequisite-lab-modifier" then
+    prerequisite.researched=nil
+    setmetatable(prerequisite,{__newindex=function(row,key,value)
+      rawset(row,key,value)
+      if key=="researched" then player.laboratory_productivity_bonus=.1 end
+    end})
+  end
   function player.add_research(value) player.current_research=value;return true end
   local counts={}
   local inventory={
@@ -185,7 +198,12 @@ function run_control(active_mods, opponent)
     counts["production-science-pack"]=counts["production-science-pack"]-100
     if tick==15 then
       owner.level,owner.research_unit_count,owner.researched=2,2250,false;player.current_research=nil
-      for _,name in ipairs(recipe_names) do player.recipes[name].productivity_bonus=.1 end
+      for _,name in ipairs(recipe_names) do
+        local baseline=supplied_baselines[name] or 0
+        if opponent=="double-delta" then player.recipes[name].productivity_bonus=baseline+.2
+        elseif opponent=="lost-baseline" then player.recipes[name].productivity_bonus=.1
+        else player.recipes[name].productivity_bonus=baseline+.1 end
+      end
       ok,result=pcall(callbacks.events[1],{research=owner,by_script=opponent=="scripted"})
       if not ok then return {ok=false,message=tostring(result),saves=saves,markers=markers,premature=premature} end
     end
@@ -211,8 +229,9 @@ end
         raw = {"technology": {OWNER: owner_raw(opponent)}}
         return plain(self.lua.eval("run_data")(lua_value(self.lua, raw), lua_value(self.lua, mods or STRICT_MODS)))
 
-    def _control(self, opponent: str = "", mods=None):
-        return plain(self.lua.eval("run_control")(lua_value(self.lua, mods or STRICT_MODS), opponent))
+    def _control(self, opponent: str = "", mods=None, baselines=None):
+        return plain(self.lua.eval("run_control")(lua_value(self.lua, mods or STRICT_MODS), opponent,
+                                                   lua_value(self.lua, baselines or {})))
 
     def test_info_and_facts_freeze_the_exact_profile_worker_closure(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
@@ -292,6 +311,8 @@ end
         self.assertNotIn("enable_all_prototypes", source)
         self.assertNotIn("research_all", source)
         self.assertIn('get_researching_speed("normal")', source)
+        self.assertNotIn("native_productivity_delta=.1", source)
+        self.assertIn("named_productivity_deltas=frame.deltas", source)
 
     def test_real_lab_contract_counts_one_unscripted_completion_payment_save_and_cold_reads(self):
         result = self._control()
@@ -305,14 +326,27 @@ end
             self.assertEqual(1, witness["actual_steel_laboratory_completions"])
             self.assertFalse(witness["event_by_script"])
             self.assertEqual(1, witness["named_effect_count_each"])
-            self.assertEqual(.1, witness["native_productivity_delta"])
             self.assertEqual(list(RECIPES), witness["named_steel_recipes"])
+            self.assertEqual({name: 0 for name in RECIPES}, witness["named_productivity_baselines"])
+            self.assertEqual({name: .1 for name in RECIPES}, witness["named_productivity_deltas"])
             self.assertEqual({name: .1 for name in RECIPES}, witness["named_productivity_bonuses"])
             self.assertEqual({name: 1500 for name in SCIENCE}, witness["actual_paid_science"])
             self.assertTrue(witness["broader_eligible_steel_recipes_unconstrained"])
             self.assertTrue(witness["prototype_baseline_capture_required"])
             self.assertFalse(witness["physical_output_qualified"])
         self.assertEqual({name: 100 for name in SCIENCE}, result["counts"])
+
+    def test_distinct_foreign_productivity_baselines_are_preserved_with_one_native_delta_across_colds(self):
+        baselines = {"steel-plate": .2, "casting-steel": .35, "angels-plate-steel": .4,
+                     "angels-plate-steel-2": .55}
+        result = self._control(baselines=baselines)
+        self.assertTrue(result["ok"], result.get("message", ""))
+        for marker in result["markers"]:
+            witness = marker["witnesses"]
+            self.assertEqual(baselines, witness["named_productivity_baselines"])
+            for recipe in RECIPES:
+                self.assertAlmostEqual(.1, witness["named_productivity_deltas"][recipe])
+                self.assertAlmostEqual(baselines[recipe] + .1, witness["named_productivity_bonuses"][recipe])
 
     def test_runtime_refuses_scripted_completion_and_bad_named_owner_contract_before_save(self):
         for opponent, phrase in (
@@ -323,11 +357,25 @@ end
             ("wrong-count", "native steel first-level count differs"),
             ("wrong-energy", "native steel ordinary cost differs"),
             ("wrong-pack", "native steel ingredients is absent"),
+            ("prerequisite-lab-modifier", "after prerequisite seed fixture requires unmodified force laboratory modifiers"),
+            ("negative-baseline", "native productivity baseline differs"),
+            ("nonfinite-baseline", "native productivity baseline differs"),
         ):
             with self.subTest(opponent=opponent):
                 result = self._control(opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+                self.assertEqual(0, result["saves"])
+                self.assertFalse(any(row.get("status") == "passed" for row in result["markers"]))
+
+    def test_runtime_refuses_double_delta_or_lost_foreign_baseline_before_save(self):
+        baselines = {"steel-plate": .2, "casting-steel": .35, "angels-plate-steel": .4,
+                     "angels-plate-steel-2": .55}
+        for opponent in ("double-delta", "lost-baseline"):
+            with self.subTest(opponent=opponent):
+                result = self._control(opponent, baselines=baselines)
+                self.assertFalse(result["ok"])
+                self.assertIn("native productivity bonus differs", result["message"])
                 self.assertEqual(0, result["saves"])
                 self.assertFalse(any(row.get("status") == "passed" for row in result["markers"]))
 
