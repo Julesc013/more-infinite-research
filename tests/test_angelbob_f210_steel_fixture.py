@@ -273,7 +273,7 @@ end
         with tempfile.TemporaryDirectory() as temporary:
             archive = Path(temporary) / f"{NAME}_0.1.0.zip"
             record = PACKAGE.build(FIXTURE, archive)
-            self.assertEqual(archive, Path(record["archive"]))
+            self.assertTrue(archive.samefile(Path(record["archive"])))
             self.assertEqual((NAME, "0.1.0"), (record["name"], record["version"]))
             self.assertEqual({"info.json", "fixture_facts.lua", "data.lua", "data-final-fixes.lua", "control.lua"},
                              {row["path"] for row in record["members"]})
