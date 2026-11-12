@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.13
+Date: 2026-11-12
+
+  Bugfixes:
+
+    - Improve case-insensitive matches for translated research and setting names in the Research Library, including German umlauts
+      and ß/ss.
+    - Preserve typed search text when translations arrive or the Library is reopened.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.12
 Date: 2026-11-11
 
