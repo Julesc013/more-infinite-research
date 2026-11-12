@@ -6,7 +6,6 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Preserve earned and unfinished default worker cargo research from supported MIR 4.7.3 Base saves on Factorio 2.0 and 2.1.
 - Match multilingual Research Library searches using Factorio's native text handling while retaining the typed query.
 
 ## [5.0.12] - 2026-11-11

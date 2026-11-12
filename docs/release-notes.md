@@ -12,12 +12,12 @@ source_of_truth_for:
   - mir-513-release-notes
 ---
 
-Improves upgrades from supported MIR 4.7.3 Base saves and multilingual Research Library searches.
+Fixes multilingual Research Library searches while preserving the text you typed.
 
-- Preserve earned and unfinished default worker cargo research when the known MIR 4.7.3 Base research contract matches on Factorio 2.0 or 2.1.
-- Match multilingual Library searches using Factorio's native text handling while retaining the text you typed.
+- Match Library searches using Factorio's native text handling, including non-English search text.
+- Keep the original typed query when filtering and reopening Library views.
 
-Back up your save and matching mods/settings before updating. Load a copy with the previous enabled mods and unchanged MIR worker settings, save separately and exit before adding a worker cargo provider. Unknown or already-clamped predecessor histories still need the protected original; this update does not infer lost research.
+Back up your save and matching mods/settings before updating. Existing historical worker-upgrade limits remain; the separate extension for unfinished MIR 4.7.3 worker research is still under qualification and is not included in this patch.
 
 This is a GitHub beta. Full Library input/export/client-lifecycle and whole-product performance acceptance remain unfinished for stable. Exact full reporter modpacks and arbitrary provider transitions are not claimed tested.
 

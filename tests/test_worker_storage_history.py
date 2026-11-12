@@ -1635,7 +1635,7 @@ class WorkerInfiniteHeadDebitTests(unittest.TestCase):
 
 
 class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
-    """Known473 default work, old idle records and501-empty restrictions."""
+    """Separate all-force501-empty and473-paid-idle source restrictions."""
 
     world = WorkerDefaultNativeOwnerTransferTests.world
 
@@ -1645,10 +1645,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           for _,id in ipairs({CANONICAL,ORDINARY,ID})do
             prototypes.technology[id].research_unit_count_formula="675*1.5^(L-4)"
             prototypes.technology[id].research_unit_energy=3600
-            prototypes.technology[id].research_unit_ingredients={
-              {name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},
-              {name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1},
-              {name="utility-science-pack",amount=1}}
             for _,force in pairs(game.forces)do
               local t=force.technologies[id];local mt=getmetatable(t);local read=mt.__index
               mt.__index=function(object,key)
@@ -1702,7 +1698,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     def test_473_paid_idle_preserves_native_levels_and_foreign_work(self):
         lua=self.older_world();lua.execute(r'''
           paid_idle();local event=older_event("4.7.20003",true);local before=all_frames()
-          local plan=older_plan(event);assert(writes==0 and plan.record.producer.kind=="published473-default")
+          local plan=older_plan(event);assert(writes==0 and plan.record.producer.kind=="published473-idle-default")
           assert(history.apply_default_owner_transfer(plan))
           for _,f in pairs(game.forces)do
             local a,b=frame(f),before[f.index];local n=b.source.level
@@ -1715,108 +1711,11 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(player.worker_robots_storage_bonus==21 and not uninvested.technologies[ORDINARY].enabled)
         ''')
 
-    def test_473_f210_same_edition_preserves_empty_and_paid_idle_work_and_producer(self):
-        # MIG-05 requires the published same-edition4.7.3 predecessor. The
-        # existing4.7.20003 forward route does not cover4.7.21003.
-        for paid in (False, True):
-            for observer_added in (False, True):
-                with self.subTest(paid=paid, observer_added=observer_added):
-                    lua=self.older_world("f210")
-                    lua.globals().paid=paid;lua.globals().observer_added=observer_added
-                    lua.execute(r'''
-                      if paid then paid_idle()else
-                        for _,f in pairs(game.forces)do f.research_queue={OTHER};f.research_progress=.42 end
-                        uninvested.technologies[CANONICAL].enabled=false
-                        detached.technologies[OTHER].saved_progress=.27
-                      end
-                      writes=0;queue_writes={};progress_writes={};local before=all_frames()
-                      local event=older_event("4.7.21003",observer_added)
-                      local plan=history.default_owner_preflight(event,nil,true)
-                      assert(writes==0 and same(before,all_frames()))
-                      assert(plan.record.producer.kind=="published473-default")
-                      assert(plan.record.producer.old_version=="4.7.21003")
-                      assert(plan.record.producer.new_version=="5.0.21012")
-                      assert(history.default_owner_apply(plan))
-                      for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
-                        assert(a.owner.level==b.source.level and a.owner.count==b.source.count)
-                        assert(a.owner.enabled==b.source.enabled and a.bonus==b.bonus)
-                        assert(a.current==b.current and a.progress==b.progress and same(a.queue,b.queue))
-                        assert(a.other_saved==b.other_saved and same(a.private,b.private))
-                        assert(queue_writes[f.index]==nil and progress_writes[f.index]==nil)
-                      end
-                      local saved=storage[OWNER_KEY];local settled=all_frames();writes=0
-                      local original_game,original_prototypes=game,prototypes
-                      game=setmetatable({}, {__index=function()error("cold native game read")end})
-                      prototypes=setmetatable({}, {__index=function()error("cold prototype read")end})
-                      for i=1,2 do package.loaded["runtime.worker_robot_storage"]=nil
-                        history=require("runtime.worker_robot_storage");history.default_owner_on_load()
-                        assert(storage[OWNER_KEY]==saved and writes==0)
-                      end
-                      game,prototypes=original_game,original_prototypes;history.configure(0,true)
-                      local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
-                      assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
-                      saved.producer.new_version="5.0.20012"
-                      assert(not pcall(history.default_owner_on_load)and writes==0)
-                    ''')
-
-    def test_473_f210_rejects_ambiguous_or_unfinished_history_before_writes(self):
-        opponents=(
-            'script.active_mods.foreign="1"',
-            'script.active_mods.foreign="1";event.mod_changes.foreign={old_version="1",new_version="1"}',
-            'event.mod_changes.removed={old_version="1"}',
-            'event.mod_startup_settings_changed=true',
-            'event.mod_changes.base={old_version="2.1.22",new_version="2.1.23"}',
-            'script.active_mods.base="2.1.24"',
-            'script.active_mods["space-age"]="2.1.23";event.mod_changes["space-age"]={new_version="2.1.23"}',
-            'event.mod_changes["more-infinite-research"].old_version="4.7.21002"',
-            'event.mod_changes["more-infinite-research"].old_version="4.7.20003"',
-            'event.mod_changes["more-infinite-research"].new_version="5.0.21013"',
-            'creators[CANONICAL]="foreign"',
-            'detached.technologies[CANONICAL].saved_progress=1.1',
-            'detached.technologies[ID].level=5',
-            'history.configure(4,true)',
-            'require("runtime.configuration").streams["worker-robots-storage"].effect_percent=2')
-        for opponent in opponents:
-            with self.subTest(opponent=opponent):
-                lua=self.older_world("f210")
-                lua.execute('local event=older_event("4.7.21003",true);'+opponent+';refuse_older(event)')
-
-    def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
-        for target,old,hop in (("f200","4.7.20003",False),
-                               ("f210","4.7.21003",False),
-                               ("f210","4.7.20003",True)):
-            with self.subTest(target=target,old=old,hop=hop):
-                lua=self.older_world(target);lua.globals().old=old;lua.globals().hop=hop
-                lua.execute(r'''
-                  seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
-                  local event=older_event(old,false)
-                  if hop then event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
-                    event.mod_startup_settings_changed=true end
-                  local before=all_frames();writes=0;queue_writes={};progress_writes={}
-                  local plan=history.default_owner_preflight(event,nil,true)
-                  assert(writes==0 and same(before,all_frames()))
-                  assert(plan.record.producer.kind=="published473-default")
-                  assert(history.default_owner_apply(plan))
-                  for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
-                    local current=b.current==CANONICAL and ORDINARY or b.current
-                    local queue={}for i,id in ipairs(b.queue)do queue[i]=id==CANONICAL and ORDINARY or id end
-                    assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
-                    assert(a.owner.count==b.source.count and a.owner.enabled==b.source.enabled)
-                    assert(a.current==current and a.progress==b.progress and same(a.queue,queue))
-                    assert(a.other_saved==b.other_saved and same(a.private,b.private)and a.bonus==b.bonus)
-                  end
-                  assert(player.research_queue[1].name==ORDINARY and player.research_queue[2].name==ORDINARY)
-                  assert(queue_writes[player.index]==1 and queue_writes[suspended.index]==1)
-                  assert(queue_writes[uninvested.index]==nil and queue_writes[detached.index]==nil)
-                  local settled=all_frames();writes=0;history.default_owner_on_load()
-                  local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
-                  assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
-                ''')
-
-    def test_one_force_paid_501_and_pending_501_work_refuse_before_writes(self):
+    def test_one_force_paid_501_and_any_pending_older_work_refuse_before_writes(self):
         for old, opponents in (("5.0.20001", (
                 'detached.technologies[CANONICAL].level=5',
-                'detached.technologies[CANONICAL].researched=true')),):
+                'detached.technologies[CANONICAL].researched=true')),
+                ("4.7.20003", ())):
             for opponent in opponents + (
                     'detached.technologies[CANONICAL].saved_progress=.1',
                     'detached.research_queue={CANONICAL}',
@@ -1847,7 +1746,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                 with self.subTest(old=old, opponent=opponent):
                     lua=self.older_world();lua.globals().old=old
                     lua.execute('local event=older_event(old,true);local route=nil;'+opponent+';refuse_older(event,route)')
-        for target, old in (("f210","5.0.21042"),("f210","4.7.21002"),("f200","5.0.20043"),("f200","4.7.20002")):
+        for target, old in (("f210","5.0.21042"),("f210","4.7.21003"),("f200","5.0.20043"),("f200","4.7.20002")):
             lua=self.older_world(target);lua.globals().old=old;lua.execute('refuse_older(older_event(old))')
 
     def test_473_requires_each_resolved_default_worker_value_and_selected_caps(self):
@@ -1859,22 +1758,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 lua=self.older_world();lua.execute('paid_idle();local values=require("runtime.configuration").streams["worker-robots-storage"];'+
                     opponent+';refuse_older(older_event("4.7.20003",true))')
-
-    def test_473_requires_the_historical_work_vector_even_when_current_pair_agrees(self):
-        mutations=(
-            'p.research_unit_count_formula="100*2^(L-4)"',
-            'p.research_unit_energy=1800',
-            'p.ignore_tech_cost_multiplier=true',
-            'p.research_unit_ingredients[5]=nil',
-            'p.research_unit_ingredients[5].amount=2',
-            'p.research_unit_ingredients[5].name="space-science-pack"',
-            'p.research_unit_ingredients[5].name="automation-science-pack"')
-        for target,old in (("f200","4.7.20003"),("f210","4.7.21003")):
-            for mutation in mutations:
-                with self.subTest(target=target,mutation=mutation):
-                    lua=self.older_world(target);lua.globals().old=old
-                    lua.execute('seed_owner();for _,id in ipairs({CANONICAL,ORDINARY,ID})do '+
-                        'local p=prototypes.technology[id];'+mutation+' end;refuse_older(older_event(old,false))')
 
     def test_473_imported_profile_uses_actual_resolver_instead_of_raw_default_settings(self):
         lua=self.older_world();lua.execute(r'''
@@ -1899,9 +1782,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             lua.execute(r'''
               if old=="4.7.20003"then paid_idle()end
               history.apply_default_owner_transfer(older_plan(older_event(old,true)))
-              -- Published12 used this narrower producer. Its saved meaning and
-              -- storage-only reader must survive the new full-work admission.
-              if old=="4.7.20003"then storage[OWNER_KEY].producer.kind=kind end
               local saved=storage[OWNER_KEY];assert(saved.producer.kind==kind)
               writes=0;local original_game,original_prototypes=game,prototypes
               game=setmetatable({}, {__index=function()error("cold native game read")end})
@@ -2162,7 +2042,7 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
                   assert(writes==0 and same(before,all_frames()));assert(history.default_owner_apply(plan))
                   local producer=storage[OWNER_KEY].producer
                   assert(producer.old_version==old and producer.new_version=="5.0.21012")
-                  assert(producer.kind==(old=="4.7.20003"and"published473-default"or"recorded-default"))
+                  assert(producer.kind==(old=="4.7.20003"and"published473-idle-default"or"recorded-default"))
                   for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
                     assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved and a.owner.enabled==b.source.enabled)
                     assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.private,b.private))
