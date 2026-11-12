@@ -623,7 +623,8 @@ local DEFAULT_ORIGINS = {
     ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
   f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
     ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
-    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
+    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true,
+    ["5.0.21012"]=true, ["5.0.21013"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
 
@@ -805,6 +806,15 @@ local function default_origin(event, initializing, state)
     recover_error("default transfer package-change event is inconsistent")
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
+  -- F2105.0.11 and later wrote this durable route fact while its live
+  -- canonical4 was still the MIR-owned default. It proves that precise old
+  -- route; it is not a substitute for a current prototype, native work frame,
+  -- or an unprepared finite-provider handover. Validate it before deciding
+  -- whether a simultaneous non-worker selection change is relevant.
+  local recorded_default = state ~= nil
+  if recorded_default and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
+    recover_error("legacy prepared/finite conversion is not a default-owner transfer")
+  end
   if state == nil and event.mod_startup_settings_changed ~= false
       and not (base_hop and change.old_version == "4.7.20003") then
     recover_error("unrecorded default source requires unchanged startup settings")
@@ -819,16 +829,23 @@ local function default_origin(event, initializing, state)
   end
   local engine_patch_valid = same_family_engine_patch(event)
   if not base_hop and not engine_patch_valid then recover_error("default transfer requires a supported same-family engine patch") end
+  local changed_selection = false
   for name, item in pairs(event.mod_changes) do
+    -- Once the saved route has proved the old MIR default and the *current*
+    -- default contract/frame checks below still hold, unrelated selection
+    -- changes cannot change the native worker work being transferred. Keep
+    -- the older cross-family Base hop strict: its separate proof depends on
+    -- the complete old selection rather than this modern route marker.
     if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
         or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
-      recover_error("default transfer requires the unchanged mod selection")
+      changed_selection = true
+      if not recorded_default or base_hop then recover_error("default transfer requires the unchanged mod selection") end
     end
   end
-  if state ~= nil then
-    if state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default" then
-      recover_error("legacy prepared/finite conversion is not a default-owner transfer")
-    end
+  if recorded_default and changed_selection and event.mod_startup_settings_changed ~= false then
+    recover_error("recorded default source requires unchanged startup settings")
+  end
+  if recorded_default then
     if change and type(change.old_version) ~= "string" then
       recover_error("recorded default source cannot be a first-install event")
     end
