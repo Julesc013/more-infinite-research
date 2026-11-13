@@ -93,9 +93,9 @@ class ModSettingsDatControls(unittest.TestCase):
         # imported through mod-settings.dat excludes only that terminal LF.
         token = "MIRSET1:" + ("AbcD0123" * 812)
         self.assertEqual(len(token.encode("ascii")), 6504)
-        exported_file = (token + "\\n").encode("ascii")
+        exported_file = (token + "\n").encode("ascii")
         self.assertEqual(exported_file[:-1], token.encode("ascii"))
-        self.assertEqual(exported_file[-1:], b"\\n")
+        self.assertEqual(exported_file[-1:], b"\n")
 
         startup = {
             "mir-settings-profile-import": exported_file[:-1].decode("ascii"),
@@ -115,7 +115,7 @@ class ModSettingsDatControls(unittest.TestCase):
                 blob = writer.encode(engine, startup)
                 # The independent fixed-layout control above covers framing;
                 # this checks the long string's exact bytes inside that tree.
-                encoded_wire = (b"\\x03\\x00\\x00\\xff" +
+                encoded_wire = (b"\x03\x00\x00\xff" +
                                 struct.pack("<I", 6504) + token.encode("ascii"))
                 self.assertEqual(blob.count(encoded_wire), 1)
                 self.assertEqual(blob, writer.encode(engine, dict(reversed(list(startup.items())))))
