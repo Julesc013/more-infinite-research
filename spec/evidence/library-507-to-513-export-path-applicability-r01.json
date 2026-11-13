@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "kind": "MIRLibrary507To514PreparedExportPathApplicabilityV1",
+  "prepared_on": "2026-11-13",
+  "scope": "Read-only source/consumed-input applicability audit, no new player source, fixture, native execution or release.",
+  "requirements": [
+    "CONT-10",
+    "RUN-04",
+    "VER-03",
+    "VER-07"
+  ],
+  "commits": {
+    "tag507": "e296d40924f4d0f1d133eb5710f392b92ac42158",
+    "tag513": "f208b853a6e59fdcafd9209219150965576637d7",
+    "reviewed_dev": "9618af8ac030738792fae7096ef4a98403f23b8c",
+    "prepared_pr1914_head": "7fc8ddb623fc756cdc6ab85a8b7d506f47394779"
+  },
+  "files": [
+    {
+      "path": "source/runtime/library.lua",
+      "tag507_blob": "7c161e082adc94ec872ab8071c04a659e45f8ee6",
+      "tag513_blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+      "prepared_pr1914_blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+      "unchanged_507_to_513": false,
+      "unchanged_513_to_prepared_514": true
+    },
+    {
+      "path": "source/runtime/settings_commands.lua",
+      "tag507_blob": "084504a1bf21272ae64da0276588aaf089e68be8",
+      "tag513_blob": "084504a1bf21272ae64da0276588aaf089e68be8",
+      "prepared_pr1914_blob": "084504a1bf21272ae64da0276588aaf089e68be8",
+      "unchanged_507_to_513": true,
+      "unchanged_513_to_prepared_514": true
+    },
+    {
+      "path": "source/runtime/diagnostics.lua",
+      "tag507_blob": "1948aca50e2b81045c85a7d24c0137728c326d69",
+      "tag513_blob": "1948aca50e2b81045c85a7d24c0137728c326d69",
+      "prepared_pr1914_blob": "1948aca50e2b81045c85a7d24c0137728c326d69",
+      "unchanged_507_to_513": true,
+      "unchanged_513_to_prepared_514": true
+    },
+    {
+      "path": "source/runtime/library_translations.lua",
+      "tag507_blob": "9e55e742b133b5008ae053486cbf9d07e167df1a",
+      "tag513_blob": "45b334fa8b6a9f7a7f626ae613b73ecd58b597c7",
+      "prepared_pr1914_blob": "45b334fa8b6a9f7a7f626ae613b73ecd58b597c7",
+      "unchanged_507_to_513": false,
+      "unchanged_513_to_prepared_514": true
+    },
+    {
+      "path": "source/presentation/library_layout.lua",
+      "tag507_blob": "1bb28cf409d7bfd66a732e3fb4afd8ffc72795e4",
+      "tag513_blob": "1649e248a7697d23a36565a134f98451ea9cbaca",
+      "prepared_pr1914_blob": "1649e248a7697d23a36565a134f98451ea9cbaca",
+      "unchanged_507_to_513": false,
+      "unchanged_513_to_prepared_514": true
+    },
+    {
+      "path": "source/presentation/library_model.lua",
+      "tag507_blob": "1f9f26bb3a5e51d5599f9d797bd1cc8ed2ef12af",
+      "tag513_blob": "6288349c8178ff0dd6c55dfae0245277f9e37d39",
+      "prepared_pr1914_blob": "6288349c8178ff0dd6c55dfae0245277f9e37d39",
+      "unchanged_507_to_513": false,
+      "unchanged_513_to_prepared_514": true
+    }
+  ],
+  "source_checks": {
+    "type": "textual-only",
+    "tested": 12,
+    "passed": 12,
+    "failed": 0,
+    "predicates": {
+      "settings-capture-export": true,
+      "settings-write-file": true,
+      "settings-write-line": true,
+      "diagnostic-preview": true,
+      "diagnostic-export": true,
+      "diagnostic-startup": true,
+      "ui-export-call": true,
+      "ui-diagnostic-call": true,
+      "ui-export-profile": true,
+      "ui-diagnostic-profile": true,
+      "ui-owner-gate": true,
+      "ui-chrome-lifecycle": true
+    }
+  },
+  "findings": [
+    {
+      "code": "A01",
+      "scope": "source-only",
+      "finding": "Exact export codec/file writer and diagnostic module Git blobs are unchanged from v5.0.7 through public v5.0.13 and prepared PR1914. Reuse the source identities; never relabel old native receipts."
+    },
+    {
+      "code": "A02",
+      "scope": "source-only",
+      "finding": "Library renderer, translation, layout and model blobs differ between public 5.0.7 and 5.0.13. All six examined paths are byte-identical between public 5.0.13 and prepared PR1914 head; do not generalize to an eventual release freeze."
+    },
+    {
+      "code": "A03",
+      "scope": "source-only",
+      "finding": "Current Library dispatch checks owned Settings/Help ancestry before explicit export, passes player_index, and shows the returned profile in a bounded text-box; diagnostic report has separate explicit preview and output paths."
+    },
+    {
+      "code": "A04",
+      "scope": "evidence-boundary",
+      "finding": "The accepted 5.0.7 two-client native input/lifecycle report expressly excludes settings/import/export-file interaction and separately cold-loading the final save. Prepared 0.4.0 support-export observer assets are not native qualification."
+    },
+    {
+      "code": "A05",
+      "scope": "disposition",
+      "finding": "No current 5.0.13/5.0.14 export-file, two-client post-save, native input, or entire-product performance acceptance is established here."
+    }
+  ],
+  "retained_inputs": [
+    "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+    "spec/evidence/library-client-identity-prepared-aero-r01.json",
+    "spec/evidence/library-support-exports-imported110-prepared-aero-r03.json",
+    "spec/evidence/support-exports-consumed-path-applicability-aero-r01.json"
+  ],
+  "candidate_cases": [
+    {
+      "id": "EX-01",
+      "status": "not-run",
+      "inputs": "Owner-selected exact candidate ZIP, Factorio F200/F210, adopted imported-1.1 save, actual EN/DE clients",
+      "procedure": "Physically click Settings full/compact and Help diagnostics export with original fixture, capture player identity, GUI input and script-output bytes",
+      "oracle": "MIRSET1 values decode to actual effective settings; exact attribution; no native research/queue/bonus change; settings and diagnostic privacy guidance shown"
+    },
+    {
+      "id": "EX-02",
+      "status": "not-run",
+      "inputs": "Same candidate, two different clients/force views",
+      "procedure": "Preview without clicking export; attempt wrong-player/stale element and disabled export; close/reopen after host save and two actual cold loads",
+      "oracle": "No implicit file write; ancestry rejects foreign events; native state untouched; personal search/scroll/focus/view not swapped; exports only on explicit valid action"
+    },
+    {
+      "id": "EX-03",
+      "status": "not-run",
+      "inputs": "Same selected player package with long-but-valid imported profile, EN/DE locales",
+      "procedure": "Test full/compact + omitted-settings diagnostic preview, saved file output and bounded UI presentation",
+      "oracle": "No overflow/truncation of encoded source, deterministic decoded profile and bounded preview; engine log remains separately supplied"
+    },
+    {
+      "id": "EX-04",
+      "status": "not-run",
+      "inputs": "Matched actual baseline and candidate across whole product",
+      "procedure": "Measure menu startup, first Library open, explicit export, search/reopen latency, client memory",
+      "oracle": "No whole-product performance regression or new first-open stall; stable gates remain open"
+    }
+  ],
+  "qualification": {
+    "native_tests_performed": 0,
+    "host_tests_performed": 0,
+    "not_a_release_review": true,
+    "actual_selected_514_package_observed": false,
+    "stable": false
+  },
+  "next_action": "At selected native owner freeze, compare these six exact member blobs and preserve old receipts; run only affected/never-accepted GUI, export-file, personal-view and two-client tests with independent physical input, saves/two cold loads and whole-product performance.",
+  "nonclaims": [
+    "No old A612, Angel or agriculture work repeated.",
+    "No owner/native controller, worker guard, release tag, package, or source was edited.",
+    "Prepared #1914 is not a verified released package or an acknowledged machine handoff."
+  ]
+}

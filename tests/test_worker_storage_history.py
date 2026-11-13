@@ -2140,6 +2140,106 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                 ''')
 
 
+class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
+    """A saved MIR route plus surviving native work is not a whole-modpack lock."""
+
+    def world(self, target="f210"):
+        return WorkerDefaultNativeOwnerTransferTests.world(self, target)
+
+    def test_recorded_default_preserves_paid_and_pending_work_across_consistent_mod_changes(self):
+        for target in ("f200", "f210"):
+            for change in ("added", "removed", "updated"):
+                with self.subTest(target=target, change=change):
+                    lua = self.world(target)
+                    lua.globals().change_kind = change
+                    lua.execute(r'''
+                      seed_owner()
+                      storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                      uninvested.technologies[CANONICAL].enabled=true
+                      uninvested.research_queue={CANONICAL};uninvested.research_progress=.37
+                      script.active_mods["cosmetic-example"]="1.2.3"
+                      local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                      event.mod_changes["cosmetic-example"]={old_version="1.2.2",new_version="1.2.3"}
+                      if change_kind=="added"then event.mod_changes["cosmetic-example"].old_version=nil
+                      elseif change_kind=="removed"then
+                        event.mod_changes["cosmetic-example"].new_version=nil;script.active_mods["cosmetic-example"]=nil
+                      end
+                      local before=all_frames();writes=0
+                      local plan=history.plan_default_owner_transfer(event,nil,false)
+                      assert(writes==0 and same(before,all_frames()))
+                      assert(history.apply_default_owner_transfer(plan))
+                      local state=storage[OWNER_KEY]
+                      assert(state.schema==3 and state.producer.kind=="recorded-default")
+                      for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                        assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                        assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                        assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.private,b.private))
+                      end
+                      assert(player.current_research.name==ORDINARY and player.research_progress==.375 and player.research_queue[2].name==OTHER)
+                      assert(uninvested.current_research.name==ORDINARY and uninvested.research_progress==.37)
+                      assert(suspended.current_research.name==OTHER and suspended.research_progress==.42 and suspended.research_queue[2].name==ORDINARY)
+                      assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
+                      local accepted=all_frames();writes=0
+                      local again=history.default_owner_preflight(event,nil,true)
+                      history.default_owner_apply(again)
+                      assert(same(accepted,all_frames()) and writes==0)
+                    ''')
+
+    def test_recorded_default_keeps_the_existing_base_only_engine_hop_boundary(self):
+        for removed in ("quality", "space-age", "old-helper"):
+            with self.subTest(removed=removed):
+                lua = self.world("f210")
+                lua.globals().removed = removed
+                lua.execute(r'''
+                  seed_owner()
+                  storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                  local event=owner_event("5.0.20011")
+                  event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
+                  event.mod_changes[removed]={old_version=removed=="old-helper"and"1.2.3"or"2.0.77"}
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.plan_default_owner_transfer,event,nil,false))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
+
+    def test_recorded_default_does_not_admit_inconsistent_events_or_unsafe_native_state(self):
+        for target in ("f200", "f210"):
+            for opponent in ("active-mismatch", "removed-active", "both-absent", "old-type", "new-type",
+                             "empty-old", "empty-new", "entry-type", "entry-metatable", "name-type",
+                             "unknown-mir", "first-install", "external", "absent-route", "malformed-route",
+                             "private-contract", "foreign-tail", "official-mismatch"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua = self.world(target)
+                    lua.globals().opponent = opponent
+                    lua.execute(r'''
+                      seed_owner()
+                      storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                      script.active_mods.qol="1.2.3"
+                      local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                      local entry={old_version="1.2.2",new_version="1.2.3"};event.mod_changes.qol=entry
+                      if opponent=="active-mismatch"then script.active_mods.qol="1.2.4"
+                      elseif opponent=="removed-active"then entry.new_version=nil
+                      elseif opponent=="both-absent"then entry.old_version=nil;entry.new_version=nil;script.active_mods.qol=nil
+                      elseif opponent=="old-type"then entry.old_version=12
+                      elseif opponent=="new-type"then entry.new_version=12;script.active_mods.qol=12
+                      elseif opponent=="empty-old"then entry.old_version=""
+                      elseif opponent=="empty-new"then entry.new_version="";script.active_mods.qol=""
+                      elseif opponent=="entry-type"then event.mod_changes.qol=true
+                      elseif opponent=="entry-metatable"then setmetatable(entry,{})
+                      elseif opponent=="name-type"then event.mod_changes[7]=entry;script.active_mods[7]="1.2.3"
+                      elseif opponent=="unknown-mir"then event.mod_changes["more-infinite-research"].old_version="5.0.99999"
+                      elseif opponent=="first-install"then event.mod_changes["more-infinite-research"].old_version=nil
+                      elseif opponent=="external"then storage.mir_worker_storage_route.current={kind="external",provider="old-foreign"}
+                      elseif opponent=="absent-route"then storage.mir_worker_storage_route.current={kind="absent"}
+                      elseif opponent=="malformed-route"then storage.mir_worker_storage_route.current.extra=true
+                      elseif opponent=="private-contract"then prototypes.technology[ORDINARY].research_unit_energy=999
+                      elseif opponent=="foreign-tail"then prototypes.technology["worker-robots-storage-5"]={}
+                      else script.active_mods.quality="different-engine"end
+                      local before=all_frames();writes=0
+                      assert(not pcall(history.plan_default_owner_transfer,event,nil,false))
+                      assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                    ''')
+
+
 class WorkerDefaultEditionContinuityTests(unittest.TestCase):
     """Exact existing Base hop and stable historical producer facts, host only."""
 
