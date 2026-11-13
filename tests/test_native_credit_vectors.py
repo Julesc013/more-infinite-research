@@ -172,8 +172,15 @@ class NativeCreditVectorTests(unittest.TestCase):
                     effects[2].recipe='cerys-processing-units-from-nitric-acid'
                   end
                   assert(load('return function(f,d,r,p,n) '..opponent..' end'))()(f,d,r,p,n)
+                  local history=prototypes.get_history;local reference_reads=0
+                  prototypes.get_history=function(kind,name)
+                    if kind=='technology' and name==r.name then reference_reads=reference_reads+1 end
+                    return history(kind,name)
+                  end
                   local ok,message=pcall(native_credits.on_init)
                   assert(not ok,'malformed vector admitted');assert_no_vector_writes()
+                  assert(reference_reads==(prototypes.technology[r.name] and 1 or 0),
+                    'diagnostic added a reference history query')
                   -- Strip the call-site location; all old visible first components agree.
                   return tostring(message):match('(MIR native family credit.*)')
                 ''')

@@ -244,13 +244,22 @@ local function carrier_vector(positive, negative, descriptor)
   if not descriptor.collected then return nil end
   local p = carrier_effects(positive, descriptor, "positive")
   local n = carrier_effects(negative, descriptor, "negative")
-  local function reject(reason,role) return nil,nil,{reason=reason,role=role} end
+  local history, history_observed
+  local function with_reference(rejection)
+    if rejection and history_observed then
+      rejection.reference_history_observed = true
+      rejection.reference_created = type(history)=="table" and history.created or nil
+    end
+    return rejection
+  end
+  local function reject(reason,role) return nil,nil,with_reference({reason=reason,role=role}) end
   if not p then return reject("carrier-shape","positive") end
   if not n then return reject("carrier-shape","negative") end
   if #p < 2 then return reject("vector-not-expanded","positive") end
   local name = RECIPE_VECTOR_REFERENCES[descriptor.recipe] or VECTOR_REFERENCES[descriptor.family]
   local reference = prototypes and prototypes.technology and prototypes.technology[name]
-  local history = reference and prototypes.get_history("technology", name)
+  history = reference and prototypes.get_history("technology", name)
+  history_observed = reference ~= nil
   if not reference then return reject("reference-missing","reference") end
   if reference.valid == false then return reject("reference-invalid","reference") end
   if reference.name ~= name then return reject("reference-identity","reference") end
@@ -259,8 +268,9 @@ local function carrier_vector(positive, negative, descriptor)
   if reference.max_level ~= UINT32_MAX then return reject("reference-max-level","reference") end
   if type(history) ~= "table" or type(history.created) ~= "string" or history.created == ""
       or history.created == MIR_MOD then return reject("reference-creation-history","reference") end
-  return vectors.pair(p, n, descriptor.recipe, reference.effects, descriptor.change,
+  local vector, basis, rejection = vectors.pair(p, n, descriptor.recipe, reference.effects, descriptor.change,
     native_effect_change_matches, close)
+  return vector, basis, with_reference(rejection)
 end
 
 local function completed_infinite(technology)
@@ -365,8 +375,9 @@ local function family_failure_detail(force, descriptor, scope, rejection)
       add("reference.first",reference.level)
       add("reference.max",reference.max_level)
       add("reference.hidden",reference.hidden)
-      local history = prototypes.get_history("technology",reference_id)
-      add("reference.created",type(history)=="table" and history.created or nil)
+      if rejection and rejection.reference_history_observed then
+        add("reference.created",rejection.reference_created)
+      end
       add("reference.effects_type",type(reference.effects))
       if type(reference.effects)=="table" then add("reference.effects_count",#reference.effects) end
     end
