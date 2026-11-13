@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished514LibraryConsumedInputAdoptionV1",
+  "date": "2026-11-13",
+  "scope": "Independent read-only 5.0.13 -> 5.0.14 public-tag source/fixture applicability; companion to original selected-candidate review in PR #1919; not a GUI/native/client/export/performance result.",
+  "authority": {
+    "prior_selected_review": "spec/evidence/library-selected514-consumed-input-applicability-r01.json",
+    "published13_tag": "v5.0.13",
+    "published13_commit": "f208b853a6e59fdcafd9209219150965576637d7",
+    "published14_tag": "v5.0.14",
+    "published14_commit": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+    "published14_player_tree": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+    "player_tree_source": "spec/evidence/candidate514-affected-native-verdicts-r01.json at v5.0.14",
+    "main_identical_to_tag_at_readback": true,
+    "original_selected14_commit": "5ab4facb7d774e6fae806009b78b9d95bc45c9ce"
+  },
+  "comparison": {
+    "api": "GitHub compare v5.0.13...v5.0.14; complete 48-file diff (no 300-file truncation)",
+    "status": "ahead",
+    "ahead_by": 1,
+    "behind_by": 0,
+    "changed_paths_total": 48,
+    "changed_source_paths": [
+      "source/changelog.txt",
+      "source/info.json",
+      "source/platform/target.lua",
+      "source/runtime/worker_robot_storage.lua"
+    ],
+    "scoped_player_paths_modified": [],
+    "scoped_player_paths_scope": "Original PR #1919's 113 exact paths: 100 locale cfg, six library/diagnostic/settings runtime, four library presentation, three research settings.",
+    "implication": "The 113 original scoped source blobs are reusable against published 14 because none occurs in the complete v13..v14 changed-path list. This says nothing about dynamic behavior or dependencies outside that scope.",
+    "observed_changed_dependencies": {
+      "target_metadata": "source/platform/target.lua changed distribution_version 5.0.21013 -> 5.0.21014; target is imported by library.lua",
+      "worker_saved_state": "source/runtime/worker_robot_storage.lua changed recorded-default migration policy; native research/queue and saved-work applicability cannot be inherited from unrelated Library source identity"
+    }
+  },
+  "tested_source_and_fixture_identities": {
+    "runtime_library_v13_blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+    "runtime_library_v14_blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+    "library_input_observer_v13_blob": "1f0a11cdcd392658c773f5c1469575f3fe8ad900",
+    "library_input_observer_v14_blob": "1494b60141aa666ef510fa79ab5e321163bc46cd",
+    "input_fixture_changed_paths": [
+      "tests/fixtures/library-native-input/README.md",
+      "tests/fixtures/library-native-input/control.lua",
+      "tests/fixtures/library-native-input/info-exports-513-f200.json",
+      "tests/fixtures/library-native-input/info-exports-513-f210.json",
+      "tests/fixtures/library-native-input/info-input-513-settings-api-f200.json",
+      "tests/fixtures/library-native-input/info-input-513-settings-api-f210.json",
+      "tests/fixtures/library-native-input/support-exports.lua"
+    ],
+    "native_observer_current_versions": [
+      "0.3.12",
+      "0.4.6"
+    ],
+    "native_observer_expected_mir_versions": [
+      "5.0.20013",
+      "5.0.21013"
+    ],
+    "candidate14_observer_qualified": false,
+    "tagged_f210_info_version": "5.0.21014"
+  },
+  "host_only_checks": {
+    "13-to-14-single-commit": true,
+    "exact-48-file-diff": true,
+    "scoped-library-unmodified": true,
+    "only-four-player-source-paths": true,
+    "seven-fixture-paths": true,
+    "runtime-library-blob-reused": true,
+    "fixture-observer-changed": true,
+    "observer-13-only": true,
+    "14-package-version": true,
+    "14-player-source-bound": true,
+    "main-tag-identical-at-check": true,
+    "original-review-pr-open": true
+  },
+  "host_only_checks_passed": 12,
+  "host_only_checks_total": 12,
+  "evidence_adopted_only": [
+    "Original MIR4 Library layout and first-tab requirement remain active.",
+    "Original 5.0.7 and 5.0.13 observer results keep their source and version labels; exact unchanged source can reuse source-text findings, not native results.",
+    "Published 14 worker incident native verdict has its own original scoped preservation, ordinary completion, save and two-cold acceptance; it does not test GUI or exports."
+  ],
+  "next_finite_native_gate": {
+    "prerequisite": "Create and independently review distinct exact-published-14 observer package/profile/controller bindings. Preserve 0.3.12/0.4.6 13-only files and receipts; do not hand-edit older outcomes.",
+    "package_metadata": [
+      "5.0.20014 on actual Factorio 2.0.77",
+      "5.0.21014 on actual Factorio 2.1.23"
+    ],
+    "actual_case_groups": [
+      "Real repeated mouse/keyboard Research->Queue->Settings->Debug/help->Research navigation, tab coordinates and outer geometry in normal/narrow English/German windows, including long text/Unicode and resize.",
+      "Search/filter/list selection, independent scroll, focus and persisted personal state with original MIR4 design parity checks.",
+      "Actual 13 export clicks and two server commands, read-back file names/bytes/errors, zero/false and per-player privacy; a button observer receipt alone is insufficient.",
+      "Two client join/rejoin/removal/replacement and saved-host restart, and two cold loads where applicable; the existing two-client 7168 MiB admission may not be replaced with serial one-client evidence.",
+      "Whole-product Base/SpaceAge/fixed-heavy engine cohorts, first/open/closed Library latency and memory. Reuse completed agriculture 48 and unchanged predecessor tests, not re-run as a substitute."
+    ]
+  },
+  "exclusions": {
+    "changes_to_player_source": 0,
+    "changes_to_original_fixture": 0,
+    "native_runs": 0,
+    "gui_runs": 0,
+    "export_files_observed": 0,
+    "client_sessions": 0,
+    "performance_runs": 0,
+    "beta_published": true,
+    "stable_qualified": false,
+    "ownership": "No integration, native, publication, worker-history or release ownership transferred; no competing computer task launched."
+  },
+  "references": [
+    "https://github.com/Julesc013/more-infinite-research/compare/v5.0.13...v5.0.14",
+    "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.14",
+    "https://github.com/Julesc013/more-infinite-research/pull/1919",
+    "https://github.com/Julesc013/more-infinite-research/issues/1768"
+  ]
+}
