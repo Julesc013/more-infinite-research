@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-13
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -91,6 +91,8 @@ One integration owner coordinates the current branch, the sole native-test lane 
 Issue comments record assignments and results; they do not start an idle Codex session. Confirm execution through an actual session response or runner job and its result. If a session is unavailable, carry urgent work forward in a separate branch through the available authorized execution lane, retain one integration owner and reconcile any late work before integration. Do not wait for an unreachable session or assume its disconnected process stopped. The existing native runner executes its reviewed named tasks; its smoke result establishes readiness, not gameplay acceptance or agent steering.
 
 Push each reviewable unit promptly. Commit bodies and PR descriptions record the concrete defect or outcome, changed behavior, independent expected result, actual commands and results, exact source/package identities where applicable, and remaining limitations. Finish required checks and merge completed units into `dev` while later qualification continues. Merge updated `dev` into an already published work branch when needed; preserve the commit identities that reviewers and native workers consume. Keep frozen-input custody branches reachable until their jobs and evidence readback finish.
+
+Before requesting a merge, read back the expected PR head and require successful completed results for every required check, including `branch-policy`, `verification-plan`, `native-tooling-controls` and `host-controls`. A `gh pr merge --auto` request can complete immediately when server rules do not require a pending check; it is not evidence that the checks passed. Keep this explicit verification even when the maintainer account can merge, and do not change repository controls to bypass it. After main promotion, verify the new main commit's checks and exact reviewed tree again before tagging or publication.
 
 After verified MIR5 publication and local delivery, continue authorized bug fixes, measured performance improvements and stress qualification for the next source release. Use actual review findings and observed failures to select that work. A community prerelease does not complete stable MIR5 acceptance; remaining stable gates still require their actual results.
 

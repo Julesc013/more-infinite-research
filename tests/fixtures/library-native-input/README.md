@@ -12,6 +12,17 @@ superseded_by: []
 
 # Imported Library native input and lifecycle observation
 
+## Exact 5.0.14 preparation
+
+The following new identities bind the same existing protocols to the published 5.0.14 beta. The 5.0.13 and earlier metadata and evidence keep their original identities.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.13 | `info-input-514-settings-api-f200.json` or `info-input-514-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+| Support exports | 0.4.7 | `info-exports-514-f200.json` or `info-exports-514-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+
+Compose from one reviewed commit with the same `control.lua` and `catalogue.lua`, plus the unchanged Settings probe for input or `support-exports.lua` for exports. Preserve the complete Settings, peer, input, export, privacy, native-work and responsive-width protocols described for 5.0.13 below. Exact candidate packages and protected saves require their own native-owner review; this preparation is not a native or stable acceptance result.
+
 ## Exact 5.0.13 preparation
 
 The following new identities bind the existing protocols to the published 5.0.13 beta. Earlier metadata, frozen archives and execution records retain their original versions and bytes; compose each new archive from one reviewed committed revision.

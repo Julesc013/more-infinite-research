@@ -1,0 +1,177 @@
+{
+  "kind": "MIR514ExistingFoundationActivityPreparationV1",
+  "status": "PREPARED-independent-review-GO-resource-admission-refused-no-native",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "published_tag": "v5.0.14",
+  "published_main": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+  "frozen_helper_commit": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+  "preparation": {
+    "kind": "MIR514FoundationCurrentCandidatePreparationV1",
+    "status": "READ_ONLY_PLAN_AND_PURE_CONTROLS_PASSED_NATIVE_NOT_ADMITTED",
+    "parent_packet_sha256": "CCF8917DC923B45911910931461FBD38272FE802BB329FDE6322C3FA6659B7E0",
+    "packet_sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+    "caller_sha256": "642E314EFD831D6F92A511379B15DFFEEBEF555C0AB05C021CAF6239A9ECE7D5",
+    "reader_sha256": "EE0F4BAA2948F53816DACC30E182A24C2CC5D3B7B3150187C46775E7AB220D58",
+    "plan_stdout_sha256": "7EC2BC0EEFFA7CD4D7F4593F8B9FFA2C623EBEB44AE97DB3C723B4E999126BA7",
+    "player_source_commit": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+    "player_source_tree": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+    "candidate_zip_sha256": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4",
+    "candidate_zip_bytes": 1039250,
+    "candidate_status": "frozen-candidate-publication-not-asserted",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "protected_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "observer_sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4",
+    "selected_mods": 37,
+    "selected_archives": 33,
+    "benchmark_ticks": 601,
+    "elapsed_activity_ticks": 600,
+    "surfaces": 57,
+    "required_fixed_projection": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+    "expected_peak_memory_mib": 8192,
+    "maximum_new_output_mib": 1024,
+    "timeout_seconds": 300,
+    "admission_wait_seconds": 30,
+    "controller_changes": "Only the candidate identity literals and explanatory candidate label in Get-Foundation504ProfileClosure; all other functions unchanged.",
+    "reader_changed_functions": [
+      "r06",
+      "validate_output_roots",
+      "validate_current_eligibility",
+      "validate_packet"
+    ],
+    "validation": [
+      "Original 13 packet and public provenance independently revalidated.",
+      "14 read-only Plan passed.",
+      "Actual controller function and packet-binding controls passed."
+    ],
+    "native_execution": false,
+    "library_mutation": false,
+    "resource_admission": "not attempted",
+    "compose": "not attempted",
+    "execute": "not attempted",
+    "stable_acceptance": false
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\packet.json",
+    "sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+    "bytes": 55683
+  },
+  "caller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\Invoke-Foundation514Activity.ps1",
+    "sha256": "642E314EFD831D6F92A511379B15DFFEEBEF555C0AB05C021CAF6239A9ECE7D5",
+    "bytes": 21147
+  },
+  "reader": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\Prepare-Foundation514Activity.py",
+    "sha256": "EE0F4BAA2948F53816DACC30E182A24C2CC5D3B7B3150187C46775E7AB220D58",
+    "bytes": 24016
+  },
+  "independent_review": {
+    "recorded_by": "execution lead from non-author read-only input review",
+    "reviewer": "/root/stable_ui_packet_review512",
+    "verdict": "GO-preparation-only",
+    "scope": "Guarded resource admission, zero-native Compose then conditional Execute after exact fresh admission/Compose receipts. Original reader/projection/limits restored; not a native or timing pass."
+  },
+  "actual_resource_admissions": [
+    {
+      "original": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-r01.json",
+        "sha256": "C6703D1852E7306C14B5B918A07A5EA265915E7B0C16E6C8325B3982E6BDF448",
+        "bytes": 1186
+      },
+      "actual": {
+        "error": "[mir441-resource-admission-memory]",
+        "admission": {
+          "snapshot": {
+            "observed_at": "2026-11-13T00:14:28.5791760+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 15034736640,
+              "committed_bytes": 24563916800,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 73251950592,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 187492732928,
+              "total_bytes": 599395090432
+            }
+          },
+          "limits": {
+            "physical_bytes": 6809196134,
+            "commit_bytes": 6809196134,
+            "system_bytes": 21474836480,
+            "work_bytes": 21474836480
+          },
+          "estimated_peak_bytes": 1073741824,
+          "expected_peak_memory_bytes": 8589934592
+        },
+        "native_processes": 0,
+        "packet_sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+        "library_mutations": 0,
+        "budget_mib": 8192,
+        "status": "refused",
+        "kind": "Foundation514ReadOnlyUnchangedResourceAdmissionV1",
+        "output_budget_mib": 1024,
+        "output_root_created": false
+      }
+    },
+    {
+      "original": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-r02.json",
+        "sha256": "DCB7F345A21796B30A06ABB836477BF9A71B8868BACB3FFC8D4FCCF9DF15B424",
+        "bytes": 1186
+      },
+      "actual": {
+        "output_budget_mib": 1024,
+        "output_root_created": false,
+        "packet_sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+        "library_mutations": 0,
+        "budget_mib": 8192,
+        "error": "[mir441-resource-admission-memory]",
+        "admission": {
+          "snapshot": {
+            "observed_at": "2026-11-13T00:25:26.9895765+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 14842978304,
+              "committed_bytes": 24792059904,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 73225506816,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 187502002176,
+              "total_bytes": 599395090432
+            }
+          },
+          "limits": {
+            "physical_bytes": 6809196134,
+            "commit_bytes": 6809196134,
+            "system_bytes": 21474836480,
+            "work_bytes": 21474836480
+          },
+          "estimated_peak_bytes": 1073741824,
+          "expected_peak_memory_bytes": 8589934592
+        },
+        "status": "refused",
+        "native_processes": 0,
+        "kind": "Foundation514ReadOnlyUnchangedResourceAdmissionV1"
+      }
+    }
+  ],
+  "native_processes": 0,
+  "compose_performed": false,
+  "library_mutations": 0,
+  "activity_projection_qualified": false,
+  "held_timing_processes": 18,
+  "stable_qualified": false
+}

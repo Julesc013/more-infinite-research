@@ -1,0 +1,54 @@
+{
+  "kind": "MIR514IndependentAffectedNativeVerdictV1",
+  "review_recorded_by": "execution lead from non-author read-only final result review",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "recorded_at": "2026-11-12T23:54:01.545339+00:00",
+  "verdict": "GO-affected-native-scope",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "prior_reviews": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-incident-coordination-r01\\INDEPENDENT-F200-FOLLOWUPS-RESULT-REVIEW.json",
+    "sha256": "93B04CC479A3A2B4D2730C72CA3CB9E54BCC27CFAAC4861648FCAC90566D8704"
+  },
+  "f210_custody_recovery": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-f210-custody-recovery-r02\\colds\\terminal.json",
+      "sha256": "468ABDD259C1A5FB44076710B88C25BCA40A02E714253B96C1B5365429AD175E"
+    },
+    "packet_sha256": "442A1D15C82DF4385B4B3D53A14D5BAC811BB30743B19D14DAEA57ADA5DADDE9",
+    "controller_sha256": "60E5B4447BE722D1406F18163ADD2CBAAF0092A6D1F776C8FA0C3CD34F319429",
+    "composition_sha256": "6AFF5C94D0C6BB80FFA69991788C315EB2751A66235B2738DCFB9D277F2278E5",
+    "protected_sha256": "D4806A47E89BCD626F7E0378A8281FFB2CC1030B216B01E6729354F65FF06688",
+    "new_natural_cold_pids": [
+      44204,
+      52076
+    ],
+    "new_cold_processes": 2,
+    "adopted_negative_and_server_processes": 2,
+    "prior_wrong_path_cold_processes_excluded": 2,
+    "crc_entries": 55,
+    "bytes": 181938
+  },
+  "scope": [
+    "F2002.0.77 authentic old11 with unrelated QoL addition: exact public12 refusal,14 continuation, ordinary research/science, save/two cold reads",
+    "F2102.1.23 authentic old11 with unrelated QoL addition: exact public12 refusal,14 continuation, ordinary research/science, save/two correctly contained cold reads",
+    "F210 old11 warm with QoL; independent14 QoL update and removal, ordinary continuation/save/two cold reads each"
+  ],
+  "observed_native_processes_total": 17,
+  "accepted_observations_processes": 15,
+  "adverse_cold_observations_excluded": 2,
+  "assertions": [
+    "All four force frames, current/queue/suspended work, flags and unrelated bonuses preserved",
+    "Player one new ordinary completion with1265 of each of five science packs, native worker bonus4 to5",
+    "Both natural cold endpoints exactly match adopted saved endpoint across all guarded fields",
+    "All library controls restored, original/protected saves immutable, frozen runner clean, zero remaining Factorio"
+  ],
+  "limits": [
+    "One genuine predecessor ordinary completion; pending/foreign fractions are explicitly scripted setup",
+    "F200 update/removal directions covered by pinned host controls; their actual native direction checks ran on F210",
+    "Absent/malformed historical ownership remains guarded; unsupported personal predecessor histories not inferred",
+    "Unchanged-selection public12-to13 preservation evidence retains its own original identity and scope",
+    "No GUI/client/whole-product performance/stable or arbitrary-modpack qualification"
+  ],
+  "release_acceptance": false,
+  "stable_qualified": false
+}
