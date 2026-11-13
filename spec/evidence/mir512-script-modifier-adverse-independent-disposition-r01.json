@@ -1,0 +1,27 @@
+{
+  "kind": "MIR512MultiplierForeignModifierDiagnosticIndependentDispositionV1",
+  "reviewer": "non-author",
+  "scope": "Read-only disposition of the protected current-Aero 2x preconfiguration diagnostic only. It is a diagnostic adverse, not a source, fixture or release pass.",
+  "evidence": {
+    "probe_controller": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-private-head-multiplier512-r01/preconfiguration-probe-r01/Invoke-PreConfig.ps1", "sha256": "5449C85FE91E534BB384F835D87E8FEFE277DFD1C369AE431BB84E9964B2FBCF"},
+    "probe_profile": {"sha256": "76538C122DBF0F43C4FF103806A2236B7865B98A25E61DD3D0288A786544266A"},
+    "causal_observation": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-private-head-multiplier512-r01/preconfiguration-probe-r01/CAUSAL-OBSERVATION.json", "sha256": "56355A4DF93DBD854DD66F50E737283C2201684EBA2F502D28F2D9D1A38C1028"},
+    "probe_observer": {"sha256": "C10ADBE3955C277765C869073E8C8A535369240B7F3478E931B03EF98EBC05A9", "control_sha256": "4486B836E6689F7FBA667F0B908EE15141383FE228743CCE4E6ADD39214BF562"},
+    "stdout": {"path": "D:/Projects/Factorio/.task-builds/mir512-provider-oracle-r01/build/tmp/worker-head-multiplier512-preconfig-r01/process-1.stdout.txt", "sha256": "172C591B007CA9F0D92EBFA21ED163CF844F0B7857F5AA0CA3F4F7C0CBAF8265", "pid": 30244},
+    "protected_source_2x": {"sha256": "F53375B5F648F66127EDF4FB0F7A634C13F76F1EA0149BC5C645BB1650F05BC1", "bytes": 180692, "copied_input_sha256_matches": true},
+    "current_player": {"sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7", "source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f"}
+  },
+  "observations": {
+    "early_order": "The added aaa observer is loaded ahead of MIR and emits both early-new-mod-on-init and early-on-configuration-changed frames before MIR's on_configuration_changed refusal.",
+    "frames": "Both frames show all four force mining_drill_productivity_bonus, manual_mining_speed_modifier and worker_robots_speed_modifier values at zero. They simultaneously retain the protected worker facts: player bonus4/current worker-robots-storage-4/progress0.375 and queued/detached/unpaid current/progress frames.",
+    "later_adverse": "MIR then correctly refuses the changed selection because the added diagnostic mod violates the protected source's unchanged-mod-selection admission. The one-process exit1 is retained; it is expected diagnostic containment and not a gameplay or release result.",
+    "source_api": "Current MIR source has no direct assignment to the three observed modifier fields and no reset_technology_effects call. It does write LuaTechnology.level during the transfer. Official Factorio2.1 API says reset_technology_effects loses custom force changes and that a level write is research-equivalent/enables the technology."
+  },
+  "disposition": {
+    "verdict": "DIRECT-SCRIPTED-FOREIGN-MODIFIER-WITNESS-INVALID-FOR-CONFIGURATION-PRESERVATION",
+    "reason": "The scripted values are already zero before MIR executes the transfer. The original post-transfer zero observation therefore cannot be attributed to MIR and must not be converted into an expected-zero success.",
+    "source_change": "No source change is justified by this diagnostic.",
+    "fixture_replacement": "Use a test-owned finite foreign technology with three real native effects .17/.23/.31, researched during separately labelled scripted setup. The next fixture must record its non-MIR creator/prototype history, researched/level state, effect vector and all-force bonus map before and after the unchanged-selection valid upgrade. Direct LuaForce modifier assignment alone is not an ownership witness.",
+    "release_effect": "Preserve the original multiplier r02 adverse. Current 2x/4x work/save/cold qualification remains required; no beta/release verdict follows."
+  }
+}

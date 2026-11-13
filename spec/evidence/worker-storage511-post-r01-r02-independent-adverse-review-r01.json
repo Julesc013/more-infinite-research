@@ -1,0 +1,107 @@
+{
+  "kind": "MIRWorker511PostFixtureIndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-09T09:29:16.722904+00:00",
+  "verdict": "Both stopped campaigns remain adverse; r02 native observation identifies fixture visibility expectation error. No production change indicated. Required firstadd/unchanged endpoints not reached.",
+  "source": "203e0af5/93d30a2",
+  "attempts": [
+    {
+      "revision": "r01",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-controller\\execution-Execute-r01\\terminal.json",
+        "bytes": 355887,
+        "sha256": "38FF0A9DB1C8CD866D67C67BFE969F91687EB6FC11C024DACA4EEF8F3A541B4E"
+      },
+      "processes": 3,
+      "successful_roles": [
+        [
+          "caps-seed",
+          [
+            "server"
+          ]
+        ],
+        [
+          "caps-provider",
+          [
+            "server"
+          ]
+        ]
+      ],
+      "failed_stage": "caps-enable",
+      "failure": "[worker-recovery511-packet] fatal live native log",
+      "all_raw_custody_exact": true,
+      "recorded_restoration_factorio0": true
+    },
+    {
+      "revision": "r02",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-post-transition-r02-controller\\execution-Execute-r01\\terminal.json",
+        "bytes": 896581,
+        "sha256": "D7752517CDC635DD5CE7F4F5AD51A38DFE2A963D0FF026A6AD257855F1EB5828"
+      },
+      "processes": 6,
+      "successful_roles": [
+        [
+          "caps-seed",
+          [
+            "server"
+          ]
+        ],
+        [
+          "caps-provider",
+          [
+            "server"
+          ]
+        ],
+        [
+          "caps-enable",
+          [
+            "server",
+            "cold1",
+            "cold2"
+          ]
+        ]
+      ],
+      "failed_stage": "caps-disable",
+      "failure": "[worker-recovery511-packet] fatal live native log",
+      "all_raw_custody_exact": true,
+      "recorded_restoration_factorio0": true
+    }
+  ],
+  "actual_r02_disable_delta": [
+    {
+      "path": "/enemy/rows/worker-robots-storage-9/enabled",
+      "before": true,
+      "after": false
+    },
+    {
+      "path": "/post-uninvested/rows/worker-robots-storage-9/enabled",
+      "before": true,
+      "after": false
+    },
+    {
+      "path": "/neutral/rows/worker-robots-storage-9/enabled",
+      "before": true,
+      "after": false
+    },
+    {
+      "path": "/player/rows/worker-robots-storage-9/enabled",
+      "before": true,
+      "after": false
+    }
+  ],
+  "all_other_frame_fields_exact_equal": true,
+  "native_visible_values": "All4forcesN9.visible=false beforeandafterdisable; enabledtrue->false. Bonus8/0/0/3 and private/foreign/progress/queue/cost/state preserved.",
+  "policy_basis": [
+    "Unchanged caps.lua records originalvisiblefalse, setsvisibletrue while above cap, restoresfalse when cap8->9 releases N9.",
+    "Familydisable atcap9 is not an above-cap transition. N9 level9 remains within9; authored-prototype disablement setsenabledfalse while retaining originalvisiblefalse.",
+    "Pinned2.1.23TechnologyPrototype.visible_when_disabled defaultsfalse and savedvisibility isnotreloadedfromprototype onupdates."
+  ],
+  "strict_corrected_fixture": "Cap9enabled: Nenabledtrue/visiblefalse; familydisabled: Nenabledfalse/visiblefalse. Assertthese independently-authored values and maskONLYthose declared fields before exactallotherframe comparison.",
+  "earlier_error_boundary": "r01 lacked post-MIRfielddump and maskedonlyNenabled, so exactr01 scalar remainsunlogged; caprestorevisibilityfalse fromoldtrue is supportedsourcepolicy and confirmedbyr02cap-enable pass. Do not rewrite originalr01 as successful.",
+  "next": "Fresh admittedcorrected finite schedule, preferably untouched firstadd/unchanged routes first, then caps. Same Source/package/caller; no guardwaiver. Scripted native precursors staylabelled andordinaryendlabs mustactuallycomplete.",
+  "limits": [
+    "r01actual3engines, r02actual6engines; r02first3stages/5engines passed includingcap-enabletwocolds. This isnotall16pass.",
+    "No publicrelease/beta finalverdict until requiredpostcases pass and normalpublicationgatescomplete.",
+    "No Source/docs/packet/library/nativechanges by reviewer."
+  ]
+}

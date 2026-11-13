@@ -1,0 +1,32 @@
+{
+  "kind": "MIR514ActualNativeOriginalPrivateCustodyV1",
+  "repository": "Julesc013/scratchpad",
+  "readbacks": [
+    {
+      "kind": "ActualRemoteDecodedNativeOriginalReadbackV1",
+      "repository": "Julesc013/scratchpad",
+      "commit": "78affe0ba0f69970b21a6a2581ca297a470ae3e6",
+      "path": "projects/mir/runs/mir514-recorded-default-native-and-assets-r01/original-bodies.json.gz",
+      "git_blob": "c3ee9998a7e72505abb9624b319e2205dc121916",
+      "packed_bytes": 11132763,
+      "packed_sha256": "0AB67E742C8BDF8CABDF9847754E1D41E8E69DA047F16F0BEBD33018CAF10E47",
+      "actual_originals_verified": 410,
+      "actual_original_bytes": 21221416,
+      "method": "Exact remote branch and GitBlob body download, decode/hash and actual-byte compare all originals. Includes F210 wrong-path controller adverse; this custody is not acceptance."
+    },
+    {
+      "kind": "ActualRemoteDecodedNativeOriginalReadbackV1",
+      "repository": "Julesc013/scratchpad",
+      "commit": "f97ef80e826f8546b8d212ce07db21950e54b597",
+      "path": "projects/mir/runs/mir514-f210-custody-recovery-and-review-r02/original-bodies.json.gz",
+      "git_blob": "d8bd733ae9e0cd49a129cf93fc330f0c23e1529d",
+      "packed_bytes": 299276,
+      "packed_sha256": "61A4CE929D334B04C35DBE0CD0048F461B8B16857F53F516F0E082178E2511BC",
+      "actual_originals_verified": 39,
+      "actual_original_bytes": 1321835,
+      "method": "Exact remote branch and GitBlob body download, decode/hash and actual-byte compare all originals. Corrected F210 two-cold originals and recorded independent reviews; parent retains adverse originals. Custody is not release acceptance."
+    }
+  ],
+  "scope": "Original old11 source copies, all17 frozen assets and native input/output/adverse bodies; r02 adds corrected cold continuation and execution-lead-recorded non-author reviews. All recorded bodies actually downloaded and decoded from remote GitBlobs. Overlapping files across capsules are not independent observations.",
+  "stable_qualified": false
+}

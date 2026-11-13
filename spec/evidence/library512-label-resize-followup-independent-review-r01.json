@@ -1,0 +1,54 @@
+{
+  "kind": "MIRLibrary512LabelResizeFollowupIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T14:48:25.763925+00:00",
+  "verdict": "APPROVED exactad8 narrow source/test followup for coherent integration and affected checks. No blocking finding. No native visual/input or stable acceptance.",
+  "identity": {
+    "base": "15864880cef1ccf674f76454b22291aad740f3c2",
+    "head": "ad8cdc918461bcafb5b35c87dc0b28d341fae3c5",
+    "source_tree": "c225475b457c4c62e065ba91ef339bb74823d421",
+    "tree": "de9171725d361c9b9ecd3350862d73da2ad72bbe",
+    "changed_bodies": [
+      {
+        "path": "source/runtime/library.lua",
+        "bytes": 151628,
+        "sha256": "F255C16918DC5BFA24C7043B2F5C541D37937870882E831E771BF45A101F8B6D"
+      },
+      {
+        "path": "tests/test_library.py",
+        "bytes": 280891,
+        "sha256": "B2EAAE9827F9D131F82E12559B8E8A2131C1340C1C8C9800C92420C5C7FDDD52"
+      }
+    ],
+    "preserved_prior_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-ui-and-fixture-independent-source-review-r01.json",
+      "bytes": 12308,
+      "sha256": "D0275D535F0F0B90182018F4EE684635C073C8143BFF2A8261B45CF113BB8337"
+    }
+  },
+  "independent_review": {
+    "exact_delta": "Exact Git diff touches onlytwo files: one additional player assignment plus29regression lines. Independently remove that exact assignment fromad8 player body and recover1586library.lua bytes. No other Source,locale,version,settings,callback,fixture,publicname orparentpath change.",
+    "correctness": "Creation already sets each localizedfilterlabel maximal_width to its initial controlwidth. Retainedresize within a columnband keeps thegrid but updatesfield/dropdownwidth; oldcode left that labelbound stale. Setting the existinglabel maximal_width alongsidefieldwidth restores the intendedsame currentwidth during growth andshrink. Breakpointrebuild remains unchanged. research_filters_ready validates eachlabel; no newelement replacement orsaved/gameplay state write.",
+    "portable_api_and_numbers": "Both exactpinned2.0.77/2.1.23SDKs declareLuaStyle.maximal_width read/writeint32. Currentcontrol_width comes from unchanged positiveinteger filter_layout calculation; assigning this samevalue alreadyused byfield/control widths adds no fractional/style-name API issue. Priorportable element.style fix remains exact and applicable.",
+    "regression_strength": "New authored test performs twoexpansions andtwocontractions while retaining threecolumns,grid,filters,querytext and personalresearchselection; allfivefields requirelabel.maximal_width==field.maximal_width==control.maximal_width. It checks unchangednative researchlevel andqueueidentity. Old1586 firstresize necessarily leaves thecreation labelbound behind, so theopponent is meaningful rather thanmirroring theaddedstatement. Independently compared119prior testmethodASTs: all unchanged; newtotal120. No reviewer test/native rerun.",
+    "validation_scope": "Author reports red1586 then120Librarygreen and17Packagegreen. The authoredregression andexactsource/SDKdelta were independentlyinspected; these remain host evidence. Root separately completed257selectedcoherent controls on5a0701/sourceab0 before thisfollowup; that oldresult is preserved underits ownidentity andnot relabelledad8."
+  },
+  "sdk": [
+    {
+      "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+    },
+    {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+    }
+  ],
+  "prior_coherent_result": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01\\build\\tmp\\mir512-coherent-selected-r01\\result.json",
+    "bytes": 1312,
+    "sha256": "A90A44D3D92FD8986D8AC28C37E6A0297452DAE8640CDE4224C8F9FFF7FFC82D"
+  },
+  "remaining": "Root may mergead8, then run only affectedLibrary+Package controls onexact combinedhead before package/CI/frozenGUIinputs. NativeEN/DE localizedcaptionbounds atsamecolumn resize andbreakpoints,titleactions/query/caret/selection preservation, fullinput/export/lifecycle cases remain required under priorreview. No sourcechurn oradditionalframework isneeded for thisfix.20timing remainsheld until fixedcoherentcandidate/quietblock.",
+  "scope": "Read-only bounded followup. PriorD027approval remains byteexact; thisreceipt adds no fixtureoracle relaxation orpublishedasset change. No Source/test/docs/controller/library/privateGit edit,hostsuite/build rerun ornative launch; onlythisnewprimaryreviewreceiptwritten. No gameplay/save/UI/performance/stable result is claimed."
+}

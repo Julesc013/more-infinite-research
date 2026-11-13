@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "kind": "MIR512Active68ConsumedInputIndependentReviewV1",
+  "reviewed_utc": "2026-11-10T06:16:03.031000+00:00",
+  "verdict": "Reuse original10 facts/method and unchangedworker semantics; do not reuse old10numeric cells as current12. Fresh12repairT0 separately closes its four cells. Agriculture1/32/128 remain twelve unverified current12 comparison cells, not observed regressions.",
+  "findings": [],
+  "original": {
+    "chain": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\runtime510-active-analysis-native-chain-r01.json",
+      "bytes": 3318,
+      "sha256": "6A2973014AAFC9FFE916418CB573BFE51FAF5BD623D69B87DEAA3A907CA3C6BD"
+    },
+    "player_archive": {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21010.zip",
+      "bytes": 996956,
+      "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+    },
+    "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "published_comparator": "actualpublished4.7.21002/A4BB8F47; carried505prerequisites,not4.7.3",
+    "accepted_counts": "68observations/16warmups/52scored/26pairs/16metriccells",
+    "prior_complete_custody_and_applicability": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-active68-consumed-input-independent-review-r01.json",
+      "bytes": 9277,
+      "sha256": "2FBC8171FC7C0CF5C00F06779BA808CE43FDD5B91BBC06857976D2FA07173F6D"
+    }
+  },
+  "current": {
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "archive": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01\\more-infinite-research_5.0.21012.zip",
+      "bytes": 1022087,
+      "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+    },
+    "fresh_repair_result": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-independent-measurement-result-review.json",
+      "bytes": 15205,
+      "sha256": "EFA64C4A8570C26DDFC2B2486CAF7F942C18DFF18C82C8A3ECC9E991367A7A7F"
+    },
+    "repair_disposition": "ExactSource47537/10619 repair-activeT0isclosedbynew20-runresult,notold10reuse; nofurtherrepairT0repeatidentifiedforunchangedcurrentpackage."
+  },
+  "unchanged_direct_workers": [
+    {
+      "path": "runtime/passive_repair.lua",
+      "bytes": 8942,
+      "sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9"
+    },
+    {
+      "path": "runtime/scripted_effects.lua",
+      "bytes": 5620,
+      "sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A"
+    },
+    {
+      "path": "runtime/agriculture.lua",
+      "bytes": 5652,
+      "sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA"
+    },
+    {
+      "path": "runtime/spoilage.lua",
+      "bytes": 5031,
+      "sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D"
+    },
+    {
+      "path": "runtime/configuration.lua",
+      "bytes": 347,
+      "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E"
+    },
+    {
+      "path": "runtime/settings_profile.lua",
+      "bytes": 1551,
+      "sha256": "8FD62FA72627DD36DD555AB315057DB40B10DDAA9739B6199110258B3C0658F1"
+    },
+    {
+      "path": "runtime/settings_commands.lua",
+      "bytes": 4300,
+      "sha256": "59FE63B543F3B206ED939D2B9CB57846F94D3FFEF3D4B319CCC39CE28C9A1C83"
+    },
+    {
+      "path": "runtime/spoilage_contribution.lua",
+      "bytes": 3017,
+      "sha256": "310902911FC91B920CB2111D81B72D756EE37A2FD059830CBA4FD0A14E4EF4C9"
+    },
+    {
+      "path": "runtime/lifecycle.lua",
+      "bytes": 36705,
+      "sha256": "E9ABE68A1032B314FB425D36ED58A7CA917A634FCC920A812942A5C59267BBC6"
+    },
+    {
+      "path": "runtime/catalogue.lua",
+      "bytes": 9253,
+      "sha256": "E913D1940B684C7DA6F4F5BBAB3DAE0780BF8A1215F0DACA254793B15BE50467"
+    },
+    {
+      "path": "settings.lua",
+      "bytes": 55,
+      "sha256": "74CA40A95F0B4F96F2D05F4ABC46725E761F8EDC4E142F82DCDB7643257A2121"
+    }
+  ],
+  "changed_resident_and_data_members": [
+    {
+      "path": "runtime/bootstrap.lua",
+      "old_bytes": 35461,
+      "current_bytes": 37369,
+      "current_sha256": "B34CB1F698C3AEF44B5E23ED58EDCCA83E751FF201AC28AEF58462577F8949A8"
+    },
+    {
+      "path": "runtime/library.lua",
+      "old_bytes": 148828,
+      "current_bytes": 152920,
+      "current_sha256": "369403A8D4612F757F00D497361818256740F1290AC65D114A297157DC4B5504"
+    },
+    {
+      "path": "runtime/library_translations.lua",
+      "old_bytes": 17846,
+      "current_bytes": 18147,
+      "current_sha256": "9272332AF248C8CE8998D60916F1A33B380D7ACB4DFD6E6347AF7AA69A8B8981"
+    },
+    {
+      "path": "runtime/native_credits.lua",
+      "old_bytes": 42735,
+      "current_bytes": 54427,
+      "current_sha256": "537F7E94FD515D449435A8E52FE86DCB4BB372C612418846C0575583D8A5B7B5"
+    },
+    {
+      "path": "runtime/worker_robot_storage.lua",
+      "old_bytes": 6807,
+      "current_bytes": 37165,
+      "current_sha256": "63C235C3DF5319343C19EB34B76F2DE9EE67D9D89013CD39AA85490DB31A8646"
+    },
+    {
+      "path": "runtime/native_credit_vectors.lua",
+      "old_bytes": 0,
+      "current_bytes": 3690,
+      "current_sha256": "34F66B316D753CA61F1C146B9FC88DC580D45E07C0536993C71E5626AB5527E0"
+    },
+    {
+      "path": "compatibility/modern_catalogue.lua",
+      "old_bytes": 72594,
+      "current_bytes": 73604,
+      "current_sha256": "F4BE827F5398B866D80108C5BC7C3FA5362A193A3FB0EA7EE3B605522E555709"
+    },
+    {
+      "path": "data-final-fixes.lua",
+      "old_bytes": 19858,
+      "current_bytes": 22609,
+      "current_sha256": "A584373F0EDD32D864A8865BBECCCFA18A2289547E3D9A5203681BC982845DEA"
+    },
+    {
+      "path": "research/catalogue.lua",
+      "old_bytes": 17519,
+      "current_bytes": 17567,
+      "current_sha256": "FBE14CE4AC989AC1A0BACA90D61BAE21F458DE26A57D619E5FFA6AE9464B35EC"
+    },
+    {
+      "path": "research/modern.lua",
+      "old_bytes": 32775,
+      "current_bytes": 33501,
+      "current_sha256": "F21C2EF1518D9B9961838202287B45E372FF02C37EB3711447059B77E9827A23"
+    },
+    {
+      "path": "research/worker_storage_recovery.lua",
+      "old_bytes": 0,
+      "current_bytes": 6819,
+      "current_sha256": "80FEB07F5C4D4D722D5ECD7BD2CCFF8C6768A11791CBDBBC855CF844328E1B93"
+    }
+  ],
+  "consumed_input_reasoning": {
+    "source": "Directrepair/agriculture/spoilage bodies andsettings/lifecycle/catalogueabove arebyteidentical, so theirboundedalgorithm/independentphysicalexpectationsare reusable. Currentbootstrap imports/configures enlargedworkerhistory/creditvector components; nativecreditsinitialization nowcreatesbasisrecords, anddatafinal/privateworkerprototype image differs. ThefreshAPIresult exercises itsowninit/savecase,notagricultureworlds orperformance.",
+    "time": "Agriculturebenchmarks consumeprotectedpendingworlds andreal on_tower_planted_seed dispatch/nativegrowth, surroundingloadedstate andpotentialGC. Unchangedhotloop isnotunchangedwholeprocess/updatecost proof. FreshrepairT0doesnotactivate Nplayer+Nforeign agriculturework andcannotextrapolate tothose endpoints.",
+    "memory": "Eachreportedmemorycelliswholeprocesspeak/sampledmaximum includingmod/prototype/load/residentstate. Old10versus12residentimage andsavedrecords differ. Neither identicalleafcode northeT0memorypass proves eachagriculturetier memorycell.",
+    "settings": "Original2.1.23fiveofficialmods,Defaults,matched1/32/128selectors,commonterrain424242 andexactsciencepolicy/oracles remainauthorities. OptionalFerrumdependencyordering isnotconsumedbythisNoFerrumselection; itisnotaloneusedasaretestreason.",
+    "save": "Oldthreecandidateprofiles/fixturesbind5.0.21010 andtheirprotectedseedsare10state,allrehashunchanged. Loadingthemwith12wouldbeachangedupgrade/configurationroute,notanunchangedbenchmarkseed. No current12agriculturestateequality/pendingseed/pilotisprovidedbythenamedreceipts."
+  },
+  "remaining_tiers": [
+    {
+      "tier": 1,
+      "original_binding": {
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\r510-s01\\pinned-source\\tests\\profiles\\runtime510-agriculture-candidate-defaults-1-f210-2123.json",
+          "sha256": "18EE9B33E59F52565854ACE9B2829A3B28A96BFEEDABE357FB60E1D1764A1FEA"
+        },
+        "seed": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\agri510-fixture-r01\\build\\tmp\\stable510-agri-capture-1-r01\\write-data\\saves\\mir5-native-active.zip",
+          "sha256": "64352C4C10775F8D9560DD33F8BEFF11CC2B04628121AE1A6ABED2516DB4C678",
+          "bytes": 863504
+        }
+      },
+      "current_quantitative_cells": "unverified:engineaverage,OSpeakworking,maxsampledworking,maxsampledprivate",
+      "smallest_existing_comparison_unit": {
+        "launches": 16,
+        "warmups": 4,
+        "scored": 12,
+        "counterbalanced_pairs": 6
+      },
+      "current12_pending_seed_or_pilot": "notestablishedbynamedexisting10/11evidence"
+    },
+    {
+      "tier": 32,
+      "original_binding": {
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\r510-s01\\pinned-source\\tests\\profiles\\runtime510-agriculture-candidate-defaults-32-f210-2123.json",
+          "sha256": "F8151809A8CF33A595AA93C9129EEFF229734CE5598E929B47D169BE1037A903"
+        },
+        "seed": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\agri510-fixture-r01\\build\\tmp\\stable510-agri-capture-32-r01\\write-data\\saves\\mir5-native-active.zip",
+          "sha256": "9D36A60F3951A5836B64B1EED47B30CF73B929E23C1B2969E81C7641B79EB3A4",
+          "bytes": 981704
+        }
+      },
+      "current_quantitative_cells": "unverified:engineaverage,OSpeakworking,maxsampledworking,maxsampledprivate",
+      "smallest_existing_comparison_unit": {
+        "launches": 16,
+        "warmups": 4,
+        "scored": 12,
+        "counterbalanced_pairs": 6
+      },
+      "current12_pending_seed_or_pilot": "notestablishedbynamedexisting10/11evidence"
+    },
+    {
+      "tier": 128,
+      "original_binding": {
+        "profile": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\r510-s01\\pinned-source\\tests\\profiles\\runtime510-agriculture-candidate-defaults-128-f210-2123.json",
+          "sha256": "4E6F01B35143D6E7979F81A03C1A2268E6FE2FDF0C4FDBAC18EB5E3BC2144881"
+        },
+        "seed": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\agri510-fixture-r01\\build\\tmp\\stable510-agri-capture-128-r01\\write-data\\saves\\mir5-native-active.zip",
+          "sha256": "774DFCFDD204F3499C7A80392E18F85DD44DFD44A1FE50965DB2292C11563476",
+          "bytes": 1249920
+        }
+      },
+      "current_quantitative_cells": "unverified:engineaverage,OSpeakworking,maxsampledworking,maxsampledprivate",
+      "smallest_existing_comparison_unit": {
+        "launches": 16,
+        "warmups": 4,
+        "scored": 12,
+        "counterbalanced_pairs": 6
+      },
+      "current12_pending_seed_or_pilot": "notestablishedbynamedexisting10/11evidence"
+    }
+  ],
+  "smallest_missing_checks": {
+    "preparation": "Foranadmittedaffectedtier, narrowlyprojecttheexisting10fixture/profileclosuretocurrent12andprepareanexactcurrent12pendingseedplusitsunscored25000-updatephysicalpilotunderunchangedoracles. Preserve2ordinarypreparationlabs,Nplayer+Nzero-researchforeign towers,initial0events/pendingtrue\u21922Nnativeplantingevents/pendingfalse; no reseedingorweakenedscience/nativegrowth.",
+    "comparison": "Eachselectedtierusesitsoriginalcomplete16launchunit:2warmupsperarm+6counterbalancedpairs,25000updates/run/sanitize,allfourmetricstogether. Allthreewouldtotal48launches/12warmups/36scored/18pairs,notanother68or20repairrepeat. Thisreviewqueues/admitsexactly0launches.",
+    "increment": "Current12 128-minus1 derivedincrementsremainunverifieduntilcompletecurrent1and128units. Originalreaderrequirespositivefinitecurrentpublishedincrementbeforepercentreporting;otherwiseonlyrawdifferences. Tier32remainsitsownselectedcontrol."
+  },
+  "reuse": {
+    "retained": "All68originalobservations/16acceptedcells/original1\u2192128increments retainexact10identities. Fresh12repair20isaseparatecomparisonunit. No poolingorrewritingoldnumericresults.",
+    "reference_inputs": "Reuseexactunchangedpublishedpendingseeds/capture/pilotandfixture/reader authoritiesafterbindingverification. Oldpublishedtimingobservationsarehistorical; eachnewpairedunitstillneedscontemporaneousfreshreferenceprocesses.",
+    "reference_capture": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mixed504-release-index-r01\\build\\tmp\\runtime505-active-captures-r02\\pinned-source\\build\\tmp\\active-seeds\\runtime-benchmark-active-seeds.json",
+      "sha256": "A449FF36E95491F7D3F4ED24217BCCED193F1E5E73D5A123DB581DB86363FFD6"
+    },
+    "reference_pilot": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mixed504-release-index-r01\\build\\tmp\\runtime505-active-pilots-r02\\pinned-source\\build\\tmp\\active-marker-pilot\\runtime-benchmark-active-marker-pilot.json",
+      "sha256": "4AD021E596B64752FBBA16BC3A66BC271BEF3D16DD95D1833976F57B0F4A3DE6"
+    },
+    "original_prepared": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime510-scored-custody-r01\\runtime-benchmark-active-prepared.json",
+      "bytes": 477705,
+      "sha256": "DCFE104B9B8FD86EB7486409B73E69CDB7482ECE7AEC9403CD916017CEB9DD3E"
+    },
+    "original_executed_controller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime510-scored-custody-r01\\Invoke-RuntimeBenchmark-d35f0bb2.ps1",
+      "bytes": 148161,
+      "sha256": "2AF27FC250BEC34D8626A1028C136FA879D0CA85ECE6827D930A32EAB88CF5D1"
+    },
+    "original_raw_reader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\origins\\analyze_runtime_benchmark.py",
+      "bytes": 138584,
+      "sha256": "EBBE61478F05970D55493D40973061C32E21606D9610CC6D6AA5854B84B612E7"
+    }
+  },
+  "limits": "Onlynamedactive-worktiming/memoryapplicability. No Source/doc/controller/librarychange,host/build/nativeorprivateGitoperation. No extraagriculturetiers/newframework/wholeproductorstablegateinvented; unknownimpactisunverified,notmeasuredregression.",
+  "native_admission": false,
+  "stable_acceptance": false
+}

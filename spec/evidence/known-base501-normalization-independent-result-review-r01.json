@@ -1,0 +1,105 @@
+{
+  "kind": "KnownBase501PurePredecessorAndPlasticPolicyIndependentResultV1",
+  "reviewed_at_utc": "2026-11-10T04:04:44.765929+00:00",
+  "verdict": "PASS exact pure published501 normalization/save/two immutable cold processes only. Target12/addition remains unqualified. Base plastic force-disabled expectation is justified; do not substitute F2 retained-main policy.",
+  "tuple": {
+    "packet": "C7407EC55A8F61D321FE354CC4B16F5D52E2412CC7874D1ABCFF1C5EB7CCB568",
+    "owner": "F3058DF9A8308A36D486657C82ADB7624D84F9A8F8F49B337C6C5A568C0C9663",
+    "composition": "A50439C2D61A62332D34DF8C5B86E2A4553FC4B619801B644195C351C94242D4",
+    "actor": "452FE25083BD5D6AD7E728115308A1A42B5DDE2D1AE3A628842AB80A80CCD475",
+    "harness": "b05/Source47537",
+    "loaded_player": "published5.0.20001/750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+    "engine": "2.0.77/D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "actual": {
+    "terminal_sha256": "B01E6BBE483C688DC31BFF88411B0251485B6389F683C72A2B4CDAB036AB6427",
+    "processes": [
+      {
+        "role": "server",
+        "pid": 20328,
+        "exit_code": -1,
+        "mode": "owned stop after pure-saved marker,Saving finished and valid closed ZIP; not natural0"
+      },
+      {
+        "role": "cold1",
+        "pid": 24516,
+        "exit_code": 0,
+        "mode": "natural one-update benchmark"
+      },
+      {
+        "role": "cold2",
+        "pid": 43596,
+        "exit_code": 0,
+        "mode": "natural one-update benchmark"
+      }
+    ],
+    "timeouts": 0,
+    "commands": 0,
+    "new_research": 0,
+    "configuration_tick": 314774,
+    "pure_saved_tick": 314774,
+    "cold_ticks": [
+      314775,
+      314775
+    ],
+    "loaded_mods": {
+      "base": "2.0.77",
+      "more-infinite-research": "5.0.20001"
+    },
+    "startup_changed": false,
+    "event_scope": "Only the three exact historical helpers removed; MIR version unchanged. This flag is for normalization,not future target addition."
+  },
+  "native_readback": {
+    "startup": "All875 values equal retained typed startup875 in each of four raw markers; observed clock16/mapprice1 everywhere.",
+    "full_frames": "Complete native objects and captured pre-MIR entry equal across entry,pure-saved,cold1,cold2. Original35 technology rows+71 recipe totals on each of3forces equal immutable A4A087 under original Lua-style1e-9 comparison,except ONLY two approved unit-normalized expected fractions.",
+    "gear_contract": "Counts player32000,next3; foreign/detached8000,next1. Formula8000*2^(L-1),3600ticks,four unique1-unit science ingredients,ignore-multiplierfalse,sole iron-gear-wheel effect0.10000000149011612 all actual and independently asserted.",
+    "current": "Foreign current remains gear,queue [gear,plastic],fraction5.249999999999999e-05; detached gear saved fraction3.375e-05. Each times8000 equals original0.42/0.27 research units within1e-9. All other native rights/flags/queues/effects preserve.",
+    "families": "Full six named gear/productivity row contracts,unit/science/prerequisite/effect/flags frames equal pre/post/colds. Steel observed bonus0,next1 is retained without reconstructing historical earnings.",
+    "foreign": "All3forces inventory0/robot_storage0/laboratory_speed0/laboratory_productivity0; captured manual-mining0,battery0.1,gun-speed0 preserved. All3 plastic force flags are true in this old501 pure save.",
+    "scope": "No progress,level,bonus,clock or research grants introduced. Original scripted precursors remain labelled. No new ordinary lab completion in normalization."
+  },
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\known-base-addition512-input-preparation-r01\\native-normalization-r05\\protected\\normalize.zip",
+    "bytes": 2663230,
+    "sha256": "D38CD57B0C2310569DD3039AD9109EB7F6F19930E27BA73A8E86E9869F000CA2",
+    "CRC": "All59members PASS; embedded452F actor matches; protected copy physically distinct from live closed save. Both cold inputs keep that same hash before/after."
+  },
+  "integrity": {
+    "fixed_inputs_verified": 17,
+    "original_and_retained_custody_members_verified": 21,
+    "ledgers": "Three distinct named PIDs,completed terminal modes/predicate verified; both cold CLI tick counts1.",
+    "loaded_logs": "Each server/cold canonical log loads only core,Base2.0.77,MIR5.0.20001; no fatal event; server marker precedes Saving finished; cold logs contain no save.",
+    "controls": "All3 expected library states and18 prior MIR archives verified live after recorded full restoration; temporary501 archive removed; Factorio0.",
+    "originals": "Original0C783,inputDA553,875DAT,published501 and prior adverse bodies remain unchanged."
+  },
+  "log_sha256": {
+    "server": "21278BCE7E89140D604C3DD7F1633BF00803B70D025CC943E89FBC0BB885ACBC",
+    "cold1": "FA5F6799252B4B6BEDDD3FC72DAD78B9D8AA78084453807D99C56CDCAAD79A4F",
+    "cold2": "588C17A0331B944CB8FD2524B8102DD37D7803CD14FD77DECAFB1D8C6BD618C4"
+  },
+  "plastic_policy": {
+    "verdict": "Keep strict post-MIR force.enabled=false for this exact Base authored-generated plastic fixture; the prior SA F2 force-preservation exemption does not apply.",
+    "evidence": [
+      "Source47537 compatibility/modern_catalogue.lua:819-822 starts with Base definitions; base.lua:997-1026 includes research_plastic. Its supported filter excludes only specific unsupported families,not plastic.",
+      "modern_catalogue.lua:430-431 detects Space Age by exact active mod. native_paid is populated only inside that Space Age branch:1026-1036. This prospective fixture closure excludes Space Age and SIF; synthetic provider data introduces no native-owner/profile selector.",
+      "research/catalogue.lua:102-105 generated_row has ownership_kind=authored_generated; selected.definitions loop242-245 emits plastic. In contrast, SA native_paid only enters runtime_private_credit_ids239-240,which explains the different F2 outcome.",
+      "lifecycle.lua:246-255 admits actual prototype.enabled=false for authored row;269-295 owns setting technology.enabled=false and recorded ownership. Configuration reconcile508-526 invokes this independently of finite cap settings.",
+      "f05 fixture data-final-fixes.lua:11 explicitly empties,hides,disables that Base authored plastic prototype. Therefore f05 control entry check plastic.hidden=true and plastic.enabled=false is policy-correct after MIR."
+    ],
+    "recommended_target_assertion": "Also capture/assert immutable plastic prototype.enabled=false and hidden=true,then exact post-MIR force.enabled=false. Keep other flags/current/queue/pending/credits strict. Do not allow either flag or force incomingtrue merely to match F2. If a future selection addsSA/SIF,reassess ownership instead of reusing this verdict.",
+    "native_scope": "Policy only; no target engine or provider resume/lab/save/cold has been accepted. Any actual queue behavior remains a future native gate."
+  },
+  "limits": [
+    "Qualified source input only. A later target must use accepted actual normalized fractions/clock16,actual875 readback and honest startup_changed event; no hardcoded0.42/0.27/1 or leftover old-only observer.",
+    "Original accelerated gear percentages and elapsed paid research time/science inventory are not preserved claims; no original historical steel inference.",
+    "No candidate12/addition/reporter/full-modpack/stable/release acceptance. All prior normalization and diagnostic adverses retain their identities."
+  ],
+  "operations": {
+    "native": 0,
+    "tests": 0,
+    "builds": 0,
+    "Source_controller_library_edits": 0,
+    "private_repo_mutations": 0,
+    "only_new_file": "this receipt"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "kind": "KnownBase512NestedCarrierEventIndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-10T04:29:51.244543+00:00",
+  "verdict": "Fixture event-classification defect consistent with exact native stack; narrow known-scripted-carrier filter justified for separate review. No Source change or completed transition acceptance.",
+  "tuple": {
+    "packet": "D3AC7AB98B353E36F59A35622D75EE8FE1FFF3FFCF1703162A6D08E34AFD1A60",
+    "owner": "CD11998C1575581F0309BA5421B2D5ADBEECACC3166C3BB5E380F9C21D6EC362",
+    "fixture": "735EC9DB4329E5D30943CE6060CC5B04DE609FE0D61869BDE37F79323CF09836",
+    "fixture_commit": "59b624d91b6d79c2b42ccbb6b6b10906a3b2a71b",
+    "source": "128/47537",
+    "player": "0C2F1D1F",
+    "engine": "2.0.77/D3"
+  },
+  "actual": {
+    "pid": 46520,
+    "processes": 1,
+    "terminal_status": "adverse",
+    "kernel_exit_mode": "INTERRUPTED by fatal live-log predicate;timed_outfalse;no trusted numeric natural exit in ledger",
+    "terminal_sha256": "34712F41D4A72E73D76C22EF653BCF2E451480CE2FA79D5C388B09FD72140E66",
+    "canonical_log_sha256": "2E39837886CC9299DA9DDEEAFA9C491E26B96C543A5284DFCEDD94886506E30F",
+    "error": "fixture completion was not the declared ordinary queue",
+    "stack": "fixture control.lua:251 callback \u2192 native __newindex \u2192 MIR native_credits.lua:438 set_level_and_disable \u2192448 apply_offset \u2192946 on_research_finished \u2192 bootstrap537",
+    "accepted_saves": 0,
+    "cold_processes": 0,
+    "event_name_observed": false,
+    "event_by_script_observed": false
+  },
+  "source_and_SDK_policy": [
+    "Source47537 native_credits.lua:433-441 changes only the named carrier level and then disables it. Source946 calls positive/negative offset application after an admitted pending main completion. The outer MIR error wraps the actual fixture assertion in a synchronously nested native event.",
+    "Pinned2.0.77 LuaTechnology.level description says writing is equivalent to researching the previous level and sets enabledtrue. on_research_finished has mandatory boolean by_script and LuaTechnology research. This supports separating known scripted carrier callbacks from ordinary lab counts; actual rejected tuple was not emitted and must not be invented.",
+    "Fixture currently accepts any same-force event whilephase labs into its two-event GEAR/PLASTIC assertion. Its own entry checker already validates the eight exact carrier identities/vectors/signs/levels/flags; a legitimate carrier-level callback is outside that ordinary sequence.",
+    "At callback time the level setter may have enabled the carrier before Source441 disables it. Do not impose settled forcefalse/level assertions within the nested filter. Existing entry/final/cold carrier guards remain authoritative for settled state."
+  ],
+  "bounded_correction_requirements": [
+    "For the declared force/lab phase only,allow exactly the eight independently named carrier IDs AND event.by_script==true,record their actual name/flag/force/tick separately,and return without adding an ordinary completion or touching gameplay. No prefix/substring/general internal-mod exception.",
+    "Unknown scripted identities,known carriers with false/nil by_script,and scripted GEAR/PLASTIC must still refuse. Ordinary GEAR\u2192PLASTIC sequence/by_scriptfalse,matching supply/positive per-pack consumption and all final native/credit/work/flags/stock checks stay unchanged.",
+    "Preserve all original native input/Source/player/settings,unchanged CD119 owner,previousadverses; corrected actor/host opponents,new hash/profile/freshroots,actual zero-native Compose/binding closures need separate finite3 admission. No extra diagnostic engine required before implementing this observer fix."
+  ],
+  "allowed_carrier_ids": [
+    "mir-native-credit-research_plastic-plastic-bar-positive",
+    "mir-native-credit-research_plastic-plastic-bar-negative",
+    "mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-positive",
+    "mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-negative",
+    "mir-native-credit-research_low_density_structure-low-density-structure-positive",
+    "mir-native-credit-research_low_density_structure-low-density-structure-negative",
+    "mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-positive",
+    "mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-negative"
+  ],
+  "attribution_limits": "The call stack makes a legitimate scripted carrier callback the supported causal explanation. It does not directly record exact name,flag,count or accepted ordinary-completion totals; r03 native output must supply those actual observations. No Source invariant/cost/quantum defect established.",
+  "integrity": {
+    "fixed_inputs_verified": 15,
+    "actual_original_to_retained_copies_verified": 62,
+    "live_control_states_verified": 3,
+    "prior_MIR_archives_verified": 18,
+    "restored": true,
+    "factorio_processes": 0,
+    "accepted_source_derivative_baseline_unchanged": true
+  },
+  "limits": "No save/cold/knownBase incident/reporter/generalprovider/performance/stable verdict. Both11304 utility adverse and46520 nested-event adverse remain distinct; neither is relabelled as an accepted Source result. Reviewer ran no native/host/build/Compose/CI and changed no Source/controller/library/private payload; only this new receipt."
+}

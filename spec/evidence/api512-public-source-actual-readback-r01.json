@@ -1,0 +1,159 @@
+{
+  "kind": "RootAPI512BothEngineActualReadbackV1",
+  "status": "named-eight-process-api-production-save-two-cold-passed",
+  "cases": [
+    {
+      "target": "f200",
+      "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.12\\more-infinite-research_5.0.20012.zip",
+        "bytes": 1037776,
+        "sha256": "76517C54FAE4B62DC1828350A8DEB32C39164822525AF51446369433C764C27D"
+      },
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f200/packet.json",
+        "bytes": 485471,
+        "sha256": "F96D2F878720F231150CE113C14AC503BCA3DE184A6736D125DAC5A571D1A793"
+      },
+      "composition": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f200/composition.json",
+        "bytes": 16907,
+        "sha256": "5A715CAEACE68631EB949CA9A0CE441A047B355DA0639AE04BC6A880289AEEAA"
+      },
+      "terminal": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f200/execution-record/terminal.json",
+        "bytes": 9580,
+        "sha256": "DD7FA986A56438C9DCF9BE5821ADBB98E2BDD1177B651E536B4B8F39E12196A1"
+      },
+      "result": {
+        "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-final-source-r01-f200/result.json",
+        "bytes": 49807,
+        "sha256": "7CFEDDC942DF68C549F7E3B6826A7F3305E39F6F4D6D0A84CD5F1CD54A497E16"
+      },
+      "process_ids": [
+        14564,
+        21856,
+        47184,
+        41436
+      ],
+      "process_exit_codes": [
+        0,
+        -1,
+        0,
+        0
+      ],
+      "supervised_production_completion": true,
+      "read_only_cold_loads": 2,
+      "physical_plates_each": 100,
+      "physical_cables_before": 200,
+      "physical_cables_after": 202,
+      "ordinary_labs": 0,
+      "completed_save": {
+        "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-final-source-r01-f200/write-data/saves/mir5-native-complete.zip",
+        "bytes": 790103,
+        "sha256": "D7613E90C33136F2056F4521B363A241F919C908480001D288FF4E72C8FAA0F9"
+      },
+      "original_library_states_checked_by_controller": 8,
+      "restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-api-beta-production_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-api-beta_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20012.zip",
+          "action": "removed-temporary"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.12\\more-infinite-research_5.0.21012.zip",
+        "bytes": 1038200,
+        "sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7"
+      },
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f210/packet.json",
+        "bytes": 541662,
+        "sha256": "CD97682906BB901C7AF3D05F50AB3D31177CC4A84A7A2672D88500B96B10D218"
+      },
+      "composition": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f210/composition.json",
+        "bytes": 18385,
+        "sha256": "9095183F49A71AD7972803ABD746BD7FA65F0ED10A2F55C06A5C985D2EAE4CD8"
+      },
+      "terminal": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/api512-final-source-native-r01/f210/execution-record/terminal.json",
+        "bytes": 9647,
+        "sha256": "74A6FCB9B79F57D237D0ACEE9CDC584F0D2AAE9D80BE4355918FCFE65591D4EC"
+      },
+      "result": {
+        "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-final-source-r01-f210/result.json",
+        "bytes": 50253,
+        "sha256": "8980418E623BE06AAAF7F161AF38A32E9AAD479C6812EF3035455570AF094242"
+      },
+      "process_ids": [
+        46660,
+        34048,
+        34528,
+        50656
+      ],
+      "process_exit_codes": [
+        0,
+        -1,
+        0,
+        0
+      ],
+      "supervised_production_completion": true,
+      "read_only_cold_loads": 2,
+      "physical_plates_each": 100,
+      "physical_cables_before": 200,
+      "physical_cables_after": 202,
+      "ordinary_labs": 0,
+      "completed_save": {
+        "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api512-final-source-r01-f210/write-data/saves/mir5-native-complete.zip",
+        "bytes": 803845,
+        "sha256": "D5052A74B68F496CF82376A267EBD80E0FFEAF6F5A3BFA227FF82B50184FF818"
+      },
+      "original_library_states_checked_by_controller": 8,
+      "restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta-production_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-alpha_0.1.0.zip",
+          "action": "unchanged"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+          "action": "restored-prior"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+          "action": "removed-temporary"
+        }
+      ]
+    }
+  ],
+  "actual_native_processes": 8,
+  "ordinary_labs": 0,
+  "limits": "Exact two-consumer detached-query and physical crafting/save/two-cold scenarios only. Research uses explicit native setters. Fresh initialization and reload accept the current credit implementation, but no complete private-ledger inspection, ordinary science, configured-steel upgrade, general API stability, GUI, performance or release verdict is claimed."
+}

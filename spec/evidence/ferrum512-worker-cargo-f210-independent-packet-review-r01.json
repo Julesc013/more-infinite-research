@@ -1,0 +1,172 @@
+{
+  "kind": "ferrum512-worker-cargo-f210-controller-independent-admission-r01",
+  "reviewed_at_utc": "2026-11-09T19:21:18.138013+00:00",
+  "verdict": "GO_EXACT_CLOSED_FOUR_PROCESS_F210_CARGO_NATIVE_SCHEDULE",
+  "findings": [],
+  "independence": "Non-author read-only review. Source/oracle actor870987 was separately reviewed in B99; this review covers private caller projection, bound inputs, retained controls and actual zero-native Compose. No controller/Source/library edits, tests/builds/Compose/native by reviewer.",
+  "pins": {
+    "controller-HANDOFF.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\controller-HANDOFF.json",
+      "bytes": 9697,
+      "sha256": "AA432980CD418164D1A1F042A23ADF9224A69A571628EAF85454EE8906A53285"
+    },
+    "Invoke-FerrumCargo.ps1": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Invoke-FerrumCargo.ps1",
+      "bytes": 29336,
+      "sha256": "07F7B1875E2F4637D95D6A0C35332EDE64E237AD0EBB7D1B411C393D829C18E8"
+    },
+    "packet.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\packet.json",
+      "bytes": 584512,
+      "sha256": "D1961540B4ADE41B99F27DF723581B2C843E05ADF97B27350C07977A38C76BEF"
+    },
+    "composition.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\composition.json",
+      "bytes": 51015,
+      "sha256": "8E50D55CDC1E767B29939886D5043C709373D504FBB698D246B2B047C812212C"
+    },
+    "Rcon.ps1": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Rcon.ps1",
+      "bytes": 3240,
+      "sha256": "BEBC6F6A07D455A105E3A2C510CE2FB28AB56EAF74B4FE23A528DE6D18B703DC"
+    },
+    "controller-composition-readback.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\controller-composition-readback.json",
+      "bytes": 621,
+      "sha256": "15BE15923EF854ABBB27E6D05CE6EDEABB3A8CDF6F66C3DE387C65257B97BC0A"
+    }
+  },
+  "source_oracle_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-independent-source-review-r01.json",
+    "bytes": 11270,
+    "sha256": "B99ED8D68133912506BE16F2ED37DE1B07171E975080FD8C86151E0B7BF0FD60"
+  },
+  "B_source_input_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-independent-admission.json",
+    "bytes": 22547,
+    "sha256": "6254EE110517B03498DAFFCD10FA582B01B8694B934108D47F244384352020D1"
+  },
+  "exact_inputs": {
+    "runner": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01",
+    "runner_commit": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+    "Source": "40a065c18b86437148acd60d7180666db7aaeb32",
+    "clean_exact_Git_head_and_Source_rechecked": true,
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "exists": true,
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "player": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-polish-b-r01\\original\\more-infinite-research_5.0.21012.zip",
+      "exists": true,
+      "bytes": 1017958,
+      "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+    },
+    "scenario_commit": "f028b37d0e438475ed7f288f6c19b9f5bfff6c15",
+    "scenario": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\inputs-r01\\control.lua",
+      "exists": true,
+      "bytes": 26690,
+      "sha256": "870987ED99F074884AE90334D4D035A5A75AE61DD2CE1B0E15D7FF0C41A65B22"
+    },
+    "lab": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\inputs-r01\\mir-fixture-ferrum-worker-storage-native-lab_0.1.0.zip",
+      "exists": true,
+      "bytes": 1163,
+      "sha256": "4EFF7A7BC8C8919A25CE3CCE9DD5BEDF161CAEF9105733599F29DC4F4B11BE40"
+    },
+    "selection": "Exact official2.1.23 Base/SpaceAge/quality/elevated-rails/recycler, PL2.4.0, spider2.9.87, Ferrum0.1.5, A15A observer and4EFF lab. Source omits MIR; destination adds only B4A9B/MIR21012.",
+    "fixed_tuple_total": 2216,
+    "unchanged_tuples_reused_from_prior_independent_body_readback": 2187,
+    "changed_or_new_tuples_independently_hashed": 29,
+    "mismatches": 0,
+    "kernel_provenance": "New runner-local helper paths rehashed; full tools diff f2→e694 is empty, so governor/activation/shared-native helpers are unchanged. No guard bypass or dependency-library copy.",
+    "preserved_origins": "Old R02 DF29/A781/61EA, actor68A8/native results, cargo source HANDOFF/BEB51 and B99 review remain under original hashes. Fresh source producer is mandatory; no old source save/actor replacement admitted."
+  },
+  "caller_review": {
+    "delta_basis": "Full A781→07F7 diff read. Old finite source, ordinary6/private/foreign/current/queue/partial, saved actor/CRC, same-byte copies/cold0 and restoration guards remain; new physical boundaries supplement them.",
+    "schema": "Strict two stages source then destination, source cargo=false/parentnil/colds0, destination cargo=true/parentsource/colds2, total4. Marker and final save name fixed to cargo-destination-saved/mir-ferrum-worker-cargo-destination; ordinary interim cannot alias final.",
+    "interim_before_command": "Shared tail requires ordinary destination-saved followed by Saving finished and closed interim ZIP. One whole shared read checks RCON startup and all ordinary markers even beyond tail; exact ordinary/native checks and full CRC precede physically copied/hash-equal interim. Protected saved original/copy persist and are rehashed after cargo; primary ordinary-interim.zip is retained separately.",
+    "one_send": "driver.sent is set before existing loopback RCON invocation. Exact /mir-ferrum-worker-cargo start once, through owned ephemeral loopback port/credential; bounded TCP/read/write/auth checks. Any send/response error throws and cannot retry. Source never exposes/sends cargo command.",
+    "physical_completion": "Only distinct cargo-destination-saved plus subsequent Saving finished, closed physical ZIP and CRC may end destination server. Prior ordinary Saving finished cannot qualify physical save. Governed server requires passed AND completion_predicate_observed AND no timeout; natural0 is not substituted.",
+    "independent_witness": "Post-run Assert-CargoWitness requires raw loaded7 and moved7 frames, same positive robot unit and distinct positions/tick ordering; provider0/requester0 during load, later provider0/requester7/docked1/active0/available1, stable three entity IDs/positions, normal quality and labelled setup. All4 cargo markers preserve exact all-force frames/ordinary/consumption versus ordinary interim. Scalar physical_robot_delivery alone cannot pass.",
+    "cold_witness": "Two distinct same-hash copies of protected physical save, --benchmark-ticks1/runs1, strict natural exit0/passed/no-timeout. Require exactly one cargo-phase cold marker, fresh physical frame equal closed frame, saved witness report equal, native frames equal and original4/5/6 counts unchanged. CRC and original/copy hashes remain guarded.",
+    "scope_and_limits": {
+      "max_engine_processes": 4,
+      "expected_peak_memory_mib": 4096,
+      "timeout_seconds": 180,
+      "max_output_mib_per_selection": 64
+    },
+    "storage_and_reader": "Fresh frozen-B contained build/tmp/ferrum512-worker-cargo-f210-r01 native roots, primary retained custody separate. Existing65536 shared tail; whole read only for pre-command validation, IOException means not ready; actual default helper cadence, unchanged memory/disk/timeout/PID ownership and first-failure policy."
+  },
+  "controls_review": {
+    "function_schema_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\controls-r01\\functions.stdout.json",
+      "bytes": 1757,
+      "sha256": "E315CA5F4B1F0FE65445596872C187B097641D60AF4DEA8657B2F6EA4BD58021"
+    },
+    "actual_predicate_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\controls-r01\\predicate-results.json",
+      "bytes": 1130,
+      "sha256": "89716A4567AA117C4897265F2664CEA44D40FC23BBD2C7ACA7B4485D05408852"
+    },
+    "negative_binding_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\controls-r01\\negative-bindings.json",
+      "bytes": 189,
+      "sha256": "BB536CF608761D3B92093EE1D19375BFAF35614F607FE8DC75C315CC5B7C98C8"
+    },
+    "actual_controller_code_extraction": "Read Test-Functions.ps1, Test-Predicate.ps1 and test_predicate.py. They extract final caller functions/production predicate rather than reimplementing acceptance, and use unchanged real RCON helper against one independent loopback mock. They do not launch engine or access direct library.",
+    "opponents20": "Reject flag-only, partial/stationary/different robot, lost/extra iron, undocked/unavailable endpoint, foreign/native change, missing/duplicate marker, ordinary/stale cold, missing ordinary6, fifth process/one cold/wrong cargo stage/ordinary endpoint/aliased save.",
+    "predicate_cases9": "Positive, source, missing marker/save-finished/ZIP, malformed ZIP, bad interim native state, physical-before-interim, CRC corruption. Retained results all pass; positive independently checks closed interim copy exists before sole command, ordinary cannot stop physical server, prior ordinary save message cannot qualify final, startup outside tail is still read.",
+    "scope": "Author controls and injected-defect red are host preparation only. Reviewer did not rerun them or count them as real robot/source/save observations."
+  },
+  "actual_Compose_and_restoration": {
+    "status": "passed-real-composition-zero-native",
+    "bound_packet_sha256": "D1961540B4ADE41B99F27DF723581B2C843E05ADF97B27350C07977A38C76BEF",
+    "failure": null,
+    "native_processes": 0,
+    "factorio_processes": 0,
+    "exact_case_selections": {
+      "source": 10,
+      "destination": 11
+    },
+    "actual_config_and_scenario_copy_hashes_rechecked": true,
+    "all_declared_profile_archive_closures_rechecked": true,
+    "native_roots_and_execute_receipt_and_primary_protected_folder_absent": true,
+    "independent_live_prior_control_archive_checks": 44,
+    "mismatches": 0,
+    "both_activation_restorations": "restored-direct-library-controls",
+    "temporary_B_and_lab_archives_absent": true,
+    "Factorio_observed_now": 0,
+    "input_evidence_manifest": "All12 controller HANDOFF evidence bodies rehashed; player/lab CRC-pass. No RCON credential or full argument vector exposed by reviewer."
+  },
+  "admitted_schedule": [
+    "Fresh NoMIR source ordinary4/5 and protected closed source.",
+    "B MIR-only destination ordinary6; protect ordinary interim before sole command, genuine robot carrying7 at two native positions, conserved delivery/docking, distinct protected physical save.",
+    "Cold1: isolated immutable physical-save copy, one update, exact fresh physical/native frames and natural0.",
+    "Cold2: independent process and another same-byte copy, same checks."
+  ],
+  "limits": [
+    "Native cargo/source/save/cold result remains unperformed until Root executes exact packet and independent raw readback accepts endpoints.",
+    "No physical scalar-only or host/mock result accepted as native. Three ordinary research completions must be counted separately from scripted prereq/setup/supplies and cold observations.",
+    "No F200 physical cargo, broad Ferrum planetary manufacture, UI interaction/export/client lifecycle, multiplayer, timing/performance or stable acceptance.",
+    "Old adverses and published11 bytes stay fixed; no unchanged retry or source/oracle change after a failure."
+  ],
+  "reviewer_activity": {
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-controller-independent-admission-r01.json"
+    ],
+    "Source_controller_or_packet_edits": 0,
+    "library_mutations": 0,
+    "native_processes": 0,
+    "tests": 0,
+    "builds": 0,
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 85639,
+      "bounded_scan_advisory": true
+    }
+  }
+}

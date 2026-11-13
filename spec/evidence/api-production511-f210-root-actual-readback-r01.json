@@ -1,0 +1,21 @@
+{
+  "kind": "RootAPIProduction511F210ActualReadbackV1",
+  "status": "named-published511-api-physical-output-save-two-cold-passed",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "product_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+  "terminal_sha256": "4743B6276EB0179D0C7E877199B1BB26C5833700C9715EC67FA01773DAE8BEFE",
+  "native_result": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\api-production511-f210-r01\\result.json",
+    "sha256": "FDE94D273E246D748385CB8F95317AE4ABFEB6167525378CBE424513424BAF7C"
+  },
+  "actual_processes": 4,
+  "physical_plates_each": 100,
+  "physical_cables_before": 200,
+  "physical_cables_after": 202,
+  "ordinary_labs_claimed": 0,
+  "readonly_colds": 2,
+  "completed_save_sha256": "FAD7513475912E049514A73C10619E7BBB7159AD01705FD441D6B2DA24DE6170",
+  "independent_review_sha256": "7781C7AB2854F2B2CE622A9850D6BC354442C4A3A3F1372A8D474526DAD1754F",
+  "all_28_raw_custody_members_equal": true,
+  "limits": "Only exact F2102.1.23 SpaceAge API detached-query/physical-crafting/save/two-cold case. Native researched setters are explicit; zero ordinary laboratory claims. No general API stability, F210, upgrade, client, performance or stable verdict."
+}

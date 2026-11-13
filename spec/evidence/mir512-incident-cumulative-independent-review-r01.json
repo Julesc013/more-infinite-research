@@ -1,0 +1,59 @@
+{
+  "kind": "MIR512IntegrationAndHistoricalClockIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-10T03:20:42.748332+00:00",
+  "integration": {
+    "verdict": "GO bounded cumulative integration; required checks on exact new head remain mandatory, not certified green by this review.",
+    "base": "b05a551778c5db44c3fc6011152dbd1e3ccdfe5b",
+    "head": "adea34b3c9f56d4a12fda9c8992148f1cd0f4979",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "findings": [],
+    "checks": [
+      "All 25 changed paths are docs/progress, six evidence JSONs, test driver/inventory, or test fixture/controls. Player source tree is byte-identical to b05; primary clean.",
+      "Fifteen fixture/host-test bodies match reviewed 371e26b2a08cd76748a85dfe24c50e36e6c7404d exactly. Registration adds one selected Lua control without removing controls or weakening inventory assertions.",
+      "Scoped .gitattributes sets -text only for the unmodified Cerys excerpt and license. It preserves independent byte-hash expectations on Windows; no global checkout/filter change.",
+      "All six published evidence files equal their original independent receipts byte-for-byte. Progress preserves original identities, four ordinary completions per vector route, separately identified F210 five-plus-three accepted processes, fresh F200 eight, distinct adverse attempts, and outstanding incident/UI/acceptance work."
+    ],
+    "public_receipt_sha256": {
+      "native-credit-vector512-f200-independent-result-review-r01.json": "3BB8C026EF9835C74E1CD13FC13CD9EF77CBB8A49062CDEF81A93A537389391E",
+      "native-credit-vector512-f200-science-adverse-review-r01.json": "3F217704BBAB5618F7D6E713E5C7FE981BF9313326C979F10A271C6570C86781",
+      "native-credit-vector512-f210-adverse-policy-review-r01.json": "9C52A837C327CE3A741E477045978698591094F17BF60FDAA8BE8BCC6E01CBF8",
+      "native-credit-vector512-f210-independent-result-review-r01.json": "2AFAF3CB590733FF2AD18EA4A879F4D88F9FB458F0602EFBCCAFCBE29F4523CC",
+      "native-credit-vector512-independent-source-review-r01.json": "FA61DAB823A2E6B17CB5C7D95341823327D49025F587998574E73519386775EA",
+      "worker512-history-continuity-independent-result-review-r01.json": "62693FC79032593B85A4451980C6CCD048E59B19FF286686A498E5F8572488C2"
+    },
+    "limits": "No new Source, package, reporter-save repair, full Cerys, historical Base addition, stable or publication acceptance. F210 accepted speed100001 inputs remain distinct from F200115200. b05 CI green does not establish adea CI green."
+  },
+  "diagnostic": {
+    "admission": "GO was communicated before Root execution for ONE process only; no cold or target stage.",
+    "packet_sha256": "D2EE532D3077EC067A55612641B4618F809817E899F25BD6ED2DE551DB7D55EB",
+    "owner_sha256": "479CE71D2150032248B4D915F491212CB801E35E864493449C34ABB1DD7BD6CF",
+    "composition_sha256": "DACD528C5AAA123295DA4301F0AF64FBF25EE66E67C897F124CB6D942D63EF4D",
+    "actor_sha256": "00588A77911F76A04CF8E3174CEEDE1D03F749A0B91C472EAE52840996B3DF7B",
+    "bindings_sha256": "372C257AB8EAEE242E5344880243EA5F87530D071E38603964063D3F9EA706B3",
+    "prelaunch_checks": "Actor only appends observed values to error text; original n==2 AND game.speed==1 predicate unchanged. All 58 other ZIP members match original; both CRCs pass. Thirteen input pins, five Compose copies, fresh contained roots, published501750ECA/D3/875 File settings and intentional b05 harness distinction verified. Owner differs from prior admitted normalization owner only by three-to-one process/cold bounds. Actual Compose zero-native and both wrong bindings refuse.",
+    "actual": {
+      "classification": "Expected strict observer refusal, not normalization or product failure",
+      "pid": 46012,
+      "exit_code": 1,
+      "exit_mode": "natural completed resource ledger; no timeout or completion predicate",
+      "canonical_error": "pure closure or game.speed1 differs [mods=2 speed=16 base=2.0.77 mir=5.0.20001]",
+      "terminal_sha256": "37FC7E73DAE0CF038D88CD18D06FF147F5EFB194C670B63C717F6E0297B34DD7",
+      "canonical_log_sha256": "053345D1F5F61171387829AF97C575AD6BB29723D8067CB9F77C250C35CC1A87",
+      "accepted_saves": 0,
+      "cold_processes": 0
+    },
+    "integrity": "All ten actual original-to-primary custody members match recorded hashes. Original input/settings/product remain pinned. Recorded restoration and live two controls plus eighteen pre-existing MIR archives match; temporary old501 archive removed; Factorio0.",
+    "clock_recommendation": "GO to prepare a separate test-input correction requiring exact observed16 and adding game.speed to strict native pre/post/cold frames, with wrong-speed opponent and no speed setter. Speed1 was an unsupported test assumption, not a product requirement. The getter proves only this callback boundary, not raw serialized origin. No r04 execution or later candidate addition admitted by this receipt.",
+    "limits": "No pure predecessor/native-frame preservation or save/cold endpoint was reached. Keep both original normalization and diagnostic adverses unchanged; do not claim old accelerated gear paid-science/time preservation."
+  },
+  "operations": {
+    "source_or_packet_edits": 0,
+    "native_launches_by_reviewer": 0,
+    "builds": 0,
+    "host_tests": 0,
+    "CI_launches": 0,
+    "private_repo_mutations": 0,
+    "children": 0,
+    "only_new_file": "this receipt"
+  }
+}

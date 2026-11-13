@@ -350,13 +350,14 @@ class AngelF210PipelineTests(unittest.TestCase):
         self.assertEqual(upstream["prerequisites"], disabled["prerequisites"])
         self.assertEqual(upstream["effects"], disabled["effects"])
 
-    def test_unexpected_preexisting_angel_steel_effect_refuses_before_publication(self):
+    def test_duplicate_preexisting_angel_steel_effect_refuses_before_publication(self):
         raw = deepcopy(self.context["cases"]["space_age"]["raw"])
-        raw["technology"]["steel-plate-productivity"]["effects"].append({
+        effect = {
             "type": "change-recipe-productivity",
             "recipe": "angels-plate-steel",
             "change": 0.1,
-        })
+        }
+        raw["technology"]["steel-plate-productivity"]["effects"].extend([effect, deepcopy(effect)])
         self._assert_prepublication_refusal(
             "space_age", raw, "missing or duplicate effect for angels-plate-steel"
         )

@@ -1,0 +1,22 @@
+{
+  "kind": "MIR512ReviewedReleaseCopyCorrectionV1",
+  "release_id": 441736666,
+  "pr": 1875,
+  "reviewed_head": "532f174593fea21446bbcd03b3db1694b979ab32",
+  "merged_main": "7949f596a087156e4d2d75ef5157e1bda429c3ae",
+  "body_sha256": "5A87F45AC47A07C57896D340D03D8873D9CA202E50D439D94D7A3B7F613914EB",
+  "all_19_asset_metadata_unchanged": true,
+  "all_19_local_asset_hashes_unchanged": true,
+  "published_tag_unchanged": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+  "local_texts": {
+    "release-notes.md": {
+      "bytes": 2865,
+      "sha256": "74A7B2720293395F93F3522BB1ED9480F0552C59A3C5BA64C89041C48F85ADFB"
+    },
+    "upload-text.txt": {
+      "bytes": 2710,
+      "sha256": "9829160DFEBDD8F2B78A59C1D0C9F6E22C892BC8E975280C345435F006EFDD2F"
+    }
+  },
+  "limits": "Metadata/text scope correction only; no package/source/stable qualification or replacement assets"
+}

@@ -1,0 +1,456 @@
+{
+  "kind": "Ferrum511F210FinalDataIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-09T12:48:23.381793+00:00",
+  "verdict": "Two exact full-stack native final-data observations are valid and successful; FULL DEFAULT CONTINUATION EXPECTATION NOT MET: MIR6 drops Ferrum robotics science. Do not claim full Ferrum final-data qualification from the successful process exits.",
+  "identity": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\execute-terminal.json",
+      "bytes": 57155,
+      "sha256": "D77DFBE07BA7C6CE7B8C462E37A31F108EB848FD0B62659B06F3117E47E237DD"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\packet.json",
+      "bytes": 10777,
+      "sha256": "D12E5104201EFDD20B72EEA438750282DEA4721C3D8E91D9A381157D13E04CB4"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\Invoke-FerrumData.ps1",
+      "bytes": 9336,
+      "sha256": "6A5477AF137FE647F907B63B13C1C5607AE841F26A779393B48119677155E7AE"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\composition.json",
+      "bytes": 40744,
+      "sha256": "F2CC707CEC2E8C7B6BEC0A9710E663E89087D3BD1DA82008346C316EA2A9C2C4"
+    },
+    "prior_packet_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-independent-packet-review.json",
+      "bytes": 8333,
+      "sha256": "3B3054A7CD006147422DC8C8DDA57F0FAC23A8FF1F40EC1CFB372BB19AADBD34"
+    },
+    "independent_expectations": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-final-data-expectations-independent-r01.json",
+      "bytes": 11759,
+      "sha256": "06DA80A1F9CF863F0F729FA8C9B38DC4B30316CB3404CFA47A8E605DD20A1758"
+    },
+    "runner_head": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "candidate": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.11\\more-infinite-research_5.0.21011.zip",
+      "bytes": 1006768,
+      "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    }
+  },
+  "actual_stages": [
+    {
+      "id": "upstream",
+      "pid": 31412,
+      "exit_code": 0,
+      "timed_out": false,
+      "passed": true,
+      "selected_count": 9,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "data_raw": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\upstream\\write-data\\script-output\\data-raw-dump.json",
+        "bytes": 30149352,
+        "sha256": "81D019A1BD8FAB9EF9028F7167823DD054C9FFEC7EC785E4244298C4E03C9C9E"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\upstream\\write-data\\script-output\\mod-settings-dump.json",
+        "bytes": 4126,
+        "sha256": "5CF71F05AD7777D32797D0C302B13F9F3FE51339CD9DB16B4B16083A2E75947C"
+      },
+      "factorio_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\upstream\\write-data\\factorio-current.log",
+        "bytes": 12474,
+        "sha256": "E5B86C97014E58FB5A61334E1BB9786AA71D837D659D627715371A26CF8D344F"
+      },
+      "primary_and_native_members_verified": 9,
+      "restoration_status": "restored-direct-library-controls",
+      "library_controls_restored": true,
+      "outer_archive_actions": []
+    },
+    {
+      "id": "with-mir",
+      "pid": 40628,
+      "exit_code": 0,
+      "timed_out": false,
+      "passed": true,
+      "selected_count": 10,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21011",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "data_raw": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\with-mir\\write-data\\script-output\\data-raw-dump.json",
+        "bytes": 30372560,
+        "sha256": "7C9C616B3B1A109E6966A07813F11EEF20597B201AD6DF674FFDEE6F1183BC25"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\with-mir\\write-data\\script-output\\mod-settings-dump.json",
+        "bytes": 754702,
+        "sha256": "0B1DB98501822BA0A6DB19BB7ACC43072226F6B60745803743FFEF56A3FF6D32"
+      },
+      "factorio_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-controller\\native-captures\\with-mir\\write-data\\factorio-current.log",
+        "bytes": 12821,
+        "sha256": "9F045C5999446C0B493D47877A31B0A906A56F7991D3A62794ECB861D23C304E"
+      },
+      "primary_and_native_members_verified": 9,
+      "restoration_status": "restored-direct-library-controls",
+      "library_controls_restored": true,
+      "outer_archive_actions": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+          "action": "removed-temporary"
+        }
+      ]
+    }
+  ],
+  "finding": {
+    "id": "FERRUM511-SCIENCE-ORDER-01",
+    "classification": "Demonstrated final-data discrepancy against frozen independent terminal-science preservation expectation; source-supported ordering explanation, no actual intermediate-state diagnostic. Compatibility correction/decision required before claiming this expected Ferrum continuation pass.",
+    "expected_science": [
+      [
+        "automation-science-pack",
+        1
+      ],
+      [
+        "logistic-science-pack",
+        1
+      ],
+      [
+        "chemical-science-pack",
+        1
+      ],
+      [
+        "production-science-pack",
+        1
+      ],
+      [
+        "utility-science-pack",
+        1
+      ],
+      [
+        "ferrum-robotics-science-pack",
+        1
+      ],
+      [
+        "electromagnetic-science-pack",
+        1
+      ]
+    ],
+    "actual_science": [
+      [
+        "automation-science-pack",
+        1
+      ],
+      [
+        "logistic-science-pack",
+        1
+      ],
+      [
+        "chemical-science-pack",
+        1
+      ],
+      [
+        "production-science-pack",
+        1
+      ],
+      [
+        "utility-science-pack",
+        1
+      ],
+      [
+        "electromagnetic-science-pack",
+        1
+      ]
+    ],
+    "missing": "ferrum-robotics-science-pack",
+    "evidence": "Both upstream finite4/5 actual final rows include robotics1; both actual final labs accept all expected seven packs and all seven resolve to actual data.item entries. Thus final-data lab incompatibility or missing item cannot justify the omission. Formula/effect/time and named prerequisite set otherwise match06DA.",
+    "ordering_evidence": "Actual with-MIR factorio-current.log119: MIR data-final-fixes at1.372; line122: Ferrum data-final-fixes at1.460. Ferrum source145–152 adds robotics inputs to space-capable labs in its later final stage. MIR science collector367–387 snapshots stage-local labs and defaultreduce1187–1200 can remove unsupported ingredients before that late addition. This is the narrow likely cause supported by exact source/order, not a scalar observation of labs during MIR execution.",
+    "no_waiver": "Keep original06DA/3B30 and successful raw observations unchanged. Do not add robotics after load, reapply settings, change expected vector to current output, call this gameplay failure, or claim a correction has been tested."
+  },
+  "passing_data_observations": {
+    "foreign4_and5": [
+      {
+        "name": "worker-robots-storage-4",
+        "full_row_equal": true,
+        "canonical_full_row_sha256": "1ED8D50C8FEC5D74ECD3BC95B889430D1F32DE41DFFA8E6C43E450063E147328",
+        "unit": {
+          "count": 675,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-storage-3",
+          "ferrum-robotics-science-pack"
+        ]
+      },
+      {
+        "name": "worker-robots-storage-5",
+        "full_row_equal": true,
+        "canonical_full_row_sha256": "8CC386D274E3954AD0DEB72625240D12E914A0ED1612CE3FB02AF82653970342",
+        "unit": {
+          "count": 1012,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-storage-4"
+        ]
+      }
+    ],
+    "public6": {
+      "type": "technology",
+      "name": "worker-robots-storage-6",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "localised_name": [
+        "technology-name.worker-robots-storage"
+      ],
+      "localised_description": [
+        "technology-description.worker-robots-storage"
+      ],
+      "level": 6,
+      "upgrade": true,
+      "hidden": false,
+      "max_level": "infinite",
+      "prerequisites": [
+        "worker-robots-storage-4",
+        "worker-robots-storage-5",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack",
+        "electromagnetic-science-pack"
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "unit": {
+        "count_formula": "1518.75*1.5^(L-6)",
+        "time": 60,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "electromagnetic-science-pack",
+            1
+          ]
+        ]
+      }
+    },
+    "public7_absent": true,
+    "public6_upstream_absent": true,
+    "private_full_default_holder": {
+      "type": "technology",
+      "name": "mir-worker-storage-preservation-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "localised_name": [
+        "technology-name.worker-robots-storage"
+      ],
+      "localised_description": [
+        "technology-description.worker-robots-storage"
+      ],
+      "level": 4,
+      "upgrade": true,
+      "hidden": true,
+      "max_level": "infinite",
+      "prerequisites": [
+        "worker-robots-storage-2",
+        "utility-science-pack",
+        "worker-robots-storage-3",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "electromagnetic-science-pack"
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "unit": {
+        "count_formula": "675*1.5^(L-4)",
+        "time": 60,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "electromagnetic-science-pack",
+            1
+          ]
+        ]
+      },
+      "visible_when_disabled": false,
+      "enabled": false,
+      "order": "zz[mir-worker-storage-preservation]"
+    },
+    "compatible_labs_for_all_expected_science": [
+      "lab",
+      "biolab"
+    ],
+    "all_expected_ingredients_defined_as": "item",
+    "science_default": "configured",
+    "lab_default": "reduce"
+  },
+  "custody_and_restoration": "All18 distinct raw members (9 per stage) independently match both executing native roots and retained primary copies by exact set/size/SHA256. Actual input archives CRC/hash pass, using original dist C3CB for the deliberately removed temporary direct-library MIR path. Both selected/loaded closures match9/10 exact intended mods; observer, engine and package identities retained. No fatal diagnostic in either raw log/stdout/stderr. Process ledgers show distinct PIDs31412/40628 and natural0/0. Kernel recorded complete direct-control restoration, outer archive actions remove temporary MIR, terminal Factorio0; subsequent repair Compose lease/current selection is not reinterpreted as failure of this completed restoration.",
+  "limits": "Only exact F2102.1.23 full-Ferrum0.1.5/PlanetsLib2.4.0/spider2.9.87 final-data/startup captures. No map, runtime initialization, ordinary labs, cargo/earned work, prepare/transfer, queues/caps, saves/colds, API, menu, performance, F200, release or stable verdict. No Source/controller/library/native mutation or tests/builds/reruns by reviewer; only this new primary receipt written."
+}

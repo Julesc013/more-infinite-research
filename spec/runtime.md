@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -25,6 +25,8 @@ Import modules while control code is parsed. Do not `require` within an event, G
 `RUN-02` — Keep the minimum durable state with one owner per field, explicit schema evolution and tested invalid-object cleanup. Derivable immutable data belongs in local caches only when useful. The data-stage state does not persist into runtime. Do not transport the old compiler snapshot for caps or the Library.
 
 A module is lazily activated by feature/settings checks, but a control-stage module needed for future callbacks must still be imported before callbacks. Lazy activation is not permission for prohibited late imports.
+
+The [maintainer-approved worker identity exception](https://github.com/Julesc013/more-infinite-research/issues/1845#issuecomment-6779844289) permits ordinary default worker cargo research on Factorio 2.0/2.1 to use `mir-worker-storage-default-4`, so a later provider cannot replace its continuously advancing native state. Retain `worker-robots-storage-4` as the first prerequisite or provider-owned finite stage; native objects, research events and API queries keep their literal identities rather than aliasing one to the other. Validate every force and the old/new native contracts before transferring earned levels or current, queued and suspended work exactly once. Keep old work at its original cost and preserve foreign research and bonuses. The hidden head debit and preservation holder remain supporting research, never ordinary alternatives. No per-tick history mirror, guessed erased history or aggregate bonus compensation substitutes for native preservation; affected save/research/cap/Library/API checks remain release requirements.
 
 ## Required feature fidelity
 

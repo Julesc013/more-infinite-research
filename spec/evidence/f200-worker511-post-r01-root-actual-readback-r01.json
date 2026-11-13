@@ -1,0 +1,137 @@
+{
+  "kind": "RootF200Post511ActualReadbackV1",
+  "status": "all16-native-processes-and-four-save-two-cold-endpoints-passed",
+  "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "product_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+  "engine": "2.0.77",
+  "provider": "Secretas1.0.33+pretty-frozeta0.1.0",
+  "terminal_sha256": "CEF2B41A7967248224A6F36B9FEA703D8E0ADE8A116A3657D0E355B4142E673B",
+  "scripted_precursors": true,
+  "distinct_ordinary_endpoint_labs": 6,
+  "readonly_colds": 8,
+  "cases": [
+    {
+      "id": "first-source",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 8,
+      "phase": "source-saved"
+    },
+    {
+      "id": "first-add",
+      "processes": 3,
+      "ordinary": {
+        "mir-post-sentinel": 1,
+        "worker-robots-storage-9": 1
+      },
+      "bonus": 9,
+      "phase": "endpoint-saved"
+    },
+    {
+      "id": "unchanged-source",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 10,
+      "phase": "source-saved"
+    },
+    {
+      "id": "unchanged-upgrade",
+      "processes": 3,
+      "ordinary": {
+        "worker-robots-storage-9": 1
+      },
+      "bonus": 11,
+      "phase": "endpoint-saved"
+    },
+    {
+      "id": "caps-seed",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 7,
+      "phase": "prepared-saved"
+    },
+    {
+      "id": "caps-provider",
+      "processes": 1,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1
+      },
+      "bonus": 8,
+      "phase": "provider-saved"
+    },
+    {
+      "id": "caps-enable",
+      "processes": 3,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1
+      },
+      "bonus": 8,
+      "phase": "cap-saved"
+    },
+    {
+      "id": "caps-disable",
+      "processes": 3,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1,
+        "mir-post-sentinel-two": 1
+      },
+      "bonus": 8,
+      "phase": "disabled-saved"
+    }
+  ],
+  "protected_saves": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\first-source.zip",
+      "exists": true,
+      "bytes": 852609,
+      "sha256": "2E49F56A300D5F61CF20B7C91EC2A7A4E7EE9852E4E4D5C0A9BFE4F4E5389049"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\first-add.zip",
+      "exists": true,
+      "bytes": 876525,
+      "sha256": "3BAC147B070EA9E06DC68F28DB744EC0661CD5E0C2066788D770E3D5FD01B15A"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\unchanged-source.zip",
+      "exists": true,
+      "bytes": 927689,
+      "sha256": "C133A7395A7E029396F42B11386AB18FC754D24182B64489848C6FADB88BAA48"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\unchanged-upgrade.zip",
+      "exists": true,
+      "bytes": 933111,
+      "sha256": "976B5D639F6834D347FE0766BB2E63F74E7B543C7456EA1E7F6894A2133F97AF"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\caps-seed.zip",
+      "exists": true,
+      "bytes": 914423,
+      "sha256": "41A235085B5121BA8987E3EF1BD297495B8FAF7C2C201083586FBA2E5C99F610"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\caps-provider.zip",
+      "exists": true,
+      "bytes": 917671,
+      "sha256": "53FA2822A22C4F88B495BC382900A1045570FF1DD7CC364C1A5E9D5A854ED0B5"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\caps-enable.zip",
+      "exists": true,
+      "bytes": 917710,
+      "sha256": "233E5179FE2D46D6CD757FB9BDDA597DCAD969F8B9CC4227E452D95E4E934329"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-worker511-post-r01-controller\\protected\\caps-disable.zip",
+      "exists": true,
+      "bytes": 917737,
+      "sha256": "FF66B49151F005FFCC4D321E6001474693638D85CD9A5FF3B8BB33BC8EB1906A"
+    }
+  ],
+  "all_eight_save_crc_passed": true,
+  "release_qualification": false,
+  "limits": "Named 2.0.77 provider-already-present firstMIR, unchangedprovider510\u2192511 and retired-private cap9/family-disable only. Scripted native precursors are separate from the genuine ordinary-source worker preservation route. No Ferrum, repeated provider, physical robot cargo, performance, arbitrary settings or stable verdict."
+}

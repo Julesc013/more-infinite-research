@@ -17,6 +17,7 @@ local INTERNAL_CREDIT_IDS = {
   ["mir-k2-imersite-staged-state-1"] = true,
   ["mir-k2-imersite-continuation-state-4"] = true,
 }
+if target.id == "f200" or target.id == "f210" then INTERNAL_CREDIT_IDS["mir-worker-storage-head-4"] = true end
 for name in pairs(require("research.native_gun_credit_definitions").private_ids()) do
   INTERNAL_CREDIT_IDS[name] = true
 end
@@ -186,7 +187,7 @@ local function py_material_rows()
   return rows
 end
 
-local function static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
+local function static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
   runtime_private_credit_ids = copy(INTERNAL_CREDIT_IDS)
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
@@ -259,11 +260,18 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
       "p[research_spoilage_preservation]", "technology-name.more-infinite-research.research_spoilage_preservation")
   end
   for _, continuation in ipairs(selected.continuations) do
-    rows[#rows + 1] = {id=continuation.id, family=continuation.family, progression=continuation.level,
+    local row = {id=continuation.id, family=continuation.family, progression=continuation.level,
       native_order=continuation.order or "", setting="mir-enable-" .. continuation.setting_key,
       cap_setting="mir-max-level-" .. continuation.setting_key, settings=continuation_settings(continuation.setting_key),
       locale_key=locale_key(continuation.localised_name), ownership_kind="authored_generated",
       legacy_binding=historical_binding(continuation.source, continuation.operation)}
+    rows[#rows + 1] = row
+    if worker_default_split and continuation.id == "worker-robots-storage-4" and worker_storage == nil then
+      row.fixed_maximum = 4
+      local tail = copy(row)
+      tail.id, tail.progression, tail.fixed_maximum = "mir-worker-storage-default-4", 4, nil
+      rows[#rows + 1] = tail
+    end
   end
   if selected.k2_imersite then
     for _, row in ipairs(imersite_rows()) do rows[#rows +1] = row end
@@ -320,28 +328,37 @@ local runtime_rows_source
 local runtime_rows_withheld
 local runtime_rows_finite_research_speed
 local runtime_rows_worker_storage
+local runtime_rows_worker_default_split
 
-local function prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
+local function prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
+  if worker_default_split ~= nil and type(worker_default_split) ~= "boolean" then
+    error("MIR catalogue worker default split must be boolean", 3)
+  end
+  worker_default_split = worker_default_split == true
+  if worker_default_split and target.id ~= "f200" and target.id ~= "f210" then
+    error("MIR catalogue worker default split requires a modern target", 3)
+  end
   finite_research_speed = finite_research_speed == true
   if runtime_rows == nil or runtime_rows_source ~= existing_technology_prototypes
       or runtime_rows_withheld ~= withheld_native_owners
       or runtime_rows_finite_research_speed ~= finite_research_speed
-      or runtime_rows_worker_storage ~= worker_storage then
+      or runtime_rows_worker_storage ~= worker_storage or runtime_rows_worker_default_split ~= worker_default_split then
     runtime_rows_source = existing_technology_prototypes
     runtime_rows_withheld = withheld_native_owners
     runtime_rows_finite_research_speed = finite_research_speed
     runtime_rows_worker_storage = worker_storage
-    runtime_rows = static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
+    runtime_rows_worker_default_split = worker_default_split
+    runtime_rows = static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
   end
   return runtime_rows
 end
 
-function M.prepare(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
-  prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
+function M.prepare(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
+  prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
 end
 
-function M.declared(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
-  local rows = prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage)
+function M.declared(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
+  local rows = prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed, worker_storage, worker_default_split)
   local out = {}
   for index = 1, #rows do out[index] = copy(rows[index]) end
   return out

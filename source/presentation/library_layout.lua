@@ -2,6 +2,15 @@
 -- Kept independent of Factorio GUI objects so sizing decisions stay small
 -- and testable without loading a game.
 local M = {}
+-- The native frame action and draggable header share one logical height.
+M.titlebar_action_size = 24
+M.control_height, M.label_height = 28, 20
+M.control_gap, M.filter_gap, M.section_gap = 4, 8, 12
+
+function M.title_caption_width(width)
+  -- Four actions, native frame padding/flow gaps, and a small usable handle.
+  return math.max(1, width - 4 * M.titlebar_action_size - 2 * M.section_gap - 6 * M.control_gap - 16)
+end
 
 local function finite(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
@@ -30,8 +39,9 @@ function M.frame_size(resolution, scale, geometry)
 end
 
 function M.filter_layout(width)
-  -- The authored controls use two columns below a full-width search.
-  return 2, math.max(1, integer((width - 80) / 2))
+  -- One filter row on wide windows; retain readable controls as space shrinks.
+  local columns = width >= 960 and 5 or (width >= 620 and 3 or (width >= 440 and 2 or 1))
+  return columns, math.max(1, integer((width - 80 - (columns - 1) * M.section_gap) / columns))
 end
 
 -- Every selected tab occupies the same viewport below the fixed navigation.
@@ -42,7 +52,10 @@ function M.tab_content_height(frame_height)
 end
 
 function M.content_height(frame_height, pairs_per_row)
-  return math.max(120, frame_height - (frame_height < 600 and 280 or 360))
+  local rows = math.ceil(5 / (pairs_per_row or 2))
+  local field_height = M.label_height + M.control_height + M.control_gap
+  local filters_height = field_height + rows * field_height + rows * M.filter_gap
+  return math.max(120, M.tab_content_height(frame_height) - filters_height - M.section_gap)
 end
 
 function M.split_sizes(width, height)

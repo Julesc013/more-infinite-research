@@ -1,0 +1,64 @@
+{
+  "kind": "MIRAeroLibrarySettingsCompositionIndependentSourceReviewV1",
+  "reviewer": "Black Glass root, independent of Aero author",
+  "head": "a48711770a6d5cb74f7ac18ba9c012b349f5a21a",
+  "prerequisite": "719abd75e9611a591b1c5244e6573e96cfc89f7d",
+  "verdict": "APPROVE five-file bounded test-only delta after1856; not native acceptance",
+  "facts": [
+    "All59previous test method ASTs unchanged;27old metadata bytes unchanged.",
+    "Canonical legacy probe byte-identical SHA9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234.",
+    "0.3.10 exclusively opts into exact11 tuples; old0.3.9 and0.4.4 protocols stay distinct.",
+    "Seven ordered prepare/check stages per each real EN/DE client preserve the peer root/query/tab/settings list/count/scope and existing three-force native baseline.",
+    "Unchanged probe independently enforces30tick settle, Other options scope, real filtering/nonmatch,160byte bound and retained Research query.",
+    "Mid-probe load loses local probe refs and refuses resumption; no repair/retry behavior is added.",
+    "Completion resumes existing input/lifecycle; actual desktop rendered acceptance is still required.",
+    "No player Source or published ZIP mutation."
+  ],
+  "ci": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T12:44:11Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42619416390/job/129167404521",
+      "name": "branch-policy",
+      "startedAt": "2026-11-09T12:43:46Z",
+      "status": "COMPLETED",
+      "workflowName": "Branch Policy"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T12:44:43Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42619416392/job/129167404595",
+      "name": "verification-plan",
+      "startedAt": "2026-11-09T12:43:46Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T12:44:49Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42619416392/job/129167404992",
+      "name": "native-tooling-controls",
+      "startedAt": "2026-11-09T12:43:46Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T12:58:29Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42619416392/job/129167845862",
+      "name": "host-controls",
+      "startedAt": "2026-11-09T12:44:45Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    }
+  ],
+  "limits": [
+    "Bind helper member plus exact archive/controller/profile/seed/engine/window/resource packet before real native execution.",
+    "This exact observer admits11only; new12binding must preserve frozen11fixturebytes and independently recheck any UI hierarchy changes.",
+    "Fixture host model and remote opens do not substitute actual input, full exports, lifecycle or rendered localization acceptance."
+  ]
+}

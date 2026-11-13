@@ -5,12 +5,38 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-13
 supersedes: []
 superseded_by: []
 ---
 
 # Imported Library native input and lifecycle observation
+
+## Exact 5.0.14 preparation
+
+The following new identities bind the same existing protocols to the published 5.0.14 beta. The 5.0.13 and earlier metadata and evidence keep their original identities.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.13 | `info-input-514-settings-api-f200.json` or `info-input-514-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+| Support exports | 0.4.7 | `info-exports-514-f200.json` or `info-exports-514-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+
+Compose from one reviewed commit with the same `control.lua` and `catalogue.lua`, plus the unchanged Settings probe for input or `support-exports.lua` for exports. Preserve the complete Settings, peer, input, export, privacy, native-work and responsive-width protocols described for 5.0.13 below. Exact candidate packages and protected saves require their own native-owner review; this preparation is not a native or stable acceptance result.
+
+## Exact 5.0.13 preparation
+
+The following new identities bind the existing protocols to the published 5.0.13 beta. Earlier metadata, frozen archives and execution records retain their original versions and bytes; compose each new archive from one reviewed committed revision.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.12 | `info-input-513-settings-api-f200.json` or `info-input-513-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20013; Base 2.1.23 / MIR 5.0.21013 |
+| Support exports | 0.4.6 | `info-exports-513-f200.json` or `info-exports-513-f210.json` | Base 2.0.77 / MIR 5.0.20013; Base 2.1.23 / MIR 5.0.21013 |
+
+Include `control.lua` and the unchanged independent `catalogue.lua`. Input observer 0.3.12 additionally requires the unchanged canonical `library-legacy-settings-search/probe.lua` projected as `legacy-settings-search.lua`; export observer 0.4.6 requires `support-exports.lua`. Bind each member's raw Git bytes, its resulting archive hash, the accepted player ZIP and the protected save in the native execution owner's reviewed packet. The closure remains Base, MIR, active-mod observer 0.1.0 and the selected input/export observer; no historical migration controller is reactivated.
+
+The new input observer retains all fourteen EN/DE Settings prepare/check pairs, forty-eight queries, five joins, two resets, removal/replacement and the saved-host restart. The export observer retains thirteen actual clicks, two distinct server commands, peer-local files/errors, false/zero values, five joins and restart. Both preserve the complete three-force earned/native/foreign-work baseline and responsive native width/column checks. They reject earlier/later MIR versions, opposing editions, unqualified engine patches and old/new mismatched observer identities.
+
+This is test preparation, with no new native or stable verdict. The full two-client protocol keeps its existing memory admission and actual client/window/input requirements; a one-client subset or screenshot is not its substitute. Actual Unicode query continuity for 5.0.13's search correction still needs the separately reviewed real-input case. Preserve and reuse the completed historical forward journeys and all earlier failures instead of restarting those histories to prepare these observers.
 
 ## Current helper-free inputs
 
@@ -27,6 +53,18 @@ Input observer0.3.5 attaches to the already-qualified direct MIR1.1 successor wo
 Project exactly `control.lua`, the immutable `catalogue.lua` and `info-input-current-f200.json` or `info-input-current-f210.json` as `info.json`, using raw bytes from one committed revision. The catalogue is byte-identical to the independent historical successor test data at7df0ab82, not MIR implementation. The current closure is Base2.0.77/MIR5.0.20007 or Base2.1.23/MIR5.0.21007, active-mod observer0.1.0 and input observer0.3.5: three archives in addition to built-in Base. Do not install or reactivate the old migration controller, API companion, Space Age or another mod. The original501 profiles/metadata and0.3.4 inputs retain their own immutable revisions.
 
 The observer refuses pre-existing players or its own prior state and waits until the first tick after configuration before admitting clients. It verifies the original31-row/71-recipe, three-force earned-state contract: player gear3/.20, unearned foreign/detached gear, the other paid rows, three private module holders2/.11, unearned cannon holder1, battery.10, foreign queue and `.42/8000` current progress, and `.27/8000` detached saved progress. The fractions preserve research units at the original full cost; they are not42%/27%. Native flags, queue/current/partial work, recipe totals and aggregates remain protected throughout the existing48-query/five-join/two-reset lifecycle. No research or credit is seeded. Raw save/player/mod-state applicability and exact package/controller binding remain the native owner's responsibility; a missing force, mismatched state or configuration refusal stops before input.
+
+## Optional 5.0.11 legacy Settings API composition
+
+The separate `info-input-511-settings-api-f200.json` and `info-input-511-settings-api-f210.json` metadata select input observer0.3.10 with exact Base2.0.77/MIR5.0.20011 or Base2.1.23/MIR5.0.21011. Existing0.3.9 input,0.4.4 export and all historical metadata retain their identities and original protocols. Preserve any already frozen archives and their original source commits; do not rebuild an old fixture identity from this changed controller and call its bytes unchanged. This composition changes test code only and provides no native or stable verdict.
+
+Include the unchanged [legacy Settings-search probe](../library-legacy-settings-search/probe.lua) at the owned observer ZIP root as `legacy-settings-search.lua`, alongside this `control.lua`, the existing exact historical `catalogue.lua` and selected metadata as `info.json`. Bind each member's raw Git bytes and the resulting archive hash in the native owner's separate profile/controller review. The original probe remains canonical at its existing path; do not maintain a second edited implementation. Missing helper bytes must stop loading. The two prepared0.3.9 metadata files do not select this additional protocol.
+
+After the post-configuration native baseline and two real EN/DE clients are ready, call `advance("settings-api-start")` before `inspect`. Read `report().legacy_settings_search`: actor1 is English, actor2 German, and stage1..7 follows the unchanged probe's `research`, `settings-options-baseline`, `settings-options-repair`, `settings-options-retained-default`, `settings-options-no-match`, `restore-settings-options-empty`, `restore-research` order. For each actor and stage, invoke `advance("settings-api-prepare")` exactly once, wait until its reported `ready_tick` (at least30 native ticks), independently capture that actual client's rendered query/results/tab, then invoke `advance("settings-api-check")` exactly once. Preserve both clients' captures and raw observations under their actual process/locale identities. A localised-string descriptor or a successful remote call alone is not rendered-client acceptance.
+
+There are14 prepare/check pairs, seven per client. Every pair preserves the other client's live root/query identity, Research text, selected tab, Settings query/list/count/scope and the existing three-force research/effect/queue/progress baseline. The probe checks explicit Settings searches, retained-tab searches, the160-byte bound, filtered/no-match results, Other options scope and independent Research restoration. Its raw observations persist in `legacy_settings_search.observations`; `report` does not advance or initialize it. Mid-probe host reload, skipped or repeated steps, missing locale/client, an early check, any protected-state change or an unexpected peer view must stop without retry or repair.
+
+After all14 checks, `completed` is true and phase returns to `waiting-clients`. Continue the original `inspect` and full native input/lifecycle sequence unchanged;0.3.10 refuses `inspect` before its Settings checks finish. This is an optional later native composition requiring exact package/save/helper/archive/controller/window/resource binding and independent review. It is not a new dispatched native assignment and must not alter frozen0.3.9/0.4.4 inputs already being tested.
 
 ## Corrected client identity observers
 
@@ -93,7 +131,9 @@ The fixture exposes only its own test interface `mir5-library-native-input`: `re
 
 `inspect` and each later private probe require empty private results/details and disabled native-open actions while retaining all imported native levels/flags/effects. Before the cold-host private probe, the fixture first verifies both already restored personal queries and the dragged location without opening either Library. The completed sequence has48 private queries, five actual joins, two keyboard-close events, at least one drag event, two requested native resets and one actual removal of the newly joined German test player. It never creates a fake player. Its two new saves are `mir5-library-native-input-restart` and `mir5-library-native-input-complete`. Keep owned native screenshots and actor receipts separately for every action and both final clients.
 
-The parent supplies one hash-bound actor JSON per action with schema1, kind `MIRLibraryNativeInputV1`, role `client-en` or `client-de`, exact process ID/startUTC/engine hash, client1280Ã—720 dimensions and action `escape`, `inventory`, `text`, `click` or `drag`. Text is bounded to32 ordinary ASCII characters; click/drag points are native client coordinates, and a drag is at most80pixels per axis. Before actual input, independently inspect a current owned-window capture and native geometry to freeze correct textbox/title/foreign-field points. Refuse a different physical client size or blocked foreground; do not treat the existing1280Ã—720 Factorio screenshot request as proof of actual desktop geometry. Capture preparation is functional qualification, not a timed dataset.
+The parent supplies one hash-bound actor JSON per action with schema1, kind `MIRLibraryNativeInputV1`, role `client-en` or `client-de`, exact process ID/startUTC/engine hash, client1280Ãƒâ€”720 dimensions and action `escape`, `inventory`, `text`, `click` or `drag`. Text is bounded to32 ordinary ASCII characters; click/drag points are native client coordinates, and a drag is at most80pixels per axis. Before actual input, independently inspect a current owned-window capture and native geometry to freeze correct textbox/title/foreign-field points. Refuse a different physical client size or blocked foreground; do not treat the existing1280Ãƒâ€”720 Factorio screenshot request as proof of actual desktop geometry. Capture preparation is functional qualification, not a timed dataset.
+
+A separate reviewed query-text plan may use kind `MIRLibraryNativeUnicodeTextV1`; it permits only nonempty `text` action content of at most32 UTF-16 code units with well-formed surrogate pairs and no control, line-separator or paragraph-separator characters. It has no mouse or hardware-key authority, normalizes nothing and does not use the clipboard. Root may use its hash-bound plan only after the existing case review and actual process/window/focus capture binding; its distinct receipt is not a native pass, does not alter the fixed two-client0.3.11 protocol, and still requires one bounded real Unicode case.
 
 ```powershell
 pwsh -NoProfile -File tools/Invoke-LibraryNativeInput.ps1 `
@@ -113,7 +153,7 @@ Host controls use native-shaped doubles and deliberately injected missing events
 
 The0.2 fixture variant reuses the same protected imported native-world,35-row/recipe/three-force and literal-credit assertions while preserving the frozen0.1 keyboard/drag protocol. Compose current `control.lua`, `support-exports.lua` and the appropriate `info-exports-f200.json` or `info-exports-f210.json` as `info.json`; retain the original corrected preservation fixture and exact five-mod Base closure. It imports no MIR code or saved state. Existing public validation checks profiles; native helpers only unpack returned data for independent value/metadata comparisons. The observer reads and writes no export files or engine logs.
 
-Use `remote.call("mir5-library-native-input", "prepare", ACTION)` before the actual owned Windows input click, then `check` with the same action after the event settles. Each successful check returns the exact bounded selectable preview string for external file comparison; it is not file-readback evidence. Use the existing hash-bound1280Ã—720 actor and actual inspected button coordinates, never synthetic Factorio GUI events. Prepare calls preserve an existing active export tab so repeated previews and failure retirement can be observed without rebuilding them first.
+Use `remote.call("mir5-library-native-input", "prepare", ACTION)` before the actual owned Windows input click, then `check` with the same action after the event settles. Each successful check returns the exact bounded selectable preview string for external file comparison; it is not file-readback evidence. Use the existing hash-bound1280Ãƒâ€”720 actor and actual inspected button coordinates, never synthetic Factorio GUI events. Prepare calls preserve an existing active export tab so repeated previews and failure retirement can be observed without rebuilding them first.
 
 | Ordered action | Native and external expectation |
 |---|---|
@@ -138,3 +178,20 @@ The corrected observer requires one of each named server command, from the serve
 File targeting and I/O failures require separate actual server/EN/DE write-data roots and retained before/after manifests. A host-side GUI projection cannot establish a requesting peer's local write error: the observer records each projection and requires the target peer's actual message, screenshot and files to be read independently. Preserve all original outputs before any disposable path control, verify resolved paths remain inside the explicitly owned run directory, use no recursive cleanup and restore the exact controls afterward. A report-path failure may leave a successfully exported settings file. Never count an observer marker alone as an I/O or multiplayer-safe pass.
 
 Keep original and failed receipts, actor identities, actual clicks, native headers/joins and all role-local exports. Verify exact file bytes/string round-trip, full/compact false and zero values through the existing codec/facade, latest-report overwrite/bounds/content and absence of unintended peer outputs. Check server-only startup headers separately for init/configuration and ensure ordinary load/rejoin alone does not rewrite them before an explicit export. The startup path cannot capture an OS-process launch or read factorio-current.log. This is functional qualification outside scored timings; final package hashes, all owned fixture containers, helper/actor/controller hashes, source saves, geometry and teardown/restoration still require binding by the native execution owner before dispatch.
+
+For published MIR 5.0.11, use the matching `info-input-511-f200.json` / `info-input-511-f210.json` metadata for input observer 0.3.9, or `info-exports-511-f200.json` / `info-exports-511-f210.json` for export observer 0.4.4. These retain the existing input/export protocols and bind exactly to MIR 5.0.20011 on Base 2.0.77 or MIR 5.0.21011 on Base 2.1.23. The older 0.3.8 / 0.4.3 tuples remain bound to MIR 5.0.10. The native execution owner still binds exact player ZIP, fixture, protected save, controller and resource admission before dispatch; host controls or fixture construction do not establish native acceptance.
+
+## Separate next-release bindings
+
+The next-release metadata below is test preparation for MIR 5.0.12. Keep every earlier metadata file and archive identity under its original version; do not substitute these files into a previous fixture archive.
+
+| Protocol | Observer | Metadata | Exact engine and MIR tuples |
+|---|---|---|---|
+| Settings search composition, then native input/lifecycle | 0.3.11 | `info-input-512-settings-api-f200.json`, `info-input-512-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20012; Base 2.1.23 / MIR 5.0.21012 |
+| Support exports | 0.4.5 | `info-exports-512-f200.json`, `info-exports-512-f210.json` | Base 2.0.77 / MIR 5.0.20012; Base 2.1.23 / MIR 5.0.21012 |
+
+Observer 0.3.11 requires the same fourteen prepare/check pairs from the unchanged `library-legacy-settings-search/probe.lua` body (SHA-256 `9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234`): all seven declared Settings search stages for EN and DE, before the full existing keyboard, drag, foreign-focus, removal/replacement, save and restart sequence. Observer 0.4.5 retains all thirteen click actions, two server commands, peer-local file and error checks, false/zero values, five joins and the saved-host lifecycle described above. Both retain strict earned/native/foreign-state preservation and exact engine, edition, player-version and observer closure checks; neither accepts a later release implicitly.
+
+The 12-only Research grid check follows the reviewed responsive layout: an owned frame's equal finite integer native minimum/maximum width bounds require five columns at width960 or above, three at620â€“959, two at440â€“619 and one below440. It reads the supported width bounds rather than the write-only `LuaStyle.width` convenience property. Earlier observers still require exactly two columns. Public element names, parent/type paths and mod ownership checks remain strict.
+
+These files do not establish native input, export, file, multiplayer or lifecycle acceptance. Static comparison covered the responsive hierarchy at `af5d96001f2d3e054986a20acfb867f2c8f2346a`; final coherent player-source review, exact package/fixture/controller bindings and native execution remain pending.

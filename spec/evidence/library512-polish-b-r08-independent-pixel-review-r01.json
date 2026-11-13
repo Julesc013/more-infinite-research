@@ -1,0 +1,668 @@
+{
+  "kind": "library512-polish-b-r08-independent-pixel-review-r01",
+  "reviewed_at_utc": "2026-11-09T19:44:15.013363+00:00",
+  "verdict": "STATIC_PIXEL_REVIEW_COMPLETE_WITH_ONE_KNOWN_LAYOUT_DEFECT_AND_EXPLICIT_UNVERIFIED_REGIONS",
+  "pixel_perfect_or_whole_UI_acceptance": false,
+  "identity": {
+    "source": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+    "player": "40a065c18b86437148acd60d7180666db7aaeb32",
+    "root_actual_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-controller\\root-actual-readback.json",
+      "bytes": 134309,
+      "sha256": "7F631C3EBF5EBF7B85C0CB8060C4E27F586853B5D8896908D2497144F048BE7C"
+    },
+    "input_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-independent-admission.json",
+      "bytes": 22547,
+      "sha256": "6254EE110517B03498DAFFCD10FA582B01B8694B934108D47F244384352020D1"
+    },
+    "reused_titlebar_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-titlebar-pixels-independent-review-r01.json",
+      "bytes": 8028,
+      "sha256": "4C33D5BA719B6DF2C721D0CC7F7B1E11B67D972DAABAFC0E6597191884C595C7"
+    },
+    "remote_locator_supplied_by_Root": "3da4713 / INDEX8963; exact local native bodies and hashes independently used; no separate remote download claimed."
+  },
+  "method": {
+    "unique_original_PNGs_actually_assessed": 56,
+    "additional_original_detail_views_this_assignment": 52,
+    "prior_actual_full01_images_reused": 4,
+    "all_original_image_bytes_and_hashes_independently_rechecked": true,
+    "total_PNG_bytes": 216948495,
+    "sequences": "Each case assessed coherently in page01–07 order. Previously actually viewed four01 originals reused with titlebar verdict; their research bodies also assessed. All other52 images viewed using view_image original detail.",
+    "image_transformations": 0,
+    "contact_sheets_created": 0,
+    "native_reruns": 0,
+    "tool_transfer_note": "A seven-image F200 normal-DE emission exceeded tool IPC bytes; it returned no usable images. Those originals were then actually viewed in two smaller batches. No image or native evidence was changed."
+  },
+  "findings": [
+    {
+      "id": "AVAILABILITY-ENTRY-SEPARATION",
+      "priority": "P2 focused presentation defect; already independently identified by Root",
+      "page": "06-availability",
+      "status": "OPEN_IN_FIXED_B",
+      "definite_run_on_cases": [
+        "f210-normal-en",
+        "f210-normal-de",
+        "f200-normal-en",
+        "f200-normal-de",
+        "f200-narrow-en"
+      ],
+      "adjacent_wrapped_column_cases": [
+        "f210-narrow-en",
+        "f210-narrow-de",
+        "f200-narrow-de"
+      ],
+      "actual": "Agricultural-growth and spoilage-preservation omission explanations are bare siblings in the Research two-column area. At the four normal geometries and F200 narrow EN they read as one continuous undifferentiated sentence line, with no row/section separation. Other narrow cases wrap in adjacent columns, making the pair readable but retaining the same weak grouping.",
+      "impact": "Players must parse where one omitted research explanation ends and the next starts. The screenshots do not show lost data or a wrong availability decision; the demonstrated defect is grouping/readability.",
+      "smallest_correction_check": "Keep B originals fixed. For the separately authored correction, render each omission as its own identifiable full entry/row with a bounded gap or clear item boundary. Add a narrow host structural/content assertion for two distinct complete entries, then inspect corrected06 at these existing EN/DE normal/narrow engine-specific geometries. Reuse unchanged pages only with consumed-path justification; this finding does not require inventing a new campaign or rerunning gameplay.",
+      "native_recheck_endpoints": "The eight existing06-availability endpoints; preserve actual sizes/scales. Do not resolve only by appending whitespace to concatenated labels or hide one reason."
+    }
+  ],
+  "shared_visible_results": {
+    "titlebar": "Reuse4C33 non-author actual titlebar PASS. Remaining viewed pages keep the same clearly visible light actions and fitting titles; no new titlebar clipping observed.",
+    "headers_buttons_borders_spacing": "Main tabs/search/filter/action controls, selected/detail boundaries and section headings are contained at the observed geometries. No additional definite overlap, missing glyph or broken border found. Queue empty-state whitespace is intentional; it is not missing content evidence.",
+    "filter_reflow": "All5 Research filter fields remain visible: normal images use one row and narrow cases reflow. Current German In diesem Spiel correction remains contained. No arbitrary label-width relaxation or input behavior acceptance.",
+    "Settings_actions": "F210 normal and both F200 geometries show four actions in one row; F210 narrow uses two rows of two. All visible action captions fit. These are different observed geometry/scale conditions, not assumed equivalent viewport coverage.",
+    "Settings_scroll_budget": "List and detail have usable visible space, outer/list scrollbars visible, no collapsed pane found. Long list-caption ellipsis is paired with selected detail; it is not classified as a defect. Exact reachability, last-row access and wheel routing require real scroll interaction and remain open.",
+    "Help": "Panels/export controls are visually identifiable. F200 preview regions are unobscured in these captures. F210 preview tooltips cover some text; narrow left-pane continuation is below viewport. Those regions are not signed off.",
+    "Research_missing_filtered": "Normal Research54-results, robot-filter3-results and Not-added omission explanations were seen. This does not cover a zero-match query, a populated queue, every research detail or arbitrary mod/setting profile."
+  },
+  "page_scope_notes": {
+    "01-research": "Search/filter captions,54-result list, selected research header and body/borders are visible. Long list rows ellipsize where needed; selected title is separately readable. Narrow F210 details require inner scrolling to see lower science content; that content/scroll action is not qualified by a top-position still.",
+    "02-queue": "Empty queue explanation, native research-screen button and empty status are visible and contained. Narrow guidance wraps without clipping. This is the empty queue only; no populated-queue/input behavior is inferred.",
+    "03-settings-research": "Search header, research/options/export actions, list and selected Braking-force detail are contained. F210 shows123 groups, F200121. Nested outer/list scroll tracks remain visible and panes have nonzero usable height. Lower/offscreen rows and scroll-wheel routing remain unverified.",
+    "04-settings-options": "Other-options selection, export actions, list, effective-value and configuration-source sections are visibly separated. Long selected option title/value label wrap, and list labels ellipsize. Offscreen list content is not claimed.",
+    "05-help": "Installation/report-content/startup-settings/layout/startup-failure sections, diagnostic preview and copy/diagnostic-export controls are visibly separated. Narrow F210 left pane has a scroll track and startup-failure text continues below viewport; accessibility of that remainder requires input. Visible export buttons fit; exporting was not exercised.",
+    "06-availability": "Known omission grouping defect; see finding AVAILABILITY-ENTRY-SEPARATION. No missing-reason content or availability logic is inferred from typography alone.",
+    "07-research-filtered": "robot query and3 matching technologies visible, selected flying-robot-frame detail shown. Narrow German list may ellipsize the long selected title while full title remains in details. No zero-match state or actual typing/search lifecycle was exercised."
+  },
+  "tooltip_covered_regions_unverified": {
+    "f210-normal-en": {
+      "05-help": "Diagnostic summary tooltip covers part of the preview body near current/native values."
+    },
+    "f210-normal-de": {
+      "01-research": "Cap-information tooltip covers research-unit/time area.",
+      "05-help": "Diagnosezusammenfassung tooltip covers part of preview body.",
+      "07-research-filtered": "Cap-information tooltip covers research-unit/time area."
+    },
+    "f210-narrow-en": {
+      "03-settings-research": "Additive-cost tooltip covers part of multiplier/max/time value area.",
+      "04-settings-options": "Gate-description tooltip covers part of lower value/source area.",
+      "05-help": "Diagnostic-summary tooltip covers preview text."
+    },
+    "f210-narrow-de": {
+      "03-settings-research": "Additive-cost tooltip covers part of multiplier/max/time value area.",
+      "04-settings-options": "Gate-description tooltip covers part of lower value/source area.",
+      "05-help": "Diagnostic-summary tooltip covers preview text."
+    }
+  },
+  "tooltip_caveat": "Ten F210 images visibly contain tooltips despite owned tooltip-delay60. Covered underlying text/borders are unverified; screenshots were not edited and the configuration is not claimed to have removed tooltips. Tooltip placement beyond a Library pane is native overlay behavior, not automatically a child-layout overflow defect.",
+  "actual_geometry_boundary": "F210 normal2560x1440/scale1.25, narrow960x720/scale0.75; F200 normal3200x1800/scale1.5, narrow1200x900/scale0.75. No100% claim, no relabelling F200 captures as960x720, no crop/resolution substitution.",
+  "case_reviews": [
+    {
+      "case": "f210-normal-en",
+      "actual_resolution": {
+        "width": 2560,
+        "height": 1440
+      },
+      "actual_display_scale": 1.25,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+          "bytes": 4953680,
+          "sha256": "3EBA5BEE8D66C07E17177AD90AAA526190282155AB6E7033122B140CD9B9CC36",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+          "bytes": 4754184,
+          "sha256": "6680D7E02813B7F58C09264E575989088D0B17CD2A39CF035307A40E9DEE73C2",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+          "bytes": 4928071,
+          "sha256": "05DB1FC22D076B6AE263E9497B6FE8E6CB60CB01CA8474213B4A2C4896568A0A",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+          "bytes": 5031006,
+          "sha256": "EDBCD5AD9CD0935F8127D70666907AC8AD348927FF83E29694C526C09E526CA4",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+          "bytes": 5016571,
+          "sha256": "111051636A887B0B30D7EE2E0958B37B2D5C8A930254AF35EBA39920B3E168F4",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Diagnostic summary tooltip covers part of the preview body near current/native values."
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+          "bytes": 4914242,
+          "sha256": "CE17111BED69D744E327C1115E941496A49BDD8120AA84FE9D47B37B8304E686",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+          "bytes": 5013702,
+          "sha256": "09861DF0C61C83047A9BEF7E0AB05902123A7E4A853F7BB306AF913521F2DAE7",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f210-normal-de",
+      "actual_resolution": {
+        "width": 2560,
+        "height": 1440
+      },
+      "actual_display_scale": 1.25,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+          "bytes": 4980976,
+          "sha256": "36793F7540E7101150FF46EA0DDD8A9C7DC9415B07284A02BF30F87E70841D81",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Cap-information tooltip covers research-unit/time area."
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+          "bytes": 4760943,
+          "sha256": "60348A69023BE0D45DEDEE54E6D2A22B8D7C06ADCC0A02D1070CF97A7240F9FC",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+          "bytes": 4944138,
+          "sha256": "B2D9C2D818E0C0EAEEAE76DDAE6A32402344763BD96C0BD7BCA97DE9CD2D59CB",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+          "bytes": 5061618,
+          "sha256": "97CED32F61DC005ADF7BA6B2FC2FBB6A9B8B9A82ABE73566718A14DA9C215BE6",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+          "bytes": 5031384,
+          "sha256": "2B2F4AF96EB5EFAA6E09D792930B29E6610B82F2DB557010332A579BDF858E3D",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Diagnosezusammenfassung tooltip covers part of preview body."
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+          "bytes": 4919447,
+          "sha256": "C39029CBE4402BEF1CE057C430D83E1AC0B11B5D4F123DA91D530F163D55D400",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+          "bytes": 5034242,
+          "sha256": "190B2437D4FBB3D6B836CC5C13094D49BCC0890F2E2A09728B8069FC92C5B006",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Cap-information tooltip covers research-unit/time area."
+        }
+      ]
+    },
+    {
+      "case": "f210-narrow-en",
+      "actual_resolution": {
+        "width": 960,
+        "height": 720
+      },
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+          "bytes": 986336,
+          "sha256": "C7FEF64C2CA84F1D6B96358FFF2AC8B57DFA5955831621BCE222EF2E02158A11",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+          "bytes": 949540,
+          "sha256": "6D6C6B86D5334782E2A60872BB5E3859C3A8C2FBBC46D3988F32B6288B770540",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+          "bytes": 1000486,
+          "sha256": "D542C8840A6E9B0F017692E234ACDF664033C5B65366F8F2F6D31C535011754A",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Additive-cost tooltip covers part of multiplier/max/time value area."
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+          "bytes": 1014151,
+          "sha256": "79111B170DC43A4B5880DC20B4B4601511DF0DBCAFA55E921430308059274E4B",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Gate-description tooltip covers part of lower value/source area."
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+          "bytes": 1012720,
+          "sha256": "8FEEDBFD9CA5A828B26FE63910B11A65F1712AF9D52011A8D4AC7660041EBC54",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Diagnostic-summary tooltip covers preview text."
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+          "bytes": 972310,
+          "sha256": "568C09C839A4ADE896D511FA740B7538D3DDC6D650495FFB885E09DDDACCBF1A",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+          "bytes": 996682,
+          "sha256": "DADEFB5551D878C20097528FA2BBBCA09125505CA0D6D9A4141F1F31D32021DE",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f210-narrow-de",
+      "actual_resolution": {
+        "width": 960,
+        "height": 720
+      },
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+          "bytes": 991235,
+          "sha256": "B2A25887AC0C07099DBD71C8D28390446C0A8D327D5289806CEAA67774462ACF",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+          "bytes": 952458,
+          "sha256": "0294F6850F515D1FA929AE00039B478ED019520E8D4953B2E34A8F9227B9D1F1",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+          "bytes": 1004444,
+          "sha256": "83960F69E6B25E425EC271B4B670DCE4DCF6512CD9D2D3424987A63CAA7B83A2",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Additive-cost tooltip covers part of multiplier/max/time value area."
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+          "bytes": 1017941,
+          "sha256": "012D5300E9F3F99C81BD463B55AFAA0CF51598C982B4F16A8442FCA7A47D2F89",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Gate-description tooltip covers part of lower value/source area."
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+          "bytes": 1013602,
+          "sha256": "366BAE049A8000128460BFC33A867C7A574F803D4F8D1F65615A1DDDF916E88C",
+          "status": "VISIBLE_PORTIONS_REVIEWED_OBSCURED_REGION_UNVERIFIED",
+          "obscured_region": "Diagnostic-summary tooltip covers preview text."
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+          "bytes": 974857,
+          "sha256": "3D7102DF67BE48BADB608DAE7DFD8EE417E998FF41D8D14B35C68916C22032E4",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+          "bytes": 999617,
+          "sha256": "3E7A7CBCF57BFCE4B078FADB610CBDB6A8A6DB3073D38497F8A8B5B4BCB480C6",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f200-normal-en",
+      "actual_resolution": {
+        "width": 3200,
+        "height": 1800
+      },
+      "actual_display_scale": 1.5,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+          "bytes": 7846170,
+          "sha256": "846374AFDFD7E199942C967BFC805C844918FF2662A01B488BF7D8FC48749964",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+          "bytes": 7671073,
+          "sha256": "4B032388D6B6ED86731308AB4546B104AC6D0D0D5DAEE20C7F6642EB4F899E15",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+          "bytes": 7982536,
+          "sha256": "0E87068FF35B8B29698B3C927713C0FCDD30633C3B9B641FED3119E42B3A0DAF",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+          "bytes": 8101727,
+          "sha256": "4DC28E5E643D8F20D7DF0AAB181E6335196BDC6C85701A8CFFFB2FE7B8DFBDC6",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+          "bytes": 8094933,
+          "sha256": "D96C9718B502C257729750A65A91A53B99463A18B1DB55715241780E7BA3091B",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+          "bytes": 7939144,
+          "sha256": "6BB0DD5B4A9311AE8A5DB72B364A786A77AF926971ACD0D23FD5B1880CB09067",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+          "bytes": 8087564,
+          "sha256": "B065F9FA288413670085116750E7ED6C8BB57FBD4F14CDA6FC7E3078440D0EBB",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f200-normal-de",
+      "actual_resolution": {
+        "width": 3200,
+        "height": 1800
+      },
+      "actual_display_scale": 1.5,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+          "bytes": 7870568,
+          "sha256": "8DA873B0949DEC2DAF1D744906A66B58E22CDE7BDB4D4E440ED954725CAC0D76",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+          "bytes": 7679990,
+          "sha256": "81C47D9699094B5DA6CB3971064E1BE334F79238C79535AC18778041EB212B66",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+          "bytes": 8008155,
+          "sha256": "D1B2E3C9FC6AA3EA2E04CC36EEAB5C801B869B9FC8DEF0228BE334D4A8FB2EE6",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+          "bytes": 8147935,
+          "sha256": "4EF2D2F0A273BBD6A115FED15CAD598C24CDCA7ADE6EAD6257A9FE8F38F7FE0B",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+          "bytes": 8112534,
+          "sha256": "B179A41C6B0BC103D15893F3E513F0A00A6950C9E1E7A4EEAA48511607F7B9A6",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+          "bytes": 7946528,
+          "sha256": "8B1AF418BDFDC96F7995BB0DEBEA00A23EF05459E573A3DC936570E24D8764E1",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+          "bytes": 8102376,
+          "sha256": "F05814DEC84729518098F2EF1C5411FC257EF5F05BABCAA1E61111D484694B96",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f200-narrow-en",
+      "actual_resolution": {
+        "width": 1200,
+        "height": 900
+      },
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+          "bytes": 1590390,
+          "sha256": "07A57ECDAD3941ABFC0E33756C7A89BEC48C1DBF5AC68C1A4C4BE0033F508B07",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+          "bytes": 1539216,
+          "sha256": "6FC711B879D974F3B69096C2652CFC4B4AEBD6A2DFD1DD1E09D7A571ECBAF006",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+          "bytes": 1580889,
+          "sha256": "DCE11ECCF14C228DFAFF1DAA51DEC365B5FD6A402B41B1527DF5B1AB04EC727C",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+          "bytes": 1591163,
+          "sha256": "BF64951BB8DBAF2B1D43610C3A22EF66E59D719AAD96A875B569441F2A0F4F16",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+          "bytes": 1601403,
+          "sha256": "D64B833777F2533E0F5BADD625A61DE500A4A9E379D17A4E804E62DF0AC577C0",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+          "bytes": 1555549,
+          "sha256": "5787FA8535735B60AACCB50A4C64B0D128E7A550EA0284DD78F08E484397F54F",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+          "bytes": 1585648,
+          "sha256": "6009B41E863980B3A960D6F4F8F02B2F81DA092402FDB056B8B63C2C6079E53C",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    },
+    {
+      "case": "f200-narrow-de",
+      "actual_resolution": {
+        "width": 1200,
+        "height": 900
+      },
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "pages": [
+        {
+          "id": "01-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+          "bytes": 1597696,
+          "sha256": "C6F7D9D305D07EAB0D4C726846899B75019D703F7202324CF0C7E8626A688E3C",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "02-queue",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+          "bytes": 1542273,
+          "sha256": "A3DB4E4084816C1307C3F52429086549E9BB27808B12846877382F4DAEE5B66B",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "03-settings-research",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+          "bytes": 1586840,
+          "sha256": "C3B5901CB57729687F082B67E68919C8A9AC711604819F2C62DD7D0C71B71FD5",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "04-settings-options",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+          "bytes": 1600841,
+          "sha256": "AAF93E3DBAD39D55478204301680BE3529D9E06C541CDF220B511ADE17894E98",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "05-help",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+          "bytes": 1606609,
+          "sha256": "79C56455304F74A3BA79EF64AFBD744B0B78D0B620856D73CCCE568629DF820A",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        },
+        {
+          "id": "06-availability",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+          "bytes": 1558094,
+          "sha256": "887350D486BC6794831AF9B09B1B13FDF37260AD7B0A0244CF77E83D72C1B026",
+          "status": "KNOWN_LAYOUT_FINDING",
+          "obscured_region": null
+        },
+        {
+          "id": "07-research-filtered",
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+          "bytes": 1590068,
+          "sha256": "4971DD535475697100ED45E6E35428FC03EFC933B3C4690E6FE3A5E158EB883A",
+          "status": "VISIBLE_STATIC_LAYOUT_ACCEPTABLE",
+          "obscured_region": null
+        }
+      ]
+    }
+  ],
+  "smallest_remaining_behavior_checks": [
+    "For the known Availability correction, inspect the affected06 outputs at the existing exact breakpoints/locales and assert two complete independent entries; keep native research/generator behavior unchanged.",
+    "Unobscured stills or supported real pointer movement can resolve only the ten named tooltip-covered regions; current covered pixels remain unverified.",
+    "Actual scrolling in narrow Settings lists/detail and narrow Help left/preview panes must show bottom content reachable and stable header/action behavior. A still does not prove this.",
+    "Real typing/filtering/selection retention, action clicks, titlebar drag/resize, startup settings menu, exports and save/reload/client lifecycle remain the separate already-open obligations. No extra new scenarios are inferred by this review."
+  ],
+  "limits": [
+    "This is a finite56-original static visual review of fixed B/e694/40a, not a pixel-perfect or stable verdict.",
+    "No full Source/localization/availability correctness assertion from images; named data/native-frame and package/restoration receipts keep their own scopes.",
+    "No actual mouse/keyboard/menu/resize/export/lifecycle, dual-client/multiplayer or performance acceptance.",
+    "Known Availability defect and all tooltips/earlier adverse/native identities remain preserved; Root owns coherent next correction separately."
+  ],
+  "reviewer_activity": {
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-independent-pixel-review-r01.json"
+    ],
+    "Source_host_controller_library_edits": 0,
+    "tests": 0,
+    "builds": 0,
+    "CI_operations": 0,
+    "native_processes": 0,
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 85594,
+      "bounded_scan_advisory": true
+    }
+  }
+}

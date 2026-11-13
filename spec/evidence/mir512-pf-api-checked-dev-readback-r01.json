@@ -1,0 +1,13 @@
+{
+  "full_tree": "87741163a2213100dcc7ba6cf3337b9937ad3ac2",
+  "Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "independent_review": "8BDFD1E9A57EF26296CE6E27757AA5191415408F897271C946488541BA3E76E8",
+  "clean": true,
+  "all_four_required_checks": "SUCCESS",
+  "pr": 1866,
+  "kind": "MIR512PFAPIProofCheckedDevReadbackV1",
+  "dev": "6f66e939cecf9ff9f9f75b61dec7a32f2ca1e75d",
+  "accepted_head": "934588c10c0bead48d75b8f5ac70914da78cf1dd",
+  "equal_full_tree": true,
+  "remote_dev": "6f66e939cecf9ff9f9f75b61dec7a32f2ca1e75d"
+}

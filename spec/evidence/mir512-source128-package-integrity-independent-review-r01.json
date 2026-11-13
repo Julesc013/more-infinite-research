@@ -1,0 +1,63 @@
+{
+  "kind": "MIR512Source128IndependentPackageIntegrityReviewV1",
+  "reviewed_at_utc": "2026-11-10T03:46:18.007251+00:00",
+  "verdict": "PASS exact17-package integrity and custody only; no target/native/stable/publication acceptance.",
+  "source": {
+    "commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21012",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "tree": "4b99a6654f46b6b3e1dda19800e9cd0813f9c66c"
+  },
+  "root_custody_receipt_sha256": "0AA5EE2FB930E8228D1E98447536A83E5A612BA35CBDA6E5AA65E2F5C97EFE0C",
+  "inventory_file_sha256": "9E703598B45E11489F3279DDDB79255E3696B21ACF61C5C141E03162B759AD26",
+  "inventory_self_digest": "950d91e568fc0229ce3a1477878e8ed070492d58ffd4febef404772edd97e7ac",
+  "retained": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01",
+  "external_original": "D:\\Projects\\Factorio\\.task-builds\\mir512-source128-assets-r01",
+  "independent_checks": {
+    "inventory": "Canonical JSON and self digest verified. Commit/tree/Source identity, package/release controller blob hashes, and both target-record Git blobs/SHA256 match exact12854b336976a046c73e05d5a20914e96fc1cd00.",
+    "complete_custody": "Exactly20 files in both locations:17ZIPs,two checksum files,one developer inventory. Every length/hash matches Root custody receipt and each corresponding external/retained copy.",
+    "archives": "All17 CRCs pass, unique safe single roots, exact inventory member sets and1576 uncompressed member hashes/sizes verified. No tests/tools/docs/spec/build/dist/fixtures/SDK/Git metadata in payloads.",
+    "version_metadata": "Every ZIP filename/root/info version equals5.0.<100*integer(CCC)+12 padded5>; two-part Factorio version and exact base floor match frozen target records. All17 changelogs equal full138317-byte canonicalSource history, firstVersion5.0.12. Source tag/title v5.0.12/MIR5.0.12 consistent.",
+    "selected_targets": "F013-F017/F100/F110/F200/F210 plus separate F018 and best-effort F006-F012. F018 floor0.18.47 in dependency/label and experimental-best-effort-github-only support preserved. Early qualification explicitly best-effort-early-data-only-distributions-not-native-qualified.",
+    "checksums": "GNU binary-format SHA256SUMS validates exactly10 main entries; early sums exactly7. Both checksum file lengths/hashes match inventory and custody.",
+    "reproduction": "Root freeze and existing --verify logs independently parsed; both resulting inventory objects equal frozen inventory exactly. Reviewer ran no composition/build.",
+    "modern_inputs": "F2000C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E/1021663 andF21010619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF/1022087 equal actual reviewed native credit/worker inputs under Source47537."
+  },
+  "asset_sha256": {
+    "more-infinite-research_5.0.01312.zip": "1B230B33A69F842BB57139D5852F8A4C88F0B3299BFAD6EA83F211F2FD0F8143",
+    "more-infinite-research_5.0.01412.zip": "1B0478863D39058646C8D9C86EE8440AF956F9DF49F655F78E395BAF2AEAA6DE",
+    "more-infinite-research_5.0.01512.zip": "1DDAFF695C9EEBA11B41E82EF2628860384F417BB59E205F23EF158AA983D228",
+    "more-infinite-research_5.0.01612.zip": "A3B532C0AC46348193C102E93B7C3F3E16364C110322D1D19AE542250EF75215",
+    "more-infinite-research_5.0.01712.zip": "9A8D65E9D9EAF8A0B034519455080892A005F0B83014363DFA9B3D80BA469C3A",
+    "more-infinite-research_5.0.01812.zip": "F4E7864EF19B07838D0D3B2D0147FBCA1129A279A4D9849658AA278468D950E3",
+    "more-infinite-research_5.0.10012.zip": "543B8682582A4CB5AC4D6007824EE0F4FF762DCFAD7D3A2529652E536A95465E",
+    "more-infinite-research_5.0.11012.zip": "59E5B534824B2B51710D0C710B2BD31CE267597D6D9116DAE03C3F0C26F0D3A0",
+    "more-infinite-research_5.0.20012.zip": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E",
+    "more-infinite-research_5.0.21012.zip": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "more-infinite-research_5.0.00612.zip": "860F433D39A3BFD3C6A325B96FC6D68E31D993BAB497CBB19A38B7FC7476E5D4",
+    "more-infinite-research_5.0.00712.zip": "C6CDD385C894DAC1D16A2024DA9D6912E9D4B9BA32ABA32AEE6D3A4DBC842ACD",
+    "more-infinite-research_5.0.00812.zip": "7F1D468231E65AA0721881721C77F922643752BC2424730A0AF8587C784CB060",
+    "more-infinite-research_5.0.00912.zip": "F564821B1E63C74506EC74B5D822B4EB0359C67B11A634A4EBE4B93E5101A41D",
+    "more-infinite-research_5.0.01012.zip": "29E827D18B0D140C782AE8C1EBEFB0DFE0D142311B2AA0F2B1DD98CD995B82AD",
+    "more-infinite-research_5.0.01112.zip": "C1DEE99A1951D1FB192AFFEB1832652DFEFF73A52666BF644A0E05C981D67496",
+    "more-infinite-research_5.0.01212.zip": "04476C93FD9052848133F4CD91A4FE82557C134300AFEB4759CA6578E010997E"
+  },
+  "support_scope": "Nine stable-edition targets retain their declared floors as metadata; this integrity result does not establish their missing current applicable gameplay or stable acceptance. F018 remains separate experimental GitHub-only; seven early packages keep extract-to-folder/zip delivery and best-effort limits.",
+  "preserved_adverse": "Original source-repository-output refusal log retained; _new_output rejected that location before output creation. Corrected external staging and retained copy are distinct. No published11 bytes replaced.",
+  "limits": [
+    "No release tag,asset upload,release-admin/immutability gate,PR/current CI,anonymous download or finaldist delivery reviewed here. Inventory remains developer custody,not a public asset.",
+    "Current named native evidence keeps original source/package/controller/scenario identities. No automatic reporter,UI,input,performance or stable qualification from reproducibility."
+  ],
+  "operations": {
+    "builds": 0,
+    "native": 0,
+    "host_suites": 0,
+    "release_tools_invoked": 0,
+    "source_package_or_controller_mutations": 0,
+    "private_repo_mutations": 0,
+    "only_new_file": "this receipt"
+  }
+}

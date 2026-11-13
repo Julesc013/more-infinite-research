@@ -11,6 +11,7 @@ import unittest
 
 from native_credit_oracle import verified_public_rows
 from worker_storage_recovery_fixture import expected_private_worker_row
+from test_generator import expected_worker_default_split_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -239,6 +240,14 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
             for row in lua.globals().data.emitted.values()
         }
         self.assertEqual(emitted.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
+        canonical = expected_private_worker_row()
+        canonical.update(name="worker-robots-storage-4", hidden=False)
+        for field in ("enabled", "visible_when_disabled", "order"):
+            canonical.pop(field)
+        for name, expected in expected_worker_default_split_rows(canonical).items():
+            if name == "mir-worker-storage-head-4":
+                expected["prerequisites"] = {}  # Empty Lua array in this host view.
+            self.assertEqual(emitted.pop(name), expected)
         public = verified_public_rows(
             emitted,
             {str(name) for name in lua.globals().data.raw.recipe.keys()},

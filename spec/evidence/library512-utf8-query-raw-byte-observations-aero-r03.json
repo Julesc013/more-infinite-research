@@ -1,0 +1,86 @@
+{
+  "kind": "MIRLibraryUTF8BoundaryRawByteObservationsV1",
+  "scope": "Direct exact current text helper and proposed helper extraction; complementary to the complete runtime-module GUI/legacy/saved regression. No native GUI or game execution.",
+  "source": "52f98a9fdd03f7056ab0cf99a890d107130f896e",
+  "rows": [
+    {
+      "case": "two-byte",
+      "mode": "fresh-valid-input",
+      "input_bytes": 166,
+      "input_valid_UTF8": true,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "78787878787878C3",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 159,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    },
+    {
+      "case": "two-byte",
+      "mode": "previously-saved-truncated-prefix",
+      "input_bytes": 160,
+      "input_valid_UTF8": false,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "78787878787878C3",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 159,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    },
+    {
+      "case": "three-byte",
+      "mode": "fresh-valid-input",
+      "input_bytes": 166,
+      "input_valid_UTF8": true,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "787878787878E795",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 158,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    },
+    {
+      "case": "three-byte",
+      "mode": "previously-saved-truncated-prefix",
+      "input_bytes": 160,
+      "input_valid_UTF8": false,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "787878787878E795",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 158,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    },
+    {
+      "case": "four-byte",
+      "mode": "fresh-valid-input",
+      "input_bytes": 166,
+      "input_valid_UTF8": true,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "7878787878F09F9A",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 157,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    },
+    {
+      "case": "four-byte",
+      "mode": "previously-saved-truncated-prefix",
+      "input_bytes": 160,
+      "input_valid_UTF8": false,
+      "old_output_bytes": 160,
+      "old_output_last8_hex": "7878787878F09F9A",
+      "old_output_valid_UTF8": false,
+      "proposed_output_bytes": 157,
+      "proposed_output_last8_hex": "7878787878787878",
+      "proposed_output_valid_UTF8": true,
+      "exact_complete_prefix": true
+    }
+  ],
+  "native_execution": false
+}

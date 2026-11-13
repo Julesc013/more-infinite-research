@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/stable_ui_packet_review512",
+  "configured_role": "mir_terra_review_xhigh",
+  "verdict": "GO to adopt exact scoped F2002x4x default-owner result",
+  "packet_sha256": "CBE3E7EF82803797D7547B61C5E0987A66FCB9F3B436143375F96C08C04B9E39",
+  "owner_sha256": "CEDED6FA18CA5965544AC5EB8D3D3165CECCDFFFD05BF5CF776FC48B8B982464",
+  "composition_sha256": "6453AFFD061271A641031A5186BC24FCE84A6032F03A99777610937111EB5AD9",
+  "terminal_sha256": "3DC33C8F9C6DF9763E7C50E4E85995AB8B1E3C2813B4584A69E65769B14BDA3E",
+  "direct_checks": [
+    "Exact12 actualprocesses, zero live Factorio, all6 roles restored/null exceptions",
+    "Source and upgraded ordinary completions by_script:false; strict source1350/2700 and target1265/2530 science",
+    "Four-force pending/current/queued/detached/unpaid state and foreign .125/.25/.5 effects retained",
+    "Private head count1/exempt and ordinary prices retained",
+    "Each immutable save and two cold loads has55-entry CRC custody"
+  ],
+  "adverses": [
+    "r01 failed before on_init on wrong-engine map property; restored",
+    "Root stdout-only cold-log assumption corrected to declared cold1/cold2 engine logs",
+    "Root target-inventory-zero assumption retracted: original accepted method requires exact net depletion and permits overprovision; r04/oracles/native inputs unchanged"
+  ],
+  "scope": "Default owner2x4x on2.0.77 only; no provider/reporter/client/UI/export/physical/performance/fullstable/GitHub approval claim."
+}

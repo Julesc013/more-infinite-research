@@ -1,0 +1,312 @@
+{
+  "kind": "Ferrum512ModernFinalDataIndependentPacketReviewV1",
+  "reviewed_at_utc": "2026-11-09T14:02:02.488029+00:00",
+  "verdict": "APPROVED exactly three serial governed data-stage observations after Root admission: F210 withMIR once against the exact retained upstream baseline, and F200 upstream then withMIR. No blocking prelaunch finding. Actual-result review remains mandatory.",
+  "packets": [
+    {
+      "family": "f210",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\packet.json",
+        "bytes": 17993,
+        "sha256": "623DDBDCB949E48DB7EDD16653C01227B80BC93DBBCC523BBAFCB59186684033"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\Invoke-FerrumData.ps1",
+        "bytes": 9662,
+        "sha256": "F118689E6519291A97625DA63933D4C65B291B1FD7B7E493630123CE11674A73"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\composition.json",
+        "bytes": 21814,
+        "sha256": "C100838B18814E58BAE93229BB95651C2D9F59AAD4E1E78A439C9512E81E3CF2"
+      },
+      "negative_controls": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\negative-controls-r02.json",
+        "bytes": 1602,
+        "sha256": "8F986FF7B68FFD63BBA5D7271F5F9F6CFE4010412E0516163C3E48F2B71E82AF"
+      },
+      "negative_script": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\offline-controls-r02.py",
+        "bytes": 2800,
+        "sha256": "10C2A00E65C9620C6F81314EB0FD9EF4328C89056665A03D4CD8B6D60FB01F9F"
+      },
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-ferrum-qualification-r01\\original\\more-infinite-research_5.0.21012.zip",
+        "bytes": 1006802,
+        "sha256": "43663FABEAE4D14A6414F363E3006B53B624DCF2EFAFBD1E5C73ABFE3F148A16"
+      },
+      "new_processes": 1,
+      "stages": [
+        {
+          "id": "with-mir",
+          "expected_selected": 10,
+          "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f210-data-r01\\with-mir"
+        }
+      ]
+    },
+    {
+      "family": "f200",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\packet.json",
+        "bytes": 11391,
+        "sha256": "F07DE77C31E89826093F2C6B1F56279AF7B4F27B6A8184B505DAB75C5A4D01B7"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\Invoke-FerrumData.ps1",
+        "bytes": 9671,
+        "sha256": "4B14AD9AF27DCCA2C0ECB71299E8C44CE9AF6F6AE03A00BB9E156811F944B3CA"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\composition.json",
+        "bytes": 36429,
+        "sha256": "1856B2BF463458D41C0188BDE82321140A7DA59C536B487687B2D4576A71CEFA"
+      },
+      "negative_controls": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\negative-controls-r02.json",
+        "bytes": 1602,
+        "sha256": "5ED47AF81315DF75D4019BB5322808C144EA7DA2B7258B05765FC86955DB7E05"
+      },
+      "negative_script": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\offline-controls-r02.py",
+        "bytes": 2800,
+        "sha256": "03E7DFB3947B1BBFEBDFFCE098A8496F21EFE5D43D0D798CCBF5D06C303153FF"
+      },
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-ferrum-qualification-r01\\original\\more-infinite-research_5.0.20012.zip",
+        "bytes": 1006378,
+        "sha256": "2E24DAE2BD1D0D9277AA2C677D806535AE29E71A04F53401CEAF0B0424DE40D9"
+      },
+      "new_processes": 2,
+      "stages": [
+        {
+          "id": "upstream",
+          "expected_selected": 8,
+          "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f200-data-r01\\upstream"
+        },
+        {
+          "id": "with-mir",
+          "expected_selected": 9,
+          "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f200-data-r01\\with-mir"
+        }
+      ]
+    }
+  ],
+  "candidate_identity": {
+    "commit": "2623d3d8ffd1539d2b35f21b06bcd936856b6fa8",
+    "source_tree": "ce8f1178c800ee90da2af087f602cf467c4a7fa7",
+    "prior_source_unit_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum-final-science-order-independent-source-review-r01.json",
+      "bytes": 10308,
+      "sha256": "740EDEE1E5A3E1C559F8B3A1F27D00291FA4B80A375DFA2DE7469F6C678C13E9"
+    },
+    "integration_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-ferrum-integration-independent-review-r01.json",
+      "bytes": 13378,
+      "sha256": "49103CBBFA83299BE1464D0C8FE4D34592BC15D381D1D29C5C306B10A644D2E6"
+    },
+    "two_package_reproduction": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-ferrum-qualification-r01\\reproduction-readback.json",
+      "bytes": 1449,
+      "sha256": "CE37AD166FFC4B105142F1522B33CB9BC686E0D4FBEDDDA78CA627F5BC931A1A"
+    },
+    "scope": "Frozen qualification source only; separate startup/UI work is not loaded and no applicability to its eventual changed candidate is implied."
+  },
+  "independent_checks": {
+    "full_input_binding": "All39 F210 and28 F200 declared input bindings independently match size/hash. Both packet/caller/composition triplets match exact Root pins. Qualification ZIPs CRC and every244F210/243F200 member independently equal no-output member composition from committed2623 source/target record; versions21012/20012 and ordinaryoptionalFerrum edge are exact. Original/reproduction record binds43663F and2E24DA, not published11 bytes.",
+    "harness_vs_player": "Both real Git roots are clean and exact: executing canonical harness203/Source93d, loaded qualification candidate2623/Sourcece8. Caller now explicitly guards candidate root/head/source cleanliness in addition to harness identity. Canonical16206-byte7ABE prototype capture and trusted governor/custody helpers are unchanged; no old harness Source is relabelled as player12.",
+    "callers": "Read both complete logical diffs from reviewed511caller. F210 narrows stage/process count toone and rebinds immutable12 inputs; F200 retains exacttwo stages and changes only family/engine-line bindings, candidate provenance and labels. Same strict naturalexit0/passed/nontimeout/one-run checks, fatal-log scan, actualobserver/loadedselection, validJSON output, freshcontained roots and owned restoration remain. No numeric/physical oracle is implemented by these observation callers; raw outputs must be independently compared afterward.",
+    "actual_composition": "Recorded real Compose passed0native/restored for exact10F210,8F200upstream and9F200withMIR rows. F200 has four native official mods; F210 has five. Both explicit profiles omitMIR and bind the expected engine/default mode/archive hashes; exact MIRArchive is the sole player selection. Independent actual trusted Resolve accepts30 proposed native/compose/config/selection/write-data/dump fields under executing203/build/tmp. Allthree native roots remain absent before approval.",
+    "negative_guards": "Read both actual nine-case scripts/receipts and every raw refused stdout/stderr reason: wrongpacket hash,kind,caller,runner,bound input,limits,stage schedule,output root,composition each exitnonzero before engine with originalcontrols/archive snapshot unchanged.18 actual refusal cases pass. F210 first reader assertion/linewrap and cp1252printing failures are retained as zero-native preparation errors; r02 changes the expected reason substring tobound input and leaves the caller guard intact.",
+    "observer": "F210 A15A and F200723D are distinct correctly pinned family archives. Independent ZIP member comparison shows onlyinfo.json differs; observational data-final body is byte-identical. Do not call F200 archiveA15A or infer runtime behavior from that metadata difference.",
+    "f210_baseline_reuse": "Allnine exact prior upstream retained files are explicitly present in packet.bound and rehashed. Original actual upstream-only9mod engine/upstream archive/default/observer closure equals new F210 profile excluding the soleMIR12 digest. No player code, candidate GUI or changed MIR metadata was loaded in that baseline. Reuse keeps original511controller/raw/source identity; old C3CB withMIR adverse is retained, never used as the expected numeric oracle or relabelled12."
+  },
+  "f200_prelaunch_independent_expectations": {
+    "basis": {
+      "native2and3": {
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\prototypes\\technology.lua",
+        "bytes": 122922,
+        "sha256": "19E827C2B7D02A72EACA5BE284DD67BF76E0D4ECDD86722232D8F98805D4FE6F"
+      },
+      "location": "4205–4254",
+      "ferrum_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\planet-ferrum_0.0.5.zip",
+        "bytes": 25098621,
+        "sha256": "7B1276EA9181C4ED1DE4EE67085D4795EE1D37883F04AA2BA4BC12BAA4DB5246"
+      },
+      "ferrum_members": [
+        {
+          "member": "planet-ferrum/prototypes/techs.lua",
+          "bytes": 8098,
+          "sha256": "031FFD69E6B335F428EB3DB3B05C91020BFC11A1A25184C30EC006F02B04F434"
+        },
+        {
+          "member": "planet-ferrum/data-final-fixes.lua",
+          "bytes": 6537,
+          "sha256": "590535E3DD96D42E12276C2340C3ADBF5D34C4AAFD92147C14EBC5E7861284A3"
+        },
+        {
+          "member": "planet-ferrum/prototypes/science.lua",
+          "bytes": 599,
+          "sha256": "6F33D2D6C4243C21B1CEFEA32D49F5F8D786BB9143F7C81F5B255356336C3B13"
+        }
+      ],
+      "prior_frozen_oracle": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-final-data-expectations-independent-r01.json",
+        "bytes": 11759,
+        "sha256": "06DA80A1F9CF863F0F729FA8C9B38DC4B30316CB3404CFA47A8E605DD20A1758"
+      }
+    },
+    "derivation": "Actual pinned2.0.77Base native2 count300/native3count450, effect1/time60 and five listed packs equal the consumed2.1 worker facts. Official0.0.5 techs,final-fixes andscience member bodies independently equal their0.1.5 counterparts. Ratio1.5 givesfinite4floor(450*1.5)=675 andfinite5floor(675*1.5)=1012. This freezes the F200 numeric/vector expectation before any engine, independently of candidate output.",
+    "upstream4": {
+      "count": 675,
+      "time": 60,
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "ingredients": [
+        [
+          "automation-science-pack",
+          1
+        ],
+        [
+          "logistic-science-pack",
+          1
+        ],
+        [
+          "chemical-science-pack",
+          1
+        ],
+        [
+          "production-science-pack",
+          1
+        ],
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "ferrum-robotics-science-pack",
+          1
+        ]
+      ],
+      "prerequisites": [
+        "worker-robots-storage-3",
+        "ferrum-robotics-science-pack"
+      ]
+    },
+    "upstream5": {
+      "count": 1012,
+      "time": 60,
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "ingredients": [
+        [
+          "automation-science-pack",
+          1
+        ],
+        [
+          "logistic-science-pack",
+          1
+        ],
+        [
+          "chemical-science-pack",
+          1
+        ],
+        [
+          "production-science-pack",
+          1
+        ],
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "ferrum-robotics-science-pack",
+          1
+        ]
+      ],
+      "prerequisites": [
+        "worker-robots-storage-4"
+      ]
+    },
+    "finite_identity": "Both remain finite andupgrade=true, with actual absent/default finite maxima retained. Upstream-only6 absent. Compare their FULL actual final prototype rows exactly towithMIR; do not add an invented robotics prerequisite to5.",
+    "current6": {
+      "name": "worker-robots-storage-6",
+      "level": 6,
+      "max_level": "infinite",
+      "upgrade": true,
+      "hidden": false,
+      "enabled": "true/defaulttrue",
+      "unit": {
+        "count_formula": "1518.75*1.5^(L-6)",
+        "time": 60,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "ferrum-robotics-science-pack",
+            1
+          ],
+          [
+            "electromagnetic-science-pack",
+            1
+          ]
+        ]
+      },
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisite_set": [
+        "worker-robots-storage-4",
+        "worker-robots-storage-5",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack",
+        "electromagnetic-science-pack"
+      ],
+      "public7_absent": true
+    },
+    "policy_and_lab": "Defaultconfigured/reduce remains unchanged. Preserve allseven amount1 packs, addEM once, no extra white/military/otherplanet science. Actual final lab must accept the whole vector, and every ingredient must resolve to a concrete allowed item/tool. Verify actual Ferrum finalizer precedesMIR in log; currentfinal labs acceptingrobotics cannot excuse a missingingredient. No reduction/skip/engine-default waiver.",
+    "private_holder": "Hidden/disabled mir-worker-storage-preservation-4 remains full authoreddefault4 work:675*1.5^(L-4),time60/effect1/five nativepacks+EM/originaldefault4+science gates, visible_when_disabledfalse; not a unit1 placeholder. Data existence makes no saved-state/prepared-work claim."
+  },
+  "shared_actual_result_requirements": "Same sevenpack/fullforeign4/5/formula/effect/time/prerequisite/privateholder oracle applies to F210 under preserved06DA. After Root executes, independently reread allthree raw processes/logs/selectedmods/settings/dumps and exact retained custody/restoration. Successful dump exits alone do not establish any prototype expectation pass. Stopfirstfailure, preserve oldadverses/protected originals, no unchangedretry or rewritten oracle.",
+  "execution_bounds": {
+    "new_processes_maximum": 3,
+    "serial_only": true,
+    "per_process_timeout_seconds": 180,
+    "per_process_expected_peak_mib": 4096,
+    "per_process_output_mib": 512,
+    "payload": "--dump-data only; no map,server,benchmark or GUI actor"
+  },
+  "limits": "No native process yet by these packets, no reviewer Source/test/docs/packet/library mutation, hostsuite/build or native launch. Only this new primary review receipt written. No gameplay/runtime initialization, worker/cargo/prepare/research, save/two-cold, UI, timing/memory, release, stable or latercandidate applicability verdict.20repair timing remainsheld until coherent production/UI candidate and quietblock admission."
+}

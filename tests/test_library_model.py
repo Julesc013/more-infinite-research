@@ -253,6 +253,7 @@ class LibraryModelTests(unittest.TestCase):
           end
           expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
           expected["mir-worker-storage-preservation-4"] = true
+          expected["mir-worker-storage-head-4"] = true
           expected["mir-k2-imersite-staged-state-1"] = true
           expected["mir-k2-imersite-continuation-state-4"] = true
           expected["mir-native-credit-research_electric_shooting_speed-electric-positive"] = true
@@ -265,7 +266,7 @@ class LibraryModelTests(unittest.TestCase):
             assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
             count = count + 1
           end
-          assert(count == 11)
+          assert(count == 12)
           for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
           local changed = "mir-legacy-module-credit-speed-module"
           first[changed] = false
@@ -637,6 +638,45 @@ class LibraryModelTests(unittest.TestCase):
             hidden = {[id] = true}, visibility = 2
           }, translated)
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
+        ''')
+
+    def test_localized_german_search_casefolds_without_losing_diacritics(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local gear = technology(id, {level = 3})
+          local force = {technologies = {[id] = gear}, research_queue = {}}
+          local declared = {{id = id, family = "research_gears"}}
+          local sharp_s = string.char(195, 159)
+          local upper_a, lower_a = string.char(195, 132), string.char(195, 164)
+          local upper_o, lower_o = string.char(195, 150), string.char(195, 182)
+          local upper_u, lower_u = string.char(195, 156), string.char(195, 188)
+          local cyrillic_upper, cyrillic_lower = string.char(208, 150, 208, 163, 208, 154),
+            string.char(208, 182, 209, 131, 208, 186)
+          local greek_upper, greek_lower = string.char(206, 169), string.char(207, 137)
+          local calls = {}
+          local function native_lower(value)
+            calls[#calls + 1] = value
+            value = value:gsub(upper_a, lower_a):gsub(upper_o, lower_o):gsub(upper_u, lower_u)
+            value = value:gsub(cyrillic_upper, cyrillic_lower):gsub(greek_upper, greek_lower)
+            return (value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end))
+          end
+          local translated = {[id] = "Fu" .. sharp_s .. " Gr" .. lower_o .. sharp_s .. "e "
+            .. upper_a .. "rger " .. upper_u .. "bung " .. cyrillic_upper .. " " .. greek_upper}
+          for _, search in ipairs{
+            "FUSS", "fuss", "GR" .. upper_o .. "SSE", "gr" .. lower_o .. "sse",
+            upper_a .. "RGER", lower_a .. "rger", upper_u .. "BUNG", lower_u .. "bung",
+            cyrillic_lower, greek_lower
+          } do
+            local rows = model.rows(force, declared, {search = search}, translated, {search_normalizer = native_lower})
+            assert(#rows == 1 and rows[1].id == id,
+              "injected multilingual normalizer lost localized search")
+          end
+          assert(#model.rows(force, declared, {search = "arger"}, translated, {search_normalizer = native_lower}) == 0,
+            "localized search must not strip the umlaut while casefolding")
+          assert(#calls >= 12, "model did not route labels and queries through the injected normalizer")
+          assert(gear.level == 3 and gear.enabled and not gear.researched
+            and #force.research_queue == 0,
+            "localized row search changed native research state")
         ''')
 
     def test_stable_secondary_recipe_ids_remain_searchable_without_translated_labels(self):

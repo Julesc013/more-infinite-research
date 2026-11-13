@@ -2,6 +2,7 @@
 import argparse
 from copy import deepcopy
 import json
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -64,8 +65,13 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         for name, row in emitted.items():
             self.assertIsNone(technologies[name], "MIR transport collided with a foreign owner")
             prototype = deepcopy(row)
-            prototype.setdefault("level", 1)
+            # Native initial level comes from the numeric name suffix; an
+            # omitted authored `level` never turns head4 into runtime level1.
+            suffix = re.search(r"-(\d+)$", name)
+            prototype.setdefault("level", int(suffix.group(1)) if suffix else 1)
             prototype.setdefault("enabled", True)
+            prototype.setdefault("hidden", False)
+            prototype.setdefault("visible_when_disabled", False)
             if prototype.get("max_level") == "infinite": prototype["max_level"] = 4294967295
             technology = lua.globals().technology(name, prototype["level"], prototype.get("enabled", True))
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
@@ -79,10 +85,24 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 technology.research_unit_count = unit["count"]
             elif unit.get("count_formula") == "1":
                 technology.research_unit_count = 1
+            elif name in ("worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-preservation-4"):
+                self.assertEqual("675*1.5^(L-4)", unit.get("count_formula"))
+                technology.research_unit_count = 675
             technology.research_unit_energy = unit["time"] * 60
             technology.research_unit_ingredients = data_fixture.generator_fixture.lua_table(lua, [
                 {"name": ingredient[0], "amount": ingredient[1]}
                 for ingredient in unit["ingredients"]])
+            prototype["research_unit_count_formula"] = unit.get("count_formula")
+            prototype["research_unit_count"] = unit.get("count")
+            prototype["research_unit_energy"] = unit["time"] * 60
+            prototype["research_unit_ingredients"] = [
+                {"name": ingredient[0], "amount": ingredient[1]} for ingredient in unit["ingredients"]]
+            prototype["ignore_tech_cost_multiplier"] = prototype.get("ignore_tech_cost_multiplier", False)
+            prototype["prerequisites"] = {prerequisite: {"name": prerequisite}
+                                           for prerequisite in prototype.get("prerequisites", [])}
+            for effect in prototype["effects"]:
+                effect.setdefault("hidden", False)
+            technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
             technologies[name] = technology
         lua.globals().mir_created = data_fixture.generator_fixture.lua_table(lua, {
             name: True for name in emitted})
@@ -92,9 +112,17 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             return {created="more-infinite-research"}
           end
         ''')
-        lua.globals().world = lua.globals().force(41, technologies, lua.table(), None, None)
+        lua.globals().world = lua.globals().force(41, technologies, lua.table(), None, 0)
         lua.globals().world.foreign_state = "preserve"
+        # This host force has no paid worker levels (Base rows are absent).
+        # The empty native transfer must retain its literal zero contribution.
+        lua.globals().world.worker_robots_storage_bonus = 0
         lua.globals().active_mods = data_fixture.generator_fixture.lua_table(lua, MODS)
+        lua.execute('active_mods["more-infinite-research"]=require("platform.target").distribution_version')
+        native_prototypes = lua.table()
+        for name, technology in technologies.items():
+            native_prototypes[name] = technology.prototype
+        lua.globals().emitted_native_prototypes = native_prototypes
         lua.globals().native_data = data_fixture.generator_fixture.lua_table(lua, {MOD_DATA: {"data": metadata}})
         return lua
 
@@ -105,20 +133,40 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         lua.globals().extra_settings = data_fixture.generator_fixture.lua_table(lua, extra)
         lua.globals().retained_storage = storage
         lua.execute('''
-          boot({[41]=world},0,"",retained_storage,nil,0,active_mods,nil,extra_settings,{},native_data,native_history)
+          boot({[41]=world},0,"",retained_storage,nil,0,active_mods,nil,extra_settings,{},native_data,native_history,
+            emitted_native_prototypes)
         ''')
 
     def test_paid_runtime_transport_requires_mir_creation_and_named_holders(self):
         _, owners, metadata = self.stage()
-        for invalid in ("missing-history", "foreign-creator", "missing-main"):
+        for invalid in ("missing-history", "foreign-creator", "missing-paid-history",
+                        "foreign-paid-creator", "missing-main"):
             with self.subTest(invalid=invalid):
                 lua = self.runtime(owners, metadata)
+                expected_refusal = "MIR native family"
                 if invalid == "missing-history": lua.globals().native_history = None
                 elif invalid == "foreign-creator":
                     lua.execute('native_history=function() return {created="space-age"} end')
+                elif invalid in ("missing-paid-history", "foreign-paid-creator"):
+                    lua.globals().invalid_paid_creator = invalid == "foreign-paid-creator"
+                    lua.execute('''
+                      local original=native_history
+                      native_history=function(kind,name)
+                        if name=="recipe-prod-research_steel-1" then
+                          if invalid_paid_creator then return {created="space-age"} end
+                          return nil
+                        end
+                        return original(kind,name)
+                      end
+                    ''')
                 else:
                     lua.globals().world.technologies["recipe-prod-research_steel-1"] = None
-                with self.assertRaisesRegex(LuaError, "MIR native family"):
+                if invalid in ("missing-history", "foreign-creator"):
+                    # Global loss now fails at the earlier worker split
+                    # custody boundary. The paid-only opponents above still
+                    # independently reach the original native-family guard.
+                    expected_refusal = "MIR worker default requires its authored native owner and first-level debit"
+                with self.assertRaisesRegex(LuaError, expected_refusal):
                     self.boot(lua, 2)
                     lua.globals().handlers.init()
                 self.assertIsNone(lua.globals().storage.mir_native_credits)
@@ -147,7 +195,8 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 data_fixture.generator_fixture.lua_table(lua, row["effects"]))
         lua.globals().native_data = data_fixture.generator_fixture.lua_table(lua, {MOD_DATA: {"data": metadata}})
         self.boot(lua, 0, storage=data_fixture.generator_fixture.lua_table(lua, retained))
-        lua.globals().handlers.configuration(lua.table())
+        lua.globals().handlers.configuration(data_fixture.generator_fixture.lua_table(lua, {
+            "mod_startup_settings_changed": True, "mod_changes": {}}))
         for name, _ in data_fixture.OWNERS.values():
             self.assertTrue(lua.globals().world.technologies[name].enabled)
             self.assertEqual(3, lua.globals().world.technologies[name].level)
@@ -161,7 +210,8 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         lua.globals().handlers.init()
         retained = data_fixture.plain(lua.globals().storage)
         self.boot(lua, 0, storage=data_fixture.generator_fixture.lua_table(lua, retained))
-        lua.globals().handlers.configuration(lua.table())
+        lua.globals().handlers.configuration(data_fixture.generator_fixture.lua_table(lua, {
+            "mod_startup_settings_changed": True, "mod_changes": {}}))
         for name, _ in data_fixture.OWNERS.values():
             self.assertFalse(lua.globals().world.technologies[name].enabled)
 

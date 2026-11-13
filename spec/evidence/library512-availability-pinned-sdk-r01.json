@@ -1,0 +1,349 @@
+{
+  "scope": "Exact installed SDKs only, no latest-web substitution or native claim",
+  "engines": [
+    {
+      "version": "2.0.77",
+      "sdk_path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "styles": [
+        {
+          "name": "height",
+          "order": 63,
+          "description": "Sets both minimal and maximal height to the given value.",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "horizontally_stretchable",
+          "order": 24,
+          "description": "Whether the GUI element stretches its size horizontally to other elements. `nil` if this element does not support stretching.",
+          "read_type": "boolean",
+          "write_type": "boolean",
+          "optional": true
+        },
+        {
+          "name": "maximal_height",
+          "order": 5,
+          "description": "Maximal height ensures, that the widget will never be bigger than than that size. It can't be stretched to be bigger.",
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "maximal_width",
+          "order": 3,
+          "description": "Maximal width ensures, that the widget will never be bigger than than that size. It can't be stretched to be bigger.",
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "single_line",
+          "order": 45,
+          "description": "",
+          "subclasses": [
+            "LabelStyle"
+          ],
+          "read_type": "boolean",
+          "write_type": "boolean",
+          "optional": false
+        },
+        {
+          "name": "vertical_spacing",
+          "order": 40,
+          "description": "Vertical space between individual cells.",
+          "subclasses": [
+            "LuaTableStyle",
+            "LuaFlowStyle",
+            "LuaVerticalFlowStyle",
+            "LuaTabbedPaneStyle"
+          ],
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "order": 62,
+          "description": "Sets both minimal and maximal width to the given value.",
+          "write_type": "int32",
+          "optional": false
+        }
+      ],
+      "element_attributes": [
+        {
+          "name": "direction",
+          "order": 6,
+          "description": "Direction of this element's layout.",
+          "subclasses": [
+            "frame",
+            "flow",
+            "line"
+          ],
+          "read_type": "GuiDirection",
+          "optional": false
+        },
+        {
+          "name": "horizontal_scroll_policy",
+          "order": 19,
+          "description": "Policy of the horizontal scroll bar.",
+          "subclasses": [
+            "scroll-pane"
+          ],
+          "read_type": "ScrollPolicy",
+          "write_type": "ScrollPolicy",
+          "optional": false
+        },
+        {
+          "name": "vertical_scroll_policy",
+          "order": 20,
+          "description": "Policy of the vertical scroll bar.",
+          "subclasses": [
+            "scroll-pane"
+          ],
+          "read_type": "ScrollPolicy",
+          "write_type": "ScrollPolicy",
+          "optional": false
+        }
+      ],
+      "element_methods": [
+        {
+          "name": "clear",
+          "order": 1,
+          "description": "Remove children of this element. Any [LuaGuiElement](runtime:LuaGuiElement) objects referring to the destroyed elements become invalid after this operation.",
+          "examples": [
+            "```\ngame.player.gui.top.clear()\n```"
+          ],
+          "parameters": [],
+          "format": {
+            "takes_table": false
+          },
+          "return_values": []
+        },
+        {
+          "name": "destroy",
+          "order": 2,
+          "description": "Remove this element, along with its children. Any [LuaGuiElement](runtime:LuaGuiElement) objects referring to the destroyed elements become invalid after this operation.\n\nThe top-level GUI elements - [LuaGui::top](runtime:LuaGui::top), [LuaGui::left](runtime:LuaGui::left), [LuaGui::center](runtime:LuaGui::center) and [LuaGui::screen](runtime:LuaGui::screen) - can't be destroyed.",
+          "examples": [
+            "```\ngame.player.gui.top.greeting.destroy()\n```"
+          ],
+          "parameters": [],
+          "format": {
+            "takes_table": false
+          },
+          "return_values": []
+        }
+      ],
+      "add_variants": [
+        {
+          "name": "flow",
+          "order": 1,
+          "description": "",
+          "parameters": [
+            {
+              "name": "direction",
+              "order": 0,
+              "description": "The initial direction of the flow's layout. Defaults to `\"horizontal\"`.",
+              "type": "GuiDirection",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "scroll-pane",
+          "order": 10,
+          "description": "",
+          "parameters": [
+            {
+              "name": "horizontal_scroll_policy",
+              "order": 0,
+              "description": "Policy of the horizontal scroll bar. Defaults to `\"auto\"`.",
+              "type": "ScrollPolicy",
+              "optional": true
+            },
+            {
+              "name": "vertical_scroll_policy",
+              "order": 1,
+              "description": "Policy of the vertical scroll bar. Defaults to `\"auto\"`.",
+              "type": "ScrollPolicy",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "2.1.23",
+      "sdk_path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "styles": [
+        {
+          "name": "height",
+          "order": 63,
+          "description": "Sets both minimal and maximal height to the given value.",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "horizontally_stretchable",
+          "order": 24,
+          "description": "Whether the GUI element stretches its size horizontally to other elements. `nil` if this element does not support stretching.",
+          "read_type": "boolean",
+          "write_type": "boolean",
+          "optional": true
+        },
+        {
+          "name": "maximal_height",
+          "order": 5,
+          "description": "Maximal height ensures, that the widget will never be bigger than than that size. It can't be stretched to be bigger.",
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "maximal_width",
+          "order": 3,
+          "description": "Maximal width ensures, that the widget will never be bigger than than that size. It can't be stretched to be bigger.",
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "single_line",
+          "order": 45,
+          "description": "",
+          "subclasses": [
+            "LabelStyle"
+          ],
+          "read_type": "boolean",
+          "write_type": "boolean",
+          "optional": false
+        },
+        {
+          "name": "vertical_spacing",
+          "order": 40,
+          "description": "Vertical space between individual cells.",
+          "subclasses": [
+            "LuaTableStyle",
+            "LuaFlowStyle",
+            "LuaVerticalFlowStyle",
+            "LuaTabbedPaneStyle"
+          ],
+          "read_type": "int32",
+          "write_type": "int32",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "order": 62,
+          "description": "Sets both minimal and maximal width to the given value.",
+          "write_type": "int32",
+          "optional": false
+        }
+      ],
+      "element_attributes": [
+        {
+          "name": "direction",
+          "order": 6,
+          "description": "Direction of this element's layout.",
+          "subclasses": [
+            "frame",
+            "flow",
+            "line"
+          ],
+          "read_type": "GuiDirection",
+          "optional": false
+        },
+        {
+          "name": "horizontal_scroll_policy",
+          "order": 19,
+          "description": "Policy of the horizontal scroll bar.",
+          "subclasses": [
+            "scroll-pane"
+          ],
+          "read_type": "ScrollPolicy",
+          "write_type": "ScrollPolicy",
+          "optional": false
+        },
+        {
+          "name": "vertical_scroll_policy",
+          "order": 20,
+          "description": "Policy of the vertical scroll bar.",
+          "subclasses": [
+            "scroll-pane"
+          ],
+          "read_type": "ScrollPolicy",
+          "write_type": "ScrollPolicy",
+          "optional": false
+        }
+      ],
+      "element_methods": [
+        {
+          "name": "clear",
+          "order": 1,
+          "description": "Remove children of this element. Any [LuaGuiElement](runtime:LuaGuiElement) objects referring to the destroyed elements become invalid after this operation.",
+          "examples": [
+            "```\ngame.player.gui.top.clear()\n```"
+          ],
+          "parameters": [],
+          "format": {
+            "takes_table": false
+          },
+          "return_values": []
+        },
+        {
+          "name": "destroy",
+          "order": 2,
+          "description": "Remove this element, along with its children. Any [LuaGuiElement](runtime:LuaGuiElement) objects referring to the destroyed elements become invalid after this operation.\n\nThe top-level GUI elements - [LuaGui::top](runtime:LuaGui::top), [LuaGui::left](runtime:LuaGui::left), [LuaGui::center](runtime:LuaGui::center) and [LuaGui::screen](runtime:LuaGui::screen) - can't be destroyed.",
+          "examples": [
+            "```\ngame.player.gui.top.greeting.destroy()\n```"
+          ],
+          "parameters": [],
+          "format": {
+            "takes_table": false
+          },
+          "return_values": []
+        }
+      ],
+      "add_variants": [
+        {
+          "name": "flow",
+          "order": 1,
+          "description": "",
+          "parameters": [
+            {
+              "name": "direction",
+              "order": 0,
+              "description": "The initial direction of the flow's layout. Defaults to `\"horizontal\"`.",
+              "type": "GuiDirection",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "scroll-pane",
+          "order": 10,
+          "description": "",
+          "parameters": [
+            {
+              "name": "horizontal_scroll_policy",
+              "order": 0,
+              "description": "Policy of the horizontal scroll bar. Defaults to `\"auto\"`.",
+              "type": "ScrollPolicy",
+              "optional": true
+            },
+            {
+              "name": "vertical_scroll_policy",
+              "order": 1,
+              "description": "Policy of the vertical scroll bar. Defaults to `\"auto\"`.",
+              "type": "ScrollPolicy",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

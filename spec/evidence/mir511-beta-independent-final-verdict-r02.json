@@ -1,0 +1,25 @@
+{
+  "kind": "MIR511BetaFinalIndependentVerdictV2",
+  "verdict": "APPROVED: MIR5.0.11 GitHub beta/prerelease only. All required source, package, native and CI gates closed; no remaining product blocker in the declared scope.",
+  "utc": "2026-11-09T09:43:35.188986+00:00",
+  "main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+  "dev": "b22963ad589108ac8f02d93c21a6e972e25b49a7",
+  "tree": "02dc515326990ba9f7560853ebf16d20b4b5b7a9",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "checked_PR_heads": {
+    "1851": "ccd74a35d747c87a47a0849b632b82a64960fbfa",
+    "1852": "a41bca89add5113ce49f45cc4bf5bcea012a6c57"
+  },
+  "CI": "All4required checks SUCCESS on both exact PR heads. Main/dev entire trees equal reviewed tree; main retains958 ancestry. Development publication step3 permits new identical-tree merge identities. Postmerge CI is not claimed passed.",
+  "inventory": "build/packages/mir511-cumulative-assets-r04/MIR5ReleaseAssetInventoryV1.json",
+  "inventory_sha256": "4CBBD915044002ACB2003F7B4293D5D190A7FEE8AD79443E039F545DC455CB5C",
+  "evidence": "Final17archives/two sums checked; original credit33 applicability retained; R07 prepared-source route+2colds passed; mandatory post16/6ordinary endpoints/8colds passed with scripted precursors explicitly labelled. Native controls/archives restored, Factorio0. All adverse attempts retained.",
+  "post_verdict_sha256": "B18C7849919CB2CCFAB8A0D7BCBF54DDDF2A98178E1FF9B94C82F2D2C0B5534C",
+  "detailed_verdict_sha256": "4F703ABDDCA405D6B5468B11F22C838470C0F0828550BA2AB61A3065729DB3A9",
+  "limits": "No stable/fullFerrum/reporter-profile/2.0worker/physicalcargo/repeated-provider/overhaul/performance acceptance. Remaining Library/stable work stays open; historical best-effort limits unchanged.",
+  "publication_only_conditions": [
+    "Fresh administration and separate immutability checks pass; no controls changed.",
+    "Canonical v5.0.11 tag at checked main; authorized unsigned annotation. Reconcile one draft, stage exact17ZIPs+2sums unchanged; prerelease/notlatest/mutable.",
+    "Verify staged hashes, publish, verify all19 anonymous downloads and matching primarydist notes/assets/clean remote-equal handoff. Mod Portal remains maintainer-owned."
+  ]
+}

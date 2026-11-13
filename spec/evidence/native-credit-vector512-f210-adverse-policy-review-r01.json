@@ -1,0 +1,121 @@
+{
+  "kind": "MIRVectorF2DiagnosticIndependentActualPolicyReviewV1",
+  "reviewed_at_utc": "2026-11-10T01:39:27.780962+00:00",
+  "verdict": "Exact diagnostic established; FIXTURE expectation defect, no production change justified by this failure",
+  "tuple": {
+    "packet_sha256": "7C0991527441646493C3CDF798FBB834DFC658ED62ABB2E1E9B0D379EB40E09B",
+    "owner_sha256": "A0451A9EF3D3AD7E10DC78789C468B7A18DC9F2E78F33742D8420FF03E2C0B2C",
+    "composition_sha256": "96BF497E1FA1DCAA617ADA8FBFAFCFCD3266C002DA327D149FBDB3341726F782",
+    "independent_admission_sha256": "39B9C68F5ACAE87B2111A388A594DB1999D475F8D184B7C5AA42C1BA943521A8",
+    "terminal_sha256": "0B4A7F417480C710774A79E5E03F5F7D060748A8852A8909C848FF56EA480EB9",
+    "canonical_log_sha256": "215C9D211D1505BA43AD79D3EC7889DC7369E02F238EB188BC550AF0E30D9095",
+    "Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "harness": "3bbe21fd35fe93ba998a85b6501c906d73cf3626"
+  },
+  "actual": {
+    "kernel_invocations": 1,
+    "pid": 42872,
+    "exit_code": 1,
+    "status": "failed",
+    "timed_out": false,
+    "completion_predicate_observed": false,
+    "marker_kind": "work-mismatch",
+    "phase": "F2-entry-pending",
+    "tick": 2505,
+    "only_work_difference": {
+      "path": "$/main/enabled",
+      "expected": false,
+      "actual": true
+    },
+    "all_other_work_fields_exact": true,
+    "signed_completed_counts": {
+      "scrap-recycling": {
+        "positive": 1,
+        "negative": 0
+      },
+      "low-density-structure": {
+        "positive": 3,
+        "negative": 0
+      },
+      "casting-low-density-structure": {
+        "positive": 3,
+        "negative": 0
+      }
+    },
+    "main_prototype_hidden": true,
+    "main_prototype_enabled": false,
+    "main_force_enabled": true,
+    "original_strict_observer_refusal_retained": true,
+    "accepted_endpoints": 0,
+    "continuation_commands": 0,
+    "new_ordinary_events": 0,
+    "new_saves_or_colds": 0
+  },
+  "source_policy_evidence": [
+    {
+      "file": "source/compatibility/modern_catalogue.lua",
+      "lines": [
+        1020,
+        1035
+      ],
+      "fact": "Space Age retains the five historical MIR identities in native_paid when native owners own new earning; comments explicitly preserve historical investment and queue prerequisites."
+    },
+    {
+      "file": "source/research/catalogue.lua",
+      "lines": [
+        239,
+        245
+      ],
+      "fact": "selected.native_paid adds its historical main ID ONLY to runtime_private_credit_ids. The following separate selected.definitions loop constructs authored_generated declarations. The retained LDS identity therefore does not enter lifecycle ORDERED_DECLARATIONS as authored_generated."
+    },
+    {
+      "file": "source/research/catalogue.lua",
+      "lines": [
+        154,
+        158
+      ],
+      "fact": "Authored unavailable material rows opt into queued cancellation; the comment explicitly distinguishes retired native-owner streams with an admitted pending-completion contract."
+    },
+    {
+      "file": "source/runtime/lifecycle.lua",
+      "lines": [
+        271,
+        294
+      ],
+      "fact": "reconcile_authored_prototype_disablement iterates ORDERED_DECLARATIONS and writes enabled=false ONLY for ownership_kind authored_generated. It has no authority over this private retained main."
+    },
+    {
+      "file": "source/runtime/lifecycle.lua",
+      "lines": [
+        307,
+        322
+      ],
+      "fact": "Queue cancellation likewise requires authored_generated plus explicit cancel_queued_when_unavailable. No blanket prototype.enabled=false cancellation rule applies."
+    },
+    {
+      "file": "source/runtime/native_credits.lua",
+      "lines": [
+        433,
+        450
+      ],
+      "fact": "set_level_and_disable is the named signed-carrier materialization path; its enabled=false compensates the native carrier level setter, not an instruction to disable the retained main."
+    }
+  ],
+  "classification": "The actor unconditionally changed expected entry_work.main.enabled to false at original3bbe line174, asserting a lifecycle write for an identity excluded from that lifecycle authority. This assumption contradicts the existing authored policy independently of the observed value. Source preserves the actual pre-MIR force flag here; its prototype remains strictly hidden+disabled. This is not a new general permission to enable private research or a change justified solely by observation.",
+  "bounded_next_step": "Remove only the unsupported forced-false expectation; preserve the exact already-captured raw pre-MIR main enabled/visible values through strict full-work equality. Correct the host model that simulated a nonexistent MIR disable write. Add a post-entry opponent that flips actual force.enabled away from the captured value and must refuse; retain old392 red. Keep hidden+disabled PROTOTYPE, pending queue/progress/unit/inventory, public/sentinel baseline, signed counts and all other guards unchanged. New actor/packet/output identities must be separately reviewed. Reuse byte-unchanged actual F1 pending native/script payload via observer-only derivative rather than recreating valid F0/F1 work.",
+  "integrity": {
+    "input_and_original_full_CRC_pass": true,
+    "only_level_control_changed_six_other_members_exact": true,
+    "all8_input_hashes_unchanged_after_run": true,
+    "actual_ledger_singlePID_natural1_verified": true,
+    "exact7loaded_mods_and_raw_witness": true,
+    "recorded_restored": true,
+    "live3prior_controls_equal": true,
+    "Factorio0_recorded_and_original_F210_adverse_kept": true
+  },
+  "limits": [
+    "This diagnostic is an actual strict refusal, not the F2 positive checkpoint or final continuation/save/cold qualification.",
+    "F200 remains unexecuted and held; do not assume its native flag representation or continuation result from F210.",
+    "No reporter/fullCerys/physical/performance/stable acceptance. Reviewer made no Source/controller/native/library changes."
+  ]
+}

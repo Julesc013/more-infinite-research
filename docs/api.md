@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -61,6 +61,8 @@ The [SDK](../sdk/README.md) provides independent required-dependency and optiona
 An optional runtime caller checks `script.active_mods["more-infinite-research"]` and the remote interface. The data-stage `mods` global is unavailable at runtime. Call queries in a game-available handler; `on_load` may register a later observation but must not query game state.
 
 `get_research(force_index, technology_name)` returns a detached native-status table or `nil, error_code`. It reads the named technology without initializing MIR storage or changing research. Its `level` is Factorio's current native level: finite, staged and infinite research do not share a universal completed-count formula. Saved progress is optional where the engine cannot expose it.
+
+From MIR 5.0.12, ordinary default worker cargo research on Factorio 2.0 and 2.1 advances in `mir-worker-storage-default-4`. Query that literal native identity for the default owner. `worker-robots-storage-4` remains a separate first prerequisite or foreign finite stage; it is not an alias for the owner and does not report a combined total level. Consumers must check the actual native technology for the active route; `get_research` retains its existing literal-name semantics.
 
 Version, capability and research result tables are detached snapshots. Use capabilities for the selected target and current context; they do not certify an arbitrary mod combination. The [runtime contract](../spec/api.md#types-and-errors) describes status fields and distinct unavailable/invalid-input errors.
 

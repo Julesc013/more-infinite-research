@@ -1,0 +1,717 @@
+{
+  "kind": "ferrum512-worker-cargo-f210-independent-result-review-r01",
+  "reviewed_at_utc": "2026-11-09T19:28:50.644871+00:00",
+  "verdict": "PASS_EXACT_F210_FULL_FERRUM_ORDINARY4_5_FIRST_MIR_ORDINARY6_SINGLE_NATIVE_ROBOT_SEVEN_IRON_FLIGHT_DELIVERY_PHYSICAL_SAVE_AND_TWO_IMMUTABLE_COLD_LOADS",
+  "findings": [],
+  "identity": {
+    "actual_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\execution-Execute-r01\\terminal.json",
+      "bytes": 1112906,
+      "sha256": "E34A108DBB6405B3F08648374F9F0C8EE4402C9B2C744DE7B80E7B456FAD481C"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\packet.json",
+      "bytes": 584512,
+      "sha256": "D1961540B4ADE41B99F27DF723581B2C843E05ADF97B27350C07977A38C76BEF"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Invoke-FerrumCargo.ps1",
+      "bytes": 29336,
+      "sha256": "07F7B1875E2F4637D95D6A0C35332EDE64E237AD0EBB7D1B411C393D829C18E8"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\composition.json",
+      "bytes": 51015,
+      "sha256": "8E50D55CDC1E767B29939886D5043C709373D504FBB698D246B2B047C812212C"
+    },
+    "admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-controller-independent-admission-r01.json",
+      "bytes": 13015,
+      "sha256": "462FBCCC662AB08AFB4706B9F3F5FFEFBA49F6E901AB55DB4A25A7E31D189882"
+    },
+    "source_oracle_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-independent-source-review-r01.json",
+      "bytes": 11270,
+      "sha256": "B99ED8D68133912506BE16F2ED37DE1B07171E975080FD8C86151E0B7BF0FD60"
+    },
+    "runner": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01",
+    "runner_commit": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+    "Source": "40a065c18b86437148acd60d7180666db7aaeb32",
+    "player": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-polish-b-r01\\original\\more-infinite-research_5.0.21012.zip",
+      "exists": true,
+      "bytes": 1017958,
+      "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "exists": true,
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "actor_commit": "f028b37d0e438475ed7f288f6c19b9f5bfff6c15",
+    "actor": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\inputs-r01\\control.lua",
+      "exists": true,
+      "bytes": 26690,
+      "sha256": "870987ED99F074884AE90334D4D035A5A75AE61DD2CE1B0E15D7FF0C41A65B22"
+    },
+    "lab": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\inputs-r01\\mir-fixture-ferrum-worker-storage-native-lab_0.1.0.zip",
+      "exists": true,
+      "bytes": 1163,
+      "sha256": "4EFF7A7BC8C8919A25CE3CCE9DD5BEDF161CAEF9105733599F29DC4F4B11BE40"
+    }
+  },
+  "actual_processes": 4,
+  "stages": [
+    {
+      "id": "source",
+      "processes": [
+        {
+          "role": "server",
+          "pid": 46320,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 10.191776,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\source\\process-1.resources.jsonl",
+            "bytes": 6284,
+            "sha256": "7812C24A0D8B53ABD7F8007C3FBAC7B31033BE2A0FA5873DF0AC769BBEE232D2"
+          }
+        }
+      ],
+      "mods": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-ferrum-worker-storage-native-lab@0.1.0",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "server_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-source\\server.log",
+        "bytes": 124771,
+        "sha256": "F37DC5E18A6BD851F1014C815B64B3E6D3DC4C465F8B8692384892F597EAF6A2"
+      },
+      "markers": [
+        {
+          "stage": "administrative-setup-only",
+          "tick": 0,
+          "phase": "source-init",
+          "bonus": 3,
+          "ordinary": {}
+        },
+        {
+          "stage": "lab-start",
+          "tick": 0,
+          "phase": "earning",
+          "bonus": 3,
+          "ordinary": {}
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 2427,
+          "phase": "completion-pending",
+          "bonus": 4,
+          "ordinary": {
+            "worker-robots-storage-4": 1
+          }
+        },
+        {
+          "stage": "lab-start",
+          "tick": 2428,
+          "phase": "earning",
+          "bonus": 4,
+          "ordinary": {
+            "worker-robots-storage-4": 1
+          }
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 6067,
+          "phase": "completion-pending",
+          "bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "source-saved",
+          "tick": 6068,
+          "phase": "source-saved",
+          "bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        }
+      ],
+      "closed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\source\\write-data\\saves\\mir-ferrum-worker-source.zip",
+        "exists": true,
+        "bytes": 572387,
+        "sha256": "AB5CB6E95BC34BCBC4499B96A2456BFC440A02AA3A38D8C77A3F4A1151B70E1E"
+      },
+      "native_original_root": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\source",
+      "primary_copy_root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-source",
+      "members": 17,
+      "raw_bytes": 2738529
+    },
+    {
+      "id": "destination",
+      "processes": [
+        {
+          "role": "server",
+          "pid": 21956,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 12.339898,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\process-1.resources.jsonl",
+            "bytes": 7502,
+            "sha256": "9DB538B3C94C91C9C2C09D1DE8200E3D30B1678D4635CB1B964A33E2EA23C6C9"
+          }
+        },
+        {
+          "role": "cold1",
+          "pid": 15972,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.107548,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "700BE0DCCEA93C75271BB4E3FF4087C72FD464B6E2796233EB65EE6F26477F6C"
+          }
+        },
+        {
+          "role": "cold2",
+          "pid": 40996,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.077854,
+          "resources": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\process-3.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "A315BC9D6919727847A049C58CDDC21C2420EADE4892473DB1941235EDA38B6E"
+          }
+        }
+      ],
+      "mods": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-ferrum-worker-storage-native-lab@0.1.0",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21012",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "server_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-destination\\server.log",
+        "bytes": 252204,
+        "sha256": "1961F1F901459643D53995024C6D046FF402ACD854450575AE71F685F2FA5B5D"
+      },
+      "markers": [
+        {
+          "stage": "level-pre-MIR-configuration",
+          "tick": 6070,
+          "phase": "source-saved",
+          "bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "post-MIR-configuration",
+          "tick": 6070,
+          "phase": "destination-entry",
+          "bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "lab-start",
+          "tick": 6070,
+          "phase": "earning",
+          "bonus": 5,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1
+          }
+        },
+        {
+          "stage": "ordinary-finished",
+          "tick": 11529,
+          "phase": "completion-pending",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "destination-saved",
+          "tick": 11530,
+          "phase": "destination-saved",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "cargo-administrative-setup-only",
+          "tick": 12509,
+          "phase": "cargo-active",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "cargo-loaded-seven",
+          "tick": 12775,
+          "phase": "cargo-active",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "cargo-seven-in-flight",
+          "tick": 12795,
+          "phase": "cargo-active",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        },
+        {
+          "stage": "cargo-destination-saved",
+          "tick": 13646,
+          "phase": "cargo-destination-saved",
+          "bonus": 6,
+          "ordinary": {
+            "worker-robots-storage-4": 1,
+            "worker-robots-storage-5": 1,
+            "worker-robots-storage-6": 1
+          }
+        }
+      ],
+      "closed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\write-data\\saves\\mir-ferrum-worker-cargo-destination.zip",
+        "exists": true,
+        "bytes": 594945,
+        "sha256": "81785725181E71AE4599593F3CE720FA162B527EDFA5A8EC9DD9FAD746B780E6"
+      },
+      "native_original_root": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination",
+      "primary_copy_root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-destination",
+      "members": 29,
+      "raw_bytes": 5064736
+    }
+  ],
+  "ordinary_research": {
+    "distinct_ordinary_completions": 3,
+    "ordinary": {
+      "worker-robots-storage-4": 1,
+      "worker-robots-storage-5": 1,
+      "worker-robots-storage-6": 1
+    },
+    "administrative_prerequisite_completions": 68,
+    "separation": "Exactly4/5 source and6 destination completed once through the actor event path requiring by_script=false, prior partial progress, exact budget insertion and actual zero residual lab inputs. Scripted1..3/science prerequisites (68 events), cargo placement/supplies/energy and both cold observations are not additional ordinary research.",
+    "actual_bonuses": "Source setup3, finite4 completion4, finite5 completion5. First-MIR pre/post entry bonus5, ordinary6 completion6 and all physical/cold observations remain6.",
+    "science_consumption": [
+      {
+        "id": "worker-robots-storage-4",
+        "units": 675,
+        "budgets": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "ferrum-robotics-science-pack": 675
+        },
+        "inserted": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "ferrum-robotics-science-pack": 675
+        },
+        "progress_seen": true
+      },
+      {
+        "id": "worker-robots-storage-5",
+        "units": 1012,
+        "budgets": {
+          "automation-science-pack": 1012,
+          "logistic-science-pack": 1012,
+          "chemical-science-pack": 1012,
+          "production-science-pack": 1012,
+          "utility-science-pack": 1012,
+          "ferrum-robotics-science-pack": 1012
+        },
+        "inserted": {
+          "automation-science-pack": 1012,
+          "logistic-science-pack": 1012,
+          "chemical-science-pack": 1012,
+          "production-science-pack": 1012,
+          "utility-science-pack": 1012,
+          "ferrum-robotics-science-pack": 1012
+        },
+        "progress_seen": true
+      },
+      {
+        "id": "worker-robots-storage-6",
+        "units": 1518,
+        "budgets": {
+          "automation-science-pack": 1518,
+          "logistic-science-pack": 1518,
+          "chemical-science-pack": 1518,
+          "production-science-pack": 1518,
+          "utility-science-pack": 1518,
+          "electromagnetic-science-pack": 1518,
+          "ferrum-robotics-science-pack": 1518
+        },
+        "inserted": {
+          "automation-science-pack": 1518,
+          "logistic-science-pack": 1518,
+          "chemical-science-pack": 1518,
+          "production-science-pack": 1518,
+          "utility-science-pack": 1518,
+          "electromagnetic-science-pack": 1518,
+          "ferrum-robotics-science-pack": 1518
+        },
+        "progress_seen": true
+      }
+    ],
+    "cost_and_effect": "Actual native independent calibration1518 from untouched literal1518.75 control. Public6 formula remains1518.75*1.5^(L-6), runtime3600ticks/raw60seconds, effect1, seven amount1 science types. Source4/5 cost675/1012 with six science types and Ferrum native ownership; normal robot base payload1 plus genuinely earned storage bonus6 establishes expected7-item capacity. Actual payload-base/event-by_script/inventory residual conditions are executed guards in exact saved actor, not separately printed new scalars.",
+    "cursor": "Actual public6 level7/researchedfalse after one earned6; no public7 prototype, no hidden private investment."
+  },
+  "command_and_save_order": {
+    "source_command_count": 0,
+    "destination_command_count": 1,
+    "command": "/mir-ferrum-worker-cargo start",
+    "interim_before_command": {
+      "exists": true,
+      "bytes": 594647,
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\write-data\\saves\\mir-ferrum-worker-destination.zip",
+      "sha256": "ADA6314CDA189802ED46C38B7AEC8C8407092672E8155BE329E639E4384E80D8"
+    },
+    "same_hash_copy_before_command": {
+      "exists": true,
+      "bytes": 594647,
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\interim-before-cargo.zip",
+      "sha256": "ADA6314CDA189802ED46C38B7AEC8C8407092672E8155BE329E639E4384E80D8"
+    },
+    "raw_log_order": "Destination ordinary marker line169 at tick11530, Saving finished171, cargo setup173 at tick12509, loaded174, moving175, physical marker176 at tick13646, Saving finished178. Source final marker157 precedes Saving finished159.",
+    "provenance": "Exact reviewed07F7 caller enforces closed interimZIP/full CRC/native checks and physically distinct equal copy before setting sent and sending once. Actual command receipt records the same ADA631 interim and pre-command copy hashes; both remain unchanged. Source never sends cargo command. Ordinary interim is separately protected and is not physical completion.",
+    "server_exits": "Both servers are admitted governed owned stops with exit-1, passed=true, completion_predicate_observed=true and timed_out=false after their proper named save endpoints. Neither is labelled natural0. Two cold processes naturally exit0."
+  },
+  "actual_physical_witness": {
+    "administrative_setup": {
+      "robot_items": 1,
+      "provider_iron": 7,
+      "requester_iron": 0,
+      "normal_quality": true,
+      "one_time_port_energy": 100000000
+    },
+    "start_tick": 12509,
+    "loaded": {
+      "tick": 12775,
+      "frame": {
+        "provider": 0,
+        "requester": 0,
+        "docked": 0,
+        "port": 40,
+        "provider_id": 41,
+        "requester_id": 42,
+        "positions": {
+          "port": {
+            "y": 12,
+            "x": 0
+          },
+          "provider": {
+            "y": 12.5,
+            "x": -11.5
+          },
+          "requester": {
+            "y": 12.5,
+            "x": 12.5
+          }
+        },
+        "active": [
+          {
+            "unit": 43,
+            "count": 7,
+            "position": {
+              "x": -11.5,
+              "y": 12.5
+            },
+            "quality": "normal"
+          }
+        ],
+        "network_ready": true,
+        "available": 0
+      }
+    },
+    "flight": {
+      "tick": 12795,
+      "frame": {
+        "provider": 0,
+        "requester": 0,
+        "docked": 0,
+        "port": 40,
+        "provider_id": 41,
+        "requester_id": 42,
+        "positions": {
+          "port": {
+            "y": 12,
+            "x": 0
+          },
+          "provider": {
+            "y": 12.5,
+            "x": -11.5
+          },
+          "requester": {
+            "y": 12.5,
+            "x": 12.5
+          }
+        },
+        "active": [
+          {
+            "unit": 43,
+            "count": 7,
+            "position": {
+              "x": -10.5,
+              "y": 12.5
+            },
+            "quality": "normal"
+          }
+        ],
+        "network_ready": true,
+        "available": 0
+      }
+    },
+    "delivered": {
+      "tick": 13646,
+      "frame": {
+        "provider": 0,
+        "requester": 7,
+        "docked": 1,
+        "port": 40,
+        "provider_id": 41,
+        "requester_id": 42,
+        "positions": {
+          "port": {
+            "y": 12,
+            "x": 0
+          },
+          "provider": {
+            "y": 12.5,
+            "x": -11.5
+          },
+          "requester": {
+            "y": 12.5,
+            "x": 12.5
+          }
+        },
+        "active": {},
+        "network_ready": true,
+        "available": 1
+      }
+    },
+    "fresh_saved_physical_frame": {
+      "provider": 0,
+      "requester": 7,
+      "docked": 1,
+      "port": 40,
+      "provider_id": 41,
+      "requester_id": 42,
+      "positions": {
+        "port": {
+          "y": 12,
+          "x": 0
+        },
+        "provider": {
+          "y": 12.5,
+          "x": -11.5
+        },
+        "requester": {
+          "y": 12.5,
+          "x": 12.5
+        }
+      },
+      "active": {},
+      "network_ready": true,
+      "available": 1
+    },
+    "independent_comparison": "Raw loaded and moving physical_frame objects exactly equal their corresponding historical report frames. Native robot43 has7 normal iron at(-11.5,12.5) tick12775 and(-10.5,12.5) tick12795, with provider0/requester0/docked0/available0 at both. Same port40/provider41/requester42 and static positions persist. Final tick13646 is provider0/requester7/docked1/deployed0/available1; fresh frame equals delivered report frame.",
+    "conservation": "Exact saved actor870987 checks every cargo tick: normal quality/no extra inventory, one network cell, one total logistic robot and zero construction robots, docked+deployed=1 and provider+requester+carried iron=7. Actual loaded/moving/final frames independently satisfy conserved7 and same robot before native docking.",
+    "non_substitution": "Source/code provenance confirms only labelled placement, provider iron, port robot item and one-time native energy setup. No direct robot-cargo or requester insertion, teleport, destination setting, forced capacity or research shortcut supplies the observed delivery. This accepts one actual physical transfer, not general manufacture or logistics throughput."
+  },
+  "native_and_foreign_continuity": {
+    "pre_post_MIR": "Tick6070 pre-MIR and post-MIR all-four-force frame dictionaries are exactly equal. Mask only introduced6/P to recover source-saved frames exactly. Original source fields remain after ordinary6 except the legitimate player bonus+1 and newly earned continuation; scripted player sentinel restoration is labelled fixture cleanup, not evidence replacing the immediate callback checks.",
+    "during_cargo": "All4 physical-phase marker frames, ordinary counts, consumption, administrative events and calibration equal the ordinary interim exactly. No new research or aggregate contribution is granted during cargo.",
+    "forces": [
+      "player",
+      "enemy",
+      "neutral",
+      "mir-ferrum-foreign"
+    ],
+    "player": {
+      "current": "mir-ferrum-sentinel",
+      "queue": [
+        "mir-ferrum-sentinel",
+        "mir-ferrum-detached"
+      ],
+      "progress": 0.375,
+      "detached_saved": 0.27,
+      "bonus": 6
+    },
+    "foreign": {
+      "current": "mir-ferrum-sentinel",
+      "queue": [
+        "mir-ferrum-sentinel",
+        "mir-ferrum-detached"
+      ],
+      "progress_actual": 0.42000000000000004,
+      "detached_saved": 0.27,
+      "native4_enabled": false,
+      "bonus": 0
+    },
+    "private": "All four private holders remain hidden/disabled/unresearched level4/saved0/count675. Actual direct prerequisite maps contain all8 names including worker2 andworker3. Player private row and all nonplayer frames remain exact through addition/cargo/colds; no pruning/alternate shape or paid-mask adoption.",
+    "float_identity": "Foreign0.42000000000000004, player.375 and detached.27 are retained exactly between raw frames; no after-result tolerance/oracle change."
+  },
+  "immutable_physical_colds": {
+    "input_sha256": "81785725181E71AE4599593F3CE720FA162B527EDFA5A8EC9DD9FAD746B780E6",
+    "input_bytes": 594945,
+    "source_inputs": "Two physically distinct immutable copies, separate from each other and protected destination. Original/interim/source and both physical input hashes still match after both loads.",
+    "actual_arguments": "Both raw cold logs specify --benchmark-ticks1 --benchmark-runs1 --benchmark-sanitize.",
+    "observations": "Exactly one cold marker each, phase cargo-destination-saved, tick13650, no extra ordinary event. Both fresh physical_frame dictionaries, historical cargo reports, native frames, ordinary counters, consumption, administrative events and calibration exactly equal final closed physical endpoint. No durable cold mutation or save by actor.",
+    "native_frame_sha256": "1852646023CD4AEE7DC4454B0EB335CA24A81C03169D3D5E8EC171239AAF571F",
+    "physical_frame_sha256": "EA1C6A8FE0739EE9FF0BAA5075442746FBEACAC56DC2308D91769F2A0B34C73B",
+    "cold_logs": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-destination\\cold1.log",
+        "bytes": 41463,
+        "sha256": "7C5B7BF2BA6E95DD54442A67AC24DBAA6E3DC76F8C7BBB3E689183743A8B29B4"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\Execute-r01-destination\\cold2.log",
+        "bytes": 41463,
+        "sha256": "46E65434BFCBFCBB4AA8ED5C1B2B781BEF365428B9C0F7DBF1586E7C28192BFC"
+      }
+    ]
+  },
+  "custody_and_restoration": {
+    "native_original_and_primary_copy_members_independently_rehashed": 46,
+    "native_raw_bytes": 7803265,
+    "exact_both_directory_member_sets": true,
+    "native_ZIP_CRC_and_saved_actor_checks": 7,
+    "protected_record_body_and_CRC_checks": 5,
+    "saved_actor_sha256": "870987ED99F074884AE90334D4D035A5A75AE61DD2CE1B0E15D7FF0C41A65B22",
+    "protected_records": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\protected\\source.zip",
+        "exists": true,
+        "bytes": 572387,
+        "sha256": "AB5CB6E95BC34BCBC4499B96A2456BFC440A02AA3A38D8C77A3F4A1151B70E1E"
+      },
+      {
+        "exists": true,
+        "bytes": 594647,
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\write-data\\saves\\mir-ferrum-worker-destination.zip",
+        "sha256": "ADA6314CDA189802ED46C38B7AEC8C8407092672E8155BE329E639E4384E80D8"
+      },
+      {
+        "exists": true,
+        "bytes": 594647,
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\ferrum512-worker-cargo-f210-r01\\native\\destination\\interim-before-cargo.zip",
+        "sha256": "ADA6314CDA189802ED46C38B7AEC8C8407092672E8155BE329E639E4384E80D8"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\protected\\ordinary-interim.zip",
+        "exists": true,
+        "bytes": 594647,
+        "sha256": "ADA6314CDA189802ED46C38B7AEC8C8407092672E8155BE329E639E4384E80D8"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-r01-controller\\protected\\destination.zip",
+        "exists": true,
+        "bytes": 594945,
+        "sha256": "81785725181E71AE4599593F3CE720FA162B527EDFA5A8EC9DD9FAD746B780E6"
+      }
+    ],
+    "source_binding": "Destination predecessor copy matches protected source AB5CB6...572387B. Ordinary interim ADA631...594647B stays distinct from physical817857...594945B. All original/protected/native-copy hashes remain unchanged.",
+    "input_binding": "Exact engine8DC, B package4A9B, actor870987, native config/scenario bodies, actual mod versions10source/11destination and same11bothcolds match admission. Every server marker mod map equals its exact selected name/version dictionary; all retained official archive/Baseinfo body hashes rechecked. No A9b/AA26 or old R02 result was relabelled as this execution.",
+    "fatal_checks": "No fatal/error/trace pattern in raw server/cold logs or4stdout; all4stderr empty. All raw loaded selection and actor/native guard endpoints pass.",
+    "prior_control_and_archive_states_independently_rechecked_live": 44,
+    "mismatches": 0,
+    "both_library_activations_restored": true,
+    "temporary_B_and_lab_archives_absent": true,
+    "actual_final_Factorio_count": 0,
+    "terminal_prose": "Frozen prospective remaining fields and physical_cargo_qualification=false are preserved as pre-review historical prose/observation flags. This independent named result verdict derives from actual raw endpoints/custody, not terminal status or exit0 alone."
+  },
+  "preserved_adverses": [
+    "Original missing-worker2 A881/2F4 oracle refusal and correction remain unchanged.",
+    "Original raw60/runtime3600, icon, Compose/schema/host-reader and missing-flight mutant adverse bodies remain under their identities.",
+    "Old R02 ordinary result stays actor68A8/A9b; published11 assets and its Ferrum science failure stay immutable."
+  ],
+  "limits": [
+    "Exact F2102.1.23/Ferrum0.1.5/PL2.4.0/spider2.9.87/defaults/B4A9B/actor870987 single physical transfer route only.",
+    "Scripted infrastructure, supplies, one-time energy and fast fixture labs are labelled; no planetary science/iron manufacture or autonomous network construction witness.",
+    "Two immutable one-update colds are exact scoped loads, not soak or multiplayer/rejoin acceptance.",
+    "No F200 physical counterpart, general logistics throughput/latency, Library image/input/export/lifecycle, multiplayer, benchmark/performance or stable verdict.",
+    "Root/Aero own Library review; no image review duplicated here. No SourceB release or broad gameplay verdict follows from this named native pass."
+  ],
+  "reviewer_activity": {
+    "read_only_original_raw_and_primary_copies": true,
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-cargo-f210-independent-result-review-r01.json"
+    ],
+    "native_runs": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "Source_controller_or_packet_edits": 0,
+    "library_mutations": 0,
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 85620,
+      "bounded_scan_advisory": true
+    },
+    "reader_note": "One ad-hoc extraction assumed log locator was a string; actual receipt uses a path record. Reader was corrected only; no native inputs/outputs/oracle changed."
+  }
+}

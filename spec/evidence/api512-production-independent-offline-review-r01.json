@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIR512APITwoConsumerPhysicalOfflineIndependentReviewV1",
+  "reviewed_utc": "2026-11-10T05:54:07.878748+00:00",
+  "verdict": "GO for unchanged method and a fresh exact zero-engine composition; native execution pending matching final packet/composition tuples",
+  "findings": [],
+  "player": {
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "publication": "unpublished12; integrity60808CA5 and exact inventory/checked integration/CI guarded independently of historical11 delivery"
+  },
+  "harness": {
+    "repo": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04",
+    "head": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "native_fixture_helper_sha256": "5FF07FF2131DB29C42B25185CF8984824C010272FE6B1BB4CACE26189938B199",
+    "clean_proper_git_root_verified": true,
+    "unchanged_helpers_per_arm": 8,
+    "loaded_player_is_not_harness_source": true
+  },
+  "review": {
+    "fixed_input_rows_physically_hashed": 4254,
+    "cached_unique_hash_reads_including_eligibility_and_fixture_inputs": 4228,
+    "fixture_archives_checked": 8,
+    "fixture_member_bodies_checked": 24,
+    "unchanged_member_bodies": 20,
+    "changed_member_bodies": 4,
+    "member_changes": "Exactly one target version literal in each production control.lua and exact info dependency per engine. Tenothermembers/threeZIPs perengine remain identical to accepted11 inputs; all8ZIP CRCs pass. Source directories match ZIP bodies.",
+    "caller_projection": "Actual unifieddiff exactly matches supplied patch perarm. Caller changes only exact current12 metadata/provenance/eligibility/version/paths; executable process/save/cold tail remains byte-identical to each accepted11 caller.",
+    "resources": "4096MiB sampled-watchdog/180s/128MiB,30s bounded admissionwait; unchanged governor/lease/direct-library restoration. No hard-cap claim.",
+    "schedule": "Two serial independent four-process cases,8total maximum, create\u2192physicalproduction/save\u2192cold1\u2192cold2. Stopfirstfailure/no retries.",
+    "oracles": "Actual100copperplates\u2192200cable before research and100\u2192202after native finite setter; exact recipe+0.01; module-free/no-beacon assembler aggregate0. Detached Alpha/Beta readonlyquery checks and both consumer marker requirements unchanged. Zero ordinary labs.",
+    "exit_policy": "Outerproduction allows0-or-completionpredicate; trusted helper ALWAYS requires live completionpredicate whenever supplied, including exit0. Predicate requires fixture marker+saveexists+Savingfinished/fatal-free log. Create and both1-update colds require natural0; both read completed frame and exactsame savehash. Independent actualsaveCRC/marker/count/selection/custody verification remains required.",
+    "negative_controls": "Read nine actual wrongsource/hash/authority/helper/profile/consumer/createonly/output/packet refusals perengine on preserved draft tuple, plus source closure and real resource/path escape controls. VerifyOnly evidence is offline only; corrected packet finalVerifyOnly was not yet performed when author corrected its premature running claim."
+  },
+  "metadata_boundary": {
+    "correction": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\metadata-only-correction.json",
+      "bytes": 3692,
+      "sha256": "72059031FE1813BA4C9798529A15ACD93BC856CD69380DC79A356FEB2A56C228"
+    },
+    "description": "Author changed only limits[1] after declaring draft frozen while Root zero-engine Compose was dispatched. Exact old packet bodies and roots are preserved; both old compositions closed/restored on old exact pins. They are valid OLD zero-engine receipts, not native evidence or matching compositions of corrected packet hashes. No silent rebind/adverse deletion. Fresh matching composition/admission is required before Execute.",
+    "old_compose": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\composition.json",
+        "bytes": 16887,
+        "sha256": "88120D082515DC3F3894A4DF606426E82600578E4E5BD369E275FF672C6BE21E"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\composition.json",
+        "bytes": 18365,
+        "sha256": "75A99211E9C73E7C601BF1B7A84D5C5D7F44DFF43460B04FF9BF1492A71BA4ED"
+      }
+    ],
+    "corrected_packets": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\packet.json",
+        "bytes": 473681,
+        "sha256": "A4CEBDABD7488EAAE91079C575C614E2F3285A00766321F022958345AF166D55"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\packet.json",
+        "bytes": 528672,
+        "sha256": "2915BF4E1F2D656CA199D69D0FCB2810E7E3E4B8CE0394168B590EF3C2C265D4"
+      }
+    ],
+    "unchanged_callers": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\Invoke-Owned.ps1",
+        "bytes": 32320,
+        "sha256": "4094AFF343A8D3386FD17F3751D620ECBDC8E983FDF82E7F43BB964E6288B3EA"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\Invoke-Owned.ps1",
+        "bytes": 32493,
+        "sha256": "6CDA58B84E307C7D1A3CDAC8B5543B63CB6258D4A201ED6240697AAC123603E2"
+      }
+    ],
+    "profiles": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f200\\profile.json",
+        "bytes": 2041,
+        "sha256": "2D85B21D4D41BAC6E8943A322E097F514C1D75110445540FC1CE4CCE1C549381"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\f210\\profile.json",
+        "bytes": 2129,
+        "sha256": "9579B34781633728FCF9981FF55756FB81800696E9DAB6EEFE58CFF191FAC767"
+      }
+    ],
+    "root_inventory": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\packet.json",
+      "bytes": 4560,
+      "sha256": "DBC211BA808298A3B5E4A462AA330204187AEC6D5B5C5BD5C054A0025C26F422"
+    }
+  },
+  "actual_zero_engine_readback": "Both old compositions contain exactfourCLIroles and exactselected9F200/10F210rows, selfcaller hashes, contained config roots, zeroFactorio; all16prior control/archive states rechecked live and original candidate temporary removal confirmed. No native acceptance follows.",
+  "native_execution_admitted": false,
+  "new_engines_builds_host_tests_leases_or_compose_by_reviewer": 0,
+  "limits": [
+    "Only the named existing two-consumer/physical/init/save/cold cases; old11 native results retain old identities.",
+    "Current12 native-credit basis init/save/cold reachability is the actual gap; unchanged API leaf code does not supply current endpoints.",
+    "No universal API1stability, ordinarylab, protectedhistoricalsave, wholeproduct/performance/release/stable verdict."
+  ]
+}

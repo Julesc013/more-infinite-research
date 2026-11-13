@@ -1,0 +1,69 @@
+{
+  "kind": "MIR511RepairR01IndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-09T12:22:36.340044+00:00",
+  "verdict": "CONFIRMED zero-engine preparation refusal; exact restoration. Not a native, actor, Source or performance failure. No retry of R01 is admitted.",
+  "original_admission": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-root-prepare-admission.json",
+    "bytes": 1419,
+    "sha256": "3FF2C8E9D2C71B49EA3217CC5ADB2372513B44592A993398F90622699D3E4F5D"
+  },
+  "original_independent_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-independent-packet-review.json",
+    "bytes": 6485,
+    "sha256": "4A4101BBDF3BBABF1508ECFE5B0EF6DBE1BFD5BDC00E842F4AC0B5C45D035A27"
+  },
+  "identity": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-controller\\packet.json",
+      "bytes": 28123,
+      "sha256": "58C6EFE6446B3E57C6584DA5B0962F5807C22E39AD7900FBCEE2D23E6CF2E909"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-controller\\Invoke-Repair511.ps1",
+      "bytes": 26366,
+      "sha256": "774ED5DF950B7700AFFD9FC46CD3DB78C1E1AA5F3C28F251898C2212E84BF2AF"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-controller\\composition.json",
+      "bytes": 22770,
+      "sha256": "FA333B87B48805CEA526786B34A30FE02A1B9B7964BB3A4C3DAA1E0A62E35F7C"
+    }
+  },
+  "actual": {
+    "custody": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\runtime511-repair-r01-inputs\\benchmark\\build\\tmp\\runtime511-repair-r01\\archive-custody\\candidate-prepare\\result.json",
+      "bytes": 2390,
+      "sha256": "45B5E8F283B8E0E41D6AE0F9A5799BD0EA7568884FFAFEC6507E3956FDFB6D3B"
+    },
+    "passed": false,
+    "error": "[mir5-native-fixture] active repair MIR role is unsupported",
+    "factorio_processes_launched": 0,
+    "preparation_created": false,
+    "capture_output_root_absent": true,
+    "stdout": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-controller\\prepare.stdout.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "stderr": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r01-controller\\prepare.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  },
+  "cause": "Exact original063 capture helper Assert-ActiveFixtureSelection maps current repair role only5.0.21010 to fixture0.2.1 at line376. Actual selected5.0.21011 leaves expectedBaseVersion empty and line378 refuses. Top-level role invocation line811 precedes resource context/process launch. Capture root, save, pilot and preparation receipt were not created; outer owned-archive custody caught the refusal and restored the selection.",
+  "review_gap": "The preserved4A41 review approved only Prepare2, not native results. It verified fixture-source/CLI/resource composition but missed this reachable role admission; R01 Compose did not invoke the role function. The prior review remains byte-exact evidence of that bounded preparation coverage gap and is not relabelled as native success.",
+  "restoration": {
+    "scope": "r01-adverse",
+    "custody": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\runtime511-repair-r01-inputs\\benchmark\\build\\tmp\\runtime511-repair-r01\\archive-custody\\candidate-prepare\\result.json",
+      "bytes": 2390,
+      "sha256": "45B5E8F283B8E0E41D6AE0F9A5799BD0EA7568884FFAFEC6507E3956FDFB6D3B"
+    },
+    "before_states_live_equal": 8,
+    "passed": false,
+    "error": "[mir5-native-fixture] active repair MIR role is unsupported"
+  },
+  "preservation": "R01 packet, caller, composition, Root admission,4A41 review, empty stdout/stderr and adverse custody remain unchanged and are explicitly bound by R02 origin_adverse. No physical sample or timing observation exists to reuse.",
+  "limits": "Read-only source/custody/live restoration inspection. No Source, fixture, controller, direct-library or native mutation and no host/native rerun by reviewer. No whole-product or stable verdict."
+}

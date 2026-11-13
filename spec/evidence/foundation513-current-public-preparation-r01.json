@@ -1,0 +1,169 @@
+{
+  "kind": "MIR513ExistingFoundationCurrentPublicPreparationV1",
+  "status": "PREPARED_REVIEWED_READONLY_PLAN_PASS_NATIVE_HELD_BY_UNCHANGED_RESOURCE_GUARD",
+  "candidate": {
+    "source": "32505443e929344affb2c7d691dd15bdb7fb2a4d",
+    "main": "f208b853a6e59fdcafd9209219150965576637d7",
+    "f200_zip_sha256": "4DD6562C42C296AFB0EF428643FBBEFCAD6D328CDDBEFD1ABB812F053D18F882"
+  },
+  "prepared": {
+    "kind": "ExistingFoundationPublic13SuccessorPreparationV1",
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir513-foundation-current13-r01\\packet.json",
+      "bytes": 53156,
+      "sha256": "CCF8917DC923B45911910931461FBD38272FE802BB329FDE6322C3FA6659B7E0"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir513-foundation-current13-r01\\Invoke-Foundation513Activity.ps1",
+      "bytes": 21147,
+      "sha256": "634F2E39E0FE3D321DEB45410476DEC28FA778FB7ED77A873A47E9F8E03B0CEA"
+    },
+    "reader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir513-foundation-current13-r01\\Prepare-Foundation513Activity.py",
+      "bytes": 25071,
+      "sha256": "DFBF50522A3DE9257CE93763DF3AE0A4ABB414B63D4BCD50B48D7769766D50DC"
+    },
+    "literal_records": 67,
+    "resources": {
+      "expected_peak_memory_mib": 8192,
+      "maximum_new_output_mib": 1024,
+      "timeout_seconds": 300,
+      "admission_wait_seconds": 30
+    },
+    "benchmark": {
+      "ticks": 601,
+      "runs": 1,
+      "sanitize": true,
+      "per_tick_verbose": false
+    },
+    "parent_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir512-next-heavy-profile-aero-r01\\current-controller\\packet.json",
+      "bytes": 38288,
+      "sha256": "A93A9EC3E3F3488522CF94110B20ADDD8DB90BFBABB0A0903E3EEEBAF6B59880"
+    },
+    "native_execution": false,
+    "compose": false,
+    "admission": "NOT_GRANTED_PENDING_CONTROLS_PLAN_INDEPENDENT_REVIEW_AND_REAL_RAM_GUARD"
+  },
+  "actual_controls": {
+    "kind": "Foundation513ActivityActualFunctionControlsV1",
+    "native_processes": 0,
+    "library_mutation": false,
+    "changed_function": [
+      "Get-Foundation504ProfileClosure"
+    ],
+    "tests": [
+      {
+        "name": "all governor/custody/restoration/admission/run functions unchanged",
+        "passed": true
+      },
+      {
+        "name": "old504",
+        "passed": true,
+        "refusal": "exact public13 candidate differs"
+      },
+      {
+        "name": "future14",
+        "passed": true,
+        "refusal": "exact public13 candidate differs"
+      },
+      {
+        "name": "wrong13hash",
+        "passed": true,
+        "refusal": "exact public13 candidate differs"
+      },
+      {
+        "name": "natural0 accepted",
+        "passed": true
+      },
+      {
+        "name": "wrong native return {\"completion_predicate_observed\":false,\"timed_out\":false,\"passed\":false,\"exit_code\":0}",
+        "passed": true
+      },
+      {
+        "name": "wrong native return {\"completion_predicate_observed\":false,\"timed_out\":true,\"passed\":true,\"exit_code\":0}",
+        "passed": true
+      },
+      {
+        "name": "wrong native return {\"completion_predicate_observed\":false,\"timed_out\":false,\"passed\":true,\"exit_code\":1}",
+        "passed": true
+      },
+      {
+        "name": "wrong native return {\"completion_predicate_observed\":true,\"timed_out\":false,\"passed\":true,\"exit_code\":0}",
+        "passed": true
+      }
+    ],
+    "count": 9
+  },
+  "actual_plan": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir513-foundation-current13-r01\\plan.stdout.txt",
+    "bytes": 3475,
+    "sha256": "964D7F61C78F3862463CD146801DE49CDBE17C75193C06EC44DD47679BF349A8",
+    "native_execution": false,
+    "library_mutation": false
+  },
+  "actual_guard": {
+    "kind": "Foundation513ReadOnlyUnchangedResourceAdmissionV1",
+    "status": "refused",
+    "error": "[mir441-resource-admission-memory]",
+    "admission": {
+      "snapshot": {
+        "observed_at": "2026-11-12T14:44:23.3241399+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 14127689728,
+          "committed_bytes": 25992564736,
+          "commit_limit_bytes": 41293737984
+        },
+        "work_volume": {
+          "name": "D:\\",
+          "free_bytes": 73528791040,
+          "total_bytes": 1500099112960
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 187167862784,
+          "total_bytes": 599395090432
+        }
+      },
+      "limits": {
+        "physical_bytes": 6809196134,
+        "commit_bytes": 6809196134,
+        "system_bytes": 21474836480,
+        "work_bytes": 21474836480
+      },
+      "estimated_peak_bytes": 1073741824,
+      "expected_peak_memory_bytes": 8589934592
+    },
+    "native_processes": 0,
+    "library_mutations": 0,
+    "output_root_created": false,
+    "budget_mib": 8192,
+    "output_budget_mib": 1024,
+    "helper": "0b20bc472562ee22cb32393afab29f2a43c0c8ec"
+  },
+  "independent_review_recorded_by": "BlackGlass execution lead",
+  "independent_review": {
+    "reviewer": "/root/stable_ui_packet_review512",
+    "verdict": "GO prepared read-only binding only",
+    "actual_checks": "All67literal inputs rehashed; no missing/mismatch/duplicatepaths. ExactF2001,038,837B/root5.0.20013/Factorio2.0/base>=2.0.77. Profile37mods/33archives differs onlyMIR12to13. Complete244-member comparison partitions8changed/236unchanged and same8source paths. Caller constants+readerfilename only; scientificR06 andtwoLua unchanged. Delivery/independentF200 row, actualPlan/9controls/resource refusal valid. No target/package/closure/admission defect; noCompose/native authority."
+  },
+  "custody": {
+    "kind": "ActualRemoteDecodedPublicationOriginalReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "3e69a85937dbf9926f6a3bae5f534221461fb645",
+    "path": "projects/mir/runs/foundation513-prepared-activity-r01/original-bodies.json.gz",
+    "git_blob": "d0010eea8d38184ad94bb98633ba7c47a142577e",
+    "packed_bytes": 120531,
+    "packed_sha256": "6DC0B9D028AF480B6DDA61DF8635848739DD52BB13A4B0FC17E329F2CC9CE5CE",
+    "actual_originals_verified": 24,
+    "actual_original_bytes": 289661,
+    "method": "Exact remote branch readback, authenticated GitBlob body download, decode/hash and actual-byte compare every original file. Prepared existing Foundation Source13 metadata receiver/control/Plan/resource-refusal originals; zero native/Compose."
+  },
+  "next_execution": "Only after fresh unchanged physical/commit/disk admission and exact separate Root Compose/Execute admissions. Run the one existing601-update unscored whole57-surface activity case; its expected490A projection must match before existing18normal timing observations. No budget reduction or old result relabel.",
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_acceptance": false,
+  "stable_acceptance": false,
+  "native_processes": 0
+}

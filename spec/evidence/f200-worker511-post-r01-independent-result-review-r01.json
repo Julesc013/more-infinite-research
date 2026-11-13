@@ -1,0 +1,54 @@
+{
+  "kind": "F200Worker511PostTransitionIndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:15:40Z",
+  "verdict": "PASS for the exact F2002.0.77 first-add, unchanged510 Secretas upgrade, cap9 enable and family-disable endpoints with their eight cold reloads. No findings.",
+  "identity": {
+    "frozen_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "published511_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+    "published510_sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
+    "Secretas": "1.0.33 / C5C8F83433B56D80682819BDDBAF1D85F56433A834AE4FB0F1F28371F8C3A290",
+    "pretty_frozeta": "0.1.0 / AB5A168C606544E85798E6CAD6477E1154C2AD6509C402234D1AFC76F1D05195",
+    "packet_sha256": "744A55B85B92BED74E65255C5AB971817ADB6494CCBFE9D8795D522E4DC27E42",
+    "caller_sha256": "2D7DC31A9483E19EA1C0E735EF40B2A9837093DB2A0EF64C74B893943A2B7F46",
+    "scenario_sha256": "9B2727BFC7545A14125B70B8B3350935DF31038C1BF1617567E1635D1FE33FDA",
+    "composition_sha256": "CFF9F41615FF21639D855266F71ACFC9A20ED2726E373B43E0310DEC792723A4",
+    "root_admission_sha256": "338011E9FE8A04C26B734BBC6D1CEB05A9EB633DA0BA18C62046103480143FE6",
+    "terminal": "build/qualification/f200-worker511-post-r01-controller/execution-Execute-r01/terminal.json",
+    "terminal_sha256": "CEF2B41A7967248224A6F36B9FEA703D8E0ADE8A116A3657D0E355B4142E673B"
+  },
+  "packet_review": "Complete caller/scenario and F210-r04 projection inspected. Scenario changes only the two expected MIR target versions21010/21011 to20010/20011. All eight exact profiles, predecessor roles and sixteen-process closure remain finite. Raw F200 effects are read without adding/normalizing hidden, no unsupported queue switch is present, settings-category guards are retained and ordinary callbacks require by_script=false. There is no production or published-byte delta.",
+  "actual_execution": {
+    "stages": 8,
+    "distinct_native_processes": 16,
+    "servers": 8,
+    "cold_processes": 8,
+    "server_exit": "All eight exit-1 runs passed their admitted actual complete-marker + Saving finished + closed-ZIP predicate; no natural-exit0 claim is made.",
+    "cold_exit": "All eight natural exit0, non-timeout, strict read-only cold frames and original closed-save hashes.",
+    "failures": 0,
+    "distinct_guarded_ordinary_completions": 6,
+    "ordinary_counting": "First-add contributes sentinel1 plus public worker9=1; unchanged upgrade contributes public worker9=1; final caps chain contributes private1 plus sentinel1 plus sentinel-two1. Carried cumulative caps counters are counted once. All precursor levels/prerequisites are explicitly scripted, not ordinary paid source proof."
+  },
+  "independently_checked_native_frames": {
+    "first_add": "Actual NoMIR Secretas source bonus8 and sentinel current/queue/progress0.125 survive first MIR addition. All finite4..8 rows, both sentinel rows and all four force frames retain native flags, count/formula/time/science/effects/creator fields. New private rows are empty level4/unresearched/disabled/saved0. Two ordinary endpoints give player bonus9 and next public10, with cap9 disabling that next row. Foreign forces remain unearned.",
+    "unchanged_upgrade": "Published510 Secretas source bonus10, public native level11/current27%, queue[N,S] and detached sentinel12.5% survive11 unchanged. All finite/public/sentinel fields match original four-force frames; private rows are newly empty. One ordinary worker completion gives bonus11 and public next12, preserving current sentinel12.5%. Cap12 and the original finite provider are retained.",
+    "prepared_provider": "Caps source prepares the scripted default next8 frame at bonus7/current37.5%, moving only its earned work into private8. Actual provider addition preserves private/S rows, current, queue, work and bonus on every force; foreign finite4..8 remain unresearched. One ordinary private completion gives bonus8, private next9 retired/disabled/saved0 and sentinel current12.5%. No extra paid benefit is inferred from preparation.",
+    "cap_and_disable": "At actual cap8-to9, all four public9 rows become enabled=true/visible=false. Family disable at cap9 makes enabled=false/visible=false. Independent comparison masks only those two asserted public fields, then requires every other field of every force frame to equal the preceding closed source. Private retirement and player bonus8 remain intact; other forces retain bonuses0/0/3. Ordinary S and T endpoints complete without further worker benefit.",
+    "all_force_shapes": "Exact player/enemy/neutral/post-uninvested names and all native row flags/shape/cost/time/effects/history are retained. Across672 raw SimpleModifier effect occurrences, hidden is absent; no observer injection converts absence into a false field. Source/target row equality is checked on those actual tables.",
+    "cold_state": "Each of the four destinations passes two distinct cold processes with exactly the closed server frames, ordinary counters, selected mod versions, price1.25 and unchanged save bytes. No new laboratory work is counted in colds."
+  },
+  "protected_saves": [
+    {"stage": "first-source", "bytes": 852609, "sha256": "2E49F56A300D5F61CF20B7C91EC2A7A4E7EE9852E4E4D5C0A9BFE4F4E5389049"},
+    {"stage": "first-add", "bytes": 876525, "sha256": "3BAC147B070EA9E06DC68F28DB744EC0661CD5E0C2066788D770E3D5FD01B15A"},
+    {"stage": "unchanged-source", "bytes": 927689, "sha256": "C133A7395A7E029396F42B11386AB18FC754D24182B64489848C6FADB88BAA48"},
+    {"stage": "unchanged-upgrade", "bytes": 933111, "sha256": "976B5D639F6834D347FE0766BB2E63F74E7B543C7456EA1E7F6894A2133F97AF"},
+    {"stage": "caps-seed", "bytes": 914423, "sha256": "41A235085B5121BA8987E3EF1BD297495B8FAF7C2C201083586FBA2E5C99F610"},
+    {"stage": "caps-provider", "bytes": 917671, "sha256": "53FA2822A22C4F88B495BC382900A1045570FF1DD7CC364C1A5E9D5A854ED0B5"},
+    {"stage": "caps-enable", "bytes": 917710, "sha256": "233E5179FE2D46D6CD757FB9BDDA597DCAD969F8B9CC4227E452D95E4E934329"},
+    {"stage": "caps-disable", "bytes": 917737, "sha256": "FF66B49151F005FFCC4D321E6001474693638D85CD9A5FF3B8BB33BC8EB1906A"}
+  ],
+  "custody_and_restoration": "Independently rehashed1999 unique bound files. All eight protected saves equal their live closed outputs, pass every ZIP-member CRC and contain the exact9B27 scenario. Every dependent predecessor-copy matches its protected parent's hash. All150 retained custody bodies equal source copies, declared size and SHA256. Raw server/cold JSON markers equal receipts; all sixteen governed ledgers identify distinct PIDs and no fatal log/stdout/stderr diagnostics occur. Recorded activation controls restore with zero dependency copies/links/extractions. Twenty unique prior control/MIR archive states match current live bytes; all protected originals remain unchanged. Recorded and independent current Factorio count is zero.",
+  "limits": "This result qualifies the named F2002.0.77/Secretas1.0.33 post-transition boundaries on published511, with exact scripted precursor scope. The separately accepted seven-process genuine ordinary-source preservation route retains its own identity and twelve carried/new lab counts. No historical adverse is relabelled or universal2.0 flag-reset correction claimed. Full Ferrum, physical robot inventory/cargo, arbitrary providers/settings, client/Library, timing/memory and whole-product stable acceptance remain unverified by this result. Reviewer launched no host/build/native and changed no Source, docs, packet or direct library.",
+  "findings": []
+}

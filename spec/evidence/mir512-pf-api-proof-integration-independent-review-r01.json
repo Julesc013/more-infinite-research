@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "MIR512RepairAPIEvidenceIntegrationIndependentReviewV1",
+  "reviewed_utc": "2026-11-10T06:13:51.816542+00:00",
+  "base": "b275a24113d374116dcddd030cae08a503fa1883",
+  "head": "934588c10c0bead48d75b8f5ac70914da78cf1dd",
+  "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "verdict": "GO: exact docs/evidence integration only; required PR checks/normal merge remain mandatory",
+  "findings": [],
+  "changed_files": 10,
+  "source_targets_tools_tests_and_package_bytes_changed": false,
+  "verbatim_evidence": [
+    {
+      "path": "spec/evidence/api512-production-independent-admission-r02.json",
+      "bytes": 11370,
+      "sha256": "8A9F1DFDA035446FA18ED10C3AEC8E9E5E29514620CB5663FC749316A55AD3FA",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r02-independent-admission-r01.json"
+    },
+    {
+      "path": "spec/evidence/api512-production-independent-offline-review-r01.json",
+      "bytes": 7368,
+      "sha256": "FB4E9230ABDAA593A68F82FDDE570B126CAF22AEAF0DCED5DE1B49FDC44AD4CC",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-independent-offline-review.json"
+    },
+    {
+      "path": "spec/evidence/api512-production-independent-result-review-r01.json",
+      "bytes": 22981,
+      "sha256": "928A45C7E22EE80A50AACED5E5A54ECB752B950E68B077970176A06C6DA31E41",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r02-independent-result-review-r01.json"
+    },
+    {
+      "path": "spec/evidence/api512-production-remote-custody-r01.json",
+      "bytes": 711,
+      "sha256": "E256DA21709F6F7A2FC2E5F98369DC03583AD9E260CBD9DD5EE0EE28C370636F",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\remote-custody-r01.json"
+    },
+    {
+      "path": "spec/evidence/api512-production-root-actual-readback-r01.json",
+      "bytes": 6780,
+      "sha256": "E64D9D48FA74F82940BD3426247564BFC1A3FC4FCB3613E2AF32D8EC81D91ABF",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api512-production-r01-controller\\root-actual-readback-r01.json"
+    },
+    {
+      "path": "spec/evidence/runtime512-repair-independent-measurement-result-review-r01.json",
+      "bytes": 15205,
+      "sha256": "EFA64C4A8570C26DDFC2B2486CAF7F942C18DFF18C82C8A3ECC9E991367A7A7F",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-independent-measurement-result-review.json"
+    },
+    {
+      "path": "spec/evidence/runtime512-repair-independent-packet-review-r01.json",
+      "bytes": 6542,
+      "sha256": "56EB0AA4DDB5E98CBCD51415F74E87B087F908154CF289E0FFFC60097E90D2E1",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-independent-packet-review.json"
+    },
+    {
+      "path": "spec/evidence/runtime512-repair-independent-preparation-result-review-r01.json",
+      "bytes": 5665,
+      "sha256": "FCD8A3A41EA03A0B949816B3276BF3F4731575FA30D3A9ADB0DEB25098C95CF1",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-independent-preparation-result-review.json"
+    },
+    {
+      "path": "spec/evidence/runtime512-repair-independent-quiet-block-admission-r01.json",
+      "bytes": 3772,
+      "sha256": "33FEC940E760684EDF492DB00350E72E44A41FF79F49609AEA01CE8E2C21F05B",
+      "exact_original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-independent-quiet-block-admission.json"
+    }
+  ],
+  "claims_reviewed": [
+    "Current12 repair-active tier0 alone:20freshnatural0,4warmups/16scored/eightpairs,9mods/25000updates/256+8physical witnesses and four predeclared comparisons. Retained samplinggap2.165s and noinstantaneoussampledpeak orwholeproduct/stable claim.",
+    "Current12APIcases:8distinctprocesses=2supervisedproduction+6natural0; bothconsumers/200then202/+0.01/save/fourcoldreads;zeroordinarylabs. All56original/copiedcustodypairs and16priorstates are scopedcorrectly.",
+    "Private263bodies/17,722,966B at1a8fed/INDEX2DC2 recordsrawcustody, notadditionalnative/gameplayacceptance. Ninthpublicreceiptalso byteexact againstprimary remote-custody-r01.json; thisreview doesnotrepeatprivateblobretrieval.",
+    "Historical10/11/nativeadverse/preparationidentities retained. NoSource orreleaseasset replacement. ActualPFcomparator is published4.7.21002/A4BB, carriedfrom505campaign; no4.7.3relabelling.",
+    "Otheragriculture,wholeproduct/client/UI/performance/generalAPI/stable obligations stayopen. Privatebasisdecoding is an unobservedscope limit here, not a newlyinvented mandatorycampaign."
+  ],
+  "ci_disposition": "PR1866 CI reportedrunning; no claim its requiredchecks already passed. ExactSource128/475 package/proof identities remain fixed.",
+  "new_native_host_build_or_source_mutations": 0
+}

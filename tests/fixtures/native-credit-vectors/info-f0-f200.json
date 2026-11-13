@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-native-credit-vectors",
+  "version": "0.1.0",
+  "title": "MIR test-only native credit vectors F0",
+  "author": "MIR contributors; Cerys excerpt by its upstream authors",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "space-age = 2.0.77",
+    "more-infinite-research = 5.0.20012"
+  ]
+}

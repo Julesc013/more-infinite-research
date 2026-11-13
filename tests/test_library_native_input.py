@@ -83,6 +83,79 @@ class LibraryNativeInputControls(unittest.TestCase):
                                     capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_unicode_text_intent_is_text_only_well_formed_and_receipted_without_desktop_input(self):
+        base = {"schema": 1, "kind": "MIRLibraryNativeUnicodeTextV1", "role": "client-en", "process_id": 12345,
+                "process_start_utc": "2026-10-29T09:00:00.1234567Z", "engine_sha256": "A" * 64,
+                "client_width": 1280, "client_height": 720, "action": "text", "text": "é"}
+        accepted = [{**base, "text": "é"}, {**base, "text": "界"}, {**base, "text": "🚀"},
+                    {**base, "text": "e\u0301"}, {**base, "text": "🚀" * 16}]
+        rejected = [
+            {**base, "text": ""}, {**base, "text": "🚀" * 17}, {**base, "text": "line\nbreak"}, {**base, "text": "before\u2028after"},
+            {**base, "text": "before\u2029after"}, {**base, "text": "nul\x00text"},
+            {**base, "action": "escape"}, {**base, "action": "click", "x": 600, "y": 150},
+            {**base, "kind": "MIRLibraryNativeUnicodeTextV2"},
+        ]
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_INPUT_ACTOR,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'input actor parse failed'}
+          foreach($name in @('Assert-LibraryInput','Test-LibraryInputInteger','Test-LibraryInputUnicodeText','Assert-LibraryInputPlan')){
+            $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+            if($node.Count-ne1){throw 'unicode validator definition missing or ambiguous'}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $cases=Get-Content -LiteralPath $env:MIR_INPUT_CASES -Raw|ConvertFrom-Json -AsHashtable -DateKind String
+          foreach($case in $cases.accepted){Assert-LibraryInputPlan $case}
+          foreach($case in $cases.rejected){
+            $rejected=$false;try{Assert-LibraryInputPlan $case}catch{$rejected=$true}
+            if(-not$rejected){throw ('accepted invalid Unicode text plan: '+($case|ConvertTo-Json -Compress))}
+          }
+          foreach($unit in @(0xd800,0xdc00)){
+            $case=[ordered]@{}
+            foreach($key in $cases.accepted[0].Keys){$case[$key]=$cases.accepted[0][$key]}
+            $case.text=[string][char]$unit
+            $rejected=$false;try{Assert-LibraryInputPlan $case}catch{$rejected=$true}
+            if(-not$rejected){throw ('accepted direct lone surrogate UTF-16 unit: '+$unit)}
+          }
+          foreach($text in @('☃','é','界','🚀')){
+            $legacy=[ordered]@{}
+            foreach($key in $cases.accepted[0].Keys){$legacy[$key]=$cases.accepted[0][$key]}
+            $legacy.kind='MIRLibraryNativeInputV1';$legacy.text=$text
+            $rejected=$false;try{Assert-LibraryInputPlan $legacy}catch{$rejected=$true}
+            if(-not$rejected){throw ('legacy ASCII intent accepted non-ASCII text: '+$text)}
+          }
+          $actor=Get-Content -LiteralPath $env:MIR_INPUT_ACTOR -Raw
+          foreach($required in @('MIRLibraryNativeUnicodeTextV1', "'text'{foreach(`$character in `$spec.text.ToCharArray())", '[MIRLibraryInputNative]::UnicodePair([uint16]$character)')){
+            if(-not$actor.Contains($required)){throw "Unicode text dispatch changed: $required"}
+          }
+          foreach($forbidden in @('Normalize(', 'Get-Clipboard', 'Set-Clipboard')){
+            if($actor.Contains($forbidden)){throw "Unicode text actor gained forbidden conversion authority: $forbidden"}
+          }
+          'PASS Unicode text-only validator and existing UTF-16 SendInput dispatch;zero desktop input'
+        '''
+        with tempfile.TemporaryDirectory() as temporary:
+            cases = Path(temporary) / "cases.json"
+            cases.write_text(json.dumps({"accepted": accepted, "rejected": rejected}), encoding="utf-8")
+            result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                    env={**os.environ, "MIR_INPUT_ACTOR": str(ACTOR), "MIR_INPUT_CASES": str(cases)},
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("zero desktop input", result.stdout)
+            spec = Path(temporary) / "unicode.json"
+            spec.write_bytes((json.dumps({**base, "text": "🚀"}) + "\n").encode())
+            sha = hashlib.sha256(spec.read_bytes()).hexdigest().upper()
+            command = ["pwsh", "-NoProfile", "-File", str(ACTOR), "-SpecPath", str(spec), "-SpecSha256", sha,
+                       "-OutputRoot", str(Path(temporary) / "output"), "-ValidateOnly"]
+            validation = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+            self.assertEqual(validation.returncode, 0, validation.stdout + validation.stderr)
+            self.assertEqual(json.loads(validation.stdout), {
+                "kind": "MIRLibraryNativeUnicodeTextReceiptV1", "plan_kind": "MIRLibraryNativeUnicodeTextV1",
+                "status": "validated-schema-only", "action": "text", "native_input_sent": False,
+                "native_process_identity_checked": False,
+            })
+            self.assertFalse((Path(temporary) / "output").exists())
+
     def test_actual_validate_only_checks_hash_and_claims_no_native_identity_or_input(self):
         spec = {"schema": 1, "kind": "MIRLibraryNativeInputV1", "role": "client-de", "process_id": 12345,
                 "process_start_utc": "2026-10-29T09:00:00Z", "engine_sha256": "B" * 64,

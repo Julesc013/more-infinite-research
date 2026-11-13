@@ -140,6 +140,13 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.lifecycle"] = function()
               return {
+                preflight_worker_storage_split_caps = function(plan)
+                  lifecycle_calls.worker_cap_plan = plan
+                  return nil
+                end,
+                apply_worker_storage_split_caps = function(plan)
+                  assert(plan == nil, "unexpected cap plan in lifecycle stub")
+                end,
                 cap_limits = function(force)
                   lifecycle_calls.cap_force = force
                   return { ["recipe-prod-research_gears-1"] = 2 }
@@ -289,6 +296,58 @@ class BootstrapTests(unittest.TestCase):
             return require("control")
           end
         ''')
+
+    def test_actual_bootstrap_keeps_gate_only_configuration_after_legacy_commit(self):
+        # Routing only: the complete worker/history controls own native-frame
+        # validation. This independent order must not delegate a flag-only plan.
+        for preflight_error in (False, True):
+            with self.subTest(preflight_error=preflight_error):
+                self.setUp()
+                self.lua.globals().gate_preflight_error = preflight_error
+                self.lua.execute('''
+                  install_modules(false);install_runtime()
+                  local catalogue=require("runtime.catalogue")
+                  catalogue.worker_default_split=function()return true end
+                  local worker=require("runtime.worker_robot_storage")
+                  local lifecycle=require("runtime.lifecycle")
+                  local plan={kind="default-native-provider-gate-settle",changed=true}
+                  local legacy={kind="unchanged-prepared-quota"};local order={}
+                  worker.default_owner_preflight=function(event,route,split)
+                    assert(split and route==nil and event.marker=="gate-only")
+                    order[#order+1]="owner-preflight"
+                    if gate_preflight_error then error("invalid paid H frame")end
+                    return plan
+                  end
+                  worker.preflight=function(event,route,delegated)
+                    assert(delegated==nil);order[#order+1]="legacy-preflight";return legacy
+                  end
+                  worker.apply=function(value)
+                    assert(value==legacy);order[#order+1]="legacy-commit"
+                  end
+                  worker.default_owner_apply=function(value)
+                    assert(value==plan and order[#order]=="legacy-commit")
+                    order[#order+1]="gate-only-apply"
+                  end
+                  lifecycle.preflight_worker_storage_split_caps=function(value)
+                    assert(value==plan);order[#order+1]="cap-preflight";return nil
+                  end
+                  lifecycle.apply_worker_storage_split_caps=function(value)
+                    assert(value==nil and order[#order]=="gate-only-apply")
+                    order[#order+1]="cap-noop"
+                  end
+                  package.preload["runtime.worker_robot_storage"]=function()return worker end
+                  package.preload["runtime.lifecycle"]=function()return lifecycle end
+                  load_control()
+                  local ok,message=pcall(handlers.configuration,{marker="gate-only",mod_startup_settings_changed=true,mod_changes={}})
+                  if gate_preflight_error then
+                    assert(not ok and tostring(message):find("invalid paid H frame",1,true))
+                    assert(#order==1 and lifecycle_calls.configuration==nil)
+                  else
+                    assert(ok,message)
+                    assert(table.concat(order,",")=="owner-preflight,legacy-preflight,cap-preflight,legacy-commit,gate-only-apply,cap-noop",table.concat(order,","))
+                    assert(lifecycle_calls.configuration.marker=="gate-only"and library_calls.configuration.marker=="gate-only")
+                  end
+                ''')
 
     def test_gun_credit_preflight_runs_before_every_configuration_writer(self):
         self.lua.execute('''
