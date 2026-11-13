@@ -29,7 +29,8 @@ function Invoke-MIR441LinuxResourceObservation {
   param(
     [Parameter(Mandatory)][ValidateSet('snapshot','process-identity','process-tree')][string]$Operation,
     [int]$ProcessId=0,
-    [int64]$RootStartTicks=0
+    [int64]$RootStartTicks=0,
+    [int64]$SessionId=0
   )
   if(-not$IsLinux){throw '[mir441-resource-linux-required]'}
   $python=Get-Command python3 -ErrorAction SilentlyContinue
@@ -42,6 +43,7 @@ function Invoke-MIR441LinuxResourceObservation {
     if($Operation-ceq'process-tree'){
       if($RootStartTicks-le0){throw '[mir441-resource-linux-process-identity]'}
       [void]$arguments.Add('--root-start-ticks');[void]$arguments.Add([string]$RootStartTicks)
+      if($SessionId-gt0){[void]$arguments.Add('--session-id');[void]$arguments.Add([string]$SessionId)}
     }
   }
   $lines=@(& $python.Source $helper @arguments 2>&1);$exit=$LASTEXITCODE
@@ -63,6 +65,33 @@ function Get-MIR441LinuxProcessIdentity {
   $probe=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $ProcessId
   if(($null -ne $probe.PSObject.Properties['exited']) -and [bool]$probe.exited){throw '[mir441-owned-root-identity]'}
   return $probe
+}
+
+function Wait-MIR441LinuxLaunchReceipt {
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][string]$Path,[ValidateRange(1,5)][int]$TimeoutSeconds=2)
+  $deadline=[DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
+  while($true){
+    if(Test-Path -LiteralPath $Path -PathType Leaf){
+      try{$item=Get-Item -LiteralPath $Path -Force -ErrorAction Stop}catch{throw '[mir441-resource-linux-launch-receipt]'}
+      if(($item.Attributes-band[IO.FileAttributes]::ReparsePoint)-or-not($item-is[IO.FileInfo])-or$item.Length-le0-or$item.Length-gt1024){throw '[mir441-resource-linux-launch-receipt]'}
+      try{$receipt=([IO.File]::ReadAllText($item.FullName,[Text.UTF8Encoding]::new($false))|ConvertFrom-Json -Depth 4)}catch{throw '[mir441-resource-linux-launch-receipt]'}
+      $names=@($receipt.PSObject.Properties.Name|Sort-Object)
+      if($names.Count-ne4-or($names-join',')-cne'kind,pid,session_id,start_ticks'-or[string]$receipt.kind-cne'MIR441LinuxNativeLaunchV1'-or$receipt.pid-isnot[Int64]-or$receipt.start_ticks-isnot[Int64]-or$receipt.session_id-isnot[Int64]){throw '[mir441-resource-linux-launch-receipt]'}
+      try{[int]$pid=$receipt.pid;[int64]$startTicks=$receipt.start_ticks;[int64]$sessionId=$receipt.session_id}catch{throw '[mir441-resource-linux-launch-receipt]'}
+      if($pid-ne$Process.Id-or$pid-le0-or$startTicks-le0-or$sessionId-ne$pid){throw '[mir441-resource-linux-launch-receipt]'}
+      $identity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $pid
+      if(($null -eq $identity.PSObject.Properties['exited']) -or -not [bool]$identity.exited){
+        if(([int64]$identity.start_ticks -ne $startTicks) -or ([int64]$identity.session_id -ne $sessionId)){throw '[mir441-resource-linux-launch-receipt]'}
+      }else{
+        # A session cannot be reallocated while it still has a member. This
+        # preserves owned orphans if the session leader exits before polling.
+        $null=Invoke-MIR441LinuxResourceObservation -Operation process-tree -ProcessId $pid -RootStartTicks $startTicks -SessionId $sessionId
+      }
+      return [pscustomobject][ordered]@{pid=$pid;start_ticks=$startTicks;session_id=$sessionId;kind='MIR441LinuxNativeLaunchV1'}
+    }
+    if([DateTimeOffset]::UtcNow-ge$deadline){throw '[mir441-resource-linux-launch-receipt]'}
+    Start-Sleep -Milliseconds 10
+  }
 }
 
 function Resolve-MIR441RecoveryScratchPath {
@@ -280,8 +309,9 @@ function Get-MIR441OwnedProcessTree {
   param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$StartedUtc,$RootIdentity=$null)
   if($IsLinux){
     if($null-eq$RootIdentity){$RootIdentity=Get-MIR441LinuxProcessIdentity -ProcessId $Process.Id}
-    $tree=Invoke-MIR441LinuxResourceObservation -Operation process-tree -ProcessId $Process.Id -RootStartTicks ([int64]$RootIdentity.start_ticks)
-    $children=@($tree.children|ForEach-Object {[pscustomobject]@{id=[int]$_.id;start_ticks=[int64]$_.start_ticks}})
+    $sessionId=if($null-ne$RootIdentity.PSObject.Properties['session_id']){[int64]$RootIdentity.session_id}else{0L}
+    $tree=Invoke-MIR441LinuxResourceObservation -Operation process-tree -ProcessId $Process.Id -RootStartTicks ([int64]$RootIdentity.start_ticks) -SessionId $sessionId
+    $children=@($tree.children|ForEach-Object {[pscustomobject]@{id=[int]$_.id;start_ticks=[int64]$_.start_ticks;session_id=[int64]$_.session_id}})
     return [pscustomobject][ordered]@{
       working_set_bytes=[int64]$tree.working_set_bytes;private_bytes=[int64]$tree.private_bytes;children=$children
       root_exited=[bool]$tree.root_exited;root_identity=$tree.root_identity
@@ -341,6 +371,7 @@ function Stop-MIR441OwnedProcess {
         $identity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId ([int]$child.id)
         if(($null -ne $identity.PSObject.Properties['exited']) -and [bool]$identity.exited){continue}
         if([int64]$identity.start_ticks -ne [int64]$child.start_ticks){throw '[mir441-owned-child-identity]'}
+        if(($null -ne $RootIdentity) -and ($null -ne $RootIdentity.PSObject.Properties['session_id']) -and ([int64]$identity.session_id -ne [int64]$RootIdentity.session_id)){throw '[mir441-owned-session-identity]'}
         $p=Get-Process -Id ([int]$child.id) -ErrorAction Stop
         if(-not$p.HasExited){$p.Kill($true);[void]$p.WaitForExit(3000)}
       }catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}catch [InvalidOperationException]{
@@ -612,7 +643,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$launchReceipt='';$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null
   # This is deliberately outside the output-writing try/catch: contention is
   # a prelaunch refusal, not an interrupted governed execution. Its scope is
   # the current Linux execution account, never a host-wide scheduler claim.
@@ -630,19 +661,28 @@ function Invoke-MIR441MonitoredProcess {
       $tempDrive=[IO.DriveInfo]::new([IO.Path]::GetFullPath($temp))
       if(-not$tempDrive.IsReady-or$tempDrive.DriveFormat-cne'ext4'-or$tempDrive.Name-cne$admission.work_volume.name){throw '[mir441-resource-linux-temp-filesystem]'}
     }
-    $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=$FilePath;$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
+    $start=[Diagnostics.ProcessStartInfo]::new();$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
     $start.Environment['TEMP']=$temp;$start.Environment['TMP']=$temp;$start.Environment['TMPDIR']=$temp
     # Factorio only needs these fixed Steam identifiers in its owned child.
     # Keep this narrow option separate from the governor's custody variables:
     # callers cannot supply arbitrary child environment keys or replace TEMP/TMP.
     if($FactorioSteamIdentity){$start.Environment['SteamAppId']='427520';$start.Environment['SteamGameId']='427520'}
-    foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
+    if($IsLinux){
+      $python=Get-Command python3 -ErrorAction SilentlyContinue;$launcher=Join-Path $PSScriptRoot 'LinuxNativeLaunch.py'
+      if($null-eq$python-or-not(Test-Path -LiteralPath $launcher -PathType Leaf)-or-not[IO.Path]::IsPathRooted($FilePath)){throw '[mir441-resource-linux-launcher-unavailable]'}
+      $launchReceipt=Join-Path $temp 'linux-native-launch.json'
+      $start.FileName=$python.Source
+      foreach($argument in @('-I',$launcher,'--receipt',$launchReceipt,'--',$FilePath)+$Arguments){[void]$start.ArgumentList.Add($argument)}
+    }else{
+      $start.FileName=$FilePath
+      foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
+    }
     $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
     $start.RedirectStandardInput=($null-ne$consoleStartup)
     if($null-ne$consoleStartup){$start.StandardInputEncoding=[Text.UTF8Encoding]::new($false)}
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
     if(-not$process.Start()){throw '[mir441-process-start]'}
-    $started=$process.StartTime.ToUniversalTime();if($IsLinux){$rootIdentity=Get-MIR441LinuxProcessIdentity -ProcessId $process.Id};$timer=[Diagnostics.Stopwatch]::StartNew()
+    $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew();if($IsLinux){$rootIdentity=Wait-MIR441LinuxLaunchReceipt -Process $process -Path $launchReceipt}
     # Streaming capture avoids retaining the complete child output in RAM.
     foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){
       # A console marker must become visible before the child exits. Keep the
@@ -670,7 +710,7 @@ function Invoke-MIR441MonitoredProcess {
       # Preserve the triggering process observation before enforcing its budget.
       # Private bytes can exceed working set during graphical resource loading.
       $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
-      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta}
+      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}
@@ -707,9 +747,12 @@ function Invoke-MIR441MonitoredProcess {
     foreach($copy in $copies){$null=$copy.GetAwaiter().GetResult()}
     $process.Refresh();$peak=[Math]::Max($peak,[int64]$process.PeakWorkingSet64)
     $passed=$completionObserved-or$process.ExitCode-eq0
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
+    $completedLedger=[ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}
+    if($IsLinux){$completedLedger.clock_scope='linux-launcher-session-inclusive'}
+    Write-MIR441Json -Value $completedLedger -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
     $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
+    if($IsLinux){$completed|Add-Member -NotePropertyName clock_scope -NotePropertyValue 'linux-launcher-session-inclusive'}
     if($null-ne$consoleStartup){$completed|Add-Member -NotePropertyName console_startup -NotePropertyValue $consoleStartup.receipt}
     if($null -ne $PreStartAdmissionWait){$completed|Add-Member -NotePropertyName admission_wait -NotePropertyValue $PreStartAdmissionWait}
     if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){

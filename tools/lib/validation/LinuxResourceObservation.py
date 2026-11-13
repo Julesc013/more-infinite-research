@@ -278,8 +278,27 @@ def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[
     return {
         "pid": pid,
         "ppid": parse_uint(fields[1], "mir441-linux-process-stat"),
+        "session_id": parse_uint(fields[3], "mir441-linux-process-stat"),
         "start_ticks": parse_uint(fields[19], "mir441-linux-process-stat"),
     }
+
+
+def iter_proc_stats(proc_root: Path) -> list[dict[str, int]]:
+    try:
+        entries = list(proc_root.iterdir())
+    except OSError:
+        fail("mir441-linux-process-stat")
+    rows: list[dict[str, int]] = []
+    for entry in entries:
+        if not entry.name.isascii() or not entry.name.isdecimal():
+            continue
+        pid = parse_uint(entry.name, "mir441-linux-process-stat")
+        if pid <= 0:
+            fail("mir441-linux-process-stat")
+        row = read_proc_stat(proc_root, pid, missing_is_exit=True)
+        if row is not None:
+            rows.append(row)
+    return rows
 
 
 def read_status_rss(proc_root: Path, pid: int) -> int:
@@ -345,12 +364,22 @@ def process_identity(proc_root: Path, pid: int) -> dict[str, int | bool]:
     row = read_proc_stat(proc_root, pid, missing_is_exit=True)
     if row is None:
         return {"pid": pid, "exited": True}
-    return {"pid": row["pid"], "start_ticks": row["start_ticks"]}
+    return {"pid": row["pid"], "start_ticks": row["start_ticks"], "session_id": row["session_id"]}
 
 
-def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int) -> dict[str, Any]:
+def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_id: int | None) -> dict[str, Any]:
     root = read_proc_stat(proc_root, root_pid, missing_is_exit=True)
-    if root is None:
+    if root is not None and root["start_ticks"] != root_start_ticks:
+        fail("mir441-owned-root-identity")
+    if session_id is not None:
+        if session_id <= 0 or session_id != root_pid:
+            fail("mir441-owned-session-identity")
+        if root is not None and root["session_id"] != session_id:
+            fail("mir441-owned-session-identity")
+        owned = {row["pid"]: row for row in iter_proc_stats(proc_root) if row["session_id"] == session_id}
+        if root is not None and root_pid not in owned:
+            fail("mir441-owned-session-identity")
+    elif root is None:
         return {
             "root_exited": True,
             "root_identity": {"pid": root_pid, "start_ticks": root_start_ticks},
@@ -361,25 +390,24 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int) -> dict[
             "private_measure": "smaps_rollup_private_resident_plus_swap",
             "children": [],
         }
-    if root["start_ticks"] != root_start_ticks:
-        fail("mir441-owned-root-identity")
-    queue = [root]
-    owned: dict[int, dict[str, int]] = {root_pid: root}
-    while queue:
-        parent = queue.pop(0)
-        for child_pid in task_children(proc_root, parent["pid"]):
-            child = read_proc_stat(proc_root, child_pid, missing_is_exit=True)
-            if child is None:
-                continue
-            if child["ppid"] != parent["pid"] or child["start_ticks"] < root_start_ticks:
-                fail("mir441-owned-child-identity")
-            prior = owned.get(child_pid)
-            if prior is not None:
-                if prior["start_ticks"] != child["start_ticks"]:
+    else:
+        queue = [root]
+        owned = {root_pid: root}
+        while queue:
+            parent = queue.pop(0)
+            for child_pid in task_children(proc_root, parent["pid"]):
+                child = read_proc_stat(proc_root, child_pid, missing_is_exit=True)
+                if child is None:
+                    continue
+                if child["ppid"] != parent["pid"] or child["start_ticks"] < root_start_ticks:
                     fail("mir441-owned-child-identity")
-                continue
-            owned[child_pid] = child
-            queue.append(child)
+                prior = owned.get(child_pid)
+                if prior is not None:
+                    if prior["start_ticks"] != child["start_ticks"]:
+                        fail("mir441-owned-child-identity")
+                    continue
+                owned[child_pid] = child
+                queue.append(child)
 
     working = 0
     private_resident = 0
@@ -390,17 +418,17 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int) -> dict[
         current = read_proc_stat(proc_root, pid, missing_is_exit=True)
         if current is None:
             continue
-        if current["start_ticks"] != row["start_ticks"]:
+        if current["start_ticks"] != row["start_ticks"] or (session_id is not None and current["session_id"] != session_id):
             fail("mir441-owned-child-identity")
         working += read_status_rss(proc_root, pid)
         resident, swap = read_private_memory(proc_root, pid)
         private_resident += resident
         private_swap += swap
         if pid != root_pid:
-            children.append({"id": pid, "start_ticks": row["start_ticks"]})
+            children.append({"id": pid, "start_ticks": row["start_ticks"], "session_id": row["session_id"]})
     return {
-        "root_exited": False,
-        "root_identity": {"pid": root_pid, "start_ticks": root_start_ticks},
+        "root_exited": root is None,
+        "root_identity": {"pid": root_pid, "start_ticks": root_start_ticks, "session_id": session_id},
         "working_set_bytes": working,
         "private_resident_bytes": private_resident,
         "private_swap_bytes": private_swap,
@@ -421,6 +449,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--proc-root", default="/proc")
     parser.add_argument("--pid", type=int)
     parser.add_argument("--root-start-ticks", type=int)
+    parser.add_argument("--session-id", type=int)
     args = parser.parse_args(argv)
     proc_root = Path(args.proc_root)
     try:
@@ -432,7 +461,7 @@ def main(argv: list[str]) -> int:
             return result(process_identity(proc_root, args.pid))
         if args.root_start_ticks is None or args.root_start_ticks < 0:
             fail("mir441-linux-process-stat")
-        return result(process_tree(proc_root, args.pid, args.root_start_ticks))
+        return result(process_tree(proc_root, args.pid, args.root_start_ticks, args.session_id))
     except ObservationFailure as error:
         print(json.dumps({"ok": False, "code": error.code}, separators=(",", ":"), sort_keys=True))
         return 2

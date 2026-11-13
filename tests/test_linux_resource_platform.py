@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 import uuid
 from pathlib import Path
@@ -12,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "tools" / "lib" / "validation" / "LinuxResourceObservation.py"
+LAUNCHER = ROOT / "tools" / "lib" / "validation" / "LinuxNativeLaunch.py"
 
 
 def write(path: Path, text: str) -> None:
@@ -33,14 +36,14 @@ def cgroup_files(path: Path, *, current: int, maximum: str, high: str) -> None:
     )
 
 
-def proc_stat(pid: int, ppid: int, start: int) -> str:
+def proc_stat(pid: int, ppid: int, start: int, session: int = 1) -> str:
     # Fields after the final ')' start at procfs field 3.  starttime is field 22.
-    fields = ["S", str(ppid)] + ["0"] * 17 + [str(start)]
+    fields = ["S", str(ppid), "0", str(session)] + ["0"] * 15 + [str(start)]
     return f"{pid} (owned worker {pid}) {' '.join(fields)}\n"
 
 
-def process_files(proc: Path, pid: int, ppid: int, start: int, children: dict[int, str]) -> None:
-    write(proc / str(pid) / "stat", proc_stat(pid, ppid, start))
+def process_files(proc: Path, pid: int, ppid: int, start: int, children: dict[int, str], session: int = 1) -> None:
+    write(proc / str(pid) / "stat", proc_stat(pid, ppid, start, session))
     write(proc / str(pid) / "status", "Name:\towned\nVmRSS:\t12 kB\n")
     write(
         proc / str(pid) / "smaps_rollup",
@@ -200,6 +203,76 @@ try {{
         self.assertIn("[mir441-resource-output-root]", result["case_root"])
         self.assertIn("[mir441-resource-output-work-root]", result["case_output"])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Linux setsid and procfs")
+    def test_real_linux_launcher_retains_a_child_after_the_session_leader_exits(self) -> None:
+        temporary = Path(tempfile.mkdtemp(prefix="mir-linux-session-launch-", dir=ROOT / "build" / "tmp"))
+        self.addCleanup(lambda: shutil.rmtree(temporary, ignore_errors=True))
+        receipt = temporary / "launch.json"
+        target = temporary / "leader.py"
+        write(
+            target,
+            "import os, time\n"
+            "child = os.fork()\n"
+            "if child:\n"
+            "    os._exit(0)\n"
+            "time.sleep(15)\n",
+        )
+        process = subprocess.Popen(
+            [sys.executable, "-I", str(LAUNCHER), "--receipt", str(receipt), "--", sys.executable, "-I", str(target)],
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        try:
+            deadline = time.monotonic() + 5
+            while not receipt.exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertTrue(receipt.exists())
+            launch = json.loads(receipt.read_text(encoding="utf-8"))
+            self.assertEqual("MIR441LinuxNativeLaunchV1", launch["kind"])
+            self.assertEqual(process.pid, launch["pid"])
+            self.assertEqual(process.pid, launch["session_id"])
+            self.assertGreater(launch["start_ticks"], 0)
+            process.wait(timeout=5)
+            self.assertEqual(0, process.returncode)
+            status, payload = self.run_helper(
+                "process-tree",
+                "--pid",
+                str(launch["pid"]),
+                "--root-start-ticks",
+                str(launch["start_ticks"]),
+                "--session-id",
+                str(launch["session_id"]),
+            )
+            self.assertEqual(0, status)
+            value = payload["value"]
+            self.assertTrue(value["root_exited"])
+            self.assertEqual(1, len(value["children"]))
+            self.assertEqual(launch["session_id"], value["children"][0]["session_id"])
+        finally:
+            if receipt.exists():
+                try:
+                    launch = json.loads(receipt.read_text(encoding="utf-8"))
+                    status, payload = self.run_helper(
+                        "process-tree",
+                        "--pid",
+                        str(launch["pid"]),
+                        "--root-start-ticks",
+                        str(launch["start_ticks"]),
+                        "--session-id",
+                        str(launch["session_id"]),
+                    )
+                    for child in payload.get("value", {}).get("children", []):
+                        try:
+                            os.kill(child["id"], 15)
+                        except ProcessLookupError:
+                            pass
+                except (OSError, ValueError, json.JSONDecodeError):
+                    pass
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=5)
+
     def test_process_tree_uses_all_owned_threads_and_start_identities_without_cmdline(self) -> None:
         temporary, proc = self.make_fixture()
         self.addCleanup(lambda: __import__("shutil").rmtree(temporary, ignore_errors=True))
@@ -211,7 +284,7 @@ try {{
         # still observe only the owned descendant closure successfully.
         status, identity = self.run_helper("process-identity", "--proc-root", str(proc), "--pid", "100")
         self.assertEqual(0, status)
-        self.assertEqual({"pid": 100, "start_ticks": 1000}, identity["value"])
+        self.assertEqual({"pid": 100, "start_ticks": 1000, "session_id": 1}, identity["value"])
         status, payload = self.run_helper(
             "process-tree", "--proc-root", str(proc), "--pid", "100", "--root-start-ticks", "1000"
         )
@@ -247,6 +320,31 @@ try {{
         status, payload = self.run_helper("process-identity", "--proc-root", str(proc), "--pid", "999")
         self.assertEqual(0, status)
         self.assertEqual({"pid": 999, "exited": True}, payload["value"])
+
+    def test_session_tree_retains_an_orphan_after_its_session_leader_exits(self) -> None:
+        temporary, proc = self.make_fixture()
+        self.addCleanup(lambda: shutil.rmtree(temporary, ignore_errors=True))
+        process_files(proc, 101, 1, 1001, {101: ""}, session=100)
+        status, payload = self.run_helper(
+            "process-tree", "--proc-root", str(proc), "--pid", "100", "--root-start-ticks", "1000", "--session-id", "100"
+        )
+        self.assertEqual(0, status)
+        self.assertTrue(payload["value"]["root_exited"])
+        self.assertEqual([101], [row["id"] for row in payload["value"]["children"]])
+        self.assertEqual(100, payload["value"]["children"][0]["session_id"])
+
+        status, payload = self.run_helper(
+            "process-tree", "--proc-root", str(proc), "--pid", "100", "--root-start-ticks", "1000", "--session-id", "101"
+        )
+        self.assertEqual(2, status)
+        self.assertEqual("mir441-owned-session-identity", payload["code"])
+
+        process_files(proc, 100, 1, 9999, {100: ""}, session=100)
+        status, payload = self.run_helper(
+            "process-tree", "--proc-root", str(proc), "--pid", "100", "--root-start-ticks", "1000", "--session-id", "100"
+        )
+        self.assertEqual(2, status)
+        self.assertEqual("mir441-owned-root-identity", payload["code"])
 
     def test_tiny_output_budget_reaches_the_live_governor_at_its_declared_reserve(self) -> None:
         """Exercise the production monitor with host-only admission doubles.
