@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -55,6 +56,34 @@ class ModSettingsDatControls(unittest.TestCase):
         for version, data in (("2.0.78", {}), ("2.0.77", {"": 0}), ("2.0.77", [])):
             with self.assertRaises(ValueError):
                 writer.encode(version, data)
+
+    def test_aggregate_limit_rejects_before_accumulating_all_rows(self):
+        # Shared input is small, but its serialized form would exceed 9 GiB.
+        # Abort a broken writer early so this regression cannot exhaust RAM.
+        value = "x" * (1024 * 1024)
+        settings = {str(index): value for index in range(10000)}
+        original_value = writer._value
+        calls = 0
+
+        def limited_value(item):
+            nonlocal calls
+            calls += 1
+            if calls > 4:
+                self.fail("writer continued accumulating after 4 MiB of payload")
+            return original_value(item)
+
+        with patch.object(writer, "_value", side_effect=limited_value):
+            with self.assertRaisesRegex(ValueError, "file exceeds output bound"):
+                writer.encode("2.0.77", settings)
+        self.assertEqual(calls, 4)
+        accepted = {str(index): value for index in range(3)}
+        self.assertEqual(reader.decode(writer.encode("2.0.77", accepted))["startup"], accepted)
+
+    def test_setting_name_utf8_limit_matches_value_limit(self):
+        name = "é" * (1024 * 1024 // 2)
+        self.assertEqual(reader.decode(writer.encode("2.1.23", {name: False}))["startup"], {name: False})
+        with self.assertRaisesRegex(ValueError, "string exceeds input bound"):
+            writer.encode("2.1.23", {name + "é": False})
 
     def test_reject_truncation_corruption_and_trailing_data(self):
         blob = writer.encode("2.0.77", {"flag": False, "profile": "é" * 128})

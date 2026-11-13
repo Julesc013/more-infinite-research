@@ -18,6 +18,8 @@ MAX_FILE_BYTES = 4 * 1024 * 1024
 
 
 def _string(value):
+    if len(value) > MAX_STRING_BYTES:
+        raise ValueError("string exceeds input bound")
     raw = value.encode("utf-8")
     if len(raw) > MAX_STRING_BYTES:
         raise ValueError("string exceeds input bound")
@@ -50,15 +52,24 @@ def encode(version, startup):
         raise ValueError("unsupported engine version")
     if type(startup) is not dict or len(startup) > MAX_SETTINGS:
         raise ValueError("startup must be a bounded object")
+    header = struct.pack("<4H?", *VERSIONS[version], False)
+    sections = {"startup": _dictionary({}), "runtime-global": _dictionary({}),
+                "runtime-per-user": _dictionary({})}
+    # Keep accumulated rows bounded, including their names and dictionary
+    # framing. A direct encode() caller is not subject to the CLI JSON limit.
+    size = len(header) + len(_dictionary(sections))
     rows = {}
     for name, value in startup.items():
         if type(name) is not str or not name:
             raise ValueError("setting name must be a nonempty string")
-        rows[name] = _dictionary({"value": _value(value)})
-    result = struct.pack("<4H?", *VERSIONS[version], False) + _dictionary({
-        "startup": _dictionary(rows), "runtime-global": _dictionary({}),
-        "runtime-per-user": _dictionary({}),
-    })
+        name_size = len(_string(name))
+        row = _dictionary({"value": _value(value)})
+        size += name_size + len(row)
+        if size > MAX_FILE_BYTES:
+            raise ValueError("file exceeds output bound")
+        rows[name] = row
+    sections["startup"] = _dictionary(rows)
+    result = header + _dictionary(sections)
     if len(result) > MAX_FILE_BYTES:
         raise ValueError("file exceeds output bound")
     return result
