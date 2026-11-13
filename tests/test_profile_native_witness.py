@@ -34,7 +34,10 @@ class ProfileNativeWitnessTests(unittest.TestCase):
               receiver.consumption_limits=nil;receiver.pollution_limits=nil
               receiver.speed_limits.low=nil
             end
-            return raw,native,product,receiver
+            local native_receiver=frozen(receiver)
+            if mode=="numeric" then native_receiver.pollution_limits.low=-.9113 end
+            native.entity["assembling-machine-1"].effect_receiver=f210 and native_receiver or nil
+            return raw,native,product,receiver,native_receiver
           end
           function frozen(t)
             local copy={}
@@ -71,8 +74,9 @@ class ProfileNativeWitnessTests(unittest.TestCase):
         self.lua.execute('''
           for _,mode in ipairs({"numeric","aliases"})do
             for _,field in ipairs({"speed_limits","quality_limits"})do
-              local raw,native,p,r=independent_world("2.1.23",mode)
+              local raw,native,p,r,nr=independent_world("2.1.23",mode)
               r[field].high=0
+              nr[field].high=0
               assert(not pcall(W.data,raw,"2.1.23",mode))
               assert(not pcall(W.runtime,native,"2.1.23",mode))
             end
@@ -80,9 +84,9 @@ class ProfileNativeWitnessTests(unittest.TestCase):
               or {"speed_limits","quality_limits"}
             for _,field in ipairs(fields)do
               for _,missing in ipairs({false,true})do
-                local raw,native,p,r=independent_world("2.1.23",mode)
-                if missing then r[field]=nil else
-                  local side=(mode=="aliases" or field=="quality_limits") and "high" or "low";r[field][side]=0
+                local raw,native,p,r,nr=independent_world("2.1.23",mode)
+                if missing then r[field]=nil;nr[field]=nil else
+                  local side=(mode=="aliases" or field=="quality_limits") and "high" or "low";r[field][side]=0;nr[field][side]=0
                 end
                 assert(not pcall(W.data,raw,"2.1.23",mode))
                 assert(not pcall(W.runtime,native,"2.1.23",mode))
@@ -131,6 +135,19 @@ class ProfileNativeWitnessTests(unittest.TestCase):
           assert(W.runtime(native,"2.0.77","numeric").recycling_probability==p.probability)
           assert(not pcall(W.data,raw,"2.0.78","numeric"))
           assert(not pcall(W.data,raw,"2.0.77","unknown"))
+        ''')
+
+    def test_runtime_effectvalue_quantization_keeps_data_and_exact_neighbor_checks(self):
+        self.lua.execute('''
+          local raw,native,p,r,nr=independent_world("2.1.23","numeric")
+          assert(W.data(raw,"2.1.23","numeric").receiver.pollution_limits.low==-.91125)
+          assert(W.runtime(native,"2.1.23","numeric").receiver.pollution_limits.low==-.9113)
+          for _,wrong in ipairs({-.9112,-.91125})do
+            nr.pollution_limits.low=wrong
+            assert(not pcall(W.runtime,native,"2.1.23","numeric"))
+          end
+          r.pollution_limits.low=-.9113
+          assert(not pcall(W.data,raw,"2.1.23","numeric"))
         ''')
 
 

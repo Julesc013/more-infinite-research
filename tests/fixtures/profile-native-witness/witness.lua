@@ -42,6 +42,10 @@ local function observe(stage, base, mode, recipe, recycling, receiver, pipeline)
     local expected = {consumption_limits = {low = -0.8325}, pollution_limits = {low = -0.91125},
       speed_limits = {low = -0.755, high = mode == "aliases" and 1000 or 12.345},
       quality_limits = {high = mode == "aliases" and 1000 or 6.789}}
+    -- Native EffectValue stores four decimals. Exact2.1.23 resolves the
+    -- negative half-step to -0.9113; the data-stage double stays -0.91125.
+    -- Preserve the per-field tolerance rather than accepting either neighbor.
+    if stage == "runtime" then expected.pollution_limits.low = -0.9113 end
     if mode == "aliases" then expected = {speed_limits = {high = 1000}, quality_limits = {high = 1000}} end
     result.receiver = {}
     for name, limits in pairs(expected) do
