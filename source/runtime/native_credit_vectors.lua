@@ -26,15 +26,43 @@ function M.pair(positive, negative, anchor, reference, change, native_matches, o
   local p, size=effects(positive)
   local n, negative_size=effects(negative)
   local r, reference_size=effects(reference)
-  if not p or not n or not r or size<2 or size~=negative_size or size~=reference_size
-      or not finite(r[anchor]) or r[anchor]<=0 or p[anchor]==nil then return nil end
+  -- Return the first rejected invariant as error-path data. Admission and the
+  -- complete-vector comparison remain unchanged; no partial vector is usable.
+  local function reject(reason, role, recipe, expected)
+    local detail={reason=reason,role=role,recipe=recipe,expected=expected}
+    if recipe then
+      detail.positive=p and p[recipe]
+      detail.negative=n and n[recipe]
+      detail.reference=r and r[recipe]
+      local rows=role=="positive" and positive or role=="negative" and negative or reference
+      for index,effect in ipairs(rows) do
+        if effect.recipe==recipe then detail.component=index;break end
+      end
+    end
+    return nil,nil,detail
+  end
+  if not p then return reject("vector-shape","positive") end
+  if not n then return reject("vector-shape","negative") end
+  if not r then return reject("vector-shape","reference") end
+  if size<2 then return reject("vector-not-expanded","positive") end
+  if size~=negative_size then return reject("vector-count","negative") end
+  if size~=reference_size then return reject("reference-vector-count","reference") end
+  if not finite(r[anchor]) or r[anchor]<=0 or p[anchor]==nil then
+    return reject("reference-anchor","reference",anchor)
+  end
   local basis={}
   for recipe, coefficient in pairs(r) do
-    if coefficient<=0 or p[recipe]==nil or n[recipe]==nil then return nil end
+    if coefficient<=0 then return reject("reference-coefficient","reference",recipe) end
+    if p[recipe]==nil then return reject("vector-recipe","positive",recipe) end
+    if n[recipe]==nil then return reject("vector-recipe","negative",recipe) end
     basis[recipe]=coefficient/r[anchor]
     local expected=change*basis[recipe]
-    if not native_matches(p[recipe],expected) or p[recipe]==0 and n[recipe]~=0
-        or not opposite_matches(n[recipe],-p[recipe]) then return nil end
+    if not native_matches(p[recipe],expected) then
+      return reject("positive-component","positive",recipe,expected)
+    end
+    if p[recipe]==0 and n[recipe]~=0 or not opposite_matches(n[recipe],-p[recipe]) then
+      return reject("negative-component","negative",recipe,-p[recipe])
+    end
   end
   return p, basis
 end
