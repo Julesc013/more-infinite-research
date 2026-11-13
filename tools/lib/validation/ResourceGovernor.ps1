@@ -68,10 +68,11 @@ function Get-MIR441LinuxProcessIdentity {
 function Resolve-MIR441RecoveryScratchPath {
   param([Parameter(Mandatory)][string]$Path)
   $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
+  $comparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   $full=[IO.Path]::GetFullPath($Path);$admitted=$false
   foreach($relative in @('build/tmp','build/p')) {
     $root=[IO.Path]::GetFullPath((Join-Path $repo $relative)).TrimEnd('\','/')
-    if($full.Equals($root,[StringComparison]::OrdinalIgnoreCase)-or$full.StartsWith($root+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){$admitted=$true}
+    if($full.Equals($root,$comparison)-or$full.StartsWith($root+[IO.Path]::DirectorySeparatorChar,$comparison)){$admitted=$true}
   }
   if(-not$admitted){throw "[mir441-resource-output-root] $full"}
   $current=$full
@@ -82,15 +83,29 @@ function Resolve-MIR441RecoveryScratchPath {
   return $full
 }
 
+function Resolve-MIR441ExistingDirectoryAncestor {
+  param([Parameter(Mandatory)][string]$Path)
+  $candidate=[IO.Path]::GetFullPath($Path)
+  while(-not(Test-Path -LiteralPath $candidate -PathType Container)){
+    $parent=Split-Path -Parent $candidate
+    if([string]::IsNullOrWhiteSpace($parent)-or$parent-ceq$candidate){throw '[mir441-resource-linux-work-filesystem]'}
+    $candidate=$parent
+  }
+  try{$item=Get-Item -LiteralPath $candidate -Force -ErrorAction Stop}catch{throw '[mir441-resource-linux-work-filesystem]'}
+  if(-not($item-is[IO.DirectoryInfo])){throw '[mir441-resource-linux-work-filesystem]'}
+  return $item.FullName
+}
+
 function Get-MIR441ResourceSnapshot {
   param([Parameter(Mandatory)][string]$WorkRoot)
   if($IsLinux){
     $linux=Invoke-MIR441LinuxResourceObservation -Operation snapshot
     $memory=[pscustomobject][ordered]@{total_bytes=[int64]$linux.memory.total_bytes;free_bytes=[int64]$linux.memory.available_bytes;cgroup_v2=$linux.cgroup_v2}
-    $workDrive=[IO.DriveInfo]::new([IO.Path]::GetFullPath($WorkRoot));$systemDrive=[IO.DriveInfo]::new('/')
+    $fullWorkRoot=[IO.Path]::GetFullPath($WorkRoot)
+    $workDrive=[IO.DriveInfo]::new((Resolve-MIR441ExistingDirectoryAncestor -Path $fullWorkRoot));$systemDrive=[IO.DriveInfo]::new('/')
     if(-not$workDrive.IsReady-or-not$systemDrive.IsReady-or$workDrive.DriveFormat-cne'ext4'){throw '[mir441-resource-linux-work-filesystem]'}
     return [pscustomobject][ordered]@{
-      observed_at=[DateTimeOffset]::UtcNow.ToString('o');platform=[ordered]@{os='linux';memory_policy='MemAvailable is physical-RAM headroom; Committed_AS and CommitLimit are not admission fields';commit_policy='inapplicable'}
+      observed_at=[DateTimeOffset]::UtcNow.ToString('o');work_root=$fullWorkRoot;platform=[ordered]@{os='linux';memory_policy='MemAvailable is physical-RAM headroom; Committed_AS and CommitLimit are not admission fields';commit_policy='inapplicable'}
       memory=$memory
       work_volume=[ordered]@{name=$workDrive.Name;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize;filesystem_type=$workDrive.DriveFormat}
       system_volume=[ordered]@{name=$systemDrive.Name;free_bytes=[int64]$systemDrive.AvailableFreeSpace;total_bytes=[int64]$systemDrive.TotalSize;filesystem_type=$systemDrive.DriveFormat}
@@ -362,9 +377,9 @@ function Stop-MIR441OwnedProcess {
 
 function New-MIR441LinuxExecutionAccountLock {
   if(-not$IsLinux){return $null}
-  $home=[Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
-  if([string]::IsNullOrWhiteSpace($home)){throw '[mir441-resource-linux-account-lock-home]'}
-  $directory=$home
+  $mirLinuxUserProfile=[Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
+  if([string]::IsNullOrWhiteSpace($mirLinuxUserProfile)){throw '[mir441-resource-linux-account-lock-home]'}
+  $directory=$mirLinuxUserProfile
   foreach($part in @('.local','state','mir')){
     $directory=Join-Path $directory $part
     if(-not(Test-Path -LiteralPath $directory)){
@@ -580,9 +595,10 @@ function Invoke-MIR441MonitoredProcess {
     if([string]::IsNullOrWhiteSpace($StdoutPath)-and[string]::IsNullOrWhiteSpace($StderrPath)){throw '[mir441-factorio-console-output-required]'}
   }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
+  $pathComparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
-    if(-not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw '[mir441-resource-output-work-root]'}
+    if(-not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,$pathComparison)){throw '[mir441-resource-output-work-root]'}
   }
   if($EstimatedPeakBytes-le0-or$ExpectedPeakMemoryBytes-le0){throw '[mir441-resource-peak-budget-required]'}
   if($null -ne $PreStartAdmissionWait){Assert-MIR441PreStartAdmissionWaitState -State $PreStartAdmissionWait}

@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import uuid
 from pathlib import Path
 
 
@@ -153,6 +154,52 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         self.assertEqual(2, status)
         self.assertEqual("mir441-linux-cgroup-memory", payload["code"])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires real Linux procfs, cgroup v2, and pwsh")
+    def test_real_linux_new_workroot_uses_existing_volume_and_case_sensitive_containment(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("PowerShell is unavailable")
+        run_root = ROOT / "build" / "tmp" / f"linux-resource-real-{uuid.uuid4().hex}"
+        harness = run_root.with_suffix(".ps1")
+        script = rf"""
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+. '{(ROOT / "tools" / "lib" / "validation" / "ResourceGovernor.ps1").as_posix()}'
+$runRoot='{run_root.as_posix()}'
+$newWork=Join-Path $runRoot 'new-output/not-created-yet'
+$caseWork=Join-Path $runRoot 'work'
+$caseOther=Join-Path $runRoot 'Work'
+New-Item -ItemType Directory -Force -Path $runRoot,$caseWork,$caseOther | Out-Null
+try {{
+  $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $newWork
+  $caseRoot=''
+  try {{ Resolve-MIR441RecoveryScratchPath -Path '{(ROOT / "BUILD" / "tmp" / "wrong-case").as_posix()}' | Out-Null }} catch {{ $caseRoot=$_.Exception.Message }}
+  $caseOutput=''
+  try {{ Invoke-MIR441MonitoredProcess -FilePath '/not-used' -Arguments @() -WorkRoot $caseWork -LedgerPath (Join-Path $caseOther 'ledger.jsonl') -Policy ([pscustomobject]@{{}}) -EstimatedPeakBytes 16MB -ExpectedPeakMemoryBytes 64MB | Out-Null }} catch {{ $caseOutput=$_.Exception.Message }}
+  [pscustomobject]@{{filesystem=$snapshot.work_volume.filesystem_type;work_root=$snapshot.work_root;new_work_exists=(Test-Path -LiteralPath $newWork);case_root=$caseRoot;case_output=$caseOutput}} | ConvertTo-Json -Compress
+}} finally {{
+  if(Test-Path -LiteralPath $runRoot) {{ Remove-Item -LiteralPath $runRoot -Recurse -Force }}
+}}
+"""
+        harness.write_text(script, encoding="utf-8")
+        self.addCleanup(lambda: harness.unlink(missing_ok=True))
+        self.addCleanup(lambda: shutil.rmtree(run_root, ignore_errors=True))
+        completed = subprocess.run(
+            [pwsh, "-NoProfile", "-File", str(harness)],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=45,
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual("ext4", result["filesystem"])
+        self.assertEqual(str(run_root / "new-output" / "not-created-yet"), result["work_root"])
+        self.assertFalse(result["new_work_exists"])
+        self.assertIn("[mir441-resource-output-root]", result["case_root"])
+        self.assertIn("[mir441-resource-output-work-root]", result["case_output"])
+
     def test_process_tree_uses_all_owned_threads_and_start_identities_without_cmdline(self) -> None:
         temporary, proc = self.make_fixture()
         self.addCleanup(lambda: __import__("shutil").rmtree(temporary, ignore_errors=True))
@@ -224,11 +271,12 @@ Set-StrictMode -Version Latest
 $runRoot='{run_root.as_posix()}'
 $ledger=Join-Path $runRoot 'ledger.jsonl'
 New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
+$volumeName=[IO.DriveInfo]::new($runRoot).Name
 $script:admissionBytes=[Collections.Generic.List[long]]::new()
 $events=[pscustomobject]@{{low=0;high=0;max=0;oom=0;oom_kill=0}}
 $pressure=[pscustomobject]@{{some=[pscustomobject]@{{avg10=0.0;avg60=0.0;avg300=0.0;total=0}};full=[pscustomobject]@{{avg10=0.0;avg60=0.0;avg300=0.0;total=0}}}}
-$cgroup=[pscustomobject]@{{ancestors=@([pscustomobject]@{{relative_path='/host-only';events=$events;events_local=$events;pressure=$pressure}})}}
-$snapshot=[pscustomobject]@{{memory=[pscustomobject]@{{total_bytes=[int64]32GB;free_bytes=[int64]32GB;commit_limit_bytes=[int64]32GB;committed_bytes=0L;cgroup_v2=$cgroup}};work_volume=[pscustomobject]@{{name='host-only';free_bytes=[int64]64GB;total_bytes=[int64]128GB}};system_volume=[pscustomobject]@{{name='host-only';free_bytes=[int64]64GB;total_bytes=[int64]128GB}}}}
+$cgroup=[pscustomobject]@{{ancestors=@([pscustomobject]@{{relative_path='/host-only';control_applicability='applicable';events=$events;events_local=$events;pressure=$pressure}})}}
+$snapshot=[pscustomobject]@{{memory=[pscustomobject]@{{total_bytes=[int64]32GB;free_bytes=[int64]32GB;commit_limit_bytes=[int64]32GB;committed_bytes=0L;cgroup_v2=$cgroup}};work_volume=[pscustomobject]@{{name=$volumeName;free_bytes=[int64]64GB;total_bytes=[int64]128GB}};system_volume=[pscustomobject]@{{name=$volumeName;free_bytes=[int64]64GB;total_bytes=[int64]128GB}}}}
 function Assert-MIR441ResourceAdmission {{
   param($Policy,[string]$WorkRoot,[int64]$EstimatedPeakBytes,[int64]$ExpectedPeakMemoryBytes)
   $script:admissionBytes.Add($EstimatedPeakBytes)
