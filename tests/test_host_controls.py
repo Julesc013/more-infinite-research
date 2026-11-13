@@ -198,6 +198,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_spoilage.py",
             "tests/test_scripted_effects_lifecycle.py",
             "tests/test_settings_profile.py",
+            "tests/test_profile_native_witness.py",
             "tests/test_settings_commands.py",
             "tests/test_properties.py",
             "tests/test_replay.py",

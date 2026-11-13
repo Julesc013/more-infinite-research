@@ -168,6 +168,7 @@ $controls = @(
   [ordered]@{path='tests/test_spoilage.py';lua=$true},
   [ordered]@{path='tests/test_scripted_effects_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_settings_profile.py';lua=$true},
+  [ordered]@{path='tests/test_profile_native_witness.py';lua=$true},
   [ordered]@{path='tests/test_settings_commands.py';lua=$true},
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
