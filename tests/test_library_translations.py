@@ -175,6 +175,54 @@ class LibraryTranslationTests(unittest.TestCase):
           assert(translations.labels(latest, latest_scope).gear == "Zahnrad")
         ''')
 
+    def test_reused_player_slot_same_locale_does_not_publish_departed_translation(self):
+        # Pure cache/ledger boundary, not actual player removal or two-client
+        # native evidence. A replacement player may reuse an index, locale and
+        # force; only the caller's lifetime epoch distinguishes the old reply.
+        for order in ("old-first", "new-first"):
+            with self.subTest(callback_order=order):
+                self.lua.execute(r'''
+                  local original = scope(7, "de", 2, 50)
+                  local departed = prepared(7, "de", 2, 50, {"gear"})
+                  assert(translations.dispatch(departed, original, 10,
+                    function() return 51 end).issued == 1)
+                  local ledger = assert(translations.export_pending(departed))
+                  assert(#ledger == 1 and ledger[1].scope.generation == 50)
+
+                  -- Same player index, locale, force, key and local cache
+                  -- generation: a fresh caller epoch is the only separator.
+                  local replacement_scope = scope(7, "de", 2, 51)
+                  local replacement = prepared(7, "de", 2, 51, {"gear"})
+                  assert(replacement.generation == departed.generation)
+                  assert(translations.hydrate_pending(replacement, ledger))
+                  assert(replacement.outstanding == 1 and replacement.pending_by_key.gear == nil)
+                  assert(translations.dispatch(replacement, replacement_scope, 11,
+                    function() return 52 end).issued == 1)
+                  assert(replacement.outstanding == 2)
+                  local function old_reply()
+                    local result = translations.complete(replacement, replacement_scope, 51, "Alter Name")
+                    assert(result.released and not result.published)
+                  end
+                  local function new_reply()
+                    local result = translations.complete(replacement, replacement_scope, 52, "Neuer Name")
+                    assert(result.released and result.published)
+                  end
+                  if callback_order == "old-first" then
+                    old_reply()
+                    assert(translations.labels(replacement, replacement_scope).gear == nil)
+                    new_reply()
+                  else
+                    new_reply()
+                    old_reply()
+                  end
+                  assert(translations.labels(replacement, replacement_scope).gear == "Neuer Name")
+                  local snapshot = assert(translations.snapshot(replacement, replacement_scope))
+                  assert(snapshot.stats.outstanding == 0 and snapshot.stats.resolved == 1)
+                  assert(not translations.needs_maintenance(replacement))
+                  assert(#assert(translations.export_pending(replacement)) == 0)
+                  assert(translations.labels(replacement, original) == nil)
+                '''.replace("callback_order", '"' + order + '"'))
+
     def test_pending_ledger_rejects_malformed_duplicate_and_uint32_records_without_mutation(self):
         self.lua.execute('''
           local active = scope(1, "en", 1, 0)
