@@ -13,6 +13,7 @@ import argparse
 import json
 import math
 import os
+import posixpath
 import re
 import sys
 from pathlib import Path
@@ -103,6 +104,34 @@ def cgroup_mount(proc_root: Path) -> tuple[str, Path]:
     if len(selected) != 1:
         fail("mir441-linux-cgroup-v2")
     return selected[0]
+
+
+def mount_identity(proc_root: Path, path: str) -> dict[str, int | str]:
+    if "\x00" in path or not path.startswith("/"):
+        fail("mir441-linux-mount-identity")
+    candidate = posixpath.normpath(path)
+    matches: list[tuple[int, int, int, str, str]] = []
+    for index, line in enumerate(read_text(proc_root / "self" / "mountinfo", "mir441-linux-mount-identity").splitlines()):
+        pieces = line.split(" - ", 1)
+        if len(pieces) != 2:
+            fail("mir441-linux-mount-identity")
+        before, after = pieces
+        fields = before.split()
+        trailer = after.split()
+        if len(fields) < 5 or len(trailer) < 3:
+            fail("mir441-linux-mount-identity")
+        mount_id = parse_uint(fields[0], "mir441-linux-mount-identity")
+        mount_point = unescape_mount(fields[4], "mir441-linux-mount-identity")
+        if not mount_point.startswith("/") or "\x00" in mount_point:
+            fail("mir441-linux-mount-identity")
+        prefix = mount_point.rstrip("/") or "/"
+        contained = candidate == prefix or (prefix != "/" and candidate.startswith(prefix + "/")) or prefix == "/"
+        if contained:
+            matches.append((len(prefix), index, mount_id, mount_point, trailer[0]))
+    if not matches:
+        fail("mir441-linux-mount-identity")
+    _, _, mount_id, mount_point, filesystem_type = max(matches, key=lambda row: (row[0], row[1]))
+    return {"mount_id": mount_id, "mount_point": mount_point, "filesystem_type": filesystem_type}
 
 
 def cgroup_leaf(mount_root: str, mount_point: Path, cgroup_path: str) -> Path:
@@ -445,8 +474,9 @@ def result(value: dict[str, Any]) -> int:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("snapshot", "process-identity", "process-tree"))
+    parser.add_argument("command", choices=("snapshot", "mount-identity", "process-identity", "process-tree"))
     parser.add_argument("--proc-root", default="/proc")
+    parser.add_argument("--path")
     parser.add_argument("--pid", type=int)
     parser.add_argument("--root-start-ticks", type=int)
     parser.add_argument("--session-id", type=int)
@@ -455,6 +485,10 @@ def main(argv: list[str]) -> int:
     try:
         if args.command == "snapshot":
             return result({"memory": read_meminfo(proc_root), "cgroup_v2": cgroup_snapshot(proc_root)})
+        if args.command == "mount-identity":
+            if args.path is None:
+                fail("mir441-linux-mount-identity")
+            return result(mount_identity(proc_root, args.path))
         if args.pid is None:
             fail("mir441-linux-process-stat")
         if args.command == "process-identity":

@@ -63,6 +63,8 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         write(proc / "self" / "cgroup", "0::/leaf/work\n")
         write(
             proc / "self" / "mountinfo",
+            "35 25 8:1 / / rw,relatime - ext4 /dev/test rw\n"
+            "36 35 8:1 / /work rw,relatime - ext4 /dev/test rw\n"
             f"40 31 0:44 / {cgroup.as_posix()} rw,nosuid,nodev - cgroup2 cgroup rw\n",
         )
         cgroup_files(cgroup, current=100, maximum="max", high="max")
@@ -100,6 +102,24 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         self.assertEqual(700, leaf["high_headroom_bytes"])
         self.assertEqual({"some", "full"}, set(leaf["pressure"]))
         self.assertEqual(0, leaf["events_local"]["oom_kill"])
+
+    def test_mount_identity_uses_the_longest_case_sensitive_mount_boundary(self) -> None:
+        temporary, proc = self.make_fixture()
+        self.addCleanup(lambda: shutil.rmtree(temporary, ignore_errors=True))
+        write(
+            proc / "self" / "mountinfo",
+            "35 25 8:1 / / rw,relatime - ext4 /dev/test rw\n"
+            "36 35 8:1 / /work rw,relatime - ext4 /dev/test rw\n",
+        )
+        status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/work/future/output")
+        self.assertEqual(0, status)
+        self.assertEqual({"mount_id": 36, "mount_point": "/work", "filesystem_type": "ext4"}, payload["value"])
+        status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/Work/future/output")
+        self.assertEqual(0, status)
+        self.assertEqual({"mount_id": 35, "mount_point": "/", "filesystem_type": "ext4"}, payload["value"])
+        status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "relative")
+        self.assertEqual(2, status)
+        self.assertEqual("mir441-linux-mount-identity", payload["code"])
 
     def test_snapshot_refuses_malformed_or_missing_required_cgroup_facts(self) -> None:
         temporary, proc = self.make_fixture()
@@ -178,7 +198,7 @@ try {{
   $caseRoot=''
   try {{ Resolve-MIR441RecoveryScratchPath -Path '{(ROOT / "BUILD" / "tmp" / "wrong-case").as_posix()}' | Out-Null }} catch {{ $caseRoot=$_.Exception.Message }}
   $caseOutput=''
-  try {{ Invoke-MIR441MonitoredProcess -FilePath '/not-used' -Arguments @() -WorkRoot $caseWork -LedgerPath (Join-Path $caseOther 'ledger.jsonl') -Policy ([pscustomobject]@{{}}) -EstimatedPeakBytes 16MB -ExpectedPeakMemoryBytes 64MB | Out-Null }} catch {{ $caseOutput=$_.Exception.Message }}
+  try {{ Invoke-MIR441MonitoredProcess -FilePath '/not-used' -Arguments @('--version') -WorkRoot $caseWork -LedgerPath (Join-Path $caseOther 'ledger.jsonl') -Policy ([pscustomobject]@{{}}) -EstimatedPeakBytes 16MB -ExpectedPeakMemoryBytes 64MB | Out-Null }} catch {{ $caseOutput=$_.Exception.Message }}
   [pscustomobject]@{{filesystem=$snapshot.work_volume.filesystem_type;work_root=$snapshot.work_root;new_work_exists=(Test-Path -LiteralPath $newWork);case_root=$caseRoot;case_output=$caseOutput}} | ConvertTo-Json -Compress
 }} finally {{
   if(Test-Path -LiteralPath $runRoot) {{ Remove-Item -LiteralPath $runRoot -Recurse -Force }}
@@ -272,6 +292,89 @@ try {{
             if process.poll() is None:
                 process.kill()
                 process.wait(timeout=5)
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Linux procfs, cgroup v2, and pwsh")
+    def test_real_linux_production_monitor_stops_an_orphaned_session_child(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("PowerShell is unavailable")
+        run_root = ROOT / "build" / "tmp" / f"linux-production-session-{uuid.uuid4().hex}"
+        child_receipt = run_root / "child.json"
+        target = run_root / "leader.py"
+        harness = run_root.with_suffix(".ps1")
+        target_body = r"""
+import json
+import os
+import sys
+import time
+
+receipt = sys.argv[1]
+child = os.fork()
+if child:
+    deadline = time.monotonic() + 2
+    while not os.path.exists(receipt) and time.monotonic() < deadline:
+        time.sleep(0.005)
+    os._exit(0 if os.path.exists(receipt) else 2)
+text = open(f"/proc/{os.getpid()}/stat", encoding="utf-8").read()
+close = text.rfind(")")
+fields = text[close + 1:].split()
+with open(receipt, "x", encoding="utf-8") as stream:
+    json.dump({"pid": os.getpid(), "start_ticks": int(fields[19]), "session_id": os.getsid(0)}, stream)
+    stream.flush()
+    os.fsync(stream.fileno())
+time.sleep(20)
+""".lstrip()
+        write(target, target_body)
+        script = rf"""
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+. '{(ROOT / "tools" / "lib" / "validation" / "NativeProbeCommon.ps1").as_posix()}'
+. '{(ROOT / "tools" / "lib" / "validation" / "ResourceGovernor.ps1").as_posix()}'
+$runRoot='{run_root.as_posix()}'
+New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
+try {{
+  $result=Invoke-MIR441MonitoredProcess -FilePath '{Path(sys.executable).as_posix()}' -Arguments @('-I','{target.as_posix()}','{child_receipt.as_posix()}') -WorkRoot $runRoot -LedgerPath (Join-Path $runRoot 'ledger.jsonl') -Policy ([pscustomobject]@{{}}) -EstimatedPeakBytes 16MB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 20
+  [pscustomobject]@{{status=$result.status;ledger=(Join-Path $runRoot 'ledger.jsonl');child='{child_receipt.as_posix()}'}} | ConvertTo-Json -Compress
+}} catch {{
+  [pscustomobject]@{{error=$_.Exception.Message}} | ConvertTo-Json -Compress
+  exit 1
+}}
+"""
+        harness.write_text(script, encoding="utf-8")
+        self.addCleanup(lambda: harness.unlink(missing_ok=True))
+        self.addCleanup(lambda: shutil.rmtree(run_root, ignore_errors=True))
+        completed = subprocess.run(
+            [pwsh, "-NoProfile", "-File", str(harness)],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=45,
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual("passed", result["status"])
+        child = json.loads(child_receipt.read_text(encoding="utf-8"))
+        rows = [json.loads(line) for line in Path(result["ledger"]).read_text(encoding="utf-8").splitlines()]
+        process_rows = [row for row in rows if "process" in row]
+        self.assertGreaterEqual(len(process_rows), 1)
+        self.assertTrue(process_rows[0]["process"]["root_exited"])
+        leader = process_rows[0]["process"]["start_identity"]
+        status, payload = self.run_helper(
+            "process-tree",
+            "--pid",
+            str(leader["pid"]),
+            "--root-start-ticks",
+            str(leader["start_ticks"]),
+            "--session-id",
+            str(leader["session_id"]),
+        )
+        self.assertEqual(0, status)
+        self.assertTrue(payload["value"]["root_exited"])
+        self.assertEqual([], payload["value"]["children"])
+        status, payload = self.run_helper("process-identity", "--pid", str(child["pid"]))
+        self.assertEqual(0, status)
+        self.assertTrue(payload["value"]["exited"])
 
     def test_process_tree_uses_all_owned_threads_and_start_identities_without_cmdline(self) -> None:
         temporary, proc = self.make_fixture()
@@ -369,12 +472,13 @@ Set-StrictMode -Version Latest
 $runRoot='{run_root.as_posix()}'
 $ledger=Join-Path $runRoot 'ledger.jsonl'
 New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
-$volumeName=[IO.DriveInfo]::new($runRoot).Name
+$volumeName=[IO.DriveInfo]::new($runRoot).Name;$mountId=1L
+if($IsLinux) {{ $mount=Invoke-MIR441LinuxResourceObservation -Operation mount-identity -Path $runRoot;$volumeName=$mount.mount_point;$mountId=[int64]$mount.mount_id }}
 $script:admissionBytes=[Collections.Generic.List[long]]::new()
 $events=[pscustomobject]@{{low=0;high=0;max=0;oom=0;oom_kill=0}}
 $pressure=[pscustomobject]@{{some=[pscustomobject]@{{avg10=0.0;avg60=0.0;avg300=0.0;total=0}};full=[pscustomobject]@{{avg10=0.0;avg60=0.0;avg300=0.0;total=0}}}}
 $cgroup=[pscustomobject]@{{ancestors=@([pscustomobject]@{{relative_path='/host-only';control_applicability='applicable';events=$events;events_local=$events;pressure=$pressure}})}}
-$snapshot=[pscustomobject]@{{memory=[pscustomobject]@{{total_bytes=[int64]32GB;free_bytes=[int64]32GB;commit_limit_bytes=[int64]32GB;committed_bytes=0L;cgroup_v2=$cgroup}};work_volume=[pscustomobject]@{{name=$volumeName;free_bytes=[int64]64GB;total_bytes=[int64]128GB}};system_volume=[pscustomobject]@{{name=$volumeName;free_bytes=[int64]64GB;total_bytes=[int64]128GB}}}}
+$snapshot=[pscustomobject]@{{memory=[pscustomobject]@{{total_bytes=[int64]32GB;free_bytes=[int64]32GB;commit_limit_bytes=[int64]32GB;committed_bytes=0L;cgroup_v2=$cgroup}};work_volume=[pscustomobject]@{{name=$volumeName;mount_id=$mountId;free_bytes=[int64]64GB;total_bytes=[int64]128GB}};system_volume=[pscustomobject]@{{name=$volumeName;free_bytes=[int64]64GB;total_bytes=[int64]128GB}}}}
 function Assert-MIR441ResourceAdmission {{
   param($Policy,[string]$WorkRoot,[int64]$EstimatedPeakBytes,[int64]$ExpectedPeakMemoryBytes)
   $script:admissionBytes.Add($EstimatedPeakBytes)

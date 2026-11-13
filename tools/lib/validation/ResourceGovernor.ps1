@@ -27,17 +27,21 @@ public static class MIR441MemoryNative {
 
 function Invoke-MIR441LinuxResourceObservation {
   param(
-    [Parameter(Mandatory)][ValidateSet('snapshot','process-identity','process-tree')][string]$Operation,
+    [Parameter(Mandatory)][ValidateSet('snapshot','mount-identity','process-identity','process-tree')][string]$Operation,
     [int]$ProcessId=0,
     [int64]$RootStartTicks=0,
-    [int64]$SessionId=0
+    [int64]$SessionId=0,
+    [string]$Path=''
   )
   if(-not$IsLinux){throw '[mir441-resource-linux-required]'}
   $python=Get-Command python3 -ErrorAction SilentlyContinue
   $helper=Join-Path $PSScriptRoot 'LinuxResourceObservation.py'
   if($null-eq$python-or-not(Test-Path -LiteralPath $helper -PathType Leaf)){throw '[mir441-resource-linux-observer-unavailable]'}
   $arguments=[Collections.Generic.List[string]]::new();[void]$arguments.Add($Operation)
-  if($Operation-cne'snapshot'){
+  if($Operation-ceq'mount-identity'){
+    if([string]::IsNullOrWhiteSpace($Path)){throw '[mir441-resource-linux-mount-identity]'}
+    [void]$arguments.Add('--path');[void]$arguments.Add($Path)
+  }elseif($Operation-cne'snapshot'){
     if($ProcessId-le0){throw '[mir441-resource-linux-process-identity]'}
     [void]$arguments.Add('--pid');[void]$arguments.Add([string]$ProcessId)
     if($Operation-ceq'process-tree'){
@@ -131,12 +135,13 @@ function Get-MIR441ResourceSnapshot {
     $linux=Invoke-MIR441LinuxResourceObservation -Operation snapshot
     $memory=[pscustomobject][ordered]@{total_bytes=[int64]$linux.memory.total_bytes;free_bytes=[int64]$linux.memory.available_bytes;cgroup_v2=$linux.cgroup_v2}
     $fullWorkRoot=[IO.Path]::GetFullPath($WorkRoot)
+    $workMount=Invoke-MIR441LinuxResourceObservation -Operation mount-identity -Path $fullWorkRoot
     $workDrive=[IO.DriveInfo]::new((Resolve-MIR441ExistingDirectoryAncestor -Path $fullWorkRoot));$systemDrive=[IO.DriveInfo]::new('/')
-    if(-not$workDrive.IsReady-or-not$systemDrive.IsReady-or$workDrive.DriveFormat-cne'ext4'){throw '[mir441-resource-linux-work-filesystem]'}
+    if(-not$workDrive.IsReady-or-not$systemDrive.IsReady-or[string]$workMount.filesystem_type-cne'ext4'){throw '[mir441-resource-linux-work-filesystem]'}
     return [pscustomobject][ordered]@{
       observed_at=[DateTimeOffset]::UtcNow.ToString('o');work_root=$fullWorkRoot;platform=[ordered]@{os='linux';memory_policy='MemAvailable is physical-RAM headroom; Committed_AS and CommitLimit are not admission fields';commit_policy='inapplicable'}
       memory=$memory
-      work_volume=[ordered]@{name=$workDrive.Name;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize;filesystem_type=$workDrive.DriveFormat}
+      work_volume=[ordered]@{name=[string]$workMount.mount_point;mount_id=[int64]$workMount.mount_id;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize;filesystem_type=[string]$workMount.filesystem_type}
       system_volume=[ordered]@{name=$systemDrive.Name;free_bytes=[int64]$systemDrive.AvailableFreeSpace;total_bytes=[int64]$systemDrive.TotalSize;filesystem_type=$systemDrive.DriveFormat}
     }
   }
@@ -658,8 +663,8 @@ function Invoke-MIR441MonitoredProcess {
     if($IsLinux){$linuxCgroupBaseline=$admission.memory.cgroup_v2}
     New-Item -ItemType Directory -Force -Path $temp|Out-Null
     if($IsLinux){
-      $tempDrive=[IO.DriveInfo]::new([IO.Path]::GetFullPath($temp))
-      if(-not$tempDrive.IsReady-or$tempDrive.DriveFormat-cne'ext4'-or$tempDrive.Name-cne$admission.work_volume.name){throw '[mir441-resource-linux-temp-filesystem]'}
+      $tempMount=Invoke-MIR441LinuxResourceObservation -Operation mount-identity -Path ([IO.Path]::GetFullPath($temp))
+      if([string]$tempMount.filesystem_type-cne'ext4'-or[int64]$tempMount.mount_id-ne[int64]$admission.work_volume.mount_id){throw '[mir441-resource-linux-temp-filesystem]'}
     }
     $start=[Diagnostics.ProcessStartInfo]::new();$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
     $start.Environment['TEMP']=$temp;$start.Environment['TMP']=$temp;$start.Environment['TMPDIR']=$temp
@@ -710,7 +715,7 @@ function Invoke-MIR441MonitoredProcess {
       # Preserve the triggering process observation before enforcing its budget.
       # Private bytes can exceed working set during graphical resource loading.
       $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
-      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
+      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}
