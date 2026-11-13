@@ -1,0 +1,136 @@
+{
+  "kind": "ConfiguredSteel512ScopedConsumedInputReviewAeroV1",
+  "reviewed_utc": "2026-11-09T18:08:24.865650+00:00",
+  "published_reference": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+  "published_source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "candidate": "f2ea5e9986768073a04aba47fffcd50254a1a5ad",
+  "candidate_source": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+  "scope": "Existing exact2.1.23SpaceAge/17%-steel genuine10 source8A04 to published11 destination1567 route, closed headless profile; relevant production input delta to frozen12 only.",
+  "verdict": "No newly affected production path identified. Original11result supports inherited named configured-steel behavior on unchanged relevant production code/profile; retain original11execution identity. This does not claim a fresh12upgrade/save/cold execution or admit a12nativepacket. Final cached-result adoption and accepted ZIP/source identity remain with the non-author stable reviewer.",
+  "exact_unchanged_consumed_modules": [
+    {
+      "path": "runtime/bootstrap.lua",
+      "bytes": 37369,
+      "sha256": "B34CB1F698C3AEF44B5E23ED58EDCCA83E751FF201AC28AEF58462577F8949A8"
+    },
+    {
+      "path": "runtime/native_credits.lua",
+      "bytes": 47761,
+      "sha256": "E11AC70C18CAE71903FF0DCFDEC7A9780D6F438A87FB541198AD554FC1C4DDFD"
+    },
+    {
+      "path": "runtime/worker_robot_storage.lua",
+      "bytes": 34158,
+      "sha256": "DFF0B2145DC22CB263EE95A4DA87F04D771CF8B7E9809F77BBF5BC821D5F621A"
+    },
+    {
+      "path": "runtime/lifecycle.lua",
+      "bytes": 36705,
+      "sha256": "E9ABE68A1032B314FB425D36ED58A7CA917A634FCC920A812942A5C59267BBC6"
+    },
+    {
+      "path": "runtime/legacy_module_credits.lua",
+      "bytes": 10964,
+      "sha256": "EB6E25EA62C46D8B104F6C6218FD42EF156D863B31C052EDF879E86A25067B81"
+    },
+    {
+      "path": "runtime/legacy_cannon_credits.lua",
+      "bytes": 10384,
+      "sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD"
+    },
+    {
+      "path": "runtime/configuration.lua",
+      "bytes": 347,
+      "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E"
+    },
+    {
+      "path": "runtime/cap_admission.lua",
+      "bytes": 3454,
+      "sha256": "D13110614A14B3BB3A525C47471C422B2449BBD121460251F7E248F8CD91BB34"
+    },
+    {
+      "path": "runtime/caps.lua",
+      "bytes": 12624,
+      "sha256": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52"
+    },
+    {
+      "path": "runtime/settings_profile.lua",
+      "bytes": 1551,
+      "sha256": "8FD62FA72627DD36DD555AB315057DB40B10DDAA9739B6199110258B3C0658F1"
+    },
+    {
+      "path": "research/native_credit_definitions.lua",
+      "bytes": 9472,
+      "sha256": "6DF5FADD1816418DA12ABEFF431102AD0152E8527153E6D8F69EC7EB2444C69C"
+    },
+    {
+      "path": "research/native_credit_contracts.lua",
+      "bytes": 3868,
+      "sha256": "19A8C7C4B6A440851214EAF5BFEE0A17124FAD0F2490D1C94C6FB9967692D589"
+    },
+    {
+      "path": "research/native_adoption.lua",
+      "bytes": 7390,
+      "sha256": "FE8D36252FC5F13ED3907E6259B8E0C02F9B8A95B7121AC0AFE23E1E9B0A3711"
+    },
+    {
+      "path": "research/product_target_extension.lua",
+      "bytes": 21618,
+      "sha256": "9890FB58AA68B443EEE294A56131D3B5673211AF409A6851FE28AB08FB551306"
+    },
+    {
+      "path": "research/generator.lua",
+      "bytes": 5802,
+      "sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717"
+    },
+    {
+      "path": "research/modern.lua",
+      "bytes": 33501,
+      "sha256": "F21C2EF1518D9B9961838202287B45E372FF02C37EB3711447059B77E9827A23"
+    },
+    {
+      "path": "research/settings.lua",
+      "bytes": 18813,
+      "sha256": "328A16974CBDBD24027419561A861FF1D0175A9DB24641A6DD23E3DBA288149E"
+    },
+    {
+      "path": "compatibility/modern_catalogue.lua",
+      "bytes": 73604,
+      "sha256": "F4BE827F5398B866D80108C5BC7C3FA5362A193A3FB0EA7EE3B605522E555709"
+    },
+    {
+      "path": "compatibility/modern_catalogue/space_age.lua",
+      "bytes": 42265,
+      "sha256": "07F356E13EDFEADADB005A11C15555E28D783C493B59F66E24C8A053A2CAFFA0"
+    }
+  ],
+  "source_lua_changes": [
+    "source/platform/target.lua",
+    "source/presentation/library_layout.lua",
+    "source/runtime/library.lua"
+  ],
+  "source_migration_changes": [],
+  "platform_target_delta": "Only distribution_version21011to21012; all capability/base/target fields exact.",
+  "dependency_delta": "Only ? planet-ferrum added. Absent from exact7-mod profile/all3 actual logs, so the new Ferrum ordering rule is outside this case. Same actual engine/data/observer/save/settings bytes remain a condition of scoped reuse.",
+  "guard_review": [
+    "native_credits legacy_family_context compares event.new_version with script.active_mods[MIR] and accepts5.0.210NN destination shape;12 satisfies the same identity relation as11 when metadata matches. The old source remains21010, not a publishedMIR4/data-only origin.",
+    "lifecycle directF200-toF210 special route requires a publishedF200MIR4 old version;false for this21010same-engine source under both targets.",
+    "legacy_module_credits is excluded by Space Age and its old-version guard; legacy_cannon_credits old published-combined guard isfalse for21010. Worker bootstrap/preflight and all named steel/cap/credit/settings/emission modules remain exact.",
+    "The only other changed Lua functions are Library frame/layout/render paths; this actor never creates a player or opens/uses LibraryGUI. Existing closed-view load/configuration callbacks are unchanged. This gives no reuse verdict for changed client/personal-view paths."
+  ],
+  "actor_version_caveat": {
+    "existing_actor": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "locks": "Its5target-version literal sites admit21011, and the same actor is embedded in protected source8A04 and destination1567. Unchanged old scenario is NOT dispatchable on12. This is fixture scope, not a demonstrated player defect.",
+    "if_fresh12_observation_is_required": "Review a separate exact10-to12actor/controller/save-scenario binding. Preserve the original8A04save/actor and all old packets. Any derivative embedded-code substitution needs explicit reviewed provenance and unchanged native earned-state body checks; do not erase version guards or silently rewrite protected source. Reuse original single ordinary source completion; smallest affected destination leg stays load/save/two readonly colds,3processes/0newlabs. No caller/fixture/prepared12packet is supplied or authorized here."
+  },
+  "limits": [
+    "Named17%steel/casting and foreign0.07/disabled/private/lab/science values only;zero partial work. Not manufacturing, allcarrier/ledger masks, worker/provider/cargo/client/performance or stable acceptance.",
+    "Actual final12archive bytes were not independently downloaded/rehashed here; final package correspondence is a separate gate.",
+    "Final coherent Source may change after9b. Recheck actual relevant delta rather than relabel this receipt or repeat unchanged source construction.",
+    "Existing public German unit7722074 remains isolated; this read-only case changes noSource/docs/test/native/CI/library."
+  ],
+  "native_execution": false,
+  "source_edits": false,
+  "player_builds": 0,
+  "stable_acceptance": false
+}

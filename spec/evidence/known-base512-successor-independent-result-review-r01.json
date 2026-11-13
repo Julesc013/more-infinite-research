@@ -1,0 +1,143 @@
+{
+  "kind": "KnownBase501To512SyntheticSuccessorIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-10T04:40:01.081795+00:00",
+  "verdict": "PASS exact F200 pure published501\u2192Source47537 target512 syntheticprovider/retirement mechanism,normal ordinary work/save/two immutable cold loads only. No reporter or stable verdict.",
+  "tuple": {
+    "packet": "88797901793AC8BFC65CA73B7E28B9D41090EF811C6D82405865E618A2265DA9",
+    "owner": "CD11998C1575581F0309BA5421B2D5ADBEECACC3166C3BB5E380F9C21D6EC362",
+    "composition": "5109762FD49A874B9D505AD9FD8E17DECA4FC3EE3982B34A53677691022AF8CA",
+    "fixture_commit": "48dbbe3096d07bafbe140a3b1f56bd3d4eefe5e7",
+    "fixture_sha256": "354407A86961A80F8144F8DB398464775C1ACD40A0FDC993AFF6AC0A6AECD0B8",
+    "fixture_actor_sha256": "F0A6F937952D08EE9428B6930142437BA6D239BAF9B77783F3F9A5B56DD46A2C",
+    "target_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "player_sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E",
+    "engine": "2.0.77/D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "executing_harness": "b05/Source47537",
+    "pure_source_sha256": "D38CD57B0C2310569DD3039AD9109EB7F6F19930E27BA73A8E86E9869F000CA2",
+    "neutral48B_derivative": "1FD23C73DFBCFB10F5D1D1F6808BDDA10B0E20F46137BBBB42649DD10B532AF7",
+    "baseline_sha256": "78F19898C18458BB97F95F6677FC0A4477C3FC37D4E6BEA465E8A8634B1C0D2D"
+  },
+  "actual_processes": [
+    {
+      "role": "server",
+      "pid": 49464,
+      "exit_code": -1,
+      "mode": "owned stop after initial completion marker,Saving finished and closed CRC-valid ZIP;not natural0"
+    },
+    {
+      "role": "cold1",
+      "pid": 46628,
+      "exit_code": 0,
+      "mode": "natural1update"
+    },
+    {
+      "role": "cold2",
+      "pid": 48144,
+      "exit_code": 0,
+      "mode": "natural1update"
+    }
+  ],
+  "timeouts": 0,
+  "terminal_sha256": "FF52FD971DB6C454FF58D3DEF247B9615BCFD435BB265633778646B80F746C47",
+  "actual_provenance": {
+    "mods": {
+      "base": "2.0.77",
+      "more-infinite-research": "5.0.20012",
+      "mir-fixture-mir5-known-base-addition": "0.1.0"
+    },
+    "startup_values": 875,
+    "startup": "Actual full dictionary equals accepted source key/value set;owner executed typed equality,all3 raw markers agree.",
+    "mod_startup_settings_changed": false,
+    "mod_changes": "Only MIR5.0.20001\u21925.0.20012 and newly addedfixture0.1.0 with no oldversion. This is the actual target callback,not replayed oldnormalization flag.",
+    "clock": 16,
+    "lab_force_modifiers": {
+      "speed": 0,
+      "productivity": 0
+    }
+  },
+  "ordinary_work": {
+    "physical_lab_entities": 64,
+    "prototype_speed": 14400,
+    "completion_events": [
+      {
+        "name": "recipe-prod-research_gears-1",
+        "tick": 314806
+      },
+      {
+        "name": "recipe-prod-research_plastic-1",
+        "tick": 314869
+      }
+    ],
+    "by_script_evidence": "Executed pinnedactor guard requires explicitfalse for both ordinary main events;ordinary record storesname/tick. No script/carrier event enters those counts.",
+    "normal_units": "gear8000,plastic16000;formula8000*2^(L-1),3600ticks,four1-unit packs retained. Gear started314775;plastic started314807 after previous callback/debit settled.",
+    "actual_per_pack": {
+      "gear": {
+        "starting": 0,
+        "inserted": 11776,
+        "remaining_carried_to_plastic": 3776,
+        "consumed_at_event": 8000,
+        "consumed_settled": 8000
+      },
+      "plastic": {
+        "starting": 3776,
+        "inserted": 16128,
+        "remaining_final": 3904,
+        "consumed_at_event": 16000,
+        "consumed_settled": 16000
+      },
+      "total_consumed": 24000,
+      "packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ]
+    },
+    "supply_events": 8,
+    "independent_balance": "Each research ledger and all8 supply-log sums balance exactly for every pack;final stock3904each preserved on both colds. No leftover clearing or science-consumption substitution."
+  },
+  "actual_scripted_carrier_events": [
+    {
+      "name": "mir-native-credit-research_plastic-plastic-bar-positive",
+      "by_script": true,
+      "force": "mir5-migration-origin-f200-110-foreign",
+      "tick": 314869
+    }
+  ],
+  "native_frames": {
+    "initial_source": "All6 named main levels/researched/saved work,queue/current and captured foreign fields compared against actualpure baseline. Plastic alone has deliberate hidden prototype/force-disablement policy;all other mainflags/hidden/visible preserved. Steel observednext1/bonus0 unchanged,not historically inferred.",
+    "pending": "Initialforeign currentgear5.249999999999999e-05 withqueue[gear,plastic];detached gear saved3.375e-05 retained throughfinal+both colds.",
+    "final_changes_only": "Foreigngear next1\u21922,bonus0\u21920.10000000149011612;foreignplastic next2\u21923,bonus0.10000000149011612\u21920.20000000298023224. Both completed savedprogress0;queue/current cleared ordinarily. Every other emitted initial-to-final snapshot field matches under authored tolerance.",
+    "preserved_bonuses": "Playergear0.20000000298023224 and detachedgear0;LDS/processing/rocketfuel0.10000000149011612 onall3forces;steel0. Both new unpaid recipient recipes remain0 onall3forces,before andafter ordinary work.",
+    "plastic_ownership": "Forceenabledfalse/hidden prototype remainsfalse/true onall3forces. Prototypeenabledfalse is required by executedentry predicate;this Base authored-generated row differs from SA retainednative-holder exemption.",
+    "signed_carriers": "All8 exact signed-holder shape/effect/level/flag checks execute atentry,settledfinal,both colds. These are successful native predicate evidence,not invented raw carrier-row dumps. Actual separatepositivecarrier event matches Source pending-credit materialization and is not counted as an ordinary lab.",
+    "cold_equality": "Every marker field other than stage/on_load_read_only equals server record,including initial/final snapshots,ordinary/scripted records,settings/event/clock,supply/science/stock. Both actual benchmark CLI/kernel invocations run1update with natural0;no save emitted in coldlogs."
+  },
+  "protected_successor": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\known-base-addition512-successor-native-r01-controller\\candidate-r03\\protected\\successor.zip",
+    "bytes": 2676354,
+    "sha256": "164A1DBE025BAFD768C44FD826E0A045F5FA3B11134491B00C6C820C183CFDB0",
+    "CRC": "Closed live+physically distinct protected copy PASS;both coldinputs unchanged hash. Savedlevelcontrol is original48Bneutral Basebody,not fixtureactor;externalfixture provenance is independently bound by archivehash/fourGitmemberbodies/loadedselection."
+  },
+  "custody_and_restoration": {
+    "fixed_inputs_verified": 16,
+    "original_to_primary_raw_members_verified": 21,
+    "loaded_logs": "Each process loads only core+three exact selected mods;no fatal event. Servercompletion marker precedesSavingfinished. Coldlogs no save.",
+    "governor_ledgers": "Three distinct named PIDs/completedexitmodes,nottimedout.",
+    "library": "Recorded+live threecontrol states and18prior MIR archive bodies exact;temporaryfixture+targetMIR removed;Factorio0.",
+    "source_input_baseline": "AcceptedD38/1FD/78F,settings0F86,published old501 andcurrent0C2F remain unchanged."
+  },
+  "canonical_log_sha256": {
+    "server": "4F0D35EDA6917ADC941302CF952A5FA18F9C134C4D933E4E1F41969D190849A8",
+    "cold1": "5D7FFABF9649C22E70BCC70FCDA5CCF2E230E0ADFBC3B675DE79AC43472F09AD",
+    "cold2": "4C2A5FADED4347A6F949D70E6CCEE204A6EA78A60EA2151507C56E26C6FFF3D5"
+  },
+  "history_and_limits": [
+    "This target sequence is3acceptedprocesses plus2separate rejectedattempts:11304natural1 fixturedeepcopy;46520fatalpredicateinterrupted fixtureeventclassifier. Do not pool/relabel them;46520 exacteventname/flag remain unobserved despite r03 independently recording its own tuple.",
+    "The separately accepted pure501 preparation has3processes/0newresearch. Original source scripted precursors are not counted as new ordinary source completions.",
+    "Only synthetic known-Base5.0.1 provenance/late-provider retirement mechanism is qualified. No realthirdpartyprovider,all5.0.0/5.0.2routes,unknown reporter2.1profile/history,erasedpaidmask recovery or wholeissue closure.",
+    "Originalacceleratedpercentages/elapsedpaidtime/physicalscience preservation not claimed. Current unitnormalization and preservedclock are independently observedinputs.",
+    "No UI/client/performance/stable/release verdict. Reviewer launched no native/host/build/Compose/CI and edited no Source/controller/library/privatepayload;only this receipt written."
+  ]
+}

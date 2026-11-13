@@ -1,0 +1,44 @@
+{
+  "kind": "MIR512IntegratedUTF8RootHostReviewR01",
+  "base_C": "12f73d5df6b3a8446d230063d819fd454465c8e5",
+  "Aero_original_proof": "5def95e45e32900d9f248724295680bf87290250",
+  "Aero_preferred_patch_sha256": "336EA5F9465178FF06A845EE65BE21DE4339D7D6FE61DEA06608BAAD1E15FD10",
+  "files": [
+    {
+      "path": "source/runtime/library.lua",
+      "bytes": 152920,
+      "sha256": "369403A8D4612F757F00D497361818256740F1290AC65D114A297157DC4B5504"
+    },
+    {
+      "path": "tests/test_library.py",
+      "bytes": 289138,
+      "sha256": "B322E660A1389A5EE4012B19CC5150C3BCE8614CD898F86B94714B6F4FB6C2BB"
+    }
+  ],
+  "pinned_runtime_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+  "actual_C_unchanged_boundary_control": {
+    "tests": 1,
+    "errors": 30,
+    "failures": 0,
+    "expected_red": true
+  },
+  "integrated_D_narrow": {
+    "tests": 4,
+    "errors": 0,
+    "failures": 0
+  },
+  "integrated_D_full": {
+    "tests": 122,
+    "errors": 0,
+    "failures": 0
+  },
+  "behavior": "Preserve complete UTF8 prefixes under existing160-byte query budget and normalize old incomplete trailing characters; same helper preserves existing117-byte preview. No schema/API/native-research changes.",
+  "native_runs": 0,
+  "CI_runs": 0,
+  "C_preserved_without_native_or_CI": true,
+  "remaining": [
+    "Affected actual input/reopen/old-view native checks remain part of existing Library input programme.",
+    "Availability/Queue screenshots use the final frozen integrated package after this host-tested correction.",
+    "No gameplay/client/performance/stable verdict."
+  ]
+}

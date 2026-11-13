@@ -7,6 +7,7 @@
 local definitions = require("research.native_credit_definitions")
 local catalogue = require("runtime.catalogue")
 local target = require("platform.target")
+local vectors = require("runtime.native_credit_vectors")
 
 local M = {}
 
@@ -34,6 +35,14 @@ local FAMILY_IDS = {
   research_plastic="recipe-prod-research_plastic-1", research_processing_unit="recipe-prod-research_processing_unit-1",
   research_rocket_fuel="recipe-prod-research_rocket_fuel-1", research_steel="recipe-prod-research_steel-1",
 }
+-- These are public native productivity identities, never MIR carrier rows.
+-- Scrap can be collected by a different product family (for example SIF).
+local VECTOR_REFERENCES = {
+  research_low_density_structure="low-density-structure-productivity",
+  research_plastic="plastic-bar-productivity", research_processing_unit="processing-unit-productivity",
+  research_rocket_fuel="rocket-fuel-productivity", research_steel="steel-plate-productivity",
+}
+local RECIPE_VECTOR_REFERENCES = {["scrap-recycling"]="scrap-recycling-productivity"}
 local function require_creation_history(name)
   if history_seen[name] then return end
   if not prototypes or type(prototypes.get_history) ~= "function" then
@@ -150,6 +159,17 @@ local function validate_records(records)
           or not integer(record.completed) or record.completed < 0 then
         error("MIR unsupported native family credit record", 3)
       end
+      if record.basis ~= nil then
+        if type(record.basis) ~= "table" or getmetatable(record.basis) ~= nil or record.basis[name] ~= 1 then
+          error("MIR unsupported native credit vector basis", 3)
+        end
+        for member, weight in pairs(record.basis) do
+          if type(member) ~= "string" or member == "" or member:find("\0",1,true)
+              or type(weight) ~= "number" or weight ~= weight or weight <= 0 or weight == math.huge then
+            error("MIR unsupported native credit vector basis", 3)
+          end
+        end
+      end
     end
   end
 end
@@ -192,7 +212,7 @@ local function named_main_effect(prototype, recipe)
   return found, true
 end
 
-local function carrier_scalar(technology, descriptor, direction)
+local function carrier_effects(technology, descriptor, direction)
   local name = direction == "positive" and descriptor.positive_id or descriptor.negative_id
   local prototype = technology and technology.prototype
   local effects = prototype and prototype.effects
@@ -201,9 +221,15 @@ local function carrier_scalar(technology, descriptor, direction)
       or prototype.level ~= 1 or prototype.max_level ~= UINT32_MAX
       or prototype.hidden ~= true or prototype.enabled ~= false
       or prototype.visible_when_disabled ~= false
-      or type(effects) ~= "table" or #effects ~= 1 then
+      or type(effects) ~= "table" or #effects == 0 then
     return nil
   end
+  return effects
+end
+
+local function carrier_scalar(technology, descriptor, direction)
+  local effects = carrier_effects(technology, descriptor, direction)
+  if effects == nil or #effects ~= 1 or next(effects) ~= 1 or next(effects,1) ~= nil then return nil end
   local effect = effects[1]
   if type(effect) ~= "table" or effect.type ~= PRODUCTIVITY_EFFECT
       or effect.recipe ~= descriptor.recipe or type(effect.change) ~= "number"
@@ -212,6 +238,22 @@ local function carrier_scalar(technology, descriptor, direction)
     return nil
   end
   return effect.change
+end
+
+local function carrier_vector(positive, negative, descriptor)
+  if not descriptor.collected then return nil end
+  local p = carrier_effects(positive, descriptor, "positive")
+  local n = carrier_effects(negative, descriptor, "negative")
+  if not p or not n or #p < 2 then return nil end
+  local name = RECIPE_VECTOR_REFERENCES[descriptor.recipe] or VECTOR_REFERENCES[descriptor.family]
+  local reference = prototypes and prototypes.technology and prototypes.technology[name]
+  local history = reference and prototypes.get_history("technology", name)
+  if not reference or reference.valid == false or reference.name ~= name or reference.hidden == true
+      or reference.level ~= 1 or reference.max_level ~= UINT32_MAX
+      or type(history) ~= "table" or type(history.created) ~= "string" or history.created == ""
+      or history.created == MIR_MOD then return nil end
+  return vectors.pair(p, n, descriptor.recipe, reference.effects, descriptor.change,
+    native_effect_change_matches, close)
 end
 
 local function completed_infinite(technology)
@@ -230,6 +272,11 @@ local function inspect_with_mask(force, descriptor, scope)
   local negative = technologies[descriptor.negative_id]
   local positive_scalar = carrier_scalar(positive, descriptor, "positive")
   local negative_scalar = carrier_scalar(negative, descriptor, "negative")
+  local vector, basis
+  if positive_scalar == nil or negative_scalar == nil then
+    vector, basis = carrier_vector(positive, negative, descriptor)
+    if vector then positive_scalar, negative_scalar = vector[descriptor.recipe], -vector[descriptor.recipe] end
+  end
   if type(positive_scalar) ~= "number" or positive_scalar < 0 or negative_scalar == nil then
     return nil
   end
@@ -253,9 +300,9 @@ local function inspect_with_mask(force, descriptor, scope)
   local effect, effects_valid
   if scope then
     effect = scope.values[descriptor.recipe]
-    effects_valid = scope.valid and effect ~= false
+    effects_valid = scope.valid and (scope.expanded or effect ~= false)
   else effect, effects_valid = named_main_effect(prototype, descriptor.recipe) end
-  if not effects_valid or (effect ~= nil and (positive_scalar == 0 and effect ~= 0
+  if not effects_valid or (not (scope and scope.expanded) and effect ~= nil and (positive_scalar == 0 and effect ~= 0
       or not close(effect, positive_scalar))) then return nil end
   return {
     descriptor = descriptor,
@@ -265,6 +312,9 @@ local function inspect_with_mask(force, descriptor, scope)
     positive = positive,
     negative = negative,
     private = prototype.hidden == true,
+    vector = vector,
+    scalar = positive_scalar,
+    basis = basis or {[descriptor.recipe]=1},
   }
 end
 
@@ -337,7 +387,7 @@ local function family_failure_detail(force, descriptor, scope)
 end
 
 local function family_observations(force)
-  local out, scopes = {}, {}
+  local out, scopes, by_main = {}, {}, {}
   for _, descriptor in ipairs(DESCRIPTORS) do
     if descriptor.collected then
       local scope = scopes[descriptor.main_id]
@@ -345,6 +395,13 @@ local function family_observations(force)
         local main = force.technologies[descriptor.main_id]
         local effects = main and main.prototype and main.prototype.effects
         scope = {valid=type(effects) == "table", values={}}
+        for _, row in ipairs(COLLECTED_BY_MAIN[descriptor.main_id]) do
+          for _, id in ipairs({row.positive_id,row.negative_id}) do
+            local holder=force.technologies[id]
+            local value=holder and holder.prototype and holder.prototype.effects
+            if type(value)=="table" and #value>1 then scope.expanded=true end
+          end
+        end
         for _, effect in ipairs(scope.valid and effects or {}) do
           if type(effect) == "table" and type(effect.recipe) == "string" then
             if scope.values[effect.recipe] ~= nil or effect.type ~= PRODUCTIVITY_EFFECT
@@ -358,7 +415,16 @@ local function family_observations(force)
       end
       local observation = inspect_with_mask(force, descriptor, scope)
       if observation == nil then error(family_failure_detail(force, descriptor, scope), 3) end
+      by_main[descriptor.main_id]=by_main[descriptor.main_id] or {}
+      by_main[descriptor.main_id][#by_main[descriptor.main_id]+1]=observation
       out[#out + 1] = observation
+    end
+  end
+  for id, rows in pairs(by_main) do
+    if scopes[id].expanded then
+      local included=vectors.inclusions(force.technologies[id].prototype.effects,rows,close)
+      if included==nil then error("MIR native family credit has inconsistent expanded main vector: "..id,3) end
+      for index, observation in ipairs(rows) do observation.included=included[index] end
     end
   end
   return out
@@ -440,12 +506,45 @@ local function family_failure(message)
   error("MIR native family credit: " .. message, 3)
 end
 
+local function same_basis(left, right)
+  if left == nil then return false end
+  for recipe, weight in pairs(left) do if right[recipe] ~= weight then return false end end
+  for recipe in pairs(right) do if left[recipe] == nil then return false end end
+  return true
+end
+
+local function previous_basis(record, observation)
+  if record and record.basis then return record.basis end
+  -- The old writer accepted exactly one effect. It supplies no authority for
+  -- newly expanded recipes, even if today's public reference also expanded.
+  if not observation.vector then return {[observation.descriptor.recipe]=1} end
+end
+
+local function preflight_basis(record, observation, force, queued)
+  if same_basis(previous_basis(record,observation),observation.basis) then return end
+  local main=force.technologies[observation.descriptor.main_id]
+  local uninvested=observation.completed==0 and observation.offset==0
+    and (queued[observation.descriptor.main_id] or 0)==0
+    and (main.saved_progress==nil or main.saved_progress==0)
+    and (not record or record.completed==0 and record.offset==0 and record.pending==0)
+  if not uninvested then
+    family_failure("paid or unfinished recipe-vector basis is unknown or changed for "
+      .. observation.descriptor.family .. ":" .. observation.descriptor.recipe .. "; restore original save and inputs")
+  end
+end
+
 -- A failed configuration cannot open the Library's report exporter. Put the
 -- already-observed earning identity and transition in the ordinary error;
 -- do not allocate history, inspect the whole force, or guess the old mask.
 local function unknown_paid_mask(event, force, observation, queued, current)
   local function value(item)
-    if type(item) == "string" then return item:gsub("[%z\1-\31\127]", " "):sub(1, 96) end
+    if type(item) == "string" then
+      -- Escape bounded raw bytes so control characters and a split UTF8
+      -- sequence cannot make the copied, single-line context unprintable.
+      return (item:sub(1, 96):gsub("[%z\1-\31\127-\255]", function(byte)
+        return string.format("\\x%02X", string.byte(byte))
+      end))
+    end
     if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
     return "unknown"
   end
@@ -562,20 +661,40 @@ local function legacy_family_context(event)
     m4_base = admitted and data_only_mask == nil
     data_only_base = admitted and data_only_mask or nil
   end
-  -- Only the reviewed plain Base closure is admitted here. Other profiles,
-  -- provider changes and startup changes still require their own old mask.
-  local beta_base = same_inputs and type(active.base) == "string" and (
+  local beta_origin = type(active.base) == "string" and (
     active.base:match("^2%.0%.%d+$") and (old == "5.0.20000" or old == "5.0.20001" or old == "5.0.20002")
     or active.base:match("^2%.1%.%d+$") and (old == "5.0.21000" or old == "5.0.21001" or old == "5.0.21002"))
   -- The frozen pre-correction5.0.3 also has the broad sulfur binding. Valid
   -- corrected saves already have the named record and never use this reader.
-  local beta_unchanged = beta_base or same_inputs and type(active.base) == "string" and (
+  local beta_unchanged = same_inputs and (beta_origin or type(active.base) == "string" and (
     active.base:match("^2%.0%.%d+$") and old == "5.0.20003"
-    or active.base:match("^2%.1%.%d+$") and old == "5.0.21003")
-  if beta_base then
-    for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
+    or active.base:match("^2%.1%.%d+$") and old == "5.0.21003"))
+  -- The event can also prove that the OLD closure was plain Base: every
+  -- extra active mod must be newly added, with no removed/updated provider.
+  -- This uses the published old mask even if a new provider makes today's
+  -- main private; today's effects never establish its previous paid rights.
+  local beta_added_base = valid and beta_origin and event.mod_startup_settings_changed == false and not plain_base
+    and (f200_destination and active.base:match("^2%.0%.") or f210_destination and active.base:match("^2%.1%."))
+  if beta_added_base then
+    for name, version in pairs(active) do
+      if name ~= "base" and name ~= MIR_MOD then
+        local change = changes[name]
+        if type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= version then
+          beta_added_base = false
+        end
+      end
+    end
+    for name, change in pairs(changes) do
+      if name ~= MIR_MOD then
+        if type(change) ~= "table" or change.new_version ~= active[name] or active[name] == nil
+            or (name == "base" and change.old_version ~= active.base
+              or name ~= "base" and change.old_version ~= nil) then beta_added_base = false end
+      end
+    end
   end
+  local beta_base = beta_origin and (same_inputs and plain_base or beta_added_base)
   return {beta_base=beta_base, beta_unchanged=beta_unchanged, m4_base=m4_base,
+    beta_added_base=beta_added_base,
     data_only_base=data_only_base, base_paid_recipes=data_only_base or m4_base and m4_mask
       or beta_base and PUBLISHED_BASE_RECIPES,
     sif502=old == "5.0.20002" and previous_sif,
@@ -703,6 +822,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
         local descriptor = observation.descriptor
         local key, family = descriptor.key, descriptor.family
         local record, history = records and records[key], histories[family]
+        preflight_basis(record,observation,force,queued)
         local prior_included, payable, pending
         if record then
           if record.offset ~= observation.offset then family_failure("saved offset differs from its native carriers") end
@@ -743,7 +863,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
               complete_sif_checked = true
             end
             prior_included = SIF_RECIPES[family][descriptor.recipe] == true
-          elseif context.base_paid_recipes and not observation.private then
+          elseif context.base_paid_recipes and (not observation.private or context.beta_added_base) then
             if not complete_base_checked then
               for old_family, recipes in pairs(context.base_paid_recipes) do
                 if force.technologies[FAMILY_IDS[old_family]] == nil then family_failure("missing published Base paid identity") end
@@ -766,7 +886,8 @@ function M.preflight_family_transition(event, fresh, selected_force)
         if not observation.private then pending, payable = 0, observation.included end
         if pending == 0 then payable = observation.included end
         plan.rows[#plan.rows + 1] = {observation=observation, record={included=observation.included,
-          offset=offset, private=observation.private, payable=payable, pending=pending, completed=observation.completed}}
+          offset=offset, private=observation.private, payable=payable, pending=pending, completed=observation.completed,
+          basis=observation.basis}}
         plan.histories[family] = plan.histories[family] or {schema=1, recipes={}}
         plan.histories[family].recipes[descriptor.recipe] = true
       end
@@ -807,6 +928,9 @@ function M.on_research_finished(event)
     if descriptor.main_id == research.name then
       local record = records and records[descriptor.key]
       if record and record.private and record.pending > 0 then
+        if not same_basis(previous_basis(record,observation),observation.basis) then
+          family_failure("unfinished recipe-vector basis changed")
+        end
         if record.offset ~= observation.offset then family_failure("unfinished carrier state was changed") end
         local delta = observation.completed - record.completed
         if delta < 0 or delta > 1 then family_failure("unfinished native completion differs from one level") end

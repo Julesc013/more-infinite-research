@@ -1,5 +1,6 @@
 """MIRSET1 settings-profile host controls (Lua 5.2; not native evidence)."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -39,6 +40,46 @@ class SettingsProfileTests(unittest.TestCase):
           end
           settings = {startup = defaults()}
         ''')
+
+    def test_unchanged_startup_labels_retain_published_translations_and_rich_text(self):
+        # Exact missing values from published4.7.21003/B6EB9430, not generated
+        # translations. The five labels whose English wording changed remain
+        # on the current fallback; this projection covers only recovered keys.
+        keys = (
+            "ips-require-space-gate", "mir-science-pack-ingredient-policy",
+            "mir-enable-base-tech", "mir-cost-linear-increment", "mir-cost-growth",
+            "mir-max-level", "mir-research-time", "mir-effect-per-level",
+            "mir-prefer-this-mod-for-competing-techs", "mir-use-installed-space-age-icons",
+        )
+        russian_keys = keys[3:8]  # The other five already have translations.
+        projection = {}
+        for path in sorted((ROOT / "source/locale").glob("*/more-infinite-research.cfg")):
+            language = path.parent.name
+            if language == "en":
+                continue
+            names = parse_cfg(path)["mod-setting-name"]
+            selected = russian_keys if language == "ru" else keys
+            projection[language] = {}
+            for key in selected:
+                self.assertIn(key, names, f"{language}: published startup label lost")
+                value = names[key]
+                projection[language][key] = value
+                arguments = re.findall(r"__(\d+)__", value)
+                self.assertEqual(arguments, ["1"] if key.startswith((
+                    "mir-enable-base-", "mir-cost-", "mir-max-level", "mir-research-time", "mir-effect-")) else [])
+                stack = []
+                for closing, tag in re.findall(r"\[(/?)(font|color)(?:=[^\]]+)?\]", value):
+                    if closing:
+                        self.assertTrue(stack, f"{language}: unmatched rich-text close in {key}")
+                        self.assertEqual(stack.pop(), tag)
+                    else:
+                        stack.append(tag)
+                self.assertEqual(stack, [], f"{language}: unclosed rich text in {key}")
+        self.assertEqual(len(projection), 49)
+        self.assertEqual(sum(map(len, projection.values())), 485)
+        encoded = json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        self.assertEqual(hashlib.sha256(encoded).hexdigest(),
+                         "2357b9dfc1ac6cf87c2484ef3e24ee62a084a9f4b4e96e9837f79080862264c4")
 
     def test_all_generated_setting_labels_notes_and_choices_have_mir_locale_keys(self):
         required = {}

@@ -1,0 +1,39 @@
+{
+  "kind": "Foundation512ReadOnlyOriginalResourceAdmissionR01",
+  "status": "refused",
+  "error": "[mir441-resource-admission-memory]",
+  "admission": {
+    "snapshot": {
+      "observed_at": "2026-11-10T06:36:33.0047524+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 15126757376,
+        "committed_bytes": 24372883456,
+        "commit_limit_bytes": 41293737984
+      },
+      "work_volume": {
+        "name": "D:\\",
+        "free_bytes": 87161954304,
+        "total_bytes": 1500099112960
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 200035409920,
+        "total_bytes": 599395090432
+      }
+    },
+    "limits": {
+      "physical_bytes": 6809196134,
+      "commit_bytes": 6809196134,
+      "system_bytes": 21474836480,
+      "work_bytes": 21474836480
+    },
+    "estimated_peak_bytes": 1073741824,
+    "expected_peak_memory_bytes": 8589934592
+  },
+  "native_processes": 0,
+  "library_mutations": 0,
+  "output_root_created": false,
+  "budget_mib": 8192,
+  "output_budget_mib": 1024
+}

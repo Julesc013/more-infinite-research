@@ -1,0 +1,88 @@
+{
+  "kind": "MIR513AffectedNativeVerdictsV1",
+  "player_source": "32505443e929344affb2c7d691dd15bdb7fb2a4d",
+  "modern_zip_sha256": {
+    "f200": "4DD6562C42C296AFB0EF428643FBBEFCAD6D328CDDBEFD1ABB812F053D18F882",
+    "f210": "E92714D1E25B5BF5927FD131FF39F51CBB4FB97C305ECE722F7EA2797C88A38F"
+  },
+  "reviews": [
+    {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker473-f210-earned-pending-positive13-r01/INDEPENDENT-RESULT-REVIEW.json",
+      "sha256": "0D438B91EB8A51FC3E2EF2EF2C45304A1F685CAF00DE6454B178E8AD5270388D",
+      "actual_review": {
+        "kind": "IndependentBoundedNativeResultReviewV1",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO exact F210 earned/pending native result only",
+        "terminal_sha256": "D8CEB55B21D113D669BB408630E4BFCADD33820D58CD8D9BBAD80A16A3BF8994",
+        "packet_sha256": "B4FCE5E05DCF408399C62B063F42628F52B63C99F845C8EB150701445298FF90",
+        "review": "All48fixed inputs hash/size match. FourPIDs46160/40432/47120/42104, no failure, library restoration/zero remaining. Config-before equals first19stable projections; config and both colds match semantically. Complete86+34 prototypes,30zero carriers perforce, finite34/unlocks70, original lab5/old1receipt and unrelated gear work preserved. One new by_script=false default6to7 on existing lab13 gives bonus5to6. Full200-only refill30events; actual1207.497777... units each matches(1518*(1-oldp6)+2278*0)/1.1; final100.0000000044. Protected E951...35EF and8851...240D/save55CRC/cold copies verified; source333 unchanged. No defect found.",
+        "scope": "Exact2.1.23 Base-only4.7.21003 controlled source333 earning/pending upgrade, real second configuration, one new ordinary completion/save/two colds. NoAngelBob, otherworkers, F200 extrapolation, performance, release or stable verdict."
+      }
+    },
+    {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker473-f200-positive13-r01/INDEPENDENT-RESULT-REVIEW.json",
+      "sha256": "2D3E6CC84F29C381D80904D8BB0A3A7BCE5A4FDB66344AD820B3C5D78ADAD77D",
+      "actual_review": {
+        "kind": "IndependentBoundedNativeResultReviewV1",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO exact F200 continuation native result only",
+        "terminal_sha256": "1C9C8E604BE45AF664677205E5ADDC9E689A2010580F5D1D264DC8F9F8701279",
+        "packet_sha256": "449E108DC0886100AA8827F27363489E6658D7ECFA434343C391159E5C46530A",
+        "review": "All90fixed inputs match. ThreePIDs31912/24884/12704, no failure/restored/zero remaining. Before ordinary=false/bonus4/default5; one by_script=false5to6 gives bonus5. First and both colds identical exceptphase/tick. Eachpack1000inserted/80remaining/920spent, full200-empty witnesses, speed/clock/handler restoration hold. Protected51D...7F06 and coldcopies55CRC/readable/equal; source7AB unchanged. Preserved54/85/15/7 fields,34/70prerequisite/unlock,875settings and20declared legacycredit rows. No defect found.",
+        "scope": "Exact2.0.77 Base-only4.7.20003 controlled7AB seeded-worker source, changed13admission, one new ordinary completion/save/two colds. Predecessor levels/readiness explicitly scripted; no genuine oldordinary/pending-worker source, global30carrier/API/secondconfig/AngelBob/performance/release/stable verdict."
+      }
+    },
+    {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/angelbob132-inputs-r01/INDEPENDENT-NATIVE-RESULT-REVIEW.json",
+      "sha256": "B22A81A142D810435B8B0FCBDF02B0087EC9BB8ECCC413D96F315EEB217E829A",
+      "actual_review": {
+        "kind": "IndependentControlledSteelNativeResultReviewV1",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO exact controlled F210 steel case",
+        "stock_result_sha256": "C5B15F0B98DB12EC6B7A8DA3C46AF9AA6082D6245E8A81EF9BCD383DC1E62A80",
+        "terminal_sha256": "BDB3BF412AA70A08EB943EA725A57E4220B86B31AD7DAD1904FC96DFA9B73CA2",
+        "capture_adoption_sha256": "68F29B46C0E3B9C2BC752B75BD1E0543ACFA7E216033637F1AB84F456AA8E94A",
+        "pids": [
+          44396,
+          41732,
+          41768,
+          46876
+        ],
+        "review": "Four governed processes pass/restored/zero live; log hashes and all28selected inputs match. One genuine ordinary steel completion, four single.1 contributions, all4169recipe baselines/deltas/bonuses preserved through save/two read-only cold markers. Every pack paid1499.9999999999877 with100.0000000000122remaining, including native storedscience. Protected2FC789CA...C0E7 is56CRC-valid entries, both colds byte-identical. Engine8DC/2.1.23, fixtureB125, observerA15, controlledpreowner7796 and playerE927 exact. Production exit-1 is the successful predicate stop. Original11 precise guard exit1 is retained in three captured preowned arms; the read-only classifier consumes run/log/modtable/ledger and preserves the outer-reader adverse without rerun. Earlier defaultold11natural0 remains an unaffectedcontrol.",
+        "scope": "Actual1.3.2 required closure plus explicitly controlled foreignpreowner, not the unspecified reporterpack. No physicalcrafting, migration, generic AngelBob, performance, release or stable qualification."
+      }
+    },
+    {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/public12-to13-preservation-r01/INDEPENDENT-RESULT-REVIEW.json",
+      "sha256": "2F939B890F12548BF029FF2511D3FEC69900BC416F5F359E6FEB9BFBA9FFE440",
+      "actual_review": {
+        "kind": "IndependentPublic12To13PreservationResultReviewV1",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO both exact cases",
+        "f200_terminal_sha256": "4F9D341EE16F01FC1894B9338FA50A4C787E5F956009B70C5F5DEE41F745C712",
+        "f210_terminal_sha256": "7B9364121BABB63FF0C8974B81048959272925461E9B1E91FA5205F6DBC88A9F",
+        "pids": {
+          "f200": [
+            49752,
+            48848,
+            10416
+          ],
+          "f210": [
+            51976,
+            10368,
+            47348
+          ]
+        },
+        "review": "All six actual raw frames recursively match every expected preservation field; zero mismatches. Exact source/public12 ZIP/saved last-cold/protected predecessor custody verified. Preserve full875/889startup maps, bothforces, queues/work, fourworkerroles,20declaredcredits,111prototypes, labs,34finite prerequisites/70unlocks and oldordinary1/by_scriptfalse/920science plus80remaining. F210 residual80.00000000169713 explicitly retained. Each case saves and cold-loads identical55CRC bytes twice, with no new research or gameplay setters. All restored/zero live. Predicate-owned stops are not natural exits or timeouts.",
+        "scope": "Exact public12-to-frozen13 Base-only2.0.77 and2.1.23 preservation. Old receipt remains Source12 earning. No global30carrier, arbitraryconfig, reporterpack, performance or stable verdict."
+      }
+    }
+  ],
+  "steel_scope": "Official AngelBob Space Age Rebalance1.3.2 required closure plus an explicitly controlled foreign preowner reproduces the old11 exact guard and is accepted by13. The minimum required closure with no witness also loads old11 and remains an unaffected control. This is not the reporter full modpack.",
+  "historical_scope": "F210 predecessor contains genuine old earning and pending worker research. F200 predecessor worker cursor/readiness is explicitly scripted; the new ordinary completion and save/two-cold preservation are actual. Prior scoped paid-idle results retain their old identities.",
+  "limits": [
+    "No whole-product performance or GUI/client acceptance",
+    "No unsupported reporter personal history inferred",
+    "Original adverse receipts remain unchanged"
+  ]
+}

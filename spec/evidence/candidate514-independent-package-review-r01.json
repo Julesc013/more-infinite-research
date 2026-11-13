@@ -1,0 +1,28 @@
+{
+  "kind": "MIR514IndependentPackageAndWordingReviewV1",
+  "review_recorded_by": "execution lead from non-author read-only review",
+  "reviewer": "/root/api512_final_source_applicability",
+  "recorded_at": "2026-11-12T23:54:44.781402+00:00",
+  "verdict": "GO-package-integrity-and-wording-only",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "freeze_commit": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+  "inventory_sha256": "17A14DEA4841044DF2AB7639B7C0B24585228330A629781F113625F5AB933AC2",
+  "reproduced_zip_count": 17,
+  "actual_member_hashes_verified": 1576,
+  "checks": [
+    "Every ZIP CRC/root/member/info/changelog/codec/floor/label/license/developer exclusion",
+    "Both checksum files and frozen package/release controller plus target records",
+    "F0180.18.47 experimental/GitHub-only and early-edition data-only limits",
+    "Notes/upload recorded-default scope and protected originals for missing history",
+    "All17 published13 ZIPs and21 local delivery files match accepted anonymous-delivery receipt"
+  ],
+  "modern_zip_sha256": {
+    "f200": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4",
+    "f210": "021E222A5495398ECEED272DE340BD1731816CCA483DA446B6F641BF5FE2DD3B"
+  },
+  "nonclaims": [
+    "No assets changed",
+    "No native/gameplay/CI/publication/fresh remote13 download verdict"
+  ],
+  "stable_qualified": false
+}

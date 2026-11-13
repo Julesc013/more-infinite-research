@@ -1,6 +1,6 @@
 {
   "name": "more-infinite-research",
-  "version": "5.0.21011",
+  "version": "5.0.21014",
   "title": "More Infinite Research",
   "author": "Julesc013",
   "description": "Configurable infinite research with native effects, explicit compatibility bindings and the Research Library.",
@@ -24,6 +24,7 @@
     "(?) space-exploration",
     "? space-age >= 2.1.23",
     "? space-is-fake",
-    "? crushing-industry"
+    "? crushing-industry",
+    "? planet-ferrum"
   ]
 }

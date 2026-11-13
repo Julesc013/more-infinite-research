@@ -1,0 +1,20 @@
+{
+  "kind": "RootRecordedIndependentReviewV1",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "configured_role": "mir_terra_review_xhigh",
+  "backend_model_independently_verified": false,
+  "verdict": "GO for exact current F200/F210 eight-process two-consumer case",
+  "actual_readback_sha256": "B89279B95D8D2CACBCF8618B8E9D45D76748EEC5B4C2AF23D91F67B751ABA10E",
+  "actual_processes": 8,
+  "checks": [
+    "Four unique PIDs per engine; null exceptions; original controls restored; zero Factorio",
+    "Alpha/Beta init, physical production, save and two natural cold stages",
+    "Setter research true; ordinary labs zero; 100/100 plates to200/202 cables",
+    "55/56 entry complete saves; protected bytes and cold identity exact"
+  ],
+  "limitations": [
+    "No general API/backend, provider/reporter, UI, multiplayer, performance or stable verdict",
+    "Preactivation Start-Job raw-Git-read adverse retained separately"
+  ],
+  "recorded_from": "Reviewer message to Root on2026-11-12; Root persisted without representing reviewer-authored file"
+}

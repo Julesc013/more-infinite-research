@@ -1,0 +1,57 @@
+{
+  "kind": "MIR514IndependentActualPublicDeliveryReviewV1",
+  "review_recorded_by": "execution lead from non-author read-only final delivery review",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "recorded_at": "2026-11-13T00:29:17.791069+00:00",
+  "verdict": "GO-GitHub-beta-delivery-only",
+  "method": "Reviewer performed fresh in-memory anonymous HTTP reads of every public asset with no Authorization header; independently reported every hash/length/name/label/GitHub digest equal. Root records those reported hashes; source public bodies remain separately retained by the publication run.",
+  "release": {
+    "id": 443666966,
+    "tag": "v5.0.14",
+    "title": "MIR 5.0.14",
+    "published_at": "2026-11-13T00:24:28Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false
+  },
+  "main": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+  "tree": "372a8febe1fbe9fee5b6a17a65059d34889dc74d",
+  "annotated_tag_object": "b67e32e598f9188abe5162ff0d06e08bd1881036",
+  "actual_anonymous_asset_hashes": {
+    "more-infinite-research_5.0.00614.zip": "57165c24cc205daf7b28b2c27e5a140174e306ce2673642e003583b275c697d8",
+    "more-infinite-research_5.0.00714.zip": "3e3fba38e170c6d10f70821c74b2121de95a18dd0bb6da00b02d2e8610481112",
+    "more-infinite-research_5.0.00814.zip": "9bc3c19e9de4249077176d0bfc660e4ef01ff63bfc76cc7a459e5b51c41f1ce0",
+    "more-infinite-research_5.0.00914.zip": "036c4789255ed3f701335978c75ddaa79ab557f307967ef27c2d306c965284a9",
+    "more-infinite-research_5.0.01014.zip": "5b4b45e35bb2d19dc05e0b9a4476ac3cfc4d7ecfe5a445ce1aa731bf4b2f7c97",
+    "more-infinite-research_5.0.01114.zip": "a5ba3a2adb5b7c236977fc30228a23268287b65fd46748085f99997923a6e893",
+    "more-infinite-research_5.0.01214.zip": "b0e388ab400a2c106455ccc13555653673f46787a9319f13958c7b982f93f16b",
+    "more-infinite-research_5.0.01314.zip": "3033417e2515c2cf5ae12c999d6239223a4c4cedb86dbf554da54863bd0a58ea",
+    "more-infinite-research_5.0.01414.zip": "8d9926c79095f54e996a9681fe80a1ecc38e7f49d062b3a87904884c9be0009b",
+    "more-infinite-research_5.0.01514.zip": "cafe3d0ebf8897a5979f2e4b29b5ae4ffab80b66ed019c024307340c16320aa9",
+    "more-infinite-research_5.0.01614.zip": "19144102ec4b8234784818dea0ee58f0b2fcb5f66b9c3aea4f32f4590a74a6b6",
+    "more-infinite-research_5.0.01714.zip": "45743cf2193ec6604528be1db08e70a81572fbf02ef831833e691fe81791f7e2",
+    "more-infinite-research_5.0.01814.zip": "9e7772cccd42ff72128b2e735b566f2681b6a452f96ab7ead762b9c412d1cdd9",
+    "more-infinite-research_5.0.10014.zip": "4191851b8fd17665b559c3f2751af58af09af17b253edd95d413a088fe984def",
+    "more-infinite-research_5.0.11014.zip": "57a2c9843395a19391f5ce1fddfe0ce4a8f4470403e667bf1108c4aef576e5b5",
+    "more-infinite-research_5.0.20014.zip": "10eb57d9d2228ead4d818d8dbccba035b7bc110af83bb2dadb9ba665dd9a05c4",
+    "more-infinite-research_5.0.21014.zip": "021e222a5495398eceed272de340bd1731816cca483da446b6f641bf5fe2dd3b",
+    "SHA256SUMS.txt": "ac09efb19135547fe17f469f72d94f336c29256b09e004ecca96627267046819",
+    "SHA256SUMS-early.txt": "10f868a832f0b2a10b5860e35dd996b9c18af7258c1e5bc7c3271b77ea971371"
+  },
+  "actual_anonymous_assets_verified": 19,
+  "actual_local_files_verified": 21,
+  "release_body_sha256": "8A475C75FCA5D3EF3495FA051435679C8698D42EAEFE99BD9B85A2F84A0C9333",
+  "latest_stable": {
+    "tag": "v4.7.3",
+    "id": 422732162
+  },
+  "preservation": {
+    "earlier_releases": 103,
+    "earlier_tag_refs": 181,
+    "unchanged": true
+  },
+  "nonclaims": [
+    "No stable/GUI/client/export/performance/Foundation/personal-history qualification"
+  ],
+  "stable_qualified": false
+}

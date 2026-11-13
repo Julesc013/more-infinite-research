@@ -1,0 +1,167 @@
+{
+  "kind": "ferrum512-worker-f210-independent-packet-review-r02",
+  "reviewed_at_utc": "2026-11-09T18:02:44.729359+00:00",
+  "verdict": "GO_EXACT_CLOSED_FOUR_PROCESS_F210_NATIVE_SCHEDULE_ONLY",
+  "findings": [],
+  "independence": "Reviewer did not author production Ferrum source or this fixture/controller. Read-only delta review; no native, host test, build or library operation by reviewer.",
+  "pins": {
+    "HANDOFF.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\HANDOFF.json",
+      "bytes": 4673,
+      "sha256": "490041AEC936FC55700C9C2956422DB4C9DA9F0F9F8786F1BE9C7AE37382D6EC"
+    },
+    "packet.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\packet.json",
+      "bytes": 580457,
+      "sha256": "DF29E64864ED9ABFD98766BEA3CE1F38103F516B0EF5CA455CD3B8DF6B905C80"
+    },
+    "Invoke-FerrumWorker.ps1": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\Invoke-FerrumWorker.ps1",
+      "bytes": 20148,
+      "sha256": "A781931A726540E342D99C314A67286F057A257D396C304383C15A88A7F7D59C"
+    },
+    "composition.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\composition.json",
+      "bytes": 50332,
+      "sha256": "61EA3EFF3938F693CCC93ACE6DC9B0869DC8C04193305434D588A7E884740F80"
+    },
+    "inputs/control.lua": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\inputs\\control.lua",
+      "bytes": 18470,
+      "sha256": "68A8746806653A95374381971B9409B06403BA739BBD9A503DA7AF35E385EB4E"
+    },
+    "inputs/mir-fixture-ferrum-worker-storage-native-lab_0.1.0.zip": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\inputs\\mir-fixture-ferrum-worker-storage-native-lab_0.1.0.zip",
+      "bytes": 1163,
+      "sha256": "4EFF7A7BC8C8919A25CE3CCE9DD5BEDF161CAEF9105733599F29DC4F4B11BE40"
+    },
+    "accepted-full-private-prerequisites.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\accepted-full-private-prerequisites.json",
+      "bytes": 2533,
+      "sha256": "16003E0B1242EEA72FE6C34BD09630A9B09EEDEA9CA0108940B3313F2F18F4CB"
+    }
+  },
+  "prior_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-independent-packet-review-r01.json",
+    "bytes": 11163,
+    "sha256": "5D99E83A5183F3859FA9022C3066F3C0CD27A46BA131543C8FBA12B8B3B225D2"
+  },
+  "closed_finding": {
+    "prior_packet_sha256": "A881EC324872D4058EC2CC245F83AA99DB7E5A082925CCC45EA77100F49A05B2",
+    "actor_commit": "cb652f7cdfb89bbcde574ac8b6d393133b7114e3",
+    "delta": "Exactly one actor vector adds worker-robots-storage-2 to PRIVATE prerequisites; all other actor bytes remain unchanged. Independent prototype double adds the same authored literal. New missing-worker2 opponent must refuse before ordinary6 or a destination save, with lab stopped and only the already completed source save.",
+    "exact_expected_direct_names": [
+      "worker-robots-storage-2",
+      "worker-robots-storage-3",
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack",
+      "electromagnetic-science-pack"
+    ],
+    "independent_basis": "Accepted F273 raw full-private-holder extraction rechecked exactly against original data; pinned SDK direct-name map. No alternate prerequisite shape or native pruning assumption admitted.",
+    "retained_red": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\fe694-private-worker2-red.log",
+      "bytes": 10950,
+      "sha256": "8848F7492E9AE901FBF31062439D67F0A7EF15396A4AD3FDAF6BC68F11B87649"
+    },
+    "retained_green": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\corrected-private-worker2-green.log",
+      "bytes": 2104,
+      "sha256": "CD75B84E7BC9CF87B7E8178B44D8448B3D49C2CD7D9ABC527B5093AD0E71F5B4"
+    },
+    "host_scope": "Author retained 12 focused controls pass, with old actor red against the corrected independent double and missing-worker2 opponent. Read, not rerun; this is host evidence only."
+  },
+  "changed_input_review": {
+    "new_packet_fixed_input_count": 2212,
+    "unchanged_exact_tuples_reused_from_prior_independent_2208_body_readback": 2198,
+    "changed_or_new_tuple_bodies_independently_rehashed": 14,
+    "changed_tuple_mismatches": 0,
+    "prior_inputs_not_rehashed_as_campaign": true,
+    "committed_actor_bytes_exact": true,
+    "caller_byte_identical_to_A781": true,
+    "unchanged_server_lab_source_profile_destination_profile_bytes_rechecked": true,
+    "production_player_engine_upstream_helpers_sdk": "Same unchanged bound tuples as R01: Source9b, AA26 player1017812B, 8DC2.1.23, official Ferrum0.1.5/PL2.4/spider2.9.87, 4EFF lab, A15A observer and existing trusted runtime/custody helpers.",
+    "runner": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-visual-polish-integrate-r01",
+      "commit": "f2ea5e9986768073a04aba47fffcd50254a1a5ad",
+      "source": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+      "clean": true
+    },
+    "schema": "Same Ferrum512WorkerF210PacketV1; added prior_oracle_adverse provenance only. Same source parent=null/colds0, destination parent=source/colds2, four-process cap, limits and strict endpoint rules.",
+    "paths": "Fresh contained frozen-f2 build/tmp/ferrum512-worker-f210-r02-private/{compose,native}/{source,destination}. Both native roots and new primary protected folder absent at review. All four config/write-data projections contained; actual two composed config and actor body hashes rechecked."
+  },
+  "actual_preparation": {
+    "composition_status": "passed-real-composition-zero-native",
+    "bound_packet_sha256": "DF29E64864ED9ABFD98766BEA3CE1F38103F516B0EF5CA455CD3B8DF6B905C80",
+    "failure": null,
+    "native_processes": 0,
+    "factorio_processes": 0,
+    "selections": {
+      "source": {
+        "selected_count": 10,
+        "status": "composed-zero-native",
+        "native_runs": 0,
+        "predecessor": null,
+        "activation_restoration": "restored-direct-library-controls"
+      },
+      "destination": {
+        "selected_count": 11,
+        "status": "composed-zero-native",
+        "native_runs": 0,
+        "predecessor": "source",
+        "activation_restoration": "restored-direct-library-controls"
+      }
+    },
+    "exact_selection": "Source10 and destination11; only destination adds exact MIR21012. No previous source save or old native output reused.",
+    "restoration_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-r02-controller\\composition-restoration-readback.json",
+      "bytes": 2212,
+      "sha256": "7C78E49E03544CED1C56768B904E18B64BF87B0F695C04AFE3AD0704604B3960"
+    },
+    "independent_live_prior_state_tuple_checks": 44,
+    "independent_live_state_mismatches": 0,
+    "temporary_lab_and_player_archives_absent": true,
+    "factorio_process_count_independently_observed": 0
+  },
+  "admitted_scope": {
+    "processes": [
+      "NoMIR source: genuinely earn finite4 and5 by ordinary labs, exact science depletion and bonus3-to4-to5; protect completed source save.",
+      "Destination: add MIR only to protected source copy, require strict pre/post-init source and foreign frames, earn infinite6 normally with independent native integer calibration of unrounded1518.75 coefficient, bonus6, protect completed destination.",
+      "Cold1: separate same-byte protected destination input, one-update natural exit0, exact saved frames/no extra ordinary event.",
+      "Cold2: another separate same-byte protected destination input, same strict checks and natural exit0."
+    ],
+    "limits": {
+      "max_engine_processes": 4,
+      "expected_peak_memory_mib": 4096,
+      "timeout_seconds": 180,
+      "max_output_mib_per_selection": 64
+    },
+    "server_endpoint": "Existing helper governed owned-stop requires passed plus observed named-marker/Saving-finished/closed-save predicate and no timeout. Server OS exit0 is not substituted for the predicate. Both colds require exact natural exit0.",
+    "custody": "Preserve ZIP CRC, saved actor68A8, all protected originals, per-stage raw copies/loaded selections/fatal rejection, exact controls/archive restoration and Factorio0; stop first failure without retry or expectation changes.",
+    "native_observation_rule": "If native direct prerequisite map differs despite accepted raw row, retain actual marker and classify the runtime fixture boundary independently before any changed oracle or production attribution."
+  },
+  "limits": [
+    "Admission is preparation only; no ordinary completion/save/cold result has been accepted yet.",
+    "No physical cargo delivery, F200 counterpart, planetary science manufacture, UI/client, multiplayer, timing, performance or stable acceptance.",
+    "R01 A881/2F4 refusal and earlier preparation adverses remain unchanged; published11 assets remain unchanged."
+  ],
+  "reviewer_activity": {
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-worker-f210-independent-packet-review-r02.json"
+    ],
+    "source_edits": 0,
+    "controller_edits": 0,
+    "library_mutations": 0,
+    "native_processes": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 86763,
+      "bounded_scan_advisory": true
+    }
+  }
+}

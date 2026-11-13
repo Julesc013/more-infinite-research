@@ -1,0 +1,65 @@
+{
+  "kind": "MIRVectorF200ScienceDiagnosticIndependentResultJudgmentV1",
+  "reviewed_at_utc": "2026-11-10T02:25:10.238551+00:00",
+  "verdict": "Diagnostic strict refusal verified; recommend controlled fixture-only integer-rate revision. No Source defect or engine-cause attribution established.",
+  "pins": {
+    "packet_sha256": "AFD74F17823245F4A90C7D9D153E953A372775647F6355F873FF314DE41C1C74",
+    "owner_sha256": "DF14422F884BF44D27F80F1306F4223CCCEF3B44BE0F91D6F6FB552A7FFD4651",
+    "admission_sha256": "33B19B0C314DF110FEBCDC0F8B2A35C7DF08393B7D3C9BD8676DEE61644BE629",
+    "terminal_sha256": "4E7C2C791C75B2629CE20273C9A63779254E073E0E55ED77456799DE0FE21500",
+    "canonical_log_sha256": "A1FCAACF304B6D04A4DD3BD233F6CF26C3F82FCBA9B6BFD8687B33901F6DB5ED",
+    "observed_counters_sha256": "36235AD4B197E458715CBFEB01C30CE8A9B55E460926B79D44896789F93E1C63",
+    "Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "engine": "2.0.77/D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "player": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+  },
+  "actual": {
+    "engine_processes": 1,
+    "pid": 33940,
+    "ledger_final_phase": "interrupted",
+    "trusted_native_exit_code": null,
+    "note": "Original fatal-live completion predicate interrupted this process. Do not call natural1 or infer timeout status from a wrapper scalar; preserve context/ledger.",
+    "status": "ADVERSE expected original strict refusal; no endpoint accepted",
+    "tick": 864,
+    "ordinary_events": 2,
+    "all_four_pack_inserted": 23501,
+    "all_four_pack_inventory_counts": 173,
+    "all_four_pack_inserted_minus_inventory": 23328,
+    "expected_completed_cost": 24000,
+    "unchanged_tolerance": 1,
+    "laboratory_productivity_bonus": 0,
+    "laboratory_speed_modifier": 0,
+    "prototype_normal_lab_speed": 100001,
+    "map_price_multiplier": 1,
+    "actual_next_unit_count": 32000,
+    "formula": "8000*2^(L-1)",
+    "time_ticks": 3600,
+    "four_science_amounts": 1,
+    "accepted_save_or_cold_endpoints": 0
+  },
+  "integrity": "Independently parsed canonical science-charge-refusal JSON and every pack count; matches named counter file. All15 original-to-primary raw copies,15boundinputs/restoration/current priorcontrols+MIRarchives verified. No savedendpoint file/marker. Original r03/PID34420 adverse remains unchanged; F210 accepted old-speed case unaffected.",
+  "arithmetic_and_limits": {
+    "observed_identity": "23501−173=23328=864×floor(100001/3600)=864×27",
+    "not_proved": "This identity does not distinguish native fractional inventory accounting, refill/partial-pack behavior or another mechanism. No engine bug, inventory.insert cause, changed native cost or Source fault is inferred. Item counts alone are not a new durability audit.",
+    "proposed_rate": "115200/3600=32 exactly",
+    "nominal_costs": [
+      8000,
+      16000,
+      32000,
+      64000
+    ],
+    "ticks_per_level_at_zero_force_modifiers": [
+      250,
+      500,
+      1000,
+      2000
+    ],
+    "all_costs_divisible_by_32": true,
+    "F0_nominal_ticks": 750,
+    "total_four_level_nominal_ticks": 3750
+  },
+  "recommendation": "Use one shared test-fixture researching-speed constant115200, with exact arithmetic/divisibility guards and unchanged native main formula/time/science/rewards. Retain the observed-counter error marker and the existing24000/56000/120000±1 plus crosspack equality checks. Do not compensate science supplies, set progress/levels/bonuses, increase tolerance, infer a fractional correction or add unrelated inventory experiments.",
+  "assumptions_to_bind": "Exact normal-quality prototype rate115200, force laboratory_speed_modifier0 and laboratory_productivity_bonus0 are required for the simple32packs/tick rationale. Preserve or explicitly verify these observed conditions in the revised fixture/reader; extra force modifiers would invalidate that arithmetic. F1 pending remains actual lab-earned[.2,.3); a threshold at.2 or next native increment is acceptable under the unchanged interval, not a direct progress assignment.",
+  "new_evidence_required": "Review exact fixture/test delta and fresh F2008-process bindings before execution. Then require actual unchanged cost/whole97vectors/nativebonus/ordinary/pending/save/two-cold/science/restoration results; integer design is not proof the new case passes. No F210 rerun implied solely by changing a TEST fixture: old100001 result remains qualified only under its old data/actor/hash identity, never relabelled115200.",
+  "scope": "No Source/player/version change or native launch authorized by this recommendation. No reporter/fullCerys/performance/stable verdict. Reviewer changed only this receipt."
+}

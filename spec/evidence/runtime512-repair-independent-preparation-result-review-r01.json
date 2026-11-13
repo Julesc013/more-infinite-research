@@ -1,0 +1,80 @@
+{
+  "kind": "MIR512RepairIndependentActualPreparationReviewV1",
+  "reviewed_at_utc": "2026-11-10T05:15:28.606426+00:00",
+  "verdict": "PASS exactly fresh current12 pendingseed capture plus one unscored25000-update physical pilot. No timing/scored/performance or stable acceptance.",
+  "pins": {
+    "packet": "4FB70A4B9BDD5FC0049F91EAEAADAA7D12023DB2BAF87590C2AA65417BC6543B",
+    "caller": "691319A003A048A666C4CE1D23C5AE198329A59450CFFE1FC4E77B81F00285D2",
+    "composition": "E59440E8E36044F945D968F7E637FCA31B11A233FB3001775A0B777AB5710087",
+    "preparation": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-repair-r01\\preparation.json",
+      "bytes": 40432,
+      "sha256": "E16553489C597DC286926D6D4B846E1D5287FD101D6B5324A1D68483F2EAB1BB"
+    },
+    "capture_record": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime512-repair-capture-r01\\build\\tmp\\runtime512-repair-r01-capture\\result.json",
+      "sha256": "DDDDA5D9F0256CB30CA6058438578175F15C561A2906DF5BDAB29DE0729CA4F6"
+    },
+    "candidate_player": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "candidate_Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "capture_harness": "be3048d0921b1caff56ed04a34e6c2b7e9511efb/Sourcef4e",
+    "benchmark_harness": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6/Sourcef4e",
+    "engine": "2.1.23/8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "actual_processes": [
+    {
+      "role": "capture",
+      "pid": 50260,
+      "exit_code": 0,
+      "mode": "natural create/save;no timeout/predicate"
+    },
+    {
+      "role": "unscoredpilot",
+      "pid": 40624,
+      "exit_code": 0,
+      "mode": "natural25000-update benchmark;no timeout/predicate"
+    }
+  ],
+  "actual_physical_witnesses": {
+    "prepared": "Raw canonical prepared marker,pendingtrue,1000eligible/256firstcapacity/744overflow,128player+128reciprocalfriend;initial_changed0/reactivation_changed0. Seed contains pendingwork,not completed workload.",
+    "pilot_start": "Raw startpending marker equals samephysicalcohort;first active run from immutablecopy.",
+    "pilot_complete": "Raw completestatuspassed,pendingfalse,initial_changed256/reactivation_changed8. Exact quiet600/service60/repairamount1/native LuaEntity.damage electric contract unchanged.",
+    "foreign_and_nonwall": "Pinned unchanged fixture executes overflow744/nonfriendly-wall/nonwall entity-health preservation assertions before successfulcomplete endpoint. These are successful native predicate evidence,not invented raw per-entity dumps.",
+    "loaded": "A15A actual raw observer logs independently parsed in bothprocesses:5official2.1.23mods+MIR5.0.21012+stress0.2.1+selector0.1.0+observer0.1.0,exact9tuple. Defaultprofile/selectedarchivehashes agree.",
+    "scope_flags": "Prepared/start/complete markers all explicitly performance_qualifiedfalse/runtime_elapsed_qualifiedfalse. Sourceharness identity remains distinct from loaded player."
+  },
+  "seed_integrity": {
+    "sha256": "6C3C8D20DE4F719FDFB1E693790D44D0FC2D25AEC6B91A089A36830D1DC984C7",
+    "bytes": 871335,
+    "source": "D:\\Projects\\Factorio\\.task-builds\\runtime512-repair-capture-r01\\build\\tmp\\runtime512-repair-r01-capture\\write-data\\saves\\mir5-native-active.zip",
+    "owned": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-repair-r01\\preparation\\pilot\\input\\fresh-owned-active-seed.zip",
+    "independent": "Both56-member ZIPs CRCpass,samehash before/afterpilot,physicallydistinct/nlink1. New12seed is not old11/505seed. Benchmarkcommand25000ticks/1run/sanitize verified."
+  },
+  "raw_memory_review": {
+    "status": "complete-observation,noincomplete_reasons",
+    "observations": 17,
+    "one_pid_and_starttime": 40624,
+    "target_interval_ms": 250,
+    "actual_sample_note": "Targetcadence,not guaranteed preciseinterval or instantaneouspeak;actualtimestamps retained.",
+    "maximum_sampled_working_set_bytes": 505032704,
+    "maximum_sampled_private_bytes": 500019200,
+    "root_OS_peak_working_set_bytes": 530571264,
+    "governor_working_set_peak_bytes": 530333696,
+    "governor_private_peak_bytes": 524849152,
+    "independent": "Raw17samplevalues/counts/PID-starttuple/maxima agree with summary;OSrootpeak kept distinct from sampled/governor metrics. Bounds4096MiB/600or900seconds/output128or120MiB apply;unscored numbers supply no comparison."
+  },
+  "restoration": {
+    "outer_candidate_prepare_custody_passed": true,
+    "live_original_states_verified": 8,
+    "inner_capture_and_pilot_controls": "restored-direct-library-controls,exact9selectedtuple;no dependency payloadcopy/link/extraction",
+    "factorio_processes": 0
+  },
+  "canonical_log_sha256": {
+    "capture": "6EAC4CB80B0E3DF8F485333843419F1D1A21A94A84E6C5236FE78563E8C02C33",
+    "pilot": "78F8B7FCFEA8B9197F4DBF9E03EC41727FE9504B7472DC18850C27CC23B4DCEA",
+    "pilot_stdout": "56AC274FE92FA0E088311E614DD29A934A2AECC98160DA6E1C8C3141349E731F"
+  },
+  "remaining_gates": "All20 measurementroots/observations absent andunexecuted atreview. Separate exactE165 quietblockadmission must precede complete4warmup+16scored/8paired observationblock;no prefix/retry/pooling/oldnumeric reuse.",
+  "limits": "Repair-only preparation. No agriculture/all68cells/generalruntime/API/UI/stable/release verdict. Reviewer performed no native/host/build/Compose/CI or Source/controller/library/private mutation;only new review receipts."
+}

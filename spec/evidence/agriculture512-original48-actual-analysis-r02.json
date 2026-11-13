@@ -1,0 +1,990 @@
+{
+  "kind": "MIR512MatchedAgricultureOriginal48AnalysisV1",
+  "status": "all-declared-scoped-comparisons-pass",
+  "timing_packet_sha256": "9184378047AF73725F8CFDD6A0D34457FB81F9BBBD9E76BFC8293CFA11CE1249",
+  "terminal_sha256": "A54A3419A4E2DB97AE485A79291A07CC824E99980B13B54A06C062F3E1F9398F",
+  "original_plan_sha256": "9CDED5FE074894D734210CB432384BF4B509D69AD9CB527424701358EF7054F9",
+  "native_processes": 48,
+  "warmups": 12,
+  "scored": 36,
+  "process_identities": [
+    [
+      47600,
+      "2026-11-11T17:50:05.1697355+00:00"
+    ],
+    [
+      17132,
+      "2026-11-11T17:50:12.6298666+00:00"
+    ],
+    [
+      40308,
+      "2026-11-11T17:50:19.4196849+00:00"
+    ],
+    [
+      12704,
+      "2026-11-11T17:50:24.9072821+00:00"
+    ],
+    [
+      30432,
+      "2026-11-11T17:50:30.4062721+00:00"
+    ],
+    [
+      25496,
+      "2026-11-11T17:50:37.0352025+00:00"
+    ],
+    [
+      9648,
+      "2026-11-11T17:50:42.6941342+00:00"
+    ],
+    [
+      43592,
+      "2026-11-11T17:50:48.2615425+00:00"
+    ],
+    [
+      44228,
+      "2026-11-11T17:51:04.8150966+00:00"
+    ],
+    [
+      50064,
+      "2026-11-11T17:51:12.5425947+00:00"
+    ],
+    [
+      38512,
+      "2026-11-11T17:51:18.1368687+00:00"
+    ],
+    [
+      21240,
+      "2026-11-11T17:51:23.5263117+00:00"
+    ],
+    [
+      39560,
+      "2026-11-11T17:51:30.1014835+00:00"
+    ],
+    [
+      24844,
+      "2026-11-11T17:51:36.8749227+00:00"
+    ],
+    [
+      10072,
+      "2026-11-11T17:51:42.4169451+00:00"
+    ],
+    [
+      27156,
+      "2026-11-11T17:51:48.0631377+00:00"
+    ],
+    [
+      33372,
+      "2026-11-11T17:51:54.5933798+00:00"
+    ],
+    [
+      36348,
+      "2026-11-11T17:52:01.1531486+00:00"
+    ],
+    [
+      42124,
+      "2026-11-11T17:52:07.6818736+00:00"
+    ],
+    [
+      52016,
+      "2026-11-11T17:52:13.1943788+00:00"
+    ],
+    [
+      12412,
+      "2026-11-11T17:52:19.7739655+00:00"
+    ],
+    [
+      26856,
+      "2026-11-11T17:52:26.7599420+00:00"
+    ],
+    [
+      28332,
+      "2026-11-11T17:52:32.6527799+00:00"
+    ],
+    [
+      24996,
+      "2026-11-11T17:52:38.3280629+00:00"
+    ],
+    [
+      17084,
+      "2026-11-11T17:52:45.0110789+00:00"
+    ],
+    [
+      42868,
+      "2026-11-11T17:52:51.7957984+00:00"
+    ],
+    [
+      22588,
+      "2026-11-11T17:52:57.4278907+00:00"
+    ],
+    [
+      50884,
+      "2026-11-11T17:53:02.9014643+00:00"
+    ],
+    [
+      43048,
+      "2026-11-11T17:53:10.4133880+00:00"
+    ],
+    [
+      17164,
+      "2026-11-11T17:53:22.3275807+00:00"
+    ],
+    [
+      23332,
+      "2026-11-11T17:53:29.4088686+00:00"
+    ],
+    [
+      41384,
+      "2026-11-11T17:53:38.4602953+00:00"
+    ],
+    [
+      37152,
+      "2026-11-11T17:53:48.1729898+00:00"
+    ],
+    [
+      27604,
+      "2026-11-11T17:53:57.4901286+00:00"
+    ],
+    [
+      27052,
+      "2026-11-11T17:54:07.6411478+00:00"
+    ],
+    [
+      40724,
+      "2026-11-11T17:54:17.3752387+00:00"
+    ],
+    [
+      41312,
+      "2026-11-11T17:54:27.2029690+00:00"
+    ],
+    [
+      4380,
+      "2026-11-11T17:54:41.2947723+00:00"
+    ],
+    [
+      32368,
+      "2026-11-11T17:54:48.6467725+00:00"
+    ],
+    [
+      36872,
+      "2026-11-11T17:54:57.5907180+00:00"
+    ],
+    [
+      50420,
+      "2026-11-11T17:55:07.3301125+00:00"
+    ],
+    [
+      45152,
+      "2026-11-11T17:55:19.8710145+00:00"
+    ],
+    [
+      27108,
+      "2026-11-11T17:55:30.9459727+00:00"
+    ],
+    [
+      39684,
+      "2026-11-11T17:55:44.7302378+00:00"
+    ],
+    [
+      48264,
+      "2026-11-11T17:55:57.0822206+00:00"
+    ],
+    [
+      48372,
+      "2026-11-11T17:56:08.9303377+00:00"
+    ],
+    [
+      24312,
+      "2026-11-11T17:56:19.6943541+00:00"
+    ],
+    [
+      44728,
+      "2026-11-11T17:56:30.0294563+00:00"
+    ]
+  ],
+  "medians": {
+    "published-1": {
+      "engine_reported_average_ms_per_tick": 0.0665,
+      "operating_system_peak_working_set_bytes": 630849536.0,
+      "maximum_sampled_working_set_bytes": 613085184.0,
+      "maximum_sampled_private_bytes": 609099776.0
+    },
+    "candidate-defaults-1": {
+      "engine_reported_average_ms_per_tick": 0.0645,
+      "operating_system_peak_working_set_bytes": 519440384.0,
+      "maximum_sampled_working_set_bytes": 457381888.0,
+      "maximum_sampled_private_bytes": 452247552.0
+    },
+    "published-32": {
+      "engine_reported_average_ms_per_tick": 0.069,
+      "operating_system_peak_working_set_bytes": 625930240.0,
+      "maximum_sampled_working_set_bytes": 606435328.0,
+      "maximum_sampled_private_bytes": 605153280.0
+    },
+    "candidate-defaults-32": {
+      "engine_reported_average_ms_per_tick": 0.068,
+      "operating_system_peak_working_set_bytes": 540610560.0,
+      "maximum_sampled_working_set_bytes": 508538880.0,
+      "maximum_sampled_private_bytes": 505208832.0
+    },
+    "published-128": {
+      "engine_reported_average_ms_per_tick": 0.0815,
+      "operating_system_peak_working_set_bytes": 635453440.0,
+      "maximum_sampled_working_set_bytes": 527218688.0,
+      "maximum_sampled_private_bytes": 528435200.0
+    },
+    "candidate-defaults-128": {
+      "engine_reported_average_ms_per_tick": 0.0805,
+      "operating_system_peak_working_set_bytes": 540618752.0,
+      "maximum_sampled_working_set_bytes": 513300480.0,
+      "maximum_sampled_private_bytes": 512141312.0
+    }
+  },
+  "comparisons": [
+    {
+      "tier": 1,
+      "metric": "engine_reported_average_ms_per_tick",
+      "published_median": 0.0665,
+      "candidate_median": 0.0645,
+      "limit": 0.3165,
+      "passed": true
+    },
+    {
+      "tier": 1,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published_median": 630849536.0,
+      "candidate_median": 519440384.0,
+      "limit": 697958400.0,
+      "passed": true
+    },
+    {
+      "tier": 1,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published_median": 613085184.0,
+      "candidate_median": 457381888.0,
+      "limit": 680194048.0,
+      "passed": true
+    },
+    {
+      "tier": 1,
+      "metric": "maximum_sampled_private_bytes",
+      "published_median": 609099776.0,
+      "candidate_median": 452247552.0,
+      "limit": 676208640.0,
+      "passed": true
+    },
+    {
+      "tier": 32,
+      "metric": "engine_reported_average_ms_per_tick",
+      "published_median": 0.069,
+      "candidate_median": 0.068,
+      "limit": 0.319,
+      "passed": true
+    },
+    {
+      "tier": 32,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published_median": 625930240.0,
+      "candidate_median": 540610560.0,
+      "limit": 693039104.0,
+      "passed": true
+    },
+    {
+      "tier": 32,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published_median": 606435328.0,
+      "candidate_median": 508538880.0,
+      "limit": 673544192.0,
+      "passed": true
+    },
+    {
+      "tier": 32,
+      "metric": "maximum_sampled_private_bytes",
+      "published_median": 605153280.0,
+      "candidate_median": 505208832.0,
+      "limit": 672262144.0,
+      "passed": true
+    },
+    {
+      "tier": 128,
+      "metric": "engine_reported_average_ms_per_tick",
+      "published_median": 0.0815,
+      "candidate_median": 0.0805,
+      "limit": 0.3315,
+      "passed": true
+    },
+    {
+      "tier": 128,
+      "metric": "operating_system_peak_working_set_bytes",
+      "published_median": 635453440.0,
+      "candidate_median": 540618752.0,
+      "limit": 702562304.0,
+      "passed": true
+    },
+    {
+      "tier": 128,
+      "metric": "maximum_sampled_working_set_bytes",
+      "published_median": 527218688.0,
+      "candidate_median": 513300480.0,
+      "limit": 594327552.0,
+      "passed": true
+    },
+    {
+      "tier": 128,
+      "metric": "maximum_sampled_private_bytes",
+      "published_median": 528435200.0,
+      "candidate_median": 512141312.0,
+      "limit": 595544064.0,
+      "passed": true
+    }
+  ],
+  "increments": {
+    "engine_reported_average_ms_per_tick": {
+      "published_128_minus_1": 0.015,
+      "candidate_128_minus_1": 0.016,
+      "relative_change_percent": 6.666666666666673
+    },
+    "operating_system_peak_working_set_bytes": {
+      "published_128_minus_1": 4603904.0,
+      "candidate_128_minus_1": 21178368.0,
+      "relative_change_percent": 360.008896797153
+    },
+    "maximum_sampled_working_set_bytes": {
+      "published_128_minus_1": -85866496.0,
+      "candidate_128_minus_1": 55918592.0,
+      "relative_change_percent": null
+    },
+    "maximum_sampled_private_bytes": {
+      "published_128_minus_1": -80664576.0,
+      "candidate_128_minus_1": 59893760.0,
+      "relative_change_percent": null
+    }
+  },
+  "observations": [
+    {
+      "id": "agriculture-1-warmup-published-1",
+      "tier": 1,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.066,
+        "operating_system_peak_working_set_bytes": 645910528,
+        "maximum_sampled_working_set_bytes": 632745984,
+        "maximum_sampled_private_bytes": 632283136
+      },
+      "raw_sha256": "5A583B9F3C14D25BE627E42CE721CFF58CD9AC8D8FB4207D3888E5B9BB45674B"
+    },
+    {
+      "id": "agriculture-1-warmup-published-2",
+      "tier": 1,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.065,
+        "operating_system_peak_working_set_bytes": 617447424,
+        "maximum_sampled_working_set_bytes": 615813120,
+        "maximum_sampled_private_bytes": 612630528
+      },
+      "raw_sha256": "EBEE8082F1E6144E91452877D197F24B02B97CE8E4EFB7FF25C6C2218952CD9D"
+    },
+    {
+      "id": "agriculture-1-warmup-candidate-defaults-1",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.063,
+        "operating_system_peak_working_set_bytes": 512425984,
+        "maximum_sampled_working_set_bytes": 494391296,
+        "maximum_sampled_private_bytes": 492322816
+      },
+      "raw_sha256": "8BD588E8C5BC6BFC91FE8C9FB5B75F0F55EDC1FED3BD0FA5366DD0D7C940E5DB"
+    },
+    {
+      "id": "agriculture-1-warmup-candidate-defaults-2",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.064,
+        "operating_system_peak_working_set_bytes": 537985024,
+        "maximum_sampled_working_set_bytes": 498139136,
+        "maximum_sampled_private_bytes": 500596736
+      },
+      "raw_sha256": "E9CBDA30EABDC0C9F1E2FB6E2C8156638680C1E8D5A34004FE6C380083AFF53C"
+    },
+    {
+      "id": "agriculture-1-b1-1-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 638038016,
+        "maximum_sampled_working_set_bytes": 637317120,
+        "maximum_sampled_private_bytes": 634068992
+      },
+      "raw_sha256": "CFE4F1A22A7FE8BAC4AD9DC2097756CBEBA21C931EC669BE61DE88DE36507EA6"
+    },
+    {
+      "id": "agriculture-1-b1-2-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.064,
+        "operating_system_peak_working_set_bytes": 521420800,
+        "maximum_sampled_working_set_bytes": 463581184,
+        "maximum_sampled_private_bytes": 458252288
+      },
+      "raw_sha256": "431FE4707067CC3D3C78C986AD51B2ED2B5DBA8DE70E8CCE678E1993B25DE45F"
+    },
+    {
+      "id": "agriculture-1-b2-1-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.065,
+        "operating_system_peak_working_set_bytes": 517459968,
+        "maximum_sampled_working_set_bytes": 451182592,
+        "maximum_sampled_private_bytes": 446242816
+      },
+      "raw_sha256": "5381545123B4F926B5010F49F302B8CD396581396FEB515062918C0D0C916F06"
+    },
+    {
+      "id": "agriculture-1-b2-2-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.066,
+        "operating_system_peak_working_set_bytes": 621543424,
+        "maximum_sampled_working_set_bytes": 567005184,
+        "maximum_sampled_private_bytes": 563724288
+      },
+      "raw_sha256": "D36A1C3EFCA07AEBC8929BB67B3EA66ED50A4C1C90EF75CE0E8BA1A941F4BF3C"
+    },
+    {
+      "id": "agriculture-1-b3-1-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.067,
+        "operating_system_peak_working_set_bytes": 603607040,
+        "maximum_sampled_working_set_bytes": 603074560,
+        "maximum_sampled_private_bytes": 598827008
+      },
+      "raw_sha256": "55E7D0368F4274E1BD6319F53EC668041B50DD07EDFA563D2F0C8D030BD913CD"
+    },
+    {
+      "id": "agriculture-1-b3-2-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.065,
+        "operating_system_peak_working_set_bytes": 509759488,
+        "maximum_sampled_working_set_bytes": 428916736,
+        "maximum_sampled_private_bytes": 424542208
+      },
+      "raw_sha256": "4BC29B5F282423159F5B63EFF2C2C766AA2D2673B4AD14D22B03BDE83BD9F922"
+    },
+    {
+      "id": "agriculture-1-b4-1-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.062,
+        "operating_system_peak_working_set_bytes": 541822976,
+        "maximum_sampled_working_set_bytes": 483594240,
+        "maximum_sampled_private_bytes": 478818304
+      },
+      "raw_sha256": "539CEAEE407B558CBBAD74091768D7C410D34BBDE7D5AD245A982AACE4B2DDFB"
+    },
+    {
+      "id": "agriculture-1-b4-2-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.064,
+        "operating_system_peak_working_set_bytes": 708169728,
+        "maximum_sampled_working_set_bytes": 704372736,
+        "maximum_sampled_private_bytes": 704745472
+      },
+      "raw_sha256": "8E315138C777919D9FF826770226652ACEC7E8332FD4654029CD6F3313F920DD"
+    },
+    {
+      "id": "agriculture-1-b5-1-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 667598848,
+        "maximum_sampled_working_set_bytes": 503287808,
+        "maximum_sampled_private_bytes": 498376704
+      },
+      "raw_sha256": "84500FAA7EE673336D4FD5D30AEB24687ED4BA74D8BF45755023BAF157375564"
+    },
+    {
+      "id": "agriculture-1-b5-2-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.067,
+        "operating_system_peak_working_set_bytes": 540823552,
+        "maximum_sampled_working_set_bytes": 514322432,
+        "maximum_sampled_private_bytes": 513187840
+      },
+      "raw_sha256": "308C30362900E6AB75C3A62AD9BC775516CF39B311F4E18962C6C6961B5F3057"
+    },
+    {
+      "id": "agriculture-1-b6-1-candidate-defaults",
+      "tier": 1,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.064,
+        "operating_system_peak_working_set_bytes": 512565248,
+        "maximum_sampled_working_set_bytes": 429453312,
+        "maximum_sampled_private_bytes": 429625344
+      },
+      "raw_sha256": "73872974D46272EA346ACA51085867A23494FC6ED01EB4C5B0859397160CA980"
+    },
+    {
+      "id": "agriculture-1-b6-2-published",
+      "tier": 1,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.064,
+        "operating_system_peak_working_set_bytes": 623661056,
+        "maximum_sampled_working_set_bytes": 623095808,
+        "maximum_sampled_private_bytes": 619372544
+      },
+      "raw_sha256": "99A33079E6B076A4217B436F7804E7359A42D2BAFC6901978AFC7284F5F85593"
+    },
+    {
+      "id": "agriculture-32-warmup-published-1",
+      "tier": 32,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.067,
+        "operating_system_peak_working_set_bytes": 600682496,
+        "maximum_sampled_working_set_bytes": 597184512,
+        "maximum_sampled_private_bytes": 595562496
+      },
+      "raw_sha256": "DDC59CE26995C644AA7ABA57046C916D46EDAD763BA6E3BA7FF80F16D8D6A801"
+    },
+    {
+      "id": "agriculture-32-warmup-published-2",
+      "tier": 32,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 613691392,
+        "maximum_sampled_working_set_bytes": 608169984,
+        "maximum_sampled_private_bytes": 604205056
+      },
+      "raw_sha256": "C94B45C14E85267A863C174D9A4B0F4DBAE4E57FD1E9EDADF7F288DF84467F7E"
+    },
+    {
+      "id": "agriculture-32-warmup-candidate-defaults-1",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 516730880,
+        "maximum_sampled_working_set_bytes": 504893440,
+        "maximum_sampled_private_bytes": 502513664
+      },
+      "raw_sha256": "B9DCA979FB626BB6F6B06F079CF164A0E08C8535781549B4E9F9E7E7604BE177"
+    },
+    {
+      "id": "agriculture-32-warmup-candidate-defaults-2",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 539840512,
+        "maximum_sampled_working_set_bytes": 477188096,
+        "maximum_sampled_private_bytes": 473104384
+      },
+      "raw_sha256": "5E450B96A22B896B7780CBE784E4D8BB25604F630C0F7CD6B13F9D2F9187D5D8"
+    },
+    {
+      "id": "agriculture-32-b1-1-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.069,
+        "operating_system_peak_working_set_bytes": 617361408,
+        "maximum_sampled_working_set_bytes": 510214144,
+        "maximum_sampled_private_bytes": 508600320
+      },
+      "raw_sha256": "59E559080AA235CFFBA34D56DAC8F3F8C56A378EF271E1FBF28CD09BAB951B64"
+    },
+    {
+      "id": "agriculture-32-b1-2-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 541265920,
+        "maximum_sampled_working_set_bytes": 537645056,
+        "maximum_sampled_private_bytes": 535224320
+      },
+      "raw_sha256": "818331A97865D7E9182206DB34D57F6865FE25B79B170F2BE8EFC0AEF71B015C"
+    },
+    {
+      "id": "agriculture-32-b2-1-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.068,
+        "operating_system_peak_working_set_bytes": 509247488,
+        "maximum_sampled_working_set_bytes": 447229952,
+        "maximum_sampled_private_bytes": 448446464
+      },
+      "raw_sha256": "A362D54DDB21E8C6CEA4500DD8AADCB951FF93E43A36D0A78D9DA71310BCA174"
+    },
+    {
+      "id": "agriculture-32-b2-2-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.069,
+        "operating_system_peak_working_set_bytes": 620892160,
+        "maximum_sampled_working_set_bytes": 620445696,
+        "maximum_sampled_private_bytes": 616898560
+      },
+      "raw_sha256": "8A17857D74C51DC5FE2525FAD6FE2ED55CB2E704B1F1D116520098FBEFD7EDA0"
+    },
+    {
+      "id": "agriculture-32-b3-1-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.073,
+        "operating_system_peak_working_set_bytes": 636481536,
+        "maximum_sampled_working_set_bytes": 635486208,
+        "maximum_sampled_private_bytes": 632348672
+      },
+      "raw_sha256": "60E17B138C241C1EDEBA1D925876B155F2EB892763525B46BA8BAADEB18E65BE"
+    },
+    {
+      "id": "agriculture-32-b3-2-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.07,
+        "operating_system_peak_working_set_bytes": 521437184,
+        "maximum_sampled_working_set_bytes": 465125376,
+        "maximum_sampled_private_bytes": 459816960
+      },
+      "raw_sha256": "C0A147EC41B8BE3B329F1FF53D46B6ADAC6D587EA21F99BB9E79D65E2E8AFC4A"
+    },
+    {
+      "id": "agriculture-32-b4-1-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.067,
+        "operating_system_peak_working_set_bytes": 540467200,
+        "maximum_sampled_working_set_bytes": 493383680,
+        "maximum_sampled_private_bytes": 488312832
+      },
+      "raw_sha256": "B99B1DE04722791592C061D0E6776BAD1935B145D44D60388D86300CD2128BF0"
+    },
+    {
+      "id": "agriculture-32-b4-2-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.069,
+        "operating_system_peak_working_set_bytes": 630968320,
+        "maximum_sampled_working_set_bytes": 592424960,
+        "maximum_sampled_private_bytes": 593408000
+      },
+      "raw_sha256": "BBD3D25C41A99BFB22953C0A4DCE1FBC0CB1213A862357D4C49DC856B418F18D"
+    },
+    {
+      "id": "agriculture-32-b5-1-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.069,
+        "operating_system_peak_working_set_bytes": 639094784,
+        "maximum_sampled_working_set_bytes": 638357504,
+        "maximum_sampled_private_bytes": 634875904
+      },
+      "raw_sha256": "7F1703E9BBFB8A512C09AD2298C8EB7DCADB08A510D6E15F207E8F9B04ACA1D1"
+    },
+    {
+      "id": "agriculture-32-b5-2-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.071,
+        "operating_system_peak_working_set_bytes": 541614080,
+        "maximum_sampled_working_set_bytes": 528371712,
+        "maximum_sampled_private_bytes": 526839808
+      },
+      "raw_sha256": "8E22D04ECF677B475AC6E217FB52502765027E0820E51B611C6539E0C176569A"
+    },
+    {
+      "id": "agriculture-32-b6-1-candidate-defaults",
+      "tier": 32,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.067,
+        "operating_system_peak_working_set_bytes": 540753920,
+        "maximum_sampled_working_set_bytes": 523694080,
+        "maximum_sampled_private_bytes": 522104832
+      },
+      "raw_sha256": "34CE9E4BF6B358EE433F9CFC535097521B7F5AB95CEAA5656B50983A4AE47930"
+    },
+    {
+      "id": "agriculture-32-b6-2-published",
+      "tier": 32,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.071,
+        "operating_system_peak_working_set_bytes": 596758528,
+        "maximum_sampled_working_set_bytes": 485179392,
+        "maximum_sampled_private_bytes": 501637120
+      },
+      "raw_sha256": "A081C798E6B6FA9FAD3B55A44E24249162E49479C376E210DF2F16E1FE2F4BB7"
+    },
+    {
+      "id": "agriculture-128-warmup-published-1",
+      "tier": 128,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.086,
+        "operating_system_peak_working_set_bytes": 609144832,
+        "maximum_sampled_working_set_bytes": 603623424,
+        "maximum_sampled_private_bytes": 599613440
+      },
+      "raw_sha256": "7A5ABE135EA865551E2D8AD523BE2BDD768F4B8B99B019209B83F7A923DAD9FA"
+    },
+    {
+      "id": "agriculture-128-warmup-published-2",
+      "tier": 128,
+      "arm": "published",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.081,
+        "operating_system_peak_working_set_bytes": 647188480,
+        "maximum_sampled_working_set_bytes": 642961408,
+        "maximum_sampled_private_bytes": 642244608
+      },
+      "raw_sha256": "ACCC397662401BA86241E31FCEA2A69943AC32052383F3C850E445E64955E82D"
+    },
+    {
+      "id": "agriculture-128-warmup-candidate-defaults-1",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.078,
+        "operating_system_peak_working_set_bytes": 534589440,
+        "maximum_sampled_working_set_bytes": 524578816,
+        "maximum_sampled_private_bytes": 522551296
+      },
+      "raw_sha256": "3F5FFF9BA155BAE2A6A91816364CFD902E6AB3BE1CEC74BDC0365D902D35A7D5"
+    },
+    {
+      "id": "agriculture-128-warmup-candidate-defaults-2",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": false,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.08,
+        "operating_system_peak_working_set_bytes": 514363392,
+        "maximum_sampled_working_set_bytes": 497627136,
+        "maximum_sampled_private_bytes": 495439872
+      },
+      "raw_sha256": "04B88E06A5D8AD48EB49656CB2A9E6C5772220BEF700EB4AE0BC4DDAB2AFD2D2"
+    },
+    {
+      "id": "agriculture-128-b1-1-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.085,
+        "operating_system_peak_working_set_bytes": 625180672,
+        "maximum_sampled_working_set_bytes": 518270976,
+        "maximum_sampled_private_bytes": 516386816
+      },
+      "raw_sha256": "009C7254DDFC146517D1644F535636F381AFECB6BAD95456BAAD9999C51CF889"
+    },
+    {
+      "id": "agriculture-128-b1-2-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.079,
+        "operating_system_peak_working_set_bytes": 541859840,
+        "maximum_sampled_working_set_bytes": 506925056,
+        "maximum_sampled_private_bytes": 505909248
+      },
+      "raw_sha256": "64517A8FEE5C0EF24F78558AD396E705C4B63E5796DDBE8CBE93706459FF5BBB"
+    },
+    {
+      "id": "agriculture-128-b2-1-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.081,
+        "operating_system_peak_working_set_bytes": 543744000,
+        "maximum_sampled_working_set_bytes": 528412672,
+        "maximum_sampled_private_bytes": 527155200
+      },
+      "raw_sha256": "392D07657039CA13A17D38B41FD696C6D877AFD5BA0811A121A2F806CC3F66F1"
+    },
+    {
+      "id": "agriculture-128-b2-2-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.08,
+        "operating_system_peak_working_set_bytes": 634613760,
+        "maximum_sampled_working_set_bytes": 560529408,
+        "maximum_sampled_private_bytes": 558125056
+      },
+      "raw_sha256": "CE8D2F18B520838C51DC270D2C8373A087E4C5F9FF0F70D73F8C31A2E011A7CE"
+    },
+    {
+      "id": "agriculture-128-b3-1-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.08,
+        "operating_system_peak_working_set_bytes": 636293120,
+        "maximum_sampled_working_set_bytes": 520413184,
+        "maximum_sampled_private_bytes": 519897088
+      },
+      "raw_sha256": "599D9480647E4D1EAE5AA80A0D28C8C16B8B8A0BEE9A312C9979A16DBAB237AD"
+    },
+    {
+      "id": "agriculture-128-b3-2-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.079,
+        "operating_system_peak_working_set_bytes": 514412544,
+        "maximum_sampled_working_set_bytes": 436207616,
+        "maximum_sampled_private_bytes": 435146752
+      },
+      "raw_sha256": "57C52BD5A0A5EDA2773790016767DC614B5ED9148495AF084E9F5F78FE8DBD66"
+    },
+    {
+      "id": "agriculture-128-b4-1-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.082,
+        "operating_system_peak_working_set_bytes": 544571392,
+        "maximum_sampled_working_set_bytes": 519675904,
+        "maximum_sampled_private_bytes": 518373376
+      },
+      "raw_sha256": "65BF550CA2381AE53534E06572951967A1C1E2EE4725E729A64714B3834F0F43"
+    },
+    {
+      "id": "agriculture-128-b4-2-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.082,
+        "operating_system_peak_working_set_bytes": 632832000,
+        "maximum_sampled_working_set_bytes": 534024192,
+        "maximum_sampled_private_bytes": 536973312
+      },
+      "raw_sha256": "2CF376841B115E5F28211AE465BF654BFE7213BA2F1BEF4453BAD99F3EE5302B"
+    },
+    {
+      "id": "agriculture-128-b5-1-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.085,
+        "operating_system_peak_working_set_bytes": 640790528,
+        "maximum_sampled_working_set_bytes": 637415424,
+        "maximum_sampled_private_bytes": 636354560
+      },
+      "raw_sha256": "595676753CC77AA56A57BE605BA3751FCE2AA8B9210DC7599DFEE2E1199AC1ED"
+    },
+    {
+      "id": "agriculture-128-b5-2-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.08,
+        "operating_system_peak_working_set_bytes": 517017600,
+        "maximum_sampled_working_set_bytes": 465362944,
+        "maximum_sampled_private_bytes": 465584128
+      },
+      "raw_sha256": "568A9B7F26C0637BC55A89C221B40C9DDE22DA59660853693BDDAE56BA6BFE74"
+    },
+    {
+      "id": "agriculture-128-b6-1-candidate-defaults",
+      "tier": 128,
+      "arm": "candidate-defaults",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.081,
+        "operating_system_peak_working_set_bytes": 539377664,
+        "maximum_sampled_working_set_bytes": 528183296,
+        "maximum_sampled_private_bytes": 526528512
+      },
+      "raw_sha256": "926D3701B222348BAEED56F4529CAD822397C23BD226C1053AE77069E0AD702B"
+    },
+    {
+      "id": "agriculture-128-b6-2-published",
+      "tier": 128,
+      "arm": "published",
+      "scored": true,
+      "metrics": {
+        "engine_reported_average_ms_per_tick": 0.081,
+        "operating_system_peak_working_set_bytes": 661868544,
+        "maximum_sampled_working_set_bytes": 469327872,
+        "maximum_sampled_private_bytes": 467136512
+      },
+      "raw_sha256": "4DA900276DBF7EFDA20043EA8C0503681713A677BD443A604BE59FE6F28DBF39"
+    }
+  ],
+  "performance_acceptance": false,
+  "limits": "Defined Space Age agriculture workload on2.1.23 only, published4.7.21002 versus public5.0.21012. No process-to-menu startup, heavy cohort, other engine, retained-memory, Library/client, whole-product or stable verdict."
+}

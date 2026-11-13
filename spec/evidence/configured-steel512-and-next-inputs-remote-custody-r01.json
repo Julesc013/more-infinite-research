@@ -1,0 +1,13 @@
+{
+  "kind": "ConfiguredSteel512AndNextInputsOriginalRemoteReadbackV1",
+  "status": "all-original-bodies-roundtrip-equal",
+  "repository": "Julesc013/scratchpad",
+  "ref": "refs/heads/evidence/mir511-incident-native-blackglass-r01",
+  "commit": "fbc6ffe4c7d54e25c88807c67360c054228520e3",
+  "index": "evidence/configured-steel512-and-next-inputs-r01-originals/INDEX.json",
+  "index_sha256": "E0243756402BFBCC27F944B113022C1008ED00740537CC80E1C07EC31D84B440",
+  "files": 101,
+  "bytes": 5495651,
+  "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "limits": "Closed three-process steel result and exact prospective factory inputs plus memory/capture refusals. Prospective input custody is not factory, GUI, performance or stable acceptance."
+}

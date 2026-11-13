@@ -1,0 +1,37 @@
+{
+  "kind": "MIR512GermanLabelsAndNativeTitleSpriteSourceReview",
+  "reviewer": "Root non-author review of Aero German unit and exact externally authored three-line sprite proposal",
+  "german_commit": "7722074444bedbb7534873d770be1e26a6b0d7e8",
+  "sprite_proposal_commit": "9a9b5904f67304a1d5a8df7518ebdc793286f822",
+  "sprite_proposal_sha256": "83399487016CBD37CDB6A104682D3D0214BF0E1EDA7EC7CAB94C3180BE3D2A46",
+  "verdict": "Accept narrow source corrections; native corrected render qualification remains separate",
+  "facts": [
+    "German visibility option is equivalent under existing Show heading and shorter than observed clipped text.",
+    "Rocket productivity uses actual pinned SpaceAge item/recipe noun Rakete f\u00fcr Gefangennahme, preserving old B6 literal and hashes.",
+    "Six German startup labels preserve every existing setting ID/order/type/default, rich-text signature and placeholder contract.",
+    "Existing title action IDs/handlers/dimensions unchanged; only native backward_arrow/forward_arrow/reset_white bindings change.",
+    "All three native sprites are present in both exact installed2.0.77 and2.1.23 Core utility definitions. Older reduced editions do not consume the Library module."
+  ],
+  "controls": {
+    "library": 120,
+    "locale": 9,
+    "package": 17,
+    "registration": 3
+  },
+  "native_status": "Source9b/AA26 R07 fourteen original images stay under their actual identity; next changed player tree is not relabelled9b or native-qualified.",
+  "current_source_edits": [
+    "source/runtime/library.lua:3sprite literals",
+    "source/locale/de/mir-library.cfg:1option",
+    "source/locale/de/more-infinite-research.cfg:1noun+6labels"
+  ],
+  "2.0_core_sprite_definition": {
+    "path": "D:\\Games\\Factorio\\2.0\\data\\core\\prototypes\\utility-sprites.lua",
+    "bytes": 111042,
+    "sha256": "BDB260BE79217AA8FEA2AB71B1FB71EDD6F83D43A84C92ED72CFED4CCEC07137"
+  },
+  "2.1_core_sprite_definition": {
+    "path": "D:\\Games\\Factorio\\2.1\\data\\core\\prototypes\\utility-sprites.lua",
+    "bytes": 112953,
+    "sha256": "C76EFC5A0129A54E8672ADA010FB0EA593474F99EB6E74DB707741801522546B"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "remote_head": "b4a41331cf70327dfaf29b54aa892789e8123ad1",
+  "path": "projects/mir/runs/agriculture512-matched18-r02",
+  "kind": "Agriculture512Matched18PrivateCustodyV1",
+  "files": 662,
+  "bytes": 34428664,
+  "gzip_sha256": "631F7DB433DF97B8703E08F7D9374EF4AA1D53A28DF81931CF2A78CBDFDA500B",
+  "excluded": [
+    "player-data.json",
+    "dependency libraries",
+    "engine installations",
+    "credentials"
+  ],
+  "qualification": false,
+  "all_decoded_originals_reverified": true
+}

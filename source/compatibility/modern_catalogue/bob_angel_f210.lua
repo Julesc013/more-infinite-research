@@ -387,15 +387,14 @@ local function require_native_steel(raw, callback)
     fail("steel-plate-productivity changed", callback)
   end
   local required, seen = { ["steel-plate"]=true, ["casting-steel"]=true }, {}
+  local extension = { ["angels-plate-steel"]=true, ["angels-plate-steel-2"]=true }
   for _, effect in ipairs(type(steel.effects) == "table" and steel.effects or {}) do
-    if type(effect) == "table" and effect.type == "change-recipe-productivity" and required[effect.recipe] then
+    if type(effect) == "table" and effect.type == "change-recipe-productivity"
+        and (required[effect.recipe] or extension[effect.recipe]) then
       if seen[effect.recipe] or effect.change ~= expected.effect_change then
         fail("steel-plate-productivity existing effect changed: " .. effect.recipe, callback)
       end
       seen[effect.recipe] = true
-    elseif type(effect) == "table" and effect.type == "change-recipe-productivity"
-        and (effect.recipe == "angels-plate-steel" or effect.recipe == "angels-plate-steel-2") then
-      fail("steel-plate-productivity already owns Angel steel", callback)
     end
   end
   for recipe in pairs(required) do

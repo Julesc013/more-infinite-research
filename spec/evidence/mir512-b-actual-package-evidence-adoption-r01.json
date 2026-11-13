@@ -1,0 +1,57 @@
+{
+  "kind": "MIR512BActualPackageScopedEvidenceAdoptionR01",
+  "source": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+  "player": "40a065c18b86437148acd60d7180666db7aaeb32",
+  "packages": [
+    {
+      "target": "f200",
+      "old_package_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+      "B_package_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "member_paths_equal": true,
+      "unchanged_lua_count": 133,
+      "changed_lua": [
+        "platform/target.lua",
+        "presentation/library_layout.lua",
+        "runtime/library.lua"
+      ],
+      "named_API_modules": 10,
+      "steel_modules": 0,
+      "target_delta": "only literal distribution_version11 to12",
+      "info_delta": "only version and appended optional Ferrum, absent from original closed profiles"
+    },
+    {
+      "target": "f210",
+      "old_package_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+      "B_package_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "member_paths_equal": true,
+      "unchanged_lua_count": 133,
+      "changed_lua": [
+        "platform/target.lua",
+        "presentation/library_layout.lua",
+        "runtime/library.lua"
+      ],
+      "named_API_modules": 10,
+      "steel_modules": 19,
+      "target_delta": "only literal distribution_version11 to12",
+      "info_delta": "only version and appended optional Ferrum, absent from original closed profiles"
+    }
+  ],
+  "A_to_B_source_delta": [
+    "source/locale/de/mir-library.cfg",
+    "source/locale/de/more-infinite-research.cfg",
+    "source/runtime/library.lua"
+  ],
+  "independent_Aero_packets": {
+    "api": "1a0b2eaccc700e3ef0d7397b954f70ce2a40d1a2",
+    "steel": "91642229c895deb6655c2cbcfb5f438884944dca"
+  },
+  "verdict": "Adopt original11 API two-consumer physical/save and F210 configured17%-steel observations for their unchanged named closed production paths on B. Actual package contents now independently bind all named modules. Preserve11 native identity and12 metadata distinction.",
+  "limits": [
+    "Not a new12 API or steel native execution. Old exact11 actor locks remain nondispatchable on12.",
+    "No changed Library/client, installed Ferrum, unknown modpack, performance or whole stable verdict.",
+    "Recheck affected consumed modules and final actual packages if Source changes."
+  ],
+  "native_processes": 0,
+  "new_tests": 0,
+  "new_packages": 0
+}

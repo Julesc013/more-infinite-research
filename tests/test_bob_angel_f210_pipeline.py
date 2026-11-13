@@ -736,8 +736,8 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 deepcopy(raw["technology"]["steel-plate-productivity"]["effects"][0])),
              "steel-plate-productivity existing effect"),
             ("space_age", lambda raw: raw["technology"]["steel-plate-productivity"]["effects"].append(
-                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.1}),
-             "steel-plate-productivity already owns Angel steel"),
+                {"type": "change-recipe-productivity", "recipe": "angels-plate-steel", "change": 0.2}),
+             "steel-plate-productivity existing effect"),
         )
         for case, mutate, expected in scenarios:
             with self.subTest(case=case, expected=expected):
@@ -901,6 +901,137 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         lua = self.stage("space_age", raw=raw)
         row = _plain(lua.globals().data.raw.technology["steel-plate-productivity"])
         self.assertEqual(foreign, row["effects"][:2])
+
+    def _native_steel_with_angel_effects(self, recipes, reverse=False):
+        raw = deepcopy(self.context["cases"]["space_age"]["raw"])
+        owner = raw["technology"]["steel-plate-productivity"]
+        owner["order"] = "foreign-steel-order"
+        owner["visible_when_disabled"] = True
+        owner["show_levels_info"] = False
+        # These effects are unrelated to the named productivity vector, even
+        # when an unlock shares one of the extension's recipe names.
+        owner["effects"].extend([
+            {"type": "laboratory-speed", "modifier": 0.12},
+            {"type": "unlock-recipe", "recipe": "angels-plate-steel"},
+        ])
+        owner["effects"].extend(
+            {"type": "change-recipe-productivity", "recipe": recipe, "change": 0.1, "hidden": True}
+            for recipe in recipes
+        )
+        if reverse:
+            owner["effects"].reverse()
+        return raw
+
+    def test_native_steel_reuses_preexisting_angel_effects_once(self):
+        angel_recipes = ("angels-plate-steel", "angels-plate-steel-2")
+        for present in ((), angel_recipes[:1], angel_recipes[1:], angel_recipes):
+            for reverse in (False, True):
+                with self.subTest(present=present, reverse=reverse):
+                    raw = self._native_steel_with_angel_effects(present, reverse)
+                    expected = deepcopy(raw["technology"]["steel-plate-productivity"])
+                    expected["effects"].extend(
+                        {"type": "change-recipe-productivity", "recipe": recipe, "change": 0.1}
+                        for recipe in angel_recipes if recipe not in present
+                    )
+                    lua = self.stage("space_age", raw=raw)
+                    actual = _plain(lua.globals().data.raw.technology["steel-plate-productivity"])
+                    self.assertEqual(expected, actual)
+                    self.assertEqual(1, lua.globals().technology_publications)
+                    self.assertNotIn("steel-plate-productivity", _plain(lua.globals().emitted))
+
+    def test_native_steel_configured_effect_updates_each_owned_recipe_once(self):
+        angel_recipes = ("angels-plate-steel", "angels-plate-steel-2")
+        owned = {"steel-plate", "casting-steel", *angel_recipes}
+        for present in ((), angel_recipes[:1], angel_recipes[1:], angel_recipes):
+            with self.subTest(present=present):
+                raw = self._native_steel_with_angel_effects(present, reverse=True)
+                expected = deepcopy(raw["technology"]["steel-plate-productivity"])
+                for effect in expected["effects"]:
+                    if effect["type"] == "change-recipe-productivity" and effect["recipe"] in owned:
+                        effect["change"] = 0.25
+                expected["effects"].extend(
+                    {"type": "change-recipe-productivity", "recipe": recipe, "change": 0.25}
+                    for recipe in angel_recipes if recipe not in present
+                )
+                lua = self.stage("space_age", {"ips-effect-per-level-research_steel": 25}, raw=raw)
+                actual = _plain(lua.globals().data.raw.technology["steel-plate-productivity"])
+                self.assertEqual(expected, actual)
+                self.assertEqual(1, lua.globals().technology_publications)
+
+    def test_disabled_native_steel_retains_every_upstream_angel_effect(self):
+        angel_recipes = ("angels-plate-steel", "angels-plate-steel-2")
+        for present in ((), angel_recipes[:1], angel_recipes[1:], angel_recipes):
+            with self.subTest(present=present):
+                raw = self._native_steel_with_angel_effects(present, reverse=True)
+                expected = deepcopy(raw["technology"]["steel-plate-productivity"])
+                lua = self.stage("space_age", {"ips-enable-research_steel": False}, raw=raw)
+                self.assertEqual(expected, _plain(lua.globals().data.raw.technology["steel-plate-productivity"]))
+                self.assertEqual(1, lua.globals().technology_publications)
+
+    def test_preexisting_angel_steel_duplicates_and_malformed_scalars_fail_before_writes(self):
+        for recipe in ("angels-plate-steel", "angels-plate-steel-2"):
+            for bad in (None, True, "0.1", 0, -0.1, 0.2, float("nan"), float("inf"), "duplicate"):
+                with self.subTest(recipe=recipe, bad=repr(bad)):
+                    raw = self._native_steel_with_angel_effects((recipe,))
+                    effect = raw["technology"]["steel-plate-productivity"]["effects"][-1]
+                    if bad == "duplicate":
+                        raw["technology"]["steel-plate-productivity"]["effects"].append(deepcopy(effect))
+                    elif bad is None:
+                        effect.pop("change")
+                    else:
+                        effect["change"] = bad
+                    expected = deepcopy(raw["technology"]["steel-plate-productivity"])
+                    lua = self.stage("space_age", raw=raw, expect_failure=True)
+                    self.assertIn("steel-plate-productivity existing effect", str(lua.globals().message))
+                    self.assertEqual(0, lua.globals().technology_publications)
+                    self.assertEqual({}, _plain(lua.globals().emitted))
+                    self.assertEqual(
+                        json.dumps(expected, sort_keys=True),
+                        json.dumps(_plain(lua.globals().data.raw.technology["steel-plate-productivity"]), sort_keys=True),
+                    )
+
+    def test_native_owner_extension_preflight_is_detached_and_idempotent(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = SOURCE_ROOT.as_posix()
+        lua.execute(r'''
+          package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
+          local modern=require("research.modern")
+          local recipes={"steel-plate","casting-steel","angels-plate-steel","angels-plate-steel-2"}
+          local effects={{type="unlock-recipe",recipe="angels-plate-steel"}}
+          for _,recipe in ipairs(recipes) do
+            effects[#effects+1]={type="change-recipe-productivity",recipe=recipe,change=.1}
+          end
+          local unit={count_formula="1.5^L*1000",time=60,ingredients={{"automation-science-pack",1}}}
+          local owner={name="steel-plate-productivity",enabled=true,max_level="infinite",effects=effects,unit=unit}
+          local definition={id=owner.name,family="research_steel",
+            expected={enabled=true,max_level="infinite",effect_change=.1},
+            admission={effect_type="change-recipe-productivity",recipes=recipes},
+            append_recipes={"angels-plate-steel","angels-plate-steel-2"}}
+          local selection={native_owners={definition}}
+          local raw={technology={[owner.name]=owner}}
+          local stream={enabled=true,effect_percent=10,configured={}}
+          local values={streams={research_steel=stream}}
+          local patches=modern.preflight_native_owner_patches(selection,raw,values)
+          assert(#patches==1 and patches[1].owner==owner and patches[1].effects==nil)
+          modern.apply_native_owner_patches(patches)
+          assert(owner.effects==effects and owner.unit==unit,"default re-application changed upstream tables")
+          definition.append_recipes[3]="angels-plate-steel"
+          local ok,message=pcall(modern.preflight_native_owner_patches,selection,raw,values)
+          assert(not ok and tostring(message):find("duplicate append recipe",1,true))
+          definition.append_recipes[3]=nil
+          effects[2].change=.2
+          ok,message=pcall(modern.preflight_native_owner_patches,selection,raw,values)
+          assert(not ok and tostring(message):find("unexpected effect change",1,true))
+          assert(owner.effects==effects and owner.unit==unit)
+          effects[2].change=.1
+          stream.effect_percent,stream.configured.effect_percent=25,true
+          patches=modern.preflight_native_owner_patches(selection,raw,values)
+          assert(owner.effects==effects and effects[2].change==.1 and owner.unit==unit,"preflight wrote raw")
+          assert(#patches[1].effects==5 and patches[1].effects[1].type=="unlock-recipe")
+          modern.apply_native_owner_patches(patches)
+          assert(owner.unit==unit and owner.effects[1].recipe=="angels-plate-steel")
+          for index=2,5 do assert(owner.effects[index].change==.25) end
+        ''')
 
 
 if __name__ == "__main__":

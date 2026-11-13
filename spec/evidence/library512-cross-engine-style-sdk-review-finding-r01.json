@@ -1,0 +1,84 @@
+{
+  "kind": "LibraryNativeStyleCrossEngineSDKReviewFindingV1",
+  "source": "af5d96001f2d3e054986a20acfb867f2c8f2346a",
+  "finding": "sync_titlebar assigns button.style.name when adapting an existing differently styled action. Pinned2.0.77 declares LuaStyle.name read-only; pinned2.1.23 permits writing. The shared LuaGuiElement.style string setter is available on both and expresses the intended restyle.",
+  "sdk": [
+    {
+      "engine_version": "2.0.77",
+      "sdk": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "attributes": {
+        "LuaStyle.name": {
+          "name": "name",
+          "order": 1,
+          "description": "Name of this style.",
+          "read_type": "string",
+          "optional": false
+        },
+        "LuaGuiElement.style": {
+          "name": "style",
+          "order": 7,
+          "description": "The style of this element. When read, this evaluates to a [LuaStyle](runtime:LuaStyle). For writing, it only accepts a string that specifies the textual identifier (prototype name) of the desired style.",
+          "read_type": {
+            "complex_type": "union",
+            "options": [
+              "LuaStyle",
+              "string"
+            ],
+            "full_format": false
+          },
+          "write_type": {
+            "complex_type": "union",
+            "options": [
+              "LuaStyle",
+              "string"
+            ],
+            "full_format": false
+          },
+          "optional": false
+        }
+      }
+    },
+    {
+      "engine_version": "2.1.23",
+      "sdk": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "attributes": {
+        "LuaStyle.name": {
+          "name": "name",
+          "order": 1,
+          "description": "Name of this style.",
+          "read_type": "string",
+          "write_type": "string",
+          "optional": false
+        },
+        "LuaGuiElement.style": {
+          "name": "style",
+          "order": 7,
+          "description": "The style of this element. When read, this evaluates to a [LuaStyle](runtime:LuaStyle). For writing, it only accepts a string that specifies the textual identifier (prototype name) of the desired style.\n\nWhen writing, this clears all custom values set through [LuaStyle](runtime:LuaStyle).",
+          "read_type": {
+            "complex_type": "union",
+            "options": [
+              "LuaStyle",
+              "string"
+            ],
+            "full_format": false
+          },
+          "write_type": {
+            "complex_type": "union",
+            "options": [
+              "LuaStyle",
+              "string"
+            ],
+            "full_format": false
+          },
+          "optional": false
+        }
+      }
+    }
+  ],
+  "native_processes": 0,
+  "scope": "Static API compatibility finding; no observed native crash is claimed. Source author owns correction and focused old-window regression."
+}

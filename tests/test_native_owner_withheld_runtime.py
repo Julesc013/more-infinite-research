@@ -53,13 +53,13 @@ class WithheldRuntimeTests(unittest.TestCase):
             for _,native in pairs(technologies) do native.force=world end
             return world
           end
-          function parse(world,data,saved,configured_effect,history)
+          function parse(world,data,saved,configured_effect,history,native_prototypes)
             local settings={}
             for _,row in ipairs(owner_rows) do
               settings["ips-max-level-"..row[2]]=2
               if configured_effect then settings["ips-effect-per-level-"..row[2]]=configured_effect end
             end
-            boot({[41]=world},0,"",saved,nil,0,active,nil,settings,{},data,history)
+            boot({[41]=world},0,"",saved,nil,0,active,nil,settings,{},data,history,native_prototypes)
             return require("runtime.lifecycle"),require("runtime.catalogue")
           end
           function present(rows,name)
@@ -251,19 +251,47 @@ class WithheldRuntimeTests(unittest.TestCase):
                 self.lua.execute(r'''
                   local world=world_for(true)
                   local native=world.technologies["processing-unit-productivity"]
+                  native.saved_progress=0 -- actual native queued technologies always expose this getter
                   world._queue={native};world.current_research=native
                   local queued=world._queue
                   local id="recipe-prod-research_processing_unit-1"
+                  local emitted_prototypes={}
                   -- Materialize the actual emitted MIR definitions rather
                   -- than inventing a partial post-data control-stage world.
                   local function install(name,level)
                     if world.technologies[name] then return end
                     local proto=actual_technologies[name];assert(proto,"missing actual source "..name)
-                    proto.level=1;proto.max_level=4294967295
+                    proto.level=proto.level or tonumber(name:match("%-(%d+)$"))or 1
+                    if proto.max_level=="infinite"then proto.max_level=4294967295 end
                     if proto.enabled==nil then proto.enabled=true end
-                    local row=technology(name,level or 1,proto.enabled)
-                    row.prototype=proto;row.force=world;world.technologies[name]=row
+                    if proto.hidden==nil then proto.hidden=false end
+                    if proto.visible_when_disabled==nil then proto.visible_when_disabled=false end
+                    proto.ignore_tech_cost_multiplier=proto.ignore_tech_cost_multiplier or false
+                    local unit=proto.unit
+                    proto.research_unit_count_formula=unit.count_formula
+                    proto.research_unit_count=unit.count
+                    proto.research_unit_energy=unit.time*60
+                    proto.research_unit_ingredients={}
+                    for i,pack in ipairs(unit.ingredients)do proto.research_unit_ingredients[i]={name=pack[1],amount=pack[2]}end
+                    local prerequisites={}
+                    for _,prerequisite in ipairs(proto.prerequisites or{})do prerequisites[prerequisite]={name=prerequisite}end
+                    proto.prerequisites=prerequisites
+                    for _,effect in ipairs(proto.effects)do if effect.hidden==nil then effect.hidden=false end end
+                    local row=technology(name,level or proto.level,proto.enabled)
+                    row.visible_when_disabled=proto.visible_when_disabled;row.saved_progress=0
+                    row.research_unit_count=unit.count
+                    if name=="worker-robots-storage-4"or name=="mir-worker-storage-default-4"or name=="mir-worker-storage-preservation-4"then
+                      assert(unit.count_formula=="675*1.5^(L-4)");row.research_unit_count=675
+                    end
+                    row.research_unit_energy=proto.research_unit_energy;row.research_unit_ingredients=proto.research_unit_ingredients
+                    row.prerequisites={};row.prototype=proto;row.force=world;world.technologies[name]=row
+                    emitted_prototypes[name]=proto
                   end
+                  for _,name in ipairs({"worker-robots-storage-4","mir-worker-storage-default-4","mir-worker-storage-head-4","mir-worker-storage-preservation-4"})do install(name)end
+                  -- This force has no paid Base worker rows. The model's
+                  -- native contribution is a literal zero, not recovery input.
+                  world.worker_robots_storage_bonus=0
+                  active["more-infinite-research"]=require("platform.target").distribution_version
                   local credits=actual_data["more-infinite-research-native-adoptions"].data.credits
                   for family in pairs(credits) do
                     local main="recipe-prod-"..family.."-1"
@@ -276,7 +304,7 @@ class WithheldRuntimeTests(unittest.TestCase):
                   local lifecycle,runtime=parse(world,actual_data,nil,17,function(_,name)
                     assert(actual_technologies[name],"creation claim lacks actual source")
                     return {created="more-infinite-research"}
-                  end)
+                  end,emitted_prototypes)
                   handlers.init()
                   assert(native.enabled and native.level==3 and native.researched==false)
                   assert(world._queue==queued and world.current_research==native and world.research_progress==.42)

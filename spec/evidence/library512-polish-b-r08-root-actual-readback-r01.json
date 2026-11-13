@@ -1,0 +1,2519 @@
+{
+  "kind": "MIRActualEightSerialLibraryRenderReadbackR08",
+  "source": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+  "player": "40a065c18b86437148acd60d7180666db7aaeb32",
+  "scope": "56 actual PNGs, native-frame equality and exact full restoration; separate pixel review. No actual pointer, resize, menu, export, lifecycle, dual-client, performance or stable verdict.",
+  "tooltip_preference_observed": "Tooltips remain visible on some pages despite owned tooltip-delay=60; do not claim those pixels unobscured.",
+  "runs": [
+    {
+      "case": "f210-normal-en",
+      "plan_sha256": "4AB740F32536E1A57962BC02D07F99383F0EC43806E72D8FF40CFE6209B14F3B",
+      "identity": {
+        "process_id": 46708,
+        "process_start_utc": "2026-11-09T19:01:24.0005949Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 34.371495,
+        "peak_working_set_bytes": 1278349312,
+        "peak_sampled_private_bytes": 2479423488,
+        "admission": {
+          "observed_at": "2026-11-09T19:01:23.9676240+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14646214656,
+            "committed_bytes": 25209032704,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90755928064,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203570376704,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1017958,
+        "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3368906707",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "1731653950"
+      },
+      "actual_resolution": {
+        "width": 2560,
+        "height": 1440
+      },
+      "actual_display_scale": 1.25,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 4953680,
+          "sha256": "3EBA5BEE8D66C07E17177AD90AAA526190282155AB6E7033122B140CD9B9CC36",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "02-queue",
+          "bytes": 4754184,
+          "sha256": "6680D7E02813B7F58C09264E575989088D0B17CD2A39CF035307A40E9DEE73C2",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 4928071,
+          "sha256": "05DB1FC22D076B6AE263E9497B6FE8E6CB60CB01CA8474213B4A2C4896568A0A",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 5031006,
+          "sha256": "EDBCD5AD9CD0935F8127D70666907AC8AD348927FF83E29694C526C09E526CA4",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "05-help",
+          "bytes": 5016571,
+          "sha256": "111051636A887B0B30D7EE2E0958B37B2D5C8A930254AF35EBA39920B3E168F4",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "06-availability",
+          "bytes": 4914242,
+          "sha256": "CE17111BED69D744E327C1115E941496A49BDD8120AA84FE9D47B37B8304E686",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 5013702,
+          "sha256": "09861DF0C61C83047A9BEF7E0AB05902123A7E4A853F7BB306AF913521F2DAE7",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f210-normal-de",
+      "plan_sha256": "52D6DB816245EB196859D5BE9CD010F2FC20DA2763C5C9210C84BA45059B07C2",
+      "identity": {
+        "process_id": 52108,
+        "process_start_utc": "2026-11-09T19:02:00.3093836Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 16.431502,
+        "peak_working_set_bytes": 1263722496,
+        "peak_sampled_private_bytes": 2503118848,
+        "admission": {
+          "observed_at": "2026-11-09T19:02:00.2996285+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14235901952,
+            "committed_bytes": 25716379648,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90718580736,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203569905664,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1017958,
+        "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3368906707",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "1731653950"
+      },
+      "actual_resolution": {
+        "width": 2560,
+        "height": 1440
+      },
+      "actual_display_scale": 1.25,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 4980976,
+          "sha256": "36793F7540E7101150FF46EA0DDD8A9C7DC9415B07284A02BF30F87E70841D81",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "02-queue",
+          "bytes": 4760943,
+          "sha256": "60348A69023BE0D45DEDEE54E6D2A22B8D7C06ADCC0A02D1070CF97A7240F9FC",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 4944138,
+          "sha256": "B2D9C2D818E0C0EAEEAE76DDAE6A32402344763BD96C0BD7BCA97DE9CD2D59CB",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 5061618,
+          "sha256": "97CED32F61DC005ADF7BA6B2FC2FBB6A9B8B9A82ABE73566718A14DA9C215BE6",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "05-help",
+          "bytes": 5031384,
+          "sha256": "2B2F4AF96EB5EFAA6E09D792930B29E6610B82F2DB557010332A579BDF858E3D",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "06-availability",
+          "bytes": 4919447,
+          "sha256": "C39029CBE4402BEF1CE057C430D83E1AC0B11B5D4F123DA91D530F163D55D400",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 5034242,
+          "sha256": "190B2437D4FBB3D6B836CC5C13094D49BCC0890F2E2A09728B8069FC92C5B006",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f210-narrow-en",
+      "plan_sha256": "5E4C04012FF56E14455F84A97CD97AFC693CF907E3A6A31F217CC540E1953AA7",
+      "identity": {
+        "process_id": 30976,
+        "process_start_utc": "2026-11-09T19:02:18.6828025Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 16.124964,
+        "peak_working_set_bytes": 1294139392,
+        "peak_sampled_private_bytes": 2395873280,
+        "admission": {
+          "observed_at": "2026-11-09T19:02:18.6735142+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14376300544,
+            "committed_bytes": 25655844864,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90681229312,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203569565696,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1017958,
+        "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3368906707",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "1731653950"
+      },
+      "actual_resolution": {
+        "width": 960,
+        "height": 720
+      },
+      "actual_display_scale": 0.75,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 986336,
+          "sha256": "C7FEF64C2CA84F1D6B96358FFF2AC8B57DFA5955831621BCE222EF2E02158A11",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "02-queue",
+          "bytes": 949540,
+          "sha256": "6D6C6B86D5334782E2A60872BB5E3859C3A8C2FBBC46D3988F32B6288B770540",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 1000486,
+          "sha256": "D542C8840A6E9B0F017692E234ACDF664033C5B65366F8F2F6D31C535011754A",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 1014151,
+          "sha256": "79111B170DC43A4B5880DC20B4B4601511DF0DBCAFA55E921430308059274E4B",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "05-help",
+          "bytes": 1012720,
+          "sha256": "8FEEDBFD9CA5A828B26FE63910B11A65F1712AF9D52011A8D4AC7660041EBC54",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "06-availability",
+          "bytes": 972310,
+          "sha256": "568C09C839A4ADE896D511FA740B7538D3DDC6D650495FFB885E09DDDACCBF1A",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 996682,
+          "sha256": "DADEFB5551D878C20097528FA2BBBCA09125505CA0D6D9A4141F1F31D32021DE",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f210-narrow-de",
+      "plan_sha256": "147A8EA9D76D8F7EE7C4D70D2A741E41118F7745939409ABE60A25BBBAC35E35",
+      "identity": {
+        "process_id": 41696,
+        "process_start_utc": "2026-11-09T19:02:36.7116208Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 15.949566,
+        "peak_working_set_bytes": 1185255424,
+        "peak_sampled_private_bytes": 2372714496,
+        "admission": {
+          "observed_at": "2026-11-09T19:02:36.7022123+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14163116032,
+            "committed_bytes": 25650556928,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90670370816,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203569303552,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1017958,
+        "sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3368906707",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "1731653950"
+      },
+      "actual_resolution": {
+        "width": 960,
+        "height": 720
+      },
+      "actual_display_scale": 0.75,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 991235,
+          "sha256": "B2A25887AC0C07099DBD71C8D28390446C0A8D327D5289806CEAA67774462ACF",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "02-queue",
+          "bytes": 952458,
+          "sha256": "0294F6850F515D1FA929AE00039B478ED019520E8D4953B2E34A8F9227B9D1F1",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 1004444,
+          "sha256": "83960F69E6B25E425EC271B4B670DCE4DCF6512CD9D2D3424987A63CAA7B83A2",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 1017941,
+          "sha256": "012D5300E9F3F99C81BD463B55AFAA0CF51598C982B4F16A8442FCA7A47D2F89",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "05-help",
+          "bytes": 1013602,
+          "sha256": "366BAE049A8000128460BFC33A867C7A574F803D4F8D1F65615A1DDDF916E88C",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "06-availability",
+          "bytes": 974857,
+          "sha256": "3D7102DF67BE48BADB608DAE7DFD8EE417E998FF41D8D14B35C68916C22032E4",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 999617,
+          "sha256": "3E7A7CBCF57BFCE4B078FADB610CBDB6A8A6DB3073D38497F8A8B5B4BCB480C6",
+          "width": 960,
+          "height": 720,
+          "display_scale": 0.75
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f200-normal-en",
+      "plan_sha256": "9272B84C1DD6AB2D1B9CAF6F20327A38290BEC0487FE72CB509A9ED7DE0F49B1",
+      "identity": {
+        "process_id": 22848,
+        "process_start_utc": "2026-11-09T19:02:54.5481801Z",
+        "executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 70.974663,
+        "peak_working_set_bytes": 1204498432,
+        "peak_sampled_private_bytes": 2295693312,
+        "admission": {
+          "observed_at": "2026-11-09T19:02:54.5392194+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14234357760,
+            "committed_bytes": 25581191168,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90660679680,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203565948928,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017534,
+        "sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.0.77",
+        "more-infinite-research": "5.0.20012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3792629764",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "3986050130"
+      },
+      "actual_resolution": {
+        "width": 3200,
+        "height": 1800
+      },
+      "actual_display_scale": 1.5,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 7846170,
+          "sha256": "846374AFDFD7E199942C967BFC805C844918FF2662A01B488BF7D8FC48749964",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "02-queue",
+          "bytes": 7671073,
+          "sha256": "4B032388D6B6ED86731308AB4546B104AC6D0D0D5DAEE20C7F6642EB4F899E15",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 7982536,
+          "sha256": "0E87068FF35B8B29698B3C927713C0FCDD30633C3B9B641FED3119E42B3A0DAF",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 8101727,
+          "sha256": "4DC28E5E643D8F20D7DF0AAB181E6335196BDC6C85701A8CFFFB2FE7B8DFBDC6",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "05-help",
+          "bytes": 8094933,
+          "sha256": "D96C9718B502C257729750A65A91A53B99463A18B1DB55715241780E7BA3091B",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "06-availability",
+          "bytes": 7939144,
+          "sha256": "6BB0DD5B4A9311AE8A5DB72B364A786A77AF926971ACD0D23FD5B1880CB09067",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 8087564,
+          "sha256": "B065F9FA288413670085116750E7ED6C8BB57FBD4F14CDA6FC7E3078440D0EBB",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f200-normal-de",
+      "plan_sha256": "C4130F27C77461F6D5102E2CB58FFD6ABCCD6C40D81CE7543C20C60D0C496D2E",
+      "identity": {
+        "process_id": 38444,
+        "process_start_utc": "2026-11-09T19:04:07.7065006Z",
+        "executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 18.184772,
+        "peak_working_set_bytes": 1704611840,
+        "peak_sampled_private_bytes": 2804023296,
+        "admission": {
+          "observed_at": "2026-11-09T19:04:07.6976179+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14196555776,
+            "committed_bytes": 25805623296,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90586808320,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203564498944,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017534,
+        "sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.0.77",
+        "more-infinite-research": "5.0.20012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3792629764",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "3986050130"
+      },
+      "actual_resolution": {
+        "width": 3200,
+        "height": 1800
+      },
+      "actual_display_scale": 1.5,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 7870568,
+          "sha256": "8DA873B0949DEC2DAF1D744906A66B58E22CDE7BDB4D4E440ED954725CAC0D76",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "02-queue",
+          "bytes": 7679990,
+          "sha256": "81C47D9699094B5DA6CB3971064E1BE334F79238C79535AC18778041EB212B66",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 8008155,
+          "sha256": "D1B2E3C9FC6AA3EA2E04CC36EEAB5C801B869B9FC8DEF0228BE334D4A8FB2EE6",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 8147935,
+          "sha256": "4EF2D2F0A273BBD6A115FED15CAD598C24CDCA7ADE6EAD6257A9FE8F38F7FE0B",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "05-help",
+          "bytes": 8112534,
+          "sha256": "B179A41C6B0BC103D15893F3E513F0A00A6950C9E1E7A4EEAA48511607F7B9A6",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "06-availability",
+          "bytes": 7946528,
+          "sha256": "8B1AF418BDFDC96F7995BB0DEBEA00A23EF05459E573A3DC936570E24D8764E1",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 8102376,
+          "sha256": "F05814DEC84729518098F2EF1C5411FC257EF5F05BABCAA1E61111D484694B96",
+          "width": 3200,
+          "height": 1800,
+          "display_scale": 1.5
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f200-narrow-en",
+      "plan_sha256": "207BDEBBB6E5151377F7189624A237609BC33A99FB24C0303BA338E152F34313",
+      "identity": {
+        "process_id": 36992,
+        "process_start_utc": "2026-11-09T19:04:28.0425333Z",
+        "executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 17.119142,
+        "peak_working_set_bytes": 1340137472,
+        "peak_sampled_private_bytes": 2307543040,
+        "admission": {
+          "observed_at": "2026-11-09T19:04:28.0336058+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14154489856,
+            "committed_bytes": 25743822848,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90528403456,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203578720256,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017534,
+        "sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.0.77",
+        "more-infinite-research": "5.0.20012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3792629764",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "3986050130"
+      },
+      "actual_resolution": {
+        "width": 1200,
+        "height": 900
+      },
+      "actual_display_scale": 0.75,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 1590390,
+          "sha256": "07A57ECDAD3941ABFC0E33756C7A89BEC48C1DBF5AC68C1A4C4BE0033F508B07",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "02-queue",
+          "bytes": 1539216,
+          "sha256": "6FC711B879D974F3B69096C2652CFC4B4AEBD6A2DFD1DD1E09D7A571ECBAF006",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 1580889,
+          "sha256": "DCE11ECCF14C228DFAFF1DAA51DEC365B5FD6A402B41B1527DF5B1AB04EC727C",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 1591163,
+          "sha256": "BF64951BB8DBAF2B1D43610C3A22EF66E59D719AAD96A875B569441F2A0F4F16",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "05-help",
+          "bytes": 1601403,
+          "sha256": "D64B833777F2533E0F5BADD625A61DE500A4A9E379D17A4E804E62DF0AC577C0",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "06-availability",
+          "bytes": 1555549,
+          "sha256": "5787FA8535735B60AACCB50A4C64B0D128E7A550EA0284DD78F08E484397F54F",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 1585648,
+          "sha256": "6009B41E863980B3A960D6F4F8F02B2F81DA092402FDB056B8B63C2C6079E53C",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        }
+      ],
+      "original_library_restored": true
+    },
+    {
+      "case": "f200-narrow-de",
+      "plan_sha256": "BBABE89ACCF1E06331A06C0D982AEAD2EADF568B42FEEFBCFE89E83B949B7E19",
+      "identity": {
+        "process_id": 50640,
+        "process_start_utc": "2026-11-09T19:04:47.1784017Z",
+        "executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "source_head": "e694c38cb650bc2da31f7f735ab595998485a7b1"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 17.364998,
+        "peak_working_set_bytes": 1285980160,
+        "peak_sampled_private_bytes": 2172567552,
+        "admission": {
+          "observed_at": "2026-11-09T19:04:47.1695074+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14195998720,
+            "committed_bytes": 25716912128,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 90514833408,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 203577380864,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-b-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017534,
+        "sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D"
+      },
+      "actual_data_mods": {
+        "core": "0.0.0",
+        "base": "2.0.77",
+        "more-infinite-research": "5.0.20012"
+      },
+      "actual_script_checksums": {
+        "__level__/control.lua": "3792629764",
+        "__mir-fixture-library-render-capture__/control.lua": "3923863659",
+        "__more-infinite-research__/control.lua": "3986050130"
+      },
+      "actual_resolution": {
+        "width": 1200,
+        "height": 900
+      },
+      "actual_display_scale": 0.75,
+      "native_snapshot_unchanged": true,
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 1597696,
+          "sha256": "C6F7D9D305D07EAB0D4C726846899B75019D703F7202324CF0C7E8626A688E3C",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "02-queue",
+          "bytes": 1542273,
+          "sha256": "A3DB4E4084816C1307C3F52429086549E9BB27808B12846877382F4DAEE5B66B",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 1586840,
+          "sha256": "C3B5901CB57729687F082B67E68919C8A9AC711604819F2C62DD7D0C71B71FD5",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 1600841,
+          "sha256": "AAF93E3DBAD39D55478204301680BE3529D9E06C541CDF220B511ADE17894E98",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "05-help",
+          "bytes": 1606609,
+          "sha256": "79C56455304F74A3BA79EF64AFBD744B0B78D0B620856D73CCCE568629DF820A",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "06-availability",
+          "bytes": 1558094,
+          "sha256": "887350D486BC6794831AF9B09B1B13FDF37260AD7B0A0244CF77E83D72C1B026",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 1590068,
+          "sha256": "4971DD535475697100ED45E6E35428FC03EFC933B3C4690E6FE3A5E158EB883A",
+          "width": 1200,
+          "height": 900,
+          "display_scale": 0.75
+        }
+      ],
+      "original_library_restored": true
+    }
+  ],
+  "originals": [
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\native-identity.json",
+      "path": "f210-normal-en/native-identity.json",
+      "bytes": 302,
+      "sha256": "8C817F40713219BB33DE43510FAB6ACE4312902798621A96AEDE6E59418E6328"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\owner-result.json",
+      "path": "f210-normal-en/owner-result.json",
+      "bytes": 4163,
+      "sha256": "D058E7913AF364FA70E555F56AFAF7C1E306CF110BEACCDDD8DE4487AC760F54"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\process-1.resources.jsonl",
+      "path": "f210-normal-en/process-1.resources.jsonl",
+      "bytes": 9980,
+      "sha256": "716422BB26A1B0F98918EFE3C964AC6C13EF966D9FEB2F5ED3C0C8076C002B93"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\process-1.stderr.txt",
+      "path": "f210-normal-en/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\process-1.stdout.txt",
+      "path": "f210-normal-en/process-1.stdout.txt",
+      "bytes": 18677,
+      "sha256": "BF68F7734C7DB2D01039C45D8D4455088208EBBEC3FD40B912B4DB60DF281AF6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\render-file-validation.json",
+      "path": "f210-normal-en/render-file-validation.json",
+      "bytes": 1665,
+      "sha256": "BAD4489F3890BB252E62F799FB6DCFC8DF703F44BE680A6EF46F47CF30578BC3"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\achievements-modded.dat",
+      "path": "f210-normal-en/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "D7E13188B3390FC6E69C13CC83C864E87C3E0D686443C4C5E5E53C8918B115A0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\crop-cache.dat",
+      "path": "f210-normal-en/write-data/crop-cache.dat",
+      "bytes": 2598280,
+      "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\factorio-current.log",
+      "path": "f210-normal-en/write-data/factorio-current.log",
+      "bytes": 18482,
+      "sha256": "46B33CA9D323B33427FB475305EF1C529DD053C3AC120CBBC73F189F530F99DB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\player-data.json",
+      "path": "f210-normal-en/write-data/player-data.json",
+      "bytes": 13022,
+      "sha256": "EC01E7D1D1A1391D8293FAEF6A54C30294558EC8B5A7581BCB1EB6BEDFD74D89"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/01-research.json",
+      "bytes": 224,
+      "sha256": "D1C3BA0FD85B809F4EE560529849CAB54B0C9C8A5C201236DD9BB182BB90E6CF"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/01-research.png",
+      "bytes": 4953680,
+      "sha256": "3EBA5BEE8D66C07E17177AD90AAA526190282155AB6E7033122B140CD9B9CC36"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/02-queue.json",
+      "bytes": 221,
+      "sha256": "4A0A303289ED2ADB47B2A5D41CACE919D90EB83C9E0CF3814352E06ECEEBFD0D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/02-queue.png",
+      "bytes": 4754184,
+      "sha256": "6680D7E02813B7F58C09264E575989088D0B17CD2A39CF035307A40E9DEE73C2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/03-settings-research.json",
+      "bytes": 233,
+      "sha256": "93CD6B981AED9109BB71FBB6D71C438D729A9FECBD94C5935E186EAB3C136F00"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/03-settings-research.png",
+      "bytes": 4928071,
+      "sha256": "05DB1FC22D076B6AE263E9497B6FE8E6CB60CB01CA8474213B4A2C4896568A0A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/04-settings-options.json",
+      "bytes": 232,
+      "sha256": "6477C17FC77EABB23F5428009C7CE8B06B4D7BC6892FCBC4F8CC489A7FD18EC1"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/04-settings-options.png",
+      "bytes": 5031006,
+      "sha256": "EDBCD5AD9CD0935F8127D70666907AC8AD348927FF83E29694C526C09E526CA4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/05-help.json",
+      "bytes": 220,
+      "sha256": "71ED36880A0DAEC706E8360D25F4AAF3D3B2CC0464E39FC2827D576FF4CC555A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/05-help.png",
+      "bytes": 5016571,
+      "sha256": "111051636A887B0B30D7EE2E0958B37B2D5C8A930254AF35EBA39920B3E168F4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/06-availability.json",
+      "bytes": 228,
+      "sha256": "20FBA700BDE56646D6AAF1D42733EC198A1F3AEA42DB2817DC28F140E3A23CFD"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/06-availability.png",
+      "bytes": 4914242,
+      "sha256": "CE17111BED69D744E327C1115E941496A49BDD8120AA84FE9D47B37B8304E686"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/07-research-filtered.json",
+      "bytes": 233,
+      "sha256": "B30427A748B178112850E58618F7FA9E0B238E7456BB4F42EF46C8C87D7B6030"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/07-research-filtered.png",
+      "bytes": 5013702,
+      "sha256": "09861DF0C61C83047A9BEF7E0AB05902123A7E4A853F7BB306AF913521F2DAE7"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+      "path": "f210-normal-en/write-data/script-output/mir-library-render/en/complete.json",
+      "bytes": 2000,
+      "sha256": "25F5A5CD17048A2D5C27546F366B91EB1F5490F7D368CF414943D4A3FE1E1F56"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-en\\write-data\\tips-and-tricks.log",
+      "path": "f210-normal-en/write-data/tips-and-tricks.log",
+      "bytes": 38,
+      "sha256": "B049B54887E88768CD86ED824B74529328F05A5C94B02B4067C3AD8AC7016C23"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\native-identity.json",
+      "path": "f210-normal-de/native-identity.json",
+      "bytes": 302,
+      "sha256": "7E88F3F442DBA42C56AB80399992D52C1AD9E09BB34362552A697F096267163F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\owner-result.json",
+      "path": "f210-normal-de/owner-result.json",
+      "bytes": 4163,
+      "sha256": "E6E3FAC0B2553D097102D9EA3F3825EB2A16B9935FA5EE30BA00438D15CBA469"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\process-1.resources.jsonl",
+      "path": "f210-normal-de/process-1.resources.jsonl",
+      "bytes": 9363,
+      "sha256": "462A4A066D4A5EE515F2A027AC46D3282C8D8AC2884A14FE52C02EECA199F699"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\process-1.stderr.txt",
+      "path": "f210-normal-de/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\process-1.stdout.txt",
+      "path": "f210-normal-de/process-1.stdout.txt",
+      "bytes": 18677,
+      "sha256": "8F87F65E34636E55214D6ADC7F6094D156D988D659372EA2E9AD83214756B540"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\render-file-validation.json",
+      "path": "f210-normal-de/render-file-validation.json",
+      "bytes": 1665,
+      "sha256": "3733BF11243755B81B239AFFB0587A9D8DAE965696E5C23AE30C3502CE9D4B9A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\achievements-modded.dat",
+      "path": "f210-normal-de/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "D7E13188B3390FC6E69C13CC83C864E87C3E0D686443C4C5E5E53C8918B115A0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\crop-cache.dat",
+      "path": "f210-normal-de/write-data/crop-cache.dat",
+      "bytes": 2598280,
+      "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\factorio-current.log",
+      "path": "f210-normal-de/write-data/factorio-current.log",
+      "bytes": 18482,
+      "sha256": "7E92A59DCFABFFAE650AD87EA2E1E041D05A2FB8FA4A078C6CA9D8A7617B8BCB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\player-data.json",
+      "path": "f210-normal-de/write-data/player-data.json",
+      "bytes": 13013,
+      "sha256": "F86D9F074D8246F6AADDD617A963A1D88E7805B5F9BAC34629C26CD22789C60E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/01-research.json",
+      "bytes": 224,
+      "sha256": "25E5C8D21313A4BCF4BA70D3F143E78485410C5051C30EC87575ACBD02C9889E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/01-research.png",
+      "bytes": 4980976,
+      "sha256": "36793F7540E7101150FF46EA0DDD8A9C7DC9415B07284A02BF30F87E70841D81"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/02-queue.json",
+      "bytes": 221,
+      "sha256": "B944307E50D322ABA571FD627675F9B8EB4F7D7D77C5BE37FF5AD989F5E9B06E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/02-queue.png",
+      "bytes": 4760943,
+      "sha256": "60348A69023BE0D45DEDEE54E6D2A22B8D7C06ADCC0A02D1070CF97A7240F9FC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/03-settings-research.json",
+      "bytes": 233,
+      "sha256": "D746D95E1181ED1D870EC31BFCA82202DD79E1C6D4491544BB526CE8C05D43A6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/03-settings-research.png",
+      "bytes": 4944138,
+      "sha256": "B2D9C2D818E0C0EAEEAE76DDAE6A32402344763BD96C0BD7BCA97DE9CD2D59CB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/04-settings-options.json",
+      "bytes": 232,
+      "sha256": "0DB8523D1AB6F58EC5511A2C3428A72295A52422CF923ADE990844680CCC66B2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/04-settings-options.png",
+      "bytes": 5061618,
+      "sha256": "97CED32F61DC005ADF7BA6B2FC2FBB6A9B8B9A82ABE73566718A14DA9C215BE6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/05-help.json",
+      "bytes": 220,
+      "sha256": "57531652238E86001F579C1A86E1E440C89BD9BC1121350E8254AE7D967D581A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/05-help.png",
+      "bytes": 5031384,
+      "sha256": "2B2F4AF96EB5EFAA6E09D792930B29E6610B82F2DB557010332A579BDF858E3D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/06-availability.json",
+      "bytes": 228,
+      "sha256": "EA879A8CB3A5B3A3D80BDBEC61A37BD845ABB83729178FF3DD8B913D8576010F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/06-availability.png",
+      "bytes": 4919447,
+      "sha256": "C39029CBE4402BEF1CE057C430D83E1AC0B11B5D4F123DA91D530F163D55D400"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/07-research-filtered.json",
+      "bytes": 233,
+      "sha256": "EF2267BB0D270C13C945A018268D892FB843A444D0B5DFFCB21448DFF51D1CB6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/07-research-filtered.png",
+      "bytes": 5034242,
+      "sha256": "190B2437D4FBB3D6B836CC5C13094D49BCC0890F2E2A09728B8069FC92C5B006"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+      "path": "f210-normal-de/write-data/script-output/mir-library-render/de/complete.json",
+      "bytes": 2000,
+      "sha256": "7A02B771A54C8F8AE74268A3B3C2BBB810024FC8E51EAD298FCABA01553785BC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-normal-de\\write-data\\tips-and-tricks.log",
+      "path": "f210-normal-de/write-data/tips-and-tricks.log",
+      "bytes": 37,
+      "sha256": "F502108C2BD27F037A5EA2EAE06C58F06CE5A444072805587C5C66D79981D61B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\native-identity.json",
+      "path": "f210-narrow-en/native-identity.json",
+      "bytes": 302,
+      "sha256": "6650030C2E1614B6B08A785B0097DA60C4D146FF5A5BC624CB68B1CEAF1C9411"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\owner-result.json",
+      "path": "f210-narrow-en/owner-result.json",
+      "bytes": 4164,
+      "sha256": "7E96D79602F5C86F198035C2CC8741F7E315D5B2938BF638199612FF61256B23"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\process-1.resources.jsonl",
+      "path": "f210-narrow-en/process-1.resources.jsonl",
+      "bytes": 9369,
+      "sha256": "DD90A019DE2462E5A67365C84CEEDBE92CD35DF15BBE6EDFE30EF19D3FF58B02"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\process-1.stderr.txt",
+      "path": "f210-narrow-en/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\process-1.stdout.txt",
+      "path": "f210-narrow-en/process-1.stdout.txt",
+      "bytes": 18558,
+      "sha256": "EA3DD00B3E20597C603EF170FA9DAF3F469607F2FE8C46A0B189C546FF83B842"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\render-file-validation.json",
+      "path": "f210-narrow-en/render-file-validation.json",
+      "bytes": 1647,
+      "sha256": "839007E5817F2DD3D4D02E7DEBD7DDD41589264733DB169BB9876C247DD1C649"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\.lock",
+      "path": "f210-narrow-en/write-data/.lock",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\crop-cache.dat",
+      "path": "f210-narrow-en/write-data/crop-cache.dat",
+      "bytes": 2598280,
+      "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\factorio-current.log",
+      "path": "f210-narrow-en/write-data/factorio-current.log",
+      "bytes": 18400,
+      "sha256": "DD36780DC2BD14D5223E5AFB0EC313B128B2AA6AEFE405434CE4F805E8638D8C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/01-research.json",
+      "bytes": 219,
+      "sha256": "6CB4AC7A0806855E6482498C35E99AC790A6372A9BE6344D6AB7381D0DE55A1F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/01-research.png",
+      "bytes": 986336,
+      "sha256": "C7FEF64C2CA84F1D6B96358FFF2AC8B57DFA5955831621BCE222EF2E02158A11"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/02-queue.json",
+      "bytes": 216,
+      "sha256": "380FFC29DEFA110AA4837D8428883A85B7F3F817DCEAA8C073DF150C08E946FC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/02-queue.png",
+      "bytes": 949540,
+      "sha256": "6D6C6B86D5334782E2A60872BB5E3859C3A8C2FBBC46D3988F32B6288B770540"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/03-settings-research.json",
+      "bytes": 228,
+      "sha256": "8797331D008B68F94D0356E591D248A417D77ADB965C661F45FC356C431DB8D5"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/03-settings-research.png",
+      "bytes": 1000486,
+      "sha256": "D542C8840A6E9B0F017692E234ACDF664033C5B65366F8F2F6D31C535011754A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/04-settings-options.json",
+      "bytes": 227,
+      "sha256": "ECC237F476E2D0408EAE6FF43FC0E0B1202298303897CA901560DFE863AAF4DE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/04-settings-options.png",
+      "bytes": 1014151,
+      "sha256": "79111B170DC43A4B5880DC20B4B4601511DF0DBCAFA55E921430308059274E4B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/05-help.json",
+      "bytes": 215,
+      "sha256": "92B5534FCEFFFDE185D09B11B65BD54BCAC2B472639F510A0CE01CA7BAA93465"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/05-help.png",
+      "bytes": 1012720,
+      "sha256": "8FEEDBFD9CA5A828B26FE63910B11A65F1712AF9D52011A8D4AC7660041EBC54"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/06-availability.json",
+      "bytes": 223,
+      "sha256": "735154ED4B40F4A2B058E3CA10EC71F3359DF6679FD039A644E08C5DC11D10A3"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/06-availability.png",
+      "bytes": 972310,
+      "sha256": "568C09C839A4ADE896D511FA740B7538D3DDC6D650495FFB885E09DDDACCBF1A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/07-research-filtered.json",
+      "bytes": 228,
+      "sha256": "98A2A623060FF7B84A4F2B09D72EAD93895376C27E6D204C6CB68C7442C47750"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/07-research-filtered.png",
+      "bytes": 996682,
+      "sha256": "DADEFB5551D878C20097528FA2BBBCA09125505CA0D6D9A4141F1F31D32021DE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+      "path": "f210-narrow-en/write-data/script-output/mir-library-render/en/complete.json",
+      "bytes": 1965,
+      "sha256": "7A312DEE2F21300E75A16C63910C2C0F281962775CAA6F2915BD29AC5AA8711A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\control.lua",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/control.lua",
+      "bytes": 48,
+      "sha256": "70B2039F46EB0325D74A6219DD72186C6563DFD775884DD701DAA64E12A27BB0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\description.json",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/description.json",
+      "bytes": 77,
+      "sha256": "58D1D56C3F826E3FD95EDF863738E02A6610DC8265DACD7387C29E5CB7BD2924"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\level-init.dat",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/level-init.dat",
+      "bytes": 913367,
+      "sha256": "12D274A5271ACBD142EC9A6D1FF5A668D0F5700B6C6D312EBF01692C27BBD2FC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\af\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/af/freeplay.cfg",
+      "bytes": 479,
+      "sha256": "5C75397938B451D81F0A60CFCE1394B7BF811A49F918DF3A13A04286C1A4A2B9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ar\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ar/freeplay.cfg",
+      "bytes": 3239,
+      "sha256": "10D22CAAC2000EE6FBF40925181D6BD73FDCB2E84EA10205A8CC388109F70CE0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\be\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/be/freeplay.cfg",
+      "bytes": 3890,
+      "sha256": "95A940F01792CFDDE93C834EDE95B4A39B9E6445FD0FC45652E54E5992F3A0D2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\bg\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/bg/freeplay.cfg",
+      "bytes": 4245,
+      "sha256": "4AD98A947419AD3F8522E964FB9933DF7120C53A8C79BDFC1EF8F972D35B7823"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ca\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ca/freeplay.cfg",
+      "bytes": 2588,
+      "sha256": "D022C13A515DCA9EAE7CEF033BC9078AB82CA7EE609DA71EFC6EC22873CA840B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\cs\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/cs/freeplay.cfg",
+      "bytes": 2507,
+      "sha256": "DBBB185A70A1550B1F4F05218A0343675FB083A5B1F167DD8CA2D3FCFCB5108E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\da\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/da/freeplay.cfg",
+      "bytes": 2384,
+      "sha256": "9D534211425257F0D01C37B511E5225FE8D816DC24037691F32A83A9F04A3FF9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\de\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/de/freeplay.cfg",
+      "bytes": 2819,
+      "sha256": "72C817B7FA422F927873C76ABA4AFF1DEC47EDE9F86B4F7AB07453968E675EA8"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\el\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/el/freeplay.cfg",
+      "bytes": 4369,
+      "sha256": "F36F7A4176277786BB314F77DE2A6C6BEC5A376FA28D659960996854681B5BFE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\en\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/en/freeplay.cfg",
+      "bytes": 2377,
+      "sha256": "DB24B3B1BD935EFF42E27AB43E4D80F21B24C16E87B81940A860081587F3EBB3"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\eo\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/eo/freeplay.cfg",
+      "bytes": 2298,
+      "sha256": "4E62446D4666ED89B8DC78DD9671B2796886A5E2CA864B1ABDFBB1E209F29516"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\es-ES\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/es-ES/freeplay.cfg",
+      "bytes": 2391,
+      "sha256": "BFEEEF3CFCF05416F372AB5E2ECF0AA1ED6DE6246A5393FC6F5587684AF6E48F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\et\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/et/freeplay.cfg",
+      "bytes": 2326,
+      "sha256": "2EA101678365BDFBA7874F2E70922A36B689A0C2B0D8C0AA2C40F28A20853404"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\eu\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/eu/freeplay.cfg",
+      "bytes": 28,
+      "sha256": "F67D39BAC2F86656AA7FD2DB3752A08EE56392124B817C311DCCE396B6253E77"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\fa\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/fa/freeplay.cfg",
+      "bytes": 3595,
+      "sha256": "5435AEB9E3D490C52A87D9D93B9B976C7C2198AC21F59C7A8AA46397F44B5532"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\fi\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/fi/freeplay.cfg",
+      "bytes": 2602,
+      "sha256": "C055C2E580AB0606274ECCBE30BD0BCE5A996F7850515B773637BC6A731D1E1A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\fr\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/fr/freeplay.cfg",
+      "bytes": 2681,
+      "sha256": "A4730BEDD954CFB3792FAECA161E5D48272187698DD2B7D766615AE7FD4F2351"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\fy-NL\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/fy-NL/freeplay.cfg",
+      "bytes": 24,
+      "sha256": "16773FE4C5FD7953247E2C64FB0A6AB448B199525124A769A7F08280EC9D223A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ga-IE\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ga-IE/freeplay.cfg",
+      "bytes": 26,
+      "sha256": "23F22A4E0D27E2809CE0C98AD13679DDF706E9B8DFC228519E0630C19CB77418"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\he\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/he/freeplay.cfg",
+      "bytes": 2974,
+      "sha256": "DE0DD8DB815B65E27182FBBE66823C41E8D5E5155385A1F4D8DDFEA5E8D6F8C1"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\hr\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/hr/freeplay.cfg",
+      "bytes": 2480,
+      "sha256": "CE5100C802C8A8C9D90323E1CF4BED589A0BC1DEEC00074EFA9D8A475F5F80DE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\hu\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/hu/freeplay.cfg",
+      "bytes": 2540,
+      "sha256": "5775E703AC6D7110C49768D7B4D782F9947DDF175690DD4D97C51E536C8A2A34"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\id\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/id/freeplay.cfg",
+      "bytes": 2380,
+      "sha256": "8C7935116C9FC086656184C4AEF8DEC6AF7CA1D3EA02EEE26E66A50B481FB825"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\is\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/is/freeplay.cfg",
+      "bytes": 29,
+      "sha256": "ACE69AC617CB0AC31D7FDD8FED9FD259E86E405B7FD0ACCB7EE4336B83DC9CD0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\it\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/it/freeplay.cfg",
+      "bytes": 1803,
+      "sha256": "3BB66F69AE14DD0508F8317FAA5BEC9626487FF6CEF8793DB772FD22A844C933"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ja\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ja/freeplay.cfg",
+      "bytes": 2787,
+      "sha256": "D3CCDFF6F02DCCF8859496BC68639837B50E17A688742EE806F0EBEB596E3A99"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ka\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ka/freeplay.cfg",
+      "bytes": 279,
+      "sha256": "66805E2ABCE63F42F9E1B06685C56FB4814A5D2DD7C225E304F04636F8498FFA"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\kk\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/kk/freeplay.cfg",
+      "bytes": 35,
+      "sha256": "E5AC332A2BFECB45927A2B588D7C44CAA26A488A582173173243DC7198668633"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ko\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ko/freeplay.cfg",
+      "bytes": 3021,
+      "sha256": "4A30D7091BF4EC417AD265F6EF5D6AF63EE13951BB1A0FC1016F54C6C73A9BF5"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\lt\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/lt/freeplay.cfg",
+      "bytes": 2614,
+      "sha256": "A16B0D6C0518DB99204669241E575BA06C9713E03CA3738DAC8D88CBC68B33ED"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\lv\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/lv/freeplay.cfg",
+      "bytes": 2431,
+      "sha256": "B4DC8C51524799A384776E62D028CA35057CF5F39DD00562DD7DC4CD6AA0DED4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\nl\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/nl/freeplay.cfg",
+      "bytes": 2510,
+      "sha256": "FFFE82C1D533E29577D171696D10247F0D3EBE265E3312C3FF2B7FD5F04EA46A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\no\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/no/freeplay.cfg",
+      "bytes": 2415,
+      "sha256": "E2076ECC63BF65EE54DF603DE9F1C796CC1042A3B5C295D304C414487DE8C22C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\pl\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/pl/freeplay.cfg",
+      "bytes": 2473,
+      "sha256": "02A3EF9D5DA60E271ED73381DED26768B9DCFCB1FA4E9C7E9C5D5E1943B9C6B4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\pt-BR\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/pt-BR/freeplay.cfg",
+      "bytes": 2524,
+      "sha256": "17EFCC5C754CA0491D96CAD1C1C83000ABD28665EE49FA7881E0B58A684334FF"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\pt-PT\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/pt-PT/freeplay.cfg",
+      "bytes": 2377,
+      "sha256": "07A411358841B6C25241F15B2B67475676B00E644DBDB61341C12F49540C9143"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ro\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ro/freeplay.cfg",
+      "bytes": 2600,
+      "sha256": "A93DCFCE0B26C46B6A73353B3E41CE3861F53510E487AC8C0C14443C19B954B8"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\ru\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/ru/freeplay.cfg",
+      "bytes": 3927,
+      "sha256": "DA53416F9F3FFD4CD478C5123A1F701E67C3F1CE9FC4B5DE1028A72C6A3D352F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\sk\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/sk/freeplay.cfg",
+      "bytes": 2409,
+      "sha256": "429AA376DFCDED3F116BAD2E07B9BDAEB7FAF9A88F77145D63A160517991DD8B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\sl\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/sl/freeplay.cfg",
+      "bytes": 27,
+      "sha256": "6B46D0408CDF0370951744AEB8ACCCDDEFB5A7675174C0784D77F1B59C77FE43"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\sr\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/sr/freeplay.cfg",
+      "bytes": 30,
+      "sha256": "528B5312FA6427FE978AD61766ADD76BD8C0C4096E7C760D22EB0E1FD2E5A5DD"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\sv-SE\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/sv-SE/freeplay.cfg",
+      "bytes": 2369,
+      "sha256": "306163EEB1E6430EF7E2F8E9550EB1B53714A5FAE4D0EF88E2863750ECB44A41"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\th\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/th/freeplay.cfg",
+      "bytes": 4851,
+      "sha256": "CC6C31B0D3FB76B1D42312EC943FE3F5A95A6CF0E3EAA6AB459A2623BFB4274D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\tr\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/tr/freeplay.cfg",
+      "bytes": 2504,
+      "sha256": "C73BFAE7C791086C73FBA0AE47C6EF8E9ABBB0262FD9523054A3BC255DB4262C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\uk\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/uk/freeplay.cfg",
+      "bytes": 3890,
+      "sha256": "EA33C57A772FDB89CFDD3E47BD42445FE336ABD292AA803F86C9544D3C2432F7"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\vi\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/vi/freeplay.cfg",
+      "bytes": 3244,
+      "sha256": "6D1A2576808D8057C2D9283651B29D907DC55390123605E17295092FF14999BC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\zh-CN\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/zh-CN/freeplay.cfg",
+      "bytes": 2250,
+      "sha256": "5CF8BEEE3C248AB523B15848BDB5594B9E9965D1BF43F64796FAB01D4519A2C0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\temp\\currently-playing\\locale\\zh-TW\\freeplay.cfg",
+      "path": "f210-narrow-en/write-data/temp/currently-playing/locale/zh-TW/freeplay.cfg",
+      "bytes": 2112,
+      "sha256": "0B83E2D7C9761A81A6784B0021F97C382C1946C4DEB4D4956EA7B6C3C29989A0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-en\\write-data\\tips-and-tricks.log",
+      "path": "f210-narrow-en/write-data/tips-and-tricks.log",
+      "bytes": 38,
+      "sha256": "B049B54887E88768CD86ED824B74529328F05A5C94B02B4067C3AD8AC7016C23"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\native-identity.json",
+      "path": "f210-narrow-de/native-identity.json",
+      "bytes": 302,
+      "sha256": "4C377CFACECBDA4728637A16D7406A110CBDCAE85243C5A24846ED472D162691"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\owner-result.json",
+      "path": "f210-narrow-de/owner-result.json",
+      "bytes": 4163,
+      "sha256": "D5605F52A1BDB78F824D1B84763F1324CC742FC2437172985D2FD2225104FCED"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\process-1.resources.jsonl",
+      "path": "f210-narrow-de/process-1.resources.jsonl",
+      "bytes": 9367,
+      "sha256": "8276C21E6AE6950D34F6F63E4C526996D5F85F64A4A9317E01606FB7126ED745"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\process-1.stderr.txt",
+      "path": "f210-narrow-de/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\process-1.stdout.txt",
+      "path": "f210-narrow-de/process-1.stdout.txt",
+      "bytes": 18675,
+      "sha256": "BEF3C2D4018D742299AA88ADA45FCE996451F2B1CE79DE4448D0C764538CB921"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\render-file-validation.json",
+      "path": "f210-narrow-de/render-file-validation.json",
+      "bytes": 1647,
+      "sha256": "263CB046E00414E209DE11A059BD229E426555B98E0C038031F746B19573D9B4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\achievements-modded.dat",
+      "path": "f210-narrow-de/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "D7E13188B3390FC6E69C13CC83C864E87C3E0D686443C4C5E5E53C8918B115A0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\crop-cache.dat",
+      "path": "f210-narrow-de/write-data/crop-cache.dat",
+      "bytes": 2598280,
+      "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\factorio-current.log",
+      "path": "f210-narrow-de/write-data/factorio-current.log",
+      "bytes": 18480,
+      "sha256": "D5EEC45EE01DC8E366341C2A6CB20DC5E7559DCFDE8BFD701734E3831AF1F1EB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\player-data.json",
+      "path": "f210-narrow-de/write-data/player-data.json",
+      "bytes": 13011,
+      "sha256": "3F357693B74D294D0247820CB99F3768C98C625BFF589B589DC39C6BDFEABC55"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/01-research.json",
+      "bytes": 219,
+      "sha256": "78D6C105B636A5B6C3D109BCAFEF4AE9F0F28CFC09153D4004D5AD1F555E508A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/01-research.png",
+      "bytes": 991235,
+      "sha256": "B2A25887AC0C07099DBD71C8D28390446C0A8D327D5289806CEAA67774462ACF"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/02-queue.json",
+      "bytes": 216,
+      "sha256": "532A51813C4BD7FEE6FDD28AED6AA6D67437483CD764D210C2A2764FEB5D9AF7"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/02-queue.png",
+      "bytes": 952458,
+      "sha256": "0294F6850F515D1FA929AE00039B478ED019520E8D4953B2E34A8F9227B9D1F1"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/03-settings-research.json",
+      "bytes": 228,
+      "sha256": "5970DFD122B507FA266A2813109C67F090CE227BFAF51E78D9540B17C43C4DC4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/03-settings-research.png",
+      "bytes": 1004444,
+      "sha256": "83960F69E6B25E425EC271B4B670DCE4DCF6512CD9D2D3424987A63CAA7B83A2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/04-settings-options.json",
+      "bytes": 227,
+      "sha256": "659A9F903BB6DEB91EFBF1E13B7FCDF4D154E85FE9BD93277F256CBED14E46F5"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/04-settings-options.png",
+      "bytes": 1017941,
+      "sha256": "012D5300E9F3F99C81BD463B55AFAA0CF51598C982B4F16A8442FCA7A47D2F89"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/05-help.json",
+      "bytes": 215,
+      "sha256": "5401FB7BA732F83AAC1F7CB20A532902CD5BF8CC46235A2DD30A9AAA1A4E69D8"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/05-help.png",
+      "bytes": 1013602,
+      "sha256": "366BAE049A8000128460BFC33A867C7A574F803D4F8D1F65615A1DDDF916E88C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/06-availability.json",
+      "bytes": 223,
+      "sha256": "B724083122A715C878A3CB9779AD7B89EF639500B4A342B97D9E11DEE4ADC220"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/06-availability.png",
+      "bytes": 974857,
+      "sha256": "3D7102DF67BE48BADB608DAE7DFD8EE417E998FF41D8D14B35C68916C22032E4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/07-research-filtered.json",
+      "bytes": 228,
+      "sha256": "203FBDEBD7BB589AB8FBBBF4396084081AFCAF59DE4A97871997E141ABFD9147"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/07-research-filtered.png",
+      "bytes": 999617,
+      "sha256": "3E7A7CBCF57BFCE4B078FADB610CBDB6A8A6DB3073D38497F8A8B5B4BCB480C6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+      "path": "f210-narrow-de/write-data/script-output/mir-library-render/de/complete.json",
+      "bytes": 1965,
+      "sha256": "C00E1984D371BA37664B8487496BE41D2F1095058CC664A0804F9A17412ED0AD"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f210-narrow-de\\write-data\\tips-and-tricks.log",
+      "path": "f210-narrow-de/write-data/tips-and-tricks.log",
+      "bytes": 37,
+      "sha256": "F502108C2BD27F037A5EA2EAE06C58F06CE5A444072805587C5C66D79981D61B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\native-identity.json",
+      "path": "f200-normal-en/native-identity.json",
+      "bytes": 302,
+      "sha256": "30A1A902DC062794E133BD03B10B1A27196AFBE0249914C13C440FDA66542AFB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\owner-result.json",
+      "path": "f200-normal-en/owner-result.json",
+      "bytes": 4029,
+      "sha256": "480AAE1A63ECAB62E54CAFE1813AF6B80B074E7E5A0F35A83B1FD27BEB961325"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\process-1.resources.jsonl",
+      "path": "f200-normal-en/process-1.resources.jsonl",
+      "bytes": 39812,
+      "sha256": "30AB9213BD1248A5305B43860B18A72EEEBF5C320C2D89F6B75979DE6BCBC79B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\process-1.stderr.txt",
+      "path": "f200-normal-en/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\process-1.stdout.txt",
+      "path": "f200-normal-en/process-1.stdout.txt",
+      "bytes": 13525,
+      "sha256": "1D4C0D72883D7FE853D4086D16630054042324D531AF81E935054D030F1973DA"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\render-file-validation.json",
+      "path": "f200-normal-en/render-file-validation.json",
+      "bytes": 1658,
+      "sha256": "0EDDF4D99F8AB011F1D13231EFE19E2C77F1BF1F0132A4A175D10755BFB0BFA7"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\achievements-modded.dat",
+      "path": "f200-normal-en/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\crop-cache.dat",
+      "path": "f200-normal-en/write-data/crop-cache.dat",
+      "bytes": 2412238,
+      "sha256": "344203BF41C4A4D1105958B14AD7E252BA7FB75AFF8605A3E0B14E6E39DC2EF9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\factorio-current.log",
+      "path": "f200-normal-en/write-data/factorio-current.log",
+      "bytes": 13379,
+      "sha256": "9E4D37F60AEA00D70B082C0DBFE711AD3F9DFA0C036B3015E6D4A86A411343A8"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\player-data.json",
+      "path": "f200-normal-en/write-data/player-data.json",
+      "bytes": 12904,
+      "sha256": "9330D4F7DA1FB037843DDEEA28EEB11EE9B9F4E7263FFD48D767DCCCA26A58D0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/01-research.json",
+      "bytes": 223,
+      "sha256": "B6356F6CD15AC99D27E07238B74C40A13740BD52B089EC3AF4FB1A7EDE220660"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/01-research.png",
+      "bytes": 7846170,
+      "sha256": "846374AFDFD7E199942C967BFC805C844918FF2662A01B488BF7D8FC48749964"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/02-queue.json",
+      "bytes": 220,
+      "sha256": "47FD759CD8569B4C9C791F278C07D8B529FC7EE5AEE0795683832C50389E800E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/02-queue.png",
+      "bytes": 7671073,
+      "sha256": "4B032388D6B6ED86731308AB4546B104AC6D0D0D5DAEE20C7F6642EB4F899E15"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/03-settings-research.json",
+      "bytes": 232,
+      "sha256": "96EE6AF440BE5ED9FE004687B0CC367C590D9BEF11E1F6F8C386492B64ACD5E4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/03-settings-research.png",
+      "bytes": 7982536,
+      "sha256": "0E87068FF35B8B29698B3C927713C0FCDD30633C3B9B641FED3119E42B3A0DAF"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/04-settings-options.json",
+      "bytes": 231,
+      "sha256": "39DE0BD6808DDFCC8645CB0ECFE5D1BDAD3A6F34DB4354D0D1506E797917AF5E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/04-settings-options.png",
+      "bytes": 8101727,
+      "sha256": "4DC28E5E643D8F20D7DF0AAB181E6335196BDC6C85701A8CFFFB2FE7B8DFBDC6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/05-help.json",
+      "bytes": 219,
+      "sha256": "D9E81E053DED8E9C90C90FF9EF06799A20E5D524493CFD8F8E7AF8A1C701B0E0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/05-help.png",
+      "bytes": 8094933,
+      "sha256": "D96C9718B502C257729750A65A91A53B99463A18B1DB55715241780E7BA3091B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/06-availability.json",
+      "bytes": 227,
+      "sha256": "AF0230C045F3E352FC2B590265AE62E9B0C46E8C49E52661E52D922C774DD9CB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/06-availability.png",
+      "bytes": 7939144,
+      "sha256": "6BB0DD5B4A9311AE8A5DB72B364A786A77AF926971ACD0D23FD5B1880CB09067"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/07-research-filtered.json",
+      "bytes": 232,
+      "sha256": "7C7745DC8BFA38B01D350B25F5A12D01EE37CDE810828DF57914114843EA5957"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/07-research-filtered.png",
+      "bytes": 8087564,
+      "sha256": "B065F9FA288413670085116750E7ED6C8BB57FBD4F14CDA6FC7E3078440D0EBB"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+      "path": "f200-normal-en/write-data/script-output/mir-library-render/en/complete.json",
+      "bytes": 1993,
+      "sha256": "BC3BF19D041F06342FEDEA666D445B9815CBD144BEB230F51A9F7C9973D87B06"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-en\\write-data\\tips-and-tricks.log",
+      "path": "f200-normal-en/write-data/tips-and-tricks.log",
+      "bytes": 38,
+      "sha256": "B072633F829CD2FC8C2E205B94E57A1CFD2FF2978A31B9AA316218D124BC4D7C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\native-identity.json",
+      "path": "f200-normal-de/native-identity.json",
+      "bytes": 302,
+      "sha256": "6EF58093B77C339F2F2966B5212F11AC05CEBD87364EF51D951029E404877016"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\owner-result.json",
+      "path": "f200-normal-de/owner-result.json",
+      "bytes": 4029,
+      "sha256": "030EE30A4C0FA21540F3529D09CF940F21885DB6D0A2E6FDBB3A3F7E1EFB6F20"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\process-1.resources.jsonl",
+      "path": "f200-normal-de/process-1.resources.jsonl",
+      "bytes": 9972,
+      "sha256": "D50C079EDBA9CE8F141F13D3B295F72C351D957C01AB9788E792E3AF6887B3F3"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\process-1.stderr.txt",
+      "path": "f200-normal-de/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\process-1.stdout.txt",
+      "path": "f200-normal-de/process-1.stdout.txt",
+      "bytes": 13525,
+      "sha256": "3C77124F3A051DAF46F1C275696C378960673CFE8BBFD518E0FDE2EC55BC9BBE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\render-file-validation.json",
+      "path": "f200-normal-de/render-file-validation.json",
+      "bytes": 1658,
+      "sha256": "1AC1CD78AE0D996C041F7C7F7F18693F0FAEADA7CEDB379C1876CB8AEA849E27"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\achievements-modded.dat",
+      "path": "f200-normal-de/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\crop-cache.dat",
+      "path": "f200-normal-de/write-data/crop-cache.dat",
+      "bytes": 2412238,
+      "sha256": "344203BF41C4A4D1105958B14AD7E252BA7FB75AFF8605A3E0B14E6E39DC2EF9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\factorio-current.log",
+      "path": "f200-normal-de/write-data/factorio-current.log",
+      "bytes": 13379,
+      "sha256": "E34327CD5F65EC4E1DA9D492E6EA2CAA5A86699577E82940612AC22A4A86B62A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\player-data.json",
+      "path": "f200-normal-de/write-data/player-data.json",
+      "bytes": 12902,
+      "sha256": "075E7C758EDCA27D38ECDB1C625A962B1FCF22BA333905AC39CD92E45CD5F603"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/01-research.json",
+      "bytes": 223,
+      "sha256": "248B6DD4F10A1752276C83C5B93D62BE816F345B115F4EF2E9DE9A219807CCA2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/01-research.png",
+      "bytes": 7870568,
+      "sha256": "8DA873B0949DEC2DAF1D744906A66B58E22CDE7BDB4D4E440ED954725CAC0D76"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/02-queue.json",
+      "bytes": 220,
+      "sha256": "C3DF80228FE6B72A04FE809EC9E4B87E4D808E15F79CB4B4C6CCE0825B2BFD2B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/02-queue.png",
+      "bytes": 7679990,
+      "sha256": "81C47D9699094B5DA6CB3971064E1BE334F79238C79535AC18778041EB212B66"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/03-settings-research.json",
+      "bytes": 232,
+      "sha256": "0770C1511060C0EA0BA0F56EE2791D369C167028010AA75D9C21E3EA2E989B7E"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/03-settings-research.png",
+      "bytes": 8008155,
+      "sha256": "D1B2E3C9FC6AA3EA2E04CC36EEAB5C801B869B9FC8DEF0228BE334D4A8FB2EE6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/04-settings-options.json",
+      "bytes": 231,
+      "sha256": "2C8D13F27BB9080FB420DF474FCEE130618F5D3128BBB786239B4D9808E462D1"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/04-settings-options.png",
+      "bytes": 8147935,
+      "sha256": "4EF2D2F0A273BBD6A115FED15CAD598C24CDCA7ADE6EAD6257A9FE8F38F7FE0B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/05-help.json",
+      "bytes": 219,
+      "sha256": "35CE779B74AC81A366389357EFAAC80984BB80F081BFF8F3866D040373C44523"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/05-help.png",
+      "bytes": 8112534,
+      "sha256": "B179A41C6B0BC103D15893F3E513F0A00A6950C9E1E7A4EEAA48511607F7B9A6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/06-availability.json",
+      "bytes": 227,
+      "sha256": "4E87C019010E62DF07B85A40A4336EED6A159F540AC8F240C04527AC268C80D4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/06-availability.png",
+      "bytes": 7946528,
+      "sha256": "8B1AF418BDFDC96F7995BB0DEBEA00A23EF05459E573A3DC936570E24D8764E1"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/07-research-filtered.json",
+      "bytes": 232,
+      "sha256": "A9A7DCD33609155ABC61901D3E9C5E45B46C087D0232F2C55ADE5EC4FCE03B3A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/07-research-filtered.png",
+      "bytes": 8102376,
+      "sha256": "F05814DEC84729518098F2EF1C5411FC257EF5F05BABCAA1E61111D484694B96"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+      "path": "f200-normal-de/write-data/script-output/mir-library-render/de/complete.json",
+      "bytes": 1993,
+      "sha256": "4F0D3BA5B05E0838122D772F985DBE942381CE27AC3594D499906D32BFEC55CD"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-normal-de\\write-data\\tips-and-tricks.log",
+      "path": "f200-normal-de/write-data/tips-and-tricks.log",
+      "bytes": 37,
+      "sha256": "0E8B905876CE8FC1E50D2D03DC16DAAFB9F260C045F0BFCCB135E050E3005EA8"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\native-identity.json",
+      "path": "f200-narrow-en/native-identity.json",
+      "bytes": 302,
+      "sha256": "89036285A2486AAB8D46473BD912A351C5F66C5060D30042823B8E9DC1D1746F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\owner-result.json",
+      "path": "f200-narrow-en/owner-result.json",
+      "bytes": 4029,
+      "sha256": "292D3215A80207F7264B6CDF0677EBF17E6561D7DD10A6E8749B78C83FE1676D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\process-1.resources.jsonl",
+      "path": "f200-narrow-en/process-1.resources.jsonl",
+      "bytes": 9975,
+      "sha256": "F5B88F47C123B6DAE31152336E85ACF634DA47946ED320ED4773D43555292F95"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\process-1.stderr.txt",
+      "path": "f200-narrow-en/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\process-1.stdout.txt",
+      "path": "f200-narrow-en/process-1.stdout.txt",
+      "bytes": 13523,
+      "sha256": "B55484ACF16D634A4C6299E1439ED45271CC8FFDDDF824D0B232C379D4C42B55"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\render-file-validation.json",
+      "path": "f200-narrow-en/render-file-validation.json",
+      "bytes": 1658,
+      "sha256": "A02C7A88617069BD182A1294A0FE2D5DAD16D34E0402A704DB325187D6F1394D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\achievements-modded.dat",
+      "path": "f200-narrow-en/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\crop-cache.dat",
+      "path": "f200-narrow-en/write-data/crop-cache.dat",
+      "bytes": 2412238,
+      "sha256": "344203BF41C4A4D1105958B14AD7E252BA7FB75AFF8605A3E0B14E6E39DC2EF9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\factorio-current.log",
+      "path": "f200-narrow-en/write-data/factorio-current.log",
+      "bytes": 13377,
+      "sha256": "D28351851942C296DF8C9C97AD9089C367BC57CF39A66A44D3F483CCFA90CEBC"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\player-data.json",
+      "path": "f200-narrow-en/write-data/player-data.json",
+      "bytes": 12912,
+      "sha256": "27E0F6FF5C21D4047361993762CFF3DB6BC176EB5DB1AB79BE9E7AD13A77F98D"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/01-research.json",
+      "bytes": 220,
+      "sha256": "C99B0D8604C53BFB5958F86E5AA5A4C0983E09FDE40916A9A4AD3B25E5D63F2C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/01-research.png",
+      "bytes": 1590390,
+      "sha256": "07A57ECDAD3941ABFC0E33756C7A89BEC48C1DBF5AC68C1A4C4BE0033F508B07"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/02-queue.json",
+      "bytes": 217,
+      "sha256": "3120963650F1B976A12DD508B7E16148A8B693E4CF9D38FD9633DC5668EB3C97"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/02-queue.png",
+      "bytes": 1539216,
+      "sha256": "6FC711B879D974F3B69096C2652CFC4B4AEBD6A2DFD1DD1E09D7A571ECBAF006"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/03-settings-research.json",
+      "bytes": 229,
+      "sha256": "A86D67670A694D17475E8C78B164871BF8180E227FB3F2E800F2D4159F8C3CFE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/03-settings-research.png",
+      "bytes": 1580889,
+      "sha256": "DCE11ECCF14C228DFAFF1DAA51DEC365B5FD6A402B41B1527DF5B1AB04EC727C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/04-settings-options.json",
+      "bytes": 228,
+      "sha256": "A4EDBDCF45FC53A3E52846ACF6976359B8CDE8C0E1BC2E908AA95874411B208B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/04-settings-options.png",
+      "bytes": 1591163,
+      "sha256": "BF64951BB8DBAF2B1D43610C3A22EF66E59D719AAD96A875B569441F2A0F4F16"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/05-help.json",
+      "bytes": 216,
+      "sha256": "FEF7E9B0DDCB5D57A7E4D8BEB45F1C2FE6EA7E69EDF5408B1BC9A0E3E8743231"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/05-help.png",
+      "bytes": 1601403,
+      "sha256": "D64B833777F2533E0F5BADD625A61DE500A4A9E379D17A4E804E62DF0AC577C0"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/06-availability.json",
+      "bytes": 224,
+      "sha256": "D1F01C2A84BCB4F25141A5C5F5198AE3AD8B302AB27824B1857E0EBA65C28378"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/06-availability.png",
+      "bytes": 1555549,
+      "sha256": "5787FA8535735B60AACCB50A4C64B0D128E7A550EA0284DD78F08E484397F54F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/07-research-filtered.json",
+      "bytes": 229,
+      "sha256": "E2D560B6D27D4B13FAC57D81601348639A6FC2C5042CE23E051DB97109534F2B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/07-research-filtered.png",
+      "bytes": 1585648,
+      "sha256": "6009B41E863980B3A960D6F4F8F02B2F81DA092402FDB056B8B63C2C6079E53C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+      "path": "f200-narrow-en/write-data/script-output/mir-library-render/en/complete.json",
+      "bytes": 1972,
+      "sha256": "F0A783DA22C6F7D3B11B47D16D0DF7E7764BB9C5D83703161B3CB6BA7C9BFA93"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-en\\write-data\\tips-and-tricks.log",
+      "path": "f200-narrow-en/write-data/tips-and-tricks.log",
+      "bytes": 38,
+      "sha256": "B072633F829CD2FC8C2E205B94E57A1CFD2FF2978A31B9AA316218D124BC4D7C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\native-identity.json",
+      "path": "f200-narrow-de/native-identity.json",
+      "bytes": 302,
+      "sha256": "1EC0559AAE65E374D79C333B97A205C869A096E70DB9D702EAED4CE42140B194"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\owner-result.json",
+      "path": "f200-narrow-de/owner-result.json",
+      "bytes": 4029,
+      "sha256": "629928576096291D3ACB2F6B91B6472C947DE922F16A53448239E2106B6FDF46"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\process-1.resources.jsonl",
+      "path": "f200-narrow-de/process-1.resources.jsonl",
+      "bytes": 9968,
+      "sha256": "79CC8F4138EEC6BDADE4984BB0F7AA4774E72F52848DC7AF294A7AD99A0728D2"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\process-1.stderr.txt",
+      "path": "f200-narrow-de/process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\process-1.stdout.txt",
+      "path": "f200-narrow-de/process-1.stdout.txt",
+      "bytes": 13523,
+      "sha256": "F6AD2386151BF37FD3F46EA2915B56789FEED7EE02172F8FEEA6D6A647E26555"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\render-file-validation.json",
+      "path": "f200-narrow-de/render-file-validation.json",
+      "bytes": 1658,
+      "sha256": "E0B7D066888BEAC87404D546B11C143EF79A224486E14C8B9B16C5AEDDF57ECD"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\achievements-modded.dat",
+      "path": "f200-narrow-de/write-data/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\crop-cache.dat",
+      "path": "f200-narrow-de/write-data/crop-cache.dat",
+      "bytes": 2412238,
+      "sha256": "344203BF41C4A4D1105958B14AD7E252BA7FB75AFF8605A3E0B14E6E39DC2EF9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\factorio-current.log",
+      "path": "f200-narrow-de/write-data/factorio-current.log",
+      "bytes": 13377,
+      "sha256": "E4340173E04FC29972E81F72655C2948757717BDF7498B3CAD6C429219357224"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\player-data.json",
+      "path": "f200-narrow-de/write-data/player-data.json",
+      "bytes": 12904,
+      "sha256": "4AAA113F348ED33FAA150903AF8B29C6F6012A765F977E5A019A42E7FEFF10F6"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/01-research.json",
+      "bytes": 220,
+      "sha256": "137A9C6DFACE934DA096686FBF75D910DE6895ED637F1D0E66D7BEA34B3E0AF4"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/01-research.png",
+      "bytes": 1597696,
+      "sha256": "C6F7D9D305D07EAB0D4C726846899B75019D703F7202324CF0C7E8626A688E3C"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/02-queue.json",
+      "bytes": 217,
+      "sha256": "5E8531F058A3F6978F3B0D27ABCB70EE02FFB35C34616DF702768A2529966DEE"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/02-queue.png",
+      "bytes": 1542273,
+      "sha256": "A3DB4E4084816C1307C3F52429086549E9BB27808B12846877382F4DAEE5B66B"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/03-settings-research.json",
+      "bytes": 229,
+      "sha256": "9CB227BA0C91E243759E1A53007CE269A5F785224B408F2BA7DAC1468A3A4C0A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/03-settings-research.png",
+      "bytes": 1586840,
+      "sha256": "C3B5901CB57729687F082B67E68919C8A9AC711604819F2C62DD7D0C71B71FD5"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/04-settings-options.json",
+      "bytes": 228,
+      "sha256": "E3BE79886301471FE898EE6531B31C247CD9DF04C956E44D9D54BB176A3E608F"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/04-settings-options.png",
+      "bytes": 1600841,
+      "sha256": "AAF93E3DBAD39D55478204301680BE3529D9E06C541CDF220B511ADE17894E98"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/05-help.json",
+      "bytes": 216,
+      "sha256": "31D41E788D574531004190081C5AC3B4DA50E65B38FD62FC0D2142E2FDD465E9"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/05-help.png",
+      "bytes": 1606609,
+      "sha256": "79C56455304F74A3BA79EF64AFBD744B0B78D0B620856D73CCCE568629DF820A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/06-availability.json",
+      "bytes": 224,
+      "sha256": "5385418C018ADC7AB6BCB6E0629AB6108F527E98AF33448A3162419A65AFA403"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/06-availability.png",
+      "bytes": 1558094,
+      "sha256": "887350D486BC6794831AF9B09B1B13FDF37260AD7B0A0244CF77E83D72C1B026"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/07-research-filtered.json",
+      "bytes": 229,
+      "sha256": "A9A3089376D6E526DEAAB49835AAD312B10D1EFF737513AAAE99EB3FA628C747"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/07-research-filtered.png",
+      "bytes": 1590068,
+      "sha256": "4971DD535475697100ED45E6E35428FC03EFC933B3C4690E6FE3A5E158EB883A"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+      "path": "f200-narrow-de/write-data/script-output/mir-library-render/de/complete.json",
+      "bytes": 1972,
+      "sha256": "1CB27FC1E7E6C76FEA356154FA18EDFE4BF2FF58473FD19DAAC6A0B4C6BA57D7"
+    },
+    {
+      "original": "D:\\Projects\\Factorio\\.task-builds\\mir512-native-fixtures-r01\\build\\tmp\\library512-polish-b-r08-f200-narrow-de\\write-data\\tips-and-tricks.log",
+      "path": "f200-narrow-de/write-data/tips-and-tricks.log",
+      "bytes": 37,
+      "sha256": "0E8B905876CE8FC1E50D2D03DC16DAAFB9F260C045F0BFCCB135E050E3005EA8"
+    }
+  ]
+}

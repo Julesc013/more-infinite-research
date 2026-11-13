@@ -1,0 +1,62 @@
+{
+  "kind": "MIRAPIProduction511F210IndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:27:20Z",
+  "verdict": "PASS for the exact published511 F2102.1.23 Space Age two-consumer physical-production/save/two-cold case. No findings.",
+  "identity": {
+    "frozen_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "engine": "Factorio2.1.23 / 8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "published_candidate": "more-infinite-research_5.0.21011.zip",
+    "candidate_bytes": 1006768,
+    "candidate_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+    "packet_sha256": "61FD5036DC2F70713BC423F95AAB2A3BC53B557F2A38550F9B779F5C6FA6D96B",
+    "caller_sha256": "C54985CC53075F4B69E30524D3D3ED7426A68C3D9E955E817903AA1873786D34",
+    "composition_sha256": "58647E2C99C0DEFA9D66114FA1DFE0CC40DF44D86D5D3675C3BA910E2E98CFF5",
+    "root_admission_sha256": "401880450DCD7E268BFE71C620211EDBA5445AE3B5586157011A825327987FEC"
+  },
+  "actual_evidence": {
+    "terminal": {
+      "path": "build/qualification/api-production511-f210-r01-controller/execution-record/terminal.json",
+      "bytes": 9639,
+      "sha256": "4743B6276EB0179D0C7E877199B1BB26C5833700C9715EC67FA01773DAE8BEFE",
+      "exception": null
+    },
+    "native_result": {
+      "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api-production511-f210-r01/result.json",
+      "bytes": 50200,
+      "sha256": "FDE94D273E246D748385CB8F95317AE4ABFEB6167525378CBE424513424BAF7C"
+    },
+    "processes": [
+      {"role": "create", "pid": 17220, "exit_code": 0, "completion_predicate_observed": false},
+      {"role": "production", "pid": 6300, "exit_code": -1, "completion_predicate_observed": true},
+      {"role": "cold1", "pid": 23508, "exit_code": 0, "completion_predicate_observed": false},
+      {"role": "cold2", "pid": 37464, "exit_code": 0, "completion_predicate_observed": false}
+    ],
+    "all_four_passed_without_timeout": true,
+    "fatal_diagnostics": 0,
+    "stderr_bytes_each": 0,
+    "selection": "All four raw logs show exactly the ten admitted enabled mods and published511 version, including the five official2.1.23 modules and four fixture/consumer mods. Frozen head is clean and all2220 fixed-input bodies were rehashed after execution."
+  },
+  "physical_and_API_observations": {
+    "copper_plates_inserted_each_phase": 100,
+    "baseline_copper_cables": 200,
+    "researched_copper_cables": 202,
+    "recipe_productivity_oracles": [0, 0.01],
+    "assembler_productivity": 0,
+    "modules_empty": true,
+    "beacons_created": false,
+    "ordinary_laboratory_completions": 0,
+    "research_method": "Explicit native researched setters, separately identified from the read-only API calls.",
+    "actual_counter_provenance": "Raw physical markers equal runner records. Their100/100 inserted and200/202 produced counts are persisted native input/output inventory counters guarded by full consumption and settled crafting checks in the unchanged actor, not substituted synthetic scalars. The native effect and recipe bonus remain checked against0.01 under the original1e-9 tolerance; marker0.01 is the expected scalar and does not claim an external bit-pattern measurement.",
+    "queries": "Passing unchanged Alpha/Beta actors retain detached version/capability/status, mutation-isolation, native-status/effect, absent force/technology and no-query-write assertions. Actual create observes Alpha researched and Beta unresearched at level1; production starts with Beta false. Both colds observe both researched at level1 and unchanged manual crafting modifier0.05.",
+    "durability": "Both distinct cold processes observe identical completed counts, consumer frames and tick4803. Deferred on_load/native-query checks pass. The saved-state early return prevents another crafting run; cold counters are retained work, not new output."
+  },
+  "save_completion_policy": "The outer guard permits production exit0 OR an observed supervised predicate, while the pinned trusted helper independently always requires that predicate. Here the actual production exit is-1 with predicate=true, and the initial physical marker precedes Saving finished for the owned completed save. No zero-exit shortcut is used. Create and both cold exits are strictly0. The old000 full native result and erroneous outer all-exit0 refusal retain their original identities.",
+  "saves": [
+    {"name": "seed.zip", "bytes": 609670, "sha256": "42CA33E08EF72B317A5049E37C7787E22EF9D6829537869643E6DB55BD757AC9"},
+    {"name": "mir5-native-complete.zip", "bytes": 616774, "sha256": "FAD7513475912E049514A73C10619E7BBB7159AD01705FD441D6B2DA24DE6170"}
+  ],
+  "custody_and_restoration": "Both save archives passed all-member CRC and contain native level/script state. Completed-save current bytes equal both cold hashes. All23 native plus5 controller retained bodies equal source copies, recorded sizes and SHA256. Before/after control/archive states are equal and independently match current live originals. All five owned archive transactions restore or remove temporary inputs as declared. Dependency copies, links and extractions are zero. Recorded and independent current Factorio process counts are zero.",
+  "limits": "Named fresh present-MIR F2102.1.23 Space Age physical/API/save case only. No ordinary-lab, historical upgrade, worker preservation, physical cargo, client, timing/memory, general API stability or whole-product stable verdict follows. This is a fresh result for published511; earlierF200 and original000 observations retain separate exact identities. Reviewer launched no native/build/host and changed no Source, docs, controller, packet or direct library.",
+  "findings": []
+}

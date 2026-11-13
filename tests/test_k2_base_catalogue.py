@@ -11,6 +11,7 @@ import subprocess
 import sys
 import unittest
 from worker_storage_recovery_fixture import expected_private_worker_row
+from test_generator import expected_worker_default_split_rows
 
 from native_credit_oracle import (
     current_native_credit_rows as native_credit_carrier_rows,
@@ -418,6 +419,11 @@ class K2BaseCatalogueTests(unittest.TestCase):
         self.assertEqual(len(emitted_names), len(set(emitted_names)), "duplicate K2 Base output")
         emitted_rows = {name: _plain(actual[name]) for name in emitted_names}
         private_worker = {"mir-worker-storage-preservation-4": expected_private_worker_row()}
+        split_worker = expected_worker_default_split_rows(rows["worker-robots-storage-4"])
+        gate = split_worker.pop("mir-worker-storage-head-4")
+        gate["prerequisites"] = {}  # Empty Lua array in this host-table view.
+        private_worker[gate["name"]] = gate
+        rows.update(split_worker)
         actual_public, actual_credit = split_public_and_native_credit_rows(emitted_rows, private_worker)
         expected_credit = native_credit_carrier_rows(
             rows, set(self._captured_raw_subset()["recipe"])

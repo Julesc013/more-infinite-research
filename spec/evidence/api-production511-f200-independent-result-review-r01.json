@@ -1,0 +1,61 @@
+{
+  "kind": "MIRAPIProduction511F200IndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T10:57:49Z",
+  "verdict": "PASS for the named current-511 F200 Space Age API physical-production/save/two-cold case; no findings.",
+  "identity": {
+    "frozen_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "engine": "Factorio 2.0.77, D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "published_candidate": "more-infinite-research_5.0.20011.zip",
+    "candidate_bytes": 1006342,
+    "candidate_sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+    "packet_sha256": "AA537BFD43ED1BACB48B17FD92D6EFA7FA3698BB093F4D86A85C2C173D1D43BB",
+    "caller_sha256": "650A37FD4F577CC580AE56C4743086C90B43A29DF34B4D172E28029A3FE39B23",
+    "composition_sha256": "4668D232CC8DD2BEBE4C5C7A8782ED09B3E7FDE1F2F475073FFDA9E44E41AFE0",
+    "root_admission_sha256": "6968F289F00E411A233C9BFC30E18EB9697695D564A2C5CA2629BF65368CB1F3"
+  },
+  "actual_evidence": {
+    "terminal": {
+      "path": "build/qualification/api-production511-f200-r01-controller/execution-record/terminal.json",
+      "bytes": 9572,
+      "sha256": "35FD5D0CE1058762478F6FED17EB6929ADDA15A0A0C2375E1FE03C2E3F552F21",
+      "exception": null
+    },
+    "native_result": {
+      "path": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04/build/tmp/api-production511-f200-r01/result.json",
+      "bytes": 49753,
+      "sha256": "A5ECA196C68BFB3B8BB0E1DF95BD7C9C109A286279D11F905C98682AADB469D3"
+    },
+    "processes": [
+      {"role": "create", "pid": 584, "exit_code": 0},
+      {"role": "production", "pid": 28224, "exit_code": -1, "completion_predicate_observed": true},
+      {"role": "cold1", "pid": 35816, "exit_code": 0},
+      {"role": "cold2", "pid": 51576, "exit_code": 0}
+    ],
+    "all_four_passed_without_timeout": true,
+    "fatal_diagnostics": 0,
+    "stderr_bytes_each": 0,
+    "actual_active_selection": "All four raw logs show exactly the nine admitted mods and 511 version; native selection agrees with the sealed profile."
+  },
+  "physical_and_API_observations": {
+    "copper_plates_inserted_each_phase": 100,
+    "baseline_copper_cables": 200,
+    "researched_copper_cables": 202,
+    "recipe_productivity_oracles": [0, 0.01],
+    "assembler_productivity": 0,
+    "modules_empty": true,
+    "beacons_created": false,
+    "research": "Explicit native researched setters; zero laboratory research completions claimed.",
+    "oracle_provenance": "Independent raw-log markers match runner records. The exact physical counts come from native output inventory removal counters after all 100 inserted plates are consumed and crafting settles. Native effect and recipe bonus are checked against 0.01 with the original unchanged 1e-9 tolerance; marker 0.01 is the expected scalar, not a claim of an externally measured bit pattern. No expectations were relaxed.",
+    "queries": "Alpha and Beta detached version/capability/status and absent-state assertions are unchanged. Actual create observes Alpha researched true and Beta false at level 1. Production starts with Beta false; both cold ticks observe Beta true, Alpha true, level 1 and unchanged manual crafting modifier 0.05. Passing actors contain the mutation-isolation and native-state comparisons; fixture administration is separate from read-only API queries.",
+    "cold_durability": "Both distinct cold processes report the completed 100/100 input and 200/202 output state at tick 4803, with identical consumer frames, recipe/entity assertions and deferred-on_load checks. Completed-state early return prevents a new crafting run on cold load."
+  },
+  "saves": [
+    {"name": "seed.zip", "bytes": 552132, "sha256": "6E3426C54D2EC2DF2BD959EE6493CCB43398AD7D1255A10FC6D1F30FFD15D4C9"},
+    {"name": "mir5-native-complete.zip", "bytes": 558370, "sha256": "4AC94CEB347130DAEF43F0265DEA6C62EE4065EDC7D5AA6058B58AFC59F8A709"}
+  ],
+  "custody_and_restoration": "Both save archives passed all-member CRC and contain actual F200 level.dat0/script.dat bodies. Completed-save SHA equals both cold receipts and current bytes. All 23 native and 5 controller retained bodies equal source copies, recorded sizes and SHA256. Original before/after records and current live controls/archives match exactly; all five temporary owned archive transactions restored or removed as declared. Dependency copies, links and extractions are zero. Recorded and independent current Factorio process counts are zero.",
+  "reviewer_check_correction": "An initial read-only save-member check assumed level.dat; actual F200 uses level.dat0. The corrected native-shape check passed. This was a reviewer assertion error, not an engine failure or a new native run.",
+  "scope": "Fresh present-MIR F2002.0.77 Space Age physical API case only, using the published immutable 511 ZIP. Original evidence remains named under original inputs; this result supplies the changed consumed-input check identified by the prior applicability review. It does not establish F210 execution, general API stability, historical upgrade safety, multiplayer/client behavior, worker preservation, physical cargo, performance or whole-product stable acceptance. No Source, docs, engine, library or packet mutation was performed by this reviewer.",
+  "findings": []
+}

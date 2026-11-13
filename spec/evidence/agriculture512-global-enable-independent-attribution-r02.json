@@ -1,0 +1,277 @@
+{
+  "schema": 1,
+  "kind": "MIR512AgricultureDiagnosticAttributionAndMatchedSetupV1",
+  "reviewed_utc": "2026-11-11T17:24:04.450584+00:00",
+  "verdict": "ADOPT diagnostic fixture-contamination attribution; GO matched two-line setup correction on both arms; require fresh18-process preparation before paired timing",
+  "inputs": {
+    "owner": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-native-diagnostic-r01\\Invoke-ForceDiagnostic.ps1",
+      "bytes": 14188,
+      "sha256": "F907A07491E1C6BC0EA6C7E68648C5F1896266F1FB84A3C93C0E249662D540A2"
+    },
+    "diagnostic_plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-native-diagnostic-r01\\diagnostic.json",
+      "bytes": 3346,
+      "sha256": "960DCB83C900B2A8C83FC0C2A859304D4A9C09E87FCDDC79E7BA1D5FE03EF0FD"
+    },
+    "diagnostic_actor": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-native-diagnostic-r01\\core\\control.lua",
+      "bytes": 30472,
+      "sha256": "3259A37111F622922B3E26EEF0AD19B1E6586E64003F6B012C13C8F6BB7CC0B3"
+    },
+    "native_result": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime512-agriculture-capture-r01\\build\\tmp\\agriculture512-force-diagnostic-r01\\result.json",
+      "bytes": 12807,
+      "sha256": "3696DD0E343C41F82C16D70BCD4E50227F18DD36CBC902A22F89836DEC4E1DE3"
+    },
+    "stdout": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime512-agriculture-capture-r01\\build\\tmp\\agriculture512-force-diagnostic-r01\\process-1.stdout.txt",
+      "bytes": 19501,
+      "sha256": "5B7A91B1F3AC39A143181812245F2BAB562E98E6C988B4E696F57779AE225AA7"
+    },
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-native-diagnostic-r01\\terminal.json",
+      "bytes": 338,
+      "sha256": "3BAB8909B80A74DD17ADCABFCD7B2F5FABF799E4182D8F4FD78306BC4938BBC1"
+    },
+    "archive_restoration": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\agriculture512-force-diagnostic-r01\\archive-custody\\force-diagnostic\\result.json",
+      "bytes": 3640,
+      "sha256": "1438FB8D592B6EEBAB3D598DFEF53FEB6C6340523606E6100DCFCBB9CE09246C"
+    },
+    "original_r01_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-agriculture-current-final-aero-r01\\current-controller\\draft-port\\packet.current.json",
+      "bytes": 50036,
+      "sha256": "BA92ED9FE4F545F0C6B81238BFE61ABDE832C5D68AD5AD2F0E2F3E2E42742DBC"
+    },
+    "original_published_reference": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-agriculture-current-final-aero-r01\\current-controller\\draft-port\\reference.json",
+      "bytes": 109986,
+      "sha256": "0B305FAF7FD78A544581A1D7F93167D229F9429F1C381AE95B57655DE67152D0"
+    },
+    "proposal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-diagnosis-r01\\proposed-control.lua",
+      "bytes": 29330,
+      "sha256": "372D2A18AA31D4AEC1F6E105151EED3073F5A682782130D6BDB0FD7EE53E6D2C"
+    },
+    "prior_diagnosis": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture512-force-diagnosis-r01\\review.json",
+      "bytes": 8552,
+      "sha256": "4BFD6E20B09656F9410DF55526E73DDC2BD84794598DF92D19F05C5E5129EEC8"
+    }
+  },
+  "actual_raw_frames": [
+    {
+      "stage": "before-pristine-create",
+      "forces": [
+        {
+          "index": 1,
+          "name": "player",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 2,
+          "name": "enemy",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 3,
+          "name": "neutral",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        }
+      ]
+    },
+    {
+      "stage": "after-pristine-create",
+      "forces": [
+        {
+          "index": 1,
+          "name": "player",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 2,
+          "name": "enemy",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 3,
+          "name": "neutral",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 4,
+          "name": "mir-agri-pristine-diagnostic",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        }
+      ]
+    },
+    {
+      "stage": "after-original-player-enable-all",
+      "forces": [
+        {
+          "index": 1,
+          "name": "player",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 2,
+          "name": "enemy",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 3,
+          "name": "neutral",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        },
+        {
+          "index": 4,
+          "name": "mir-agri-pristine-diagnostic",
+          "head": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "saved_progress": 0
+          },
+          "current": false,
+          "queue": {}
+        }
+      ]
+    }
+  ],
+  "attribution": [
+    "Exact public Source0efb/F2107AA6 package on2.1.23/8DC initializes without the captured gate error. Before pristine creation player/enemy/neutral H4 are level4,researchedfalse,enabledfalse,invisible,saved0,with no current or queued research.",
+    "Creating the declared fourth diagnostic force succeeds. Its H4 has the same strict valid state and all three existing force frames remain identical. This is actual native evidence against attributing the original failure to pristine force creation in this exact closure.",
+    "Executing the original player.enable_all_prototypes then changes only player.head.enabled fromfalse totrue among the logged raw fields. That violates gate_frame on the existing player before the original fixture next creates its foreign force and triggers the all-force validator. It supplies a concrete causal setup interaction consistent with the original captured trace.",
+    "Only the explicit diagnostic error follows; no original fixture body/science/physics executes. Generic result remains failed with naturalexit1,one process,restored controls and0remaining. It is a diagnostic observation,not a preparation or gameplay pass.",
+    "The frames log H and queue/current state,not every technology/recipe/prototype or field. The observed sole difference is confined to that logged vector; no claim that enable_all changes only H globally is made."
+  ],
+  "fixture_correction": {
+    "change": "Remove player.enable_all_prototypes() and foreign.enable_all_prototypes() from each arm respective retained core control.lua. Apply only these two deletions to the actual current and published sources; do not transplant current0.1.1 version/arm guards onto published0.1.0.",
+    "keep": "Every original agriculture enabled/prerequisite/science/lab/count/planting/tower/growth/spoilage/save assertion,selector,officialengine/package identity,resource budget,25000tickpilot/benchmark endpoint,48sample schedule,counterbalancing and scoring thresholds remains unchanged.",
+    "production": "No MIR gate,worker owner state,sourcepackage,technology enabled flag or hidden research is repaired or weakened."
+  },
+  "paired_method_decision": {
+    "reuse_old_published_seeds_as_r02_comparator": false,
+    "why": "The old published seeds were produced by the original two broad enable calls. Candidate-only deletion changes a common setup operation affecting whole force technology/recipe flags; original agriculture witnesses prove named research/science/physical endpoints,not that all background native/script activity over25000ticks is invariant to those flags. Neither the H-only diagnostic nor the offline sentinel controls establish whole-workload equivalence. PERF-03 matched workload/observer and VER-06 exact consumed fixture/save inputs therefore do not justify retaining old published active seeds as the corrected paired comparator.",
+    "minimal_bounded_preparation": {
+      "tiers": [
+        1,
+        32,
+        128
+      ],
+      "arms": [
+        "candidate-defaults",
+        "published4.7.21002"
+      ],
+      "per_tier_arm": [
+        "fresh-create",
+        "active-server/save",
+        "unscored-marker-pilot"
+      ],
+      "candidate_processes": 9,
+      "published_processes": 9,
+      "total_processes": 18,
+      "timing_launches_in_preparation": 0
+    },
+    "why_not_15_or_old_pilots": "An existing seed reload does not rerun on_init and cannot undo broad enablement by deleting source lines. Reusing an old pilot tests the oldseed/fixture input. Patching saved flags would be a new world-normalization operation with a different oracle. Fresh create+server/save+pilot on each of six corrected selections is the existing method,not a new harness.",
+    "retain_originals": "Keep original published seeds,pilots,rawrecords,scientific oracles and failed r01 candidate as historical evidence. Published product ZIP bytes,exactengine/upstream mods and arm-specificscience expectations remain reusable. Only corrected core fixture/archive/profile hashes,newseeds and capture/pilot receipts replace active r02 comparator bindings.",
+    "scope_limit": "This decision requires matching the fixture procedure,not equal wholecatalogues across different productversions. Intended product/technology differences remain the subject of comparison."
+  },
+  "r02_packet_updates": [
+    "Create fresh r02 input,capture,compose,preparation/pilot and result namespaces; preserve all r01 outputs.",
+    "Bind per-arm exact two-line-corrected core source/archive/profile/member hashes and existing required selector identities.",
+    "Compose all six corrected selections before native dispatch; retain archive/restoration/exactengine/source/package checks.",
+    "Use the genericcapture method for each arm with its exact role/metadata. The currently admitted current0.1.1 role projection does not automatically admit published0.1.0; use its retained validpublishedrole,not a permissiveversionrange.",
+    "Replace the retained publishedreference selection/seed/capture/pilot bindings with fresh r02 records while keeping the originalreference separately discoverable.",
+    "Require actual two capture processes plus one pilot for every tier/arm with unchanged physical/marker oracles; do not admit timing after only nine correctedcandidate processes."
+  ],
+  "offline_controls": "Root reports all3prepared Lua5.2 setup interaction controls passed0.004s. This receipt doesnot re-execute them or treat them as nativeevidence.",
+  "limits": [
+    "No new native launches,tests,builds,activation or production edits by reviewer.",
+    "Diagnostic has no seed,pilot,timing or agriculture gameplay/performance acceptance.",
+    "No pure-pristine-force product regression established; this exact originalfailure is attributable to fixture globalenable contamination of the player H.",
+    "Configured Sol/xhigh retained; no verified backendidentity/effort exposed."
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "kind": "MIRLibrary512UIAndFixtureIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T14:37:10.346372+00:00",
+  "verdict": "SOURCE APPROVED for correctedAero1586488 UI unit and fixturefc9467 integration, focused coherent host/CI checks and exact frozen native qualification. No additional blocking finding. Unfixedaf5 is not approved for2.0; known SDK issue is closed by1586. This is not native/visual/lifecycle acceptance.",
+  "units": {
+    "player_ui": {
+      "head": "15864880cef1ccf674f76454b22291aad740f3c2",
+      "tree": "ea1ef770beb662649b3a2362ee185b3cc751720c",
+      "source_tree": "69fc0d386729852c2d69453e52f2beb6b45cb5c4",
+      "reviewed_chain": [
+        "a71bd55df nativechrome",
+        "af5d96001f2d3e054986a20acfb867f2c8f2346a",
+        "15864880cef1ccf674f76454b22291aad740f3c2"
+      ],
+      "approved_metadata_base": "2623d3d8ffd1539d2b35f21b06bcd936856b6fa8",
+      "key_bodies": [
+        {
+          "path": "source/presentation/library_layout.lua",
+          "bytes": 4629,
+          "sha256": "4C361FBD51B20471774A6A8951C7760B97D6C05F58775B68B8BEEC5B9BF6F63F",
+          "git_blob": "1649e248a7697d23a36565a134f98451ea9cbaca"
+        },
+        {
+          "path": "source/runtime/library.lua",
+          "bytes": 151550,
+          "sha256": "1316C77DC28F63A160E4ED93AB17A44927A04086C5357DDB2578FD525E92F52D",
+          "git_blob": "2ff52388cbb234087914f2d023592b8234150567"
+        },
+        {
+          "path": "tests/test_library.py",
+          "bytes": 279172,
+          "sha256": "C0CD86D32E7C675D1DF6684084277915F6175BFE56078427DE3E3DE3053537E0",
+          "git_blob": "29e949be6d1423b9adccaddfb8c9c755f89eb339"
+        }
+      ]
+    },
+    "fixture": {
+      "head": "fc9467f4af71c298e2aa720c7e9920ad4b31e120",
+      "base": "7edf840297fc8ed243ade5e98bf2a3b5808080cf",
+      "tree": "22cef99491f7936f3473b660251b9a7d2e8abc7f",
+      "source_tree": "c34febdfe6655803fafd5140bf9adf43e39fcca6",
+      "source_unchanged_from_base": true,
+      "handoff": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\HANDOFF.json",
+        "bytes": 3328,
+        "sha256": "FCB9C48A4EC3C297E2D0931632C65B3426B9549DB5A181E0A65AEEEE843D652E"
+      },
+      "input_observer": "0.3.11",
+      "export_observer": "0.4.5",
+      "exact_tuples": [
+        "base2.0.77/MIR5.0.20012",
+        "base2.1.23/MIR5.0.21012"
+      ]
+    }
+  },
+  "findings": [],
+  "known_finding_closure": {
+    "original_root_finding": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-cross-engine-style-sdk-review-finding-r01.json",
+      "bytes": 3111,
+      "sha256": "CDABCAE5F1FE7838097AD113D5CBC47946CCD833C6DED2B7BCD4A1F2686D4DD6"
+    },
+    "classification": "Previously identified byRoot; not a new duplicate finding or observed native failure. Only unpublishedin-progressaf5 used the unsupported2.0style.name writer.",
+    "fix": "1586 changes exactly that assignment to button.style=\"frame_action_button\"; readingstyle.name remains valid onbothSDKs. This uses the common string-only LuaGuiElement.style setter, which resets customvalues before the existing24px bound checks reapplydimensions.",
+    "regression": "GUI double now rejects writes tostyle.name, accepts onlystring writes toelement.style and creates resetstyleinstances. New meaningful test restyles a retained30px oldbutton, asserts the oldunsupported writer throws, keepsroot/button/queryidentity and text, and observes24px header afterreopen.119Library methods now present. Author reports in-memory restoration of theoldwriter fails the regression; no reviewer test/native run is claimed."
+  },
+  "pinned_sdk_audit": {
+    "sdk": [
+      {
+        "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+        "bytes": 1878804,
+        "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+      },
+      {
+        "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+        "bytes": 2132310,
+        "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+      }
+    ],
+    "readback": "Independently read actual2.0.77/2.1.23SDK attributes: column_count anddirection readonly, width/heightwriteonlyint32 setting bothbounds, minimal/maximaldimensions readableint32, elementstyle stringsetter availableboth, style.name readonlyonly2.0. drag_target/ignored_by_interaction/toggled/visible and usedstyle dimension/spacing/font/margin members permit intendedaccesses. Bothinstalledcorestyle definitions containframe_action_button,frame_title,draggable_space_header. No other new unavailable API member found.",
+    "fixture_boundary": "Fixture reads maximal/minimalwidth rather than nonexistentreadablewidth, requires equal positivefiniteintegers, and exactly maps960→5/620→3/440→2/otherwise1. New12 only; older protocols still demandexact2columns. It never writesreadonlycolumn_count or guessesnativepixelwidth fromdisplayresolution."
+  },
+  "player_ui_review": {
+    "responsive_geometry": "Only the smallfiltergrid is destroyed/rebuilt when its readonlycolumncount mustchange. Existingquerytextfield/root/tabs remain; everynewfamily/status/mode/sort/visibility control is initialized from retainedview using the same names/parents/indexmaps. Search/caret element is not recreated onordinarybreakpointchanges. Contentheight reserves labeledfilter rows and keeps theResearchpage scrollable rather than hiding labels; all newlywrittennative dimensions are integerbounded.",
+    "native_chrome": "Screen-ownedframe is ancestor oftitleflow/caption/handle. Titleflow drag_target points toframe; caption/handle passthrough does not set actionbuttons ignored. Four24px frame_action buttons keep existingclicknames, utilitysprites andkeyboardownedframe closure. Captionwidth leaves room foractions. No gameforce/research/queue mutation ornewcallback introduced.",
+    "page_states": "Emptyqueue hides only its emptylist and shows existingemptyguidance; existingnativequeue remainsauthoritative. Settingsscopebuttons reflect retainedviewscope via SDK-supportedtoggled flag; query/selection semantics and eventrouting unchanged.",
+    "locale_and_public_boundaries": "All50localechanges preserve exactkeys and interpolation placeholders; nonGerman files changeonlyHelp label. Germanhas the sameHelp plus10terminology corrections. No settingID/APIremote/publicLibraryfunctionname/root/prefix/tab/page/filterparentpath/sourceversion orsemanticsettingcontract changes. Independent function-list andmetadata comparison confirms existingpublicsurface unchanged. Localechange ispresentationonly; actualEN/DE search/render/input stillrequiresnativequalification."
+  },
+  "fixture_review": {
+    "scope": "Eightfiles only; fournewexactmetadata descriptors, versiongates and12-onlylayoutobservation added. PlayerSource remainsc34exact. Ordinaryno-order dependency on exactMIR12 preserves existingobserverlifecycle protocol; allowedclosures still reject extra/missing/wrongfamily/future/old tuples.",
+    "settings_and_lifecycle": "0.3.11 necessarily enters unchanged9917legacySettingsprobe path, all14EN/DE pairs and fullretainedinput sequence. Literalexpectedsettings stages/default/no-match/queryrestoration,48privatequeries/5joins/2requestedresets/1removed/2Libraryclosed remain innewcontrol. No earlycompletion orhostmodel-as-nativepass is added. Report/on_load remainread-only and allnative/foreign/importedearningsguards retained.",
+    "exports": "0.4.5 changes exact12tuple only. SixEN/DE full/compact/diagnostic export actionprotocol, content/profile/read-only/world/native/settingguards and strictrejoin/restart/removal/server-event semantics remain; no actualfile orhumaninput pass followsfromfixtureversionbinding.",
+    "preservation": "Independently compare original62testmethodASTs: allunchanged; sixnewmethods added. All35preservedhistoricalmetadata/probe bodies equalbaseGit bytes andproofhashes. Probe.lua exact9806bytes/SHA9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234. Handoffall8filebindings match exactfcGit bodies. Responsiveoracle rejectswrongcolumn0/4/6,mismatch/absent/nonfinite/nonintegerbounds; widththreshold expectation is independentliteral authoreddesign, notcandidateoutputadoption."
+  },
+  "validation_evidence": {
+    "fixture_plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\host-plan.json",
+      "bytes": 15881,
+      "sha256": "33807AFEA8C3B8C2870055EBF725879F91C37CA303CBAE129CF1DB3FC5ADF91A"
+    },
+    "fixture_preservation": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\preservation.json",
+      "bytes": 11650,
+      "sha256": "32ED7C01CC42728487276E2F453E05E3DA81EDCCC45EFAD578D342D31A29304C"
+    },
+    "fixture_logs": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\red-new-tests.log",
+        "bytes": 15027,
+        "sha256": "414C347490E039E0732680C73B2CCB63C99A48B2720EDDC5CE6A9AF78B6AA0FC"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\responsive-red.json",
+        "bytes": 878,
+        "sha256": "9AB3354746C0EAD3101025309028A57F16E0058CCEE1FBC2ECBA87F14741CB65"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\green-new-tests-final.log",
+        "bytes": 1338,
+        "sha256": "D4CEACDCA05880966D5D07AD3AA51686151819B76E127E0F86126FC1A9F0B731"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\fixture-suite-final.log",
+        "bytes": 13188,
+        "sha256": "4B57C2EDE6A79371FD4B3237DF3A4504C3F4D9CBA3473F3322D699A692E911F1"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\static-final.log",
+        "bytes": 460,
+        "sha256": "648B4844BF6B1EFD9FCC589526F7AAAA89642D3C0351F9B818C19019851AA497"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-input-bindings-r01-controller\\changelog-final.log",
+        "bytes": 68,
+        "sha256": "74AAF05A7AD2FE2850B8FCF71FF1FE15A674C818DC5CFA53A5F6867D3A2EC9B3"
+      }
+    ],
+    "scope": "Read retained68fixturecontrolsPASS and6newfocusedPASS, initialoldversionandtwo-columnopponents preserved. No oldAST assertion removed. Aero reports119Library+18translation+8locale+5legacyprobe=150selectedPASS; this is host evidence, not desktop/native acceptance. Authorpackage/static finalchecks and Root coherentintegrationbatch remain separately required. Reviewer onlyreadsource/SDK/logs and comparedexactAST/metadata bodies; no testsuite/build/native rerun."
+  },
+  "mandatory_followup": "Integrate corrected1586 with independentlyownedstartup5e329 andfixturefc ononeexactcandidate; resolve actualcombineddiff andrunrequired focusedhost/CI/packagechecks beforefreezingGUIinputs. Nativeinteraction/capture mustverify oldwindowrestyle,title+handle drag andall4actions,960/620/440responsivebreakpoints withlivequery/root/tabs/choices preserved, keyboardclose,queueempty/nonempty,settingsscope,EN/DE14settingspairs/fullinputlifecycle andexportfile/content/rejoin/restart/remove/foreignisolation. Simultaneousclient/headroomboundaries remainseparate; no scriptedclick orhostmock substitutesforrequireddesktop evidence.",
+  "limits": "Approval covers only namedincomingUIandfixtureunits. Unreviewedfuturecombinedstartup/UI/sourcechanges need exactintegrationreview and affectedconsumed-inputapplicability. PriorFerrum3dataresults, published11adverses, current11repairpilot andothernative results retain originalsource/packageidentities.20repairtiming remainsheld until coherentproduction/UIcandidate andquietblock. No stable/release/publicationwaiver. No Source/test/docs/controller/packet/library/privateGit/native mutation, hostsuite/build orFactorio launch byreviewer; onlythisnewprimaryreceiptwritten."
+}

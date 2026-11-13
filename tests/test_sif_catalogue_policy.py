@@ -174,7 +174,7 @@ class SIFCataloguePolicyTests(unittest.TestCase):
                             expected["unit"]["ingredients"] = [ingredient for ingredient in expected["unit"]["ingredients"]
                                                                 if ingredient[0] != WHITE]
                             if "prerequisites" in expected:
-                                expected["prerequisites"] = [gate for gate in expected["prerequisites"] if gate != WHITE] or {}
+                                expected["prerequisites"] = [gate for gate in expected["prerequisites"] if gate != WHITE]
                             self.assertEqual(expected, row, name)
                             if row.get("enabled") is not False:
                                 self.assertNotIn(WHITE, [ingredient[0] for ingredient in row["unit"]["ingredients"]], name)
@@ -251,21 +251,30 @@ class SIFCataloguePolicyTests(unittest.TestCase):
 
         for maximum, infinite in ((4, False), (7, False), (10, False),
                                   (4, True), (7, True), (10, True)):
-            for policy in ("configured", "all"):
-                with self.subTest(maximum=maximum, infinite=infinite, policy=policy):
-                    retired_raw, mods = self.inputs("f210")
-                    available_raw, _ = self.inputs("f210", source="native")
+            for target, policy in (("f200", "configured"), ("f200", "all"),
+                                   ("f210", "configured"), ("f210", "all")):
+                with self.subTest(target=target, maximum=maximum, infinite=infinite, policy=policy):
+                    retired_raw, mods = self.inputs(target)
+                    available_raw, _ = self.inputs(target, source="native")
                     mods["WorkerRobotCargoSizeResearch"] = "1.0.0"
                     retired_provider = install_provider(retired_raw, maximum, infinite)
                     available_provider = install_provider(available_raw, maximum, infinite)
-                    retired_lua = self.stage(retired_raw, mods, "f210", policy)
-                    available_lua = self.stage(available_raw, mods, "f210", policy)
+                    retired_lua = self.stage(retired_raw, mods, target, policy)
+                    available_lua = self.stage(available_raw, mods, target, policy)
                     retired, available = self.emitted(retired_lua), self.emitted(available_lua)
                     continuation = f"worker-robots-storage-{maximum + 1}"
                     for name, expected in retired_provider.items():
                         self.assertEqual(expected, fixture.plain_lua(retired_lua.globals().data.raw.technology[name]), name)
                     for name, expected in available_provider.items():
                         self.assertEqual(expected, fixture.plain_lua(available_lua.globals().data.raw.technology[name]), name)
+                    # The public continuation is only one of MIR's worker
+                    # rows: retained work and its default owner/debit must
+                    # also use the final retired-science policy.
+                    for name in ("mir-worker-storage-preservation-4", "mir-worker-storage-default-4",
+                                 "mir-worker-storage-head-4"):
+                        self.assertIn(name, retired)
+                        self.assertNotIn(WHITE, [ingredient[0] for ingredient in retired[name]["unit"]["ingredients"]], name)
+                        self.assertNotIn(WHITE, retired[name].get("prerequisites", []), name)
                     if infinite:
                         self.assertNotIn(continuation, retired)
                         self.assertNotIn(continuation, available)

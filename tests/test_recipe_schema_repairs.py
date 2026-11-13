@@ -6,6 +6,7 @@ import unittest
 
 from native_credit_oracle import verified_public_rows
 from worker_storage_recovery_fixture import expected_private_worker_row
+from test_generator import expected_worker_default_split_rows
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -111,7 +112,7 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   -- Five published Base recipe families add ten signed
                   -- holders to the original 54 public/24 private rows, plus
                   -- the explicitly validated private worker holder.
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10+1)
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10+1+2)
                   local science_pack_productivity
                   for _, row in ipairs(environment.emitted) do
                     if row.name == "recipe-prod-research_science_pack_productivity-1" then
@@ -139,6 +140,12 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                     for row in host.lua.globals().schema_output.values()
                 }
                 self.assertEqual(actual.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
+                canonical = expected_private_worker_row()
+                canonical.update(name="worker-robots-storage-4", hidden=False)
+                for field in ("enabled", "visible_when_disabled", "order"):
+                    canonical.pop(field)
+                for name, expected in expected_worker_default_split_rows(canonical).items():
+                    self.assertEqual(actual.pop(name), expected)
                 public = verified_public_rows(
                     actual,
                     {str(name) for name in host.lua.globals().schema_recipes.keys()},

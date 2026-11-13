@@ -1,0 +1,32 @@
+{
+  "kind": "Ferrum512ModernNativeOriginalRemoteReadbackV1",
+  "commit": "adb60e5f7f2fc345f2af2a16e81ae98950f6eeeb",
+  "branch": "evidence/mir511-incident-native-blackglass-r01",
+  "files": [
+    {
+      "path": "evidence/mir512-ferrum-modern-final-data-blackglass-r01/.gitattributes",
+      "blob": "e098080faf10a95784c089e96ded428ebdabe55c",
+      "bytes": 33,
+      "sha256": "E73808E42008AA2DF6CD38297A19A687E3FE5A3474C4AEA253DD55F07E3DDFBB"
+    },
+    {
+      "path": "evidence/mir512-ferrum-modern-final-data-blackglass-r01/MANIFEST.json",
+      "blob": "f051645dda809432d31cc0a256aa240b0f68d5a6",
+      "bytes": 100086,
+      "sha256": "306026E835BF1866AA68957C71A36468FD6FCA46893824771C9DCDB835A397DF"
+    },
+    {
+      "path": "evidence/mir512-ferrum-modern-final-data-blackglass-r01/original-bodies.json.gz",
+      "blob": "340ea3bf41c3569027b4c2c850bc4a4c581e3859",
+      "bytes": 14984287,
+      "sha256": "740669B02D6ED64E7827A13CC636DC7F0055F4E1BED9E8107B617F094A9AAE75"
+    }
+  ],
+  "records": 246,
+  "original_bytes": 152077262,
+  "all_original_roundtrips_exact": true,
+  "all_remote_blobs_exact": true,
+  "metadata_only_refusals_preserved": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-modern-data-r01-remote-manifest-normalization-adverse",
+  "index_note": "Canonical LF metadata equals exact Git blob; ordinary git add refreshed stale stat without any staged delta. Original CRLF metadata and both strict remote refusals retained.",
+  "scope": "Preserve published511 full2.1 Ferrum final-science adverse and original prelaunch refusal, plus separately reviewed frozen12 modern full final-data qualification: three new natural exits, one reused upstream baseline. No gameplay/save/runtime cargo/UI/timing/stable verdict. All originals and negative-reader refusals retain exact identities."
+}

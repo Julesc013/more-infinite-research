@@ -1,0 +1,373 @@
+{
+  "schema": 1,
+  "kind": "MIR512RepairActiveTier0IndependentMeasurementReviewV1",
+  "reviewed_utc": "2026-11-10T05:30:37.102548+00:00",
+  "reviewer": "non-author bounded actual-result review",
+  "verdict": "PASS: exact repair-active tier0 timing/memory comparison is within all four predeclared limits",
+  "findings": [],
+  "candidate": {
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "player_source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "publication_status": "unpublished 5.0.12",
+    "archive": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-source128-r01/more-infinite-research_5.0.21012.zip",
+      "bytes": 1022087,
+      "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+    },
+    "reference": "published 4.7.21002",
+    "engine": {
+      "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "version": "2.1.23",
+      "data": "D:\\Games\\Factorio\\2.1\\data"
+    },
+    "harness_source_distinction": "Capture be3048d/benchmark32fe use Sourcef4e45e5; loaded current player is Source47537/10619C8C. Harness source is not represented as the loaded product."
+  },
+  "evidence": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\packet.json",
+      "bytes": 39950,
+      "sha256": "4FB70A4B9BDD5FC0049F91EAEAADAA7D12023DB2BAF87590C2AA65417BC6543B"
+    },
+    "owner": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\Invoke-Repair512.ps1",
+      "bytes": 30363,
+      "sha256": "691319A003A048A666C4CE1D23C5AE198329A59450CFFE1FC4E77B81F00285D2"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\composition.json",
+      "bytes": 22421,
+      "sha256": "E59440E8E36044F945D968F7E637FCA31B11A233FB3001775A0B777AB5710087"
+    },
+    "preparation": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-repair-r01\\preparation.json",
+      "bytes": 40432,
+      "sha256": "E16553489C597DC286926D6D4B846E1D5287FD101D6B5324A1D68483F2EAB1BB"
+    },
+    "observations": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-repair-r01\\measurement\\observations.json",
+      "bytes": 494965,
+      "sha256": "7D0DE98D1E33C31DA805F7C8F3201E56A59FFDC4B2B8144C8D43428F0DDE767D"
+    },
+    "root_analysis": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\analysis-root-r01.json",
+      "bytes": 7005,
+      "sha256": "51E6640F402ED9CA972A2C6EEC5FC9AFFE45CE356990D7B7394915EBEB433B51"
+    },
+    "original_reader": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/runtime512-repair-r01-controller/origins/analyze_runtime_benchmark.py",
+      "bytes": 138584,
+      "sha256": "EBBE61478F05970D55493D40973061C32E21606D9610CC6D6AA5854B84B612E7"
+    },
+    "adapter": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/runtime512-repair-r01-controller/analyze_repair512.py",
+      "bytes": 7477,
+      "sha256": "EE913EF9C430134EDBA9F849BD0E5A6DD29E338ACEBCB9E911F53CC315902C44"
+    },
+    "schedule": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/runtime512-repair-r01-controller/schedule.json",
+      "bytes": 3482,
+      "sha256": "C3864D68067DC40E24631E23898DE77F4CA36A69423CD0AD27C86D1C18796BA5"
+    },
+    "quiet_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\quiet-window-admission-root-r01.json",
+      "bytes": 1002,
+      "sha256": "EAF553F14806E4C01948BA5C26802782E7DBFF229F1C58C59398714D49E41839"
+    },
+    "quiet_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime512-repair-r01-controller\\quiet-window-terminal-root-r01.json",
+      "bytes": 89,
+      "sha256": "04B690DB24E88C196E13DAC8EA4AAB737E49D24A4D1224E6A176B4C5EE61AF01"
+    },
+    "archive_restoration": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime512-repair-r01\\archive-custody\\candidate-whole-measurement\\result.json",
+      "bytes": 1149,
+      "sha256": "8D8A32AF7B76906F044329E363823552C58A1BFCF51B9D9D3B6C25E63AD893C1"
+    }
+  },
+  "methods": {
+    "original_validator_replayed": true,
+    "full_replay_equal_root_analysis_after_JSON_key_normalization": true,
+    "independent_arithmetic": "Parsed all20 raw stdout timing tuples; recomputed scored medians/ranges from raw engine average and retained owned-handle OS peak, and recomputed sampled maxima from all354 raw memory observations. Exact agreement with all four original-reader comparisons.",
+    "unit": "One complete20-launch same-machine unit; 10reference+10candidate, 4unscored warmups then16scored observations/eightpairs; oddpairs reference-first/evenpairs candidate-first. No prefix selection or pooling.",
+    "timing_rule": "candidate median <= reference median + max(10% reference median,0.25ms/tick)",
+    "memory_rule": "Each metric separately: candidate median <= reference median + max(10% reference median,67108864bytes)"
+  },
+  "actual": {
+    "launches": 20,
+    "unique_pids": 20,
+    "unique_start_times": 20,
+    "serial_nonoverlap": true,
+    "natural_exit0": 20,
+    "completion_predicate_substitutions": 0,
+    "actual_updates_per_launch": 25000,
+    "warmups": 4,
+    "scored": 16,
+    "scored_pairs": 8,
+    "raw_stdout_log_memory_result_and_custody_verified": true,
+    "physical": "Every actual log has one pending start and one passed complete:1000eligible,256firstcapacity(128player+128reciprocalfriend),744overflow,initial0→256,reactivation0→8,pendingtrue→false. One-point electric damage,600quiet/60service ticks. Fixture complete predicates also assert overflow/nonfriendly/nonwall unchanged; per-entity health arrays are not emitted in markers.",
+    "loaded_mods": "All20 A15A full observer tuples match exactly9 selected mods and their arm-specific versions. Every selected archive hash, fixed engine, current player, profile, reader/adapter/schedule and official info body checked. Defaults settings policy unchanged.",
+    "seed_crc": "22ZIPs CRC-checked: two source seeds and20physicallydistinct owned copies, allnlink1; allsource/owned before-and-after digests match and both originals remain unchanged.",
+    "reference_seed_sha256": "D3E04D1D54D0D3E6AE319753F023E04553989EB32DAF1BEBA0B511704E46948B",
+    "candidate_seed_sha256": "6C3C8D20DE4F719FDFB1E693790D44D0FC2D25AEC6B91A089A36830D1DC984C7",
+    "resource_policy": "Original4096MiB sampled-watchdog,900s,120MiB output and bounded250ms-target sampler retained; allnatural completions within bounds. This is a watchdog, not a hard memory cap.",
+    "maximum_measured_stage_output_bytes": 950653,
+    "maximum_governor_peak_working_set_bytes": 646582272,
+    "memory_observations": 354,
+    "live_restored_distinct_control_archive_states": 9,
+    "restoration": "All20 raw fixture custody transactions succeeded without failures; outer archive transaction passed/errornull. Rechecked all9 distinct prior states against live library, including temporary candidate/fixture removal, plus immutable originals. No dependency copying, extraction or archive links.",
+    "factorio_processes_live_readback": 0,
+    "quiet_interval_utc": [
+      "2026-11-10T05:17:41.0722389+00:00",
+      "2026-11-10T05:20:23.1502508+00:00"
+    ],
+    "quiet_evidence": "Root quiet admission records bothotheragents completed/idle andzeroagent builds/host/othernative/inference; all20PID intervals lie inside block. This reviewer remained idle during block. No independent OS-wide activity trace is claimed."
+  },
+  "metrics": {
+    "engine_reported_average_milliseconds_per_tick": {
+      "reference_median": 0.1355,
+      "candidate_median": 0.133,
+      "allowance": 0.25,
+      "limit": 0.3855,
+      "candidate_minus_reference": -0.0025000000000000022,
+      "reference_range": [
+        0.133,
+        0.14
+      ],
+      "candidate_range": [
+        0.131,
+        0.135
+      ],
+      "verdict": "within-predeclared-limit"
+    },
+    "operating_system_peak_working_set_bytes": {
+      "reference_median": 613943296.0,
+      "candidate_median": 519940096.0,
+      "allowance": 67108864,
+      "limit": 681052160.0,
+      "candidate_minus_reference": -94003200.0,
+      "reference_range": [
+        590766080.0,
+        647331840.0
+      ],
+      "candidate_range": [
+        498237440.0,
+        531353600.0
+      ],
+      "verdict": "within-predeclared-limit"
+    },
+    "maximum_sampled_working_set_bytes": {
+      "reference_median": 492032000.0,
+      "candidate_median": 512446464.0,
+      "allowance": 67108864,
+      "limit": 559140864.0,
+      "candidate_minus_reference": 20414464.0,
+      "reference_range": [
+        448073728.0,
+        590536704.0
+      ],
+      "candidate_range": [
+        438968320.0,
+        530907136.0
+      ],
+      "verdict": "within-predeclared-limit"
+    },
+    "maximum_sampled_private_bytes": {
+      "reference_median": 489338880.0,
+      "candidate_median": 507832320.0,
+      "allowance": 67108864,
+      "limit": 556447744.0,
+      "candidate_minus_reference": 18493440.0,
+      "reference_range": [
+        448323584.0,
+        586010624.0
+      ],
+      "candidate_range": [
+        446566400.0,
+        525185024.0
+      ],
+      "verdict": "within-predeclared-limit"
+    }
+  },
+  "sampling_limit": {
+    "target_interval_ms": 250,
+    "actual_interval_ms_min": 319.46799999999985,
+    "actual_interval_ms_median": 334.1440000000001,
+    "actual_interval_ms_max": 2165.4269999999997,
+    "largest_gap_sample": "repair-b2-2-published",
+    "interpretation": "Original plan expressly retains real gaps. Sampled working/private values are sampled maxima, not instantaneous proven peaks. Retained owned-handle OS peak is a separate metric; governor hybrid peaks are not substituted."
+  },
+  "processes": [
+    {
+      "id": "repair-warmup-published-1",
+      "arm": "published",
+      "scored": false,
+      "pid": 39196,
+      "start_utc": "2026-11-10T05:17:49.0516316Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-warmup-published-2",
+      "arm": "published",
+      "scored": false,
+      "pid": 50256,
+      "start_utc": "2026-11-10T05:17:58.2661883Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-warmup-candidate-1",
+      "arm": "candidate",
+      "scored": false,
+      "pid": 41492,
+      "start_utc": "2026-11-10T05:18:06.9514961Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-warmup-candidate-2",
+      "arm": "candidate",
+      "scored": false,
+      "pid": 39308,
+      "start_utc": "2026-11-10T05:18:14.1450999Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b1-1-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 43832,
+      "start_utc": "2026-11-10T05:18:21.5601773Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b1-2-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 47768,
+      "start_utc": "2026-11-10T05:18:29.6476063Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b2-1-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 42296,
+      "start_utc": "2026-11-10T05:18:37.1411697Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b2-2-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 51604,
+      "start_utc": "2026-11-10T05:18:44.3570286Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b3-1-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 38332,
+      "start_utc": "2026-11-10T05:18:54.5099723Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b3-2-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 27492,
+      "start_utc": "2026-11-10T05:19:02.6847220Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b4-1-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 25412,
+      "start_utc": "2026-11-10T05:19:09.6191738Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b4-2-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 48808,
+      "start_utc": "2026-11-10T05:19:16.4549021Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b5-1-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 48668,
+      "start_utc": "2026-11-10T05:19:24.4798900Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b5-2-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 51564,
+      "start_utc": "2026-11-10T05:19:32.4994169Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b6-1-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 41660,
+      "start_utc": "2026-11-10T05:19:39.4979241Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b6-2-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 44496,
+      "start_utc": "2026-11-10T05:19:46.4814317Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b7-1-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 51860,
+      "start_utc": "2026-11-10T05:19:54.5025756Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b7-2-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 49164,
+      "start_utc": "2026-11-10T05:20:02.5939753Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b8-1-candidate",
+      "arm": "candidate",
+      "scored": true,
+      "pid": 36532,
+      "start_utc": "2026-11-10T05:20:09.7113869Z",
+      "exit_code": 0
+    },
+    {
+      "id": "repair-b8-2-published",
+      "arm": "published",
+      "scored": true,
+      "pid": 43592,
+      "start_utc": "2026-11-10T05:20:16.6876096Z",
+      "exit_code": 0
+    }
+  ],
+  "limits": [
+    "Only the named2.1.23 repair-active tier0 matched25000-update workload on Black Glass and these exact inputs; no second-machine qualification.",
+    "Within the predeclared practical tolerances is not a statistical equivalence or substantial-speedup claim. Descriptive ranges retained; no confidence/significance claim.",
+    "No agriculture/otheractive68cells, scaling, responsive-menu/startup, Library, API, save-load or general performance acceptance.",
+    "Original preparation/observation records retain their not-performance-accepted flags; this separate review grants only the named repair-active control. Prior511results/adverses retain original identities.",
+    "No whole-product, release or stable acceptance; remaining functional/UI/performance gates are unchanged."
+  ],
+  "stable_acceptance": false,
+  "general_performance_acceptance": false,
+  "new_native_or_tests_launched_by_reviewer": 0
+}

@@ -1,0 +1,170 @@
+{
+  "kind": "WorkerHistoryContextAndAuthorityIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T23:10:30.278651+00:00",
+  "verdict": "GO for fd283 diagnostic/guidance-only unit. Unprepared reported transition remains unresolved; two separately identified unchanged-Secretas provenance/history gaps need bounded correction and qualification.",
+  "reviewer": "Non-author read-only bounded Source/authority audit; no children",
+  "source": {
+    "head": "fd2830f7ca75138b3132fe5c119903893a261df5",
+    "base": "765fc4fa25e17f9ec5f1402f3b65da5e781d42db",
+    "tree": "46e62567b60ccc9c29aeff13840cce148a4cebad",
+    "player_source": "698f4e76b3aa4840866642c8528e69eada820f98",
+    "files": [
+      {
+        "ref": "fd2830f7ca75138b3132fe5c119903893a261df5:source/runtime/worker_robot_storage.lua",
+        "git_blob": "1ec906e753ff0609c41657d06c78efeb2cdca406",
+        "bytes": 36023,
+        "sha256": "15E7A2423E71DC907AB2EBC6413E0879D778DCCA288255BBE707BBFF13193D58"
+      },
+      {
+        "ref": "fd2830f7ca75138b3132fe5c119903893a261df5:tests/test_worker_storage_history.py",
+        "git_blob": "800d64aa2976bf00b23565c72189a4a2dfb6c8cd",
+        "bytes": 44247,
+        "sha256": "A1254F76FFBED937661083428E1CA3CA4331157DC74A59734DFD9A8E704CE0F4"
+      }
+    ],
+    "bound": "Reviewed gitshow exactfd,not moving Root worktree edits."
+  },
+  "diagnostic_review": {
+    "result": "No acceptance,storage/native-write,queue/cap/prepared-work contract or lifecycle behavior changed. Changes are bounded printable context/conditional recovery guidance and passing actual validated route into the existing refusal. technology=unobserved replaces an unsupported default inference.",
+    "context": "previous_mir is observed old event version/absent,unchanged when MIR absent from a present mod_changes table,or unknown without that table. new_mir uses event new value or currently active MIR; startup_changed and validated surviving route-kind are named separately. It records3named provider changes without discovering/attributing a culprit.",
+    "printability": "Each string field is cut to96input bytes before escaping control/space and bytes127..255 as ASCII\\xHH; partial UTF8 is printable escaped bytes. Fixed field count bounds added diagnostic size. Primitive numbers/booleans print; other item types become unknown. This is logging,never paid-state authority.",
+    "event_and_state_safety": "For reached diagnostic paths,non-table events normalize to empty details;nil events omit context and still refuse with actual route. checked_state/checked(route) run before contextual state indexing,so schema1/schema2/prepared-kind accesses use already-validated shapes. Current route and missing/saved route are distinguished. Existing unchanged_unrecorded_secretas event indexing is outside this diagnostic delta;do not infer blanket malformed-event API acceptance.",
+    "guidance": "Protected original COPY and previous selection/matching settings advice remains. Prepare is explicitly conditional on a separately loaded copy having live MIR-owned default infinite worker4; other prior routes need verified history. No recommendation to reset levels,trust clamped current state,or prepare an arbitrary foreign route.",
+    "tests_read_not_rerun": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\github-six-issue-reconciliation-r01\\worker-context-controls-r03.log",
+        "bytes": 145,
+        "sha256": "516281B96AFAAC889016D3FC9D3081077B1CEE6982166FF260CB9FBDD79530D2"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\github-six-issue-reconciliation-r01\\worker-context-bootstrap-r01.log",
+        "bytes": 5570,
+        "sha256": "8066F3FA48E7AA404D5947B4AC6A64B5FBF2E69D0109BEB73C88DFD77D354AAB"
+      }
+    ],
+    "actual_host_counts": "41worker-history and31bootstrap PASS read back; no native or reporter-save qualification follows. Three new tests preserve zero writes/storage identity and assert actual continuation/event/surviving marker and printable hostile suffix handling."
+  },
+  "actionable_findings": [
+    {
+      "id": "UNCHANGED-PUBLISHED9-SECRETAS-GATE",
+      "priority": "P1 for the specifically proven unchanged-route upgrade class; not a diagnosis of newest reporter",
+      "location": "fd283 source/runtime/worker_robot_storage.lua:427-436",
+      "problem": "Only5.0.20010/21010 may use the nil-history unchangedSecretas exception. Published5.0.9 already constructed the same explicit finite4..8 to ninth continuation identity,while no worker history module/writer existed in that release. A strictly unchanged owned Secretas9 source from published9 is unnecessarily rejected by this version gate.",
+      "independent_old_producer": "v5.0.9 modern_catalogue.lua1123-1136 enables exactSecretas handling onF200/F210;1290-1318 chooses named9 and honors meaningful external infinite owners. secretas.lua9-54 sets9/previous8/exact prerequisite8,validates five finite4..8,count/time/science and one positive worker effect,then inherits last7/8 price/time/science/effect. modern.lua197-248 emits native level9/infinite,absolute worker effect,authored cost and cap/enable settings. The Secretas helper is byte-identical in9,10,11 andfd;cost.lua andcaps.lua also match across those releases.",
+      "recommendation": "Add only a separately provenance-guarded known9 unchangedSecretas path: matching family/old version and destination active MIR,unchanged engine/startup/all other mod versions,owned current exact9 with checked five-stage finite creator/shape. Retain external/unknown/change opponents. This does not authorize provider addition/removal,changed costs/settings,default4 clamping or current-mask/count inference. Native unchanged9 upgrade/save/read-only reload remains required."
+    },
+    {
+      "id": "UNCHANGED10-TO11-HISTORY-NOT-MATERIALIZED",
+      "priority": "P1 concrete existing source writer gap",
+      "location": "v5.0.11 worker_robot_storage.lua:404-445; corresponding fd283:457-480 and118-137",
+      "problem": "The accepted nil-history unchangedSecretas branch assigns plan=nil. With or without an empty-private wrapper,M.apply ultimately calls legacy_apply(nil),which stores nothing. A successful10to11 unchangedSecretas transition can therefore retain nil KEY; its next11to12 upgrade no longer matches the old10-only exception and refuses unknown history.",
+      "source_basis": "This follows directly from branch/return/apply writer flow,independent of native clamp inference. It is an applicable recurring-failure class,not proof of the newest reporter prior version or route.",
+      "recommendation": "For an independently proven unchanged named9 route,return/materialize a detached checked schema1 route after all global preflights. Cover first accepted10history materialization,subsequent11upgrade and read-only reload. For nil published11 writer-gap sources,require the same tight unchanged engine/startup/all-mod/target/current-owned finite-route provenance before admission. No native level/progress/queue grant and no guessed historical counts."
+    }
+  ],
+  "clamp_authority": {
+    "priority_stop_record": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-transition-1845-r02-controller\\PRIORITY-STOP-AND-CLAMP-EVIDENCE.json",
+      "bytes": 107017,
+      "sha256": "624C8C80375FB2E0E7AB94B477AAFFB92A452CAA5AADBD9BA312B7D8FBC48D5C"
+    },
+    "selected_native_receipts": [
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-readback.json",
+        "bytes": 48121,
+        "sha256": "AE47EF5D0270CC9A915FDD75BFA2F2FAB1BF9B74C5D2F55D4671F67EBDC7F375"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-lua-entry-r01-controller\\native-readback.json",
+        "bytes": 105797,
+        "sha256": "2F73D8FF4E2BDF7029442C47C949F7C852D57EC8C86A78BCD88F4B4F1D33D832"
+      }
+    ],
+    "reviewed": "Exact AE47/2F73 native-readback,packet,caller,terminal andNATIVE-RESULTS pins rehashed;readback states and result limits inspected. Full70-body custody was already Root-audited and is not re-explored here. Original per-stage raw locators remain in the priority record;this review does not claim new native execution or independent reread of every raw member.",
+    "actual_scope": "Standalone2.1.23/8DC Base+owned test only,MIR absent,admin-seeded next8/next7/current.375/suspended.27,zero labs. These are engine semantics,not Ferrum/Secretas production or reporter qualification.",
+    "destroyed_before_Lua": "Player next8/unresearched/bonus7 becomes finite4/researched/bonus4;worker current.375 and queued identity disappear,next sentinel becomes current0. Suspended next7/bonus6 becomes finite4/researched/bonus4;worker saved.27 and queue membership disappear,unrelated sentinel.42 remains. Uninvested next4/unresearched/disabled/bonus3 and sentinel.125 remain. Lua migration is already in this clamped frame before configuration callback (production.log119 then120),and pre-save/cold agree.",
+    "surviving_authority": "Fixture detached storage.source_baseline survives and would contain lost facts because the fixture deliberately wrote them before change. MIR was absent,so this is not evidence a reporter MIR ledger contains those facts. Separate staticJSONold4-to-legacy4 control preserves the seeded state but supplies no generic production rename/repeated-provider/reporter policy.",
+    "impossibility_boundary": "Clamped finite4/bonus4/current or saved0 is many-to-one:it cannot identify the former native level,paid excess,current/queued/suspended work or old cost/effect contract. No automatic unprepared default-to-finite repair is supported by these native facts."
+  },
+  "published_saved_authority": {
+    "v10": {
+      "worker": {
+        "ref": "v5.0.10:source/runtime/worker_robot_storage.lua",
+        "git_blob": "054d668b2f46c8369fc8f3500f3c61924c71a32f",
+        "bytes": 6807,
+        "sha256": "D85F40AFC20EECFA45C8F8D95B77DD61F10FFF7E95CAAC616A3D04C78EB0130E"
+      },
+      "writer": "on_init139-145 writes schema1 route only when nonnil;default4 writes nothing. Route records finite identities/creator/ownedness,not per-force paid counts/partials/queue/old work contract."
+    },
+    "v11": {
+      "worker": {
+        "ref": "v5.0.11:source/runtime/worker_robot_storage.lua",
+        "git_blob": "609867224b83eb110e27816e926a652341a095ce",
+        "bytes": 34158,
+        "sha256": "DFF0B2145DC22CB263EE95A4DA87F04D771CF8B7E9809F77BBF5BC821D5F621A"
+      },
+      "writer": "ordinary schema2route/current marker stores current default/finite/external identity only. Explicit prepared schema2 additionally holds contract,cap,enable and per-force next_level/limit/pending/flags;the stable private native holder carries actual work/partial. Those fields exist only after real preparation,not by ordinary unknown-route loading."
+    },
+    "caps": "Exactcaps.luaA50E7D... is unchanged9/10/11/fd. Per-force owned_disabled/discovery_enabled/visible_when_disabled records establish flag ownership only;cap ceiling/old4.7.3 managed ownership metadata is not historical paid/current/suspended work.",
+    "survival_limit": "Arbitrary Lua storage survival is demonstrated by the fixture;actual reporter saved writer/schema/fields were not inspected. Never treat nil as a proven default marker,or a route/cap record as an earned-count ledger."
+  },
+  "old_producer_pins": [
+    {
+      "ref": "v5.0.9:source/compatibility/modern_catalogue/secretas.lua",
+      "git_blob": "227b04d119afabd881918f2b5a862bfa0aac6328",
+      "bytes": 3144,
+      "sha256": "7BFF501A939FD9A8524510774154FAA37B5A08A777E371A73254CFF32BBA117D"
+    },
+    {
+      "ref": "v5.0.9:source/compatibility/modern_catalogue.lua",
+      "git_blob": "e2fae1f7a594748097772426f9005cf0a7194d53",
+      "bytes": 71684,
+      "sha256": "283EFC2E190BF9C5322F122D1764A89D175AA694A6CF32E31709B458D1843C47"
+    },
+    {
+      "ref": "v5.0.9:source/research/modern.lua",
+      "git_blob": "6693c24bf4201182efb1d857d105d2c3efcb2d3b",
+      "bytes": 32452,
+      "sha256": "228E3DEEF7F1CB5FE33CBE4B78506FD2C09F68D5CC60EDA65D27576FC7FEB0B6"
+    },
+    {
+      "ref": "v5.0.9:source/runtime/bootstrap.lua",
+      "git_blob": "db97f4f07d40e25e31c069a76b0f851705c361f0",
+      "bytes": 34819,
+      "sha256": "43A53E653ED805F368CA54E9F3A61C25CA8EF93AA5A3902407CFFB6D3DD21298"
+    },
+    {
+      "ref": "v5.0.9:source/research/cost.lua",
+      "git_blob": "3d4927b8258cb7b843be7470bf21d9c353970227",
+      "bytes": 3218,
+      "sha256": "044978690FEB3863D790019A89356496AE442AB0C803BEE92503945C8385CBE2"
+    },
+    {
+      "ref": "v5.0.9:source/runtime/caps.lua",
+      "git_blob": "9d1b3efae685f37d1771ff35b9b4c22a997b79d6",
+      "bytes": 12624,
+      "sha256": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52"
+    }
+  ],
+  "reporter_limits": {
+    "intake": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\github-six-issue-reconciliation-r01\\current-1845-new-recurrences.json",
+      "bytes": 38001,
+      "sha256": "CF4EC7A30E0E6CFC98A7F36FF62CFA9DD78102EF80FDC43C722C38A0F2B8D1EC"
+    },
+    "comment": "https://github.com/Julesc013/more-infinite-research/issues/1845#issuecomment-6752594815",
+    "known": "New report runs5.0.21011 and refuses previous continuation ownership unknown. Oldtechnology=default was diagnostic fallback.",
+    "unknown": "Actual previous MIR/engine/mod/settings selection,original save/native levels/paid work,saved route schema and configuration event remain unconfirmed. Neither identified unchangedSecretas class is asserted to explain it.97effect credit issue is disjoint and not reviewed here.",
+    "release": "Logging alone does not resolve the unprepared failure or satisfy the maintainer known-issue release requirement. No whole-product,beta/stable or reporter closure verdict."
+  },
+  "operations": {
+    "Source_tests_docs_edits": 0,
+    "host_runs": 0,
+    "native": 0,
+    "builds": 0,
+    "activation": 0,
+    "CI": 0,
+    "children": 0,
+    "stop": "Sealed at Root-requested boundary to free sole local worker slot;further minimal correction review is separate."
+  }
+}

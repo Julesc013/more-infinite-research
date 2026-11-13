@@ -1,0 +1,37 @@
+{
+  "kind": "MIR513ActualNativeOriginalPrivateCustodyV1",
+  "repository": "Julesc013/scratchpad",
+  "scope": "Current13 worker runs plus final AngelBob132 captures/lab/adverses and public12-to13 preservation; exact original-body readbacks, not replayed acceptance.",
+  "readbacks": [
+    {
+      "kind": "RootActualRemoteDecodedOriginalReadbackV1",
+      "commit": "b3770bad1a861c47be4b1c13d5bec611848f17e2",
+      "git_blob": "bfed52d507916e8d2ebad9a2e2191fc50df1a3f0",
+      "packed_bytes": 5051988,
+      "packed_sha256": "95ECD04E5D2D75CB89B5E4C23DE4505348F2F11428AA8CA22F587D363229276B",
+      "decoded_bytes": 15964216,
+      "decoded_sha256": "82E18D0E48ECCEECD284C090BAD76724F4C5A468C12E03182359E6B5ADE01986",
+      "actual_originals_verified": 244,
+      "actual_original_bytes": 19392987,
+      "unique_bodies": 177,
+      "method": "Authenticated real-user GitHub GitBlob API; decode and compare every retained original body with actual local bytes; no content printed."
+    },
+    {
+      "kind": "ActualRemoteDecodedOriginalReadbackV1",
+      "commit": "5f7c5c6094ecff0507f530f48e0dcc9ae510969e",
+      "remote_branch": "evidence/mir511-incident-native-blackglass-r01",
+      "git_blob": "95abc5d5fbf21dd0f4078108b8a7763196298c3c",
+      "private_path": "projects/mir/runs/angelbob132-and-public12-final13-r01/original-bodies.json.gz",
+      "packed_bytes": 40148301,
+      "packed_sha256": "E5F2ED7B21D63876809F3D99FD0D16AFF55CA0C3E89E10C92B6B60AF31D38DBD",
+      "decoded_bytes": 426912419,
+      "decoded_sha256": "FE83CA40FF7E20AFCF695C0E6882B8AE222B5FAC2DEBBB19C838633232807B65",
+      "actual_originals_verified": 384,
+      "actual_original_bytes": 388223517,
+      "unique_bodies": 282,
+      "method": "Real-user authenticated GitHub GitBlob API after exact remote branch readback; decode all deduplicated bodies, verify each SHA, compare every original file byte-for-byte. No evidence content or credentials printed."
+    }
+  ],
+  "total_originals_verified": 628,
+  "stable_qualified": false
+}
