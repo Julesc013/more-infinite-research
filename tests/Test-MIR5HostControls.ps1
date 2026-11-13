@@ -172,6 +172,7 @@ $controls = @(
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
   [ordered]@{path='tests/test_locale_catalogue.py';lua=$false},
+  [ordered]@{path='tests/test_mod_settings_dat.py';lua=$false},
   [ordered]@{path='tests/test_angelbob_rebalance_space_age_profiles.py';lua=$false},
   [ordered]@{path='tests/test_dependency_declarations.py';lua=$false},
   [ordered]@{path='tests/test_library_native_input.py';lua=$false},
