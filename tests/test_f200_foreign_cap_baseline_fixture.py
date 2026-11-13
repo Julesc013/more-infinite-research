@@ -385,8 +385,10 @@ end
                          (receipt["fixture_package"]["path"], receipt["fixture_package"]["sha256"]))
         self.assertEqual(("tools/package.py", "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674"),
                          (receipt["verification_controller"]["path"], receipt["verification_controller"]["sha256"]))
+        historical_controller = subprocess.check_output(
+            ["git", "show", FIXTURE_REVISION + ":tools/package.py"], cwd=ROOT)
         self.assertEqual(receipt["verification_controller"]["sha256"],
-                         hashlib.sha256((ROOT / "tools" / "package.py").read_bytes()).hexdigest().upper())
+                         hashlib.sha256(historical_controller).hexdigest().upper())
         self.assertEqual(["source", "finite", "relaxed"], [row["stage"] for row in receipt["stages"]])
         for profile in receipt["profiles"]:
             actual = ROOT / profile["path"]
