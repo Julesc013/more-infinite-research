@@ -869,9 +869,9 @@ if($laserTransition){$record.f100_f110_laser_transition=@{stage=$F100F110LaserSt
 if($publishedF100Forward){$record.published_f100_forward=@{stage=$PublishedF100ForwardStage;target=$publishedF100Fixture.target;role=$publishedF100Fixture.role;predecessor_origin='published-f100-4.7.10003';protected_input_sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}
 if($publishedF100Forward -and $PublishedF100ForwardStage -ceq 'bridge'){$record.published_f100_forward.engine_bridge_refusal_readback=$publishedF100Fixture.refusal_readback}
 try{
-  # Compile the governor's native memory reader before releasing temporary
-  # host allocations; its first Add-Type call otherwise occurs inside wait.
-  $null=Get-MIR441PhysicalMemorySnapshot
+  # Compile the Windows native reader before releasing temporary allocations.
+  # Linux admission uses its proc/cgroup observer, with no Windows Add-Type.
+  if($IsWindows){$null=Get-MIR441PhysicalMemorySnapshot}
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
   $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
