@@ -1,0 +1,345 @@
+{
+  "kind": "MIR514IndependentObserverArchiveInputReviewV1",
+  "review_recorded_by": "execution lead from non-author read-only archive review",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "recorded_at": "2026-11-13T01:22:21.695731+00:00",
+  "verdict": "GO-archive-input-only",
+  "original_manifest": {
+    "kind": "MIR514LibraryObserverArchivePreparationV1",
+    "status": "OFFLINE_ASSEMBLED_REVIEW_REQUIRED",
+    "source_commit": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+    "source_tree": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+    "assembly_method": "Existing order-neutral fixture policy: raw Git members, deterministic 1980 timestamp, Unix 100644, ZIP_DEFLATED level 9.",
+    "catalogue_legacy_source": "7df0ab82:tests/fixtures/migration-origins/f200-110-successor/catalogue.lua",
+    "sources": [
+      {
+        "source": "tests/fixtures/library-native-input/control.lua",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "be2cdbcded111be6c88350dc8a3987b2a6d3d33a",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\control.lua",
+        "bytes": 51124,
+        "sha256": "EDDC26AECA58532A9D29C2941CE79D58CCB9C7CFA4ADE033265F3DC7F83C7C81"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/support-exports.lua",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "03095e7e906a65ec3ff4d088afcaaa37278a7abe",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\support-exports.lua",
+        "bytes": 17459,
+        "sha256": "9C0F1EED7EF9C8D0C758097A33817FECE0DDEECC90AB6137860F116BCCDD6434"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/catalogue.lua",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "9fc688e456457ed6db4f39063d340e8f02a27600",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\catalogue.lua",
+        "bytes": 9263,
+        "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26"
+      },
+      {
+        "source": "tests/fixtures/library-legacy-settings-search/probe.lua",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "98160f49a7fe82dda647edf03b214575ad2d576e",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-legacy-settings-search\\probe.lua",
+        "bytes": 9806,
+        "sha256": "9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/info-input-514-settings-api-f200.json",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "aab9787b0c8c705516d0e26659076fe6d8d7a9b9",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\info-input-514-settings-api-f200.json",
+        "bytes": 283,
+        "sha256": "9D4C8E6847791A32D51FECAD23E352547310C467773FEADB06A01D623A979197"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/info-exports-514-f200.json",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "987473af74dc6b847ebd8782548d31b8e1197b52",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\info-exports-514-f200.json",
+        "bytes": 286,
+        "sha256": "AA9F51CBFAEE273BBF5B97F0BB50F6892E9414281CDEC657351FCA84C09BAAFF"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/info-input-514-settings-api-f210.json",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "0fca203bebdb53eae6d1b63976863a082d1b6293",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\info-input-514-settings-api-f210.json",
+        "bytes": 283,
+        "sha256": "A3C98CEF86963FCCB1CEF0450189C9FB4E49478F6ACDA6A2EE62BF3EF9EFB85C"
+      },
+      {
+        "source": "tests/fixtures/library-native-input/info-exports-514-f210.json",
+        "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+        "git_blob": "ae026dbf0e0dd28b51d05183cb668314a38b2183",
+        "raw_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\raw\\tests\\fixtures\\library-native-input\\info-exports-514-f210.json",
+        "bytes": 286,
+        "sha256": "DF86E808022A919C6532E85D1CD2A59AA667602881962F3228C1A4EC6318D43C"
+      }
+    ],
+    "archives": [
+      {
+        "engine": "2.0.77",
+        "target": "f200",
+        "role": "input",
+        "mir_version": "5.0.20014",
+        "observer_version": "0.3.13",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\f200\\input\\mir-fixture-mir5-library-native-input_0.3.13.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.13",
+        "info": {
+          "name": "mir-fixture-mir5-library-native-input",
+          "version": "0.3.13",
+          "title": "MIR imported Library native input observer",
+          "author": "MIR maintainers",
+          "factorio_version": "2.0",
+          "dependencies": [
+            "base = 2.0.77",
+            "~ more-infinite-research = 5.0.20014"
+          ]
+        },
+        "crc_passed": true,
+        "members": [
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/control.lua",
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "be2cdbcded111be6c88350dc8a3987b2a6d3d33a",
+            "crc32": "9D43859E",
+            "bytes": 51124,
+            "sha256": "EDDC26AECA58532A9D29C2941CE79D58CCB9C7CFA4ADE033265F3DC7F83C7C81"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/info.json",
+            "source": "tests/fixtures/library-native-input/info-input-514-settings-api-f200.json",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "aab9787b0c8c705516d0e26659076fe6d8d7a9b9",
+            "crc32": "98CEDFDF",
+            "bytes": 283,
+            "sha256": "9D4C8E6847791A32D51FECAD23E352547310C467773FEADB06A01D623A979197"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/catalogue.lua",
+            "source": "tests/fixtures/library-native-input/catalogue.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "9fc688e456457ed6db4f39063d340e8f02a27600",
+            "crc32": "B12F9105",
+            "bytes": 9263,
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/legacy-settings-search.lua",
+            "source": "tests/fixtures/library-legacy-settings-search/probe.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "98160f49a7fe82dda647edf03b214575ad2d576e",
+            "crc32": "9442ED96",
+            "bytes": 9806,
+            "sha256": "9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234"
+          }
+        ],
+        "bytes": 17564,
+        "sha256": "2D8CE3BD3F62310AF304C75948C8FDC2792AD2780F6BF1E9E95B058F31B695EF"
+      },
+      {
+        "engine": "2.0.77",
+        "target": "f200",
+        "role": "exports",
+        "mir_version": "5.0.20014",
+        "observer_version": "0.4.7",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\f200\\exports\\mir-fixture-mir5-library-native-input_0.4.7.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.4.7",
+        "info": {
+          "name": "mir-fixture-mir5-library-native-input",
+          "version": "0.4.7",
+          "title": "MIR qualified imported Library export observer",
+          "author": "MIR maintainers",
+          "factorio_version": "2.0",
+          "dependencies": [
+            "base = 2.0.77",
+            "~ more-infinite-research = 5.0.20014"
+          ]
+        },
+        "crc_passed": true,
+        "members": [
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/control.lua",
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "be2cdbcded111be6c88350dc8a3987b2a6d3d33a",
+            "crc32": "9D43859E",
+            "bytes": 51124,
+            "sha256": "EDDC26AECA58532A9D29C2941CE79D58CCB9C7CFA4ADE033265F3DC7F83C7C81"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/info.json",
+            "source": "tests/fixtures/library-native-input/info-exports-514-f200.json",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "987473af74dc6b847ebd8782548d31b8e1197b52",
+            "crc32": "BE289B4B",
+            "bytes": 286,
+            "sha256": "AA9F51CBFAEE273BBF5B97F0BB50F6892E9414281CDEC657351FCA84C09BAAFF"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/catalogue.lua",
+            "source": "tests/fixtures/library-native-input/catalogue.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "9fc688e456457ed6db4f39063d340e8f02a27600",
+            "crc32": "B12F9105",
+            "bytes": 9263,
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/support-exports.lua",
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "03095e7e906a65ec3ff4d088afcaaa37278a7abe",
+            "crc32": "1C5ADBCB",
+            "bytes": 17459,
+            "sha256": "9C0F1EED7EF9C8D0C758097A33817FECE0DDEECC90AB6137860F116BCCDD6434"
+          }
+        ],
+        "bytes": 19959,
+        "sha256": "9309982533594809E5BD7FBD24228CBE098C5C69D237B610D51527440C9636F9"
+      },
+      {
+        "engine": "2.1.23",
+        "target": "f210",
+        "role": "input",
+        "mir_version": "5.0.21014",
+        "observer_version": "0.3.13",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\f210\\input\\mir-fixture-mir5-library-native-input_0.3.13.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.13",
+        "info": {
+          "name": "mir-fixture-mir5-library-native-input",
+          "version": "0.3.13",
+          "title": "MIR imported Library native input observer",
+          "author": "MIR maintainers",
+          "factorio_version": "2.1",
+          "dependencies": [
+            "base = 2.1.23",
+            "~ more-infinite-research = 5.0.21014"
+          ]
+        },
+        "crc_passed": true,
+        "members": [
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/control.lua",
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "be2cdbcded111be6c88350dc8a3987b2a6d3d33a",
+            "crc32": "9D43859E",
+            "bytes": 51124,
+            "sha256": "EDDC26AECA58532A9D29C2941CE79D58CCB9C7CFA4ADE033265F3DC7F83C7C81"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/info.json",
+            "source": "tests/fixtures/library-native-input/info-input-514-settings-api-f210.json",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "0fca203bebdb53eae6d1b63976863a082d1b6293",
+            "crc32": "5DE42E96",
+            "bytes": 283,
+            "sha256": "A3C98CEF86963FCCB1CEF0450189C9FB4E49478F6ACDA6A2EE62BF3EF9EFB85C"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/catalogue.lua",
+            "source": "tests/fixtures/library-native-input/catalogue.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "9fc688e456457ed6db4f39063d340e8f02a27600",
+            "crc32": "B12F9105",
+            "bytes": 9263,
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.3.13/legacy-settings-search.lua",
+            "source": "tests/fixtures/library-legacy-settings-search/probe.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "98160f49a7fe82dda647edf03b214575ad2d576e",
+            "crc32": "9442ED96",
+            "bytes": 9806,
+            "sha256": "9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234"
+          }
+        ],
+        "bytes": 17564,
+        "sha256": "3EF65758CAD27F41FDD67B4B11C8E37806896C9D2919B4047110DC33207DB63C"
+      },
+      {
+        "engine": "2.1.23",
+        "target": "f210",
+        "role": "exports",
+        "mir_version": "5.0.21014",
+        "observer_version": "0.4.7",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-library-observer-archives-r01\\f210\\exports\\mir-fixture-mir5-library-native-input_0.4.7.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.4.7",
+        "info": {
+          "name": "mir-fixture-mir5-library-native-input",
+          "version": "0.4.7",
+          "title": "MIR qualified imported Library export observer",
+          "author": "MIR maintainers",
+          "factorio_version": "2.1",
+          "dependencies": [
+            "base = 2.1.23",
+            "~ more-infinite-research = 5.0.21014"
+          ]
+        },
+        "crc_passed": true,
+        "members": [
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/control.lua",
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "be2cdbcded111be6c88350dc8a3987b2a6d3d33a",
+            "crc32": "9D43859E",
+            "bytes": 51124,
+            "sha256": "EDDC26AECA58532A9D29C2941CE79D58CCB9C7CFA4ADE033265F3DC7F83C7C81"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/info.json",
+            "source": "tests/fixtures/library-native-input/info-exports-514-f210.json",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "ae026dbf0e0dd28b51d05183cb668314a38b2183",
+            "crc32": "7B026A02",
+            "bytes": 286,
+            "sha256": "DF86E808022A919C6532E85D1CD2A59AA667602881962F3228C1A4EC6318D43C"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/catalogue.lua",
+            "source": "tests/fixtures/library-native-input/catalogue.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "9fc688e456457ed6db4f39063d340e8f02a27600",
+            "crc32": "B12F9105",
+            "bytes": 9263,
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26"
+          },
+          {
+            "path": "mir-fixture-mir5-library-native-input_0.4.7/support-exports.lua",
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+            "git_blob": "03095e7e906a65ec3ff4d088afcaaa37278a7abe",
+            "crc32": "1C5ADBCB",
+            "bytes": 17459,
+            "sha256": "9C0F1EED7EF9C8D0C758097A33817FECE0DDEECC90AB6137860F116BCCDD6434"
+          }
+        ],
+        "bytes": 19960,
+        "sha256": "E1C90077486C4F4A41DF2C7B5CACD34FF4BFAB17253B39AED8E9292656ABC19E"
+      }
+    ],
+    "native_execution": false,
+    "library_activation": false,
+    "release_acceptance": false
+  },
+  "original_manifest_sha256": "35E6F1210C7A5B37512A4D22D3432824ED15D082840B1C04B98E64C908EEDD52",
+  "checked": [
+    "All8 raw Git bodies/hash/bytes and all4 full ZIP hashes/lengths",
+    "Every declared four-member CRC/hash/size/root/mode/timestamp",
+    "Input=control/info/legacy-settings-search/catalogue; export=control/info/support-exports/catalogue",
+    "Catalogue exactly legacy7df0ab82 blob9fc688 and probe9917...0234; no candidate-generated oracle",
+    "Exact14 MIR/engine/observer tuples agree with published ZIPs; no dev/custody/player files leaked"
+  ],
+  "next_requirements": [
+    "Select only one same-name observer alternative per native run",
+    "Separately bind active-mod observer, package, save, profile and controller",
+    "Actual GUI/export/client evidence remains unperformed"
+  ],
+  "native_executions": 0,
+  "stable_qualified": false
+}
