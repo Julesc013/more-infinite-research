@@ -221,9 +221,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   # The same governed ProcessStartInfo already owns the process lifetime,
   # streamed stdout/stderr, process tree, timeout and cleanup. Start Factorio
-  # directly so its duration is native executable start-to-exit, rather than
-  # the historical PowerShell-wrapper tree duration. This clock-scope repair
-  # removes developer harness work; it is not product-speedup evidence.
+  # directly on Windows. Linux first establishes an owned POSIX session then
+  # execs the engine with the same PID; that launcher remains in its clock
+  # scope. Neither scope supplies a product-speedup claim on its own.
   $actorArguments=@{Context=$Context;FilePath=$FilePath;Arguments=$Arguments;TimeoutSeconds=$TimeoutSeconds;FactorioSteamIdentity=$true;CompletionPredicate=$CompletionPredicate}
   if($SampleMilliseconds -ne 0){$actorArguments.SampleMilliseconds=$SampleMilliseconds}
   if($null -ne $OwnedProcessSampleCallback){$actorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
@@ -235,9 +235,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
   }
   $run=Invoke-MIRNativeProbeProcess @actorArguments
   $run.result | Add-Member -NotePropertyName duration_measurement -NotePropertyValue ([ordered]@{
-    scope='direct-native-executable-start-to-exit'
+    scope=$(if($IsLinux){'linux-session-launch-and-native-exec-start-to-exit'}else{'direct-native-executable-start-to-exit'})
     historical_scope='governed-powershell-wrapper-tree-start-to-exit'
-    comparability='scope-changed; compare only fresh direct-native measurements; no product-speedup claim'
+    comparability=$(if($IsLinux){'functional Linux receipt includes session launcher; no scored timing or Windows comparison'}else{'scope-changed; compare only fresh direct-native measurements; no product-speedup claim'})
   }) -Force
   if($actorArguments.ContainsKey('PreStartAdmissionWait')){
     $run | Add-Member -NotePropertyName admission_wait -NotePropertyValue $actorArguments.PreStartAdmissionWait -Force
