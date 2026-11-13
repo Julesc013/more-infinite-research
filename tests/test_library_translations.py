@@ -181,6 +181,7 @@ class LibraryTranslationTests(unittest.TestCase):
         # force; only the caller's lifetime epoch distinguishes the old reply.
         for order in ("old-first", "new-first"):
             with self.subTest(callback_order=order):
+                self.lua.globals().callback_order = order
                 self.lua.execute(r'''
                   local original = scope(7, "de", 2, 50)
                   local departed = prepared(7, "de", 2, 50, {"gear"})
@@ -221,7 +222,7 @@ class LibraryTranslationTests(unittest.TestCase):
                   assert(not translations.needs_maintenance(replacement))
                   assert(#assert(translations.export_pending(replacement)) == 0)
                   assert(translations.labels(replacement, original) == nil)
-                '''.replace("callback_order", '"' + order + '"'))
+                ''')
 
     def test_pending_ledger_rejects_malformed_duplicate_and_uint32_records_without_mutation(self):
         self.lua.execute('''
