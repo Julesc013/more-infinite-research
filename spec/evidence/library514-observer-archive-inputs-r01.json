@@ -341,5 +341,15 @@
     "Actual GUI/export/client evidence remains unperformed"
   ],
   "native_executions": 0,
-  "stable_qualified": false
+  "stable_qualified": false,
+  "actual_original_body_readback": {
+    "kind": "ActualObserverArchiveOriginalRemoteReadbackV1",
+    "commit": "08111fce9355dca922236fcc5d64cd228bb52a72",
+    "path": "projects/mir/runs/mir514-library-four-observer-archives-r01/original-bodies.json.gz",
+    "git_blob": "1c2efe9b8d2437df0b3971d7a138a5ee10da32fa",
+    "actual_originals_verified": 14,
+    "actual_original_bytes": 197450,
+    "packed_sha256": "3FBB77286220D8F76CB046062D8D37673DB6808776EF6D6388D4157CCD67A4DE",
+    "scope": "Four reviewed14 observer archives, their exact raw-Git control/catalogue/probe/selected metadata, original assembly manifest/rebuild checks and non-author input-only review. No native/profile/library/client/export/timing/stable acceptance."
+  }
 }
