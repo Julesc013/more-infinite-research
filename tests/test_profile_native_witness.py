@@ -27,6 +27,13 @@ class ProfileNativeWitnessTests(unittest.TestCase):
             local native={recipe={["iron-gear-wheel"]={maximum_productivity=43.215},
                 ["iron-ore-recycling"]={products={product}}},
               entity={["assembling-machine-1"]={effect_receiver=f210 and receiver or nil}}}
+            if mode=="aliases" then
+              raw.recipe["iron-gear-wheel"].maximum_productivity=nil
+              native.recipe["iron-gear-wheel"].maximum_productivity=3
+              raw["assembling-machine"]["assembling-machine-2"].fluid_boxes[1].max_pipeline_extent=nil
+              receiver.consumption_limits=nil;receiver.pollution_limits=nil
+              receiver.speed_limits.low=nil
+            end
             return raw,native,product,receiver
           end
           function frozen(t)
@@ -50,9 +57,11 @@ class ProfileNativeWitnessTests(unittest.TestCase):
               local a,b=frozen(raw),frozen(native)
               local data=W.data(raw,base,mode)
               local runtime=W.runtime(native,base,mode)
-              assert(data.pipeline_extent==395 and runtime.pipeline_extent==nil)
+              assert(runtime.pipeline_extent==nil)
+              if mode=="numeric" then assert(data.pipeline_extent==395)else assert(data.pipeline_extent==nil)end
+              assert(data.pipeline_extent_explicit==(mode=="numeric"))
               assert(data.receiver_limits_supported==(base=="2.1.23"))
-              assert(W.line(data):find("pipeline=395",1,true))
+              assert(W.line(data):find(mode=="numeric" and "pipeline=395" or "pipeline=implicit",1,true))
               same(a,raw);same(b,native)
             end
           end
@@ -67,11 +76,13 @@ class ProfileNativeWitnessTests(unittest.TestCase):
               assert(not pcall(W.data,raw,"2.1.23",mode))
               assert(not pcall(W.runtime,native,"2.1.23",mode))
             end
-            for _,field in ipairs({"consumption_limits","pollution_limits","speed_limits","quality_limits"})do
+            local fields=mode=="numeric" and {"consumption_limits","pollution_limits","speed_limits","quality_limits"}
+              or {"speed_limits","quality_limits"}
+            for _,field in ipairs(fields)do
               for _,missing in ipairs({false,true})do
                 local raw,native,p,r=independent_world("2.1.23",mode)
                 if missing then r[field]=nil else
-                  local side=field=="quality_limits" and "high" or "low";r[field][side]=0
+                  local side=(mode=="aliases" or field=="quality_limits") and "high" or "low";r[field][side]=0
                 end
                 assert(not pcall(W.data,raw,"2.1.23",mode))
                 assert(not pcall(W.runtime,native,"2.1.23",mode))
@@ -85,10 +96,12 @@ class ProfileNativeWitnessTests(unittest.TestCase):
                 assert(not pcall(W.runtime,native,base,mode))
               end
               local raw,native=independent_world(base,mode)
-              raw.recipe["iron-gear-wheel"].maximum_productivity=1
-              native.recipe["iron-gear-wheel"].maximum_productivity=1
-              assert(not pcall(W.data,raw,base,mode))
-              assert(not pcall(W.runtime,native,base,mode))
+              if mode=="numeric" then
+                raw.recipe["iron-gear-wheel"].maximum_productivity=1
+                native.recipe["iron-gear-wheel"].maximum_productivity=1
+                assert(not pcall(W.data,raw,base,mode))
+                assert(not pcall(W.runtime,native,base,mode))
+              end
               raw,native=independent_world(base,mode)
               raw["assembling-machine"]["assembling-machine-2"].fluid_boxes[1].max_pipeline_extent=320
               assert(not pcall(W.data,raw,base,mode))

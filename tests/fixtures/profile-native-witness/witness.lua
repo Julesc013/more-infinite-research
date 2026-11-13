@@ -24,17 +24,25 @@ local function observe(stage, base, mode, recipe, recycling, receiver, pipeline)
   near(product.extra_count_fraction or 0, 0, "self recycling fraction")
   local probability = target == "f210" and product.independent_probability or product.probability
   near(probability, mode == "aliases" and 0.25 or 0.1234, "self recycling probability")
-  near(recipe.maximum_productivity, 43.215, "recipe productivity cap")
-  if stage == "data" then near(pipeline, 395, "pipeline extent") end
+  if mode == "numeric" then
+    near(recipe.maximum_productivity, 43.215, "recipe productivity cap")
+    if stage == "data" then near(pipeline, 395, "pipeline extent") end
+  elseif stage == "data" then
+    assert(pipeline == nil, "profile native witness: alias profile changed implicit pipeline extent")
+  end
   local result = {stage = stage, family = target, mode = mode,
     maximum_productivity = recipe.maximum_productivity, recycling_amount = product.amount,
     recycling_probability = probability, receiver_limits_supported = target == "f210"}
-  if stage == "data" then result.pipeline_extent = pipeline end
+  if stage == "data" then
+    result.pipeline_extent = pipeline
+    result.pipeline_extent_explicit = pipeline ~= nil
+  end
   if target == "f210" then
     assert(receiver, "profile native witness: receiver")
     local expected = {consumption_limits = {low = -0.8325}, pollution_limits = {low = -0.91125},
       speed_limits = {low = -0.755, high = mode == "aliases" and 1000 or 12.345},
       quality_limits = {high = mode == "aliases" and 1000 or 6.789}}
+    if mode == "aliases" then expected = {speed_limits = {high = 1000}, quality_limits = {high = 1000}} end
     result.receiver = {}
     for name, limits in pairs(expected) do
       assert(receiver[name], "profile native witness: " .. name)
@@ -66,13 +74,13 @@ end
 function M.line(value)
   assert(value.stage == "data", "profile native witness: data log only")
   local text = "[MIR_PROFILE_NATIVE_DATA] family=" .. value.family .. ";mode=" .. value.mode
-    .. ";pipeline=" .. string.format("%.17g", value.pipeline_extent)
-    .. ";productivity=" .. string.format("%.17g", value.maximum_productivity)
+    .. ";pipeline=" .. (value.pipeline_extent and string.format("%.17g", value.pipeline_extent) or "implicit")
+    .. ";productivity=" .. (value.maximum_productivity and string.format("%.17g", value.maximum_productivity) or "implicit")
     .. ";recycling=" .. string.format("%.17g", value.recycling_probability)
   if value.receiver then
     for _, name in ipairs({"consumption_limits", "pollution_limits", "speed_limits", "quality_limits"}) do
       for _, side in ipairs({"low", "high"}) do
-        local number = value.receiver[name][side]
+        local number = value.receiver[name] and value.receiver[name][side]
         if number ~= nil then text = text .. ";" .. name .. "." .. side .. "=" .. string.format("%.17g", number) end
       end
     end
