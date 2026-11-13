@@ -612,6 +612,71 @@ class SettingsProfileTests(unittest.TestCase):
         ''')
 
 
+    def test_real_888_descriptor_profile_survives_versioned_settings_dat_and_raw_conflicts(self):
+        # Host-only cross-language transport control. The profile uses an
+        # identity helper codec, NOT Factorio's compressed MIRSET1 wire format.
+        # In particular, neither a native import nor a save upgrade is proven.
+        sys.path.insert(0, str(ROOT / "tools"))
+        import read_mod_settings_dat as dat_reader
+        import write_mod_settings_dat as dat_writer
+
+        self.lua.globals().json_to_lua_profile = (
+            lambda text: self.lua.table_from(json.loads(text), recursive=True))
+        self.lua.execute("""
+          helpers.json_to_table = json_to_lua_profile
+          settings.startup["ips-enable-research_gears"].value = false
+          settings.startup["ips-cost-base-research_gears"].value = 1
+          settings.startup["ips-research-time-research_gears"].value = 0
+          settings.startup["mir-enable-passive-repair"].value = true
+          settings.startup["mir-unrestricted-modules"].value = false
+        """)
+        names = self.lua.eval("config.registered_names()")
+        source = self.lua.eval("config.effective_values(settings.startup, helpers)")
+        expected = {names[i]: source[names[i]] for i in range(1, len(names) + 1)}
+        self.assertEqual(len(expected), 888)
+        token = self.lua.eval("facade.export_string()")
+        self.assertTrue(token.startswith("MIRSET1:"))
+
+        descriptors = self.lua.eval("config.prototypes()")
+        raw = {descriptors[i]["name"]: descriptors[i]["default_value"]
+               for i in range(1, len(descriptors) + 1)}
+        self.assertEqual(len(raw), 889)  # 888 exported plus the import carrier.
+        raw.update({
+            "mir-settings-profile-import": token,
+            "ips-enable-research_gears": True,
+            "ips-cost-base-research_gears": 8000,
+            "ips-research-time-research_gears": 1,
+            "mir-unrestricted-modules": True,
+        })
+
+        for engine in ("2.0.77", "2.1.23"):
+            with self.subTest(engine=engine):
+                encoded = dat_writer.encode(engine, raw)
+                decoded = dat_reader.decode(encoded)
+                self.assertEqual(decoded["engine"], engine)
+                self.assertEqual(decoded["startup"], raw)
+                self.assertIs(decoded["startup"]["mir-unrestricted-modules"], True)
+                self.assertIs(decoded["startup"]["ips-enable-research_gears"], True)
+                self.assertEqual(decoded["startup"]["ips-cost-base-research_gears"], 8000.0)
+                self.assertEqual(decoded["startup"]["mir-settings-profile-import"], token)
+
+                # Deliver every decoded scalar, not a hand-picked artificial
+                # subset, to the shipped Lua profile resolver.
+                active = self.lua.table_from(
+                    {name: {"value": value} for name, value in decoded["startup"].items()},
+                    recursive=True)
+                self.lua.globals().settings.startup = active
+                effective = self.lua.eval("config.effective_values(settings.startup, helpers)")
+                self.assertEqual({name: effective[name] for name in expected}, expected)
+                self.assertIs(effective["ips-enable-research_gears"], False)
+                self.assertIs(effective["mir-unrestricted-modules"], False)
+                self.assertIs(effective["mir-enable-passive-repair"], True)
+                self.assertEqual(effective["ips-cost-base-research_gears"], 1)
+                self.assertEqual(effective["ips-research-time-research_gears"], 0)
+                # Profile precedence must not silently rewrite the raw wire.
+                self.assertIs(active["mir-unrestricted-modules"]["value"], True)
+                self.assertEqual(active["ips-cost-base-research_gears"]["value"], 8000.0)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
