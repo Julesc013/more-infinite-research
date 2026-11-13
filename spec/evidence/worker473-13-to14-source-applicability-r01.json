@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "MIRWorker473Source13To14ConsumedInputApplicabilityV1",
+  "date": "2026-11-13",
+  "recorded_by": "execution lead from independent read-only reviewer findings",
+  "reviewer": "/root/api512_final_source_applicability",
+  "verdict": "GO-scoped-source-reuse-with-original-execution-identities",
+  "from_tag": "v5.0.13",
+  "to_tag": "v5.0.14",
+  "worker_blob_13": "7e611dcb805c12b74996088c1bc7af4471f82819",
+  "worker_blob_14": "8ed7034cffa554f8d674a550d7977f8f3100a42d",
+  "observed_change": "Only default_origin behavior changes: valid schema2 recorded-default histories may accompany consistent unrelated-mod changes. The changed branch has separate14 affected-native evidence.",
+  "byte_identical_ranges": [
+    "older_default_origin, lines734-789",
+    "owner_record, lines675-728",
+    "early default_origin, lines791-821",
+    "All code after default_origin:13line856 onward equals14line873 onward"
+  ],
+  "original_result_record": "spec/evidence/candidate513-affected-native-verdicts-r01.json",
+  "reusable_cases": [
+    {
+      "engine": "2.1.23",
+      "predecessor": "Controlled authentic4.7.21003 source; old ordinary completion and actual pending worker work",
+      "path": "Unchanged older_default_origin admission; later schema3 owner bypasses changed default_origin branch",
+      "preserved_scope": "Actual ordinary6-to7 research, save and two cold loads; original Source13 execution identity retained"
+    },
+    {
+      "engine": "2.0.77",
+      "predecessor": "Controlled4.7.20003 with scripted worker cursor/readiness",
+      "path": "Same unchanged historical admission; transfer, prices/effects, queue mapping, force/save/load and completion code unchanged",
+      "preserved_scope": "Actual new5-to6 research,920science, save and two cold loads; no genuine old-earned or old-pending-worker claim"
+    },
+    {
+      "engines": ["2.0.77", "2.1.23"],
+      "predecessor": "Published12 to13 permanent native ownership",
+      "path": "Unchanged schema3 owner route",
+      "preserved_scope": "Six-process preservation of original Source12 completion/science/labs/work; no new earning and no relabelled12-to14 native execution"
+    }
+  ],
+  "no_newly_affected_check_for_these_cases": true,
+  "changed_branch_evidence": "spec/evidence/candidate514-affected-native-verdicts-r01.json",
+  "new_native_execution": false,
+  "limits": "Other supported historical/profile paths retain their own evidence obligations. This does not complete the nine-edition programme, unknown reporter/provider histories, GUI/client/performance or stable acceptance."
+}
