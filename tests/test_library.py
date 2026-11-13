@@ -1697,7 +1697,9 @@ class LibraryTests(unittest.TestCase):
             local original_width,original_height=frame.style.minimal_width,frame.style.minimal_height
             local x,y=frame.location.x,frame.location.y
             local query=research_filters(frame).mir_library_query
-            local settings_query=tabs.mir_library_settings_content.mir_library_settings_query
+            local settings_page=tabs.mir_library_settings_content
+            local settings_query=settings_page.mir_library_settings_query
+            local toolbar_columns=settings_page.mir_library_settings_toolbar.column_count
             local page_height=research_page(frame).style.minimal_height
             for _,index in ipairs({1,3,2,4,3,1,3,1}) do
               tabs.selected_tab_index=index
@@ -1720,9 +1722,18 @@ class LibraryTests(unittest.TestCase):
                   "all tabs retain the same bounded page height")
               end
               assert(research_filters(frame).mir_library_query==query and query.text=="gear")
-              assert(tabs.mir_library_settings_content.mir_library_settings_query==settings_query
-                and settings_query.text=="repair",
-                "switching tabs must not exchange independent search fields")
+              local current_query=settings_page.mir_library_settings_query
+              if current_query~=settings_query then
+                -- Responsive toolbar column changes legitimately rebuild this
+                -- field. Reject gratuitous replacement on ordinary tab changes.
+                local new_columns=settings_page.mir_library_settings_toolbar.column_count
+                assert(index==3 and new_columns~=toolbar_columns and not settings_query.valid,
+                  "only a Settings toolbar breakpoint may replace its search field")
+                settings_query,toolbar_columns=current_query,new_columns
+              end
+              assert(settings_query.valid and settings_query.text=="repair"
+                and view.settings_query=="repair" and view.query=="gear",
+                "switching tabs must preserve distinct Settings and Research searches")
             end
             assert(view.query=="gear" and view.settings_query=="repair"
               and view.settings_scope=="options" and view.setting_selected==setting
