@@ -1108,22 +1108,22 @@ class BootstrapTests(unittest.TestCase):
         # a root __newindex guard alone cannot detect writes to existing fields.
         self.lua.execute('''
           install_modules(false, true); install_runtime(); load_control()
-          local first = {retained=true, earned=2}
-          local second = {retained=true, earned=4}
+          local first = {retained=true, sentinel="left"}
+          local second = {retained=true, sentinel="right"}
           local queue = {7, 9}
           local members = {[7]=first, [9]=second}
           local opaque = {marker="keep"}
           local bucket = {queue=queue, members=members, scheduled=false, unknown=opaque}
-          local legacy = {earned="untouched"}
+          local legacy = {sentinel="untouched"}
           local namespace = {passive_repair=bucket, historical_other=legacy}
           storage.mir = namespace
           local function unchanged()
             assert(storage.mir == namespace and namespace.passive_repair == bucket)
             assert(bucket.queue == queue and #queue == 2 and queue[1] == 7 and queue[2] == 9)
             assert(bucket.members == members and members[7] == first and members[9] == second)
-            assert(first.retained and first.earned == 2 and second.retained and second.earned == 4)
+            assert(first.retained and first.sentinel == "left" and second.retained and second.sentinel == "right")
             assert(bucket.scheduled == false and bucket.unknown == opaque and opaque.marker == "keep")
-            assert(namespace.historical_other == legacy and legacy.earned == "untouched")
+            assert(namespace.historical_other == legacy and legacy.sentinel == "untouched")
           end
           for cold = 1, 2 do
             -- A new control module rebinds subscriptions; the same saved
