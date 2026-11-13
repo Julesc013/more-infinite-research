@@ -202,6 +202,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_properties.py",
             "tests/test_replay.py",
             "tests/test_locale_catalogue.py",
+            "tests/test_mod_settings_dat.py",
             "tests/test_angelbob_rebalance_space_age_profiles.py",
             "tests/test_dependency_declarations.py",
             "tests/test_library_native_input.py",
