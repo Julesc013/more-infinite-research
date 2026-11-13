@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIRPublished514LibraryConsumedInputAdoptionV1",
   "date": "2026-11-13",
-  "scope": "Independent read-only 5.0.13 -> 5.0.14 public-tag source/fixture applicability; companion to original selected-candidate review in PR #1919; not a GUI/native/client/export/performance result.",
+  "scope": "Independent read-only 5.0.13 -> 5.0.14 public-TAG source/fixture snapshot; accepted later dev observer preparation is recorded separately below. Companion to original selected-candidate review in PR #1919; not a GUI/native/client/export/performance result.",
   "authority": {
     "prior_selected_review": "spec/evidence/library-selected514-consumed-input-applicability-r01.json",
     "published13_tag": "v5.0.13",
@@ -48,16 +48,17 @@
       "tests/fixtures/library-native-input/info-input-513-settings-api-f210.json",
       "tests/fixtures/library-native-input/support-exports.lua"
     ],
-    "native_observer_current_versions": [
+    "tagged_f210_info_version": "5.0.21014",
+    "published_tag_observer_snapshot_scope": "These observer versions and expected MIR versions belong only to published v5.0.14 tag32d3fadd, not the later active dev preparation.",
+    "published_tag_observer_versions": [
       "0.3.12",
       "0.4.6"
     ],
-    "native_observer_expected_mir_versions": [
+    "published_tag_observer_expected_mir_versions": [
       "5.0.20013",
       "5.0.21013"
     ],
-    "candidate14_observer_qualified": false,
-    "tagged_f210_info_version": "5.0.21014"
+    "published_tag_contains14_observer_bindings": false
   },
   "host_only_checks": {
     "13-to-14-single-commit": true,
@@ -67,11 +68,11 @@
     "seven-fixture-paths": true,
     "runtime-library-blob-reused": true,
     "fixture-observer-changed": true,
-    "observer-13-only": true,
     "14-package-version": true,
     "14-player-source-bound": true,
     "main-tag-identical-at-check": true,
-    "original-review-pr-open": true
+    "original-review-pr-open": true,
+    "published-tag-observer-13-only": true
   },
   "host_only_checks_passed": 12,
   "host_only_checks_total": 12,
@@ -81,7 +82,7 @@
     "Published 14 worker incident native verdict has its own original scoped preservation, ordinary completion, save and two-cold acceptance; it does not test GUI or exports."
   ],
   "next_finite_native_gate": {
-    "prerequisite": "Create and independently review distinct exact-published-14 observer package/profile/controller bindings. Preserve 0.3.12/0.4.6 13-only files and receipts; do not hand-edit older outcomes.",
+    "prerequisite": "Adopt selected3403a3b9 / checked PR1921 integration50ad8b57 exact14 input0.3.13/export0.4.7 and the four independently reviewed raw-Git archives in the linked current dev records. Freeze the remaining exact player/profile/protected-save/active-observer/controller/client-role and input/readback bindings before actual execution. The public-tag snapshot retains its old13-only metadata and original outcomes; do not recreate already accepted14 observer preparation or relabel older results.",
     "package_metadata": [
       "5.0.20014 on actual Factorio 2.0.77",
       "5.0.21014 on actual Factorio 2.1.23"
@@ -110,6 +111,36 @@
     "https://github.com/Julesc013/more-infinite-research/compare/v5.0.13...v5.0.14",
     "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.14",
     "https://github.com/Julesc013/more-infinite-research/pull/1919",
-    "https://github.com/Julesc013/more-infinite-research/issues/1768"
-  ]
+    "https://github.com/Julesc013/more-infinite-research/issues/1768",
+    "https://github.com/Julesc013/more-infinite-research/pull/1921",
+    "https://github.com/Julesc013/more-infinite-research/pull/1923"
+  ],
+  "current_dev_observer_preparation": {
+    "scope": "Accepted developer preparation after the public-tag snapshot; preserve earlier observer identities and outcomes.",
+    "selected_author_commit": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+    "integrated_dev": "50ad8b572f374a1aa5a48cb6e58c073d37e9732a",
+    "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+    "input_observer_version": "0.3.13",
+    "export_observer_version": "0.4.7",
+    "expected_mir_versions": [
+      "5.0.20014",
+      "5.0.21014"
+    ],
+    "metadata_files": [
+      "tests/fixtures/library-native-input/info-input-514-settings-api-f200.json",
+      "tests/fixtures/library-native-input/info-input-514-settings-api-f210.json",
+      "tests/fixtures/library-native-input/info-exports-514-f200.json",
+      "tests/fixtures/library-native-input/info-exports-514-f210.json"
+    ],
+    "preparation_record": "spec/evidence/library514-input-export-observer-preparation-r01.json",
+    "archive_inputs_record": "spec/evidence/library514-observer-archive-inputs-r01.json",
+    "host_controls_passed": 80,
+    "prior_test_method_asts_preserved": 74,
+    "owned_archives_prepared": 4,
+    "unselected_alternative_commit": "2b5f1d8fc4861ab114d181d296722a83b63817e4",
+    "unselected_alternative_status": "Preserved, not integrated; matching controller/member bytes do not select a second implementation or transfer execution authority.",
+    "native_packet_frozen_by_this_record": false,
+    "native_qualified": false,
+    "stable_qualified": false
+  }
 }
