@@ -12,6 +12,21 @@ superseded_by: []
 
 # Imported Library native input and lifecycle observation
 
+## Exact 5.0.14 preparation
+
+The following new identities bind the unchanged full observer protocols to the published 5.0.14 beta. All earlier metadata, frozen archives and execution records retain their original versions and bytes; compose each new archive from one reviewed committed revision.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.13 | `info-input-514-settings-api-f200.json` or `info-input-514-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+| Support exports | 0.4.7 | `info-exports-514-f200.json` or `info-exports-514-f210.json` | Base 2.0.77 / MIR 5.0.20014; Base 2.1.23 / MIR 5.0.21014 |
+
+Include `control.lua` and the unchanged independent `catalogue.lua`. Input observer 0.3.13 additionally requires the unchanged canonical `library-legacy-settings-search/probe.lua` projected as `legacy-settings-search.lua`; export observer 0.4.7 requires `support-exports.lua`. The closure remains Base, MIR, active-mod observer 0.1.0 and the selected input/export observer; no historical migration controller is reactivated.
+
+The input observer retains all fourteen EN/DE Settings prepare/check pairs, forty-eight queries, five joins, two resets, removal/replacement and the saved-host restart. The export observer retains thirteen actual clicks, two distinct server commands, peer-local files/errors, false/zero values, five joins and restart. Both retain the complete three-force earned/native/foreign-work baseline and responsive native width/column checks, and reject earlier/later MIR versions, opposing editions, unqualified engine patches and old/new mismatched observer identities.
+
+This is test preparation only: it does not create a native result, a library acceptance result or a stable verdict. The native owner must bind raw member bytes, archive hash, accepted player ZIP and protected save in a separately reviewed execution packet. The existing client/window/input, exact closure, resource and preserved-evidence requirements remain mandatory.
+
 ## Exact 5.0.13 preparation
 
 The following new identities bind the existing protocols to the published 5.0.13 beta. Earlier metadata, frozen archives and execution records retain their original versions and bytes; compose each new archive from one reviewed committed revision.

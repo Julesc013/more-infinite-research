@@ -12,6 +12,16 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-native-input"
+QUALIFIED_LIBRARY_OBSERVERS = (
+    ("513", "0.3.12", "0.4.6", (
+        ("f200", "5.0.20013", "5.0.21013"),
+        ("f210", "5.0.21013", "5.0.20013"),
+    )),
+    ("514", "0.3.13", "0.4.7", (
+        ("f200", "5.0.20014", "5.0.21014"),
+        ("f210", "5.0.21014", "5.0.20014"),
+    )),
+)
 
 
 def plain(value):
@@ -739,8 +749,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version,layout_width,layout_columns)
-            local settings_api=input_observer_version=="0.3.10" or input_observer_version=="0.3.11" or input_observer_version=="0.3.12"
-            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3" or input_observer_version=="0.3.9" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6"
+            local settings_api=input_observer_version=="0.3.10" or input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.3.13"
+            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3" or input_observer_version=="0.3.9" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7"
             authored_page=authored_page or settings_api
             local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or authored_page or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
@@ -848,7 +858,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               local root=p.gui.screen[root_name]
               if not root or not root.valid then
                 root=element("frame",root_name);root.location=p.remembered_location or {x=200,y=100};root.style.width=1000
-                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" then
+                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.3.13" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" then
                   root.style.width=layout_width or 1000
                   if opponent=="missing-layout-width" then root.style.maximal_width=nil end
                   if opponent=="mismatched-layout-width" then root.style.minimal_width=999 end
@@ -875,7 +885,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 local previous_grid=filters.mir_library_filter_grid
                 local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
                 grid.column_count=layout_columns or 2;filters.mir_library_filter_grid=grid
-                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" then grid.column_count=layout_columns or 5 end
+                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.3.13" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" then grid.column_count=layout_columns or 5 end
                 for _,name in ipairs({"family","status","mode","sort","visibility"}) do
                   local id="mir_library_"..name
                   local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
@@ -1122,7 +1132,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
               end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
-              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" or input_observer_version=="0.4.3" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" then return end
+              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" or input_observer_version=="0.4.3" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" then return end
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
@@ -1967,32 +1977,36 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     result = self.run_case(target, opponent)
                     self.assertFalse(result["ok"], result["message"])
 
-    def test_513_export_attachment_preserves_actual_imported_frame_and_exact_closure(self):
-        for target, player, other in (("f200", "5.0.20013", "5.0.21013"),
-                                      ("f210", "5.0.21013", "5.0.20013")):
-            for opponent in (None, "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
-                with self.subTest(target=target, opponent=opponent):
-                    result = self.run_case(target, opponent, player, "0.4.6")
-                    self.assertTrue(result["ok"], result["message"])
-                    self.assertEqual((result["initial_report"]["case"], result["initial_report"]["phase"],
-                        result["initial_report"]["actual_joins"]), ("library-support-exports", "ready", 0))
-                    self.assertFalse(result["initial_report"]["original_preservation_fixture_required"])
-                    self.assertTrue(result["readonly_report"])
-            for opponent in ("helperfree-historical-controller", "helperfree-missing-active-observer",
-                "helperfree-wrong-engine", "helperfree-lost-row", "helperfree-lost-recipe", "helperfree-lost-foreign-work",
-                "helperfree-wrong-foreign-queue", "helperfree-lost-detached-work", "helperfree-wrong-battery",
-                "preexisting-player", "extra-mod", "startup-baseline-early-report", "startup-credit-still-enabled",
-                "startup-credit-level-lost", "startup-credit-effect-lost"):
-                with self.subTest(target=target, opponent=opponent):
-                    self.assertFalse(self.run_case(target, opponent, player, "0.4.6")["ok"])
-            for wrong in (player[:-2] + "12", player[:-2] + "14", other):
-                with self.subTest(target=target, player=wrong):
-                    self.assertFalse(self.run_case(target, package_version=wrong, input_observer_version="0.4.6")["ok"])
-            self.assertFalse(self.run_case(target, package_version=player, input_observer_version="0.4.4")["ok"])
+    def test_513_and_514_export_attachments_preserve_actual_imported_frame_and_exact_closure(self):
+        for release, _, observer, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            for target, player, other in targets:
+                for opponent in (None, "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
+                    with self.subTest(release=release, target=target, opponent=opponent):
+                        result = self.run_case(target, opponent, player, observer)
+                        self.assertTrue(result["ok"], result["message"])
+                        self.assertEqual((result["initial_report"]["case"], result["initial_report"]["phase"],
+                            result["initial_report"]["actual_joins"]), ("library-support-exports", "ready", 0))
+                        self.assertFalse(result["initial_report"]["original_preservation_fixture_required"])
+                        self.assertTrue(result["readonly_report"])
+                for opponent in ("helperfree-historical-controller", "helperfree-missing-active-observer",
+                    "helperfree-wrong-engine", "helperfree-lost-row", "helperfree-lost-recipe", "helperfree-lost-foreign-work",
+                    "helperfree-wrong-foreign-queue", "helperfree-lost-detached-work", "helperfree-wrong-battery",
+                    "preexisting-player", "extra-mod", "startup-baseline-early-report", "startup-credit-still-enabled",
+                    "startup-credit-level-lost", "startup-credit-effect-lost"):
+                    with self.subTest(release=release, target=target, opponent=opponent):
+                        self.assertFalse(self.run_case(target, opponent, player, observer)["ok"])
+                for wrong in (player[:-2] + f"{int(player[-2:]) - 1:02d}",
+                              player[:-2] + f"{int(player[-2:]) + 1:02d}", other):
+                    with self.subTest(release=release, target=target, player=wrong):
+                        self.assertFalse(self.run_case(target, package_version=wrong, input_observer_version=observer)["ok"])
+                for wrong_observer in (f"0.4.{int(observer.rsplit('.', 1)[1]) - 1}",
+                                       f"0.4.{int(observer.rsplit('.', 1)[1]) + 1}"):
+                    with self.subTest(release=release, target=target, observer=wrong_observer):
+                        self.assertFalse(self.run_case(target, package_version=player, input_observer_version=wrong_observer)["ok"])
 
 
 
-    def test_513_input_rejects_wrong_tuples_and_retains_strict_state_peer_and_hierarchy_guards(self):
+    def test_513_and_514_inputs_reject_wrong_tuples_and_retain_strict_state_peer_and_hierarchy_guards(self):
         opponents = ("settings-skipped", "settings-too-early", "settings-repeated", "settings-unbounded",
             "settings-unfiltered", "settings-wrong-scope", "settings-peer-query", "settings-peer-list",
             "settings-midload", "settings-native-mutation", "native-effect-change", "replacement-index-reuses-en",
@@ -2009,74 +2023,83 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             "bad-query-type": "authored research query is malformed or foreign",
             "foreign-field": "authored research filter field is foreign",
             "wrong-field-parent": "authored research filter field is foreign"}
-        for target, player, other in (("f200", "5.0.20013", "5.0.21013"),
-                                      ("f210", "5.0.21013", "5.0.20013")):
-            for opponent in opponents:
-                with self.subTest(target=target, opponent=opponent):
-                    try:
-                        result = self.run_case(target, opponent, player, "0.3.12")
-                    except Exception as exc:
-                        self.assertIn(opponent, hierarchy_errors)
-                        self.assertIn(hierarchy_errors[opponent], str(exc))
-                    else:
-                        self.assertFalse(result["ok"], opponent)
-                        if opponent in hierarchy_errors:
-                            self.assertIn(hierarchy_errors[opponent], result["message"])
-            for wrong_player, wrong_observer in ((player[:-2] + "12", "0.3.12"),
-                (player[:-2] + "14", "0.3.12"), (other, "0.3.12"), (player, "0.3.11"), (player, "0.3.13")):
-                with self.subTest(target=target, player=wrong_player, observer=wrong_observer):
-                    self.assertFalse(self.run_case(target, package_version=wrong_player,
-                        input_observer_version=wrong_observer)["ok"])
+        for release, observer, _, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            for target, player, other in targets:
+                for opponent in opponents:
+                    with self.subTest(release=release, target=target, opponent=opponent):
+                        try:
+                            result = self.run_case(target, opponent, player, observer)
+                        except Exception as exc:
+                            self.assertIn(opponent, hierarchy_errors)
+                            self.assertIn(hierarchy_errors[opponent], str(exc))
+                        else:
+                            self.assertFalse(result["ok"], opponent)
+                            if opponent in hierarchy_errors:
+                                self.assertIn(hierarchy_errors[opponent], result["message"])
+                for wrong_player, wrong_observer in (
+                    (player[:-2] + f"{int(player[-2:]) - 1:02d}", observer),
+                    (player[:-2] + f"{int(player[-2:]) + 1:02d}", observer),
+                    (other, observer),
+                    (player, f"0.3.{int(observer.rsplit('.', 1)[1]) - 1}"),
+                    (player, f"0.3.{int(observer.rsplit('.', 1)[1]) + 1}"),
+                ):
+                    with self.subTest(release=release, target=target, player=wrong_player, observer=wrong_observer):
+                        self.assertFalse(self.run_case(target, package_version=wrong_player,
+                            input_observer_version=wrong_observer)["ok"])
 
 
 
-    def test_513_metadata_has_only_exact_next_release_tuples(self):
-        for target, base, player in (("f200", "2.0.77", "5.0.20013"),
-                                     ("f210", "2.1.23", "5.0.21013")):
-            for kind, old_kind, version in (("input-513-settings-api", "input-512-settings-api", "0.3.12"),
-                                            ("exports-513", "exports-512", "0.4.6")):
-                with self.subTest(target=target, kind=kind):
-                    previous = json.loads((FIXTURE / f"info-{old_kind}-{target}.json").read_text())
-                    current = json.loads((FIXTURE / f"info-{kind}-{target}.json").read_text())
-                    self.assertEqual(current, dict(previous, version=version,
-                        dependencies=[f"base = {base}", f"~ more-infinite-research = {player}"]))
+    def test_513_and_514_metadata_have_only_exact_next_release_tuples(self):
+        for release, input_version, export_version, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            previous_release = f"{int(release) - 1:03d}"
+            for target, player, _ in targets:
+                base = "2.0.77" if target == "f200" else "2.1.23"
+                for kind, old_kind, version in ((f"input-{release}-settings-api", f"input-{previous_release}-settings-api", input_version),
+                                                (f"exports-{release}", f"exports-{previous_release}", export_version)):
+                    with self.subTest(release=release, target=target, kind=kind):
+                        previous = json.loads((FIXTURE / f"info-{old_kind}-{target}.json").read_text())
+                        current = json.loads((FIXTURE / f"info-{kind}-{target}.json").read_text())
+                        self.assertEqual(current, dict(previous, version=version,
+                            dependencies=[f"base = {base}", f"~ more-infinite-research = {player}"]))
         probe = ROOT / "tests/fixtures/library-legacy-settings-search/probe.lua"
         self.assertEqual(hashlib.sha256(probe.read_bytes()).hexdigest().upper(),
                          "9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234")
 
 
 
-    def test_513_responsive_grid_requires_exact_observed_width_and_columns(self):
-        for target, player in (("f200", "5.0.20013"), ("f210", "5.0.21013")):
-            for width, columns in ((1, 1), (439, 1), (440, 2), (619, 2),
-                                   (620, 3), (959, 3), (960, 5), (1200, 5)):
-                with self.subTest(target=target, width=width, columns=columns):
-                    result = self.run_case(target, package_version=player,
-                        input_observer_version="0.3.12", layout_width=width, layout_columns=columns)
-                    self.assertTrue(result["ok"], result["message"])
-                for wrong in (0, 1, 2, 3, 4, 5, 6):
-                    if wrong == columns:
-                        continue
-                    with self.subTest(target=target, width=width, wrong_columns=wrong):
-                        with self.assertRaisesRegex(Exception, "authored research filter grid is malformed"):
-                            self.run_case(target, package_version=player, input_observer_version="0.3.12",
-                                layout_width=width, layout_columns=wrong)
-            for opponent, width in (("missing-layout-width", 1000), ("mismatched-layout-width", 1000),
-                (None, 0), (None, -1), (None, 620.5), (None, "620"), (None, float("inf")), (None, float("nan"))):
-                with self.subTest(target=target, opponent=opponent, width=width):
-                    with self.assertRaisesRegex(Exception, "authored research frame width is malformed"):
-                        self.run_case(target, opponent, player, "0.3.12", layout_width=width)
+    def test_513_and_514_responsive_grids_require_exact_observed_widths_and_columns(self):
+        for release, observer, _, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            for target, player, _ in targets:
+                for width, columns in ((1, 1), (439, 1), (440, 2), (619, 2),
+                                       (620, 3), (959, 3), (960, 5), (1200, 5)):
+                    with self.subTest(release=release, target=target, width=width, columns=columns):
+                        result = self.run_case(target, package_version=player,
+                            input_observer_version=observer, layout_width=width, layout_columns=columns)
+                        self.assertTrue(result["ok"], result["message"])
+                    for wrong in (0, 1, 2, 3, 4, 5, 6):
+                        if wrong == columns:
+                            continue
+                        with self.subTest(release=release, target=target, width=width, wrong_columns=wrong):
+                            with self.assertRaisesRegex(Exception, "authored research filter grid is malformed"):
+                                self.run_case(target, package_version=player, input_observer_version=observer,
+                                    layout_width=width, layout_columns=wrong)
+                for opponent, width in (("missing-layout-width", 1000), ("mismatched-layout-width", 1000),
+                    (None, 0), (None, -1), (None, 620.5), (None, "620"), (None, float("inf")), (None, float("nan"))):
+                    with self.subTest(release=release, target=target, opponent=opponent, width=width):
+                        with self.assertRaisesRegex(Exception, "authored research frame width is malformed"):
+                            self.run_case(target, opponent, player, observer, layout_width=width)
 
 
 
-    def test_513_runs_all_fourteen_settings_pairs_then_full_input_lifecycle(self):
+    def test_513_and_514_run_all_fourteen_settings_pairs_then_full_input_lifecycle(self):
         stages = ["research", "settings-options-baseline", "settings-options-repair",
                   "settings-options-retained-default", "settings-options-no-match",
                   "restore-settings-options-empty", "restore-research"]
-        for target, player in (("f200", "5.0.20013"), ("f210", "5.0.21013")):
-            for opponent in (None, "removed-index-reused"):
-                with self.subTest(target=target, opponent=opponent):
-                    result = self.run_case(target, opponent, player, "0.3.12")
+        for release, observer, _, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            for target, player, _ in targets:
+                for opponent in (None, "removed-index-reused"):
+                    with self.subTest(release=release, target=target, opponent=opponent):
+                        result = self.run_case(target, opponent, player, observer)
                     self.assertTrue(result["ok"], result["message"])
                     final = result["final"]
                     search = final["legacy_settings_search"]
@@ -2118,6 +2141,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             if qualified=="511" and not override_mir then mir=target=="f200" and "5.0.20011" or "5.0.21011" end
             if qualified=="512" and not override_mir then mir=target=="f200" and "5.0.20012" or "5.0.21012" end
             if qualified=="513" and not override_mir then mir=target=="f200" and "5.0.20013" or "5.0.21013" end
+            if qualified=="514" and not override_mir then mir=target=="f200" and "5.0.20014" or "5.0.21014" end
             local original="mir-fixture-mir5-migration-origin-f200-110-source"
             local fixture=target=="f200"and"0.3.0"or"0.4.0"
             local callbacks,interfaces,store,players,decoded={},{},{},{},{}
@@ -2189,7 +2213,8 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             if qualified=="511" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.4" end
             if qualified=="512" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.5" end
             if qualified=="513" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.6" end
-            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513",current_508=qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513",current_510=qualified=="510",current_511=qualified=="511",current_512=qualified=="512",current_513=qualified=="513",
+            if qualified=="514" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.7" end
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514",current_508=qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514",current_510=qualified=="510",current_511=qualified=="511",current_512=qualified=="512",current_513=qualified=="513",current_514=qualified=="514",
               world=function()return{serial=native}end,
               assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
               imported=function()assert(native==1,"actual imported credit changed")end}
@@ -2202,7 +2227,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               assert(store[key].native==nil and not pcall(api.report),"early support baseline was admitted")
               callbacks[4]({tick=1});assert(callbacks[4]==nil,"support baseline kept its tick handler")
             end
-            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513"))
+            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514"))
             local en,de=player(0,"en"),player(2,"de")
             game.players,game.connected_players={[0]=en,[2]=de},{en,de}
             local function joined(index)
@@ -2474,28 +2499,33 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                 with self.assertRaises(Exception):
                     self.lua.globals().run_export_observer(target, "zero-server-index")
 
-    def test_513_export_retains_every_action_and_strict_tuple_lifecycle_and_value_guards(self):
+    def test_513_and_514_exports_retain_every_action_and_strict_tuple_lifecycle_and_value_guards(self):
         run = self.lua.globals().run_export_observer
-        for target, base, player, other in (("f200", "2.0.77", "5.0.20013", "5.0.21013"),
-                                           ("f210", "2.1.23", "5.0.21013", "5.0.20013")):
-            with self.subTest(target=target):
-                self.assertEqual(run(target, "", "513", "authored"), (13, 5, 2, 0))
-            for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
-                "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation", "missing-rejoin",
-                "missing-restart", "duplicate-settings-command", "early-server-commands", "post-load-server-command",
-                "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin", "duplicate-restart-role", "early-rejoin",
-                "zero-server-index"):
-                with self.subTest(target=target, opponent=opponent), self.assertRaises(Exception):
-                    run(target, opponent, "513", "authored")
-            for layout in (None, "flat-decoy", "foreign-panes", "foreign-panel", "missing-panel", "wrong-parent"):
-                with self.subTest(target=target, layout=layout), self.assertRaises(Exception):
-                    run(target, "", "513", layout)
-            for wrong_base, wrong_player, wrong_observer in ((base, player[:-2] + "12", "0.4.6"),
-                (base, player[:-2] + "14", "0.4.6"), (base, other, "0.4.6"), ("2.0.78", player, "0.4.6"),
-                (base, player, "0.4.5"), (base, player, "0.4.7")):
-                with self.subTest(target=target, base=wrong_base, player=wrong_player,
-                    observer=wrong_observer), self.assertRaises(Exception):
-                    run(target, "", "513", "authored", wrong_base, wrong_player, wrong_observer)
+        for release, _, observer, targets in QUALIFIED_LIBRARY_OBSERVERS:
+            for target, player, other in targets:
+                base = "2.0.77" if target == "f200" else "2.1.23"
+                with self.subTest(release=release, target=target):
+                    self.assertEqual(run(target, "", release, "authored"), (13, 5, 2, 0))
+                for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+                    "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation", "missing-rejoin",
+                    "missing-restart", "duplicate-settings-command", "early-server-commands", "post-load-server-command",
+                    "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin", "duplicate-restart-role", "early-rejoin",
+                    "zero-server-index"):
+                    with self.subTest(release=release, target=target, opponent=opponent), self.assertRaises(Exception):
+                        run(target, opponent, release, "authored")
+                for layout in (None, "flat-decoy", "foreign-panes", "foreign-panel", "missing-panel", "wrong-parent"):
+                    with self.subTest(release=release, target=target, layout=layout), self.assertRaises(Exception):
+                        run(target, "", release, layout)
+                for wrong_base, wrong_player, wrong_observer in (
+                    (base, player[:-2] + f"{int(player[-2:]) - 1:02d}", observer),
+                    (base, player[:-2] + f"{int(player[-2:]) + 1:02d}", observer),
+                    (base, other, observer), ("2.0.78", player, observer),
+                    (base, player, f"0.4.{int(observer.rsplit('.', 1)[1]) - 1}"),
+                    (base, player, f"0.4.{int(observer.rsplit('.', 1)[1]) + 1}"),
+                ):
+                    with self.subTest(release=release, target=target, base=wrong_base, player=wrong_player,
+                        observer=wrong_observer), self.assertRaises(Exception):
+                        run(target, "", release, "authored", wrong_base, wrong_player, wrong_observer)
 
 
 
