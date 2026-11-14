@@ -331,6 +331,43 @@ class LibraryModelTests(unittest.TestCase):
             "a malformed named owner must not escape the bounded availability check")
         ''')
 
+    def test_missing_space_age_availability_respects_effectively_disabled_streams(self):
+        # Host-only authored-explanation contract. Use the already-resolved
+        # stream map, not raw startup settings or a guessed historical save.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local target = {recipe_productivity = true}
+          local baseline = availability.rows({}, target, nil, "")
+          assert(#baseline == 2 and baseline[1].family == "research_agricultural_growth_speed"
+            and baseline[2].family == "research_spoilage_preservation")
+
+          local effective = {
+            research_agricultural_growth_speed = {enabled = false},
+            research_spoilage_preservation = {enabled = true},
+          }
+          local rows = availability.rows({}, target, nil, "", effective)
+          assert(#rows == 1 and rows[1].family == "research_spoilage_preservation"
+            and rows[1].reason == "requires-space-age",
+            "disabled agriculture must not be described as withheld by Space Age")
+          assert(#availability.rows({}, target, nil, "agricultural", effective) == 0)
+
+          effective.research_agricultural_growth_speed.enabled = true
+          effective.research_spoilage_preservation.enabled = false
+          rows = availability.rows({}, target, nil, "", effective)
+          assert(#rows == 1 and rows[1].family == "research_agricultural_growth_speed",
+            "disabled spoilage must not be described as withheld by Space Age")
+          assert(#availability.rows({}, target, nil, "spoilage", effective) == 0)
+
+          effective.research_agricultural_growth_speed.enabled = false
+          assert(#availability.rows({}, target, nil, "", effective) == 0)
+          assert(#availability.rows({}, target, nil, "", nil) == 2,
+            "an unknown effective stream is not evidence of a disabled stream")
+          assert(#availability.rows({["space-age"] = "2.1.23"}, target, nil, "", effective) == 0)
+          assert(effective.research_agricultural_growth_speed.enabled == false
+            and effective.research_spoilage_preservation.enabled == false,
+            "Availability must never mutate the effective configuration")
+        ''')
+
     def test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation(self):
         self.lua.execute('''
           local availability = require("presentation.availability")
