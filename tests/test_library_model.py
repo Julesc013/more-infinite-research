@@ -380,9 +380,10 @@ class LibraryModelTests(unittest.TestCase):
             and native_owner.prototype.effects[1].modifier == 0.1,
             "projection must not change native facts")
 
-          local unreadable = force_with(setmetatable({}, {
-            __index = function() error("named technology read refused") end
-          }))
+          local unreadable = {technologies = setmetatable({}, {
+            __index = function() error("named technology read refused") end,
+            __pairs = function() error("Availability enumerated native technologies") end
+          })}
           assert(#availability.rows({}, target, unreadable, "") == 0,
             "a failed named lookup is not proof that a technology is absent")
         ''')
