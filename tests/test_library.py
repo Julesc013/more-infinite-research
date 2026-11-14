@@ -1674,6 +1674,84 @@ class LibraryTests(unittest.TestCase):
             "an explicit reopen must select the existing owned frame")
         ''')
 
+    def test_tab_navigation_after_resizes_preserves_shared_chrome_and_independent_search(self):
+        # Host-only composition control. This combines layout-size transitions
+        # with tab switching; it is not a native screenshot or input verdict.
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution={width=1600,height=900}
+          local root=library.open(player,{tab="research",query="gear",selected=gear.name})
+          root.location={x=37,y=19}
+          library.on_gui_location_changed({player_index=1,element=root})
+          root=library.open(player,{tab="settings",settings_scope="options",settings_search="repair"})
+          local view=storage.mir_library.players[1]
+          local setting=view.setting_selected
+          assert(view.query=="gear" and view.settings_query=="repair"
+            and view.settings_scope=="options")
+          local before_level,before_progress=gear.level,player.force.research_progress
+
+          local function cycle()
+            local frame=player.gui.screen.mir_research_browser
+            local tabs=frame.mir_library_tabs
+            local title=frame.mir_library_title
+            local original_width,original_height=frame.style.minimal_width,frame.style.minimal_height
+            local x,y=frame.location.x,frame.location.y
+            local query=research_filters(frame).mir_library_query
+            local settings_page=tabs.mir_library_settings_content
+            local settings_query=settings_page.mir_library_settings_query
+            local toolbar_columns=settings_page.mir_library_settings_toolbar.column_count
+            local page_height=research_page(frame).style.minimal_height
+            for _,index in ipairs({1,3,2,4,3,1,3,1}) do
+              tabs.selected_tab_index=index
+              library.on_gui_selected_tab_changed({player_index=1,element=tabs})
+              assert(player.gui.screen.mir_research_browser==frame
+                and frame.mir_library_tabs==tabs and frame.mir_library_title==title,
+                "tab navigation must never rebuild or displace owned chrome")
+              assert(frame.style.minimal_width==original_width
+                and frame.style.minimal_height==original_height
+                and frame.location.x==x and frame.location.y==y,
+                "tab content must not resize or move the outer window")
+              local live={}
+              for _,child in ipairs(frame._children) do
+                if child.valid then live[#live+1]=child end
+              end
+              assert(#live==2 and live[1]==title and live[2]==tabs,
+                "tab-specific controls must remain beneath navigation")
+              for _,name in ipairs({"research_page","queue_content","settings_content","help_content"}) do
+                assert(tabs["mir_library_"..name].style.minimal_height==page_height,
+                  "all tabs retain the same bounded page height")
+              end
+              assert(research_filters(frame).mir_library_query==query and query.text=="gear")
+              local current_query=settings_page.mir_library_settings_query
+              if current_query~=settings_query then
+                -- Responsive toolbar column changes legitimately rebuild this
+                -- field. Reject gratuitous replacement on ordinary tab changes.
+                local new_columns=settings_page.mir_library_settings_toolbar.column_count
+                assert(index==3 and new_columns~=toolbar_columns and not settings_query.valid,
+                  "only a Settings toolbar breakpoint may replace its search field")
+                settings_query,toolbar_columns=current_query,new_columns
+              end
+              assert(settings_query.valid and settings_query.text=="repair"
+                and view.settings_query=="repair" and view.query=="gear",
+                "switching tabs must preserve distinct Settings and Research searches")
+            end
+            assert(view.query=="gear" and view.settings_query=="repair"
+              and view.settings_scope=="options" and view.setting_selected==setting
+              and view.selected==gear.name)
+            assert(gear.level==before_level and player.force.research_progress==before_progress)
+          end
+          cycle()
+          for _,action in ipairs({"layout_smaller","layout_smaller","layout_larger","layout_larger"}) do
+            root=player.gui.screen.mir_research_browser
+            library.on_gui_click({player_index=1,element=root.mir_library_title["mir_library_"..action]})
+            cycle()
+          end
+          player.display_resolution={width=640,height=480}
+          root=library.open(player,{tab="settings"})
+          assert(root==player.gui.screen.mir_research_browser)
+          cycle()
+        ''')
+
     def test_tab_navigation_stays_above_tab_specific_controls_and_preserves_personal_view(self):
         self.lua.execute(r'''
           boot()
