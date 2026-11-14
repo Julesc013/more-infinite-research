@@ -363,6 +363,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_scripted_effects_lifecycle.py",
             "tests/test_settings_profile.py",
             "tests/test_profile_native_witness.py",
+            "tests/test_profile_native_runner.py",
             "tests/test_settings_commands.py",
             "tests/test_properties.py",
             "tests/test_replay.py",
@@ -390,6 +391,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_pack.py",
             "tests/test_startup_timings.py",
             "tests/test_host_controls.py",
+            "tests/test_input_filesystem_boundaries.py",
+            "tests/test_linux_resource_platform.py",
             "tools/check_repository.py",
         ])
         self.assertEqual(len(set(paths)), len(paths))

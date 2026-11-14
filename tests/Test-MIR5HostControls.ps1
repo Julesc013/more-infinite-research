@@ -169,6 +169,7 @@ $controls = @(
   [ordered]@{path='tests/test_scripted_effects_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_settings_profile.py';lua=$true},
   [ordered]@{path='tests/test_profile_native_witness.py';lua=$true},
+  [ordered]@{path='tests/test_profile_native_runner.py';lua=$true},
   [ordered]@{path='tests/test_settings_commands.py';lua=$true},
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
@@ -196,6 +197,8 @@ $controls = @(
   [ordered]@{path='tests/test_pack.py';lua=$false},
   [ordered]@{path='tests/test_startup_timings.py';lua=$false},
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
+  [ordered]@{path='tests/test_input_filesystem_boundaries.py';lua=$false},
+  [ordered]@{path='tests/test_linux_resource_platform.py';lua=$false},
   [ordered]@{path='tools/check_repository.py';lua=$false}
 )
 

@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-profile-native-runner",
+  "version": "0.1.0",
+  "title": "MIR private numeric profile lifecycle actor",
+  "author": "MIR maintainers",
+  "description": "Disposable save and two-cold actor around the independent native profile observer; no research is granted.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "quality = 2.0.77",
+    "more-infinite-research = 5.0.20014",
+    "mir-fixture-mir5-profile-native-witness = 0.1.0"
+  ]
+}
