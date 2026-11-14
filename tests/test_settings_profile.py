@@ -377,6 +377,38 @@ class SettingsProfileTests(unittest.TestCase):
           assert(profile == nil and decode_error == "unsupported profile format")
         ''')
 
+    def test_profile_export_metadata_is_detached_from_the_supplied_table(self):
+        # current_profile is also used by explicit server and GUI export
+        # callers. A result-only export_mode annotation must not overwrite
+        # caller metadata, even on repeated full/compact conversions.
+        self.lua.execute(r'''
+          local nested = {marker = "unchanged"}
+          local metadata = {export_mode = "original", owner = "caller", extra = nested}
+          local options = {
+            metadata = metadata,
+            names = {"mir-enable-passive-repair"},
+            value_resolver = function() return false end
+          }
+          local full = codec.current_profile(options)
+          assert(metadata.export_mode == "original" and metadata.owner == "caller")
+          assert(full.metadata ~= metadata and full.metadata.export_mode == "full"
+            and full.metadata.owner == "caller" and full.metadata.extra == nested)
+          assert(full.settings["mir-enable-passive-repair"] == false,
+            "detaching export metadata must not discard a false setting")
+
+          options.compact = true
+          local compact = codec.current_profile(options)
+          assert(compact.metadata ~= metadata and compact.metadata ~= full.metadata)
+          assert(compact.metadata.export_mode == "compact"
+            and full.metadata.export_mode == "full"
+            and metadata.export_mode == "original",
+            "converting an existing input twice must not rewrite prior metadata")
+          compact.metadata.owner = "changed"
+          assert(full.metadata.owner == "caller" and metadata.owner == "caller"
+            and metadata.extra == nested,
+            "mutating a result must not mutate sibling or caller top-level metadata")
+        ''')
+
     def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
         # Published round-trip fixture635deae0 tests the entire effect-setting
         # surface, independently of any serializer's selected examples/counts.
