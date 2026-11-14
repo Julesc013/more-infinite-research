@@ -331,6 +331,41 @@ class LibraryModelTests(unittest.TestCase):
             "a malformed named owner must not escape the bounded availability check")
         ''')
 
+    def test_native_lab_availability_omits_explicitly_disabled_stream(self):
+        # Host-only Availability semantics: the captured native Space Age
+        # owner may exist even when MIR's lab-productivity stream is disabled.
+        # A disabled stream must not be described as omitted by that owner.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local mods = {["space-age"] = "2.1.23"}
+          local target = {recipe_productivity = true}
+          local native = {
+            valid = true,
+            prototype = {effects = {{type = "laboratory-productivity", modifier = 0.1}}}
+          }
+          local technologies = setmetatable({["research-productivity"] = native}, {
+            __pairs = function() error("Availability enumerated technology catalogue") end
+          })
+          local force = {technologies = technologies}
+          local enabled = {research_lab_productivity = {enabled = true}}
+          local disabled = {research_lab_productivity = {enabled = false}}
+          local baseline = availability.rows(mods, target, force, "lab", enabled)
+          assert(#baseline == 1 and baseline[1].family == "research_lab_productivity"
+            and baseline[1].reason == "native-research-productivity")
+          assert(#availability.rows(mods, target, force, "lab", disabled) == 0,
+            "explicitly disabled lab stream is not a native-owner omission")
+          assert(#availability.rows(mods, target, force, "", disabled) == 0)
+          assert(#availability.rows(mods, target, force, "lab", nil) == 1,
+            "unspecified stream state must retain its previous explanation")
+          assert(#availability.rows(mods, target, force, "lab", {}) == 1)
+          assert(#availability.rows(mods, {recipe_productivity = false}, force, "", enabled) == 0)
+          assert(enabled.research_lab_productivity.enabled == true
+            and disabled.research_lab_productivity.enabled == false
+            and technologies["research-productivity"] == native
+            and native.prototype.effects[1].modifier == 0.1,
+            "Availability must not mutate effective settings or native facts")
+        ''')
+
     def test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation(self):
         self.lua.execute('''
           local availability = require("presentation.availability")
