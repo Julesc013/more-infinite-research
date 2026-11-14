@@ -1102,6 +1102,54 @@ class BootstrapTests(unittest.TestCase):
             and storage.mir.historical_other == "keep" and handlers.nth[60] == nil)
         ''')
 
+    def test_repeated_load_retains_pending_repair_queue_and_has_no_ordinary_tick(self):
+        # Host-only repeated Lua bootstrap/load simulation, not native save/cold-load
+        # evidence. Check *nested saved values* as well as top-level identities:
+        # a root __newindex guard alone cannot detect writes to existing fields.
+        self.lua.execute('''
+          install_modules(false, true); install_runtime(); load_control()
+          local first = {retained=true, sentinel="left"}
+          local second = {retained=true, sentinel="right"}
+          local queue = {7, 9}
+          local members = {[7]=first, [9]=second}
+          local opaque = {marker="keep"}
+          local bucket = {queue=queue, members=members, scheduled=false, unknown=opaque}
+          local legacy = {sentinel="untouched"}
+          local namespace = {passive_repair=bucket, historical_other=legacy}
+          storage.mir = namespace
+          local function unchanged()
+            assert(storage.mir == namespace and namespace.passive_repair == bucket)
+            assert(bucket.queue == queue and #queue == 2 and queue[1] == 7 and queue[2] == 9)
+            assert(bucket.members == members and members[7] == first and members[9] == second)
+            assert(first.retained and first.sentinel == "left" and second.retained and second.sentinel == "right")
+            assert(bucket.scheduled == false and bucket.unknown == opaque and opaque.marker == "keep")
+            assert(namespace.historical_other == legacy and legacy.sentinel == "untouched")
+          end
+          for cold = 1, 2 do
+            -- A new control module rebinds subscriptions; the same saved
+            -- namespace must remain intact even with an inaccessible world.
+            remote.interfaces = {}
+            load_control()
+            unchanged()
+            local ordinary_game = game
+            game = setmetatable({}, {
+              __index = function() error("on_load read game") end,
+              __newindex = function() error("on_load wrote game") end
+            })
+            handlers.load()
+            unchanged()
+            assert(type(handlers.nth[60]) == "function")
+            assert(handlers.events[defines.events.on_tick] == nil)
+            local scheduled = handlers.nth[60]
+            local calls = handlers.nth_calls
+            handlers.load()
+            unchanged()
+            assert(handlers.nth[60] == scheduled and handlers.nth_calls == calls)
+            assert(handlers.events[defines.events.on_tick] == nil)
+            game = ordinary_game
+          end
+        ''')
+
     def test_data_stage_keeps_the_published_shortcut_and_private_native_admission(self):
         self.lua.execute('''
           local function capture(space_age)
