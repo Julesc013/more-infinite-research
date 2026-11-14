@@ -251,9 +251,18 @@ function M.rows(active_mods, target, force, query, effective_streams)
   if not supports_recipe_productivity(target) then return rows end
   if not has_space_age(active_mods) then
     for _, row in ipairs(BASE_WITHOUT_SPACE_AGE) do
-      if matches(row, query) then rows[#rows + 1] = copy(row) end
+      -- A named technology already present in this force is not "not added".
+      -- A failed native read is not proof of absence; do not scan the catalogue.
+      if emitted_technology_state(force, "recipe-prod-" .. row.family .. "-1") == false
+          and matches(row, query) then
+        rows[#rows + 1] = copy(row)
+      end
     end
-  elseif has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+  elseif emitted_technology_state(force,
+      "recipe-prod-" .. NATIVE_LAB_PRODUCTIVITY.family .. "-1") == false
+      and has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+    -- The named native owner is insufficient to claim omission if MIR's exact
+    -- historical technology identity is also present in the force.
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
   end
   if is_f200_bob_angel(active_mods, target) then
