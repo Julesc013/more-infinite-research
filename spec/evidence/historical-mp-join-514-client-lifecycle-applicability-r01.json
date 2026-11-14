@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalMultiplayerJoinCurrent514LifecycleApplicabilityReviewV1",
+  "prepared_on": "2026-11-13",
+  "purpose": "Finite MP-JOIN-01 history-to-current-source mapping; preserve the real two-client evidence and exact missing reporter qualification without relabelling old tests as current 5.0.14 results.",
+  "scope": "Independent read-only Git-blob/source/test/ledger review; 18 static predicates executed in this session; no Factorio, Lua host tests, client, screenshot, performance, package or owner state was executed or changed.",
+  "request": {
+    "id": "MP-JOIN-01",
+    "source_id": "P-MP-JOIN-2026-10-25",
+    "status": "requested-not-qualified",
+    "decision": "retain-open-for-mir5-regression-and-community-continuity",
+    "description": "Reported multiplayer join failure after MIR update; an old 4.4.1 maintainer fix claim is not exact old-report reproduction or current-package acceptance.",
+    "screenshot_url": "https://i.imgur.com/Blc0VpG.png",
+    "screenshot_readable_in_this_review": false,
+    "missing_reporter_inputs": [
+      "Readable original error/stack",
+      "Exact engine and before/after MIR archive identities",
+      "Complete mod/settings closure",
+      "Affected save and actual client versions"
+    ],
+    "source_ledger": "spec/programmes/community-requests.json"
+  },
+  "identities": {
+    "inspected_dev_commit": "6848661578137b989924d532901779cafe15a9b5",
+    "selected_public_beta_tag": "v5.0.14",
+    "selected_public_commit": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+    "git_blobs": {
+      "source/runtime/bootstrap.lua": "e97436db4a1bc9d72795a65873941f45a55d1158",
+      "source/runtime/lifecycle.lua": "26100b5f15a9883aa1c973dd89bf165fa7e0cf10",
+      "tests/test_bootstrap.py": "fb0ddeb3c8723a4dc696db7823072eaa84a1a536",
+      "source/changelog.txt": "9b28e93e76ac8787cb185ac8da1fbc463ad86368",
+      "spec/programmes/community-requests.json": "9e8f71be4fe629862cc6780216bbb588e03b8366",
+      "spec/evidence/library-multiplayer-current-chain.json": "409d8d68c8678f731bbfea2b5e2f63f3c87f38c6",
+      "spec/evidence/library-multiplayer-availability-native-chain.json": "3eb39b95273246e21bd077139e5810fa94554546"
+    },
+    "identical_public14_and_inspected_dev_blobs": [
+      "source/runtime/bootstrap.lua",
+      "source/runtime/lifecycle.lua",
+      "tests/test_bootstrap.py",
+      "spec/programmes/community-requests.json"
+    ]
+  },
+  "historical": {
+    "source": "source/changelog.txt / Version: 4.4.1",
+    "claim": "Prevent multiplayer join failures caused by a load-only on_tick event registration.",
+    "limitation": "The 4.4.1 changelog expressly defers fresh native multiplayer/client and broader save/engine qualification; the original user screenshot remained unreadable in this review.",
+    "interpretation": "A published fix assertion and the current architecture do not identify or reproduce the original unknown save's failure."
+  },
+  "current_code": {
+    "bootstrap": "source/runtime/bootstrap.lua",
+    "lifecycle": "source/runtime/lifecycle.lua",
+    "source_observations": [
+      "control registration installs on_load and on_player_joined_game callbacks during parse-time M.register.",
+      "The inspected bootstrap does not register the ordinary on_tick event; several independent scheduled needs use on_nth_tick.",
+      "The on_load path reconnects feature locals and conditionally reconstructs passive-repair and translation subscriptions; its source comments forbid save writes and game access.",
+      "runtime/lifecycle.lua on_load body is empty; lifecycle mutation belongs to initialization/configuration.",
+      "Existing host test bodies assert an absent ordinary on_tick after on_load, guarded game access, and preservation of the saved passive-repair queue/members while reconstructing a scheduler."
+    ],
+    "limit": "Source/text predicates inspect code and existing test assertions. They do not execute the test suite or prove joining-clients on an actual current candidate."
+  },
+  "existing_scoped_native": {
+    "first_record": "spec/evidence/library-multiplayer-current-chain.json",
+    "second_record": "spec/evidence/library-multiplayer-availability-native-chain.json",
+    "engine": "Factorio 2.0.77",
+    "player": "5.0.20000",
+    "status": "Accepted prior private single-host Base loopback two-client evidence at its original identity only",
+    "client_names": [
+      "MIR5English",
+      "MIR5Deutsch"
+    ],
+    "observation": "Two distinct EN/DE clients join/rejoin and restart, with native saved state and readable captured Library views in the recorded scope.",
+    "evidence_release_qualification": false,
+    "limits": [
+      "Old MIR 5.0.20000 is not published 5.0.20014/5.0.21014.",
+      "Original reporter's unknown versions, settings, mod selection and affected save are not reproduced.",
+      "A successful script-driven client lifecycle is not equivalent to complete current GUI-input/export, whole-product or arbitrary-modpack qualification."
+    ]
+  },
+  "static_review": {
+    "executed": 18,
+    "passed": 18,
+    "failed": 0,
+    "checks": {
+      "request_identity": true,
+      "historical_claim_explicit": true,
+      "historical_no_native": true,
+      "request_still_open": true,
+      "original_screenshot_not_assumed": true,
+      "bootstrap_on_load_registered": true,
+      "join_handler_registered": true,
+      "no_static_on_tick_registration": true,
+      "on_load_scope_read_only_source": true,
+      "lifecycle_on_load_empty": true,
+      "static_host_asserts_no_on_tick": true,
+      "static_host_asserts_no_world_access": true,
+      "static_host_preserves_repair_queue": true,
+      "prior_native_distinct_clients": true,
+      "prior_native_rejoin_restart": true,
+      "prior_native_not_release": true,
+      "prior_native_not_14": true,
+      "current14_source_identical": true
+    },
+    "method": "Exact fetched Git blobs plus JSON shape/text predicates; no Lua or native process."
+  },
+  "next_finite_gate": [
+    {
+      "id": "MPJ-14-01",
+      "type": "source-and-host",
+      "input": "Selected published14 and current-dev bootstrap/control/changed source+test blobs",
+      "expected": "Continue to enforce deterministic parse-time event registration and read-only on_load, including conditional subscription reconstruction; preserve already accepted host controls",
+      "status": "source-applicability-only"
+    },
+    {
+      "id": "MPJ-14-02",
+      "type": "native",
+      "input": "Exact pinned F200 or F210 5.0.14 package/engine, protected saved state, two distinct graphical client roles, frozen profiles and controller",
+      "expected": "A genuine second join/rejoin, same saved host restart and reconnect must succeed without load-time game access, desync, erased earned work, queue/partial progress/bonus drift or spurious registration; retain original client logs/files",
+      "status": "not-run"
+    },
+    {
+      "id": "MPJ-14-03",
+      "type": "reporter",
+      "input": "Original screenshot/error/version/mod/settings/save if already recoverable from retained incident custody",
+      "expected": "Only an exact matching reproduced reporter scenario plus fix can close the personal incident; no request to resend existing logs and no fabricated configuration",
+      "status": "unverified-original-inputs"
+    }
+  ],
+  "owners": {
+    "integration_native_release": "Black Glass existing owner",
+    "this_review": "Independent additive historical evidence only"
+  },
+  "explicit_nonclaims": [
+    "No new reporter error signature inferred from inaccessible screenshot.",
+    "No current 14 native client, input, export, save or two cold loads observed.",
+    "No 4.4.1, 5.0.20000 or host test promoted to a current 5.0.14 stable verdict.",
+    "No worker repair, provider ownership, runtime source or native/published archive altered.",
+    "MP-JOIN-01 remains open; active MIR4 Library parity, localized input/client/export and whole-product performance remain required."
+  ]
+}
