@@ -636,6 +636,31 @@ class LocaleCatalogueTests(unittest.TestCase):
                     arguments = set(re.findall(r"__(\d+)__", value))
                     self.assertEqual(arguments, {"1"} if key in NATIVE_SETTING_KEYS else set())
 
+    def test_all_locales_retain_historical_ips_stream_setting_labels(self) -> None:
+        # Historical forum case T45-I01 reported an unresolved
+        # mod-setting-name.ips-enable-research-XXX. XXX was a placeholder,
+        # not a confirmed literal setting suffix. The current generator
+        # supplies a technology-name argument to these seven shared
+        # "<prefix>stream" name/description keys.
+        stream_keys = (
+            "ips-enable-stream", "ips-cost-base-stream",
+            "ips-cost-linear-increment-stream", "ips-cost-growth-stream",
+            "ips-max-level-stream", "ips-research-time-stream",
+            "ips-effect-per-level-stream",
+        )
+        paths = sorted(LOCALE_ROOT.glob("*/more-infinite-research.cfg"))
+        self.assertEqual({path.parent.name for path in paths},
+                         set(EXPECTED_RETAINED_PROJECTION_SHA256))
+        for path in paths:
+            sections = parse_cfg(path)
+            for section in ("mod-setting-name", "mod-setting-description"):
+                for key in stream_keys:
+                    with self.subTest(language=path.parent.name, section=section, key=key):
+                        value = sections.get(section, {}).get(key, "")
+                        self.assertTrue(value.strip(), f"missing {section}.{key} in {path.parent.name}")
+                        self.assertEqual(set(re.findall(r"__(\\d+)__", value)), {"1"},
+                                         f"invalid technology argument in {section}.{key} ({path.parent.name})")
+
     def test_german_visible_option_is_shorter_and_startup_names_are_translated(self) -> None:
         # Actual R07 German images exposed the overlong Show option and six
         # missing startup names. A descriptor audit also exposed the native
