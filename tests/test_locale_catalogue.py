@@ -658,7 +658,7 @@ class LocaleCatalogueTests(unittest.TestCase):
                     with self.subTest(language=path.parent.name, section=section, key=key):
                         value = sections.get(section, {}).get(key, "")
                         self.assertTrue(value.strip(), f"missing {section}.{key} in {path.parent.name}")
-                        self.assertEqual(set(re.findall(r"__(\\d+)__", value)), {"1"},
+                        self.assertEqual(set(re.findall(r"__(\d+)__", value)), {"1"},
                                          f"invalid technology argument in {section}.{key} ({path.parent.name})")
 
     def test_german_visible_option_is_shorter_and_startup_names_are_translated(self) -> None:
