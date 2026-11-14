@@ -257,7 +257,9 @@ function M.rows(active_mods, target, force, query, effective_streams)
         rows[#rows + 1] = copy(row)
       end
     end
-  elseif has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+  elseif not is_explicitly_disabled(NATIVE_LAB_PRODUCTIVITY, effective_streams)
+      and has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+    -- A deliberately disabled stream is not an omitted MIR research entry.
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
   end
   if is_f200_bob_angel(active_mods, target) then
