@@ -85,6 +85,51 @@ class ModSettingsDatControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "string exceeds input bound"):
             writer.encode("2.1.23", {name + "é": False})
 
+    def test_888_setting_profile_wire_transport_is_byte_exact_and_type_stable(self):
+        # Host-only transport control for the published 5.0.14 F210
+        # nondefault File-profile acceptance boundary. The token is synthetic
+        # and is NOT an actual MIRSET1 codec export or native import verdict.
+        # The observed source export included exactly one file LF; the wire
+        # imported through mod-settings.dat excludes only that terminal LF.
+        token = "MIRSET1:" + ("AbcD0123" * 812)
+        self.assertEqual(len(token.encode("ascii")), 6504)
+        exported_file = (token + "\n").encode("ascii")
+        self.assertEqual(exported_file[:-1], token.encode("ascii"))
+        self.assertEqual(exported_file[-1:], b"\n")
+
+        startup = {
+            "mir-settings-profile-import": exported_file[:-1].decode("ascii"),
+            "mir-unrestricted-modules": True,
+            "ips-enable-research_gears": False,
+            "ips-cost-base-research_gears": 1,
+            "ips-research-time-research_gears": 0,
+        }
+        # Exercise the same descriptor cardinality as the F210 Base export
+        # without asserting these synthetic names are real MIR settings.
+        for number in range(888 - len(startup)):
+            startup[f"synthetic-setting-{number:04d}"] = number / 16
+        self.assertEqual(len(startup), 888)
+
+        for engine in ("2.0.77", "2.1.23"):
+            with self.subTest(engine=engine):
+                blob = writer.encode(engine, startup)
+                # The independent fixed-layout control above covers framing;
+                # this checks the long string's exact bytes inside that tree.
+                encoded_wire = (b"\x03\x00\x00\xff" +
+                                struct.pack("<I", 6504) + token.encode("ascii"))
+                self.assertEqual(blob.count(encoded_wire), 1)
+                self.assertEqual(blob, writer.encode(engine, dict(reversed(list(startup.items())))))
+                actual = reader.decode(blob)
+                self.assertEqual(actual["engine"], engine)
+                self.assertEqual(len(actual["startup"]), 888)
+                self.assertEqual(actual["startup"]["mir-settings-profile-import"], token)
+                self.assertIs(actual["startup"]["mir-unrestricted-modules"], True)
+                self.assertIs(actual["startup"]["ips-enable-research_gears"], False)
+                self.assertEqual(actual["startup"]["ips-cost-base-research_gears"], 1.0)
+                self.assertEqual(actual["startup"]["ips-research-time-research_gears"], 0.0)
+                self.assertIs(type(actual["startup"]["ips-research-time-research_gears"]), float)
+                self.assertEqual(actual["startup"], startup)
+
     def test_reject_truncation_corruption_and_trailing_data(self):
         blob = writer.encode("2.0.77", {"flag": False, "profile": "é" * 128})
         for offset in range(len(blob)):
