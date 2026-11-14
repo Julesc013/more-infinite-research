@@ -230,6 +230,69 @@ class NativeCreditVectorTests(unittest.TestCase):
                     self.assertIn('rejection.role="' + role + '"', message)
                     self.assertIn('rejection.recipe="processing-unit"', message)
 
+    def test_malformed_processing_tail_reports_observed_component_without_writes(self):
+        tail = 'cerys-processing-units-from-nitric-acid'
+        cases = (
+            ("rows[2].type='unlock-recipe'", 'table', tail, 'unlock-recipe'),
+            ("rows[2].recipe=rows[1].recipe", 'table', 'processing-unit', 'change-recipe-productivity'),
+            ("rows[2].change=math.huge", 'table', tail, 'change-recipe-productivity'),
+            ("rows[2].change=0/0", 'table', tail, 'change-recipe-productivity'),
+            ("rows[2]=false", 'boolean', None, None),
+            ("rows[2]=setmetatable({type='unlock-recipe',recipe=rows[2].recipe},"
+             "{__index=function()error('diagnostic inspected an absent field')end})",
+             'table', tail, 'unlock-recipe'),
+        )
+        for target in ('f200', 'f210'):
+            for role in ('positive', 'negative', 'reference'):
+                for opponent, component_type, recipe, effect_type in cases:
+                    with self.subTest(target=target, role=role, opponent=opponent):
+                        self.setUp()
+                        self.lua.globals().case_target = target
+                        self.lua.globals().case_role = role
+                        self.lua.globals().opponent = opponent
+                        message = self.lua.execute(r'''
+                          local f,d,r=vector_world(2,false,case_target,.1,1,
+                            'research_processing_unit','processing-unit','processing-unit-productivity')
+                          local p=f.technologies[d.positive_id].prototype.effects
+                          local n=f.technologies[d.negative_id].prototype.effects
+                          for _,rows in ipairs({p,n,r.effects})do
+                            rows[2].recipe='cerys-processing-units-from-nitric-acid'
+                          end
+                          local rows=case_role=='positive' and p or case_role=='negative' and n or r.effects
+                          assert(load('return function(rows) '..opponent..' end'))()(rows)
+                          local history=prototypes.get_history;local reference_reads=0
+                          prototypes.get_history=function(kind,name)
+                            if kind=='technology' and name==r.name then reference_reads=reference_reads+1 end
+                            return history(kind,name)
+                          end
+                          local previous
+                          for attempt=1,2 do
+                            local ok,message=pcall(native_credits.on_init)
+                            assert(not ok,'malformed component admitted');assert_no_vector_writes()
+                            assert(reference_reads==attempt,'diagnostic added a reference history query')
+                            message=tostring(message):match('(MIR native family credit.*)')
+                            assert(message,'malformed observation replaced the MIR refusal')
+                            assert(not previous or previous==message,'equal rejected input changed diagnostic')
+                            previous=message
+                          end
+                          return previous
+                        ''')
+                        self.assertIn('rejection.reason="vector-shape"', message)
+                        self.assertIn('rejection.role="' + role + '"', message)
+                        self.assertIn('rejection.component=2', message)
+                        self.assertIn('rejection.component_type="' + component_type + '"', message)
+                        if recipe is None:
+                            self.assertNotIn('rejection.recipe=', message)
+                        else:
+                            self.assertIn('rejection.recipe="' + recipe + '"', message)
+                        if effect_type is None:
+                            self.assertNotIn('rejection.effect_type=', message)
+                        else:
+                            self.assertIn('rejection.effect_type="' + effect_type + '"', message)
+                        if opponent in ('rows[2].change=math.huge', 'rows[2].change=0/0'):
+                            expression = opponent.split('=', 1)[1]
+                            self.assertIn('rejection.change=' + self.lua.eval('tostring(' + expression + ')'), message)
+
     def test_processing_recheck_failure_preserves_existing_ledger_and_foreign_progress(self):
         self.lua.execute(r'''
           local f,d=vector_world(2,false,'f210',.1,1,

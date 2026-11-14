@@ -360,7 +360,8 @@ local function family_failure_detail(force, descriptor, scope, rejection)
   add("scope_valid", scope and scope.valid)
   if scope and scope.values then add("main_recipe_change", scope.values[descriptor.recipe]) end
   if rejection then
-    for _,name in ipairs({"reason","role","recipe","component","positive","negative","reference","expected"}) do
+    for _,name in ipairs({"reason","role","recipe","component","positive","negative","reference","expected",
+        "component_type","effect_type","change"}) do
       if rejection[name] ~= nil then add("rejection." .. name,rejection[name]) end
     end
   end
