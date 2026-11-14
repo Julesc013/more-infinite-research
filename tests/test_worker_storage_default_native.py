@@ -54,6 +54,139 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
         self.assertEqual(["base >= 2.1.23", "more-infinite-research"], info["dependencies"])
         self.assertFalse((FIXTURE / "settings.lua").exists())
 
+    def test_exact_map_price_mode_selection_rejects_old_or_unsupported_routes(self):
+        self.lua.execute(r'''
+          assert(actor.select_mode("5.0.21011",1)=="old-source")
+          assert(actor.select_mode("5.0.20011",1)=="old-source")
+          assert(actor.select_mode("5.0.21012",1)=="first")
+          assert(actor.select_mode("5.0.20012",1)=="first")
+          assert(actor.select_mode("5.0.21012",2)=="first-map-price")
+          assert(actor.select_mode("5.0.20012",4)=="first-map-price")
+          for _,input in ipairs({{"5.0.21011",2},{"5.0.20011",4},{"5.0.21012",0},
+            {"5.0.21012",3},{"5.0.21012",1.5},{"5.0.21013",1}})do
+            assert(not pcall(actor.select_mode,input[1],input[2]))
+          end
+          game={speed=1,difficulty_settings={technology_price_multiplier=1}}
+          storage={};assert(not pcall(interfaces["mir-worker-storage-default-native"].begin,"first-map-price"))
+          assert(storage.worker_storage_default_native_fixture==nil)
+        ''')
+
+    def test_first_level4_map_price_witness_has_only_independent_integer_expectations(self):
+        self.lua.execute(r'''
+          assert(actor.first_level4_science(2)==1350 and actor.first_level4_science(4)==2700)
+          assert(not pcall(actor.first_level4_science,1) and not pcall(actor.first_level4_science,3))
+        ''')
+        text = (FIXTURE / "control.lua").read_text()
+        self.assertIn('p.ignore_tech_cost_multiplier == true', text)
+        self.assertIn('p.research_unit_count == 1', text)
+        self.assertIn('check(#s.ordinary == 1, "one actual first level4 completion")', text)
+        self.assertIn('"first-map-price-" .. s.map_price .. "x-level4-saved"', text)
+        for unproven_level5_count in ("3374", "6748", "3375", "6750"):
+            self.assertNotIn(unproven_level5_count, text)
+
+    def _install_map_price_world(self):
+        self.lua.execute(r'''
+          local function worker(name, level, count, enabled, visible, saved)
+            return {name=name,level=level,researched=false,enabled=enabled,visible_when_disabled=visible,
+              saved_progress=saved or 0,research_unit_count=count}
+          end
+          function map_price_world(multiplier, spent, ordinary, inserted, phase)
+            local id, science = actor.ids, {"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack"}
+            local prerequisites = {"worker-robots-storage-2","worker-robots-storage-3","automation-science-pack",
+              "logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"}
+            local function ingredients()
+              local out={};for i,name in ipairs(science)do out[i]={name=name,amount=1}end;return out
+            end
+            local function full(name, hidden, enabled, modifier)
+              local required={};for _,name in ipairs(prerequisites)do required[name]={name=name}end
+              return {name=name,level=4,max_level=4294967295,hidden=hidden,enabled=enabled,visible_when_disabled=false,
+                research_unit_count_formula="675*1.5^(L-4)",research_unit_count=675,research_unit_energy=3600,
+                research_unit_ingredients=ingredients(),effects={{type="worker-robot-storage",modifier=modifier}},
+                prerequisites=required,ignore_tech_cost_multiplier=false}
+            end
+            prototypes={technology={[id.main]=full(id.main,false,true,1),[id.tail]=full(id.tail,false,true,1),
+              [id.private]=full(id.private,true,false,1),[id.gate]={name=id.gate,level=4,max_level=4294967295,
+                hidden=true,enabled=false,visible_when_disabled=false,research_unit_count=1,research_unit_energy=60,
+                research_unit_ingredients={{name=science[1],amount=1}},effects={{type="worker-robot-storage",modifier=-1}},
+                prerequisites={},ignore_tech_cost_multiplier=true}},get_history=function(kind,name)return {created="more-infinite-research"}end}
+            local function force(name, player)
+              local rows={[id.main]=worker(id.main,5,9999,false,true),[id.tail]=worker(id.tail,5,7777,true,false),
+                [id.gate]=worker(id.gate,5,1,false,false),[id.private]=worker(id.private,4,675,false,false),
+                [id.current]=worker(id.current,1,100000,true,false),[id.queued]=worker(id.queued,1,100000,true,false),
+                [id.detached]=worker(id.detached,1,100000,true,false)}
+              local current=player and rows[id.tail] or rows[id.current]
+              return {name=name,valid=true,technologies=rows,worker_robots_storage_bonus=player and 4 or 3,current_research=current,
+                research_progress=0,research_queue=player and {rows[id.tail],rows[id.queued]} or {current},
+                mining_drill_productivity_bonus=0,manual_mining_speed_modifier=0,laboratory_speed_modifier=0,
+                laboratory_productivity_bonus=0,worker_robots_speed_modifier=0}
+            end
+            local expected=675*multiplier;inserted=inserted or math.ceil(expected/200)*200
+            local input={counts={}};for _,name in ipairs(science)do input.counts[name]=inserted-spent end
+            input.get_item_count=function(name)return input.counts[name]end
+            local modules={is_empty=function()return true end}
+            local lab={valid=true,disabled_by_script=false,unit_number=17,prototype={get_researching_speed=function()return 3600 end},
+              get_inventory=function(kind)return kind==defines.inventory.lab_input and input or modules end}
+            saves={};game={tick=300,speed=1,difficulty_settings={technology_price_multiplier=multiplier},
+              forces={player=force("player",true),["mir-worker-default-queued"]=force("mir-worker-default-queued"),
+                ["mir-worker-default-detached"]=force("mir-worker-default-detached"),["mir-worker-default-unpaid"]=force("mir-worker-default-unpaid")},
+              is_multiplayer=function()return true end,server_save=function(name)saves[#saves+1]=name end}
+            storage={};local state={mode="first-map-price",map_price=multiplier,phase=phase or "head-research",lab=lab,
+              ordinary={},administrative={},inserted={}}
+            for _,name in ipairs(science)do state.inserted[name]=inserted end
+            for i=1,ordinary do state.ordinary[i]={name=id.tail,tick=i,by_script=false}end
+            storage.worker_storage_default_native_fixture=state;state.baseline=deep(actor.frames())
+            return state,id,science
+          end
+
+        ''')
+
+    def test_map_price_first_completion_saves_then_cold_loads_exact_closed_frame(self):
+        self._install_map_price_world()
+        self.lua.execute(r'''
+          for _,multiplier in ipairs({2,4})do
+            local state,id=map_price_world(multiplier,675*multiplier,0)
+            actor.on_finished{research={name=id.tail,force=game.forces.player},by_script=false,tick=game.tick}
+            assert(state.phase=="head-finished" and state.lab.disabled_by_script and #state.ordinary==1)
+            actor.on_tick()
+            local phase="first-map-price-"..multiplier.."x-level4-saved"
+            assert(state.phase==phase and saves[1]=="worker-default-"..phase)
+            assert(last_body.stage==state.phase and last_body.map_price==multiplier and #last_body.ordinary==1)
+            assert(last_body.frames[1].bonus==4 and last_body.frames[1].current==id.tail)
+            assert(last_body.frames[1].rows[id.main].level==5 and last_body.frames[1].rows[id.gate].count==1)
+            assert(last_body.contracts[id.gate].ignore_price==true and type(last_body.frames[1].rows[id.tail].count)=="number")
+            local closed=deep(state.closed);handlers.load();actor.on_tick()
+            assert(last_body.stage=="cold" and #saves==1 and state.phase==phase)
+            actor.same(closed,state.closed)
+          end
+        ''')
+
+    def test_map_price_witness_refuses_changed_frames_science_and_ordinary_counts(self):
+        self._install_map_price_world()
+        self.lua.execute(r'''
+          local id=actor.ids
+          local function make(spent, ordinary, inserted)
+            local state=map_price_world(2,spent,ordinary,inserted,"head-finished")
+            state.lab.disabled_by_script=true
+            return state
+          end
+          for _,case in ipairs({{1349,1,nil},{1351,1,nil},{1350,1,1350},{1350,1,1600},{1350,0,nil},{1350,2,nil}})do
+            local state=make(case[1],case[2],case[3]);local ok=pcall(actor.on_tick)
+            assert(not ok and #saves==0 and state.phase=="head-finished")
+          end
+          local state=make(1350,1);game.forces.player.technologies[id.private].saved_progress=.5
+          local ok=pcall(actor.on_tick);assert(not ok and #saves==0 and state.phase=="head-finished")
+          state=make(1350,1);game.forces.player.technologies[id.gate].research_unit_count=2
+          ok=pcall(actor.on_tick);assert(not ok and #saves==0 and state.phase=="head-finished")
+        ''')
+
+    def test_existing_one_x_first_and_old_routes_remain_separate_from_map_price_witness(self):
+        text = (FIXTURE / "control.lua").read_text()
+        self.assertIn('save("first-saved", frames)', text)
+        self.assertIn('675 + 1012', text)
+        self.assertIn('s.phase == "old-source-saved"', text)
+        self.assertIn('closure(false, "upgrade")', text)
+
     def test_data_is_four_detached_owned_prototypes_without_foreign_changes(self):
         self.lua.globals().data_source = (FIXTURE / "data.lua").read_text()
         self.lua.execute(r'''
@@ -163,10 +296,17 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
     def test_exact_first_tick_auto_mode_selection_does_not_reinitialize_saved_or_cold_state(self):
         self.lua.execute(r'''
           local calls={};actor.begin=function(mode)calls[#calls+1]=mode end
+          game={difficulty_settings={technology_price_multiplier=1}}
           for _,version in ipairs({"5.0.21011","5.0.20011","5.0.21012","5.0.20012"})do
             storage={};script.active_mods["more-infinite-research"]=version;actor.on_tick()
             assert(calls[#calls]==(version:sub(-2)=="11"and"old-source"or"first"))
           end
+          for _,multiplier in ipairs({2,4})do
+            storage={};game.difficulty_settings.technology_price_multiplier=multiplier
+            script.active_mods["more-infinite-research"]="5.0.21012";actor.on_tick()
+            assert(calls[#calls]=="first-map-price")
+          end
+          game.difficulty_settings.technology_price_multiplier=1
           script.active_mods["more-infinite-research"]="5.0.21013";storage={}
           assert(not pcall(actor.on_tick))
           local count=#calls;local state={phase="first-saved"};storage={worker_storage_default_native_fixture=state}
