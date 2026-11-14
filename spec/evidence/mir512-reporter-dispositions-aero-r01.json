@@ -1,0 +1,313 @@
+{
+  "kind": "MIR512ReporterDispositionsIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-11T23:47:54.155360+00:00",
+  "base_commit": "86bf070b73b8e6270ae3c7619b55aaf870fb74fa",
+  "player_source": "b20eb4380d931b1fc2eef24052a66c35632d482d",
+  "scope": "Reporter-history reconciliation using protected originals and existing independently accepted exact-input results. Published12 delivery is separate from current development and stable acceptance. No new native execution, reporter-save acceptance, source correction or publication authority.",
+  "incident_recommendation": {
+    "verdict": "Published5.0.12 beta is delivered; its bounded incident issue1845 is closed. Stable remains unqualified.",
+    "reason": "The accepted current multiplier result and available-Rigor qualification resolved the earlier beta holds, followed by checked17-ZIP publication and download/local delivery verification. Prior pending-result statements remain history in7aa2517.",
+    "reuse": "Reuse the named Secretas, worker/provider, controlled97-component vector, known-Base, steel, actual Bob/cap, available33-component Rigor and both-engine multiplier results only under their recorded input identities and limits. Do not rerun unchanged completed cases.",
+    "next_action": "Black Glass owns affected current-candidate qualification and eventual stable integration/publication. Aero supplies bounded coverage/review. Missing reporter predecessors remain unverified; the separately reproduced principal4.7.21003 host-admission refusal requires its own exact-save disposition.",
+    "stable": "Current Library input/exports/client lifecycle, affected historical/compatibility paths and whole-product performance remain required. Beta publication closes none of those gates."
+  },
+  "reporters": [
+    {
+      "reporter": "shxuai",
+      "issue": 1807,
+      "predecessor": "Reported MIR 5.0.21009 with WorkerRobotCargoSizeResearch; duplicate worker-robots-storage-4 during prototype preflight.",
+      "disposition": "Delivered 5.0.10 and explicit player confirmation. Issue 1807 is closed.",
+      "limit": "Does not establish preservation for adding or removing another provider on an invested existing save."
+    },
+    {
+      "reporter": "jouven",
+      "issue": 1807,
+      "predecessor": "Space Is Fake space-science requirements regressed before 5.0.10.",
+      "disposition": "Delivered 5.0.10 and explicit player confirmation. Issue 1807 is closed.",
+      "limit": "Final SIF/worker combined-output qualification is separately recorded; startup success alone is not its evidence."
+    },
+    {
+      "reporter": "jivaii",
+      "issue": 1845,
+      "known_transition": "Names Secretas and Frozeta. First 5.0.21010 trace reaches the explicit Secretas presence-change refusal; a separate Ferrum trace reports unknown worker-robots-storage-6 ownership.",
+      "latest_report": "5.0.21011 worker history refusal at line 425 with technology=default. That fallback string does not establish a prior MIR-owned default route.",
+      "applicable_correction": "Merged native default-owner/provider handover and unchanged-Secretas persistence are relevant mechanisms; legacy prepared-default transitions retain separate evidence. Their success is not a reconstruction of the actual Ferrum history.",
+      "accepted_evidence": "worker512-history-continuity-independent-result-review-r01.json",
+      "remaining": "The supplied issue1871 log establishes engine/current MIR/Ferrum and the matching refusal, but supplies no protected predecessor save or earlier paid/current/queued/detached state. The accepted WorkerRobotCargoSizeResearch developer transition does not establish this Ferrum history. A route-specific disposition remains required; no report closure is asserted.",
+      "smallest_action": "Retain issue1871 open for its actual missing predecessor history. Reuse existing exact Ferrum/developer-route observations within their scope; do not rerun an unchanged legacy case or infer prior default ownership from the error fallback. Any recovered authentic predecessor must preserve earned bonus and current/queued/detached work through the affected transition and reloads.",
+      "issues": [
+        1845,
+        1871
+      ],
+      "retained_1871_log": {
+        "bytes": 210247,
+        "sha256": "3D2637327F6EC8E5FE58DDD6264F8BD708DC2EC191C414DB814FD8F0E373B5B6",
+        "source": "https://github.com/user-attachments/files/34640024/factorio-current.log",
+        "engine": "2.1.24 build87808",
+        "mir": "5.0.21011",
+        "ferrum": "0.1.5",
+        "failure": "on_configuration_changed worker_robot_storage.lua425 unknown previous continuation ownership; technology=default is the published11 fallback",
+        "observed": "Ferrum migrations0.0.2/0.0.3/0.0.5 run before the MIR refusal. The issue title reports adding Ferrum to an existing MIR save. No old MIR version, saved worker levels/work or authoritative pre-change route is supplied."
+      }
+    },
+    {
+      "reporter": "Driku",
+      "issue": 1845,
+      "chronology": "Earlier 5.0.21005/21008 on_init gun-credit reports and research multiplier 2 precede supplied file links. Reporter then explicitly says 5.0.21009 loads successfully. New 5.0.21011 on_configuration_changed worker refusal is a separate later report.",
+      "retained_save": {
+        "bytes": 27201055,
+        "sha256": "BCD549813C04D3C8F3DB90D0A205703FE24DE6588518759DAE87508B316DAAE9",
+        "download_mac_verified": true,
+        "header_engine_u16": [
+          2,
+          1,
+          21,
+          11
+        ],
+        "header_mod_records": 463,
+        "header_selected_versions": {
+          "more-infinite-research": "4.3.21000",
+          "secretas": "1.0.38",
+          "Cerys-Moon-of-Fulgora": "4.24.18",
+          "frozeta-nuclear-winter": "1.12.1"
+        },
+        "header_limit": "Read-only bounded contiguous records at offsets 44 through 11454, all 463 names unique. No Ferrum or WorkerRobotCargoSizeResearch record. No native force state, startup settings or upgrade acceptance decoded."
+      },
+      "retained_log": {
+        "bytes": 13626300,
+        "sha256": "168FFEC2721B647F5FCF6461D52892446F60B0CF9F3D5D84C9254652A99E5C9A",
+        "download_mac_verified": true,
+        "started": "2026-11-07 11:56:18; Factorio 2.1.24 build 87808",
+        "selected_loading_versions": {
+          "secretas": "1.0.38",
+          "Cerys-Moon-of-Fulgora": "4.25.0",
+          "frozeta-nuclear-winter": "1.12.7"
+        },
+        "limit": "Only MIR mention is duplicate installed archive/highest 5.0.21008. No MIR loading entry, MIR stack trace, map load or script.dat load. This startup log is not a later worker-failure reproduction."
+      },
+      "applicable_correction": "Accepted unchanged-Secretas persistence applies only when the later predecessor meets that contract. The current public12 private head has independently accepted2x/4x default-owner work/save/two-cold results on2.0.77 and2.1.23; these address that mechanism, not the unprovided later Secretas worker history. The authentic earlier4.3-plus-Secretas input remains a distinct historical route.",
+      "remaining": "The older save is authentic 4.3-plus-Secretas input, not a known 9/11 predecessor for the latest failure. The actual later saved predecessor and provider/settings changes remain unknown.",
+      "smallest_action": "Retain and use the newly reachable older originals for their actual historical scope. Do not relabel their eventual pass as resolution of the later worker failure. No fresh reporter request is required to begin a faithful developer reproduction."
+    },
+    {
+      "reporter": "Ryutavi",
+      "issue": 1845,
+      "known_shape": "5.0.21011 on_init; research_low_density_structure main is unresearched level 1, hidden and empty; scrap-recycling signed holders each have 97 effects, level 1 and unresearched. Trace names the selected recipe and changes +0.1/-0.1, not the remaining 96 complete entries.",
+      "applicable_correction": "Candidate validates complete signed recipe-effect vectors and their public-reference/main relationship, replacing the old exactly-one-effect assumption. Historical paid credit uses its saved earning basis; current vector validity alone does not establish earlier entitlement.",
+      "accepted_evidence": [
+        "native-credit-vector512-independent-source-review-r01.json",
+        "native-credit-vector512-f210-independent-result-review-r01.json",
+        "native-credit-vector512-f200-independent-result-review-r01.json",
+        "mir512-rigor-scoped-independent-review-r01.json",
+        "mir512-beta-independent-final-verdict-r01.json"
+      ],
+      "disposition": "The controlled97-component mechanism remains accepted on2.0.77/2.1.23 with signed contributions, ordinary completions, work and cold loads. Separately, real Rigor Module1.1.24 in the available12-mod SpaceAge/PlanetsLib closure on2.1.24 reproduces published11 refusal with33/33 signed effects; current public12 passes create, server/save and one immutable cold process, with five complete families and complete native zero-bonus maps. These are different exact scenarios.",
+      "remaining": "The complete supplied239-mod save is not reproduced: three of233 exact third-party versions remain unavailable. The available33-effect Rigor case does not prove the reported complete97-effect modpack or invested historical state. No new ordinary lab completion or two-cold chain is asserted for that available cohort.",
+      "supplied_originals": {
+        "save": {
+          "bytes": 11184926,
+          "sha256": "B94A26B175C3B424EC400C9EAD11D0214C2709C873F61CD8E1FBAD79B7ADD7ED",
+          "zip_members": 75,
+          "all_member_crcs": "PASS",
+          "engine_u16": [
+            2,
+            1,
+            24,
+            1
+          ],
+          "saved_mod_records": 242,
+          "record_start": 45,
+          "record_end": 5952,
+          "mir_in_saved_mod_header": false,
+          "limit": "Bounded contiguous short-name/three-byte-version mod metadata only; no native force/research/startup-state decode"
+        },
+        "log": {
+          "bytes": 523581,
+          "sha256": "18307B8A4935B0E8A91C61C0D93BB86694F5D82B0CED94DDE4DEB2000D861261",
+          "engine": "2.1.24 build87808",
+          "mir": "5.0.21011",
+          "failure_lines": [
+            5924,
+            5925
+          ],
+          "exact_reported_97_effect_on_init_shape": true
+        },
+        "mod_list": {
+          "bytes": 23406,
+          "sha256": "F542BF70C1661DDECB8216C9D9F24BC442A4F08F29EA8E0FFFD3BF4E1AD34B91",
+          "listed": 313,
+          "enabled": 239,
+          "complete_log_registry_matches_enabled_names": true
+        },
+        "saved_to_current": {
+          "added": {
+            "more-infinite-research": "5.0.21011"
+          },
+          "removed": {
+            "bobwarfare": "3.0.2",
+            "vanilla_galore_continued": "1.4.11",
+            "galore_lib": "2.6.0",
+            "space_age_galore": "1.6.14"
+          },
+          "retained_mod_version_changes": {},
+          "cerys": "Disabled in supplied list and absent from saved header/current registry",
+          "route": "MIR-absent saved selection to MIR on_init; addition or re-addition, not a proved old-MIR upgrade",
+          "limit": "A header without MIR does not establish that MIR was never installed earlier."
+        },
+        "selected_existing_versions": {
+          "productivity-through-science": "1.1.9",
+          "progressive-productivity": "1.1.6",
+          "recycler-recipes-fix": "0.2.0",
+          "recycler-progression": "1.1.1",
+          "remove-productivity-cap": "1.2.0"
+        }
+      },
+      "smallest_action": "Reuse the accepted available-Rigor and controlled97-component observations without relabelling either as the complete reporter save. Preserve the original save/log/list and exact missing-version limit. Investigate recovered exact inputs or a demonstrated new affected failure; do not restart completed component tests merely to accumulate another pass.",
+      "actual_expansion_component": {
+        "mod": "rigor-module",
+        "version": "1.1.24",
+        "private_commit": "82555129e746ba83d37e48fcf56743f0c316be85",
+        "directory": "projects/mir/reporter-inputs/20261111-aero-r01/rigor-source-component",
+        "source_scope": "Public upstream GitLab blobs whose info declares1.1.24; not a hash-matched Portal archive or full reporter closure. Full license retained.",
+        "mechanism": "Technology expansion loop appends linked recipe-productivity effects to all matching technologies, including hidden signed MIR carriers and the public reference. Canonical default scale25 through2400 yields original plus96 recipe variants, but actual reporter maps were not decoded.",
+        "host_observation": "Actual source loop accepts the single-family zero-invested hidden-main/97-signed-carrier shape under current credit validation without changing modeled totals. Published11 rejects before writes. This is a component host model, not normal Factorio bootstrap, native credits/research or save/cold qualification.",
+        "accepted_native_scope": {
+          "engine": "2.1.24",
+          "closure": "Available12-mod official SpaceAge/PlanetsLib/Rigor1.1.24",
+          "signed_component_count": 33,
+          "published11": "Original on_init refusal retained",
+          "public12": "Create, server/save and one immutable cold; complete five-family signed maps and zero force-bonus maps",
+          "source": "mir512-rigor-scoped-independent-review-r01.json",
+          "limit": "No full239-mod save, new ordinary completion, arbitrary expansion support or stable verdict."
+        }
+      },
+      "unavailable_exact_third_party_versions": {
+        "factorio-resource-formatter-mod": "0.0.2",
+        "steam-condenser": "0.1.0",
+        "universal-transmuter": "0.1.0"
+      },
+      "cache_scope": "230/233 is the integration-owner report in issue1845, not an Aero directory scan or proof that the remaining full modpack has been executed."
+    },
+    {
+      "reporter": "wakaba20202020",
+      "issue": 1806,
+      "known_transition": "5.0.21009 on_configuration_changed on Factorio 2.1.24, unknown first paid mask. Actual previous MIR, mods, settings and earning history are not supplied.",
+      "applicable_correction": "Known-Base 5.0.1 history now has an independently reviewed and natively tested bounded transition.",
+      "accepted_evidence": [
+        "known-base501-normalization-independent-result-review-r01.json",
+        "known-base512-successor-independent-result-review-r01.json"
+      ],
+      "remaining": "Synthetic provider addition from an authentic 5.0.20001 Base save on 2.0.77 is not the unknown reporter 2.1.24 path. Issue 1806 remains open.",
+      "smallest_action": "Recover a surviving earning basis or establish the actual predecessor contract with a faithful reproduction. Never assign the current expanded mask as historical paid ownership merely to permit loading."
+    }
+  ],
+  "other_named_issues": [
+    {
+      "issue": 621,
+      "state": "closed",
+      "basis": "Existing closure records rehashed published 4.2.2 delivery and retained upgrade/cold-load evidence. This review neither recreates erased research nor broadens that historical verdict."
+    },
+    {
+      "issue": 1768,
+      "state": "open",
+      "basis": "Layout/source/visual corrections exist; actual Library input, export and client lifecycle acceptance remains unqualified. A screenshot or source review alone cannot close those obligations."
+    },
+    {
+      "issue": 446,
+      "state": "open",
+      "basis": "Historical maintenance umbrella retains its underlying requirements. Its old release date does not erase unqualified progression, performance, UI or ecosystem obligations."
+    },
+    {
+      "issue": 1845,
+      "state": "closed",
+      "basis": "Bounded5.0.12 beta incident delivery, not full reporter-history or stable acceptance. Current states1871/1806/1768/446 remain open."
+    }
+  ],
+  "custody": {
+    "private_repository": "Julesc013/scratchpad",
+    "commit": "fd97ab744f19601c1e934f3f0a7d2a0f129ca9d2",
+    "directory": "projects/mir/reporter-inputs/driku-earlier512-r01",
+    "manifest_sha256": "31F13DECB6AE2490A4DC42F26B15D9953186C37407DE9FA7AF84B999EEB0F83A",
+    "attachment_sha256": "8D16829DDE3750B97807E7B371D245AB611D563D40E291B436CCC5BBD09DC333",
+    "privacy": "Original save and losslessly compressed log remain private. Public evidence contains hashes and selected technical facts; no link keys or signed download URLs.",
+    "remote_readback": "Exact remote branch/ref matched fd97ab7; all ten manifest-file bytes and hashes passed Git object readback, original log decompression hash matched, all 132 original save ZIP member CRCs passed. Supporting JSON normalization failures and both earlier commits remain retained. Originals were unchanged."
+  },
+  "issue1845_refresh": "The original opening refresh and then-open state remain preserved in7aa2517 and private before/after custody. The issue is now closed as MIR5.0.12 delivered. This record does not reopen it or claim that1871/1806 or stable acceptance are closed.",
+  "engine_loss_boundary": "Existing worker512-context-and-history-authority-independent-review-r01.json records pre-Lua native clamping and a separate static JSON preservation control. The latter is not a reviewed production policy for first MIR installation, repeated provider changes or arbitrary reporter histories. Reuse those observations; do not rerun or call them a generic impossibility proof.",
+  "execution_limits": "This update changes one existing evidence JSON relative to dev86bf and preserves original author commits through an ordinary dev merge. No Source edit, package build, controller/native selection change, game run, independent requalification, branch integration or publication. Existing native results retain their exact inputs, original adverse records and reviewer scope.",
+  "supplied_reporter_custody": {
+    "private_repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir512-reporter-originals-aero-r02",
+    "commit": "7553ec103922a6570b462927ba4070f7d6f0e28e",
+    "directory": "projects/mir/reporter-inputs/20261111-aero-r01",
+    "manifest_sha256": "D13883F1918CFC2D0A466CB17E8809A18D7DE3F4FEF0CC6812D8EC888424CAB5",
+    "remote_readback": "All9 stored blobs match fresh remote Git object bytes. Seven manifest-listed originals/metadata files total11976685bytes. Save all75 member CRCs pass. Original Downloads files unchanged. Full logs/save/mod lists stay private; no MEGA keys stored."
+  },
+  "current_candidate_boundary": {
+    "development": {
+      "dev_head": "86bf070b73b8e6270ae3c7619b55aaf870fb74fa",
+      "source_tree": "b20eb4380d931b1fc2eef24052a66c35632d482d",
+      "state": "Contains the reviewed Library multilingual search correction; this is not published12 Source and has no blanket current native/stable verdict. Changed package contents require next unpublished patch13."
+    },
+    "published_beta": {
+      "tag": "v5.0.12",
+      "source_commit": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+      "source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+      "release_id": 441736666,
+      "published_utc": "2026-11-11T13:33:07Z",
+      "prerelease": true,
+      "zip_count": 17,
+      "integrity_files": 2,
+      "delivery": "candidate512-github-prerelease-delivery-r01.json",
+      "independent_delivery": "candidate512-independent-verified-delivery-r01.json",
+      "note_correction": "candidate512-reviewed-note-correction-r01.json",
+      "published_player_bytes_changed": false
+    },
+    "accepted_multiplier_scope": {
+      "f210": "mir512-beta-independent-final-verdict-r01.json",
+      "f200": "worker512-f200-multiplier-independent-result-r02.json",
+      "scope": "Current public12 Base default-owner2x/4x earning/work/save/two-cold mechanism only, not unknown reporter history."
+    },
+    "prior_sourcec": "Earlier earned08/provider SourceC1x keeps its original exact identity and is not relabelled as current public12 execution.",
+    "stable_qualified": false
+  },
+  "previous_review": {
+    "commit": "b47678a1d486aec5f17d7f98791a01c582f6aaaa",
+    "reviewed_at_utc": "2026-11-10T21:50:18.853377+00:00",
+    "base_commit": "c346399fdec4f20dc750002c650ff9751cccf30d",
+    "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "candidate_head_then": "016ccd9b7afddc5d5e09d634ff598416ace5619a",
+    "status": "Historical intake/source snapshot, superseded only as current status; original commit and inputs retained."
+  },
+  "review_history": [
+    {
+      "commit": "4f9e50f85f24f97f6d77be73241c5608ded81c9b",
+      "reviewed_at_utc": "2026-11-11T10:09:23.796063+00:00",
+      "base_commit": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
+      "player_source": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
+      "private_head_was_integrated": false
+    },
+    {
+      "commit": "7aa251738042fc33515a2d6858d5d751fa77cab3",
+      "reviewed_at_utc": "2026-11-11T11:58:35.584016+00:00",
+      "base_commit": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+      "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+      "scope": "Exact pre-publication intake and pending-result snapshot remains preserved in this original commit; it is not the current release status."
+    }
+  ],
+  "development_findings": {
+    "principal473_admission": {
+      "observed_dev": "86bf070b73b8e6270ae3c7619b55aaf870fb74fa",
+      "scope": "Existing Lua5.2 production-module fixture with all four workers pristine and zero native-double writes; not an authentic old-save run.",
+      "result": "Current guard rejects same-family4.7.21003 before worker-state admission;4.7.20003 and5.0.20011/21011 controls accept. Actual4.7.21003 archive has control.lua and neither new worker-history key.",
+      "required_disposition": "Black Glass checks/corrects the authentic principal predecessor route. This is separate from1871 and1806 missing personal histories and from the accepted4.7.20003 forward route.",
+      "original_source_locators": [
+        "full-catalogue-473-8f-native-chain.json",
+        "full-catalogue-473-current7a2-native-chain-r01.json"
+      ],
+      "public_tracking": "https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-6809839749",
+      "private_diagnostic_commit": "a1da35dea4638cb45f011f062f6e8d3ef3d3a5d8",
+      "source_correction_or_native_pass": false
+    }
+  }
+}
