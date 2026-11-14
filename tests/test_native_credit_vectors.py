@@ -203,6 +203,33 @@ class NativeCreditVectorTests(unittest.TestCase):
         # This fails on the previous error: four different causes printed one identical body.
         self.assertEqual(len(set(messages)), len(cases))
 
+    def test_missing_carrier_anchor_is_distinct_from_invalid_reference_anchor(self):
+        cases = (
+            ("p[1].recipe='other-anchor';n[1].recipe='other-anchor'", 'vector-anchor', 'positive'),
+            ("r.effects[1].recipe='other-anchor'", 'reference-anchor', 'reference'),
+            ("r.effects[1].change=0", 'reference-anchor', 'reference'),
+            ("r.effects[1].change=-.1", 'reference-anchor', 'reference'),
+        )
+        for target in ('f200', 'f210'):
+            for opponent, reason, role in cases:
+                with self.subTest(target=target, reason=reason, opponent=opponent):
+                    self.setUp()
+                    self.lua.globals().case_target = target
+                    self.lua.globals().opponent = opponent
+                    message = self.lua.execute(r'''
+                      local f,d,r=vector_world(2,false,case_target,.1,1,
+                        'research_processing_unit','processing-unit','processing-unit-productivity')
+                      local p=f.technologies[d.positive_id].prototype.effects
+                      local n=f.technologies[d.negative_id].prototype.effects
+                      assert(load('return function(r,p,n) '..opponent..' end'))()(r,p,n)
+                      local ok,message=pcall(native_credits.on_init)
+                      assert(not ok,'missing or invalid anchor admitted');assert_no_vector_writes()
+                      return tostring(message)
+                    ''')
+                    self.assertIn('rejection.reason="' + reason + '"', message)
+                    self.assertIn('rejection.role="' + role + '"', message)
+                    self.assertIn('rejection.recipe="processing-unit"', message)
+
     def test_processing_recheck_failure_preserves_existing_ledger_and_foreign_progress(self):
         self.lua.execute(r'''
           local f,d=vector_world(2,false,'f210',.1,1,

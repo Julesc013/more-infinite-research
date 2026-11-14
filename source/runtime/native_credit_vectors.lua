@@ -47,9 +47,10 @@ function M.pair(positive, negative, anchor, reference, change, native_matches, o
   if size<2 then return reject("vector-not-expanded","positive") end
   if size~=negative_size then return reject("vector-count","negative") end
   if size~=reference_size then return reject("reference-vector-count","reference") end
-  if not finite(r[anchor]) or r[anchor]<=0 or p[anchor]==nil then
+  if not finite(r[anchor]) or r[anchor]<=0 then
     return reject("reference-anchor","reference",anchor)
   end
+  if p[anchor]==nil then return reject("vector-anchor","positive",anchor) end
   local basis={}
   for recipe, coefficient in pairs(r) do
     if coefficient<=0 then return reject("reference-coefficient","reference",recipe) end
