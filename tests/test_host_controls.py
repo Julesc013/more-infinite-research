@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import unittest
 
 
@@ -16,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WRAPPER = ROOT / "tests/Test-MIR5HostControls.ps1"
 WORKFLOW = ROOT / ".github/workflows/validate.yml"
 VALIDATE_WORKFLOW = ROOT / ".github/workflows/validate.yml"
+BRANCH_POLICY = ROOT / "tests/release/Test-MIRBranchPolicy.ps1"
 
 
 def run_powershell(arguments: list[str]) -> subprocess.CompletedProcess[str]:
@@ -26,6 +28,168 @@ def run_powershell(arguments: list[str]) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         check=True,
     )
+
+
+class ReportResolutionPolicyTests(unittest.TestCase):
+    """Execute the claim guard; these synthetic records are not native proof."""
+
+    COMPLETE = """Report scope: complete
+Report: #1942
+Reproduction evidence: failing released input and exact captured result at evidence/original.json
+Regression evidence: old input fails and corrected input passes at evidence/regression.json
+Native/preservation evidence: Not applicable: this fixture exercises a tooling policy only
+Delivery evidence: exact delivered remedy and readback at evidence/delivery.json
+"""
+
+    def policy(self, body, messages=("Preserve evidence",), *, change_event=None, change_packet=None):
+        head, base = "b" * 40, "a" * 40
+        event = {"repository": {"full_name": "Julesc013/more-infinite-research"},
+                 "pull_request": {"body": body, "base": {"sha": base}, "head": {"sha": head},
+                                  "commits": len(messages)}}
+        packet = {"base_sha": base, "head_sha": head, "commits": [
+            {"sha": head if index == len(messages) - 1 else "c" * 40, "message": message}
+            for index, message in enumerate(messages)]}
+        if change_event:
+            change_event(event)
+        if change_packet:
+            change_packet(packet)
+        with tempfile.TemporaryDirectory(prefix="mir-report-policy-") as directory:
+            event_path, commits_path = Path(directory) / "event.json", Path(directory) / "commits.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            commits_path.write_text(json.dumps(packet), encoding="utf-8")
+            return subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-File", str(BRANCH_POLICY), "-ReportPolicyOnly",
+                 "-EventPath", str(event_path), "-ReportCommitsPath", str(commits_path)],
+                cwd=ROOT, text=True, capture_output=True, check=False)
+
+    def test_unrelated_legacy_and_related_partial_work_remain_usable(self):
+        for body in (None, "Explain a documentation correction.", "Report scope:\nReport:\nDelivery evidence:",
+                     "Report scope: none\nReport:\nRegression evidence:",
+                     "Report scope: diagnostic\nRelated to #1942; the player's failure remains open."):
+            with self.subTest(body=body):
+                result = self.policy(body)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_partial_scopes_refuse_closing_in_body_and_new_commit(self):
+        for scope in ("diagnostic", "partial", "unverified", "functional-candidate", "none"):
+            for location in ("body", "commit"):
+                with self.subTest(scope=scope, location=location):
+                    body = "Report scope: " + scope + "\nRelated to #1942."
+                    messages = ("Preserve diagnostic evidence",)
+                    if location == "body":
+                        body += "\nFixes #1942"
+                    else:
+                        messages = ("Explain refusal\n\nResolves Julesc013/more-infinite-research#1942",)
+                    result = self.policy(body, messages)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("[mir-report-closure-scope]", result.stderr)
+
+    def test_closing_syntax_requires_complete_even_on_a_legacy_pr(self):
+        for directive in ("CLOSES: #1942", "Fixes:#1942", "fixed #1942", "resolve\n#1942",
+                          "Closed https://github.com/Julesc013/more-infinite-research/issues/1942"):
+            with self.subTest(directive=directive):
+                result = self.policy(directive)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("[mir-report-closure-scope]", result.stderr)
+        result = self.policy("Report scope: diagnostic", ("Fixes:#1942",))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("[mir-report-closure-scope]", result.stderr)
+
+    def test_complete_claim_needs_each_evidence_field_and_explicit_native_applicability(self):
+        for field in ("Report", "Reproduction evidence", "Regression evidence",
+                      "Native/preservation evidence", "Delivery evidence"):
+            with self.subTest(field=field):
+                body = re.sub(r"(?m)^" + re.escape(field) + r":.*$", field + ": pending", self.COMPLETE)
+                result = self.policy(body + "\nCloses #1942")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("[mir-report-complete-evidence]", result.stderr)
+        body = self.COMPLETE.replace("Not applicable: this fixture exercises a tooling policy only", "Not applicable")
+        result = self.policy(body)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("[mir-report-native-applicability]", result.stderr)
+        result = self.policy(self.COMPLETE + "\nFixes #1942", ("Resolve #1942",))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.policy(self.COMPLETE.replace("\n", "\r\n") + "\r\nCloses #1942")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.policy(self.COMPLETE + "\nCloses Julesc013/more-infinite-research#1942")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.policy(self.COMPLETE.replace("#1942", "HTTPS://GITHUB.COM/Julesc013/more-infinite-research/issues/1942")
+                             + "\nCloses #1942")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.policy(self.COMPLETE.replace("Report: #1942", "Report: #1845") + "\nCloses #1942")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("[mir-report-closure-target]", result.stderr)
+
+    def test_unknown_duplicate_scope_and_unbound_commit_inputs_refuse(self):
+        for body in ("Report scope: maybe", "Report scope: complete\nReport scope: partial"):
+            with self.subTest(body=body):
+                result = self.policy(body)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("[mir-report-scope]", result.stderr)
+        result = self.policy("", change_event=lambda event: event.clear())
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("[mir-report-event-invalid]", result.stderr)
+        changes = (
+            (lambda packet: packet.update(head_sha="d" * 40), "[mir-report-commits-binding]"),
+            (lambda packet: packet.update(commits=[]), "[mir-report-commits-count]"),
+            (lambda packet: packet["commits"][0].update(sha="d" * 40), "[mir-report-commits-binding]"),
+        )
+        for change, refusal in changes:
+            with self.subTest(refusal=refusal):
+                result = self.policy("Report scope: partial", change_packet=change)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(refusal, result.stderr)
+
+    def test_real_local_commit_messages_are_read_without_fetching(self):
+        with tempfile.TemporaryDirectory(prefix="mir-report-git-") as directory:
+            repo = Path(directory)
+            script = repo / "tests/release/Test-MIRBranchPolicy.ps1"
+            script.parent.mkdir(parents=True)
+            script.write_bytes(BRANCH_POLICY.read_bytes())
+            hooks = repo / "empty-hooks"
+            hooks.mkdir()
+
+            def git(*arguments):
+                return subprocess.run(
+                    ["git", "-C", str(repo), "-c", "user.name=MIR policy test", "-c",
+                     "user.email=policy-test@example.invalid", "-c", "commit.gpgsign=false",
+                     "-c", "core.hooksPath=" + str(hooks), *arguments],
+                    text=True, capture_output=True, check=True).stdout.strip()
+
+            git("init", "--quiet", "--template=")
+            git("commit", "--allow-empty", "--quiet", "-m", "Original input")
+            base = git("rev-parse", "HEAD")
+            git("commit", "--allow-empty", "--quiet", "-m", "Diagnostics only\n\nFixes #1942")
+            head = git("rev-parse", "HEAD")
+            event = {"repository": {"full_name": "Julesc013/more-infinite-research"},
+                     "pull_request": {"body": "Report scope: diagnostic\nRelated to #1942",
+                                      "base": {"sha": base}, "head": {"sha": head}, "commits": 1}}
+            event_path = repo / "event.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            command = ["pwsh", "-NoLogo", "-NoProfile", "-File", str(script),
+                       "-ReportPolicyOnly", "-EventPath", str(event_path)]
+            result = subprocess.run(command, text=True, capture_output=True, check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("[mir-report-closure-scope]", result.stderr)
+            event["pull_request"]["body"] = self.COMPLETE
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = subprocess.run(command, text=True, capture_output=True, check=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(git("remote"), "", "The control must not depend on a remote.")
+
+    def test_metadata_edits_recheck_the_existing_policy_without_full_host_reruns(self):
+        branch = (ROOT / ".github/workflows/branch-policy.yml").read_text(encoding="utf-8")
+        self.assertRegex(branch, r"pull_request:\s+types: \[opened, synchronize, reopened, edited\]")
+        self.assertIn("contents: read", branch)
+        permissions = re.search(r"(?ms)^permissions:\n(.*?)(?=^\S|\Z)", branch)
+        self.assertIsNotNone(permissions)
+        self.assertNotRegex(permissions.group(1), r"(?m)^\s+[a-z-]+:\s*write\s*$")
+        self.assertNotIn("pull_request_target", branch)
+        self.assertIn("Test-MIRBranchPolicy.ps1", branch)
+        host = WORKFLOW.read_text(encoding="utf-8")
+        pull_request = re.search(r"(?ms)^  pull_request:\n(.*?)(?=^  [a-z_]+:|\Z)", host)
+        self.assertIsNotNone(pull_request)
+        self.assertNotIn("edited", pull_request.group(1))
 
 
 class HostControlsTests(unittest.TestCase):

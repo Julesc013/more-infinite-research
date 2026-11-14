@@ -302,9 +302,18 @@ jobs:
             'tests/tooling/Test-MIRLibraryActivation.ps1',
             'tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1',
             'tests/tooling/Test-MIRDevelopmentHealth.ps1',
-            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1'
+            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1',
+            'tests/tooling/Test-MIRPlayerReport.ps1'
           )
           foreach ($control in $controls) {
             & pwsh -NoLogo -NoProfile -File $control
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+      - name: Check the player collector under Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1) {
+            throw 'The Windows convenience launcher requires a PowerShell 5.1 control.'
+          }
+          & .\tests\tooling\Test-MIRPlayerReport.ps1

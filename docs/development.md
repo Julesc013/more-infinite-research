@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -73,6 +73,24 @@ For the first port, recover actual identity/tuning/settings from the pinned base
 ## Community bugs and request continuity
 
 Maintain the [existing community request ledger](../spec/programmes/community-requests.json) through `CONT-15`; preserve original IDs, MIR 4 crash/failure evidence, unresolved bugs and technology-tuning requests. Carry them into affected MIR 5 work and regression selection rather than closing them because the architecture changes. `SCI-UNLOCK-01` records the recurring approved science binding startup failures, the reported unsuccessful mod-removal attempts and missing reproduction evidence. It remains open until exact affected-package qualification supports closure. This intake does not claim a fix.
+
+Use the original report's GitHub issue as its completion authority and follow [report resolution](../spec/verification.md#report-resolution). Keep each unresolved player case linked and open when a release umbrella closes. Retain existing request IDs and source links; do not create another ledger. A Mod Portal post can be linked from the maintained issue without asking its author to repost or manage GitHub.
+
+One acknowledged owner records the next concrete action and carries the case through the following evidence boundaries. Assigning a name or posting a comment does not establish active execution; use the existing coordination procedure below when a worker is unavailable.
+
+| State | Evidence the maintainer must hold |
+| --- | --- |
+| Reported | Original symptom or intended use, retained attachments and exact input identities where available. |
+| Reproduced | The failing package exhibits the reported behavior; a reduced mechanism and the original configuration have separate verdicts. |
+| Repaired | The old implementation fails the regression, the candidate passes, and adjacent families/references and lifecycle boundaries have been checked. |
+| Qualified | The actual candidate package passes the affected original-input and state-preservation scenarios. |
+| Delivered | The tested version and downloadable artifact are identified and delivery is verified. |
+
+Fill the [PR report-resolution section](../.github/PULL_REQUEST_TEMPLATE.md) with the original report, scope, reproduction, regression, native/preservation applicability, delivery and remaining limits. Use `Related to` for diagnostic, partial, unverified or functional-candidate work. Automatic closing keywords require `Report scope: complete` and populated evidence fields; the existing `branch-policy` check examines the body and introduced commit messages and reruns when the description changes. Passing this check does not qualify a save or validate the truth of a receipt. Independent review owns that assessment before manual or automatic closure.
+
+For a suggestion, retain the intended outcome, decide accepted/declined/deferred/superseded with a reason, and write a small observable acceptance scenario before implementation. Keep the requester's proposed mechanism separate from the intended benefit. Ask a focused clarification only when unresolved intent prevents a correct decision; do the available investigation first and combine necessary questions. The requester need not design the implementation, minimize a modpack or validate a release on our behalf.
+
+Preserve raw private inputs separately from public summaries. The [support collector](../scripts/Collect-MIRPlayerReport.ps1) can gather startup logs and existing MIR exports; its explicit settings/save options capture additional exact inputs. Its manifest records missing, truncated, unreadable and excluded material. A settings hash, redacted excerpt or stale runtime export cannot recreate absent original bytes. Read those limitations before calling a bundle reproducible, and search retained custody before requesting a new attachment.
 
 ## Work in small vertical slices
 

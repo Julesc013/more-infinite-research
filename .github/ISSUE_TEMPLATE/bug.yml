@@ -3,6 +3,12 @@ description: Tell us about a crash, loading failure, unexpected behavior, or pro
 title: "bug: "
 labels: ["bug", "triage"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem once; you do not need to diagnose it or remove mods one by one.
+        The optional [support collector](https://github.com/Julesc013/more-infinite-research/blob/dev/SUPPORT.md#collect-the-available-files-in-one-zip) gathers available logs and existing exports in one ZIP, even after a startup failure. It can also include exact settings and a save you select. Review attachments and use private sharing for personal inputs.
+        We retain supplied evidence with the case and own investigation and verification.
   - type: textarea
     id: problem
     attributes:
@@ -28,4 +34,4 @@ body:
     id: evidence
     attributes:
       label: Optional attachments
-      description: Error text, screenshots, factorio-current.log, a settings export or a small save can help. Check attachments for personal information before posting.
+      description: A support ZIP, error text, screenshots or an existing file/link can help. If you already supplied a file in this report or a linked discussion, point us to it; there is no need to upload it again. Check attachments for personal information before posting.
