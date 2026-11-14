@@ -403,6 +403,62 @@ class LibraryModelTests(unittest.TestCase):
             "Availability must not mutate effective settings or native facts")
         ''')
 
+    def test_availability_never_claims_named_present_research_was_omitted(self):
+        # Pure source regression: an authored terminal explanation is not
+        # authoritative when the exact technology exists in the force.
+        # This does not infer historical work from current/default research.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local target = {recipe_productivity = true}
+          local ag = "recipe-prod-research_agricultural_growth_speed-1"
+          local spoil = "recipe-prod-research_spoilage_preservation-1"
+          local lab = "recipe-prod-research_lab_productivity-1"
+          local function force_with(technologies)
+            return {technologies = setmetatable(technologies, {
+              __pairs = function() error("Availability enumerated native technologies") end
+            })}
+          end
+          local present = {valid = true}
+          local absent_dlc_force = force_with({[ag] = present})
+          local rows = availability.rows({}, target, absent_dlc_force, "")
+          assert(#rows == 1 and rows[1].family == "research_spoilage_preservation",
+            "a present agriculture technology must not be described as absent")
+          absent_dlc_force.technologies[spoil] = present
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 0,
+            "a present spoilage technology must not be described as absent")
+          absent_dlc_force.technologies[ag] = nil
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 1
+            and availability.rows({}, target, absent_dlc_force, "")[1].family
+              == "research_agricultural_growth_speed",
+            "the other actually absent identity retains its explanation")
+          assert(#availability.rows({}, target, nil, "") == 2,
+            "a null-force pure projection retains its historical baseline")
+          absent_dlc_force.technologies[ag] = {valid = false}
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 1,
+            "an invalid named technology is not an existing research identity")
+
+          local native_owner = {valid = true, prototype = {effects = {
+            {type = "laboratory-productivity", modifier = 0.1}
+          }}}
+          local native_force = force_with({["research-productivity"] = native_owner})
+          local mods = {["space-age"] = "2.1.23"}
+          assert(#availability.rows(mods, target, native_force, "lab") == 1,
+            "the exact native owner still explains an actually absent MIR lab")
+          native_force.technologies[lab] = present
+          assert(#availability.rows(mods, target, native_force, "lab") == 0,
+            "an existing MIR lab cannot simultaneously be not-added")
+          assert(native_force.technologies[lab] == present
+            and native_force.technologies["research-productivity"] == native_owner
+            and native_owner.prototype.effects[1].modifier == 0.1,
+            "projection must not change native facts")
+
+          local unreadable = force_with(setmetatable({}, {
+            __index = function() error("named technology read refused") end
+          }))
+          assert(#availability.rows({}, target, unreadable, "") == 0,
+            "a failed named lookup is not proof that a technology is absent")
+        ''')
+
     def test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation(self):
         self.lua.execute('''
           local availability = require("presentation.availability")
