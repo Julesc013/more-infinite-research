@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,6 +51,18 @@ The [required migration boundaries](migrations.md#required-origin-coverage) reta
 Keep these independent: feature parity; supported-profile correctness; migration/client safety; performance improvement; non-regression controls; package/delivery identity. A public release deadline or green host CI does not override a missing stable-acceptance verdict. A separately reviewed community prerelease identifies its exact bytes, completed/failed/unverified gates and support limits; its GitHub prerelease flag does not claim stable acceptance. The maintainer authorizes the first `v5.0.0` GitHub beta with unfinished Library input/export/personal-view checks and performance tests disclosed as unverified and deferred to stable. Package integrity, exact source/package/controller provenance, upgrade safety and normal checked publication remain mandatory; no missing or adverse result is reclassified as passed. Stable publication still requires every applicable verdict. No native test is counted as passed when unavailable, refused or not run.
 
 Do not execute another local native job if the maintainer's worker already owns the same scenario. Three total agent slots and one heavy native workload per admitted machine remain the working capacity rule; a multiplayer scenario may require its intended simultaneous participants. Preserve and restore mod-list/settings controls.
+
+## Report resolution
+
+`VER-08` — Each reported player failure retains its own open issue or linked canonical incident until its actual scope is resolved. A release-delivery umbrella, diagnostic patch or reduced reproduction MUST NOT absorb or close an unresolved original case. Preserve the original wording, attachments, known working/failing versions and exact-input custody once; check existing custody before asking for anything again. Maintainers own reduction, investigation, testing and delivery. Reporter confirmation is optional, and silence is not evidence of success.
+
+For a functional repair, demonstrate that the original failing implementation fails the regression and the repaired implementation passes independently specified behavior. Keep the reduced mechanism test and the original configuration's verdict separate. Before public repair claims, review every affected family/reference, engine capability and relevant fresh/earned/partial/queued state; deliberately exercise multiple related invalid inputs when first-failure termination could hide another defect. Record selected boundaries and omissions instead of claiming all arbitrary mod combinations are covered.
+
+Qualify the actual candidate package on the retained original input and the applicable initialization, configuration, ordinary completion, save/reload, client and performance paths. Preserve foreign state and all adverse observations. Missing inputs or unavailable execution leave that case unverified; they do not stop independent ready work or authorize a guessed repair. A complete resolution includes the exact delivered version/artifact and verified delivery, not only a merged source change.
+
+The PR's report-resolution fields distinguish diagnostic, partial, unverified, functional-candidate and complete work. The existing branch-policy check rejects automatic issue-closing directives in PR descriptions or introduced commit messages unless the declaration is complete and its required evidence fields are populated. This is a structural consistency check. Independent review must still verify that linked evidence proves the claimed case, that native applicability is justified and that delivery refers to the tested bytes. Manual issue closure remains subject to the same evidence requirement.
+
+Suggestions preserve the original intended use and receive an explicit accepted, declined, deferred or superseded decision with a reason. For accepted work, define observable acceptance criteria and applicable compatibility constraints before implementation, then verify and deliver them without requiring the requester to manage the work or act as its acceptance tester. A declined or duplicate request may close with that actual disposition and canonical link; it must not be described as implemented or repaired.
 
 ## Historical preservation before stable
 
