@@ -244,16 +244,33 @@ local function carrier_vector(positive, negative, descriptor)
   if not descriptor.collected then return nil end
   local p = carrier_effects(positive, descriptor, "positive")
   local n = carrier_effects(negative, descriptor, "negative")
-  if not p or not n or #p < 2 then return nil end
+  local history, history_observed
+  local function with_reference(rejection)
+    if rejection and history_observed then
+      rejection.reference_history_observed = true
+      rejection.reference_created = type(history)=="table" and history.created or nil
+    end
+    return rejection
+  end
+  local function reject(reason,role) return nil,nil,with_reference({reason=reason,role=role}) end
+  if not p then return reject("carrier-shape","positive") end
+  if not n then return reject("carrier-shape","negative") end
+  if #p < 2 then return reject("vector-not-expanded","positive") end
   local name = RECIPE_VECTOR_REFERENCES[descriptor.recipe] or VECTOR_REFERENCES[descriptor.family]
   local reference = prototypes and prototypes.technology and prototypes.technology[name]
-  local history = reference and prototypes.get_history("technology", name)
-  if not reference or reference.valid == false or reference.name ~= name or reference.hidden == true
-      or reference.level ~= 1 or reference.max_level ~= UINT32_MAX
-      or type(history) ~= "table" or type(history.created) ~= "string" or history.created == ""
-      or history.created == MIR_MOD then return nil end
-  return vectors.pair(p, n, descriptor.recipe, reference.effects, descriptor.change,
+  history = reference and prototypes.get_history("technology", name)
+  history_observed = reference ~= nil
+  if not reference then return reject("reference-missing","reference") end
+  if reference.valid == false then return reject("reference-invalid","reference") end
+  if reference.name ~= name then return reject("reference-identity","reference") end
+  if reference.hidden == true then return reject("reference-hidden","reference") end
+  if reference.level ~= 1 then return reject("reference-start-level","reference") end
+  if reference.max_level ~= UINT32_MAX then return reject("reference-max-level","reference") end
+  if type(history) ~= "table" or type(history.created) ~= "string" or history.created == ""
+      or history.created == MIR_MOD then return reject("reference-creation-history","reference") end
+  local vector, basis, rejection = vectors.pair(p, n, descriptor.recipe, reference.effects, descriptor.change,
     native_effect_change_matches, close)
+  return vector, basis, with_reference(rejection)
 end
 
 local function completed_infinite(technology)
@@ -272,38 +289,40 @@ local function inspect_with_mask(force, descriptor, scope)
   local negative = technologies[descriptor.negative_id]
   local positive_scalar = carrier_scalar(positive, descriptor, "positive")
   local negative_scalar = carrier_scalar(negative, descriptor, "negative")
-  local vector, basis
+  local vector, basis, rejection
   if positive_scalar == nil or negative_scalar == nil then
-    vector, basis = carrier_vector(positive, negative, descriptor)
+    vector, basis, rejection = carrier_vector(positive, negative, descriptor)
     if vector then positive_scalar, negative_scalar = vector[descriptor.recipe], -vector[descriptor.recipe] end
   end
   if type(positive_scalar) ~= "number" or positive_scalar < 0 or negative_scalar == nil then
-    return nil
+    return nil,rejection or {reason="carrier-scalar"}
   end
-  if descriptor.collected and not native_effect_change_matches(positive_scalar, descriptor.change) then return nil end
+  if descriptor.collected and not native_effect_change_matches(positive_scalar, descriptor.change) then
+    return nil,{reason="carrier-native-scalar"}
+  end
   if positive_scalar == 0 then
     -- Only a valid collected descriptor normalized to zero can reach here.
     -- Its paired effect must also be exactly zero; counts still prove history.
-    if not descriptor.collected or negative_scalar ~= 0 then return nil end
-  elseif not close(negative_scalar, -positive_scalar) then return nil end
+    if not descriptor.collected or negative_scalar ~= 0 then return nil,{reason="carrier-zero-pair"} end
+  elseif not close(negative_scalar, -positive_scalar) then return nil,{reason="carrier-scalar-pair"} end
   local positive_completed = completed_infinite(positive)
   local negative_completed = completed_infinite(negative)
-  if positive_completed == nil or negative_completed == nil then return nil end
+  if positive_completed == nil or negative_completed == nil then return nil,{reason="carrier-completed-count"} end
   local prototype = main and main.prototype
   if main == nil or main.valid == false or main.name ~= descriptor.main_id
       or prototype == nil or prototype.name ~= descriptor.main_id
       or prototype.level ~= 1 or prototype.max_level ~= UINT32_MAX then
-    return nil
+    return nil,{reason="main-shape"}
   end
   local main_completed = completed_infinite(main)
-  if main_completed == nil then return nil end
+  if main_completed == nil then return nil,{reason="main-completed-count"} end
   local effect, effects_valid
   if scope then
     effect = scope.values[descriptor.recipe]
     effects_valid = scope.valid and (scope.expanded or effect ~= false)
   else effect, effects_valid = named_main_effect(prototype, descriptor.recipe) end
   if not effects_valid or (not (scope and scope.expanded) and effect ~= nil and (positive_scalar == 0 and effect ~= 0
-      or not close(effect, positive_scalar))) then return nil end
+      or not close(effect, positive_scalar))) then return nil,{reason="main-effect"} end
   return {
     descriptor = descriptor,
     included = effect ~= nil,
@@ -319,7 +338,7 @@ local function inspect_with_mask(force, descriptor, scope)
 end
 
 -- Error-path-only observation; no state/level writes or broad scans.
-local function family_failure_detail(force, descriptor, scope)
+local function family_failure_detail(force, descriptor, scope, rejection)
   local function text(value)
     local kind = type(value)
     if kind == "string" then
@@ -340,6 +359,29 @@ local function family_failure_detail(force, descriptor, scope)
   add("expected_change", descriptor.change)
   add("scope_valid", scope and scope.valid)
   if scope and scope.values then add("main_recipe_change", scope.values[descriptor.recipe]) end
+  if rejection then
+    for _,name in ipairs({"reason","role","recipe","component","positive","negative","reference","expected"}) do
+      if rejection[name] ~= nil then add("rejection." .. name,rejection[name]) end
+    end
+  end
+  local reference_id = RECIPE_VECTOR_REFERENCES[descriptor.recipe] or VECTOR_REFERENCES[descriptor.family]
+  local reference = prototypes and prototypes.technology and prototypes.technology[reference_id]
+  add("reference.id",reference_id)
+  add("reference.present",reference ~= nil)
+  if reference then
+    add("reference.valid",reference.valid)
+    if reference.valid ~= false then
+      add("reference.name",reference.name)
+      add("reference.first",reference.level)
+      add("reference.max",reference.max_level)
+      add("reference.hidden",reference.hidden)
+      if rejection and rejection.reference_history_observed then
+        add("reference.created",rejection.reference_created)
+      end
+      add("reference.effects_type",type(reference.effects))
+      if type(reference.effects)=="table" then add("reference.effects_count",#reference.effects) end
+    end
+  end
   local technologies = force and force.technologies
   for _, part in ipairs({{"main", descriptor.main_id}, {"positive", descriptor.positive_id},
       {"negative", descriptor.negative_id}}) do
@@ -413,8 +455,8 @@ local function family_observations(force)
         end
         scopes[descriptor.main_id] = scope
       end
-      local observation = inspect_with_mask(force, descriptor, scope)
-      if observation == nil then error(family_failure_detail(force, descriptor, scope), 3) end
+      local observation, rejection = inspect_with_mask(force, descriptor, scope)
+      if observation == nil then error(family_failure_detail(force, descriptor, scope, rejection), 3) end
       by_main[descriptor.main_id]=by_main[descriptor.main_id] or {}
       by_main[descriptor.main_id][#by_main[descriptor.main_id]+1]=observation
       out[#out + 1] = observation
