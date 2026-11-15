@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -44,7 +44,7 @@ The [earlier bounded resource refusal](../spec/evidence/foundation514-bounded-re
 
 The [independently reviewed affected native results](../spec/evidence/candidate513-affected-native-verdicts-r01.json) close the named Angel steel-ownership mechanism, current13 supported4.7.3 worker admission/continuation and public12-to13 preservation on both modern engines. The actual1.3.2 minimum required closure loads old11 too; the separate explicitly controlled foreign preowner reproduces the reported old guard. Corrected13 retains the complete steel owner, all4169 recipe bonuses, ordinary research and exact science through save/two cold loads. F210's old worker source has genuine earning and pending work; F200's predecessor cursor/readiness is scripted and is not relabelled as genuine old earning. Unspecified reporter packs and unknown personal histories remain unverified. The [private custody](../spec/evidence/candidate513-private-native-custody-r01.json) retains628 original files with actual remote decoded-byte readback, including earlier failed attempts.
 
-Accepted developer fixture/test/documentation work continues on `dev`; its player tree equals the frozen release. Test-only commits after the reviewed promotion do not change or replace published13 bytes. Keep this release fixed and continue the ordered existing stable worklist below: Library input/export/client lifecycle, exact remaining historical/profile applicability and whole-product performance. Do not rerun the completed48 agriculture processes or the unchanged incident tests.
+Accepted developer fixture/test/documentation work continues on `dev`, but neither frozen player tree is asserted equal to current development: the exact13 player `32505443e929344affb2c7d691dd15bdb7fb2a4d` and exact14 player `e35961ca94c68300d0843b3a3a5270db81d3241a` remain separate published/native inputs. Current development contains later repair work, including the pending5.0.15 repair, which is neither native-qualified nor published. Preserve both release byte sets and every earlier native source identity; do not rebind old results to the newer tree. Keep the releases fixed and continue the ordered existing stable worklist below: Library input/export/client lifecycle, exact remaining historical/profile applicability and whole-product performance. Do not rerun the completed48 agriculture processes or the unchanged incident tests.
 
 The [exact current13 API physical/save record](../spec/evidence/candidate513-api-physical-save-native-r01.json) now accepts one closed SpaceAge/Defaults two-consumer case on each actual Factorio2.0.77 and2.1.23 engine. Each ran four native processes, observed100 baseline and100 researched copper plates produce200 and202 cables at native recipe productivity0→0.01, saved the completed world and passed two byte-identical cold loads with Beta still researched. All eight original states (three control files and five owned archives) matched after restoration, with no Factorio process remaining in either terminal. Research used an explicit native setter. The original raw artifacts, independent result review, failed earlier F210 composition wrapper and checked reader correction retain distinct identities; this result grants no ordinary-laboratory, general API, client, performance or stable verdict.
 
