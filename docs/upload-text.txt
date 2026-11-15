@@ -1,13 +1,15 @@
-MIR 5.0.14
+MIR 5.0.15
 Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Fixes worker cargo save upgrades that reject unrelated mod changes despite having saved MIR ownership history.
+Repairs productivity compatibility and worker cargo upgrades with authenticated research history.
 
-- Preserve earned worker cargo levels and unfinished or queued research during these recorded-default upgrades.
-- Include the previous MIR version and saved-route information in changed-selection refusals.
+- Accept complete productivity preservation effects when native public research covers extra recipes.
+- Return explicitly prepared default worker research to its ordinary owner while retaining earned levels and unfinished or queued work.
+- Admit supported engine patches for qualified older default worker upgrades.
+- Show more useful effect/reference details in remaining productivity refusals; improve the external log collector.
 
-Keep a protected original save and its matching mods/settings. Saves missing earlier ownership data still need that original configuration; this update does not reconstruct erased research. Update a copy before adopting it.
+Keep a protected original save and its matching mods/settings, and upgrade a copy first. Saves without authenticated earlier ownership still need their original history; this update does not reconstruct erased research or qualify every provider and finite-research transition.
 
 This is a GitHub beta. Library input/export/client-lifecycle checks and broader performance acceptance remain unfinished for stable.
 
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.15/docs/support.md).

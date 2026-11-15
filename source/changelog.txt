@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.15
+Date: 2026-11-16
+
+  Bugfixes:
+
+    - Accept complete productivity preservation effects when their native public research also covers additional recipes.
+    - Preserve explicitly prepared default worker cargo research when returning it to the ordinary native owner.
+    - Accept supported engine patch updates for authenticated older default worker cargo upgrades.
+    - Report the rejected productivity effect or reference more precisely, including malformed later effects.
+
+  Changes:
+
+    - Retain the beginning and end of long logs in the external player-report collector, with explicit missing-input details.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.14
 Date: 2026-11-13
 
