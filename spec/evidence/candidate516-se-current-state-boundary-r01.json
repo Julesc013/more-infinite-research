@@ -354,7 +354,7 @@
     }
   ],
   "interpretation": [
-    "Provider configuration normalized the incomplete synthetic prerequisite history and changed target work/bonuses. The original source facts are not valid continuation preconditions.",
+    "After configuration, the named prerequisite flags are false and captured target work/bonuses differ from the source frames. Prerequisite flags were not recorded at source save time, so their survival and the causative callback are not established. The original source facts are not valid continuation preconditions.",
     "The result does not identify an MIR production defect or justify blindly restoring prerequisites.",
     "The host observer initially omitted asset-only mods, then rejected the shared log callsite; authentic runtime tuples and raw observations were adopted independently without reruns. All adverse terminals remain unchanged.",
     "The separately reviewed next contract administratively constructs an explicit post-provider current state and uses real reset_technology_effects event delivery. It cannot qualify save-upgrade/configuration preservation or exclusive internal-writer attribution."
