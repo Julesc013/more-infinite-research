@@ -407,6 +407,50 @@ class SettingsProfileTests(unittest.TestCase):
           assert(full.metadata.owner == "caller" and metadata.owner == "caller"
             and metadata.extra == nested,
             "mutating a result must not mutate sibling or caller top-level metadata")
+
+    def test_codec_rejects_nonfinite_and_cycle_without_silently_dropping_values(self):
+        # The restricted export must not quietly omit malformed settings or
+        # metadata, even at nested positions. This is a codec-only host check,
+        # not a claim that registered Factorio settings admit these values.
+        self.lua.execute(r'''
+          local calls = 0
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text) calls = calls + 1; return text end,
+          }
+          local ok_wire, ok_error = codec.encode({
+            settings = {count = 0, enabled = false, nested = {limit = 1}},
+            metadata = {tags = {"one", "two"}},
+          }, checked_helpers)
+          assert(ok_wire and not ok_error and calls == 1)
+          assert(ok_wire:find('"count":0', 1, true))
+          assert(ok_wire:find('"enabled":false', 1, true))
+          assert(ok_wire:find('"limit":1', 1, true))
+
+          local invalid_profiles = {
+            {settings = {good = false, bad = math.huge}},
+            {settings = {good = 0, deep = {bad = -math.huge}}},
+            {settings = {good = true, deep = {bad = 0/0}}},
+            {settings = {good = false}, metadata = {nested = {bad = math.huge}}},
+          }
+          for _, profile in ipairs(invalid_profiles) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile contains a non-finite number",
+              "bad numeric data was silently discarded")
+          end
+
+          local settings_cycle = {}
+          settings_cycle.self = settings_cycle
+          local wire, err = codec.encode({settings = {good = false, bad = settings_cycle}}, checked_helpers)
+          assert(wire == nil and err == "profile contains a cycle",
+            "cyclic setting data was silently discarded")
+          local metadata_cycle = {}
+          metadata_cycle.nested = {parent = metadata_cycle}
+          wire, err = codec.encode({settings = {good = false}, metadata = metadata_cycle}, checked_helpers)
+          assert(wire == nil and err == "profile contains a cycle",
+            "cyclic metadata was silently discarded")
+          assert(calls == 1, "malformed values reached the compression/string encoder")
         ''')
 
     def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
