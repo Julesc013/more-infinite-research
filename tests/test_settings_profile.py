@@ -454,6 +454,37 @@ class SettingsProfileTests(unittest.TestCase):
           assert(calls == 1, "malformed values reached the compression/string encoder")
         ''')
 
+    def test_codec_rejects_nested_nonstring_object_keys_before_the_encoder(self):
+        # JSON object keys are strings.  A numeric key in a nested object can
+        # otherwise collide with its textual spelling during JSON emission.
+        # Dense arrays remain valid because their numeric keys are positions,
+        # not JSON object names.
+        self.lua.execute(r'''
+          local calls = 0
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text) calls = calls + 1; return text end,
+          }
+          local valid, valid_error = codec.encode({
+            settings = {x = {"first", "second"}},
+            metadata = {labels = {"one", "two"}},
+          }, checked_helpers)
+          assert(valid and not valid_error and calls == 1,
+            "dense nested arrays must remain valid JSON values")
+
+          local opponents = {
+            {settings = {x = {[1] = "number", ["1"] = "string"}}},
+            {settings = {good = false}, metadata = {x = {[1] = "number", ["1"] = "string"}}},
+          }
+          for _, profile in ipairs(opponents) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile object key must be a string",
+              "non-string nested object key was silently made lossy")
+          end
+          assert(calls == 1, "lossy object keys reached the compression/string encoder")
+        ''')
+
     def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
         # Published round-trip fixture635deae0 tests the entire effect-setting
         # surface, independently of any serializer's selected examples/counts.

@@ -89,11 +89,16 @@ local function copy_json_value(value, seen)
   if value_type ~= "table" then return nil end
   if seen[value] then return nil, "profile contains a cycle" end
   seen[value] = true
+  local array = is_array(value)
   local out = {}
   for key, item in pairs(value) do
+    if not array and type(key) ~= "string" then
+      seen[value] = nil
+      return nil, "profile object key must be a string"
+    end
     local copied, err = copy_json_value(item, seen)
     if err then seen[value] = nil; return nil, err end
-    if copied ~= nil and (type(key) == "string" or type(key) == "number") then out[key] = copied end
+    if copied ~= nil then out[key] = copied end
   end
   seen[value] = nil
   return out
