@@ -251,7 +251,11 @@ function M.rows(active_mods, target, force, query, effective_streams)
   if not supports_recipe_productivity(target) then return rows end
   if not has_space_age(active_mods) then
     for _, row in ipairs(BASE_WITHOUT_SPACE_AGE) do
-      if matches(row, query) then rows[#rows + 1] = copy(row) end
+      -- Match the Bob/Angel rule: a deliberately disabled stream is not an
+      -- omitted research entry, even if its required DLC is absent.
+      if not is_explicitly_disabled(row, effective_streams) and matches(row, query) then
+        rows[#rows + 1] = copy(row)
+      end
     end
   elseif has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
