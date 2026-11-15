@@ -81,21 +81,42 @@ function Wait-MIR441LinuxLaunchReceipt {
       try{$receipt=([IO.File]::ReadAllText($item.FullName,[Text.UTF8Encoding]::new($false))|ConvertFrom-Json -Depth 4)}catch{throw '[mir441-resource-linux-launch-receipt]'}
       $names=@($receipt.PSObject.Properties.Name|Sort-Object)
       if($names.Count-ne4-or($names-join',')-cne'kind,pid,session_id,start_ticks'-or[string]$receipt.kind-cne'MIR441LinuxNativeLaunchV1'-or$receipt.pid-isnot[Int64]-or$receipt.start_ticks-isnot[Int64]-or$receipt.session_id-isnot[Int64]){throw '[mir441-resource-linux-launch-receipt]'}
-      try{[int]$pid=$receipt.pid;[int64]$startTicks=$receipt.start_ticks;[int64]$sessionId=$receipt.session_id}catch{throw '[mir441-resource-linux-launch-receipt]'}
-      if($pid-ne$Process.Id-or$pid-le0-or$startTicks-le0-or$sessionId-ne$pid){throw '[mir441-resource-linux-launch-receipt]'}
-      $identity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $pid
+      try{[int]$mirLinuxRootPid=$receipt.pid;[int64]$startTicks=$receipt.start_ticks;[int64]$sessionId=$receipt.session_id}catch{throw '[mir441-resource-linux-launch-receipt]'}
+      if($mirLinuxRootPid-ne$Process.Id-or$mirLinuxRootPid-le0-or$startTicks-le0-or$sessionId-ne$mirLinuxRootPid){throw '[mir441-resource-linux-launch-receipt]'}
+      $identity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $mirLinuxRootPid
       if(($null -eq $identity.PSObject.Properties['exited']) -or -not [bool]$identity.exited){
         if(([int64]$identity.start_ticks -ne $startTicks) -or ([int64]$identity.session_id -ne $sessionId)){throw '[mir441-resource-linux-launch-receipt]'}
       }else{
         # A session cannot be reallocated while it still has a member. This
         # preserves owned orphans if the session leader exits before polling.
-        $null=Invoke-MIR441LinuxResourceObservation -Operation process-tree -ProcessId $pid -RootStartTicks $startTicks -SessionId $sessionId
+        $null=Invoke-MIR441LinuxResourceObservation -Operation process-tree -ProcessId $mirLinuxRootPid -RootStartTicks $startTicks -SessionId $sessionId
       }
-      return [pscustomobject][ordered]@{pid=$pid;start_ticks=$startTicks;session_id=$sessionId;kind='MIR441LinuxNativeLaunchV1'}
+      return [pscustomobject][ordered]@{pid=$mirLinuxRootPid;start_ticks=$startTicks;session_id=$sessionId;kind='MIR441LinuxNativeLaunchV1'}
     }
     if([DateTimeOffset]::UtcNow-ge$deadline){throw '[mir441-resource-linux-launch-receipt]'}
     Start-Sleep -Milliseconds 10
   }
+}
+
+function Write-MIR441LinuxLaunchAck {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$RootIdentity)
+  $python=Get-Command python3 -ErrorAction SilentlyContinue;$launcher=Join-Path $PSScriptRoot 'LinuxNativeLaunch.py'
+  if($null-eq$python-or-not(Test-Path -LiteralPath $launcher -PathType Leaf)){throw '[mir441-resource-linux-launch-ack]'}
+  $arguments=@('-I',$launcher,'--write-ack','--path',$Path,'--pid',[string]$RootIdentity.pid,'--start-ticks',[string]$RootIdentity.start_ticks,'--session-id',[string]$RootIdentity.session_id)
+  $lines=@(& $python.Source @arguments 2>&1)
+  if($LASTEXITCODE-ne0-or$lines.Count-ne0){throw '[mir441-resource-linux-launch-ack]'}
+}
+
+function Stop-MIR441LinuxPreAckLauncher {
+  param([Diagnostics.Process]$Process,$Identity=$null)
+  if($null-eq$Process-or$Process.HasExited){return}
+  if($null-ne$Identity){
+    $current=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $Process.Id
+    if(($null-ne$current.PSObject.Properties['exited'])-and[bool]$current.exited){return}
+    if(([int]$current.pid-ne[int]$Identity.pid)-or([int64]$current.start_ticks-ne[int64]$Identity.start_ticks)){throw '[mir441-owned-root-identity]'}
+  }
+  # Target exec is ACK-gated. Before an ACK this Process is the launcher only.
+  $Process.Kill($true);[void]$Process.WaitForExit(3000)
 }
 
 function Resolve-MIR441RecoveryScratchPath {
@@ -648,7 +669,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$launchReceipt='';$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$launchReceipt='';$launchAck='';$preAckIdentity=$null;$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null
   # This is deliberately outside the output-writing try/catch: contention is
   # a prelaunch refusal, not an interrupted governed execution. Its scope is
   # the current Linux execution account, never a host-wide scheduler claim.
@@ -675,9 +696,9 @@ function Invoke-MIR441MonitoredProcess {
     if($IsLinux){
       $python=Get-Command python3 -ErrorAction SilentlyContinue;$launcher=Join-Path $PSScriptRoot 'LinuxNativeLaunch.py'
       if($null-eq$python-or-not(Test-Path -LiteralPath $launcher -PathType Leaf)-or-not[IO.Path]::IsPathRooted($FilePath)){throw '[mir441-resource-linux-launcher-unavailable]'}
-      $launchReceipt=Join-Path $temp 'linux-native-launch.json'
+      $launchReceipt=Join-Path $temp 'linux-native-launch.json';$launchAck=Join-Path $temp 'linux-native-launch.ack.json'
       $start.FileName=$python.Source
-      foreach($argument in @('-I',$launcher,'--receipt',$launchReceipt,'--',$FilePath)+$Arguments){[void]$start.ArgumentList.Add($argument)}
+      foreach($argument in @('-I',$launcher,'--receipt',$launchReceipt,'--ack',$launchAck,'--',$FilePath)+$Arguments){[void]$start.ArgumentList.Add($argument)}
     }else{
       $start.FileName=$FilePath
       foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
@@ -687,7 +708,7 @@ function Invoke-MIR441MonitoredProcess {
     if($null-ne$consoleStartup){$start.StandardInputEncoding=[Text.UTF8Encoding]::new($false)}
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
     if(-not$process.Start()){throw '[mir441-process-start]'}
-    $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew();if($IsLinux){$rootIdentity=Wait-MIR441LinuxLaunchReceipt -Process $process -Path $launchReceipt}
+    $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew();if($IsLinux){$preAckIdentity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $process.Id;$rootIdentity=Wait-MIR441LinuxLaunchReceipt -Process $process -Path $launchReceipt}
     # Streaming capture avoids retaining the complete child output in RAM.
     foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){
       # A console marker must become visible before the child exits. Keep the
@@ -696,6 +717,7 @@ function Invoke-MIR441MonitoredProcess {
       $stream=if($null-ne$consoleStartup){[IO.FileStream]::new($pair[0],[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::Read,1,[IO.FileOptions]::Asynchronous)}else{[IO.File]::Create($pair[0])}
       $streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)
     }}
+    if($IsLinux){Write-MIR441LinuxLaunchAck -Path $launchAck -RootIdentity $rootIdentity}
     if($null-ne$consoleStartup){
       $inputWriter=$process.StandardInput;$inputWriter.NewLine="`n";$inputWriter.AutoFlush=$true
       if($StdoutPath){Add-MIR441FactorioConsoleStartupOutput -State $consoleStartup -Kind stdout -Path $StdoutPath}
@@ -774,14 +796,22 @@ function Invoke-MIR441MonitoredProcess {
     $isNaturalExitFailure=[object]::ReferenceEquals($failure.Exception,$naturalExitFailure)
     # A callback or unrelated failure cannot supply this reserved terminal.
     if(-not$isNaturalExitFailure){$failure.Exception.Data.Remove('mir441_process_result')}
-    if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started -RootIdentity $rootIdentity;$children=@($children+$tree.children)}catch{}}
-    Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity
+    if($null-ne$process-and$null-ne$rootIdentity){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started -RootIdentity $rootIdentity;$children=@($children+$tree.children)}catch{}}
+    $cleanupFailure=$null
+    try{
+      if($IsLinux-and$null-eq$rootIdentity){Stop-MIR441LinuxPreAckLauncher -Process $process -Identity $preAckIdentity}else{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}
+    }catch{$cleanupFailure=$_.Exception.Message}
+    if($null-ne$cleanupFailure){$failure.Exception.Data['mir441_process_cleanup']=$cleanupFailure}
     if(-not$isNaturalExitFailure){
       Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
     }
     throw $failure
   }finally{
-    try{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}finally{
+    try{
+      try{
+        if($IsLinux-and$null-eq$rootIdentity){Stop-MIR441LinuxPreAckLauncher -Process $process -Identity $preAckIdentity}else{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}
+      }catch{}
+    }finally{
       try{
         foreach($copy in $copies){try{$null=$copy.Wait(3000)}catch{}}
         foreach($stream in $streams){$stream.Dispose()};if($null-ne$inputWriter){$inputWriter.Dispose()};if($null-ne$process){$process.Dispose()}
