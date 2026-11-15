@@ -1766,7 +1766,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'event.mod_changes.removed={old_version="1"}',
             'event.mod_startup_settings_changed=true',
             'event.mod_changes.base={old_version="2.1.22",new_version="2.1.23"}',
-            'script.active_mods.base="2.1.24"',
             'script.active_mods["space-age"]="2.1.23";event.mod_changes["space-age"]={new_version="2.1.23"}',
             'event.mod_changes["more-infinite-research"].old_version="4.7.21002"',
             'event.mod_changes["more-infinite-research"].old_version="4.7.20003"',
@@ -1813,6 +1812,130 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
                 ''')
 
+    def test_473_supported_same_edition_patches_preserve_the_complete_default_work(self):
+        # A minimum engine version is a floor. An unchanged supported patch or
+        # same-family patch update does not change this exact worker contract.
+        for target, old, cases in (
+                ("f200", "4.7.20003", (("2.0.78", None), ("2.0.78", "2.0.77"),
+                                       ("2.0.78", "2.0.78"), ("2.0.79", "2.0.78"))),
+                ("f210", "4.7.21003", (("2.1.24", None), ("2.1.24", "2.1.23"),
+                                       ("2.1.24", "2.1.24"), ("2.1.25", "2.1.24")))):
+            for current_base, previous_base in cases:
+                with self.subTest(target=target, current=current_base, previous=previous_base):
+                    lua=self.older_world(target);lua.globals().old=old
+                    lua.globals().current_base=current_base;lua.globals().previous_base=previous_base
+                    lua.execute(r'''
+                      seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
+                      foreign_bonus[detached.index]=73
+                      script.active_mods.base=current_base;local event=older_event(old,false)
+                      if previous_base then event.mod_changes.base={old_version=previous_base,new_version=current_base}end
+                      local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                      local plan=history.default_owner_preflight(event,nil,true)
+                      assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                      assert(plan.record.producer.kind=="published473-default"and plan.record.producer.old_version==old)
+                      assert(history.default_owner_apply(plan))
+                      for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                        local queue={}for i,id in ipairs(b.queue)do queue[i]=id==CANONICAL and ORDINARY or id end
+                        assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                        assert(a.owner.count==b.source.count and a.owner.enabled==b.source.enabled
+                          and a.owner.visible==b.source.visible and not a.owner.researched)
+                        assert(a.current==(b.current==CANONICAL and ORDINARY or b.current)
+                          and a.progress==b.progress and same(a.queue,queue))
+                        assert(a.bonus==foreign_bonus[f.index]+b.source.level-4 and a.bonus==b.bonus)
+                        assert(a.other_saved==b.other_saved and same(a.private,b.private))
+                      end
+                      assert(player.research_progress==.375 and player.research_queue[2].name==ORDINARY)
+                      assert(suspended.technologies[ORDINARY].saved_progress==.27)
+                      assert(detached.technologies[ORDINARY].saved_progress==.23)
+                      assert(queue_writes[player.index]==1 and queue_writes[suspended.index]==1)
+                      assert(queue_writes[uninvested.index]==nil and queue_writes[detached.index]==nil)
+                      local saved=storage[OWNER_KEY];local settled=all_frames();writes=0
+                      local original_game,original_prototypes=game,prototypes
+                      game=setmetatable({}, {__index=function()error("cold native game read")end})
+                      prototypes=setmetatable({}, {__index=function()error("cold prototype read")end})
+                      for i=1,2 do package.loaded["runtime.worker_robot_storage"]=nil
+                        history=require("runtime.worker_robot_storage");history.default_owner_on_load()
+                        assert(storage[OWNER_KEY]==saved and writes==0)
+                      end
+                      game,prototypes=original_game,original_prototypes;history.configure(0,true)
+                      local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
+                      assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
+                    ''')
+
+    def test_501_observer_exception_remains_empty_only_on_supported_same_family_patches(self):
+        for previous_base in (None, "2.0.77", "2.0.78"):
+            for paid in (False, True):
+                with self.subTest(previous=previous_base, paid=paid):
+                    lua=self.older_world();lua.globals().previous_base=previous_base;lua.globals().paid=paid
+                    lua.execute(r'''
+                      player.research_queue={OTHER};player.research_progress=.42
+                      if paid then detached.technologies[CANONICAL].level=5 end
+                      script.active_mods.base="2.0.78";local event=older_event("5.0.20001",true)
+                      if previous_base then event.mod_changes.base={old_version=previous_base,new_version="2.0.78"}end
+                      if paid then refuse_older(event);return end
+                      local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                      local plan=older_plan(event);assert(writes==0 and same(before,all_frames()))
+                      assert(plan.record.producer.kind=="older-mir501-empty-default")
+                      assert(history.apply_default_owner_transfer(plan))
+                      for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                        assert(a.owner.level==4 and not a.owner.researched and a.bonus==20 and a.bonus==b.bonus)
+                        assert(a.current==b.current and a.progress==b.progress and same(a.queue,b.queue))
+                      end
+                      assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                    ''')
+
+    def test_older_patch_admission_retains_engine_event_and_worker_authority_refusals(self):
+        opponents=("current-floor", "current-family", "current-malformed", "current-leading-zero",
+            "old-floor", "downgrade", "old-family", "old-malformed", "base-new", "base-new-only",
+            "base-old-only", "base-not-table", "changes-not-table", "startup-missing", "startup-not-boolean",
+            "startup-changed", "previous-mod", "removed-mod", "updated-mod", "official-mod",
+            "foreign-source", "clamped-source", "provider", "cap", "private-work", "unqualified-472")
+        for target, old in (("f200", "4.7.20003"), ("f210", "4.7.21003"), ("f200", "5.0.20001")):
+            # The501 exception proves every force is empty and already allows
+            # a selected cap. Only the473 paid-work contract requires max0.
+            cases=opponents if old!="5.0.20001"else tuple(case for case in opponents if case!="cap")
+            for opponent in cases:
+                with self.subTest(target=target, old=old, opponent=opponent):
+                    lua=self.older_world(target);lua.globals().old=old;lua.globals().opponent=opponent
+                    lua.execute(r'''
+                      if old~="5.0.20001"then seed_owner()end
+                      local f200=package_family=="f200";local current=f200 and"2.0.78"or"2.1.24"
+                      local floor=f200 and"2.0.77"or"2.1.23";local below=f200 and"2.0.76"or"2.1.22"
+                      local higher=f200 and"2.0.79"or"2.1.25";local other=f200 and"2.1.23"or"2.0.77"
+                      script.active_mods.base=current;local event=older_event(old,true);local route=nil
+                      event.mod_changes.base={old_version=floor,new_version=current}
+                      if opponent=="current-floor"then script.active_mods.base=below
+                        event.mod_changes.base={old_version=below,new_version=below}
+                      elseif opponent=="current-family"then script.active_mods.base=other
+                        event.mod_changes.base={old_version=other,new_version=other}
+                      elseif opponent=="current-malformed"then script.active_mods.base=current..".0";event.mod_changes.base=nil
+                      elseif opponent=="current-leading-zero"then script.active_mods.base=f200 and"2.0.078"or"2.1.024";event.mod_changes.base=nil
+                      elseif opponent=="old-floor"then event.mod_changes.base.old_version=below
+                      elseif opponent=="downgrade"then event.mod_changes.base.old_version=higher
+                      elseif opponent=="old-family"then event.mod_changes.base.old_version=other
+                      elseif opponent=="old-malformed"then event.mod_changes.base.old_version=floor..".0"
+                      elseif opponent=="base-new"then event.mod_changes.base.new_version=higher
+                      elseif opponent=="base-new-only"then event.mod_changes.base.old_version=nil
+                      elseif opponent=="base-old-only"then event.mod_changes.base.new_version=nil
+                      elseif opponent=="base-not-table"then event.mod_changes.base=true
+                      elseif opponent=="changes-not-table"then event.mod_changes=true
+                      elseif opponent=="startup-missing"then event.mod_startup_settings_changed=nil
+                      elseif opponent=="startup-not-boolean"then event.mod_startup_settings_changed="false"
+                      elseif opponent=="startup-changed"then event.mod_startup_settings_changed=true
+                      elseif opponent=="previous-mod"then script.active_mods.foreign="1"
+                      elseif opponent=="removed-mod"then event.mod_changes.foreign={old_version="1"}
+                      elseif opponent=="updated-mod"then script.active_mods.foreign="2";event.mod_changes.foreign={old_version="1",new_version="2"}
+                      elseif opponent=="official-mod"then script.active_mods.quality=current;event.mod_changes.quality={old_version=floor,new_version=current}
+                      elseif opponent=="foreign-source"then creators[CANONICAL]="foreign"
+                      elseif opponent=="clamped-source"then prototypes.technology[CANONICAL].max_level=4
+                      elseif opponent=="provider"then add_provider(7);route=provider_route(7)
+                      elseif opponent=="cap"then history.configure(10,true)
+                      elseif opponent=="private-work"then detached.technologies[ID].saved_progress=.1
+                      elseif opponent=="unqualified-472"then event.mod_changes["more-infinite-research"].old_version=f200 and"4.7.20002"or"4.7.21002"
+                        script.active_mods["space-exploration"]="0.7.57";history.configure(10,true)end
+                      refuse_older(event,route)
+                    ''')
+
     def test_one_force_paid_501_and_pending_501_work_refuse_before_writes(self):
         for old, opponents in (("5.0.20001", (
                 'detached.technologies[CANONICAL].level=5',
@@ -1836,7 +1959,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'event.mod_changes.base={new_version="2.0.77"}',
             'event.mod_startup_settings_changed=true',
             'event.mod_changes["more-infinite-research"].new_version="5.0.20013"',
-            'script.active_mods.base="2.0.78"',
             'script.active_mods["space-age"]="2.0.77";event.mod_changes["space-age"]={new_version="2.0.77"}',
             'creators[CANONICAL]="foreign"',
             'add_provider(7);route=provider_route(7)',
