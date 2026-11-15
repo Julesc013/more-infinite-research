@@ -5,7 +5,10 @@ local M = {}
 local INFINITE_MAX_LEVEL = 4294967295
 local CANDIDATES = {
   { name = "worker-robots-speed-7", predecessor = "worker-robots-speed-6" },
-  { name = "worker-robots-speed-6", predecessor = "worker-robots-speed-5" }
+  { name = "worker-robots-speed-6", predecessor = "worker-robots-speed-5" },
+  -- Space Exploration's exact procedural data pass splits the Base infinite
+  -- tail through level10.  Only its named final tail remains infinite.
+  { name = "worker-robots-speed-10", predecessor = "worker-robots-speed-9" }
 }
 
 local function sole_worker_robot_speed_effect(effects, modifier)
@@ -43,7 +46,7 @@ end
 
 local function select(lookup, admits, modifiers)
   if type(lookup) ~= "function" then return nil end
-  for index = 1, 2 do
+  for index = 1, #CANDIDATES do
     local candidate = CANDIDATES[index]
     local called, technology = pcall(lookup, candidate.name)
     if called then
@@ -56,7 +59,7 @@ local function select(lookup, admits, modifiers)
 end
 
 -- Data-stage technology tables use max_level = "infinite" and prerequisite
--- names. The lookup is called only for the two recognized tail names.
+-- names. The lookup is called only for the three recognized tail names.
 function M.data_worker_robot_speed_owner(lookup, modifiers)
   return select(lookup, admits_data, modifiers)
 end
