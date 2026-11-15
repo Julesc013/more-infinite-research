@@ -252,7 +252,7 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         if cls.context.get("schema") != "MIR5BobAngelF210UpstreamPipelineContextV1":
             raise AssertionError("Bob+Angel F210 context schema changed")
 
-    def stage(self, case, startup=None, raw=None, mods=None, expect_failure=False):
+    def stage(self, case, startup=None, raw=None, mods=None, expect_failure=False, refuse_pure_angel=False):
         source = self.context["cases"][case]
         raw = deepcopy(source["raw"] if raw is None else raw)
         mods = deepcopy(source["selection"] if mods is None else mods)
@@ -261,6 +261,7 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, mods)
         lua.globals().startup_values = _lua_value(lua, startup or {})
+        lua.globals().refuse_pure_angel = refuse_pure_angel
         lua.execute(r'''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
           mods,script,helpers,log=active_mods,nil,{},function() end
@@ -289,6 +290,17 @@ class BobAngelF210PipelineTests(unittest.TestCase):
           end
           settings={startup=declared}
           assert(loadfile(player_root.."/data.lua"))()
+           if refuse_pure_angel then
+             local original=require("compatibility.angel_f210_profile")
+             local sentinel={select=function(active)
+               if type(active)=="table" and active.bobplates~=nil and active.angelssmelting~=nil then
+                 error("pure Angel selector must remain uncalled for a combined Bob+Angel profile")
+               end
+               return original.select(active)
+             end}
+             package.loaded["compatibility.angel_f210_profile"] = sentinel
+             package.preload["compatibility.angel_f210_profile"] = function() return sentinel end
+           end
           emitted,technology_publications={},0
           outcome,message=pcall(function() assert(loadfile(player_root.."/data-final-fixes.lua"))() end)
           if outcome then declared_runtime=require("research.catalogue").declared() end
@@ -843,6 +855,33 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertIsNone(full_bob)
         self.assertIsNone(core)
         self.assertIsNone(f200)
+
+    def test_combined_profile_never_calls_the_pure_angel_selector(self):
+        for case in ("base", "space_age"):
+            with self.subTest(case=case):
+                combined = deepcopy(self.context["cases"][case]["selection"])
+                pure = deepcopy(combined)
+                pure.pop("bobplates")
+
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                lua.globals().player_root = SOURCE_ROOT.as_posix()
+                lua.globals().pure_mods = _lua_value(lua, pure)
+                lua.globals().combined_mods = _lua_value(lua, combined)
+                pure_profile, invalid_bobplates = lua.execute(r'''
+                  package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
+                  local target=require("platform.target")
+                  target.id,target.factorio_version,target.minimum_base="f210","2.1","2.1.23"
+                  local profile=require("compatibility.angel_f210_profile")
+                  return profile.select(pure_mods),profile.select(combined_mods)
+                ''')
+                self.assertIn(pure_profile, ("base", "space-age"))
+                self.assertIsNone(invalid_bobplates)
+
+                # This invokes the actual data-final pipeline. The controlled
+                # The loaded pure selector throws only for the valid combined
+                # input. Unrelated later baseline declarations still delegate
+                # to its actual source implementation.
+                self.stage(case, refuse_pure_angel=True)
 
     def test_asset_only_mods_and_equivalent_unlocks_do_not_disable_the_combined_profile(self):
         for case in ("base", "space_age"):
