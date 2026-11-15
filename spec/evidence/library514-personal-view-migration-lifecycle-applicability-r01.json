@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-personal-view-migration-lifecycle-source-review",
+  "recorded_date": "2026-11-13",
+  "status": "source-and-existing-host-intent-reviewed-native-unverified",
+  "purpose": "Bind the published 5.0.14 Library personal-view migration, per-player privacy and lifecycle expectations to the exact source and existing host cases, with a distinct final-package client/save/export acceptance oracle. No runtime execution or new positive native verdict.",
+  "references": {
+    "coordination": "https://github.com/Julesc013/scratchpad/pull/137#issuecomment-6843045041",
+    "acceptance_issue": "https://github.com/Julesc013/more-infinite-research/issues/1768",
+    "existing_observer_binding": "https://github.com/Julesc013/more-infinite-research/pull/1921",
+    "release": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.14",
+    "historical_library_parity": "https://github.com/Julesc013/more-infinite-research/pull/1915",
+    "export_applicability": "https://github.com/Julesc013/more-infinite-research/pull/1919"
+  },
+  "inputs": {
+    "published_tag": "v5.0.14",
+    "published_tag_commit": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+    "inspected_dev_commit": "7364a35f960ce990967af935d3035753729de3bb",
+    "files": [
+      {
+        "path": "source/runtime/library.lua",
+        "ref": "v5.0.14",
+        "git_blob": "54ae09e769dda2ad40c24312252b34412ddf1563"
+      },
+      {
+        "path": "source/runtime/bootstrap.lua",
+        "ref": "v5.0.14",
+        "git_blob": "e97436db4a1bc9d72795a65873941f45a55d1158"
+      },
+      {
+        "path": "source/runtime/settings_commands.lua",
+        "ref": "v5.0.14",
+        "git_blob": "084504a1bf21272ae64da0276588aaf089e68be8"
+      },
+      {
+        "path": "tests/test_library.py",
+        "ref": "7364a35f960ce990967af935d3035753729de3bb",
+        "git_blob": "53ee79ae8366124b71485c518759f651e07b7d1b"
+      },
+      {
+        "path": "tests/test_library_multiplayer_fixture.py",
+        "ref": "7364a35f960ce990967af935d3035753729de3bb",
+        "git_blob": "a6a616ad05ca686eb9c10eeed2d397e81fee8f23"
+      }
+    ]
+  },
+  "static_review": {
+    "predicate_count": 16,
+    "passing_predicates": 16,
+    "method": "Exact fetched blob identities and 16 source-text checks; no Lua interpreter, Factorio, native windows, player saves or GitHub CI executed in this review.",
+    "observations": [
+      {
+        "id": "L01-L02",
+        "finding": "A per-index storage.mir_library.players record is projected through local_view; typed Research query bytes remain distinct from model-normalized search.",
+        "source": "source/runtime/library.lua:30,312-375",
+        "limit": "Does not establish focus/caret/scroll behavior under actual GUI input."
+      },
+      {
+        "id": "L03-L04",
+        "finding": "on_configuration_changed copies legacy browser personal data only when no current private view exists; preserves an explicit bounded legacy snapshot with an authoritative original source, and fills report switches only when unset.",
+        "source": "source/runtime/library.lua:567-675,3199-3282",
+        "limit": "The preserved convenience snapshot may be truncated; it must not be called a full lossless replacement. Current preferences win on a repeated configuration event."
+      },
+      {
+        "id": "L05-L06",
+        "finding": "Removal clears the indexed private record, marks legacy player history retired, and GUI callbacks validate the owned tagged-root ancestry.",
+        "source": "source/runtime/library.lua:703-719,3120-3145",
+        "limit": "Static guards and host doubles are not an actual account-index-reuse client observation."
+      },
+      {
+        "id": "L07-L08",
+        "finding": "on_load reconnects translation working references only; joined and left callbacks have separate view/render/cleanup branches.",
+        "source": "source/runtime/library.lua:3027-3049,3290-3294",
+        "limit": "Does not establish remote client rejoin, real language completion or cold-load persistence."
+      },
+      {
+        "id": "L09-L11",
+        "finding": "Help report checkbox updates target the saved personal view after ownership checks; user-triggered file exports route through an indexed explicit file writer, not the tab renderer.",
+        "source": "source/runtime/library.lua:2594-2606,2173-2194;source/runtime/settings_commands.lua:34-85",
+        "limit": "No actual file or privacy readback has been done for 5.0.14 in this review."
+      }
+    ],
+    "existing_host_methods": [
+      "test_configuration_marks_a_bounded_legacy_snapshot_without_mutating_its_authoritative_bucket",
+      "test_configuration_preserves_newer_private_view_and_does_not_claim_same_named_foreign_root",
+      "test_configuration_restores_legacy_report_choices_without_overwriting_current_choices",
+      "test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history",
+      "test_help_report_choices_are_owned_personal_retained_and_do_not_export_on_refresh",
+      "test_report_choices_and_previews_stay_separate_for_players_sharing_a_force",
+      "test_support_exports_are_owned_local_and_inactive_on_research_views"
+    ],
+    "existing_host_result": "Methods present in inspected test source. Their declarations are not an execution receipt from this review."
+  },
+  "native_oracle": {
+    "status": "not-executed",
+    "required_input_binding": [
+      "Select exact published 5.0.14 edition package and matching Factorio engine; record archive hash, exact unchanged actor/fixture version, enabled mods, world/source save and startup values.",
+      "Use selected 0.3.13 input / 0.4.7 export observer bindings without combining incompatible same-name variants. Bind actual player indices, client languages, input transport and output paths.",
+      "Any historical migration claim must begin with an observed nonpristine predecessor saved personal view, including explicit original query, filters, report flags, selected item and geometry; never synthesize history from a default current client."
+    ],
+    "case_matrix": [
+      {
+        "id": "PV-01",
+        "operation": "same-force two-client opening, switching and input",
+        "expected": "Two simultaneously distinct EN/DE client indices; their own queries, selected technology, hidden IDs, Settings query and report inclusion switches remain isolated; shared native force current research, queue and progress stay unchanged.",
+        "required_observations": "Native GUI/input event and both indexed personal view readbacks; not screenshots alone."
+      },
+      {
+        "id": "PV-02",
+        "operation": "rejoin and host restart",
+        "expected": "After disconnect/rejoin and saved-host restart, each existing account recovers its own view and valid translations, with no foreign preview or query swap.",
+        "required_observations": "Two-client connection/session identities, before/after saved personal view snapshots and actual host restart. Source on_load alone cannot pass."
+      },
+      {
+        "id": "PV-03",
+        "operation": "remove/reuse native player index",
+        "expected": "Old personal choices are not imported into the replacement account after removal; original legacy preservation remains a distinct historical snapshot and cannot seed the new record.",
+        "required_observations": "Actual pre-removal profile and preserved source, removed-event and new account/index identity, new default private view and two account readbacks."
+      },
+      {
+        "id": "PV-04",
+        "operation": "real full, compact and diagnostics export",
+        "expected": "No file on mere open/tab render; explicit player-origin commands create the intended files with matching content and personal report inclusion scope, while server-origin output remains classified separately.",
+        "required_observations": "Exact output filenames, bytes, decoded payloads, submitting player indices and no-export control; read native files rather than relying on a preview."
+      },
+      {
+        "id": "PV-05",
+        "operation": "migration save and two independent cold loads where applicable",
+        "expected": "Genuine predecessor private view and native earned research, unfinished progress, queue and bonus stay preserved, followed by one ordinary completion and a saved successor whose two cold-load records agree.",
+        "required_observations": "Original protected predecessor save and initial before-work observation; physical science/payment, completion/bonus, saved bytes, cold1/cold2 immutable copies and semantic comparators. Do not substitute an initialized current default or scripted credit."
+      }
+    ],
+    "exclusions": [
+      "Do not classify prior 5.0.13 observer or earlier MIR4 screenshots as public 5.0.14 native input.",
+      "Do not infer same-index privacy from host doubles, a one-client screenshot or serial session.",
+      "Do not treat an old bounded convenience snapshot as deletion/replacement of the authoritative old state.",
+      "Do not treat an export preview, unchanged source hash or better diagnostics as successful file output.",
+      "Do not claim full native support if the approved two-client 7168MiB resource guard refuses admission.",
+      "Do not rerun accepted A612 source, unchanged Angel/agriculture cases or usurp Black Glass Foundation/server-export execution."
+    ]
+  },
+  "coordination_and_disposition": {
+    "ownership": "This review covers one new evidence file only. Black Glass retains all player source, integration, native execution and publication; current server-export and Foundation assignments untouched.",
+    "verdict": "Unperformed 5.0.14 personal saved-view, real client input/lifecycle and export-file behavior remain blocking stable acceptance. No new gameplay defect is alleged from static text.",
+    "release_status": "5.0.14 remains published prerelease; do not mark stable.",
+    "follow_up": "Adopt these precise expectations in an independently reviewed existing native/client packet when the sole execution owner admits it. Retain original negative receipts and zero-pass limits."
+  }
+}

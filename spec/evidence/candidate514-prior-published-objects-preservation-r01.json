@@ -1,0 +1,29 @@
+{
+  "kind": "MIR514PriorPublishedObjectsPreservationV1",
+  "unchanged": true,
+  "release_count": 103,
+  "tag_ref_count": 181,
+  "before_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate514-publication-r01\\prior-objects-before.json",
+  "after_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate514-publication-r01\\prior-objects-after.json",
+  "before_file_sha256": "E2029EDA0E232FA913400F441E55BA27FDB2FA1B3FB2C51ECE57734A081FC5F7",
+  "after_file_sha256": "C98F5B0D26DA80D3EF4B06C6A019596514C723F6BFD537BF1A4B5FAD8EA202B2",
+  "before_canonical_sha256": "DA9D634C62568190EA56470C9EE7E4CA852783BF6287298942631014C98A6536",
+  "after_canonical_sha256": "DA9D634C62568190EA56470C9EE7E4CA852783BF6287298942631014C98A6536",
+  "scope": "All103 earlier releases and181 earlier tag refs preserved; full projections retained separately. Download counters excluded. No prior published asset bytes replaced.",
+  "actual_original_body_readback": {
+    "kind": "ActualRemoteDecodedNativeOriginalReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "fbef2d66b3231f09df6ce461414e3e4c3617f577",
+    "path": "projects/mir/runs/mir514-publication-and-stable-continuation-r01/original-bodies.json.gz",
+    "git_blob": "48d9fc9e09e71aa722922a3bdec414069d13c446",
+    "packed_bytes": 9042328,
+    "packed_sha256": "6C0FA8FA0F18B3A31146B3B9DD23D36E470563CA27AC833F8CF0C9D1CD07DC9F",
+    "actual_originals_verified": 114,
+    "actual_original_bytes": 18479193,
+    "method": "Exact remote branch and GitBlob body download, decode/hash and actual-byte compare all originals. Actual publication/all19/projections/originals plus next stable preparation. No new Foundation game or stable verdict."
+  },
+  "raw_projection_paths_in_remote_capsule": [
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate514-publication-r01\\prior-objects-before.json",
+    "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate514-publication-r01\\prior-objects-after.json"
+  ]
+}

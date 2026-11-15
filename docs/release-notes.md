@@ -1,24 +1,26 @@
 ---
-title: "MIR 5.0.14 beta release notes"
+title: "MIR 5.0.15 beta release notes"
 status: current
-applies_to: "MIR 5.0.14 GitHub prerelease"
+applies_to: "MIR 5.0.15 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-514-release-notes
+  - mir-515-release-notes
 ---
 
-Fixes worker cargo save upgrades that reject unrelated mod changes despite having saved MIR ownership history.
+Preserves worker-cargo research through prepared upgrades and fixes a productivity compatibility refusal.
 
-- Preserve earned worker cargo levels and unfinished or queued research during these recorded-default upgrades.
-- Include the previous MIR version and saved-route information in changed-selection refusals.
+- Preserve earned levels and unfinished default worker-cargo research from prepared MIR 5.0.11 saves.
+- Preserve authenticated older default worker-cargo upgrades when moving from Factorio 2.1.23 to 2.1.24.
+- Accept a complete productivity-preservation effect when its public research also covers other recipes.
+- Name the rejected productivity component and its public reference in startup errors.
 
-Keep a protected original save and its matching mods/settings. Saves missing earlier ownership data still need that original configuration; this update does not reconstruct erased research. Update a copy before adopting it.
+Update a copy first. Keep a protected original save with its matching mods and startup settings. Histories missing the required ownership evidence may still need that original configuration; MIR cannot reconstruct erased research.
 
-This is a GitHub beta. Library input/export/client-lifecycle checks and broader performance acceptance remain unfinished for stable.
+This is a GitHub prerelease, not stable. Graphical Library and multiplayer checks, plus broader performance testing, remain unfinished.
 
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.15/docs/support.md).

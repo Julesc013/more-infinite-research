@@ -1294,6 +1294,85 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                   no_foreign_write(force)
                 ''')
 
+    def test_published_f210_m4_base_exact_patch24_hop_preserves_only_old_paid_mask(self):
+        """The observed Base patch hop retains its fixed mask for an F210 successor."""
+        for successor in ("5.0.21015", "5.0.21016"):
+            with self.subTest(successor=successor):
+                self.setUp()
+                self._published_m4_base("f210")
+                self.lua.globals().successor = successor
+                self.lua.execute('''
+          BASE_ACTIVE.base="2.1.24";BASE_ACTIVE["more-infinite-research"]=successor
+          reload_credits(BASE_ACTIVE,"f210")
+          local force=make_collected_force(1,8,published_base_mask,false)
+          local main=force.technologies["recipe-prod-research_steel-1"]
+          main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+          force.current_research=main;local queue=force.research_queue
+          native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes={
+            base={old_version="2.1.23",new_version="2.1.24"},
+            ["more-infinite-research"]={old_version="4.7.21003",new_version=successor}}})
+          for family,recipes in pairs(GROUPS) do
+            close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
+            assert(record(force,family,recipes[1].recipe).offset==0)
+          end
+          close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+          assert(record(force,"research_steel","new-unpaid-steel").offset==-7)
+          assert(force.research_queue==queue and force.current_research==main
+            and main.saved_progress==.27 and force.research_progress==.42)
+          no_foreign_write(force)
+        ''')
+
+    def test_published_f210_m4_base_patch24_reader_refuses_other_inputs_before_writes(self):
+        opponents = ("old-below-floor", "downgrade", "missing-base", "new-mismatch", "cross-family",
+                     "changed-settings", "foreign-mod", "invalid-settings-flag")
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._published_m4_base("f210")
+                self.lua.globals().opponent = opponent
+                self.lua.execute('''
+                  BASE_ACTIVE.base="2.1.24";BASE_ACTIVE["more-infinite-research"]="5.0.21015"
+                  local changed=false
+                  local changes={base={old_version="2.1.23",new_version="2.1.24"},
+                    ["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21015"}}
+                  if opponent=="old-below-floor" then changes.base.old_version="2.1.22" end
+                  if opponent=="downgrade" then
+                    BASE_ACTIVE.base="2.1.23";changes.base={old_version="2.1.24",new_version="2.1.23"}
+                  end
+                  if opponent=="missing-base" then changes.base=nil end
+                  if opponent=="new-mismatch" then
+                    BASE_ACTIVE["more-infinite-research"]="5.0.21016"
+                  end
+                  if opponent=="cross-family" then
+                    BASE_ACTIVE["more-infinite-research"]="5.0.20015"
+                    changes["more-infinite-research"].new_version="5.0.20015"
+                  end
+                  if opponent=="changed-settings" then changed=true end
+                  if opponent=="foreign-mod" then
+                    BASE_ACTIVE.foreign="1.0.0";changes.foreign={new_version="1.0.0"}
+                  end
+                  if opponent=="invalid-settings-flag" then changed="false" end
+                  reload_credits(BASE_ACTIVE,"f210")
+                  local fresh=make_collected_force(1,1,{},false)
+                  local force=make_collected_force(2,8,published_base_mask,false)
+                  local main=force.technologies["recipe-prod-research_steel-1"]
+                  main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+                  force.current_research=main;local queue=force.research_queue
+                  local ok,message=pcall(native_credits.on_configuration_changed,
+                    {mod_startup_settings_changed=changed,mod_changes=changes})
+                  assert(not ok and tostring(message):find("unknown first paid mask",1,true),
+                    "unproven patch24 route admitted: "..opponent.." "..tostring(message))
+                  assert(next(storage)==nil,"refusal wrote MIR storage")
+                  for _,f in ipairs({fresh,force}) do
+                    for _,state in pairs(f._states) do
+                      assert(state.writes.level==0 and state.writes.enabled==0,"refusal mutated native state")
+                    end
+                    no_foreign_write(f)
+                  end
+                  assert(force.research_queue==queue and force.current_research==main
+                    and main.saved_progress==.27 and force.research_progress==.42)
+                ''')
+
     def test_published_m4_engine_hop_known_mask_does_not_require_unchanged_settings_flag(self):
         for full_bootstrap in (False, True):
             for changed in (False, True):

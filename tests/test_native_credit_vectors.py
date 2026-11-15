@@ -5,6 +5,7 @@ import sys
 import unittest
 
 import test_native_family_paid_credits as family_fixture
+import test_generator as generator_fixture
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,15 +18,16 @@ class NativeCreditVectorTests(unittest.TestCase):
         case.setUp()
         self.lua = case.lua
         self.lua.execute(r'''
-          function vector_world(size, included, target, change, level)
-            GROUPS={research_low_density_structure={{recipe="scrap-recycling",change=change or .1}}}
+          function vector_world(size, included, target, change, level, family, recipe, public_id)
+            family=family or "research_low_density_structure";recipe=recipe or "scrap-recycling"
+            GROUPS={[family]={{recipe=recipe,change=change or .1}}}
             reload_credits(nil,target or "f210");game.forces={};storage={}
             local f=make_collected_force(1,level or 1,{},not included)
             local d=native_credit_definitions.collected_descriptors(GROUPS)[1]
-            local public_id="scrap-recycling-productivity"
+            public_id=public_id or "scrap-recycling-productivity"
             local reference={name=public_id,level=1,max_level=UINT32_MAX,hidden=false,effects={}}
             for i=1,size do
-              reference.effects[i]={type="change-recipe-productivity",recipe=i==1 and"scrap-recycling"or"synthetic-recycling-"..i,
+              reference.effects[i]={type="change-recipe-productivity",recipe=i==1 and recipe or"synthetic-recycling-"..i,
                 change=fixture_effect(.1)}
             end
             local pub,pub_state=make_technology(public_id,reference,4,false,true)
@@ -81,6 +83,423 @@ class NativeCreditVectorTests(unittest.TestCase):
             VF,VD,VR=f,d,reference
             return f,d,reference
           end
+        ''')
+
+    def test_real_collection_then_cerys_loop_admits_complete_carriers_with_broader_public_owner(self):
+        # The extra producer is explicitly synthetic. The collector, carrier
+        # constructor and unchanged Cerys loop are real source. This is a host
+        # reproduction of their composition, not either reporter's modpack.
+        generator_fixture.LuaRuntime = LuaRuntime
+        stage = generator_fixture.GeneratorTests()
+        stage.setUp()
+        stage.lua.execute(r'''
+          mods={base="2.1.23",["space-age"]="2.1.23"}
+          package.loaded["research.settings"]=nil
+          local config=require("research.settings");local startup={}
+          for _,row in ipairs(config.prototypes())do startup[row.name]={value=row.default_value}end
+          settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function()end
+          function data:extend(rows)
+            for _,row in ipairs(rows)do
+              self.raw[row.type]=self.raw[row.type]or{}
+              assert(self.raw[row.type][row.name]==nil,"duplicate publication")
+              self.raw[row.type][row.name]=row
+            end
+          end
+          local owner="processing-unit-productivity"
+          data.raw.technology[owner]={name=owner,type="technology",max_level="infinite",
+            effects={{type="change-recipe-productivity",recipe="processing-unit",change=.1}},
+            unit={count_formula="1.5^L*1000",time=60}}
+          for _,name in ipairs({"processing-unit","cerys-processing-units-from-nitric-acid",
+              "mir-vector-independent-processing"})do
+            data.raw.recipe[name]={type="recipe",name=name,enabled=false,allow_productivity=true,
+              ingredients={{type="item",name="advanced-circuit",amount=2}},
+              results={{type="item",name="processing-unit",amount=1}}}
+          end
+          dofile(player_root.."/data.lua");dofile(data_final_path)
+          emitted_groups=data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.credits
+          assert(#emitted_groups.research_processing_unit==3,"collector omitted a productive recipe")
+          assert(#data.raw.technology[owner].effects==3,"public owner lost a collected recipe")
+        ''')
+        stage.lua.execute((ROOT / "tests/fixtures/native-credit-vectors/cerys-technology-first45.lua").read_text())
+        stage.lua.execute(r'''
+          local prefix="mir-native-credit-research_processing_unit-"
+          assert(#data.raw.technology[prefix.."processing-unit-positive"].effects==2)
+          assert(#data.raw.technology[prefix.."processing-unit-negative"].effects==2)
+          assert(#data.raw.technology[prefix.."mir-vector-independent-processing-positive"].effects==1)
+          assert(#data.raw.technology["processing-unit-productivity"].effects==3)
+        ''')
+        groups = generator_fixture.plain_lua(stage.lua.globals().emitted_groups)
+        emitted = generator_fixture.plain_lua(stage.lua.globals().data.raw.technology)
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.setUp()
+                self.lua.globals().case_target = target
+                self.lua.globals().emitted_groups = generator_fixture.lua_table(
+                    self.lua, {"research_processing_unit": groups["research_processing_unit"]})
+                self.lua.globals().emitted = generator_fixture.lua_table(self.lua, emitted)
+                self.lua.execute(r'''
+                  GROUPS=emitted_groups;reload_credits(nil,case_target);storage={};game.forces={}
+                  local f=make_collected_force(1,1,{},true)
+                  local ds=native_credit_definitions.collected_descriptors(GROUPS)
+                  local function runtime_prototype(id)
+                    local p=emitted[id];p.level=p.level or 1;p.max_level=UINT32_MAX
+                    for _,e in ipairs(p.effects)do e.change=fixture_effect(e.change)end
+                    return p
+                  end
+                  for _,d in ipairs(ds)do
+                    for _,id in ipairs({d.main_id,d.positive_id,d.negative_id})do
+                      f._states[id].prototype=runtime_prototype(id)
+                    end
+                  end
+                  local public_id="processing-unit-productivity"
+                  local reference=runtime_prototype(public_id)
+                  reference.hidden=false
+                  prototypes.technology[public_id]=reference
+                  local public,state=make_technology(public_id,reference,4,false,true)
+                  f.technologies[public_id]=public;f._states[public_id]=state
+                  local history=prototypes.get_history
+                  prototypes.get_history=function(kind,name)
+                    if name==public_id then return{created="space-age"}end
+                    return history(kind,name)
+                  end
+                  local foreign=f.technologies.foreign;foreign.saved_progress=.27
+                  local queue={foreign};f.research_queue=queue;f.current_research=foreign
+                  native_credits.on_init();native_credits.on_configuration_changed()
+                  local main_record=record(f,"research_processing_unit","processing-unit")
+                  assert(main_record.basis["processing-unit"]==1)
+                  assert(main_record.basis["cerys-processing-units-from-nitric-acid"]==1)
+                  assert(main_record.basis["mir-vector-independent-processing"]==nil,
+                    "reference-only recipe became carrier credit")
+                  assert(f.research_queue==queue and f.current_research==foreign)
+                  assert(f.research_progress==.42 and foreign.saved_progress==.27)
+                  for _,s in pairs(f._states)do assert(s.writes.level==0 and s.writes.enabled==0)end
+                  no_foreign_write(f)
+                ''')
+
+    def test_reference_only_recipe_is_not_paid_by_positive_or_negative_carrier(self):
+        families = (
+            ("research_low_density_structure", "low-density-structure", "low-density-structure-productivity"),
+            ("research_plastic", "plastic-bar", "plastic-bar-productivity"),
+            ("research_processing_unit", "processing-unit", "processing-unit-productivity"),
+            ("research_rocket_fuel", "rocket-fuel", "rocket-fuel-productivity"),
+            ("research_steel", "steel-plate", "steel-plate-productivity"),
+        )
+        for target in ("f200", "f210"):
+            for family, recipe, reference_id in families:
+                with self.subTest(target=target, family=family):
+                    self.setUp()
+                    self.lua.globals().case_target = target
+                    self.lua.globals().case_family = family
+                    self.lua.globals().case_recipe = recipe
+                    self.lua.globals().case_reference = reference_id
+                    self.lua.execute(r'''
+                      local f,d,r=vector_world(2,true,case_target,.1,1,case_family,case_recipe,case_reference)
+                      r.effects[3]={type="change-recipe-productivity",recipe="public-only",change=fixture_effect(.2)}
+                      native_credits.on_init();earn_vector_main(2)
+                      local main=f.technologies[d.main_id]
+                      -- Retiring paid work must carry both owned components,
+                      -- while the unrelated public effect keeps exactly 3 levels.
+                      main.prototype.effects={};main.prototype.hidden=true
+                      native_credits.on_configuration_changed()
+                      assert(f.technologies[d.positive_id].level==3)
+                      local function check(units)
+                        local totals=vector_totals();local step=fixture_effect(.1)
+                        close(totals[case_recipe],3*step+units*step)
+                        close(totals["synthetic-recycling-2"],3*step+units*step)
+                        close(totals["public-only"],3*fixture_effect(.2))
+                        assert(record(f,case_family,case_recipe).basis["public-only"]==nil)
+                        assert(f._states[case_reference].writes.level==0 and f._states[case_reference].writes.enabled==0)
+                        no_foreign_write(f)
+                      end
+                      check(2)
+                      local baseline=storage.mir_native_credits
+                      for _=1,2 do native_credits.on_load();native_credits.on_configuration_changed();check(2)end
+                      assert(storage.mir_native_credits==baseline)
+                      local basis=record(f,case_family,case_recipe).basis
+                      r.effects[4]={type="change-recipe-productivity",recipe="another-public-only",change=fixture_effect(.3)}
+                      native_credits.on_configuration_changed();check(2)
+                      assert(record(f,case_family,case_recipe).basis["another-public-only"]==nil)
+                      close(vector_totals()["another-public-only"],3*fixture_effect(.3))
+                      table.remove(r.effects)
+                      native_credits.on_configuration_changed();check(2)
+                      assert(record(f,case_family,case_recipe).basis[case_recipe]==basis[case_recipe])
+                      -- Advance hidden work without a payable queue, then expose
+                      -- exactly the two owned components: the debit is also local.
+                      advance(f,d.main_id,5,false);native_credits.on_configuration_changed()
+                      main.prototype.effects={
+                        {type="change-recipe-productivity",recipe=case_recipe,change=fixture_effect(.1)},
+                        {type="change-recipe-productivity",recipe="synthetic-recycling-2",change=fixture_effect(.1)}}
+                      main.prototype.hidden=false
+                      native_credits.on_configuration_changed()
+                      assert(f.technologies[d.negative_id].level==3);check(2)
+                      advance(f,d.main_id,6,false)
+                      native_credits.on_research_finished{research=main,by_script=false}
+                      native_credits.on_configuration_changed();check(3)
+                    ''')
+
+    def test_broader_reference_cannot_hide_invalid_or_uncovered_carrier_components(self):
+        cases = (
+            ("p[3]={type='change-recipe-productivity',recipe='uncovered',change=.1};"
+             "n[3]={type='change-recipe-productivity',recipe='uncovered',change=-.1}", "vector-recipe"),
+            ("table.remove(n)", "vector-count"),
+            ("n[3]={type='change-recipe-productivity',recipe='public-only',change=-.1}", "vector-count"),
+            ("n[2].recipe='public-only'", "vector-recipe"),
+            ("r.effects[2].recipe='unrelated-reference'", "vector-recipe"),
+            ("p[2].change=.2", "positive-component"),
+            ("n[2].change=.1", "negative-component"),
+            ("r.effects[3].type='unlock-recipe'", "vector-shape"),
+            ("r.effects[3].recipe=r.effects[1].recipe", "vector-shape"),
+            ("r.effects[3].change=0/0", "vector-shape"),
+            ("r.effects[3].change=0", "reference-coefficient"),
+        )
+        for target in ("f200", "f210"):
+            for opponent, reason in cases:
+                with self.subTest(target=target, opponent=opponent):
+                    self.setUp()
+                    self.lua.globals().case_target = target
+                    self.lua.globals().opponent = opponent
+                    self.lua.globals().reason = reason
+                    self.lua.execute(r'''
+                      local f,d,r=vector_world(2,false,case_target,.1,1,
+                        'research_processing_unit','processing-unit','processing-unit-productivity')
+                      r.effects[3]={type='change-recipe-productivity',recipe='public-only',change=fixture_effect(.1)}
+                      local p=f.technologies[d.positive_id].prototype.effects
+                      local n=f.technologies[d.negative_id].prototype.effects
+                      assert(load('return function(p,n,r) '..opponent..' end'))()(p,n,r)
+                      local ok,message=pcall(native_credits.on_init)
+                      assert(not ok and tostring(message):find('rejection.reason="'..reason..'"',1,true),
+                        'invalid complete signed pair or reference was admitted')
+                      assert_no_vector_writes()
+                    ''')
+
+    def test_each_family_reference_accepts_hidden_empty_enabled_main_and_preserves_state(self):
+        # Independent public identities: none takes the scrap-recycling override.
+        families = (
+            ("research_low_density_structure", "low-density-structure", "low-density-structure-productivity"),
+            ("research_plastic", "plastic-bar", "plastic-bar-productivity"),
+            ("research_processing_unit", "processing-unit", "processing-unit-productivity"),
+            ("research_rocket_fuel", "rocket-fuel", "rocket-fuel-productivity"),
+            ("research_steel", "steel-plate", "steel-plate-productivity"),
+        )
+        # Exact independent native .1 representations; no implementation oracle.
+        for target, native_change in (("f200", 0.10000000149011612), ("f210", 0.1)):
+            for family, recipe, reference_id in families:
+                with self.subTest(target=target, family=family):
+                    self.lua.globals().case_target = target
+                    self.lua.globals().case_family = family
+                    self.lua.globals().case_recipe = recipe
+                    self.lua.globals().case_reference = reference_id
+                    self.lua.globals().expected_native = native_change
+                    self.lua.execute(r'''
+                      local f,d=vector_world(2,false,case_target,.1,1,case_family,case_recipe,case_reference)
+                      local main=f.technologies[d.main_id];main.prototype.enabled=true
+                      local foreign=f.technologies.foreign;foreign.saved_progress=.27
+                      local queue={foreign};f.research_queue=queue;f.current_research=foreign
+                      local function preserved_no_writes()
+                        local row=record(f,case_family,case_recipe)
+                        assert(row and row.private and not row.included and row.offset==0)
+                        assert(row.basis[case_recipe]==1 and row.basis['synthetic-recycling-2']==1)
+                        assert(main.prototype.hidden and #main.prototype.effects==0)
+                        assert(main.prototype.enabled and main.enabled and main.level==1)
+                        assert(f.research_queue==queue and queue[1]==foreign and f.current_research==foreign)
+                        assert(f.research_progress==.42 and foreign.saved_progress==.27)
+                        local totals=vector_totals()
+                        close(totals[case_recipe],3*expected_native)
+                        close(totals['synthetic-recycling-2'],3*expected_native)
+                        for _,s in pairs(f._states)do
+                          assert(s.writes.level==0 and s.writes.enabled==0,'valid baseline wrote native state')
+                        end
+                        no_foreign_write(f)
+                      end
+                      native_credits.on_init();preserved_no_writes()
+                      local baseline=storage.mir_native_credits
+                      native_credits.on_configuration_changed();preserved_no_writes()
+                      -- Fresh Lua module with saved ledger; this is a host reload control.
+                      local saved_game=game;game=nil;package.loaded['runtime.native_credits']=nil
+                      native_credits=require('runtime.native_credits');native_credits.on_load();game=saved_game
+                      assert(storage.mir_native_credits==baseline);preserved_no_writes()
+                      native_credits.on_configuration_changed();preserved_no_writes()
+                      vector_mask(true,false);native_credits.on_configuration_changed();earn_vector_main(2)
+                      vector_mask(false,true);native_credits.on_configuration_changed()
+                      assert(record(f,case_family,case_recipe).offset==2)
+                      assert(main.level==3 and f.technologies[d.positive_id].level==3)
+                      assert(f.technologies[d.negative_id].level==1)
+                      local totals=vector_totals()
+                      close(totals[case_recipe],5*expected_native)
+                      close(totals['synthetic-recycling-2'],5*expected_native)
+                      assert(f.research_queue==queue and f.current_research==foreign)
+                      assert(f.research_progress==.42 and foreign.saved_progress==.27)
+                      for _,id in ipairs({d.main_id,case_reference,'foreign'})do
+                        assert(f._states[id].writes.level==0 and f._states[id].writes.enabled==0)
+                      end
+                      no_foreign_write(f)
+                    ''')
+
+    def test_processing_tail_and_reference_rejections_are_distinct_and_make_no_writes(self):
+        cases = (
+            ('n[2].change=.2', 'negative-component', (
+                'rejection.role="negative"', 'rejection.component=2',
+                'rejection.recipe="cerys-processing-units-from-nitric-acid"',
+                'rejection.positive=0.1', 'rejection.negative=0.2')),
+            ('prototypes.technology[r.name]=nil', 'reference-missing', ('reference.present=false',)),
+            ('r.hidden=true', 'reference-hidden', ('reference.hidden=true',)),
+            ('table.remove(r.effects)', 'reference-vector-count', ('reference.effects_count=1',)),
+        )
+        messages = []
+        for opponent, reason, details in cases:
+            with self.subTest(reason=reason):
+                self.setUp()
+                self.lua.globals().opponent = opponent
+                message = self.lua.execute(r'''
+                  local f,d,r=vector_world(2,false,'f210',.1,1,
+                    'research_processing_unit','processing-unit','processing-unit-productivity')
+                  f.technologies[d.main_id].prototype.enabled=true
+                  local p=f.technologies[d.positive_id].prototype.effects
+                  local n=f.technologies[d.negative_id].prototype.effects
+                  for _,effects in ipairs({p,n,r.effects})do
+                    effects[2].recipe='cerys-processing-units-from-nitric-acid'
+                  end
+                  assert(load('return function(f,d,r,p,n) '..opponent..' end'))()(f,d,r,p,n)
+                  local history=prototypes.get_history;local reference_reads=0
+                  prototypes.get_history=function(kind,name)
+                    if kind=='technology' and name==r.name then reference_reads=reference_reads+1 end
+                    return history(kind,name)
+                  end
+                  local ok,message=pcall(native_credits.on_init)
+                  assert(not ok,'malformed vector admitted');assert_no_vector_writes()
+                  assert(reference_reads==(prototypes.technology[r.name] and 1 or 0),
+                    'diagnostic added a reference history query')
+                  -- Strip the call-site location; all old visible first components agree.
+                  return tostring(message):match('(MIR native family credit.*)')
+                ''')
+                self.assertIsNotNone(message)
+                messages.append(message)
+                for unchanged in ('main.hidden=true', 'main.enabled=true', 'main.effects_count=0',
+                                  'positive.effects_count=2', 'negative.effects_count=2',
+                                  'positive.recipe="processing-unit"',
+                                  'negative.recipe="processing-unit"'):
+                    self.assertIn(unchanged, message)
+                self.assertIn('reference.id="processing-unit-productivity"', message)
+                self.assertIn('rejection.reason="' + reason + '"', message)
+                for field in details:
+                    self.assertIn(field, message)
+                if reason == 'negative-component':
+                    for field in ('reference.present=true', 'reference.hidden=false', 'reference.first=1',
+                                  'reference.max=4294967295', 'reference.created="space-age"',
+                                  'reference.effects_count=2'):
+                        self.assertIn(field, message)
+        # This fails on the previous error: four different causes printed one identical body.
+        self.assertEqual(len(set(messages)), len(cases))
+
+    def test_missing_carrier_anchor_is_distinct_from_invalid_reference_anchor(self):
+        cases = (
+            ("p[1].recipe='other-anchor';n[1].recipe='other-anchor'", 'vector-anchor', 'positive'),
+            ("r.effects[1].recipe='other-anchor'", 'reference-anchor', 'reference'),
+            ("r.effects[1].change=0", 'reference-anchor', 'reference'),
+            ("r.effects[1].change=-.1", 'reference-anchor', 'reference'),
+        )
+        for target in ('f200', 'f210'):
+            for opponent, reason, role in cases:
+                with self.subTest(target=target, reason=reason, opponent=opponent):
+                    self.setUp()
+                    self.lua.globals().case_target = target
+                    self.lua.globals().opponent = opponent
+                    message = self.lua.execute(r'''
+                      local f,d,r=vector_world(2,false,case_target,.1,1,
+                        'research_processing_unit','processing-unit','processing-unit-productivity')
+                      local p=f.technologies[d.positive_id].prototype.effects
+                      local n=f.technologies[d.negative_id].prototype.effects
+                      assert(load('return function(r,p,n) '..opponent..' end'))()(r,p,n)
+                      local ok,message=pcall(native_credits.on_init)
+                      assert(not ok,'missing or invalid anchor admitted');assert_no_vector_writes()
+                      return tostring(message)
+                    ''')
+                    self.assertIn('rejection.reason="' + reason + '"', message)
+                    self.assertIn('rejection.role="' + role + '"', message)
+                    self.assertIn('rejection.recipe="processing-unit"', message)
+
+    def test_malformed_processing_tail_reports_observed_component_without_writes(self):
+        tail = 'cerys-processing-units-from-nitric-acid'
+        cases = (
+            ("rows[2].type='unlock-recipe'", 'table', tail, 'unlock-recipe'),
+            ("rows[2].recipe=rows[1].recipe", 'table', 'processing-unit', 'change-recipe-productivity'),
+            ("rows[2].change=math.huge", 'table', tail, 'change-recipe-productivity'),
+            ("rows[2].change=0/0", 'table', tail, 'change-recipe-productivity'),
+            ("rows[2]=false", 'boolean', None, None),
+            ("rows[2]=setmetatable({type='unlock-recipe',recipe=rows[2].recipe},"
+             "{__index=function()error('diagnostic inspected an absent field')end})",
+             'table', tail, 'unlock-recipe'),
+        )
+        for target in ('f200', 'f210'):
+            for role in ('positive', 'negative', 'reference'):
+                for opponent, component_type, recipe, effect_type in cases:
+                    with self.subTest(target=target, role=role, opponent=opponent):
+                        self.setUp()
+                        self.lua.globals().case_target = target
+                        self.lua.globals().case_role = role
+                        self.lua.globals().opponent = opponent
+                        message = self.lua.execute(r'''
+                          local f,d,r=vector_world(2,false,case_target,.1,1,
+                            'research_processing_unit','processing-unit','processing-unit-productivity')
+                          local p=f.technologies[d.positive_id].prototype.effects
+                          local n=f.technologies[d.negative_id].prototype.effects
+                          for _,rows in ipairs({p,n,r.effects})do
+                            rows[2].recipe='cerys-processing-units-from-nitric-acid'
+                          end
+                          local rows=case_role=='positive' and p or case_role=='negative' and n or r.effects
+                          assert(load('return function(rows) '..opponent..' end'))()(rows)
+                          local history=prototypes.get_history;local reference_reads=0
+                          prototypes.get_history=function(kind,name)
+                            if kind=='technology' and name==r.name then reference_reads=reference_reads+1 end
+                            return history(kind,name)
+                          end
+                          local previous
+                          for attempt=1,2 do
+                            local ok,message=pcall(native_credits.on_init)
+                            assert(not ok,'malformed component admitted');assert_no_vector_writes()
+                            assert(reference_reads==attempt,'diagnostic added a reference history query')
+                            message=tostring(message):match('(MIR native family credit.*)')
+                            assert(message,'malformed observation replaced the MIR refusal')
+                            assert(not previous or previous==message,'equal rejected input changed diagnostic')
+                            previous=message
+                          end
+                          return previous
+                        ''')
+                        self.assertIn('rejection.reason="vector-shape"', message)
+                        self.assertIn('rejection.role="' + role + '"', message)
+                        self.assertIn('rejection.component=2', message)
+                        self.assertIn('rejection.component_type="' + component_type + '"', message)
+                        if recipe is None:
+                            self.assertNotIn('rejection.recipe=', message)
+                        else:
+                            self.assertIn('rejection.recipe="' + recipe + '"', message)
+                        if effect_type is None:
+                            self.assertNotIn('rejection.effect_type=', message)
+                        else:
+                            self.assertIn('rejection.effect_type="' + effect_type + '"', message)
+                        if opponent in ('rows[2].change=math.huge', 'rows[2].change=0/0'):
+                            expression = opponent.split('=', 1)[1]
+                            self.assertIn('rejection.change=' + self.lua.eval('tostring(' + expression + ')'), message)
+
+    def test_processing_recheck_failure_preserves_existing_ledger_and_foreign_progress(self):
+        self.lua.execute(r'''
+          local f,d=vector_world(2,false,'f210',.1,1,
+            'research_processing_unit','processing-unit','processing-unit-productivity')
+          local main=f.technologies[d.main_id];main.prototype.enabled=true
+          local foreign=f.technologies.foreign;foreign.saved_progress=.27
+          local queue={foreign};f.research_queue=queue;f.current_research=foreign
+          native_credits.on_init()
+          local ledger=storage.mir_native_credits;local row=record(f,d.family,d.recipe)
+          local basis=row.basis
+          f.technologies[d.negative_id].prototype.effects[2].change=.2
+          local ok=pcall(native_credits.on_configuration_changed);assert(not ok)
+          assert(storage.mir_native_credits==ledger and record(f,d.family,d.recipe)==row)
+          assert(row.basis==basis and basis[d.recipe]==1 and basis['synthetic-recycling-2']==1)
+          assert(row.private and not row.included and row.offset==0)
+          assert(f.research_queue==queue and f.current_research==foreign)
+          assert(f.research_progress==.42 and foreign.saved_progress==.27)
+          for _,s in pairs(f._states)do assert(s.writes.level==0 and s.writes.enabled==0)end
+          no_foreign_write(f)
         ''')
 
     def test_complete_97_recipe_totals_survive_both_inclusion_directions_and_repetition(self):

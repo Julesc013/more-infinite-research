@@ -1,0 +1,85 @@
+{
+  "kind": "MIR514FoundationLatestBoundedReadOnlyResourceRefusalV1",
+  "actual": {
+    "output_root_created": false,
+    "state": {
+      "phase": "foundation-whole-world-activity-r08",
+      "admission_wait_seconds": 30,
+      "status": "capacity-timeout",
+      "attempt_count": 59,
+      "refusal_count": 59,
+      "elapsed_seconds": 30.003,
+      "first_refusal": {
+        "observed_at": "2026-11-13T01:00:12.9356369+00:00",
+        "error": "[mir441-resource-admission-memory]",
+        "snapshot": {
+          "observed_at": "2026-11-13T01:00:12.9354167+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14311755776,
+            "committed_bytes": 25475055616,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 73022263296,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 187288522752,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "last_refusal": {
+        "observed_at": "2026-11-13T01:00:42.4798712+00:00",
+        "error": "[mir441-resource-admission-memory]",
+        "snapshot": {
+          "observed_at": "2026-11-13T01:00:42.4797702+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14329348096,
+            "committed_bytes": 25485201408,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 73022263296,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 187286257664,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "last_error": "[mir441-resource-admission-memory]",
+      "started_at": "2026-11-13T01:00:12.4827355+00:00",
+      "deadline_at": "2026-11-13T01:00:42.4827355+00:00",
+      "admission": null
+    },
+    "error": "[mir441-resource-admission-memory]",
+    "native_processes": 0,
+    "packet_sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+    "kind": "Foundation514ReadOnlyUnchangedBoundedAdmissionWaitV1",
+    "library_mutations": 0
+  },
+  "original_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-wait-r04.json",
+  "original_bytes": 2157,
+  "original_sha256": "F0906096B53BE6AF5C8D5CFFA4C42E9D0F895EBDB959F8EC8DD5D7A871CF4F2F",
+  "actual_original_remote_readback": {
+    "kind": "ActualObserverPreparationOriginalRemoteReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "02e7b9a59284096622fec4e8d0448d5dd2fbf136",
+    "path": "projects/mir/runs/mir514-library-observer-preparation-and-resource-r01/original-bodies.json.gz",
+    "git_blob": "1913fe5fe17bfc4343dfc78bab340d9f92d24653",
+    "actual_originals_verified": 12,
+    "actual_original_bytes": 346094,
+    "packed_sha256": "1E023B1B689B9ECBCFA5008C7FF31895FC74E8FDFA4C097F7A8DBBB4D52D5F12",
+    "scope": "Actual80-method host stdout and74-method AST preservation proof, non-author observer-preparation review, exact8 authored fixture/test inputs at3403, plus unchanged-resource bounded admission R04 timeout. No GUI/native/client/export/activity/timing/stable result."
+  },
+  "scope": "Fourth resource snapshot/bounded wait, not a game run. Exact30s policy remains unchanged; no output/library/native. The original r01/r02 and r03 receipts remain preserved.",
+  "stable_qualified": false
+}
