@@ -226,7 +226,11 @@ try {
   $recoveryJournal=$abandoned.journal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
   foreach($handle in $abandoned.handles){$handle.Dispose()};$abandoned.lock.Dispose();$abandoned.closed=$true
   $recoveryJournal.owner_pid=[int]::MaxValue;$recoveryJournal.owner_started_utc='2000-01-01T00:00:00Z'
-  [IO.File]::WriteAllText((Join-Path $library '.mir-active-profile.json'),($recoveryJournal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+  $recoveryJournalPath=Join-Path $library '.mir-active-profile.json'
+  [IO.File]::WriteAllText($recoveryJournalPath,($recoveryJournal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+  $recoveryJournalItem=Get-Item -LiteralPath $recoveryJournalPath -Force
+  Assert-Library ($recoveryJournalItem.Length-gt0-and$recoveryJournalItem.Name-ceq'.mir-active-profile.json') 'stale-journal-is-present-before-recovery'
+  if($IsLinux){Assert-Library ([bool]($recoveryJournalItem.Attributes-band[IO.FileAttributes]::Hidden)) 'stale-journal-is-hidden-on-linux'}
   [IO.File]::WriteAllText($legacyJson,'{"interrupted-engine":true}',[Text.UTF8Encoding]::new($false))
   $recovered=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
   try{Assert-Library ($recovered.journal.controls['mod-settings.json'].sha256-ceq$jsonOriginalHash-and-not(Test-Path -LiteralPath $legacyJson)) 'legacy-json-recovery-restores-original-before-next-defaults'}

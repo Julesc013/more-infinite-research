@@ -216,8 +216,8 @@ function Start-MIRLibraryActivation {
     Assert-MIRLibraryIdle
     if(Test-Path -LiteralPath $journalPath){
       Assert-MIRLibraryPath $journalPath
-      if((Get-Item -LiteralPath $journalPath).Length -gt 12MB){throw '[mir-library-recovery-size]'}
-      $old=Get-Content -LiteralPath $journalPath -Raw|ConvertFrom-Json -AsHashtable -DateKind String
+      if((Get-Item -LiteralPath $journalPath -Force).Length -gt 12MB){throw '[mir-library-recovery-size]'}
+      $old=Get-Content -LiteralPath $journalPath -Force -Raw|ConvertFrom-Json -AsHashtable -DateKind String
       $owner=Get-Process -Id ([int]$old.owner_pid) -ErrorAction SilentlyContinue
       if($null -ne $owner -and $owner.StartTime.ToUniversalTime().ToString('o') -ceq $old.owner_started_utc){throw '[mir-library-recovery-owner-alive]'}
       Restore-MIRLibraryControls -LibraryDirectory $library -Journal $old
