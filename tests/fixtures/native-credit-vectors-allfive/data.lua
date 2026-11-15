@@ -5,11 +5,13 @@ C.require(source and source.type=="assembling-machine" and source.name=="assembl
 local assembler=table.deepcopy(source)
 lab.name=C.lab
 lab.minable=nil
+lab.next_upgrade=nil
 lab.energy_source={type="void"}
 lab.researching_speed=C.lab_speed
 lab.inputs=table.deepcopy(C.packs)
 assembler.name=C.assembler
 assembler.minable=nil
+assembler.next_upgrade=nil
 assembler.energy_source={type="void"}
 assembler.energy_usage="1W"
 assembler.crafting_speed=1
