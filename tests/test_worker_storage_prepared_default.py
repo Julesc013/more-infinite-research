@@ -132,6 +132,40 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
                     and writes==0 and same(settled,all_frames()))
                 ''')
 
+    def test_published11_preparation_requires_its_actual_package_change_event_before_writes(self):
+        for target in ("f200", "f210"):
+            for opponent in ("old10", "no-package-change", "other-edition"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua=self.prepared(target);lua.globals().opponent=opponent
+                    lua.execute(r'''
+                      local event=owner_event(published_version)
+                      if opponent=="old10"then
+                        event.mod_changes["more-infinite-research"].old_version=package_family=="f200"and"5.0.20010"or"5.0.21010"
+                      elseif opponent=="no-package-change"then event.mod_changes={}
+                      else event.mod_changes["more-infinite-research"].old_version=package_family=="f200"and"5.0.21011"or"5.0.20011"end
+                      local before=all_frames();local prepared=storage.mir_worker_storage_route;writes=0
+                      local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                      assert(not ok,"accepted a prepared witness under a different or missing producer event")
+                      assert(tostring(message):find("MIR worker storage history",1,true))
+                      assert(writes==0 and same(before,all_frames())and storage.mir_worker_storage_route==prepared
+                        and storage[OWNER_KEY]==nil)
+                    ''')
+
+    def test_persisted_prepared_owner_cannot_claim_old10_on_storage_only_load(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua=self.prepared(target)
+                lua.execute(r'''
+                  assert(history.default_owner_apply(history.default_owner_preflight(owner_event(published_version),nil,true)))
+                  storage[OWNER_KEY].producer.old_version=package_family=="f200"and"5.0.20010"or"5.0.21010"
+                  writes=0
+                  game=setmetatable({},{__index=function()error("load accessed native game")end})
+                  prototypes=setmetatable({},{__index=function()error("load accessed native prototypes")end})
+                  local ok,message=pcall(history.default_owner_on_load)
+                  assert(not ok,"accepted a persisted prepared owner attributed to the wrong published producer")
+                  assert(tostring(message):find("unknown default native%-owner producer")and writes==0)
+                ''')
+
     def test_unrelated_changes_do_not_erase_authenticated_work_or_foreign_disablement(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
