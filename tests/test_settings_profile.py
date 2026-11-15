@@ -465,6 +465,16 @@ class SettingsProfileTests(unittest.TestCase):
               "invalid mod identity was silently changed")
           end
 
+          local envelope_opponents = {
+            {profile = {schema = false, settings = {good = false}}, error = "unsupported profile schema false"},
+            {profile = {kind = false, settings = {good = false}}, error = "unsupported profile kind false"},
+          }
+          for _, opponent in ipairs(envelope_opponents) do
+            local wire, err = codec.encode(opponent.profile, checked_helpers)
+            assert(wire == nil and err == opponent.error,
+              "false envelope identity was silently defaulted")
+          end
+
           local settings_cycle = {}
           settings_cycle.self = settings_cycle
           local wire, err = codec.encode({settings = {good = false, bad = settings_cycle}}, checked_helpers)

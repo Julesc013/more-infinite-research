@@ -106,9 +106,11 @@ end
 
 local function normalized_for_encode(profile)
   if type(profile) ~= "table" then return nil, "profile must be a table" end
-  local schema = profile.schema or M.schema
+  local schema = profile.schema
+  if schema == nil then schema = M.schema end
   if schema ~= M.schema then return nil, "unsupported profile schema " .. tostring(schema) end
-  local kind = profile.kind or M.kind
+  local kind = profile.kind
+  if kind == nil then kind = M.kind end
   if kind ~= M.kind then return nil, "unsupported profile kind " .. tostring(kind) end
   if profile.settings ~= nil and type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
   local settings = {}
