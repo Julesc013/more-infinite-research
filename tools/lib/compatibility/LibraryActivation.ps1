@@ -185,7 +185,8 @@ function Start-MIRLibraryActivation {
     [ValidateSet('Defaults','File')][string]$SettingsMode='Defaults',
     [string]$SettingsPath='',[string]$SettingsSha256='',
     [string[]]$PrePinMIROwnedArchiveNames=@(),
-    [string[]]$HideDisabledMIROwnedFixtureArchiveNames=@()
+    [string[]]$HideDisabledMIROwnedFixtureArchiveNames=@(),
+    [AllowNull()][IO.FileStream]$LibraryLock=$null
   )
   if(-not(Test-Path -LiteralPath $LibraryDirectory -PathType Container)){
     throw "[mir-library-missing] Supply the exact selected archive library: $LibraryDirectory"
@@ -195,15 +196,28 @@ function Start-MIRLibraryActivation {
   Assert-MIRLibraryIdle
   $lockPath=Join-Path $library '.mir-library.lock'
   if(Test-Path -LiteralPath $lockPath){Assert-MIRLibraryPath $lockPath}
-  try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir-library-busy] Another activation owns the library.'}
+  $ownsLibraryLock=$null-eq$LibraryLock
+  if($ownsLibraryLock){
+    try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir-library-busy] Another activation owns the library.'}
+  }else{
+    $lock=$LibraryLock
+    try{if($lock.SafeFileHandle.IsClosed){throw '[mir-library-borrowed-lock-closed]'};$lockName=$lock.Name}catch{throw '[mir-library-borrowed-lock-closed]'}
+    if(-not$lock.CanRead-or-not$lock.CanWrite){throw '[mir-library-borrowed-lock-access]'}
+    $comparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
+    if(-not[string]::Equals([IO.Path]::GetFullPath($lockName),[IO.Path]::GetFullPath($lockPath),$comparison)){throw '[mir-library-borrowed-lock-path]'}
+    $probe=$null
+    try{$probe=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::ReadWrite)}catch [IO.IOException]{}
+    finally{if($null-ne$probe){$probe.Dispose()}}
+    if($null-ne$probe){throw '[mir-library-borrowed-lock-exclusive]'}
+  }
   $handles=[Collections.Generic.List[object]]::new();$journal=$null
   $journalPath=Join-Path $library '.mir-active-profile.json'
   try{
     Assert-MIRLibraryIdle
     if(Test-Path -LiteralPath $journalPath){
       Assert-MIRLibraryPath $journalPath
-      if((Get-Item -LiteralPath $journalPath).Length -gt 12MB){throw '[mir-library-recovery-size]'}
-      $old=Get-Content -LiteralPath $journalPath -Raw|ConvertFrom-Json -AsHashtable -DateKind String
+      if((Get-Item -LiteralPath $journalPath -Force).Length -gt 12MB){throw '[mir-library-recovery-size]'}
+      $old=Get-Content -LiteralPath $journalPath -Force -Raw|ConvertFrom-Json -AsHashtable -DateKind String
       $owner=Get-Process -Id ([int]$old.owner_pid) -ErrorAction SilentlyContinue
       if($null -ne $owner -and $owner.StartTime.ToUniversalTime().ToString('o') -ceq $old.owner_started_utc){throw '[mir-library-recovery-owner-alive]'}
       Restore-MIRLibraryControls -LibraryDirectory $library -Journal $old
@@ -304,10 +318,10 @@ function Start-MIRLibraryActivation {
     # mode. File still pins only mod-settings.dat; this adds no legacy File API.
     Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.json') -Absent
     if($null -eq $settings){Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Absent}else{Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Bytes ([Convert]::FromBase64String($settings.bytes))}
-    return [pscustomobject]@{library=$library;engine_data=(Resolve-Path -LiteralPath $EngineDataDirectory).Path;lock=$lock;handles=$handles;journal=$journal;selected=$selected.ToArray();inventory=$inventory;mod_list_bytes=$activeBytes;profile_sha256=$profile.sha256;closed=$false}
+    return [pscustomobject]@{library=$library;engine_data=(Resolve-Path -LiteralPath $EngineDataDirectory).Path;lock=$lock;owns_library_lock=$ownsLibraryLock;handles=$handles;journal=$journal;selected=$selected.ToArray();inventory=$inventory;mod_list_bytes=$activeBytes;profile_sha256=$profile.sha256;closed=$false}
   }catch{
     if($null -ne $journal){try{Assert-MIRLibraryIdle;Restore-MIRLibraryControls -LibraryDirectory $library -Journal $journal;[IO.File]::Delete($journalPath)}catch{Write-Warning 'Library controls require recovery; the durable journal was retained.'}}
-    foreach($handle in $handles){$handle.Dispose()};$lock.Dispose();throw
+    foreach($handle in $handles){$handle.Dispose()};if($ownsLibraryLock){$lock.Dispose()};throw
   }
 }
 
@@ -547,14 +561,19 @@ function Assert-MIRLibraryLaunch {
 function Complete-MIRLibraryActivation {
   param([Parameter(Mandatory)]$Activation)
   if($Activation.closed){throw '[mir-library-activation-closed]'}
+  $ownsLibraryLock=$true
+  if($null-ne$Activation.PSObject.Properties['owns_library_lock']){
+    if($Activation.owns_library_lock-isnot[bool]){throw '[mir-library-activation-lock-ownership]'}
+    $ownsLibraryLock=[bool]$Activation.owns_library_lock
+  }
   # Keep the lock and archive handles if an engine still uses this selection.
   Assert-MIRLibraryIdle -WaitMilliseconds 3000
   try{
     Restore-MIRLibraryControls -LibraryDirectory $Activation.library -Journal $Activation.journal
     [IO.File]::Delete((Join-Path $Activation.library '.mir-active-profile.json'))
     $hiddenCount=if($Activation.journal.Contains('owned_archive_visibility')){@($Activation.journal.owned_archive_visibility).Count}else{0}
-    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;owned_archive_names_temporarily_hidden=$hiddenCount;selected=@($Activation.selected|Select-Object name,version,path,builtin,identity,sha256,bytes)}
+    return [ordered]@{status='restored-direct-library-controls';profile_sha256=$Activation.profile_sha256;library_lock_released=$ownsLibraryLock;dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0;owned_archive_names_temporarily_hidden=$hiddenCount;selected=@($Activation.selected|Select-Object name,version,path,builtin,identity,sha256,bytes)}
   }finally{
-    foreach($handle in $Activation.handles){$handle.Dispose()};$Activation.lock.Dispose();$Activation.closed=$true
+    foreach($handle in $Activation.handles){$handle.Dispose()};if($ownsLibraryLock){$Activation.lock.Dispose()};$Activation.closed=$true
   }
 }
