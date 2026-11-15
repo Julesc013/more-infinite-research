@@ -149,12 +149,22 @@ function Resolve-MIR441ExistingDirectoryAncestor {
 
 function Get-MIR441LinuxVolumeDevice {
   param([Parameter(Mandatory)]$Volume)
-  $deviceProperty=$Volume.PSObject.Properties['device'];$mountProperty=$Volume.PSObject.Properties['mount_id']
-  if($null-eq$deviceProperty-or$null-eq$mountProperty-or$deviceProperty.Value-isnot[string]-or
-    [string]::IsNullOrWhiteSpace([string]$deviceProperty.Value)-or($mountProperty.Value-isnot[int]-and$mountProperty.Value-isnot[long])-or[int64]$mountProperty.Value-le0){
+  # Linux snapshots intentionally use [ordered]@{} rows. Those are
+  # OrderedDictionary instances: member access adapts keys, but PSObject
+  # properties do not enumerate those keys. Read IDictionary rows directly;
+  # retain the PSCustomObject path for controlled callers and tests.
+  if($Volume-is[Collections.IDictionary]){
+    if(-not$Volume.Contains('device')-or-not$Volume.Contains('mount_id')){throw '[mir441-resource-linux-mount-device]'}
+    $deviceValue=$Volume['device'];$mountValue=$Volume['mount_id']
+  }else{
+    $deviceProperty=$Volume.PSObject.Properties['device'];$mountProperty=$Volume.PSObject.Properties['mount_id']
+    if($null-eq$deviceProperty-or$null-eq$mountProperty){throw '[mir441-resource-linux-mount-device]'}
+    $deviceValue=$deviceProperty.Value;$mountValue=$mountProperty.Value
+  }
+  if($deviceValue-isnot[string]-or[string]::IsNullOrWhiteSpace([string]$deviceValue)-or($mountValue-isnot[int]-and$mountValue-isnot[long])-or[int64]$mountValue-le0){
     throw '[mir441-resource-linux-mount-device]'
   }
-  $match=[regex]::Match([string]$deviceProperty.Value,'^(?<major>[0-9]+):(?<minor>[0-9]+)$')
+  $match=[regex]::Match([string]$deviceValue,'^(?<major>[0-9]+):(?<minor>[0-9]+)$')
   if(-not$match.Success){throw '[mir441-resource-linux-mount-device]'}
   [uint64]$major=0;[uint64]$minor=0
   if(-not[uint64]::TryParse($match.Groups['major'].Value,[ref]$major)-or-not[uint64]::TryParse($match.Groups['minor'].Value,[ref]$minor)){
