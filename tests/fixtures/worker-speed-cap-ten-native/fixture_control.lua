@@ -460,12 +460,16 @@ function M.apply(stage)
     if type(state) ~= "table" or state.phase ~= "await-ordinary-level-ten" then return end
     local player = game.forces.player
     if event.research == nil or event.research.force ~= player or event.research.name ~= WORKER then return end
-    if event.by_script ~= false or event.research.level ~= 10 then
+    -- Factorio increments an infinite technology's level before this event:
+    -- finishing level ten is observed here at the next level, eleven.
+    if event.by_script ~= false or event.research.level ~= 11 then
       fail("scripted or non-level-ten completion cannot satisfy ordinary cap-ten work")
     end
     state.ordinary_native_completion_count = state.ordinary_native_completion_count + 1
     if state.ordinary_native_completion_count ~= 1 then fail("second worker completion occurred") end
-    state.ordinary_events[#state.ordinary_events + 1] = {name = WORKER, by_script = false, tick = event.tick}
+    state.ordinary_events[#state.ordinary_events + 1] = {
+      name = WORKER, by_script = false, completed_level = 10,
+      event_post_increment_level = event.research.level, tick = event.tick}
     state.phase = "ordinary-level-ten-finished"
   end)
 
