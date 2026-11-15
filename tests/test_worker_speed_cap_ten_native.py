@@ -150,9 +150,10 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   local owner=player.technologies[WORKER]
   if opponent=="await-eleven"then owner.level=11;ok,result=call(successor.events[3],{research=owner,tick=0});return{ok=ok,message=result}end
   game.tick=1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end
-  if opponent=="scripted-finish"then ok,result=call(successor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result}end
-  player.research_queue={};owner.level=10;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result}end
-  owner.level=11;player.worker_robots_speed_modifier=state.player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  if opponent=="scripted-finish"then owner.level=11;ok,result=call(successor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result}end
+  if opponent=="preincrement-finish"then owner.level=10;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result}end
+  player.research_queue={};owner.level=11;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result}end
+  player.worker_robots_speed_modifier=state.player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(successor.events[3],{research=owner,tick=1});return{ok=ok,message=result}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end end
   for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"successor16",game,storage,settings(10),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
@@ -223,7 +224,8 @@ end
         self.assertEqual(("5.0.20015", "5.0.20016"), (markers[0]["mir_version"], markers[1]["mir_version"]))
         complete = markers[2]
         self.assertEqual((1, 0), (complete["ordinary_native_completion_count"], complete["level_eleven_start_count"]))
-        self.assertEqual((WORKER, False), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"]))
+        self.assertEqual((WORKER, False, 10, 11), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"],
+                                                    complete["ordinary_events"][1]["completed_level"], complete["ordinary_events"][1]["event_post_increment_level"]))
         self.assertEqual((WORKER, False), (complete["ordinary"][1]["name"], complete["ordinary"][1]["by_script"]))
         self.assertEqual((2, 1, 0), (len(markers[0]["player"]["queue"]["queue"]), len(markers[1]["player"]["queue"]["queue"]), len(complete["player"]["queue"]["queue"])))
         self.assertEqual(3600, complete["player"]["research_unit_energy"])
@@ -242,7 +244,7 @@ end
         self.assertTrue(electricity_admin["ok"])
         self.assertEqual(ELECTRICITY, electricity_admin["state"]["scripted_administrative_events"][1]["name"])
         preinit = self.flow_result("successor", "preinit-unrelated"); self.assertTrue(preinit["ok"]); self.assertIsNone(preinit["state"])
-        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-electricity": "foreign automation electricity prerequisite is absent", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
+        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-electricity": "foreign automation electricity prerequisite is absent", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "preincrement-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
             with self.subTest(opponent=opponent):
                 result = self.flow_result("successor", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
