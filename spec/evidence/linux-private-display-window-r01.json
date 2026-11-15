@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "kind": "MIRLinuxPrivateDisplayEvidenceV1",
+  "status": "passed-private-mapped-window-infrastructure-only",
+  "observation": {
+    "first_sample_utc": "2026-11-15T19:35:11.0804616+00:00",
+    "last_sample_utc": "2026-11-15T19:35:11.5517221+00:00"
+  },
+  "runner_commit": "b2fda79bac7d0c55c595484a7a2517f96fc25218",
+  "prepared_private_source": "29afbb07b8a331eeda614ce3a297ba12ff0d190f",
+  "original_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "e9cbb507a14eb3a30a7c06e7ada12537fca8ba80",
+    "tree": "d46fd9d3bc663f7d01da2293ae28150b0654ed47",
+    "prefix": "projects/mir/evidence/mir515-additional-raw-review-aero-r01/post515-stable-units-r01/gunmetal-private-display-probe-r05",
+    "raw_files": 8,
+    "raw_bytes": 40653,
+    "per_file_hashes": [
+      {
+        "path": "display.log",
+        "bytes": 746,
+        "sha256": "269DA9D48A0A753C6D16D24EB320ADD10A54A3C5DAE85EE26FE9115E9A639F49"
+      },
+      {
+        "path": "display-ready.json",
+        "bytes": 928,
+        "sha256": "C3E41D1C43060F0189001430B3D50911CEA2F77964EE8F5958C0A6253E9CF6A4"
+      },
+      {
+        "path": "graphics-checkpoints.jsonl",
+        "bytes": 601,
+        "sha256": "E6B72ED858FED1ADE70EADD2694140A8096A5B896BA7CF58B87004862EED51AE"
+      },
+      {
+        "path": "observations.json",
+        "bytes": 1767,
+        "sha256": "4C6B8EE40502F1EB55D301912154AD4286C5672BD668D21202FA0D216DC36A91"
+      },
+      {
+        "path": "process-1.resources.jsonl",
+        "bytes": 14069,
+        "sha256": "12C867C0040312C8CEB3C8BBD465E4AEE41D7859576EB757DF1E49042DD2CBF9"
+      },
+      {
+        "path": "process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "path": "process-1.stdout.txt",
+        "bytes": 46,
+        "sha256": "29889202ABD65412982B0FFD6052DD9D9F52C130B339C2698AE8B4383C48F26B"
+      },
+      {
+        "path": "result.json",
+        "bytes": 22496,
+        "sha256": "0B065C85F43B1A9496AACF1E86323A0CFE5EF07E68BF2C9882C7E68439E2C7AA"
+      }
+    ],
+    "raw_git_and_remote_ref_readback": true
+  },
+  "review": {
+    "source_sha256": "B8713FF98105627FA63A92946AEF43377EBB11499B7B58C615AE0AB25BDD0611",
+    "actual_sha256": "5D5870B6EE93A67DB32DD51F068982CA187B444A756ADFC3742D350818DF3AC5",
+    "independent_actual_verdict": "CASE_REVIEW_PASS: infrastructure scope only"
+  },
+  "inputs": {
+    "packet_sha256": "5075C0BD163C7BB60207E7BB4B864BE358BF91E3C3DF03AB729B9937C50874D0",
+    "actor_sha256": "F2DF1A32CA48119010E5DBE42326B3ED46E13A01A08B487AFDF0CDA5B180B423",
+    "controller_sha256": "40E7F0D8AE41D7F5EE98FE435BA2E65DB1B41B923A808AE2BE6DA4BEB7527A31"
+  },
+  "observed": {
+    "kind": "MIRPrivateDisplayGraphicsSmokeV1",
+    "status": "passed",
+    "factorio_processes": 0,
+    "input_events_sent": 0,
+    "host_configuration_changes": false,
+    "display_binding": {
+      "socket_device_inode": [
+        40,
+        1208
+      ],
+      "lock_device_inode": [
+        40,
+        1207
+      ],
+      "uid": 1000,
+      "pid": 39128,
+      "listeners": [
+        [
+          "/tmp/.X11-unix/X193",
+          "100619"
+        ],
+        [
+          "@/tmp/.X11-unix/X193",
+          "100618"
+        ]
+      ]
+    },
+    "private_viewer_binding": {
+      "device_inode": [
+        2067,
+        2097479
+      ],
+      "uid": 1000,
+      "mode": "0600",
+      "listener": [
+        "runtime/viewer.sock",
+        "100624"
+      ],
+      "pid": 39128,
+      "working_directory": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-native-platform-aero-r01/build/p/private-display-probe-r05"
+    },
+    "graphics": {
+      "surface": "mapped-GLX-window",
+      "glx": [
+        1,
+        4
+      ],
+      "opengl": "4.5 (Compatibility Profile) Mesa 25.0.7-2+deb13u1",
+      "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "pixel_rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "ximage_pixel": 16711680,
+      "rgb_masks": [
+        16711680,
+        65280,
+        255
+      ],
+      "window_depth": 24,
+      "window_geometry": [
+        128,
+        128
+      ],
+      "fbconfig": {
+        "red": 8,
+        "green": 8,
+        "blue": 8,
+        "alpha": 8,
+        "double_buffer": 1,
+        "drawable_type": 7,
+        "visual_id": 382
+      },
+      "xtest": [
+        2,
+        2
+      ],
+      "input_events_sent": 0,
+      "software_rendering_requested": true,
+      "mit_shm_enabled": false,
+      "x_error_count": 0
+    },
+    "display_pid": 39128,
+    "tcp_udp_sockets": 0,
+    "display_exit": 0,
+    "display_socket_restored": true,
+    "private_viewer_restored": true
+  },
+  "resource_scope": {
+    "expected_peak_mib": 1024,
+    "max_new_output_mib": 4,
+    "child_timeout_seconds": 45,
+    "outer_service_timeout_seconds": 90,
+    "unchanged_admission_policy": true,
+    "swap_capacity_not_counted_as_ram": true,
+    "no_host_configuration_changes": true
+  },
+  "readiness": {
+    "valid_plan": "passed with zero display/game launches",
+    "singleton_kind_array_opponent": "rejected before display/game launch",
+    "unit": "mir-private-display-r05.service",
+    "terminal": "MainPID=0, Result=success, ExecMainStatus=0, RemainAfterExit active/exited",
+    "all_transient_endpoints_and_authority_absent": true
+  },
+  "preserved_adverses": [
+    {
+      "case": "r01",
+      "status": "failed before graphics: no RFB incoming endpoint configured",
+      "private_commit": "da5ebad0d8f71bd6a77075bf21568abf77bd8d2d"
+    },
+    {
+      "case": "r02",
+      "status": "failed before graphics: AF_UNIX absolute path too long",
+      "private_commit": "3945ef8a2307c6573c14e035d83af95346a81639"
+    },
+    {
+      "case": "r03",
+      "status": "failed at MIT-SHM PutImage; verified owned stale-endpoint cleanup was separate, not automatic",
+      "private_commit": "13dd2b747afa5316b68e8d9b12fc8510666a66d8"
+    },
+    {
+      "case": "r04",
+      "status": "failed controlled core PutImage/BadMatch while rendering a pbuffer; automatic cleanup passed",
+      "private_commit": "29afbb07b8a331eeda614ce3a297ba12ff0d190f"
+    }
+  ],
+  "scope_limits": [
+    "Zero Factorio processes, archive-library activations and input events.",
+    "This mapped GLX window result does not pass the separate failed pbuffer cases.",
+    "Software llvmpipe only; no NVIDIA/GPU or performance qualification.",
+    "No MIR Library, graphical client, actual input/export, save/client lifecycle, Windows or stable acceptance.",
+    "Next graphical work requires its own exact engine/package/observer/profile/save bindings and independent review."
+  ]
+}
