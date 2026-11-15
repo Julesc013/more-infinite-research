@@ -407,6 +407,7 @@ class SettingsProfileTests(unittest.TestCase):
           assert(full.metadata.owner == "caller" and metadata.owner == "caller"
             and metadata.extra == nested,
             "mutating a result must not mutate sibling or caller top-level metadata")
+        ''')
 
     def test_codec_rejects_nonfinite_and_cycle_without_silently_dropping_values(self):
         # The restricted export must not quietly omit malformed settings or
