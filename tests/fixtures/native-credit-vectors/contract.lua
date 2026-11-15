@@ -119,7 +119,7 @@ function M.close(a,b)return type(a)=="number"and type(b)=="number"and math.abs(a
 function M.require(value,message)if not value then error("[mir-native-credit-vectors] "..message,2)end end
 function M.phase(mods)
   local base=mods.base
-  local mir=base=="2.0.77" and "5.0.20012" or base=="2.1.23" and "5.0.21012"
+  local mir=base=="2.0.77" and "5.0.20015" or base=="2.1.23" and "5.0.21015"
   M.require(mir and mods["more-infinite-research"]==mir and mods["space-age"]==base,"exact engine/MIR/SA tuple differs")
   local allowed={base=true,['space-age']=true,quality=true,['elevated-rails']=true,
     ['more-infinite-research']=true,[M.mod]=true}

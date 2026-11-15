@@ -26,7 +26,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           table.deepcopy=clone
           function data_case(phase,opponent)
             mods={base='2.1.23',['space-age']='2.1.23',quality='2.1.23',['elevated-rails']='2.1.23',recycler='2.1.23',
-              ['more-infinite-research']='5.0.21012',[C.mod]=phase}
+              ['more-infinite-research']='5.0.21015',[C.mod]=phase}
             settings={startup={['mir-prefer-this-mod-for-competing-techs']={value=true}}}
             data={raw={technology={},recipe={},lab={lab={type='lab',name='lab'}},['mod-data']={}}}
             function data:extend(rows)for _,v in ipairs(rows)do self.raw[v.type]=self.raw[v.type]or{};assert(self.raw[v.type][v.name]==nil);self.raw[v.type][v.name]=v end end
@@ -74,7 +74,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           storage={};last_storage=storage;last_logs=logs;last_saves=saves
           local base=target=='f200'and'2.0.77'or'2.1.23'
           local mods={base=base,['space-age']=base,quality=base,['elevated-rails']=base,
-            ['more-infinite-research']=target=='f200'and'5.0.20012'or'5.0.21012',[C.mod]='0.1.0'}
+            ['more-infinite-research']=target=='f200'and'5.0.20015'or'5.0.21015',[C.mod]='0.1.0'}
           if target=='f210' then mods.recycler=base end
           if opponent=='wrong-engine'then mods.base='2.1.24'end
           if opponent=='wrong-mir'then mods['more-infinite-research']='5.0.21013'end
@@ -162,9 +162,10 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             recompute_bonus()
           end
           recompute_bonus()
-          local q={}
+          local q,queue_writes={},0
           setmetatable(f,{__index=function(_,k)if k=='research_queue'then return q end end,
             __newindex=function(_,k,v)if k=='research_queue'then
+              queue_writes=queue_writes+1
               if f.current_research then f.current_research.saved_progress=f.research_progress end
               q=v;f.current_research=v[1]
               if v[1]and v[1].researched then v[1].level=v[1].level+1;v[1].researched=false end
@@ -251,7 +252,18 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           until_phase('f1-pending-saved')
           if opponent=='duplicate'then callbacks.finished{research=main,by_script=false}end
           configure('0.3.0','0.2.0');until_phase('f2-positive-saved');cold_read();cold_read()
-          commands_map['mir-native-credit-vectors']{parameter='continue'};until_phase('f2-final-saved');cold_read();cold_read()
+          -- This invokes the registered F2 callback. It must resume the saved
+          -- main/sentinel partial without assigning research_queue again.
+          local f2_writes=queue_writes;local f2_current=f.current_research;local f2_progress=f.research_progress
+          local f2_saved=main.saved_progress;local f2_first,f2_second=q[1],q[2]
+          assert(f2_current==main and #q==2 and f2_first==main and f2_second==f.technologies[C.sentinel]
+            and f2_progress>=.2 and f2_progress<.3)
+          commands_map['mir-native-credit-vectors']{parameter='continue'}
+          assert(queue_writes==f2_writes,'F2 continuation rewrote research_queue')
+          assert(f.current_research==f2_current and #q==2 and q[1]==f2_first and q[2]==f2_second
+            and f.research_progress==f2_progress and main.saved_progress==f2_saved,
+            'F2 continuation changed current/pending partial')
+          until_phase('f2-final-saved');cold_read();cold_read()
           assert(storage.mir_native_credit_vectors_fixture.ordinary==4)
           local state=storage.mir_native_credit_vectors_fixture
           for _,id in ipairs(C.main_ids)do
@@ -269,7 +281,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
         ''')
 
     def test_exact_metadata_and_original_upstream_excerpt(self):
-        expected = {"f200": ("2.0.77", "5.0.20012"), "f210": ("2.1.23", "5.0.21012")}
+        expected = {"f200": ("2.0.77", "5.0.20015"), "f210": ("2.1.23", "5.0.21015")}
         for target, (base, mir) in expected.items():
             for phase, version in (("f0", "0.1.0"), ("f1", "0.2.0"), ("f2", "0.3.0")):
                 info = json.loads((FIXTURE / f"info-{phase}-{target}.json").read_text())
@@ -338,15 +350,15 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                     self.assertIs(None if target == "f200" else False, hidden)
 
     def test_exact_engine_package_fixture_closure_opponents(self):
-        for target, base, mir in (("f200", "2.0.77", "5.0.20012"), ("f210", "2.1.23", "5.0.21012")):
+        for target, base, mir in (("f200", "2.0.77", "5.0.20015"), ("f210", "2.1.23", "5.0.21015")):
             active = {"base": base, "space-age": base, "quality": base, "elevated-rails": base,
                       "more-infinite-research": mir, "mir-fixture-native-credit-vectors": "0.1.0"}
             if target == "f210":
                 active["recycler"] = base
             phase = self.lua.globals().C.phase
             self.assertEqual("F0", phase(self.lua.table_from(active)))
-            mutations = [{"more-infinite-research": "5.0.21012" if target == "f200" else "5.0.20012"},
-                         {"more-infinite-research": mir[:-2] + "11"}, {"more-infinite-research": mir[:-2] + "13"},
+            mutations = [{"more-infinite-research": "5.0.21015" if target == "f200" else "5.0.20015"},
+                         {"more-infinite-research": mir[:-2] + "14"}, {"more-infinite-research": mir[:-2] + "16"},
                          {"mir-fixture-native-credit-vectors": "0.4.0"}, {"quality": "2.1.24"}, {"unknown-mod": "1.0.0"}]
             for mutation in mutations:
                 with self.subTest(target=target, mutation=mutation):
@@ -408,6 +420,8 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                   local family='research_low_density_structure'
                   GROUPS={[family]={{recipe='scrap-recycling',change=.1},{recipe='low-density-structure',change=.1},{recipe='casting-low-density-structure',change=.1}}}
                   local base=case_target=='f200'and'2.0.77'or'2.1.23'
+                  -- Frozen published-5.0.12 module input/result control; this is
+                  -- intentionally separate from the active candidate-15 actor.
                   reload_credits({base=base,['space-age']=base,['more-infinite-research']=case_target=='f200'and'5.0.20012'or'5.0.21012'},case_target)
                   game.forces={};storage={}
                   local f=make_collected_force(1,1,{[key(family,'low-density-structure')]=true,[key(family,'casting-low-density-structure')]=true},false)

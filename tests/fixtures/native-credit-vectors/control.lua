@@ -237,8 +237,15 @@ commands.add_command('mir-native-credit-vectors','Continue only the next declare
   local state=storage[KEY]
   require_ok(command.player_index==nil and command.parameter=='continue','server-only exact continue command required')
   require_ok(state and(state.phase=='f1-negative-saved'or state.phase=='f2-positive-saved'),'continue phase differs')
-  verify_endpoint(state);cold=false;state.phase=state.phase=='f1-negative-saved'and'earn-F1'or'earn-F2';state.deadline=game.tick+60000
-  enqueue(state,C.main,state.phase=='earn-F1'and false or false)
+  verify_endpoint(state);cold=false;state.deadline=game.tick+60000
+  if state.phase=='f1-negative-saved'then
+    state.phase='earn-F1';enqueue(state,C.main,false)
+  else
+    local q=queue()
+    require_ok(q.current==C.main and #q.names==2 and q.names[1]==C.main and q.names[2]==C.sentinel
+      and q.progress>=.2 and q.progress<.3,'F2 preserved pending queue/partial differs')
+    state.phase='earn-F2';state.active_main=C.main
+  end
 end)
 script.on_event(defines.events.on_research_finished,function(event)
   local state=storage[KEY];local t=event.research
