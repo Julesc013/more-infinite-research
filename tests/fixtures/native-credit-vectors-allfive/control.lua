@@ -196,7 +196,9 @@ end
 local function frame(state)
   local force=game.forces.player
   local physical=state.physical and {phase=state.physical.phase,f0=copy(state.physical.f0),f1=copy(state.physical.f1),current=physical_snapshot(state)}or nil
-  local out={phase=state.phase,ordinary=copy(state.ordinary),science=copy(state.inserted),physical=physical,families={}}
+local out={phase=state.phase,ordinary=copy(state.ordinary),science=copy(state.inserted),
+  lab={name=state.lab.name,researching_speed=state.lab.prototype.get_researching_speed("normal")},
+  physical=physical,families={}}
   for _,family in ipairs(C.families)do
     local row={main=completed(tech(C.main(family))),holders={},bonus={},references={}}
     for _,recipe in ipairs(family.routes)do
@@ -254,6 +256,7 @@ local function prepare(state)
   local surface=game.surfaces[1];local force=game.forces.player
   state.lab=surface.create_entity{name=C.lab,position={0,0},force=force}
   fail(state.lab and state.lab.valid~=false,"fixture lab creation failed")
+  fail(state.lab.prototype.get_researching_speed("normal")==C.lab_speed,"fixture lab speed differs")
   for _,family in ipairs(C.families)do
     local main=tech(C.main(family))
     for _,prerequisite in pairs(main.prerequisites)do

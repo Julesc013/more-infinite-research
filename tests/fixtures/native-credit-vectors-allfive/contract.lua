@@ -1,7 +1,7 @@
 -- Exact test-only metadata for the five published public references.
 local M={mod="mir-fixture-native-credit-vectors-allfive",upstream="a-mir-fixture-native-credit-vectors-allfive-upstream",version="0.1.0",lab="mir-allfive-credit-lab",assembler="mir-allfive-credit-assembler",
   key="mir_native_credit_allfive_fixture",
-  formula="8000*2^(L-1)",seconds=60,
+  formula="8000*2^(L-1)",seconds=60,lab_speed=115200,
   physical_input="iron-plate",physical_output="iron-gear-wheel",physical_batch=10,physical_deadline=18000,
   packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}}
 

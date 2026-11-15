@@ -519,7 +519,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             end
             local lab_inventory=inventory()
             local lab={valid=true,disabled_by_script=false,name=C.lab,prototype={}}
-            lab.prototype.get_researching_speed=function(quality)assert(quality=="normal");return 3600 end
+            lab.prototype.get_researching_speed=function(quality)assert(quality=="normal");return C.lab_speed end
             lab.get_inventory=function()return lab_inventory end
             local machines={}
             local function machine()
@@ -793,6 +793,8 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             self.assertEqual("f2-positive-saved", endpoint["phase"])
             self.assertTrue(all(endpoint["science"][pack] > 0 for pack in self.lua.globals().C.packs.values()))
             physical = endpoint["physical"]
+            self.assertEqual((self.lua.globals().C.lab, 115200),
+                             (endpoint["lab"]["name"], endpoint["lab"]["researching_speed"]))
             self.assertEqual("F1-complete", physical["phase"])
             self.assertEqual(6, len(list(physical["f0"].values())))
             self.assertEqual(6, len(list(physical["f1"].values())))
