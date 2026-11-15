@@ -280,6 +280,39 @@ local function marker(phase, state)
   log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. body)
 end
 
+-- This snapshot is deliberately observational.  It is emitted before the
+-- existing prerequisite assertion so a native diagnostic can distinguish a
+-- source-state normalization from a fixture setup failure without changing
+-- that assertion, queue, force, laboratory, or fixture storage.
+local function prerequisite_flags(force, label)
+  local values = {}
+  for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, PROBE}) do
+    local value = technology(force, name)
+    values[name] = {researched = value.researched, enabled = value.enabled, level = value.level, valid = value.valid}
+  end
+  return values
+end
+
+local function preconditions_marker(state)
+  local player, foreign, earned = observe_all(state, "preconditions")
+  local mods, active_mod_count = active_mods_snapshot()
+  local snapshot = {
+    case = CASE, phase = "preconditions", fixture_stage = script.active_mods[FIXTURE],
+    mir_version = script.active_mods["more-infinite-research"], mods = mods, active_mod_count = active_mod_count,
+    source_snapshot_role = "pre-assert-configuration",
+    source_state = {phase = state.phase, source_mir = state.source_mir},
+    worker_frames = {player = player, foreign = foreign, earned_above_cap = earned},
+    prerequisite_flags = {
+      player = prerequisite_flags(game.forces.player, "preconditions player"),
+      foreign = prerequisite_flags(force_by_index(state.foreign_index, "preconditions foreign"), "preconditions foreign"),
+      earned_above_cap = prerequisite_flags(force_by_index(state.earned_index, "preconditions earned"), "preconditions earned"),
+    },
+  }
+  local body = helpers.table_to_json(snapshot)
+  helpers.write_file("worker-speed-cap-ten/preconditions.json", body .. "\n", false)
+  log("[MIR_WORKER_SPEED_CAP_TEN phase=preconditions] " .. body)
+end
+
 local function seed_foreign(foreign)
   seed_worker_prerequisites(foreign, "foreign")
   local electricity = technology(foreign, ELECTRICITY)
@@ -418,6 +451,7 @@ function M.apply(stage)
     if type(state) ~= "table" or state.phase ~= "source-seeded" or state.source_mir ~= "5.0.20015" then
       fail("scripted source state is absent")
     end
+    preconditions_marker(state)
     local player, foreign, earned = observe_all(state, "cap-ten configuration")
     assert_seeded_prerequisites(state, "cap-ten configuration")
     state.pre_work = {source_mir = state.source_mir, active_mir = script.active_mods["more-infinite-research"],
