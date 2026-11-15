@@ -216,6 +216,7 @@ function current_state_flow(old_path,successor_path,common,mode,opponent)
   if opponent=="await-eleven"then owner.level=11;ok,result=call(actor.events[3],{research=owner,tick=0});return{ok=ok,message=result,state=state}end
   if opponent=="post-boundary-admin-write"then player.technologies[PREDECESSOR].researched=false end
   if opponent=="post-boundary-sentinel-write"then player.technologies["stone-wall"].enabled=true end
+  if opponent=="post-boundary-bonus-drift"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.1 end
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
   player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
@@ -378,10 +379,15 @@ end
         self.assertEqual((1, 0, 2), (complete["ordinary_native_completion_count"],
                                      complete["level_eleven_start_count"], complete["post_completion_hold_ticks"]))
         self.assertAlmostEqual(complete["post_reset_player_bonus"] + .65,
-                               complete["post_completion"]["player"]["bonus"])
+                               complete["post_completion"]["player"]["worker"]["bonus"])
         self.assertEqual(set(PACKS), set(complete["lab"]["input_by_name"].keys()))
         self.assertTrue(all(complete["lab"]["input_by_name"][name] > 0 for name in PACKS))
         self.assertEqual((True, 2), (cold["on_load_read_only"], cold["post_completion_hold_ticks"]))
+        for phase in (complete, cold):
+            self.assertEqual({"player", "foreign", "earned_above_cap"}, set(phase["completed_forces"].keys()))
+            for role in ("player", "foreign", "earned_above_cap"):
+                self.assertEqual(self._current_frame_signature(phase["completed_forces"][role]),
+                                 self._current_frame_signature(phase["post_completion"][role]))
         self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-pre-reset.json",
                           "worker-speed-cap-ten/current-post-reset.json", "worker-speed-cap-ten/current-pre-work.json",
                           "worker-speed-cap-ten/current-complete.json", "worker-speed-cap-ten/current-cold.json",
@@ -391,12 +397,12 @@ end
     def test_current_state_controls_refuse_missing_or_extra_reset_and_boundary_mutation(self):
         for opponent, phrase in {
             "missing-prerequisite": "technology is absent: worker-robots-speed-9",
-            "sentinel-enabled": "current provider player unrelated sentinel is enabled",
             "missing-reset-event": "native reset event was not delivered synchronously",
             "candidate-no-cap": "candidate player reset state differs",
             "fourth-reset": "observed reset outside the declared three-force boundary",
             "post-boundary-admin-write": "post-reset public state changed before ordinary lab work",
             "post-boundary-sentinel-write": "current pre-work player unrelated sentinel is enabled",
+            "post-boundary-bonus-drift": "post-reset public state changed before ordinary lab work",
             "await-eleven": "level eleven research started",
             "after-eleven": "level eleven research started",
             "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
@@ -405,6 +411,11 @@ end
                 result = self.current_state_result("candidate", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+        provider_sentinel = self.current_state_result("candidate", "sentinel-enabled")
+        self.assertFalse(provider_sentinel["ok"])
+        self.assertIn("current pre-reset player unrelated sentinel is enabled", provider_sentinel["message"])
+        provider = self._current_markers(provider_sentinel)["current-provider"]
+        self.assertTrue(provider["player"]["unrelated_sentinel"]["enabled"])
         source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         current = source.split("local function begin_current_state", 1)[1].split("function M.apply", 1)[0]
         for forbidden in ("game.create_force", "add_research", "worker_robots_speed_modifier =", "storage[KEY]",

@@ -435,9 +435,11 @@ local function current_flags_snapshot(force, label)
   return flags
 end
 
-local function current_force_snapshot(force, label)
+local function current_force_snapshot(force, label, allow_unprepared_sentinel)
   local sentinel = current_technology_snapshot(force, SENTINEL, label)
-  if sentinel.enabled ~= false then fail(label .. " unrelated sentinel is enabled") end
+  if allow_unprepared_sentinel ~= true and sentinel.enabled ~= false then
+    fail(label .. " unrelated sentinel is enabled")
+  end
   return {force_index = force.index, force_name = force.name, worker = worker_snapshot(force, label),
     prerequisite_flags = current_flags_snapshot(force, label), unrelated_sentinel = sentinel}
 end
@@ -452,9 +454,14 @@ local function same_current_frame(left, right)
   if type(left) ~= "table" or type(right) ~= "table" then return false end
   local worker_left, worker_right = left.worker, right.worker
   if type(worker_left) ~= "table" or type(worker_right) ~= "table"
+      or left.force_index ~= right.force_index or left.force_name ~= right.force_name
       or worker_left.level ~= worker_right.level or worker_left.researched ~= worker_right.researched
       or worker_left.enabled ~= worker_right.enabled or worker_left.visible ~= worker_right.visible
       or not close(worker_left.saved_progress, worker_right.saved_progress)
+      or not close(worker_left.bonus, worker_right.bonus)
+      or not close(worker_left.per_level_speed_effect, worker_right.per_level_speed_effect)
+      or worker_left.research_unit_count ~= worker_right.research_unit_count
+      or worker_left.research_unit_energy ~= worker_right.research_unit_energy
       or not same_queue(worker_left.queue, worker_right.queue) then return false end
   if not same_current_row(left.unrelated_sentinel, right.unrelated_sentinel) then return false end
   for _, name in ipairs(CURRENT_FLAGS) do
@@ -504,9 +511,9 @@ local function current_provider_marker(stage)
   snapshot.snapshot_role = "post-provider-normalization-before-fixture-admin"
   snapshot.source_base = {identity = "controller-bound-A0-base-input-only",
     fixture_source_phase = "not-read-no-continuation-precondition"}
-  snapshot.player = current_force_snapshot(player_force, "current provider player")
-  snapshot.foreign = current_force_snapshot(foreign_force, "current provider foreign")
-  snapshot.earned_above_cap = current_force_snapshot(earned_force, "current provider earned")
+  snapshot.player = current_force_snapshot(player_force, "current provider player", true)
+  snapshot.foreign = current_force_snapshot(foreign_force, "current provider foreign", true)
+  snapshot.earned_above_cap = current_force_snapshot(earned_force, "current provider earned", true)
   current_emit("provider", snapshot)
 end
 
@@ -656,7 +663,7 @@ local function assert_current_post_completion(state, label)
     fail(label .. " current-state earned state differs")
   end
   assert_feed_consumed_and_remaining(state, label)
-  return player, foreign, earned
+  return player_support, foreign_support, earned_support
 end
 
 local function begin_current_state(stage)
@@ -752,6 +759,7 @@ local function tick_current_state(state)
     complete.post_completion_hold_ticks, complete.reset_rows, complete.native_reset_events = state.post_completion_hold_ticks,
       copy(state.reset_rows), copy(state.native_reset_events)
     complete.player, complete.foreign, complete.earned_above_cap = player, foreign, earned
+    complete.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
     current_emit("complete", complete)
     game.server_save(CURRENT_SAVE)
     cold_requested, cold_logged = false, true
@@ -770,6 +778,7 @@ local function tick_current_state(state)
   cold.on_load_read_only, cold.lab = true, lab_snapshot(state, "current cold")
   cold.post_completion_hold_ticks, cold.reset_rows, cold.native_reset_events = state.post_completion_hold_ticks,
     copy(state.reset_rows), copy(state.native_reset_events)
+  cold.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
   current_emit("cold", cold)
   cold_logged = true
 end
