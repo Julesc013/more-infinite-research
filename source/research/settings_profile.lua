@@ -103,8 +103,13 @@ local function normalized_for_encode(profile)
   if profile.settings ~= nil and type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
   local settings = {}
   for name, value in pairs(profile.settings or {}) do
+    -- Registered setting identities are non-empty strings. Coercing arbitrary
+    -- caller keys with tostring can merge distinct keys and lose a value.
+    if type(name) ~= "string" or name == "" then
+      return nil, "profile setting name must be a non-empty string"
+    end
     local copied = copy_json_value(value, {})
-    if copied ~= nil then settings[tostring(name)] = copied end
+    if copied ~= nil then settings[name] = copied end
   end
   return {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
