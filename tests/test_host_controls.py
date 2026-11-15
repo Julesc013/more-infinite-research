@@ -213,6 +213,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_worker_storage_prepared_default.py",
             "tests/test_worker_native_owner_data.py",
     "tests/test_worker_storage_default_native.py",
+      "tests/test_worker_storage_prepared_native.py",
     "tests/test_worker_storage_provider_native.py",
             "tests/test_worker_default_snapshot_probe.py",
             "tests/test_ferrum_worker_storage_native.py",
