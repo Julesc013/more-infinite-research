@@ -8,7 +8,7 @@ local raw = {
   ["mir-prototype-speed-floor"] = "engine-default",
   ["mir-prototype-speed-cap"] = "engine-default",
   ["mir-prototype-quality-cap"] = "engine-default",
-  ["mir-recycling-return-chance"] = "percent-25",
+  ["mir-recycling-return-chance"] = "percent-20",
 }
 for name, value in pairs(raw) do
   local prototype = assert(data.raw["string-setting"][name], "numeric profile raw setting missing: " .. name)

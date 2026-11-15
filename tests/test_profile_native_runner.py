@@ -124,6 +124,22 @@ class ProfileNativeRunnerTests(unittest.TestCase):
             "mir-fixture-mir5-profile-native-witness = 0.1.0",
         ])
 
+    def test_opposing_dropdowns_are_valid_authored_values_not_import_only_aliases(self):
+        self.lua.globals().options_path = (ROOT / "source/research/historical_settings.lua").as_posix()
+        self.lua.globals().settings_path = (FIXTURE / "settings-updates.lua").as_posix()
+        self.lua.execute("""
+          data={raw={['string-setting']={['mir-settings-profile-import']={default_value=''}}}}
+          for _,spec in ipairs(dofile(options_path).options) do
+            if spec.type=='string-setting' then data.raw['string-setting'][spec.name]=spec end
+          end
+          dofile(settings_path)
+        """)
+        strings = self.lua.globals().data["raw"]["string-setting"]
+        for name in PERCENTAGES:
+            spec = strings[name]
+            allowed = [value for _, value in spec["allowed_values"].items()]
+            self.assertIn(spec["default_value"], allowed, name)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
