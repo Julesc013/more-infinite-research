@@ -291,9 +291,15 @@ class BobAngelF210PipelineTests(unittest.TestCase):
           settings={startup=declared}
           assert(loadfile(player_root.."/data.lua"))()
            if refuse_pure_angel then
-             package.preload["compatibility.angel_f210_profile"] = function()
-               return {select=function() error("pure Angel selector must remain uncalled for a combined Bob+Angel profile") end}
-             end
+             local original=require("compatibility.angel_f210_profile")
+             local sentinel={select=function(active)
+               if type(active)=="table" and active.bobplates~=nil and active.angelssmelting~=nil then
+                 error("pure Angel selector must remain uncalled for a combined Bob+Angel profile")
+               end
+               return original.select(active)
+             end}
+             package.loaded["compatibility.angel_f210_profile"] = sentinel
+             package.preload["compatibility.angel_f210_profile"] = function() return sentinel end
            end
           emitted,technology_publications={},0
           outcome,message=pcall(function() assert(loadfile(player_root.."/data-final-fixes.lua"))() end)
@@ -872,8 +878,9 @@ class BobAngelF210PipelineTests(unittest.TestCase):
                 self.assertIsNone(invalid_bobplates)
 
                 # This invokes the actual data-final pipeline. The controlled
-                # pure selector throws if a combined route reaches it; it is
-                # not a copied model of the source predicate.
+                # The loaded pure selector throws only for the valid combined
+                # input. Unrelated later baseline declarations still delegate
+                # to its actual source implementation.
                 self.stage(case, refuse_pure_angel=True)
 
     def test_asset_only_mods_and_equivalent_unlocks_do_not_disable_the_combined_profile(self):

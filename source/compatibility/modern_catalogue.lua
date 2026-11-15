@@ -593,6 +593,7 @@ local function material_definitions(stages)
 end
 
 function M.angel_material_definitions(active_mods)
+  if M.bob_angel_f210_profile(active_mods) ~= nil then return {} end
   if M.angel_f210_profile(active_mods) ~= "base" then return {} end
   return material_definitions(require("compatibility.modern_catalogue.angel_f210").base.material_stages)
 end
