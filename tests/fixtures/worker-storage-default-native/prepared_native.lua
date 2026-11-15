@@ -71,6 +71,10 @@ function P.event_transition(event,engine,old,new)
   local change=event.mod_changes and event.mod_changes["more-infinite-research"]
   check(change and change.old_version==old and change.new_version==new
     and type(event.mod_startup_settings_changed)=="boolean","exact historical version/settings event")
+  if engine=="2.1.24" and old=="5.0.21011" and new=="5.0.21015" then
+    local base=event.mod_changes.base
+    check(base and base.old_version=="2.1.23" and base.new_version=="2.1.24","explicit declared engine patch event")
+  end
   for name,item in pairs(event.mod_changes)do
     local patch=name=="base"and engine=="2.1.24"and item.old_version=="2.1.23"and item.new_version=="2.1.24"
       and old=="5.0.21011"and new=="5.0.21015"

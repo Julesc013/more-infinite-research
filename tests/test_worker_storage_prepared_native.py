@@ -120,7 +120,8 @@ class PreparedNativeActorTests(unittest.TestCase):
           local function event(flag)return{mod_startup_settings_changed=flag,mod_changes={
             ["more-infinite-research"]={old_version="5.0.21011",new_version="5.0.21015"}}}end
           for _,flag in ipairs{true,false}do
-            prepared.event_transition(event(flag),"2.1.24","5.0.21011","5.0.21015")
+            prepared.event_transition(event(flag),"2.1.23","5.0.21011","5.0.21015")
+            assert(not pcall(prepared.event_transition,event(flag),"2.1.24","5.0.21011","5.0.21015"))
             local patch=event(flag);patch.mod_changes.base={old_version="2.1.23",new_version="2.1.24"}
             prepared.event_transition(patch,"2.1.24","5.0.21011","5.0.21015")
             patch.mod_changes.base.old_version="2.1.22"
