@@ -6,9 +6,9 @@ local KEY = "mir5_worker_speed_cap_ten"
 local SAVE = "mir5-worker-speed-cap-ten-complete"
 local CASE = "f200-se-worker-speed-cap-ten"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
-local WORKER = "worker-robots-speed-6"
-local PREDECESSOR = "worker-robots-speed-5"
-local SPACE_SCIENCE = "space-science-pack"
+local WORKER = "worker-robots-speed-10"
+local PREDECESSOR = "worker-robots-speed-9"
+local DEEP_SCIENCE = "se-deep-space-science-pack-1"
 local PROBE = "automation"
 local AUTOMATION_SCIENCE = "automation-science-pack"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
@@ -20,9 +20,13 @@ local UINT32_MAX = 4294967295
 local DEADLINE_TICKS = 18000
 local POST_COMPLETION_HOLD_TICKS = 2
 local LAB_TOP_UP_REQUEST = 200
-local STAGES = {source = {version = "0.1.0", cap = 0}, cap10 = {version = "0.2.0", cap = 10}}
+local STAGES = {
+  source15 = {version = "0.4.0", cap = 0, mir = "5.0.20015"},
+  ["old-negative15"] = {version = "0.5.0", cap = 10, mir = "5.0.20015"},
+  successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"}
+}
 local CLOSURE = {
-  base = "2.0.77", ["more-infinite-research"] = "5.0.20015", ["space-exploration"] = "0.7.57",
+  base = "2.0.77", ["space-exploration"] = "0.7.57",
   ["aai-containers"] = "0.3.2", ["aai-industry"] = "0.6.16", ["alien-biomes"] = "0.7.4",
   ["alien-biomes-graphics"] = "0.7.1", jetpack = "0.4.17", robot_attrition = "0.6.6",
   ["shield-projector"] = "0.2.2", ["space-exploration-graphics"] = "0.7.5",
@@ -52,9 +56,13 @@ local function check_closure(stage)
   local active = script.active_mods
   for name, version in pairs(CLOSURE) do if active[name] ~= version then fail("F200 SE closure differs: " .. name) end end
   for name in pairs(active) do
-    if name ~= FIXTURE and CLOSURE[name] == nil then fail("unexpected enabled mod: " .. name) end
+    if name ~= FIXTURE and name ~= "more-infinite-research" and CLOSURE[name] == nil then
+      fail("unexpected enabled mod: " .. name)
+    end
   end
-  if active[FIXTURE] ~= expected.version then fail("fixture stage version differs") end
+  if active[FIXTURE] ~= expected.version or active["more-infinite-research"] ~= expected.mir then
+    fail("fixture stage version differs")
+  end
   local setting = settings.startup and settings.startup["mir-max-level-worker-robots-speed"]
   local imported = settings.startup and settings.startup["mir-settings-profile-import"]
   if type(setting) ~= "table" or setting.value ~= expected.cap or type(imported) ~= "table" or imported.value ~= "" then
@@ -85,24 +93,25 @@ local function assert_worker(value, label)
       or not close(effects[1].modifier, EFFECT) then fail(label .. " worker effect differs") end
   local prerequisites, prerequisite_count = value.prerequisites or {}, 0
   for _ in pairs(prerequisites) do prerequisite_count = prerequisite_count + 1 end
-  local predecessor, space = prerequisites[PREDECESSOR], prerequisites[SPACE_SCIENCE]
+  local predecessor, deep = prerequisites[PREDECESSOR], prerequisites[DEEP_SCIENCE]
   if prerequisite_count ~= 2 or predecessor == nil or predecessor.name ~= PREDECESSOR
-      or space == nil or space.name ~= SPACE_SCIENCE then fail(label .. " worker direct prerequisites differ") end
+      or deep == nil or deep.name ~= DEEP_SCIENCE then fail(label .. " worker direct prerequisites differ") end
   if type(value.research_unit_count) ~= "number" or value.research_unit_count <= 0
       or value.research_unit_count ~= math.floor(value.research_unit_count)
-      or type(value.research_unit_energy) ~= "number" or value.research_unit_energy <= 0 then
+      or value.research_unit_energy ~= 3600 then
     fail(label .. " worker research-unit contract differs")
   end
-  local seen = {}
+  local expected = { ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+    ["chemical-science-pack"] = true, ["utility-science-pack"] = true, ["space-science-pack"] = true,
+    ["se-rocket-science-pack"] = true, ["se-energy-science-pack-4"] = true,
+    ["se-deep-space-science-pack-1"] = true }
   for _, ingredient in ipairs(value.research_unit_ingredients or {}) do
-    if type(ingredient.name) ~= "string" or ingredient.name == "" or seen[ingredient.name]
-        or type(ingredient.amount) ~= "number" or ingredient.amount <= 0
-        or ingredient.amount ~= math.floor(ingredient.amount) then
+    if expected[ingredient.name] ~= true or ingredient.amount ~= 1 then
       fail(label .. " worker ingredient contract differs")
     end
-    seen[ingredient.name] = true
+    expected[ingredient.name] = nil
   end
-  if next(seen) == nil then fail(label .. " worker ingredients are absent") end
+  if next(expected) ~= nil then fail(label .. " worker ingredient contract differs") end
 end
 
 local function queue_snapshot(force)
@@ -126,6 +135,7 @@ local function worker_snapshot(force, label)
   return {level = value.level, researched = value.researched, enabled = value.enabled,
     visible = value.visible_when_disabled, saved_progress = value.saved_progress,
     bonus = force.worker_robots_speed_modifier, per_level_speed_effect = value.prototype.effects[1].modifier,
+    research_unit_count = value.research_unit_count, research_unit_energy = value.research_unit_energy,
     queue = queue_snapshot(force)}
 end
 
@@ -153,6 +163,15 @@ local function assert_foreign_cap(actual, state, label)
   end
 end
 
+local function assert_foreign_seed(actual, state, label)
+  if actual.level ~= 11 or actual.researched ~= false or actual.enabled ~= false or actual.visible ~= false
+      or not close(actual.bonus, state.foreign_bonus) or actual.queue.current ~= PROBE
+      or #actual.queue.queue ~= 1 or actual.queue.queue[1] ~= PROBE
+      or not close(actual.queue.progress, FOREIGN_PROGRESS) then
+    fail(label .. " foreign source sentinel differs")
+  end
+end
+
 local function assert_earned_cap(actual, state, label)
   if actual.level ~= EARNED_LEVEL or actual.researched ~= false or actual.enabled ~= false or actual.visible ~= true
       or not close(actual.bonus, state.earned_bonus) or actual.queue.current ~= false or #actual.queue.queue ~= 0 then
@@ -160,8 +179,15 @@ local function assert_earned_cap(actual, state, label)
   end
 end
 
+local function assert_earned_seed(actual, state, label)
+  if actual.level ~= EARNED_LEVEL or actual.researched ~= false or actual.enabled ~= true or actual.visible ~= false
+      or not close(actual.bonus, state.earned_bonus) or actual.queue.current ~= false or #actual.queue.queue ~= 0 then
+    fail(label .. " earned source state differs")
+  end
+end
+
 local function seed_worker_prerequisites(force, label)
-  for _, name in ipairs({PREDECESSOR, SPACE_SCIENCE}) do
+  for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE}) do
     local prerequisite = technology(force, name)
     prerequisite.researched, prerequisite.enabled = true, true
     if prerequisite.researched ~= true then fail(label .. " worker prerequisite could not be seeded: " .. name) end
@@ -174,7 +200,7 @@ local function assert_seeded_prerequisites(state, label)
   local player = game.forces.player
   local foreign = force_by_index(state.foreign_index, label .. " foreign")
   local earned = force_by_index(state.earned_index, label .. " earned")
-  for _, name in ipairs({PREDECESSOR, SPACE_SCIENCE}) do
+  for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE}) do
     if technology(player, name).researched ~= true then fail(label .. " player worker prerequisite is not researched: " .. name) end
     if technology(foreign, name).researched ~= true or technology(earned, name).researched ~= true then
       fail(label .. " witness worker prerequisite is not researched: " .. name)
@@ -225,9 +251,11 @@ local function marker(phase, state)
   local mods, active_mod_count = active_mods_snapshot()
   local snapshot = {
     case = CASE, phase = phase, fixture_stage = script.active_mods[FIXTURE],
+    mir_version = script.active_mods["more-infinite-research"],
     mods = mods, active_mod_count = active_mod_count, cap = settings.startup["mir-max-level-worker-robots-speed"].value,
     per_level_speed_effect = EFFECT,
-    scripted_setup = {source_level = 10, current_partial = PARTIAL, queued_next_occurrences = 1,
+    scripted_setup = {target = WORKER, source_level = 10, current_partial = PARTIAL,
+      queued_next_occurrences = 1, formula = "0.2*(2^(L-6)*1000)", research_time = 60,
       foreign_disabled = true, earned_above_cap_force = true, lab_feed = state.lab_feed ~= nil},
     ordinary_native_completion_count = state.ordinary_native_completion_count or 0,
     level_eleven_start_count = state.level_eleven_start_count or 0,
@@ -303,7 +331,6 @@ local function create_lab(state)
   local lab = surface.create_entity({name = LAB, position = {0, 0}, force = player})
   if lab == nil or lab.valid == false then fail("fixture fast lab could not be created") end
   lab.disabled_by_script = false
-  lab.energy = 100000000
   if lab.get_inventory(defines.inventory.lab_input) == nil then fail("fixture fast lab input is absent") end
   state.lab, state.lab_feed, state.lab_post_completion_top_up = lab, {}, {}
 end
@@ -348,7 +375,7 @@ function M.apply(stage)
   if expected == nil then fail("unknown control stage") end
 
   script.on_init(function()
-    if stage ~= "source" then fail("only source stage may initialize") end
+    if stage ~= "source15" then fail("only source stage may initialize") end
     check_closure(stage)
     if storage[KEY] ~= nil then fail("fixture state already exists") end
     local state = {phase = "source-setup", ordinary_native_completion_count = 0, level_eleven_start_count = 0,
@@ -374,33 +401,45 @@ function M.apply(stage)
     seed_earned(earned)
     local foreign_state = worker_snapshot(foreign, "source foreign")
     local earned_state = worker_snapshot(earned, "source earned")
-    state.phase = "source-seeded"
+    state.phase, state.source_mir = "source-seeded", script.active_mods["more-infinite-research"]
     state.player_bonus_before, state.foreign_bonus, state.earned_bonus = player_state.bonus, foreign_state.bonus, earned_state.bonus
     marker("source", state)
   end)
 
   script.on_configuration_changed(function()
-    if stage ~= "cap10" then fail("source stage does not accept configuration") end
+    if stage == "source15" then fail("source stage does not accept configuration") end
     check_closure(stage)
     local state = storage[KEY]
-    if type(state) ~= "table" or state.phase ~= "source-seeded" then fail("scripted source state is absent") end
+    if type(state) ~= "table" or state.phase ~= "source-seeded" or state.source_mir ~= "5.0.20015" then
+      fail("scripted source state is absent")
+    end
     local player, foreign, earned = observe_all(state, "cap-ten configuration")
-    assert_player_cap(player, state, "cap-ten configuration")
-    assert_foreign_cap(foreign, state, "cap-ten configuration")
-    assert_earned_cap(earned, state, "cap-ten configuration")
     assert_seeded_prerequisites(state, "cap-ten configuration")
-    state.pre_work = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
+    state.pre_work = {source_mir = state.source_mir, active_mir = script.active_mods["more-infinite-research"],
+      player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
+    if stage == "old-negative15" then
+      assert_player_seed(player, "published15 adverse")
+      assert_foreign_seed(foreign, state, "published15 adverse")
+      assert_earned_seed(earned, state, "published15 adverse")
+      marker("old-negative", state)
+      error("MIR_EXPECTED_OLD15_CAP_NOT_ENFORCED")
+    end
+    if stage ~= "successor16" then fail("unknown cap-ten configuration stage") end
+    assert_player_cap(player, state, "successor configuration")
+    assert_foreign_cap(foreign, state, "successor configuration")
+    assert_earned_cap(earned, state, "successor configuration")
+    marker("pre-work", state)
     create_lab(state)
     state.phase, state.deadline_tick = "await-ordinary-level-ten", game.tick + DEADLINE_TICKS
   end)
 
   script.on_event(defines.events.on_research_finished, function(event)
-    if stage == "source" then
+    if stage == "source15" then
       local research = event.research
       local source_state = storage[KEY]
       if research == nil or research.name ~= WORKER then
         if type(source_state) == "table" and event.by_script == true and research ~= nil
-            and (research.name == PREDECESSOR or research.name == SPACE_SCIENCE or research.name == AUTOMATION_SCIENCE)
+            and (research.name == PREDECESSOR or research.name == DEEP_SCIENCE or research.name == AUTOMATION_SCIENCE)
             and actor_force(source_state, research.force)
             and #source_state.scripted_administrative_events < 16 then
           source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {
@@ -415,7 +454,9 @@ function M.apply(stage)
     if type(state) ~= "table" or state.phase ~= "await-ordinary-level-ten" then return end
     local player = game.forces.player
     if event.research == nil or event.research.force ~= player or event.research.name ~= WORKER then return end
-    if event.by_script ~= false then fail("scripted completion cannot satisfy ordinary cap-ten work") end
+    if event.by_script ~= false or event.research.level ~= 10 then
+      fail("scripted or non-level-ten completion cannot satisfy ordinary cap-ten work")
+    end
     state.ordinary_native_completion_count = state.ordinary_native_completion_count + 1
     if state.ordinary_native_completion_count ~= 1 then fail("second worker completion occurred") end
     state.ordinary_events[#state.ordinary_events + 1] = {name = WORKER, by_script = false, tick = event.tick}
@@ -423,7 +464,7 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_research_started, function(event)
-    if stage ~= "cap10" then return end
+    if stage ~= "successor16" then return end
     local state = storage[KEY]
     if type(state) ~= "table" then return end
     local player = game.forces.player
@@ -440,7 +481,8 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_tick, function()
-    if stage == "source" then fail("source create-only stage received an actor tick") end
+    if stage == "source15" then fail("source create-only stage received an actor tick") end
+    if stage == "old-negative15" then fail("published15 adverse stage received an actor tick") end
     local state = storage[KEY]
     if type(state) ~= "table" then fail("fixture state is absent") end
     if state.phase == "await-ordinary-level-ten" then

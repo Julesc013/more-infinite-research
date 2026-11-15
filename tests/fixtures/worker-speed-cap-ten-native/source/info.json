@@ -1,9 +1,9 @@
 {
   "name": "mir-fixture-mir5-worker-speed-cap-ten",
-  "version": "0.1.0",
-  "title": "MIR F200 SE worker-speed cap-ten source fixture",
+  "version": "0.4.0",
+  "title": "MIR F200 SE worker-speed tail-ten source fixture",
   "author": "MIR maintainers",
-  "description": "Disposable scripted source state for the F200 SE worker-speed cap-ten boundary; not a reporter save.",
+  "description": "Disposable scripted source15 state for the F200 SE worker-speed tail-ten boundary; not a reporter save.",
   "factorio_version": "2.0",
   "dependencies": ["base = 2.0.77", "space-exploration = 0.7.57", "more-infinite-research = 5.0.20015"]
 }

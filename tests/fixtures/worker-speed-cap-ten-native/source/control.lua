@@ -1,1 +1,1 @@
-require("__mir-fixture-mir5-worker-speed-cap-ten__/fixture_control").apply("source")
+require("__mir-fixture-mir5-worker-speed-cap-ten__/fixture_control").apply("source15")

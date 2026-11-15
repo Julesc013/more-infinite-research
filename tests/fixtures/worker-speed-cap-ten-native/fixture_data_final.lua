@@ -1,14 +1,18 @@
 local M = {}
 
-local WORKER = "worker-robots-speed-6"
-local PREDECESSOR = "worker-robots-speed-5"
-local SPACE_SCIENCE = "space-science-pack"
+local WORKER = "worker-robots-speed-10"
+local PREDECESSOR = "worker-robots-speed-9"
+local DEEP_SCIENCE = "se-deep-space-science-pack-1"
 local CAP = "mir-max-level-worker-robots-speed"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
-local STAGES = {source = {version = "0.1.0", cap = 0}, cap10 = {version = "0.2.0", cap = 10}}
+local STAGES = {
+  source15 = {version = "0.4.0", cap = 0, mir = "5.0.20015"},
+  ["old-negative15"] = {version = "0.5.0", cap = 10, mir = "5.0.20015"},
+  successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"}
+}
 local CLOSURE = {
-  base = "2.0.77", ["more-infinite-research"] = "5.0.20015", ["space-exploration"] = "0.7.57",
+  base = "2.0.77", ["space-exploration"] = "0.7.57",
   ["aai-containers"] = "0.3.2", ["aai-industry"] = "0.6.16", ["alien-biomes"] = "0.7.4",
   ["alien-biomes-graphics"] = "0.7.1", jetpack = "0.4.17", robot_attrition = "0.6.6",
   ["shield-projector"] = "0.2.2", ["space-exploration-graphics"] = "0.7.5",
@@ -29,9 +33,13 @@ local function assert_closure(stage)
   if expected == nil then fail("unknown data-final stage") end
   for name, version in pairs(CLOSURE) do if mods[name] ~= version then fail("F200 SE closure differs: " .. name) end end
   for name in pairs(mods) do
-    if name ~= FIXTURE and CLOSURE[name] == nil then fail("unexpected enabled mod: " .. name) end
+    if name ~= FIXTURE and name ~= "more-infinite-research" and CLOSURE[name] == nil then
+      fail("unexpected enabled mod: " .. name)
+    end
   end
-  if mods[FIXTURE] ~= expected.version then fail("fixture stage version differs") end
+  if mods[FIXTURE] ~= expected.version or mods["more-infinite-research"] ~= expected.mir then
+    fail("fixture stage version differs")
+  end
   return expected
 end
 
@@ -50,13 +58,23 @@ local function assert_worker(row)
     if type(name) ~= "string" or prerequisites[name] then fail("SE worker-speed prerequisite differs") end
     prerequisites[name], prerequisite_count = true, prerequisite_count + 1
   end
-  if prerequisite_count ~= 2 or prerequisites[PREDECESSOR] ~= true or prerequisites[SPACE_SCIENCE] ~= true then
+  if prerequisite_count ~= 2 or prerequisites[PREDECESSOR] ~= true or prerequisites[DEEP_SCIENCE] ~= true then
     fail("SE worker-speed direct prerequisites differ")
   end
-  if type(row.unit) ~= "table" or type(row.unit.time) ~= "number" or row.unit.time <= 0
-      or type(row.unit.ingredients) ~= "table" or #row.unit.ingredients == 0 then
+  if type(row.unit) ~= "table" or row.unit.count_formula ~= "0.2*(2^(L-6)*1000)"
+      or row.unit.time ~= 60 or type(row.unit.ingredients) ~= "table" or #row.unit.ingredients ~= 8 then
     fail("SE worker-speed research unit differs")
   end
+  local expected = { ["automation-science-pack"] = true, ["logistic-science-pack"] = true,
+    ["chemical-science-pack"] = true, ["utility-science-pack"] = true, ["space-science-pack"] = true,
+    ["se-rocket-science-pack"] = true, ["se-energy-science-pack-4"] = true,
+    ["se-deep-space-science-pack-1"] = true }
+  for _, ingredient in ipairs(row.unit.ingredients) do
+    local name, amount = ingredient.name or ingredient[1], ingredient.amount or ingredient[2]
+    if expected[name] ~= true or amount ~= 1 then fail("SE worker-speed ingredient differs") end
+    expected[name] = nil
+  end
+  if next(expected) ~= nil then fail("SE worker-speed ingredient differs") end
 end
 
 local function worker_inputs(row)
