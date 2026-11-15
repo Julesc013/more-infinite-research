@@ -377,6 +377,150 @@ class SettingsProfileTests(unittest.TestCase):
           assert(profile == nil and decode_error == "unsupported profile format")
         ''')
 
+    def test_profile_export_metadata_is_detached_from_the_supplied_table(self):
+        # current_profile is also used by explicit server and GUI export
+        # callers. A result-only export_mode annotation must not overwrite
+        # caller metadata, even on repeated full/compact conversions.
+        self.lua.execute(r'''
+          local nested = {marker = "unchanged"}
+          local metadata = {export_mode = "original", owner = "caller", extra = nested}
+          local options = {
+            metadata = metadata,
+            names = {"mir-enable-passive-repair"},
+            value_resolver = function() return false end
+          }
+          local full = codec.current_profile(options)
+          assert(metadata.export_mode == "original" and metadata.owner == "caller")
+          assert(full.metadata ~= metadata and full.metadata.export_mode == "full"
+            and full.metadata.owner == "caller" and full.metadata.extra == nested)
+          assert(full.settings["mir-enable-passive-repair"] == false,
+            "detaching export metadata must not discard a false setting")
+
+          options.compact = true
+          local compact = codec.current_profile(options)
+          assert(compact.metadata ~= metadata and compact.metadata ~= full.metadata)
+          assert(compact.metadata.export_mode == "compact"
+            and full.metadata.export_mode == "full"
+            and metadata.export_mode == "original",
+            "converting an existing input twice must not rewrite prior metadata")
+          compact.metadata.owner = "changed"
+          assert(full.metadata.owner == "caller" and metadata.owner == "caller"
+            and metadata.extra == nested,
+            "mutating a result must not mutate sibling or caller top-level metadata")
+        ''')
+
+    def test_codec_rejects_nonfinite_and_cycle_without_silently_dropping_values(self):
+        # The restricted export must not quietly omit malformed settings or
+        # metadata, even at nested positions. This is a codec-only host check,
+        # not a claim that registered Factorio settings admit these values.
+        self.lua.execute(r'''
+          local calls = 0
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text) calls = calls + 1; return text end,
+          }
+          local ok_wire, ok_error = codec.encode({
+            mod = "example-mod",
+            settings = {count = 0, enabled = false, nested = {limit = 1}},
+            metadata = {tags = {"one", "two"}},
+          }, checked_helpers)
+          assert(ok_wire and not ok_error and calls == 1)
+          assert(ok_wire:find('"count":0', 1, true))
+          assert(ok_wire:find('"enabled":false', 1, true))
+          assert(ok_wire:find('"limit":1', 1, true))
+          assert(ok_wire:find('"mod":"example-mod"', 1, true))
+
+          local invalid_profiles = {
+            {settings = {good = false, bad = math.huge}},
+            {settings = {good = 0, deep = {bad = -math.huge}}},
+            {settings = {good = true, deep = {bad = 0/0}}},
+            {settings = {good = false}, metadata = {nested = {bad = math.huge}}},
+          }
+          for _, profile in ipairs(invalid_profiles) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile contains a non-finite number",
+              "bad numeric data was silently discarded")
+          end
+
+          local unsupported_profiles = {
+            {settings = {good = false, bad = function() end}},
+            {settings = {good = 0}, metadata = {bad = function() end}},
+          }
+          for _, profile in ipairs(unsupported_profiles) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile contains an unsupported value",
+              "unsupported data was silently discarded")
+          end
+
+          for _, metadata in ipairs({"scalar", false, true, 1}) do
+            local wire, err = codec.encode({settings = {good = false}, metadata = metadata}, checked_helpers)
+            assert(wire == nil and err == "profile metadata must be a table",
+              "scalar metadata was silently discarded")
+          end
+
+          for _, mod in ipairs({false, true, 1, {}, function() end, ""}) do
+            local wire, err = codec.encode({mod = mod, settings = {good = false}}, checked_helpers)
+            assert(wire == nil and err == "profile mod must be a non-empty string",
+              "invalid mod identity was silently changed")
+          end
+
+          local envelope_opponents = {
+            {profile = {schema = false, settings = {good = false}}, error = "unsupported profile schema false"},
+            {profile = {kind = false, settings = {good = false}}, error = "unsupported profile kind false"},
+          }
+          for _, opponent in ipairs(envelope_opponents) do
+            local wire, err = codec.encode(opponent.profile, checked_helpers)
+            assert(wire == nil and err == opponent.error,
+              "false envelope identity was silently defaulted")
+          end
+
+          local settings_cycle = {}
+          settings_cycle.self = settings_cycle
+          local wire, err = codec.encode({settings = {good = false, bad = settings_cycle}}, checked_helpers)
+          assert(wire == nil and err == "profile contains a cycle",
+            "cyclic setting data was silently discarded")
+          local metadata_cycle = {}
+          metadata_cycle.nested = {parent = metadata_cycle}
+          wire, err = codec.encode({settings = {good = false}, metadata = metadata_cycle}, checked_helpers)
+          assert(wire == nil and err == "profile contains a cycle",
+            "cyclic metadata was silently discarded")
+          assert(calls == 1, "malformed values reached the compression/string encoder")
+        ''')
+
+    def test_codec_rejects_nested_nonstring_object_keys_before_the_encoder(self):
+        # JSON object keys are strings.  A numeric key in a nested object can
+        # otherwise collide with its textual spelling during JSON emission.
+        # Dense arrays remain valid because their numeric keys are positions,
+        # not JSON object names.
+        self.lua.execute(r'''
+          local calls = 0
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text) calls = calls + 1; return text end,
+          }
+          local valid, valid_error = codec.encode({
+            settings = {x = {"first", "second"}},
+            metadata = {labels = {"one", "two"}},
+          }, checked_helpers)
+          assert(valid and not valid_error and calls == 1,
+            "dense nested arrays must remain valid JSON values")
+
+          local opponents = {
+            {settings = {x = {[1] = "number", ["1"] = "string"}}},
+            {settings = {good = false}, metadata = {x = {[1] = "number", ["1"] = "string"}}},
+            {settings = {x = {[1] = "first", [3] = "third"}}},
+            {settings = {good = 0}, metadata = {x = {[1] = "first", [3] = "third"}}},
+          }
+          for _, profile in ipairs(opponents) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile object key must be a string",
+              "non-string nested object key was silently made lossy")
+          end
+          assert(calls == 1, "lossy object keys reached the compression/string encoder")
+        ''')
+
     def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
         # Published round-trip fixture635deae0 tests the entire effect-setting
         # surface, independently of any serializer's selected examples/counts.
@@ -609,6 +753,47 @@ class SettingsProfileTests(unittest.TestCase):
             same(config.spec(name), specs[name])
             assert(config.default_value(name) == specs[name].default_value)
           end
+        ''')
+
+
+    def test_codec_rejects_setting_name_coercion_before_encoding(self):
+        # The public restricted codec is also callable with arbitrary Lua
+        # tables. tostring(1) collides with the distinct string key "1";
+        # malformed inputs must not produce a silently incomplete MIRSET1.
+        # Registered MIR settings already have non-empty string identities.
+        self.lua.execute(r'''
+          local calls, encoded = 0, nil
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text)
+              calls = calls + 1
+              encoded = text
+              return text
+            end,
+          }
+          local good, good_error = codec.encode({
+            settings = {
+              ["ips-enable-research_gears"] = false,
+              ["future-profile-setting"] = 0,
+            }
+          }, checked_helpers)
+          assert(good and good_error == nil and calls == 1)
+          assert(encoded:find('"ips-enable-research_gears":false', 1, true))
+          assert(encoded:find('"future-profile-setting":0', 1, true))
+
+          local invalid = {
+            {settings = {[1] = true, ["1"] = false}},
+            {settings = {[false] = true, ["false"] = false}},
+            {settings = {[""] = false}},
+            {settings = {[{}] = "foreign"}},
+          }
+          for _, profile in ipairs(invalid) do
+            local token, err = codec.encode(profile, checked_helpers)
+            assert(token == nil and err == "profile setting name must be a non-empty string",
+              "non-string or empty setting name was coerced to a serialized identity")
+          end
+          assert(calls == 1, "invalid setting-key input reached the string encoder")
         ''')
 
 
