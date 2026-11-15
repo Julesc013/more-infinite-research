@@ -199,14 +199,20 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
   ok, result = invoke(source.init)
   if not ok then return {ok = false, message = result} end
   if opponent == "source-administrative" or opponent == "source-ordinary" or opponent == "source-scripted-worker"
-      or opponent == "source-unrelated" then
+      or opponent == "source-unrelated" or opponent == "source-unknown-known-administrative"
+      or opponent == "source-unknown-worker" then
     local administrative = opponent == "source-administrative"
     local unrelated = opponent == "source-unrelated"
+    local unknown_known = opponent == "source-unknown-known-administrative"
+    local unknown_worker = opponent == "source-unknown-worker"
     local worker = opponent == "source-ordinary" or opponent == "source-scripted-worker"
+    local upstream = (unknown_known or unknown_worker) and game.create_force("mir5-worker-speed-cap-ten-upstream") or nil
     local research = unrelated and {name = "se-always-researched", force = player}
+      or unknown_known and upstream.technologies["worker-robots-speed-5"]
+      or unknown_worker and upstream.technologies[WORKER]
       or worker and player.technologies[WORKER] or player.technologies["worker-robots-speed-5"]
     ok, result = invoke(source.events[2], {research = research,
-      by_script = administrative or opponent == "source-scripted-worker", tick = game.tick})
+      by_script = administrative or unknown_known or unknown_worker or opponent == "source-scripted-worker", tick = game.tick})
     return {ok = ok, message = result, state = storage[KEY]}
   end
   if opponent == "source-tick" then
@@ -402,6 +408,7 @@ end
         administrative = self.flow_result("source-administrative")
         self.assertTrue(administrative["ok"], administrative["message"])
         self.assertEqual("scripted-prerequisite", administrative["state"]["scripted_administrative_events"][1]["setup_class"])
+        self.assertEqual(1, administrative["state"]["scripted_administrative_events"][1]["force_index"])
         preinit_unrelated = self.flow_result("preinit-unrelated")
         self.assertTrue(preinit_unrelated["ok"], preinit_unrelated["message"])
         self.assertIsNone(preinit_unrelated["state"])
@@ -412,6 +419,13 @@ end
         self.assertTrue(source_unrelated["ok"], source_unrelated["message"])
         self.assertEqual((0, 0), (source_unrelated["state"]["ordinary_native_completion_count"],
                                   len(source_unrelated["state"]["scripted_administrative_events"])))
+        source_unknown_known = self.flow_result("source-unknown-known-administrative")
+        self.assertTrue(source_unknown_known["ok"], source_unknown_known["message"])
+        self.assertEqual((0, 0), (source_unknown_known["state"]["ordinary_native_completion_count"],
+                                  len(source_unknown_known["state"]["scripted_administrative_events"])))
+        source_unknown_worker = self.flow_result("source-unknown-worker")
+        self.assertFalse(source_unknown_worker["ok"])
+        self.assertIn("source stage observed non-administrative research completion", source_unknown_worker["message"])
         source_ordinary = self.flow_result("source-ordinary")
         self.assertFalse(source_ordinary["ok"])
         self.assertIn("source stage observed non-administrative research completion", source_ordinary["message"])

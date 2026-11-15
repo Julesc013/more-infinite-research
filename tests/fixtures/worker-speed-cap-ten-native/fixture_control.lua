@@ -247,8 +247,7 @@ local function marker(phase, state)
   log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. body)
 end
 
-local function seed_foreign()
-  local foreign = game.create_force("mir5-worker-speed-cap-ten-foreign")
+local function seed_foreign(foreign)
   foreign.enable_all_prototypes()
   seed_worker_prerequisites(foreign, "foreign")
   local science = technology(foreign, AUTOMATION_SCIENCE)
@@ -264,8 +263,7 @@ local function seed_foreign()
   return foreign
 end
 
-local function seed_earned()
-  local earned = game.create_force("mir5-worker-speed-cap-ten-earned")
+local function seed_earned(earned)
   earned.enable_all_prototypes()
   seed_worker_prerequisites(earned, "earned")
   local owner = technology(earned, WORKER)
@@ -273,6 +271,12 @@ local function seed_earned()
   earned.reset_technology_effects()
   owner.enabled, owner.visible_when_disabled = true, false
   return earned
+end
+
+local function actor_force(state, force)
+  local index = force and force.index
+  return type(index) == "number" and (index == state.player_force_index
+    or index == state.foreign_index or index == state.earned_index)
 end
 
 local function refill_lab(state, label)
@@ -351,6 +355,7 @@ function M.apply(stage)
       ordinary_events = {}, scripted_administrative_events = {}}
     storage[KEY] = state
     local player = game.forces.player
+    state.player_force_index = player.index
     player.enable_all_prototypes()
     seed_worker_prerequisites(player, "player")
     local owner = technology(player, WORKER)
@@ -361,10 +366,15 @@ function M.apply(stage)
     player.research_progress = PARTIAL
     local player_state = worker_snapshot(player, "source player")
     assert_player_seed(player_state, "source")
-    local foreign, earned = seed_foreign(), seed_earned()
+    local foreign = game.create_force("mir5-worker-speed-cap-ten-foreign")
+    state.foreign_index = foreign.index
+    seed_foreign(foreign)
+    local earned = game.create_force("mir5-worker-speed-cap-ten-earned")
+    state.earned_index = earned.index
+    seed_earned(earned)
     local foreign_state = worker_snapshot(foreign, "source foreign")
     local earned_state = worker_snapshot(earned, "source earned")
-    state.phase, state.foreign_index, state.earned_index = "source-seeded", foreign.index, earned.index
+    state.phase = "source-seeded"
     state.player_bonus_before, state.foreign_bonus, state.earned_bonus = player_state.bonus, foreign_state.bonus, earned_state.bonus
     marker("source", state)
   end)
@@ -391,9 +401,11 @@ function M.apply(stage)
       if research == nil or research.name ~= WORKER then
         if type(source_state) == "table" and event.by_script == true and research ~= nil
             and (research.name == PREDECESSOR or research.name == SPACE_SCIENCE or research.name == AUTOMATION_SCIENCE)
+            and actor_force(source_state, research.force)
             and #source_state.scripted_administrative_events < 16 then
           source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {
-            name = research.name, by_script = true, tick = event.tick, setup_class = "scripted-prerequisite"}
+            name = research.name, force_index = research.force.index, by_script = true, tick = event.tick,
+            setup_class = "scripted-prerequisite"}
         end
         return
       end
