@@ -689,6 +689,47 @@ class SettingsProfileTests(unittest.TestCase):
         ''')
 
 
+    def test_codec_rejects_setting_name_coercion_before_encoding(self):
+        # The public restricted codec is also callable with arbitrary Lua
+        # tables. tostring(1) collides with the distinct string key "1";
+        # malformed inputs must not produce a silently incomplete MIRSET1.
+        # Registered MIR settings already have non-empty string identities.
+        self.lua.execute(r'''
+          local calls, encoded = 0, nil
+          local checked_helpers = {
+            json_to_table = helpers.json_to_table,
+            decode_string = helpers.decode_string,
+            encode_string = function(text)
+              calls = calls + 1
+              encoded = text
+              return text
+            end,
+          }
+          local good, good_error = codec.encode({
+            settings = {
+              ["ips-enable-research_gears"] = false,
+              ["future-profile-setting"] = 0,
+            }
+          }, checked_helpers)
+          assert(good and good_error == nil and calls == 1)
+          assert(encoded:find('"ips-enable-research_gears":false', 1, true))
+          assert(encoded:find('"future-profile-setting":0', 1, true))
+
+          local invalid = {
+            {settings = {[1] = true, ["1"] = false}},
+            {settings = {[false] = true, ["false"] = false}},
+            {settings = {[""] = false}},
+            {settings = {[{}] = "foreign"}},
+          }
+          for _, profile in ipairs(invalid) do
+            local token, err = codec.encode(profile, checked_helpers)
+            assert(token == nil and err == "profile setting name must be a non-empty string",
+              "non-string or empty setting name was coerced to a serialized identity")
+          end
+          assert(calls == 1, "invalid setting-key input reached the string encoder")
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
