@@ -1,7 +1,7 @@
 -- Test-only: render the public Library. No synthetic input or player-code import.
 local BROWSER = "more-infinite-research-browser"
 local ROOT = "mir_research_browser"
-local EXACT_PACKAGES = {["2.0.77"] = "5.0.20015", ["2.1.24"] = "5.0.21015"}
+local EXACT_PACKAGES = {["2.0.77"] = "5.0.20016", ["2.1.24"] = "5.0.21016"}
 local CASES = {
   {id = "01-research", tab = "research", search = "", visibility = 1},
   {id = "02-queue", tab = "queue"},
