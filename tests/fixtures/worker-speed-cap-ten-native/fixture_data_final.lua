@@ -1,6 +1,8 @@
 local M = {}
 
 local WORKER = "worker-robots-speed-6"
+local PREDECESSOR = "worker-robots-speed-5"
+local SPACE_SCIENCE = "space-science-pack"
 local CAP = "mir-max-level-worker-robots-speed"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
@@ -42,12 +44,14 @@ local function assert_worker(row)
   if type(effect) ~= "table" or effect.type ~= "worker-robot-speed" or not close(effect.modifier, 0.65) then
     fail("SE worker-speed effect differs")
   end
-  local predecessor = false
+  local prerequisites, prerequisite_count = {}, 0
   for key, value in pairs(row.prerequisites or {}) do
-    if key == "worker-robots-speed-5" or value == "worker-robots-speed-5" then predecessor = true end
+    local name = type(key) == "string" and key or value
+    if type(name) ~= "string" or prerequisites[name] then fail("SE worker-speed prerequisite differs") end
+    prerequisites[name], prerequisite_count = true, prerequisite_count + 1
   end
-  if not predecessor then
-    fail("SE worker-speed predecessor differs")
+  if prerequisite_count ~= 2 or prerequisites[PREDECESSOR] ~= true or prerequisites[SPACE_SCIENCE] ~= true then
+    fail("SE worker-speed direct prerequisites differ")
   end
   if type(row.unit) ~= "table" or type(row.unit.time) ~= "number" or row.unit.time <= 0
       or type(row.unit.ingredients) ~= "table" or #row.unit.ingredients == 0 then

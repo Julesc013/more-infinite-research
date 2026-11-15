@@ -8,6 +8,7 @@ local CASE = "f200-se-worker-speed-cap-ten"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local WORKER = "worker-robots-speed-6"
 local PREDECESSOR = "worker-robots-speed-5"
+local SPACE_SCIENCE = "space-science-pack"
 local PROBE = "automation"
 local AUTOMATION_SCIENCE = "automation-science-pack"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
@@ -82,8 +83,11 @@ local function assert_worker(value, label)
   local effects = prototype.effects
   if type(effects) ~= "table" or #effects ~= 1 or effects[1].type ~= "worker-robot-speed"
       or not close(effects[1].modifier, EFFECT) then fail(label .. " worker effect differs") end
-  local predecessor = value.prerequisites and value.prerequisites[PREDECESSOR]
-  if predecessor == nil or predecessor.name ~= PREDECESSOR then fail(label .. " worker predecessor differs") end
+  local prerequisites, prerequisite_count = value.prerequisites or {}, 0
+  for _ in pairs(prerequisites) do prerequisite_count = prerequisite_count + 1 end
+  local predecessor, space = prerequisites[PREDECESSOR], prerequisites[SPACE_SCIENCE]
+  if prerequisite_count ~= 2 or predecessor == nil or predecessor.name ~= PREDECESSOR
+      or space == nil or space.name ~= SPACE_SCIENCE then fail(label .. " worker direct prerequisites differ") end
   if type(value.research_unit_count) ~= "number" or value.research_unit_count <= 0
       or value.research_unit_count ~= math.floor(value.research_unit_count)
       or type(value.research_unit_energy) ~= "number" or value.research_unit_energy <= 0 then
@@ -156,10 +160,12 @@ local function assert_earned_cap(actual, state, label)
   end
 end
 
-local function seed_worker_predecessor(force, label)
-  local predecessor = technology(force, PREDECESSOR)
-  predecessor.researched, predecessor.enabled = true, true
-  if predecessor.researched ~= true then fail(label .. " worker predecessor could not be seeded") end
+local function seed_worker_prerequisites(force, label)
+  for _, name in ipairs({PREDECESSOR, SPACE_SCIENCE}) do
+    local prerequisite = technology(force, name)
+    prerequisite.researched, prerequisite.enabled = true, true
+    if prerequisite.researched ~= true then fail(label .. " worker prerequisite could not be seeded: " .. name) end
+  end
 end
 
 local force_by_index
@@ -168,10 +174,11 @@ local function assert_seeded_prerequisites(state, label)
   local player = game.forces.player
   local foreign = force_by_index(state.foreign_index, label .. " foreign")
   local earned = force_by_index(state.earned_index, label .. " earned")
-  if technology(player, PREDECESSOR).researched ~= true then fail(label .. " player worker predecessor is not researched") end
-  if technology(foreign, PREDECESSOR).researched ~= true
-      or technology(earned, PREDECESSOR).researched ~= true then
-    fail(label .. " witness worker predecessor is not researched")
+  for _, name in ipairs({PREDECESSOR, SPACE_SCIENCE}) do
+    if technology(player, name).researched ~= true then fail(label .. " player worker prerequisite is not researched: " .. name) end
+    if technology(foreign, name).researched ~= true or technology(earned, name).researched ~= true then
+      fail(label .. " witness worker prerequisite is not researched: " .. name)
+    end
   end
   if technology(foreign, AUTOMATION_SCIENCE).researched ~= true then
     fail(label .. " foreign automation science prerequisite is not researched")
@@ -243,7 +250,7 @@ end
 local function seed_foreign()
   local foreign = game.create_force("mir5-worker-speed-cap-ten-foreign")
   foreign.enable_all_prototypes()
-  seed_worker_predecessor(foreign, "foreign")
+  seed_worker_prerequisites(foreign, "foreign")
   local science = technology(foreign, AUTOMATION_SCIENCE)
   science.researched, science.enabled = true, true
   local owner = technology(foreign, WORKER)
@@ -260,7 +267,7 @@ end
 local function seed_earned()
   local earned = game.create_force("mir5-worker-speed-cap-ten-earned")
   earned.enable_all_prototypes()
-  seed_worker_predecessor(earned, "earned")
+  seed_worker_prerequisites(earned, "earned")
   local owner = technology(earned, WORKER)
   owner.level, owner.researched = EARNED_LEVEL, false
   earned.reset_technology_effects()
@@ -345,7 +352,7 @@ function M.apply(stage)
     storage[KEY] = state
     local player = game.forces.player
     player.enable_all_prototypes()
-    seed_worker_predecessor(player, "player")
+    seed_worker_prerequisites(player, "player")
     local owner = technology(player, WORKER)
     owner.level, owner.researched = 10, false
     player.reset_technology_effects()
@@ -381,11 +388,13 @@ function M.apply(stage)
     if stage == "source" then
       local research = event.research
       local source_state = storage[KEY]
-      if type(source_state) == "table" and event.by_script == true and research ~= nil
-          and (research.name == PREDECESSOR or research.name == AUTOMATION_SCIENCE)
-          and #source_state.scripted_administrative_events < 16 then
-        source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {
-          name = research.name, by_script = true, tick = event.tick, setup_class = "scripted-prerequisite"}
+      if research == nil or research.name ~= WORKER then
+        if type(source_state) == "table" and event.by_script == true and research ~= nil
+            and (research.name == PREDECESSOR or research.name == SPACE_SCIENCE or research.name == AUTOMATION_SCIENCE)
+            and #source_state.scripted_administrative_events < 16 then
+          source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {
+            name = research.name, by_script = true, tick = event.tick, setup_class = "scripted-prerequisite"}
+        end
         return
       end
       fail("source stage observed non-administrative research completion")

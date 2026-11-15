@@ -34,6 +34,7 @@ local KEY = "mir5_worker_speed_cap_ten"
 local WORKER = "worker-robots-speed-6"
 local PROBE = "automation"
 local AUTOMATION_SCIENCE = "automation-science-pack"
+local SPACE_SCIENCE = "space-science-pack"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local closure = {
   base = "2.0.77", ["more-infinite-research"] = "5.0.20015", ["space-exploration"] = "0.7.57",
@@ -55,9 +56,10 @@ function worker_cap_data(settings_wrapper, data_wrapper, settings_common, data_c
   local versions = {source = "0.1.0", cap10 = "0.2.0"}
   local cap = stage == "source" and 0 or 10
   if opponent == "wrong-cap" then cap = cap == 0 and 10 or 0 end
-  local worker = {name = WORKER, max_level = "infinite", prerequisites = {"worker-robots-speed-5"},
-    unit = {count_formula = "0.6*((2^(L-6))*1000)", time = 60,
-      ingredients = {{"automation-science-pack", 1}, {"utility-science-pack", 1}}},
+  local worker = {name = WORKER, max_level = "infinite", prerequisites = {"worker-robots-speed-5", SPACE_SCIENCE},
+    unit = {count_formula = "2^(L-6)*1000", time = 60,
+      ingredients = {{"automation-science-pack", 1}, {"logistic-science-pack", 1}, {"chemical-science-pack", 1},
+        {"utility-science-pack", 1}, {SPACE_SCIENCE, 1}}},
     effects = {{type = "worker-robot-speed", modifier = opponent == "wrong-effect" and .6 or .65}}}
   local raw = {technology = {[WORKER] = worker}, lab = {lab = {name = "lab", inputs = {"automation-science-pack"}}},
     ["int-setting"] = {["mir-max-level-worker-robots-speed"] = {default_value = 0, minimum_value = 0}}}
@@ -89,8 +91,12 @@ local function technology(name, force)
       and {{type = "worker-robot-speed", modifier = .65}} or {}, visible_when_disabled = false},
     prerequisites = {}, research_unit_count = 3, research_unit_energy = 60,
     research_unit_ingredients = {{name = "automation-science-pack", amount = 1},
-      {name = "utility-science-pack", amount = 1}}}
-  if name == WORKER then value.prerequisites["worker-robots-speed-5"] = {name = "worker-robots-speed-5"} end
+      {name = "logistic-science-pack", amount = 1}, {name = "chemical-science-pack", amount = 1},
+      {name = "utility-science-pack", amount = 1}, {name = SPACE_SCIENCE, amount = 1}}}
+  if name == WORKER then
+    value.prerequisites["worker-robots-speed-5"] = {name = "worker-robots-speed-5"}
+    value.prerequisites[SPACE_SCIENCE] = {name = SPACE_SCIENCE}
+  end
   return value
 end
 
@@ -100,6 +106,7 @@ local function force(name, index)
   value.technologies[WORKER] = technology(WORKER, value)
   value.technologies[PROBE] = technology(PROBE, value)
   value.technologies[AUTOMATION_SCIENCE] = technology(AUTOMATION_SCIENCE, value)
+  value.technologies[SPACE_SCIENCE] = technology(SPACE_SCIENCE, value)
   value.technologies["worker-robots-speed-5"] = technology("worker-robots-speed-5", value)
   function value.enable_all_prototypes() end
   function value.reset_technology_effects()
@@ -109,7 +116,8 @@ local function force(name, index)
   function value.add_research(research)
     if type(research) == "string" then research = value.technologies[research] end
     if research == nil or research.enabled ~= true or value.current_research ~= nil then return false end
-    if research.name == WORKER and value.technologies["worker-robots-speed-5"].researched ~= true then return false end
+    if research.name == WORKER and (value.technologies["worker-robots-speed-5"].researched ~= true
+        or value.technologies[SPACE_SCIENCE].researched ~= true) then return false end
     if research.name == PROBE and value.technologies[AUTOMATION_SCIENCE].researched ~= true then return false end
     value.research_queue = {research}; return true
   end
@@ -183,12 +191,22 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
     ["mir-max-level-worker-robots-speed"] = {value = cap}, ["mir-settings-profile-import"] = {value = ""}}} end
   local source, message = load_control(source_path, common, "source", game, storage, settings(0), markers, logs, files)
   if not source then return {ok = false, message = message} end
-  local ok, result = invoke(source.init)
+  local ok, result
+  if opponent == "preinit-unrelated" then
+    ok, result = invoke(source.events[2], {research = {name = "se-always-researched", force = player}, by_script = true, tick = game.tick})
+    return {ok = ok, message = result, state = storage[KEY], markers = markers, player = player}
+  end
+  ok, result = invoke(source.init)
   if not ok then return {ok = false, message = result} end
-  if opponent == "source-administrative" or opponent == "source-ordinary" then
+  if opponent == "source-administrative" or opponent == "source-ordinary" or opponent == "source-scripted-worker"
+      or opponent == "source-unrelated" then
     local administrative = opponent == "source-administrative"
-    ok, result = invoke(source.events[2], {research = player.technologies["worker-robots-speed-5"],
-      by_script = administrative, tick = game.tick})
+    local unrelated = opponent == "source-unrelated"
+    local worker = opponent == "source-ordinary" or opponent == "source-scripted-worker"
+    local research = unrelated and {name = "se-always-researched", force = player}
+      or worker and player.technologies[WORKER] or player.technologies["worker-robots-speed-5"]
+    ok, result = invoke(source.events[2], {research = research,
+      by_script = administrative or opponent == "source-scripted-worker", tick = game.tick})
     return {ok = ok, message = result, state = storage[KEY]}
   end
   if opponent == "source-tick" then
@@ -198,6 +216,7 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
   local state = storage[KEY]
   if type(state) ~= "table" then return {ok = false, message = "source state absent"} end
   if opponent == "missing-prerequisite" then player.technologies["worker-robots-speed-5"].researched = false end
+  if opponent == "missing-space-science" then player.technologies[SPACE_SCIENCE].researched = false end
   if opponent ~= "skip-lifecycle" then
     for _, value in ipairs({player, game.forces[state.foreign_index], game.forces[state.earned_index]}) do
       caps.reconcile(value, {[WORKER] = 10}, storage.mir_caps, {[WORKER] = true})
@@ -277,12 +296,16 @@ end
                 worker = result["raw"]["technology"][WORKER]
                 self.assertEqual(("infinite", "worker-robot-speed", .65),
                                  (worker["max_level"], worker["effects"][1]["type"], worker["effects"][1]["modifier"]))
-                self.assertEqual(("0.6*((2^(L-6))*1000)", 60,
-                                  ("automation-science-pack", "utility-science-pack")),
+                self.assertEqual(("2^(L-6)*1000", 60,
+                                  ("automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+                                   "utility-science-pack", "space-science-pack")),
                                  (worker["unit"]["count_formula"], worker["unit"]["time"],
-                                  tuple(worker["unit"]["ingredients"][index][1] for index in range(1, 3))))
-                self.assertEqual(("automation-science-pack", "utility-science-pack"),
-                                 tuple(result["extensions"][1]["inputs"][index] for index in range(1, 3)))
+                                  tuple(worker["unit"]["ingredients"][index][1] for index in range(1, 6))))
+                self.assertEqual(("worker-robots-speed-5", "space-science-pack"),
+                                 tuple(worker["prerequisites"][index] for index in range(1, 3)))
+                self.assertEqual(("automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+                                  "utility-science-pack", "space-science-pack"),
+                                 tuple(result["extensions"][1]["inputs"][index] for index in range(1, 6)))
                 self.assertEqual(cap, result["raw"]["int-setting"][CAP]["default_value"])
                 self.assertEqual(1, len(result["extensions"]))
                 self.assertEqual("mir-worker-speed-cap-ten-fast-lab", result["extensions"][1]["name"])
@@ -360,7 +383,8 @@ end
             "skip-lifecycle": "cap-ten did not retain only current level-ten work",
             "partial-drift": "cap-ten did not retain only current level-ten work",
             "foreign-reenabled": "foreign disabled sentinel differs",
-            "missing-prerequisite": "player worker predecessor is not researched",
+            "missing-prerequisite": "player worker prerequisite is not researched: worker-robots-speed-5",
+            "missing-space-science": "player worker prerequisite is not researched: space-science-pack",
             "scripted-completion": "scripted completion cannot satisfy ordinary cap-ten work",
             "await-level-eleven-start": "level eleven research started",
             "level-eleven-start": "level eleven research started",
@@ -378,9 +402,22 @@ end
         administrative = self.flow_result("source-administrative")
         self.assertTrue(administrative["ok"], administrative["message"])
         self.assertEqual("scripted-prerequisite", administrative["state"]["scripted_administrative_events"][1]["setup_class"])
+        preinit_unrelated = self.flow_result("preinit-unrelated")
+        self.assertTrue(preinit_unrelated["ok"], preinit_unrelated["message"])
+        self.assertIsNone(preinit_unrelated["state"])
+        self.assertEqual(0, len(preinit_unrelated["markers"]))
+        self.assertEqual((1, False), (preinit_unrelated["player"]["technologies"][WORKER]["level"],
+                                      preinit_unrelated["player"]["technologies"][WORKER]["researched"]))
+        source_unrelated = self.flow_result("source-unrelated")
+        self.assertTrue(source_unrelated["ok"], source_unrelated["message"])
+        self.assertEqual((0, 0), (source_unrelated["state"]["ordinary_native_completion_count"],
+                                  len(source_unrelated["state"]["scripted_administrative_events"])))
         source_ordinary = self.flow_result("source-ordinary")
         self.assertFalse(source_ordinary["ok"])
         self.assertIn("source stage observed non-administrative research completion", source_ordinary["message"])
+        source_scripted_worker = self.flow_result("source-scripted-worker")
+        self.assertFalse(source_scripted_worker["ok"])
+        self.assertIn("source stage observed non-administrative research completion", source_scripted_worker["message"])
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         on_load = control.split("script.on_load(function()", 1)[1].split("script.on_event(defines.events.on_tick", 1)[0]
         self.assertNotIn("game", on_load)
