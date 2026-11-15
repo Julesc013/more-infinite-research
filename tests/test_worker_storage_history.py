@@ -957,7 +957,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                       assert(prototypes.technology[ORDINARY].ignore_tech_cost_multiplier==public_exempt)
                     ''')
 
-    def test_initial_investment_unknown_producer_and_prepared_history_refuse_before_writes(self):
+    def test_initial_investment_unknown_producer_and_invalid_prepared_history_refuse_before_writes(self):
         for opponent in ('player.technologies[CANONICAL].saved_progress=.1','player.research_queue={CANONICAL}','player.technologies[CANONICAL].level=5'):
             lua=self.world();lua.execute(opponent+r''';local b=all_frames();writes=0
               assert(not pcall(history.plan_default_owner_transfer,nil,nil,true)and writes==0 and same(b,all_frames()))
@@ -968,7 +968,9 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
               assert(writes==0 and same(b,all_frames())and storage[OWNER_KEY]==nil)
             ''')
         lua=self.world();lua.execute(r'''
-          seed_owner();history.prepare(nil);local b=all_frames();writes=0
+          seed_owner();history.prepare(nil)
+          storage.mir_worker_storage_route.contract=storage.mir_worker_storage_route.contract..":changed"
+          local b=all_frames();writes=0
           assert(not pcall(history.plan_default_owner_transfer,owner_event("5.0.21011"),nil,false)and writes==0 and same(b,all_frames()))
         ''')
 
