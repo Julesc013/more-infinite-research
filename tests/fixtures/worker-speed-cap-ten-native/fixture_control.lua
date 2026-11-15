@@ -647,6 +647,11 @@ local function assert_current_post_completion(state, label)
   local player_support = current_force_snapshot(game.forces.player, label .. " player")
   local foreign_support = current_force_snapshot(force_by_index(state.foreign_index, label .. " foreign"), label .. " foreign")
   local earned_support = current_force_snapshot(force_by_index(state.earned_index, label .. " earned"), label .. " earned")
+  local ordinary = state.ordinary_events
+  if type(ordinary) ~= "table" or #ordinary ~= 1 or type(ordinary[1]) ~= "table"
+      or ordinary[1].name ~= WORKER or ordinary[1].by_script ~= false or type(ordinary[1].tick) ~= "number" then
+    fail(label .. " ordinary native level-ten event differs")
+  end
   if not same_current_support_rows(state.current_pre_work_frames.player, player_support)
       or not same_current_support_rows(state.current_pre_work_frames.foreign, foreign_support)
       or not same_current_support_rows(state.current_pre_work_frames.earned_above_cap, earned_support) then
@@ -758,6 +763,7 @@ local function tick_current_state(state)
     complete.level_eleven_queue_attempt, complete.lab = copy(state.level_eleven_queue_attempt), ending_lab
     complete.post_completion_hold_ticks, complete.reset_rows, complete.native_reset_events = state.post_completion_hold_ticks,
       copy(state.reset_rows), copy(state.native_reset_events)
+    complete.ordinary_events = copy(state.ordinary_events)
     complete.player, complete.foreign, complete.earned_above_cap = player, foreign, earned
     complete.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
     current_emit("complete", complete)
@@ -778,6 +784,7 @@ local function tick_current_state(state)
   cold.on_load_read_only, cold.lab = true, lab_snapshot(state, "current cold")
   cold.post_completion_hold_ticks, cold.reset_rows, cold.native_reset_events = state.post_completion_hold_ticks,
     copy(state.reset_rows), copy(state.native_reset_events)
+  cold.ordinary_events = copy(state.ordinary_events)
   cold.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
   current_emit("cold", cold)
   cold_logged = true

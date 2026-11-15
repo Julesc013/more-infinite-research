@@ -220,6 +220,7 @@ function current_state_flow(old_path,successor_path,common,mode,opponent)
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
   player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  if opponent=="missing-ordinary-event"then state.ordinary_events={} end
   owner.level=11;player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end end
@@ -378,6 +379,9 @@ end
         complete, cold = candidate_markers["current-complete"], candidate_markers["current-cold"]
         self.assertEqual((1, 0, 2), (complete["ordinary_native_completion_count"],
                                      complete["level_eleven_start_count"], complete["post_completion_hold_ticks"]))
+        for phase in (complete, cold):
+            self.assertEqual((WORKER, False), (phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"]))
+            self.assertIsInstance(phase["ordinary_events"][1]["tick"], int)
         self.assertAlmostEqual(complete["post_reset_player_bonus"] + .65,
                                complete["post_completion"]["player"]["worker"]["bonus"])
         self.assertEqual(set(PACKS), set(complete["lab"]["input_by_name"].keys()))
@@ -403,6 +407,7 @@ end
             "post-boundary-admin-write": "post-reset public state changed before ordinary lab work",
             "post-boundary-sentinel-write": "current pre-work player unrelated sentinel is enabled",
             "post-boundary-bonus-drift": "post-reset public state changed before ordinary lab work",
+            "missing-ordinary-event": "ordinary native level-ten event differs",
             "await-eleven": "level eleven research started",
             "after-eleven": "level eleven research started",
             "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
