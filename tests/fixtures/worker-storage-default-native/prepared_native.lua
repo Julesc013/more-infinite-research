@@ -58,6 +58,16 @@ function P.tuple(engine,version)
   for _,stage in ipairs({"origin","inherited","successor"})do if values[stage]==version then return stage end end
   check(false,"exact predecessor/11/candidate15 version")
 end
+function P.event_transition(event,engine,old,new)
+  local change=event.mod_changes and event.mod_changes["more-infinite-research"]
+  check(change and change.old_version==old and change.new_version==new
+    and type(event.mod_startup_settings_changed)=="boolean","exact historical version/settings event")
+  for name,item in pairs(event.mod_changes)do
+    local patch=name=="base"and engine=="2.1.24"and item.old_version=="2.1.23"and item.new_version=="2.1.24"
+      and old=="5.0.21011"and new=="5.0.21015"
+    check(name=="more-infinite-research"or item.old_version==item.new_version or patch,"unchanged other mods or exact declared engine patch hop")
+  end
+end
 function P.bind(shared)
   local loaded=false
   local function state()return storage[KEY]end
@@ -141,21 +151,16 @@ function P.bind(shared)
     s.setting_up=false;s.phase="origin-ready"
     emit("setup",{scripted_prerequisites=true,scripted_earned_levels=true,scripted_partial_work=true})
   end
-  local function event_versions(event,old,new)
-    local change=event.mod_changes and event.mod_changes["more-infinite-research"]
-    check(change and change.old_version==old and change.new_version==new and event.mod_startup_settings_changed==false,"exact unchanged-settings historical hop")
-    for name,item in pairs(event.mod_changes)do check(name=="more-infinite-research"or item.old_version==item.new_version,"unchanged other mods/engine")end
-  end
   local function configure(event)
     local s=state();if not s then return end
     local version=script.active_mods["more-infinite-research"];local values=VERSIONS[script.active_mods.base]
     emit("configuration-observed",{event=event})
     if s.phase=="origin-saved"then
-      closure("inherited");contracts("inherited");event_versions(event,values.origin,values.inherited)
+      closure("inherited");contracts("inherited");P.event_transition(event,script.active_mods.base,values.origin,values.inherited)
       shared.same(P.expected_inherited(s.closed),shared.frames());shared.same(s.closed_bonuses,bonuses());shared.same(s.closed_labs,labs())
       s.phase="inherited-ready"
     elseif s.phase=="prepared-saved"then
-      closure("successor");contracts("successor");event_versions(event,values.inherited,values.successor)
+      closure("successor");contracts("successor");P.event_transition(event,script.active_mods.base,values.inherited,values.successor)
       s.expected=shared.expected_upgrade(s.before_preparation)
       shared.same(s.expected,shared.frames());shared.same(s.closed_bonuses,bonuses());shared.same(s.closed_labs,labs())
       s.phase="successor-ready"

@@ -46,6 +46,22 @@ class PreparedNativeActorTests(unittest.TestCase):
           assert(not pcall(prepared.expected_inherited,original))
         ''')
 
+    def test_observed_global_settings_flag_is_not_a_worker_contract_and_patch_hop_is_exact(self):
+        self.lua.execute(r'''
+          local function event(flag)return{mod_startup_settings_changed=flag,mod_changes={
+            ["more-infinite-research"]={old_version="5.0.21011",new_version="5.0.21015"}}}end
+          for _,flag in ipairs{true,false}do
+            prepared.event_transition(event(flag),"2.1.24","5.0.21011","5.0.21015")
+            local patch=event(flag);patch.mod_changes.base={old_version="2.1.23",new_version="2.1.24"}
+            prepared.event_transition(patch,"2.1.24","5.0.21011","5.0.21015")
+            patch.mod_changes.base.old_version="2.1.22"
+            assert(not pcall(prepared.event_transition,patch,"2.1.24","5.0.21011","5.0.21015"))
+          end
+          for _,bad in ipairs{"false",0,1}do assert(not pcall(prepared.event_transition,event(bad),"2.1.24","5.0.21011","5.0.21015"))end
+          local foreign=event(false);foreign.mod_changes.observer={new_version="1"}
+          assert(not pcall(prepared.event_transition,foreign,"2.1.24","5.0.21011","5.0.21015"))
+        ''')
+
     def test_full_preparation_maps_native_work_and_preserves_foreign_state(self):
         self.lua.execute(r'''
           local before=source_frame();before[1].queue={actor.ids.main,actor.ids.main,actor.ids.queued}
