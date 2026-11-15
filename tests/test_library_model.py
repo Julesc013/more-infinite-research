@@ -452,6 +452,31 @@ class LibraryModelTests(unittest.TestCase):
             and native_owner.prototype.effects[1].modifier == 0.1,
             "projection must not change native facts")
 
+          local invalid_lab = {valid = false}
+          native_force.technologies[lab] = invalid_lab
+          local invalid_rows = availability.rows(mods, target, native_force, "lab")
+          assert(#invalid_rows == 1 and invalid_rows[1].family == "research_lab_productivity",
+            "an invalid named MIR lab retains the valid native owner's explanation")
+          assert(native_force.technologies[lab] == invalid_lab and invalid_lab.valid == false,
+            "projection must not repair or replace an invalid native object")
+
+          local unreadable_lab = {technologies = setmetatable({
+            ["research-productivity"] = native_owner
+          }, {
+            __index = function(_, name)
+              assert(name == lab, "Availability read an unrelated technology")
+              error("named MIR lab lookup refused")
+            end,
+            __pairs = function() error("Availability enumerated native technologies") end,
+            __newindex = function() error("Availability mutated native technologies") end
+          })}
+          assert(#availability.rows(mods, target, unreadable_lab, "lab") == 0,
+            "a failed named MIR lab lookup is not proof of omission, even with a valid native owner")
+          assert(unreadable_lab.technologies["research-productivity"] == native_owner
+            and rawget(unreadable_lab.technologies, lab) == nil
+            and native_owner.prototype.effects[1].modifier == 0.1,
+            "the unreadable projection must preserve the native owner and missing MIR key")
+
           local unreadable = {technologies = setmetatable({}, {
             __index = function() error("named technology read refused") end,
             __pairs = function() error("Availability enumerated native technologies") end
