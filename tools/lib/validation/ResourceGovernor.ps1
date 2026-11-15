@@ -99,12 +99,9 @@ function Wait-MIR441LinuxLaunchReceipt {
 }
 
 function Write-MIR441LinuxLaunchAck {
-  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$RootIdentity)
-  $python=Get-Command python3 -ErrorAction SilentlyContinue;$launcher=Join-Path $PSScriptRoot 'LinuxNativeLaunch.py'
-  if($null-eq$python-or-not(Test-Path -LiteralPath $launcher -PathType Leaf)){throw '[mir441-resource-linux-launch-ack]'}
-  $arguments=@('-I',$launcher,'--write-ack','--path',$Path,'--pid',[string]$RootIdentity.pid,'--start-ticks',[string]$RootIdentity.start_ticks,'--session-id',[string]$RootIdentity.session_id)
-  $lines=@(& $python.Source @arguments 2>&1)
-  if($LASTEXITCODE-ne0-or$lines.Count-ne0){throw '[mir441-resource-linux-launch-ack]'}
+  param([Parameter(Mandatory)][IO.TextWriter]$Writer,[Parameter(Mandatory)]$RootIdentity)
+  $ack=[ordered]@{kind='MIR441LinuxNativeAckV1';pid=[int64]$RootIdentity.pid;start_ticks=[int64]$RootIdentity.start_ticks;session_id=[int64]$RootIdentity.session_id}
+  try{$Writer.WriteLine(($ack|ConvertTo-Json -Compress));$Writer.Flush()}catch{throw '[mir441-resource-linux-launch-ack]'}
 }
 
 function Stop-MIR441LinuxPreAckLauncher {
@@ -696,16 +693,16 @@ function Invoke-MIR441MonitoredProcess {
     if($IsLinux){
       $python=Get-Command python3 -ErrorAction SilentlyContinue;$launcher=Join-Path $PSScriptRoot 'LinuxNativeLaunch.py'
       if($null-eq$python-or-not(Test-Path -LiteralPath $launcher -PathType Leaf)-or-not[IO.Path]::IsPathRooted($FilePath)){throw '[mir441-resource-linux-launcher-unavailable]'}
-      $launchReceipt=Join-Path $temp 'linux-native-launch.json';$launchAck=Join-Path $temp 'linux-native-launch.ack.json'
+      $launchReceipt=Join-Path $temp 'linux-native-launch.json'
       $start.FileName=$python.Source
-      foreach($argument in @('-I',$launcher,'--receipt',$launchReceipt,'--ack',$launchAck,'--',$FilePath)+$Arguments){[void]$start.ArgumentList.Add($argument)}
+      foreach($argument in @('-I',$launcher,'--receipt',$launchReceipt,'--',$FilePath)+$Arguments){[void]$start.ArgumentList.Add($argument)}
     }else{
       $start.FileName=$FilePath
       foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
     }
     $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
-    $start.RedirectStandardInput=($null-ne$consoleStartup)
-    if($null-ne$consoleStartup){$start.StandardInputEncoding=[Text.UTF8Encoding]::new($false)}
+    $start.RedirectStandardInput=($IsLinux-or$null-ne$consoleStartup)
+    if($start.RedirectStandardInput){$start.StandardInputEncoding=[Text.UTF8Encoding]::new($false)}
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
     if(-not$process.Start()){throw '[mir441-process-start]'}
     $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew();if($IsLinux){$preAckIdentity=Invoke-MIR441LinuxResourceObservation -Operation process-identity -ProcessId $process.Id;$rootIdentity=Wait-MIR441LinuxLaunchReceipt -Process $process -Path $launchReceipt}
@@ -717,7 +714,10 @@ function Invoke-MIR441MonitoredProcess {
       $stream=if($null-ne$consoleStartup){[IO.FileStream]::new($pair[0],[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::Read,1,[IO.FileOptions]::Asynchronous)}else{[IO.File]::Create($pair[0])}
       $streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)
     }}
-    if($IsLinux){Write-MIR441LinuxLaunchAck -Path $launchAck -RootIdentity $rootIdentity}
+    if($IsLinux){
+      $inputWriter=$process.StandardInput;$inputWriter.NewLine="`n";$inputWriter.AutoFlush=$true
+      Write-MIR441LinuxLaunchAck -Writer $inputWriter -RootIdentity $rootIdentity
+    }
     if($null-ne$consoleStartup){
       $inputWriter=$process.StandardInput;$inputWriter.NewLine="`n";$inputWriter.AutoFlush=$true
       if($StdoutPath){Add-MIR441FactorioConsoleStartupOutput -State $consoleStartup -Kind stdout -Path $StdoutPath}

@@ -228,7 +228,6 @@ try {{
         temporary = Path(tempfile.mkdtemp(prefix="mir-linux-session-launch-", dir=ROOT / "build" / "tmp"))
         self.addCleanup(lambda: shutil.rmtree(temporary, ignore_errors=True))
         receipt = temporary / "launch.json"
-        ack = temporary / "launch.ack.json"
         target = temporary / "leader.py"
         write(
             target,
@@ -239,8 +238,9 @@ try {{
             "time.sleep(15)\n",
         )
         process = subprocess.Popen(
-            [sys.executable, "-I", str(LAUNCHER), "--receipt", str(receipt), "--ack", str(ack), "--", sys.executable, "-I", str(target)],
+            [sys.executable, "-I", str(LAUNCHER), "--receipt", str(receipt), "--", sys.executable, "-I", str(target)],
             cwd=ROOT,
+            stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
@@ -254,26 +254,8 @@ try {{
             self.assertEqual(process.pid, launch["pid"])
             self.assertEqual(process.pid, launch["session_id"])
             self.assertGreater(launch["start_ticks"], 0)
-            ack_write = subprocess.run(
-                [
-                    sys.executable,
-                    "-I",
-                    str(LAUNCHER),
-                    "--write-ack",
-                    "--path",
-                    str(ack),
-                    "--pid",
-                    str(launch["pid"]),
-                    "--start-ticks",
-                    str(launch["start_ticks"]),
-                    "--session-id",
-                    str(launch["session_id"]),
-                ],
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-            self.assertEqual(0, ack_write.returncode, ack_write.stderr)
+            process.stdin.write((json.dumps(dict(launch, kind="MIR441LinuxNativeAckV1")) + "\n").encode())
+            process.stdin.flush()
             process.wait(timeout=5)
             self.assertEqual(0, process.returncode)
             status, payload = self.run_helper(
@@ -313,17 +295,18 @@ try {{
             if process.poll() is None:
                 process.kill()
                 process.wait(timeout=5)
+            process.stdin.close()
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Linux setsid and procfs")
     def test_real_linux_launcher_never_executes_without_a_matching_ack(self) -> None:
-        for mode in ("absent", "wrong-identity", "malformed"):
+        for mode in ("absent", "wrong-identity", "malformed", "matching-file-only"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory(prefix="mir-linux-ack-", dir=ROOT / "build" / "tmp") as directory:
                 temporary = Path(directory)
                 receipt, ack, marker = (temporary / name for name in ("receipt.json", "ack.json", "executed"))
                 process = subprocess.Popen(
-                    [sys.executable, "-I", str(LAUNCHER), "--receipt", str(receipt), "--ack", str(ack), "--",
+                    [sys.executable, "-I", str(LAUNCHER), "--receipt", str(receipt), "--",
                      sys.executable, "-I", "-c", "from pathlib import Path; import sys; Path(sys.argv[1]).touch()", str(marker)],
-                    cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 )
                 try:
                     deadline = time.monotonic() + 5
@@ -334,9 +317,17 @@ try {{
                     self.assertFalse(marker.exists(), "Target ran before ownership acknowledgement")
                     if mode == "wrong-identity":
                         value.update(kind="MIR441LinuxNativeAckV1", start_ticks=value["start_ticks"] + 1)
-                        ack.write_text(json.dumps(value))
+                        process.stdin.write((json.dumps(value) + "\n").encode())
+                        process.stdin.flush()
                     elif mode == "malformed":
-                        ack.write_text("{")
+                        process.stdin.write(b"{\n")
+                        process.stdin.flush()
+                    elif mode == "matching-file-only":
+                        value["kind"] = "MIR441LinuxNativeAckV1"
+                        ack.write_text(json.dumps(value))
+                    # Keep the pipe open: absence must time out rather than
+                    # accidentally passing because communicate() closed stdin.
+                    process.wait(timeout=5)
                     stdout, stderr = process.communicate(timeout=5)
                     self.assertEqual(125, process.returncode, (stdout, stderr))
                     self.assertFalse(marker.exists(), "Unacknowledged target executed")

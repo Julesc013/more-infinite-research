@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import secrets
+import select
 import stat
 import sys
 import time
@@ -79,63 +80,34 @@ def valid_bound_value(value: object, kind: str) -> bool:
     return all(type(value[name]) is int and value[name] > 0 for name in ("pid", "session_id", "start_ticks")) and value["pid"] == value["session_id"]
 
 
-def wait_for_ack(path: Path, expected: dict[str, int | str], timeout_seconds: float = 2.0) -> bool:
+def wait_for_ack(expected: dict[str, int | str], timeout_seconds: float = 2.0) -> bool:
+    # Only the inherited parent pipe authorizes execution. Receipt-derived
+    # values in a filesystem ACK cannot establish that the parent adopted us.
     deadline = time.monotonic() + timeout_seconds
+    payload = bytearray()
     while time.monotonic() < deadline:
-        try:
-            descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
-        except FileNotFoundError:
-            time.sleep(0.01)
-            continue
-        except OSError:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0 or not select.select([0], [], [], remaining)[0]:
             return False
-        try:
-            details = os.fstat(descriptor)
-            if not stat.S_ISREG(details.st_mode) or details.st_size <= 0 or details.st_size > 1024:
+        byte = os.read(0, 1)
+        if not byte or len(payload) >= 1024:
+            return False
+        if byte == b"\n":
+            try:
+                value = json.loads(payload.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError):
                 return False
-            payload = os.read(descriptor, details.st_size + 1)
-        finally:
-            os.close(descriptor)
-        if len(payload) > 1024:
-            return False
-        try:
-            value = json.loads(payload.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
-            return False
-        return valid_bound_value(value, "MIR441LinuxNativeAckV1") and value == expected
+            return valid_bound_value(value, "MIR441LinuxNativeAckV1") and value == expected
+        payload.extend(byte)
     return False
 
 
-def write_ack(argv: list[str]) -> int:
-    if len(argv) != 9 or argv[0] != "--write-ack" or argv[1] != "--path" or argv[3] != "--pid" or argv[5] != "--start-ticks" or argv[7] != "--session-id":
-        return 125
-    try:
-        value: dict[str, int | str] = {
-            "kind": "MIR441LinuxNativeAckV1",
-            "pid": int(argv[4]),
-            "start_ticks": int(argv[6]),
-            "session_id": int(argv[8]),
-        }
-    except (IndexError, ValueError):
-        return 125
-    if not valid_bound_value(value, "MIR441LinuxNativeAckV1"):
-        return 125
-    try:
-        write_exclusive_json(Path(argv[2]), value)
-    except (OSError, UnicodeError, ValueError):
-        return 125
-    return 0
-
-
 def main(argv: list[str]) -> int:
-    if argv and argv[0] == "--write-ack":
-        return write_ack(argv)
-    if len(argv) < 6 or argv[0] != "--receipt" or argv[2] != "--ack" or argv[4] != "--":
+    if len(argv) < 4 or argv[0] != "--receipt" or argv[2] != "--":
         return 125
     receipt = Path(argv[1])
-    ack = Path(argv[3])
-    target = argv[5]
-    target_argv = argv[5:]
+    target = argv[3]
+    target_argv = argv[3:]
     if not os.path.isabs(target) or "\x00" in target:
         return 125
     try:
@@ -156,7 +128,7 @@ def main(argv: list[str]) -> int:
         )
         ack_value = dict(receipt_value)
         ack_value["kind"] = "MIR441LinuxNativeAckV1"
-        if not wait_for_ack(ack, ack_value):
+        if not wait_for_ack(ack_value):
             return 125
         os.execv(target, target_argv)
     except (OSError, UnicodeError, ValueError):
