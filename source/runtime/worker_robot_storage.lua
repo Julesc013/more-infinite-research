@@ -630,6 +630,9 @@ local DEFAULT_ORIGINS = {
     ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
+-- This schema-2/default preparation is the published11 producer contract,
+-- not evidence that any earlier or current package created the witness.
+local PREPARED_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -717,6 +720,7 @@ local function owner_record()
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
       or (value.producer.kind == "unchanged-mir5-default" or prepared_default) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
+      or prepared_default and value.producer.old_version ~= PREPARED_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
@@ -833,6 +837,9 @@ local function default_origin(event, initializing, state)
       recover_error("legacy prepared/finite conversion is not a default-owner transfer")
     end
     if prepared and base_hop then recover_error("prepared default engine hop remains unqualified") end
+    if prepared and (not change or change.old_version ~= PREPARED_DEFAULT_ORIGINS[target.id]) then
+      recover_error("prepared default requires its published11 producer package event", nil, event, state, {kind="default"})
+    end
     -- This saved fact authenticates the old MIR default. The caller also
     -- checks the surviving full native contract and every force's work.
     -- Other mods may change without invalidating those independent facts.
