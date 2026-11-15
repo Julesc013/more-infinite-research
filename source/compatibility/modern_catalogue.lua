@@ -836,7 +836,8 @@ function M.select(active_mods, raw, withheld)
     -- sparse Bob Plates, pure Angel, or BobTech material body by accident.
     bob_plates, bob_productivity = nil, nil
   end
-  local angel_f210 = bob_angel_f210 and nil or M.angel_f210_profile(active_mods)
+  local angel_f210
+  if not bob_angel_f210 then angel_f210 = M.angel_f210_profile(active_mods) end
   local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
   local exact_product_bindings = nil
   local replacement_product_target_families, excluded_product_target_recipes = {}, {}
@@ -1036,6 +1037,8 @@ function M.select(active_mods, raw, withheld)
     end
   end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
+  local angel_materials = {}
+  if not bob_angel_f210 then angel_materials = M.angel_material_definitions(active_mods) end
   local external_continuations, worker_storage = {}, {}
   local continuations = M.continuations(active_mods, raw, external_continuations, worker_storage)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = continuations,
@@ -1050,7 +1053,7 @@ function M.select(active_mods, raw, withheld)
     bob_angel_f200_combined = bob_angel_f200_combined,
     bob_core = bob_core, bob_plates_profile = bob_plates,
     bob_tech_materials = bob_tech_materials,
-    angel_f210_profile = angel_f210, angel_materials = M.angel_material_definitions(active_mods),
+    angel_f210_profile = angel_f210, angel_materials = angel_materials,
     bob_angel_f210_profile = bob_angel_f210,
     bob_angel_f210_materials = M.bob_angel_f210_material_definitions(active_mods),
     bob_native_continuations = M.retains_bob_native_continuations(active_mods),
@@ -1251,7 +1254,8 @@ function M.continuations(active_mods, raw, external_continuations, worker_storag
       overrides[key] = value
     end
   end
-  local angel_f210 = M.angel_f210_profile(active_mods)
+  local angel_f210
+  if not bob_angel_f210 then angel_f210 = M.angel_f210_profile(active_mods) end
   if angel_f210 then
     local delta = require("compatibility.modern_catalogue.angel_f210")[angel_f210 == "space-age" and "space_age" or angel_f210]
     for key, value in pairs(delta.continuation_overrides or {}) do
@@ -1371,7 +1375,9 @@ function M.native_owners(active_mods)
   if not active_space_age(active_mods) then return {} end
   local owners = copy(require("compatibility.modern_catalogue.space_age").native_owners)
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
-  if bob_angel_f210 == "space-age" or M.angel_f210_profile(active_mods) == "space-age" then
+  local angel_f210
+  if not bob_angel_f210 then angel_f210 = M.angel_f210_profile(active_mods) end
+  if bob_angel_f210 == "space-age" or angel_f210 == "space-age" then
     local source = bob_angel_f210 == "space-age" and require("compatibility.modern_catalogue.bob_angel_f210").space_age
       or require("compatibility.modern_catalogue.angel_f210").space_age
     local recipes = source.native_owners.research_steel.expected.recipes
