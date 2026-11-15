@@ -1,0 +1,124 @@
+{
+  "kind": "MIR516SEWorkerSpeedCapAdverseDiagnosticV1",
+  "status": "independently-reviewed-adverse-and-read-only-observation",
+  "published_package": {
+    "version": "5.0.20015",
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+    "source_commit": "3aa4e2c67811665c7600d8dbacb29e0b06404a82",
+    "player_tree": "b3d7d083251f8473b77bdd7e9dd691646d460bac"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "selection": {
+    "mods": 20,
+    "space_exploration": "0.7.57",
+    "postprocess": "0.7.5",
+    "space_age": false,
+    "original_reporter_selection": false
+  },
+  "native_attempts": 2,
+  "adverse": {
+    "pid": 99060,
+    "processes": 1,
+    "status": "adverse-stopped-first-failure",
+    "failure": "[mir441-process-exit] 1",
+    "restored": true,
+    "map_created": false,
+    "fixture_head": "8e4caa0440f7676c1ebda312664b2bfe5b1bc2b8",
+    "receipt": {
+      "path": "build/qualification/mir515-se-speed-cap-ten-r01/terminal.json",
+      "bytes": 624,
+      "sha256": "F50CD7AEE9643F326F450BCB6593134D12312C869B8A4975E165BD4388064A47"
+    }
+  },
+  "diagnostic": {
+    "pid": 98744,
+    "processes": 1,
+    "status": "observed-read-only-late-data-snapshot",
+    "restored": true,
+    "map_created": false,
+    "fixture_head": "a556c6faabafd9a9a3b56cd94452aeb3c1eabf2a",
+    "receipt": {
+      "path": "build/qualification/mir515-se-worker-row-diagnostic-r01/terminal-r03.json",
+      "bytes": 46804,
+      "sha256": "F4EDA69314A2D5A8FF34AEB47867FFED99C38292C23C52087C8B293DE5282F47"
+    },
+    "actual_tail": {
+      "name": "worker-robots-speed-10",
+      "max_level": "infinite",
+      "modifier": 0.65,
+      "effect_type": "worker-robot-speed",
+      "prerequisites": [
+        "worker-robots-speed-9",
+        "se-deep-space-science-pack-1"
+      ],
+      "time_seconds": 60,
+      "count_formula": "0.2*(2^(L-6)*1000)",
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "utility-science-pack",
+        "space-science-pack",
+        "se-rocket-science-pack",
+        "se-energy-science-pack-4",
+        "se-deep-space-science-pack-1"
+      ]
+    }
+  },
+  "private_custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir516-se-cap-adverse-blackglass-r01",
+    "commit": "45bfc1faa622a4087726d0c51058e0f48b97fb08",
+    "git_blob": "98cb2a913784315130a1122058eef83adbfc68f8",
+    "path": "projects/mir/runs/mir516-se-cap-adverse-diagnostic-r01/original-bodies.json.gz",
+    "packed_bytes": 272017,
+    "packed_sha256": "E0541D359523589C2909ECCFA062E67A348F99EAB3845BF90AFCBB2693010CB9",
+    "original_bodies": 140,
+    "unique_bodies": 115,
+    "original_bytes": 1226932,
+    "actual_remote_decoded_bytes_equal_primary": true,
+    "public_package_bodies": false,
+    "third_party_archive_bodies": false
+  },
+  "independent_review": {
+    "reviewer": "/root/review_515_prerequisites",
+    "verdict": "GO: actual remote original bytes and two-process scope",
+    "record": "Independent agent message; no reviewer-authored receipt file"
+  },
+  "proof": [
+    {
+      "path": "build/qualification/mir516-se-cap-adverse-private-custody-r01/custody-created.json",
+      "bytes": 522,
+      "sha256": "B5B76A37F4DDBD5F6AC336D2970F8E335B1263B32BC755D2B8D81EB0B54A2A0C"
+    },
+    {
+      "path": "build/qualification/mir516-se-cap-adverse-private-custody-r01/remote-readback.json",
+      "bytes": 1035,
+      "sha256": "3E782A2DFE0CD0581DB22D8B59C3477316FDDD5A7930A79AAB0ED37A0EA97260"
+    },
+    {
+      "path": "build/qualification/mir516-se-cap-adverse-private-custody-r01/Capture.py",
+      "bytes": 3318,
+      "sha256": "B8BF4CBFAA3D6585CA842115E3969413BE33E4644974FF77A51F893979FBA392"
+    },
+    {
+      "path": "build/qualification/mir516-se-cap-adverse-private-custody-r01/Verify.py",
+      "bytes": 493,
+      "sha256": "D1089FBDE9A2511C4E42BC7D581453096CF1F47C3374A97FA111F46D3D229802"
+    }
+  ],
+  "limitations": [
+    "The first cap fixture incorrectly targeted finite worker-6; no map, ordinary completion or cold-read result exists from it.",
+    "The second process intentionally stops after the final data snapshot; it proves row selection only.",
+    "An initial root misreading of the first error and reviewer procedural/ingredient misreadings were withdrawn; original errors and corrective classification remain in custody.",
+    "The source repair and actual old-negative/candidate ordinary-research comparison require separate checked integration and native results.",
+    "The reporter original save/settings/full selection are absent; ore-output, GUI, multiplayer, performance and stable acceptance remain open."
+  ],
+  "gameplay_qualification": false,
+  "ordinary_research_qualification": false,
+  "stable_acceptance": false,
+  "whole_goal_complete": false
+}
