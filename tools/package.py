@@ -22,6 +22,7 @@ EARLY_LOCALE_OUTPUT = "locale/en/more-infinite-research.cfg"
 EARLY_DESCRIPTION = ("Adds fixed finite default continuations of selected research bonus lines for museum "
                      "Factorio releases; it has no configurable startup settings.")
 MIR_PLAYER_NAME = "more-infinite-research"
+FIXTURE_INFO_F200 = "info-f200.json"
 SOURCE_TARGET_PATH = "platform/target.lua"
 SOURCE_TARGET_ID_ASSIGNMENT = re.compile(rb'(?m)^[ \t]*id[ \t]*=')
 SOURCE_TARGET_ID = re.compile(rb'(?m)^[ \t]*id[ \t]*=[ \t]*"(?P<id>f\d{3})"[ \t]*,[ \t]*\r?$')
@@ -151,6 +152,70 @@ def git_source(source, revision, include_early_locale=False):
         files[name] = process.stdout[cursor:cursor + int(size)]
         cursor += int(size) + 1
     return commit, files
+
+
+def fixture_metadata_source(source, fixture_info):
+    """Return the admitted direct fixture root for the F200 metadata alternate."""
+    if fixture_info != FIXTURE_INFO_F200:
+        raise ValueError("Fixture metadata selection admits only info-f200.json")
+    source, repository = git_repository(source)
+    source_relative = source.relative_to(repository)
+    if (len(source_relative.parts) != 3
+            or source_relative.parts[:2] != ("tests", "fixtures")):
+        raise ValueError("Fixture metadata selection requires a direct tests/fixtures source")
+    return source, repository, source_relative
+
+
+def fixture_metadata(source, commit, files, fixture_info):
+    """Select the one committed F200 fixture metadata alternate as ``info.json``.
+
+    This is intentionally not a general metadata-projection facility.  The
+    portable profile witness needs its tracked F200 manifest while retaining
+    the same committed Lua members as its canonical F210 fixture.  Player
+    packages and arbitrary fixture files must continue through their ordinary
+    metadata paths.
+    """
+    source, repository, source_relative = fixture_metadata_source(source, fixture_info)
+    try:
+        canonical = json.loads(files["info.json"].decode("utf-8"))
+    except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("Fixture canonical metadata is invalid") from error
+    if (not isinstance(canonical, dict) or not isinstance(canonical.get("name"), str)
+            or not isinstance(canonical.get("version"), str)):
+        raise ValueError("Fixture canonical metadata has no name/version")
+    source_path = source_relative.as_posix() + "/" + fixture_info
+    entries = subprocess.check_output(
+        ["git", "-C", str(repository), "ls-tree", "-z", commit, "--", source_path]).split(b"\0")
+    entries = [entry for entry in entries if entry]
+    if len(entries) != 1:
+        raise ValueError("Selected fixture metadata is not tracked at the frozen revision")
+    metadata, name = entries[0].split(b"\t", 1)
+    mode, kind, blob = metadata.split()
+    if (name.decode("utf-8") != source_path or kind != b"blob"
+            or mode not in (b"100644", b"100755")):
+        raise ValueError("Selected fixture metadata is not an ordinary tracked file")
+    contents = subprocess.check_output(
+        ["git", "-C", str(repository), "cat-file", "blob", blob.decode("ascii")])
+    try:
+        selected = json.loads(contents.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("Selected fixture metadata is invalid") from error
+    if (not isinstance(selected, dict) or not isinstance(selected.get("name"), str)
+            or not isinstance(selected.get("version"), str)):
+        raise ValueError("Selected fixture metadata has no name/version")
+    if canonical.get("factorio_version") != "2.1" or selected.get("factorio_version") != "2.0":
+        raise ValueError("Fixture metadata selection requires canonical F210 and alternate F200 metadata")
+    if canonical["name"] == MIR_PLAYER_NAME or selected["name"] == MIR_PLAYER_NAME:
+        raise ValueError("Fixture metadata selection does not package MIR player source")
+    if (selected["name"], selected["version"]) != (canonical["name"], canonical["version"]):
+        raise ValueError("Selected fixture metadata must keep the canonical fixture name and version")
+    return contents, {
+        "source_path": fixture_info,
+        "source_blob": blob.decode("ascii"),
+        "sha256": digest(contents),
+        "bytes": len(contents),
+        "output_path": "info.json",
+    }
 
 
 def read_editions(source, revision=None, target_record=TARGET_RECORD):
@@ -423,7 +488,15 @@ def members(source, version=None, committed_files=None, target=None, editions=No
     return info, rows
 
 
-def build(source, output, version=None, revision=None, target=None, target_record=TARGET_RECORD):
+def build(source, output, version=None, revision=None, target=None, target_record=TARGET_RECORD,
+          fixture_info=None):
+    if fixture_info is not None:
+        if revision is None:
+            raise ValueError("Fixture metadata selection requires --revision")
+        if version is not None:
+            raise ValueError("Fixture metadata selection does not permit --version")
+        if target is not None:
+            raise ValueError("Fixture metadata selection does not permit --target")
     selected_record = target_record_path(target_record)
     if target is None and selected_record != TARGET_RECORD:
         raise ValueError("Target record selection requires a declared target")
@@ -432,9 +505,16 @@ def build(source, output, version=None, revision=None, target=None, target_recor
     source = source.resolve(strict=True)
     if not source.is_dir() or source.is_symlink():
         raise ValueError("Select an ordinary existing source root")
+    if fixture_info is not None:
+        fixture_metadata_source(source, fixture_info)
     early = target is not None and selected_record == EARLY_TARGET_RECORD
     commit, files = (git_source(source, revision, include_early_locale=early)
                      if revision is not None else (None, None))
+    fixture_info_record = None
+    if fixture_info is not None:
+        selected_info, fixture_info_record = fixture_metadata(source, commit, files, fixture_info)
+        files = dict(files)
+        files["info.json"] = selected_info
     record_path = selected_record if target is not None else None
     editions, editions_sha = (read_editions(source, commit, record_path)
                               if target is not None else (None, None))
@@ -458,6 +538,7 @@ def build(source, output, version=None, revision=None, target=None, target_recor
                  if early else "native-package-members-not-gameplay-qualification"),
         "source_root": str(source), "archive": str(output.resolve()),
         "source_commit": commit,
+        **({"fixture_info": fixture_info_record} if fixture_info_record is not None else {}),
         "target": target, "target_record": record_path, "edition_record_sha256": editions_sha,
         "name": info["name"], "version": info["version"],
         **({"delivery": editions[target]["delivery"]} if early else {}),
@@ -473,11 +554,13 @@ def main():
     parser.add_argument("--record", type=Path)
     parser.add_argument("--version", help="Explicit target/fixture metadata version; never a product packaging retry counter")
     parser.add_argument("--revision", help="Read exact committed blobs, excluding dirty and untracked development work")
+    parser.add_argument("--fixture-info", help="Use the committed F200 fixture metadata alternate as info.json; requires --revision")
     parser.add_argument("--target", help="Select an implemented edition; this is not native qualification")
     parser.add_argument("--target-record", default=TARGET_RECORD,
                         help="Tracked targets/*.json selection record, frozen with --revision")
     args = parser.parse_args()
-    record = build(args.source, args.output, args.version, args.revision, args.target, args.target_record)
+    record = build(args.source, args.output, args.version, args.revision, args.target, args.target_record,
+                   args.fixture_info)
     if args.record:
         args.record.parent.mkdir(parents=True, exist_ok=True)
         with args.record.open("x", encoding="utf-8", newline="\n") as stream:

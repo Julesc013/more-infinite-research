@@ -15,6 +15,8 @@ $controls = @(
   [ordered]@{path='tests/test_secretas_continuation.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_continuation.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_history.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_inherited_origin.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_prepared_default.py';lua=$true},
   [ordered]@{path='tests/test_worker_native_owner_data.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_default_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_provider_native.py';lua=$true},

@@ -1,0 +1,749 @@
+{
+  "schema": 1,
+  "kind": "MIR514F210ActualNumericAndAliasFileProfileRoundtripsV1",
+  "date": "2026-11-13",
+  "status": "ACCEPTED-bounded-F210-numeric8-and-alias3-file-roundtrips",
+  "published_tag": "v5.0.14",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "frozen_runner": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23",
+    "data": "D:\\Games\\Factorio\\2.1\\data"
+  },
+  "player": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.21014.zip",
+    "bytes": 1039673,
+    "sha256": "021E222A5495398ECEED272DE340BD1731816CCA483DA446B6F641BF5FE2DD3B",
+    "version": "5.0.21014"
+  },
+  "selected_mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21014",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-profile-native-witness",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "resources": {
+    "memory_mib": 4096,
+    "output_mib": 64,
+    "timeout_seconds": 180
+  },
+  "fixture": {
+    "archive": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\mir-fixture-mir5-profile-native-witness_0.1.0.zip",
+      "bytes": 3110,
+      "sha256": "5E8938D8CEA9BAB7EB43FA00BD20E28B99D217FD1B35E7F568210E3EAE493786"
+    },
+    "data_and_alias_runtime_source_commit": "4ea7bb4797be26772bae9dd286ace120be81ab85",
+    "numeric_runtime_observer_commit": "a21506dcdda53c5c0c0a3f3d4d4ec8102910048f",
+    "merged_reviewed_observer_pr": 1937,
+    "observer_merge_commit": "cdfd572984bb84c33bbe4a91b89bc9096e1c4ca3",
+    "independent_code_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\INDEPENDENT-FINAL-WITNESS-CODE-REVIEW.json",
+      "bytes": 563,
+      "sha256": "47A3258296998EB9E9CBF72F13A6FE2AB0C8BDFD2EB4CB9CB8AD2AA5B21D8229"
+    },
+    "scope": "Private read-only witness; original archive stays unchanged. Numeric RCON embeds exact corrected canonical W body and never invokes its old failed remote. No prototype/world mutation or player-package change."
+  },
+  "independent_original_obligations": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\settings-profile-roundtrip-intents-aero-r01.json",
+    "bytes": 19271,
+    "sha256": "DF10EC9AD26210F21D0D65B4BA4F9910BAEB55455E35D6C88D036919C96A7363"
+  },
+  "cases": [
+    {
+      "case": "f210-numeric",
+      "status": "ACCEPTED-bounded-actual-file-profile-roundtrip",
+      "independent_import_values": {
+        "mir-pipeline-extent-multiplier": 123.45,
+        "mir-prototype-productivity-cap": 4321.5,
+        "mir-prototype-efficiency-cap": -83.25,
+        "mir-prototype-pollution-cap": -91.125,
+        "mir-prototype-speed-floor": -75.5,
+        "mir-prototype-speed-cap": 1234.5,
+        "mir-prototype-quality-cap": 678.9,
+        "mir-recycling-return-chance": 12.34
+      },
+      "actual_source_file_bytes": 6537,
+      "actual_wire_bytes_imported": 6536,
+      "wire_transformation": "Remove exactly one original terminal LF; no decoding/recompression/re-encoding.",
+      "raw_dropdown_conflicts": {
+        "mir-pipeline-extent-multiplier": "25",
+        "mir-prototype-productivity-cap": "percent-25",
+        "mir-prototype-efficiency-cap": "saving-25",
+        "mir-prototype-pollution-cap": "saving-25",
+        "mir-prototype-speed-floor": "saving-25",
+        "mir-prototype-speed-cap": "bonus-25",
+        "mir-prototype-quality-cap": "bonus-25",
+        "mir-recycling-return-chance": "percent-10"
+      },
+      "raw_values_remain_visible": true,
+      "effective_MIR_settings": 888,
+      "actual_native_fields": {
+        "stage": "runtime",
+        "family": "f210",
+        "mode": "numeric",
+        "maximum_productivity": 43.215,
+        "recycling_amount": 1,
+        "recycling_probability": 0.1234,
+        "receiver_limits_supported": true,
+        "receiver": {
+          "consumption_limits": {
+            "low": -0.8324999999999999
+          },
+          "pollution_limits": {
+            "low": -0.9113
+          },
+          "speed_limits": {
+            "low": -0.755,
+            "high": 12.345
+          },
+          "quality_limits": {
+            "high": 6.789
+          }
+        }
+      },
+      "actual_data_fields": {
+        "pipeline": 395.0,
+        "productivity": 43.215,
+        "recycling": 0.1234,
+        "consumption_limits.low": -0.8324999999999999,
+        "pollution_limits.low": -0.9112500000000001,
+        "speed_limits.low": -0.755,
+        "speed_limits.high": 12.345,
+        "quality_limits.high": 6.789
+      },
+      "paired_files": {
+        "profile-full.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\retained-native\\evidence\\profile-full.txt",
+            "bytes": 6537,
+            "sha256": "45BA18A25204A37D37BFBA4175D7B6D9DEE08E88E3E99AF63EE10AE0321BABF2"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-numeric-import-native\\evidence\\profile-full.txt",
+            "bytes": 6537,
+            "sha256": "45BA18A25204A37D37BFBA4175D7B6D9DEE08E88E3E99AF63EE10AE0321BABF2"
+          },
+          "exact_bytes_equal": true
+        },
+        "profile-compact.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\retained-native\\evidence\\profile-compact.txt",
+            "bytes": 433,
+            "sha256": "482B345A95B314D8CAF739F7760B381D6E5076A91E779E22F60D972F4A2C18D5"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-numeric-import-native\\evidence\\profile-compact.txt",
+            "bytes": 433,
+            "sha256": "482B345A95B314D8CAF739F7760B381D6E5076A91E779E22F60D972F4A2C18D5"
+          },
+          "exact_bytes_equal": true
+        },
+        "profile-after-diagnostics.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\retained-native\\evidence\\profile-after-diagnostics.txt",
+            "bytes": 6537,
+            "sha256": "45BA18A25204A37D37BFBA4175D7B6D9DEE08E88E3E99AF63EE10AE0321BABF2"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-numeric-import-native\\evidence\\profile-after-diagnostics.txt",
+            "bytes": 6537,
+            "sha256": "45BA18A25204A37D37BFBA4175D7B6D9DEE08E88E3E99AF63EE10AE0321BABF2"
+          },
+          "exact_bytes_equal": true
+        },
+        "diagnostic-explicit.log": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\retained-native\\evidence\\diagnostic-explicit.log",
+            "bytes": 7211,
+            "sha256": "DA015C5B8690CE5412E0E32A1F79E0EB07505EDA55CAC9A3001ABD156D4E3862"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-numeric-import-native\\evidence\\diagnostic-explicit.log",
+            "bytes": 7211,
+            "sha256": "DA015C5B8690CE5412E0E32A1F79E0EB07505EDA55CAC9A3001ABD156D4E3862"
+          },
+          "exact_bytes_equal": true
+        }
+      },
+      "cross_arm_forces_equal": true,
+      "cross_arm_native_fields_equal": true,
+      "forces": 3,
+      "captured_technology_rows": 879,
+      "source": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\packet.json",
+          "bytes": 68898,
+          "sha256": "6E0AFE7F15960BDF7CE9DBC0D4AB2C5F511FCE978EE606C0225B792ADDA23080"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\terminal.json",
+          "bytes": 15365,
+          "sha256": "DB4FE15A7FE444987DD47FF0E07E5E6A07D1D963CCD418C9057E791AB7C85127"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\composition.json",
+          "bytes": 12161,
+          "sha256": "693B592E0DF6F0B6B2BF0C0BF88A7AD832972F0173BC4D0CB6F412F23F39E64A"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\Invoke-PortableSourceContinuation.ps1",
+          "bytes": 16991,
+          "sha256": "7CCBBD6FCC1192928B71176A49029C67F7702364CBE5B888747FA33E70307E75"
+        },
+        "reader": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\read-portable-evidence-r03.py",
+          "bytes": 7874,
+          "sha256": "4EDFB9F9AEBBF7BE984C4E0696C6C52B538E3FA82A53B2D091741A4FA9E815A5"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\Observe-PortableRuntimeR03.lua",
+          "bytes": 6827,
+          "sha256": "1E9494B4C28695AF4124B71C6EF0614277DA03D3D43D3722F56924D65043ED24"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-numeric-source\\mod-settings.dat",
+          "bytes": 527,
+          "sha256": "29FFC59EE30C6DA40F926EC661A169F9D72F4CC8EB9A905A01A3B3DC3C3F6507"
+        },
+        "raw_startup_input": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-numeric-source\\startup.json",
+          "bytes": 456,
+          "sha256": "B207F9FD9EF57F6CDB4C3301FA33B61E0909424E8C4274949A93F52F17730149"
+        },
+        "observed_pids": [
+          28628
+        ],
+        "native_processes": 1,
+        "process_ends": [
+          {
+            "exit_code": -1,
+            "predicate_observed": true,
+            "passed": true
+          }
+        ],
+        "restored": true
+      },
+      "imported": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-numeric-import\\packet.json",
+          "bytes": 76396,
+          "sha256": "381AEA4E59B6C4E38DF856F650D12E088F137DFFA3B8729CB5F016D61335D1F9"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-numeric-import\\terminal.json",
+          "bytes": 18430,
+          "sha256": "0BC07945A61B8B18D1EC9B2F22A47A06938ABADB1B5A1AEC9E982A1C5B0091E2"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-numeric-import\\composition.json",
+          "bytes": 12903,
+          "sha256": "EBFBC7E1929DF23177BD84C4D724DC82194E7FC87210303A121803A9337B8B3F"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\Invoke-f210-numeric-Import.ps1",
+          "bytes": 16777,
+          "sha256": "C7DCF098CFF20E0B107328A1A71B58006286DEE80F4BD3E12BD7A86DA8CB0F88"
+        },
+        "reader": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\read-import-pair.py",
+          "bytes": 2698,
+          "sha256": "CF91321358FA0469D6586DBB1A034E3350E8D9FA11A8FC55C74068D4CEDC5ADF"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\Observe-PortableRuntimeR03.lua",
+          "bytes": 6827,
+          "sha256": "1E9494B4C28695AF4124B71C6EF0614277DA03D3D43D3722F56924D65043ED24"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-import\\mod-settings.dat",
+          "bytes": 7147,
+          "sha256": "A2BF3F77E0787BC6FDF1BE0D820672C1036B8B6BF3E7AC0401B5C91773FCCCFA"
+        },
+        "raw_startup_input": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-import\\startup.json",
+          "bytes": 6980,
+          "sha256": "6790C67D00263F3BFFF105ADE2BB46B986B9AC0740C7BC7DD25D212F0CD3DA0B"
+        },
+        "observed_pids": [
+          28536,
+          30816
+        ],
+        "native_processes": 2,
+        "process_ends": [
+          {
+            "exit_code": 0,
+            "predicate_observed": false,
+            "passed": true
+          },
+          {
+            "exit_code": -1,
+            "predicate_observed": true,
+            "passed": true
+          }
+        ],
+        "restored": true
+      },
+      "source_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-source\\INDEPENDENT-SOURCE-RESULT-REVIEW.json",
+        "bytes": 2211,
+        "sha256": "CEB773866CEA7712B1053DF67CB428867BC651F359EFD441A52A77F709CAA2D5"
+      },
+      "import_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-numeric-import\\INDEPENDENT-ROUNDTRIP-RESULT-REVIEW.json",
+        "bytes": 1314,
+        "sha256": "9A03511C339CB2BB0ECA3AD1768602B4C6A328DBAC8AB9673C94CDFCC7B6D7E8"
+      },
+      "review_findings": {
+        "reviewer": "/root/review_factory_result",
+        "verdict": "GO-scoped-actual-portable-roundtrip",
+        "case": "f210-numeric",
+        "terminal_sha256": "0BC07945A61B8B18D1EC9B2F22A47A06938ABADB1B5A1AEC9E982A1C5B0091E2",
+        "packet_sha256": "381AEA4E59B6C4E38DF856F650D12E088F137DFFA3B8729CB5F016D61335D1F9",
+        "actual_import_wire_bytes": 6536,
+        "raw_conflicts": 8,
+        "effective_settings": 888,
+        "actual_pids": [
+          28536,
+          30816
+        ],
+        "create_natural_exit": 0,
+        "server_supervised_exit": -1,
+        "restoration_controls_independently_verified": 25,
+        "restored": true,
+        "live_factorio": 0,
+        "findings": "Independent pair-reader replay passes exact original wire, eight preserved raw dropdown conflicts, own fresh-create data/runtime fields, all888effective settings, four corresponding profile/report byte pairs and typed forces/native frame equality across3forces/879rows. Original create-data pollution-0.91125 remains separate from native runtime-0.9113 at1e-6. Exact5mod closure and both fresh processes pass. Original DABE source adverse remains byte-exact/adverse, with only its valid create adopted once.",
+        "limits": "F210 eight-number File profile route only. No aliases/F200/GUI/client/gameplay/performance/full native/stable/release qualification. Raw bodies require preserved custody before public integration."
+      },
+      "primary_import_raw_custody": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-numeric-import\\PRIMARY-RAW-READBACK.json",
+        "bytes": 51773,
+        "sha256": "A23003E5E8AA0839A6A4CCDC95ABD810EE242F6FFD32D295237A33D5D87F082A"
+      },
+      "players": 0,
+      "public_commands_per_arm": [
+        "/mir-settings-export",
+        "/mir-settings-export --compact mir-headless-compact",
+        "/mir-diagnostics-export"
+      ],
+      "source_and_import_public_invocations": 6
+    },
+    {
+      "case": "f210-aliases",
+      "status": "ACCEPTED-bounded-actual-file-profile-roundtrip",
+      "independent_import_values": {
+        "mir-prototype-speed-cap": "bonus-100000",
+        "mir-prototype-quality-cap": "bonus-100000",
+        "mir-recycling-return-chance": "percent-25"
+      },
+      "actual_source_file_bytes": 6525,
+      "actual_wire_bytes_imported": 6524,
+      "wire_transformation": "Remove exactly one original terminal LF; no decoding/recompression/re-encoding.",
+      "raw_dropdown_conflicts": {
+        "mir-prototype-speed-cap": "bonus-25",
+        "mir-prototype-quality-cap": "bonus-25",
+        "mir-recycling-return-chance": "percent-10"
+      },
+      "raw_values_remain_visible": true,
+      "effective_MIR_settings": 888,
+      "actual_native_fields": {
+        "stage": "runtime",
+        "family": "f210",
+        "mode": "aliases",
+        "maximum_productivity": 3,
+        "recycling_amount": 1,
+        "recycling_probability": 0.25,
+        "receiver_limits_supported": true,
+        "receiver": {
+          "speed_limits": {
+            "high": 1000
+          },
+          "quality_limits": {
+            "high": 1000
+          }
+        }
+      },
+      "actual_data_fields": {
+        "recycling": 0.25,
+        "speed_limits.high": 1000.0,
+        "quality_limits.high": 1000.0
+      },
+      "paired_files": {
+        "profile-full.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\retained-native\\evidence\\profile-full.txt",
+            "bytes": 6525,
+            "sha256": "42C1C76A5F9B50B28E84EF2AC99B59B1CA4EAAD49175F4AB87158C5BC8F16C0A"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-aliases-import-native\\evidence\\profile-full.txt",
+            "bytes": 6525,
+            "sha256": "42C1C76A5F9B50B28E84EF2AC99B59B1CA4EAAD49175F4AB87158C5BC8F16C0A"
+          },
+          "exact_bytes_equal": true
+        },
+        "profile-compact.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\retained-native\\evidence\\profile-compact.txt",
+            "bytes": 345,
+            "sha256": "CF3E65BB73C9CD725BA0BF365A3955046AEBBBB483B17FEDB1E1E3A341BD3037"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-aliases-import-native\\evidence\\profile-compact.txt",
+            "bytes": 345,
+            "sha256": "CF3E65BB73C9CD725BA0BF365A3955046AEBBBB483B17FEDB1E1E3A341BD3037"
+          },
+          "exact_bytes_equal": true
+        },
+        "profile-after-diagnostics.txt": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\retained-native\\evidence\\profile-after-diagnostics.txt",
+            "bytes": 6525,
+            "sha256": "42C1C76A5F9B50B28E84EF2AC99B59B1CA4EAAD49175F4AB87158C5BC8F16C0A"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-aliases-import-native\\evidence\\profile-after-diagnostics.txt",
+            "bytes": 6525,
+            "sha256": "42C1C76A5F9B50B28E84EF2AC99B59B1CA4EAAD49175F4AB87158C5BC8F16C0A"
+          },
+          "exact_bytes_equal": true
+        },
+        "diagnostic-explicit.log": {
+          "source": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\retained-native\\evidence\\diagnostic-explicit.log",
+            "bytes": 7199,
+            "sha256": "155FDF0D8642B6B998906D94C7A1A0AD3C7FC23B4B7D8019F826496D3B90B329"
+          },
+          "imported": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-portable-profiles-r04-f210-aliases-import-native\\evidence\\diagnostic-explicit.log",
+            "bytes": 7199,
+            "sha256": "155FDF0D8642B6B998906D94C7A1A0AD3C7FC23B4B7D8019F826496D3B90B329"
+          },
+          "exact_bytes_equal": true
+        }
+      },
+      "cross_arm_forces_equal": true,
+      "cross_arm_native_fields_equal": true,
+      "forces": 3,
+      "captured_technology_rows": 879,
+      "source": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\packet-r02.json",
+          "bytes": 62319,
+          "sha256": "70DC786262691437561A4F3F83D8942FBBCB4BDAF7D2FDF574D5DA35FE92301C"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\terminal.json",
+          "bytes": 17623,
+          "sha256": "02410226C9D97EB9E44642C64A6E3F6EAC570CAD845E59840BDB5DB5D9D4A6A5"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\composition.json",
+          "bytes": 12903,
+          "sha256": "DA96D0D191ADF2E72753D7EAA675806386B78C73CD90C1CB9F6D1AD5A1604898"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\Invoke-PortableProfileArm.ps1",
+          "bytes": 16668,
+          "sha256": "DA638B6082781C7BA524C3F756BD7B78C8C025F23B7715299B742C94A000F6B6"
+        },
+        "reader": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\read-portable-evidence.py",
+          "bytes": 7765,
+          "sha256": "FDE7EEA789AC789A32118390D8558FD9107CF1D4758940F6B965A8D06C794008"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\Observe-PortableProfile.lua",
+          "bytes": 2044,
+          "sha256": "9C1DBB54F715778E8D7A7FFC006A9145B7624789E38AB2BAFA066F79943ECAA0"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\mod-settings.dat",
+          "bytes": 357,
+          "sha256": "93C80649E24761612AD8E5589FB45045C280CD18AF7C36010A2566992A9BE5F3"
+        },
+        "raw_startup_input": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\startup.json",
+          "bytes": 286,
+          "sha256": "BB9F90054277A3615375B72C988EB9B0B74F420589FF26D07209D57A3EE1DE9F"
+        },
+        "observed_pids": [
+          16964,
+          29492
+        ],
+        "native_processes": 2,
+        "process_ends": [
+          {
+            "exit_code": 0,
+            "predicate_observed": false,
+            "passed": true
+          },
+          {
+            "exit_code": -1,
+            "predicate_observed": true,
+            "passed": true
+          }
+        ],
+        "restored": true
+      },
+      "imported": {
+        "packet": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-aliases-import\\packet.json",
+          "bytes": 70677,
+          "sha256": "C53C8238042F99D12623306D2E5566FCCBF12FB52E5CEC18C0A25870D119909C"
+        },
+        "terminal": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-aliases-import\\terminal.json",
+          "bytes": 18043,
+          "sha256": "C2D945D0FFCD087370C28F82D48062DC8F90C15E6CEDC04486F56F73D73E7610"
+        },
+        "composition": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-aliases-import\\composition.json",
+          "bytes": 12903,
+          "sha256": "09B5F186125374918F141C38878BB6F052453B12D549DC7C7BA12B89C2C483FD"
+        },
+        "owner": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\Invoke-f210-aliases-Import.ps1",
+          "bytes": 16640,
+          "sha256": "92FB0512A22D7C7C150A22B991112977E99F5EEAA19203DB07A3435C1C7D1691"
+        },
+        "reader": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\read-import-pair.py",
+          "bytes": 2698,
+          "sha256": "CF91321358FA0469D6586DBB1A034E3350E8D9FA11A8FC55C74068D4CEDC5ADF"
+        },
+        "observer": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\Observe-PortableProfile.lua",
+          "bytes": 2044,
+          "sha256": "9C1DBB54F715778E8D7A7FFC006A9145B7624789E38AB2BAFA066F79943ECAA0"
+        },
+        "settings": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-import\\mod-settings.dat",
+          "bytes": 6861,
+          "sha256": "2D15668DC68E6947BACF1407F7EA14EB4F11F78A8328E17476312C6156D53B9D"
+        },
+        "raw_startup_input": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-import\\startup.json",
+          "bytes": 6739,
+          "sha256": "F59F502F7B9DDF88FFED0A7564DB8FC1E6E34086FB83F93E0FF9EA9466EA9546"
+        },
+        "observed_pids": [
+          26840,
+          29928
+        ],
+        "native_processes": 2,
+        "process_ends": [
+          {
+            "exit_code": 0,
+            "predicate_observed": false,
+            "passed": true
+          },
+          {
+            "exit_code": -1,
+            "predicate_observed": true,
+            "passed": true
+          }
+        ],
+        "restored": true
+      },
+      "source_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-source\\INDEPENDENT-SOURCE-RESULT-REVIEW.json",
+        "bytes": 2129,
+        "sha256": "6CDAE69FDF86CEDA728404D3B5F378708ECBAA1E53B39B0317002656D310757A"
+      },
+      "import_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-aliases-import\\INDEPENDENT-ROUNDTRIP-RESULT-REVIEW.json",
+        "bytes": 1256,
+        "sha256": "E9A20610288AD393A085EE8DEAD29E54069BA9A115D3EFCAC5D072963350817E"
+      },
+      "review_findings": {
+        "reviewer": "/root/review_1929_live",
+        "verdict": "GO-scoped-actual-portable-roundtrip",
+        "case": "f210-aliases",
+        "terminal_sha256": "C2D945D0FFCD087370C28F82D48062DC8F90C15E6CEDC04486F56F73D73E7610",
+        "packet_sha256": "C53C8238042F99D12623306D2E5566FCCBF12FB52E5CEC18C0A25870D119909C",
+        "actual_import_wire_bytes": 6524,
+        "raw_conflicts": 3,
+        "effective_settings": 888,
+        "actual_pids": [
+          26840,
+          29928
+        ],
+        "create_natural_exit": 0,
+        "server_supervised_exit": -1,
+        "original_retained_raw_pairs_verified": 91,
+        "restored": true,
+        "live_factorio": 0,
+        "findings": "Pair-reader replay passes both original and retained actual evidence. All four snapshots preserve raw speed/qualitybonus25,recyclepercent10 and exact6524Bsourcewire, while effective full/compact exports preserve the three original aliases. Four corresponding source/import profile/report files byte-match; all3forces/879rows and native frames match. Native speed/quality highs1000 and recycling amount1/probability.25 verified. Both actual processes, exact5mod closure and restoration pass.",
+        "limits": "Only the exact F210 three-alias File source-export/startup-import/native-output path. No F200/GUI/client/gameplay/performance/full native/stable/release qualification."
+      },
+      "primary_import_raw_custody": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\f210-aliases-import\\PRIMARY-RAW-READBACK.json",
+        "bytes": 51773,
+        "sha256": "4B5B35B07FFD134C84855CB17CBD536DE29B725E8B93C3B5EFF206F31656B243"
+      },
+      "players": 0,
+      "public_commands_per_arm": [
+        "/mir-settings-export",
+        "/mir-settings-export --compact mir-headless-compact",
+        "/mir-diagnostics-export"
+      ],
+      "source_and_import_public_invocations": 6
+    }
+  ],
+  "numeric_original_adverse": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-numeric-source\\terminal.json",
+      "bytes": 15722,
+      "sha256": "DABE1D0402CC1E8698E2F463A102A4BFA62ED61020197E707CB8590AEEB55BB5"
+    },
+    "initial_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-numeric-source\\packet-r02.json",
+      "bytes": 62319,
+      "sha256": "AF311D9AEC13C7F20AAC6C2298B56E6633FB80781F31337B140C3724243A8B2A"
+    },
+    "actual_processes": 2,
+    "create_pid": 22376,
+    "interrupted_server_pid": 23836,
+    "cause": "Original runtime observer required data-stage pollution-0.91125; exact engine EffectValue is four-decimal and returns-0.9113. Data expected value and per-field1e-6 tolerance remain unchanged; corrected runtime explicitly rejects-0.9112 and unquantized-0.91125.",
+    "status_preserved": "adverse-stopped-first-failure",
+    "public_exports": 0,
+    "natural_create_only_adopted": true,
+    "adoption": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\seed-adoption.json",
+      "bytes": 4859,
+      "sha256": "3F05985D4F993C38E6BA3C9A0BCB32FD558A5AFD90EECA6A50938A4A44464EBB"
+    },
+    "independent_adoption": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\INDEPENDENT-SEED-ADOPTION-REVIEW.json",
+      "bytes": 898,
+      "sha256": "E219BCCCE4145CAF40721F816081BEE10B4388ED94E352908C0D3E66FC9336FD"
+    },
+    "protected_seed": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\inputs\\numeric-source-seed.zip",
+      "bytes": 176399,
+      "sha256": "613D73955201979B2F3D350B2BDBE8763164A91FDCDD9091087D394DB6BB857B"
+    },
+    "duplicate_creates_for_observer_recovery": 0,
+    "corrected_server_pid": 28628,
+    "installed_runtime_api": {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+    },
+    "installed_prototype_api": {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\prototype-api.json",
+      "bytes": 1866585,
+      "sha256": "03DB6BFFF8AB1DCF738A52F33331FB839E53DBAFCC576492CD297F94A4BA99F2"
+    }
+  },
+  "pre_native_comparison_gap": {
+    "initial_no_go": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\NUMERIC-IMPORT-INITIAL-INPUT-REVIEW-NOGO.json",
+      "bytes": 684,
+      "sha256": "366B6186228C903FC4364D42C3B28A7D49A00537C2F87608D655CF45573BA8EA"
+    },
+    "superseded_numeric_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\f210-numeric-import\\packet.json",
+      "bytes": 71787,
+      "sha256": "9873AF5AA662D4B34AF3D5A1C34E2A8396421B022DE129AE37840F9175A8529F"
+    },
+    "superseded_alias_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-import\\packet.json",
+      "bytes": 65130,
+      "sha256": "C0AF6D770AD6FB88B7E5A6691C3D1A11C82C1315B0D3D68286F2EBFD11F87EF2"
+    },
+    "alias_zero_native_composition_preserved": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r02\\f210-aliases-import\\composition.json",
+      "bytes": 12903,
+      "sha256": "3BC592DFFEB22B2775F89CFD7C6A89350465DCFDBB446AD6AC2FD4DEF820B834"
+    },
+    "correction": "Before either import engine run, pin/compare full,compact,post-diagnostics profile,explicit diagnostic report,forces/nativeframe, and rerun matching zero-native Compose under fresh roots.",
+    "pair_reader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\read-import-pair.py",
+      "bytes": 2698,
+      "sha256": "CF91321358FA0469D6586DBB1A034E3350E8D9FA11A8FC55C74068D4CEDC5ADF"
+    },
+    "pair_host_controls": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r04\\test-pair-gate.py",
+      "bytes": 3275,
+      "sha256": "9FDCEF4625D3DEDEB3871FFAB58A53B1712EB33A43B755EBC8DAE29B63A47DD4"
+    }
+  },
+  "primary_source_raw_custody": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-portable-profile-native-r03\\SOURCE-PRIMARY-RAW-READBACK.json",
+    "bytes": 105998,
+    "sha256": "990E49ACDBA4766A58636159A024A1F79B2B0DF6372BF3E3450C56FD3F8D4AE0"
+  },
+  "remote_original_custody": {
+    "kind": "MIR514F210NumericAliasOriginalRemoteReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "dd9e9e825eca8a3276560b9adab19039d97c8a45",
+    "path": "projects/mir/runs/mir514-f210-numeric-alias-actual-roundtrips-r01/original-bodies.json.gz",
+    "git_blob": "a7f9e61c520a89a9407f0d7d7409064fd28ba20f",
+    "packed_sha256": "1D0676C60A1EF9A209F4BA5E8A5605BE35F50229D09D70C0625DCC1E64315DED",
+    "actual_originals_verified": 962,
+    "actual_original_bytes": 20459504,
+    "scope": "Two actual2.1.23 Base+Recycler+Quality/public5.0.21014 profile round trips: exact8numeric values and original3legacy aliases; actual exported bytes imported against8/3raw conflicts,888effective settings, four corresponding profile/report byte pairs,3forces/879rows andnativefields equal.9actualprocesses include the retained interrupted original numeric observer; its valid create is explicitly adopted once into a single corrected server without recreate. Original preparations/NO-GOs and6zero-nativeComposes retained. NoF2008/3,GUI/client/production-save/performance/fullnative/stable verdict."
+  },
+  "totals": {
+    "actual_native_processes": 9,
+    "natural_creates": 4,
+    "completed_supervised_servers": 4,
+    "interrupted_adverse_servers": 1,
+    "zero_native_compositions": 6,
+    "all_original_controls_restored": true,
+    "live_factorio": 0,
+    "public_commands": 12
+  },
+  "validation": {
+    "original_numeric_alias_host_controls": 2,
+    "focused_witness_controls": 4,
+    "host_plan_controls": 3,
+    "pair_gate_actual_body_controls": 4,
+    "complete_runtime_observer_preflight_stages": 4,
+    "runtime_wrong_neighbors_rejected": [
+      -0.9112,
+      -0.91125
+    ],
+    "full_local_host_suite_duplicated": false,
+    "observer_exact_head_four_checks_passed_before_merge": true
+  },
+  "limitations": [
+    "Only the exact F2102.1.23 Base+Recycler+Quality/public5.0.21014 eight-number and three-alias routes, using fresh disposable worlds and one adopted valid create.",
+    "No F200 numeric8/alias3 native case or other per-setting native boundaries/reloads is established here; both earlier nine-value/explicit-false File cases retain separate receipts.",
+    "No13GUI export clicks, Unicode/search/dropdown/scroll/resize/EN-DE visual, peer-local/join/rejoin/saved-host/client or production/historical-save qualification.",
+    "No scored timing, whole-product performance, full native/stable verdict or new release. All published14 bytes remain unchanged."
+  ],
+  "scoped_actual_roundtrips_verified": true,
+  "native_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "performance_acceptance": false,
+  "stable_acceptance": false,
+  "release_qualification": false
+}

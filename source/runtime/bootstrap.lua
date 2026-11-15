@@ -376,13 +376,16 @@ local function on_configuration_changed(event)
     and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
-  local worker_storage_plan = worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
+  local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
+  -- The default-owner plan authenticates and consumes this complete prepared
+  -- witness. Do not issue a second legacy plan that could reinstall its quota.
+  local worker_storage_plan = not worker_prepared_default and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
     worker_provider_handover and worker_default_plan or nil)
   local worker_default_caps = lifecycle.preflight_worker_storage_split_caps(worker_default_plan)
   if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
       and ((secretas.old_version ~= nil) ~= (secretas.new_version ~= nil))
       and (mir == nil or mir.old_version ~= nil)
-      and not (worker_robot_storage and worker_robot_storage.plan_prepared(worker_storage_plan)) then
+      and not worker_prepared_default and not (worker_robot_storage and worker_robot_storage.plan_prepared(worker_storage_plan)) then
     -- Foreign finite4..8 and MIR's infinite4/9 represent different paid
     -- identities. Do not guess their former levels after prototype migration.
     error("MIR cannot safely add or remove Secretas on this unprepared save; keep the protected original COPY and prepare its MIR-default infinite worker4 before adding the provider using /mir-worker-storage-recovery prepare", 2)
@@ -411,7 +414,9 @@ local function on_configuration_changed(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
   if worker_robot_storage then
-    if worker_provider_handover then
+    if worker_prepared_default then
+      worker_robot_storage.default_owner_apply(worker_default_plan)
+    elseif worker_provider_handover then
       -- Native setters can raise scripted callbacks. Keep the old route until
       -- its work is completely on the private holder, then install its quota.
       worker_robot_storage.default_owner_apply(worker_default_plan)

@@ -30,6 +30,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
           git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 29da2a250efa9235c9bde0f5bf9f4a9013f990a3
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
@@ -160,6 +162,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
           git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 29da2a250efa9235c9bde0f5bf9f4a9013f990a3
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
@@ -302,9 +306,18 @@ jobs:
             'tests/tooling/Test-MIRLibraryActivation.ps1',
             'tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1',
             'tests/tooling/Test-MIRDevelopmentHealth.ps1',
-            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1'
+            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1',
+            'tests/tooling/Test-MIRPlayerReport.ps1'
           )
           foreach ($control in $controls) {
             & pwsh -NoLogo -NoProfile -File $control
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+      - name: Check the player collector under Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1) {
+            throw 'The Windows convenience launcher requires a PowerShell 5.1 control.'
+          }
+          & .\tests\tooling\Test-MIRPlayerReport.ps1
