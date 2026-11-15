@@ -28,16 +28,17 @@ local function effects(values)
   return map, count
 end
 
--- The external public technology supplies the entire independent recipe basis
--- and relative coefficients. The authored descriptor supplies only its tuning.
+-- The external public technology independently covers each carrier component
+-- and its relative coefficient. It may also own other recipes: those are not
+-- carrier effects or historical credits. The descriptor supplies only tuning.
 -- Each positive coefficient must have the target's exact native representation;
 -- each negative coefficient must be its opposite under the existing tolerance.
 function M.pair(positive, negative, anchor, reference, change, native_matches, opposite_matches)
   local p, size, positive_shape=effects(positive)
   local n, negative_size, negative_shape=effects(negative)
   local r, reference_size, reference_shape=effects(reference)
-  -- Return the first rejected invariant as error-path data. Admission and the
-  -- complete-vector comparison remain unchanged; no partial vector is usable.
+  -- Return the first rejected invariant as error-path data. No partial
+  -- carrier vector is usable.
   local function reject(reason, role, recipe, expected, shape)
     local detail=shape or {recipe=recipe,expected=expected}
     detail.reason=reason;detail.role=role
@@ -57,7 +58,7 @@ function M.pair(positive, negative, anchor, reference, change, native_matches, o
   if not r then return reject("vector-shape","reference",nil,nil,reference_shape) end
   if size<2 then return reject("vector-not-expanded","positive") end
   if size~=negative_size then return reject("vector-count","negative") end
-  if size~=reference_size then return reject("reference-vector-count","reference") end
+  if size>reference_size then return reject("reference-vector-count","reference") end
   if not finite(r[anchor]) or r[anchor]<=0 then
     return reject("reference-anchor","reference",anchor)
   end
@@ -65,7 +66,13 @@ function M.pair(positive, negative, anchor, reference, change, native_matches, o
   local basis={}
   for recipe, coefficient in pairs(r) do
     if coefficient<=0 then return reject("reference-coefficient","reference",recipe) end
-    if p[recipe]==nil then return reject("vector-recipe","positive",recipe) end
+  end
+  -- Account for the entire signed pair, not a projection of it. Equal pair
+  -- sizes plus named coverage below reject every extra/missing negative row.
+  -- Public-only components never enter the saved carrier basis.
+  for recipe in pairs(p) do
+    local coefficient=r[recipe]
+    if coefficient==nil then return reject("vector-recipe","reference",recipe) end
     if n[recipe]==nil then return reject("vector-recipe","negative",recipe) end
     basis[recipe]=coefficient/r[anchor]
     local expected=change*basis[recipe]
