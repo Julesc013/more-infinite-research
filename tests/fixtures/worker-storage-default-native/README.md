@@ -1,6 +1,20 @@
+---
+title: "Default worker native fixture"
+status: draft
+applies_to: "Private modern-engine qualification"
+audience: developer
+doc_type: test-guide
+owner: mir-maintainers
+last_reviewed: 2026-11-16
+---
+
 # Default worker native fixture
 
-This is a test-only Base fixture, not a player mod or provider simulation. Canonical metadata targets Factorio 2.1.23; the existing runner must project only engine-family metadata for 2.0.77 and retain the exact source bodies. Its unchanged version 0.1.0 and dependency on MIR put its callbacks after MIR in both source and target. No startup settings are added.
+This is a test-only Base fixture, not a player mod or provider simulation. Canonical metadata targets Factorio 2.1; the committed `info-f200.json` supplies the Factorio2.0 metadata through the strict revision-pinned fixture selector. Its unchanged version0.1.0 and dependency on MIR put its callbacks after MIR in both source and target. The hidden observer setting `worker-default-native-scenario` defaults to `legacy`, retaining the prior actor; `prepared-default` selects the separate fixed historical chain. Keep that setting identical in every predecessor and successor leg.
+
+The prepared-default actor admits only the declared exact2.0.77/2.1.23/2.1.24 engine tuples for published4.7.2→published5.0.11→candidate5.0.15. It creates a genuine native4.7.2 predecessor with explicitly labelled administrative earned levels and partial work, observes its inherited11 configuration without manufacturing MIR storage, then waits for the controller to invoke the actual `/mir-worker-storage-recovery prepare` command. Only after that public command succeeds may `remote.call("mir-worker-storage-default-native","begin","prepared")` verify the complete observed transfer and request a protected prepared save. This actor reads only its own saved state, never MIR's recovery/owner records.
+
+The candidate leg must preserve all four named forces' native frames, every live force's aggregate worker bonus and both stopped labs. It then completes one native next-level8 research and one previously unpaid level4 research using the supplied labs, with1982 and426 units of each of the five science packs consumed. Scripted setup and callbacks remain separate from these two `by_script=false` completions. The final successor save must be closed and CRC-checked, then read through two independent one-tick cold processes that preserve frames, all-force bonuses, stopped labs, inventory and ordinary-completion counts. Exact packet/engine/archive/controller provenance, process governance and independent result acceptance remain the execution owner's separate responsibilities.
 
 When its own saved key is absent, the first native tick after all mod initializers automatically selects `old-source` for exact published11 or `first` for exact candidate12; other versions refuse. No work is performed by the fixture's on_init. The existing owner must retain the create log and verify that its seed creation did not execute an update. `remote.call("mir-worker-storage-default-native", "begin", mode)` remains available for manual/host use. `first` earns stable native levels4 and5 with a genuine supplied lab, two repeated native-owner queue entries, foreign queued/detached controls and exact science depletion. `old-source` scripts explicitly labelled next levels8/7/6 plus an unpaid4 force, native current/queued/detached partials, then saves with its owned lab stopped. The unchanged fixture observes the candidate upgrade automatically after MIR's configuration callback; optional `upgrade` only verifies that phase. Existing saved/cold state is never initialized again. No provider is present.
 

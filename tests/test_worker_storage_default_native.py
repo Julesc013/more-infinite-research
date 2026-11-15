@@ -52,7 +52,10 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
         self.assertEqual("0.1.0", info["version"])
         self.assertEqual("2.1", info["factorio_version"])
         self.assertEqual(["base >= 2.1.23", "more-infinite-research"], info["dependencies"])
-        self.assertFalse((FIXTURE / "settings.lua").exists())
+        settings_source = (FIXTURE / "settings.lua").read_text()
+        self.assertIn('name="worker-default-native-scenario"', settings_source)
+        self.assertIn('default_value="legacy"', settings_source)
+        self.assertIn('allowed_values={"legacy","prepared-default"}', settings_source)
 
     def test_data_is_four_detached_owned_prototypes_without_foreign_changes(self):
         self.lua.globals().data_source = (FIXTURE / "data.lua").read_text()

@@ -285,7 +285,10 @@ function M.on_tick()
   end
 end
 local callbacks = M
-if script.active_mods.WorkerRobotCargoSizeResearch then
+local scenario = settings and settings.startup and settings.startup["worker-default-native-scenario"]
+if scenario and scenario.value == "prepared-default" then
+  callbacks = require("prepared_native").bind(M)
+elseif script.active_mods.WorkerRobotCargoSizeResearch then
   callbacks = require("provider_native").bind(M)
 end
 script.on_init(function() end)
