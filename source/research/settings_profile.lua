@@ -157,9 +157,13 @@ end
 function M.current_profile(options)
   options = options or {}
   local compact = options.compact == true
+  -- Export annotations belong to this result, not to the caller's metadata.
+  -- Retain unknown metadata fields without rewriting the supplied table.
+  local metadata = {}
+  for key, value in pairs(options.metadata or {}) do metadata[key] = value end
   local profile = {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
-    mod = "more-infinite-research", metadata = options.metadata or {}, settings = {}
+    mod = "more-infinite-research", metadata = metadata, settings = {}
   }
   profile.metadata.export_mode = compact and "compact" or "full"
   for _, name in ipairs(options.names or {}) do
