@@ -11,6 +11,7 @@ local PREDECESSOR = "worker-robots-speed-9"
 local DEEP_SCIENCE = "se-deep-space-science-pack-1"
 local PROBE = "automation"
 local AUTOMATION_SCIENCE = "automation-science-pack"
+local ELECTRICITY = "electricity"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
 local PARTIAL = 0.27
 local FOREIGN_PROGRESS = 0.42
@@ -209,6 +210,9 @@ local function assert_seeded_prerequisites(state, label)
   if technology(foreign, AUTOMATION_SCIENCE).researched ~= true then
     fail(label .. " foreign automation science prerequisite is not researched")
   end
+  if technology(foreign, ELECTRICITY).researched ~= true then
+    fail(label .. " foreign automation electricity prerequisite is not researched")
+  end
 end
 
 force_by_index = function(index, label)
@@ -278,6 +282,9 @@ end
 
 local function seed_foreign(foreign)
   seed_worker_prerequisites(foreign, "foreign")
+  local electricity = technology(foreign, ELECTRICITY)
+  electricity.researched, electricity.enabled = true, true
+  if electricity.researched ~= true then fail("foreign electricity prerequisite could not be seeded") end
   local science = technology(foreign, AUTOMATION_SCIENCE)
   science.researched, science.enabled = true, true
   local owner = technology(foreign, WORKER)
@@ -437,7 +444,8 @@ function M.apply(stage)
       local source_state = storage[KEY]
       if research == nil or research.name ~= WORKER then
         if type(source_state) == "table" and event.by_script == true and research ~= nil
-            and (research.name == PREDECESSOR or research.name == DEEP_SCIENCE or research.name == AUTOMATION_SCIENCE)
+            and (research.name == PREDECESSOR or research.name == DEEP_SCIENCE
+              or research.name == AUTOMATION_SCIENCE or research.name == ELECTRICITY)
             and actor_force(source_state, research.force)
             and #source_state.scripted_administrative_events < 16 then
           source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {

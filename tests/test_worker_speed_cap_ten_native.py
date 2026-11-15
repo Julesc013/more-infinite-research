@@ -22,6 +22,7 @@ LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
 DEEP_SCIENCE = "se-deep-space-science-pack-1"
+ELECTRICITY = "electricity"
 UNRELATED = "mir-fixture-unrelated-disabled"
 CAP = "mir-max-level-worker-robots-speed"
 PACKS = (
@@ -39,7 +40,7 @@ class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
 local caps = require("runtime.caps")
 local KEY = "mir5_worker_speed_cap_ten"
 local WORKER, PREDECESSOR = "worker-robots-speed-10", "worker-robots-speed-9"
-local DEEP, PROBE, AUTOMATION = "se-deep-space-science-pack-1", "automation", "automation-science-pack"
+local DEEP, PROBE, AUTOMATION, ELECTRICITY = "se-deep-space-science-pack-1", "automation", "automation-science-pack", "electricity"
 local UNRELATED = "mir-fixture-unrelated-disabled"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -89,14 +90,14 @@ local function tech(name,force,wrong_energy)
 end
 local function force(name,index,wrong_energy)
   local f={name=name,index=index,valid=true,technologies={},_queue={},current_research=nil,research_progress=0,worker_robots_speed_modifier=0}
-  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP,UNRELATED})do f.technologies[n]=tech(n,f,wrong_energy)end
+  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP,ELECTRICITY,UNRELATED})do f.technologies[n]=tech(n,f,wrong_energy)end
   f.technologies[UNRELATED].enabled,f.technologies[UNRELATED].researched=false,false
   function f.enable_all_prototypes()error("broad prototype enablement is forbidden by this fixture")end
   function f.reset_technology_effects()f.worker_robots_speed_modifier=(f.technologies[WORKER].level-1)*.65 end
   function f.add_research(r)
     if type(r)=="string"then r=f.technologies[r]end;if not r or r.enabled~=true or f.current_research then return false end
     if r.name==WORKER and(f.technologies[PREDECESSOR].researched~=true or f.technologies[DEEP].researched~=true)then return false end
-    if r.name==PROBE and f.technologies[AUTOMATION].researched~=true then return false end;f.research_queue={r};return true
+    if r.name==PROBE and (f.technologies[AUTOMATION].researched~=true or f.technologies[ELECTRICITY].researched~=true) then return false end;f.research_queue={r};return true
   end
   return setmetatable(f,{__index=function(s,k)if k=="research_queue"then return rawget(s,"_queue")end end,
     __newindex=function(s,k,v)if k~="research_queue"then rawset(s,k,v)return end;rawset(s,"_queue",v);rawset(s,"current_research",v[1]);rawset(s,"research_progress",v[1]and 0 or 0)end})
@@ -129,8 +130,16 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   ok,result=call(source.init);if not ok then return{ok=false,message=result}end
   if opponent=="source-tick"then ok,result=call(source.events[1]);return{ok=ok,message=result}end
   if opponent=="source-worker"then ok,result=call(source.events[2],{research=player.technologies[WORKER],by_script=false,tick=0});return{ok=ok,message=result,state=storage[KEY]}end
-  if opponent=="source-admin"then ok,result=call(source.events[2],{research=player.technologies[PREDECESSOR],by_script=true,tick=0});return{ok=ok,message=result,state=storage[KEY]}end
+  if opponent=="source-admin"or opponent=="source-admin-electricity"then
+    local prerequisite=opponent=="source-admin" and PREDECESSOR or ELECTRICITY
+    ok,result=call(source.events[2],{research=player.technologies[prerequisite],by_script=true,tick=0});return{ok=ok,message=result,state=storage[KEY]}
+  end
   local state=storage[KEY];if not state then return{ok=false,message="source state absent"}end
+  if opponent=="missing-electricity"then
+    local foreign=game.forces[state.foreign_index];foreign.technologies[ELECTRICITY].researched=false
+    local accepted=foreign.add_research(foreign.technologies[PROBE])
+    return{ok=accepted==true,message=accepted and "foreign automation unexpectedly queued" or "foreign automation electricity prerequisite is absent"}
+  end
   if mode=="old-negative"then local old,oldmsg=load_stage(old_path,common,"old-negative15",game,storage,settings(10),markers,logs,files);if not old then return{ok=false,message=oldmsg}end
     ok,result=call(old.changed);return{ok=ok,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}end
   if opponent=="missing-predecessor"then player.technologies[PREDECESSOR].researched=false end;if opponent=="missing-deep"then player.technologies[DEEP].researched=false end
@@ -222,8 +231,11 @@ end
     def test_source_and_successor_controls_refuse_adverse_states(self):
         source_tick = self.flow_result("successor", "source-tick"); self.assertFalse(source_tick["ok"]); self.assertIn("source create-only stage received an actor tick", source_tick["message"])
         admin = self.flow_result("successor", "source-admin"); self.assertTrue(admin["ok"]); self.assertEqual("scripted-prerequisite", admin["state"]["scripted_administrative_events"][1]["setup_class"])
+        electricity_admin = self.flow_result("successor", "source-admin-electricity")
+        self.assertTrue(electricity_admin["ok"])
+        self.assertEqual(ELECTRICITY, electricity_admin["state"]["scripted_administrative_events"][1]["name"])
         preinit = self.flow_result("successor", "preinit-unrelated"); self.assertTrue(preinit["ok"]); self.assertIsNone(preinit["state"])
-        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
+        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-electricity": "foreign automation electricity prerequisite is absent", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
             with self.subTest(opponent=opponent):
                 result = self.flow_result("successor", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
