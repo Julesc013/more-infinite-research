@@ -451,6 +451,12 @@ class SettingsProfileTests(unittest.TestCase):
               "unsupported data was silently discarded")
           end
 
+          for _, metadata in ipairs({"scalar", false, true, 1}) do
+            local wire, err = codec.encode({settings = {good = false}, metadata = metadata}, checked_helpers)
+            assert(wire == nil and err == "profile metadata must be a table",
+              "scalar metadata was silently discarded")
+          end
+
           local settings_cycle = {}
           settings_cycle.self = settings_cycle
           local wire, err = codec.encode({settings = {good = false, bad = settings_cycle}}, checked_helpers)

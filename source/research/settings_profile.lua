@@ -122,6 +122,9 @@ local function normalized_for_encode(profile)
     if err then return nil, err end
     if copied ~= nil then settings[name] = copied end
   end
+  if profile.metadata ~= nil and type(profile.metadata) ~= "table" then
+    return nil, "profile metadata must be a table"
+  end
   local metadata, metadata_error = copy_json_value(profile.metadata or {}, {})
   if metadata_error then return nil, metadata_error end
   return {
