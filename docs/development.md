@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -74,6 +74,24 @@ For the first port, recover actual identity/tuning/settings from the pinned base
 
 Maintain the [existing community request ledger](../spec/programmes/community-requests.json) through `CONT-15`; preserve original IDs, MIR 4 crash/failure evidence, unresolved bugs and technology-tuning requests. Carry them into affected MIR 5 work and regression selection rather than closing them because the architecture changes. `SCI-UNLOCK-01` records the recurring approved science binding startup failures, the reported unsuccessful mod-removal attempts and missing reproduction evidence. It remains open until exact affected-package qualification supports closure. This intake does not claim a fix.
 
+Use the original report's GitHub issue as its completion authority and follow [report resolution](../spec/verification.md#report-resolution). Keep each unresolved player case linked and open when a release umbrella closes. Retain existing request IDs and source links; do not create another ledger. A Mod Portal post can be linked from the maintained issue without asking its author to repost or manage GitHub.
+
+One acknowledged owner records the next concrete action and carries the case through the following evidence boundaries. Assigning a name or posting a comment does not establish active execution; use the existing coordination procedure below when a worker is unavailable.
+
+| State | Evidence the maintainer must hold |
+| --- | --- |
+| Reported | Original symptom or intended use, retained attachments and exact input identities where available. |
+| Reproduced | The failing package exhibits the reported behavior; a reduced mechanism and the original configuration have separate verdicts. |
+| Repaired | The old implementation fails the regression, the candidate passes, and adjacent families/references and lifecycle boundaries have been checked. |
+| Qualified | The actual candidate package passes the affected original-input and state-preservation scenarios. |
+| Delivered | The tested version and downloadable artifact are identified and delivery is verified. |
+
+Fill the [PR report-resolution section](../.github/PULL_REQUEST_TEMPLATE.md) with the original report, scope, reproduction, regression, native/preservation applicability, delivery and remaining limits. Use `Related to` for diagnostic, partial, unverified or functional-candidate work. Automatic closing keywords require `Report scope: complete` and populated evidence fields; the existing `branch-policy` check examines the body and introduced commit messages and reruns when the description changes. Passing this check does not qualify a save or validate the truth of a receipt. Independent review owns that assessment before manual or automatic closure.
+
+For a suggestion, retain the intended outcome, decide accepted/declined/deferred/superseded with a reason, and write a small observable acceptance scenario before implementation. Keep the requester's proposed mechanism separate from the intended benefit. Ask a focused clarification only when unresolved intent prevents a correct decision; do the available investigation first and combine necessary questions. The requester need not design the implementation, minimize a modpack or validate a release on our behalf.
+
+Preserve raw private inputs separately from public summaries. The [support collector](../scripts/Collect-MIRPlayerReport.ps1) can gather startup logs and existing MIR exports; its explicit settings/save options capture additional exact inputs. Its manifest records missing, truncated, unreadable and excluded material. A settings hash, redacted excerpt or stale runtime export cannot recreate absent original bytes. Read those limitations before calling a bundle reproducible, and search retained custody before requesting a new attachment.
+
 ## Work in small vertical slices
 
 The additional F001–F012 request is a separate best-effort GitHub delivery obligation under the [target contract](../spec/targets.md#additional-historical-editions), with the nine stable editions retaining release priority. Buildable extra editions receive explicit feature/installation/qualification limits; unavailable inputs do not become invented support or implicit release blockers. The separate [early target record](../targets/early-editions.json) selects only the actual finite data adapter. F018/0.18.47 remains selected by the ordinary target record but is permanently GitHub-only experimental/best effort: its target-specific scope is metadata/package information and an actual0.18 native load/crash smoke, not a stable save, modpack, science, client or performance campaign.
@@ -91,6 +109,8 @@ One integration owner coordinates the current branch, the sole native-test lane 
 Issue comments record assignments and results; they do not start an idle Codex session. Confirm execution through an actual session response or runner job and its result. If a session is unavailable, carry urgent work forward in a separate branch through the available authorized execution lane, retain one integration owner and reconcile any late work before integration. Do not wait for an unreachable session or assume its disconnected process stopped. The existing native runner executes its reviewed named tasks; its smoke result establishes readiness, not gameplay acceptance or agent steering.
 
 Push each reviewable unit promptly. Commit bodies and PR descriptions record the concrete defect or outcome, changed behavior, independent expected result, actual commands and results, exact source/package identities where applicable, and remaining limitations. Finish required checks and merge completed units into `dev` while later qualification continues. Merge updated `dev` into an already published work branch when needed; preserve the commit identities that reviewers and native workers consume. Keep frozen-input custody branches reachable until their jobs and evidence readback finish.
+
+Before requesting a merge, read back the expected PR head and require successful completed results for every required check, including `branch-policy`, `verification-plan`, `native-tooling-controls` and `host-controls`. A `gh pr merge --auto` request can complete immediately when server rules do not require a pending check; it is not evidence that the checks passed. Keep this explicit verification even when the maintainer account can merge, and do not change repository controls to bypass it. After main promotion, verify the new main commit's checks and exact reviewed tree again before tagging or publication.
 
 After verified MIR5 publication and local delivery, continue authorized bug fixes, measured performance improvements and stress qualification for the next source release. Use actual review findings and observed failures to select that work. A community prerelease does not complete stable MIR5 acceptance; remaining stable gates still require their actual results.
 
@@ -162,6 +182,8 @@ for member in members:
 ```
 
 The library archive must already match the profile's selected archive SHA256; a same-name container with different bytes is refused. The projection is caller-owned temporary input, not a ZIP extraction, dependency copy or a substitute for the profile's engine/archive admission. Do not pipe `git show` through text cmdlets when creating that projection: its selected blobs are binary input, even where an individual member happens to be text.
+
+The F200 profile-native witness is the narrowly admitted alternate-metadata case: use `--fixture-info info-f200.json` together with `--revision <full-commit>` when packaging its direct `tests/fixtures/<fixture>` source. The packager reads that alternate as a raw Git blob from the selected commit and emits it only as archive `info.json`, recording its source path, blob, hash and byte count; shared fixture members remain raw Git members from that same commit. This selector rejects player source, untracked or path-like metadata names, and `--target` or `--version`, so it cannot materialize a player edition or rewrite the exact fixture metadata.
 
 ## Recover an exact published catalogue
 

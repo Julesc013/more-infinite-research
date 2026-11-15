@@ -1,0 +1,32 @@
+{
+  "kind": "MIR514VerifiedPublicationAndContinuationPrivateCustodyV1",
+  "actual_remote_readback": {
+    "kind": "ActualRemoteDecodedNativeOriginalReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "fbef2d66b3231f09df6ce461414e3e4c3617f577",
+    "path": "projects/mir/runs/mir514-publication-and-stable-continuation-r01/original-bodies.json.gz",
+    "git_blob": "48d9fc9e09e71aa722922a3bdec414069d13c446",
+    "packed_bytes": 9042328,
+    "packed_sha256": "6C0FA8FA0F18B3A31146B3B9DD23D36E470563CA27AC833F8CF0C9D1CD07DC9F",
+    "actual_originals_verified": 114,
+    "actual_original_bytes": 18479193,
+    "method": "Exact remote branch and GitBlob body download, decode/hash and actual-byte compare all originals. Actual publication/all19/projections/originals plus next stable preparation. No new Foundation game or stable verdict."
+  },
+  "scope": "All actual publication/check/admin/tag/staged/anonymous/delivery originals, complete103-release/181-ref before/after projections, recorded independent all19 review, exact14 Foundation preparation/no-launch refusals and manifest-verified post-delivery report packet. No Foundation activity/performance/stable verdict.",
+  "continuation_packet": {
+    "packet": "E:\\Downloads\\MIR514_Delivered_Stable_Continuation_2026-11-13_r02.zip",
+    "bytes": 25256,
+    "sha256": "4992F18F776CFDBA389A0A3ED87C28DFA2B4197AA3AB37A660C4C0869AF89B9F",
+    "payloads": 15,
+    "status": "verified-packet-not-production-qualification"
+  },
+  "adverse_relocation": {
+    "previous_root": "D:\\Projects\\Factorio\\more-infinite-research\\System.Management.Automation.OrderedHashtable",
+    "kind": "MIR514PostQualificationAdverseLocationDispositionV1",
+    "sha256": "D4806A47E89BCD626F7E0378A8281FFB2CC1030B216B01E6729354F65FF06688",
+    "preserved_root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-f210-custody-recovery-r02\\preserved-misplaced-root",
+    "bytes": 181938,
+    "disposition": "Moved only after terminal result and independent actual review; preserve original receipts and remote original-body custody with original locator. No payload deleted or accepted cold relabelled. Correct-root protected copy and runner original unchanged."
+  },
+  "stable_qualified": false
+}

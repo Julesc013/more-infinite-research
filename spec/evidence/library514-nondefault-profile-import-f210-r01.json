@@ -1,0 +1,440 @@
+{
+  "schema": 1,
+  "kind": "MIR514ActualNondefaultFileProfileRoundtripF210V1",
+  "date": "2026-11-13",
+  "status": "ACCEPTED-bounded-actual-file-profile-roundtrip-F210",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "published_tag": "v5.0.14",
+  "frozen_runner": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23",
+    "data": "D:\\Games\\Factorio\\2.1\\data"
+  },
+  "player": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.21014.zip",
+    "bytes": 1039673,
+    "sha256": "021E222A5495398ECEED272DE340BD1731816CCA483DA446B6F641BF5FE2DD3B",
+    "version": "5.0.21014"
+  },
+  "selected_mods": [
+    "base@2.1.23",
+    "more-infinite-research@5.0.21014"
+  ],
+  "resources": {
+    "memory_mib": 4096,
+    "output_mib": 64,
+    "timeout_seconds": 180
+  },
+  "writer_prerequisite": {
+    "pr": 1929,
+    "reviewed_head": "953f10c3167dc447065985cdca129090081889a7",
+    "merge_commit": "55f0c09685a54385f1ab0d6ffd854fc0bc1cf564",
+    "writer": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-modern-settings-dat-r01\\tools\\write_mod_settings_dat.py",
+      "bytes": 4014,
+      "sha256": "C4F94F12A9B7B0D1A29F4B94A28973DA80F8A0054FA99CF5A30CFF8CAD9333B7"
+    },
+    "independent_reader": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-modern-settings-dat-r01\\tools\\read_mod_settings_dat.py",
+      "bytes": 3849,
+      "sha256": "FE770A4A9EB39229C49D11ADB8ABAA23DE8E72B4DDCD387E896A98B099F56E80"
+    },
+    "code_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-modern-settings-dat-review-r01\\REVIEW.json",
+      "bytes": 1290,
+      "sha256": "6B97427B165A0211DCDFAA01C8BDFB63EFC38A3FF254E2C704D262985616F49F"
+    },
+    "scope": "Seven binary/type/size/exclusive-output controls and three host-plan controls; exact-head four required checks and independent review before merge. That prerequisite alone was not native acceptance."
+  },
+  "independent_expectations": {
+    "fixture": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\tests\\fixtures\\settings-repair\\control.lua",
+      "bytes": 15895,
+      "sha256": "9E562B647491402D1AD56C08C56AF430C01BEA0DDEFEDA7E224EDC50848B69EF"
+    },
+    "fixture_startup": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\tests\\fixtures\\settings-repair\\settings-updates.lua",
+      "bytes": 2324,
+      "sha256": "0DCF314ABD58E98BA0D28DD3F33BEED73654970FE1EADCEC174A2A0F01E23700"
+    },
+    "effective_values": {
+      "ips-enable-research_gears": true,
+      "ips-cost-base-research_gears": 1,
+      "ips-cost-linear-increment-research_gears": 0,
+      "ips-cost-growth-research_gears": 1,
+      "ips-max-level-research_gears": 0,
+      "ips-research-time-research_gears": 1,
+      "ips-effect-per-level-research_gears": 10,
+      "mir-max-level-worker-robots-speed": 0,
+      "mir-enable-passive-repair": true
+    },
+    "compact_changes": {
+      "ips-cost-base-research_gears": 1,
+      "ips-cost-growth-research_gears": 1,
+      "ips-research-time-research_gears": 1,
+      "mir-enable-passive-repair": true
+    },
+    "additional_boolean_conflict": {
+      "setting": "mir-unrestricted-modules",
+      "raw": true,
+      "imported_effective": false
+    }
+  },
+  "source_export_to_import": {
+    "source_export": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-profile-roundtrip-r01-f210-source-native\\evidence\\profile-full.txt",
+      "bytes": 6505,
+      "sha256": "4C5A9908799F77188EF8F9CCDBBC93817E404192BE5B60F5979FBA9E20830CF5"
+    },
+    "source_file_bytes": 6505,
+    "imported_actual_wire_bytes": 6504,
+    "transformation": "Remove exactly the original single terminal file LF; no decode/re-encode/recompression.",
+    "actual_import_dat": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\mod-settings.dat",
+      "bytes": 7159,
+      "sha256": "D230D7315CBEB41525A289E3170523BD2C51B2385F30B53D9416B7EECAE7C164"
+    },
+    "actual_observed_raw_string_byte_equal": true,
+    "raw_conflicts_preserved": 10,
+    "imported_false_wins_raw_true": true,
+    "full_effective_settings": 888,
+    "raw_startup_and_effective_exports_checked_separately": true
+  },
+  "native_observations": {
+    "gear_count": 1,
+    "gear_research_energy_ticks": 60,
+    "gear_effect_change": 0.1,
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "iron-gear-wheel",
+    "effect_hidden": false,
+    "full_bytes": 6505,
+    "compact_bytes": 333,
+    "actual_captured_forces_equal": true,
+    "forces": 3,
+    "captured_technology_rows": 861,
+    "public_commands": [
+      "/mir-settings-export",
+      "/mir-settings-export --compact mir-headless-compact",
+      "/mir-diagnostics-export"
+    ],
+    "source_and_import_public_invocations": 6,
+    "players": 0,
+    "comparison": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\ACTUAL-ROUNDTRIP-COMPARISON.json",
+      "bytes": 3962,
+      "sha256": "8B36BC731776350EC68C048F21DE4335EC2578DB3864A59D70E759FD0104BF8E"
+    },
+    "corresponding_source_import_exports_byte_identical": true
+  },
+  "arms": [
+    {
+      "arm": "source",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\packet-r03.json",
+        "bytes": 14139,
+        "sha256": "E3116FCB9F6F8E367AE8AB670DA8A5EE88E810BFDC51005615412117B60BE44D"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\Invoke-ProfileArm.ps1",
+        "bytes": 16140,
+        "sha256": "210027E88666B4E2F68FEC5B9403A3DF2B80CDE06E7B7D6ACAF88D9168F3713A"
+      },
+      "reader": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\check-profile-evidence.py",
+        "bytes": 4659,
+        "sha256": "97635FA136E8B58AB9789AE9B7AD7AFFE2553D4D656B984A7EE89EC9DAF73A66"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\mod-settings.dat",
+        "bytes": 563,
+        "sha256": "5BED3773AACD350D7474A7616F60D5CC00BB5F4A5444D72AD9CABD2E9724159B"
+      },
+      "raw_startup_input": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\startup.json",
+        "bytes": 367,
+        "sha256": "97012C29FF518A3C5FBAEDA0D4CDAE4B33081D3FB600BAC420B21A9EFCDBC2B0"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\composition.json",
+        "bytes": 10232,
+        "sha256": "5F6B495FD57AE58947B6F745578A2F4F4ACC7CA6F4F1C4116D3176AEE555C501"
+      },
+      "original_terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\terminal.json",
+        "bytes": 14053,
+        "sha256": "2C5258F55503FE93DCB864B5CBC8D7A0748EBAEA35878E3EFD0CAAB386658999"
+      },
+      "original_status": "adverse-stopped-first-failure",
+      "native_processes": 2,
+      "process_ids": [
+        11348,
+        2460
+      ],
+      "process_ends": [
+        {
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true
+        },
+        {
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "passed": true
+        }
+      ],
+      "restored": true
+    },
+    {
+      "arm": "import",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\packet-r02.json",
+        "bytes": 18892,
+        "sha256": "3907F46F0D50FED9AA5FF07026BE82B34AC7B26C279D9E98A047FEFABD372F2C"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\Invoke-ProfileArm.ps1",
+        "bytes": 16140,
+        "sha256": "210027E88666B4E2F68FEC5B9403A3DF2B80CDE06E7B7D6ACAF88D9168F3713A"
+      },
+      "reader": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\read-import-evidence-r05.py",
+        "bytes": 5618,
+        "sha256": "A1EA4E984BBEA3B231AB540A197BE02949D0D32A4F77BFEF5A664C7F57A8F63E"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\mod-settings.dat",
+        "bytes": 7159,
+        "sha256": "D230D7315CBEB41525A289E3170523BD2C51B2385F30B53D9416B7EECAE7C164"
+      },
+      "raw_startup_input": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\startup.json",
+        "bytes": 6948,
+        "sha256": "FE243CA65E6FB77C727EB019C61F2DB12FB285B13F82B86887A6A94D57F68545"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\composition.json",
+        "bytes": 10232,
+        "sha256": "D173B33EF993600934AEFEF6A021C34BA4E081CB7ACE78FD864FA75983A87C49"
+      },
+      "original_terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\terminal.json",
+        "bytes": 14521,
+        "sha256": "D2CBE6A8E679C91D950A1AA89BE56A05983ED64DA1BAF64EEFEDDE0E717F73E0"
+      },
+      "original_status": "observed-nondefault-profile-arm-review-required",
+      "native_processes": 2,
+      "process_ids": [
+        23684,
+        7352
+      ],
+      "process_ends": [
+        {
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "passed": true
+        },
+        {
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "passed": true
+        }
+      ],
+      "restored": true
+    }
+  ],
+  "source_reader_adverse": {
+    "original_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\terminal.json",
+      "bytes": 14053,
+      "sha256": "2C5258F55503FE93DCB864B5CBC8D7A0748EBAEA35878E3EFD0CAAB386658999"
+    },
+    "original_reader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\check-profile-evidence.py",
+      "bytes": 4659,
+      "sha256": "97635FA136E8B58AB9789AE9B7AD7AFFE2553D4D656B984A7EE89EC9DAF73A66"
+    },
+    "failure": "[mir514-headless-export] Independent actual evidence reader",
+    "corrected_postreader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\read-profile-evidence-r04.py",
+      "bytes": 5047,
+      "sha256": "C6C729899BB91FCAC1373446552357D113A6C33C1ADD03448C247C46D5668489"
+    },
+    "corrected_postread": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\SOURCE-POSTREAD-R04.json",
+      "bytes": 467,
+      "sha256": "87D9B23593D62249154E8D19AC2F54DDCE77A0097E328E6555DE1E518593FAAD"
+    },
+    "explicit_independent_adoption": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\INDEPENDENT-SOURCE-RESULT-REVIEW.json",
+      "bytes": 6758,
+      "sha256": "F8492FCEBF0D6558A874F2C211B4A584F10C97085ADF0609013E84DEA9EDF066"
+    },
+    "cause": "An invented whole-dictionary equality rejected the native hidden:false effect metadata. Existing independent fixture expectations require one effect with the expected type/recipe/change. R04 retains those checks and explicit hidden:false, and re-reads all original raw/effective/export evidence.",
+    "original_failure_preserved": true,
+    "repeated_native_processes_for_reader_fix": 0
+  },
+  "independent_review": {
+    "record": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\INDEPENDENT-ROUNDTRIP-RESULT-REVIEW.json",
+      "bytes": 4209,
+      "sha256": "034433B4D6B4A81E623E0DB619D7491649B29AC79F4025CFF3CE9A4B81720C77"
+    },
+    "findings": {
+      "kind": "MIR514ActualNondefaultRoundtripIndependentResultReviewV1",
+      "reviewer": "/root/review_factory_result",
+      "recorded_by": "integration lead from non-author read-only actual-result review",
+      "verdict": "GO-scoped-F210-actual-file-profile-roundtrip",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\packet-r02.json",
+        "bytes": 18892,
+        "sha256": "3907F46F0D50FED9AA5FF07026BE82B34AC7B26C279D9E98A047FEFABD372F2C"
+      },
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\terminal.json",
+        "bytes": 14521,
+        "sha256": "D2CBE6A8E679C91D950A1AA89BE56A05983ED64DA1BAF64EEFEDDE0E717F73E0"
+      },
+      "reader": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\read-import-evidence-r05.py",
+        "bytes": 5618,
+        "sha256": "A1EA4E984BBEA3B231AB540A197BE02949D0D32A4F77BFEF5A664C7F57A8F63E"
+      },
+      "source_adoption": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\INDEPENDENT-SOURCE-RESULT-REVIEW.json",
+        "bytes": 6758,
+        "sha256": "F8492FCEBF0D6558A874F2C211B4A584F10C97085ADF0609013E84DEA9EDF066"
+      },
+      "original_source_adverse": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-source\\terminal.json",
+        "bytes": 14053,
+        "sha256": "2C5258F55503FE93DCB864B5CBC8D7A0748EBAEA35878E3EFD0CAAB386658999"
+      },
+      "actual_comparison": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\ACTUAL-ROUNDTRIP-COMPARISON.json",
+        "bytes": 3962,
+        "sha256": "8B36BC731776350EC68C048F21DE4335EC2578DB3864A59D70E759FD0104BF8E"
+      },
+      "fixed_inputs_independently_rehashed": 37,
+      "fixed_input_mismatches": 0,
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\f210-import\\mod-settings.dat",
+        "bytes": 7159,
+        "sha256": "D230D7315CBEB41525A289E3170523BD2C51B2385F30B53D9416B7EECAE7C164"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "version": "2.1.23",
+        "data": "D:\\Games\\Factorio\\2.1\\data"
+      },
+      "player": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.21014.zip",
+        "bytes": 1039673,
+        "sha256": "021E222A5495398ECEED272DE340BD1731816CCA483DA446B6F641BF5FE2DD3B",
+        "version": "5.0.21014"
+      },
+      "source_wire_bytes_imported": 6504,
+      "only_source_file_newline_removed": true,
+      "effective_settings": 888,
+      "independent_fixture_values": 9,
+      "raw_conflicts_preserved": 10,
+      "raw_true_effective_false_verified": true,
+      "native_gear": {
+        "count": 1,
+        "energy_ticks": 60,
+        "effect": 0.1
+      },
+      "full_bytes": 6505,
+      "compact_bytes": 333,
+      "source_import_exports_exact_equal": true,
+      "import_four_snapshots_exact_equal": true,
+      "cross_world_native_forces_exact_equal": true,
+      "captured_force_count": 3,
+      "captured_technology_rows": 861,
+      "actual_import_processes": [
+        {
+          "pid": 23684,
+          "exit_code": 0,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.591119
+        },
+        {
+          "pid": 7352,
+          "exit_code": -1,
+          "completion_predicate_observed": true,
+          "duration_seconds": 4.876671
+        }
+      ],
+      "restored": true,
+      "current_control_hashes_match_pre_run": true,
+      "live_factorio": 0,
+      "source_original_adverse_preserved": true,
+      "scope": "One2.1.23/Base+public14 actual nine-value and explicit-false precedence path; noF200,numeric8,threealiases,GUI/client,performance or stable result.",
+      "native_acceptance": false,
+      "stable_acceptance": false,
+      "performance_acceptance": false
+    }
+  },
+  "primary_raw_custody": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\SOURCE-PRIMARY-RAW-READBACK.json",
+      "bytes": 50690,
+      "sha256": "EADA1651DE62EB70CB6F1B6A931333EC528779E710749A6F214F3567704201AE"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\IMPORT-PRIMARY-RAW-READBACK.json",
+      "bytes": 50686,
+      "sha256": "AB4A3798E9786232E3BF6B3816C5EAE641C56845C32A34438E6EDE084E3F8002"
+    }
+  ],
+  "original_remote_custody": {
+    "kind": "MIR514ActualRoundtripOriginalRemoteReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "0f1cf0101bc0f45c32122a2a7531df5a480b098e",
+    "path": "projects/mir/runs/mir514-f210-actual-profile-roundtrip-r01/original-bodies.json.gz",
+    "git_blob": "173c974285b19466ed506a0560e0de2d8cc8df69",
+    "packed_sha256": "A7B39BB87F1221CF8C9C7A2EBA8AE707974B24C43D2AF0DA2850A0B2B664017D",
+    "actual_originals_verified": 404,
+    "actual_original_bytes": 8928822,
+    "scope": "Actual2.1.23/Base/public5.0.21014 source export to exact6504byte startup import,9fixture raw conflicts plus rawTrue/importedFalse, nativegear1/60/.1 and same888effective settings. Four actual engine invocations, two zero-native compositions. Original source reader adverse and all input-review corrections remain; corrected independent read adopts source outputs without rerun. Complete actual raw worlds, logs, exports, decoded profiles, observations, controllers, settings inputs and primary copies retained. NoF200,percentage/alias,GUI/client/performance/stable result."
+  },
+  "existing_delivery_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-nondefault-profile-roundtrip-r01\\EXISTING-DIST-READBACK.json",
+    "bytes": 3892,
+    "sha256": "7D51A3ACE496061D4EA3BFE7007C3F82FA387985A9E439ACC6E5A54C56F49F8D"
+  },
+  "totals": {
+    "actual_native_processes": 4,
+    "zero_native_compositions": 2,
+    "natural_creates": 2,
+    "supervised_servers": 2,
+    "all_original_controls_restored": true,
+    "live_factorio": 0
+  },
+  "validation": {
+    "focused_dat_controls": 7,
+    "host_plan_controls": 3,
+    "actual_body_postread_controls": 4,
+    "original_reader_failure_reproduced": true,
+    "negative_opponents": "Wrong native cost/time/effect/hidden/duplicate effect, profile envelope/mod/codec/exporter/import-setting and raw false-versus-zero reject.",
+    "full_local_host_suite_repeated": false
+  },
+  "limitations": [
+    "One Factorio2.1.23 Base+exact public5.0.21014 nine-fixture-value and explicit-false precedence path; other per-setting/native boundaries remain separate.",
+    "Factorio2.0 nondefault-file import, eight numeric percentage values and three import-only aliases remain unverified by this case.",
+    "No13GUI export clicks, Unicode/search/dropdown/resize/EN-DE visuals, peer-local state, multiplayer/join/rejoin or saved-host/cold-load qualification.",
+    "Fresh disposable worlds only; no production or historical-save preservation verdict.",
+    "No scored timing or whole-product performance/stable verdict. Published bytes and player source remain unchanged."
+  ],
+  "scoped_actual_file_roundtrip_verified": true,
+  "native_acceptance": false,
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "stable_acceptance": false,
+  "release_qualification": false
+}

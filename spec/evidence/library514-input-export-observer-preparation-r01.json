@@ -1,0 +1,52 @@
+{
+  "kind": "MIR514IndependentLibraryObserverPreparationReviewV1",
+  "review_recorded_by": "execution lead from non-author read-only source/test review",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "recorded_at": "2026-11-13T01:03:00.681743+00:00",
+  "verdict": "GO-preparation-after-required-CI",
+  "head": "3403a3b9152d6098f447fd2815149cf44dfd94f5",
+  "tree": "4ecfc4f2cb6a7b2a40d81665bd4724ce92b0f322",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "actual_content_range": "612670dc287e3dd4078757b4f7b8764252e9d20b..3403a3b9152d6098f447fd2815149cf44dfd94f5",
+  "actual_changed_files": 8,
+  "three_dot_note": "GitHub lists ten already-accepted byte-identical evidence/progress files through squash ancestry; actual current-dev-to-head content delta is eight fixture/test files only.",
+  "reviewed": [
+    "Exact0.3.13 input/0.4.7 export metadata and14 MIR/engine tuples match published modern ZIPs",
+    "Settings/helper-free/deferred baseline and retired-index reuse predicates",
+    "Exact responsive width/column guards retained",
+    "0.4.7 export routing carries current_514, preserving current_513 and older semantics",
+    "Extra/missing closure, wrong MIR/engine/observer/edition and malformed hierarchy/state/lifecycle opponents remain strict",
+    "All complete input/settings/export/peer/work/width/read-only/false-zero/privacy protocols retained; no source/framework/native mutation"
+  ],
+  "reported_selected_host_methods": 80,
+  "prior_method_ast_identical": 74,
+  "new_methods": 6,
+  "host_log_sha256": "CB22E4F11018A91FED302F5B0F7DF634AFDB2079B1DBE8249749F0868923B5E6",
+  "prior_ast_proof_sha256": "43CE9BE5E6039FD30E1A493661970BF7BA4E113758A553D92464E1CF279A0F4B",
+  "settings_probe_sha256": "9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234",
+  "next_native_packet_requires": [
+    "Raw control/support/probe/catalogue/selected metadata archive hashes",
+    "Actual exact package/save/profile/engine binding",
+    "Separate valid GUI/native input and export-file/client result"
+  ],
+  "native_executions": 0,
+  "gui_acceptance": false,
+  "stable_qualified": false,
+  "integration": {
+    "pr": 1921,
+    "merge_commit": "50ad8b572f374a1aa5a48cb6e58c073d37e9732a",
+    "tree": "4ecfc4f2cb6a7b2a40d81665bd4724ce92b0f322",
+    "all_four_checks_passed_before_merge": true
+  },
+  "actual_original_body_readback": {
+    "kind": "ActualObserverPreparationOriginalRemoteReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "02e7b9a59284096622fec4e8d0448d5dd2fbf136",
+    "path": "projects/mir/runs/mir514-library-observer-preparation-and-resource-r01/original-bodies.json.gz",
+    "git_blob": "1913fe5fe17bfc4343dfc78bab340d9f92d24653",
+    "actual_originals_verified": 12,
+    "actual_original_bytes": 346094,
+    "packed_sha256": "1E023B1B689B9ECBCFA5008C7FF31895FC74E8FDFA4C097F7A8DBBB4D52D5F12",
+    "scope": "Actual80-method host stdout and74-method AST preservation proof, non-author observer-preparation review, exact8 authored fixture/test inputs at3403, plus unchanged-resource bounded admission R04 timeout. No GUI/native/client/export/activity/timing/stable result."
+  }
+}
