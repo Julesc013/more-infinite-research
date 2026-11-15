@@ -9,6 +9,61 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryModelTests(unittest.TestCase):
+    def test_bob_core_gate_and_availability_preserve_named_selection_cases(self):
+        facts = json.loads((ROOT / "tests/fixtures/bob-core-f210-captured-facts.json").read_bytes())
+        # Supply independent captured names as Lua literals, not candidate output.
+        self.lua.execute("core_selection={" + ",".join(
+            f"[{json.dumps(name)}]={json.dumps(version)}" for name, version in facts["required_mods"].items()
+        ) + "}")
+        self.lua.globals().expected_core_omissions = len(facts["withheld_families"])
+        self.lua.execute(r'''
+          local gate = require("compatibility.bob_core_profile")
+          local availability = require("presentation.availability")
+          local target = require("platform.target")
+          local prior = {target.id, target.factorio_version, target.minimum_base, target.recipe_productivity}
+          local cases = {
+            {name="captured", selected=true},
+            {name="reskin", addition="unrelated-reskin", selected=true},
+            {name="asset", addition="Krastorio2Assets", selected=true},
+            {name="missing-bobtech", removal="bobtech", selected=false},
+            {name="missing-space-age", removal="space-age", selected=false},
+            {name="Angel", addition="angelsbioprocessing", selected=false},
+            {name="Angel-before-floor", addition="angelsbioprocessing", minimum="2.1.24", selected=false},
+            {name="partial-before-overhaul", removal="bobtech", addition="Krastorio2", selected=false},
+            {name="Krastorio", addition="Krastorio2", error="unsupported overhaul selection"},
+            {name="Py", addition="pycoalprocessing", error="unsupported overhaul selection"},
+            {name="raised-floor", minimum="2.1.24", error="target minimum base"},
+            {name="floor-before-overhaul", minimum="2.1.24", addition="Krastorio2", error="target minimum base"},
+            {name="wrong-target", target="f200", selected=false},
+            {name="wrong-line", line="2.0", selected=false}
+          }
+          local force = {technologies=setmetatable({}, {
+            __pairs=function() error("Availability enumerated technology catalogue") end,
+            __newindex=function() error("Availability wrote a technology") end
+          })}
+          for _, case in ipairs(cases) do
+            target.id,target.factorio_version,target.minimum_base,target.recipe_productivity =
+              case.target or "f210",case.line or "2.1",case.minimum or "2.1.23",true
+            local active = {}
+            for name, version in pairs(core_selection) do active[name]=version end
+            if case.removal then active[case.removal]=nil end
+            if case.addition then active[case.addition]="present" end
+            local ok, selected = pcall(gate.applies, active)
+            if case.error then
+              assert(not ok and selected:find(case.error,1,true),case.name)
+            else assert(ok and selected==case.selected,case.name) end
+            local rows=availability.rows(active,target,force,"material")
+            assert(#rows==(case.selected and expected_core_omissions or 0),case.name)
+            for _, row in ipairs(rows) do assert(row.reason=="not-available-in-bob-core-profile") end
+            for name, version in pairs(core_selection) do
+              assert(active[name]==(name~=case.removal and version or nil),case.name)
+            end
+            if case.addition then assert(active[case.addition]=="present") end
+          end
+          target.id,target.factorio_version,target.minimum_base,target.recipe_productivity =
+            prior[1],prior[2],prior[3],prior[4]
+        ''')
+
     def test_benefit_captions_use_native_labels_and_correct_percent_or_count_units(self):
         self.lua.execute('''
           local effects=require("presentation.library_effects")
@@ -1301,7 +1356,13 @@ class LibraryModelTests(unittest.TestCase):
         catalogue = (ROOT / "source/research/catalogue.lua").read_text(encoding="utf-8")
         self.assertNotIn("require(", source)
         self.assertNotIn("Generator", source)
-        self.assertNotIn("require(", availability)
+        # Only the small pure selection facts are shared. Presentation must
+        # not import a profile constructor, Generator or runtime authority.
+        self.assertEqual(availability.count("require("), 1)
+        self.assertIn('require("compatibility.bob_core_selection")', availability)
+        selection = (ROOT / "source/compatibility/bob_core_selection.lua").read_text(encoding="utf-8")
+        for forbidden in ("require(", "game.", "storage.", "data.raw", "prototypes."):
+            self.assertNotIn(forbidden, selection)
         for forbidden in ("game.", "storage.", "data.raw", "pairs(technologies)", "technology_id"):
             self.assertNotIn(forbidden, availability)
         self.assertIn('require("compatibility.modern_catalogue")', catalogue)
