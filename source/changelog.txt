@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.15
+Date: 2026-11-16
+
+  Bugfixes:
+
+    - Preserve prepared default worker cargo research from MIR 5.0.11, including earned levels and unfinished research.
+    - Keep authenticated older default worker upgrades valid on supported newer engine patches.
+    - Accept complete productivity preservation effects when their public research also covers other recipes.
+    - Include the rejected productivity component and public reference in startup errors.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.14
 Date: 2026-11-13
 
