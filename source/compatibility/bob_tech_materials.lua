@@ -5,6 +5,7 @@
 local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_tech_materials")
 local target = require("platform.target")
+local ordinary_rows = require("compatibility.ordinary_rows")
 
 local M = {}
 
@@ -18,39 +19,6 @@ end
 
 function M.applies(active_mods)
   return require("compatibility.bob_tech_profile").applies(active_mods)
-end
-
-local function entry_name(entry)
-  return type(entry) == "table" and (entry.name or entry[1]) or nil
-end
-
-local function entry_amount(entry)
-  return type(entry) == "table" and (entry.amount or entry[2]) or nil
-end
-
-local function ordinary_rows(actual, expected, product)
-  if type(actual) ~= "table" or #actual ~= #expected then return false end
-  for index, wanted in ipairs(expected) do
-    local row = actual[index]
-    if type(row) ~= "table" then return false end
-    local ignored = row.ignored_by_productivity
-    if product and ignored == nil and target.productivity_ignores_stats == true then
-      ignored = row.ignored_by_stats
-    end
-    if (row.type or "item") ~= wanted.type
-        or entry_name(row) ~= wanted.name or entry_amount(row) ~= wanted.amount
-        or row.amount_min ~= nil or row.amount_max ~= nil
-        or (row.probability ~= nil and row.probability ~= 1)
-        or (row.independent_probability ~= nil and row.independent_probability ~= 1)
-        or (row.shared_probability ~= nil and (type(row.shared_probability) ~= "table"
-          or row.shared_probability.min ~= 0 or row.shared_probability.max ~= 1))
-        or (row.catalyst_amount ~= nil and row.catalyst_amount ~= 0)
-        or (ignored ~= nil and ignored ~= 0)
-        or (row.extra_count_fraction ~= nil and row.extra_count_fraction ~= 0) then
-      return false
-    end
-  end
-  return true
 end
 
 local function exact_names(actual, expected)
@@ -69,7 +37,7 @@ end
 local function owner_matches(owner, route)
   if type(owner) ~= "table" or owner.enabled == false
       or not exact_names(owner.prerequisites or {}, route.owner_prerequisites)
-      or not ordinary_rows(type(owner.unit) == "table" and owner.unit.ingredients or nil, route.owner_science) then
+      or not ordinary_rows.matches(type(owner.unit) == "table" and owner.unit.ingredients or nil, route.owner_science) then
     return false
   end
   local matches = 0
@@ -101,10 +69,10 @@ local function validate_raw(raw, definition)
     if recipe.enabled ~= false or recipe.hidden == true or recipe.allow_productivity ~= true then
       fail(route.recipe .. " changed: availability or productivity flags")
     end
-    if not ordinary_rows(recipe.ingredients, route.ingredients) then
+    if not ordinary_rows.matches(recipe.ingredients, route.ingredients) then
       fail(route.recipe .. " changed: ingredients")
     end
-    if not ordinary_rows(recipe.results, route.results, true) then
+    if not ordinary_rows.matches(recipe.results, route.results, target.productivity_ignores_stats == true) then
       fail(route.recipe .. " changed: results")
     end
     if not owner_matches(raw.technology[route.owner], route) then

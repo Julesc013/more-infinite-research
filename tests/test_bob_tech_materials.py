@@ -362,6 +362,70 @@ class BobTechMaterialTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "recipe-prod-research_material_gunmetal-4 has missing prerequisite space-science-pack"):
             self.rows(raw=missing_tail_gate)
 
+    def test_ordinary_recipe_rows_have_the_same_meaning_in_both_consumers(self):
+        family = deepcopy(self.facts["families"][0])
+        for route in family["routes"]:
+            route["enabled"] = False
+        definition = _lua_value(self.lua, family)
+        preflight = self.lua.eval(r'''function(raw, definition)
+          require("compatibility.material_routes").preflight(raw, definition,
+            function(message) error(message, 0) end)
+          return true
+        end''')
+        for module, method in (("material_routes", "preflight"), ("bob_tech_materials", "technologies")):
+            actual = self.lua.eval(
+                'debug.getinfo(require("compatibility.' + module + '").' + method + ', "S").source'
+            )
+            self.assertEqual("@" + (ROOT / "source/compatibility" / (module + ".lua")).as_posix(),
+                             actual.replace("\\", "/"))
+
+        # These cases describe ordinary deterministic recipe semantics, not
+        # the spelling or location of either consumer's validation function.
+        cases = [
+            ("ordinary", {}, {}, True),
+            ("certain legacy probability", {"probability": 1}, {}, True),
+            ("certain independent probability", {"independent_probability": 1}, {}, True),
+            ("full shared probability", {"shared_probability": {"min": 0, "max": 1}}, {}, True),
+            ("zero catalyst", {"catalyst_amount": 0}, {}, True),
+            ("zero extra yield", {"extra_count_fraction": 0}, {}, True),
+            ("ingredient statistics", {}, {"ignored_by_stats": 1}, True),
+            ("explicit productivity zero", {"ignored_by_productivity": 0, "ignored_by_stats": 1}, {}, True),
+            ("wrong result", {"name": "wrong-material"}, {}, False),
+            ("wrong type", {"type": "fluid"}, {}, False),
+            ("wrong amount", {"amount": 5}, {}, False),
+            ("random legacy yield", {"probability": 0.5}, {}, False),
+            ("random independent yield", {"independent_probability": 0.5}, {}, False),
+            ("partial shared probability", {"shared_probability": {"min": 0.1, "max": 1}}, {}, False),
+            ("catalyst", {"catalyst_amount": 1}, {}, False),
+            ("extra yield", {"extra_count_fraction": 0.5}, {}, False),
+            ("productivity exclusion", {"ignored_by_productivity": 1}, {}, False),
+            ("native stats exclusion", {"ignored_by_stats": 1}, {}, False),
+            ("invalid numeric exclusion", {"ignored_by_productivity": False}, {}, False),
+            ("wrong ingredient amount", {}, {"amount": 41}, False),
+        ]
+        baseline = _plain(self.rows())
+        recipe_name = family["routes"][0]["recipe"]
+        for name, product_fields, ingredient_fields, accepted in cases:
+            with self.subTest(case=name):
+                raw = self.raw_fixture()
+                recipe = raw["recipe"][recipe_name]
+                for key, value in product_fields.items():
+                    recipe["results"][1][key] = _lua_value(self.lua, value)
+                for key, value in ingredient_fields.items():
+                    recipe["ingredients"][1][key] = _lua_value(self.lua, value)
+                # JSON distinguishes false from numeric zero in this ownership
+                # check, unlike Python's ordinary equality for those values.
+                before = json.dumps(_plain(raw), sort_keys=True)
+                if accepted:
+                    self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+                    self.assertIs(preflight(raw, definition), True)
+                else:
+                    with self.assertRaisesRegex(Exception, recipe_name + " changed"):
+                        self.rows(raw=raw)
+                    with self.assertRaisesRegex(Exception, recipe_name + " changed"):
+                        preflight(raw, definition)
+                self.assertEqual(before, json.dumps(_plain(raw), sort_keys=True))
+
     def test_effective_productivity_exclusion_distinguishes_products_from_inputs(self):
         route = self.facts["families"][0]["routes"][0]
         baseline = _plain(self.rows())
