@@ -8,6 +8,8 @@ local CURRENT, QUEUED, DETACHED = "mir-worker-default-native-current", "mir-work
 local LAB = "mir-worker-default-native-lab"
 local ROLES = {"player", "mir-worker-default-queued", "mir-worker-default-detached", "mir-worker-default-unpaid"}
 local SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"}
+local PREREQUISITES = {"worker-robots-storage-2", "worker-robots-storage-3", "automation-science-pack",
+  "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"}
 local VERSIONS = {
   ["2.0.77"]={origin="4.7.20002", inherited="5.0.20011", successor="5.0.20015"},
   ["2.1.23"]={origin="4.7.21002", inherited="5.0.21011", successor="5.0.21015"},
@@ -44,13 +46,20 @@ function P.expected_prepared(before)
   end
   return out
 end
-function P.expected_completion(before,index)
-  local out=copy(before);local force=out[index];local owner=force.rows[OWNER]
+function P.expected_completion(before,frame_ordinal,force_index)
+  local out=copy(before);local force=out[frame_ordinal];local owner=force.rows[OWNER]
+  check(force.index==force_index,"protected frame/force identity")
   check(force.current==OWNER and force.queue[1]==OWNER and not owner.researched,"ordinary current must be queued")
   owner.level,owner.saved,owner.count=owner.level+1,0,price(owner.level+1)
   force.rows[MAIN]=row(MAIN,5,false,true,0);force.rows[HEAD]=row(HEAD,5,false,false,0)
   force.bonus=force.bonus+1;table.remove(force.queue,1)
   force.current,force.progress=force.queue[1],0
+  return out
+end
+function P.expected_bonus_after(before,force_index)
+  local out=copy(before);local key=tostring(force_index)
+  check(type(out[key])=="number","protected live force bonus required")
+  out[key]=out[key]+1
   return out
 end
 function P.tuple(engine,version)
@@ -70,8 +79,17 @@ function P.event_transition(event,engine,old,new)
 end
 function P.bind(shared)
   local loaded=false
-  local function state()return storage[KEY]end
+  local function selected()
+    local setting=settings and settings.startup and settings.startup["worker-default-native-scenario"]
+    check(setting and setting.value=="prepared-default","prepared actor requires prepared-default startup setting")
+  end
+  local function state()
+    selected();local s=storage[KEY]
+    check(not s or s.fixture_scenario=="prepared-default","prepared actor refuses legacy fixture state")
+    return s
+  end
   local function closure(stage)
+    selected()
     local active=script.active_mods
     check(P.tuple(active.base,active["more-infinite-research"])==stage,"exact stage")
     check(active[FIXTURE]=="0.1.0" and game.speed==1 and game.difficulty_settings.technology_price_multiplier==1,"fixture/map/clock")
@@ -81,14 +99,23 @@ function P.bind(shared)
   end
   local function contract(id, modifier)
     local p=prototypes.technology[id]
-    check(p and p.level==4 and p.max_level==4294967295 and #p.effects==1
+    check(p and p.name==id and p.level==4 and p.max_level==4294967295 and #p.effects==1
       and p.effects[1].type=="worker-robot-storage" and p.effects[1].modifier==modifier,"native contract "..id)
     check(prototypes.get_history("technology",id).created=="more-infinite-research","MIR custody "..id)
     if id==HEAD then
-      check(p.research_unit_count==1 and p.research_unit_energy==60 and p.ignore_tech_cost_multiplier,"head debit contract")
+      check(p.hidden and p.enabled==false and p.visible_when_disabled==false and p.research_unit_count==1
+        and p.research_unit_count_formula==nil and p.research_unit_energy==60 and p.ignore_tech_cost_multiplier
+        and next(p.prerequisites)==nil and next(p.research_unit_ingredients)==nil,"head debit contract")
     else
       check(p.research_unit_count_formula=="675*1.5^(L-4)" and p.research_unit_energy==3600
         and not p.ignore_tech_cost_multiplier and #p.research_unit_ingredients==5,"full native worker price/science")
+      check(p.hidden==(id==PRIVATE) and p.enabled==(id~=PRIVATE) and p.visible_when_disabled==false,
+        "exact native prototype flags "..id)
+      local actual,expected={},copy(PREREQUISITES)
+      for key,item in pairs(p.prerequisites)do
+        actual[#actual+1]=type(key)=="string"and key or type(item)=="string"and item or item.name
+      end
+      table.sort(actual);table.sort(expected);shared.same(expected,actual)
       for index,item in ipairs(p.research_unit_ingredients)do check(item.name==SCIENCE[index]and item.amount==1,"exact native science")end
     end
   end
@@ -99,18 +126,29 @@ function P.bind(shared)
     else check(prototypes.technology[OWNER]==nil and prototypes.technology[HEAD]==nil,"old origin has no ordinary/debit holders")end
   end
   local function bonuses()
-    local out={}for _,force in pairs(game.forces)do out[tostring(force.index)]=force.worker_robots_storage_bonus end return out
+    local out={}for _,force in pairs(game.forces)do
+      check(force.valid~=false and type(force.index)=="number","live force identity")
+      out[tostring(force.index)]=force.worker_robots_storage_bonus
+    end return out
   end
   local function labs()
     local out={}
     for role,lab in pairs(state().labs)do
-      check(lab and lab.valid and lab.prototype.get_researching_speed("normal")==3600,"owned native lab")
+      check(lab and lab.valid and lab.name==LAB and lab.force and lab.force.name==role
+        and lab.prototype.get_researching_speed("normal")==3600,"owned native lab")
       check(lab.get_inventory(defines.inventory.lab_modules).is_empty(),"no lab modules")
       local amounts={}local input=lab.get_inventory(defines.inventory.lab_input)
       for _,pack in ipairs(SCIENCE)do amounts[pack]=input.get_item_count(pack)end
-      out[role]={unit=lab.unit_number,disabled=lab.disabled_by_script,inventory=amounts}
+      out[role]={name=lab.name,unit=lab.unit_number,force={name=lab.force.name,index=lab.force.index},
+        disabled=lab.disabled_by_script,inventory=amounts}
     end
     return out
+  end
+  local function stopped_labs(s,expected,reason)
+    local actual=labs()
+    for role,item in pairs(actual)do check(item.disabled==true,"stopped native lab differs "..role.."/"..reason)end
+    if expected then shared.same(expected,actual)end
+    return actual
   end
   local function emit(phase,extra)
     local s=state();local body={phase=phase,tick=game.tick,mods=script.active_mods,frames=shared.frames(),
@@ -121,14 +159,15 @@ function P.bind(shared)
     log("[MIR_WORKER_PREPARED_NATIVE phase="..phase.."]")
   end
   local function save(phase)
-    local s=state();for _,lab in pairs(s.labs)do lab.disabled_by_script=true end
-    s.phase,s.closed,s.closed_labs,s.closed_bonuses=phase,shared.frames(),labs(),bonuses()
+    local s=state();local stopped=stopped_labs(s,s.stopped_labs,phase.." save")
+    if phase=="successor-saved"then shared.same(s.expected_bonuses,bonuses())end
+    s.phase,s.closed,s.closed_labs,s.closed_bonuses=phase,shared.frames(),stopped,bonuses();s.stopped_labs=copy(stopped)
     emit(phase);check(game.is_multiplayer(),"owned server save")
     game.server_save("worker-prepared-"..phase)
   end
   local function setup()
     closure("origin");contracts("origin")
-    local s={phase="setup",setting_up=true,labs={},inserted={},ordinary={},administrative={}};storage[KEY]=s
+    local s={fixture_scenario="prepared-default",phase="setup",setting_up=true,labs={},inserted={},ordinary={},administrative={}};storage[KEY]=s
     for index,name in ipairs(ROLES)do
       local force=game.forces[name]or game.create_force(name);local main=force.technologies[MAIN]
       for _,prerequisite in pairs(main.prerequisites)do prerequisite.research_recursive()end
@@ -154,7 +193,6 @@ function P.bind(shared)
   local function configure(event)
     local s=state();if not s then return end
     local version=script.active_mods["more-infinite-research"];local values=VERSIONS[script.active_mods.base]
-    emit("configuration-observed",{event=event})
     if s.phase=="origin-saved"then
       closure("inherited");contracts("inherited");P.event_transition(event,script.active_mods.base,values.origin,values.inherited)
       shared.same(P.expected_inherited(s.closed),shared.frames());shared.same(s.closed_bonuses,bonuses());shared.same(s.closed_labs,labs())
@@ -163,8 +201,10 @@ function P.bind(shared)
       closure("successor");contracts("successor");P.event_transition(event,script.active_mods.base,values.inherited,values.successor)
       s.expected=shared.expected_upgrade(s.before_preparation)
       shared.same(s.expected,shared.frames());shared.same(s.closed_bonuses,bonuses());shared.same(s.closed_labs,labs())
+      s.expected_bonuses=copy(s.closed_bonuses)
       s.phase="successor-ready"
     else check(false,"unexpected historical configuration phase/version "..tostring(version))end
+    emit("configuration-observed",{event=event})
   end
   local function prepared()
     local s=state();check(s and s.phase=="inherited-saved","public prepare observation requires inherited save")
@@ -178,8 +218,14 @@ function P.bind(shared)
     prepared()
   end
   local function start_work(index)
-    local s=state();s.work=index;s.role=index==1 and ROLES[1]or ROLES[4];s.force_index=index==1 and 1 or 4
-    local frame=shared.frames()[s.force_index]
+    local s=state();local role=index==1 and ROLES[1]or ROLES[4]
+    local force=game.forces[role];check(force and force.valid,"live work force")
+    local frame_ordinal=index==1 and 1 or 4
+    local frame=shared.frames()[frame_ordinal]
+    check(frame.index==force.index,"work frame/force index differs")
+    s.stopped_labs=stopped_labs(s,s.stopped_labs or s.closed_labs,"before ordinary start")
+    shared.same(s.expected_bonuses,bonuses())
+    s.work,s.role,s.frame_ordinal,s.force_index=index,role,frame_ordinal,force.index
     check(frame.current==OWNER and frame.queue[1]==OWNER,"transferred native current research")
     check(frame.rows[OWNER].level==(index==1 and 8 or 4),"literal incoming worker level")
     check(math.ceil(frame.rows[OWNER].count*(1-frame.progress))==(index==1 and 1982 or 426),"independent remaining science oracle")
@@ -192,17 +238,26 @@ function P.bind(shared)
       check(#s.administrative<512,"bounded administrative callbacks")
       s.administrative[#s.administrative+1]={name=event.research.name,force=event.research.force.name,tick=event.tick,by_script=true};return
     end
-    emit("ordinary-callback-"..tostring(#s.ordinary+1),{name=event.research.name,force=event.research.force.name,by_script=event.by_script})
     check(s.phase=="research"and event.by_script==false and event.research.name==OWNER and event.research.force.name==s.role,"exact ordinary native completion")
+    check(event.research.force.index==s.force_index,"ordinary completion force index differs")
+    local frames=shared.frames();check(frames[s.frame_ordinal].index==s.force_index,"callback frame/force index differs")
+    shared.assert_callback_safe(frames[s.frame_ordinal])
+    s.callback_bonuses=P.expected_bonus_after(s.expected_bonuses,s.force_index)
+    shared.same(s.callback_bonuses,bonuses())
+    local before=labs()
+    for role,item in pairs(before)do
+      if role==s.role then check(item.disabled==false,"ordinary lab unexpectedly stopped")
+      else shared.same(s.stopped_labs[role],item)end
+    end
     s.ordinary[#s.ordinary+1]={name=OWNER,force=s.role,tick=event.tick,by_script=false}
-    shared.assert_callback_safe(shared.frames()[s.force_index])
-    s.labs[s.role].disabled_by_script=true;s.phase="finish-ready"
+    s.labs[s.role].disabled_by_script=true;s.stopped_labs=stopped_labs(s,nil,"ordinary completion intentional stop")
+    s.phase="finish-ready";emit("ordinary-callback-"..tostring(#s.ordinary),{name=event.research.name,force=event.research.force.name,by_script=event.by_script})
   end
   local function cold()
     local s=state();local stage=s.phase=="origin-saved"and"origin"or s.phase=="successor-saved"and"successor"or"inherited"
     closure(stage);contracts(stage)
-    shared.same(s.closed,shared.frames());shared.same(s.closed_labs,labs());shared.same(s.closed_bonuses,bonuses())
-    for _,lab in pairs(s.labs)do check(lab.disabled_by_script,"cold cannot run labs")end
+    shared.same(s.closed,shared.frames());stopped_labs(s,s.closed_labs,"cold");shared.same(s.closed_bonuses,bonuses())
+    if stage=="successor"then shared.same(s.expected_bonuses,bonuses())end
     check(#s.ordinary==(stage=="successor"and 2 or 0),"cold cannot add completions")
     emit("cold")
   end
@@ -213,7 +268,7 @@ function P.bind(shared)
     if s.phase=="origin-ready"then save("origin-saved")
     elseif s.phase=="inherited-ready"then save("inherited-saved")
     elseif s.phase=="prepared-ready"then save("prepared-saved")
-    elseif s.phase=="successor-ready"then shared.same(s.expected,shared.frames());emit("upgrade-verified");start_work(1)
+    elseif s.phase=="successor-ready"then shared.same(s.expected,shared.frames());start_work(1);emit("upgrade-verified")
     elseif s.phase=="research"then
       local input=s.labs[s.role].get_inventory(defines.inventory.lab_input)
       for _,pack in ipairs(SCIENCE)do if input.get_item_count(pack)<64 then
@@ -221,11 +276,15 @@ function P.bind(shared)
         s.inserted[s.role][pack]=(s.inserted[s.role][pack]or 0)+n
       end end
     elseif s.phase=="finish-ready"then
-      s.expected=P.expected_completion(s.expected,s.force_index);shared.same(s.expected,shared.frames())
+      check(s.callback_bonuses,"ordinary callback bonus map missing")
+      s.expected=P.expected_completion(s.expected,s.frame_ordinal,s.force_index);shared.same(s.expected,shared.frames())
+      shared.same(s.callback_bonuses,bonuses());s.expected_bonuses=s.callback_bonuses;s.callback_bonuses=nil
       local inventory=labs()[s.role].inventory
       for _,pack in ipairs(SCIENCE)do check(s.inserted[s.role][pack]-inventory[pack]==(s.work==1 and 1982 or 426),"exact ordinary science depletion")end
       emit("ordinary-settled-"..s.work)
-      if s.work==1 then start_work(2)else check(#s.ordinary==2,"two ordinary successor completions");save("successor-saved")end
+      if s.work==1 then start_work(2)else
+        check(#s.ordinary==2,"two ordinary successor completions");shared.same(s.expected_bonuses,bonuses());save("successor-saved")
+      end
     end
   end
   return {begin=begin,on_configuration_changed=configure,on_tick=tick,on_finished=finish,on_load=function()loaded=true end}

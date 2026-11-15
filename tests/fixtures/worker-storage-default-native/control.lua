@@ -19,6 +19,16 @@ local function copy(v)
   local out = {}; for k, x in pairs(v) do out[k] = copy(x) end; return out
 end
 local function check(ok, reason) if not ok then error("[worker-default-native] " .. reason, 2) end end
+local function fixture_scenario()
+  local setting=settings and settings.startup and settings.startup["worker-default-native-scenario"]
+  check(setting and(setting.value=="legacy"or setting.value=="prepared-default"),"exact fixture startup scenario")
+  return setting.value
+end
+local function legacy_state()
+  local s=storage[KEY]
+  check(not s or s.fixture_scenario~="prepared-default","legacy actor refuses prepared fixture state")
+  return s
+end
 function M.same(a, b, path)
   path = path or "$"
   check(type(a) == type(b), path .. " type differs")
@@ -75,7 +85,7 @@ function M.frames()
   local frames = {}
   for _, name in ipairs(ROLES) do
     local force = game.forces[name]; check(force and force.valid, "missing role force " .. name)
-    local frame = {name=name, bonus=force.worker_robots_storage_bonus, current=force.current_research and force.current_research.name,
+    local frame = {name=name,index=force.index, bonus=force.worker_robots_storage_bonus, current=force.current_research and force.current_research.name,
       progress=force.research_progress, queue={}, rows={}, mining=force.mining_drill_productivity_bonus,
       manual_mining=force.manual_mining_speed_modifier, lab_speed=force.laboratory_speed_modifier,
       lab_productivity=force.laboratory_productivity_bonus, robot_speed=force.worker_robots_speed_modifier}
@@ -146,7 +156,7 @@ local function contracts(old)
 end
 local function setup(mode)
   local old = mode == "old-source"; closure(old); contracts(old)
-  local s = {mode=mode, phase="setup", setting_up=true, ordinary={}, administrative={}, inserted={}}
+  local s = {fixture_scenario="legacy",mode=mode, phase="setup", setting_up=true, ordinary={}, administrative={}, inserted={}}
   storage[KEY] = s
   for i, name in ipairs(ROLES) do
     local force = game.forces[name] or game.create_force(name)
@@ -206,6 +216,7 @@ local function save(phase, frames)
   game.server_save("worker-default-" .. phase)
 end
 function M.begin(mode)
+  check(fixture_scenario()=="legacy","legacy actor requires legacy startup scenario");legacy_state()
   check(mode == "first" or mode == "old-source" or mode == "upgrade" or mode == "cold", "unknown mode")
   if mode == "first" or mode == "old-source" then check(storage[KEY] == nil, "fixture already initialized"); setup(mode)
   elseif mode == "upgrade" then check(storage[KEY] and (storage[KEY].phase == "upgrade-ready"
@@ -213,14 +224,16 @@ function M.begin(mode)
   else M.cold() end
 end
 function M.cold()
-  local s = storage[KEY]; check(s and s.closed and s.phase:match("%-saved$"), "cold requires closed source")
+  check(fixture_scenario()=="legacy","legacy actor requires legacy startup scenario")
+  local s = legacy_state(); check(s and s.closed and s.phase:match("%-saved$"), "cold requires closed source")
   emit("cold-observed")
   check(s.lab and s.lab.valid and s.lab.disabled_by_script and #s.ordinary == (s.mode == "first" and 2 or 0), "cold lab/count controls")
   closure(s.phase == "old-source-saved"); contracts(s.phase == "old-source-saved")
   M.same(s.closed, M.frames()); M.same(s.closed_lab, lab_frame()); emit("cold")
 end
 function M.on_configuration_changed(event)
-  local s = storage[KEY]; if not s then return end
+  check(fixture_scenario()=="legacy","legacy actor requires legacy startup scenario")
+  local s = legacy_state(); if not s then return end
   emit("configuration-observed", {event=event}) -- full actual frame before strict comparison.
   check(s.phase == "old-source-saved", "unexpected configuration phase"); closure(false); contracts(false)
   local change = event.mod_changes["more-infinite-research"]
@@ -232,7 +245,8 @@ function M.on_configuration_changed(event)
   s.mode, s.phase = "upgrade", "upgrade-ready"
 end
 function M.on_finished(event)
-  local s = storage[KEY]; if not s then return end
+  check(fixture_scenario()=="legacy","legacy actor requires legacy startup scenario")
+  local s = legacy_state(); if not s then return end
   local id = event.research.name
   if event.by_script == true then
     if not s.setting_up then emit("scripted-completion-observed", {name=id, by_script=true, force=event.research.force.name}) end
@@ -254,7 +268,8 @@ function M.on_finished(event)
   if #s.ordinary == 2 then s.lab.disabled_by_script = true end
 end
 function M.on_tick()
-  local s = storage[KEY]
+  check(fixture_scenario()=="legacy","legacy actor requires legacy startup scenario")
+  local s = legacy_state()
   if not s then
     loaded = false
     local version = script.active_mods["more-infinite-research"]
@@ -285,8 +300,8 @@ function M.on_tick()
   end
 end
 local callbacks = M
-local scenario = settings and settings.startup and settings.startup["worker-default-native-scenario"]
-if scenario and scenario.value == "prepared-default" then
+local scenario = fixture_scenario()
+if scenario == "prepared-default" then
   callbacks = require("prepared_native").bind(M)
 elseif script.active_mods.WorkerRobotCargoSizeResearch then
   callbacks = require("provider_native").bind(M)
