@@ -209,6 +209,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_secretas_continuation.py",
             "tests/test_worker_storage_continuation.py",
             "tests/test_worker_storage_history.py",
+            "tests/test_worker_storage_inherited_origin.py",
             "tests/test_worker_native_owner_data.py",
     "tests/test_worker_storage_default_native.py",
     "tests/test_worker_storage_provider_native.py",
