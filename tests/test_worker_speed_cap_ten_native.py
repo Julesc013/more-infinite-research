@@ -203,6 +203,7 @@ end
         complete = markers[2]
         self.assertEqual((1, 0), (complete["ordinary_native_completion_count"], complete["level_eleven_start_count"]))
         self.assertEqual((WORKER, False), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"]))
+        self.assertEqual((WORKER, False), (complete["ordinary"][1]["name"], complete["ordinary"][1]["by_script"]))
         self.assertEqual((2, 1, 0), (len(markers[0]["player"]["queue"]["queue"]), len(markers[1]["player"]["queue"]["queue"]), len(complete["player"]["queue"]["queue"])))
         self.assertEqual(3600, complete["player"]["research_unit_energy"])
         self.assertEqual(set(PACKS), set(complete["post_completion"]["lab"]["input_by_name"].keys()))
