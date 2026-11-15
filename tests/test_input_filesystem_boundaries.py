@@ -162,7 +162,7 @@ class InputFilesystemBoundaries(unittest.TestCase):
             "try { "
             f"$context=[pscustomobject]@{{root={quote(output)};aliases=@();shared_alias_bytes=0L;max_new_output_bytes=1MB;result_reserve_bytes=64KB}}; "
             f"$activation=[pscustomobject]@{{closed=$false;lock=$lock;library={quote(library)};journal=@{{controls=@{{"
-            "'mod-list.json'=@{exists=$false};'mod-settings.dat'=@{exists=$false}}}}}; "
+            "'mod-list.json'=@{exists=$false};'mod-settings.dat'=@{exists=$false}}}}; "
             "Add-MIRNativeProbeLibraryActivation -Context $context -Activation $activation; "
             "$remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $context; "
             "@{remaining=$remaining}|ConvertTo-Json -Compress "
