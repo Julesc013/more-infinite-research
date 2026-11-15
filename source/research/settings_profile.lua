@@ -82,12 +82,17 @@ end
 local function copy_json_value(value, seen)
   local value_type = type(value)
   if value_type == "string" or value_type == "boolean" then return value end
-  if value_type == "number" then return finite(value) and value or nil end
-  if value_type ~= "table" or seen[value] then return nil end
+  if value_type == "number" then
+    if not finite(value) then return nil, "profile contains a non-finite number" end
+    return value
+  end
+  if value_type ~= "table" then return nil end
+  if seen[value] then return nil, "profile contains a cycle" end
   seen[value] = true
   local out = {}
   for key, item in pairs(value) do
-    local copied = copy_json_value(item, seen)
+    local copied, err = copy_json_value(item, seen)
+    if err then seen[value] = nil; return nil, err end
     if copied ~= nil and (type(key) == "string" or type(key) == "number") then out[key] = copied end
   end
   seen[value] = nil
@@ -103,13 +108,16 @@ local function normalized_for_encode(profile)
   if profile.settings ~= nil and type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
   local settings = {}
   for name, value in pairs(profile.settings or {}) do
-    local copied = copy_json_value(value, {})
+    local copied, err = copy_json_value(value, {})
+    if err then return nil, err end
     if copied ~= nil then settings[tostring(name)] = copied end
   end
+  local metadata, metadata_error = copy_json_value(profile.metadata or {}, {})
+  if metadata_error then return nil, metadata_error end
   return {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
     mod = profile.mod or "more-infinite-research",
-    metadata = copy_json_value(profile.metadata or {}, {}) or {}, settings = settings
+    metadata = metadata or {}, settings = settings
   }
 end
 
