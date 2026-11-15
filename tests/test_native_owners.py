@@ -71,10 +71,98 @@ class NativeOwnersTests(unittest.TestCase):
           local calls = {}
           local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6")
           local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5")
+          local ten = data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+            prerequisites = {"worker-robots-speed-9", "se-deep-space-science-pack-1"}
+          })
           assert(owners.data_worker_robot_speed_owner(lookup({
-            [seven.name] = seven, [six.name] = six
+            [seven.name] = seven, [six.name] = six, [ten.name] = ten
           }, calls)) == seven.name)
           assert(#calls == 1 and calls[1] == seven.name)
+        ''')
+
+    def test_known_se_tail_ten_follows_only_finite_six_and_seven(self):
+        self.lua.execute('''
+          local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7, prerequisites = {"worker-robots-speed-6"}
+          })
+          local ten = data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+            prerequisites = {"worker-robots-speed-9", "se-deep-space-science-pack-1"}
+          })
+          local data_calls = {}
+          assert(owners.data_worker_robot_speed_owner(lookup({
+            [six.name] = six, [seven.name] = seven, [ten.name] = ten
+          }, data_calls)) == ten.name)
+          assert(#data_calls == 3 and data_calls[1] == seven.name
+            and data_calls[2] == six.name and data_calls[3] == ten.name)
+
+          local runtime_six = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local runtime_seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7
+          })
+          local runtime_ten = runtime_technology("worker-robots-speed-10", "worker-robots-speed-9")
+          local runtime_calls = {}
+          assert(owners.runtime_worker_robot_speed_owner(lookup({
+            [runtime_six.name] = runtime_six, [runtime_seven.name] = runtime_seven,
+            [runtime_ten.name] = runtime_ten
+          }, runtime_calls)) == runtime_ten.name)
+          assert(#runtime_calls == 3 and runtime_calls[1] == runtime_seven.name
+            and runtime_calls[2] == runtime_six.name and runtime_calls[3] == runtime_ten.name)
+        ''')
+
+    def test_tail_ten_keeps_exact_effect_predecessor_and_infinite_admission(self):
+        self.lua.execute('''
+          local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7, prerequisites = {"worker-robots-speed-6"}
+          })
+          local function reject(data_tail, runtime_tail)
+            local data_calls, runtime_calls = {}, {}
+            assert(owners.data_worker_robot_speed_owner(lookup({
+              [six.name] = six, [seven.name] = seven, [data_tail.name] = data_tail
+            }, data_calls)) == nil)
+            assert(owners.runtime_worker_robot_speed_owner(lookup({
+              ["worker-robots-speed-6"] = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5", {max_level = 6}),
+              ["worker-robots-speed-7"] = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6", {max_level = 7}),
+              [runtime_tail.name] = runtime_tail
+            }, runtime_calls)) == nil)
+            assert(#data_calls == 3 and data_calls[3] == "worker-robots-speed-10")
+            assert(#runtime_calls == 3 and runtime_calls[3] == "worker-robots-speed-10")
+          end
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-8", {
+              prerequisites = {"worker-robots-speed-8"}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-8")
+          )
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              prerequisites = {"worker-robots-speed-9"},
+              effects = {{type = "worker-robot-speed", modifier = .64}}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              effects = {{type = "worker-robot-speed", modifier = .64}}
+            })
+          )
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              max_level = 10, prerequisites = {"worker-robots-speed-9"}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-9", {max_level = 10})
+          )
+          local unknown = data_technology("worker-robots-speed-11", "worker-robots-speed-10", {
+            prerequisites = {"worker-robots-speed-10"}
+          })
+          local calls = {}
+          assert(owners.data_worker_robot_speed_owner(lookup({[unknown.name] = unknown}, calls)) == nil)
+          assert(#calls == 3 and calls[1] == "worker-robots-speed-7"
+            and calls[2] == "worker-robots-speed-6" and calls[3] == "worker-robots-speed-10")
         ''')
 
     def test_runtime_uses_numeric_max_and_prerequisite_object_map(self):
