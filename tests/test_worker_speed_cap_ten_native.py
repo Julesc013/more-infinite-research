@@ -70,16 +70,16 @@ function data_case(settings_wrapper,data_wrapper,settings_common,data_common,sta
     effects={{type="worker-robot-speed",modifier=opponent=="wrong-effect" and .6 or .65}}}
   local raw={technology={[WORKER]=worker},lab={lab={name="lab",inputs={"automation-science-pack"}}},
     ["int-setting"]={["mir-max-level-worker-robots-speed"]={default_value=0,minimum_value=0}}}
-  local rows = {}
+  local rows, logs = {}, {}
   local env={mods=copy(closure),data={raw=raw,extend=function(_,v)for _,x in ipairs(v)do rows[#rows+1]=x end end},
-    settings={startup={["mir-max-level-worker-robots-speed"]={value=cap}}}}
+    settings={startup={["mir-max-level-worker-robots-speed"]={value=cap}}},log=function(row)logs[#logs+1]=row end}
   env.mods[FIXTURE],env.mods["more-infinite-research"]=expected.fixture,expected.mir
   local tables={}for k,v in pairs(table)do tables[k]=v end;tables.deepcopy=copy;env.table=tables
   env.require=function(n)if n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_settings"then return assert(loadfile(settings_common,"t",env))()end
     assert(n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_data_final");return assert(loadfile(data_common,"t",env))()end
   env._G=env;setmetatable(env,{__index=function(_,k)return _G[k]end})
-  local ok,msg=pcall(assert(loadfile(settings_wrapper,"t",env)));if not ok then return{ok=false,message=tostring(msg),raw=raw,rows=rows}end
-  ok,msg=pcall(assert(loadfile(data_wrapper,"t",env)));return{ok=ok,message=tostring(msg),raw=raw,rows=rows}
+  local ok,msg=pcall(assert(loadfile(settings_wrapper,"t",env)));if not ok then return{ok=false,message=tostring(msg),raw=raw,rows=rows,logs=logs,mods=env.mods}end
+  ok,msg=pcall(assert(loadfile(data_wrapper,"t",env)));return{ok=ok,message=tostring(msg),raw=raw,rows=rows,logs=logs,mods=env.mods}
 end
 
 local function tech(name,force,wrong_energy)
@@ -189,6 +189,13 @@ end
                 self.assertEqual((PREDECESSOR, DEEP_SCIENCE), tuple(worker["prerequisites"][i] for i in range(1, 3)))
                 self.assertEqual(PACKS, tuple(result["rows"][1]["inputs"][i] for i in range(1, 9)))
                 self.assertEqual(cap, result["raw"]["int-setting"][CAP]["default_value"])
+                self.assertEqual(1, len(result["logs"]))
+                observed = result["logs"][1]
+                self.assertTrue(observed.startswith("[MIR_ACTIVE_MODS] "))
+                reported = observed.removeprefix("[MIR_ACTIVE_MODS] ").split("|")
+                expected_mods = sorted(f"{name}@{version}" for name, version in result["mods"].items())
+                self.assertEqual(expected_mods, reported)
+                self.assertEqual(20, len(reported))
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])

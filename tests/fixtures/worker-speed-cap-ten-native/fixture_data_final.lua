@@ -43,6 +43,19 @@ local function assert_closure(stage)
   return expected
 end
 
+local function observe_active_mods()
+  local rows = {}
+  for name, version in pairs(mods) do
+    if type(name) ~= "string" or name == "" or type(version) ~= "string"
+        or version:match("^%d+%.%d+%.%d+$") == nil then
+      fail("active mod identity differs")
+    end
+    rows[#rows + 1] = name .. "@" .. version
+  end
+  table.sort(rows)
+  log("[MIR_ACTIVE_MODS] " .. table.concat(rows, "|"))
+end
+
 local function assert_worker(row)
   if type(row) ~= "table" or row.name ~= WORKER or row.max_level ~= "infinite" then
     fail("SE worker-speed target is absent or finite")
@@ -93,6 +106,7 @@ end
 
 function M.apply(stage)
   local expected = assert_closure(stage)
+  observe_active_mods()
   local row = data.raw.technology and data.raw.technology[WORKER]
   local startup = settings.startup and settings.startup[CAP]
   if type(startup) ~= "table" or startup.value ~= expected.cap then fail("worker-speed cap startup differs") end
