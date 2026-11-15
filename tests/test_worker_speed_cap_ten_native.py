@@ -21,6 +21,8 @@ FIXTURE = ROOT / "tests" / "fixtures" / "worker-speed-cap-ten-native"
 SOURCE = FIXTURE / "source"
 OLD_NEGATIVE = FIXTURE / "cap10"
 SUCCESSOR = FIXTURE / "successor16"
+CURRENT_OLD_NEGATIVE = FIXTURE / "current-old15"
+CURRENT_SUCCESSOR = FIXTURE / "current-successor16"
 LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
@@ -29,6 +31,7 @@ AUTOMATION_SCIENCE = "automation-science-pack"
 AUTOMATION = "automation"
 ELECTRICITY = "electricity"
 UNRELATED = "mir-fixture-unrelated-disabled"
+CURRENT_SENTINEL = "stone-wall"
 CAP = "mir-max-level-worker-robots-speed"
 PACKS = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -74,7 +77,9 @@ local closure = {
 local stages = {
   source15={fixture="0.4.0",mir="5.0.20015",cap=0},
   ["old-negative15"]={fixture="0.5.0",mir="5.0.20015",cap=10},
-  successor16={fixture="0.6.0",mir="5.0.20016",cap=10}
+  successor16={fixture="0.6.0",mir="5.0.20016",cap=10},
+  ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
+  ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -107,10 +112,15 @@ local function tech(name,force,wrong_energy)
 end
 local function force(name,index,wrong_energy)
   local f={name=name,index=index,valid=true,technologies={},_queue={},current_research=nil,research_progress=0,worker_robots_speed_modifier=0}
-  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP,ELECTRICITY,UNRELATED})do f.technologies[n]=tech(n,f,wrong_energy)end
+  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP,ELECTRICITY,UNRELATED,"stone-wall"})do f.technologies[n]=tech(n,f,wrong_energy)end
   f.technologies[UNRELATED].enabled,f.technologies[UNRELATED].researched=false,false
+  f.technologies["stone-wall"].enabled,f.technologies["stone-wall"].researched=false,false
   function f.enable_all_prototypes()error("broad prototype enablement is forbidden by this fixture")end
-  function f.reset_technology_effects()f.worker_robots_speed_modifier=(f.technologies[WORKER].level-1)*.65 end
+  function f.reset_technology_effects()
+    f.worker_robots_speed_modifier=f._reset_bonus or (f.technologies[WORKER].level-1)*.65
+    if f._external_reset then f._external_reset(f) end
+    if f._reset_dispatch then f._reset_dispatch(f) end
+  end
   function f.add_research(r)
     if type(r)=="string"then r=f.technologies[r]end;if not r or r.enabled~=true or f.current_research then return false end
     if r.name==WORKER and(f.technologies[PREDECESSOR].researched~=true or f.technologies[DEEP].researched~=true)then return false end
@@ -127,7 +137,7 @@ local function load_stage(path,common,stage,game,storage,settings,markers,logs,f
   local e,s,active = {events={}},assert(stages[stage]),copy(closure);active[FIXTURE],active["more-infinite-research"]=s.fixture,s.mir
   local env={game=game,storage=storage,settings=settings,script={active_mods=active,on_init=function(f)e.init=f end,
       on_configuration_changed=function(f)e.changed=f end,on_load=function(f)e.load=f end,on_event=function(k,f)e.events[k]=f end},
-    defines={events={on_tick=1,on_research_finished=2,on_research_started=3},inventory={lab_input=1}},
+    defines={events={on_tick=1,on_research_finished=2,on_research_started=3,on_technology_effects_reset=4},inventory={lab_input=1}},
     helpers={table_to_json=function(row)markers[#markers+1]=row;return '{"fixture":"host"}'end,
       write_file=function(p,b,a)files[#files+1]={path=p,body=b,append=a}end},log=function(x)logs[#logs+1]=x end}
   env.require=function(n)assert(n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_control");return assert(loadfile(common,"t",env))()end
@@ -175,10 +185,53 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"successor16",game,storage,settings(10),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY],player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
+
+function current_state_flow(old_path,successor_path,common,mode,opponent)
+  local player,foreign,earned=force("player",1,false),force("mir5-worker-speed-cap-ten-foreign",2,false),force("mir5-worker-speed-cap-ten-earned",3,false)
+  local game={tick=0,forces={player=player,[1]=player,[foreign.name]=foreign,[foreign.index]=foreign,[earned.name]=earned,[earned.index]=earned},surfaces={}}
+  local saves,labs=0,0;game.surfaces[1]={create_entity=function(row)labs=labs+1;local x={valid=true,disabled_by_script=false,unit_number=labs,input=inventory()};function x.get_inventory(i)assert(i==1)return x.input end;game.lab=x;return x end}
+  function game.server_save(n)assert(n=="mir5-worker-speed-cap-current-state-complete");saves=saves+1 end
+  local storage,markers,logs,files={mir_caps={}}, {},{},{};local function settings()return{startup={["mir-max-level-worker-robots-speed"]={value=10},["mir-settings-profile-import"]={value=""}}}end
+  local stage=mode=="old" and "current-old15" or "current-successor16";local path=mode=="old" and old_path or successor_path
+  local actor,message=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not actor then return{ok=false,message=message}end
+  local function install_reset(force)
+    force._external_reset=function(value)
+      if mode=="candidate" and opponent~="candidate-no-cap" then caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
+    end
+    force._reset_dispatch=function(value)
+      if opponent=="missing-reset-event" then return end
+      local callback=actor.events[4];if callback then callback({force=value})end
+    end
+  end
+  install_reset(player)
+  install_reset(foreign);install_reset(earned)
+  function game.create_force()error("current-state role must use the three named input forces")end
+  if opponent=="missing-prerequisite"then player.technologies[PREDECESSOR]=nil end
+  if opponent=="sentinel-enabled"then player.technologies["stone-wall"].enabled=true end
+  local ok,result=call(actor.changed)
+  if mode=="old"then return{ok=ok,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage.mir5_worker_speed_cap_current_state,player=player,foreign=foreign,earned=earned}end
+  if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage.mir5_worker_speed_cap_current_state,player=player,foreign=foreign,earned=earned}end
+  local state=storage.mir5_worker_speed_cap_current_state;local owner=player.technologies[WORKER]
+  if opponent=="fourth-reset"then player.reset_technology_effects();ok,result=call(actor.events[1]);return{ok=ok,message=result,state=state,markers=markers}end
+  if opponent=="await-eleven"then owner.level=11;ok,result=call(actor.events[3],{research=owner,tick=0});return{ok=ok,message=result,state=state}end
+  if opponent=="post-boundary-admin-write"then player.technologies[PREDECESSOR].researched=false end
+  if opponent=="post-boundary-sentinel-write"then player.technologies["stone-wall"].enabled=true end
+  if opponent=="post-boundary-bonus-drift"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.1 end
+  game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
+  if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
+  player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  if opponent=="missing-ordinary-event"then state.ordinary_events={} end
+  owner.level=11;player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
+  for _=1,3 do game.tick=game.tick+1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end end
+  for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"current-successor16",game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
+  return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
+end
 ''')
 
     def data_result(self, stage: str, opponent: str = ""):
-        directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR}[stage]
+        directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR,
+                     "current-old15": CURRENT_OLD_NEGATIVE, "current-successor16": CURRENT_SUCCESSOR}[stage]
         return self.lua.eval("data_case")(str(directory / "settings-updates.lua"), str(directory / "data-final-fixes.lua"),
                                           str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
@@ -186,9 +239,16 @@ end
         return self.lua.eval("flow")(str(SOURCE / "control.lua"), str(OLD_NEGATIVE / "control.lua"), str(SUCCESSOR / "control.lua"),
                                      str(FIXTURE / "fixture_control.lua"), mode, opponent)
 
+    def current_state_result(self, mode: str = "candidate", opponent: str = ""):
+        return self.lua.eval("current_state_flow")(str(CURRENT_OLD_NEGATIVE / "control.lua"),
+                                                   str(CURRENT_SUCCESSOR / "control.lua"),
+                                                   str(FIXTURE / "fixture_control.lua"), mode, opponent)
+
     def test_metadata_declares_three_explicit_f200_se_stages(self):
         for directory, version, mir in ((SOURCE, "0.4.0", "5.0.20015"), (OLD_NEGATIVE, "0.5.0", "5.0.20015"),
-                                        (SUCCESSOR, "0.6.0", "5.0.20016")):
+                                        (SUCCESSOR, "0.6.0", "5.0.20016"),
+                                        (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
+                                        (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -196,7 +256,8 @@ end
                 self.assertEqual(["base = 2.0.77", "space-exploration = 0.7.57", f"more-infinite-research = {mir}"], info["dependencies"])
 
     def test_data_preflight_retains_actual_tail_ten_contract_and_only_adds_fixture_lab(self):
-        for stage, cap in (("source15", 0), ("old-negative15", 10), ("successor16", 10)):
+        for stage, cap in (("source15", 0), ("old-negative15", 10), ("successor16", 10),
+                           ("current-old15", 10), ("current-successor16", 10)):
             with self.subTest(stage=stage):
                 result = self.data_result(stage)
                 self.assertTrue(result["ok"], result["message"])
@@ -216,6 +277,157 @@ end
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
+
+    @staticmethod
+    def _current_markers(result):
+        return {row["phase"]: row for row in (result["markers"][index]
+                for index in range(1, len(result["markers"]) + 1))}
+
+    @staticmethod
+    def _current_frame_signature(frame):
+        worker = frame["worker"]
+        queue = worker["queue"]
+        flags = frame["prerequisite_flags"]
+        return (
+            frame["force_index"], frame["force_name"], worker["level"], worker["researched"], worker["enabled"],
+            worker["visible"], worker["saved_progress"], worker["bonus"], worker["per_level_speed_effect"],
+            worker["research_unit_count"], worker["research_unit_energy"], queue["current"],
+            tuple(queue["queue"][index] for index in range(1, len(queue["queue"]) + 1)), queue["progress"],
+            tuple((name, flags[name]["researched"], flags[name]["enabled"], flags[name]["visible"],
+                   flags[name]["level"], flags[name]["valid"])
+                  for name in (PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION)),
+            frame["unrelated_sentinel"]["name"], frame["unrelated_sentinel"]["researched"],
+            frame["unrelated_sentinel"]["enabled"], frame["unrelated_sentinel"]["visible"],
+            frame["unrelated_sentinel"]["level"], frame["unrelated_sentinel"]["valid"],
+        )
+
+    def test_current_state_reset_roles_keep_the_declared_three_force_boundary(self):
+        old = self.current_state_result("old")
+        self.assertFalse(old["ok"])
+        self.assertIn("MIR_EXPECTED_CURRENT_OLD15_RESET_NOT_ENFORCED", old["message"])
+        self.assertEqual((0, 0), (old["saves"], old["labs"]))
+        old_markers = self._current_markers(old)
+        self.assertEqual({"current-provider", "current-pre-reset", "current-post-reset"}, set(old_markers))
+        provider, old_pre, old_post = (old_markers[phase] for phase in
+                                       ("current-provider", "current-pre-reset", "current-post-reset"))
+        self.assertEqual(("post-provider-normalization-before-fixture-admin", "controller-bound-A0-base-input-only",
+                          "not-read-no-continuation-precondition"),
+                         (provider["snapshot_role"], provider["source_base"]["identity"],
+                          provider["source_base"]["fixture_source_phase"]))
+        self.assertEqual("published15-reset-event-not-enforced", old_post["outcome"])
+        self.assertEqual(3, old_post["reset_call_count"])
+        self.assertEqual({"player", "foreign", "earned_above_cap"},
+                         {old_post["reset_rows"][index]["force_role"]
+                          for index in range(1, len(old_post["reset_rows"]) + 1)})
+        self.assertTrue(all(old_post["reset_rows"][index]["native_event_delivered"] is True
+                            for index in range(1, len(old_post["reset_rows"]) + 1)))
+
+        for frame_name in ("player", "foreign", "earned_above_cap"):
+            frame = provider[frame_name]
+            self.assertIsInstance(frame["force_index"], int)
+            self.assertIsInstance(frame["force_name"], str)
+            self.assertFalse(frame["unrelated_sentinel"]["enabled"])
+            self.assertIsNone(frame["unrelated_sentinel"]["queue"])
+            self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION},
+                             set(frame["prerequisite_flags"].keys()))
+
+        player_intent = old_pre["admin_intent"]["player"]
+        foreign_intent = old_pre["admin_intent"]["foreign"]
+        self.assertEqual((10, False, True, (WORKER, WORKER), .27),
+                         (player_intent["worker"]["level"], player_intent["worker"]["researched"],
+                          player_intent["worker"]["enabled"], tuple(player_intent["worker"]["queue"][index]
+                                                                        for index in range(1, len(player_intent["worker"]["queue"]) + 1)),
+                          player_intent["worker"]["progress"]))
+        self.assertEqual((11, True, (AUTOMATION,), .42),
+                         (foreign_intent["worker"]["level"], foreign_intent["worker"]["enabled"],
+                          tuple(foreign_intent["queue"][index] for index in range(1, len(foreign_intent["queue"]) + 1)),
+                          foreign_intent["progress"]))
+        self.assertEqual((CURRENT_SENTINEL, False), (old_pre["admin_intent"]["unrelated_sentinel"]["name"],
+                                                      old_pre["admin_intent"]["unrelated_sentinel"]["enabled"]))
+        self.assertEqual((10, True, 2, .27), (old_pre["player"]["worker"]["level"],
+                                               old_pre["player"]["worker"]["enabled"],
+                                               len(old_pre["player"]["worker"]["queue"]["queue"]),
+                                               old_pre["player"]["worker"]["queue"]["progress"]))
+        self.assertEqual((11, True, AUTOMATION, .42), (old_pre["foreign"]["worker"]["level"],
+                                                        old_pre["foreign"]["worker"]["enabled"],
+                                                        old_pre["foreign"]["worker"]["queue"]["current"],
+                                                        old_pre["foreign"]["worker"]["queue"]["progress"]))
+        self.assertEqual((13, True, False), (old_pre["earned_above_cap"]["worker"]["level"],
+                                              old_pre["earned_above_cap"]["worker"]["enabled"],
+                                              old_pre["earned_above_cap"]["worker"]["queue"]["current"]))
+
+        candidate = self.current_state_result()
+        self.assertTrue(candidate["ok"], candidate["message"])
+        self.assertEqual((1, 1), (candidate["saves"], candidate["labs"]))
+        candidate_markers = self._current_markers(candidate)
+        self.assertEqual({"current-provider", "current-pre-reset", "current-post-reset", "current-pre-work",
+                          "current-complete", "current-cold"}, set(candidate_markers))
+        candidate_pre, candidate_post, pre_work = (candidate_markers[phase] for phase in
+                                                    ("current-pre-reset", "current-post-reset", "current-pre-work"))
+        for role in ("player", "foreign", "earned_above_cap"):
+            self.assertEqual(self._current_frame_signature(old_pre[role]), self._current_frame_signature(candidate_pre[role]))
+        self.assertEqual("candidate16-reset-event-enforced", candidate_post["outcome"])
+        self.assertEqual((10, 1, .27), (candidate_post["player"]["worker"]["level"],
+                                        len(candidate_post["player"]["worker"]["queue"]["queue"]),
+                                        candidate_post["player"]["worker"]["queue"]["progress"]))
+        self.assertEqual((False, AUTOMATION, .42), (candidate_post["foreign"]["worker"]["enabled"],
+                                                     candidate_post["foreign"]["worker"]["queue"]["current"],
+                                                     candidate_post["foreign"]["worker"]["queue"]["progress"]))
+        self.assertEqual((13, False), (candidate_post["earned_above_cap"]["worker"]["level"],
+                                       candidate_post["earned_above_cap"]["worker"]["enabled"]))
+        self.assertIsInstance(pre_work["post_reset_player_bonus"], (int, float))
+        complete, cold = candidate_markers["current-complete"], candidate_markers["current-cold"]
+        self.assertEqual((1, 0, 2), (complete["ordinary_native_completion_count"],
+                                     complete["level_eleven_start_count"], complete["post_completion_hold_ticks"]))
+        for phase in (complete, cold):
+            self.assertEqual((WORKER, False), (phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"]))
+            self.assertIsInstance(phase["ordinary_events"][1]["tick"], int)
+        self.assertAlmostEqual(complete["post_reset_player_bonus"] + .65,
+                               complete["post_completion"]["player"]["worker"]["bonus"])
+        self.assertEqual(set(PACKS), set(complete["lab"]["input_by_name"].keys()))
+        self.assertTrue(all(complete["lab"]["input_by_name"][name] > 0 for name in PACKS))
+        self.assertEqual((True, 2), (cold["on_load_read_only"], cold["post_completion_hold_ticks"]))
+        for phase in (complete, cold):
+            self.assertEqual({"player", "foreign", "earned_above_cap"}, set(phase["completed_forces"].keys()))
+            for role in ("player", "foreign", "earned_above_cap"):
+                self.assertEqual(self._current_frame_signature(phase["completed_forces"][role]),
+                                 self._current_frame_signature(phase["post_completion"][role]))
+        self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-pre-reset.json",
+                          "worker-speed-cap-ten/current-post-reset.json", "worker-speed-cap-ten/current-pre-work.json",
+                          "worker-speed-cap-ten/current-complete.json", "worker-speed-cap-ten/current-cold.json",
+                          "worker-speed-cap-ten/current-cold.json"],
+                         [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
+
+    def test_current_state_controls_refuse_missing_or_extra_reset_and_boundary_mutation(self):
+        for opponent, phrase in {
+            "missing-prerequisite": "technology is absent: worker-robots-speed-9",
+            "missing-reset-event": "native reset event was not delivered synchronously",
+            "candidate-no-cap": "candidate player reset state differs",
+            "fourth-reset": "observed reset outside the declared three-force boundary",
+            "post-boundary-admin-write": "post-reset public state changed before ordinary lab work",
+            "post-boundary-sentinel-write": "current pre-work player unrelated sentinel is enabled",
+            "post-boundary-bonus-drift": "post-reset public state changed before ordinary lab work",
+            "missing-ordinary-event": "ordinary native level-ten event differs",
+            "await-eleven": "level eleven research started",
+            "after-eleven": "level eleven research started",
+            "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
+        }.items():
+            with self.subTest(opponent=opponent):
+                result = self.current_state_result("candidate", opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+        provider_sentinel = self.current_state_result("candidate", "sentinel-enabled")
+        self.assertFalse(provider_sentinel["ok"])
+        self.assertIn("current pre-reset player unrelated sentinel is enabled", provider_sentinel["message"])
+        provider = self._current_markers(provider_sentinel)["current-provider"]
+        self.assertTrue(provider["player"]["unrelated_sentinel"]["enabled"])
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        current = source.split("local function begin_current_state", 1)[1].split("function M.apply", 1)[0]
+        for forbidden in ("game.create_force", "add_research", "worker_robots_speed_modifier =", "storage[KEY]",
+                          "remote.", "script.raise_event", "enable_all_prototypes", "research_recursive"):
+            self.assertNotIn(forbidden, current)
+        self.assertIn('local roles = {"player", "foreign", "earned_above_cap"}', source)
+        self.assertIn("state.reset_call_count ~= 3", source)
 
     def test_library_observer_accepts_only_the_wrapper_report_of_the_full_active_tuple(self):
         """Bind the producer's wrapper call site to the real selection reader."""
