@@ -209,10 +209,19 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
   if not cap then return {ok = false, message = cap_message} end
   ok, result = invoke(cap.changed)
   if not ok then return {ok = false, message = result, markers = markers, logs = logs, saves = saved} end
+  local owner = player.technologies[WORKER]
+  if opponent == "await-level-eleven-start" then
+    owner.level = 11
+    ok, result = invoke(cap.events[3], {research = owner, tick = game.tick})
+    return {ok = ok, message = result}
+  end
+  if opponent == "level-ten-resumption" then
+    ok, result = invoke(cap.events[3], {research = owner, tick = game.tick})
+    if not ok then return {ok = false, message = result} end
+  end
   game.tick = game.tick + 1; ok, result = invoke(cap.events[1])
   if not ok then return {ok = false, message = result} end
   -- Model the one ordinary native completion after the fixture's exact feed.
-  local owner = player.technologies[WORKER]
   if opponent == "scripted-completion" then
     ok, result = invoke(cap.events[2], {research = owner, by_script = true, tick = game.tick})
     return {ok = ok, message = result}
@@ -287,6 +296,8 @@ end
     def test_source_is_create_only_and_cap_stage_observes_one_ordinary_completion_then_two_cold_reads(self):
         result = self.flow_result()
         self.assertTrue(result["ok"], result["message"])
+        level_ten_resumption = self.flow_result("level-ten-resumption")
+        self.assertTrue(level_ten_resumption["ok"], level_ten_resumption["message"])
         self.assertEqual((1, 1), (result["saves"], result["labs"]))
         markers = [result["markers"][index] for index in range(1, len(result["markers"]) + 1)]
         self.assertEqual(["source", "complete", "cold", "cold"], [row["phase"] for row in markers])
@@ -351,7 +362,8 @@ end
             "foreign-reenabled": "foreign disabled sentinel differs",
             "missing-prerequisite": "player worker predecessor is not researched",
             "scripted-completion": "scripted completion cannot satisfy ordinary cap-ten work",
-            "level-eleven-start": "ordinary completion started or consumed level eleven",
+            "await-level-eleven-start": "level eleven research started",
+            "level-eleven-start": "level eleven research started",
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):

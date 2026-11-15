@@ -404,10 +404,12 @@ function M.apply(stage)
   script.on_event(defines.events.on_research_started, function(event)
     if stage ~= "cap10" then return end
     local state = storage[KEY]
-    if type(state) ~= "table" or state.phase == "await-ordinary-level-ten" then return end
+    if type(state) ~= "table" then return end
     local player = game.forces.player
-    if event.research ~= nil and event.research.force == player and event.research.name == WORKER then
+    if event.research ~= nil and event.research.force == player and event.research.name == WORKER
+        and type(event.research.level) == "number" and event.research.level > 10 then
       state.level_eleven_start_count = state.level_eleven_start_count + 1
+      fail("level eleven research started")
     end
   end)
 
