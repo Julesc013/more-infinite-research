@@ -86,8 +86,117 @@ local function contracts(phase)
     end
   end
 end
+
+local function empty_modules(machine)
+  local modules=machine.get_inventory(defines.inventory.crafter_modules)
+  return modules==nil or modules.is_empty()
+end
+local function physical_machine(row)
+  local machine=row.machine
+  fail(machine and machine.valid~=false and machine.name==C.assembler,"synthetic assembler differs: "..row.id)
+  local input=machine.get_inventory(defines.inventory.crafter_input)
+  local output=machine.get_inventory(defines.inventory.crafter_output)
+  fail(input and output and empty_modules(machine),"synthetic assembler inventory/modules differ: "..row.id)
+  fail(type(machine.productivity_bonus)=="number" and C.close(machine.productivity_bonus,0),
+    "synthetic assembler productivity differs: "..row.id)
+  return machine,input,output
+end
+local function expected_output(row,phase)return phase=="F1" and row.kind=="companion" and 11 or 10 end
+local function expected_bonus(row,phase)return phase=="F1" and row.kind=="companion" and .1 or 0 end
+local function contents(inventory)
+  local rows={}
+  for name,count in pairs(inventory.get_contents())do rows[name]=count end
+  return rows
+end
+local function physical_snapshot(state)
+  local rows={}
+  for _,row in ipairs(state.physical.rows)do
+    local machine,input,output=physical_machine(row)
+    local selected_recipe=machine.get_recipe()
+    rows[#rows+1]={id=row.id,kind=row.kind,family=row.family,recipe=row.recipe,selected=selected_recipe and selected_recipe.name,
+      inserted=row.inserted or 0,input=input.get_item_count(C.physical_input),
+      consumed=(row.inserted or 0)-input.get_item_count(C.physical_input),output=output.get_item_count(C.physical_output),
+      input_contents=contents(input),output_contents=contents(output),
+      progress=machine.crafting_progress,bonus_progress=machine.bonus_progress,machine_productivity=machine.productivity_bonus,
+      modules_empty=empty_modules(machine)}
+  end
+  return rows
+end
+local function assert_snapshot(rows,phase)
+  for _,row in ipairs(rows or {})do
+    local output=expected_output(row,phase)
+    fail(row.selected==row.recipe and row.inserted==C.physical_batch and row.input==0 and row.consumed==C.physical_batch,
+      "synthetic physical input/recipe differs: "..row.id)
+    -- The exact integer output is the native productivity witness. `bonus_progress`
+    -- is a floating engine field, so only its zero remainder uses the bounded
+    -- numeric comparison shared by the fixture's F200/F210 observations.
+    fail(equal(row.input_contents,{}) and equal(row.output_contents,{[C.physical_output]=output})
+      and row.output==output and C.close(row.progress,0) and C.close(row.bonus_progress,0)
+      and C.close(row.machine_productivity,0) and row.modules_empty==true,
+      "synthetic physical output/state differs: "..row.id)
+  end
+end
+local function assert_physical(state,phase)
+  local physical=state.physical
+  fail(physical and type(physical.rows)=="table" and #physical.rows==#C.families+1,"physical cohort differs")
+  fail(physical.f0 and type(physical.f0)=="table","F0 physical baseline absent")
+  assert_snapshot(physical.f0,"F0")
+  if phase=="F0"then
+    fail(physical.phase=="F0-complete" and physical.f1==nil,"F0 physical phase differs")
+    fail(equal(physical_snapshot(state),physical.f0),"F0 physical machines drifted")
+  else
+    fail(physical.phase=="F1-complete" and physical.f1,"F1 physical witness absent")
+    assert_snapshot(physical.f1,"F1")
+    fail(equal(physical_snapshot(state),physical.f1),"F1 physical machines drifted")
+  end
+end
+local function start_physical(state,phase)
+  local physical=state.physical
+  if phase=="F1"then
+    fail(physical.phase=="F0-complete","F1 physical predecessor differs")
+    assert_physical(state,"F0")
+  else fail(phase=="F0" and physical.phase=="new","F0 physical predecessor differs")end
+  for _,row in ipairs(physical.rows)do
+    local machine,input,output=physical_machine(row)
+    local prior=output.get_item_count(C.physical_output)
+    if phase=="F1"then
+      fail(prior==10 and input.get_item_count(C.physical_input)==0 and C.close(machine.crafting_progress,0),
+        "F0 physical remainder differs: "..row.id)
+      fail(output.remove{name=C.physical_output,count=prior}==prior,"could not retire F0 physical output: "..row.id)
+    else fail(prior==0 and input.get_item_count(C.physical_input)==0 and C.close(machine.crafting_progress,0),
+      "new physical assembler was not empty: "..row.id)end
+    machine.set_recipe(row.recipe)
+    local selected_recipe=machine.get_recipe()
+    fail(selected_recipe and selected_recipe.name==row.recipe,"synthetic recipe selection differs: "..row.id)
+    local bonus=game.forces.player.recipes[row.recipe]
+    fail(bonus and C.close(bonus.productivity_bonus,expected_bonus(row,phase)),"synthetic recipe bonus differs: "..row.id)
+    local inserted=input.insert{name=C.physical_input,count=C.physical_batch}
+    fail(inserted==C.physical_batch,"synthetic physical input was partial: "..row.id)
+    row.inserted=inserted
+  end
+  physical.phase=phase.."-running";physical.deadline=game.tick+C.physical_deadline
+end
+local function tick_physical(state)
+  local physical=state.physical
+  if physical.phase~="F0-running" and physical.phase~="F1-running"then return nil end
+  fail(game.tick<=physical.deadline,"synthetic physical cohort timed out")
+  local phase=physical.phase:sub(1,2);local settled=true
+  for _,row in ipairs(physical.rows)do
+    local machine,input,output=physical_machine(row)
+    local produced=output.get_item_count(C.physical_output)
+    fail(produced<=expected_output(row,phase),"synthetic physical output exceeded expectation: "..row.id)
+    if input.get_item_count(C.physical_input)~=0 or not C.close(machine.crafting_progress,0)then settled=false
+    elseif produced~=expected_output(row,phase)then fail("synthetic physical output differs: "..row.id)end
+  end
+  if not settled then return nil end
+  local snapshot=physical_snapshot(state);assert_snapshot(snapshot,phase)
+  physical[phase:lower()]=copy(snapshot);physical.phase=phase.."-complete"
+  return phase
+end
 local function frame(state)
-  local force=game.forces.player;local out={phase=state.phase,ordinary=copy(state.ordinary),science=copy(state.inserted),families={}}
+  local force=game.forces.player
+  local physical=state.physical and {phase=state.physical.phase,f0=copy(state.physical.f0),f1=copy(state.physical.f1),current=physical_snapshot(state)}or nil
+  local out={phase=state.phase,ordinary=copy(state.ordinary),science=copy(state.inserted),physical=physical,families={}}
   for _,family in ipairs(C.families)do
     local row={main=completed(tech(C.main(family))),holders={},bonus={},references={}}
     for _,recipe in ipairs(family.routes)do
@@ -112,8 +221,8 @@ end
 local function marker(kind,state,detail)
   log("[mir-native-credit-vectors-allfive] "..helpers.table_to_json({kind=kind,tick=game.tick,
     phase=selected(),frame=frame(state),detail=detail,
-    scope={controlled_synthetic_mechanism=true,reporter_reproduction=false,scrap97_separate=true,
-      mir_runtime_imported=false,mir_ledger_written=false,shared_world_families=5}}))
+    scope={controlled_synthetic_mechanism=true,synthetic_companion_production=true,anchor_recipe_mutated=false,
+      reporter_reproduction=false,scrap97_separate=true,mir_runtime_imported=false,mir_ledger_written=false,shared_world_families=5}}))
 end
 local function assert_state(state,phase,wanted)
   contracts(phase)
@@ -152,6 +261,19 @@ local function prepare(state)
       prerequisite.research_recursive()
     end
   end
+  state.physical={phase="new",rows={}}
+  for index,family in ipairs(C.families)do
+    local recipe=family.extra[family.physical]
+    state.physical.rows[#state.physical.rows+1]={id=family.key,kind="companion",family=family.key,recipe=recipe,
+      machine=surface.create_entity{name=C.assembler,position={index*3,4},force=force}}
+  end
+  state.physical.rows[#state.physical.rows+1]={id="public-only",kind="public-only",family="research_low_density_structure",
+    recipe=C.public_physical,machine=surface.create_entity{name=C.assembler,position={18,4},force=force}}
+  for _,row in ipairs(state.physical.rows)do
+    local machine=physical_machine(row)
+    machine.set_recipe(row.recipe)
+  end
+  start_physical(state,"F0")
 end
 local function enqueue_all(state)
   local force=game.forces.player;local queue={};state.mains={};state.inserted={};state.ordinary={}
@@ -168,7 +290,7 @@ end
 remote.add_interface("mir_native_credit_vectors_allfive",{observe=function()local state=storage[C.key];return state and frame(state)end})
 script.on_init(function()
   fail(selected()=="F0","new shared world must begin at F0")
-  local state={phase="f0-ready",ordinary={},mains={},inserted={}}
+  local state={phase="f0-physical",ordinary={},mains={},inserted={}}
   storage[C.key]=state;contracts("F0");assert_state(state,"F0",{positive=0,negative=0,bonus=0})
   prepare(state);marker("initial",state)
 end)
@@ -185,11 +307,11 @@ script.on_configuration_changed(function(event)
   fail(change and change.new_version==script.active_mods[C.mod],"fixture configuration version differs")
   if phase=="F1"then
     fail(state and state.phase=="f0-saved" and change.old_version=="0.1.0" and change.new_version=="0.2.0","F1 transition differs")
-    each_completed(state,1);assert_state(state,"F1",{positive=0,negative=1,bonus=0})
+    each_completed(state,1);assert_state(state,"F1",{positive=0,negative=1,bonus=0});assert_physical(state,"F0")
     save(state,"f1-negative-saved","native-credit-allfive-f1-negative")
   elseif phase=="F2"then
     fail(state and state.phase=="f1-saved" and change.old_version=="0.2.0" and change.new_version=="0.3.0","F2 transition differs")
-    each_completed(state,2);assert_state(state,"F2",{positive=1,negative=0,bonus=.1})
+    each_completed(state,2);assert_state(state,"F2",{positive=1,negative=0,bonus=.1});assert_physical(state,"F2")
     save(state,"f2-positive-saved","native-credit-allfive-f2-positive")
   else fail(false,"unexpected configuration phase")end
 end)
@@ -203,12 +325,22 @@ script.on_event(defines.events.on_research_finished,function(event)
   if all then
     state.lab.disabled_by_script=true
     local phase=selected()
-    if phase=="F0"then each_completed(state,1);assert_state(state,"F0",{positive=0,negative=0,bonus=0});save(state,"f0-saved","native-credit-allfive-f0")
-    else each_completed(state,2);assert_state(state,"F1",{positive=0,negative=1,bonus=.1});save(state,"f1-saved","native-credit-allfive-f1")end
+    if phase=="F0"then
+      each_completed(state,1);assert_state(state,"F0",{positive=0,negative=0,bonus=0});assert_physical(state,"F0")
+      save(state,"f0-saved","native-credit-allfive-f0")
+    else
+      each_completed(state,2);assert_state(state,"F1",{positive=0,negative=1,bonus=.1});assert_physical(state,"F0")
+      state.phase="f1-physical";start_physical(state,"F1");marker("physical-f1-start",state)
+    end
   end
 end)
 script.on_event(defines.events.on_tick,function()
   local state=storage[C.key];if not state then return end
+  local complete=tick_physical(state)
+  if complete=="F0"then state.phase="f0-ready";marker("physical-f0-complete",state);return end
+  if complete=="F1"then
+    assert_physical(state,"F1");save(state,"f1-saved","native-credit-allfive-f1");return
+  end
   if cold then
     fail(state.endpoint and game.tick==state.saved_tick+1 and equal(frame(state),state.endpoint),"immutable cold endpoint differs")
     cold=false;marker("cold",state);return

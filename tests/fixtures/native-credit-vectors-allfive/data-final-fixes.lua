@@ -1,4 +1,4 @@
--- Runs after exact MIR through info.json. All prototype changes here are
+-- Runs after the bounded 5.0.14/5.0.15 MIR dependency through info.json. All prototype changes here are
 -- controlled fixture mechanism, not a report about any external modpack.
 local C=require("contract")
 local _,_,phase=C.phase(mods)
@@ -13,12 +13,11 @@ local function effect(technology,recipe,change)
     end
   end
 end
-local function clone_recipe(source,name)
+local function controlled_recipe(name)
   C.require(data.raw.recipe[name]==nil,"fixture recipe exists: "..name)
-  local row=table.deepcopy(data.raw.recipe[source])
-  C.require(row and row.type=="recipe" and row.name==source,"source recipe missing: "..source)
-  row.name=name;row.enabled=false;row.hidden=true
-  data:extend({row})
+  data:extend({{type="recipe",name=name,category="crafting",enabled=true,hidden=true,allow_productivity=true,
+    ingredients={{type="item",name=C.physical_input,amount=1}},results={{type="item",name=C.physical_output,amount=1}},
+    main_product=C.physical_output,auto_recycle=false}})
 end
 local function append(technology,recipe,change)
   C.require(not effect(technology,recipe,change),"fixture effect exists: "..technology.name..":"..recipe)
@@ -71,7 +70,7 @@ for _,family in ipairs(C.families)do
     -- Ensure the real public reference still owns the actual route before the
     -- fixture adds any controlled companion or public-only component.
     C.require(effect(reference,recipe,.1),"public reference route differs: "..reference_name..":"..recipe)
-    clone_recipe(recipe,extra)
+    controlled_recipe(extra)
     append(reference,extra,.1)
     for _,sign in ipairs({"positive","negative"})do
       local holder=technologies[C.carrier(family,recipe,sign)]
@@ -85,7 +84,7 @@ for _,family in ipairs(C.families)do
       -- exact signed holder. F0 carries no basis; F2 retires it again.
       append(main,recipe,.1);append(main,extra,.1)
     end
-    clone_recipe(recipe,public_only)
+    controlled_recipe(public_only)
     -- Every controlled public-only component stays exclusively on the foreign
     -- reference selected for this exact carrier route. In particular, Scrap
     -- retains its independently authored productivity reference.

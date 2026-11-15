@@ -422,9 +422,10 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
           function allfive_data_case(target,phase,opponent)
             local tuple=C.targets[target]
             mods={base=tuple.base,["space-age"]=tuple.base,quality=tuple.base,["elevated-rails"]=tuple.base,
-              ["more-infinite-research"]=tuple.mir,[C.mod]=phase,[C.upstream]="0.1.0"}
+              ["more-infinite-research"]=tuple.mir15,[C.mod]=phase,[C.upstream]="0.1.0"}
             if tuple.recycler then mods.recycler=tuple.base end
-            data={raw={technology={},recipe={},lab={lab={type="lab",name="lab"}},["mod-data"]={}}}
+            data={raw={technology={},recipe={},lab={lab={type="lab",name="lab"}},
+              ["assembling-machine"]={["assembling-machine-1"]={type="assembling-machine",name="assembling-machine-1"}},["mod-data"]={}}}
             function data:extend(rows)for _,row in ipairs(rows)do self.raw[row.type]=self.raw[row.type]or{};assert(self.raw[row.type][row.name]==nil,"duplicate "..row.name);self.raw[row.type][row.name]=row end end
             local credits={}
             for _,family in ipairs(C.families)do
@@ -460,7 +461,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
           function allfive_shared_actor_case(target,opponent)
             local tuple=C.targets[target];local callbacks,commands_map,saves={}, {}, {};storage={}
             local mods={base=tuple.base,["space-age"]=tuple.base,quality=tuple.base,["elevated-rails"]=tuple.base,
-              ["more-infinite-research"]=tuple.mir,[C.mod]="0.1.0",[C.upstream]="0.1.0"}
+              ["more-infinite-research"]=tuple.mir15,[C.mod]="0.1.0",[C.upstream]="0.1.0"}
             if tuple.recycler then mods.recycler=tuple.base end
             local queue={};local force={technologies={},recipes={},laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
             setmetatable(force,{__index=function(_,key)if key=="research_queue"then return queue end end,
@@ -499,16 +500,62 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
               end
               for reference,names in pairs(references)do technology(reference,vector(names,1),false,true)end
             end
-            local inventory={counts={}}
-            function inventory.insert(row)inventory.counts[row.name]=(inventory.counts[row.name]or 0)+row.count;return row.count end
-            function inventory.get_item_count(name)return inventory.counts[name]or 0 end
+            local function inventory()
+              local value={counts={}}
+              function value.insert(row)
+                local accepted=row.count
+                if opponent=="partial-input" and row.name==C.physical_input then accepted=math.max(0,row.count-1)end
+                value.counts[row.name]=(value.counts[row.name]or 0)+accepted;return accepted
+              end
+              function value.get_item_count(name)return value.counts[name]or 0 end
+              function value.get_contents()
+                local rows={};for name,count in pairs(value.counts)do if count~=0 then rows[name]=count end end;return rows
+              end
+              function value.remove(row)
+                local count=math.min(value.counts[row.name]or 0,row.count);value.counts[row.name]=(value.counts[row.name]or 0)-count;return count
+              end
+              function value.is_empty()for _,count in pairs(value.counts)do if count~=0 then return false end end;return true end
+              return value
+            end
+            local lab_inventory=inventory()
             local lab={valid=true,disabled_by_script=false,name=C.lab,prototype={}}
             lab.prototype.get_researching_speed=function(quality)assert(quality=="normal");return 3600 end
-            lab.get_inventory=function()return inventory end
+            lab.get_inventory=function()return lab_inventory end
+            local machines={}
+            local function machine()
+              local input,output=inventory(),inventory()
+              local value={name=C.assembler,valid=true,productivity_bonus=0,crafting_progress=0,bonus_progress=0}
+              function value.get_inventory(which)
+                if which==2 then return input elseif which==3 then return output elseif which==4 then return nil end
+              end
+              function value.set_recipe(name)value.recipe={name=name}end
+              function value.get_recipe()return value.recipe end
+              machines[#machines+1]=value;return value
+            end
             local game={tick=0,forces={player=force},surfaces={{}},server_save=function(name)saves[#saves+1]=name end}
-            game.surfaces[1].create_entity=function(row)assert(row.name==C.lab and row.force==force);return lab end
+            game.surfaces[1].create_entity=function(row)
+              assert(row.force==force)
+              if row.name==C.lab then return lab end
+              assert(row.name==C.assembler);return machine()
+            end
+            local function advance_machines()
+              for _,value in ipairs(machines)do
+                local input,output=value.get_inventory(2),value.get_inventory(3)
+                if value.recipe and input.get_item_count(C.physical_input)>0 then
+                  if opponent=="ongoing"then value.crafting_progress=.5
+                  else
+                    local consumed=input.remove{name=C.physical_input,count=input.get_item_count(C.physical_input)}
+                    local bonus=force.recipes[value.recipe.name].productivity_bonus
+                    local made=consumed+(bonus>0 and 1 or 0)
+                    if opponent=="wrong-output"then made=made-1 end
+                    output.insert{name=C.physical_output,count=made};value.crafting_progress=0;value.bonus_progress=0
+                    if opponent=="extra-output"then output.insert{name="stone",count=1}end
+                  end
+                end
+              end
+            end
             local env={storage=storage,game=game,script={active_mods=mods},remote={add_interface=function()end},commands={},
-              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},helpers={table_to_json=function()return "record"end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1,crafter_input=2,crafter_output=3,crafter_modules=4}},helpers={table_to_json=function()return "record"end},
               log=function()end,require=require,pairs=pairs,ipairs=ipairs,next=next,type=type,tostring=tostring,math=math,error=error}
             env.script.on_init=function(fn)callbacks.init=fn end;env.script.on_load=function(fn)callbacks.load=fn end
             env.script.on_configuration_changed=function(fn)callbacks.config=fn end
@@ -516,11 +563,16 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             env.commands.add_command=function(name,_,fn)commands_map[name]=fn end
             package.preload["__mir-fixture-native-credit-vectors-allfive__/contract"]=function()return C end
             assert(loadfile(fixture_path.."/control.lua","t",env))();callbacks.init()
+            local function engine_tick()
+              game.tick=game.tick+1;advance_machines();callbacks.tick()
+            end
+            if opponent=="ongoing"then game.tick=storage[C.key].physical.deadline+1;callbacks.tick()
+            else engine_tick()end
             local function cold_reads()
               for _=1,2 do game.tick=storage[C.key].saved_tick;callbacks.load();game.tick=game.tick+1;callbacks.tick()end
             end
             local function finish_cohort(phase)
-              callbacks.tick()
+              engine_tick()
               for _,family in ipairs(C.families)do
                 local main=force.technologies[C.main(family)];main.level=main.level+1
                 if phase=="F1"then
@@ -535,7 +587,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
               force.technologies[C.carrier(family,recipe,"negative")].level=2
             end end
             callbacks.config{mod_changes={[C.mod]={old_version="0.1.0",new_version="0.2.0"}}};cold_reads()
-            commands_map["mir-native-credit-vectors-allfive"]{player_index=nil,parameter="continue"};finish_cohort("F1");cold_reads()
+            commands_map["mir-native-credit-vectors-allfive"]{player_index=nil,parameter="continue"};finish_cohort("F1");engine_tick();cold_reads()
             mods[C.mod]="0.3.0";family_shape("F2")
             for _,family in ipairs(C.families)do for _,recipe in ipairs(family.routes)do
               force.technologies[C.carrier(family,recipe,"negative")].level=1
@@ -544,6 +596,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             callbacks.config{mod_changes={[C.mod]={old_version="0.2.0",new_version="0.3.0"}}}
             if opponent=="cold-string"then storage[C.key].endpoint.phase="wrong"end
             if opponent=="cold-boolean"then storage[C.key].endpoint.boolean_mutant=true end
+            if opponent=="cold-physical"then storage[C.key].endpoint.physical.current[1].output=12 end
             cold_reads();assert(#saves==4 and saves[1]=="native-credit-allfive-f0" and saves[2]=="native-credit-allfive-f1-negative"
               and saves[3]=="native-credit-allfive-f1" and saves[4]=="native-credit-allfive-f2-positive",
               "save sequence "..#saves..":"..tostring(saves[1])..":"..tostring(saves[2])..":"..tostring(saves[3])..":"..tostring(saves[4]))
@@ -561,19 +614,23 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
         self.current_vectors = self.lua.execute(
             (ROOT / "source/runtime/native_credit_vectors.lua").read_text())
 
-    def test_exact_15_fixture_tuples_and_synthetic_scope(self):
+    def test_exact_14_15_fixture_tuples_and_synthetic_scope(self):
         expected = {
             "f200": ("2.0.77", "5.0.20015", "2.0", False),
             "f210": ("2.1.24", "5.0.21015", "2.1", True),
         }
         contract = (ALL_FIVE_FIXTURE / "contract.lua").read_text()
+        actor = (ALL_FIVE_FIXTURE / "control.lua").read_text()
         self.assertIn("controlled synthetic fixture", (ALL_FIVE_FIXTURE / "README.md").read_text())
         self.assertIn("Scrap97", (ALL_FIVE_FIXTURE / "README.md").read_text())
-        self.assertNotIn("require(\"runtime.", (ALL_FIVE_FIXTURE / "control.lua").read_text())
-        self.assertNotRegex((ALL_FIVE_FIXTURE / "control.lua").read_text(), r"storage\.mir_native_credits")
-        self.assertIn("game.server_save", (ALL_FIVE_FIXTURE / "control.lua").read_text())
-        self.assertIn("script.on_load", (ALL_FIVE_FIXTURE / "control.lua").read_text())
-        self.assertIn("event.by_script==false", (ALL_FIVE_FIXTURE / "control.lua").read_text())
+        self.assertNotIn("require(\"runtime.", actor)
+        self.assertNotRegex(actor, r"storage\.mir_native_credits")
+        self.assertNotRegex(actor, r"\.productivity_bonus\s*=")
+        self.assertNotRegex(actor, r"\.level\s*=")
+        self.assertIn("game.server_save", actor)
+        self.assertIn("script.on_load", actor)
+        self.assertIn("event.by_script==false", actor)
+        self.assertIn("synthetic_companion_production=true", actor)
         self.assertNotIn("Cerys", contract)
         for target, (base, mir, factorio, recycler) in expected.items():
             upstream = json.loads((ALL_FIVE_UPSTREAM / f"info-{target}.json").read_text())
@@ -589,7 +646,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
                 dependencies = set(info["dependencies"])
                 self.assertIn(f"base = {base}", dependencies)
                 self.assertIn("a-mir-fixture-native-credit-vectors-allfive-upstream = 0.1.0", dependencies)
-                self.assertIn(f"more-infinite-research = {mir}", dependencies)
+                self.assertIn(f"more-infinite-research >= {mir[:-2]}14", dependencies)
                 self.assertEqual(recycler, any(row.startswith("recycler =") for row in dependencies))
                 active = {"base": base, "space-age": base, "quality": base, "elevated-rails": base,
                           "more-infinite-research": mir, "mir-fixture-native-credit-vectors-allfive": version,
@@ -598,16 +655,23 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
                     active["recycler"] = base
                 self.assertEqual(target, self.lua.globals().C.target(self.lua.table_from(active))[0])
                 self.assertEqual(phase.upper(), self.lua.globals().C.phase(self.lua.table_from(active))[2])
+                active["more-infinite-research"] = mir[:-2] + "14"
+                self.assertEqual(target, self.lua.globals().C.target(self.lua.table_from(active))[0])
                 with self.assertRaises(LuaError):
                     self.lua.globals().C.target(self.lua.table_from(active | {"unknown": "1.0.0"}))
                 with self.assertRaises(LuaError):
-                    self.lua.globals().C.target(self.lua.table_from(active | {"more-infinite-research": mir[:-2] + "14"}))
+                    self.lua.globals().C.target(self.lua.table_from(active | {"more-infinite-research": mir[:-2] + "13"}))
+                with self.assertRaises(LuaError):
+                    self.lua.globals().C.target(self.lua.table_from(active | {"more-infinite-research": mir[:-2] + "16"}))
 
     def test_data_fixture_expands_each_actual_carrier_but_only_public_references_get_public_only_recipes(self):
         for target in ("f200", "f210"):
             for phase, version in (("F0", "0.1.0"), ("F1", "0.2.0"), ("F2", "0.3.0")):
                 raw = self.lua.globals().allfive_data_case(target, version, "")
                 technologies, recipes = raw["technology"], raw["recipe"]
+                assembler = raw["assembling-machine"][self.lua.globals().C.assembler]
+                self.assertEqual("void", assembler["energy_source"]["type"])
+                self.assertEqual(0, assembler["module_slots"])
                 for family in self.lua.globals().C.families.values():
                     main = technologies[self.lua.globals().C.main(family)]
                     main_recipes = {effect["recipe"] for effect in main["effects"].values()}
@@ -620,6 +684,13 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
                         reference_recipes = {effect["recipe"] for effect in reference["effects"].values()}
                         self.assertIn(public_only, reference_recipes)
                         self.assertIn(extra, reference_recipes)
+                        for synthetic in (extra, public_only):
+                            row = recipes[synthetic]
+                            self.assertTrue(row["enabled"])
+                            self.assertTrue(row["allow_productivity"])
+                            self.assertEqual("iron-gear-wheel", row["main_product"])
+                            self.assertEqual(("iron-plate", 1), (row["ingredients"][1]["name"], row["ingredients"][1]["amount"]))
+                            self.assertEqual(("iron-gear-wheel", 1), (row["results"][1]["name"], row["results"][1]["amount"]))
                         self.assertEqual(phase == "F1", recipe in main_recipes)
                         self.assertEqual(phase == "F1", extra in main_recipes)
                         for sign in ("positive", "negative"):
@@ -656,6 +727,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
               if case_target=="f210"then mods.recycler=case_base end
               package.loaded["research.settings"]=nil
               data=full_world(mods,true);data.raw.lab.lab={type="lab",name="lab",inputs={}}
+              data.raw["assembling-machine"]={["assembling-machine-1"]={type="assembling-machine",name="assembling-machine-1"}}
               table.deepcopy=function(value)
                 if type(value)~="table"then return value end
                 local result={};for key,child in pairs(value)do result[key]=table.deepcopy(child)end;return result
@@ -720,6 +792,22 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             endpoint = self.lua.globals().allfive_shared_actor_case(target, "")
             self.assertEqual("f2-positive-saved", endpoint["phase"])
             self.assertTrue(all(endpoint["science"][pack] > 0 for pack in self.lua.globals().C.packs.values()))
+            physical = endpoint["physical"]
+            self.assertEqual("F1-complete", physical["phase"])
+            self.assertEqual(6, len(list(physical["f0"].values())))
+            self.assertEqual(6, len(list(physical["f1"].values())))
+            for row in physical["f0"].values():
+                self.assertEqual((10, 10, 0, 10), (row["inserted"], row["consumed"], row["input"], row["output"]))
+                self.assertEqual({}, dict(row["input_contents"].items()))
+                self.assertEqual({"iron-gear-wheel": 10}, dict(row["output_contents"].items()))
+            for row in physical["f1"].values():
+                expected = 11 if row["kind"] == "companion" else 10
+                self.assertEqual((10, 10, 0, expected), (row["inserted"], row["consumed"], row["input"], row["output"]))
+                self.assertEqual({}, dict(row["input_contents"].items()))
+                self.assertEqual({"iron-gear-wheel": expected}, dict(row["output_contents"].items()))
+                self.assertEqual(0, row["progress"])
+                self.assertEqual(0, row["machine_productivity"])
+                self.assertTrue(row["modules_empty"])
             self.assertEqual(5, len(list(endpoint["families"].values())))
             for row in endpoint["families"].values():
                 self.assertEqual(2, row["main"])
@@ -729,8 +817,13 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
                 self.assertTrue(all(reference["level"] == 1 and not reference["researched"]
                                     for reference in row["references"].values()))
         for opponent, refusal in (("scripted", "ordinary family completion differs"),
+                                  ("partial-input", "synthetic physical input was partial"),
+                                  ("wrong-output", "synthetic physical output/state differs"),
+                                  ("extra-output", "synthetic physical output/state differs"),
+                                  ("ongoing", "synthetic physical cohort timed out"),
                                   ("cold-string", "immutable cold endpoint differs"),
-                                  ("cold-boolean", "immutable cold endpoint differs")):
+                                  ("cold-boolean", "immutable cold endpoint differs"),
+                                  ("cold-physical", "immutable cold endpoint differs")):
             with self.subTest(opponent=opponent):
                 with self.assertRaisesRegex(LuaError, refusal):
                     self.lua.globals().allfive_shared_actor_case("f200", opponent)
