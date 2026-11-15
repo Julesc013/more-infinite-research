@@ -22,6 +22,7 @@ LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
 DEEP_SCIENCE = "se-deep-space-science-pack-1"
+UNRELATED = "mir-fixture-unrelated-disabled"
 CAP = "mir-max-level-worker-robots-speed"
 PACKS = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -39,6 +40,7 @@ local caps = require("runtime.caps")
 local KEY = "mir5_worker_speed_cap_ten"
 local WORKER, PREDECESSOR = "worker-robots-speed-10", "worker-robots-speed-9"
 local DEEP, PROBE, AUTOMATION = "se-deep-space-science-pack-1", "automation", "automation-science-pack"
+local UNRELATED = "mir-fixture-unrelated-disabled"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "utility-science-pack", "space-science-pack", "se-rocket-science-pack",
@@ -87,8 +89,9 @@ local function tech(name,force,wrong_energy)
 end
 local function force(name,index,wrong_energy)
   local f={name=name,index=index,valid=true,technologies={},_queue={},current_research=nil,research_progress=0,worker_robots_speed_modifier=0}
-  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP})do f.technologies[n]=tech(n,f,wrong_energy)end
-  function f.enable_all_prototypes()end
+  for _,n in ipairs({WORKER,PROBE,AUTOMATION,PREDECESSOR,DEEP,UNRELATED})do f.technologies[n]=tech(n,f,wrong_energy)end
+  f.technologies[UNRELATED].enabled,f.technologies[UNRELATED].researched=false,false
+  function f.enable_all_prototypes()error("broad prototype enablement is forbidden by this fixture")end
   function f.reset_technology_effects()f.worker_robots_speed_modifier=(f.technologies[WORKER].level-1)*.65 end
   function f.add_research(r)
     if type(r)=="string"then r=f.technologies[r]end;if not r or r.enabled~=true or f.current_research then return false end
@@ -192,6 +195,8 @@ end
         self.assertEqual((11, False, "automation", .42), (adverse["foreign"]["level"], adverse["foreign"]["enabled"], adverse["foreign"]["queue"]["current"], adverse["foreign"]["queue"]["progress"]))
         self.assertEqual((13, True, False), (adverse["earned_above_cap"]["level"], adverse["earned_above_cap"]["enabled"], adverse["earned_above_cap"]["queue"]["current"]))
         self.assertFalse(adverse["lab"]["present"]); self.assertEqual(0, adverse["ordinary_native_completion_count"])
+        self.assertTrue(all(result[force]["technologies"][UNRELATED]["enabled"] is False
+                            for force in ("player", "foreign", "earned")))
         self.assertNotIn("cap_owner", {key: adverse[key] for key in adverse})
         self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/old-negative.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
 

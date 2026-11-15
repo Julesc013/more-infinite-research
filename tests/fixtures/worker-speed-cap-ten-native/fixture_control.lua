@@ -277,7 +277,6 @@ local function marker(phase, state)
 end
 
 local function seed_foreign(foreign)
-  foreign.enable_all_prototypes()
   seed_worker_prerequisites(foreign, "foreign")
   local science = technology(foreign, AUTOMATION_SCIENCE)
   science.researched, science.enabled = true, true
@@ -293,7 +292,6 @@ local function seed_foreign(foreign)
 end
 
 local function seed_earned(earned)
-  earned.enable_all_prototypes()
   seed_worker_prerequisites(earned, "earned")
   local owner = technology(earned, WORKER)
   owner.level, owner.researched = EARNED_LEVEL, false
@@ -384,7 +382,6 @@ function M.apply(stage)
     storage[KEY] = state
     local player = game.forces.player
     state.player_force_index = player.index
-    player.enable_all_prototypes()
     seed_worker_prerequisites(player, "player")
     local owner = technology(player, WORKER)
     owner.level, owner.researched = 10, false
