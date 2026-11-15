@@ -26,26 +26,34 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           table.deepcopy=clone
           function data_case(phase,opponent)
             mods={base='2.1.23',['space-age']='2.1.23',quality='2.1.23',['elevated-rails']='2.1.23',recycler='2.1.23',
-              ['more-infinite-research']='5.0.21012',[C.mod]=phase}
+              ['more-infinite-research']='5.0.21015',[C.mod]=phase}
             settings={startup={['mir-prefer-this-mod-for-competing-techs']={value=true}}}
             data={raw={technology={},recipe={},lab={lab={type='lab',name='lab'}},['mod-data']={}}}
             function data:extend(rows)for _,v in ipairs(rows)do self.raw[v.type]=self.raw[v.type]or{};assert(self.raw[v.type][v.name]==nil);self.raw[v.type][v.name]=v end end
             local tech=data.raw.technology
-            tech[C.main]={name=C.main,hidden=true,effects={},unit={count_formula='8000*2^(L-1)',time=60,
-              ingredients={{'automation-science-pack',1},{'logistic-science-pack',1},{'chemical-science-pack',1},{'production-science-pack',1}}}}
+            local function unit()return {count_formula='8000*2^(L-1)',time=60,
+              ingredients={{'automation-science-pack',1},{'logistic-science-pack',1},{'chemical-science-pack',1},{'production-science-pack',1}}}end
             local rows={}
-            for _,recipe in ipairs({'low-density-structure','casting-low-density-structure','scrap-recycling'})do
-              rows[#rows+1]={recipe=recipe,change=.1}
-              for _,sign in ipairs({'positive','negative'})do
-                tech[C.carrier(recipe,sign)]={hidden=true,enabled=false,effects={{type='change-recipe-productivity',recipe=recipe,change=sign=='positive'and .1 or -.1}}}
+            for _,family in ipairs(C.families)do
+              tech[family.main]={name=family.main,hidden=true,effects={},unit=unit()}
+              rows[family.family]={}
+              for _,route in ipairs(family.routes)do
+                rows[family.family][#rows[family.family]+1]={recipe=route.recipe,change=.1}
+                data.raw.recipe[route.recipe]={type='recipe',name=route.recipe}
+                for _,sign in ipairs({'positive','negative'})do
+                  tech[C.carrier_for(route.family,route.recipe,sign)]={hidden=true,enabled=false,
+                    effects={{type='change-recipe-productivity',recipe=route.recipe,change=sign=='positive'and .1 or -.1}}}
+                end
               end
             end
-            tech[C.public]={effects={{type='change-recipe-productivity',recipe='scrap-recycling',change=.1}}}
-            tech['processing-unit-productivity']={effects={{type='change-recipe-productivity',recipe='processing-unit',change=.1}}}
-            data.raw['mod-data']['more-infinite-research-native-adoptions']={data={credits={research_low_density_structure=rows}}}
-            data.raw.recipe['processing-unit']={type='recipe',name='processing-unit'}
-            data.raw.recipe['scrap-recycling']={type='recipe',name='scrap-recycling'}
-            if opponent=='foreign-extra'then data.raw['mod-data']['more-infinite-research-native-adoptions'].data.credits.research_low_density_structure[4]={recipe='unknown',change=.1}end
+            for reference,names in pairs(C.base_reference_vectors)do
+              tech[reference]={effects={}}
+              for _,recipe in ipairs(names)do tech[reference].effects[#tech[reference].effects+1]={type='change-recipe-productivity',recipe=recipe,change=.1}end
+            end
+            data.raw['mod-data']['more-infinite-research-native-adoptions']={data={credits=rows}}
+            if opponent=='foreign-extra'then rows.research_low_density_structure[4]={recipe='unknown',change=.1}end
+            if opponent=='missing-family'then rows.research_steel=nil end
+            if opponent=='missing-route'then table.remove(rows.research_rocket_fuel)end
             if opponent=='changed-time'then tech[C.main].unit.time=1 end
             if opponent=='changed-formula'then tech[C.main].unit.count_formula='1'end
             if opponent=='missing-pack'then table.remove(tech[C.main].unit.ingredients)end
@@ -66,7 +74,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           storage={};last_storage=storage;last_logs=logs;last_saves=saves
           local base=target=='f200'and'2.0.77'or'2.1.23'
           local mods={base=base,['space-age']=base,quality=base,['elevated-rails']=base,
-            ['more-infinite-research']=target=='f200'and'5.0.20012'or'5.0.21012',[C.mod]='0.1.0'}
+            ['more-infinite-research']=target=='f200'and'5.0.20015'or'5.0.21015',[C.mod]='0.1.0'}
           if target=='f210' then mods.recycler=base end
           if opponent=='wrong-engine'then mods.base='2.1.24'end
           if opponent=='wrong-mir'then mods['more-infinite-research']='5.0.21013'end
@@ -106,29 +114,58 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             setmetatable(t,{__index=function(_,k)if k=='research_unit_count'then return 8000*2^(t.level-1)end end})
             f.technologies[id]=t;return t
           end
-          local main=tech(C.main,C.singles)
-          tech(C.public,C.recipes)
+          local function main_names(family,phase)
+            local names={};if phase=='F2'then return names end
+            for _,route in ipairs(family.routes)do
+              if phase=='F1'or route.f0 then
+                for _,name in ipairs(C.carrier_vector(route))do names[#names+1]=name end
+              end
+            end
+            return names
+          end
+          local mains={}
+          for _,family in ipairs(C.families)do mains[family.main]=tech(family.main,main_names(family,'F0'))end
+          local main=mains[C.main]
+          for _,reference in ipairs(C.reference_ids)do tech(reference,C.reference_vectors[reference])end
           local sentinel=tech(C.sentinel,{});sentinel.prototype.max_level=1
-          for _,recipe in ipairs({'scrap-recycling','low-density-structure','casting-low-density-structure'})do
-            for _,sign in ipairs({'positive','negative'})do tech(C.carrier(recipe,sign),recipe=='scrap-recycling'and C.recipes or{recipe},sign=='positive'and 1 or -1,true)end
+          for _,route in ipairs(C.routes)do
+            for _,sign in ipairs({'positive','negative'})do
+              tech(C.carrier_for(route.family,route.recipe,sign),C.carrier_vector(route),sign=='positive'and 1 or -1,true)
+            end
           end
           local prerequisite=tech('production-science-pack',{});prerequisite.prototype.max_level=1
           prerequisite.research_recursive=function()prerequisite.researched=true;callbacks.finished{research=prerequisite,by_script=true}end
-          main.prerequisites[prerequisite.name]=prerequisite
+          for _,id in ipairs(C.main_ids)do mains[id].prerequisites[prerequisite.name]=prerequisite end
           local function count(t)return t.level-1+(t.researched and 1 or 0)end
-          local function offset(recipe,n)
-            f.technologies[C.carrier(recipe,'positive')].level=1+math.max(n,0)
-            f.technologies[C.carrier(recipe,'negative')].level=1+math.max(-n,0)
+          local function recompute_bonus()
+            for _,name in ipairs(C.observed_recipes)do f.recipes[name]={productivity_bonus=0}end
+            for _,t in pairs(f.technologies)do
+              local n=count(t)
+              for _,effect in ipairs(t.prototype.effects)do
+                if f.recipes[effect.recipe]then f.recipes[effect.recipe].productivity_bonus=f.recipes[effect.recipe].productivity_bonus+n*effect.change end
+              end
+            end
           end
-          local function bonus(scrap,lds)
-            for _,name in ipairs(C.recipes)do f.recipes[name]={productivity_bonus=scrap}end
-            for _,name in ipairs(C.singles)do f.recipes[name]={productivity_bonus=lds}end
-            f.recipes['processing-unit']={productivity_bonus=0};f.recipes['cerys-processing-units-from-nitric-acid']={productivity_bonus=0}
+          local function set_carriers(phase)
+            for _,route in ipairs(C.routes)do
+              local positive,negative=0,0
+              if phase=='F1'then
+                if route.recipe=='scrap-recycling'then negative=2
+                elseif not route.f0 then negative=1 end
+              elseif phase=='F2'then
+                if route.f0 then positive=count(mains[route.main])
+                elseif route.recipe=='scrap-recycling'then positive=math.max(count(main)-2,0)end
+              end
+              f.technologies[C.carrier_for(route.family,route.recipe,'positive')].level=1+positive
+              f.technologies[C.carrier_for(route.family,route.recipe,'negative')].level=1+negative
+            end
+            recompute_bonus()
           end
-          bonus(0,0)
-          local q={}
+          recompute_bonus()
+          local q,queue_writes={},0
           setmetatable(f,{__index=function(_,k)if k=='research_queue'then return q end end,
             __newindex=function(_,k,v)if k=='research_queue'then
+              queue_writes=queue_writes+1
               if f.current_research then f.current_research.saved_progress=f.research_progress end
               q=v;f.current_research=v[1]
               if v[1]and v[1].researched then v[1].level=v[1].level+1;v[1].researched=false end
@@ -146,19 +183,19 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           assert(loadfile(fixture_path..'/control.lua','t',env))()
           local function step()
             game.tick=game.tick+1;callbacks.tick()
-            if not lab.disabled_by_script and f.current_research==main then
-              local cost=main.research_unit_count
+            local current=f.current_research
+            if not lab.disabled_by_script and current and C.main_set[current.name]then
+              local cost=current.research_unit_count
               local n=math.min(100,cost*(1-f.research_progress))
               if opponent~='no-consumption'then for _,name in ipairs(C.packs)do assert(inv.counts[name]>=n);inv.counts[name]=inv.counts[name]-n end end
               f.research_progress=f.research_progress+n/cost
               if f.research_progress>=1-1e-10 then
-                local paid=count(main)+1
-                if completed_shape then main.level=paid;main.researched=true else main.level=paid+1;main.researched=false end
-                main.saved_progress=0;f.research_progress=0
-                local phase=mods[C.mod]
-                bonus(phase=='0.1.0'and 0 or phase=='0.2.0'and(paid-2)*.1 or(paid-2)*.1,paid*.1)
-                if phase=='0.3.0'then offset('scrap-recycling',paid-2);for _,r in ipairs(C.singles)do offset(r,paid)end end
-                callbacks.finished{research=main,by_script=opponent=='scripted'}
+                local paid=count(current)+1
+                if completed_shape then current.level=paid;current.researched=true else current.level=paid+1;current.researched=false end
+                current.saved_progress=0;f.research_progress=0
+                recompute_bonus()
+                callbacks.finished{research=current,by_script=opponent=='scripted'}
+                if mods[C.mod]=='0.3.0' then set_carriers('F2') end
                 table.remove(q,1);f.current_research=q[1]
               end
             end
@@ -187,12 +224,15 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           if opponent=='unexpected-carrier'then callbacks.finished{research=f.technologies[C.carrier('scrap-recycling','positive')],by_script=true}end
           local function configure(version,old)
             callbacks.load();mods[C.mod]=version
-            if version=='0.2.0'then local names=clone(C.singles);for _,n in ipairs(C.recipes)do names[#names+1]=n end;main.prototype.effects=effects(names,1);bonus(.2,.2)
-            else main.prototype.effects={};main.prototype.hidden=true;main.prototype.enabled=false;bonus(-.2,0)end
+            local phase=version=='0.2.0'and'F1'or'F2'
+            for _,family in ipairs(C.families)do
+              local t=mains[family.main]
+              t.prototype.effects=effects(main_names(family,phase),1)
+              t.prototype.hidden=phase=='F2';t.prototype.enabled=phase~='F2'
+            end
             if opponent=='lost-pending'and version=='0.3.0'then f.research_progress=0 end
             callbacks.config{mod_changes={[C.mod]={old_version=old,new_version=version}}}
-            if version=='0.2.0'then offset('scrap-recycling',-2);bonus(0,.2)
-            else offset('scrap-recycling',1);for _,r in ipairs(C.singles)do offset(r,3)end;bonus(.1,.3)end
+            set_carriers(phase)
             -- A native MIR level setter may emit a scripted carrier event;
             -- it must remain separate from all ordinary earnings.
             callbacks.finished{research=f.technologies[C.carrier('scrap-recycling','positive')],by_script=true}
@@ -200,8 +240,8 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             if opponent=='sentinel-flag-drift-config'then f.technologies[C.sentinel].visible_when_disabled=true end
             if opponent=='retired-main-flag-drift'and version=='0.3.0'then main.enabled=false end
             if opponent=='wrong-last-recipe'then f.recipes['mir-vector-synthetic-scrap-95'].productivity_bonus=99 end
-            if opponent=='wrong-negative'and version=='0.2.0'then offset('scrap-recycling',-1)end
-            if opponent=='lost-source-bonus'then bonus(0,.1)end
+            if opponent=='wrong-negative'and version=='0.2.0'then f.technologies[C.carrier('scrap-recycling','negative')].level=2;recompute_bonus()end
+            if opponent=='lost-source-bonus'then f.recipes['low-density-structure'].productivity_bonus=0 end
             if opponent=='wrong-sign'then f.technologies[C.carrier('scrap-recycling','negative')].prototype.effects[97].change=.1 end
             step()
           end
@@ -212,13 +252,36 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           until_phase('f1-pending-saved')
           if opponent=='duplicate'then callbacks.finished{research=main,by_script=false}end
           configure('0.3.0','0.2.0');until_phase('f2-positive-saved');cold_read();cold_read()
-          commands_map['mir-native-credit-vectors']{parameter='continue'};until_phase('f2-final-saved');cold_read();cold_read()
+          -- This invokes the registered F2 callback. It must resume the saved
+          -- main/sentinel partial without assigning research_queue again.
+          local f2_writes=queue_writes;local f2_current=f.current_research;local f2_progress=f.research_progress
+          local f2_saved=main.saved_progress;local f2_first,f2_second=q[1],q[2]
+          assert(f2_current==main and #q==2 and f2_first==main and f2_second==f.technologies[C.sentinel]
+            and f2_progress>=.2 and f2_progress<.3)
+          commands_map['mir-native-credit-vectors']{parameter='continue'}
+          assert(queue_writes==f2_writes,'F2 continuation rewrote research_queue')
+          assert(f.current_research==f2_current and #q==2 and q[1]==f2_first and q[2]==f2_second
+            and f.research_progress==f2_progress and main.saved_progress==f2_saved,
+            'F2 continuation changed current/pending partial')
+          until_phase('f2-final-saved');cold_read();cold_read()
           assert(storage.mir_native_credit_vectors_fixture.ordinary==4)
+          local state=storage.mir_native_credit_vectors_fixture
+          for _,id in ipairs(C.main_ids)do
+            local wanted=id==C.main and 4 or 1
+            assert(state.ordinary_by_main[id]==wanted,'final ordinary schedule '..id)
+          end
+          local bonuses=state.endpoint.bonuses
+          assert(bonuses['low-density-structure']==.4 and bonuses['casting-low-density-structure']==.4)
+          assert(bonuses['plastic-bar']==.1 and bonuses['processing-unit']==.1
+            and bonuses['cerys-processing-units-from-nitric-acid']==.1)
+          assert(bonuses['rocket-fuel']==.1 and bonuses['steel-plate']==.1 and bonuses['scrap-recycling']==.2)
+          assert(bonuses['bioplastic']==0 and bonuses['rocket-fuel-from-jelly']==0
+            and bonuses['ammonia-rocket-fuel']==0 and bonuses['casting-steel']==0 and bonuses[C.noncarrier]==0)
           assert(#saves==5)
         ''')
 
     def test_exact_metadata_and_original_upstream_excerpt(self):
-        expected = {"f200": ("2.0.77", "5.0.20012"), "f210": ("2.1.23", "5.0.21012")}
+        expected = {"f200": ("2.0.77", "5.0.20015"), "f210": ("2.1.23", "5.0.21015")}
         for target, (base, mir) in expected.items():
             for phase, version in (("f0", "0.1.0"), ("f1", "0.2.0"), ("f2", "0.3.0")):
                 info = json.loads((FIXTURE / f"info-{phase}-{target}.json").read_text())
@@ -231,7 +294,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                          hashlib.sha256((FIXTURE / "Cerys-LICENSE.txt").read_bytes()).hexdigest().upper())
 
     def test_actual_excerpt_and_synthetic_vector_masks_preserve_main_cost(self):
-        for phase, size in (("0.1.0", 2), ("0.2.0", 99), ("0.3.0", 0)):
+        for phase in ("0.1.0", "0.2.0", "0.3.0"):
             self.setUp()
             self.lua.globals().case_phase = phase
             self.lua.execute(r'''
@@ -239,16 +302,40 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
               assert(#t[C.public].effects==97)
               assert(#t[C.carrier('scrap-recycling','positive')].effects==97)
               assert(#t[C.carrier('scrap-recycling','negative')].effects==97)
-              assert(#t['processing-unit-productivity'].effects==2)
-              assert(t[C.main].unit.count_formula=='8000*2^(L-1)'and t[C.main].unit.time==60)
+              assert(#t['processing-unit-productivity'].effects==3)
+              local routes=0
+              for _,route in ipairs(C.routes)do
+                routes=routes+1
+                local vector=C.carrier_vector(route)
+                assert(#t[C.carrier_for(route.family,route.recipe,'positive')].effects==#vector)
+                assert(#t[C.carrier_for(route.family,route.recipe,'negative')].effects==#vector)
+                for _,effect in ipairs(t[C.carrier_for(route.family,route.recipe,'positive')].effects)do
+                  assert(effect.recipe~=C.noncarrier)
+                end
+              end
+              assert(routes==11 and #C.reference_ids==6)
+              for _,reference in ipairs(C.reference_ids)do assert(#t[reference].effects==#C.reference_vectors[reference])end
+              local sizes=case_phase=='0.1.0'and {
+                [C.main]=2,['recipe-prod-research_plastic-1']=1,['recipe-prod-research_processing_unit-1']=2,
+                ['recipe-prod-research_rocket_fuel-1']=1,['recipe-prod-research_steel-1']=1,
+              }or case_phase=='0.2.0'and {
+                [C.main]=99,['recipe-prod-research_plastic-1']=2,['recipe-prod-research_processing_unit-1']=2,
+                ['recipe-prod-research_rocket_fuel-1']=3,['recipe-prod-research_steel-1']=2,
+              }or {
+                [C.main]=0,['recipe-prod-research_plastic-1']=0,['recipe-prod-research_processing_unit-1']=0,
+                ['recipe-prod-research_rocket_fuel-1']=0,['recipe-prod-research_steel-1']=0,
+              }
+              for _,id in ipairs(C.main_ids)do
+                assert(#t[id].effects==sizes[id])
+                assert(t[id].unit.count_formula=='8000*2^(L-1)'and t[id].unit.time==60)
+              end
               assert(#data.raw.lab['mir-vector-lab'].inputs==4 and data.raw.lab['mir-vector-lab'].researching_speed==115200)
               assert(115200/3600==32)
               for level=1,4 do assert((8000*2^(level-1))%32==0)end
             ''')
-            self.assertEqual(size, len(self.lua.globals().data.raw.technology[self.lua.globals().C.main].effects))
 
     def test_changed_authored_data_is_rejected_before_modeling_masks(self):
-        for opponent in ("foreign-extra", "changed-time", "changed-formula", "missing-pack", "paid-mask-baseline"):
+        for opponent in ("foreign-extra", "missing-family", "missing-route", "changed-time", "changed-formula", "missing-pack", "paid-mask-baseline"):
             with self.subTest(opponent=opponent):
                 self.setUp()
                 self.assertRaises(LuaError, self.lua.globals().data_case, "0.1.0", opponent)
@@ -263,15 +350,15 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                     self.assertIs(None if target == "f200" else False, hidden)
 
     def test_exact_engine_package_fixture_closure_opponents(self):
-        for target, base, mir in (("f200", "2.0.77", "5.0.20012"), ("f210", "2.1.23", "5.0.21012")):
+        for target, base, mir in (("f200", "2.0.77", "5.0.20015"), ("f210", "2.1.23", "5.0.21015")):
             active = {"base": base, "space-age": base, "quality": base, "elevated-rails": base,
                       "more-infinite-research": mir, "mir-fixture-native-credit-vectors": "0.1.0"}
             if target == "f210":
                 active["recycler"] = base
             phase = self.lua.globals().C.phase
             self.assertEqual("F0", phase(self.lua.table_from(active)))
-            mutations = [{"more-infinite-research": "5.0.21012" if target == "f200" else "5.0.20012"},
-                         {"more-infinite-research": mir[:-2] + "11"}, {"more-infinite-research": mir[:-2] + "13"},
+            mutations = [{"more-infinite-research": "5.0.21015" if target == "f200" else "5.0.20015"},
+                         {"more-infinite-research": mir[:-2] + "14"}, {"more-infinite-research": mir[:-2] + "16"},
                          {"mir-fixture-native-credit-vectors": "0.4.0"}, {"quality": "2.1.24"}, {"unknown-mod": "1.0.0"}]
             for mutation in mutations:
                 with self.subTest(target=target, mutation=mutation):
@@ -333,6 +420,8 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                   local family='research_low_density_structure'
                   GROUPS={[family]={{recipe='scrap-recycling',change=.1},{recipe='low-density-structure',change=.1},{recipe='casting-low-density-structure',change=.1}}}
                   local base=case_target=='f200'and'2.0.77'or'2.1.23'
+                  -- Frozen published-5.0.12 module input/result control; this is
+                  -- intentionally separate from the active candidate-15 actor.
                   reload_credits({base=base,['space-age']=base,['more-infinite-research']=case_target=='f200'and'5.0.20012'or'5.0.21012'},case_target)
                   game.forces={};storage={}
                   local f=make_collected_force(1,1,{[key(family,'low-density-structure')]=true,[key(family,'casting-low-density-structure')]=true},false)
