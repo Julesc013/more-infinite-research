@@ -133,6 +133,7 @@ $controls = @(
   [ordered]@{path='tests/test_legacy_boolean_cap_fixture.py';lua=$true},
     [ordered]@{path='tests/test_f200_foreign_cap_baseline_fixture.py';lua=$true},
   [ordered]@{path='tests/test_native_owner_cap_order_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_worker_speed_cap_ten_native.py';lua=$true},
   [ordered]@{path='tests/test_f200_legacy_worker_fixture.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_migration.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_transition_fixture.py';lua=$true},
