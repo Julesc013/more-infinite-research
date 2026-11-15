@@ -111,6 +111,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/bob_angel_f200_combined_profile.lua",
                 "compatibility/bob_tech_profile.lua",
                 "compatibility/bob_core_profile.lua",
+                "compatibility/bob_core_selection.lua",
                 "compatibility/bob_plates_profile.lua",
                 "compatibility/bob_productivity.lua",
                 "compatibility/ironclad.lua",
