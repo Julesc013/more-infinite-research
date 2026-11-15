@@ -441,6 +441,16 @@ class SettingsProfileTests(unittest.TestCase):
               "bad numeric data was silently discarded")
           end
 
+          local unsupported_profiles = {
+            {settings = {good = false, bad = function() end}},
+            {settings = {good = 0}, metadata = {bad = function() end}},
+          }
+          for _, profile in ipairs(unsupported_profiles) do
+            local wire, err = codec.encode(profile, checked_helpers)
+            assert(wire == nil and err == "profile contains an unsupported value",
+              "unsupported data was silently discarded")
+          end
+
           local settings_cycle = {}
           settings_cycle.self = settings_cycle
           local wire, err = codec.encode({settings = {good = false, bad = settings_cycle}}, checked_helpers)
@@ -476,6 +486,8 @@ class SettingsProfileTests(unittest.TestCase):
           local opponents = {
             {settings = {x = {[1] = "number", ["1"] = "string"}}},
             {settings = {good = false}, metadata = {x = {[1] = "number", ["1"] = "string"}}},
+            {settings = {x = {[1] = "first", [3] = "third"}}},
+            {settings = {good = 0}, metadata = {x = {[1] = "first", [3] = "third"}}},
           }
           for _, profile in ipairs(opponents) do
             local wire, err = codec.encode(profile, checked_helpers)

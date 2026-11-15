@@ -86,7 +86,7 @@ local function copy_json_value(value, seen)
     if not finite(value) then return nil, "profile contains a non-finite number" end
     return value
   end
-  if value_type ~= "table" then return nil end
+  if value_type ~= "table" then return nil, "profile contains an unsupported value" end
   if seen[value] then return nil, "profile contains a cycle" end
   seen[value] = true
   local array = is_array(value)
