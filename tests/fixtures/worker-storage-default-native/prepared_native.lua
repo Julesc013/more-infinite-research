@@ -109,7 +109,8 @@ function P.bind(shared)
     if id==HEAD then
       check(p.hidden and p.enabled==false and p.visible_when_disabled==false and p.research_unit_count==1
         and p.research_unit_count_formula==nil and p.research_unit_energy==60 and p.ignore_tech_cost_multiplier
-        and next(p.prerequisites)==nil and next(p.research_unit_ingredients)==nil,"head debit contract")
+        and next(p.prerequisites)==nil and #p.research_unit_ingredients==1
+        and p.research_unit_ingredients[1].name==SCIENCE[1] and p.research_unit_ingredients[1].amount==1,"head debit contract")
     else
       check(p.research_unit_count_formula=="675*1.5^(L-4)" and p.research_unit_energy==3600
         and not p.ignore_tech_cost_multiplier and #p.research_unit_ingredients==5,"full native worker price/science")

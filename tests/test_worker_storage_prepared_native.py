@@ -72,7 +72,8 @@ class PreparedNativeActorTests(unittest.TestCase):
               [actor.ids.tail]=contract(actor.ids.tail,1,false,true),
               [actor.ids.gate]={name=actor.ids.gate,level=4,max_level=4294967295,hidden=true,enabled=false,
                 visible_when_disabled=false,effects={{type='worker-robot-storage',modifier=-1}},research_unit_count=1,
-                research_unit_energy=60,ignore_tech_cost_multiplier=true,prerequisites={},research_unit_ingredients={}}},
+                research_unit_energy=60,ignore_tech_cost_multiplier=true,prerequisites={},
+                research_unit_ingredients={{name='automation-science-pack',amount=1}}}},
               get_history=function(kind,id)return{created='more-infinite-research'}end}
             frames=actor.expected_upgrade(before);actor.frames=function()return frames end
             game={tick=0,forces=forces,speed=1,difficulty_settings={technology_price_multiplier=1},
@@ -190,7 +191,10 @@ class PreparedNativeActorTests(unittest.TestCase):
           assert(not pcall(callbacks.on_configuration_changed,prepared_event)and #written==0)
 
           for _,change in ipairs({function()prototypes.technology[actor.ids.tail].enabled=false end,
-            function()table.remove(prototypes.technology[actor.ids.main].prerequisites)end})do
+            function()table.remove(prototypes.technology[actor.ids.main].prerequisites)end,
+            function()prototypes.technology[actor.ids.gate].research_unit_ingredients={}end,
+            function()prototypes.technology[actor.ids.gate].research_unit_ingredients[1].name='logistic-science-pack'end,
+            function()prototypes.technology[actor.ids.gate].research_unit_ingredients[1].amount=2 end})do
             install_prepared_successor_harness();callbacks=prepared.bind(actor);change()
             assert(not pcall(callbacks.on_configuration_changed,prepared_event)and #written==0)
           end
