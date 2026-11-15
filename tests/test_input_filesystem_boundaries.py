@@ -150,6 +150,26 @@ class InputFilesystemBoundaries(unittest.TestCase):
         expected_mib = shutil.disk_usage(ROOT).free // 1024**2
         self.assertLess(abs(record["disk"]["free_mib"] - expected_mib), 16)
 
+    @unittest.skipUnless(sys.platform == "linux", "Linux hidden library controls")
+    def test_output_budget_charges_hidden_active_profile_control(self):
+        library, output = self.directory / "library", self.directory / "output"
+        library.mkdir()
+        output.mkdir()
+        (library / ".mir-active-profile.json").write_bytes(b"{}\n")
+        result = self.ps(
+            f". {quote(ROOT / 'tools/lib/validation/NativeProbeResources.ps1')}; "
+            f"$lock=[IO.File]::Open({quote(library / '.test-lock')},'CreateNew','ReadWrite','None'); "
+            "try { "
+            f"$context=[pscustomobject]@{{root={quote(output)};aliases=@();shared_alias_bytes=0L;max_new_output_bytes=1MB;result_reserve_bytes=64KB}}; "
+            f"$activation=[pscustomobject]@{{closed=$false;lock=$lock;library={quote(library)};journal=@{{controls=@{{"
+            "'mod-list.json'=@{exists=$false};'mod-settings.dat'=@{exists=$false}}}}}; "
+            "Add-MIRNativeProbeLibraryActivation -Context $context -Activation $activation; "
+            "$remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $context; "
+            "@{remaining=$remaining}|ConvertTo-Json -Compress "
+            "} finally {$lock.Dispose()}"
+        )
+        self.assertEqual(1024**2 - 64 * 1024 - 3, result["remaining"])
+
 
 if __name__ == "__main__":
     unittest.main()

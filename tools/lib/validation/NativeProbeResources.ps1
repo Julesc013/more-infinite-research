@@ -84,7 +84,7 @@ function Get-MIRNativeProbeRemainingOutputBytes {
         $path=Join-Path $activation.library ($name+$suffix)
         if(Test-Path -LiteralPath $path){
           Assert-MIRLibraryPath $path
-          $controlBytes+=[int64](Get-Item -LiteralPath $path).Length
+          $controlBytes+=[int64](Get-Item -LiteralPath $path -Force).Length
         }
       }
     }
