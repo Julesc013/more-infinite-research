@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "MIR5ReportedWorkerHistoryBoundaryReconciliationV1",
+  "created_on": "2026-11-15",
+  "scope": "Issue 1944's real old-11 save-loading report against published beta14 and dev. Exact reported and source-determined facts only; independent test/fixture expectations, not a functional change or a native qualification.",
+  "source_baselines": {
+    "dev_commit": "b45ffd980edcceceac3a0065cd1d342e4ddce00d",
+    "published_beta_tag": "v5.0.14",
+    "published_beta_commit": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+    "stable_release": "v4.7.3",
+    "current_worker_source": "source/runtime/worker_robot_storage.lua",
+    "current_worker_blob": "8ed7034cffa554f8d674a550d7977f8f3100a42d",
+    "source_11_worker_blob": "609867224b83eb110e27816e926a652341a095ce",
+    "current_source_matches_dev_and_published14": true,
+    "evidence_note": "The v5.0.11 worker module predates current default_origin/plan_default_owner_transfer; its absence is not evidence that an old save contains no worker work."
+  },
+  "direct_report": {
+    "issue": "https://github.com/Julesc013/more-infinite-research/issues/1944",
+    "reported_prior_version": "5.0.21011",
+    "reported_failed_new_versions": [
+      "5.0.21012",
+      "5.0.21013",
+      "5.0.21014"
+    ],
+    "observed_error_edition": "5.0.21014",
+    "callback": "on_configuration_changed",
+    "source_function": "runtime/worker_robot_storage.lua:default_origin",
+    "exact_error_class": "default transfer requires the unchanged mod selection",
+    "diagnostic_fields": {
+      "previous_mir": "5.0.21011",
+      "new_mir": "5.0.21014",
+      "startup_changed": false,
+      "saved_route": "absent",
+      "current_route": "default",
+      "technology": "unobserved"
+    },
+    "reporter_followup": "A pre-existing saved game loads under 5.0.21011, but fails after upgrading.",
+    "attachments_already_linked_in_issue": [
+      "factorio-current.log",
+      "mod-list.json"
+    ],
+    "original_attachment_contents_read_in_this_review": false,
+    "original_protected_save_received_or_replayed_in_this_review": false,
+    "engine_patch_version": "unverified",
+    "exact_mod_change_event": "unverified; the attached current mod list is not a proven historical before-and-after event",
+    "exact_prior_earned_worker_frame": "unverified",
+    "saved_route_inference_limit": "saved_route=absent means the current schema-2 route record is absent at failure time; this does not establish zero historical earned levels, bonuses, partial research or queued work",
+    "technology_inference_limit": "technology=unobserved is an error-context value, not a pristine saved-technology observation"
+  },
+  "source_analysis": {
+    "change_guard": "With missing saved route and absent native owner, current default_origin rejects non-MIR mod_changes other than qualified Base/engine changes if an item is added, removed, updated, malformed or disagrees with active_mods; a recognized old MIR version alone cannot override that guard.",
+    "distinct_recorded_path": "A validated saved schema-2 default route has a different explicitly validated changed-selection policy; its accepted migration tests cannot substitute for issue 1944's absent-route origin.",
+    "source_locations": [
+      "source/runtime/worker_robot_storage.lua:default_origin",
+      "source/runtime/worker_robot_storage.lua:plan_default_owner_transfer",
+      "source/research/worker_storage_recovery.lua"
+    ],
+    "diagnostic_proposal": "https://github.com/Julesc013/more-infinite-research/pull/1912",
+    "diagnostic_proposal_limit": "Draft changes wording/context only, does not establish saved predecessor ownership and is stale relative to published14.",
+    "disposition": "unresolved-reporter-specific-history; do not infer admission or lost research from source-only diagnostics"
+  },
+  "independently_required_acceptance": [
+    {
+      "case": "A",
+      "input": "Retain an immutable actual old5.0.21011 save and its exact mod/settings/engine provenance, when available from existing custody.",
+      "oracle": "Observe original native worker ownership, level, bonus, paid progress, current research and ordered queue before upgrade, not just current beta's default; do not alter source."
+    },
+    {
+      "case": "B",
+      "input": "Use exactly the same selected predecessor/save and current14 with no unrelated mod changes where obtainable.",
+      "oracle": "If historical producer authority is valid, migrate all earned work, partial/current/queue/bonus and unrelated technologies; if authority genuinely missing, reject before any partial mutation."
+    },
+    {
+      "case": "C",
+      "input": "Use the same independently established history with a single explicitly inert added, removed, or updated mod in separate tests.",
+      "oracle": "Admit only after verifying valid authority and unchanged native semantics; check all preserved work; never treat a changed selection as inherently safe."
+    },
+    {
+      "case": "D",
+      "input": "Malformed/inconsistent events and unsupported provider ownership with otherwise comparable inputs.",
+      "oracle": "Deterministic bounded refusal with no partial native owner, debit, research, queue or bonus change."
+    },
+    {
+      "case": "E",
+      "input": "One accepted positive migrated case after B or C.",
+      "oracle": "Earn the next ordinary research completion with correct effect and physical science, save, cold-load twice from immutable inputs, preserve previous earned and pending work and show no duplicate application."
+    }
+  ],
+  "accepted_evidence_reuse": {
+    "recorded_default14": "Scratchpad PR137 publication coordination #6840014357 reports completed modern F200/F210 native qualification with defined retained work and cold loads; do not repeat unchanged accepted cases.",
+    "old_f200_a612": "The A612 4.7.20003 source preparation is an independent historical engine route; it does not establish this reporter's 5.0.21011 predecessor.",
+    "angel_and_agriculture": "Previously accepted unchanged Angel/steel and agriculture measurement paths are not implicated in this evidence-only issue and should not be rerun.",
+    "distinct_reports": [
+      "https://github.com/Julesc013/more-infinite-research/issues/1871",
+      "https://github.com/Julesc013/more-infinite-research/issues/1806",
+      "https://github.com/Julesc013/more-infinite-research/issues/1942"
+    ]
+  },
+  "ownership": {
+    "integration_native_release": "Black Glass root",
+    "functional_worker_history": "Black Glass angelbob_fix worker",
+    "linux_platform_adapter": "Aero",
+    "this_change": "Unowned independent issue-1944 history/evidence reconciliation only; no runtime, integration, native process, protected save or release mutation"
+  },
+  "delivery_gates_remaining": [
+    "Reporter-specific functional save loading with demonstrated predecessor authority or exact guarded limitation",
+    "Earned level and bonus, partial/current/queue and unrelated state preserved",
+    "Ordinary completion and save plus two cold loads for positive migrations",
+    "MIR4 Library design/parity and stable tab geometry",
+    "Localized search/availability and EN/DE client input/export/rejoin lifecycle",
+    "Whole-product performance and historical requirements",
+    "Actual final stable release and delivered-asset readback"
+  ],
+  "exclusions": [
+    "No assertion that the reporter's current mod list proves their prior mod selection",
+    "No source data inferred from an unavailable saved frame",
+    "No blanket guard bypass or fabricated initial owner",
+    "No claim that diagnostic PR1912 repairs loading",
+    "No new Lua/Factorio run; no published14 alteration",
+    "No stable-release verdict"
+  ],
+  "native_execution": false,
+  "functional_fix": false,
+  "stable_acceptance": false
+}
