@@ -215,6 +215,7 @@ function current_state_flow(old_path,successor_path,common,mode,opponent)
   if opponent=="fourth-reset"then player.reset_technology_effects();ok,result=call(actor.events[1]);return{ok=ok,message=result,state=state,markers=markers}end
   if opponent=="await-eleven"then owner.level=11;ok,result=call(actor.events[3],{research=owner,tick=0});return{ok=ok,message=result,state=state}end
   if opponent=="post-boundary-admin-write"then player.technologies[PREDECESSOR].researched=false end
+  if opponent=="post-boundary-sentinel-write"then player.technologies["stone-wall"].enabled=true end
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
   player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
@@ -395,6 +396,7 @@ end
             "candidate-no-cap": "candidate player reset state differs",
             "fourth-reset": "observed reset outside the declared three-force boundary",
             "post-boundary-admin-write": "post-reset public state changed before ordinary lab work",
+            "post-boundary-sentinel-write": "current pre-work player unrelated sentinel is enabled",
             "await-eleven": "level eleven research started",
             "after-eleven": "level eleven research started",
             "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",

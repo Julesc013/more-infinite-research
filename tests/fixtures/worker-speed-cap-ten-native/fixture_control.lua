@@ -637,6 +637,14 @@ end
 
 local function assert_current_post_completion(state, label)
   local player, foreign, earned = observe_all(state, label)
+  local player_support = current_force_snapshot(game.forces.player, label .. " player")
+  local foreign_support = current_force_snapshot(force_by_index(state.foreign_index, label .. " foreign"), label .. " foreign")
+  local earned_support = current_force_snapshot(force_by_index(state.earned_index, label .. " earned"), label .. " earned")
+  if not same_current_support_rows(state.current_pre_work_frames.player, player_support)
+      or not same_current_support_rows(state.current_pre_work_frames.foreign, foreign_support)
+      or not same_current_support_rows(state.current_pre_work_frames.earned_above_cap, earned_support) then
+    fail(label .. " changed named prerequisite or unrelated sentinel state")
+  end
   if state.level_eleven_start_count ~= 0 or player.level ~= 11 or player.researched ~= false or player.enabled ~= false
       or player.queue.current ~= false or #player.queue.queue ~= 0 or not close(player.queue.progress, 0)
       or not close(player.bonus, state.current_player_bonus_before + EFFECT) then
