@@ -1,0 +1,9 @@
+# All-five native-credit vector fixture
+
+This is a controlled synthetic fixture for the five published Space Age native productivity references on the exact MIR 5.0.15 F200 and F210 tuples. It is not a reproduction of a reporter modpack and does not establish gameplay acceptance.
+
+After MIR's normal data stage has constructed its named carrier technologies, the fixture adds one named companion recipe to each signed carrier and its public reference, then adds one public-only recipe to each public reference. The companion makes each carrier an explicit two-or-more component vector; the public-only recipe remains only on the foreign public reference. Thus the valid signed carrier is a strict subset of its public reference. The old 5.0.14 vector contract rejects that shape; the current contract accepts it without granting credit to the public-only recipe.
+
+`scrap-recycling-productivity` and the retained 97-component Cerys/Scrap fixture remain separate in `../native-credit-vectors/`. This fixture deliberately exercises the LDS `low-density-structure-productivity` reference rather than relabeling Scrap97 as LDS coverage.
+
+The control actor owns only its fixture state. It never imports MIR runtime modules or reads/writes MIR's native-credit ledger. It observes all five public-only recipe bonuses, earns one independent ordinary sentinel technology in a fixture lab, requests a save, and verifies the same endpoint on each cold load. A future governed native caller still has to perform the actual package/profile/save/engine admission and collect the two cold observations.
