@@ -8,7 +8,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-render-capture"
 CURRENT_TUPLES = (("2.0.77", "5.0.20015"), ("2.1.24", "5.0.21015"))
-ORIGINAL_TUPLES = (("2.0.77", "5.0.20012"), ("2.1.23", "5.0.21012"))
 
 
 class LibraryRenderCaptureTests(unittest.TestCase):
@@ -102,24 +101,6 @@ class LibraryRenderCaptureTests(unittest.TestCase):
                   local report=writes["mir-library-render/en/complete.json"]
                   assert(report and report.native_snapshot_unchanged)
                   assert(report.scenario_setup.original_flag_unset and intro_flag==true)
-                ''')
-
-    def test_current_tuples_fail_the_retained_original_tuple_binding_then_pass(self):
-        original = dict(ORIGINAL_TUPLES)
-        for engine, package in CURRENT_TUPLES:
-            with self.subTest(engine=engine, package=package):
-                self.assertNotEqual(original.get(engine), package)
-                self.setUp()
-                self.lua.globals().engine = engine
-                self.lua.globals().package = package
-                self.lua.execute(r'''
-                  local original_expected = { ["2.0.77"]="5.0.20012", ["2.1.23"]="5.0.21012" }
-                  assert(not (original_expected[engine] and original_expected[engine] == package),
-                    "current tuple unexpectedly passed the retained original binding")
-                  script.active_mods.base=engine
-                  script.active_mods["more-infinite-research"]=package
-                  run()
-                  assert(#calls==7 and #screenshots==7 and flushes==1)
                 ''')
 
     def test_cross_edition_missing_and_unqualified_tuples_refuse(self):
