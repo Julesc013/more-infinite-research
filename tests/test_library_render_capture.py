@@ -2,24 +2,30 @@
 import argparse
 import json
 from pathlib import Path
+import re
+import subprocess
 import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-render-capture"
-CURRENT_TUPLES = (("2.0.77", "5.0.20015"), ("2.1.24", "5.0.21015"))
+CURRENT_TUPLES = (("2.0.77", "5.0.20016"), ("2.1.24", "5.0.21016"))
+RETAINED_014_REVISION = "2fd5d0fcfd1e4173284bbae8d61a8293d439977c"
+RETAINED_CONTROL_PATH = "tests/fixtures/library-render-capture/control.lua"
+RETAINED_INFO_PATH = "tests/fixtures/library-render-capture/info.json"
+TUPLE_BINDING = re.compile(r'^local EXACT_PACKAGES = .+$', re.MULTILINE)
 
 
 class LibraryRenderCaptureTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self, actor_source=None):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
-        self.lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.globals().actor_source = actor_source or (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.lua.execute(r'''
           local tick_callback
           handlers={}
           defines={controllers={cutscene=6}}
           storage={}
-          script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21015"},
+          script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21016"},
             on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end,
             on_init=function(fn) handlers.init=fn end,
             on_configuration_changed=function(fn) handlers.configuration=fn end}
@@ -61,11 +67,16 @@ class LibraryRenderCaptureTests(unittest.TestCase):
               assert(append==false and index==1);writes[path]=value
             end}
           log=function() end
-          dofile(actor_path)
+          assert(load(actor_source, "@mir-fixture-library-render-capture/control.lua"))()
           handlers.init()
           function step(n) for i=1,n do game.tick=game.tick+30;tick_callback() end end
           function run() step(100) end
         ''')
+
+    @staticmethod
+    def retained_014_blob(path):
+        return subprocess.check_output(
+            ["git", "show", f"{RETAINED_014_REVISION}:{path}"], cwd=ROOT).decode("utf-8")
 
     def test_all_pages_are_public_real_gui_render_requests(self):
         self.lua.execute(r'''
@@ -103,11 +114,33 @@ class LibraryRenderCaptureTests(unittest.TestCase):
                   assert(report.scenario_setup.original_flag_unset and intro_flag==true)
                 ''')
 
+    def test_retained_014_actor_refuses_both_current_tuples_before_actions(self):
+        retained_info = json.loads(self.retained_014_blob(RETAINED_INFO_PATH))
+        self.assertEqual(retained_info["version"], "0.1.4")
+        self.assertEqual(retained_info["dependencies"], ["base = 2.1.24", "~ more-infinite-research = 5.0.21015"])
+        retained_actor = self.retained_014_blob(RETAINED_CONTROL_PATH)
+        for engine, package in CURRENT_TUPLES:
+            with self.subTest(engine=engine, package=package):
+                self.setUp(actor_source=retained_actor)
+                self.lua.globals().engine = engine
+                self.lua.globals().package = package
+                self.lua.execute('script.active_mods.base=engine;script.active_mods["more-infinite-research"]=package')
+                with self.assertRaisesRegex(Exception, "exact engine/package"):
+                    self.lua.execute('step(1)')
+                self.assertEqual(self.lua.eval('#calls'), 0)
+                self.assertEqual(self.lua.eval('#screenshots'), 0)
+
+    def test_current_actor_preserves_retained_014_capture_protocol_except_tuples(self):
+        retained_actor = self.retained_014_blob(RETAINED_CONTROL_PATH)
+        current_actor = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertEqual(TUPLE_BINDING.sub("local EXACT_PACKAGES = <tuple-binding>", current_actor),
+                         TUPLE_BINDING.sub("local EXACT_PACKAGES = <tuple-binding>", retained_actor))
+
     def test_cross_edition_missing_and_unqualified_tuples_refuse(self):
-        for engine, package in [("2.0.77", "5.0.21015"), ("2.1.24", "5.0.20015"),
-                                ("2.0.77", "5.0.20014"), ("2.0.77", "5.0.20016"),
+        for engine, package in [("2.0.77", "5.0.21016"), ("2.1.24", "5.0.20016"),
+                                ("2.0.77", "5.0.20014"), ("2.0.77", "5.0.20015"),
                                 ("2.1.23", "5.0.21012"), ("2.1.24", "5.0.21014"),
-                                ("2.1.24", "5.0.21016"), ("2.0.76", "5.0.20015"),
+                                ("2.1.24", "5.0.21015"), ("2.0.76", "5.0.20016"),
                                 ("2.0.77", None), (None, None)]:
             with self.subTest(engine=engine, package=package):
                 self.setUp()
@@ -121,7 +154,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
 
     def test_exact_engine_and_package_are_required(self):
         for opponent in ['script.active_mods.base="2.1.23"',
-                         'script.active_mods["more-infinite-research"]="5.0.21014"']:
+                         'script.active_mods["more-infinite-research"]="5.0.21015"']:
             with self.subTest(opponent=opponent):
                 self.setUp()
                 self.lua.execute(opponent)
@@ -231,11 +264,11 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-render-capture",
-            "version": "0.1.4",
+            "version": "0.1.5",
             "title": "MIR Library render-only capture fixture",
             "author": "MIR maintainers",
             "factorio_version": "2.1",
-            "dependencies": ["base = 2.1.24", "~ more-infinite-research = 5.0.21015"],
+            "dependencies": ["base = 2.1.24", "~ more-infinite-research = 5.0.21016"],
         })
         code = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         for forbidden in ["remote.add_interface", "raise_event", "require(", "server_save", "auto_save",
@@ -246,14 +279,14 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         info = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-render-capture",
-            "version": "0.1.4",
+            "version": "0.1.5",
             "title": "MIR Library render-only capture fixture",
             "author": "MIR maintainers",
             "factorio_version": "2.0",
-            "dependencies": ["base = 2.0.77", "~ more-infinite-research = 5.0.20015"],
+            "dependencies": ["base = 2.0.77", "~ more-infinite-research = 5.0.20016"],
         })
         f210 = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
-        self.assertEqual(f210["version"], "0.1.4")
+        self.assertEqual(f210["version"], "0.1.5")
 
 
 if __name__ == "__main__":
