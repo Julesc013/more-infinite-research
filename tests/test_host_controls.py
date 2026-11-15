@@ -327,6 +327,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_legacy_boolean_cap_fixture.py",
             "tests/test_f200_foreign_cap_baseline_fixture.py",
             "tests/test_native_owner_cap_order_fixture.py",
+            "tests/test_worker_speed_cap_ten_native.py",
             "tests/test_f200_legacy_worker_fixture.py",
             "tests/test_k2_imersite_migration.py",
             "tests/test_k2_imersite_transition_fixture.py",
