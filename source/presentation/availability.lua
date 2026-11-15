@@ -253,13 +253,20 @@ function M.rows(active_mods, target, force, query, effective_streams)
     for _, row in ipairs(BASE_WITHOUT_SPACE_AGE) do
       -- Match the Bob/Angel rule: a deliberately disabled stream is not an
       -- omitted research entry, even if its required DLC is absent.
-      if not is_explicitly_disabled(row, effective_streams) and matches(row, query) then
+      -- A named technology already present in this force is not "not added".
+      -- A failed native read is not proof of absence; do not scan the catalogue.
+      if emitted_technology_state(force, "recipe-prod-" .. row.family .. "-1") == false
+          and not is_explicitly_disabled(row, effective_streams)
+          and matches(row, query) then
         rows[#rows + 1] = copy(row)
       end
     end
-  elseif not is_explicitly_disabled(NATIVE_LAB_PRODUCTIVITY, effective_streams)
+  elseif emitted_technology_state(force,
+      "recipe-prod-" .. NATIVE_LAB_PRODUCTIVITY.family .. "-1") == false
+      and not is_explicitly_disabled(NATIVE_LAB_PRODUCTIVITY, effective_streams)
       and has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
-    -- A deliberately disabled stream is not an omitted MIR research entry.
+    -- The named native owner is insufficient to claim omission if MIR's exact
+    -- historical technology identity is also present in the force.
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
   end
   if is_f200_bob_angel(active_mods, target) then
