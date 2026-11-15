@@ -18,7 +18,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$comparison = [StringComparison]::OrdinalIgnoreCase
+$comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
 
 function Resolve-MIRDevelopmentHealthRepoRoot {
   param([Parameter(Mandatory)][AllowEmptyString()][string]$Candidate)
@@ -198,7 +198,8 @@ $worktrees=Get-MIRDevelopmentHealthWorktrees -Repository $repo -CurrentRoot $rep
 $branches=Get-MIRDevelopmentHealthBranches -Repository $repo -CurrentBranch $currentBranch -Limit $MaxBranches -OldDays $OldBranchDays -Now $NowUtc -IncludeUniqueCommitCounts $includeUniqueCommitCounts
 $build=Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'build') -Stopwatch $clock -MaxSeconds $MaxScanSeconds -MaxEntries $MaxEntriesPerRoot
 $dist=Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'dist') -Stopwatch $clock -MaxSeconds $MaxScanSeconds -MaxEntries $MaxEntriesPerRoot
-$drive=[IO.DriveInfo]::new([IO.Path]::GetPathRoot($repo));$freeMiB=[int][Math]::Floor($drive.AvailableFreeSpace/1MB);$buildMiB=[int][Math]::Ceiling($build.bytes/1MB);$distMiB=[int][Math]::Ceiling($dist.bytes/1MB)
+$drivePath=if($IsWindows){[IO.Path]::GetPathRoot($repo)}else{$repo}
+$drive=[IO.DriveInfo]::new($drivePath);$freeMiB=[int][Math]::Floor($drive.AvailableFreeSpace/1MB);$buildMiB=[int][Math]::Ceiling($build.bytes/1MB);$distMiB=[int][Math]::Ceiling($dist.bytes/1MB)
 $oldWorktrees=@($worktrees.rows|Where-Object review_needed);$oldBranches=@($branches.rows|Where-Object review_needed);$attention=@()
 if($dirty.readable-and$dirty.count-gt0){$attention+="dirty:$($dirty.count)"}
 if(@($dirty.operations).Count-gt0){$attention+='git-operation:'+(@($dirty.operations)-join ',')}

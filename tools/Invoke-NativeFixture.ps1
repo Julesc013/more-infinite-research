@@ -42,6 +42,7 @@ param(
   [string]$SettingsSha256='',
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
+  [ValidateRange(16,128)][int]$MaxNewOutputMiB=128,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
@@ -859,6 +860,7 @@ $record=[ordered]@{
   historical_transition=if($historicalTransition){@{stage=$HistoricalTransitionStage;published_archive_sha256=[string]$historicalFixture.definition.published_archive_sha256;predecessor_mir_version=[string]$historicalFixture.definition.published_mir_version;successor_mir_version=[string]$historicalFixture.definition.mir_version}}else{$null}
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
   observation=if($CreateOnly){'native-create-runtime-load-only'}elseif($activeSeed){'native-active-save-preparation-only'}else{'native-fixture-production-and-two-cold-reloads'}
+  max_new_output_mib=$MaxNewOutputMiB
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
   release_qualification=$false
 }
@@ -867,12 +869,12 @@ if($laserTransition){$record.f100_f110_laser_transition=@{stage=$F100F110LaserSt
 if($publishedF100Forward){$record.published_f100_forward=@{stage=$PublishedF100ForwardStage;target=$publishedF100Fixture.target;role=$publishedF100Fixture.role;predecessor_origin='published-f100-4.7.10003';protected_input_sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}
 if($publishedF100Forward -and $PublishedF100ForwardStage -ceq 'bridge'){$record.published_f100_forward.engine_bridge_refusal_readback=$publishedF100Fixture.refusal_readback}
 try{
-  # Compile the governor's native memory reader before releasing temporary
-  # host allocations; its first Add-Type call otherwise occurs inside wait.
-  $null=Get-MIR441PhysicalMemorySnapshot
+  # Compile the Windows native reader before releasing temporary allocations.
+  # Linux admission uses its proc/cgroup observer, with no Windows Add-Type.
+  if($IsWindows){$null=Get-MIR441PhysicalMemorySnapshot}
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
-  $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes 128MB -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 128 -UseExactOutputRoot
+  $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
   $config=Join-Path $resources.root 'config.ini'
