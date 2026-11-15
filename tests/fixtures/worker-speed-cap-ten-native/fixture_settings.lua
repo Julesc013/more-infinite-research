@@ -1,7 +1,10 @@
 local M = {}
 
 local CAP = "mir-max-level-worker-robots-speed"
-local CAPS = {source15 = 0, ["old-negative15"] = 10, successor16 = 10}
+local CAPS = {
+  source15 = 0, ["old-negative15"] = 10, successor16 = 10,
+  ["current-old15"] = 10, ["current-successor16"] = 10,
+}
 
 function M.apply(stage)
   local cap = CAPS[stage]

@@ -9,7 +9,9 @@ local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local STAGES = {
   source15 = {version = "0.4.0", cap = 0, mir = "5.0.20015"},
   ["old-negative15"] = {version = "0.5.0", cap = 10, mir = "5.0.20015"},
-  successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"}
+  successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"},
+  ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
+  ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
