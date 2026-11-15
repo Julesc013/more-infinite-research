@@ -188,6 +188,7 @@ end
 
 function current_state_flow(old_path,successor_path,common,mode,opponent)
   local player,foreign,earned=force("player",1,false),force("mir5-worker-speed-cap-ten-foreign",2,false),force("mir5-worker-speed-cap-ten-earned",3,false)
+  for _,value in ipairs({player,foreign,earned})do value.technologies["stone-wall"].enabled=true end
   local game={tick=0,forces={player=player,[1]=player,[foreign.name]=foreign,[foreign.index]=foreign,[earned.name]=earned,[earned.index]=earned},surfaces={}}
   local saves,labs=0,0;game.surfaces[1]={create_entity=function(row)labs=labs+1;local x={valid=true,disabled_by_script=false,unit_number=labs,input=inventory()};function x.get_inventory(i)assert(i==1)return x.input end;game.lab=x;return x end}
   function game.server_save(n)assert(n=="mir5-worker-speed-cap-current-state-complete");saves=saves+1 end
@@ -207,7 +208,6 @@ function current_state_flow(old_path,successor_path,common,mode,opponent)
   install_reset(foreign);install_reset(earned)
   function game.create_force()error("current-state role must use the three named input forces")end
   if opponent=="missing-prerequisite"then player.technologies[PREDECESSOR]=nil end
-  if opponent=="sentinel-enabled"then player.technologies["stone-wall"].enabled=true end
   local ok,result=call(actor.changed)
   if mode=="old"then return{ok=ok,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage.mir5_worker_speed_cap_current_state,player=player,foreign=foreign,earned=earned}end
   if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage.mir5_worker_speed_cap_current_state,player=player,foreign=foreign,earned=earned}end
@@ -239,10 +239,10 @@ end
         return self.lua.eval("flow")(str(SOURCE / "control.lua"), str(OLD_NEGATIVE / "control.lua"), str(SUCCESSOR / "control.lua"),
                                      str(FIXTURE / "fixture_control.lua"), mode, opponent)
 
-    def current_state_result(self, mode: str = "candidate", opponent: str = ""):
+    def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("current_state_flow")(str(CURRENT_OLD_NEGATIVE / "control.lua"),
                                                    str(CURRENT_SUCCESSOR / "control.lua"),
-                                                   str(FIXTURE / "fixture_control.lua"), mode, opponent)
+                                                   str(fixture_control), mode, opponent)
 
     def test_metadata_declares_three_explicit_f200_se_stages(self):
         for directory, version, mir in ((SOURCE, "0.4.0", "5.0.20015"), (OLD_NEGATIVE, "0.5.0", "5.0.20015"),
@@ -307,9 +307,9 @@ end
         self.assertIn("MIR_EXPECTED_CURRENT_OLD15_RESET_NOT_ENFORCED", old["message"])
         self.assertEqual((0, 0), (old["saves"], old["labs"]))
         old_markers = self._current_markers(old)
-        self.assertEqual({"current-provider", "current-pre-reset", "current-post-reset"}, set(old_markers))
-        provider, old_pre, old_post = (old_markers[phase] for phase in
-                                       ("current-provider", "current-pre-reset", "current-post-reset"))
+        self.assertEqual({"current-provider", "current-admin-observed", "current-pre-reset", "current-post-reset"}, set(old_markers))
+        provider, admin_observed, old_pre, old_post = (old_markers[phase] for phase in
+            ("current-provider", "current-admin-observed", "current-pre-reset", "current-post-reset"))
         self.assertEqual(("post-provider-normalization-before-fixture-admin", "controller-bound-A0-base-input-only",
                           "not-read-no-continuation-precondition"),
                          (provider["snapshot_role"], provider["source_base"]["identity"],
@@ -326,10 +326,13 @@ end
             frame = provider[frame_name]
             self.assertIsInstance(frame["force_index"], int)
             self.assertIsInstance(frame["force_name"], str)
-            self.assertFalse(frame["unrelated_sentinel"]["enabled"])
+            self.assertTrue(frame["unrelated_sentinel"]["enabled"])
             self.assertIsNone(frame["unrelated_sentinel"]["queue"])
             self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION},
                              set(frame["prerequisite_flags"].keys()))
+            self.assertFalse(admin_observed[frame_name]["unrelated_sentinel"]["enabled"])
+            self.assertFalse(old_pre[frame_name]["unrelated_sentinel"]["enabled"])
+        self.assertEqual("after-declared-admin-before-baseline-validation", admin_observed["snapshot_role"])
 
         player_intent = old_pre["admin_intent"]["player"]
         foreign_intent = old_pre["admin_intent"]["foreign"]
@@ -360,8 +363,8 @@ end
         self.assertTrue(candidate["ok"], candidate["message"])
         self.assertEqual((1, 1), (candidate["saves"], candidate["labs"]))
         candidate_markers = self._current_markers(candidate)
-        self.assertEqual({"current-provider", "current-pre-reset", "current-post-reset", "current-pre-work",
-                          "current-complete", "current-cold"}, set(candidate_markers))
+        self.assertEqual({"current-provider", "current-admin-observed", "current-pre-reset", "current-post-reset",
+                          "current-pre-work", "current-complete", "current-cold"}, set(candidate_markers))
         candidate_pre, candidate_post, pre_work = (candidate_markers[phase] for phase in
                                                     ("current-pre-reset", "current-post-reset", "current-pre-work"))
         for role in ("player", "foreign", "earned_above_cap"):
@@ -392,10 +395,10 @@ end
             for role in ("player", "foreign", "earned_above_cap"):
                 self.assertEqual(self._current_frame_signature(phase["completed_forces"][role]),
                                  self._current_frame_signature(phase["post_completion"][role]))
-        self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-pre-reset.json",
-                          "worker-speed-cap-ten/current-post-reset.json", "worker-speed-cap-ten/current-pre-work.json",
-                          "worker-speed-cap-ten/current-complete.json", "worker-speed-cap-ten/current-cold.json",
-                          "worker-speed-cap-ten/current-cold.json"],
+        self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-admin-observed.json",
+                          "worker-speed-cap-ten/current-pre-reset.json", "worker-speed-cap-ten/current-post-reset.json",
+                          "worker-speed-cap-ten/current-pre-work.json", "worker-speed-cap-ten/current-complete.json",
+                          "worker-speed-cap-ten/current-cold.json", "worker-speed-cap-ten/current-cold.json"],
                          [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
 
     def test_current_state_controls_refuse_missing_or_extra_reset_and_boundary_mutation(self):
@@ -416,12 +419,20 @@ end
                 result = self.current_state_result("candidate", opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
-        provider_sentinel = self.current_state_result("candidate", "sentinel-enabled")
-        self.assertFalse(provider_sentinel["ok"])
-        self.assertIn("current pre-reset player unrelated sentinel is enabled", provider_sentinel["message"])
-        provider = self._current_markers(provider_sentinel)["current-provider"]
-        self.assertTrue(provider["player"]["unrelated_sentinel"]["enabled"])
         source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        sentinel_setup = '  set_current_technology(force, SENTINEL, false, false, label)\n'
+        self.assertEqual(1, source.count(sentinel_setup))
+        with tempfile.TemporaryDirectory(prefix="mir5-current-sentinel-omission-") as work:
+            omitted = Path(work) / "fixture_control.lua"
+            omitted.write_text(source.replace(sentinel_setup, "", 1), encoding="utf-8", newline="\n")
+            old_omission = self.current_state_result("candidate", fixture_control=omitted)
+        self.assertFalse(old_omission["ok"])
+        self.assertIn("current pre-reset player unrelated sentinel is enabled", old_omission["message"])
+        old_omission_markers = self._current_markers(old_omission)
+        self.assertTrue(all(old_omission_markers["current-provider"][role]["unrelated_sentinel"]["enabled"]
+                            for role in ("player", "foreign", "earned_above_cap")))
+        self.assertTrue(all(old_omission_markers["current-admin-observed"][role]["unrelated_sentinel"]["enabled"]
+                            for role in ("player", "foreign", "earned_above_cap")))
         current = source.split("local function begin_current_state", 1)[1].split("function M.apply", 1)[0]
         for forbidden in ("game.create_force", "add_research", "worker_robots_speed_modifier =", "storage[KEY]",
                           "remote.", "script.raise_event", "enable_all_prototypes", "research_recursive"):

@@ -548,6 +548,7 @@ local function set_current_prerequisites(force, foreign, label)
   set_current_technology(force, AUTOMATION_SCIENCE, foreign, true, label)
   set_current_technology(force, ELECTRICITY, foreign, true, label)
   set_current_technology(force, PROBE, false, true, label)
+  set_current_technology(force, SENTINEL, false, false, label)
 end
 
 local function assert_current_baseline(state, label)
@@ -694,6 +695,12 @@ local function begin_current_state(stage)
   owner = technology(earned, WORKER)
   owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = EARNED_LEVEL, false, true, false
   earned.research_queue = {}
+  local admin_observed = current_header("admin-observed", stage)
+  admin_observed.snapshot_role = "after-declared-admin-before-baseline-validation"
+  admin_observed.player = current_force_snapshot(player, "current admin observed player", true)
+  admin_observed.foreign = current_force_snapshot(foreign, "current admin observed foreign", true)
+  admin_observed.earned_above_cap = current_force_snapshot(earned, "current admin observed earned", true)
+  current_emit("admin-observed", admin_observed)
   local player_frame, foreign_frame, earned_frame = assert_current_baseline(state, "current pre-reset")
   local pre_reset = current_header("pre-reset", stage)
   pre_reset.snapshot_role = "fixture-admin-current-state-before-native-reset"
