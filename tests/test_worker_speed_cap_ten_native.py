@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 
 
@@ -22,6 +25,8 @@ LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
 DEEP_SCIENCE = "se-deep-space-science-pack-1"
+AUTOMATION_SCIENCE = "automation-science-pack"
+AUTOMATION = "automation"
 ELECTRICITY = "electricity"
 UNRELATED = "mir-fixture-unrelated-disabled"
 CAP = "mir-max-level-worker-robots-speed"
@@ -30,6 +35,18 @@ PACKS = (
     "utility-science-pack", "space-science-pack", "se-rocket-science-pack",
     "se-energy-science-pack-4", "se-deep-space-science-pack-1",
 )
+ACTIVE_MODS = (
+    "aai-containers@0.3.2", "aai-industry@0.6.16", "aai-signal-transmission@0.5.3",
+    "alien-biomes-graphics@0.7.1", "alien-biomes@0.7.4", "base@2.0.77",
+    "informatron@0.4.0", "jetpack@0.4.17",
+    "mir-fixture-mir5-worker-speed-cap-ten@0.5.0", "more-infinite-research@5.0.20015",
+    "robot_attrition@0.6.6", "shield-projector@0.2.2",
+    "space-exploration-graphics-2@0.7.2", "space-exploration-graphics-3@0.7.2",
+    "space-exploration-graphics-4@0.7.2", "space-exploration-graphics-5@0.7.3",
+    "space-exploration-graphics@0.7.5", "space-exploration-menu-simulations@0.7.4",
+    "space-exploration-postprocess@0.7.5", "space-exploration@0.7.57",
+)
+ACTIVE_MODS_OBSERVER = "mir-fixture-mir5-worker-speed-cap-ten"
 
 
 class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
@@ -146,7 +163,7 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   if opponent~="skip-caps"then for _,f in ipairs({player,game.forces[state.foreign_index],game.forces[state.earned_index]})do caps.reconcile(f,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end end
   if opponent=="partial-drift"then player.research_progress=.26 end;if opponent=="foreign-reenabled"then game.forces[state.foreign_index].technologies[WORKER].enabled=true end
   local successor,smsg=load_stage(successor_path,common,"successor16",game,storage,settings(10),markers,logs,files);if not successor then return{ok=false,message=smsg}end
-  ok,result=call(successor.changed);if not ok then return{ok=false,message=result,markers=markers,files=files,saves=saves,labs=labs}end
+  ok,result=call(successor.changed);if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs}end
   local owner=player.technologies[WORKER]
   if opponent=="await-eleven"then owner.level=11;ok,result=call(successor.events[3],{research=owner,tick=0});return{ok=ok,message=result}end
   game.tick=1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end
@@ -200,12 +217,71 @@ end
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
 
+    def test_library_observer_accepts_only_the_wrapper_report_of_the_full_active_tuple(self):
+        """Bind the producer's wrapper call site to the real selection reader."""
+        tuple_text = "|".join(ACTIVE_MODS)
+        fixture_log = lambda script, rows=tuple_text, loading="": (
+            f"{loading}1.860 Script @__{ACTIVE_MODS_OBSERVER}__/{script}:3: [MIR_ACTIVE_MODS] {rows}\n"
+        )
+        with tempfile.TemporaryDirectory(prefix="mir5-cap-ten-active-mods-") as work:
+            temporary = Path(work)
+            selection = temporary / "selected.json"
+            selection.write_text(json.dumps([
+                {"name": row.partition("@")[0], "version": row.partition("@")[2]}
+                for row in ACTIVE_MODS
+            ]), encoding="utf-8")
+            logs = {
+                "accepted": fixture_log("data-final-fixes.lua"),
+                "shared": fixture_log("fixture_data_final.lua"),
+                "contradictory": fixture_log("data-final-fixes.lua", loading="1.859 Loading mod base 2.0.78 (data.lua)\n"),
+                "missing_asset": fixture_log("data-final-fixes.lua", rows="|".join(
+                    row for row in ACTIVE_MODS if row != "space-exploration-graphics-5@0.7.3")),
+            }
+            paths = {}
+            for name, contents in logs.items():
+                path = temporary / f"{name}.log"
+                path.write_text(contents, encoding="utf-8", newline="\n")
+                paths[name] = str(path)
+            script = r'''
+              $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+              . $env:MIR_TEST_LIBRARY_ACTIVATION
+              $activation=[pscustomobject]@{selected=@(Get-Content -LiteralPath $env:MIR_TEST_SELECTION -Raw|ConvertFrom-Json)}
+              $observer=$env:MIR_TEST_OBSERVER
+              Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $env:MIR_TEST_ACCEPTED -ActiveModsObserver $observer|Out-Null
+              function Assert-ObserverRefusal([string]$Path,[string]$Expected){
+                $refused=$false
+                try{Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $Path -ActiveModsObserver $observer|Out-Null}catch{
+                  if(-not $_.Exception.Message.Contains($Expected)){throw ('unexpected observer refusal: '+$_.Exception.Message)}
+                  $refused=$true
+                }
+                if(-not $refused){throw ('observer opponent accepted: '+$Path)}
+              }
+              Assert-ObserverRefusal $env:MIR_TEST_SHARED '[mir-library-loaded-observation]'
+              Assert-ObserverRefusal $env:MIR_TEST_CONTRADICTORY '[mir-library-loaded-selection] Duplicate or contradictory native identity.'
+              Assert-ObserverRefusal $env:MIR_TEST_MISSING_ASSET '[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'
+            '''
+            environment = dict(os.environ, MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
+                               MIR_TEST_SELECTION=str(selection), MIR_TEST_OBSERVER=ACTIVE_MODS_OBSERVER,
+                               MIR_TEST_ACCEPTED=paths["accepted"], MIR_TEST_SHARED=paths["shared"],
+                               MIR_TEST_CONTRADICTORY=paths["contradictory"], MIR_TEST_MISSING_ASSET=paths["missing_asset"])
+            result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                                    cwd=ROOT, env=environment, text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        shared = (FIXTURE / "fixture_data_final.lua").read_text(encoding="utf-8")
+        self.assertNotIn('log("[MIR_ACTIVE_MODS] ', shared)
+        for stage in (SOURCE, OLD_NEGATIVE, SUCCESSOR):
+            wrapper = (stage / "data-final-fixes.lua").read_text(encoding="utf-8")
+            self.assertIn('log("[MIR_ACTIVE_MODS] " .. tuple)', wrapper)
+
     def test_published15_old_negative_records_public_adverse_before_expected_failure(self):
         result = self.flow_result("old-negative")
         self.assertFalse(result["ok"]); self.assertIn("MIR_EXPECTED_OLD15_CAP_NOT_ENFORCED", result["message"]); self.assertEqual((0, 0), (result["saves"], result["labs"]))
         markers = [result["markers"][i] for i in range(1, len(result["markers"]) + 1)]
-        self.assertEqual(["source", "old-negative"], [row["phase"] for row in markers])
-        adverse = markers[1]
+        self.assertEqual(["source", "preconditions", "old-negative"], [row["phase"] for row in markers])
+        preconditions, adverse = markers[1], markers[2]
+        self.assertEqual(("pre-assert-configuration", "source-seeded", "5.0.20015"),
+                         (preconditions["source_snapshot_role"], preconditions["source_state"]["phase"], preconditions["source_state"]["source_mir"]))
+        self.assertEqual(20, preconditions["active_mod_count"])
         self.assertEqual(("5.0.20015", "5.0.20015"), (adverse["pre_work"]["source_mir"], adverse["pre_work"]["active_mir"]))
         self.assertEqual((10, True, 2, .27), (adverse["player"]["level"], adverse["player"]["enabled"], len(adverse["player"]["queue"]["queue"]), adverse["player"]["queue"]["progress"]))
         self.assertEqual((11, False, "automation", .42), (adverse["foreign"]["level"], adverse["foreign"]["enabled"], adverse["foreign"]["queue"]["current"], adverse["foreign"]["queue"]["progress"]))
@@ -214,18 +290,18 @@ end
         self.assertTrue(all(result[force]["technologies"][UNRELATED]["enabled"] is False
                             for force in ("player", "foreign", "earned")))
         self.assertNotIn("cap_owner", {key: adverse[key] for key in adverse})
-        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/old-negative.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
+        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/preconditions.json", "worker-speed-cap-ten/old-negative.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
 
     def test_successor_cap_keeps_one_ordinary_tail_ten_completion_then_two_cold_reads(self):
         result = self.flow_result(); self.assertTrue(result["ok"], result["message"]); self.assertEqual((1, 1), (result["saves"], result["labs"]))
         markers = [result["markers"][i] for i in range(1, len(result["markers"]) + 1)]
-        self.assertEqual(["source", "pre-work", "complete", "cold", "cold"], [row["phase"] for row in markers])
-        self.assertEqual(("5.0.20015", "5.0.20016"), (markers[0]["mir_version"], markers[1]["mir_version"]))
-        complete = markers[2]
+        self.assertEqual(["source", "preconditions", "pre-work", "complete", "cold", "cold"], [row["phase"] for row in markers])
+        self.assertEqual(("5.0.20015", "5.0.20016"), (markers[0]["mir_version"], markers[2]["mir_version"]))
+        complete = markers[3]
         self.assertEqual((1, 0), (complete["ordinary_native_completion_count"], complete["level_eleven_start_count"]))
         self.assertEqual((WORKER, False), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"]))
         self.assertEqual((WORKER, False), (complete["ordinary"][1]["name"], complete["ordinary"][1]["by_script"]))
-        self.assertEqual((2, 1, 0), (len(markers[0]["player"]["queue"]["queue"]), len(markers[1]["player"]["queue"]["queue"]), len(complete["player"]["queue"]["queue"])))
+        self.assertEqual((2, 1, 0), (len(markers[0]["player"]["queue"]["queue"]), len(markers[2]["player"]["queue"]["queue"]), len(complete["player"]["queue"]["queue"])))
         self.assertEqual(3600, complete["player"]["research_unit_energy"])
         self.assertEqual(set(PACKS), set(complete["post_completion"]["lab"]["input_by_name"].keys()))
         self.assertTrue(all(complete["post_completion"]["lab"]["input_by_name"][name] > 0 for name in PACKS))
@@ -233,7 +309,7 @@ end
         end_input = complete["post_completion"]["end_lab"]["input_by_name"]
         self.assertEqual({name: post_input[name] for name in PACKS}, {name: end_input[name] for name in PACKS})
         self.assertEqual((False, 2), (complete["level_eleven_queue_attempt"]["accepted"], complete["post_completion_hold_ticks"]))
-        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/pre-work.json", "worker-speed-cap-ten/complete.json", "worker-speed-cap-ten/cold.json", "worker-speed-cap-ten/cold.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
+        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/preconditions.json", "worker-speed-cap-ten/pre-work.json", "worker-speed-cap-ten/complete.json", "worker-speed-cap-ten/cold.json", "worker-speed-cap-ten/cold.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
 
     def test_source_and_successor_controls_refuse_adverse_states(self):
         source_tick = self.flow_result("successor", "source-tick"); self.assertFalse(source_tick["ok"]); self.assertIn("source create-only stage received an actor tick", source_tick["message"])
@@ -248,6 +324,43 @@ end
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         on_load = control.split("script.on_load(function()", 1)[1].split("script.on_event(defines.events.on_tick", 1)[0]
         self.assertNotIn("game", on_load); self.assertNotIn("storage", on_load)
+
+    def test_precondition_observer_precedes_the_known_missing_predecessor_assertion(self):
+        result = self.flow_result("successor", "missing-predecessor")
+        self.assertFalse(result["ok"])
+        self.assertIn("player worker prerequisite is not researched: worker-robots-speed-9", result["message"])
+        markers = [result["markers"][i] for i in range(1, len(result["markers"]) + 1)]
+        self.assertEqual(["source", "preconditions"], [row["phase"] for row in markers])
+        preconditions = markers[1]
+        self.assertEqual(("pre-assert-configuration", "source-seeded", "5.0.20015"),
+                         (preconditions["source_snapshot_role"], preconditions["source_state"]["phase"], preconditions["source_state"]["source_mir"]))
+        self.assertEqual(False, preconditions["prerequisite_flags"]["player"][PREDECESSOR]["researched"])
+        self.assertEqual(True, preconditions["prerequisite_flags"]["foreign"][PREDECESSOR]["researched"])
+        self.assertEqual(True, preconditions["prerequisite_flags"]["earned_above_cap"][PREDECESSOR]["researched"])
+        self.assertEqual(20, preconditions["active_mod_count"])
+        self.assertEqual("0.7.57", preconditions["mods"]["space-exploration"])
+        self.assertEqual("0.6.0", preconditions["mods"]["mir-fixture-mir5-worker-speed-cap-ten"])
+        self.assertEqual("5.0.20016", preconditions["mods"]["more-infinite-research"])
+        expected_researched = {
+            "player": {PREDECESSOR: False, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
+            "foreign": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: True, ELECTRICITY: True, AUTOMATION: False},
+            "earned_above_cap": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
+        }
+        for force_name in ("player", "foreign", "earned_above_cap"):
+            flags = preconditions["prerequisite_flags"][force_name]
+            self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION}, set(flags.keys()))
+            for technology_name in (PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION):
+                value = flags[technology_name]
+                self.assertEqual((expected_researched[force_name][technology_name], True, 1, True),
+                                 (value["researched"], value["enabled"], value["level"], value["valid"]),
+                                 f"{force_name}/{technology_name}")
+        self.assertEqual((10, 11, 13), (preconditions["worker_frames"]["player"]["level"],
+                                        preconditions["worker_frames"]["foreign"]["level"],
+                                        preconditions["worker_frames"]["earned_above_cap"]["level"]))
+        self.assertEqual(2, len(result["logs"]))
+        self.assertTrue(result["logs"][2].startswith("[MIR_WORKER_SPEED_CAP_TEN phase=preconditions] "))
+        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/preconditions.json"],
+                         [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
 
 
 if __name__ == "__main__":

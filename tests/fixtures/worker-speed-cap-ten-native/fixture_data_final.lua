@@ -43,7 +43,7 @@ local function assert_closure(stage)
   return expected
 end
 
-local function observe_active_mods()
+local function active_mod_tuple()
   local rows = {}
   for name, version in pairs(mods) do
     if type(name) ~= "string" or name == "" or type(version) ~= "string"
@@ -53,7 +53,7 @@ local function observe_active_mods()
     rows[#rows + 1] = name .. "@" .. version
   end
   table.sort(rows)
-  log("[MIR_ACTIVE_MODS] " .. table.concat(rows, "|"))
+  return table.concat(rows, "|")
 end
 
 local function assert_worker(row)
@@ -104,9 +104,10 @@ local function worker_inputs(row)
   return inputs
 end
 
-function M.apply(stage)
+function M.apply(stage, report_active_mods)
   local expected = assert_closure(stage)
-  observe_active_mods()
+  if type(report_active_mods) ~= "function" then fail("active-mod observer callback differs") end
+  report_active_mods(active_mod_tuple())
   local row = data.raw.technology and data.raw.technology[WORKER]
   local startup = settings.startup and settings.startup[CAP]
   if type(startup) ~= "table" or startup.value ~= expected.cap then fail("worker-speed cap startup differs") end
