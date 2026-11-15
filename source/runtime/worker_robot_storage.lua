@@ -734,7 +734,7 @@ end
 local function older_default_origin(event, change, active, base_hop)
   local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
     or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
-    and active.base == target.minimum_base
+    and same_family_engine_patch(event)
   if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false) then
     recover_error("older default source requires its qualified Base engine and unchanged settings")
   end
@@ -750,8 +750,10 @@ local function older_default_origin(event, change, active, base_hop)
   end
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR then
+      -- Same-edition Base changes already passed the supported-patch check.
+      -- The separately qualified cross-edition hop keeps its exact source.
       if type(item) ~= "table" or item.new_version ~= active[name] or type(item.new_version) ~= "string"
-          or name == "base" and item.old_version ~= (base_hop and "2.0.77" or target.minimum_base)
+          or name == "base" and base_hop and item.old_version ~= "2.0.77"
           or name ~= "base" and item.old_version ~= nil then
         recover_error("older default source changed a previous mod or engine")
       end
