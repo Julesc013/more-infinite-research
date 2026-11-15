@@ -127,6 +127,9 @@ local function normalized_for_encode(profile)
   end
   local metadata, metadata_error = copy_json_value(profile.metadata or {}, {})
   if metadata_error then return nil, metadata_error end
+  if profile.mod ~= nil and (type(profile.mod) ~= "string" or profile.mod == "") then
+    return nil, "profile mod must be a non-empty string"
+  end
   return {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
     mod = profile.mod or "more-infinite-research",

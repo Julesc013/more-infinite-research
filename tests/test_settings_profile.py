@@ -421,6 +421,7 @@ class SettingsProfileTests(unittest.TestCase):
             encode_string = function(text) calls = calls + 1; return text end,
           }
           local ok_wire, ok_error = codec.encode({
+            mod = "example-mod",
             settings = {count = 0, enabled = false, nested = {limit = 1}},
             metadata = {tags = {"one", "two"}},
           }, checked_helpers)
@@ -428,6 +429,7 @@ class SettingsProfileTests(unittest.TestCase):
           assert(ok_wire:find('"count":0', 1, true))
           assert(ok_wire:find('"enabled":false', 1, true))
           assert(ok_wire:find('"limit":1', 1, true))
+          assert(ok_wire:find('"mod":"example-mod"', 1, true))
 
           local invalid_profiles = {
             {settings = {good = false, bad = math.huge}},
@@ -455,6 +457,12 @@ class SettingsProfileTests(unittest.TestCase):
             local wire, err = codec.encode({settings = {good = false}, metadata = metadata}, checked_helpers)
             assert(wire == nil and err == "profile metadata must be a table",
               "scalar metadata was silently discarded")
+          end
+
+          for _, mod in ipairs({false, true, 1, {}, function() end, ""}) do
+            local wire, err = codec.encode({mod = mod, settings = {good = false}}, checked_helpers)
+            assert(wire == nil and err == "profile mod must be a non-empty string",
+              "invalid mod identity was silently changed")
           end
 
           local settings_cycle = {}
