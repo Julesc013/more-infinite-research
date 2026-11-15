@@ -10,6 +10,42 @@ $root=Join-Path $repo ('build/tmp/mir5-native-probe-controls-'+[guid]::NewGuid()
 $checks=0
 function Assert-Probe([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-native-probe-$Code]"};$script:checks++}
 function Refuses-Probe([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Probe ($actual.Contains($Expected)) "refusal-$Expected"}
+function Assert-LinuxDistinctSystemDiskAccounting {
+  param([Parameter(Mandatory)][string]$AdmissionRoot)
+  if(-not$IsLinux){return}
+  $events=[pscustomobject]@{low=0;high=0;max=0;oom=0;oom_kill=0}
+  $pressure=[pscustomobject]@{some=[pscustomobject]@{avg10=0.0;avg60=0.0;avg300=0.0;total=0};full=[pscustomobject]@{avg10=0.0;avg60=0.0;avg300=0.0;total=0}}
+  $snapshot=[pscustomobject]@{
+    memory=[pscustomobject]@{total_bytes=[int64]64GB;free_bytes=[int64]64GB;cgroup_v2=[pscustomobject]@{effective_headroom_bytes=$null;ancestors=@([pscustomobject]@{relative_path='/host-only';control_applicability='applicable';events=$events;events_local=$events;pressure=$pressure})}}
+    work_volume=[pscustomobject]@{name='/work';mount_id=[int64]36;device='8:1';free_bytes=[int64]64GB;total_bytes=[int64]128GB;filesystem_type='ext4'}
+    system_volume=[pscustomobject]@{name='/';mount_id=[int64]35;device='8:2';free_bytes=[int64]64GB;total_bytes=[int64]128GB;filesystem_type='overlay'}
+  }
+  $policy=[pscustomobject]@{minimum_free_ram_gib=4;system_drive_hard_stop_free_gib=24;system_drive_target_free_gib=24;work_volume_reserve_gib=24}
+  $limits=Get-MIR441ResourceLimits -Policy $policy -Snapshot $snapshot;$output=[int64]16MB
+  $snapshot.system_volume.free_bytes=[int64]$limits.system_bytes
+  $snapshot.work_volume.free_bytes=[int64]$limits.work_bytes+2*$output
+  $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
+  try {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $snapshot}.GetNewClosure()
+    $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB
+    Assert-Probe $true 'linux-distinct-system-reserve-without-work-output-charge'
+    $snapshot.system_volume.device='8:1';$snapshot.system_volume.free_bytes=[int64]$limits.system_bytes+2*$output-1
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-admission-system-disk]'
+    $snapshot.system_volume.free_bytes=[int64]$limits.system_bytes+2*$output
+    $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB
+    Assert-Probe $true 'linux-same-device-different-mount-id-retains-output-charge'
+    $snapshot.system_volume.device='8:2';$snapshot.system_volume.free_bytes=[int64]$limits.system_bytes-1
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-admission-system-disk]'
+    $snapshot.system_volume.free_bytes=[int64]$limits.system_bytes;$snapshot.work_volume.free_bytes=[int64]$limits.work_bytes+2*$output-1
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-admission-work-disk]'
+    $snapshot.work_volume.free_bytes=[int64]$limits.work_bytes+2*$output;$snapshot.system_volume.device=''
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-linux-mount-device]'
+    $snapshot.system_volume.device='8:2';$snapshot.system_volume.mount_id=[int64]0
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-linux-mount-device]'
+    $snapshot.system_volume.mount_id=[int64]35;$snapshot.work_volume.device='malformed'
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $AdmissionRoot -EstimatedPeakBytes $output -ExpectedPeakMemoryBytes 1GB} '[mir441-resource-linux-mount-device]'
+  } finally {Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value $priorSnapshot}
+}
 function New-BenchmarkMemoryCallbacks {
   param([Parameter(Mandatory)]$Sampler)
   $state=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
@@ -267,8 +303,8 @@ try {
   $eightGiB=[int64]8GB
   $boundarySnapshot=[pscustomobject]@{
     observed_at='test';memory=[pscustomobject]@{total_bytes=[int64]64GB;free_bytes=[int64]64GB;commit_limit_bytes=[int64]64GB;committed_bytes=0L}
-    work_volume=[pscustomobject]@{name='W:';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
-    system_volume=[pscustomobject]@{name='S:';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
+    work_volume=[pscustomobject]@{name='W:';mount_id=[int64]1;device='8:1';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
+    system_volume=[pscustomobject]@{name='S:';mount_id=[int64]1;device='8:1';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
   }
   $admissionLimits=Get-MIR441ResourceLimits -Policy $admissionPolicy -Snapshot $boundarySnapshot
   $requiredDisk=[int64]$admissionLimits.work_bytes+2*$eightGiB
@@ -285,6 +321,7 @@ try {
   } finally {
     Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value $priorSnapshot
   }
+  Assert-LinuxDistinctSystemDiskAccounting -AdmissionRoot $admissionRoot
   $defaultBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'default-budget') -ExpectedPeakMemoryMiB 1024 -UseExactOutputRoot
   Assert-Probe ([int64]$defaultBudget.max_new_output_bytes -eq [int64]120MB) 'default-output-budget'
   $boundarySnapshot.work_volume.free_bytes=$requiredDisk;$boundarySnapshot.system_volume.free_bytes=$requiredDisk
