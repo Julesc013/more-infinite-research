@@ -330,6 +330,21 @@ class BobTechMaterialTests(unittest.TestCase):
             with self.assertRaisesRegex(Exception, "angels-plate-tin changed: availability or productivity flags"):
                 self.rows(raw=changed)
 
+    def test_named_item_reskin_is_unconsumed_but_item_presence_remains_required(self):
+        baseline = _plain(self.rows())
+        reskinned = self.raw_fixture()
+        reskinned_item = reskinned["item"]["bob-tin-plate"]
+        reskinned_item["icon"] = "__reskin__/graphics/icons/bob-tin-plate.png"
+        reskinned_item["icon_size"] = 128
+        before = _plain(reskinned)
+        self.assertEqual(baseline, _plain(self.rows(raw=reskinned)))
+        self.assertEqual(before, _plain(reskinned))
+
+        missing = self.raw_fixture()
+        missing["item"]["bob-tin-plate"] = None
+        with self.assertRaisesRegex(Exception, "bob-tin-plate is unavailable"):
+            self.rows(raw=missing)
+
     def test_named_preflight_rejects_route_owner_and_stage_drift_without_scanning(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')
         raw = self.raw_fixture()

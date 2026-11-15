@@ -56,8 +56,10 @@ local function validate_raw(raw, definition)
     fail("named F210 BobTech raw prototypes are unavailable")
   end
   local item = raw.item[definition.item]
-  if type(item) ~= "table" or item.icon ~= definition.icon or item.icon_size ~= definition.icon_size then
-    fail(definition.item .. " presentation changed")
+  -- The emitted technology retains the authored definition icon. Native item
+  -- presentation is not consumed by this named recipe/owner contract.
+  if type(item) ~= "table" then
+    fail(definition.item .. " is unavailable")
   end
   for _, route in ipairs(definition.routes) do
     local recipe = raw.recipe[route.recipe]
