@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 
 
@@ -32,6 +35,18 @@ PACKS = (
     "utility-science-pack", "space-science-pack", "se-rocket-science-pack",
     "se-energy-science-pack-4", "se-deep-space-science-pack-1",
 )
+ACTIVE_MODS = (
+    "aai-containers@0.3.2", "aai-industry@0.6.16", "aai-signal-transmission@0.5.3",
+    "alien-biomes-graphics@0.7.1", "alien-biomes@0.7.4", "base@2.0.77",
+    "informatron@0.4.0", "jetpack@0.4.17",
+    "mir-fixture-mir5-worker-speed-cap-ten@0.5.0", "more-infinite-research@5.0.20015",
+    "robot_attrition@0.6.6", "shield-projector@0.2.2",
+    "space-exploration-graphics-2@0.7.2", "space-exploration-graphics-3@0.7.2",
+    "space-exploration-graphics-4@0.7.2", "space-exploration-graphics-5@0.7.3",
+    "space-exploration-graphics@0.7.5", "space-exploration-menu-simulations@0.7.4",
+    "space-exploration-postprocess@0.7.5", "space-exploration@0.7.57",
+)
+ACTIVE_MODS_OBSERVER = "mir-fixture-mir5-worker-speed-cap-ten"
 
 
 class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
@@ -201,6 +216,62 @@ end
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
+
+    def test_library_observer_accepts_only_the_wrapper_report_of_the_full_active_tuple(self):
+        """Bind the producer's wrapper call site to the real selection reader."""
+        tuple_text = "|".join(ACTIVE_MODS)
+        fixture_log = lambda script, rows=tuple_text, loading="": (
+            f"{loading}1.860 Script @__{ACTIVE_MODS_OBSERVER}__/{script}:3: [MIR_ACTIVE_MODS] {rows}\n"
+        )
+        with tempfile.TemporaryDirectory(prefix="mir5-cap-ten-active-mods-") as work:
+            temporary = Path(work)
+            selection = temporary / "selected.json"
+            selection.write_text(json.dumps([
+                {"name": row.partition("@")[0], "version": row.partition("@")[2]}
+                for row in ACTIVE_MODS
+            ]), encoding="utf-8")
+            logs = {
+                "accepted": fixture_log("data-final-fixes.lua"),
+                "shared": fixture_log("fixture_data_final.lua"),
+                "contradictory": fixture_log("data-final-fixes.lua", loading="1.859 Loading mod base 2.0.78 (data.lua)\n"),
+                "missing_asset": fixture_log("data-final-fixes.lua", rows="|".join(
+                    row for row in ACTIVE_MODS if row != "space-exploration-graphics-5@0.7.3")),
+            }
+            paths = {}
+            for name, contents in logs.items():
+                path = temporary / f"{name}.log"
+                path.write_text(contents, encoding="utf-8", newline="\n")
+                paths[name] = str(path)
+            script = r'''
+              $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+              . $env:MIR_TEST_LIBRARY_ACTIVATION
+              $activation=[pscustomobject]@{selected=@(Get-Content -LiteralPath $env:MIR_TEST_SELECTION -Raw|ConvertFrom-Json)}
+              $observer=$env:MIR_TEST_OBSERVER
+              Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $env:MIR_TEST_ACCEPTED -ActiveModsObserver $observer|Out-Null
+              function Assert-ObserverRefusal([string]$Path,[string]$Expected){
+                $refused=$false
+                try{Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $Path -ActiveModsObserver $observer|Out-Null}catch{
+                  if(-not $_.Exception.Message.Contains($Expected)){throw ('unexpected observer refusal: '+$_.Exception.Message)}
+                  $refused=$true
+                }
+                if(-not $refused){throw ('observer opponent accepted: '+$Path)}
+              }
+              Assert-ObserverRefusal $env:MIR_TEST_SHARED '[mir-library-loaded-observation]'
+              Assert-ObserverRefusal $env:MIR_TEST_CONTRADICTORY '[mir-library-loaded-selection] Duplicate or contradictory native identity.'
+              Assert-ObserverRefusal $env:MIR_TEST_MISSING_ASSET '[mir-library-loaded-selection] Actual mod names/versions differ from the profile.'
+            '''
+            environment = dict(os.environ, MIR_TEST_LIBRARY_ACTIVATION=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
+                               MIR_TEST_SELECTION=str(selection), MIR_TEST_OBSERVER=ACTIVE_MODS_OBSERVER,
+                               MIR_TEST_ACCEPTED=paths["accepted"], MIR_TEST_SHARED=paths["shared"],
+                               MIR_TEST_CONTRADICTORY=paths["contradictory"], MIR_TEST_MISSING_ASSET=paths["missing_asset"])
+            result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                                    cwd=ROOT, env=environment, text=True, capture_output=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        shared = (FIXTURE / "fixture_data_final.lua").read_text(encoding="utf-8")
+        self.assertNotIn('log("[MIR_ACTIVE_MODS] ', shared)
+        for stage in (SOURCE, OLD_NEGATIVE, SUCCESSOR):
+            wrapper = (stage / "data-final-fixes.lua").read_text(encoding="utf-8")
+            self.assertIn('log("[MIR_ACTIVE_MODS] " .. tuple)', wrapper)
 
     def test_published15_old_negative_records_public_adverse_before_expected_failure(self):
         result = self.flow_result("old-negative")
