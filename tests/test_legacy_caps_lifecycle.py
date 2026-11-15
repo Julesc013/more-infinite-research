@@ -1229,64 +1229,41 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
         ''')
 
     def test_se_tail_ten_cap_survives_ordinary_event_without_claiming_foreign_ownership(self):
-        baseline = "d57dc66ae11c65325e7e09b37cae3a91f6f87a40"
-        for corrected in (False, True):
-            with self.subTest(corrected=corrected):
-                self.setUp()
-                self.lua.globals().corrected = corrected
-                for module in ("lifecycle",):
-                    self.lua.globals()["baseline_" + module] = subprocess.check_output(
-                        ["git", "show", f"{baseline}:source/runtime/{module}.lua"], cwd=ROOT
-                    ).decode("utf-8")
-                self.lua.globals().baseline_native_owners = subprocess.check_output(
-                    ["git", "show", f"{baseline}:source/research/native_owners.lua"], cwd=ROOT
-                ).decode("utf-8")
-                self.lua.execute('''
-                  local six = worker("worker-robots-speed-6")
-                  six.prototype.max_level = 6
-                  local seven = worker("worker-robots-speed-7")
-                  seven.prototype.max_level = 7
-                  local player = worker("worker-robots-speed-10")
-                  player.level, player.enabled = 11, true
-                  local foreign = worker("worker-robots-speed-10")
-                  foreign.level, foreign.enabled = 11, false
-                  local player_force = force(1, {[six.name] = six, [seven.name] = seven,
-                    [player.name] = player})
-                  local foreign_force = force(2, {[six.name] = worker(six.name),
-                    [seven.name] = worker(seven.name), [foreign.name] = foreign})
-                  foreign_force.technologies[six.name].prototype.max_level = 6
-                  foreign_force.technologies[seven.name].prototype.max_level = 7
-                  boot({[1] = player_force, [2] = foreign_force}, nil, nil, {worker_limit = 10})
-                  if not corrected then
-                    package.loaded["research.native_owners"] = assert(load(
-                      baseline_native_owners, "mir516-old-native-owners", "t", _G))()
-                    package.loaded["runtime.lifecycle"] = assert(load(
-                      baseline_lifecycle, "mir516-old-lifecycle", "t", _G))()
-                    lifecycle = package.loaded["runtime.lifecycle"]
-                  end
-                  lifecycle.on_configuration_changed()
-                  local saved = storage.mir_caps and storage.mir_caps.owned_disabled or {}
-                  if not corrected then
-                    assert(player.enabled and saved[1] == nil,
-                      "old 6/7-only selection must leave the SE tail ten uncapped")
-                    assert(not foreign.enabled and saved[2] == nil,
-                      "old selection must not claim the foreign tail ten")
-                  else
-                    assert(not player.enabled and saved[1] and saved[1][player.name]
-                      and saved[1][player.name].disabled == true,
-                      "current configuration must cap the admitted SE tail ten")
-                    assert(not foreign.enabled and saved[2] and saved[2][foreign.name]
-                      and saved[2][foreign.name].disabled == false,
-                      "current configuration must retain the foreign-disable baseline")
-                    player.enabled = true
-                    lifecycle.on_research_finished({force = player_force, research = player})
-                    assert(not player.enabled and saved[1][player.name].disabled == true,
-                      "ordinary tail-ten completion released MIR's cap ownership")
-                    lifecycle.on_research_finished({force = foreign_force, research = foreign})
-                    assert(not foreign.enabled and saved[2][foreign.name].disabled == false,
-                      "ordinary tail-ten completion claimed a foreign disablement")
-                  end
-                ''')
+        # The pre-fix 6/7-only selection is retained in PR review evidence.
+        # Keep this host control self-contained so shallow CI can exercise the
+        # lifecycle invariant without needing to fetch that historical tree.
+        self.lua.execute('''
+          local six = worker("worker-robots-speed-6")
+          six.prototype.max_level = 6
+          local seven = worker("worker-robots-speed-7")
+          seven.prototype.max_level = 7
+          local player = worker("worker-robots-speed-10")
+          player.level, player.enabled = 11, true
+          local foreign = worker("worker-robots-speed-10")
+          foreign.level, foreign.enabled = 11, false
+          local player_force = force(1, {[six.name] = six, [seven.name] = seven,
+            [player.name] = player})
+          local foreign_force = force(2, {[six.name] = worker(six.name),
+            [seven.name] = worker(seven.name), [foreign.name] = foreign})
+          foreign_force.technologies[six.name].prototype.max_level = 6
+          foreign_force.technologies[seven.name].prototype.max_level = 7
+          boot({[1] = player_force, [2] = foreign_force}, nil, nil, {worker_limit = 10})
+          lifecycle.on_configuration_changed()
+          local saved = storage.mir_caps and storage.mir_caps.owned_disabled or {}
+          assert(not player.enabled and saved[1] and saved[1][player.name]
+            and saved[1][player.name].disabled == true,
+            "current configuration must cap the admitted SE tail ten")
+          assert(not foreign.enabled and saved[2] and saved[2][foreign.name]
+            and saved[2][foreign.name].disabled == false,
+            "current configuration must retain the foreign-disable baseline")
+          player.enabled = true
+          lifecycle.on_research_finished({force = player_force, research = player})
+          assert(not player.enabled and saved[1][player.name].disabled == true,
+            "ordinary tail-ten completion released MIR's cap ownership")
+          lifecycle.on_research_finished({force = foreign_force, research = foreign})
+          assert(not foreign.enabled and saved[2][foreign.name].disabled == false,
+            "ordinary tail-ten completion claimed a foreign disablement")
+        ''')
 
     def test_historical_worker_allowlist_does_not_create_tail_ten_restoration_rights(self):
         self.lua.execute('''
