@@ -55,6 +55,20 @@ local function assert_worker(row)
   end
 end
 
+local function worker_inputs(row)
+  local inputs, seen = {}, {}
+  for _, ingredient in ipairs(row.unit.ingredients) do
+    local name = ingredient.name or ingredient[1]
+    local amount = ingredient.amount or ingredient[2]
+    if type(name) ~= "string" or name == "" or seen[name] or type(amount) ~= "number" or amount <= 0 then
+      fail("SE worker-speed ingredient differs")
+    end
+    seen[name] = true
+    inputs[#inputs + 1] = name
+  end
+  return inputs
+end
+
 function M.apply(stage)
   local expected = assert_closure(stage)
   local row = data.raw.technology and data.raw.technology[WORKER]
@@ -70,6 +84,7 @@ function M.apply(stage)
   lab.minable = nil
   lab.energy_source = {type = "void"}
   lab.researching_speed = 14400
+  lab.inputs = worker_inputs(row)
   data:extend({lab})
 end
 

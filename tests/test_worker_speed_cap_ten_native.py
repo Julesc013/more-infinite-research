@@ -33,6 +33,7 @@ local caps = require("runtime.caps")
 local KEY = "mir5_worker_speed_cap_ten"
 local WORKER = "worker-robots-speed-6"
 local PROBE = "automation"
+local AUTOMATION_SCIENCE = "automation-science-pack"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local closure = {
   base = "2.0.77", ["more-infinite-research"] = "5.0.20015", ["space-exploration"] = "0.7.57",
@@ -98,6 +99,7 @@ local function force(name, index)
     current_research = nil, research_progress = 0, worker_robots_speed_modifier = 0}
   value.technologies[WORKER] = technology(WORKER, value)
   value.technologies[PROBE] = technology(PROBE, value)
+  value.technologies[AUTOMATION_SCIENCE] = technology(AUTOMATION_SCIENCE, value)
   value.technologies["worker-robots-speed-5"] = technology("worker-robots-speed-5", value)
   function value.enable_all_prototypes() end
   function value.reset_technology_effects()
@@ -107,6 +109,8 @@ local function force(name, index)
   function value.add_research(research)
     if type(research) == "string" then research = value.technologies[research] end
     if research == nil or research.enabled ~= true or value.current_research ~= nil then return false end
+    if research.name == WORKER and value.technologies["worker-robots-speed-5"].researched ~= true then return false end
+    if research.name == PROBE and value.technologies[AUTOMATION_SCIENCE].researched ~= true then return false end
     value.research_queue = {research}; return true
   end
   return setmetatable(value, {__index = function(self, key)
@@ -119,13 +123,17 @@ local function force(name, index)
 end
 
 local function inventory()
-  local value = {items = {}}
-  function value.insert(row) value.items[row.name] = (value.items[row.name] or 0) + row.count; return row.count end
+  local value = {items = {}, capacity = 200}
+  function value.insert(row)
+    local accepted = math.min(row.count, math.max(0, value.capacity - (value.items[row.name] or 0)))
+    value.items[row.name] = (value.items[row.name] or 0) + accepted
+    return accepted
+  end
   function value.get_item_count(name) return value.items[name] or 0 end
   return value
 end
 
-local function load_control(path, common, stage, game, storage, settings, markers, logs)
+local function load_control(path, common, stage, game, storage, settings, markers, logs, files)
   local callbacks = {events = {}}
   local versions = {source = "0.1.0", cap10 = "0.2.0"}
   local active = copy(closure); active[FIXTURE] = versions[stage]
@@ -134,7 +142,10 @@ local function load_control(path, common, stage, game, storage, settings, marker
       on_configuration_changed = function(f) callbacks.changed = f end, on_load = function(f) callbacks.load = f end,
       on_event = function(event, f) callbacks.events[event] = f end},
     defines = {events = {on_tick = 1, on_research_finished = 2, on_research_started = 3}, inventory = {lab_input = 1}},
-    helpers = {table_to_json = function(row) markers[#markers + 1] = row; return "{}" end},
+    helpers = {table_to_json = function(row) markers[#markers + 1] = row; return '{"fixture":"host-control"}' end,
+      write_file = function(path, body, append)
+        files[#files + 1] = {path = path, body = body, append = append}
+      end},
     log = function(row) logs[#logs + 1] = row end}
   env.require = function(name)
     assert(name == "__mir-fixture-mir5-worker-speed-cap-ten__/fixture_control")
@@ -167,19 +178,26 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
     game.lab = value; return value
   end}
   function game.server_save(name) assert(name == "mir5-worker-speed-cap-ten-complete"); saved = saved + 1 end
-  local storage, markers, logs = {mir_caps = {}}, {}, {}
+  local storage, markers, logs, files = {mir_caps = {}}, {}, {}, {}
   local function settings(cap) return {startup = {
     ["mir-max-level-worker-robots-speed"] = {value = cap}, ["mir-settings-profile-import"] = {value = ""}}} end
-  local source, message = load_control(source_path, common, "source", game, storage, settings(0), markers, logs)
+  local source, message = load_control(source_path, common, "source", game, storage, settings(0), markers, logs, files)
   if not source then return {ok = false, message = message} end
   local ok, result = invoke(source.init)
   if not ok then return {ok = false, message = result} end
+  if opponent == "source-administrative" or opponent == "source-ordinary" then
+    local administrative = opponent == "source-administrative"
+    ok, result = invoke(source.events[2], {research = player.technologies["worker-robots-speed-5"],
+      by_script = administrative, tick = game.tick})
+    return {ok = ok, message = result, state = storage[KEY]}
+  end
   if opponent == "source-tick" then
     local tick_ok, tick_message = invoke(source.events[1])
     return {ok = tick_ok, message = tick_message}
   end
   local state = storage[KEY]
   if type(state) ~= "table" then return {ok = false, message = "source state absent"} end
+  if opponent == "missing-prerequisite" then player.technologies["worker-robots-speed-5"].researched = false end
   if opponent ~= "skip-lifecycle" then
     for _, value in ipairs({player, game.forces[state.foreign_index], game.forces[state.earned_index]}) do
       caps.reconcile(value, {[WORKER] = 10}, storage.mir_caps, {[WORKER] = true})
@@ -187,10 +205,12 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
   end
   if opponent == "partial-drift" then player.research_progress = .26 end
   if opponent == "foreign-reenabled" then game.forces[state.foreign_index].technologies[WORKER].enabled = true end
-  local cap, cap_message = load_control(cap_path, common, "cap10", game, storage, settings(10), markers, logs)
+  local cap, cap_message = load_control(cap_path, common, "cap10", game, storage, settings(10), markers, logs, files)
   if not cap then return {ok = false, message = cap_message} end
   ok, result = invoke(cap.changed)
   if not ok then return {ok = false, message = result, markers = markers, logs = logs, saves = saved} end
+  game.tick = game.tick + 1; ok, result = invoke(cap.events[1])
+  if not ok then return {ok = false, message = result} end
   -- Model the one ordinary native completion after the fixture's exact feed.
   local owner = player.technologies[WORKER]
   if opponent == "scripted-completion" then
@@ -198,7 +218,7 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
     return {ok = ok, message = result}
   end
   player.research_queue = {}; owner.level = 11; player.worker_robots_speed_modifier = state.player_bonus_before + .65
-  for name in pairs(state.lab_feed) do game.lab.input.items[name] = 0 end
+  for name in pairs(state.lab_feed) do game.lab.input.items[name] = 50 end
   caps.reconcile(player, {[WORKER] = 10}, storage.mir_caps, {[WORKER] = true})
   ok, result = invoke(cap.events[2], {research = owner, by_script = false, tick = game.tick})
   if not ok then return {ok = false, message = result} end
@@ -211,12 +231,12 @@ function worker_cap_flow(source_path, cap_path, common, opponent)
     if not ok then return {ok = false, message = result} end
   end
   for _ = 1, 2 do
-    local cold, cold_message = load_control(cap_path, common, "cap10", game, storage, settings(10), markers, logs)
+    local cold, cold_message = load_control(cap_path, common, "cap10", game, storage, settings(10), markers, logs, files)
     if not cold then return {ok = false, message = cold_message} end
     ok, result = invoke(cold.load); if not ok then return {ok = false, message = result} end
     game.tick = game.tick + 1; ok, result = invoke(cold.events[1]); if not ok then return {ok = false, message = result} end
   end
-  return {ok = true, markers = markers, logs = logs, saves = saved, labs = created, state = storage[KEY],
+  return {ok = true, markers = markers, logs = logs, files = files, saves = saved, labs = created, state = storage[KEY],
     player = player, foreign = game.forces[state.foreign_index], earned = game.forces[state.earned_index]}
 end
 ''')
@@ -252,6 +272,8 @@ end
                                   ("automation-science-pack", "utility-science-pack")),
                                  (worker["unit"]["count_formula"], worker["unit"]["time"],
                                   tuple(worker["unit"]["ingredients"][index][1] for index in range(1, 3))))
+                self.assertEqual(("automation-science-pack", "utility-science-pack"),
+                                 tuple(result["extensions"][1]["inputs"][index] for index in range(1, 3)))
                 self.assertEqual(cap, result["raw"]["int-setting"][CAP]["default_value"])
                 self.assertEqual(1, len(result["extensions"]))
                 self.assertEqual("mir-worker-speed-cap-ten-fast-lab", result["extensions"][1]["name"])
@@ -285,14 +307,27 @@ end
                                         len(complete["pre_work"]["player"]["queue"]["queue"]),
                                         len(complete["player"]["queue"]["queue"])))
         self.assertEqual(.27, complete["pre_work"]["player"]["queue"]["progress"])
+        self.assertFalse(markers[0]["foreign"]["visible"])
+        self.assertTrue(complete["pre_work"]["foreign"]["visible"])
         self.assertFalse(complete["pre_work"]["foreign"]["enabled"])
-        self.assertEqual(11, complete["pre_work"]["earned_above_cap"]["level"])
+        self.assertEqual(13, complete["pre_work"]["earned_above_cap"]["level"])
+        self.assertEqual(complete["pre_work"]["earned_above_cap"]["bonus"], complete["earned_above_cap"]["bonus"])
         self.assertEqual((False, 2), (complete["level_eleven_queue_attempt"]["accepted"],
                                       complete["post_completion_hold_ticks"]))
-        self.assertEqual((0, 0), (complete["post_completion"]["lab"]["input_total"],
-                                  complete["post_completion"]["end_lab"]["input_total"]))
+        self.assertEqual(complete["post_completion"]["lab"]["input_total"],
+                         complete["post_completion"]["end_lab"]["input_total"])
+        self.assertGreater(complete["post_completion"]["lab"]["input_total"], 0)
         self.assertEqual(complete["post_completion"]["lab"]["scripted_feed_total"],
                          complete["post_completion"]["end_lab"]["scripted_feed_total"])
+        input_by_name = complete["post_completion"]["lab"]["input_by_name"]
+        end_input_by_name = complete["post_completion"]["end_lab"]["input_by_name"]
+        self.assertEqual({key: input_by_name[key] for key in input_by_name},
+                         {key: end_input_by_name[key] for key in end_input_by_name})
+        self.assertTrue(all(input_by_name[key] > 0 for key in input_by_name))
+        feed_by_name = complete["scripted_lab_feed"]
+        self.assertEqual({key: input_by_name[key] for key in input_by_name},
+                         {key: input_by_name[key] for key in feed_by_name})
+        self.assertTrue(all(feed_by_name[key] > input_by_name[key] for key in feed_by_name))
         self.assertFalse(complete["lab"]["disabled_by_script"])
         self.assertTrue(complete["scripted_setup"]["lab_feed"])
         self.assertEqual((11, False, 0), (result["player"]["technologies"][WORKER]["level"],
@@ -300,12 +335,21 @@ end
                                            len(result["player"]["research_queue"])))
         self.assertFalse(result["foreign"]["technologies"][WORKER]["enabled"])
         self.assertFalse(result["earned"]["technologies"][WORKER]["enabled"])
+        self.assertEqual(13, result["earned"]["technologies"][WORKER]["level"])
+        writes = [result["files"][index] for index in range(1, len(result["files"]) + 1)]
+        self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/complete.json",
+                          "worker-speed-cap-ten/cold.json", "worker-speed-cap-ten/cold.json"],
+                         [row["path"] for row in writes])
+        self.assertEqual({"worker-speed-cap-ten/source.json", "worker-speed-cap-ten/complete.json",
+                          "worker-speed-cap-ten/cold.json"}, {row["path"] for row in writes})
+        self.assertTrue(all(row["append"] is False and row["body"] == '{"fixture":"host-control"}\n' for row in writes))
 
     def test_cap_stage_refuses_without_lifecycle_queue_filtering_or_with_adverse_state_drift(self):
         opponents = {
             "skip-lifecycle": "cap-ten did not retain only current level-ten work",
             "partial-drift": "cap-ten did not retain only current level-ten work",
             "foreign-reenabled": "foreign disabled sentinel differs",
+            "missing-prerequisite": "player worker predecessor is not researched",
             "scripted-completion": "scripted completion cannot satisfy ordinary cap-ten work",
             "level-eleven-start": "ordinary completion started or consumed level eleven",
         }
@@ -319,6 +363,12 @@ end
         source_tick = self.flow_result("source-tick")
         self.assertFalse(source_tick["ok"])
         self.assertIn("source create-only stage received an actor tick", source_tick["message"])
+        administrative = self.flow_result("source-administrative")
+        self.assertTrue(administrative["ok"], administrative["message"])
+        self.assertEqual("scripted-prerequisite", administrative["state"]["scripted_administrative_events"][1]["setup_class"])
+        source_ordinary = self.flow_result("source-ordinary")
+        self.assertFalse(source_ordinary["ok"])
+        self.assertIn("source stage observed non-administrative research completion", source_ordinary["message"])
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         on_load = control.split("script.on_load(function()", 1)[1].split("script.on_event(defines.events.on_tick", 1)[0]
         self.assertNotIn("game", on_load)

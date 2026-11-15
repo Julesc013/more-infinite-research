@@ -9,13 +9,16 @@ local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local WORKER = "worker-robots-speed-6"
 local PREDECESSOR = "worker-robots-speed-5"
 local PROBE = "automation"
+local AUTOMATION_SCIENCE = "automation-science-pack"
 local LAB = "mir-worker-speed-cap-ten-fast-lab"
 local PARTIAL = 0.27
 local FOREIGN_PROGRESS = 0.42
 local EFFECT = 0.65
+local EARNED_LEVEL = 13
 local UINT32_MAX = 4294967295
 local DEADLINE_TICKS = 18000
 local POST_COMPLETION_HOLD_TICKS = 2
+local LAB_TOP_UP_REQUEST = 200
 local STAGES = {source = {version = "0.1.0", cap = 0}, cap10 = {version = "0.2.0", cap = 10}}
 local CLOSURE = {
   base = "2.0.77", ["more-infinite-research"] = "5.0.20015", ["space-exploration"] = "0.7.57",
@@ -147,13 +150,35 @@ local function assert_foreign_cap(actual, state, label)
 end
 
 local function assert_earned_cap(actual, state, label)
-  if actual.level ~= 11 or actual.researched ~= false or actual.enabled ~= false or actual.visible ~= true
+  if actual.level ~= EARNED_LEVEL or actual.researched ~= false or actual.enabled ~= false or actual.visible ~= true
       or not close(actual.bonus, state.earned_bonus) or actual.queue.current ~= false or #actual.queue.queue ~= 0 then
     fail(label .. " earned-above-cap state differs")
   end
 end
 
-local function force_by_index(index, label)
+local function seed_worker_predecessor(force, label)
+  local predecessor = technology(force, PREDECESSOR)
+  predecessor.researched, predecessor.enabled = true, true
+  if predecessor.researched ~= true then fail(label .. " worker predecessor could not be seeded") end
+end
+
+local force_by_index
+
+local function assert_seeded_prerequisites(state, label)
+  local player = game.forces.player
+  local foreign = force_by_index(state.foreign_index, label .. " foreign")
+  local earned = force_by_index(state.earned_index, label .. " earned")
+  if technology(player, PREDECESSOR).researched ~= true then fail(label .. " player worker predecessor is not researched") end
+  if technology(foreign, PREDECESSOR).researched ~= true
+      or technology(earned, PREDECESSOR).researched ~= true then
+    fail(label .. " witness worker predecessor is not researched")
+  end
+  if technology(foreign, AUTOMATION_SCIENCE).researched ~= true then
+    fail(label .. " foreign automation science prerequisite is not researched")
+  end
+end
+
+force_by_index = function(index, label)
   local value = game.forces[index]
   if value == nil or value.valid == false then fail(label .. " force is absent") end
   return value
@@ -173,15 +198,19 @@ local function feed_total(feed)
 end
 
 local function lab_snapshot(state, label)
-  if state.lab == nil then return {present = false, scripted_feed_total = 0, input_total = 0} end
+  if state.lab == nil then return {present = false, scripted_feed_total = 0, scripted_feed_by_name = {}, input_total = 0, input_by_name = {}} end
   if state.lab.valid ~= true then fail(label .. " fixture lab is absent") end
   if state.lab.disabled_by_script ~= false then fail(label .. " fixture lab was stopped") end
   local inventory = state.lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail(label .. " fixture lab input is absent") end
-  local input_total = 0
-  for name in pairs(state.lab_feed or {}) do input_total = input_total + inventory.get_item_count(name) end
+  local input_total, input_by_name = 0, {}
+  for name in pairs(state.lab_feed or {}) do
+    local count = inventory.get_item_count(name)
+    input_total, input_by_name[name] = input_total + count, count
+  end
   return {present = true, valid = true, disabled_by_script = false, unit_number = state.lab.unit_number,
-    scripted_feed_total = feed_total(state.lab_feed), input_total = input_total}
+    scripted_feed_total = feed_total(state.lab_feed), scripted_feed_by_name = copy(state.lab_feed),
+    input_total = input_total, input_by_name = input_by_name}
 end
 
 local function marker(phase, state)
@@ -195,20 +224,28 @@ local function marker(phase, state)
       foreign_disabled = true, earned_above_cap_force = true, lab_feed = state.lab_feed ~= nil},
     ordinary_native_completion_count = state.ordinary_native_completion_count or 0,
     level_eleven_start_count = state.level_eleven_start_count or 0,
+    scripted_administrative_events = copy(state.scripted_administrative_events or {}),
     ordinary_events = copy(state.ordinary_events or {}), pre_work = state.pre_work and copy(state.pre_work) or false,
     post_completion = state.post_completion and copy(state.post_completion) or false,
     post_completion_hold_ticks = state.post_completion_hold_ticks or 0,
     level_eleven_queue_attempt = state.level_eleven_queue_attempt and copy(state.level_eleven_queue_attempt) or false,
     lab = lab_snapshot(state, phase),
     player = player, foreign = foreign, earned_above_cap = earned,
-    scripted_lab_feed = copy(state.lab_feed or {}), on_load_read_only = phase == "cold",
+    scripted_lab_feed = copy(state.lab_feed or {}),
+    scripted_lab_post_completion_top_up = copy(state.lab_post_completion_top_up or {}),
+    on_load_read_only = phase == "cold",
   }
-  log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. helpers.table_to_json(snapshot))
+  local body = helpers.table_to_json(snapshot)
+  helpers.write_file("worker-speed-cap-ten/" .. phase .. ".json", body .. "\n", false)
+  log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. body)
 end
 
 local function seed_foreign()
   local foreign = game.create_force("mir5-worker-speed-cap-ten-foreign")
   foreign.enable_all_prototypes()
+  seed_worker_predecessor(foreign, "foreign")
+  local science = technology(foreign, AUTOMATION_SCIENCE)
+  science.researched, science.enabled = true, true
   local owner = technology(foreign, WORKER)
   owner.level, owner.researched = 11, false
   foreign.reset_technology_effects()
@@ -223,40 +260,51 @@ end
 local function seed_earned()
   local earned = game.create_force("mir5-worker-speed-cap-ten-earned")
   earned.enable_all_prototypes()
+  seed_worker_predecessor(earned, "earned")
   local owner = technology(earned, WORKER)
-  owner.level, owner.researched = 11, false
+  owner.level, owner.researched = EARNED_LEVEL, false
   earned.reset_technology_effects()
   owner.enabled, owner.visible_when_disabled = true, false
   return earned
 end
 
-local function feed_lab(state)
+local function refill_lab(state, label)
+  local inventory = state.lab and state.lab.get_inventory(defines.inventory.lab_input)
+  if inventory == nil then fail(label .. " fixture fast lab input is absent") end
+  local owner = technology(game.forces.player, WORKER)
+  assert_worker(owner, label .. " worker")
+  for _, ingredient in ipairs(owner.research_unit_ingredients) do
+    local inserted = inventory.insert({name = ingredient.name, count = LAB_TOP_UP_REQUEST})
+    if type(inserted) ~= "number" or inserted < 0 or inserted > LAB_TOP_UP_REQUEST then
+      fail(label .. " fixture lab returned an invalid accepted input count")
+    end
+    state.lab_feed[ingredient.name] = (state.lab_feed[ingredient.name] or 0) + inserted
+    if label == "post-completion" then
+      state.lab_post_completion_top_up[ingredient.name] = (state.lab_post_completion_top_up[ingredient.name] or 0) + inserted
+    end
+  end
+end
+
+local function create_lab(state)
   local player = game.forces.player
-  local owner = technology(player, WORKER)
-  assert_worker(owner, "cap-ten pre-feed")
   local surface = game.surfaces[1]
   if surface == nil then fail("fixture surface is absent") end
   local lab = surface.create_entity({name = LAB, position = {0, 0}, force = player})
   if lab == nil or lab.valid == false then fail("fixture fast lab could not be created") end
   lab.disabled_by_script = false
   lab.energy = 100000000
-  local inventory = lab.get_inventory(defines.inventory.lab_input)
-  if inventory == nil then fail("fixture fast lab input is absent") end
-  local feed = {}
-  for _, ingredient in ipairs(owner.research_unit_ingredients) do
-    local count = owner.research_unit_count * ingredient.amount
-    local inserted = inventory.insert({name = ingredient.name, count = count})
-    if inserted ~= count then fail("scripted lab feed was not fully inserted: " .. ingredient.name) end
-    feed[ingredient.name] = count
-  end
-  state.lab, state.lab_feed = lab, feed
+  if lab.get_inventory(defines.inventory.lab_input) == nil then fail("fixture fast lab input is absent") end
+  state.lab, state.lab_feed, state.lab_post_completion_top_up = lab, {}, {}
 end
 
-local function assert_feed_debited(state)
+local function assert_feed_consumed_and_remaining(state, label)
   local inventory = state.lab and state.lab.get_inventory(defines.inventory.lab_input)
   if inventory == nil then fail("fixture fast lab input disappeared") end
   for name in pairs(state.lab_feed or {}) do
-    if inventory.get_item_count(name) ~= 0 then fail("ordinary level-ten research did not debit scripted feed: " .. name) end
+    local inserted = state.lab_feed[name]
+    local remaining = inventory.get_item_count(name)
+    if inserted <= remaining then fail(label .. " did not consume scripted feed: " .. name) end
+    if remaining <= 0 then fail(label .. " did not retain positive scripted input: " .. name) end
   end
 end
 
@@ -269,7 +317,7 @@ local function assert_post_completion(state, label)
   end
   assert_foreign_cap(foreign, state, label)
   assert_earned_cap(earned, state, label)
-  assert_feed_debited(state)
+  assert_feed_consumed_and_remaining(state, label)
   return player, foreign, earned
 end
 
@@ -292,8 +340,12 @@ function M.apply(stage)
     if stage ~= "source" then fail("only source stage may initialize") end
     check_closure(stage)
     if storage[KEY] ~= nil then fail("fixture state already exists") end
+    local state = {phase = "source-setup", ordinary_native_completion_count = 0, level_eleven_start_count = 0,
+      ordinary_events = {}, scripted_administrative_events = {}}
+    storage[KEY] = state
     local player = game.forces.player
     player.enable_all_prototypes()
+    seed_worker_predecessor(player, "player")
     local owner = technology(player, WORKER)
     owner.level, owner.researched = 10, false
     player.reset_technology_effects()
@@ -305,12 +357,8 @@ function M.apply(stage)
     local foreign, earned = seed_foreign(), seed_earned()
     local foreign_state = worker_snapshot(foreign, "source foreign")
     local earned_state = worker_snapshot(earned, "source earned")
-    local state = {
-      phase = "source-seeded", foreign_index = foreign.index, earned_index = earned.index,
-      player_bonus_before = player_state.bonus, foreign_bonus = foreign_state.bonus, earned_bonus = earned_state.bonus,
-      ordinary_native_completion_count = 0, level_eleven_start_count = 0, ordinary_events = {},
-    }
-    storage[KEY] = state
+    state.phase, state.foreign_index, state.earned_index = "source-seeded", foreign.index, earned.index
+    state.player_bonus_before, state.foreign_bonus, state.earned_bonus = player_state.bonus, foreign_state.bonus, earned_state.bonus
     marker("source", state)
   end)
 
@@ -323,13 +371,25 @@ function M.apply(stage)
     assert_player_cap(player, state, "cap-ten configuration")
     assert_foreign_cap(foreign, state, "cap-ten configuration")
     assert_earned_cap(earned, state, "cap-ten configuration")
+    assert_seeded_prerequisites(state, "cap-ten configuration")
     state.pre_work = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
-    feed_lab(state)
+    create_lab(state)
     state.phase, state.deadline_tick = "await-ordinary-level-ten", game.tick + DEADLINE_TICKS
   end)
 
   script.on_event(defines.events.on_research_finished, function(event)
-    if stage ~= "cap10" then fail("source stage observed a research completion") end
+    if stage == "source" then
+      local research = event.research
+      local source_state = storage[KEY]
+      if type(source_state) == "table" and event.by_script == true and research ~= nil
+          and (research.name == PREDECESSOR or research.name == AUTOMATION_SCIENCE)
+          and #source_state.scripted_administrative_events < 16 then
+        source_state.scripted_administrative_events[#source_state.scripted_administrative_events + 1] = {
+          name = research.name, by_script = true, tick = event.tick, setup_class = "scripted-prerequisite"}
+        return
+      end
+      fail("source stage observed non-administrative research completion")
+    end
     local state = storage[KEY]
     if type(state) ~= "table" or state.phase ~= "await-ordinary-level-ten" then return end
     local player = game.forces.player
@@ -361,10 +421,12 @@ function M.apply(stage)
     local state = storage[KEY]
     if type(state) ~= "table" then fail("fixture state is absent") end
     if state.phase == "await-ordinary-level-ten" then
+      refill_lab(state, "await")
       if game.tick > state.deadline_tick then fail("ordinary level-ten completion timed out") end
       return
     end
     if state.phase == "ordinary-level-ten-finished" then
+      refill_lab(state, "post-completion")
       local player, foreign, earned = assert_post_completion(state, "ordinary completion")
       state.post_completion = {tick = game.tick, player = copy(player), foreign = copy(foreign),
         earned_above_cap = copy(earned), lab = lab_snapshot(state, "ordinary completion")}
@@ -400,7 +462,7 @@ function M.apply(stage)
         or not close(player.bonus, state.player_bonus_before + EFFECT) then fail("cold player cap state differs") end
     assert_foreign_cap(foreign, state, "cold")
     assert_earned_cap(earned, state, "cold")
-    assert_feed_debited(state)
+    assert_feed_consumed_and_remaining(state, "cold")
     marker("cold", state)
     cold_logged = true
   end)
