@@ -1,0 +1,8 @@
+{
+  "name": "a-mir-fixture-native-credit-vectors-allfive-upstream",
+  "version": "0.1.0",
+  "title": "MIR test-only all-five native-credit upstream scaffold",
+  "author": "MIR contributors",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "space-age = 2.0.77", "quality = 2.0.77", "elevated-rails = 2.0.77"]
+}

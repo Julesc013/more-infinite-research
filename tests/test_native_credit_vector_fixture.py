@@ -9,10 +9,12 @@ import sys
 import unittest
 
 import test_native_family_paid_credits as family_fixture
+import test_generator as generator_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/native-credit-vectors"
 ALL_FIVE_FIXTURE = ROOT / "tests/fixtures/native-credit-vectors-allfive"
+ALL_FIVE_UPSTREAM = ROOT / "tests/fixtures/native-credit-vectors-allfive-upstream"
 
 
 class NativeCreditVectorFixtureControls(unittest.TestCase):
@@ -405,43 +407,39 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
           function clone(v)if type(v)~="table"then return v end local out={};for k,x in pairs(v)do out[k]=clone(x)end;return out end
           table.deepcopy=clone
           function allfive_effect(recipe,change)return {type="change-recipe-productivity",recipe=recipe,change=change}end
-          function allfive_pair(module,family,opponent)
-            local positive,negative,reference={}, {}, {}
-            for _,recipe in ipairs(family.routes)do
-              positive[#positive+1]=allfive_effect(recipe,.1)
-              negative[#negative+1]=allfive_effect(recipe,-.1)
-              reference[#reference+1]=allfive_effect(recipe,.1)
-            end
-            -- Processing has one public route. This companion is a declared
-            -- controlled fixture component, never an inferred provider route.
-            if #family.routes==1 then
-              local extra=family.extra[family.routes[1]]
-              positive[#positive+1]=allfive_effect(extra,.1)
-              negative[#negative+1]=allfive_effect(extra,-.1)
-              reference[#reference+1]=allfive_effect(extra,.1)
-            end
-            reference[#reference+1]=allfive_effect(family.public_only,.1)
-            if opponent=="public-in-positive"then positive[#positive+1]=allfive_effect(family.public_only,.1)end
+          function allfive_pair(module,family,recipe,opponent)
+            local extra,public_only=family.extra[recipe],family.public_only[recipe]
+            local positive={allfive_effect(recipe,.1),allfive_effect(extra,.1)}
+            local negative={allfive_effect(recipe,-.1),allfive_effect(extra,-.1)}
+            local reference={allfive_effect(recipe,.1),allfive_effect(extra,.1),allfive_effect(public_only,.1)}
+            if opponent=="public-in-positive"then positive[#positive+1]=allfive_effect(public_only,.1)end
             if opponent=="missing-negative"then table.remove(negative,#negative)end
-            local vector,basis=module.pair(positive,negative,family.routes[1],reference,.1,
+            local vector,basis=module.pair(positive,negative,recipe,reference,.1,
               function(left,right)return math.abs(left-right)<0.0000001 end,
               function(left,right)return math.abs(left-right)<0.0000001 end)
             return vector~=nil,basis,positive,negative,reference
           end
-          function allfive_data_case(target,opponent)
+          function allfive_data_case(target,phase,opponent)
             local tuple=C.targets[target]
             mods={base=tuple.base,["space-age"]=tuple.base,quality=tuple.base,["elevated-rails"]=tuple.base,
-              ["more-infinite-research"]=tuple.mir,[C.mod]=C.version}
+              ["more-infinite-research"]=tuple.mir,[C.mod]=phase,[C.upstream]="0.1.0"}
             if tuple.recycler then mods.recycler=tuple.base end
             data={raw={technology={},recipe={},lab={lab={type="lab",name="lab"}},["mod-data"]={}}}
             function data:extend(rows)for _,row in ipairs(rows)do self.raw[row.type]=self.raw[row.type]or{};assert(self.raw[row.type][row.name]==nil,"duplicate "..row.name);self.raw[row.type][row.name]=row end end
             local credits={}
             for _,family in ipairs(C.families)do
-              local main={name=C.main(family),effects={}}
-              local reference={name=family.reference,hidden=false,effects={}}
+              local ingredients={};local prerequisites={}
+              for _,name in ipairs(C.packs)do ingredients[#ingredients+1]={name,1};prerequisites[#prerequisites+1]=name end
+              local main={name=C.main(family),hidden=true,enabled=false,effects={},prerequisites=prerequisites,
+                unit={count_formula=C.formula,time=C.seconds,ingredients=ingredients}}
               credits[family.key]={}
               for _,recipe in ipairs(family.routes)do
-                main.effects[#main.effects+1]=allfive_effect(recipe,.1)
+                local reference_name=C.reference(family,recipe)
+                local reference=data.raw.technology[reference_name]
+                if not reference then
+                  reference={name=reference_name,hidden=false,effects={}}
+                  data.raw.technology[reference_name]=reference
+                end
                 reference.effects[#reference.effects+1]=allfive_effect(recipe,.1)
                 credits[family.key][#credits[family.key]+1]={recipe=recipe,change=.1}
                 data.raw.recipe[recipe]={type="recipe",name=recipe,enabled=false,ingredients={},results={}}
@@ -451,7 +449,7 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
                   data.raw.technology[id]={name=id,hidden=true,enabled=false,effects={allfive_effect(recipe,change)}}
                 end
               end
-              data.raw.technology[main.name]=main;data.raw.technology[reference.name]=reference
+              data.raw.technology[main.name]=main
             end
             data.raw["mod-data"]["more-infinite-research-native-adoptions"]={data={credits=credits}}
             if opponent=="missing-public-route"then table.remove(data.raw.technology[C.families[1].reference].effects)end
@@ -459,19 +457,48 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             dofile(fixture_path.."/data.lua");dofile(fixture_path.."/data-final-fixes.lua")
             return data.raw
           end
-          function allfive_actor_case(target,opponent)
-            local tuple=C.targets[target]
-            local callbacks,commands_map,saves={}, {}, {}
-            storage={}
+          function allfive_shared_actor_case(target,opponent)
+            local tuple=C.targets[target];local callbacks,commands_map,saves={}, {}, {};storage={}
             local mods={base=tuple.base,["space-age"]=tuple.base,quality=tuple.base,["elevated-rails"]=tuple.base,
-              ["more-infinite-research"]=tuple.mir,[C.mod]=C.version}
+              ["more-infinite-research"]=tuple.mir,[C.mod]="0.1.0",[C.upstream]="0.1.0"}
             if tuple.recycler then mods.recycler=tuple.base end
-            local force={technologies={},recipes={},research_queue={},laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
-            for _,family in ipairs(C.families)do
-              force.technologies[family.reference]={name=family.reference,valid=true,level=1,researched=false}
-              force.recipes[family.public_only]={productivity_bonus=0}
+            local queue={};local force={technologies={},recipes={},laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
+            setmetatable(force,{__index=function(_,key)if key=="research_queue"then return queue end end,
+              __newindex=function(value,key,row)if key=="research_queue"then queue=row;rawset(value,"current_research",row[1])else rawset(value,key,row)end end})
+            local packs={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},
+              {name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1}}
+            local function technology(name,effects,hidden,enabled)
+              local t={name=name,valid=true,level=1,researched=false,enabled=enabled,research_unit_ingredients=clone(packs),prerequisites={}}
+              t.prototype={effects=effects,hidden=hidden,enabled=enabled};force.technologies[name]=t;return t
             end
-            force.technologies[C.sentinel]={name=C.sentinel,valid=true,level=1,researched=false}
+            local function vector(names,sign)local out={};for _,name in ipairs(names)do out[#out+1]=allfive_effect(name,sign*.1)end;return out end
+            local function family_shape(phase)
+              for _,family in ipairs(C.families)do
+                local names={};for _,recipe in ipairs(family.routes)do names[#names+1]=recipe;names[#names+1]=family.extra[recipe]end
+                local main=force.technologies[C.main(family)]
+                main.prototype.effects=phase=="F1"and vector(names,1)or{}
+                main.prototype.hidden=phase=="F2";main.prototype.enabled=phase~="F2";main.enabled=phase~="F2"
+                for _,recipe in ipairs(family.routes)do
+                  local extra=family.extra[recipe]
+                  local positive=force.technologies[C.carrier(family,recipe,"positive")]
+                  local negative=force.technologies[C.carrier(family,recipe,"negative")]
+                  positive.prototype.effects=vector({recipe,extra},1);negative.prototype.effects=vector({recipe,extra},-1)
+                end
+              end
+            end
+            for _,family in ipairs(C.families)do
+              technology(C.main(family),{},false,true)
+              local references={};for _,recipe in ipairs(family.routes)do
+                local reference=C.reference(family,recipe);references[reference]=references[reference]or{}
+                references[reference][#references[reference]+1]=recipe;references[reference][#references[reference]+1]=family.extra[recipe]
+                references[reference][#references[reference]+1]=family.public_only[recipe]
+                technology(C.carrier(family,recipe,"positive"),vector({recipe,family.extra[recipe]},1),true,false)
+                technology(C.carrier(family,recipe,"negative"),vector({recipe,family.extra[recipe]},-1),true,false)
+                force.recipes[recipe]={productivity_bonus=0};force.recipes[family.extra[recipe]]={productivity_bonus=0}
+                force.recipes[family.public_only[recipe]]={productivity_bonus=0}
+              end
+              for reference,names in pairs(references)do technology(reference,vector(names,1),false,true)end
+            end
             local inventory={counts={}}
             function inventory.insert(row)inventory.counts[row.name]=(inventory.counts[row.name]or 0)+row.count;return row.count end
             function inventory.get_item_count(name)return inventory.counts[name]or 0 end
@@ -480,27 +507,46 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
             lab.get_inventory=function()return inventory end
             local game={tick=0,forces={player=force},surfaces={{}},server_save=function(name)saves[#saves+1]=name end}
             game.surfaces[1].create_entity=function(row)assert(row.name==C.lab and row.force==force);return lab end
-            local env={storage=storage,game=game,script={active_mods=mods},remote={add_interface=function(name,rows)assert(name=="mir_native_credit_vectors_allfive");env_interface=rows end},
-              commands={},defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
-              helpers={table_to_json=function()return "record"end},log=function()end,require=require,pairs=pairs,ipairs=ipairs,next=next,type=type,tostring=tostring,math=math,error=error}
-            env.script.on_init=function(fn)callbacks.init=fn end
-            env.script.on_load=function(fn)callbacks.load=fn end
-            env.script.on_event=function(id,fn)callbacks[id==1 and "finished" or "tick"]=fn end
+            local env={storage=storage,game=game,script={active_mods=mods},remote={add_interface=function()end},commands={},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},helpers={table_to_json=function()return "record"end},
+              log=function()end,require=require,pairs=pairs,ipairs=ipairs,next=next,type=type,tostring=tostring,math=math,error=error}
+            env.script.on_init=function(fn)callbacks.init=fn end;env.script.on_load=function(fn)callbacks.load=fn end
+            env.script.on_configuration_changed=function(fn)callbacks.config=fn end
+            env.script.on_event=function(id,fn)callbacks[id==1 and"finished"or"tick"]=fn end
             env.commands.add_command=function(name,_,fn)commands_map[name]=fn end
             package.preload["__mir-fixture-native-credit-vectors-allfive__/contract"]=function()return C end
-            assert(loadfile(fixture_path.."/control.lua","t",env))()
-            callbacks.init()
-            if opponent=="public-credit"then force.recipes[C.families[1].public_only].productivity_bonus=.1 end
-            commands_map["mir-native-credit-vectors-allfive"]{player_index=nil,parameter="continue"}
-            for _,name in ipairs(C.packs)do inventory.counts[name]=0 end
-            if opponent=="unspent"then inventory.counts["automation-science-pack"]=100 end
-            local sentinel=force.technologies[C.sentinel];sentinel.level=2
-            callbacks.finished{research=sentinel,by_script=opponent=="scripted"}
-            if opponent=="cold-drift"then sentinel.researched=true end
-            callbacks.load();game.tick=game.tick+1;callbacks.tick()
-            callbacks.load();game.tick=game.tick+1;callbacks.tick()
-            assert(#saves==1 and saves[1]=="native-credit-allfive")
-            assert(lab.disabled_by_script==true and storage[C.key].ordinary==1 and storage[C.key].phase=="saved")
+            assert(loadfile(fixture_path.."/control.lua","t",env))();callbacks.init()
+            local function cold_reads()
+              for _=1,2 do game.tick=storage[C.key].saved_tick;callbacks.load();game.tick=game.tick+1;callbacks.tick()end
+            end
+            local function finish_cohort(phase)
+              callbacks.tick()
+              for _,family in ipairs(C.families)do
+                local main=force.technologies[C.main(family)];main.level=main.level+1
+                if phase=="F1"then
+                  for _,recipe in ipairs(family.routes)do force.recipes[recipe].productivity_bonus=.1;force.recipes[family.extra[recipe]].productivity_bonus=.1 end
+                end
+                callbacks.finished{research=main,by_script=opponent=="scripted"}
+              end
+            end
+            commands_map["mir-native-credit-vectors-allfive"]{player_index=nil,parameter="continue"};finish_cohort("F0");cold_reads()
+            mods[C.mod]="0.2.0";family_shape("F1")
+            for _,family in ipairs(C.families)do for _,recipe in ipairs(family.routes)do
+              force.technologies[C.carrier(family,recipe,"negative")].level=2
+            end end
+            callbacks.config{mod_changes={[C.mod]={old_version="0.1.0",new_version="0.2.0"}}};cold_reads()
+            commands_map["mir-native-credit-vectors-allfive"]{player_index=nil,parameter="continue"};finish_cohort("F1");cold_reads()
+            mods[C.mod]="0.3.0";family_shape("F2")
+            for _,family in ipairs(C.families)do for _,recipe in ipairs(family.routes)do
+              force.technologies[C.carrier(family,recipe,"negative")].level=1
+              force.technologies[C.carrier(family,recipe,"positive")].level=2
+            end end
+            callbacks.config{mod_changes={[C.mod]={old_version="0.2.0",new_version="0.3.0"}}}
+            if opponent=="cold-string"then storage[C.key].endpoint.phase="wrong"end
+            if opponent=="cold-boolean"then storage[C.key].endpoint.boolean_mutant=true end
+            cold_reads();assert(#saves==4 and saves[1]=="native-credit-allfive-f0" and saves[2]=="native-credit-allfive-f1-negative"
+              and saves[3]=="native-credit-allfive-f1" and saves[4]=="native-credit-allfive-f2-positive",
+              "save sequence "..#saves..":"..tostring(saves[1])..":"..tostring(saves[2])..":"..tostring(saves[3])..":"..tostring(saves[4]))
             return storage[C.key].endpoint
           end
         ''')
@@ -530,78 +576,164 @@ class NativeCreditAllFiveFixtureControls(unittest.TestCase):
         self.assertIn("event.by_script==false", (ALL_FIVE_FIXTURE / "control.lua").read_text())
         self.assertNotIn("Cerys", contract)
         for target, (base, mir, factorio, recycler) in expected.items():
-            info = json.loads((ALL_FIVE_FIXTURE / f"info-{target}.json").read_text())
-            self.assertEqual(factorio, info["factorio_version"])
-            dependencies = set(info["dependencies"])
-            self.assertIn(f"base = {base}", dependencies)
-            self.assertIn(f"more-infinite-research = {mir}", dependencies)
-            self.assertEqual(recycler, any(row.startswith("recycler =") for row in dependencies))
-            active = {"base": base, "space-age": base, "quality": base, "elevated-rails": base,
-                      "more-infinite-research": mir, "mir-fixture-native-credit-vectors-allfive": "0.1.0"}
-            if recycler:
-                active["recycler"] = base
-            self.assertEqual(target, self.lua.globals().C.target(self.lua.table_from(active))[0])
-            with self.assertRaises(LuaError):
-                self.lua.globals().C.target(self.lua.table_from(active | {"unknown": "1.0.0"}))
-            with self.assertRaises(LuaError):
-                self.lua.globals().C.target(self.lua.table_from(active | {"more-infinite-research": mir[:-2] + "14"}))
+            upstream = json.loads((ALL_FIVE_UPSTREAM / f"info-{target}.json").read_text())
+            self.assertEqual("a-mir-fixture-native-credit-vectors-allfive-upstream", upstream["name"])
+            self.assertEqual("0.1.0", upstream["version"])
+            self.assertEqual(factorio, upstream["factorio_version"])
+            self.assertIn(f"base = {base}", upstream["dependencies"])
+            self.assertNotIn("more-infinite-research", "\n".join(upstream["dependencies"]))
+            for phase, version in (("f0", "0.1.0"), ("f1", "0.2.0"), ("f2", "0.3.0")):
+                info = json.loads((ALL_FIVE_FIXTURE / f"info-{phase}-{target}.json").read_text())
+                self.assertEqual(factorio, info["factorio_version"])
+                self.assertEqual(version, info["version"])
+                dependencies = set(info["dependencies"])
+                self.assertIn(f"base = {base}", dependencies)
+                self.assertIn("a-mir-fixture-native-credit-vectors-allfive-upstream = 0.1.0", dependencies)
+                self.assertIn(f"more-infinite-research = {mir}", dependencies)
+                self.assertEqual(recycler, any(row.startswith("recycler =") for row in dependencies))
+                active = {"base": base, "space-age": base, "quality": base, "elevated-rails": base,
+                          "more-infinite-research": mir, "mir-fixture-native-credit-vectors-allfive": version,
+                          "a-mir-fixture-native-credit-vectors-allfive-upstream": "0.1.0"}
+                if recycler:
+                    active["recycler"] = base
+                self.assertEqual(target, self.lua.globals().C.target(self.lua.table_from(active))[0])
+                self.assertEqual(phase.upper(), self.lua.globals().C.phase(self.lua.table_from(active))[2])
+                with self.assertRaises(LuaError):
+                    self.lua.globals().C.target(self.lua.table_from(active | {"unknown": "1.0.0"}))
+                with self.assertRaises(LuaError):
+                    self.lua.globals().C.target(self.lua.table_from(active | {"more-infinite-research": mir[:-2] + "14"}))
 
     def test_data_fixture_expands_each_actual_carrier_but_only_public_references_get_public_only_recipes(self):
         for target in ("f200", "f210"):
-            raw = self.lua.globals().allfive_data_case(target, "")
-            technologies, recipes = raw["technology"], raw["recipe"]
+            for phase, version in (("F0", "0.1.0"), ("F1", "0.2.0"), ("F2", "0.3.0")):
+                raw = self.lua.globals().allfive_data_case(target, version, "")
+                technologies, recipes = raw["technology"], raw["recipe"]
+                for family in self.lua.globals().C.families.values():
+                    main = technologies[self.lua.globals().C.main(family)]
+                    main_recipes = {effect["recipe"] for effect in main["effects"].values()}
+                    self.assertEqual(phase == "F2", main["hidden"])
+                    self.assertEqual(phase != "F2", main["enabled"])
+                    for recipe in family["routes"].values():
+                        reference = technologies[self.lua.globals().C.reference(family, recipe)]
+                        public_only, extra = family["public_only"][recipe], family["extra"][recipe]
+                        self.assertIsNotNone(recipes[public_only])
+                        reference_recipes = {effect["recipe"] for effect in reference["effects"].values()}
+                        self.assertIn(public_only, reference_recipes)
+                        self.assertIn(extra, reference_recipes)
+                        self.assertEqual(phase == "F1", recipe in main_recipes)
+                        self.assertEqual(phase == "F1", extra in main_recipes)
+                        for sign in ("positive", "negative"):
+                            holder = technologies[self.lua.globals().C.carrier(family, recipe, sign)]
+                            holder_recipes = {effect["recipe"] for effect in holder["effects"].values()}
+                            self.assertEqual({recipe, extra}, holder_recipes)
+                            self.assertNotIn(public_only, holder_recipes)
+            with self.assertRaises(LuaError):
+                self.lua.globals().allfive_data_case(target, "0.1.0", "missing-public-route")
+            with self.assertRaises(LuaError):
+                self.lua.globals().allfive_data_case(target, "0.1.0", "noncarrier-route")
+
+    def test_real_mir_data_stage_has_the_private_empty_main_baseline_before_fixture_masks(self):
+        """Use the current source data stage, not the local hand-built data double."""
+        generator_fixture.LuaRuntime = LuaRuntime
+        for target, base, mir in (("f200", "2.0.77", "5.0.20015"), ("f210", "2.1.24", "5.0.21015")):
+            stage = generator_fixture.GeneratorTests()
+            stage.setUp()
+            stage.lua.globals().fixture_path = ALL_FIVE_FIXTURE.as_posix()
+            stage.lua.globals().upstream_path = ALL_FIVE_UPSTREAM.as_posix()
+            stage.lua.globals().case_target = target
+            stage.lua.globals().case_base = base
+            stage.lua.globals().case_mir = mir
+            output = stage.lua.execute(r'''
+              local target=require("platform.target")
+              target.id,target.factorio_version,target.minimum_base=case_target,case_target=="f200"and"2.0"or"2.1",case_base
+              target.distribution_version=case_target=="f200"and"5.0.20015"or"5.0.21015"
+              target.cargo_research=case_target=="f210";target.recipe_probability=case_target=="f210"and"independent_probability"or"probability"
+              target.productivity_ignores_stats=true;target.receiver_limits=case_target=="f210"
+              package.path=fixture_path.."/?.lua;"..package.path
+              package.preload["__mir-fixture-native-credit-vectors-allfive__/contract"]=function()return require("contract")end
+              mods={base=case_base,["space-age"]=case_base,quality=case_base,["elevated-rails"]=case_base,
+                ["a-mir-fixture-native-credit-vectors-allfive-upstream"]="0.1.0"}
+              if case_target=="f210"then mods.recycler=case_base end
+              package.loaded["research.settings"]=nil
+              data=full_world(mods,true);data.raw.lab.lab={type="lab",name="lab",inputs={}}
+              table.deepcopy=function(value)
+                if type(value)~="table"then return value end
+                local result={};for key,child in pairs(value)do result[key]=table.deepcopy(child)end;return result
+              end
+              function data:extend(rows)
+                self.writes=self.writes+1
+                for _,row in ipairs(rows)do
+                  self.raw[row.type]=self.raw[row.type]or{}
+                  assert(self.raw[row.type][row.name]==nil,"duplicate source row "..row.name)
+                  self.raw[row.type][row.name]=row
+                end
+              end
+              settings={startup=defaults()};helpers=nil;log=function()end
+              dofile(upstream_path.."/data.lua")
+              dofile(player_root.."/data.lua");dofile(data_final_path)
+              local before={}
+              for _,family in ipairs(require("__mir-fixture-native-credit-vectors-allfive__/contract").families)do
+                local main=assert(data.raw.technology["recipe-prod-"..family.key.."-1"])
+                assert(main.hidden==true and #main.effects==0,"source main was not private-empty: "..family.key)
+                before[family.key]={hidden=main.hidden,effects=#main.effects}
+              end
+              mods["more-infinite-research"]=case_mir;mods["mir-fixture-native-credit-vectors-allfive"]="0.2.0"
+              package.path=fixture_path.."/?.lua;"..player_root.."/?.lua;"..package.path
+              dofile(fixture_path.."/data.lua");dofile(fixture_path.."/data-final-fixes.lua")
+              local after={}
+              for _,family in ipairs(require("contract").families)do
+                local main=assert(data.raw.technology["recipe-prod-"..family.key.."-1"])
+                after[family.key]={hidden=main.hidden,enabled=main.enabled,effects=#main.effects}
+              end
+              return {before=before,after=after,writes=data.writes}
+            ''')
             for family in self.lua.globals().C.families.values():
-                reference = technologies[family["reference"]]
-                public_only = family["public_only"]
-                self.assertIsNotNone(recipes[public_only])
-                reference_recipes = {effect["recipe"] for effect in reference["effects"].values()}
-                self.assertIn(public_only, reference_recipes)
-                for recipe in family["routes"].values():
-                    extra = family["extra"][recipe]
-                    self.assertIn(extra, reference_recipes)
-                    for sign in ("positive", "negative"):
-                        holder = technologies[self.lua.globals().C.carrier(family, recipe, sign)]
-                        holder_recipes = {effect["recipe"] for effect in holder["effects"].values()}
-                        self.assertEqual({recipe, extra}, holder_recipes)
-                        self.assertNotIn(public_only, holder_recipes)
-            with self.assertRaises(LuaError):
-                self.lua.globals().allfive_data_case(target, "missing-public-route")
-            with self.assertRaises(LuaError):
-                self.lua.globals().allfive_data_case(target, "noncarrier-route")
+                self.assertEqual({"hidden": True, "effects": 0}, dict(output["before"][family["key"]].items()))
+                self.assertFalse(output["after"][family["key"]]["hidden"])
+                self.assertTrue(output["after"][family["key"]]["enabled"])
+                self.assertEqual(2 * len(family["routes"]), output["after"][family["key"]]["effects"])
 
     def test_old14_rejects_public_reference_superset_current_module_accepts_full_allfive_vectors(self):
         for target in ("f200", "f210"):
             for family in self.lua.globals().C.families.values():
-                with self.subTest(target=target, family=family["key"]):
-                    # Exact published 5.0.14 rejects equal-size-only pairs.
-                    old_ok, _, _, _, _ = self.lua.globals().allfive_pair(self.old_vectors, family, "")
-                    self.assertFalse(old_ok)
-                    current_ok, basis, positive, negative, reference = self.lua.globals().allfive_pair(
-                        self.current_vectors, family, "")
-                    self.assertTrue(current_ok)
-                    self.assertLess(len(positive), len(reference))
-                    self.assertEqual(len(positive), len(negative))
-                    self.assertIsNone(basis[family["public_only"]])
-                    for recipe in family["routes"].values():
+                for recipe in family["routes"].values():
+                    with self.subTest(target=target, family=family["key"], recipe=recipe):
+                        # Exact published 5.0.14 rejects the named strict public
+                        # superset. Current 5.0.15 accepts only its signed pair.
+                        old_ok, _, _, _, _ = self.lua.globals().allfive_pair(self.old_vectors, family, recipe, "")
+                        self.assertFalse(old_ok)
+                        current_ok, basis, positive, negative, reference = self.lua.globals().allfive_pair(
+                            self.current_vectors, family, recipe, "")
+                        self.assertTrue(current_ok)
+                        self.assertLess(len(positive), len(reference))
+                        self.assertEqual(len(positive), len(negative))
+                        self.assertIsNone(basis[family["public_only"][recipe]])
                         self.assertEqual(1, basis[recipe])
-                    for opponent in ("public-in-positive", "missing-negative"):
-                        with self.subTest(opponent=opponent):
-                            accepted, _, _, _, _ = self.lua.globals().allfive_pair(
-                                self.current_vectors, family, opponent)
-                            self.assertFalse(accepted)
+                        for opponent in ("public-in-positive", "missing-negative"):
+                            with self.subTest(opponent=opponent):
+                                accepted, _, _, _, _ = self.lua.globals().allfive_pair(
+                                    self.current_vectors, family, recipe, opponent)
+                                self.assertFalse(accepted)
 
-    def test_shared_actor_runs_one_ordinary_save_and_two_immutable_colds_without_mir_runtime_access(self):
+    def test_shared_actor_runs_five_family_researches_then_signed_debit_credit_and_immutable_colds(self):
         for target in ("f200", "f210"):
-            endpoint = self.lua.globals().allfive_actor_case(target, "")
-            self.assertEqual(1, endpoint["sentinel"])
-            self.assertEqual(0, len([value for value in endpoint["public_only"].values() if value != 0]))
-        for opponent, refusal in (("public-credit", "public-only recipe received native credit"),
-                                  ("scripted", "ordinary fixture completion differs"),
-                                  ("unspent", "ordinary fixture science differs"),
-                                  ("cold-drift", "immutable cold endpoint differs")):
+            endpoint = self.lua.globals().allfive_shared_actor_case(target, "")
+            self.assertEqual("f2-positive-saved", endpoint["phase"])
+            self.assertTrue(all(endpoint["science"][pack] > 0 for pack in self.lua.globals().C.packs.values()))
+            self.assertEqual(5, len(list(endpoint["families"].values())))
+            for row in endpoint["families"].values():
+                self.assertEqual(2, row["main"])
+                self.assertEqual({0}, {holder["negative"] for holder in row["holders"].values()})
+                self.assertEqual({1}, {holder["positive"] for holder in row["holders"].values()})
+                self.assertEqual({0, 0.1}, set(row["bonus"].values()))
+                self.assertTrue(all(reference["level"] == 1 and not reference["researched"]
+                                    for reference in row["references"].values()))
+        for opponent, refusal in (("scripted", "ordinary family completion differs"),
+                                  ("cold-string", "immutable cold endpoint differs"),
+                                  ("cold-boolean", "immutable cold endpoint differs")):
             with self.subTest(opponent=opponent):
                 with self.assertRaisesRegex(LuaError, refusal):
-                    self.lua.globals().allfive_actor_case("f200", opponent)
+                    self.lua.globals().allfive_shared_actor_case("f200", opponent)
 
 
 if __name__ == "__main__":

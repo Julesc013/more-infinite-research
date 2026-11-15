@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-native-credit-vectors-allfive",
+  "version": "0.2.0",
+  "title": "MIR test-only all-five native credit vectors F1",
+  "author": "MIR contributors",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "space-age = 2.0.77", "quality = 2.0.77", "elevated-rails = 2.0.77", "a-mir-fixture-native-credit-vectors-allfive-upstream = 0.1.0", "more-infinite-research = 5.0.20015"]
+}
