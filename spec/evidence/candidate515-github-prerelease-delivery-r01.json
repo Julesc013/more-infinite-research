@@ -1,0 +1,304 @@
+{
+  "kind": "MIR515GitHubPrereleaseDeliveryV1",
+  "status": "published-anonymously-and-independently-verified-primary-delivered",
+  "release": {
+    "id": 446196178,
+    "name": "MIR 5.0.15",
+    "tag_name": "v5.0.15",
+    "html_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.15",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false,
+    "published_at": "2026-11-15T16:36:11Z",
+    "target_commitish": "d64318546890f8dfc048ab60262436130dcec5e9"
+  },
+  "source": {
+    "main": "d64318546890f8dfc048ab60262436130dcec5e9",
+    "tree": "f766575c934dddefbc7d2fa8d277c0ccb592e49f",
+    "player_tree": "b3d7d083251f8473b77bdd7e9dd691646d460bac",
+    "annotated_tag_object": "9a1b8744231e3134f4aaa1e46495f5d05bd76c21",
+    "tag_signed": false
+  },
+  "frozen_source_commit": "3aa4e2c67811665c7600d8dbacb29e0b06404a82",
+  "inventory": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir515-repair-freeze-r02\\MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 217847,
+    "sha256": "8784399E1CE2511C9387596C5FF98F0759F01783B324E2352DCA78A0B2FD9855"
+  },
+  "public_assets_verified": 19,
+  "local_delivery_files_verified": 21,
+  "local_dist": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15",
+  "files": [
+    {
+      "name": "more-infinite-research_5.0.01315.zip",
+      "bytes": 676637,
+      "sha256": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5",
+      "asset_id": 751600396
+    },
+    {
+      "name": "more-infinite-research_5.0.01415.zip",
+      "bytes": 676640,
+      "sha256": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB",
+      "asset_id": 751600399
+    },
+    {
+      "name": "more-infinite-research_5.0.01515.zip",
+      "bytes": 676637,
+      "sha256": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A",
+      "asset_id": 751600407
+    },
+    {
+      "name": "more-infinite-research_5.0.01615.zip",
+      "bytes": 676637,
+      "sha256": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D",
+      "asset_id": 751600403
+    },
+    {
+      "name": "more-infinite-research_5.0.01715.zip",
+      "bytes": 676639,
+      "sha256": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA",
+      "asset_id": 751600402
+    },
+    {
+      "name": "more-infinite-research_5.0.01815.zip",
+      "bytes": 676640,
+      "sha256": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904",
+      "asset_id": 751600513
+    },
+    {
+      "name": "more-infinite-research_5.0.10015.zip",
+      "bytes": 676631,
+      "sha256": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A",
+      "asset_id": 751600526
+    },
+    {
+      "name": "more-infinite-research_5.0.11015.zip",
+      "bytes": 676941,
+      "sha256": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86",
+      "asset_id": 751600527
+    },
+    {
+      "name": "more-infinite-research_5.0.20015.zip",
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+      "asset_id": 751600543
+    },
+    {
+      "name": "more-infinite-research_5.0.21015.zip",
+      "bytes": 1041986,
+      "sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+      "asset_id": 751600535
+    },
+    {
+      "name": "more-infinite-research_5.0.00615.zip",
+      "bytes": 139477,
+      "sha256": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A",
+      "asset_id": 751600599
+    },
+    {
+      "name": "more-infinite-research_5.0.00715.zip",
+      "bytes": 139477,
+      "sha256": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0",
+      "asset_id": 751600608
+    },
+    {
+      "name": "more-infinite-research_5.0.00815.zip",
+      "bytes": 139475,
+      "sha256": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A",
+      "asset_id": 751600613
+    },
+    {
+      "name": "more-infinite-research_5.0.00915.zip",
+      "bytes": 139477,
+      "sha256": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6",
+      "asset_id": 751600629
+    },
+    {
+      "name": "more-infinite-research_5.0.01015.zip",
+      "bytes": 139476,
+      "sha256": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D",
+      "asset_id": 751600633
+    },
+    {
+      "name": "more-infinite-research_5.0.01115.zip",
+      "bytes": 139477,
+      "sha256": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67",
+      "asset_id": 751600632
+    },
+    {
+      "name": "more-infinite-research_5.0.01215.zip",
+      "bytes": 139478,
+      "sha256": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77",
+      "asset_id": 751600635
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "EF9EEEB8B3B35F0CD089988AFA88E37F4E1F37AFA545137E9FF8E1378904F9AE",
+      "asset_id": 751600666
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "4C8EF4AB7CC2A4147D52852BF1AE356D711FE66D4E622F4F2DA70643D8F5410E",
+      "asset_id": 751600669
+    },
+    {
+      "name": "RELEASE_NOTES.md",
+      "bytes": 1007,
+      "sha256": "0A5EC0D49E17AFE98DFBFCBBD8099AD656D386984BA47B98E179E6F56575ACA5"
+    },
+    {
+      "name": "UPLOAD.txt",
+      "bytes": 1125,
+      "sha256": "9B93BC0987567E751109F7E6F1E42B2AB09D861906BFE1E92ED2F4C3C164AE2D"
+    }
+  ],
+  "checks": [
+    {
+      "id": 132872122620,
+      "name": "host-controls",
+      "head_sha": "d64318546890f8dfc048ab60262436130dcec5e9",
+      "status": "completed",
+      "conclusion": "success",
+      "completed_at": "2026-11-15T16:25:53Z",
+      "details_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/43733730987/job/132872122620"
+    },
+    {
+      "id": 132871624447,
+      "name": "branch-policy",
+      "head_sha": "d64318546890f8dfc048ab60262436130dcec5e9",
+      "status": "completed",
+      "conclusion": "success",
+      "completed_at": "2026-11-15T16:08:26Z",
+      "details_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/43733730991/job/132871624447"
+    },
+    {
+      "id": 132871624417,
+      "name": "verification-plan",
+      "head_sha": "d64318546890f8dfc048ab60262436130dcec5e9",
+      "status": "completed",
+      "conclusion": "success",
+      "completed_at": "2026-11-15T16:09:39Z",
+      "details_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/43733730987/job/132871624417"
+    },
+    {
+      "id": 132871624242,
+      "name": "native-tooling-controls",
+      "head_sha": "d64318546890f8dfc048ab60262436130dcec5e9",
+      "status": "completed",
+      "conclusion": "success",
+      "completed_at": "2026-11-15T16:09:35Z",
+      "details_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/43733730987/job/132871624242"
+    }
+  ],
+  "exact_candidate_independent_verdict": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\INDEPENDENT-PRERELEASE-QUALIFICATION.json",
+    "bytes": 1436,
+    "sha256": "1A94337D96E048702790AF9D79DA32A0E895221927C6F220663D26FE1BDC687F"
+  },
+  "current_native_and_package_verdict": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\candidate515-affected-native-verdicts-r01.json",
+    "bytes": 37993,
+    "sha256": "753D15CB3EABB161A913B3FEB8172E5E7C1E684B5020BDD5BADEE36DC9610881"
+  },
+  "staged_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\draft-downloads\\verification.json",
+    "bytes": 8756,
+    "sha256": "3021E6566425C1469D557B45323FA3297F182F870EB00E16E4A15C15D39D47F0"
+  },
+  "actual_anonymous_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\anonymous-downloads\\verification.json",
+    "bytes": 8331,
+    "sha256": "FF385995B32E9B859BBDC7C40F09FB659BBAD21100576ADA29D03452613DB57A"
+  },
+  "independent_anonymous_and_local_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-independent-public-readback-r01\\independent-public-readback.json",
+    "bytes": 25003,
+    "sha256": "AA36015C5750CB0CF9FE8CE253B8A4594947B561950114118906003DE8541725"
+  },
+  "administration_pretag": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\administration-pretag.json",
+    "bytes": 867,
+    "sha256": "668316E792A9A9A3C13A9E67F7E7C63CB05A1F4D567376F925B7BC81C151B3E8"
+  },
+  "administration_prepublish": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\administration-prepublish.json",
+    "bytes": 867,
+    "sha256": "D66D3A767C215364ACD394B76DE3433CD7DCD450556184A41B24DC6B634ECCD7"
+  },
+  "distinct_immutability_pretag": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\immutability-pretag.json",
+    "bytes": 55,
+    "sha256": "FE16E60233D9B482A0409DAF68D80FDDA81CC01E8245EC03A5FCCDB4FDE8D857"
+  },
+  "distinct_immutability_prepublish": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\immutability-prepublish.json",
+    "bytes": 55,
+    "sha256": "FE16E60233D9B482A0409DAF68D80FDDA81CC01E8245EC03A5FCCDB4FDE8D857"
+  },
+  "prior_object_preservation": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\prior-objects-preserved.json",
+    "bytes": 2269,
+    "sha256": "647B791CE77D91F9D959178B76766A628F3C767F043ACA698BE0FCB53DB9B6A4"
+  },
+  "published14_local_preservation": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\published14-local-preservation.json",
+    "bytes": 3859,
+    "sha256": "35E8CA2866375041206003EBCCF71B5A3884E3C9300A5533A6BECC03EB182A07"
+  },
+  "latest_stable": {
+    "draft": false,
+    "id": 422732162,
+    "name": "MIR 4.7.3",
+    "prerelease": false,
+    "tag_name": "v4.7.3"
+  },
+  "publication_controllers": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\Prepare-PublicInventory.py",
+      "bytes": 2932,
+      "sha256": "690505DFE7BBDFB125411FBDDB7BB32383EA481C37BC32D6597A34299E0AB9B3"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\Verify-Assets.py",
+      "bytes": 3730,
+      "sha256": "1E42D89EB7ACBEFD2751F453B2DFE7CC7FCAB9CA4A25C2D34CB315737C9E992E"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\Verify-Preservation.py",
+      "bytes": 2493,
+      "sha256": "65AF7BE55DE1F4314E82FA1C3297DE9B2A83949222B2504923D8FE4A33486B0F"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\Record-Delivery.py",
+      "bytes": 5841,
+      "sha256": "62F481FCCD66E58A023225983C77CB9243D8E64B9D73C8007E383B8D37DD5CE4"
+    }
+  ],
+  "deadline": {
+    "request_utc": "2026-11-15T13:36:33Z",
+    "deadline_utc": "2026-11-15T19:36:33Z",
+    "independently_verified_utc": "2026-11-15T16:43:51.7495500Z",
+    "within_six_hours": true,
+    "elapsed_seconds": 11238.74955,
+    "remaining_seconds": 10361.25045
+  },
+  "retained_adverse_promotion": {
+    "first_reviewed_promotion": "f9cf19a66a3ad38d9f1d859ec0a135804a4b5db3",
+    "reason": "Conservative report policy correctly rejected inherited historical closing directives. Original branch/commit preserved; one new clean main-based snapshotc403 retained exactly the reviewed tree and passed normal checks; no guards/history rewritten.",
+    "main_based_promotion": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-r01\\main-snapshot-promotion-r02.json",
+      "bytes": 2761,
+      "sha256": "FC7CFAB962DAAD9920953092CCAF69BDE1D25410EC7022549BD1B6C896BDC93F"
+    }
+  },
+  "stable_qualified": false,
+  "whole_stable_goal_complete": false,
+  "remaining": [
+    "Actual graphical Library/client/multiplayer and personal-state checks",
+    "Exact unqualified reporter/mod selections, preserved historical/provider/physical-output boundaries",
+    "Remaining profile/API ownership and validation fixes plus coherent current-source performance/stress qualification"
+  ],
+  "recorded_utc": "2026-11-15T16:49:25.661657+00:00"
+}
