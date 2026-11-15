@@ -157,6 +157,7 @@ class InputFilesystemBoundaries(unittest.TestCase):
         output.mkdir()
         (library / ".mir-active-profile.json").write_bytes(b"{}\n")
         result = self.ps(
+            f". {quote(ROOT / 'tools/lib/compatibility/LibraryActivation.ps1')}; "
             f". {quote(ROOT / 'tools/lib/validation/NativeProbeResources.ps1')}; "
             f"$lock=[IO.File]::Open({quote(library / '.test-lock')},'CreateNew','ReadWrite','None'); "
             "try { "
