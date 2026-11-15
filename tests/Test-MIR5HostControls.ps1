@@ -19,6 +19,7 @@ $controls = @(
   [ordered]@{path='tests/test_worker_storage_prepared_default.py';lua=$true},
   [ordered]@{path='tests/test_worker_native_owner_data.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_default_native.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_prepared_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_provider_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_default_snapshot_probe.py';lua=$true},
   [ordered]@{path='tests/test_ferrum_worker_storage_native.py';lua=$true},
