@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-13
+last_reviewed: 2026-11-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,18 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## 5.0.15 repair candidate and stable continuation (2026-11-16)
+
+The next unpublished repair is source5.0.15, frozen at3aa4e2c67811665c7600d8dbacb29e0b06404a82/playerb3d7d083251f8473b77bdd7e9dd691646d460bac. The independently reviewed17-package inventory is byte-reproducible. The [affected current-package verdict](../spec/evidence/candidate515-affected-native-verdicts-r01.json) records29 actual governed processes: three prepared-default worker continuations on2.0.77/2.1.23/2.1.24, the exact published4.7.21003/Base2.1.23-to2.1.24 worker route, and both five-family synthetic productivity-vector save chains. Each selected worker continuation includes ordinary research and two immutable cold reads; the vector cases retain their declared negative checkpoint, continuation and cold phases. Controls restore and no Factorio remains. These are bounded current-package results, not full reporter selections or stable acceptance.
+
+Prepared-default work now authenticates the actual published11 producer, preserves complete current/queued/detached work, transfers original enablement rights and retires the preparation quota once. The narrower known4.7.3 paid-mask reader admits the measured Base2.1.23-to2.1.24 transition without losing that same historical reader on later F210 source patches. A productivity preservation vector may match a complete subset of its public reference effects; diagnostics identify the rejected component/reference. Source units and native observers passed independent nonauthor review and required exact-head checks through [1964](https://github.com/Julesc013/more-infinite-research/pull/1964), [1966](https://github.com/Julesc013/more-infinite-research/pull/1966), [1967](https://github.com/Julesc013/more-infinite-research/pull/1967), [1969](https://github.com/Julesc013/more-infinite-research/pull/1969) and [1970](https://github.com/Julesc013/more-infinite-research/pull/1970), preserving their original branches/commits.
+
+Retain the earlier fe15 candidate observations under their original hashes. Native execution caught an observer/mock mistake about the authored one-pack debit, then a genuine exact-Base paid-mask refusal; both original failures remain, with an additive correction for the first failed process count. Their accepted published11 source preparations were reused without recreating worlds. Remote private custody decodes and compares1609 original bodies/126632407bytes across620 unique bodies; its exact commit/blob/hash is in the verdict. The pre-existing dirty private worktree is explicitly preserved untouched, while the new isolated custody branch is clean/pushed. All17 final player ZIPs are separate hash-verified public inputs, never copied dependency libraries.
+
+GitHub prerelease delivery still requires the reviewed final documentation/tree, checked main promotion, immediate administration and distinct immutability probes, one complete draft, staged/public anonymous byte readback and identical primary dist delivery. Do not publish from an earlier candidate, replace published5.0.14 bytes or infer stable qualification from this source version. The release remains GitHub-only; the maintainer owns Portal publication.
+
+After verified5.0.15 delivery, continue the existing stable worklist: actual graphical Library/export and client/personal-state lifecycle, remaining profile/settings composition, affected exact historical/provider scenarios, physical output and coherent current-source performance. Reuse accepted server exports, profile roundtrips, agriculture48/API8, incident and applicable13/14 evidence under their exact identities. Gamer433's actual2.0.77/SE0.7.57 cap10 and ore-miner report, missing personal predecessor saves, full current Ryutavi/factomacto selections and applicable K2SE exclusions remain separate unresolved cases. Preserve the crafting-drill productivity versus ore-extraction distinction; no arbitrary extraction bonus or blanket report closure is justified. The code-quality programme proceeds in bounded challenges after delivery, without a whole rewrite or a restart of completed campaigns.
 
 ## Verified5.0.14 delivery and current stable queue (2026-11-13)
 

@@ -12,7 +12,7 @@ source_of_truth_for:
   - mir-515-release-notes
 ---
 
-Improves safe upgrades for certain prepared worker-cargo saves and makes overlapping productivity effects easier to diagnose.
+Preserves worker-cargo research through prepared upgrades and fixes a productivity compatibility refusal.
 
 - Preserve earned levels and unfinished default worker-cargo research from prepared MIR 5.0.11 saves.
 - Preserve authenticated older default worker-cargo upgrades when moving from Factorio 2.1.23 to 2.1.24.
