@@ -1295,10 +1295,14 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                 ''')
 
     def test_published_f210_m4_base_exact_patch24_hop_preserves_only_old_paid_mask(self):
-        """The observed 4.7.21003/Base2.1.23 route has one fixed next patch."""
-        self._published_m4_base("f210")
-        self.lua.execute('''
-          BASE_ACTIVE.base="2.1.24";BASE_ACTIVE["more-infinite-research"]="5.0.21015"
+        """The observed Base patch hop retains its fixed mask for an F210 successor."""
+        for successor in ("5.0.21015", "5.0.21016"):
+            with self.subTest(successor=successor):
+                self.setUp()
+                self._published_m4_base("f210")
+                self.lua.globals().successor = successor
+                self.lua.execute('''
+          BASE_ACTIVE.base="2.1.24";BASE_ACTIVE["more-infinite-research"]=successor
           reload_credits(BASE_ACTIVE,"f210")
           local force=make_collected_force(1,8,published_base_mask,false)
           local main=force.technologies["recipe-prod-research_steel-1"]
@@ -1306,7 +1310,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           force.current_research=main;local queue=force.research_queue
           native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes={
             base={old_version="2.1.23",new_version="2.1.24"},
-            ["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21015"}}})
+            ["more-infinite-research"]={old_version="4.7.21003",new_version=successor}}})
           for family,recipes in pairs(GROUPS) do
             close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
             assert(record(force,family,recipes[1].recipe).offset==0)
@@ -1337,8 +1341,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                   end
                   if opponent=="missing-base" then changes.base=nil end
                   if opponent=="new-mismatch" then
-                    BASE_ACTIVE["more-infinite-research"]="5.0.21014"
-                    changes["more-infinite-research"].new_version="5.0.21014"
+                    BASE_ACTIVE["more-infinite-research"]="5.0.21016"
                   end
                   if opponent=="cross-family" then
                     BASE_ACTIVE["more-infinite-research"]="5.0.20015"

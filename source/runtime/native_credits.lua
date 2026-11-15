@@ -696,10 +696,9 @@ local function legacy_family_context(event)
     local same_engine = old == "4.7.21003" and same_inputs and (base_change == nil
       or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
     -- This is one observed published Base migration, not a patch-family rule:
-    -- 4.7.21003/Base2.1.23 may enter the fixed 5.0.21015/Base2.1.24
-    -- successor only with unchanged startup settings and no other active mod.
-    local exact_f210_patch24 = old == "4.7.21003" and mir.new_version == "5.0.21015"
-      and active[MIR_MOD] == "5.0.21015" and active.base == "2.1.24"
+    -- 4.7.21003/Base2.1.23 may enter a current F210 successor on Base2.1.24
+    -- only with unchanged startup settings and no other active mod.
+    local exact_f210_patch24 = old == "4.7.21003" and f210_destination and active.base == "2.1.24"
       and type(base_change) == "table" and base_change.old_version == "2.1.23"
       and base_change.new_version == "2.1.24" and event.mod_startup_settings_changed == false
     local admitted = valid and (same_f200 or f210_destination and active.base == "2.1.23"
