@@ -4,8 +4,14 @@ These controls exercise the hash-bound actor's public leaf functions only.  They
 do not open X, start Factorio, inspect /proc, or mutate a mod library.
 """
 import importlib.util
+import hashlib
+import io
+import json
 from pathlib import Path
+import sys
+import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,7 +72,7 @@ class MockBackend:
 
     def __init__(self, spec, binding, *, stolen_focus=False, mapped=True,
                  title="Factorio 2.1", pid=None, bounds=None, modifiers=0,
-                 group=0, reject=None):
+                 group=0, reject=None, close_error=None):
         self.spec = spec
         self.binding = binding
         self.stolen_focus = stolen_focus
@@ -77,8 +83,10 @@ class MockBackend:
         self.modifier_mask = modifiers
         self.group = group
         self.reject = reject
+        self.close_error = close_error
         self.events = []
         self.focused_window = None
+        self.close_calls = 0
 
     def window(self, binding, spec):
         return {"pid": self.pid, "bounds": list(self.bounds),
@@ -116,8 +124,40 @@ class MockBackend:
     def sync(self):
         self.events.append(("sync",))
 
+    def close(self):
+        self.close_calls += 1
+        if self.close_error is not None:
+            raise self.close_error
+
 
 class LibraryNativeInputLinuxTests(unittest.TestCase):
+    def write_pinned_json(self, root, name, value):
+        path = Path(root) / name
+        raw = json.dumps(value, separators=(",", ":")).encode("utf-8")
+        path.write_bytes(raw)
+        return path, hashlib.sha256(raw).hexdigest().upper()
+
+    def invoke_main(self, spec, binding, *, validate_only=False, guard=None, final_hash=None,
+                    backend=None):
+        with tempfile.TemporaryDirectory() as directory:
+            spec_path, spec_hash = self.write_pinned_json(directory, "spec.json", spec)
+            binding_path, binding_hash = self.write_pinned_json(directory, "binding.json", binding)
+            arguments = [
+                "actor", "--spec-path", str(spec_path), "--spec-sha256", spec_hash,
+                "--binding-path", str(binding_path), "--binding-sha256", binding_hash,
+            ]
+            if validate_only:
+                arguments.append("--validate-only")
+            output = io.StringIO()
+            guard = guard or (lambda: None)
+            final_hash = final_hash or (lambda: None)
+            with mock.patch.object(sys, "argv", arguments), \
+                    mock.patch.object(sys, "stdout", output), \
+                    mock.patch.object(ACTOR, "process_guard", return_value=(guard, final_hash)), \
+                    mock.patch.object(ACTOR, "LinuxX11", return_value=backend):
+                status = ACTOR.main()
+            return status, json.loads(output.getvalue())
+
     def perform(self, spec, backend=None, binding=None, fail_guard_at=None):
         binding = binding or valid_binding(spec)
         backend = backend or MockBackend(spec, binding)
@@ -308,6 +348,92 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
                 with self.assertRaisesRegex(ACTOR.InputError, "unexpected held modifiers"):
                     self.perform(spec, backend=backend, binding=binding)
                 self.assertFalse(any(event[0] == "key" for event in backend.events))
+
+    def test_validate_only_never_opens_x_or_reads_the_nonexistent_process_paths(self):
+        spec = valid_spec("escape", process_id=999_991)
+        binding = valid_binding(
+            spec,
+            engine_path="/missing/factorio/bin/x64/factorio",
+            xauthority="/missing/private/Xauthority",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            spec_path, spec_hash = self.write_pinned_json(directory, "spec.json", spec)
+            binding_path, binding_hash = self.write_pinned_json(directory, "binding.json", binding)
+            output = io.StringIO()
+            arguments = [
+                "actor", "--spec-path", str(spec_path), "--spec-sha256", spec_hash,
+                "--binding-path", str(binding_path), "--binding-sha256", binding_hash,
+                "--validate-only",
+            ]
+            with mock.patch.object(sys, "argv", arguments), \
+                    mock.patch.object(sys, "stdout", output), \
+                    mock.patch.object(ACTOR, "process_guard", side_effect=AssertionError("process read")), \
+                    mock.patch.object(ACTOR, "LinuxX11", side_effect=AssertionError("X open")):
+                self.assertEqual(ACTOR.main(), 0)
+        receipt = json.loads(output.getvalue())
+        self.assertEqual(receipt["status"], "validated-schema-only")
+        self.assertFalse(receipt["native_gui_acceptance"])
+        self.assertFalse(receipt["native_process_identity_checked"])
+        self.assertEqual(receipt["trace"], [])
+
+    def test_pinned_json_refuses_wrong_hash_duplicate_keys_and_oversize_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            normal = root / "normal.json"
+            normal.write_bytes(b'{"value":1}')
+            with self.assertRaisesRegex(ACTOR.InputError, "input hash differs"):
+                ACTOR.pinned_json(normal, "A" * 64)
+
+            duplicate = root / "duplicate.json"
+            duplicate_raw = b'{"value":1,"value":2}'
+            duplicate.write_bytes(duplicate_raw)
+            duplicate_hash = hashlib.sha256(duplicate_raw).hexdigest().upper()
+            with self.assertRaisesRegex(ACTOR.InputError, "duplicate JSON member"):
+                ACTOR.pinned_json(duplicate, duplicate_hash)
+
+            oversize = root / "oversize.json"
+            oversize_raw = b"{" + b" " * 8191 + b"}"
+            oversize.write_bytes(oversize_raw)
+            oversize_hash = hashlib.sha256(oversize_raw).hexdigest().upper()
+            with self.assertRaisesRegex(ACTOR.InputError, "input file differs"):
+                ACTOR.pinned_json(oversize, oversize_hash)
+
+    def test_main_keeps_the_accepted_trace_when_final_engine_hash_refuses(self):
+        spec = valid_spec("escape")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding)
+
+        def final_hash():
+            raise ACTOR.InputError("engine changed during input")
+
+        status, receipt = self.invoke_main(
+            spec, binding, backend=backend, final_hash=final_hash
+        )
+        self.assertEqual(status, 1)
+        self.assertEqual(receipt["status"], "refused")
+        self.assertFalse(receipt["native_gui_acceptance"])
+        self.assertEqual(receipt["error"], "engine changed during input")
+        self.assertEqual(backend.close_calls, 1)
+        self.assertEqual(
+            [(row["api"], row["accepted_by_xtest"]) for row in receipt["trace"]],
+            [("XTestFakeKeyEvent", True), ("XTestFakeKeyEvent", True)],
+        )
+
+    def test_main_keeps_the_accepted_trace_when_connection_close_refuses(self):
+        spec = valid_spec("escape")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding, close_error=RuntimeError("synthetic close error"))
+        status, receipt = self.invoke_main(spec, binding, backend=backend)
+        self.assertEqual(status, 1)
+        self.assertEqual(receipt["status"], "refused")
+        self.assertFalse(receipt["native_gui_acceptance"])
+        self.assertEqual(receipt["error"], "X connection close failed")
+        self.assertEqual(receipt["connection_close_error"], "RuntimeError")
+        self.assertEqual(backend.close_calls, 1)
+        self.assertEqual(
+            [(row["api"], row["accepted_by_xtest"]) for row in receipt["trace"]],
+            [("XTestFakeKeyEvent", True), ("XTestFakeKeyEvent", True)],
+        )
 
 
 if __name__ == "__main__":
