@@ -13,7 +13,7 @@ local STAGES = {
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
   ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
-  ["current-successor17"] = {version = "0.11.0", cap = 10, mir = "5.0.20017"},
+  ["current-successor17"] = {version = "0.12.0", cap = 10, mir = "5.0.20017"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
