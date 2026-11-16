@@ -65,6 +65,7 @@ local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 -- Closing a view drops that working cache and retains only issued native IDs.
 local translation_caches = {}
 local declaration_cache
+local stage_annotation_cache
 -- Credit carriers are genuine native technologies for migration/runtime
 -- accounting, but never Library research. The catalogue supplies this small
 -- exact identity map at control parse; it is not inferred from hidden flags
@@ -1107,12 +1108,13 @@ local function caption(row, player)
   return row.id or ""
 end
 
--- Rows are grouped from authored scalar stage facts, never from localized
--- caption objects. Translation may arrive after opening the Library, while
--- the stage distinction must already be visible and deterministic.
-local function stage_annotations(rows)
+-- Group complete authored declarations, not filtered live rows. A ready-only,
+-- completed-only or personal view must retain an individual finite or
+-- continuation label even when its declared sibling is not displayed.
+local function stage_annotations()
+  if stage_annotation_cache ~= nil then return stage_annotation_cache end
   local families, groups, annotations = {}, {}, {}
-  for _, row in ipairs(rows) do
+  for _, row in ipairs(authored_declarations()) do
     if type(row) == "table" and type(row.family) == "string" and row.family ~= ""
         and type(row.locale_key) == "string" and row.locale_key ~= ""
         and whole_number(row.progression, 1) then
@@ -1140,7 +1142,8 @@ local function stage_annotations(rows)
       end
     end
   end
-  return annotations
+  stage_annotation_cache = annotations
+  return stage_annotation_cache
 end
 
 local function list_caption(row, player, stage)
@@ -1604,7 +1607,7 @@ local function update_research_content(content, player, view, context, translati
   end
 
   local rows = rows_for(player, view, context, translations)
-  local stages = stage_annotations(rows)
+  local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
     local text = list_caption(row, player, stages[row.id])
@@ -3215,6 +3218,7 @@ end
 function M.on_configuration_changed()
   reconnect_translation_caches()
   declaration_cache = nil
+  stage_annotation_cache = nil
   setting_groups_cache = nil
   setting_prototype_cache = nil
   local legacy = legacy_browser_state()

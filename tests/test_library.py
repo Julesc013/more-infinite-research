@@ -4216,6 +4216,30 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress == progress
             and queue[1] == tail and queue[2] == tail,
             "Library navigation changed literal worker objects, levels, bonus or native queue state")
+
+          -- The stage relationship belongs to the complete prepared
+          -- declarations, not the current filtered list. Each lone visible
+          -- native row retains its intrinsic finite/continuation distinction.
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {}, nil, 0
+          local ready_root = library.open(player, {
+            family = "worker-robots-storage", status = 2, selected = tail_id, sort = "name-asc"
+          })
+          local ready_items = research_content(ready_root)["mir_library_list_pane"]["mir_library_results"].items
+          assert(#ready_items == 1 and ready_items[1][2] == "[img=technology/" .. tail_id .. "] "
+            and ready_items[1][3][1] == "mir-browser.list-stage-capped"
+            and ready_items[1][3][2] == "Worker robot storage"
+            and ready_items[1][3][3] == 4 and ready_items[1][3][4] == 8,
+            "a ready-only continuation lost its same-caption stage distinction")
+
+          local complete_root = library.open(player, {
+            family = "worker-robots-storage", status = 1, hidden = {tail_id}, selected = retired_id, sort = "name-asc"
+          })
+          local complete_items = research_content(complete_root)["mir_library_list_pane"]["mir_library_results"].items
+          assert(retired.researched == true and #complete_items == 1
+            and complete_items[1][2] == "[img=technology/" .. retired_id .. "] "
+            and complete_items[1][3][1] == "mir-browser.list-stage-finite"
+            and complete_items[1][3][2] == "Worker robot storage" and complete_items[1][3][3] == 4,
+            "a completed-only finite stage lost its same-caption distinction")
         ''')
 
     def _assert_real_selected_catalogue_opens_without_runtime_imports(self, profile_name, target_id, expected_id):
