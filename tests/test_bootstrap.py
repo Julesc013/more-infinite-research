@@ -1141,29 +1141,66 @@ class BootstrapTests(unittest.TestCase):
           local names = {
             "worker_storage_route", "worker_default_split", "finite_research_speed_provider"
           }
-          for _, name in ipairs(names) do
-            for _, kind in ipairs({"missing", "nonfunction"}) do
+          for _, target_id in ipairs({"f200", "f210"}) do
+            for _, name in ipairs(names) do
+              for _, kind in ipairs({"missing", "nonfunction"}) do
               install_modules(false); install_runtime()
               local supplied = {}
               for key, value in pairs(actual_catalogue) do supplied[key] = value end
-              supplied[name] = kind == "nonfunction" and false or nil
+              if kind == "nonfunction" then
+                supplied[name] = false
+                assert(rawget(supplied, name) == false and type(rawget(supplied, name)) == "boolean",
+                  "nonfunction catalogue opponent was not false: " .. name)
+              else
+                supplied[name] = nil
+                assert(rawget(supplied, name) == nil,
+                  "missing catalogue opponent unexpectedly retained a value: " .. name)
+              end
               package.loaded["runtime.catalogue"] = nil
               package.loaded["runtime.worker_robot_storage"] = nil
               package.loaded["runtime.finite_research_speed"] = nil
+              package.preload["platform.target"] = function()
+                local target = dofile(player_root .. "/platform/target.lua")
+                target.id = target_id
+                return target
+              end
               package.preload["runtime.catalogue"] = function() return supplied end
               local ok, message = pcall(load_control)
               assert(not ok and tostring(message):find("MIR runtime catalogue requires callable " .. name, 1, true),
-                kind .. " required catalogue export was treated as an absent result: " .. name)
+                target_id .. " " .. kind .. " required catalogue export was treated as an absent result: " .. name)
               assert(next(remote.interfaces) == nil and next(commands.registered) == nil
                 and handlers.init == nil and handlers.configuration == nil and handlers.load == nil
                 and next(handlers.events) == nil and next(handlers.nth) == nil,
-                kind .. " export registered a callback or command before refusal: " .. name)
+                target_id .. " " .. kind .. " export registered a callback or command before refusal: " .. name)
               assert(next(lifecycle_calls) == nil and next(library_calls) == nil
                 and package.loaded["runtime.worker_robot_storage"] == nil
                 and package.loaded["runtime.finite_research_speed"] == nil,
-                kind .. " export reached worker, finite-speed, lifecycle or Library application: " .. name)
+                target_id .. " " .. kind .. " export reached worker, finite-speed, lifecycle or Library application: " .. name)
+              end
             end
           end
+        ''')
+
+    def test_historical_target_does_not_require_current_catalogue_worker_exports(self):
+        self.lua.execute(r'''
+          install_modules(false); install_runtime()
+          local actual_catalogue = require("runtime.catalogue")
+          local supplied = {}
+          for key, value in pairs(actual_catalogue) do supplied[key] = value end
+          supplied.worker_storage_route = nil
+          supplied.worker_default_split = false
+          supplied.finite_research_speed_provider = nil
+          package.loaded["runtime.catalogue"] = nil
+          package.preload["platform.target"] = function()
+            local target = dofile(player_root .. "/platform/target.lua")
+            target.id = "f018"
+            return target
+          end
+          package.preload["runtime.catalogue"] = function() return supplied end
+          local ok, message = pcall(load_control)
+          assert(ok, message)
+          assert(next(remote.interfaces) ~= nil and handlers.init ~= nil and handlers.configuration ~= nil,
+            "historical target lost the ordinary bootstrap route")
         ''')
 
     def test_callable_catalogue_worker_exports_keep_absent_results(self):
