@@ -186,7 +186,13 @@ class NativeCreditDefinitionTests(unittest.TestCase):
 
             for _, opponent in ipairs({"missing", "false"}) do
               local malformed = copy(added[1])
-              malformed.ignore_tech_cost_multiplier = opponent == "missing" and nil or false
+              if opponent == "missing" then
+                malformed.ignore_tech_cost_multiplier = nil
+                assert(malformed.ignore_tech_cost_multiplier == nil, "missing opponent retained exemption")
+              else
+                malformed.ignore_tech_cost_multiplier = false
+                assert(malformed.ignore_tech_cost_multiplier == false, "false opponent did not set false")
+              end
               local ok, message = pcall(effective_count, malformed, multiplier)
               assert(not ok and tostring(message):find("map%-price exemption"), opponent)
             end
