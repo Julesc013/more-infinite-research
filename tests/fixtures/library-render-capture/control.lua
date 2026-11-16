@@ -14,6 +14,17 @@ local CASES = {
 local function require_that(value, message)
   if not value then error("[MIR_LIBRARY_RENDER] " .. message, 2) end
 end
+-- MIR_ACTIVE_MODS_OBSERVER_BEGIN
+local function report_active_mods()
+  local identities = {}
+  for name, version in pairs(script.active_mods) do
+    require_that(type(name) == "string" and type(version) == "string", "active mod identity differs")
+    identities[#identities + 1] = name .. "@" .. version
+  end
+  table.sort(identities)
+  log("[MIR_ACTIVE_MODS] " .. table.concat(identities, "|"))
+end
+-- MIR_ACTIVE_MODS_OBSERVER_END
 local function equal(a, b)
   if type(a) ~= type(b) then return false end
   if type(a) ~= "table" then return a == b end
@@ -92,6 +103,7 @@ script.on_nth_tick(30, function()
     local expected_package = EXACT_PACKAGES[script.active_mods.base]
     require_that(expected_package and script.active_mods["more-infinite-research"] == expected_package,
       "exact engine/package tuple differs")
+    report_active_mods()
     state = {index = 1, phase = "initial", after = game.tick + 180, observations = {}}
     storage.mir_render_capture = state
     local player = player_for(state)
