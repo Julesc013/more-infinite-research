@@ -1463,6 +1463,30 @@ class LifecycleTests(unittest.TestCase):
             "malformed native tail was managed")
         ''')
 
+    def test_cap_limits_owner_failure_keeps_presentation_inputs_read_only(self):
+        self.lua.execute('''
+          local owner = "worker-robots-speed-6"
+          local six = technology(owner, 9, true)
+          six.prototype = {max_level = 4294967295,
+            effects = {{type = "worker-robot-speed", modifier = .65}}}
+          six.prerequisites = {["worker-robots-speed-5"] = {name = "worker-robots-speed-5"}}
+          local technologies = setmetatable({[owner] = six}, {__index = function(_, name)
+            if name == "worker-robots-speed-7" then error("foreign lookup failure") end
+            return nil
+          end})
+          local f = force(16, technologies, {six}, six, .37)
+          local saved = {mir_caps = {schema = 1, owned_disabled = {}, preserved = {keep = true}}}
+          boot({[16] = f}, 0, "", saved, nil, 10)
+          local ok = pcall(function() return require("runtime.lifecycle").cap_limits(f) end)
+          assert(not ok, "owner lookup failure produced a cap snapshot")
+          assert(storage == saved and saved.mir_caps.preserved.keep
+            and next(saved.mir_caps.owned_disabled) == nil,
+            "cap presentation changed stored ownership")
+          assert(f.current_research == six and f.research_progress == .37
+            and #f.research_queue == 1 and f.research_queue[1] == six,
+            "cap presentation rewrote native work")
+        ''')
+
     def test_published_worker_cap_boundary_preserves_earned_bonus_and_partial_work(self):
         self.lua.execute('''
           -- The old worker control independently fixes the inclusive 10 cap,

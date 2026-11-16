@@ -12,9 +12,15 @@ local CANDIDATES = {
 }
 
 local function sole_worker_robot_speed_effect(effects, modifier)
+  if type(effects) ~= "table" then return false end
   local effect = effects[1]
-  return effect ~= nil and effects[2] == nil
+  return type(effect) == "table" and effects[2] == nil
     and effect.type == "worker-robot-speed" and effect.modifier == modifier
+end
+
+local function runtime_object(value)
+  local kind = type(value)
+  return kind == "table" or kind == "userdata"
 end
 
 -- The captured 2.1 data tail has the immediate predecessor plus a science
@@ -35,13 +41,16 @@ local function admits_data(technology, candidate, modifier)
 end
 
 local function admits_runtime(technology, candidate, modifier)
+  if not runtime_object(technology) then return false end
   local prototype = technology.prototype
   local prerequisites = technology.prerequisites
+  if not runtime_object(prototype) or not runtime_object(prerequisites) then return false end
+  local predecessor = prerequisites[candidate.predecessor]
+  if not runtime_object(predecessor) then return false end
   return technology.name == candidate.name
     and prototype.max_level == INFINITE_MAX_LEVEL
     and sole_worker_robot_speed_effect(prototype.effects, modifier)
-    and prerequisites[candidate.predecessor] ~= nil
-    and prerequisites[candidate.predecessor].name == candidate.predecessor
+    and predecessor.name == candidate.predecessor
 end
 
 local function select(lookup, admits, modifiers)
@@ -49,11 +58,15 @@ local function select(lookup, admits, modifiers)
   for index = 1, #CANDIDATES do
     local candidate = CANDIDATES[index]
     local called, technology = pcall(lookup, candidate.name)
-    if called then
-      local modifier = modifiers and modifiers[candidate.name] or 0.65
-      local checked, accepted = pcall(admits, technology, candidate, modifier)
-      if checked and accepted then return candidate.name end
+    if not called then
+      error("MIR native worker owner lookup failed for " .. candidate.name .. ": " .. tostring(technology), 2)
     end
+    local modifier = modifiers and modifiers[candidate.name] or 0.65
+    local checked, accepted = pcall(admits, technology, candidate, modifier)
+    if not checked then
+      error("MIR native worker owner admission failed for " .. candidate.name .. ": " .. tostring(accepted), 2)
+    end
+    if accepted then return candidate.name end
   end
   return nil
 end
