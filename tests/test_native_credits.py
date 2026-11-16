@@ -227,6 +227,58 @@ class NativeCreditRuntimeTests(unittest.TestCase):
                   for _,s in pairs(f._states) do assert(s.writes.level==0 and s.writes.enabled==0) end
                 ''')
 
+    def test_required_catalogue_interfaces_fail_closed_before_credit_writes(self):
+        self.lua.execute(r'''
+          local force=make_force(1)
+          game.forces[1]=force
+          package.loaded["runtime.native_credits"]=nil
+          package.loaded["runtime.catalogue"]={galore_sulfur_retired=function()return false end}
+          local ok,message=pcall(require,"runtime.native_credits")
+          assert(not ok and tostring(message):find("native_credit_groups",1,true),
+            "missing native_credit_groups silently loaded native credits")
+          assert(storage.mir_native_credits==nil,"missing native_credit_groups allocated a ledger")
+          for _,state in pairs(force._states) do
+            assert(state.writes.level==0 and state.writes.enabled==0,
+              "missing native_credit_groups wrote a native carrier")
+          end
+        ''')
+        self.setUp()
+        self.galore_force()
+        self.lua.execute(r'''
+          local catalogue=require("runtime.catalogue")
+          catalogue.galore_sulfur_retired=nil
+          local queue,current,progress,saved=f.research_queue,f.current_research,f.research_progress,t.saved_progress
+          local ok,message=pcall(native_credits.on_configuration_changed,beta_event)
+          assert(not ok and tostring(message):find("galore_sulfur_retired",1,true),
+            "missing galore_sulfur_retired silently entered paid Galore reconciliation")
+          assert(storage.mir_native_credits==nil,"missing galore_sulfur_retired allocated a ledger")
+          assert(f.research_queue==queue and f.current_research==current and f.research_progress==progress
+            and t.saved_progress==saved,"missing galore_sulfur_retired changed research state")
+          for _,state in pairs(f._states) do
+            assert(state.writes.level==0 and state.writes.enabled==0,
+              "missing galore_sulfur_retired wrote a native carrier")
+          end
+        ''')
+
+    def test_required_catalogue_interfaces_accept_empty_groups_and_false_retirement(self):
+        self.lua.execute(r'''
+          package.loaded["runtime.native_credits"]=nil
+          package.loaded["runtime.catalogue"]={
+            native_credit_groups=function()return {} end,
+            galore_sulfur_retired=function()return false end,
+          }
+          local ok,loaded=pcall(require,"runtime.native_credits")
+          assert(ok,tostring(loaded))
+          native_credits=loaded
+          assert(not native_credits.needs_research_events())
+        ''')
+        self.galore_force(False,False)
+        self.lua.execute(r'''
+          native_credits.on_configuration_changed(beta_event)
+          assert(ledger(f,galore.recipe).offset==0 and holder(f,galore.recipe,"positive").level==1,
+            "false Galore retirement invented a paid sulfur credit")
+        ''')
+
     def test_galore_merge_keeps_destination_credit_and_readonly_load(self):
         self.galore_force()
         self.lua.execute('''
