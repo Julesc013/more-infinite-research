@@ -17,6 +17,7 @@ from native_credit_oracle import (
     current_native_credit_rows as native_credit_carrier_rows,
     split_public_and_native_credit_rows,
 )
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -96,29 +97,6 @@ def _captured_f210_profile(relative: str, expected_sha256: str) -> bytes:
     if hashlib.sha256(data).hexdigest().upper() != expected_sha256:
         raise AssertionError(f"captured F210 K2 profile changed: {revision}:{relative}")
     return data
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
-
-
-def _plain(value):
-    if not hasattr(value, "items"):
-        return value
-    items = dict(value.items())
-    if items and set(items) == set(range(1, len(items) + 1)):
-        return [_plain(items[index]) for index in range(1, len(items) + 1)]
-    return {key: _plain(nested) for key, nested in items.items()}
 
 
 class K2BaseCatalogueTests(unittest.TestCase):
@@ -348,7 +326,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
           emitted={}
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
         ''')
-        return _plain(self.lua.globals().data.raw), mods
+        return _plain(self.lua, self.lua.globals().data.raw), mods
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -417,7 +395,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         actual = self.lua.globals().data.raw.technology
         emitted_names = [str(name) for name in self.lua.globals().emitted.values()]
         self.assertEqual(len(emitted_names), len(set(emitted_names)), "duplicate K2 Base output")
-        emitted_rows = {name: _plain(actual[name]) for name in emitted_names}
+        emitted_rows = {name: _plain(self.lua, actual[name]) for name in emitted_names}
         private_worker = {"mir-worker-storage-preservation-4": expected_private_worker_row()}
         split_worker = expected_worker_default_split_rows(rows["worker-robots-storage-4"])
         gate = split_worker.pop("mir-worker-storage-head-4")
@@ -432,7 +410,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         self.assertEqual(actual_credit, expected_credit)
         self.assertEqual(set(emitted_rows), set(rows) | set(expected_credit))
         for name, wanted in rows.items():
-            found = _plain(actual[name])
+            found = _plain(self.lua, actual[name])
             self.assertTrue(compare_k2_base.catalogue._same(found, wanted),
                             f"{name}: {compare_k2_base.catalogue._changed_paths(wanted, found)}")
         # Opponents exercise the whole-row boundary, including numeric types.

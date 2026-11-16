@@ -10,6 +10,7 @@ import zipfile
 
 from historical_sources import PUBLISHED_COMMIT, read_published_source
 from worker_storage_recovery_fixture import expected_private_worker_row
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,29 +19,6 @@ FACTS_PATH = ROOT / "tests/fixtures/bob-tech-f210-captured-facts.json"
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, item in value.items():
-            table[key] = _lua_value(lua, item)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, item in enumerate(value, 1):
-            table[index] = _lua_value(lua, item)
-        return table
-    return value
-
-
-def _plain(value):
-    if not hasattr(value, "items"):
-        return value
-    items = dict(value.items())
-    if items and set(items) == set(range(1, len(items) + 1)):
-        return [_plain(items[index]) for index in range(1, len(items) + 1)]
-    return {key: _plain(item) for key, item in items.items()}
 
 
 class BobTechMaterialTests(unittest.TestCase):
@@ -130,7 +108,7 @@ class BobTechMaterialTests(unittest.TestCase):
         )
 
     def test_exact_five_rows_preserve_stage_boundaries_and_named_routes(self):
-        rows = _plain(self.rows())
+        rows = _plain(self.lua, self.rows())
         self.assertEqual(self.facts["totals"]["technology_rows"], len(rows))
         by_id = {row["name"]: row for row in rows}
         self.assertEqual(len(rows), len(by_id))
@@ -192,19 +170,19 @@ class BobTechMaterialTests(unittest.TestCase):
         ''')
         self.generator["install"](self.rows(), stage)
         self.assertEqual(1, stage["writes"])
-        self.assertEqual(rows, _plain(stage["batch"]))
+        self.assertEqual(rows, _plain(self.lua, stage["batch"]))
 
     def test_omitted_native_productivity_ceiling_preserves_the_same_five_rows(self):
         # RecipePrototype.maximum_productivity defaults to 3 in F210. The
         # upstream Angel source omits it; native prototype dumps spell it out.
         # Admission must inspect the effective value without editing raw input.
-        baseline = _plain(self.rows())
+        baseline = _plain(self.lua, self.rows())
         raw = self.raw_fixture()
         names = [route["recipe"] for family in self.facts["families"]
                  for route in family["routes"]]
         for name in names:
             raw["recipe"][name]["maximum_productivity"] = None
-        self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+        self.assertEqual(baseline, _plain(self.lua, self.rows(raw=raw)))
         self.assertTrue(all(raw["recipe"][name]["maximum_productivity"] is None
                             for name in names))
 
@@ -227,7 +205,7 @@ class BobTechMaterialTests(unittest.TestCase):
         gunmetal["research_time"] = 45
         gunmetal["effect_percent"] = 3
         values["streams"]["research_material_tin"]["enabled"] = False
-        rows = {row["name"]: row for row in _plain(self.rows(values=values))}
+        rows = {row["name"]: row for row in _plain(self.lua, self.rows(values=values))}
         self.assertEqual("(250+3*(L-1))*2^(L-1)", rows["recipe-prod-research_material_gunmetal-1"]["unit"]["count_formula"])
         self.assertEqual("2072+250*(L-4)", rows["recipe-prod-research_material_gunmetal-4"]["unit"]["count_formula"])
         self.assertEqual(45, rows["recipe-prod-research_material_gunmetal-1"]["unit"]["time"])
@@ -258,7 +236,7 @@ class BobTechMaterialTests(unittest.TestCase):
             for stage_name in ("early", "continuation")
             if family.get(stage_name)
         }
-        actual_rows = _plain(rows)
+        actual_rows = _plain(self.lua, rows)
         for row in actual_rows:
             self.assertNotEqual(False, row.get("enabled"), row["name"])
             self.assertEqual(expected[row["name"]], [ingredient[0] for ingredient in row["unit"]["ingredients"]])
@@ -266,10 +244,10 @@ class BobTechMaterialTests(unittest.TestCase):
 
     def test_profile_gate_ignores_target_minimum_metadata_but_keeps_the_same_raw_contract(self):
         self.lua.globals().mods = self.active_mods()
-        baseline_settings = _plain(self.lua.execute(
+        baseline_settings = _plain(self.lua, self.lua.execute(
             'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
         ))
-        baseline = _plain(self.rows())
+        baseline = _plain(self.lua, self.rows())
         self.assertEqual(5, len(baseline))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
         self.assertEqual(0, len(self.rows()))
@@ -277,8 +255,8 @@ class BobTechMaterialTests(unittest.TestCase):
         self.assertEqual(0, len(self.rows()))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"')
         self.lua.execute('target.minimum_base = "2.1.24"')
-        self.assertEqual(baseline, _plain(self.rows()))
-        self.assertEqual(baseline_settings, _plain(self.lua.execute(
+        self.assertEqual(baseline, _plain(self.lua, self.rows()))
+        self.assertEqual(baseline_settings, _plain(self.lua, self.lua.execute(
             'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
         )))
 
@@ -288,7 +266,7 @@ class BobTechMaterialTests(unittest.TestCase):
         for changed in ("base", "space-age", "bobtech", "angelssmeltinggraphics"):
             mods = dict(self.facts["required_mods"])
             mods[changed] = "2.1.24" if changed in ("base", "space-age") else "changed"
-            self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, mods))))
+            self.assertEqual(baseline, _plain(self.lua, self.rows(active_mods=_lua_value(self.lua, mods))))
 
         changed = dict(self.facts["required_mods"])
         changed["bobtech"] = "changed"
@@ -307,7 +285,7 @@ class BobTechMaterialTests(unittest.TestCase):
                 # Keep the captured historical marker list unchanged. The
                 # actual asset archives contain no overhaul entrypoints and
                 # do not change this named recipe/owner contract.
-                self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, mods))))
+                self.assertEqual(baseline, _plain(self.lua, self.rows(active_mods=_lua_value(self.lua, mods))))
                 with self.assertRaisesRegex(Exception, "angels-plate-invar changed"):
                     self.rows(raw=wrong_io, active_mods=_lua_value(self.lua, mods))
             else:
@@ -338,14 +316,14 @@ class BobTechMaterialTests(unittest.TestCase):
                 self.rows(raw=changed)
 
     def test_named_item_reskin_is_unconsumed_but_item_presence_remains_required(self):
-        baseline = _plain(self.rows())
+        baseline = _plain(self.lua, self.rows())
         reskinned = self.raw_fixture()
         reskinned_item = reskinned["item"]["bob-tin-plate"]
         reskinned_item["icon"] = "__reskin__/graphics/icons/bob-tin-plate.png"
         reskinned_item["icon_size"] = 128
-        before = _plain(reskinned)
-        self.assertEqual(baseline, _plain(self.rows(raw=reskinned)))
-        self.assertEqual(before, _plain(reskinned))
+        before = _plain(self.lua, reskinned)
+        self.assertEqual(baseline, _plain(self.lua, self.rows(raw=reskinned)))
+        self.assertEqual(before, _plain(self.lua, reskinned))
 
         missing = self.raw_fixture()
         missing["item"]["bob-tin-plate"] = None
@@ -425,7 +403,7 @@ class BobTechMaterialTests(unittest.TestCase):
             ("invalid numeric exclusion", {"ignored_by_productivity": False}, {}, False),
             ("wrong ingredient amount", {}, {"amount": 41}, False),
         ]
-        baseline = _plain(self.rows())
+        baseline = _plain(self.lua, self.rows())
         recipe_name = family["routes"][0]["recipe"]
         for name, product_fields, ingredient_fields, accepted in cases:
             with self.subTest(case=name):
@@ -437,46 +415,46 @@ class BobTechMaterialTests(unittest.TestCase):
                     recipe["ingredients"][1][key] = _lua_value(self.lua, value)
                 # JSON distinguishes false from numeric zero in this ownership
                 # check, unlike Python's ordinary equality for those values.
-                before = json.dumps(_plain(raw), sort_keys=True)
+                before = json.dumps(_plain(self.lua, raw), sort_keys=True)
                 if accepted:
-                    self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+                    self.assertEqual(baseline, _plain(self.lua, self.rows(raw=raw)))
                     self.assertIs(preflight(raw, definition), True)
                 else:
                     with self.assertRaisesRegex(Exception, recipe_name + " changed"):
                         self.rows(raw=raw)
                     with self.assertRaisesRegex(Exception, recipe_name + " changed"):
                         preflight(raw, definition)
-                self.assertEqual(before, json.dumps(_plain(raw), sort_keys=True))
+                self.assertEqual(before, json.dumps(_plain(self.lua, raw), sort_keys=True))
 
     def test_effective_productivity_exclusion_distinguishes_products_from_inputs(self):
         route = self.facts["families"][0]["routes"][0]
-        baseline = _plain(self.rows())
+        baseline = _plain(self.lua, self.rows())
 
         for field, value in (("ignored_by_stats", 1), ("ignored_by_productivity", False),
                              ("ignored_by_stats", False)):
             with self.subTest(field=field, value=value):
                 excluded = self.raw_fixture()
                 excluded["recipe"][route["recipe"]]["results"][1][field] = value
-                excluded_before = _plain(excluded)
+                excluded_before = _plain(self.lua, excluded)
                 with self.assertRaisesRegex(Exception, route["recipe"] + " changed"):
                     self.rows(raw=excluded)
-                self.assertEqual(excluded_before, _plain(excluded))
+                self.assertEqual(excluded_before, _plain(self.lua, excluded))
 
         explicit_override = self.raw_fixture()
         recipe = explicit_override["recipe"][route["recipe"]]
         recipe["results"][1]["ignored_by_stats"] = 1
         recipe["results"][1]["ignored_by_productivity"] = 0
         recipe["ingredients"][1]["ignored_by_stats"] = 1
-        explicit_before = _plain(explicit_override)
-        self.assertEqual(baseline, _plain(self.rows(raw=explicit_override)))
-        self.assertEqual(explicit_before, _plain(explicit_override))
+        explicit_before = _plain(self.lua, explicit_override)
+        self.assertEqual(baseline, _plain(self.lua, self.rows(raw=explicit_override)))
+        self.assertEqual(explicit_before, _plain(self.lua, explicit_override))
 
     def test_outputs_are_detached_and_catalogue_metadata_names_exact_routes_and_boundaries(self):
         first = self.rows()
         first[1]["effects"][1]["recipe"] = "corrupted"
         first[2]["prerequisites"][1] = "corrupted"
         first[3]["icons"][1]["icon"] = "corrupted"
-        second = _plain(self.rows())
+        second = _plain(self.lua, self.rows())
         self.assertEqual("angels-plate-tin", second[0]["effects"][0]["recipe"])
         self.assertEqual("angels-gunmetal-smelting-1", second[1]["prerequisites"][0])
         self.assertEqual(self.facts["families"][1]["icon"], second[2]["icons"][0]["icon"])
@@ -484,7 +462,7 @@ class BobTechMaterialTests(unittest.TestCase):
         self.lua.globals().mods = self.active_mods()
         catalogue = self.lua.execute('package.loaded["research.catalogue"] = nil; return require("research.catalogue")')
         declared = {
-            row["id"]: _plain(row)
+            row["id"]: _plain(self.lua, row)
             for row in catalogue["declared"]().values()
             if row["id"].startswith("recipe-prod-research_material_")
         }
@@ -511,7 +489,7 @@ class BobTechMaterialTests(unittest.TestCase):
     def test_only_the_three_admitted_family_settings_are_visible(self):
         self.lua.globals().mods = self.active_mods()
         settings = self.lua.execute('package.loaded["research.settings"] = nil; return require("research.settings")')
-        specs = {spec["name"]: _plain(spec) for spec in settings["prototypes"]().values()}
+        specs = {spec["name"]: _plain(self.lua, spec) for spec in settings["prototypes"]().values()}
         for family in self.facts["families"]:
             for prefix in ("ips-enable-", "ips-cost-base-", "ips-cost-linear-increment-", "ips-cost-growth-", "ips-max-level-", "ips-research-time-", "ips-effect-per-level-"):
                 self.assertNotIn("hidden", specs[f"{prefix}{family['key']}"])
@@ -521,8 +499,8 @@ class BobTechMaterialTests(unittest.TestCase):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = (ROOT / "source").as_posix()
         lua.globals().mods = _lua_value(lua, self.facts["required_mods"])
-        lua.globals().fixture_raw = _lua_value(lua, _plain(self.raw_fixture()))
-        fixture_values = _plain(self.values())
+        lua.globals().fixture_raw = _lua_value(lua, _plain(self.lua, self.raw_fixture()))
+        fixture_values = _plain(self.lua, self.values())
         fixture_values["options"] = {}
         lua.globals().fixture_values = _lua_value(lua, fixture_values)
         authored_worker = expected_private_worker_row()
@@ -588,7 +566,7 @@ class BobTechMaterialTests(unittest.TestCase):
           end
           require("data-final-fixes")
         ''')
-        installed = _plain(lua.globals().data["installed"])
+        installed = _plain(lua, lua.globals().data["installed"])
         self.assertEqual(lua.globals().data["installs"], 1)
         worker = next(row for row in installed if row["name"] == "mir-worker-storage-preservation-4")
         self.assertEqual(worker, expected_private_worker_row("automation-science-pack"))
