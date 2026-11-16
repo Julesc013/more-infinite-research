@@ -235,6 +235,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_migration_origins_f200_120_successor_controls.py",
             "tests/test_migration_origins_successor_controls.py",
             "tests/test_modern_targets.py",
+            "tests/test_lua_table_values.py",
             "tests/test_k2_base_catalogue.py",
             "tests/test_k2_native_space_age.py",
             "tests/test_space_exploration_catalogue.py",

@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 import sys
 import unittest
-from test_bob_tech_materials import _lua_value, _plain
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 from worker_storage_recovery_fixture import expected_private_worker_row
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -219,7 +219,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           assert(package.loaded["research.legacy_module_credit_definitions"] == nil,
             "absent authored module research imported its credit definitions")
         """)
-        installed = _plain(self.lua.globals().module_installed)
+        installed = _plain(self.lua, self.lua.globals().module_installed)
         self.assertEqual(installed[1], expected_private_worker_row("automation-science-pack"))
 
     def test_raw_true_applies_published_permissions_without_changing_gear_emission(self):
