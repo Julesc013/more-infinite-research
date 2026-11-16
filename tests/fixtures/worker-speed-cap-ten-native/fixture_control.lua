@@ -4,8 +4,10 @@ local M = {}
 
 local KEY = "mir5_worker_speed_cap_ten"
 local CURRENT_KEY = "mir5_worker_speed_cap_current_state"
+local CURRENT_OBSERVE_KEY = "mir5_worker_speed_cap_current_observe"
 local SAVE = "mir5-worker-speed-cap-ten-complete"
 local CURRENT_SAVE = "mir5-worker-speed-cap-current-state-complete"
+local CURRENT_OBSERVE_TOKEN = "MIR_EXPECTED_CURRENT_OBSERVE16_TRACE_COMPLETE"
 local CASE = "f200-se-worker-speed-cap-ten"
 local FIXTURE = "mir-fixture-mir5-worker-speed-cap-ten"
 local WORKER = "worker-robots-speed-10"
@@ -26,12 +28,14 @@ local UINT32_MAX = 4294967295
 local DEADLINE_TICKS = 18000
 local POST_COMPLETION_HOLD_TICKS = 2
 local LAB_TOP_UP_REQUEST = 200
+local CURRENT_OBSERVE_MAX_EVENTS = 128
 local STAGES = {
   source15 = {version = "0.4.0", cap = 0, mir = "5.0.20015"},
   ["old-negative15"] = {version = "0.5.0", cap = 10, mir = "5.0.20015"},
   successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"},
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
+  ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -85,6 +89,20 @@ local function active_mods_snapshot()
   for _ in pairs(active) do count = count + 1 end
   if count ~= 20 then fail("F200 SE active mod count differs") end
   return active, count
+end
+
+local function current_observe_active_mod_tuple()
+  local active = active_mods_snapshot()
+  local rows = {}
+  for name, version in pairs(active) do
+    if type(name) ~= "string" or name == "" or type(version) ~= "string"
+        or version:match("^%d+%.%d+%.%d+$") == nil then
+      fail("current observe active mod identity differs")
+    end
+    rows[#rows + 1] = name .. "@" .. version
+  end
+  table.sort(rows)
+  return table.concat(rows, "|")
 end
 
 local function technology(force, name)
@@ -672,6 +690,124 @@ local function assert_current_post_completion(state, label)
   return player_support, foreign_support, earned_support
 end
 
+local function current_observe_sequence(state)
+  state.observe_sequence = state.observe_sequence + 1
+  return state.observe_sequence
+end
+
+local function current_observe_frame(state, boundary)
+  local player = current_force_snapshot(game.forces.player, "current observe " .. boundary .. " player", true)
+  local foreign = current_force_snapshot(force_by_index(state.foreign_index, "current observe " .. boundary .. " foreign"),
+    "current observe " .. boundary .. " foreign", true)
+  local earned = current_force_snapshot(force_by_index(state.earned_index, "current observe " .. boundary .. " earned"),
+    "current observe " .. boundary .. " earned", true)
+  state.observe_frames[#state.observe_frames + 1] = {
+    sequence = current_observe_sequence(state), boundary = boundary,
+    player = player, foreign = foreign, earned_above_cap = earned,
+  }
+end
+
+local function current_observe_event(state, event_name, event)
+  if #state.observe_events >= CURRENT_OBSERVE_MAX_EVENTS then fail("current observe event limit exceeded") end
+  local research = event.research
+  local force = event.force or (research and research.force)
+  local row = {sequence = current_observe_sequence(state), boundary = state.observe_boundary, event = event_name}
+  if force ~= nil then
+    row.force_index, row.force_name = force.index, force.name
+  end
+  if research ~= nil then
+    row.research_name = research.name
+    if type(research.level) == "number" then row.research_level = research.level end
+  end
+  if type(event.by_script) == "boolean" then
+    row.by_script_present, row.by_script = true, event.by_script
+  else
+    row.by_script_present = false
+  end
+  state.observe_events[#state.observe_events + 1] = row
+end
+
+local function current_observe_trace(state)
+  local trace = current_header("observe", "current-observe16")
+  trace.role = "reduced-synthetic-current-state-callback-observation"
+  trace.trace_schema = "MIR516SECapCallbackTraceV1"
+  trace.snapshot_role = "public-admin-write-boundary-observation-before-native-reset"
+  trace.source_base = {identity = "controller-bound-A0-base-input-only",
+    fixture_source_phase = "not-read-no-continuation-precondition"}
+  trace.frames, trace.events = copy(state.observe_frames), copy(state.observe_events)
+  trace.terminal = {expected_token = CURRENT_OBSERVE_TOKEN, explicit_reset_calls = 0,
+    lab_created = false, save_requested = false, cold_requested = false}
+  current_emit("observe", trace)
+end
+
+-- The reset and observation roles deliberately share this exact public
+-- administrative write sequence.  Only the observer supplies boundary hooks;
+-- the reset roles retain their original writes and no extra emitted state.
+local function apply_current_admin_sequence(player, foreign, earned, label, hooks)
+  local function before(action)
+    if hooks ~= nil and hooks.before ~= nil then hooks.before(action) end
+  end
+  local function after(action)
+    if hooks ~= nil and hooks.after ~= nil then hooks.after(action) end
+  end
+
+  before("prerequisites")
+  set_current_prerequisites(player, false, label .. " player")
+  set_current_prerequisites(foreign, true, label .. " foreign")
+  set_current_prerequisites(earned, false, label .. " earned")
+  after("prerequisites")
+
+  before("player-target")
+  local owner = technology(player, WORKER)
+  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 10, false, true, false
+  after("player-target")
+  before("player-queue")
+  player.research_queue = {owner, owner}
+  after("player-queue")
+  before("player-progress")
+  player.research_progress = PARTIAL
+  after("player-progress")
+
+  before("foreign-target")
+  owner = technology(foreign, WORKER)
+  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 11, false, true, false
+  after("foreign-target")
+  before("foreign-queue")
+  foreign.research_queue = {technology(foreign, PROBE)}
+  after("foreign-queue")
+  before("foreign-progress")
+  foreign.research_progress = FOREIGN_PROGRESS
+  after("foreign-progress")
+
+  before("earned-target")
+  owner = technology(earned, WORKER)
+  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = EARNED_LEVEL, false, true, false
+  after("earned-target")
+  before("earned-queue")
+  earned.research_queue = {}
+  after("earned-queue")
+end
+
+local function begin_current_observe()
+  current_provider_marker("current-observe16")
+  if storage[CURRENT_OBSERVE_KEY] ~= nil then fail("current observe fixture state already exists") end
+  local player, foreign, earned = current_named_forces("current observe fixture admin")
+  local state = {phase = "current-observe-admin", current_observe = true, player_force_index = player.index,
+    foreign_index = foreign.index, earned_index = earned.index, admin_intent = current_admin_intent(),
+    observe_sequence = 0, observe_frames = {}, observe_events = {}, observe_boundary = "before-admin"}
+  storage[CURRENT_OBSERVE_KEY] = state
+
+  current_observe_frame(state, "before-admin")
+  apply_current_admin_sequence(player, foreign, earned, "current observe", {
+    before = function(action) state.observe_boundary = action end,
+    after = function(action) current_observe_frame(state, "after-" .. action) end,
+  })
+
+  state.observe_boundary = "after-admin"
+  current_observe_frame(state, "after-admin")
+  state.phase = "current-observe-await-passive-tick"
+end
+
 local function begin_current_state(stage)
   current_provider_marker(stage)
   if storage[CURRENT_KEY] ~= nil then fail("current-state fixture state already exists") end
@@ -681,20 +817,7 @@ local function begin_current_state(stage)
     reset_call_count = 0, reset_rows = {}, native_reset_events = {}, admin_intent = current_admin_intent()}
   storage[CURRENT_KEY] = state
   state.foreign_index, state.earned_index = foreign.index, earned.index
-  set_current_prerequisites(player, false, "current player")
-  set_current_prerequisites(foreign, true, "current foreign")
-  set_current_prerequisites(earned, false, "current earned")
-  local owner = technology(player, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 10, false, true, false
-  player.research_queue = {owner, owner}
-  player.research_progress = PARTIAL
-  owner = technology(foreign, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 11, false, true, false
-  foreign.research_queue = {technology(foreign, PROBE)}
-  foreign.research_progress = FOREIGN_PROGRESS
-  owner = technology(earned, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = EARNED_LEVEL, false, true, false
-  earned.research_queue = {}
+  apply_current_admin_sequence(player, foreign, earned, "current", nil)
   local admin_observed = current_header("admin-observed", stage)
   admin_observed.snapshot_role = "after-declared-admin-before-baseline-validation"
   admin_observed.player = current_force_snapshot(player, "current admin observed player", true)
@@ -797,9 +920,14 @@ local function tick_current_state(state)
   cold_logged = true
 end
 
-function M.apply(stage)
+function M.apply(stage, report_active_mods)
   local expected = STAGES[stage]
   if expected == nil then fail("unknown control stage") end
+  if stage == "current-observe16" then
+    if type(report_active_mods) ~= "function" then fail("current observe active-mod observer callback differs") end
+    check_closure(stage)
+    report_active_mods(current_observe_active_mod_tuple())
+  end
 
   script.on_init(function()
     if stage ~= "source15" then fail("only source stage may initialize") end
@@ -835,6 +963,10 @@ function M.apply(stage)
   script.on_configuration_changed(function()
     if stage == "source15" then fail("source stage does not accept configuration") end
     check_closure(stage)
+    if stage == "current-observe16" then
+      begin_current_observe()
+      return
+    end
     if stage == "current-old15" or stage == "current-successor16" then
       local state, post_reset = begin_current_state(stage)
       if stage == "current-old15" then
@@ -890,6 +1022,11 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_research_finished, function(event)
+    if stage == "current-observe16" then
+      local state = storage[CURRENT_OBSERVE_KEY]
+      if type(state) == "table" then current_observe_event(state, "on_research_finished", event) end
+      return
+    end
     if stage == "current-successor16" then
       local state = storage[CURRENT_KEY]
       if type(state) ~= "table" or state.phase ~= "current-await-ordinary-level-ten" then return end
@@ -935,6 +1072,11 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_research_started, function(event)
+    if stage == "current-observe16" then
+      local state = storage[CURRENT_OBSERVE_KEY]
+      if type(state) == "table" then current_observe_event(state, "on_research_started", event) end
+      return
+    end
     if stage ~= "successor16" and stage ~= "current-successor16" then return end
     local state = storage[stage == "current-successor16" and CURRENT_KEY or KEY]
     if type(state) ~= "table" then return end
@@ -947,6 +1089,11 @@ function M.apply(stage)
   end)
 
   script.on_event(defines.events.on_technology_effects_reset, function(event)
+    if stage == "current-observe16" then
+      local state = storage[CURRENT_OBSERVE_KEY]
+      if type(state) == "table" then current_observe_event(state, "on_technology_effects_reset", event) end
+      return
+    end
     if stage ~= "current-old15" and stage ~= "current-successor16" then return end
     local state = storage[CURRENT_KEY]
     if type(state) ~= "table" or state.current_state ~= true or event.force == nil then return end
@@ -959,12 +1106,35 @@ function M.apply(stage)
     end
   end)
 
+  script.on_event(defines.events.on_research_cancelled, function(event)
+    if stage ~= "current-observe16" then return end
+    local state = storage[CURRENT_OBSERVE_KEY]
+    if type(state) == "table" then current_observe_event(state, "on_research_cancelled", event) end
+  end)
+
+  script.on_event(defines.events.on_research_reversed, function(event)
+    if stage ~= "current-observe16" then return end
+    local state = storage[CURRENT_OBSERVE_KEY]
+    if type(state) == "table" then current_observe_event(state, "on_research_reversed", event) end
+  end)
+
   script.on_load(function()
     -- Cold snapshots set local flags only and read on one later tick.
     cold_requested, cold_logged = true, false
   end)
 
   script.on_event(defines.events.on_tick, function()
+    if stage == "current-observe16" then
+      local state = storage[CURRENT_OBSERVE_KEY]
+      if type(state) ~= "table" or state.phase ~= "current-observe-await-passive-tick" then
+        fail("current observe fixture state is absent")
+      end
+      state.observe_boundary = "passive-next-tick"
+      current_observe_frame(state, "passive-next-tick")
+      state.phase = "current-observe-complete"
+      current_observe_trace(state)
+      error(CURRENT_OBSERVE_TOKEN)
+    end
     if stage == "current-successor16" then
       local state = storage[CURRENT_KEY]
       if type(state) ~= "table" then fail("current-state fixture state is absent") end

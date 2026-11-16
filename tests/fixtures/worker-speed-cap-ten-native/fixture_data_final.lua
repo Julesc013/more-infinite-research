@@ -12,6 +12,7 @@ local STAGES = {
   successor16 = {version = "0.6.0", cap = 10, mir = "5.0.20016"},
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
+  ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -108,8 +109,12 @@ end
 
 function M.apply(stage, report_active_mods)
   local expected = assert_closure(stage)
-  if type(report_active_mods) ~= "function" then fail("active-mod observer callback differs") end
-  report_active_mods(active_mod_tuple())
+  if stage == "current-observe16" then
+    if report_active_mods ~= nil then fail("current observe data observer callback differs") end
+  else
+    if type(report_active_mods) ~= "function" then fail("active-mod observer callback differs") end
+    report_active_mods(active_mod_tuple())
+  end
   local row = data.raw.technology and data.raw.technology[WORKER]
   local startup = settings.startup and settings.startup[CAP]
   if type(startup) ~= "table" or startup.value ~= expected.cap then fail("worker-speed cap startup differs") end
