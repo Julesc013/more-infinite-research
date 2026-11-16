@@ -83,7 +83,7 @@ local stages = {
   ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
   ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
-  ["current-successor17"]={fixture="0.11.0",mir="5.0.20017",cap=10}
+  ["current-successor17"]={fixture="0.12.0",mir="5.0.20017",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -278,7 +278,7 @@ end
                                         (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
                                         (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016"),
                                         (CURRENT_OBSERVE, "0.9.0", "5.0.20016"),
-                                        (CURRENT_SUCCESSOR17, "0.11.0", "5.0.20017")):
+                                        (CURRENT_SUCCESSOR17, "0.12.0", "5.0.20017")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -658,7 +658,7 @@ end
                           "current-pre-work", "current-complete", "current-cold"}, set(markers))
         for phase, marker in markers.items():
             with self.subTest(phase=phase):
-                self.assertEqual(("current-successor17", "0.11.0", "5.0.20017"),
+                self.assertEqual(("current-successor17", "0.12.0", "5.0.20017"),
                                  (marker["stage"], marker["fixture_stage"], marker["mir_version"]))
         self.assertEqual("candidate17-reset-event-enforced", markers["current-post-reset"]["outcome"])
         for phase in (markers["current-complete"], markers["current-cold"]):
@@ -677,6 +677,62 @@ end
                 self.assertFalse(adverse["ok"])
                 self.assertIn("scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
                               adverse["message"])
+
+    def test_current_successor17_complete_and_each_cold_share_the_full_observed_snapshot(self):
+        required = {
+            "case", "phase", "role", "fixture_stage", "mir_version", "mods", "active_mod_count", "cap", "stage", "target",
+            "per_level_speed_effect", "formula", "research_time", "admin_intent", "pre_reset", "post_reset", "pre_work", "post_completion",
+            "post_reset_player_bonus", "ordinary_native_completion_count", "level_eleven_start_count", "level_eleven_queue_attempt",
+            "lab", "post_completion_hold_ticks", "reset_rows", "native_reset_events", "ordinary_events", "player", "foreign",
+            "earned_above_cap", "completed_forces", "on_load_read_only",
+        }
+
+        def observed(value):
+            if hasattr(value, "keys"):
+                return {key: observed(value[key]) for key in value.keys()}
+            return value
+
+        candidate = self.current_state_result("candidate17")
+        self.assertTrue(candidate["ok"], candidate["message"])
+        rows = [candidate["markers"][index] for index in range(1, len(candidate["markers"]) + 1)]
+        complete = [row for row in rows if row["phase"] == "current-complete"]
+        colds = [row for row in rows if row["phase"] == "current-cold"]
+        self.assertEqual((1, 2), (len(complete), len(colds)))
+        complete = observed(complete[0])
+        self.assertEqual(required, set(complete))
+        self.assertEqual((False, False), (complete["on_load_read_only"], complete["level_eleven_queue_attempt"]["accepted"]))
+        def assert_full_cold_snapshot(cold):
+            cold = observed(cold)
+            self.assertEqual(required, set(cold))
+            self.assertEqual((True, False), (cold["on_load_read_only"], cold["level_eleven_queue_attempt"]["accepted"]))
+            expected = dict(complete)
+            expected["phase"] = "current-cold"
+            expected["on_load_read_only"] = True
+            self.assertEqual(expected, cold)
+
+        for ordinal, cold in enumerate(colds, start=1):
+            with self.subTest(cold=ordinal):
+                assert_full_cold_snapshot(cold)
+
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        marker = '  current_emit("cold", cold)\n'
+        self.assertEqual(1, source.count(marker))
+        with tempfile.TemporaryDirectory(prefix="mir5-current-completion-snapshot-queue-omission-") as work:
+            omitted = Path(work) / "fixture_control.lua"
+            omitted.write_text(source.replace(marker, '  cold.level_eleven_queue_attempt = nil\n' + marker), encoding="utf-8", newline="\n")
+            adverse = self.current_state_result("candidate17", fixture_control=omitted)
+        self.assertTrue(adverse["ok"], adverse["message"])
+        adverse_rows = [adverse["markers"][index] for index in range(1, len(adverse["markers"]) + 1)]
+        adverse_complete = [row for row in adverse_rows if row["phase"] == "current-complete"]
+        adverse_colds = [row for row in adverse_rows if row["phase"] == "current-cold"]
+        self.assertEqual((1, 2), (len(adverse_complete), len(adverse_colds)))
+        complete = observed(adverse_complete[0])
+        self.assertIn("level_eleven_queue_attempt", complete)
+        for ordinal, cold in enumerate(adverse_colds, start=1):
+            with self.subTest(omitted_cold=ordinal):
+                self.assertNotIn("level_eleven_queue_attempt", cold)
+                with self.assertRaises(AssertionError):
+                    assert_full_cold_snapshot(cold)
 
     def test_current_observe_role_records_interleaved_public_boundaries_then_stops_before_reset(self):
         result = self.current_state_result("observe")
