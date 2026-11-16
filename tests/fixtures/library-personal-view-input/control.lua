@@ -3,7 +3,7 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.3"
+local VERSION = "0.1.4"
 local MIR = "more-infinite-research"
 local MIR_VERSION = "5.0.21016"
 local ROOT = "mir_research_browser"
@@ -179,8 +179,8 @@ local function research_tree(player)
   return root, query
 end
 
-local function tab_bar_identity(tabs)
-  local result = {name = tabs.name, type = tabs.type, index = tabs.index or false}
+local function tab_bar_structure(tabs)
+  local result = {name = tabs.name, type = tabs.type}
   local style = tabs.style
   for _, field in ipairs({"minimal_width", "maximal_width", "minimal_height", "maximal_height"}) do
     result[field] = readable_style(style, field)
@@ -190,15 +190,19 @@ end
 
 local function record_open_shell(row, player, root, tabs)
   row.geometry = geometry(player, root)
-  row.tab_bar = tab_bar_identity(tabs)
+  row.tab_bar = tab_bar_structure(tabs)
+  row.tab_bar_index = tabs.index
+  if type(row.tab_bar_index) ~= "number" or row.tab_bar_index <= 0 then fail("tab-bar index unavailable") end
   row.tab_index = tabs.selected_tab_index
   local current = state()
   if current.open_geometry == nil then
-    current.open_geometry, current.tab_bar = row.geometry, row.tab_bar
+    current.open_geometry, current.tab_bar, current.tab_bar_index = row.geometry, row.tab_bar, row.tab_bar_index
   elseif not equal(current.open_geometry, row.geometry) then
     fail("root geometry was not retained")
   elseif not equal(current.tab_bar, row.tab_bar) then
     fail("tab-bar identity or geometry was not retained")
+  elseif row.stage ~= "reopen" and current.tab_bar_index ~= row.tab_bar_index then
+    fail("tab-bar identity changed before close")
   end
 end
 
