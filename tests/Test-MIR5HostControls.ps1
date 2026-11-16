@@ -192,6 +192,7 @@ $controls = @(
   [ordered]@{path='tests/test_package.py';lua=$false},
   [ordered]@{path='tests/test_early_package.py';lua=$false},
   [ordered]@{path='tests/test_changelog.py';lua=$false},
+  [ordered]@{path='tests/test_version_aliases.py';lua=$false},
   [ordered]@{path='tests/test_release.py';lua=$false},
   [ordered]@{path='tests/test_compose_replay.py';lua=$false},
   [ordered]@{path='tests/test_compare_captures.py';lua=$false},
