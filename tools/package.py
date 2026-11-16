@@ -15,6 +15,7 @@ REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
 ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
 F210_ONLY_MIGRATION = "migrations/more-infinite-research_4.7.0.json"
 F110_PLUS_MIGRATION = "migrations/more-infinite-research_5.0.11000.json"
+F110_PLUS_MIGRATION_SOURCE = "migrations/more-infinite-research_5.0.0.json"
 F110_PLUS_MIGRATION_TARGETS = frozenset({"f110", "f200", "f210"})
 EARLY_TARGET_IDS = frozenset({"f006", "f007", "f008", "f009", "f010", "f011", "f012"})
 EARLY_LOCALE_SOURCE = "adapters/early/locale/en/more-infinite-research.cfg"
@@ -447,6 +448,13 @@ def members(source, version=None, committed_files=None, target=None, editions=No
     if "info.json" not in committed_files:
         raise ValueError("Selected source has no info.json")
     info = json.loads(committed_files["info.json"].decode("utf-8"))
+    # Editable source uses the source-release label; saves retain the original
+    # published filename. Historical sources already using it stay unchanged.
+    if info.get("name") == MIR_PLAYER_NAME and F110_PLUS_MIGRATION_SOURCE in committed_files:
+        if F110_PLUS_MIGRATION in committed_files:
+            raise ValueError("Ambiguous canonical and published migration filenames")
+        committed_files = dict(committed_files)
+        committed_files[F110_PLUS_MIGRATION] = committed_files.pop(F110_PLUS_MIGRATION_SOURCE)
     source_version = info.get("version")
     if version is not None:
         info["version"] = version

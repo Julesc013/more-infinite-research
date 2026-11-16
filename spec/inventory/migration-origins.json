@@ -1997,7 +1997,7 @@
         "package_member": "migrations/more-infinite-research_4.7.0.json"
       },
       {
-        "path": "source/migrations/more-infinite-research_5.0.11000.json",
+        "path": "source/migrations/more-infinite-research_5.0.0.json",
         "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D",
         "git_blob": "e798b97979f9432bc3970938e5e412311aac6e6e",
         "package_member": "migrations/more-infinite-research_5.0.11000.json"
