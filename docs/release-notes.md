@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.15 beta release notes"
+title: "MIR 5.0.16 beta release notes"
 status: current
-applies_to: "MIR 5.0.15 GitHub prerelease"
+applies_to: "MIR 5.0.16 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,18 +9,21 @@ last_reviewed: 2026-11-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-515-release-notes
+  - mir-516-release-notes
 ---
 
-Preserves worker-cargo research through prepared upgrades and fixes a productivity compatibility refusal.
+Improves settings-profile fidelity, compatibility checks and research-preservation diagnostics.
 
-- Preserve earned levels and unfinished default worker-cargo research from prepared MIR 5.0.11 saves.
-- Preserve authenticated older default worker-cargo upgrades when moving from Factorio 2.1.23 to 2.1.24.
-- Accept a complete productivity-preservation effect when its public research also covers other recipes.
-- Name the rejected productivity component and its public reference in startup errors.
+- Preserve settings-profile values and reject malformed supplied headers.
+- Improve Bob/Angel material compatibility and Library availability explanations.
+- Correct internal productivity-preservation costs on maps with custom research prices.
+- Stop worker recovery after an unexpected application failure and explain when to reload the protected original.
+- Name the rejecting mod and its old, new and active versions when a worker-cargo upgrade cannot authenticate its history.
+- Report incomplete research setup immediately at startup.
+- Recognize Space Exploration's infinite worker-speed research beginning at level 10 for configured limits.
 
-Update a copy first. Keep a protected original save with its matching mods and startup settings. Histories missing the required ownership evidence may still need that original configuration; MIR cannot reconstruct erased research.
+Update a copy first. Keep a protected original save with its matching mods and startup settings. The additional worker-history details do not reconstruct missing ownership or earned research; some unprepared older saves can still be refused. Use the conditional recovery instructions in the support guide for a qualifying original default-worker save.
 
-This is a GitHub prerelease, not stable. Graphical Library and multiplayer checks, plus broader performance testing, remain unfinished.
+This is a GitHub beta. Space Exploration cap reset/continuation checks, actual Library input/client checks and broader performance testing remain unfinished. No blanket save or modpack qualification is claimed.
 
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.15/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.16/docs/support.md).

@@ -1,5 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.16
+Date: 2026-11-16
 
   Bugfixes:
 
@@ -12,6 +13,8 @@ Version: 5.0.16
     - Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
     - Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting
       values.
+    - Identify the mod and version change that caused an unrecorded worker-cargo upgrade to be refused.
+    - Accept compatible Bob material definitions with changed item icons or a higher supported engine minimum.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.15
