@@ -75,7 +75,7 @@ class PassiveRepairTests(unittest.TestCase):
           for _, revoked_side in ipairs({"player", "ally"}) do
             local game, player, ally = game_with_forces()
             local allied_gate = entity(41, ally, 2, 3, 8, "gate")
-            local own_wall = entity(42, player, 1, 3, 8)
+            local own_wall = entity(42, player, 1, 3, 5)
             local state, admitted = damage(game, {enabled = true}, nil, allied_gate, 0)
             assert(admitted.accepted)
             state, admitted = damage(game, {enabled = true}, state, own_wall, 0)
@@ -86,7 +86,12 @@ class PassiveRepairTests(unittest.TestCase):
               ally._friends[1] = false
             end
 
-            local _, first = repair.on_nth_tick(game, {enabled = true}, state, {tick = 600})
+            -- Model only the actual 60-tick subscription established by bootstrap.
+            local function scheduled(tick)
+              assert(tick % repair.repair_interval_ticks == 0)
+              return repair.on_nth_tick(game, {enabled = true}, state, {tick = tick})
+            end
+            local _, first = scheduled(600)
             assert(first.processed == 2 and first.repaired == 1 and first.dropped == 1)
             assert(allied_gate.health == 3 and allied_gate.writes == 0)
             assert(own_wall.health == 4 and own_wall.writes == 1)
@@ -95,13 +100,22 @@ class PassiveRepairTests(unittest.TestCase):
             local ignored
             state, ignored = damage(game, {enabled = true}, state, allied_gate, 660)
             assert(not ignored.accepted and #state.queue == 1 and state.members[41] == nil)
+            local _, finishing = scheduled(660)
+            assert(finishing.processed == 1 and finishing.repaired == 1
+              and own_wall.health == 5 and own_wall.writes == 2)
+            assert(#state.queue == 0 and state.members[42] == nil and not state.scheduled)
             player._friends[2], ally._friends[1] = true, true
             state, admitted = damage(game, {enabled = true}, state, allied_gate, 700)
             assert(admitted.accepted and not admitted.postponed)
             assert(#state.queue == 2 and state.queue[2] == 41)
-            repair.on_nth_tick(game, {enabled = true}, state, {tick = 1299})
-            assert(allied_gate.health == 3 and allied_gate.writes == 0)
-            local _, after = repair.on_nth_tick(game, {enabled = true}, state, {tick = 1300})
+            assert(#state.queue == 1 and state.queue[1] == 41 and state.scheduled)
+            for tick = 720, 1260, repair.repair_interval_ticks do
+              local _, waiting = scheduled(tick)
+              assert(waiting.processed == 1 and waiting.repaired == 0
+                and allied_gate.health == 3 and allied_gate.writes == 0)
+            end
+            -- Quiet until 1300: the first ordinary subscribed callback is 1320.
+            local _, after = scheduled(1320)
             assert(after.repaired == 1 and allied_gate.health == 4 and allied_gate.writes == 1)
             assert(state.members[41] ~= nil and state.scheduled)
           end
