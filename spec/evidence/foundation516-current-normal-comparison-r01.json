@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "kind": "MIR516FoundationCurrentNormalComparisonV1",
+  "status": "independently-reviewed-owner-accepted-bounded-endpoint",
+  "reviewed_on": "2026-11-16",
+  "source": {
+    "commit": "e239cf8f6769ab98ff0a33d80ffbec950ab89c47",
+    "player_tree": "b0a146b63604fa89e3cedc927508fb61c250f92a",
+    "package": "more-infinite-research_5.0.20016.zip",
+    "package_bytes": 1043918,
+    "package_members": 247,
+    "package_sha256": "BCCF5CB229C35B74563C8BD31909B442E0015FEE96B812F96DCC35055D458584",
+    "package_record_sha256": "AFDCEC315E638B87D2A413CAD2CDB6CBEC765ED1A80D6A71F823C4EF457A7011",
+    "independent_package_review_sha256": "F73DFA9E845838DD66ACF43B828F39BC92A807D2B39585BF68BF9D2FF9321817",
+    "published": false
+  },
+  "inputs": {
+    "engine_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "protected_save_bytes": 108548262,
+    "protected_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "selection": "31 direct upstream dependency archives plus four official mods; A has 35 enabled mods, B adds only the exact MIR candidate; defaults",
+    "normal_run_observer_present": false,
+    "copy_policy": "One immutable ForceCopy lease per case; fresh process, configuration and write-data per stage; direct-library archives without dependency copies or hardlinks.",
+    "scenario_peak_budget_mib": 8192,
+    "reserves_reduced": false
+  },
+  "collection": {
+    "normal_processes": 18,
+    "normal_natural_exit_zero": 18,
+    "normal_updates_each": 601,
+    "calibration_AA_pairs": 3,
+    "matched_AB_pairs": 6,
+    "retained_adverse_activity_processes": 1,
+    "aggregate_physical_processes": 19,
+    "activity_retries": 0,
+    "normal_retries_extensions_exclusions": 0,
+    "normal_terminal_sha256": "C7C9C4A95FA56A7B2F5E7F6B7634618D9ABF502F194888B9FD81D4FE5DAFC264",
+    "normal_compose_sha256": "D060317AE7959B95FA2060D1DD647EEEE90C53D140787E90044986A8AB51D325",
+    "packet_sha256": "D4A5F8F7DB962C7539C644820C88D11901B9E3A373277473C00C909CED768377",
+    "controller_sha256": "5F629385E7A7CF0AC139CC2FCFFC2261ABB14EFB0DA5224587DB52E48BB97273",
+    "plan_sha256": "46D92BC991BED8F6431260B97E1A348FC43FE4B33A8D17E6C776D3DFBB49627A",
+    "external_restoration_witness_sha256": "3472A6B26BFD5DEF3807F8E1F51BED10F981403FA9B8AC6C18876AB290A679DA",
+    "live_source_guard_receipt_sha256": "372F86F17305164319517D08803343B5823FD80E6D446593167796125AC47DD2",
+    "restoration": "Internal and external before/after library frames equal: four controls, all 18 original MIR archives, 31 direct dependencies, 884 top-level entries, owned inputs and protected original unchanged; Factorio processes absent after completion."
+  },
+  "analysis": {
+    "endpoint": "Native printed average update time, milliseconds",
+    "predeclared_absolute_non_regression_margin_ms": 1.0,
+    "calibration_absolute_AA_ms": [0.104, 0.010, 0.299],
+    "paired_B_minus_A_ms": [-0.055, -0.039, -0.098, 0.171, 0.703, 0.701],
+    "paired_mean_ms": 0.23050000000000015,
+    "paired_sample_sd_ms": 0.37688711837896494,
+    "confidence95": {
+      "method": "Student-t df5; normal paired-error assumption, six-pair small sample",
+      "lower_ms": -0.1650187742445825,
+      "upper_ms": 0.6260187742445829
+    },
+    "upper_below_predeclared_margin": true,
+    "post_reader_sha256": "6AED383A6AF8C4919B83DEEA0F0B684DD22F9DBB8CDB8CC847A702F68F4CD78B",
+    "post_reader_result_sha256": "F8EFBC71B42AC83171FD6E47C9A1D6F848EB8ACB72FA49D8C7CEC22A34B0AC6E",
+    "mir_added_percentage": null
+  },
+  "preserved_adverses": {
+    "unrun_revisions": "r01/r02 pre-execution review refusals and r03 scratch-authority refusal remain preserved; r03 started zero Factorio processes.",
+    "activity": "r04 PID136816 remains callback-interrupted after the engine's work records and Goodbye, without a recorded OS exit code. It is not a native pass or timing sample. The accepted retained reader reconstructs a strictly unscored activity observation; the activity process was not rerun.",
+    "activity_result_sha256": "A84715B0D750605F1B5E42F64271F03F7341699DDDFB4F7EA608C995CDC71536",
+    "activity_observation_sha256": "8F203A10419698D9A466582A35DFAFE0BA7C29110348E6D183666552A72DA7D4",
+    "activity_projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+    "post_readers": "The frozen first reader's settings-loader refusal and the next reader's implicit-core refusal remain preserved. The additive final reader admits the literal settings-loader form and separately binds implicit core@0.0.0, retaining unexpected/contradictory mod rejection and the explicit stdlib2 exception. No raw log, measured metric, input or native execution changed."
+  },
+  "reviews": {
+    "independent_adverse_activity_review_sha256": "4C7AEE45EC46B51381F1691EEAEEAD956DB4972696F1F576DBA55BF15324CFC4",
+    "independent_actual_compose_review_sha256": "10EA0E8582108471403157EA623FBE794C4DCB5FAC6764A01615AEEDEAFFCBF1",
+    "independent_native_result_review_sha256": "859C482FAAABD35C3DEF8DC29554B24AAE8B17DDDD23CD467D572292C5D6C1B9",
+    "owner_acceptance_sha256": "EE50A6425082B6850DA47FA4E65E815C55268147B7E6990FACBFF8EA42715245",
+    "closed_to_further_native_or_controller_writes": true
+  },
+  "custody": {
+    "local_case": "build/qualification/mir516-foundation-current-r01",
+    "local_owner_review": "build/qualification/mir516-foundation-current-root-review-r01",
+    "local_independent_review": "build/qualification/mir516-foundation-current-controller-review-r01",
+    "local_custody": "build/qualification/mir516-foundation-current-private-custody-r01",
+    "private_repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir516-foundation-current-blackglass-r01",
+    "commit": "513c2cf08a5020a139a61b1d0de8815c01f3562b",
+    "tree": "d70d3f4e835e1fdd154006857845a0546be763ce",
+    "blob": "6061500f43e1798ee57977231e0eccfe7bdc7a4b",
+    "path": "projects/mir/runs/mir516-foundation-current-r01/original-bodies.json.gz",
+    "packed_bytes": 3021901,
+    "packed_sha256": "B5CEC044811A3FCA29BBDAA9950098E44F8A0FC7C5FEAFCFE2F628245D2683D4",
+    "file_rows": 313,
+    "unique_bodies": 235,
+    "original_bytes": 14218093,
+    "excluded_identical_protected_save_copies": 4,
+    "external_references_rehashed": 36,
+    "fresh_independent_remote_review_sha256": "E558471A7B6874F84613411755BA0CF775E176BE15EC1970C8E5C8A4F3D8E267",
+    "originals_preserved": true
+  },
+  "limitations": [
+    "One protected factory, exact Factorio2.0.77 engine, exact e239 source/package and default selection; the accepted endpoint is the printed mean update time only.",
+    "No process-to-responsive-menu, MIR4 comparison, 50 percent improvement, retained-memory, spike, Library/client, physical-output or all-modpack acceptance.",
+    "All 18 normal observations are retained; the nineteenth adverse activity process is not relabelled as a natural pass.",
+    "Later dev changes do not relabel these exact inputs. Published5.0.14/15 bytes remain unchanged."
+  ],
+  "whole_product_performance_qualified": false,
+  "stable_acceptance": false,
+  "public_release_context": {
+    "observed_tag": "v5.0.16",
+    "published_at": "2026-11-16T11:37:08Z",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.16",
+    "public_f200_sha256": "EC76E089FC3A66280A3B3E1F149B55217480489E1FF55B009A3B9A50E7890A2C",
+    "measured_candidate_is_public_release": false,
+    "disposition": "The measured BCCF candidate remains a distinct unpublished package. The existing public release is preserved; these measurements are not relabelled as public-release performance evidence."
+  }
+}
