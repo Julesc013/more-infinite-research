@@ -12,6 +12,8 @@ import tempfile
 import unittest
 import zipfile
 
+from mir_test_versions import alias_for, current_alias, current_source_release
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("mir5_release", ROOT / "tools/release.py")
@@ -21,7 +23,7 @@ SPEC.loader.exec_module(release)
 
 class ReleaseTests(unittest.TestCase):
     NORMAL_TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
-    BASE_DISTRIBUTION_VERSION = "5.0.21000"
+    BASE_DISTRIBUTION_VERSION = alias_for("5.0.0", "f210").distribution_version
     _default_fixture_template = None
 
     @staticmethod
@@ -113,8 +115,7 @@ class ReleaseTests(unittest.TestCase):
 
     @staticmethod
     def _set_source_release(source, source_version):
-        major, minor, patch = source_version.split(".")
-        distribution_version = major + "." + minor + "." + str(21000 + int(patch)).zfill(5)
+        distribution_version = alias_for(source_version, "f210").distribution_version
         info_path = source / "info.json"
         info = json.loads(info_path.read_text(encoding="utf-8"))
         old_distribution = info["version"]
@@ -149,6 +150,14 @@ class ReleaseTests(unittest.TestCase):
     @classmethod
     def _archive_name(cls, target, distribution_version=None):
         return release._archive_name(target, distribution_version or cls.BASE_DISTRIBUTION_VERSION)
+
+    def test_current_authored_changelog_alias_matches_canonical_f210_player_metadata(self):
+        alias = current_alias("f210")
+        self.assertEqual(alias.source_release, current_source_release())
+        info = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["version"], alias.distribution_version)
+        target = (ROOT / "source/platform/target.lua").read_text(encoding="utf-8")
+        self.assertEqual(target.count('distribution_version="' + alias.distribution_version + '"'), 1)
 
     @staticmethod
     def _body(output):
@@ -325,6 +334,8 @@ class ReleaseTests(unittest.TestCase):
                     self.assertTrue((frozen / self._archive_name("f013", distribution_version)).is_file())
                     self.assertEqual(release.verify(source, frozen), inventory)
 
+    # The malformed codec literals below are verifier adversaries, not aliases
+    # for historical package/archive identities.
     def test_freeze_refuses_invalid_canonical_f210_metadata_and_changelog(self):
         def set_info_version(source, version):
             path = source / "info.json"

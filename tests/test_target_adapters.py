@@ -1,12 +1,13 @@
 """Pure controls for selected-target API capabilities and reduced stage adapters."""
 import argparse
 import importlib.util
-import json
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 import zipfile
+
+from mir_test_versions import current_alias
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_API = "__more-infinite-research__.api.v1.data"
@@ -33,6 +34,8 @@ class TargetAdapterTests(unittest.TestCase):
           end
 
           function target(id, research_levels, recipe_productivity)
+            -- Synthetic adapter metadata only: this deliberately is not a
+            -- declared target distribution alias or a package identity.
             return {
               id=id, factorio_version="legacy", minimum_base="0.13.0",
               distribution_version="5.0." .. id, reduced=true,
@@ -134,9 +137,7 @@ class TargetAdapterTests(unittest.TestCase):
         ''')
 
     def test_default_target_preserves_f210_api_metadata_and_capabilities(self):
-        self.lua.globals().declared_product_version = json.loads(
-            (ROOT / "source/info.json").read_text(encoding="utf-8")
-        )["version"]
+        self.lua.globals().declared_product_version = current_alias("f210").distribution_version
         self.lua.execute(r'''
           package.preload["platform.target"] = nil
           package.loaded["platform.target"] = nil
@@ -223,13 +224,11 @@ class TargetAdapterTests(unittest.TestCase):
         ''')
 
     def test_selected_f018_package_runs_the_actual_reduced_stages(self):
-        source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-        major, minor, encoded = source_version.split(".")
-        source_patch = int(encoded) % 100
-        package_root = f"more-infinite-research_{major}.{minor}.018{source_patch:02d}"
+        alias = current_alias("f018")
+        package_root = alias.archive_root
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            archive = temporary / (package_root + ".zip")
+            archive = alias.archive_path(temporary)
             pack.build(ROOT / "source", archive, target="f018")
             with zipfile.ZipFile(archive) as package:
                 package.extractall(temporary)

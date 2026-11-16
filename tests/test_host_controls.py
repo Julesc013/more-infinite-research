@@ -386,6 +386,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_package.py",
             "tests/test_early_package.py",
             "tests/test_changelog.py",
+            "tests/test_version_aliases.py",
             "tests/test_release.py",
             "tests/test_compose_replay.py",
             "tests/test_compare_captures.py",
