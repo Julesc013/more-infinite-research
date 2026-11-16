@@ -66,6 +66,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained Library render actor fetch failed.' }
           git fetch --no-tags --depth=1 origin 15f1c5d02574873dbbac7957c254acc2563b7341
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.5 Library render fixture fetch failed.' }
+          git fetch --no-tags --depth=1 origin c0990641a21517e8747f5a5266a4e2535793904e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.6 Library render fixture fetch failed.' }
           git fetch --no-tags --depth=1 origin ced35555dcaefdf09126f176cff2efdfc0fcec78
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866
@@ -204,6 +206,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained Library render actor fetch failed.' }
           git fetch --no-tags --depth=1 origin 15f1c5d02574873dbbac7957c254acc2563b7341
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.5 Library render fixture fetch failed.' }
+          git fetch --no-tags --depth=1 origin c0990641a21517e8747f5a5266a4e2535793904e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.6 Library render fixture fetch failed.' }
           git fetch --no-tags --depth=1 origin ced35555dcaefdf09126f176cff2efdfc0fcec78
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866
