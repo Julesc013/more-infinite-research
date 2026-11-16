@@ -155,9 +155,15 @@ local function migrate_profile(profile)
   if profile.schema ~= M.schema then return nil, "unsupported profile schema " .. tostring(profile.schema) end
   if profile.kind ~= nil and profile.kind ~= M.kind then return nil, "unsupported profile kind " .. tostring(profile.kind) end
   if type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
+  local format = profile.format
+  if format == nil then format = M.format
+  elseif format ~= M.format then return nil, "unsupported profile format " .. tostring(format) end
+  local codec = profile.codec
+  if codec == nil then codec = M.codec
+  elseif codec ~= M.codec then return nil, "unsupported profile codec " .. tostring(codec) end
   return {
-    schema = M.schema, kind = M.kind, format = profile.format or M.format,
-    codec = profile.codec or M.codec, mod = profile.mod or "more-infinite-research",
+    schema = M.schema, kind = M.kind, format = format,
+    codec = codec, mod = profile.mod or "more-infinite-research",
     metadata = type(profile.metadata) == "table" and profile.metadata or {}, settings = profile.settings
   }
 end

@@ -12,6 +12,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
 - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
 - Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
+- Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting values.
 
 ## [5.0.15] - 2026-11-16
 

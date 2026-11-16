@@ -10,6 +10,8 @@ Version: 5.0.16
       save.
     - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
     - Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
+    - Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting
+      values.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.15
