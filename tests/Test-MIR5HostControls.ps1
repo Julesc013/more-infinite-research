@@ -186,6 +186,7 @@ $controls = @(
   [ordered]@{path='tests/test_library_native_input.py';lua=$false},
   [ordered]@{path='tests/test_library_native_input_linux.py';lua=$false},
   [ordered]@{path='tests/test_library_linux_display.py';lua=$false},
+  [ordered]@{path='tests/test_library_linux_capture.py';lua=$false},
   [ordered]@{path='tests/test_library_profile_reader.py';lua=$false},
   [ordered]@{path='tests/test_f110_f200_runner.py';lua=$false},
   [ordered]@{path='tests/test_f100_f110_laser_runner.py';lua=$false},
