@@ -216,9 +216,34 @@ function Start-Native([string]$Name, [string[]]$Arguments, [AllowNull()][System.
 function Read-DisplayReady($Role) {
   $ready=Resolve-BuildInput ([string]$Role.ready) 'Leaf' ('display '+[string]$Role.role+' ready receipt')
   $value=Get-Content -LiteralPath $ready -Raw|ConvertFrom-Json -AsHashtable
-  Assert-Session ($value -is [System.Collections.IDictionary] -and $value.Count -eq 9 -and $value.kind -ceq 'MIRLinuxLibraryDisplayReadyV1' -and $value.role -ceq [string]$Role.role -and $value.display -ceq [string]$Role.display -and $value.geometry -ceq [string]$Role.geometry -and $value.factorio_processes -eq 0) 'private display ready receipt differs'
+  $geometry=if($value-is[System.Collections.IDictionary]-and$value.Contains('geometry')){@($value['geometry'])}else{@()}
+  Assert-Session ($value -is [System.Collections.IDictionary] -and $value.Count -eq 9 -and $value.kind -ceq 'MIRLinuxLibraryDisplayReadyV1' -and $value.role -ceq [string]$Role.role -and $value.display -ceq [string]$Role.display -and $geometry.Count -eq 2 -and $geometry[0] -is [Int64] -and $geometry[1] -is [Int64] -and $geometry[0] -eq 1280 -and $geometry[1] -eq 720 -and $value.factorio_processes -eq 0) 'private display ready receipt differs'
   foreach($field in @('display_identity','display_binding','viewer_binding','authority_device_inode')){Assert-Session ($value.Contains($field)) "private display ready receipt lacks $field"}
   return $value
+}
+function Assert-PrivateDisplayChildIdentity($Process,$Identity) {
+  Assert-Session ($null-ne$Process-and$null-ne$Identity-and$Identity.id -is [Int32] -and $Identity.start_utc_ticks -is [Int64]) 'private display child identity is absent'
+  Assert-Session (-not$Process.HasExited-and$Process.Id -eq [int]$Identity.id-and$Process.StartTime.ToUniversalTime().Ticks -eq [Int64]$Identity.start_utc_ticks) 'private display child identity changed'
+}
+function Complete-PrivateDisplayOutput($Copies,$Streams) {
+  $failure=$null
+  foreach($copy in @($Copies)){try{$null=$copy.GetAwaiter().GetResult()}catch{if($null-eq$failure){$failure=$_}}}
+  foreach($stream in @($Streams)){try{$stream.Dispose()}catch{if($null-eq$failure){$failure=$_}}}
+  if($null-ne$failure){throw $failure}
+}
+function Stop-PrivateDisplayChild($Process,$Stdin,$Identity) {
+  if($null-eq$Process-or$Process.HasExited){return $null}
+  Assert-PrivateDisplayChildIdentity $Process $Identity
+  $stdinFailure=$null
+  try{
+    if($null-ne$Stdin){$Stdin.WriteLine('stop');$Stdin.Close()}
+  }catch{$stdinFailure=$_}
+  if(-not$Process.WaitForExit(15000)){
+    Assert-PrivateDisplayChildIdentity $Process $Identity
+    try{$Process.Kill($true)}catch{$Process.Kill()}
+    Assert-Session ($Process.WaitForExit(10000)) 'private display did not stop after identity-checked termination'
+  }
+  return $stdinFailure
 }
 function Start-PrivateDisplay($Role) {
   $stdout=Resolve-BuildOutput (Join-Path $workroot ('display-'+[string]$Role.locale+'.stdout.log')) 'private display stdout'
@@ -227,29 +252,55 @@ function Start-PrivateDisplay($Role) {
   $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$linuxPrivateDisplays.python;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
   $start.RedirectStandardInput=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
   foreach($argument in @([string]$linuxPrivateDisplays.display_cli,'--module-sha256',[string]$linuxPrivateDisplays.display_module_sha256,'--mode','execute','--checkout',[string]$linuxPrivateDisplays.checkout,'--plan',[string]$Role.plan,'--plan-sha256',[string]$Role.plan_sha256)){$null=$start.ArgumentList.Add($argument)}
-  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
-  Assert-Session ($process.Start()) ('failed to start private display '+[string]$Role.role)
-  $streams=@([IO.File]::Open($stdout,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read),[IO.File]::Open($stderr,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read))
-  $copies=@($process.StandardOutput.BaseStream.CopyToAsync($streams[0]),$process.StandardError.BaseStream.CopyToAsync($streams[1]))
-  $until=[DateTime]::UtcNow.AddSeconds(30);$ready=$null
-  while([DateTime]::UtcNow-lt$until){
-    if(Test-Path -LiteralPath ([string]$Role.ready) -PathType Leaf){$ready=Read-DisplayReady $Role;break}
-    Assert-Session (-not$process.HasExited) ('private display exited before ready: '+[string]$Role.role)
-    Start-Sleep -Milliseconds 100
+  $process=$null;$identity=$null
+  $streams=[Collections.Generic.List[object]]::new();$copies=[Collections.Generic.List[object]]::new()
+  $started=$false
+  try{
+    $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+    Assert-Session ($process.Start()) ('failed to start private display '+[string]$Role.role)
+    $started=$true;$identity=[ordered]@{id=[int]$process.Id;start_utc_ticks=[Int64]$process.StartTime.ToUniversalTime().Ticks}
+    $streams.Add([IO.File]::Open($stdout,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read))
+    $streams.Add([IO.File]::Open($stderr,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read))
+    $copies.Add($process.StandardOutput.BaseStream.CopyToAsync($streams[0]))
+    $copies.Add($process.StandardError.BaseStream.CopyToAsync($streams[1]))
+    $until=[DateTime]::UtcNow.AddSeconds(30);$ready=$null
+    while([DateTime]::UtcNow-lt$until){
+      if(Test-Path -LiteralPath ([string]$Role.ready) -PathType Leaf){$ready=Read-DisplayReady $Role;break}
+      Assert-Session (-not$process.HasExited) ('private display exited before ready: '+[string]$Role.role)
+      Start-Sleep -Milliseconds 100
+    }
+    Assert-Session ($null-ne$ready) ('private display did not become ready: '+[string]$Role.role)
+    return [pscustomobject]@{role=$Role;process=$process;identity=$identity;stdin=$process.StandardInput;stdout=$stdout;stderr=$stderr;streams=$streams.ToArray();copies=$copies.ToArray();ready=$ready;closed=$false}
+  }catch{
+    $primary=$_;$cleanup=@()
+    if($started){try{$stdinFailure=Stop-PrivateDisplayChild $process $process.StandardInput $identity;if($null-ne$stdinFailure){$cleanup+=$stdinFailure.Exception.Message}}catch{$cleanup+= $_.Exception.Message}}
+    try{Complete-PrivateDisplayOutput $copies.ToArray() $streams.ToArray()}catch{$cleanup+= $_.Exception.Message}
+    if($null-ne$process){try{$process.Dispose()}catch{$cleanup+= $_.Exception.Message}}
+    if($cleanup.Count){throw ('private display start failed: '+$primary.Exception.Message+'; cleanup: '+($cleanup-join' | '))}
+    throw $primary
   }
-  Assert-Session ($null-ne$ready) ('private display did not become ready: '+[string]$Role.role)
-  return [pscustomobject]@{role=$Role;process=$process;stdin=$process.StandardInput;stdout=$stdout;stderr=$stderr;streams=$streams;copies=$copies;ready=$ready;closed=$false}
 }
 function Stop-PrivateDisplay($Display) {
   if($null-eq$Display-or$Display.closed){return}
-  $Display.stdin.WriteLine('stop');$Display.stdin.Close()
-  Assert-Session ($Display.process.WaitForExit(15000)) ('private display did not stop: '+[string]$Display.role.role)
-  foreach($copy in @($Display.copies)){$null=$copy.GetAwaiter().GetResult()};foreach($stream in @($Display.streams)){$stream.Dispose()}
-  Assert-Session ($Display.process.ExitCode-eq0) ('private display exit differs: '+[string]$Display.role.role)
-  $result=Resolve-BuildInput ([string]$Display.role.result) 'Leaf' ('display '+[string]$Display.role.role+' result receipt')
-  $value=Get-Content -LiteralPath $result -Raw|ConvertFrom-Json -AsHashtable
-  Assert-Session ($value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'stop'-and$value.role-ceq[string]$Display.role.role-and$value.global_display_restored-eq$true-and$value.private_viewer_restored-eq$true-and$value.authority_removed-eq$true) 'private display restoration receipt differs'
-  $Display.process.Dispose();$Display.closed=$true
+  $primary=$null;$cleanup=@();$outputsComplete=$false
+  try{
+    $stdinFailure=Stop-PrivateDisplayChild $Display.process $Display.stdin $Display.identity
+    Assert-Session ($null-eq$stdinFailure) ('private display stdin stop failed: '+$stdinFailure.Exception.Message)
+    Complete-PrivateDisplayOutput $Display.copies $Display.streams
+    $outputsComplete=$true
+    Assert-Session ($Display.process.ExitCode-eq0) ('private display exit differs: '+[string]$Display.role.role)
+    $result=Resolve-BuildInput ([string]$Display.role.result) 'Leaf' ('display '+[string]$Display.role.role+' result receipt')
+    $value=Get-Content -LiteralPath $result -Raw|ConvertFrom-Json -AsHashtable
+    Assert-Session ($value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'stop'-and$value.role-ceq[string]$Display.role.role-and$value.global_display_restored-eq$true-and$value.private_viewer_restored-eq$true-and$value.authority_removed-eq$true) 'private display restoration receipt differs'
+    $Display.closed=$true
+  }catch{$primary=$_
+  }finally{
+    if($null-ne$primary){try{$stdinFailure=Stop-PrivateDisplayChild $Display.process $Display.stdin $Display.identity;if($null-ne$stdinFailure){$cleanup+=$stdinFailure.Exception.Message}}catch{$cleanup+= $_.Exception.Message}}
+    if(-not$outputsComplete){try{Complete-PrivateDisplayOutput $Display.copies $Display.streams}catch{$cleanup+= $_.Exception.Message}}
+    try{$Display.process.Dispose()}catch{$cleanup+= $_.Exception.Message}
+  }
+  if($null-ne$primary){if($cleanup.Count){throw ('private display stop failed: '+$primary.Exception.Message+'; cleanup: '+($cleanup-join' | '))};throw $primary}
+  if($cleanup.Count){throw ('private display stop cleanup failed: '+($cleanup-join' | '))}
 }
 function Read-LiveText {
   $parts = [Collections.Generic.List[string]]::new()
@@ -1078,9 +1129,12 @@ function Start-Clients([string]$Phase) {
     if($null-ne$privateDisplays){
       Assert-Session ($displayByLocale.ContainsKey([string]$client.locale)) 'private display locale is unavailable'
       $display=$displayByLocale[[string]$client.locale]
-      $cache=Join-Path $client.write_data 'linux-cache';$configRoot=Join-Path $client.write_data 'linux-config'
-      foreach($path in @($cache,$configRoot)){Assert-Session (-not(Test-Path -LiteralPath $path));$null=New-Item -ItemType Directory -Path $path}
-      Assert-Session ((Get-Item -LiteralPath $display.role.authority -Force).LinkType.Count-eq0) 'private display authority became a link'
+      $graphicsRoot=Join-Path $client.write_data ('linux-graphics-'+$Phase)
+      Assert-Session (-not(Test-Path -LiteralPath $graphicsRoot)) 'private display phase graphics root already exists'
+      $null=New-Item -ItemType Directory -Path $graphicsRoot
+      $cache=Join-Path $graphicsRoot 'cache';$configRoot=Join-Path $graphicsRoot 'config'
+      foreach($path in @($cache,$configRoot)){$null=New-Item -ItemType Directory -Path $path}
+      Assert-Session ([string]::IsNullOrEmpty([string](Get-Item -LiteralPath $display.role.authority -Force).LinkType)) 'private display authority became a link'
       $environment=[ordered]@{DISPLAY=[string]$display.role.display;XAUTHORITY=[string]$display.role.authority;LIBGL_ALWAYS_SOFTWARE='1';MESA_SHADER_CACHE_DISABLE='true';__GL_SHADER_DISK_CACHE='0';XDG_CACHE_HOME=$cache;XDG_CONFIG_HOME=$configRoot}
     }
     $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics) $environment

@@ -4112,6 +4112,167 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_private_display_ready_receipts_are_typed_and_failed_starts_clean_their_live_child(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Read-DisplayReady','Assert-PrivateDisplayChildIdentity','Complete-PrivateDisplayOutput','Stop-PrivateDisplayChild','Start-PrivateDisplay','Stop-PrivateDisplay')
+          foreach($name in $names){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "private display definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK)
+          function Resolve-BuildOutput([string]$Path,[string]$Label){
+            $full=[IO.Path]::GetFullPath($Path)
+            if(-not$full.StartsWith($workroot,[StringComparison]::OrdinalIgnoreCase)){throw "$Label escapes workroot"}
+            return $full
+          }
+          function Resolve-BuildInput([string]$Path,[string]$Type,[string]$Label){
+            if(-not(Test-Path -LiteralPath $Path -PathType $Type)){throw "$Label is absent"}
+            return Resolve-BuildOutput $Path $Label
+          }
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $fake=Join-Path $workroot 'fake-display.ps1'
+          $fakeBody=@'
+param([Parameter(ValueFromRemainingArguments=$true)]$rest)
+$encoding=[Text.UTF8Encoding]::new($false)
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'bad-ready'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,'{"kind":"bad"}',$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding);exit 0}}
+}
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  Start-Sleep -Milliseconds 400
+  exit 0
+}
+throw 'unexpected fake display mode'
+'@
+          [IO.File]::WriteAllText($fake,$fakeBody,$encoding)
+          $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
+          $script:linuxPrivateDisplays=[ordered]@{python=$pwsh;display_cli=$fake;display_module_sha256=('A'*64);checkout=$workroot}
+          function New-Role([string]$Name){
+            $root=Join-Path $workroot $Name;$null=New-Item -ItemType Directory -Path $root
+            return [ordered]@{locale='en';role='client-en';display=':193';geometry='1280x720';plan=(Join-Path $root 'plan.json');plan_sha256=('A'*64);ready=(Join-Path $root 'display-ready.json');result=(Join-Path $root 'display-result.json');role_root=$root;authority=(Join-Path $root 'authority')}
+          }
+          function New-Ready($Role){
+            [ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}
+          }
+          function Refuses([scriptblock]$Block,[string]$Name){$failed=$false;try{&$Block}catch{$failed=$true};if(-not$failed){throw "private display receipt admitted:$Name"}}
+          $typed=New-Role 'typed'
+          $typedReady=New-Ready $typed
+          [IO.File]::WriteAllText($typed.ready,($typedReady|ConvertTo-Json -Compress),$encoding)
+          $actual=Read-DisplayReady $typed
+          if($actual.geometry[0]-ne1280-or$actual.geometry[1]-ne720){throw 'typed geometry was not retained'}
+          $typedReady.geometry='1280x720'
+          [IO.File]::WriteAllText($typed.ready,($typedReady|ConvertTo-Json -Compress),$encoding)
+          Refuses {Read-DisplayReady $typed|Out-Null} 'legacy geometry string'
+          $bad=New-Role 'bad'
+          $workroot=$bad.role_root
+          $env:MIR_TEST_DISPLAY_MODE='bad-ready';$env:MIR_TEST_READY=$bad.ready;$env:MIR_TEST_PID=Join-Path $bad.role_root 'child.pid';$env:MIR_TEST_STOPPED=Join-Path $bad.role_root 'stopped'
+          $failure=$null
+          try{Start-PrivateDisplay $bad|Out-Null}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display ready receipt differs'){throw "malformed ready failure differs:$failure"}
+          if(-not(Test-Path -LiteralPath $env:MIR_TEST_STOPPED)){throw 'failed start did not stop its live child'}
+          $badPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw)
+          if($null-ne(Get-Process -Id $badPid -ErrorAction SilentlyContinue)){throw 'failed start left its display child live'}
+          $linger=New-Role 'linger';$lingerReady=New-Ready $linger
+          $workroot=$linger.role_root
+          $env:MIR_TEST_DISPLAY_MODE='linger';$env:MIR_TEST_READY=$linger.ready;$env:MIR_TEST_PID=Join-Path $linger.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($lingerReady|ConvertTo-Json -Compress)
+          $display=Start-PrivateDisplay $linger
+          $lingerPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw)
+          $closedInput=[pscustomobject]@{}
+          $closedInput|Add-Member -MemberType ScriptMethod -Name WriteLine -Value {param([string]$Value)throw 'early stdin closed'}
+          $closedInput|Add-Member -MemberType ScriptMethod -Name Close -Value {}
+          $display.stdin=$closedInput
+          $failure=$null
+          try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display stdin stop failed'){throw "early stdin failure differs:$failure"}
+          if($null-ne(Get-Process -Id $lingerPid -ErrorAction SilentlyContinue)){throw 'early stdin cleanup left its display child live'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-private-display-", dir=ROOT / "build/tmp") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_private_display_client_graphics_roots_are_phase_local(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq'Start-Clients'},$true))
+          if($node.Count-ne1){throw 'actual client starter missing or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK)
+          $serverWriteData=Join-Path $root 'server';$null=New-Item -ItemType Directory -Path $serverWriteData
+          $clients=@()
+          foreach($locale in @('en','de')){
+            $write=Join-Path $root ('client-'+$locale);$null=New-Item -ItemType Directory -Path $write
+            $clients+=[pscustomobject]@{name=$(if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'});locale=$locale;config=(Join-Path $write 'client.ini');port=$(if($locale-ceq'en'){1001}else{1002});write_data=$write}
+          }
+          $authorities=@{}
+          $displayByLocale=@{}
+          foreach($client in $clients){
+            $authority=Join-Path $client.write_data 'authority';[IO.File]::WriteAllText($authority,'authority',[Text.UTF8Encoding]::new($false))
+            $authorities[$client.locale]=$authority;$displayByLocale[$client.locale]=[pscustomobject]@{role=[pscustomobject]@{authority=$authority;display=(':' + $(if($client.locale-ceq'en'){193}else{194}))}}
+          }
+          $linuxPrivateDisplays=[ordered]@{roles=@()};$library='unused';$serverPort=1000;$clientGraphics=@();$fixtureCase='library-multiplayer';$markerPrefix='MIR5_LIBRARY_MP';$apiClientConsumers=$false
+          $script:serverLog='';$script:environments=[Collections.Generic.List[object]]::new()
+          function Read-LogText([string]$Path){return $script:serverLog}
+          function Start-Native([string]$Name,$NativeArguments,$Environment){
+            if($null-eq$Environment){throw 'private display client lost its graphics environment'}
+            $script:environments.Add([pscustomobject]@{name=$Name;environment=$Environment})
+            $parts=$Name.Split('-');$phase=$parts[1];$locale=$parts[2]
+            $join=@{initial=1;rejoin=2;restart=3}[$phase]
+            $player=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+            $script:serverLog+="[$markerPrefix`_JOIN] $player $join`n"
+            return [pscustomobject]@{name=$Name}
+          }
+          function Wait-For([string]$Description,[scriptblock]$Predicate){if(-not(&$Predicate)){throw "missing expected $Description"};return $true}
+          foreach($phase in @('initial','rejoin','restart')){
+            $actors=@(Start-Clients $phase)
+            if($actors.Count-ne2){throw "phase lost client actors:$phase"}
+          }
+          if($script:environments.Count-ne6){throw 'client graphics environments differ'}
+          $actual=[Collections.Generic.List[string]]::new()
+          foreach($entry in $script:environments){
+            $cache=[string]$entry.environment['XDG_CACHE_HOME'];$config=[string]$entry.environment['XDG_CONFIG_HOME']
+            if(-not(Test-Path -LiteralPath $cache -PathType Container)-or-not(Test-Path -LiteralPath $config -PathType Container)){throw 'phase-local graphics directories are absent'}
+            $cacheRelative=[IO.Path]::GetRelativePath($root,$cache).Replace('\','/')
+            $configRelative=[IO.Path]::GetRelativePath($root,$config).Replace('\','/')
+            $actual.Add($cacheRelative);$actual.Add($configRelative)
+            if($cacheRelative-notmatch'^client-(en|de)/linux-graphics-(initial|rejoin|restart)/cache$'-or$configRelative-notmatch'^client-(en|de)/linux-graphics-(initial|rejoin|restart)/config$'){throw 'phase-local graphics root differs'}
+          }
+          if((@($actual|Sort-Object -Unique)).Count-ne12){throw 'client phases reused graphics paths'}
+          foreach($client in $clients){
+            if(Test-Path -LiteralPath (Join-Path $client.write_data 'linux-cache')){throw 'legacy shared cache root was recreated'}
+            if(Test-Path -LiteralPath (Join-Path $client.write_data 'linux-config')){throw 'legacy shared config root was recreated'}
+          }
+          $before=@(Get-ChildItem -LiteralPath $root -Recurse -Force).Count
+          $failure=$null;try{Start-Clients 'unknown'|Out-Null}catch{$failure=$_.Exception.Message}
+          if($failure-cne'unknown client phase'){throw "unknown phase refusal differs:$failure"}
+          if(@(Get-ChildItem -LiteralPath $root -Recurse -Force).Count-ne$before){throw 'unknown phase created graphics output'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-phase-graphics-", dir=ROOT / "build/tmp") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_api_client_mode_requires_exact_new_load_markers_for_each_join_phase(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
