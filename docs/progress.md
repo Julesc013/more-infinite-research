@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-16
+last_reviewed: 2026-11-17
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -31,6 +31,8 @@ The [publication and continuation custody](../spec/evidence/candidate515-publica
 This completes5.0.15 prerelease distribution only. The MIR5 stable goal remains active. Continue the existing profile/API fixes and actual GUI/client/personal-view, exact reporter/provider/historical, physical-output and coherent performance/stress acceptance. Preserve the17 published15 ZIPs and both checksum files; a player change needs the next unpublished source patch, never rebuilt/replaced15 bytes. The maintainer owns any eventual stable Portal upload of identical accepted ZIPs.
 
 ## Linux Library observations and bounded code-quality work (2026-11-16)
+
+The later [exact public16 English input case](../spec/evidence/library516-linux-personal-input-r04.json) completes one Linux2.1.24/Base shortcut, Help/Research selection, `gear` query, close and reopen sequence with the exact published ZIP. Its eight event/state phases, seven capture-integrity checks, complete mod tuple, unchanged idle research state, retained query, owned process exit and restored inputs pass bounded independent review. The critical Help and Research PNGs now visibly match their phases after a one-second capture barrier. The predeclared Queue/Settings zero-difference pixel subcriterion still fails with206 changed shared-border pixels; the title region has zero changes. That failed subcriterion is preserved without retuning, and these observations do not qualify broad layout/design parity, localization, scroll/resize, exports, multiple clients, current17 or stable. The earlier three failed pipelines remain unchanged.
 
 The [exact Linux graphical observations](../spec/evidence/library516-linux-graphical-observations-r01.json) retain one fresh seed and two distinct one-client captures on Factorio2.1.24 with the frozen local5.0.21016 Base package from56df1207. The German protocol passes independent review: seven real PNG/state pairs, the complete actual three-mod table, unchanged native research and input save, normal requested process stop and full input restoration. The English actor/owner remains failed because its control-only observer had no `Loading mod` line; independent review adopts its seven exact images only as narrow graphical observations using the Help panel's actual mod-version diagnostics. Every decoded body of all74 originals/89106907bytes matches a fresh filtered remote readback. These images do not prove mouse/keyboard, first-tab selection, exports, clients, MIR4 design parity, current-package or stable acceptance; the distinct protected historical predecessor remains outstanding.
 

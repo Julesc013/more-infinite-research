@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPersonalInputR04IndependentActualReviewV1",
+  "reviewed_on": "2026-11-17",
+  "verdict": "narrow-public16-personal-view-event-state-and-critical-tab-observation-accepted; predeclared-neighbor-tab-roi-subcriterion-failed-and-preserved",
+  "custody": {
+    "packet_sha256": "5D3B1CF260A3C1CF7E467832FE4CF7489974EDBB3BD2DF55C1D92E414FB01114",
+    "primary_originals": "build/qualification/gunmetal-library16-personal-input-r04-originals",
+    "files": 58,
+    "bytes": 172467675,
+    "all_remote_bodies_equal": true,
+    "readback": "build/qualification/linux-library-current-render-preparation-r01/personal-input-originals-readback-r04.json",
+    "readback_sha256": "59BE35BA8A8B5BA385173A722F21F38380FC2844E3CFE6E160B51CC995C6EC6E"
+  },
+  "exact_inputs": {
+    "engine": "Factorio 2.1.24 / 1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "selection": "base@2.1.24|mir-fixture-library-personal-view-input@0.1.5|more-infinite-research@5.0.21016",
+    "candidate": "79DCF8F0086F266D63A8BA5387DC1E4713D08FB68E712BD8F7D9198EA6AB3EF3",
+    "fixture": "19136D799D52C4FFA9CC939467AB374FBE85743C84B1A2203E08EDC8EF9D0A79",
+    "fresh_ui_seed": "0E55566E6B3DDFE8C0A195AE33BF843F3DC1231DC8B028BE1FC5DACEBF44EE49",
+    "seed_limit": "Fresh UI origin only; not historical, prepared-save, paid-work, upgrade or source17 evidence."
+  },
+  "execution_and_restoration": {
+    "service_invocation": "e89b074109a24acfa6c1493540f4effa",
+    "service_result": "success / ExecMainStatus=0 / MainPID=0 / SubState=exited",
+    "factorio_processes": 1,
+    "process_exit_code": 0,
+    "process_timed_out": false,
+    "factorio_stop": "requested, unforced, returncode 0",
+    "display_socket_restored": true,
+    "private_viewer_restored": true,
+    "original_library_controls_restored": true,
+    "temporary_archives_removed": true,
+    "restoration_errors": [],
+    "remaining_factorio_processes": [],
+    "runtime_config_before_after_equal": true
+  },
+  "observed_event_state_contract": {
+    "phase_files": 8,
+    "captures": 7,
+    "input_requests": 8,
+    "actor_input_events": 12,
+    "first_origin": "joined at tick 0 for player 1",
+    "event_counts": {
+      "setup": 0,
+      "shortcut": 2,
+      "tab": 2,
+      "tab_click": 2,
+      "click": 1,
+      "text": 4,
+      "close": 1
+    },
+    "query_after_text_and_reopen": "gear",
+    "native_state": "current=false, progress=0, empty queue and worker-storage bonus=0 throughout; this is non-mutation observation only",
+    "geometry": "2560x1440 at scale 1.25; root x=640 y=120 and min/max 1024x864 on open phases; reopen uses a new tab-bar index 238 after live bar index 15 was retired",
+    "validator": "A913 post-origin reader passed its eight-phase/seven-capture integrity contract; raw input_case_result intentionally retains input_acceptance=false pending independent review"
+  },
+  "critical_visual_review": {
+    "help_capture": {
+      "path": "personal-view-native/02b-help-tab.png",
+      "sha256": "0AE58CE931AAE85B52698F5E6FB49765B5069D7B0ADD25AEE2DE5AB71C48D19E",
+      "phase_tab": "Help",
+      "independently_visually_observed_tab": "Help"
+    },
+    "research_capture": {
+      "path": "personal-view-native/03-selected-research.png",
+      "sha256": "CE3CCE94321F2273FBA918AFCDFA20FA01B017B101A49A7CD0A081027A525A12",
+      "phase_tab": "Research",
+      "independently_visually_observed_tab": "Research"
+    },
+    "meaning": "These two critical rendered tabs correct the specific R03 one-frame Help/Research association adverse. PNG integrity alone was not used as a substitute for this visual inspection."
+  },
+  "preserved_layout_roi_adverse": {
+    "comparison": "02b-help-tab.png versus 03-selected-research.png",
+    "title_roi": "(645,125)-(1884,160)",
+    "title_changed_pixels": 0,
+    "queue_settings_roi": "(778,186)-(983,228)",
+    "predeclared_expected_changed_pixels": 0,
+    "actual_changed_pixels": 206,
+    "changed_columns": [778, 779, 980, 981, 982],
+    "finding": "The failed zero-difference assertion is confined to the shared left/right tab-border columns adjacent to the selected Research or Help tab; it is not a demonstrated outer geometry shift. Do not retune a threshold after this run or call whole-pixel invariance passed."
+  },
+  "scope": {
+    "accepted": [
+      "one exact public16/F210 Linux native personal-view sequence with governed XTEST requests, event ordering, retained query, close/reopen state, critical Help/Research rendered-tab association, non-mutation snapshot and restoration",
+      "the R03 one-frame capture-lag defect is not observed in the two critical Help/Research captures under the separately reviewed one-second presentation barrier"
+    ],
+    "not_accepted": [
+      "the predeclared Queue/Settings zero-difference ROI assertion",
+      "all-capture visual equality, localized input, scroll/resize, exports, client or multiplayer lifecycle, source17/current package applicability, historical-save behavior, earned/paid research, performance, release or stable acceptance"
+    ]
+  },
+  "no_rerun_or_mutation": true,
+  "stable_acceptance": false
+}
