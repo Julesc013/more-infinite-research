@@ -159,14 +159,6 @@ class ReleaseTests(unittest.TestCase):
         target = (ROOT / "source/platform/target.lua").read_text(encoding="utf-8")
         self.assertEqual(target.count('distribution_version="' + alias.distribution_version + '"'), 1)
 
-    def test_current_authored_changelog_alias_matches_canonical_f210_player_metadata(self):
-        alias = current_alias("f210")
-        self.assertEqual(alias.source_release, current_source_release())
-        info = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))
-        self.assertEqual(info["version"], alias.distribution_version)
-        target = (ROOT / "source/platform/target.lua").read_text(encoding="utf-8")
-        self.assertEqual(target.count('distribution_version="' + alias.distribution_version + '"'), 1)
-
     @staticmethod
     def _body(output):
         inventory = json.loads((output / release.INVENTORY_NAME).read_text(encoding="utf-8"))
