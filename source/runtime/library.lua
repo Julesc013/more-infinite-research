@@ -19,6 +19,7 @@ local availability = require("presentation.availability")
 local target = require("platform.target")
 local translation_queue = require("runtime.library_translations")
 local library_production = require("runtime.library_production")
+local library_settings_detail = require("runtime.library_settings_detail")
 local support_exports
 if helpers and type(helpers.write_file) == "function" then
   support_exports = require("runtime.settings_commands")
@@ -1918,54 +1919,12 @@ local function update_settings_content(content, view, preserve_query, translatio
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
   end
-  local function setting_label(spec, parent, width)
-    local label = add(parent or detail, spec)
-    if valid(label) and label.style then
-      label.style.single_line = false
-      label.style.maximal_width = math.max(1, width or panes.detail_width - 16)
-    end
-    return label
-  end
   local selected = visible[selected_index]
-  if selected == nil then
-    setting_label({type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
-    return
-  end
-  local title = setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
-  title.style.font = "default-large-bold"
-  setting_label({type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
-  if selected.externally_supplied then
-    setting_label({type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
-  end
-  library_section(detail, "settings_effective", "mir-browser.effective-values", panes.detail_width)
-  local fields = add(detail, {type = "table", name = PREFIX .. "settings_fields", column_count = 2})
-  fields.style.width = math.max(1, panes.detail_width - 16)
-  fields.style.horizontal_spacing, fields.style.vertical_spacing = 12, 10
-  local field_width = math.max(1, style_pixels((panes.detail_width - 40) * .55))
-  local value_width = math.max(1, panes.detail_width - 40 - field_width)
-  local source = "default"
-  for index, field in ipairs(selected.fields) do
-    local name = PREFIX .. "setting_" .. index
-    local label = setting_label({type = "label", name = name .. "_name", caption = field.caption,
-      tooltip = field.description}, fields, field_width)
-    label.style.font = "default-semibold"
-    local display = setting_display(field.name, field.effective)
-    if field.default ~= nil and field.effective ~= field.default then
-      display = {"mir-browser.setting-with-default", display, setting_display(field.name, field.default)}
-    end
-    setting_label({type = "label", name = name .. "_value", caption = display,
-      tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}}, fields, value_width)
-    if field.source == "mirset1" then
-      source = "mirset1"
-      setting_label({type = "label", name = name .. "_profile_marker", caption = {"mir-browser.profile-override"}}, fields, field_width)
-      setting_label({type = "label", name = name .. "_source", caption = {"mir-browser.source-mirset1"}}, fields, value_width)
-    elseif source ~= "mirset1" and field.source == "direct" then
-      source = "direct"
-    end
-  end
-  library_section(detail, "settings_source", "mir-browser.configuration-source", panes.detail_width)
-  setting_label({type = "label", name = PREFIX .. "settings_source_summary", caption = {"mir-browser.source-" .. source}})
+  library_settings_detail.render({
+    parent = detail, selected = selected, detail_width = panes.detail_width,
+    prefix = PREFIX, add = add, valid = valid, display = setting_display,
+    section = library_section, pixels = style_pixels,
+  })
 end
 
 local function queue_name(entry)
