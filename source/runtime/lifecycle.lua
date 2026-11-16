@@ -337,10 +337,19 @@ local function valid_force(force)
   return force and force.valid ~= false and type(force.index) == "number"
 end
 
+local function known_worker_tail(name)
+  for index = 1, #WORKER_TAIL_NAMES do
+    if name == WORKER_TAIL_NAMES[index] then return true end
+  end
+  return false
+end
+
 local function has_worker_ownership(owned)
-  return type(owned) == "table"
-    and (type(owned[WORKER_TAIL_NAMES[1]]) == "table"
-      or type(owned[WORKER_TAIL_NAMES[2]]) == "table")
+  if type(owned) ~= "table" then return false end
+  for index = 1, #WORKER_TAIL_NAMES do
+    if type(owned[WORKER_TAIL_NAMES[index]]) == "table" then return true end
+  end
+  return false
 end
 
 local function worker_owner(force)
@@ -486,7 +495,7 @@ local function event_limits_for(force, name, include_worker)
       return {[name] = effective_limit(row, force)}, {[name] = true}, nil
     end
   end
-  if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+  if known_worker_tail(name) then
     local owner = worker_owner(force)
     if owner == name and (WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker) then
       return {[name] = WORKER_ROBOT_SPEED_LIMIT}, {[name] = true}, owner
@@ -514,7 +523,7 @@ function M.discovery_visibility(force)
   local owned = current and current.owned_disabled[force.index]
   for name, record in pairs(owned or {}) do
     if type(record) == "table" and record.discovery_enabled == true
-        and (DECLARATION_BY_ID[name] ~= nil or name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2]) then
+        and (DECLARATION_BY_ID[name] ~= nil or known_worker_tail(name)) then
       visible[name] = true
     end
   end
@@ -529,13 +538,13 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   local owned = owned_disabled[force.index]
   if type(owned) ~= "table" then return owned end
   for name, row in pairs(owned) do
-    if not workers_only or name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+    if not workers_only or known_worker_tail(name) then
       -- A disabled authored prototype keeps a record that this runtime
       -- actually wrote. It must remain disabled until that prototype is
       -- admitted again, when caps.reconcile can restore only this proven right.
       if admitted[name] ~= true and not retained_authored_prototype_disablement(force, name) then
         owned[name] = nil
-      elseif name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+      elseif known_worker_tail(name) then
         local row = owned[name]
         if type(row) == "table" then
           -- Earlier private MIR5 rows could only represent the 0.65 variant.
@@ -607,7 +616,7 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
         row[target_name] = nil
         if next(row) == nil then owned_disabled[force.index] = nil end
       end
-      if target_name == WORKER_TAIL_NAMES[1] or target_name == WORKER_TAIL_NAMES[2] then
+      if known_worker_tail(target_name) then
         discard_unbound_ownership(force, owned_disabled, admitted, owner, true)
       end
     else
@@ -757,7 +766,7 @@ local function merge_legacy_rows(owned_disabled, force_index, rows, facts, impor
         visible_when_disabled = row.visible_when_disabled
       }
       created[name] = owned[name]
-      if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+      if known_worker_tail(name) then
         owned[name].worker_effect_modifier = worker_modifier(name)
       end
     end

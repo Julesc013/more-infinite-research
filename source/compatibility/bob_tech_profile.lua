@@ -35,11 +35,6 @@ function M.applies(active)
   -- the material module's mandatory named raw-prototype preflight; captured
   -- versions are qualification evidence, not an applicability fingerprint.
   if not complete_closure(active) then return false end
-  -- Target records may raise their declared minimum for an official patch.
-  -- That is not evidence that this F210 predecessor can be omitted.
-  if target.minimum_base ~= "2.1.23" then
-    fail_transition("target minimum base is " .. tostring(target.minimum_base) .. ", expected 2.1.23")
-  end
   if active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then
     fail_transition("captured BobTech closure has an unsupported Krastorio selection")
   end

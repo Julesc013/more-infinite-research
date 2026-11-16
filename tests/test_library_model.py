@@ -9,6 +9,61 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryModelTests(unittest.TestCase):
+    def test_bob_core_gate_and_availability_preserve_named_selection_cases(self):
+        facts = json.loads((ROOT / "tests/fixtures/bob-core-f210-captured-facts.json").read_bytes())
+        # Supply independent captured names as Lua literals, not candidate output.
+        self.lua.execute("core_selection={" + ",".join(
+            f"[{json.dumps(name)}]={json.dumps(version)}" for name, version in facts["required_mods"].items()
+        ) + "}")
+        self.lua.globals().expected_core_omissions = len(facts["withheld_families"])
+        self.lua.execute(r'''
+          local gate = require("compatibility.bob_core_profile")
+          local availability = require("presentation.availability")
+          local target = require("platform.target")
+          local prior = {target.id, target.factorio_version, target.minimum_base, target.recipe_productivity}
+          local cases = {
+            {name="captured", selected=true},
+            {name="reskin", addition="unrelated-reskin", selected=true},
+            {name="asset", addition="Krastorio2Assets", selected=true},
+            {name="missing-bobtech", removal="bobtech", selected=false},
+            {name="missing-space-age", removal="space-age", selected=false},
+            {name="Angel", addition="angelsbioprocessing", selected=false},
+            {name="Angel-with-raised-metadata", addition="angelsbioprocessing", minimum="2.1.24", selected=false},
+            {name="partial-before-overhaul", removal="bobtech", addition="Krastorio2", selected=false},
+            {name="Krastorio", addition="Krastorio2", error="unsupported overhaul selection"},
+            {name="Py", addition="pycoalprocessing", error="unsupported overhaul selection"},
+            {name="raised-metadata", minimum="2.1.24", selected=true},
+            {name="raised-metadata-overhaul", minimum="2.1.24", addition="Krastorio2", error="unsupported overhaul selection"},
+            {name="wrong-target", target="f200", selected=false},
+            {name="wrong-line", line="2.0", selected=false}
+          }
+          local force = {technologies=setmetatable({}, {
+            __pairs=function() error("Availability enumerated technology catalogue") end,
+            __newindex=function() error("Availability wrote a technology") end
+          })}
+          for _, case in ipairs(cases) do
+            target.id,target.factorio_version,target.minimum_base,target.recipe_productivity =
+              case.target or "f210",case.line or "2.1",case.minimum or "2.1.23",true
+            local active = {}
+            for name, version in pairs(core_selection) do active[name]=version end
+            if case.removal then active[case.removal]=nil end
+            if case.addition then active[case.addition]="present" end
+            local ok, selected = pcall(gate.applies, active)
+            if case.error then
+              assert(not ok and selected:find(case.error,1,true),case.name)
+            else assert(ok and selected==case.selected,case.name) end
+            local rows=availability.rows(active,target,force,"material")
+            assert(#rows==(case.selected and expected_core_omissions or 0),case.name)
+            for _, row in ipairs(rows) do assert(row.reason=="not-available-in-bob-core-profile") end
+            for name, version in pairs(core_selection) do
+              assert(active[name]==(name~=case.removal and version or nil),case.name)
+            end
+            if case.addition then assert(active[case.addition]=="present") end
+          end
+          target.id,target.factorio_version,target.minimum_base,target.recipe_productivity =
+            prior[1],prior[2],prior[3],prior[4]
+        ''')
+
     def test_benefit_captions_use_native_labels_and_correct_percent_or_count_units(self):
         self.lua.execute('''
           local effects=require("presentation.library_effects")
@@ -139,6 +194,45 @@ class LibraryModelTests(unittest.TestCase):
           for _, row in ipairs(catalogue.declared()) do ids[row.id] = true end
           assert(not ids["braking-force-8"], "runtime adapter retained an already-owned native id")
           assert(ids["research-speed-7"], "runtime adapter omitted an unrelated MIR continuation")
+        ''')
+
+    def test_runtime_catalogue_requires_and_invokes_pure_prepare_at_control_parse(self):
+        self.lua.execute('''
+          local prepared, declared = 0, 0
+          package.preload["research.catalogue"] = function()
+            return {
+              prepare = function(foreign, withheld, finite_speed, worker, split)
+                prepared = prepared + 1
+                assert(foreign == nil and withheld == nil and finite_speed == false
+                  and worker == nil and split == nil)
+              end,
+              declared = function()
+                declared = declared + 1
+                return {{id="prepared-row", settings={"prepared-setting"}}}
+              end
+            }
+          end
+          script, mods, prototypes, game = {active_mods={base="2.1.23"}}, nil, nil, nil
+          package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+          local runtime = require("runtime.catalogue")
+          assert(prepared == 1 and declared == 0, "prepare must be exactly control-parse work")
+          local first = runtime.declared()
+          assert(declared == 1 and first[1].id == "prepared-row")
+          first[1].id, first[1].settings[1] = "foreign", "foreign"
+          local second = runtime.declared()
+          assert(declared == 2 and second[1].id == "prepared-row" and second[1].settings[1] == "prepared-setting")
+        ''')
+
+        self.lua.execute('''
+          local declared = 0
+          package.preload["research.catalogue"] = function()
+            return {declared=function() declared = declared + 1; error("must not declare") end}
+          end
+          script, mods, prototypes, game = {active_mods={base="2.1.23"}}, nil, nil, nil
+          package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+          local ok, message = pcall(require, "runtime.catalogue")
+          assert(not ok and tostring(message):find("prepare", 1, true), tostring(message))
+          assert(declared == 0, "missing prepare reached declaration work")
         ''')
 
     def test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse(self):
@@ -331,6 +425,160 @@ class LibraryModelTests(unittest.TestCase):
             "a malformed named owner must not escape the bounded availability check")
         ''')
 
+    def test_missing_space_age_availability_respects_effectively_disabled_streams(self):
+        # Host-only authored-explanation contract. Use the already-resolved
+        # stream map, not raw startup settings or a guessed historical save.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local target = {recipe_productivity = true}
+          local baseline = availability.rows({}, target, nil, "")
+          assert(#baseline == 2 and baseline[1].family == "research_agricultural_growth_speed"
+            and baseline[2].family == "research_spoilage_preservation")
+
+          local effective = {
+            research_agricultural_growth_speed = {enabled = false},
+            research_spoilage_preservation = {enabled = true},
+          }
+          local rows = availability.rows({}, target, nil, "", effective)
+          assert(#rows == 1 and rows[1].family == "research_spoilage_preservation"
+            and rows[1].reason == "requires-space-age",
+            "disabled agriculture must not be described as withheld by Space Age")
+          assert(#availability.rows({}, target, nil, "agricultural", effective) == 0)
+
+          effective.research_agricultural_growth_speed.enabled = true
+          effective.research_spoilage_preservation.enabled = false
+          rows = availability.rows({}, target, nil, "", effective)
+          assert(#rows == 1 and rows[1].family == "research_agricultural_growth_speed",
+            "disabled spoilage must not be described as withheld by Space Age")
+          assert(#availability.rows({}, target, nil, "spoilage", effective) == 0)
+
+          effective.research_agricultural_growth_speed.enabled = false
+          assert(#availability.rows({}, target, nil, "", effective) == 0)
+          assert(#availability.rows({}, target, nil, "", nil) == 2,
+            "an unknown effective stream is not evidence of a disabled stream")
+          assert(#availability.rows({["space-age"] = "2.1.23"}, target, nil, "", effective) == 0)
+          assert(effective.research_agricultural_growth_speed.enabled == false
+            and effective.research_spoilage_preservation.enabled == false,
+            "Availability must never mutate the effective configuration")
+        ''')
+
+    def test_native_lab_availability_omits_explicitly_disabled_stream(self):
+        # Host-only Availability semantics: the captured native Space Age
+        # owner may exist even when MIR's lab-productivity stream is disabled.
+        # A disabled stream must not be described as omitted by that owner.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local mods = {["space-age"] = "2.1.23"}
+          local target = {recipe_productivity = true}
+          local native = {
+            valid = true,
+            prototype = {effects = {{type = "laboratory-productivity", modifier = 0.1}}}
+          }
+          local technologies = setmetatable({["research-productivity"] = native}, {
+            __pairs = function() error("Availability enumerated technology catalogue") end
+          })
+          local force = {technologies = technologies}
+          local enabled = {research_lab_productivity = {enabled = true}}
+          local disabled = {research_lab_productivity = {enabled = false}}
+          local baseline = availability.rows(mods, target, force, "lab", enabled)
+          assert(#baseline == 1 and baseline[1].family == "research_lab_productivity"
+            and baseline[1].reason == "native-research-productivity")
+          assert(#availability.rows(mods, target, force, "lab", disabled) == 0,
+            "explicitly disabled lab stream is not a native-owner omission")
+          assert(#availability.rows(mods, target, force, "", disabled) == 0)
+          assert(#availability.rows(mods, target, force, "lab", nil) == 1,
+            "unspecified stream state must retain its previous explanation")
+          assert(#availability.rows(mods, target, force, "lab", {}) == 1)
+          assert(#availability.rows(mods, {recipe_productivity = false}, force, "", enabled) == 0)
+          assert(enabled.research_lab_productivity.enabled == true
+            and disabled.research_lab_productivity.enabled == false
+            and technologies["research-productivity"] == native
+            and native.prototype.effects[1].modifier == 0.1,
+            "Availability must not mutate effective settings or native facts")
+        ''')
+
+    def test_availability_never_claims_named_present_research_was_omitted(self):
+        # Pure source regression: an authored terminal explanation is not
+        # authoritative when the exact technology exists in the force.
+        # This does not infer historical work from current/default research.
+        self.lua.execute(r'''
+          local availability = require("presentation.availability")
+          local target = {recipe_productivity = true}
+          local ag = "recipe-prod-research_agricultural_growth_speed-1"
+          local spoil = "recipe-prod-research_spoilage_preservation-1"
+          local lab = "recipe-prod-research_lab_productivity-1"
+          local function force_with(technologies)
+            return {technologies = setmetatable(technologies, {
+              __pairs = function() error("Availability enumerated native technologies") end
+            })}
+          end
+          local present = {valid = true}
+          local absent_dlc_force = force_with({[ag] = present})
+          local rows = availability.rows({}, target, absent_dlc_force, "")
+          assert(#rows == 1 and rows[1].family == "research_spoilage_preservation",
+            "a present agriculture technology must not be described as absent")
+          absent_dlc_force.technologies[spoil] = present
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 0,
+            "a present spoilage technology must not be described as absent")
+          absent_dlc_force.technologies[ag] = nil
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 1
+            and availability.rows({}, target, absent_dlc_force, "")[1].family
+              == "research_agricultural_growth_speed",
+            "the other actually absent identity retains its explanation")
+          assert(#availability.rows({}, target, nil, "") == 2,
+            "a null-force pure projection retains its historical baseline")
+          absent_dlc_force.technologies[ag] = {valid = false}
+          assert(#availability.rows({}, target, absent_dlc_force, "") == 1,
+            "an invalid named technology is not an existing research identity")
+
+          local native_owner = {valid = true, prototype = {effects = {
+            {type = "laboratory-productivity", modifier = 0.1}
+          }}}
+          local native_force = force_with({["research-productivity"] = native_owner})
+          local mods = {["space-age"] = "2.1.23"}
+          assert(#availability.rows(mods, target, native_force, "lab") == 1,
+            "the exact native owner still explains an actually absent MIR lab")
+          native_force.technologies[lab] = present
+          assert(#availability.rows(mods, target, native_force, "lab") == 0,
+            "an existing MIR lab cannot simultaneously be not-added")
+          assert(native_force.technologies[lab] == present
+            and native_force.technologies["research-productivity"] == native_owner
+            and native_owner.prototype.effects[1].modifier == 0.1,
+            "projection must not change native facts")
+
+          local invalid_lab = {valid = false}
+          native_force.technologies[lab] = invalid_lab
+          local invalid_rows = availability.rows(mods, target, native_force, "lab")
+          assert(#invalid_rows == 1 and invalid_rows[1].family == "research_lab_productivity",
+            "an invalid named MIR lab retains the valid native owner's explanation")
+          assert(native_force.technologies[lab] == invalid_lab and invalid_lab.valid == false,
+            "projection must not repair or replace an invalid native object")
+
+          local unreadable_lab = {technologies = setmetatable({
+            ["research-productivity"] = native_owner
+          }, {
+            __index = function(_, name)
+              assert(name == lab, "Availability read an unrelated technology")
+              error("named MIR lab lookup refused")
+            end,
+            __pairs = function() error("Availability enumerated native technologies") end,
+            __newindex = function() error("Availability mutated native technologies") end
+          })}
+          assert(#availability.rows(mods, target, unreadable_lab, "lab") == 0,
+            "a failed named MIR lab lookup is not proof of omission, even with a valid native owner")
+          assert(unreadable_lab.technologies["research-productivity"] == native_owner
+            and rawget(unreadable_lab.technologies, lab) == nil
+            and native_owner.prototype.effects[1].modifier == 0.1,
+            "the unreadable projection must preserve the native owner and missing MIR key")
+
+          local unreadable = {technologies = setmetatable({}, {
+            __index = function() error("named technology read refused") end,
+            __pairs = function() error("Availability enumerated native technologies") end
+          })}
+          assert(#availability.rows({}, target, unreadable, "") == 0,
+            "a failed named lookup is not proof that a technology is absent")
+        ''')
+
     def test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation(self):
         self.lua.execute('''
           local availability = require("presentation.availability")
@@ -393,9 +641,14 @@ class LibraryModelTests(unittest.TestCase):
           assert(#availability.rows(bobtech_angel, f210, empty_force, "zinc", enabled_streams) == 0,
             "the F210 explanation list must not invent a family outside its captured withholding")
           f210.minimum_base = "2.1.24"
+          local raised_metadata_rows = availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams)
+          assert(#raised_metadata_rows == 1 and raised_metadata_rows[1].family == "research_material_lead"
+            and raised_metadata_rows[1].reason == "not-available-in-bobtech-angel-profile",
+            "a declared F210 minimum change must preserve the exact BobTech omission")
+          f210.factorio_version = "2.0"
           assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
-            "a different F210 target record must not reuse this closure")
-          f210.minimum_base = "2.1.23"
+            "a wrong Factorio line must not reuse the BobTech explanation")
+          f210.factorio_version = "2.1"
           bobtech_angel.Krastorio2 = true
           assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
             "an excluded mixed closure must not reuse the BobTech explanation")
@@ -1147,7 +1400,13 @@ class LibraryModelTests(unittest.TestCase):
         catalogue = (ROOT / "source/research/catalogue.lua").read_text(encoding="utf-8")
         self.assertNotIn("require(", source)
         self.assertNotIn("Generator", source)
-        self.assertNotIn("require(", availability)
+        # Only the small pure selection facts are shared. Presentation must
+        # not import a profile constructor, Generator or runtime authority.
+        self.assertEqual(availability.count("require("), 1)
+        self.assertIn('require("compatibility.bob_core_selection")', availability)
+        selection = (ROOT / "source/compatibility/bob_core_selection.lua").read_text(encoding="utf-8")
+        for forbidden in ("require(", "game.", "storage.", "data.raw", "prototypes."):
+            self.assertNotIn(forbidden, selection)
         for forbidden in ("game.", "storage.", "data.raw", "pairs(technologies)", "technology_id"):
             self.assertNotIn(forbidden, availability)
         self.assertIn('require("compatibility.modern_catalogue")', catalogue)

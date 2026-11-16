@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "scope": "Test-only derivative observer custody. It is not a private-save loader, native result, physical-output test, or release claim.",
+  "source": {
+    "archive_sha256": "9B4FBD38B4F319B33C80735CBB25900BDA53845E7C483DED110F6298B1AD4280",
+    "archive_bytes": 830769,
+    "control_member": "native-vector-f1-negative/control.lua",
+    "control_sha256": "CAED96BD0A982B1CCDD15A575A1293F0693E91A9509EAD39C3CB28FF858B7D9C",
+    "members": [
+      {"name": "native-vector-f1-negative/control.lua", "bytes": 19772, "sha256": "CAED96BD0A982B1CCDD15A575A1293F0693E91A9509EAD39C3CB28FF858B7D9C"},
+      {"name": "native-vector-f1-negative/level-init.dat", "bytes": 1105251, "sha256": "65AE14DBAD140676ED82F9380395D3A787E9DFF75A23CA3EA0B01968A4EE86EC"},
+      {"name": "native-vector-f1-negative/level.dat1", "bytes": 19643, "sha256": "5E723C2CFD52AB089FABDF7F906A815B8913A59413DCADDE31AB3B9FBE6F87B9"},
+      {"name": "native-vector-f1-negative/level.dat0", "bytes": 388880, "sha256": "DAA9C97C6252CC6CAE5132BE27612FB18514A5BB0C3BD2079B96FF637C92DDDB"},
+      {"name": "native-vector-f1-negative/level.datmetadata", "bytes": 8, "sha256": "761A624DB53934A9DED66200CCC475D776B8D690B30E3F75384BA2153EBB1CFA"},
+      {"name": "native-vector-f1-negative/script.dat", "bytes": 150159, "sha256": "9F6CB20C48D940BC5F2269ADF3D7D253E5CFA54A577EEDE9F98FF39DF0D059DA"},
+      {"name": "native-vector-f1-negative/info.json", "bytes": 5, "sha256": "38E0B9DE817F645C4BEC37C0D4A3E58BAECCCB040F5718DC069A72C7385A0BED"}
+    ]
+  },
+  "derivative": {
+    "allowed_changed_member": "native-vector-f1-negative/control.lua",
+    "required_same_member_order": true,
+    "provenance": "The future owned seed replaces only the scenario observer and records both actor hashes; source world and old observer stay preserved."
+  },
+  "borrowed_data_stage_members": {
+    "data.lua": "33B53A9AAA6427BDCB8E26EC937C28AA5263B129859A94A0E85BAEA83B9B9523",
+    "data-final-fixes.lua": "31BDA884A0EA36DD012758F75B54C9E2E49909F2BF89ED95C54D68CDA7E81F37",
+    "cerys-technology-first45.lua": "F9C5646B863A3FC3332A0616053913A713A778D563B5DB2B147EF5BE3F0B51B1",
+    "Cerys-LICENSE.txt": "F7F28B8C7A1AF76B9874CA6D040E8B1EB6768FD1043106C9D315090EA96754E7"
+  }
+}

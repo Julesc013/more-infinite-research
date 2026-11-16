@@ -77,6 +77,40 @@ class NativeOwnersTests(unittest.TestCase):
           assert(#calls == 1 and calls[1] == seven.name)
         ''')
 
+    def test_release_scope_ignores_unshipped_se_tail_ten(self):
+        self.lua.execute('''
+          local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7, prerequisites = {"worker-robots-speed-6"}
+          })
+          local ten = data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+            prerequisites = {"worker-robots-speed-9", "se-deep-space-science-pack-1"}
+          })
+          local data_calls = {}
+          assert(owners.data_worker_robot_speed_owner(lookup({
+            [six.name] = six, [seven.name] = seven, [ten.name] = ten
+          }, data_calls)) == nil)
+          assert(#data_calls == 2 and data_calls[1] == seven.name
+            and data_calls[2] == six.name)
+
+          local runtime_six = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local runtime_seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7
+          })
+          local runtime_ten = runtime_technology("worker-robots-speed-10", "worker-robots-speed-9")
+          local runtime_calls = {}
+          assert(owners.runtime_worker_robot_speed_owner(lookup({
+            [runtime_six.name] = runtime_six, [runtime_seven.name] = runtime_seven,
+            [runtime_ten.name] = runtime_ten
+          }, runtime_calls)) == nil)
+          assert(#runtime_calls == 2 and runtime_calls[1] == runtime_seven.name
+            and runtime_calls[2] == runtime_six.name)
+        ''')
+
     def test_runtime_uses_numeric_max_and_prerequisite_object_map(self):
         self.lua.execute('''
           local current = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5")

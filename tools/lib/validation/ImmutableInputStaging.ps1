@@ -38,7 +38,8 @@ function Assert-MIRImmutableInputPathWithin {
   $fullPath = [IO.Path]::GetFullPath($Path)
   $fullRoot = [IO.Path]::GetFullPath($Root).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
   $prefix = $fullRoot + [IO.Path]::DirectorySeparatorChar
-  if (-not $fullPath.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+  $comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+  if (-not $fullPath.StartsWith($prefix, $comparison)) {
     throw "$Context must remain below ${fullRoot}: $fullPath"
   }
   return $fullPath
@@ -58,6 +59,23 @@ function Assert-MIRImmutableInputDirectory {
 
 function Get-MIRImmutableInputFileIdentity {
   param([Parameter(Mandatory)][string]$Path)
+
+  if ($IsLinux) {
+    # Query the held descriptor, not a second pathname lookup: replacement or
+    # rename must not make an open input appear to have another inode.
+    $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+    try {
+      $script = 'import os,stat,sys; s=os.stat("/proc/"+sys.argv[1]+"/fd/"+sys.argv[2]); assert stat.S_ISREG(s.st_mode) and s.st_ino>0 and s.st_nlink>0; print(f"LINUX:{s.st_dev:016X}:{s.st_ino:016X}")'
+      $identity = @(& python3 -I -c $script ([string]$PID) ([string]$stream.SafeFileHandle.DangerousGetHandle().ToInt64()))
+      if ($LASTEXITCODE -ne 0 -or $identity.Count -ne 1 -or [string]$identity[0] -cnotmatch '^LINUX:[0-9A-F]{16}:[0-9A-F]{16}$') {
+        throw '[mir-immutable-linux-file-identity] Held descriptor identity is unavailable.'
+      }
+      return [string]$identity[0]
+    } finally {
+      $stream.Dispose()
+    }
+  }
+  if (-not $IsWindows) { throw '[mir-immutable-file-identity-platform]' }
 
   if ($null -eq ('MIRImmutableInputNative' -as [type])) {
     Add-Type -TypeDefinition @'
@@ -117,9 +135,19 @@ function Assert-MIRImmutableInputCopyCapacity {
     [long]$ReserveBytes = 536870912
   )
 
-  $root = [IO.Path]::GetPathRoot([IO.Path]::GetFullPath($DestinationDirectory))
+  $fullPath = [IO.Path]::GetFullPath($DestinationDirectory)
+  $root = [IO.Path]::GetPathRoot($fullPath)
   if ([string]::IsNullOrWhiteSpace($root)) {
     throw "Cannot determine the destination volume for immutable input staging: $DestinationDirectory"
+  }
+  if ($IsLinux) {
+    # Linux mount points can sit below '/'. Observe the actual destination's
+    # nearest existing ancestor, including when staging is not created yet.
+    $root = $fullPath
+    while (-not [IO.Directory]::Exists($root)) {
+      $root = [IO.Path]::GetDirectoryName($root)
+      if ([string]::IsNullOrEmpty($root)) { throw '[mir-immutable-destination-volume]' }
+    }
   }
   $drive = [IO.DriveInfo]::new($root)
   $requiredFree = $RequiredBytes + $ReserveBytes
@@ -325,7 +353,8 @@ function New-MIRImmutableInputLease {
 
       $sourceFull = (Resolve-Path -LiteralPath $source).Path
       $runPrefix = $runRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-      if ($sourceFull.StartsWith($runPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+      $comparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else { [StringComparison]::Ordinal }
+      if ($sourceFull.StartsWith($runPrefix, $comparison)) {
         throw "Immutable input source may not be staged from its own private run root: $sourceFull"
       }
       $sourceItem = Get-Item -LiteralPath $sourceFull -Force

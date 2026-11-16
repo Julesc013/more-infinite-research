@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-worker-speed-row-diagnostic",
+  "version": "0.1.0",
+  "title": "MIR worker-speed prototype diagnostic (test only)",
+  "author": "MIR contributors",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "more-infinite-research = 5.0.20015", "space-exploration = 0.7.57", "space-exploration-postprocess = 0.7.5"]
+}

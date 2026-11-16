@@ -2,6 +2,19 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.16] - 2026-11-16
+
+### Bugfixes
+
+- Keep settings profile exports detached from caller metadata and reject values that cannot be exported without loss.
+- Show accurate Research Library availability when research is disabled by its effective settings or already exists.
+- Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
+- Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
+- Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
+- Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting values.
+- Identify the mod and version change that caused an unrecorded worker-cargo upgrade to be refused.
+- Accept compatible Bob material definitions with changed item icons or a higher supported engine minimum.
+
 ## [5.0.15] - 2026-11-16
 
 ### Bugfixes

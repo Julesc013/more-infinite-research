@@ -151,13 +151,8 @@ end
 -- Select and retain the bounded authored rows during control parsing, before
 -- Factorio freezes imports for callbacks. Later callers receive detached rows
 -- from the pure catalogue's cache.
--- A few host controls inject a minimal declaration stub in place of the
--- shipped module; the real player module always supplies this preparation
--- hook.
-if type(catalogue.prepare) == "function" then
-  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage,
-    admission_facts.worker_default_split)
-end
+catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage,
+  admission_facts.worker_default_split)
 
 function M.declared()
   local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage,

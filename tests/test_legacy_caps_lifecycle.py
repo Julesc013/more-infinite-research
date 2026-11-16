@@ -55,7 +55,8 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             result.prototype = {max_level = 4294967295,
               effects = {{type = "worker-robot-speed", modifier = .65}}}
             local predecessor = name == "worker-robots-speed-7"
-              and "worker-robots-speed-6" or "worker-robots-speed-5"
+              and "worker-robots-speed-6" or name == "worker-robots-speed-10"
+              and "worker-robots-speed-9" or "worker-robots-speed-5"
             result.prerequisites = {[predecessor] = {name = predecessor}}
             return result
           end
@@ -1225,6 +1226,36 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           lifecycle.on_configuration_changed()
           assert(not lower.enabled and lower.visible_when_disabled,
             "superseded worker tail gained restoration rights")
+        ''')
+
+    def test_release_scope_does_not_select_tail_ten_for_configuration_or_events(self):
+        self.lua.execute('''
+          local six = worker("worker-robots-speed-6")
+          six.prototype.max_level = 6
+          local seven = worker("worker-robots-speed-7")
+          seven.prototype.max_level = 7
+          local player = worker("worker-robots-speed-10")
+          player.level, player.enabled = 11, true
+          local foreign = worker("worker-robots-speed-10")
+          foreign.level, foreign.enabled = 11, false
+          local player_force = force(1, {[six.name] = six, [seven.name] = seven,
+            [player.name] = player})
+          local foreign_force = force(2, {[six.name] = worker(six.name),
+            [seven.name] = worker(seven.name), [foreign.name] = foreign})
+          foreign_force.technologies[six.name].prototype.max_level = 6
+          foreign_force.technologies[seven.name].prototype.max_level = 7
+          boot({[1] = player_force, [2] = foreign_force}, nil, nil, {worker_limit = 10})
+          lifecycle.on_configuration_changed()
+          local saved = storage.mir_caps and storage.mir_caps.owned_disabled or {}
+          assert(player.enabled and not foreign.enabled and next(saved) == nil,
+            "release scope selected the deferred SE tail ten during configuration")
+          player.enabled = true
+          lifecycle.on_research_finished({force = player_force, research = player})
+          assert(player.enabled and next(saved) == nil,
+            "release scope selected the deferred SE tail ten after ordinary research")
+          lifecycle.on_research_finished({force = foreign_force, research = foreign})
+          assert(not foreign.enabled and next(saved) == nil,
+            "release scope claimed ownership of the deferred foreign SE tail")
         ''')
 
     def test_disabled_gear_feature_never_gains_enablement_from_old_or_current_rights(self):
