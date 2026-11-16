@@ -34,6 +34,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
           git fetch --no-tags --depth=1 origin a6ace8a48dd59b3f5eb46722273d7545e0de7011
           if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
@@ -174,6 +182,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
           git fetch --no-tags --depth=1 origin a6ace8a48dd59b3f5eb46722273d7545e0de7011
           if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
