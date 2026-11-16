@@ -258,6 +258,10 @@ class NativeOwnersTests(unittest.TestCase):
           assert(lookup_ok == false,
             "earlier lookup failure selected later owner " .. tostring(lookup_owner))
           assert(#lookup_calls == 1 and lookup_calls[1] == "worker-robots-speed-7")
+          local lookup_message = tostring(lookup_owner)
+          assert(lookup_message:find("lookup failed for worker%-robots%-speed%-7")
+              and lookup_message:find("foreign lookup failure", 1, true),
+            "lookup rejection discarded its candidate or original cause: " .. lookup_message)
 
           local seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6")
           seven.prototype.max_level = nil
@@ -277,6 +281,10 @@ class NativeOwnersTests(unittest.TestCase):
           assert(admission_ok == false,
             "earlier admission failure selected later owner " .. tostring(admission_owner))
           assert(#admission_calls == 1 and admission_calls[1] == "worker-robots-speed-7")
+          local admission_message = tostring(admission_owner)
+          assert(admission_message:find("admission failed for worker%-robots%-speed%-7")
+              and admission_message:find("foreign property read failure", 1, true),
+            "admission rejection discarded its candidate or original cause: " .. admission_message)
         ''')
 
     def test_unrelated_growth_is_never_examined_or_mutated(self):

@@ -59,12 +59,12 @@ local function select(lookup, admits, modifiers)
     local candidate = CANDIDATES[index]
     local called, technology = pcall(lookup, candidate.name)
     if not called then
-      error("MIR native worker owner lookup failed for " .. candidate.name, 2)
+      error("MIR native worker owner lookup failed for " .. candidate.name .. ": " .. tostring(technology), 2)
     end
     local modifier = modifiers and modifiers[candidate.name] or 0.65
     local checked, accepted = pcall(admits, technology, candidate, modifier)
     if not checked then
-      error("MIR native worker owner admission failed for " .. candidate.name, 2)
+      error("MIR native worker owner admission failed for " .. candidate.name .. ": " .. tostring(accepted), 2)
     end
     if accepted then return candidate.name end
   end
