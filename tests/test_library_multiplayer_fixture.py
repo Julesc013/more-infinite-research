@@ -908,6 +908,40 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_linux_display_typed_envelope_survives_the_current_target_branch(self):
+        old_source = subprocess.run(
+            ["git", "show", "d5b1870841722afdad80e115a0eb38b24dc035c4:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Invoke-EntryBinding([string]$Path,[bool]$RouteFlag,$Envelope){
+            $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw $errors[0].Message}
+            $paramText=$ast.ParamBlock.Extent.Text
+            $assignments=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.AssignmentStatementAst]-and($candidate.Left.Extent.Text-ceq'$usesLinuxPrivateDisplays'-or$candidate.Left.Extent.Text-ceq'$linuxPrivateDisplays')},$true))
+            if($assignments.Count-ne1){throw 'current Linux display target assignment is absent or ambiguous'}
+            $assignment=$assignments[0].Extent.Text;$routeLiteral=if($RouteFlag){'$true'}else{'$false'}
+            $probe=[scriptblock]::Create($paramText+"`nSet-StrictMode -Version Latest`n`$target=[pscustomobject]@{linux_private_displays="+$routeLiteral+"}`n"+$assignment+"`nif("+$routeLiteral+"){if(-not(`$LinuxPrivateDisplays-is[Collections.IDictionary])-or-not`$usesLinuxPrivateDisplays){throw 'typed current envelope branch differs'}}else{if(`$null-ne`$LinuxPrivateDisplays-or`$usesLinuxPrivateDisplays){throw 'typed legacy envelope branch differs'}}`n[ordered]@{selected=`$usesLinuxPrivateDisplays}")
+            return & $probe -ArchiveLibrary 'library' -FactorioBin 'factorio' -ProfilePath 'profile' -FixtureSources @('fixture') -ExpectedMIRArchiveSha256 ('C'*64) -OutputRoot 'output' -LinuxPrivateDisplays $Envelope -RepoRoot $env:MIR_TEST_ROOT
+          }
+          $envelope=[ordered]@{python='python';display_cli='display';display_cli_sha256=('A'*64);display_module_sha256=('B'*64);checkout='checkout';roles=@()}
+          $current=Invoke-EntryBinding $env:MIR_TEST_WRAPPER $true $envelope;if($current.selected-ne$true){throw 'current typed current-route branch differs'}
+          $legacy=Invoke-EntryBinding $env:MIR_TEST_WRAPPER $false $null;if($legacy.selected-ne$false){throw 'current typed legacy-route branch differs'}
+          foreach($case in @([pscustomobject]@{flag=$true;envelope=$envelope;name='current'},[pscustomobject]@{flag=$false;envelope=$null;name='legacy'})){$oldFailure=$null;try{Invoke-EntryBinding $env:MIR_TEST_OLD_WRAPPER $case.flag $case.envelope|Out-Null}catch{$oldFailure=$_.Exception.Message};if($oldFailure-notmatch'Cannot convert value'){throw "d5 typed-envelope counterfactual differs:$($case.name)/$oldFailure"}}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-linux-display-param-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-d5.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_ROOT": str(ROOT), "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_OLD_WRAPPER": str(old_wrapper)},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_standalone_f210_api_client_profile_binds_the_exact_current_six_mod_closure(self):
         profile = json.loads(STANDALONE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
         self.assertEqual(profile["kind"], "mir5-library-api-consumers-standalone-f210-native-selection")
@@ -4459,7 +4493,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
             $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
             $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
             $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
-            $ComposeOnly=$true;$linuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
+            $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
             $selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})}
             $target=[pscustomobject]@{fixture_archive_sha256=('B'*64)};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
             $linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false
@@ -4520,7 +4554,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
           $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
           $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
           $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
-          $ComposeOnly=$true;$linuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer';$selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})};$target=[pscustomobject]@{fixture_archive_sha256=('B'*64)};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
+          $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer';$selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})};$target=[pscustomobject]@{fixture_archive_sha256=('B'*64)};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
           $linuxDisplayRuntime=[ordered]@{roles=@()};$script:preparationCalls=0;$script:nativeCalls=0;$script:activationCalls=0;$script:launchCalls=0;$script:writeCalls=0;$script:composeExited=$false
           function Invoke-MultiplayerFixturePreparation {$script:preparationCalls++;throw 'CreateOnly must not run'}
           function Invoke-MIRNativeProbeProcess {$script:nativeCalls++;throw 'native process must not run'}

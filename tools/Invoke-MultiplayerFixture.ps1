@@ -967,8 +967,8 @@ $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.sta
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
 $positivePrivateStateChecks=($target.PSObject.Properties['positive_private_state_checks'] -and $target.positive_private_state_checks -eq $true)
-$linuxPrivateDisplays=($target.PSObject.Properties['linux_private_displays'] -and $target.linux_private_displays -eq $true)
-if($linuxPrivateDisplays){
+$usesLinuxPrivateDisplays=($target.PSObject.Properties['linux_private_displays'] -and $target.linux_private_displays -eq $true)
+if($usesLinuxPrivateDisplays){
   Assert-Session ($LinuxPrivateDisplays -is [System.Collections.IDictionary]) 'current Linux Library selection requires two bound private-display plans'
   Assert-Session ($LinuxPrivateDisplays.Keys.Count -eq 6 -and $LinuxPrivateDisplays.Contains('python') -and $LinuxPrivateDisplays.Contains('display_cli') -and $LinuxPrivateDisplays.Contains('display_cli_sha256') -and $LinuxPrivateDisplays.Contains('display_module_sha256') -and $LinuxPrivateDisplays.Contains('checkout') -and $LinuxPrivateDisplays.Contains('roles')) 'current Linux private-display plan shape differs'
   Assert-Session ($LinuxPrivateDisplays.python -is [string] -and $LinuxPrivateDisplays.display_cli -is [string] -and $LinuxPrivateDisplays.checkout -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -is [string] -and $LinuxPrivateDisplays.display_module_sha256 -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $LinuxPrivateDisplays.display_module_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'current Linux private-display pins differ'
@@ -1014,7 +1014,7 @@ $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.Fu
 $preparation=Join-Path $output 'preparation'
 $activation=$null;$resources=$null;$failure=$null
 $linuxDisplayRuntime=$null
-if($linuxPrivateDisplays){
+if($usesLinuxPrivateDisplays){
   # Current Linux display plans must be schema-accepted before a CreateOnly
   # world is considered. Their runtime roots are always direct children of the
   # one future governed session root, never caller-selected sibling paths.
@@ -1023,7 +1023,7 @@ if($linuxPrivateDisplays){
   $linuxDisplayRuntime=New-LinuxPrivateDisplayRuntime -Binding $LinuxPrivateDisplays -Context $resources
 }
 if($ComposeOnly){
-  Assert-Session ($linuxPrivateDisplays-and-not$StandaloneIdentityDiscovery-and$FixtureCase-ceq'library-multiplayer') 'ComposeOnly is limited to the current Linux Library selection'
+  Assert-Session ($usesLinuxPrivateDisplays-and-not$StandaloneIdentityDiscovery-and$FixtureCase-ceq'library-multiplayer') 'ComposeOnly is limited to the current Linux Library selection'
   $baseRows=Read-MIRDirectLibraryStartupProfile -Path $profile
   $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
   $declaredHashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$declaredHashes[[string]$entry.Key]=[string]$entry.Value}
@@ -1125,7 +1125,7 @@ try {
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
-    if($linuxPrivateDisplays){
+    if($usesLinuxPrivateDisplays){
       # The caller envelope was schema-checked before CreateOnly.  The session
       # receives only context-local role roots and their freshly bound plans.
       $spec.linux_private_displays=$linuxDisplayRuntime
@@ -1144,7 +1144,7 @@ try {
   $sessionArguments=@('-NoLogo','-NoProfile','-File',(Join-Path $PSScriptRoot 'Invoke-MultiplayerSession.ps1'),'-SpecPath',$specPath)
   # Every display leaf has a hard 900-second maximum.  The containing session
   # cannot outlive that bound on the Linux route, including its teardown.
-  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}elseif($linuxPrivateDisplays){900}else{1000})}
+  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}elseif($usesLinuxPrivateDisplays){900}else{1000})}
   if(-not $StandaloneIdentityDiscovery -and -not $standaloneF210){$processArguments.FactorioSteamIdentity=$true}
   $record.process=Invoke-MIRNativeProbeProcess @processArguments
   $session=Get-Content -LiteralPath (Join-Path $resources.root 'session.json') -Raw|ConvertFrom-Json
