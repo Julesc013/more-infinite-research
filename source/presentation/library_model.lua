@@ -142,6 +142,8 @@ local function copy_declaration(value)
   if type(value) ~= "table" then return nil end
   local id = bounded_string(value.id, MAX_SEARCH)
   if not id then return nil end
+  local fixed_maximum = value.fixed_maximum
+  if fixed_maximum ~= nil and (not finite_integer(fixed_maximum) or fixed_maximum < 1) then return nil end
   local settings = {}
   if type(value.settings) == "table" then
     for index = 1, #value.settings do
@@ -159,7 +161,8 @@ local function copy_declaration(value)
     settings = settings,
     cap_setting = bounded_string(value.cap_setting, MAX_SEARCH),
     recipe = bounded_string(value.recipe, MAX_SEARCH),
-    locale_key = bounded_string(value.locale_key, MAX_TEXT)
+    locale_key = bounded_string(value.locale_key, MAX_TEXT),
+    fixed_maximum = fixed_maximum
   }
 end
 
@@ -327,6 +330,7 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
     cap = cap,
     cap_state = cap_state,
     current_level = native_read(technology, "level"),
+    fixed_maximum = declaration and declaration.fixed_maximum or nil,
     researched = researched,
     enabled = enabled,
     visible = visible,
@@ -476,14 +480,38 @@ local function row_matches(row, view, technology, context)
     or recipe_id_matches(technology, view.search, context)
 end
 
+-- A finite authored head and its continuation share their family, localized
+-- subject and first level. Keep their native identities separate while
+-- presenting the finite head before the continuation before or after labels
+-- arrive from the asynchronous translation cache.
+local function same_declared_stage(left, right)
+  return type(left) == "table" and type(right) == "table"
+    and type(left.family) == "string" and left.family == right.family
+    and type(left.locale_key) == "string" and left.locale_key == right.locale_key
+    and finite_integer(left.progression) and left.progression == right.progression
+    and (left.fixed_maximum ~= nil or right.fixed_maximum ~= nil)
+end
+
+local function staged_before(left, right)
+  if not same_declared_stage(left, right) then return nil end
+  local left_fixed = finite_integer(left.fixed_maximum) and left.fixed_maximum > 0
+  local right_fixed = finite_integer(right.fixed_maximum) and right.fixed_maximum > 0
+  if left_fixed ~= right_fixed then return left_fixed end
+  if left_fixed and left.fixed_maximum ~= right.fixed_maximum then return left.fixed_maximum < right.fixed_maximum end
+  return nil
+end
+
 local function ordered(left, right, sort)
+  local staged = staged_before(left, right)
+  if staged ~= nil then return staged end
   if sort == "name-asc" or sort == "name-desc" then
     local left_name, right_name = ascii_casefold(left.name), ascii_casefold(right.name)
     if left_name ~= right_name then
       if sort == "name-asc" then return left_name < right_name end
       return left_name > right_name
     end
-  elseif sort == "native" then
+  end
+  if sort == "native" then
     if left.native_order ~= right.native_order then return left.native_order < right.native_order end
     if left.progression ~= right.progression then return left.progression < right.progression end
   else

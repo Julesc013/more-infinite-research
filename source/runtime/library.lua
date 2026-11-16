@@ -1107,6 +1107,57 @@ local function caption(row, player)
   return row.id or ""
 end
 
+local function stage_group_key(row)
+  if type(row) ~= "table" or type(row.family) ~= "string" or row.family == ""
+      or type(row.locale_key) ~= "string" or row.locale_key == ""
+      or not whole_number(row.progression, 1) then return nil end
+  return row.family .. "\30" .. row.locale_key .. "\30" .. tostring(row.progression)
+end
+
+-- Rows are grouped from authored scalar stage facts, never from localized
+-- caption objects. Translation may arrive after opening the Library, while
+-- the stage distinction must already be visible and deterministic.
+local function stage_annotations(rows)
+  local groups, annotations = {}, {}
+  for _, row in ipairs(rows) do
+    local key = stage_group_key(row)
+    if key then
+      local group = groups[key] or {}
+      group[#group + 1], groups[key] = row, group
+    end
+  end
+  for _, group in pairs(groups) do
+    local bounded = false
+    for _, row in ipairs(group) do
+      if whole_number(row.fixed_maximum, 1) then bounded = true; break end
+    end
+    if bounded and #group > 1 then
+      table.sort(group, function(left, right)
+        local left_fixed, right_fixed = whole_number(left.fixed_maximum, 1), whole_number(right.fixed_maximum, 1)
+        if left_fixed ~= right_fixed then return left_fixed end
+        if left_fixed and left.fixed_maximum ~= right.fixed_maximum then return left.fixed_maximum < right.fixed_maximum end
+        return left.id < right.id
+      end)
+      for index, row in ipairs(group) do
+        annotations[row.id] = {position = index, total = #group, fixed_maximum = row.fixed_maximum}
+      end
+    end
+  end
+  return annotations
+end
+
+local function list_caption(row, player, stage)
+  local text = caption(row, player)
+  if type(stage) ~= "table" then return text end
+  local cap = whole_number(row.cap, 1) and row.cap or nil
+  if whole_number(stage.fixed_maximum, 1) then
+    if cap then return {"mir-browser.list-stage-finite-capped", text, stage.position, stage.total, stage.fixed_maximum, cap} end
+    return {"mir-browser.list-stage-finite", text, stage.position, stage.total, stage.fixed_maximum}
+  end
+  if cap then return {"mir-browser.list-stage-capped", text, stage.position, stage.total, row.progression, cap} end
+  return {"mir-browser.list-stage-continuation", text, stage.position, stage.total, row.progression}
+end
+
 local function row_index(rows, selected)
   for index, row in ipairs(rows) do
     if row.id == selected then return index end
@@ -1556,9 +1607,10 @@ local function update_research_content(content, player, view, context, translati
   end
 
   local rows = rows_for(player, view, context, translations)
+  local stages = stage_annotations(rows)
   local item_labels = {}
   for index, row in ipairs(rows) do
-    local text = caption(row, player)
+    local text = list_caption(row, player, stages[row.id])
     item_labels[index] = known_technology(player, row.id)
       and {"", "[img=technology/" .. row.id .. "] ", text} or text
   end

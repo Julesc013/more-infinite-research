@@ -9,6 +9,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Apply the worker robot speed limit to Space Exploration's infinite research beginning at level 10.
 - Avoid invalid GUI style reads when refreshing the Research Library's Settings tab.
 - Reject incomplete internal preservation interfaces before changing research.
+- Distinguish finite and continuing research stages with the same localized name in the Research Library, including configured caps.
 
 ## [5.0.16] - 2026-11-16
 

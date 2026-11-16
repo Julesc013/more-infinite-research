@@ -4130,10 +4130,13 @@ class LibraryTests(unittest.TestCase):
           }
           boot()
 
+          -- Native public stages deliberately share their localized technology
+          -- caption.  The Library must present the separate authored stages
+          -- without substituting either literal technology identity.
           local retired = {valid=true, name=retired_id, level=4, researched=true, enabled=false,
-            visible_when_disabled=true, localised_name="Retired worker storage head", prototype=retired_prototype}
+            visible_when_disabled=true, localised_name="Worker robot storage", prototype=retired_prototype}
           local tail = {valid=true, name=tail_id, level=7, researched=false, enabled=true,
-            visible_when_disabled=true, localised_name="Current worker storage tail", prototype=tail_prototype,
+            visible_when_disabled=true, localised_name="Worker robot storage", prototype=tail_prototype,
             research_unit_count=9100, research_unit_energy=60,
             research_unit_ingredients={{name="automation-science-pack", amount=1}}}
           local queue = {tail, tail}
@@ -4150,6 +4153,15 @@ class LibraryTests(unittest.TestCase):
           assert(declared[retired_id].fixed_maximum == 4 and declared[tail_id].fixed_maximum == nil,
             "the retired finite head and ordinary tail lost their separate contracts")
 
+          local ordinary = library.open(player, {selected=gear.name})
+          local ordinary_rows = research_content(ordinary).mir_library_list_pane.mir_library_results
+          assert(ordinary_rows.items[1][3] == gear.localised_name,
+            "an unrelated ordinary research should keep its native list caption")
+          library.set_cap_provider(function(force)
+            assert(force == player.force)
+            return {[tail_id] = 8}
+          end)
+
           local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
           local head_level, tail_level = retired.level, tail.level
           local head_enabled, tail_enabled = retired.enabled, tail.enabled
@@ -4161,13 +4173,34 @@ class LibraryTests(unittest.TestCase):
           -- After parse, callbacks must consume those retained rows and never
           -- re-import a model or reconstruct a substituted ownership route.
           require = function(name) error("Library callback imported " .. tostring(name)) end
-          local root = library.open(player, {family="worker-robots-storage", selected=tail_id})
+          local root = library.open(player, {family="worker-robots-storage", selected=tail_id, sort="name-asc"})
           local state = storage.mir_library.players[1]
           local content = research_content(root)
           local detail = content["mir_library_detail"]
           assert(state.selected == tail_id and detail["mir_library_research_facts"]
             ["mir_library_detail_heading"]["mir_library_detail_title"].caption == tail.localised_name,
             "Library selection or detail relabeled the ordinary default worker tail")
+
+          local labels = {}
+          for _, item in ipairs(content["mir_library_list_pane"]["mir_library_results"].items) do
+            if item[2] == "[img=technology/" .. retired_id .. "] " then labels[retired_id] = item[3] end
+            if item[2] == "[img=technology/" .. tail_id .. "] " then labels[tail_id] = item[3] end
+          end
+          local items = content["mir_library_list_pane"]["mir_library_results"].items
+          assert(items[1][2] == "[img=technology/" .. retired_id .. "] "
+            and items[2][2] == "[img=technology/" .. tail_id .. "] ",
+            "a same-caption name sort must retain the authored finite-to-continuation order")
+          assert(labels[retired_id] and labels[tail_id] and labels[retired_id] ~= labels[tail_id],
+            "same-caption public worker stages need distinct list choices")
+          assert(labels[retired_id][1] == "mir-browser.list-stage-finite"
+            and labels[retired_id][2] == "Worker robot storage"
+            and labels[retired_id][3] == 1 and labels[retired_id][4] == 2 and labels[retired_id][5] == 4,
+            "the finite public stage lost its authored endpoint")
+          assert(labels[tail_id][1] == "mir-browser.list-stage-capped"
+            and labels[tail_id][2] == "Worker robot storage"
+            and labels[tail_id][3] == 2 and labels[tail_id][4] == 2
+            and labels[tail_id][5] == 4 and labels[tail_id][6] == 8,
+            "the continuation must show its configured cap without exposing its internal ID")
 
           local actions = content["mir_library_list_pane"]["mir_library_actions"]
           library.on_gui_click({player_index=1, element=actions["mir_library_open_native"]})
