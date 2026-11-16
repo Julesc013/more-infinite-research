@@ -41,6 +41,7 @@ $controls = @(
   [ordered]@{path='tests/test_migration_origins_f200_120_successor_controls.py';lua=$true},
   [ordered]@{path='tests/test_migration_origins_successor_controls.py';lua=$true},
   [ordered]@{path='tests/test_modern_targets.py';lua=$true},
+  [ordered]@{path='tests/test_lua_table_values.py';lua=$true},
   [ordered]@{path='tests/test_k2_base_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_k2_native_space_age.py';lua=$true},
   [ordered]@{path='tests/test_space_exploration_catalogue.py';lua=$true},
