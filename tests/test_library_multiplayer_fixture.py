@@ -4402,13 +4402,26 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_linux_display_runtime_composition_derives_context_local_roles_before_native_preparation(self):
+    def test_linux_display_runtime_composition_derives_role_display_from_exact_nine_field_leaf_plans_before_native_preparation(self):
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw $errors[0].Message}
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $script:leafFields=@('schema','kind','role','geometry','role_root','deadline_seconds','xtigervnc','xauth','probe_display')
+          function Assert-CanonicalLeafPlan([Collections.IDictionary]$Plan,$Role,[string]$Label){
+            Assert-Session ($Plan.Keys.Count-eq$script:leafFields.Count) ($Label+' plan field count differs')
+            foreach($field in $script:leafFields){Assert-Session ($Plan.Contains($field)) ($Label+' plan field differs: '+$field)}
+            Assert-Session (-not$Plan.Contains('display')) ($Label+' plan accepts a raw display field')
+            Assert-Session ([string]$Plan.schema-ceq'MIRLinuxLibraryDisplayPlanV1'-and[string]$Plan.kind-ceq'MIRLinuxLibraryDisplayPlanV1'-and[string]$Plan.role-ceq[string]$Role.role) ($Label+' plan identity differs')
+            Assert-Session ((@($Plan.geometry)-join',')-ceq'1280,720'-and[string]$Plan.role_root-ceq[string]$Role.role_root-and[int]$Plan.deadline_seconds-eq900) ($Label+' plan geometry or root differs')
+            foreach($pinName in @('xtigervnc','xauth','probe_display')){
+              $pin=$Plan[$pinName]
+              Assert-Session ($pin-is[Collections.IDictionary]-and$pin.Keys.Count-eq3-and$pin.Contains('path')-and$pin.Contains('bytes')-and$pin.Contains('sha256')-and$pin.path-is[string]-and$pin.bytes-is[Int64]-and$pin.sha256-cmatch'^[A-Fa-f0-9]{64}$') ($Label+' '+$pinName+' pin differs')
+            }
+          }
+          function New-Pin([string]$Path){$item=Get-Item -LiteralPath $Path -Force;[ordered]@{path=$item.FullName;bytes=[Int64]$item.Length;sha256=(Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToUpperInvariant()}}
           foreach($name in @('Assert-LinuxDisplayPinnedFile','Get-LinuxDisplayProbePythonPin','Invoke-LinuxDisplaySchema','New-LinuxPrivateDisplayRuntime')){
             $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
             if($node.Count-ne1){throw "missing runtime composition definition:$name"};Invoke-Expression $node[0].Extent.Text
@@ -4417,22 +4430,28 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
           $python=Join-Path $root 'python';[IO.File]::WriteAllText($python,'# fake Python',[Text.UTF8Encoding]::new($false))
           $cli=Join-Path $input 'tools/Invoke-LibraryLinuxDisplay.py';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $cli) -Force;[IO.File]::WriteAllText($cli,'# fake CLI',[Text.UTF8Encoding]::new($false))
           $module=Join-Path $input 'tools/lib/validation/LinuxLibraryDisplay.py';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $module) -Force;[IO.File]::WriteAllText($module,'# fake module',[Text.UTF8Encoding]::new($false))
+          $xtigervnc=Join-Path $root 'Xtigervnc';[IO.File]::WriteAllText($xtigervnc,'# fake Xtigervnc',[Text.UTF8Encoding]::new($false))
+          $xauth=Join-Path $root 'xauth';[IO.File]::WriteAllText($xauth,'# fake xauth',[Text.UTF8Encoding]::new($false))
           $pythonHash=(Get-FileHash -LiteralPath $python -Algorithm SHA256).Hash.ToUpperInvariant()
           $probe=Join-Path $root 'qualified-probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$python+"': '"+$pythonHash+"',`n}`n"),[Text.UTF8Encoding]::new($false))
-          $probeItem=Get-Item -LiteralPath $probe
           $probeHash=(Get-FileHash -LiteralPath $probe -Algorithm SHA256).Hash.ToUpperInvariant()
           $roles=@()
           foreach($locale in @('en','de')){
             $roleRoot=Join-Path $input ('build/p/input-'+$locale);$null=New-Item -ItemType Directory -Path $roleRoot
-            $plan=[ordered]@{schema='MIRLinuxLibraryDisplayPlanV1';kind='MIRLinuxLibraryDisplayPlanV1';role=('client-'+$locale);display=$(if($locale-ceq'en'){':193'}else{':194'});geometry=@(1280,720);role_root=$roleRoot;deadline_seconds=900;probe_display=[ordered]@{path=$probe;bytes=[Int64]$probeItem.Length;sha256=$probeHash}}
+            $plan=[ordered]@{schema='MIRLinuxLibraryDisplayPlanV1';kind='MIRLinuxLibraryDisplayPlanV1';role=('client-'+$locale);geometry=@(1280,720);role_root=$roleRoot;deadline_seconds=900;xtigervnc=(New-Pin $xtigervnc);xauth=(New-Pin $xauth);probe_display=(New-Pin $probe)}
             $path=Join-Path $input ('plan-'+$locale+'.json');[IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $plan -Depth 10),[Text.UTF8Encoding]::new($false))
             $roles += [ordered]@{locale=$locale;role=('client-'+$locale);display=$(if($locale-ceq'en'){':193'}else{':194'});geometry='1280x720';plan=$path;plan_sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash;ready=(Join-Path $roleRoot 'display-ready.json');result=(Join-Path $roleRoot 'display-result.json');role_root=$roleRoot;authority=(Join-Path $roleRoot 'authority')}
+          }
+          foreach($role in $roles){
+            Assert-Session ($role.Keys.Count-eq10-and$role.Contains('display')-and$role.Contains('role')-and$role.Contains('plan')) 'caller role envelope is not the distinct ten-field display binding'
           }
           $binding=[ordered]@{python=$python;display_cli=$cli;display_cli_sha256=(Get-FileHash -LiteralPath $cli -Algorithm SHA256).Hash;display_module_sha256=(Get-FileHash -LiteralPath $module -Algorithm SHA256).Hash;checkout=$input;roles=$roles}
           $runtime=Join-Path $root 'runtime';$null=New-Item -ItemType Directory -Path $runtime
           $context=[pscustomobject]@{root=$runtime};$script:schemas=[Collections.Generic.List[object]]::new();$script:planSwapped=$false
           $schema={param($actualBinding,$actualRole,$label)
             $script:schemas.Add([pscustomobject]@{checkout=[string]$actualBinding.checkout;role=$actualRole;label=$label})
+            $candidate=Get-Content -LiteralPath ([string]$actualRole.plan) -Raw|ConvertFrom-Json -AsHashtable
+            Assert-CanonicalLeafPlan -Plan $candidate -Role $actualRole -Label $label
             if($label-ceq'private display en original'){
               $before=[IO.File]::ReadAllBytes([string]$actualRole.plan);$replacement=[regex]::Replace([Text.UTF8Encoding]::new($false).GetString($before),'"deadline_seconds"\s*:\s*900','"deadline_seconds": 800',1)
               $after=[Text.UTF8Encoding]::new($false).GetBytes($replacement)
@@ -4449,30 +4468,48 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
           foreach($role in @($derived.roles)){
             if(-not $role.plan.StartsWith((Join-Path $runtime 'display-plans')) -or -not $role.authority.StartsWith($role.role_root)){throw 'derived role paths differ'}
             $plan=Get-Content -LiteralPath $role.plan -Raw|ConvertFrom-Json -AsHashtable
-            $expectedDeadline=if([string]$role.locale-ceq'en'){[int]$env:MIR_TEST_EN_DEADLINE}else{900}
-            if($plan.role_root-cne$role.role_root-or$plan.probe_display.sha256-cne$derived.probe_display_sha256-or$plan.deadline_seconds-ne$expectedDeadline){throw ('derived role plan changed non-role input: '+[string]$role.locale+'/'+[string]$plan.role_root+'/'+[string]$role.role_root+'/'+[string]$plan.probe_display.sha256+'/'+[string]$derived.probe_display_sha256+'/'+[string]$plan.deadline_seconds+'/'+[string]$expectedDeadline)}
+            Assert-CanonicalLeafPlan -Plan $plan -Role $role -Label ('derived '+[string]$role.locale)
+            if($plan.role_root-cne$role.role_root-or$plan.probe_display.sha256-cne$derived.probe_display_sha256-or$plan.deadline_seconds-ne900){throw ('derived role plan changed non-role input: '+[string]$role.locale+'/'+[string]$plan.role_root+'/'+[string]$role.role_root+'/'+[string]$plan.probe_display.sha256+'/'+[string]$derived.probe_display_sha256+'/'+[string]$plan.deadline_seconds)}
           }
+          $extraRoot=Join-Path $root 'extra-display';$null=New-Item -ItemType Directory -Path $extraRoot
+          $extraRoles=@()
+          foreach($role in $roles){
+            $copy=[ordered]@{};foreach($entry in $role.GetEnumerator()){$copy[$entry.Key]=$entry.Value}
+            $extraPlan=Get-Content -LiteralPath ([string]$role.plan) -Raw|ConvertFrom-Json -AsHashtable;$extraPlan.display=[string]$role.display
+            $extraPath=Join-Path $input ('extra-plan-'+[string]$role.locale+'.json');[IO.File]::WriteAllText($extraPath,(ConvertTo-Json -InputObject $extraPlan -Depth 10),[Text.UTF8Encoding]::new($false))
+            $copy.plan=$extraPath;$copy.plan_sha256=(Get-FileHash -LiteralPath $extraPath -Algorithm SHA256).Hash;$extraRoles += $copy
+          }
+          $extra=[ordered]@{};foreach($entry in $binding.GetEnumerator()){$extra[$entry.Key]=$entry.Value};$extra.roles=@($extraRoles)
+          $extraCaught=$false;try{New-LinuxPrivateDisplayRuntime -Binding $extra -Context ([pscustomobject]@{root=$extraRoot}) -SchemaInvoker $schema -ExpectedProbeSha256 $probeHash|Out-Null}catch{$extraCaught=$true}
+          if(-not$extraCaught-or(Test-Path -LiteralPath (Join-Path $extraRoot 'build'))){throw 'raw display leaf plan did not refuse before a runtime root'}
           $bad=[ordered]@{};foreach($entry in $binding.GetEnumerator()){$bad[$entry.Key]=$entry.Value};$bad.roles=@($roles|ForEach-Object {$copy=[ordered]@{};foreach($entry in $_.GetEnumerator()){$copy[$entry.Key]=$entry.Value};$copy.plan_sha256=('0'*64);$copy})
           $blocked=Join-Path $root 'blocked';$null=New-Item -ItemType Directory -Path $blocked
           $caught=$false;try{New-LinuxPrivateDisplayRuntime -Binding $bad -Context ([pscustomobject]@{root=$blocked}) -SchemaInvoker $schema|Out-Null}catch{$caught=$true}
           if(-not$caught-or(Test-Path -LiteralPath (Join-Path $blocked 'build'))){throw 'wrong original plan hash mutated a runtime root'}
         '''
         old_source = subprocess.run(
-            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerFixture.ps1"],
+            ["git", "show", "d88e1b13c334235dc1a7457af733ce812cd2d99c:tools/Invoke-MultiplayerFixture.ps1"],
             cwd=ROOT, capture_output=True, check=False,
         )
         self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
         with tempfile.TemporaryDirectory(prefix="mir5-linux-display-runtime-", dir=ROOT / "build/tmp") as work:
-            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-57b8.ps1"
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-d88.ps1"
             old_wrapper.write_bytes(old_source.stdout)
-            for name, wrapper, expected_en_deadline in (("current", WRAPPER, "900"), ("old", old_wrapper, "800")):
-                result = subprocess.run(
-                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
-                    capture_output=True, text=True,
-                    env={**os.environ, "MIR_TEST_WRAPPER": str(wrapper), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EN_DEADLINE": expected_en_deadline},
-                    check=False,
-                )
-                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+            current = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_WORK": str(Path(work) / "current")},
+                check=False,
+            )
+            self.assertEqual(current.returncode, 0, current.stdout + current.stderr)
+            old = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(old_wrapper), "MIR_TEST_WORK": str(Path(work) / "old")},
+                check=False,
+            )
+            self.assertNotEqual(old.returncode, 0, old.stdout + old.stderr)
+            self.assertIn("private display admitted plan field differs: display", old.stdout + old.stderr)
 
     def test_compose_only_disposes_the_borrowed_library_lease_when_restoration_throws(self):
         old_source = subprocess.run(
@@ -4496,7 +4533,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
             $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
             $selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})}
             $target=[pscustomobject]@{fixture_archive_sha256=('B'*64)};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
-            $linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false
+            $LinuxPrivateDisplays=[ordered]@{};$linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false
             function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
             function Invoke-MultiplayerFixturePreparation {throw 'CreateOnly must not run'}
             function Invoke-MIRNativeProbeProcess {throw 'native process must not run'}
@@ -4518,7 +4555,9 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
             function Complete-MIRLibraryActivation {param($Activation)$Activation.closed=$true;throw 'expected restoration failure'}
             function Write-MIRNativeProbeResult {param($Context,$Record)throw 'result write must not run'}
             $failure=$null;try{Invoke-Expression $body}catch{$failure=$_.Exception.Message}
-            $stream=Get-Variable -Name lease -ValueOnly
+            $leaseVariable=Get-Variable -Name lease -ErrorAction SilentlyContinue
+            if($null-eq$leaseVariable){throw ('ComposeOnly did not create a borrowed lease: '+[string]$failure)}
+            $stream=$leaseVariable.Value
             $disposed=$stream.SafeFileHandle.IsClosed;$reopened=$false;$probe=$null
             try{$probe=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None);$reopened=$true}catch{}
             if($null-ne$probe){$probe.Dispose()}

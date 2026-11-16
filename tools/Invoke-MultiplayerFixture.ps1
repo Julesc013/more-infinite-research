@@ -874,10 +874,12 @@ function New-LinuxPrivateDisplayRuntime {
     Assert-Session ($null-ne$admitted-and$admitted.sha256-ceq[string]$role.plan_sha256.ToUpperInvariant()) 'private display authenticated plan is absent'
     $plan=$admitted.raw|ConvertFrom-Json -AsHashtable
     Assert-Session ($plan-is[Collections.IDictionary]) 'private display plan body differs'
-    foreach($field in @('schema','kind','role','display','geometry','deadline_seconds','probe_display')){Assert-Session ($plan.Contains($field)-and$admitted.plan.Contains($field)) "private display admitted plan field differs: $field"}
+    $leafPlanFields=@('schema','kind','role','geometry','role_root','deadline_seconds','xtigervnc','xauth','probe_display')
+    Assert-Session ($plan.Keys.Count-eq$leafPlanFields.Count-and$admitted.plan.Keys.Count-eq$leafPlanFields.Count) 'private display admitted plan shape differs'
+    foreach($field in $leafPlanFields){Assert-Session ($plan.Contains($field)-and$admitted.plan.Contains($field)) "private display admitted plan field differs: $field"}
     $sameGeometry=(@($plan.geometry)-join',')-ceq(@($admitted.plan.geometry)-join',')
     $sameProbe=($plan.probe_display.path-ceq$admitted.plan.probe_display.path)-and($plan.probe_display.bytes-eq$admitted.plan.probe_display.bytes)-and($plan.probe_display.sha256-ceq$admitted.plan.probe_display.sha256)
-    Assert-Session (($plan.role-ceq$admitted.plan.role)-and($plan.display-ceq$admitted.plan.display)-and$sameGeometry-and($plan.deadline_seconds-eq$admitted.plan.deadline_seconds)-and$sameProbe) 'private display runtime plan differs from its admitted source'
+    Assert-Session (($plan.role-ceq[string]$role.role)-and($plan.role-ceq$admitted.plan.role)-and$sameGeometry-and($plan.deadline_seconds-eq$admitted.plan.deadline_seconds)-and$sameProbe) 'private display runtime plan differs from its admitted source'
     $plan.role_root=$roleRoot
     $runtimePlan=Join-Path $runtimePlans ('client-'+$locale+'.json')
     [IO.File]::WriteAllText($runtimePlan,(ConvertTo-Json -InputObject $plan -Depth 12 -Compress)+"`n",[Text.UTF8Encoding]::new($false))
