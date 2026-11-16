@@ -168,6 +168,7 @@ local function carrier(name, recipe, change)
     hidden = true,
     enabled = false,
     visible_when_disabled = false,
+    ignore_tech_cost_multiplier = true,
     max_level = "infinite",
     order = ORDER_PREFIX .. name,
     effects = {{type = "change-recipe-productivity", recipe = recipe, change = change}},

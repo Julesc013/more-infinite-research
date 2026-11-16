@@ -8,6 +8,7 @@ Version: 5.0.16
     - Show accurate Research Library availability when research is disabled by its effective settings or already exists.
     - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original
       save.
+    - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.15
