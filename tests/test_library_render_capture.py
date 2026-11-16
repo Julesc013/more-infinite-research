@@ -341,6 +341,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
     def test_executed_render_observer_cannot_write_gui_fields_through_aliases(self):
         actor = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         for statement in ('local alias=player;alias.opened=nil',
+                          'local alias=player;alias["opened"]=nil',
                           'local alias=player.gui.screen.mir_research_browser;alias.text="forged"'):
             with self.subTest(statement=statement):
                 self.setUp(actor_source=actor + '\nscript.on_nth_tick(30,function() ' + statement + ' end)')
