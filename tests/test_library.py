@@ -261,6 +261,77 @@ class LibraryTests(unittest.TestCase):
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
+    def test_stateless_settings_detail_renderer_keeps_the_pre_extraction_tree_and_unavailable_path(self):
+        self.lua.execute(r'''
+          local renderer = require("runtime.library_settings_detail")
+          local original, calls, supplied = renderer.render, 0, nil
+          renderer.render = function(options)
+            calls, supplied = calls + 1, options
+            assert(options.parent and options.selected and options.detail_width > 0)
+            assert(type(options.prefix) == "string" and type(options.add) == "function"
+              and type(options.valid) == "function")
+            assert(type(options.section_gap) == "number" and type(options.control_gap) == "number")
+            assert(options.state == nil and options.cache == nil and options.player == nil,
+              "the stateless detail renderer received Library lifecycle state")
+            return original(options)
+          end
+          boot()
+          helpers = {encode_string=function(value) return value end,
+            decode_string=function(value) return value end,
+            json_to_table=function(value)
+              if value == "settings-detail-profile" then return {
+                schema=1, kind="mir-settings-profile", settings={
+                  ["ips-cost-base-research_gears"]=777
+                }}
+              end
+            end}
+          settings.startup = {
+            ["ips-enable-research_gears"]={value=false},
+            ["ips-cost-base-research_gears"]={value=4242},
+            ["ips-max-level-research_gears"]={value=0},
+            ["mir-settings-profile-import"]={value="MIRSET1:settings-detail-profile"}
+          }
+          local root = library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
+          local detail = root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
+            .mir_library_settings_detail
+          assert(calls == 1 and supplied.parent == detail and supplied.selected.fields[1]
+            and supplied.detail_width == detail.style.maximal_width)
+          local expected = {"mir_library_settings_title", "mir_library_settings_scope",
+            "mir_library_settings_effective_divider", "mir_library_settings_effective",
+            "mir_library_settings_fields", "mir_library_settings_source_divider",
+            "mir_library_settings_source", "mir_library_settings_source_summary"}
+          for index, name in ipairs(expected) do
+            assert(detail._children[index] == detail[name], "Settings detail tree changed at " .. name)
+          end
+          assert(#detail._children == #expected, "Settings detail gained an unexpected child")
+          local fields = detail.mir_library_settings_fields
+          assert(fields.mir_library_setting_1_value.caption[2][1] == "mir-browser.setting-off"
+            and fields.mir_library_setting_1_value.tooltip[3][1] == "mir-browser.setting-on",
+            "false/default display changed during extraction")
+          assert(fields.mir_library_setting_2_value.caption[2] == "777"
+            and fields.mir_library_setting_2_value.tooltip[2] == "4242"
+            and fields.mir_library_setting_2_profile_marker
+            and fields.mir_library_setting_2_source,
+            "profile override/default provenance tree changed during extraction")
+          assert(fields.mir_library_setting_5_value.caption[1] == "mir-browser.setting-unlimited",
+            "zero unlimited-cap display changed during extraction")
+          assert(detail.mir_library_settings_source_summary.caption[1] == "mir-browser.source-mirset1")
+          assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
+
+          library.close(player)
+          local catalogue = require("research.settings")
+          catalogue.registered_names = function() error("deliberate settings catalogue refusal") end
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          root = library.open(player, {tab="settings"})
+          local dynamic = root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
+          assert(dynamic.mir_library_settings_unavailable
+            and dynamic.mir_library_settings_unavailable.caption[1] == "mir-browser.detail-unavailable"
+            and calls == 1,
+            "catalogue refusal bypassed the existing unavailable path or invoked the detail renderer")
+          assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
+        ''')
+
     def test_unchanged_details_retain_widgets_snapshot_translation_tab_and_cold_load(self):
         self.lua.execute('''
           boot()
