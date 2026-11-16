@@ -271,6 +271,38 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
                 with self.assertRaisesRegex(Exception, "tab selection target invalid"):
                     self.lua.execute("emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=" + element + "})")
 
+    def test_live_owned_tab_indices_are_verified_after_selected_tab_event(self):
+        self.initialize_join_initial()
+        self.lua.execute(r'''
+          emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+          local root=open_library("");tick()
+          local tabs=root.mir_library_tabs
+          -- This is the real, owned tabbed pane.  Its default live index is
+          -- Research (1), even though the preceding click targets Help.
+          emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+        ''')
+        with self.assertRaisesRegex(Exception, "Help tab was not selected"):
+            self.lua.execute("tick()")
+
+        self.setUp()
+        self.initialize_join_initial()
+        self.lua.execute(r'''
+          emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+          local root=open_library("");tick()
+          local tabs=root.mir_library_tabs
+          emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+          tabs.selected_tab_index=4
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs});tick()
+          -- Keep the actual pane live at Help (4) after the real Research
+          -- click and selection event, so the deferred Research observation
+          -- must reject it rather than trusting the event alone.
+          emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+        ''')
+        with self.assertRaisesRegex(Exception, "Research personal view unavailable"):
+            self.lua.execute("tick()")
+
     def test_recreated_tab_handle_and_unset_style_values_remain_observable(self):
         self.lua.execute(r'''
           local original_open_library=open_library
