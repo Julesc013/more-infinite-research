@@ -142,8 +142,6 @@ local function copy_declaration(value)
   if type(value) ~= "table" then return nil end
   local id = bounded_string(value.id, MAX_SEARCH)
   if not id then return nil end
-  local fixed_maximum = value.fixed_maximum
-  if fixed_maximum ~= nil and (not finite_integer(fixed_maximum) or fixed_maximum < 1) then return nil end
   local settings = {}
   if type(value.settings) == "table" then
     for index = 1, #value.settings do
@@ -161,8 +159,7 @@ local function copy_declaration(value)
     settings = settings,
     cap_setting = bounded_string(value.cap_setting, MAX_SEARCH),
     recipe = bounded_string(value.recipe, MAX_SEARCH),
-    locale_key = bounded_string(value.locale_key, MAX_TEXT),
-    fixed_maximum = fixed_maximum
+    locale_key = bounded_string(value.locale_key, MAX_TEXT)
   }
 end
 
@@ -330,7 +327,6 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
     cap = cap,
     cap_state = cap_state,
     current_level = native_read(technology, "level"),
-    fixed_maximum = declaration and declaration.fixed_maximum or nil,
     researched = researched,
     enabled = enabled,
     visible = visible,
@@ -487,8 +483,7 @@ local function ordered(left, right, sort)
       if sort == "name-asc" then return left_name < right_name end
       return left_name > right_name
     end
-  end
-  if sort == "native" then
+  elseif sort == "native" then
     if left.native_order ~= right.native_order then return left.native_order < right.native_order end
     if left.progression ~= right.progression then return left.progression < right.progression end
   else
