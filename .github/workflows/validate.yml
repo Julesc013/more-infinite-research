@@ -36,6 +36,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
           git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
@@ -184,6 +186,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
           git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
