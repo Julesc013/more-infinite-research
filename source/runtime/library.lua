@@ -1673,6 +1673,25 @@ local function setting_value(startup, name, fallback)
   return fallback
 end
 
+local function setting_display(name, value)
+  if type(value) == "boolean" then return {"mir-browser.setting-" .. (value and "on" or "off")} end
+  if type(value) == "number" and value == 0 and type(name) == "string"
+      and name:find("%-max%-level%-", 1) then
+    return {"mir-browser.setting-unlimited"}
+  end
+  if type(value) == "number" and value == value and math.abs(value) ~= math.huge then
+    local compact = string.format("%.6g", value)
+    return tonumber(compact) == value and compact or "≈ " .. compact
+  end
+  local shown = tostring(value)
+  if #shown > 120 then
+    -- Keep the authored compact preview without splitting a UTF-8 character.
+    -- Configuration and profile export continue to use the original value.
+    return utf8_prefix(shown, 117) .. "..."
+  end
+  return shown
+end
+
 local SETTING_FIELD_CAPTIONS = {
   enabled = "setting-enable", base_cost = "setting-cost-base",
   linear_increment = "setting-cost-linear-increment", growth_factor = "setting-cost-growth",
@@ -1903,8 +1922,8 @@ local function update_settings_content(content, view, preserve_query, translatio
   local selected = visible[selected_index]
   library_settings_detail.render({
     parent = detail, selected = selected, detail_width = panes.detail_width,
-    prefix = PREFIX, add = add, valid = valid,
-    section_gap = library_layout.section_gap, control_gap = library_layout.control_gap,
+    prefix = PREFIX, add = add, valid = valid, display = setting_display,
+    section = library_section, pixels = style_pixels,
   })
 end
 

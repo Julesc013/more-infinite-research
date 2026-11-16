@@ -267,10 +267,10 @@ class LibraryTests(unittest.TestCase):
           local original, calls, supplied = renderer.render, 0, nil
           renderer.render = function(options)
             calls, supplied = calls + 1, options
-            assert(options.parent and options.selected and options.detail_width > 0)
+            assert(options.parent and options.detail_width > 0)
             assert(type(options.prefix) == "string" and type(options.add) == "function"
-              and type(options.valid) == "function")
-            assert(type(options.section_gap) == "number" and type(options.control_gap) == "number")
+              and type(options.valid) == "function" and type(options.display) == "function"
+              and type(options.section) == "function" and type(options.pixels) == "function")
             assert(options.state == nil and options.cache == nil and options.player == nil,
               "the stateless detail renderer received Library lifecycle state")
             return original(options)
@@ -318,6 +318,54 @@ class LibraryTests(unittest.TestCase):
           assert(detail.mir_library_settings_source_summary.caption[1] == "mir-browser.source-mirset1")
           assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
 
+          -- This is the exact pre-extraction tree contract for values whose
+          -- display rules differ. It uses the same Library-provided format,
+          -- section and pixel policies rather than duplicating either here.
+          local long = string.rep("ä", 80)
+          local parent = gui_container(nil)
+          renderer.render({parent=parent, detail_width=256, prefix="mir_library_",
+            add=supplied.add, valid=supplied.valid, display=supplied.display,
+            section=supplied.section, pixels=supplied.pixels, selected={
+              title="Synthetic settings", externally_supplied=true, fields={
+                {name="fixture-enabled",caption="Enabled",effective=false,direct=false,default=true,source="direct"},
+                {name="fixture-max-level-stream",caption="Cap",effective=0,direct=0,default=0,source="default"},
+                {name="fixture-number",caption="Number",effective=1.23456789,direct=1.23456789,default=1,source="mirset1"},
+                {name="fixture-text",caption="Text",effective=long,direct=long,default=long,source="direct"},
+              }}})
+          local expected_tree = {"mir_library_settings_title", "mir_library_settings_scope", "mir_library_settings_external",
+            "mir_library_settings_effective_divider", "mir_library_settings_effective", "mir_library_settings_fields",
+            "mir_library_settings_source_divider", "mir_library_settings_source", "mir_library_settings_source_summary"}
+          for index, name in ipairs(expected_tree) do
+            assert(parent._children[index] == parent[name], "pre-extraction synthetic tree changed at " .. name)
+          end
+          assert(#parent._children == #expected_tree)
+          local synthetic = parent.mir_library_settings_fields
+          local expected_fields = {"mir_library_setting_1_name", "mir_library_setting_1_value",
+            "mir_library_setting_2_name", "mir_library_setting_2_value", "mir_library_setting_3_name",
+            "mir_library_setting_3_value", "mir_library_setting_3_profile_marker", "mir_library_setting_3_source",
+            "mir_library_setting_4_name", "mir_library_setting_4_value"}
+          for index, name in ipairs(expected_fields) do
+            assert(synthetic._children[index] == synthetic[name], "pre-extraction field tree changed at " .. name)
+          end
+          assert(synthetic.mir_library_setting_1_value.caption[2][1] == "mir-browser.setting-off"
+            and synthetic.mir_library_setting_1_value.caption[3][1] == "mir-browser.setting-on")
+          assert(synthetic.mir_library_setting_2_value.caption[1] == "mir-browser.setting-unlimited")
+          assert(synthetic.mir_library_setting_3_value.caption[2] == "≈ 1.23457"
+            and synthetic.mir_library_setting_3_value.caption[3] == "1"
+            and synthetic.mir_library_setting_3_profile_marker and synthetic.mir_library_setting_3_source)
+          assert(synthetic.mir_library_setting_4_value.caption == string.rep("ä", 58) .. "...",
+            "the extracted renderer split or expanded the bounded UTF-8 preview")
+          assert(parent.mir_library_settings_external and parent.mir_library_settings_source_summary.caption[1]
+            == "mir-browser.source-mirset1")
+          local empty = gui_container(nil)
+          renderer.render({parent=empty, selected=nil, detail_width=256, prefix="mir_library_",
+            add=supplied.add, valid=supplied.valid, display=supplied.display,
+            section=supplied.section, pixels=supplied.pixels})
+          assert(#empty._children == 1 and empty.mir_library_settings_empty
+            and empty.mir_library_settings_empty.style.single_line == false
+            and empty.mir_library_settings_empty.style.maximal_width == 240,
+            "nil selection changed the retained empty-detail shape")
+
           library.close(player)
           local catalogue = require("research.settings")
           catalogue.registered_names = function() error("deliberate settings catalogue refusal") end
@@ -327,7 +375,7 @@ class LibraryTests(unittest.TestCase):
           local dynamic = root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
           assert(dynamic.mir_library_settings_unavailable
             and dynamic.mir_library_settings_unavailable.caption[1] == "mir-browser.detail-unavailable"
-            and calls == 1,
+            and calls == 3,
             "catalogue refusal bypassed the existing unavailable path or invoked the detail renderer")
           assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
         ''')
