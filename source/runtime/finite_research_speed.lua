@@ -49,33 +49,31 @@ local function legacy_mentions_eight()
   return type(managed) == "table" and managed["research-speed-8"] ~= nil
 end
 
-local function unchanged_legacy_selection(changes, active)
+local function unchanged_legacy_selection(changes)
   -- The first transported record has no old provider identity. Admit that
   -- entry only with the same upstream selection/versions; once the marker
   -- exists, unrelated mod changes no longer need this one-time restriction.
   for name, change in pairs(changes) do
-    if name ~= "more-infinite-research" and type(change) == "table" then
-      local old_version, new_version
-      if getmetatable(change) == nil then
-        old_version, new_version = rawget(change, "old_version"), rawget(change, "new_version")
-      end
-      if getmetatable(change) ~= nil or old_version ~= new_version then
-        local ok, active_version = pcall(function() return active[name] end)
-        if not ok then active_version = nil end
-        return false, {name=name, row=change, active_version=active_version}
-      end
-    end
+    if name ~= "more-infinite-research" and type(change) == "table"
+        and change.old_version ~= change.new_version then return false, {name=name, row=change} end
   end
   return true
 end
 
+local function selected_active_version(name)
+  local active = script and script.active_mods
+  if type(active) ~= "table" or getmetatable(active) ~= nil then return nil end
+  return rawget(active, name)
+end
+
 local function rejection_context(event, mir, rejected)
+  local selected = {name=rejected.name, row=rejected.row, active_version=selected_active_version(rejected.name)}
   local fields = {
     "previous_mir=" .. configuration_context.value(mir.old_version),
     "new_mir=" .. configuration_context.value(mir.new_version),
     "startup_changed=" .. configuration_context.value(event.mod_startup_settings_changed)
   }
-  for _, field in ipairs(configuration_context.rejected_fields(rejected)) do fields[#fields + 1] = field end
+  for _, field in ipairs(configuration_context.rejected_fields(selected)) do fields[#fields + 1] = field end
   return " [" .. table.concat(fields, " ") .. "]"
 end
 
@@ -118,7 +116,7 @@ function M.preflight(event, provider)
     -- already-truncated native level can stand in for prior emitted8 proof.
     if type(mir) ~= "table" or not published_legacy(mir.old_version) or not legacy
         or type(event.mod_startup_settings_changed) ~= "boolean" or event.mod_startup_settings_changed then refuse() end
-    local unchanged, rejected = unchanged_legacy_selection(changes, script and script.active_mods or {})
+    local unchanged, rejected = unchanged_legacy_selection(changes)
     if not unchanged then refuse(rejection_context(event, mir, rejected)) end
   end
   return {schema=1,technology="research-speed-8",predecessor="research-speed-7",provider=provider}

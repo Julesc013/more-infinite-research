@@ -366,39 +366,59 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
           script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21007"}}
           local guard=require("runtime.finite_research_speed")
           local provider="mir-fixture-finite-base-extension-level"
-          for _,mode in ipairs({"unchanged","provider-version","provider-false-zero","provider-malformed","startup-cap"})do
+          for _,mode in ipairs({"unchanged","provider-version","provider-false-zero","provider-metatable-equal",
+              "provider-metatable-different","provider-hostile","provider-active-proxy","startup-cap"})do
             local bucket={policy_version=3,managed_technologies={["research-speed-8"]=actual_row}}
             storage={mir={maximum_level_control=bucket}}
+            script.active_mods={base="2.1.23",["more-infinite-research"]="5.0.21007"}
             local changes={["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21007"}}
-            if mode=="provider-version"then changes[provider]={old_version="0.1.0",new_version="0.1.1"}end
-            if mode=="provider-false-zero"then changes[provider]={old_version=false,new_version=0}end
-            if mode=="provider-malformed"then
+            if mode=="provider-version"then changes[provider]={old_version="0.1.0",new_version="0.1.1"}
+            elseif mode=="provider-false-zero"then changes[provider]={old_version=false,new_version=0}
+            elseif mode=="provider-metatable-equal"then
+              changes[provider]=setmetatable({old_version="0.1.0",new_version="0.1.0"},{})
+            elseif mode=="provider-metatable-different"then
+              changes[provider]=setmetatable({old_version="0.1.0",new_version="0.1.1"},{})
+            elseif mode=="provider-hostile"then
               changes[provider]=setmetatable({}, {__index=function()error("finite rejecting row metamethod invoked")end})
+            elseif mode=="provider-active-proxy"then
+              changes[provider]={old_version="0.1.0",new_version="0.1.1"}
+              script.active_mods=setmetatable({}, {__index=function()error("finite active map metamethod invoked")end})
             end
-            if mode=="provider-version"then script.active_mods[provider]="0.1.1"
+            if mode=="provider-version" or mode=="provider-metatable-different"then script.active_mods[provider]="0.1.1"
             elseif mode=="provider-false-zero"then script.active_mods[provider]=false
-            elseif mode=="provider-malformed"then script.active_mods[provider]="active\6"
-            else script.active_mods[provider]="0.1.0" end
+            elseif mode=="provider-hostile"then script.active_mods[provider]="active\6"
+            elseif mode~="provider-active-proxy"then script.active_mods[provider]="0.1.0" end
             local ok,reason=pcall(guard.preflight,{mod_changes=changes,
               mod_startup_settings_changed=mode=="startup-cap"},provider)
-            if mode=="unchanged"then assert(ok and reason.provider==provider,mode.." "..tostring(reason))
+            if mode=="unchanged" or mode=="provider-metatable-equal"then
+              assert(ok and reason.provider==provider,mode.." "..tostring(reason))
             else
               reason=tostring(reason)
-              assert(not ok and reason:find("MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save",1,true),mode.." "..reason)
-              assert(not reason:find("finite rejecting row metamethod invoked",1,true),mode.." "..reason)
-              if mode=="provider-version"then
-                assert(reason:find("previous_mir=4.7.21003",1,true) and reason:find("new_mir=5.0.21007",1,true)
-                  and reason:find("startup_changed=false",1,true) and reason:find("rejecting_mod_name="..provider,1,true)
-                  and reason:find("rejecting_old_version=0.1.0",1,true) and reason:find("rejecting_new_version=0.1.1",1,true)
-                  and reason:find("rejecting_active_version=0.1.1",1,true))
-              elseif mode=="provider-false-zero"then
-                assert(reason:find("rejecting_old_version=false",1,true) and reason:find("rejecting_new_version=0",1,true)
-                  and reason:find("rejecting_active_version=false",1,true))
-              elseif mode=="provider-malformed"then
-                assert(reason:find("rejecting_old_version=malformed-table",1,true)
-                  and reason:find("rejecting_new_version=malformed-table",1,true)
-                  and reason:find("rejecting_active_version=active\\\\x06",1,true),reason)
-              else assert(not reason:find("rejecting_mod_name=",1,true)) end
+              assert(not ok,mode)
+              if mode=="provider-hostile"then
+                -- Preserve the original direct field-access failure. Formatting
+                -- begins only after the unchanged predicate returns false.
+                assert(reason:find("finite rejecting row metamethod invoked",1,true),reason)
+                assert(not reason:find("rejecting_mod_name=",1,true),reason)
+              else
+                assert(reason:find("MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save",1,true),mode.." "..reason)
+                assert(not reason:find("finite active map metamethod invoked",1,true),mode.." "..reason)
+                if mode=="provider-version"then
+                  assert(reason:find("previous_mir=4.7.21003",1,true) and reason:find("new_mir=5.0.21007",1,true)
+                    and reason:find("startup_changed=false",1,true) and reason:find("rejecting_mod_name="..provider,1,true)
+                    and reason:find("rejecting_old_version=0.1.0",1,true) and reason:find("rejecting_new_version=0.1.1",1,true)
+                    and reason:find("rejecting_active_version=0.1.1",1,true))
+                elseif mode=="provider-false-zero"then
+                  assert(reason:find("rejecting_old_version=false",1,true) and reason:find("rejecting_new_version=0",1,true)
+                    and reason:find("rejecting_active_version=false",1,true))
+                elseif mode=="provider-metatable-different"then
+                  assert(reason:find("rejecting_old_version=malformed-table",1,true)
+                    and reason:find("rejecting_new_version=malformed-table",1,true)
+                    and reason:find("rejecting_active_version=0.1.1",1,true),reason)
+                elseif mode=="provider-active-proxy"then
+                  assert(reason:find("rejecting_active_version=absent",1,true),reason)
+                else assert(not reason:find("rejecting_mod_name=",1,true)) end
+              end
             end
             assert(storage.mir.maximum_level_control==bucket and bucket.managed_technologies["research-speed-8"]==actual_row
               and storage.mir_finite_research_speed==nil and storage.mir_caps==nil,"refusal wrote state")
