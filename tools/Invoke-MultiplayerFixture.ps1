@@ -838,14 +838,19 @@ function New-LinuxPrivateDisplayRuntime {
   $roles=@($Binding.roles)
   Assert-Session ($roles.Count-eq2) 'current Linux private-display role count differs'
   $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  $probePath=$null;$probeHash=$null
+  $probePath=$null;$probeHash=$null;$authenticatedPlans=@{}
   foreach($role in $roles){
     Assert-Session ($role-is[Collections.IDictionary]-and$role.Keys.Count-eq10) 'private display role envelope differs'
     foreach($name in @('locale','role','display','geometry','plan','plan_sha256','ready','result','role_root','authority')){Assert-Session ($role.Contains($name)-and$role[$name]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$role[$name])) "private display role field differs: $name"}
     $locale=[string]$role.locale;Assert-Session ($locale-cin@('en','de')-and$seen.Add($locale)) 'private display locales differ'
     Assert-Session ([string]$role.role-ceq('client-'+$locale)-and[string]$role.display-ceq$(if($locale-ceq'en'){':193'}else{':194'})-and[string]$role.geometry-ceq'1280x720') 'private display role identity differs'
     $planPath=Assert-LinuxDisplayPinnedFile -Path ([string]$role.plan) -Expected ([string]$role.plan_sha256) -Label ('private display '+$locale+' plan')
-    $originalPlan=(Get-Content -LiteralPath $planPath -Raw -Encoding utf8)|ConvertFrom-Json -AsHashtable
+    try{$planBytes=[IO.File]::ReadAllBytes($planPath);$planText=[Text.UTF8Encoding]::new($false,$true).GetString($planBytes)}catch{throw '[mir5-multiplayer-fixture] private display plan text differs'}
+    Assert-Session ($planBytes.Length-gt0-and$planBytes.Length-le8KB) 'private display plan exceeds bound'
+    $sha=[Security.Cryptography.SHA256]::Create();try{$planHash=-join($sha.ComputeHash($planBytes)|ForEach-Object {$_.ToString('X2')})}finally{$sha.Dispose()}
+    Assert-Session ($planHash-ceq[string]$role.plan_sha256.ToUpperInvariant()) 'private display plan changed while reading'
+    try{$originalPlan=$planText|ConvertFrom-Json -AsHashtable}catch{throw '[mir5-multiplayer-fixture] private display plan JSON differs'}
+    $authenticatedPlans[$locale]=[pscustomobject]@{path=$planPath;sha256=$planHash;raw=$planText;plan=$originalPlan}
     Assert-Session ($originalPlan-is[Collections.IDictionary]-and$originalPlan.Contains('probe_display')-and$originalPlan.probe_display-is[Collections.IDictionary]) 'private display plan probe differs'
     $probe=$originalPlan.probe_display
     Assert-Session ($probe.Keys.Count-eq3-and$probe.Contains('path')-and$probe.Contains('bytes')-and$probe.Contains('sha256')-and$probe.path-is[string]-and$probe.bytes-is[Int64]-and$probe.sha256-is[string]-and$probe.sha256-cmatch'^[A-Fa-f0-9]{64}$') 'private display plan probe shape differs'
@@ -865,10 +870,14 @@ function New-LinuxPrivateDisplayRuntime {
   foreach($role in @($roles|Sort-Object locale)){
     $locale=[string]$role.locale;$roleRoot=Join-Path $runtimeBuild ('client-'+$locale)
     Assert-Session (-not(Test-Path -LiteralPath $roleRoot));$null=New-Item -ItemType Directory -Path $roleRoot
-    $raw=Get-Content -LiteralPath ([string]$role.plan) -Raw -Encoding utf8
-    Assert-Session ([Text.UTF8Encoding]::new($false).GetByteCount($raw)-le8KB) 'private display plan exceeds bound'
-    $plan=$raw|ConvertFrom-Json -AsHashtable
+    $admitted=$authenticatedPlans[$locale]
+    Assert-Session ($null-ne$admitted-and$admitted.sha256-ceq[string]$role.plan_sha256.ToUpperInvariant()) 'private display authenticated plan is absent'
+    $plan=$admitted.raw|ConvertFrom-Json -AsHashtable
     Assert-Session ($plan-is[Collections.IDictionary]) 'private display plan body differs'
+    foreach($field in @('schema','kind','role','display','geometry','deadline_seconds','probe_display')){Assert-Session ($plan.Contains($field)-and$admitted.plan.Contains($field)) "private display admitted plan field differs: $field"}
+    $sameGeometry=(@($plan.geometry)-join',')-ceq(@($admitted.plan.geometry)-join',')
+    $sameProbe=($plan.probe_display.path-ceq$admitted.plan.probe_display.path)-and($plan.probe_display.bytes-eq$admitted.plan.probe_display.bytes)-and($plan.probe_display.sha256-ceq$admitted.plan.probe_display.sha256)
+    Assert-Session (($plan.role-ceq$admitted.plan.role)-and($plan.display-ceq$admitted.plan.display)-and$sameGeometry-and($plan.deadline_seconds-eq$admitted.plan.deadline_seconds)-and$sameProbe) 'private display runtime plan differs from its admitted source'
     $plan.role_root=$roleRoot
     $runtimePlan=Join-Path $runtimePlans ('client-'+$locale+'.json')
     [IO.File]::WriteAllText($runtimePlan,(ConvertTo-Json -InputObject $plan -Depth 12 -Compress)+"`n",[Text.UTF8Encoding]::new($false))
@@ -1032,29 +1041,30 @@ if($ComposeOnly){
   Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $selection -EngineIdentity $engineIdentity -ArchiveHashes $actualHashes -ErrorPrefix 'mir5-multiplayer-compose'
   $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$false
   $leasePath=Join-Path $library '.mir-library.lock';$lease=[IO.File]::Open($leasePath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
-  $record=$null
+  $record=$null;$activation=$null
   try{
-    $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $actualHashes -SettingsMode Defaults -LibraryLock $lease
-    Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
-    $prospectiveSeed=Join-Path $layout.server_write 'saves/seed.zip'
-    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
-    foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
-    $record=[ordered]@{
-      kind='MIR5LibraryMultiplayerComposeV1';case=$FixtureCase;status='composed-zero-native'
-      native_processes=0;factorio_processes=0;display_processes=0;engine=$engineIdentity
-      profile_sha256=(Get-FileHash -LiteralPath $profile -Algorithm SHA256).Hash.ToUpperInvariant();archive_sha256=$actualHashes
-      runtime_display=$linuxDisplayRuntime;session_root=$resources.root
-      server_config_sha256=(Get-FileHash -LiteralPath $layout.server_config -Algorithm SHA256).Hash.ToUpperInvariant()
-      client_config_sha256=@($layout.clients|ForEach-Object {(Get-FileHash -LiteralPath $_.config -Algorithm SHA256).Hash.ToUpperInvariant()})
-      seed_status='not-created';release_qualification=$false
+    try{
+      $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $actualHashes -SettingsMode Defaults -LibraryLock $lease
+      Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+      $prospectiveSeed=Join-Path $layout.server_write 'saves/seed.zip'
+      Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
+      foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
+      $record=[ordered]@{
+        kind='MIR5LibraryMultiplayerComposeV1';case=$FixtureCase;status='composed-zero-native'
+        native_processes=0;factorio_processes=0;display_processes=0;engine=$engineIdentity
+        profile_sha256=(Get-FileHash -LiteralPath $profile -Algorithm SHA256).Hash.ToUpperInvariant();archive_sha256=$actualHashes
+        runtime_display=$linuxDisplayRuntime;session_root=$resources.root
+        server_config_sha256=(Get-FileHash -LiteralPath $layout.server_config -Algorithm SHA256).Hash.ToUpperInvariant()
+        client_config_sha256=@($layout.clients|ForEach-Object {(Get-FileHash -LiteralPath $_.config -Algorithm SHA256).Hash.ToUpperInvariant()})
+        seed_status='not-created';release_qualification=$false
+      }
+    }finally{
+      if($null-ne$activation-and-not$activation.closed){
+        $restoration=Complete-MIRLibraryActivation -Activation $activation
+        if($null-ne$record){$record.library_control_restoration=$restoration}
+      }
     }
-  }finally{
-    if($null-ne$activation-and-not$activation.closed){
-      $restoration=Complete-MIRLibraryActivation -Activation $activation
-      if($null-ne$record){$record.library_control_restoration=$restoration}
-    }
-    $lease.Dispose()
-  }
+  }finally{$lease.Dispose()}
   Assert-Session ($null-ne$record) 'ComposeOnly did not reach a zero-native composition record'
   $record.process_runs=@($resources.runs.ToArray());Write-MIRNativeProbeResult -Context $resources -Record $record
   exit 0

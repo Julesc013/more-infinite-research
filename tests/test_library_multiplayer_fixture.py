@@ -4117,7 +4117,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             Invoke-Expression $node[0].Extent.Text
           }
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
-          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK)
+          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $workroot -Force
           function Resolve-BuildOutput([string]$Path,[string]$Label){
             $full=[IO.Path]::GetFullPath($Path)
             if(-not$full.StartsWith($workroot,[StringComparison]::OrdinalIgnoreCase)){throw "$Label escapes workroot"}
@@ -4143,6 +4143,11 @@ if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
   Start-Sleep -Milliseconds 400
   exit 0
 }
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'success'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
+}
 throw 'unexpected fake display mode'
 '@
           [IO.File]::WriteAllText($fake,$fakeBody,$encoding)
@@ -4155,7 +4160,7 @@ throw 'unexpected fake display mode'
             return [ordered]@{locale='en';role='client-en';display=':193';geometry='1280x720';plan=(Join-Path $root 'plan.json');plan_sha256=('A'*64);ready=(Join-Path $root 'display-ready.json');result=(Join-Path $root 'display-result.json');role_root=$root;authority=(Join-Path $root 'authority')}
           }
           function New-Ready($Role){
-            [ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}
+            [ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]101;start_ticks=[Int64]102;session_id=[Int64]103};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}
           }
           function Refuses([scriptblock]$Block,[string]$Name){$failed=$false;try{&$Block}catch{$failed=$true};if(-not$failed){throw "private display receipt admitted:$Name"}}
           $typed=New-Role 'typed'
@@ -4188,6 +4193,24 @@ throw 'unexpected fake display mode'
           try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message}
           if($failure-notmatch'private display stdin stop failed'){throw "early stdin failure differs:$failure"}
           if($null-ne(Get-Process -Id $lingerPid -ErrorAction SilentlyContinue)){throw 'early stdin cleanup left its display child live'}
+          function New-StopResult($Ready){
+            [ordered]@{kind='MIRLinuxLibraryDisplayResultV1';status='stop';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]$Ready.display_identity.pid;start_ticks=[Int64]$Ready.display_identity.start_ticks;session_id=[Int64]$Ready.display_identity.session_id};factorio_processes=0;cleanup_errors=@();pins_rechecked=$true;display_exit=0;global_display_restored=$true;private_viewer_restored=$true;authority_removed=$true}
+          }
+          function Assert-ResultContinuityRefusal([string]$Name,[scriptblock]$Mutate){
+            $role=New-Role ('result-'+$Name);$ready=New-Ready $role;$result=New-StopResult $ready;& $Mutate $result
+            $workroot=$role.role_root;$env:MIR_TEST_DISPLAY_MODE='success';$env:MIR_TEST_READY=$role.ready;$env:MIR_TEST_PID=Join-Path $role.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($ready|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$role.result;$env:MIR_TEST_VALID_RESULT=($result|ConvertTo-Json -Compress)
+            $display=Start-PrivateDisplay $role;$childPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw);$failure=$null
+            try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message}
+            if($failure-notmatch'private display restoration receipt differs'){throw "result continuity failure differs:$Name/$failure"}
+            if($null-ne(Get-Process -Id $childPid -ErrorAction SilentlyContinue)){throw "result continuity cleanup left its child live:$Name"}
+          }
+          $success=New-Role 'result-success';$successReady=New-Ready $success;$successResult=New-StopResult $successReady
+          $workroot=$success.role_root;$env:MIR_TEST_DISPLAY_MODE='success';$env:MIR_TEST_READY=$success.ready;$env:MIR_TEST_PID=Join-Path $success.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($successReady|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$success.result;$env:MIR_TEST_VALID_RESULT=($successResult|ConvertTo-Json -Compress)
+          $display=Start-PrivateDisplay $success;Stop-PrivateDisplay $display
+          if(-not$display.closed){throw 'matching display result was not accepted'}
+          Assert-ResultContinuityRefusal 'display' {param($result)$result.display=':194'}
+          Assert-ResultContinuityRefusal 'geometry' {param($result)$result.geometry=@([Int64]1281,[Int64]720)}
+          Assert-ResultContinuityRefusal 'identity' {param($result)$result.display_identity.pid=[Int64]104}
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-private-display-", dir=ROOT / "build/tmp") as work:
             result = subprocess.run(
@@ -4197,6 +4220,54 @@ throw 'unexpected fake display mode'
                 check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_private_display_result_continuity_rejects_57b8_substitutions(self):
+        old_source = subprocess.run(
+            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Get-SessionHash','Test-Within','Assert-NoReparse','Resolve-Existing','Read-DisplayReady','Assert-PrivateDisplayChildIdentity','Get-PrivateDisplayProbePythonPin','Assert-PrivateDisplayInterpreterPin','Complete-PrivateDisplayOutput','Stop-PrivateDisplayChild','Start-PrivateDisplay','Stop-PrivateDisplay')
+          # The 57b8 counterfactual first neutralizes its unrelated StrictMode
+          # stdin-message evaluation defect, then isolates its result-policy fields.
+          foreach($name in $names){$node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true));if($node.Count-ne1){throw "private display definition is absent or ambiguous:$name"};$text=$node[0].Extent.Text;if($name-ceq'Stop-PrivateDisplay'-and$env:MIR_TEST_EXPECT_REJECT-cne'true'){$text=$text.Replace('$stdinFailure=Stop-PrivateDisplayChild $Display.process $Display.stdin $Display.identity','$null=$Display.stdin.WriteLine(''stop'');$Display.stdin.Close();Assert-Session ($Display.process.WaitForExit(15000)) ''counterfactual display did not stop'';$stdinFailure=$null').Replace('Assert-Session ($null-eq$stdinFailure) (''private display stdin stop failed: ''+$stdinFailure.Exception.Message)','$null=$null');if($text-notmatch'counterfactual display did not stop'){throw '57b8 counterfactual teardown replacement did not apply'}};Invoke-Expression $text}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition-and$env:MIR_TEST_EXPECT_REJECT-cne'true'-and$Message-like'private display stdin stop failed:*'){return};if(-not$Condition){throw $Message}}
+          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $workroot -Force
+          function Resolve-BuildOutput([string]$Path,[string]$Label){$full=[IO.Path]::GetFullPath($Path);if(-not$full.StartsWith($workroot,[StringComparison]::OrdinalIgnoreCase)){throw "$Label escapes workroot"};return $full}
+          function Resolve-BuildInput([string]$Path,[string]$Type,[string]$Label){if(-not(Test-Path -LiteralPath $Path -PathType $Type)){throw "$Label is absent"};return Resolve-BuildOutput $Path $Label}
+          $encoding=[Text.UTF8Encoding]::new($false);$fake=Join-Path $workroot 'fake-display.ps1'
+          [IO.File]::WriteAllText($fake,@'
+param([Parameter(ValueFromRemainingArguments=$true)]$rest)
+$encoding=[Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+[IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
+'@,$encoding)
+          $pwsh=(Get-Command pwsh -ErrorAction Stop).Source;$pythonHash=(Get-FileHash -LiteralPath $pwsh -Algorithm SHA256).Hash.ToUpperInvariant();$probe=Join-Path $workroot 'probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$pwsh+"': '"+$pythonHash+"',`n}`n"),$encoding)
+          $script:linuxPrivateDisplays=[ordered]@{python=$pwsh;display_cli=$fake;display_module_sha256=('A'*64);checkout=$workroot;probe_display=$probe;probe_display_sha256=(Get-FileHash -LiteralPath $probe -Algorithm SHA256).Hash.ToUpperInvariant()}
+          function New-Role([string]$Name){$root=Join-Path $workroot $Name;$null=New-Item -ItemType Directory -Path $root;[ordered]@{locale='en';role='client-en';display=':193';geometry='1280x720';plan=(Join-Path $root 'plan.json');plan_sha256=('A'*64);ready=(Join-Path $root 'display-ready.json');result=(Join-Path $root 'display-result.json');role_root=$root;authority=(Join-Path $root 'authority')}}
+          function New-Ready(){[ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]101;start_ticks=[Int64]102;session_id=[Int64]103};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}}
+          function New-Result($Ready){[ordered]@{kind='MIRLinuxLibraryDisplayResultV1';status='stop';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]$Ready.display_identity.pid;start_ticks=[Int64]$Ready.display_identity.start_ticks;session_id=[Int64]$Ready.display_identity.session_id};factorio_processes=0;global_display_restored=$true;private_viewer_restored=$true;authority_removed=$true}}
+          function Exercise([string]$Name,[scriptblock]$Mutate){$role=New-Role $Name;$ready=New-Ready;$result=New-Result $ready;& $Mutate $result;$workroot=$role.role_root;$env:MIR_TEST_READY=$role.ready;$env:MIR_TEST_PID=Join-Path $role.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($ready|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$role.result;$env:MIR_TEST_VALID_RESULT=($result|ConvertTo-Json -Compress);$display=Start-PrivateDisplay $role;$childPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw);$failure=$null;try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message};if($env:MIR_TEST_EXPECT_REJECT-ceq'true'){if($failure-notmatch'private display restoration receipt differs'){throw "continuity refusal differs:$Name/$failure"}}elseif($null-ne$failure-or-not$display.closed){throw "57b8 admitted-state counterfactual differs:$Name/$failure"};if($null-ne(Get-Process -Id $childPid -ErrorAction SilentlyContinue)){throw "continuity cleanup left child live:$Name"}}
+          Exercise 'display' {param($value)$value.display=':194'}
+          Exercise 'geometry' {param($value)$value.geometry=@([Int64]1281,[Int64]720)}
+          Exercise 'identity' {param($value)$value.display_identity.session_id=[Int64]104}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-display-result-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-57b8.ps1"
+            old_session.write_bytes(old_source.stdout)
+            for name, source, expect_reject in (("current", SESSION, "true"), ("old", old_session, "false")):
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EXPECT_REJECT": expect_reject},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
 
     def test_private_display_client_graphics_roots_are_phase_local(self):
         script = r'''
@@ -4325,31 +4396,113 @@ throw 'unexpected fake display mode'
           }
           $binding=[ordered]@{python=$python;display_cli=$cli;display_cli_sha256=(Get-FileHash -LiteralPath $cli -Algorithm SHA256).Hash;display_module_sha256=(Get-FileHash -LiteralPath $module -Algorithm SHA256).Hash;checkout=$input;roles=$roles}
           $runtime=Join-Path $root 'runtime';$null=New-Item -ItemType Directory -Path $runtime
-          $context=[pscustomobject]@{root=$runtime};$script:schemas=[Collections.Generic.List[object]]::new()
+          $context=[pscustomobject]@{root=$runtime};$script:schemas=[Collections.Generic.List[object]]::new();$script:planSwapped=$false
           $schema={param($actualBinding,$actualRole,$label)
             $script:schemas.Add([pscustomobject]@{checkout=[string]$actualBinding.checkout;role=$actualRole;label=$label})
+            if($label-ceq'private display en original'){
+              $before=[IO.File]::ReadAllBytes([string]$actualRole.plan);$replacement=[regex]::Replace([Text.UTF8Encoding]::new($false).GetString($before),'"deadline_seconds"\s*:\s*900','"deadline_seconds": 800',1)
+              $after=[Text.UTF8Encoding]::new($false).GetBytes($replacement)
+              if($before.Length-ne$after.Length-or$replacement-ceq[Text.UTF8Encoding]::new($false).GetString($before)){throw 'same-size plan replacement model differs'}
+              [IO.File]::WriteAllBytes([string]$actualRole.plan,$after);$script:planSwapped=$true
+            }
             if($label-match'runtime'){
               if([string]$actualBinding.checkout-cne$context.root){throw 'runtime checkout was not the one governed context'}
             }
           }
           $derived=New-LinuxPrivateDisplayRuntime -Binding $binding -Context $context -SchemaInvoker $schema -ExpectedProbeSha256 $probeHash
-          if($script:schemas.Count-ne4 -or (@($script:schemas|Where-Object {$_.label-match'original'}).Count-ne2) -or (@($script:schemas|Where-Object {$_.label-match'runtime'}).Count-ne2)){throw 'original/runtime schema preflight count differs'}
+          if(-not$script:planSwapped-or$script:schemas.Count-ne4 -or (@($script:schemas|Where-Object {$_.label-match'original'}).Count-ne2) -or (@($script:schemas|Where-Object {$_.label-match'runtime'}).Count-ne2)){throw 'original/runtime schema preflight count differs'}
           if($derived.Keys.Count-ne8-or$derived.probe_display-cne$probe-or$derived.probe_display_sha256-cne$probeHash){throw 'derived probe binding differs'}
           foreach($role in @($derived.roles)){
             if(-not $role.plan.StartsWith((Join-Path $runtime 'display-plans')) -or -not $role.authority.StartsWith($role.role_root)){throw 'derived role paths differ'}
             $plan=Get-Content -LiteralPath $role.plan -Raw|ConvertFrom-Json -AsHashtable
-            if($plan.role_root-cne$role.role_root-or$plan.probe_display.sha256-cne$derived.probe_display_sha256){throw 'derived role plan changed non-role input'}
+            $expectedDeadline=if([string]$role.locale-ceq'en'){[int]$env:MIR_TEST_EN_DEADLINE}else{900}
+            if($plan.role_root-cne$role.role_root-or$plan.probe_display.sha256-cne$derived.probe_display_sha256-or$plan.deadline_seconds-ne$expectedDeadline){throw ('derived role plan changed non-role input: '+[string]$role.locale+'/'+[string]$plan.role_root+'/'+[string]$role.role_root+'/'+[string]$plan.probe_display.sha256+'/'+[string]$derived.probe_display_sha256+'/'+[string]$plan.deadline_seconds+'/'+[string]$expectedDeadline)}
           }
           $bad=[ordered]@{};foreach($entry in $binding.GetEnumerator()){$bad[$entry.Key]=$entry.Value};$bad.roles=@($roles|ForEach-Object {$copy=[ordered]@{};foreach($entry in $_.GetEnumerator()){$copy[$entry.Key]=$entry.Value};$copy.plan_sha256=('0'*64);$copy})
           $blocked=Join-Path $root 'blocked';$null=New-Item -ItemType Directory -Path $blocked
           $caught=$false;try{New-LinuxPrivateDisplayRuntime -Binding $bad -Context ([pscustomobject]@{root=$blocked}) -SchemaInvoker $schema|Out-Null}catch{$caught=$true}
           if(-not$caught-or(Test-Path -LiteralPath (Join-Path $blocked 'build'))){throw 'wrong original plan hash mutated a runtime root'}
         '''
+        old_source = subprocess.run(
+            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
         with tempfile.TemporaryDirectory(prefix="mir5-linux-display-runtime-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-57b8.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            for name, wrapper, expected_en_deadline in (("current", WRAPPER, "900"), ("old", old_wrapper, "800")):
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_WRAPPER": str(wrapper), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EN_DEADLINE": expected_en_deadline},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
+    def test_compose_only_disposes_the_borrowed_library_lease_when_restoration_throws(self):
+        old_source = subprocess.run(
+            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Invoke-RestorationFailure([string]$Path,[string]$Name){
+            $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw $errors[0].Message}
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.IfStatementAst]-and$candidate.Extent.Text.Contains('if($ComposeOnly)')},$true))
+            if($node.Count-ne1){throw 'ComposeOnly branch is absent or ambiguous'}
+            $body=$node[0].Extent.Text.Replace('exit 0','$script:composeExited=$true')
+            $root=Join-Path ([IO.Path]::GetFullPath($env:MIR_TEST_WORK)) $Name;$null=New-Item -ItemType Directory -Path $root
+            $library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+            $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
+            $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
+            $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
+            $ComposeOnly=$true;$linuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
+            $selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})}
+            $target=[pscustomobject]@{fixture_archive_sha256=('B'*64)};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
+            $linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false
+            function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+            function Invoke-MultiplayerFixturePreparation {throw 'CreateOnly must not run'}
+            function Invoke-MIRNativeProbeProcess {throw 'native process must not run'}
+            function Read-MIRDirectLibraryStartupProfile {param($Path) @()}
+            function Get-MIRDirectLibraryStartupEngineIdentity {param($FactorioBin,$EngineDataDirectory) [ordered]@{sha256='E'*64;base_version='2.1.24'}}
+            function Assert-LinuxDisplayPinnedFile {param($Path,$Expected,$Label,$MaximumBytes) $Path}
+            function Assert-MIRLibraryFixtureArchive {param($Archive,$SourceDirectory)}
+            function Get-MIRDirectLibraryStartupArchiveHashes {param($LibraryDirectory,$EngineDataDirectory,$BaseRows,$MirArchive) @{'more-infinite-research_5.0.21017.zip'=('A'*64);'mir-fixture-mir5-library-multiplayer_0.1.2.zip'=('B'*64)}}
+            function Assert-MIRDirectLibraryStartupDeclaredInputs {param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,$ErrorPrefix)}
+            function New-MultiplayerSessionLayout {param($Context,$EngineData,$Target,$StandaloneClientNames)
+              $server=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path (Join-Path $server 'saves') -Force
+              $serverConfig=Join-Path $Context.root 'server.ini';$serverSettings=Join-Path $Context.root 'server-settings.json';$clientConfig=Join-Path $Context.root 'client.ini'
+              foreach($path in @($serverConfig,$serverSettings,$clientConfig)){[IO.File]::WriteAllText($path,'x',[Text.UTF8Encoding]::new($false))}
+              [pscustomobject]@{server_write=$server;server_config=$serverConfig;server_settings=$serverSettings;server_port=3001;rcon_port=3002;rcon_password='secret';clients=@([pscustomobject]@{config=$clientConfig;port=3003})}
+            }
+            function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$LibraryLock)[pscustomobject]@{closed=$false}}
+            function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+            function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments)}
+            function Complete-MIRLibraryActivation {param($Activation)$Activation.closed=$true;throw 'expected restoration failure'}
+            function Write-MIRNativeProbeResult {param($Context,$Record)throw 'result write must not run'}
+            $failure=$null;try{Invoke-Expression $body}catch{$failure=$_.Exception.Message}
+            $stream=Get-Variable -Name lease -ValueOnly
+            $disposed=$stream.SafeFileHandle.IsClosed;$reopened=$false;$probe=$null
+            try{$probe=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None);$reopened=$true}catch{}
+            if($null-ne$probe){$probe.Dispose()}
+            if(-not$disposed){$stream.Dispose()}
+            return [pscustomobject]@{failure=$failure;disposed=$disposed;reopened=$reopened}
+          }
+          $current=Invoke-RestorationFailure $env:MIR_TEST_WRAPPER 'current'
+          $old=Invoke-RestorationFailure $env:MIR_TEST_OLD_WRAPPER 'old'
+          if($current.failure-notmatch'expected restoration failure'-or-not$current.disposed-or-not$current.reopened){throw 'current ComposeOnly did not release the borrowed lease after restoration failure'}
+          if($old.failure-notmatch'expected restoration failure'-or$old.disposed-or$old.reopened){throw '57b8 counterfactual no longer exposes the borrowed-lease leak'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-compose-lease-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-57b8.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
             result = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
                 capture_output=True, text=True,
-                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_WORK": work},
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_OLD_WRAPPER": str(old_wrapper), "MIR_TEST_WORK": work},
                 check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

@@ -350,13 +350,20 @@ function Stop-PrivateDisplay($Display) {
   $primary=$null;$cleanup=@();$outputsComplete=$false
   try{
     $stdinFailure=Stop-PrivateDisplayChild $Display.process $Display.stdin $Display.identity
-    Assert-Session ($null-eq$stdinFailure) ('private display stdin stop failed: '+$stdinFailure.Exception.Message)
+    if($null-ne$stdinFailure){
+      $stdinMessage=if($stdinFailure-is[Management.Automation.ErrorRecord]){$stdinFailure.Exception.Message}else{[string]$stdinFailure}
+      Assert-Session $false ('private display stdin stop failed: '+$stdinMessage)
+    }
     Complete-PrivateDisplayOutput $Display.copies $Display.streams
     $outputsComplete=$true
     Assert-Session ($Display.process.ExitCode-eq0) ('private display exit differs: '+[string]$Display.role.role)
     $result=Resolve-BuildInput ([string]$Display.role.result) 'Leaf' ('display '+[string]$Display.role.role+' result receipt')
     $value=Get-Content -LiteralPath $result -Raw|ConvertFrom-Json -AsHashtable
-    Assert-Session ($value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'stop'-and$value.role-ceq[string]$Display.role.role-and$value.global_display_restored-eq$true-and$value.private_viewer_restored-eq$true-and$value.authority_removed-eq$true) 'private display restoration receipt differs'
+    $resultGeometry=if($value-is[Collections.IDictionary]-and$value.Contains('geometry')){@($value['geometry'])}else{@()}
+    $readyGeometry=if($Display.ready-is[Collections.IDictionary]-and$Display.ready.Contains('geometry')){@($Display.ready['geometry'])}else{@()}
+    $resultIdentity=if($value-is[Collections.IDictionary]-and$value.Contains('display_identity')){$value['display_identity']}else{$null}
+    $readyIdentity=if($Display.ready-is[Collections.IDictionary]-and$Display.ready.Contains('display_identity')){$Display.ready['display_identity']}else{$null}
+    Assert-Session ($value-is[Collections.IDictionary]-and$value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'stop'-and$value.role-ceq[string]$Display.role.role-and$value.display-ceq[string]$Display.ready.display-and$resultGeometry.Count-eq2-and$readyGeometry.Count-eq2-and$resultGeometry[0]-is[Int64]-and$resultGeometry[1]-is[Int64]-and$resultGeometry[0]-eq$readyGeometry[0]-and$resultGeometry[1]-eq$readyGeometry[1]-and$resultIdentity-is[Collections.IDictionary]-and$readyIdentity-is[Collections.IDictionary]-and$resultIdentity.Keys.Count-eq3-and$readyIdentity.Keys.Count-eq3-and$resultIdentity.Contains('pid')-and$resultIdentity.Contains('start_ticks')-and$resultIdentity.Contains('session_id')-and$readyIdentity.Contains('pid')-and$readyIdentity.Contains('start_ticks')-and$readyIdentity.Contains('session_id')-and$resultIdentity.pid-is[Int64]-and$resultIdentity.start_ticks-is[Int64]-and$resultIdentity.session_id-is[Int64]-and$readyIdentity.pid-is[Int64]-and$readyIdentity.start_ticks-is[Int64]-and$readyIdentity.session_id-is[Int64]-and$resultIdentity.pid-eq$readyIdentity.pid-and$resultIdentity.start_ticks-eq$readyIdentity.start_ticks-and$resultIdentity.session_id-eq$readyIdentity.session_id-and$value.global_display_restored-eq$true-and$value.private_viewer_restored-eq$true-and$value.authority_removed-eq$true) 'private display restoration receipt differs'
     $Display.closed=$true
   }catch{$primary=$_
   }finally{
