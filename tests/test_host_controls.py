@@ -5,8 +5,10 @@ routing.  Canonical cutover replaces that affected-path lane with this full,
 checkout-bound host gate for every dev/main change, so those assertions are no
 longer relevant to the delivered host controls.
 """
+import ast
+import copy
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import tempfile
@@ -28,6 +30,65 @@ def run_powershell(arguments: list[str]) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         check=True,
     )
+
+
+# Core boundaries remain mandatory even if a source file is accidentally removed.
+MANDATORY_HOST_BOUNDARIES = {
+    "tests/test_generator.py", "tests/test_bootstrap.py",
+    "tests/test_worker_storage_history.py", "tests/test_runtime_api.py",
+    "tests/test_library.py", "tests/test_package.py", "tests/test_release.py",
+    "tests/test_host_controls.py", "tools/check_repository.py",
+}
+
+
+def validate_host_control_plan(plan, root):
+    """Compare the declared driver plan with independently inspectable contracts."""
+    if (plan.get("kind") != "MIR5HostControlsPlanV1"
+            or plan.get("native_execution") is not False
+            or plan.get("release_qualification") is not False):
+        raise ValueError("host plan authority differs")
+    controls = plan.get("controls")
+    if not isinstance(controls, list) or not controls:
+        raise ValueError("host controls are absent")
+    paths = []
+    root = root.resolve(strict=True)
+    for row in controls:
+        if not isinstance(row, dict) or set(row) != {"path", "lua"} or type(row["lua"]) is not bool:
+            raise ValueError("host control invocation shape differs")
+        path = row["path"]
+        if (not isinstance(path, str) or "\\" in path
+                or PurePosixPath(path).is_absolute()
+                or ".." in PurePosixPath(path).parts
+                or PurePosixPath(path).as_posix() != path):
+            raise ValueError("host control path is not canonical")
+        source = root / path
+        if (not source.is_file() or source.is_symlink()
+                or not source.resolve(strict=True).is_relative_to(root)):
+            raise ValueError("host control path is missing or outside checkout")
+        paths.append(path)
+        tree = ast.parse(source.read_text(encoding="utf-8-sig"), filename=path)
+        lua_arguments = [node for node in ast.walk(tree)
+                         if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                         and node.func.attr == "add_argument"
+                         and any(isinstance(arg, ast.Constant) and arg.value == "--lua-runtime-dir"
+                                 for arg in node.args)]
+        requires_lua = any(any(keyword.arg == "required" and isinstance(keyword.value, ast.Constant)
+                               and keyword.value.value is True for keyword in node.keywords)
+                           for node in lua_arguments)
+        if (row["lua"] and not lua_arguments) or (not row["lua"] and requires_lua):
+            raise ValueError("host control invocation mode is unsupported: " + path)
+    if len(paths) != len(set(paths)):
+        raise ValueError("duplicate host control")
+    inventory = {path.relative_to(root).as_posix() for path in (root / "tests").glob("test_*.py")}
+    # No excluded top-level Python tests: exceptional lanes need an explicit reason here.
+    eligible = inventory | {"tools/check_repository.py"}
+    if set(paths) != eligible:
+        raise ValueError("host control inventory differs: missing=" + repr(sorted(eligible - set(paths)))
+                         + " unexpected=" + repr(sorted(set(paths) - eligible)))
+    if not MANDATORY_HOST_BOUNDARIES <= set(paths):
+        raise ValueError("mandatory host boundary is absent")
+    if paths[-1] != "tools/check_repository.py":
+        raise ValueError("repository check must finish the host plan")
 
 
 class ReportResolutionPolicyTests(unittest.TestCase):
@@ -196,239 +257,66 @@ class HostControlsTests(unittest.TestCase):
     def test_wrapper_has_one_explicit_current_host_control_plan(self):
         plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
         plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
-        self.assertEqual(plan["kind"], "MIR5HostControlsPlanV1")
-        self.assertFalse(plan["native_execution"])
-        self.assertFalse(plan["release_qualification"])
-        controls = plan["controls"]
-        paths = [row["path"] for row in controls]
-        self.assertEqual(paths, [
-            "tests/test_generator.py",
-            "tests/test_library_render_capture.py",
-            "tests/test_library_personal_view_input_fixture.py",
-            "tests/test_continuation_ownership.py",
-            "tests/test_native_research_speed_finite_fixture.py",
-            "tests/test_secretas_continuation.py",
-            "tests/test_worker_storage_continuation.py",
-            "tests/test_worker_storage_history.py",
-            "tests/test_worker_storage_inherited_origin.py",
-            "tests/test_worker_storage_prepared_default.py",
-            "tests/test_worker_native_owner_data.py",
-    "tests/test_worker_storage_default_native.py",
-      "tests/test_worker_storage_prepared_native.py",
-    "tests/test_worker_storage_provider_native.py",
-            "tests/test_worker_default_snapshot_probe.py",
-            "tests/test_ferrum_worker_storage_native.py",
-            "tests/test_ric_marine.py",
-            "tests/test_discovery_tree_compatibility.py",
-            "tests/test_early_target_adapter.py",
-            "tests/test_historical_direct.py",
-            "tests/test_historical_continuations.py",
-            "tests/test_historical_native_runner.py",
-            "tests/test_historical_transition_fixture.py",
-            "tests/test_f110_f200_transition_fixture.py",
-            "tests/test_f100_f110_laser_fixture.py",
-            "tests/test_published_f100_forward_fixture.py",
-            "tests/test_migration_origins_f200_source_controls.py",
-            "tests/test_migration_origins_f200_110_source_controls.py",
-            "tests/test_migration_origins_f200_110_successor_controls.py",
-            "tests/test_migration_origins_f200_120_source_controls.py",
-            "tests/test_migration_origins_f200_120_successor_controls.py",
-            "tests/test_migration_origins_successor_controls.py",
-            "tests/test_modern_targets.py",
-            "tests/test_lua_table_values.py",
-            "tests/test_k2_base_catalogue.py",
-            "tests/test_k2_native_space_age.py",
-            "tests/test_space_exploration_catalogue.py",
-            "tests/test_space_exploration_pipeline.py",
-            "tests/test_k2_base_native_fixture.py",
-            "tests/test_aai_parity_native_controls.py",
-            "tests/test_bob_angel_materials.py",
-            "tests/test_bob_angel_catalogue.py",
-            "tests/test_bob_angel_f200_combined_profile.py",
-            "tests/test_bob_angel_f200_combined_gameplay_fixture.py",
-            "tests/test_angel_f210_catalogue.py",
-            "tests/test_angel_f210_pipeline.py",
-            "tests/test_bob_tech_materials.py",
-            "tests/test_bob_tech_gameplay_fixture.py",
-            "tests/test_bob_core_materials.py",
-            "tests/test_bob_material_preservation_fixture.py",
-            "tests/test_bob_plates_f210_facts.py",
-            "tests/test_bob_plates_f210_materials.py",
-            "tests/test_bob_plates_f210_pipeline.py",
-            "tests/test_bob_plates_full_base_f210_pipeline.py",
-            "tests/test_bob_tech_progression_f210_pipeline.py",
-            "tests/test_bob_core_progression.py",
-            "tests/test_bob_core_gameplay_fixture.py",
-            "tests/test_override_interactions_fixture.py",
-            "tests/test_armor_py_catalogue.py",
-            "tests/test_bob_warfare_f210_pipeline.py",
-            "tests/test_bob_productivity_f210_pipeline.py",
-            "tests/test_ironclad_f210_pipeline.py",
-            "tests/test_bob_angel_f210_pipeline.py",
-            "tests/test_angelbob_f210_steel_fixture.py",
-            "tests/test_angelbob_preowned_steel.py",
-            "tests/test_bob_angel_f210_science_oil_fixture.py",
-            "tests/test_py_f210_catalogue.py",
-            "tests/test_py_f210_pipeline.py",
-            "tests/test_native_modded_continuations.py",
-            "tests/test_bob_native_inserter.py",
-            "tests/test_integration_catalogue_upgrade_fixture.py",
-            "tests/test_bob_angel_native_fixture.py",
-            "tests/test_bob_angel_prototype_caps.py",
-            "tests/test_atan_productivity.py",
-            "tests/test_atan_gameplay_fixture.py",
-            "tests/test_full_catalogue_upgrade_fixture.py",
-            "tests/test_full_catalogue_upgrade_f210_fixture.py",
-            "tests/test_f200_f210_catalogue_upgrade_fixture.py",
-            "tests/test_fixed_provider_removal_control_fixture.py",
-            "tests/test_automatic_families.py",
-            "tests/test_competing_productivity.py",
-            "tests/test_native_credit_definitions.py",
-            "tests/test_native_gun_credit_definitions.py",
-            "tests/test_native_gun_credits.py",
-            "tests/test_native_family_credit_definitions.py",
-            "tests/test_native_credits.py",
-            "tests/test_native_family_paid_credits.py",
-            "tests/test_native_credit_vectors.py",
-            "tests/test_native_credit_vector_fixture.py",
-            "tests/test_native_credit_price_paid.py",
-            "tests/test_known_base_addition_fixture.py",
-            "tests/test_legacy_module_credits.py",
-            "tests/test_legacy_cannon_credits.py",
-            "tests/test_legacy_preference_transition_fixture.py",
-            "tests/test_competing_epr_native_fixture.py",
-            "tests/test_competing_fixed_reference.py",
-            "tests/test_competing_fixed_native_fixture.py",
-            "tests/test_competing_dynamic_native_fixture.py",
-            "tests/test_science.py",
-            "tests/test_sif_catalogue_policy.py",
-            "tests/test_named_science_replacement_fixture.py",
-            "tests/test_fresh_science_transition_fixture.py",
-            "tests/test_sif_retained_manufacturing.py",
-            "tests/test_sif_retained_manufacturing_native.py",
-            "tests/test_sif_technology_reload_diagnostic.py",
-            "tests/test_sif_science_retirement_fixture.py",
-            "tests/test_cryogenic_native_fixture.py",
-            "tests/test_cryogenic_gameplay_fixture.py",
-            "tests/test_material_catalogue.py",
-            "tests/test_material_native_fixture.py",
-            "tests/test_product_targets.py",
-            "tests/test_product_target_extension.py",
-            "tests/test_native_family_product_targets.py",
-            "tests/test_native_owner_costs.py",
-            "tests/test_native_owner_fallback.py",
-            "tests/test_native_owner_withheld_runtime.py",
-            "tests/test_native_owner_fallback_state_boundary.py",
-            "tests/test_native_owner_cap_adoption.py",
-            "tests/test_native_owner_field_tuning.py",
-            "tests/test_diagnostics.py",
-            "tests/test_target_adapters.py",
-            "tests/test_caps.py",
-            "tests/test_legacy_caps.py",
-            "tests/test_legacy_caps_lifecycle.py",
-            "tests/test_f200_legacy_cap_fixture.py",
-            "tests/test_legacy_boolean_cap_fixture.py",
-            "tests/test_f200_foreign_cap_baseline_fixture.py",
-            "tests/test_native_owner_cap_order_fixture.py",
-            "tests/test_worker_speed_cap_ten_native.py",
-            "tests/test_f200_legacy_worker_fixture.py",
-            "tests/test_k2_imersite_migration.py",
-            "tests/test_k2_imersite_transition_fixture.py",
-            "tests/test_k2se_imersite_carrier_fixture.py",
-            "tests/test_api.py",
-            "tests/test_api_boundary_fixture.py",
-            "tests/test_runtime_api.py",
-            "tests/test_planet_discovery_api_fixture.py",
-            "tests/test_discovery_recovery_fixture.py",
-            "tests/test_sdk.py",
-            "tests/test_fixture_controls.py",
-            "tests/test_foreign_research_preservation.py",
-            "tests/test_capture_controls.py",
-            "tests/test_lifecycle.py",
-            "tests/test_native_owners.py",
-            "tests/test_module_permissions_override.py",
-            "tests/test_prototype_limits.py",
-            "tests/test_recipe_schema_repairs.py",
-            "tests/test_prerequisite_repairs.py",
-            "tests/test_module_permissions_activation.py",
-            "tests/test_bootstrap.py",
-            "tests/test_library.py",
-            "tests/test_library_legacy_settings_search_probe.py",
-            "tests/test_library_multiplayer_fixture.py",
-            "tests/test_library_native_input_fixture.py",
-            "tests/test_library_paired_browser_fixture.py",
-            "tests/test_scripted_effects_multiplayer_fixture.py",
-            "tests/test_scripted_effects_toggle_fixture.py",
-            "tests/test_library_model.py",
-            "tests/test_library_translations.py",
-            "tests/test_passive_repair.py",
-            "tests/test_repair_stress_fixture.py",
-            "tests/test_agriculture.py",
-            "tests/test_agriculture_scale_fixture.py",
-            "tests/test_large_factory_activity_fixture.py",
-            "tests/test_spoilage.py",
-            "tests/test_scripted_effects_lifecycle.py",
-            "tests/test_settings_profile.py",
-            "tests/test_profile_native_witness.py",
-            "tests/test_profile_native_runner.py",
-            "tests/test_settings_commands.py",
-            "tests/test_properties.py",
-            "tests/test_replay.py",
-            "tests/test_locale_catalogue.py",
-            "tests/test_mod_settings_dat.py",
-            "tests/test_angelbob_rebalance_space_age_profiles.py",
-            "tests/test_dependency_declarations.py",
-            "tests/test_library_native_input.py",
-            "tests/test_library_native_input_linux.py",
-            "tests/test_library_linux_display.py",
-            "tests/test_library_linux_capture.py",
-            "tests/test_library_profile_reader.py",
-            "tests/test_f110_f200_runner.py",
-            "tests/test_f100_f110_laser_runner.py",
-            "tests/test_published_f100_forward_runner.py",
-            "tests/test_native_fixture_modes.py",
-            "tests/test_package.py",
-            "tests/test_early_package.py",
-            "tests/test_changelog.py",
-            "tests/test_version_aliases.py",
-            "tests/test_release.py",
-            "tests/test_compose_replay.py",
-            "tests/test_compare_captures.py",
-            "tests/test_recover_modern_catalogue.py",
-            "tests/test_historical_sources.py",
-            "tests/test_menu_comparison.py",
-            "tests/test_menu_comparison_analysis.py",
-            "tests/test_runtime_benchmark_analysis.py",
-            "tests/test_pack.py",
-            "tests/test_startup_timings.py",
-            "tests/test_host_controls.py",
-            "tests/test_input_filesystem_boundaries.py",
-            "tests/test_linux_resource_platform.py",
-            "tools/check_repository.py",
-        ])
-        self.assertEqual(len(set(paths)), len(paths))
-        self.assertEqual(paths[-1], "tools/check_repository.py")
-        self.assertIn("tests/test_sdk.py", paths)
-        self.assertIn("tests/test_module_permissions_override.py", paths)
-        self.assertIn("tests/test_library.py", paths)
-        self.assertIn("tests/test_capture_controls.py", paths)
-        self.assertIn("tests/test_library_model.py", paths)
-        self.assertIn("tests/test_library_translations.py", paths)
-        self.assertIn("tests/test_legacy_caps.py", paths)
-        self.assertIn("tests/test_legacy_caps_lifecycle.py", paths)
-        self.assertIn("tests/test_passive_repair.py", paths)
-        self.assertIn("tests/test_agriculture.py", paths)
-        self.assertIn("tests/test_spoilage.py", paths)
-        self.assertIn("tests/test_scripted_effects_lifecycle.py", paths)
-        self.assertIn("tests/test_settings_profile.py", paths)
-        self.assertIn("tests/test_settings_commands.py", paths)
-        self.assertIn("tests/test_locale_catalogue.py", paths)
-        self.assertIn("tests/test_host_controls.py", paths)
-        self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(set(row) == {"path", "lua"} for row in controls))
-        first_python_only = paths.index("tests/test_locale_catalogue.py")
-        self.assertTrue(all(row["lua"] for row in controls[:first_python_only]))
-        self.assertTrue(all(not row["lua"] for row in controls[first_python_only:]))
+        validate_host_control_plan(plan, ROOT)
+
+    def test_plan_properties_reject_missing_duplicate_wrong_mode_and_escaped_controls(self):
+        with tempfile.TemporaryDirectory(prefix="mir-host-plan-contract-") as directory:
+            root = Path(directory)
+            paths = sorted(MANDATORY_HOST_BOUNDARIES - {"tools/check_repository.py"}) + ["tools/check_repository.py"]
+            for path in paths:
+                source = root / path
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_text("print('host control')\n", encoding="utf-8")
+            lua_source = root / "tests/test_generator.py"
+            lua_source.write_text("parser.add_argument('--lua-runtime-dir', required=True)\n", encoding="utf-8")
+            plan = {"kind": "MIR5HostControlsPlanV1", "native_execution": False,
+                    "release_qualification": False,
+                    "controls": [{"path": path, "lua": path == "tests/test_generator.py"} for path in paths]}
+            validate_host_control_plan(plan, root)
+            # The execution plan alone owns ordinary ordering; harmless permutations pass.
+            swapped = copy.deepcopy(plan)
+            swapped["controls"][0:2] = reversed(swapped["controls"][0:2])
+            validate_host_control_plan(swapped, root)
+            opponents = []
+            duplicate = copy.deepcopy(plan)
+            duplicate["controls"].insert(0, duplicate["controls"][0].copy())
+            opponents.append((duplicate, "duplicate"))
+            missing = copy.deepcopy(plan)
+            missing["controls"].pop(0)
+            opponents.append((missing, "inventory"))
+            wrong_mode = copy.deepcopy(plan)
+            next(row for row in wrong_mode["controls"] if row["path"] == "tests/test_generator.py")["lua"] = False
+            opponents.append((wrong_mode, "invocation mode"))
+            unsupported_mode = copy.deepcopy(plan)
+            next(row for row in unsupported_mode["controls"] if row["path"] == "tests/test_library.py")["lua"] = True
+            opponents.append((unsupported_mode, "invocation mode"))
+            malformed = copy.deepcopy(plan)
+            malformed["controls"][0]["lua"] = 1
+            opponents.append((malformed, "invocation shape"))
+            escaping = copy.deepcopy(plan)
+            escaping["controls"][0]["path"] = "../outside.py"
+            opponents.append((escaping, "not canonical"))
+            wrong_order = copy.deepcopy(plan)
+            wrong_order["controls"][0], wrong_order["controls"][-1] = wrong_order["controls"][-1], wrong_order["controls"][0]
+            opponents.append((wrong_order, "finish"))
+            overclaim = copy.deepcopy(plan)
+            overclaim["native_execution"] = True
+            opponents.append((overclaim, "authority"))
+            for opponent, reason in opponents:
+                with self.subTest(reason=reason), self.assertRaisesRegex(ValueError, reason):
+                    validate_host_control_plan(opponent, root)
+            new_test = root / "tests/test_new_boundary.py"
+            new_test.write_text("print('new boundary')\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "inventory"):
+                validate_host_control_plan(plan, root)
+            new_test.unlink()
+            # Deleting a core file from both the tree and plan cannot erase its obligation.
+            (root / "tests/test_bootstrap.py").unlink()
+            removed_boundary = copy.deepcopy(plan)
+            removed_boundary["controls"] = [row for row in removed_boundary["controls"]
+                                             if row["path"] != "tests/test_bootstrap.py"]
+            with self.assertRaisesRegex(ValueError, "mandatory"):
+                validate_host_control_plan(removed_boundary, root)
 
     def test_workflow_runs_the_full_host_gate_for_every_dev_main_change(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")

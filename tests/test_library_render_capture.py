@@ -7,6 +7,8 @@ import subprocess
 import sys
 import unittest
 
+from library_observer_authority import GUI_FIELD_ASSIGNMENT, LUA_GUI_AUTHORITY
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-render-capture"
 CURRENT_TUPLES = (("2.0.77", "5.0.20017"), ("2.1.24", "5.0.21017"))
@@ -26,25 +28,25 @@ class LibraryRenderCaptureTests(unittest.TestCase):
     def setUp(self, actor_source=None):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().actor_source = actor_source or (FIXTURE / "control.lua").read_text(encoding="utf-8")
-        self.lua.execute(r'''
+        self.lua.execute(LUA_GUI_AUTHORITY + r'''
           local tick_callback
           handlers={}
           defines={controllers={cutscene=6}}
           storage={}
           script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21017"},
-            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end,
-            on_init=function(fn) handlers.init=fn end,
-            on_configuration_changed=function(fn) handlers.configuration=fn end}
+            on_nth_tick=function(n,fn) assert(n==30);tick_callback=observer_callback(fn) end,
+            on_init=function(fn) handlers.init=observer_callback(fn) end,
+            on_configuration_changed=function(fn) handlers.configuration=observer_callback(fn) end}
           local tech={name="worker-robots-storage-4",level=4,researched=false,enabled=true}
           local force={technologies={[tech.name]=tech},recipes={iron={enabled=true}},
             research_queue={},research_progress=0,worker_robots_storage_bonus=0}
-          local tabs={valid=true,selected_tab_index=1}
-          local root={valid=true,mir_library_tabs=tabs,location={x=20,y=30},
+          local tabs=gui_state({valid=true,selected_tab_index=1},"tabs")
+          local root=gui_state({valid=true,mir_library_tabs=tabs,location={x=20,y=30},
             style={minimal_width=1100,maximal_width=1100,maximal_height=800},
-            get_mod=function() return "more-infinite-research" end}
-          player={valid=true,connected=true,index=1,locale="en",force=force,controller_type=1,
+            get_mod=function() return "more-infinite-research" end},"root")
+          player=gui_state({valid=true,connected=true,index=1,locale="en",force=force,controller_type=1,
             display_scale=1.25,display_resolution={width=1920,height=1080},
-            gui={screen={mir_research_browser=root}}}
+            gui={screen={mir_research_browser=root}}},"player")
           screenshots,writes,calls,flushes={}, {}, {},0
           game={tick=0,
             connected_players={player},take_screenshot=function(args)
@@ -74,7 +76,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
             end}
           logs={}
           log=function(message) logs[#logs+1]=message end
-          assert(load(actor_source, "@mir-fixture-library-render-capture/control.lua"))()
+          observer_callback(assert(load(actor_source, "@mir-fixture-library-render-capture/control.lua")))()
           handlers.init()
           function step(n) for i=1,n do game.tick=game.tick+30;tick_callback() end end
           function run() step(100) end
@@ -336,7 +338,24 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "locale changed"):
             self.lua.execute('run()')
 
-    def test_fixture_metadata_and_no_mutation_authority(self):
+    def test_executed_render_observer_cannot_write_gui_fields_through_aliases(self):
+        actor = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        for statement in ('local alias=player;alias.opened=nil',
+                          'local alias=player;alias["opened"]=nil',
+                          'local alias=player.gui.screen.mir_research_browser;alias.text="forged"'):
+            with self.subTest(statement=statement):
+                self.setUp(actor_source=actor + '\nscript.on_nth_tick(30,function() ' + statement + ' end)')
+                self.lua.execute('player.opened=player.gui.screen.mir_research_browser;player.opened.text="engine text"')
+                with self.assertRaisesRegex(Exception, "observer GUI mutation"):
+                    self.lua.execute('step(1)')
+                self.lua.execute('''
+                  local root=player.gui.screen.mir_research_browser
+                  assert(player.opened==root and root.text=="engine text")
+                  root.text="next engine input";player.opened=nil
+                  assert(root.text=="next engine input" and player.opened==nil)
+                ''')
+
+    def test_fixture_metadata_and_passive_observer_tripwires(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-render-capture",
@@ -350,6 +369,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         for forbidden in ["remote.add_interface", "raise_event", "require(", "server_save", "auto_save",
                           "research_queue =", ".researched =", ".level =", "root.style.width ="]:
             self.assertNotIn(forbidden, code)
+        self.assertIsNone(GUI_FIELD_ASSIGNMENT.search(code))
         self.assertEqual(code.count('[MIR_ACTIVE_MODS] '), 1)
         self.assertIn("for name, version in pairs(script.active_mods) do", code)
 
