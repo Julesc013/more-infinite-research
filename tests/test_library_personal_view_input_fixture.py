@@ -22,29 +22,45 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           storage={}
           logs={}
           interfaces={}
+          writes={}
           defines={events={on_player_joined_game=1,on_lua_shortcut=2,on_gui_click=3,
-            on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},gui_type={custom=99}}
+            on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},
+            gui_type={custom=99},controllers={character=1,cutscene=6}}
           script={active_mods={base=base_version, ["more-infinite-research"]=package_version,
-            ["mir-fixture-library-personal-view-input"]="0.1.1"},
+            ["mir-fixture-library-personal-view-input"]="0.1.4"},
             on_init=function(fn) callbacks.init=fn end,
             on_event=function(event,fn) callbacks.events[event]=fn end}
           remote={add_interface=function(name,values) interfaces[name]=values end}
+          helpers={table_to_json=function(value) return value end,
+            write_file=function(path,value,append,index)
+              assert(append==false and index==1 and writes[path]==nil)
+              writes[path]=value
+            end}
           log=function(message) logs[#logs+1]=message end
+          next_gui_index=0
           local function element(kind,name)
-            return {valid=true,type=kind,name=name,get_mod=function() return "more-infinite-research" end}
+            next_gui_index=next_gui_index+1
+            return {valid=true,type=kind,name=name,index=next_gui_index,get_mod=function() return "more-infinite-research" end}
           end
           force={valid=true,name="player",current_research=nil,research_progress=0,research_queue={},
             worker_robots_storage_bonus=0}
           player={valid=true,connected=true,index=1,force=force,display_scale=1.25,
-            display_resolution={width=1920,height=1080},gui={screen={}},opened=nil}
+            display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
+            gui={screen={}},opened=nil}
           game={tick=0,get_player=function(index) return index==1 and player or nil end}
           setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
           function build_root(query_text, x, y)
+            local function readable_style(values)
+              return setmetatable(values,{__index=function(_,field)
+                if field=="width" or field=="height" then error("write-only style read: "..field) end
+                return nil
+              end})
+            end
             local root=element("frame","mir_research_browser")
             root.location={x=x or 20,y=y or 30}
-            root.style={width=1100,height=800,maximal_width=1100}
+            root.style=readable_style({minimal_width=0,maximal_width=1100,minimal_height=0,maximal_height=800})
             local tabs=element("tabbed-pane","mir_library_tabs");tabs.selected_tab_index=1
-            tabs.style={width=1068,maximal_width=1068}
+            tabs.style=readable_style({minimal_width=0,maximal_width=0,minimal_height=nil,maximal_height=nil})
             tabs.mir_library_tab_research=element("tab","mir_library_tab_research")
             tabs.mir_library_tab_help=element("tab","mir_library_tab_help")
             local page=element("scroll-pane","mir_library_research_page");page.visible=true
@@ -63,7 +79,10 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           end
           function retire_library()
             local root=player.gui.screen.mir_research_browser
-            if root then root.valid=false end
+            if root then
+              root.valid=false
+              root.mir_library_tabs.valid=false
+            end
             player.gui.screen.mir_research_browser=nil;player.opened=nil
           end
           assert(load(actor_source,"@mir-fixture-library-personal-view-input/control.lua"))()
@@ -142,13 +161,21 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           assert(observed.snapshots[1].stage=="initial" and observed.snapshots[2].stage=="open")
           assert(observed.snapshots[3].stage=="help-tab" and observed.snapshots[3].tab_index==4)
           assert(observed.snapshots[4].stage=="research-tab" and observed.snapshots[4].tab_index==1)
+          assert(observed.snapshots[2].tab_bar_index==observed.snapshots[3].tab_bar_index
+            and observed.snapshots[3].tab_bar_index==observed.snapshots[4].tab_bar_index)
           assert(observed.snapshots[5].stage=="query-click" and observed.snapshots[6].query=="gear")
           assert(observed.snapshots[7].stage=="closed" and observed.snapshots[8].stage=="reopen")
-          assert(observed.snapshots[8].geometry.x==20 and observed.snapshots[8].geometry.width==1100)
+          assert(observed.snapshots[8].tab_bar_index~=observed.snapshots[2].tab_bar_index)
+          assert(observed.snapshots[8].geometry.x==20 and observed.snapshots[8].geometry.maximal_width==1100)
+          assert(writes["mir-library-personal-view-input/01-initial.json"].phase=="await-open")
+          assert(writes["mir-library-personal-view-input/03-help-tab.json"].snapshot.tab_index==4)
+          assert(writes["mir-library-personal-view-input/08-reopen.json"].complete)
+          assert(writes["mir-library-personal-view-input/08-reopen.json"].active_mods==observed.active_mods)
+          local count=0;for _ in pairs(writes) do count=count+1 end;assert(count==8)
         ''')
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.1|more-infinite-research@5.0.21016",
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.4|more-infinite-research@5.0.21016",
         )
         self.assertEqual(self.lua.eval("#logs"), 1)
 
@@ -164,7 +191,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
                     self.lua.execute("initialize()")
                 self.assertEqual(self.lua.eval("#logs"), 0)
         self.setUp()
-        self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.0"')
+        self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.3"')
         with self.assertRaisesRegex(Exception, "exact active-mod selection"):
             self.lua.execute("initialize()")
 
@@ -262,11 +289,47 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.execute(r'''
           local observed=report()
           assert(observed.complete)
-          assert(observed.snapshots[2].tab_bar.index==101)
-          assert(observed.snapshots[8].tab_bar.index==202)
+          assert(observed.snapshots[2].tab_bar_index==101)
+          assert(observed.snapshots[8].tab_bar_index==202)
           assert(observed.snapshots[2].tab_bar.minimal_width==0)
           assert(observed.snapshots[8].tab_bar.minimal_height==-1)
         ''')
+
+        self.setUp()
+        self.lua.execute("initialize();emit(defines.events.on_player_joined_game,{player_index=1});helpers=nil")
+        with self.assertRaisesRegex(Exception, "phase output helpers unavailable"):
+            self.lua.execute("tick()")
+
+    def test_pre_shortcut_base_events_and_cutscene_wait_do_not_count_as_mir_input(self):
+        self.setUp()
+        self.lua.execute(r'''
+          initialize()
+          player.controller_type=defines.controllers.cutscene
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          tick()
+          assert(report().phase=="settling-initial" and next(writes)==nil)
+          emit(defines.events.on_gui_click,{player_index=1,element={valid=true,name="base_welcome_confirm"}})
+          emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+          assert(report().events.setup==2 and report().events.shortcut==0 and report().events.close==0)
+          player.controller_type=defines.controllers.character
+          tick()
+          assert(report().phase=="await-open")
+          local initial=writes["mir-library-personal-view-input/01-initial.json"]
+          assert(initial and initial.snapshot.controller_type==defines.controllers.character)
+          assert(initial.events.setup==2 and initial.events.shortcut==0)
+        ''')
+
+    def test_host_style_double_rejects_write_only_width_and_height_reads(self):
+        for expression, field in (
+            ('local root=build_root(""); local _=root.style.width', "width"),
+            ('local root=build_root(""); local _=root.style.height', "height"),
+            ('local root=build_root(""); local _=root.mir_library_tabs.style.width', "width"),
+            ('local root=build_root(""); local _=root.mir_library_tabs.style.height', "height"),
+        ):
+            with self.subTest(field=field, expression=expression):
+                self.setUp()
+                with self.assertRaisesRegex(Exception, "write-only style read: " + field):
+                    self.lua.execute(expression)
 
     def test_invalid_closed_element_is_not_dereferenced_and_deferred_retirement_is_required(self):
         self.initialize_join_initial()
@@ -314,7 +377,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           local root=open_library("");tick()
           local tabs=root.mir_library_tabs;tabs.selected_tab_index=4
           emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs});tick()
-          tabs.selected_tab_index=1;tabs.style.width=1067
+          tabs.selected_tab_index=1;tabs.style.maximal_width=1067
           emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
         ''')
         with self.assertRaisesRegex(Exception, "tab-bar identity or geometry was not retained"):
@@ -330,7 +393,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-personal-view-input",
-            "version": "0.1.1",
+            "version": "0.1.4",
             "title": "MIR Library personal-view input observer",
             "author": "MIR maintainers",
             "factorio_version": "2.1",
@@ -348,6 +411,10 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
         self.assertIn("script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)", code)
+        self.assertIn('helpers.write_file(name, helpers.table_to_json({', code)
+        self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)
+        self.assertNotIn("style.width", code)
+        self.assertNotIn("style.height", code)
 
 
 if __name__ == "__main__":
