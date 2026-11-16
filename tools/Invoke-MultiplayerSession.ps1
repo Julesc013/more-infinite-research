@@ -154,7 +154,7 @@ function Stop-Record($Record) {
   Assert-Session $Record.process.WaitForExit(10000) "owned process did not stop: $($Record.name)"
   Complete-Record $Record
 }
-function Start-Native([string]$Name, [string[]]$Arguments) {
+function Start-Native([string]$Name, [string[]]$Arguments, [AllowNull()][System.Collections.IDictionary]$Environment=$null) {
   $stdout = Resolve-BuildOutput (Join-Path $workroot ("phase-$Name.stdout.log")) "$Name stdout"
   $stderr = Resolve-BuildOutput (Join-Path $workroot ("phase-$Name.stderr.log")) "$Name stderr"
   Assert-Session (-not (Test-Path -LiteralPath $stdout) -and -not (Test-Path -LiteralPath $stderr)) "$Name output already exists"
@@ -165,6 +165,12 @@ function Start-Native([string]$Name, [string[]]$Arguments) {
   $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
   $start.RedirectStandardOutput = $true
   $start.RedirectStandardError = $true
+  if($null-ne$Environment){
+    foreach($entry in $Environment.GetEnumerator()){
+      Assert-Session ($entry.Key -is [string] -and $entry.Value -is [string]) "$Name environment differs"
+      $start.Environment[[string]$entry.Key]=[string]$entry.Value
+    }
+  }
   foreach ($argument in $Arguments) { [void]$start.ArgumentList.Add($argument) }
   $process = [Diagnostics.Process]::new(); $process.StartInfo = $start
   $streams = [Collections.Generic.List[IO.FileStream]]::new()
@@ -206,6 +212,44 @@ function Start-Native([string]$Name, [string[]]$Arguments) {
     $process.Dispose()
     throw
   }
+}
+function Read-DisplayReady($Role) {
+  $ready=Resolve-BuildInput ([string]$Role.ready) 'Leaf' ('display '+[string]$Role.role+' ready receipt')
+  $value=Get-Content -LiteralPath $ready -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Session ($value -is [System.Collections.IDictionary] -and $value.Count -eq 9 -and $value.kind -ceq 'MIRLinuxLibraryDisplayReadyV1' -and $value.role -ceq [string]$Role.role -and $value.display -ceq [string]$Role.display -and $value.geometry -ceq [string]$Role.geometry -and $value.factorio_processes -eq 0) 'private display ready receipt differs'
+  foreach($field in @('display_identity','display_binding','viewer_binding','authority_device_inode')){Assert-Session ($value.Contains($field)) "private display ready receipt lacks $field"}
+  return $value
+}
+function Start-PrivateDisplay($Role) {
+  $stdout=Resolve-BuildOutput (Join-Path $workroot ('display-'+[string]$Role.locale+'.stdout.log')) 'private display stdout'
+  $stderr=Resolve-BuildOutput (Join-Path $workroot ('display-'+[string]$Role.locale+'.stderr.log')) 'private display stderr'
+  Assert-Session (-not(Test-Path -LiteralPath $stdout)-and-not(Test-Path -LiteralPath $stderr)) 'private display output already exists'
+  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$linuxPrivateDisplays.python;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
+  $start.RedirectStandardInput=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @([string]$linuxPrivateDisplays.display_cli,'--module-sha256',[string]$linuxPrivateDisplays.display_module_sha256,'--mode','execute','--checkout',[string]$linuxPrivateDisplays.checkout,'--plan',[string]$Role.plan,'--plan-sha256',[string]$Role.plan_sha256)){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) ('failed to start private display '+[string]$Role.role)
+  $streams=@([IO.File]::Open($stdout,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read),[IO.File]::Open($stderr,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read))
+  $copies=@($process.StandardOutput.BaseStream.CopyToAsync($streams[0]),$process.StandardError.BaseStream.CopyToAsync($streams[1]))
+  $until=[DateTime]::UtcNow.AddSeconds(30);$ready=$null
+  while([DateTime]::UtcNow-lt$until){
+    if(Test-Path -LiteralPath ([string]$Role.ready) -PathType Leaf){$ready=Read-DisplayReady $Role;break}
+    Assert-Session (-not$process.HasExited) ('private display exited before ready: '+[string]$Role.role)
+    Start-Sleep -Milliseconds 100
+  }
+  Assert-Session ($null-ne$ready) ('private display did not become ready: '+[string]$Role.role)
+  return [pscustomobject]@{role=$Role;process=$process;stdin=$process.StandardInput;stdout=$stdout;stderr=$stderr;streams=$streams;copies=$copies;ready=$ready;closed=$false}
+}
+function Stop-PrivateDisplay($Display) {
+  if($null-eq$Display-or$Display.closed){return}
+  $Display.stdin.WriteLine('stop');$Display.stdin.Close()
+  Assert-Session ($Display.process.WaitForExit(15000)) ('private display did not stop: '+[string]$Display.role.role)
+  foreach($copy in @($Display.copies)){$null=$copy.GetAwaiter().GetResult()};foreach($stream in @($Display.streams)){$stream.Dispose()}
+  Assert-Session ($Display.process.ExitCode-eq0) ('private display exit differs: '+[string]$Display.role.role)
+  $result=Resolve-BuildInput ([string]$Display.role.result) 'Leaf' ('display '+[string]$Display.role.role+' result receipt')
+  $value=Get-Content -LiteralPath $result -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Session ($value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'stop'-and$value.role-ceq[string]$Display.role.role-and$value.global_display_restored-eq$true-and$value.private_viewer_restored-eq$true-and$value.authority_removed-eq$true) 'private display restoration receipt differs'
+  $Display.process.Dispose();$Display.closed=$true
 }
 function Read-LiveText {
   $parts = [Collections.Generic.List[string]]::new()
@@ -361,6 +405,7 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21004';standalone_identity_discovery=$false},
+    [ordered]@{engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';base='2.1.24';mir='5.0.21017';standalone_identity_discovery=$false;linux_private_displays=$true},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
   )
   $requestedStandaloneIdentityDiscovery=$false
@@ -383,6 +428,8 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
       Assert-Session (-not$Spec.ContainsKey($name)) 'current504 witness admits only the four-mod Base fixture'
     }
   }
+  $expectsPrivateDisplays=$expected.Contains('linux_private_displays') -and $expected.linux_private_displays-eq$true
+  Assert-Session ($expectsPrivateDisplays -eq $Spec.ContainsKey('linux_private_displays')) 'Library session private-display mode differs from its witness target'
   if($Spec.ContainsKey('space_age_library')){
     Assert-Session (
       $Spec.space_age_library -is [bool] -and $Spec.space_age_library -and
@@ -859,6 +906,7 @@ if($fixtureCase-ceq'library-multiplayer'){
 }
 Assert-Session (-not $apiClientConsumers -or
   ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000') -or
+  ($libraryWitnessTarget.base -ceq '2.1.24' -and $libraryWitnessTarget.mir -ceq '5.0.21017' -and $spec.ContainsKey('linux_private_displays')) -or
   ($spec.ContainsKey('private_credit_checks') -and $spec.private_credit_checks -and
     $libraryWitnessTarget.base -ceq '2.0.77' -and $libraryWitnessTarget.mir -ceq '5.0.20000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
@@ -901,6 +949,36 @@ if($standaloneIdentityDiscovery){
   Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'standalone-de,standalone-en') 'standalone identity discovery client labels differ'
 }else{
   Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'MIR5Deutsch,MIR5English') 'two client identities must be MIR5English and MIR5Deutsch'
+}
+$linuxPrivateDisplays=$null
+if($spec.ContainsKey('linux_private_displays')){
+  Assert-Session ($fixtureCase-ceq'library-multiplayer'-and$apiClientConsumers-and-not$standaloneIdentityDiscovery) 'private displays differ from the current Library route'
+  Assert-Session ($spec.linux_private_displays-is[System.Collections.IDictionary]) 'private display binding differs'
+  $linuxPrivateDisplays=$spec.linux_private_displays
+  Assert-Session ($linuxPrivateDisplays.Keys.Count-eq6-and$linuxPrivateDisplays.Contains('python')-and$linuxPrivateDisplays.Contains('display_cli')-and$linuxPrivateDisplays.Contains('display_cli_sha256')-and$linuxPrivateDisplays.Contains('display_module_sha256')-and$linuxPrivateDisplays.Contains('checkout')-and$linuxPrivateDisplays.Contains('roles')) 'private display binding shape differs'
+  foreach($field in @('python','display_cli','checkout')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$linuxPrivateDisplays[$field])) "private display binding differs: $field"}
+  foreach($field in @('display_cli_sha256','display_module_sha256')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and[string]$linuxPrivateDisplays[$field]-cmatch'^[A-Fa-f0-9]{64}$') "private display hash differs: $field"}
+  $linuxPrivateDisplays.python=Resolve-Existing ([string]$linuxPrivateDisplays.python) 'Leaf' 'private display Python'
+  $linuxPrivateDisplays.display_cli=Resolve-BuildInput ([string]$linuxPrivateDisplays.display_cli) 'Leaf' 'private display CLI'
+  $linuxPrivateDisplays.checkout=Resolve-Existing ([string]$linuxPrivateDisplays.checkout) 'Container' 'private display checkout'
+  Assert-Session ((Get-SessionHash $linuxPrivateDisplays.display_cli)-ceq([string]$linuxPrivateDisplays.display_cli_sha256).ToUpperInvariant()) 'private display CLI hash differs'
+  $roles=@($linuxPrivateDisplays.roles);Assert-Session ($roles.Count-eq2) 'private display role count differs'
+  $roleLocales=[Collections.Generic.List[string]]::new()
+  foreach($role in $roles){
+    foreach($field in @('locale','role','display','geometry','plan','plan_sha256','ready','result','role_root','authority')){Assert-Session ($role.ContainsKey($field)) "private display role lacks $field"}
+    Assert-Session ($role.locale-in@('en','de')-and-not$roleLocales.Contains([string]$role.locale)-and$role.role-ceq('client-'+[string]$role.locale)-and$role.display-ceq(':'+[string]$(if($role.locale-ceq'en'){193}else{194}))-and$role.geometry-ceq'1280x720') 'private display role differs'
+    $null=$roleLocales.Add([string]$role.locale)
+    $role.plan=Resolve-BuildInput ([string]$role.plan) 'Leaf' 'private display role plan'
+    $role.role_root=Resolve-BuildInput ([string]$role.role_root) 'Container' 'private display role root'
+    Assert-Session ([string]$role.plan_sha256-cmatch'^[A-Fa-f0-9]{64}$'-and(Get-SessionHash $role.plan)-ceq([string]$role.plan_sha256).ToUpperInvariant()) 'private display plan hash differs'
+    foreach($field in @('authority','ready','result')){
+      $candidate=Resolve-BuildOutput ([string]$role[$field]) ("private display role $field")
+      Assert-Session ((Split-Path -Parent $candidate)-ceq[string]$role.role_root) "private display $field differs"
+      $role[$field]=$candidate
+    }
+    Assert-Session (-not(Test-Path -LiteralPath $role.ready)-and-not(Test-Path -LiteralPath $role.result)-and-not(Test-Path -LiteralPath $role.authority)) 'private display role output already exists'
+  }
+  Assert-Session ((@($roleLocales|Sort-Object)-join',')-ceq'de,en') 'private display locales differ'
 }
 $pairedArm=$null
 if($fixtureCase -ceq 'library-paired-browser'){
@@ -984,6 +1062,9 @@ function Start-Server([string]$Name, [string]$Save) {
 }
 function Start-Clients([string]$Phase) {
   $discovery=$false
+  $privateDisplays=$null
+  $privateBinding=Get-Variable -Name linuxPrivateDisplays -ValueOnly -ErrorAction SilentlyContinue
+  if($null-ne$privateBinding){$privateDisplays=$privateBinding}
   $mode=Get-Variable -Name standaloneIdentityDiscovery -ValueOnly -ErrorAction SilentlyContinue
   if($null-ne$mode){$discovery=[bool]$mode}
   $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
@@ -993,7 +1074,16 @@ function Start-Clients([string]$Phase) {
     $clientLogPath=Join-Path $client.write_data 'factorio-current.log'
     $clientLogBaselines[[string]$client.name]=Read-LogText $clientLogPath
     $serverLogBefore=Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
-    $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)
+    $environment=$null
+    if($null-ne$privateDisplays){
+      Assert-Session ($displayByLocale.ContainsKey([string]$client.locale)) 'private display locale is unavailable'
+      $display=$displayByLocale[[string]$client.locale]
+      $cache=Join-Path $client.write_data 'linux-cache';$configRoot=Join-Path $client.write_data 'linux-config'
+      foreach($path in @($cache,$configRoot)){Assert-Session (-not(Test-Path -LiteralPath $path));$null=New-Item -ItemType Directory -Path $path}
+      Assert-Session ((Get-Item -LiteralPath $display.role.authority -Force).LinkType.Count-eq0) 'private display authority became a link'
+      $environment=[ordered]@{DISPLAY=[string]$display.role.display;XAUTHORITY=[string]$display.role.authority;LIBGL_ALWAYS_SOFTWARE='1';MESA_SHADER_CACHE_DISABLE='true';__GL_SHADER_DISK_CACHE='0';XDG_CACHE_HOME=$cache;XDG_CONFIG_HOME=$configRoot}
+    }
+    $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics) $environment
     $actor | Add-Member -NotePropertyName native_log_path -NotePropertyValue $clientLogPath
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
@@ -1035,7 +1125,18 @@ function Start-Clients([string]$Phase) {
 
 $sessionFailure = $null
 $result = $null
+$activeDisplays=[Collections.Generic.List[object]]::new()
+$displayByLocale=@{}
 try {
+  # This lookup is deliberately inside the governed execution block.  Its
+  # extracted host control runs the lifecycle without a Linux display binding.
+  $privateDisplayBinding=Get-Variable -Name linuxPrivateDisplays -ValueOnly -ErrorAction SilentlyContinue
+  if($null-ne$privateDisplayBinding){
+    foreach($role in @($privateDisplayBinding.roles|Sort-Object locale)){
+      $display=Start-PrivateDisplay $role
+      $activeDisplays.Add($display);$displayByLocale[[string]$role.locale]=$display
+    }
+  }
   $discovery=$false
   $mode=Get-Variable -Name standaloneIdentityDiscovery -ValueOnly -ErrorAction SilentlyContinue
   if($null-ne$mode){$discovery=[bool]$mode}
@@ -1210,6 +1311,10 @@ finally {
         Write-Warning "could not clean owned $($record.name): $($_.Exception.Message)"
       }
     }
+  }
+  $displays=Get-Variable -Name activeDisplays -ValueOnly -ErrorAction SilentlyContinue
+  foreach($display in @($displays|Sort-Object {$_.role.locale} -Descending)){
+    try{Stop-PrivateDisplay $display}catch{if($null-eq$sessionFailure){$sessionFailure=$_};Write-Warning "could not clean owned private display $($display.role.role): $($_.Exception.Message)"}
   }
   $sampler = Get-Variable -Name processMemorySampler -ValueOnly -ErrorAction SilentlyContinue
   if ($null -ne $sampler) {

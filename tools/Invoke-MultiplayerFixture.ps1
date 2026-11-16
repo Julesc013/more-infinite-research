@@ -18,6 +18,10 @@ param(
   # two-client predicate.  It is deliberately opt-in so the qualified Library
   # session continues to use its original profile, identities and GUI path.
   [switch]$StandaloneIdentityDiscovery,
+  # The current Linux route receives two already-composed, hash-bound display
+  # plans.  This wrapper does not own global host-idle/campaign admission or
+  # create a second governor; the governed session owns their lifetime.
+  [System.Collections.IDictionary]$LinuxPrivateDisplays,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -203,6 +207,23 @@ function Assert-MultiplayerFixtureSelection {
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
       api_client_consumers=$true
+    }
+    [ordered]@{
+      # This is the current Linux-only fresh Library route.  It deliberately
+      # remains a separate target: it does not retag the retained 2.1.23
+      # Windows selections or make their receipts portable by assertion.
+      fixture_case='library-multiplayer';target='f210-current-linux'
+      kind='mir5-library-api-consumers-current-linux-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.2','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.2.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
     }
     [ordered]@{
       fixture_case='library-paired-browser';target='f200'
@@ -438,7 +459,7 @@ function Get-StandaloneF210NativeFixtureRawGitMemberBytes {
     [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$Member
   )
-  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
+  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
   Assert-Session ($allowed-ccontains$Member) "standalone F210 fixture member is not admitted: $FixtureDirectory/$Member"
   $path='tests/fixtures/'+$FixtureDirectory+'/'+$Member
   $start=[Diagnostics.ProcessStartInfo]::new()
@@ -462,7 +483,7 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [switch]$SpaceAgeLibrary,
     [switch]$PrivateCreditChecks,
-    [ValidateSet('5.0.21000','5.0.21004')][string]$MIRVersion='5.0.21000'
+    [ValidateSet('5.0.21000','5.0.21004','5.0.21017')][string]$MIRVersion='5.0.21000'
   )
   Assert-Session ($MIRVersion-cne'5.0.21004' -or (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks)) 'current504 projection admits only the four-mod Base fixture'
   # The checked-in fixture retains F200 metadata and its developer README.
@@ -473,14 +494,21 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
   $privateCreditMetadata='info-f210-private-credits.json'
-  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)
+  $currentLinuxMetadata='info-f210-current-517.json'
+  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata,$currentLinuxMetadata)
   $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
   $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info.json'))|ConvertFrom-Json -AsHashtable
   $f210BaseInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info-f210.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$f200Info.name-ceq'mir-fixture-mir5-library-multiplayer' -and [string]$f200Info.version-ceq'0.1.0' -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone F210 canonical F200 fixture metadata differs'
   Assert-Session ([string]$f210BaseInfo.name-ceq[string]$f200Info.name -and [string]$f210BaseInfo.version-ceq[string]$f200Info.version -and [string]$f210BaseInfo.factorio_version-ceq'2.1' -and ((@($f210BaseInfo.dependencies)-join '|')-ceq'base >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 canonical Base fixture metadata differs'
-  $metadata=if($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  $metadata=if($MIRVersion-ceq'5.0.21017'){$currentLinuxMetadata}elseif($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  if($MIRVersion-ceq'5.0.21017'){
+    Assert-Session (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks) 'current Linux Library projection admits only Base API consumers'
+    Assert-Session ($canonicalNames-ccontains$currentLinuxMetadata) 'current Linux Library fixture metadata is absent'
+    $currentInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $currentLinuxMetadata))|ConvertFrom-Json -AsHashtable
+    Assert-Session ([string]$currentInfo.name-ceq[string]$f200Info.name -and [string]$currentInfo.version-ceq'0.1.2' -and [string]$currentInfo.factorio_version-ceq'2.1' -and ((@($currentInfo.dependencies)-join'|')-ceq'base >= 2.1.24|more-infinite-research = 5.0.21017')) 'current Linux Library fixture metadata differs'
+  }
   if($SpaceAgeLibrary){
     Assert-Session ($canonicalNames-ccontains$spaceAgeMetadata) 'standalone F210 Space Age fixture metadata is absent'
     $f210SpaceAgeInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $spaceAgeMetadata))|ConvertFrom-Json -AsHashtable
@@ -796,6 +824,13 @@ $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.sta
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
 $positivePrivateStateChecks=($target.PSObject.Properties['positive_private_state_checks'] -and $target.positive_private_state_checks -eq $true)
+$linuxPrivateDisplays=($target.PSObject.Properties['linux_private_displays'] -and $target.linux_private_displays -eq $true)
+if($linuxPrivateDisplays){
+  Assert-Session ($LinuxPrivateDisplays -is [System.Collections.IDictionary]) 'current Linux Library selection requires two bound private-display plans'
+  Assert-Session ($LinuxPrivateDisplays.Keys.Count -eq 6 -and $LinuxPrivateDisplays.Contains('python') -and $LinuxPrivateDisplays.Contains('display_cli') -and $LinuxPrivateDisplays.Contains('display_cli_sha256') -and $LinuxPrivateDisplays.Contains('display_module_sha256') -and $LinuxPrivateDisplays.Contains('checkout') -and $LinuxPrivateDisplays.Contains('roles')) 'current Linux private-display plan shape differs'
+  Assert-Session ($LinuxPrivateDisplays.python -is [string] -and $LinuxPrivateDisplays.display_cli -is [string] -and $LinuxPrivateDisplays.checkout -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -is [string] -and $LinuxPrivateDisplays.display_module_sha256 -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $LinuxPrivateDisplays.display_module_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'current Linux private-display pins differ'
+  Assert-Session (@($LinuxPrivateDisplays.roles).Count -eq 2) 'current Linux private-display role count differs'
+}
 if($standaloneF210){
   $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
@@ -891,7 +926,8 @@ try {
     # Isolated disposable identities contain no online token or personal data.
     # Discovery alone uses the bounded synthetic label for its actual join
     # marker; every route still keeps its token and write-data isolated.
-    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
+    $platform=if($target.PSObject.Properties['linux_private_displays']-and$target.linux_private_displays-eq$true){'linux64'}else{'win64'}
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform=$platform}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
   }
@@ -936,6 +972,9 @@ try {
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
+    if($linuxPrivateDisplays){
+      $spec.linux_private_displays=$LinuxPrivateDisplays
+    }
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-api-consumers-current-linux-f210-native-selection",
+  "target": "f210-current-linux",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.24",
+    "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 7168,
+  "mods": [
+    {"name": "base", "version": "2.1.24", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21017", "enabled": true},
+    {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.1.2", "enabled": true},
+    {"name": "mir-fixture-mir5-api-alpha", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-api-beta", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+    "mir-fixture-mir5-api-beta_0.1.0.zip": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21017.zip": "4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615"
+  },
+  "scope": "Provisional Linux2.1.24/current17 fresh Base-only two-client Library API-consumer selection. Its API beta fixture names the separately preserved 943AF6 archive but cannot compose until raw-Git source/member projection validates that binding; it requires separate private displays and role-local graphical state before a prospective native session. It is not imported-save, multiplayer, graphical, API, laboratory, restart, or performance acceptance."
+}

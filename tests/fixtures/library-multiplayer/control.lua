@@ -1056,6 +1056,7 @@ end
 local TARGETS = {
   ["2.0.77"] = {label="F200", mir_version="5.0.20000"},
   ["2.1.23"] = {label="F210", mir_version="5.0.21000"},
+  ["2.1.24"] = {label="F210-current", mir_version="5.0.21017"},
 }
 
 local function closure()
@@ -1069,7 +1070,15 @@ local function closure()
       fail("current504 admits only the four-mod Base Library closure")
     end
   end
+  local current517 = script.active_mods.base == "2.1.24"
+    and script.active_mods["more-infinite-research"] == "5.0.21017"
+  if current517 and (space_age_library() or standalone_identity_discovery() or private_credit_browser_probe() or positive_state) then
+    fail("current517 admits only the Base API-consumer Library closure")
+  end
   if target == nil then
+    fail("unsupported native Library target base " .. tostring(script.active_mods.base))
+  end
+  if target.label == "F210-current" and not current517 then
     fail("unsupported native Library target base " .. tostring(script.active_mods.base))
   end
   -- The ordinary qualified fixture remains 0.1.0.  The standalone identity
@@ -1084,12 +1093,12 @@ local function closure()
   if private_credit and standalone_identity_discovery() then
     fail("private-credit Library fixture cannot use standalone identity discovery")
   end
-  local fixture_version = positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0")))
+  local fixture_version = current517 and "0.1.2" or (positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
-  local closures = private_credit and {} or {allowed}
-  if (target.label == "F210" and not current504) or private_credit then
+  local closures = (private_credit or current517) and {} or {allowed}
+  if ((target.label == "F210" or target.label == "F210-current") and not current504) or private_credit then
     closures[#closures + 1] = {
       base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
       ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
