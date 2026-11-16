@@ -15,6 +15,7 @@ import mir_test_versions as SHARED
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-native-input"
 MIR_517_F210 = SHARED.alias_for("5.0.17", "f210").distribution_version
+MIR_517_F200 = SHARED.alias_for("5.0.17", "f200").distribution_version
 
 
 def plain(value):
@@ -2287,18 +2288,20 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
 
     def test_517_f210_input_rejects_tuple_and_closure_before_state_write(self):
-        for opponent, base, player, observer in (
-            ("extra-mod", "2.1.24", MIR_517_F210, "0.3.14"),
-            ("helperfree-missing-active-observer", "2.1.24", MIR_517_F210, "0.3.14"),
-            (None, "2.1.23", MIR_517_F210, "0.3.14"),
-            (None, "2.1.25", MIR_517_F210, "0.3.14"),
-            (None, "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.3.14"),
-            (None, "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.3.14"),
-            (None, "2.1.24", MIR_517_F210, "0.3.13"),
-            (None, "2.1.24", MIR_517_F210, "0.3.15"),
+        for target, opponent, base, player, observer in (
+            ("f210", "extra-mod", "2.1.24", MIR_517_F210, "0.3.14"),
+            ("f210", "helperfree-missing-active-observer", "2.1.24", MIR_517_F210, "0.3.14"),
+            ("f210", None, "2.1.23", MIR_517_F210, "0.3.14"),
+            ("f210", None, "2.1.25", MIR_517_F210, "0.3.14"),
+            ("f210", None, "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.3.14"),
+            ("f210", None, "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.3.14"),
+            ("f210", None, "2.1.24", MIR_517_F210, "0.3.13"),
+            ("f210", None, "2.1.24", MIR_517_F210, "0.3.15"),
+            ("f200", None, "2.1.24", MIR_517_F200, "0.3.14"),
+            ("f200", None, "2.0.77", MIR_517_F200, "0.3.14"),
         ):
-            with self.subTest(opponent=opponent, base=base, player=player, observer=observer):
-                result = self.run_case("f210", opponent, player, observer, base_override=base)
+            with self.subTest(target=target, opponent=opponent, base=base, player=player, observer=observer):
+                result = self.run_case(target, opponent, player, observer, base_override=base)
                 self.assertFalse(result["ok"], result["message"])
                 self.assertFalse(result["storage_initialized"], result["message"])
         for width, columns in ((1, 1), (440, 2), (620, 3), (960, 5)):
@@ -2751,18 +2754,19 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             "zero-server-index"):
             with self.subTest(opponent=opponent), self.assertRaises(Exception):
                 run("f210", opponent, "517", "authored", "2.1.24")
-        for opponent, base, player, observer in (
-            ("extra-mod", "2.1.24", MIR_517_F210, "0.4.8"),
-            ("missing-active-observer", "2.1.24", MIR_517_F210, "0.4.8"),
-            ("", "2.1.23", MIR_517_F210, "0.4.8"),
-            ("", "2.1.25", MIR_517_F210, "0.4.8"),
-            ("", "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.4.8"),
-            ("", "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.4.8"),
-            ("", "2.1.24", MIR_517_F210, "0.4.7"),
-            ("", "2.1.24", MIR_517_F210, "0.4.9"),
+        for target, opponent, base, player, observer in (
+            ("f210", "extra-mod", "2.1.24", MIR_517_F210, "0.4.8"),
+            ("f210", "missing-active-observer", "2.1.24", MIR_517_F210, "0.4.8"),
+            ("f210", "", "2.1.23", MIR_517_F210, "0.4.8"),
+            ("f210", "", "2.1.25", MIR_517_F210, "0.4.8"),
+            ("f210", "", "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.4.8"),
+            ("f210", "", "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.4.8"),
+            ("f210", "", "2.1.24", MIR_517_F210, "0.4.7"),
+            ("f210", "", "2.1.24", MIR_517_F210, "0.4.9"),
+            ("f200", "", "2.0.77", "5.0.20007", "0.4.8"),
         ):
-            with self.subTest(opponent=opponent, base=base, player=player, observer=observer):
-                initialized, state_written, message = run("f210", opponent, "517", "authored", base,
+            with self.subTest(target=target, opponent=opponent, base=base, player=player, observer=observer):
+                initialized, state_written, message = run(target, opponent, "517", "authored", base,
                     player, observer, True)
                 self.assertFalse(initialized, message)
                 self.assertFalse(state_written, message)
