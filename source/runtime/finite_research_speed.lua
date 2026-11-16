@@ -2,9 +2,11 @@
 -- remains authoritative; this marker stores no levels, effects or work.
 local M = {}
 local KEY = "mir_finite_research_speed"
+local configuration_context = require("runtime.configuration_change_context")
 
-local function refuse()
-  error("MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save", 3)
+local function refuse(context)
+  error("MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save"
+    .. (context or ""), 3)
 end
 
 local function recorded()
@@ -53,9 +55,26 @@ local function unchanged_legacy_selection(changes)
   -- exists, unrelated mod changes no longer need this one-time restriction.
   for name, change in pairs(changes) do
     if name ~= "more-infinite-research" and type(change) == "table"
-        and change.old_version ~= change.new_version then return false end
+        and change.old_version ~= change.new_version then return false, {name=name, row=change} end
   end
   return true
+end
+
+local function selected_active_version(name)
+  local active = script and script.active_mods
+  if type(active) ~= "table" or getmetatable(active) ~= nil then return nil end
+  return rawget(active, name)
+end
+
+local function rejection_context(event, mir, rejected)
+  local selected = {name=rejected.name, row=rejected.row, active_version=selected_active_version(rejected.name)}
+  local fields = {
+    "previous_mir=" .. configuration_context.value(mir.old_version),
+    "new_mir=" .. configuration_context.value(mir.new_version),
+    "startup_changed=" .. configuration_context.value(event.mod_startup_settings_changed)
+  }
+  for _, field in ipairs(configuration_context.rejected_fields(selected)) do fields[#fields + 1] = field end
+  return " [" .. table.concat(fields, " ") .. "]"
 end
 
 -- Known published F210 transported-V3 versions. F200's settings-derived
@@ -96,8 +115,9 @@ function M.preflight(event, provider)
     -- No current-MIR5 version label, new prototype, cap-management tuple or
     -- already-truncated native level can stand in for prior emitted8 proof.
     if type(mir) ~= "table" or not published_legacy(mir.old_version) or not legacy
-        or type(event.mod_startup_settings_changed) ~= "boolean" or event.mod_startup_settings_changed
-        or not unchanged_legacy_selection(changes) then refuse() end
+        or type(event.mod_startup_settings_changed) ~= "boolean" or event.mod_startup_settings_changed then refuse() end
+    local unchanged, rejected = unchanged_legacy_selection(changes)
+    if not unchanged then refuse(rejection_context(event, mir, rejected)) end
   end
   return {schema=1,technology="research-speed-8",predecessor="research-speed-7",provider=provider}
 end
