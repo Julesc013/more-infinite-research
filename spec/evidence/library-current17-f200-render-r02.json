@@ -1,0 +1,830 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent17F200LibraryRenderEvidenceV1",
+  "date": "2026-11-17",
+  "status": "ACCEPTED-scoped-native-render-capture-with-open-presentation-finding",
+  "source_head": "816d7c3e8d6146c7f4cb50c3123a80818e9beb2c",
+  "player_tree": "f08bee5ab5a9152fe406aed8cc4739023f8e62e3",
+  "package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir517-se-current-candidate-r01\\more-infinite-research_5.0.20017.zip",
+    "bytes": 1044815,
+    "sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+    "version": "5.0.20017",
+    "published": false
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "edition": "Base only"
+  },
+  "fixture": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\inputs\\f200\\mir-fixture-library-render-capture_0.1.7.zip",
+    "bytes": 3321,
+    "sha256": "CAD0C1A57B2A54A6B82E15CA211EE396441B91D17DA69E4EE85B64686F3D8409",
+    "version": "0.1.7",
+    "source_commit": "0e1b3fd03fe6e3f2d577114bc31598fb0bbd1ee7"
+  },
+  "controller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\Invoke-RenderCapture-r02.ps1",
+    "bytes": 10787,
+    "sha256": "475EAFF112D3FD986C8C7C74B7B74C90D7293497F81BE5109C1B2E05CAA5D278"
+  },
+  "capture_reader": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\Validate-CaptureFiles.py",
+    "bytes": 2525,
+    "sha256": "3EFB63B6400A34CB95A45E0F7D7552C50DC645CCB48E7CC6D3387BC594D6274B"
+  },
+  "reused_seed": {
+    "source_evidence": "spec/evidence/library514-public-server-export-native-r01.json",
+    "original": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-server-export-native-r02\\inputs\\headless-seed.zip",
+      "bytes": 165367,
+      "sha256": "FACF82F560B20D0038FDF66B676D8CA8F9D947FFCAB614282ABB5A0948F98029"
+    },
+    "adopted_not_recreated": true,
+    "scope": "Protected zero-player freeplay seed; no source-create rerun and no upgrade-preservation claim."
+  },
+  "resources": {
+    "maximum_processes_per_plan": 1,
+    "maximum_gui_clients": 1,
+    "serial_peak_mib": 4096,
+    "max_new_output_mib": 512,
+    "timeout_seconds": 240,
+    "requested_window": "2560x1440",
+    "dual_client_qualification": false
+  },
+  "admission": {
+    "original_r01_no_go": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-review-r01\\INDEPENDENT-ADMISSION-REVIEW-r01.json",
+      "bytes": 4837,
+      "sha256": "7E150B3A16109B8EEF7A65CB8B07E957FCF03A3ED5BBF7E53CC4DCDC8AC814E6"
+    },
+    "r01_native_processes": 0,
+    "r02_conditional_go": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-review-r01\\INDEPENDENT-ADMISSION-REVIEW-r02.json",
+      "bytes": 4961,
+      "sha256": "28CC2715E6C6858D2799654118A2961EE8D17F9A34CE42611A2392D856B9D5D2"
+    },
+    "en_gate_before_de": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\EN-GATE-FOR-DE-r02.json",
+      "bytes": 627,
+      "sha256": "7970573B9C55AB9A276B7526D5D5E8F9044332C046D3A7A7E58BD89BBB1D74AF"
+    },
+    "cleanup_fault_controls": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\owner-cleanup-fault-controls-r02.log",
+      "bytes": 4752,
+      "sha256": "374DC16E80877F6A73C00F4B5F0F4F9B8D97B634DBB9F037ABA7F84615F89622"
+    },
+    "old_new_finally_opponents": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\owner-finally-controls-r01.log",
+      "bytes": 512,
+      "sha256": "09281B808045B8FA0031CC5A288DE1BA488B357D00555F6E18EC2F532DD138CD"
+    },
+    "fixture_checked_merge": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-binding-r01\\MERGE-READBACK-r01.json",
+      "bytes": 428,
+      "sha256": "DA7EF7055897D54AAEF9D9A58260C6E7B0688291D4C4510C7182C1B133057082"
+    }
+  },
+  "sessions": [
+    {
+      "locale": "en",
+      "pid": 141216,
+      "process_start_utc": "2026-11-16T20:17:50.3449744Z",
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\en-plan-r02.json",
+        "bytes": 6104,
+        "sha256": "A6897C1F99E5782F2C188E7620BD95E032F2BC1F60FB7F5C63C53505DA0BD4C3"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\owner-result.json",
+        "bytes": 5534,
+        "sha256": "A8AB5BD3BD82766B520327518DABC9F45D7FE04298AAF6248325B6451444787D"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\process-1.stdout.txt",
+        "bytes": 13571,
+        "sha256": "EE9B630FD033DC49C3147830A1C052817BCFE72A4256427CDBDC8DB49341ABB2"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "resources": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\process-1.resources.jsonl",
+        "bytes": 36264,
+        "sha256": "F9B642027418577793FBCAEEE00F69CFA1D2A51DFB1F638FC7B0AE67627C9FDE"
+      },
+      "run_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 116.65786,
+        "peak_working_set_bytes": 1315213312,
+        "peak_sampled_private_bytes": 2369396736,
+        "admission": {
+          "observed_at": "2026-11-16T20:17:50.2922524+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15765094400,
+            "committed_bytes": 23894761472,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 65701003264,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 181334683648,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "runtime_mod_tuple": "base@2.0.77|mir-fixture-library-render-capture@0.1.7|more-infinite-research@5.0.20017",
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 1986,
+        "sha256": "F88C9F2A9DBF7C94F3A89A676BCED850C08FBC5C90D7E39BDE0D621A2FA29D77"
+      },
+      "png_file_validation": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\render-file-validation.json",
+        "bytes": 1658,
+        "sha256": "99CEAD1F3BFEAA9593237310029C4FBEFDFF255673CA4408F12CAEAB61F28B73"
+      },
+      "post_execution_all_ten_input_pins_match": true,
+      "original_library_restored": true,
+      "protected_saves_unchanged": true,
+      "factorio_zero": true,
+      "cleanup_errors": [],
+      "pages": [
+        {
+          "id": "01-research",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+            "bytes": 4128875,
+            "sha256": "993CAADD33BDF06BB004E0FD0497E497A5DE7DC5445E51C0926D539BBFA2EDFC"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\01-research.json",
+            "bytes": 222,
+            "sha256": "DD83939E9E2E365CF548A9AA0E2DD51D9C5C0DA83D493921C9F7479DD55E9273"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "en",
+            "tick": 1140,
+            "id": "01-research"
+          }
+        },
+        {
+          "id": "02-queue",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+            "bytes": 3844350,
+            "sha256": "D7F356E9211F64457CF08ACFFC69E8FED131E36EB99AA2B5E6359DB49F4D3702"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+            "bytes": 219,
+            "sha256": "8CB6A88793D47E4E727BFD2B217E678DE76B950CB7DB7E457F2FB366D7A39CDD"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 2,
+            "locale": "en",
+            "tick": 1410,
+            "id": "02-queue"
+          }
+        },
+        {
+          "id": "03-settings-research",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.png",
+            "bytes": 4049526,
+            "sha256": "22CBF21EA3CF0FEE3CB34BD57DB8E046339C6A79F775B351A05C19CF4CFC7884"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\03-settings-research.json",
+            "bytes": 231,
+            "sha256": "6A0E08F6A9ABD84A2EEFD1692CAD0A7CCB9A51004958A9324A507A85556D85E2"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 3,
+            "locale": "en",
+            "tick": 1680,
+            "id": "03-settings-research"
+          }
+        },
+        {
+          "id": "04-settings-options",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.png",
+            "bytes": 4137580,
+            "sha256": "7ECFD3822BFE24A302198AD33BA047DF8A949D057AA954749575F85FA96EC4F1"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\04-settings-options.json",
+            "bytes": 230,
+            "sha256": "EE121EB8955D5F041419B875C2F27147AB0B20CB48F6879BD985175DCF05503B"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 3,
+            "locale": "en",
+            "tick": 1950,
+            "id": "04-settings-options"
+          }
+        },
+        {
+          "id": "05-help",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\05-help.png",
+            "bytes": 4113243,
+            "sha256": "9D8EA1F276C643F15531EAC1AF88009813156D90D9E5984AA788078296A63AF5"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\05-help.json",
+            "bytes": 218,
+            "sha256": "79D947B78B17CC88AB4DB01875911C802E7AAD78F75EFBFD496B9854F10B65E6"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 4,
+            "locale": "en",
+            "tick": 2220,
+            "id": "05-help"
+          }
+        },
+        {
+          "id": "06-availability",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+            "bytes": 3993634,
+            "sha256": "60930E87926A0653754DF77F3638C0E289E4F45A9674F4DA122306C49E81062E"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+            "bytes": 226,
+            "sha256": "730B268EAAC68A98DEB94C04263E6784DEE1F7D8FCC695261C43C1751331229B"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "en",
+            "tick": 2490,
+            "id": "06-availability"
+          }
+        },
+        {
+          "id": "07-research-filtered",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.png",
+            "bytes": 4109121,
+            "sha256": "DE8D115F45C21E2C00A787206DB636FEE98895CDEFB873163149FA78F1FAFB48"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-en-r02-native\\write-data\\script-output\\mir-library-render\\en\\07-research-filtered.json",
+            "bytes": 231,
+            "sha256": "B3FA2C869033AF70CC813C90EEBE172DED9CF57FD2A3B3AF5B97E935A7B648AF"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "en",
+            "tick": 2760,
+            "id": "07-research-filtered"
+          }
+        }
+      ]
+    },
+    {
+      "locale": "de",
+      "pid": 124576,
+      "process_start_utc": "2026-11-16T20:21:06.3642207Z",
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\de-plan-r02.json",
+        "bytes": 6104,
+        "sha256": "956C835BBD253F78245FFFDB0B68592B556B6794474EA240841B20A825E65D49"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\owner-result.json",
+        "bytes": 5534,
+        "sha256": "CAAE08106CD8A5C52F205434647B26FACDFFF0AB4135A3D7F6CDB5024F47A05E"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\process-1.stdout.txt",
+        "bytes": 13571,
+        "sha256": "6140FC1951C191999C3934B0D0B141CF74D40D99158B57E105584311D12DE6F3"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "resources": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\process-1.resources.jsonl",
+        "bytes": 18582,
+        "sha256": "0B66971ACA057E1C7880C5B73141DC9D8E59293A9CA3E2E28ECD6DDE0F93EC24"
+      },
+      "run_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 62.404362,
+        "peak_working_set_bytes": 1489002496,
+        "peak_sampled_private_bytes": 2634674176,
+        "admission": {
+          "observed_at": "2026-11-16T20:21:06.3132070+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14607892480,
+            "committed_bytes": 25159237632,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 65670057984,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 181325135872,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "runtime_mod_tuple": "base@2.0.77|mir-fixture-library-render-capture@0.1.7|more-infinite-research@5.0.20017",
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 1986,
+        "sha256": "ED1366A3610BA0672BD415F6E1ABF39ADB8780BDEB49D607023DF7CDF890021A"
+      },
+      "png_file_validation": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\render-file-validation.json",
+        "bytes": 1658,
+        "sha256": "08B8B0F6950B8980746E67FE9E0FCD1C5EC3042A1110FC71BDA0F2F074EF8083"
+      },
+      "post_execution_all_ten_input_pins_match": true,
+      "original_library_restored": true,
+      "protected_saves_unchanged": true,
+      "factorio_zero": true,
+      "cleanup_errors": [],
+      "pages": [
+        {
+          "id": "01-research",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+            "bytes": 4156168,
+            "sha256": "0DFCEF2DC9FB48200EA724CED0269572234B82BDF1995851FABFB8FDBA42406D"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\01-research.json",
+            "bytes": 222,
+            "sha256": "308E05506200A4F6D7FAF2ADE333CA55CE5750B793C997252A6E5BBACB0A776F"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "de",
+            "tick": 1140,
+            "id": "01-research"
+          }
+        },
+        {
+          "id": "02-queue",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+            "bytes": 3855942,
+            "sha256": "392303ED60EEF7D6964CA1A84A8F7FB388F09E68850A497F46B7184E823A7BDA"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+            "bytes": 219,
+            "sha256": "B79AA76C73598B39906EBF14773A24EEB66E4F4FA21EAAE4756173202F7A4DB4"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 2,
+            "locale": "de",
+            "tick": 1410,
+            "id": "02-queue"
+          }
+        },
+        {
+          "id": "03-settings-research",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.png",
+            "bytes": 4076574,
+            "sha256": "53806E53D897726A8AD1E14035A9728A647ADD59E00107F9E6BE5876BB9E887A"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\03-settings-research.json",
+            "bytes": 231,
+            "sha256": "8E799AC06BA68B9A184A242D51E6FCD23220AA527BD9DA8213C2D41DBB6E98FD"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 3,
+            "locale": "de",
+            "tick": 1680,
+            "id": "03-settings-research"
+          }
+        },
+        {
+          "id": "04-settings-options",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.png",
+            "bytes": 4185722,
+            "sha256": "5ED13A467A69733DB5F9CEEA5D814D394E8D292219C8AA0193244193AFF1050E"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\04-settings-options.json",
+            "bytes": 230,
+            "sha256": "698343DEBAA4D9AAA93859B3F04FAC64D05BC3507C0C774380D4A8CF8D02D3AC"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 3,
+            "locale": "de",
+            "tick": 1950,
+            "id": "04-settings-options"
+          }
+        },
+        {
+          "id": "05-help",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\05-help.png",
+            "bytes": 4131987,
+            "sha256": "575780A0295D093F32F5A1EE56700D919CA370588BB539EFFDD49DBEE5A6DAF9"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\05-help.json",
+            "bytes": 218,
+            "sha256": "EDEF4B5893780792D20BD74464B7C634E43C6BE0D88C622668568E896AFD92D7"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 4,
+            "locale": "de",
+            "tick": 2220,
+            "id": "05-help"
+          }
+        },
+        {
+          "id": "06-availability",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+            "bytes": 4001074,
+            "sha256": "5FAB6F8D35C38BEB0400610002969C53A746445C2B01975945CDEEC81648E9AA"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+            "bytes": 226,
+            "sha256": "69DD874329F4FD3C6198A7A7E5769A210FA63578C3270C71D52FA1226BA9F279"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "de",
+            "tick": 2490,
+            "id": "06-availability"
+          }
+        },
+        {
+          "id": "07-research-filtered",
+          "png": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.png",
+            "bytes": 4126252,
+            "sha256": "63BE2DC8EE4CCB9034DC7A254751409C422D5ED58FFE5BFA9EADE7892F12E370"
+          },
+          "page_json": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-render17-f200-de-r02-native\\write-data\\script-output\\mir-library-render\\de\\07-research-filtered.json",
+            "bytes": 231,
+            "sha256": "256F297BADE9D0EA75E3F0EE06FE1C6F7DC7DFEB823D038751D72B54419A0873"
+          },
+          "actual_observation": {
+            "location": {
+              "y": 153,
+              "x": 800
+            },
+            "minimal_width": 1066,
+            "maximal_width": 1066,
+            "maximal_height": 900,
+            "display_scale": 1.5,
+            "display_resolution": {
+              "width": 3200,
+              "height": 1800
+            },
+            "tab_index": 1,
+            "locale": "de",
+            "tick": 2760,
+            "id": "07-research-filtered"
+          }
+        }
+      ]
+    }
+  ],
+  "new_factorio_processes": 2,
+  "actual_pngs": 14,
+  "process_end": "Completion-predicate supervised close; both observed exit0. Not a natural-exit or performance acceptance claim.",
+  "native_invariant_scope": "Pinned observer compared complete named selected-force technology/recipe/queue/current/progress/worker-bonus state at each page. No raw native vectors were exported for independent replay; no all-force/gameplay/upgrade acceptance.",
+  "observed_visual_scope": {
+    "owner_viewed_all_original_pngs": 14,
+    "independent_review": "Capture integrity and direct visual spot checks, including both actual filtered worker-stage lists.",
+    "viewport": {
+      "width": 3200,
+      "height": 1800,
+      "display_scale": 1.5
+    },
+    "stable_frame_per_session": true,
+    "tabs": [
+      "research",
+      "queue",
+      "settings",
+      "help"
+    ],
+    "other_views": [
+      "settings research scope",
+      "settings options scope",
+      "availability",
+      "filtered research"
+    ],
+    "observations": [
+      "Declared pages, toolbars, split details and diagnostic preview render readably at this viewport.",
+      "Long German option headings wrap inside their detail pane. Some inactive integration setting names retain readable English fallback labels; complete German translation is not claimed.",
+      "The filtered list exposes two indistinguishable public worker-cargo captions in both locales; whole visual acceptance remains unproven."
+    ]
+  },
+  "open_presentation_finding": {
+    "requirements": [
+      "RUN-04",
+      "CONT-10"
+    ],
+    "subject": "Indistinguishable finite-head and ordinary-tail worker-cargo list choices",
+    "english_caption": "Worker robot cargo size",
+    "german_caption": "Arbeitsroboter-Transportmenge",
+    "public_ids": [
+      "worker-robots-storage-4",
+      "mir-worker-storage-default-4"
+    ],
+    "source_context": "research/catalogue.lua269-273 deliberately retains the two public stage identities; the private debit is distinct.",
+    "test_gap": "The existing native handoff identity test supplies different mock localised_name values and does not cover the real same-caption choice.",
+    "required_followup": "Preserve both identities and native handoff; establish useful list disambiguation with a same-caption real-identity opponent and affected exact-package rendering.",
+    "limits": "This observation establishes no ownership loss, hidden-credit exposure, native aliasing or gameplay mutation."
+  },
+  "owner_acceptance": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-results-r01\\OWNER-ACCEPTANCE-r01.json",
+    "bytes": 1434,
+    "sha256": "86F669D1752EA40EEEEC148FFBC2D7E5A44DA2729175C689D679657B480F55EB"
+  },
+  "owner_pixel_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-results-r01\\ROOT-PIXEL-REVIEW-r01.json",
+    "bytes": 3256,
+    "sha256": "17224AB6FE5969B318B827944765BC1E3F2FC88441807F74F4260C75B5BF57FC"
+  },
+  "independent_result_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-review-r01\\INDEPENDENT-RESULT-REVIEW-r02.json",
+    "bytes": 7715,
+    "sha256": "E26E5D0C934D75DE02A643DC7E692148E8E3633DC1187CE72A085C6BCA9D3381"
+  },
+  "raw_primary_custody": {
+    "execution_facts": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-results-r01\\EXECUTION-FACTS-r01.json",
+      "bytes": 25342,
+      "sha256": "A9550CDDED28FF4BFCE1AEDE12F857D17FF6B8FBACA58F47BEE53C900FB3AB4C"
+    },
+    "body_manifest": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-results-r01\\RAW-BODY-MANIFEST-r01.json",
+      "bytes": 30386,
+      "sha256": "7260D00D8B181491E1F05634FFF44E6D24C24DC7DE67715555986540947FD348"
+    },
+    "listed_original_files": 110,
+    "listed_original_bytes": 63547033,
+    "additional_originals": "Manifest body, result review, owner acceptance and checked merge readback are additive retained originals."
+  },
+  "private_lossless_custody": {
+    "status": "verified-complete-exact-remote-body-readback",
+    "repository": "Julesc013/scratchpad",
+    "private_repository_confirmed": true,
+    "commit": "171c96f7f7cd578229fbd19fbc8d9f6db96cc35c",
+    "tree": "1c0dc0b336a5886f44216bb208d213ede7a8144c",
+    "index_path": "projects/mir/runs/library-render-source17-f200-r01/capsule-index.json",
+    "index_blob": "54e6811b09c29118c738074c1a57b385120cd2eb",
+    "index_sha256": "24386E5BCB7254C5174227D5AA8DDAD6D10CE4E62D4D33391A970121BE31EA90",
+    "capsules": {
+      "common": {
+        "capsule": {
+          "bytes": 1332263,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-private-custody-r01\\common-original-bodies.json.gz",
+          "sha256": "A80DB8EA63AD6DDDE328974F797B03B40A5543ED11B2DB66B0ECD41764CD99CC"
+        },
+        "decoded_rows": 67,
+        "original_rows": 64,
+        "private_path": "projects/mir/runs/library-render-source17-f200-common-r01/original-bodies.json.gz",
+        "remote_blob": "5a0fa8dd1f45c5aadc970bbeec698d92a1e01db3"
+      },
+      "de": {
+        "capsule": {
+          "bytes": 29820292,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-private-custody-r01\\de-original-bodies.json.gz",
+          "sha256": "7C2E72B4B6F1A6733658D1DF6786D991DC636DC00BEE5222453DB250FB1F24A8"
+        },
+        "decoded_rows": 27,
+        "original_rows": 25,
+        "private_path": "projects/mir/runs/library-render-source17-f200-de-r01/original-bodies.json.gz",
+        "remote_blob": "5445504d4c49a7fbfb36c1d6b2eb7671358d09d8"
+      },
+      "en": {
+        "capsule": {
+          "bytes": 29660551,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-private-custody-r01\\en-original-bodies.json.gz",
+          "sha256": "1495B35A9F18EC3C42ED21700B3CFC75E437EC3777C9F4949B387BB90B54995A"
+        },
+        "decoded_rows": 27,
+        "original_rows": 25,
+        "private_path": "projects/mir/runs/library-render-source17-f200-en-r01/original-bodies.json.gz",
+        "remote_blob": "405d08968c4c58c27bf6cf5d86e676bb578c6b8e"
+      }
+    },
+    "manifest_originals": 110,
+    "explicit_additions": 4,
+    "originals_covered_exactly_once": true,
+    "worker_final_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-private-custody-r01\\final-coverage-verification.json",
+      "bytes": 720,
+      "sha256": "5E518BDDAFE5E14ECC0AFF2BA42963C7C435B84DA8CEDF5A832824E5D9C1A617"
+    },
+    "independent_root_body_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-private-readback-r01\\ROOT-COMPLETE-READBACK-r01.json",
+      "bytes": 895,
+      "sha256": "10610AE4CE2F7C3DEB99AD837139A82EC1710D79DF9F262140E76C4080EF3649"
+    },
+    "root_method": "Fresh download of all three GitHub raw blob bodies plus index; Git blob IDs/SHA256, strict gzip/JSON/base64, every114 primary original byte-compared, and paths checked at the exact private commit.",
+    "originals_byte_compared": 114
+  },
+  "unqualified": [
+    "genuine mouse/keyboard and13 export clicks",
+    "resize/drag/close and other viewport/DPI",
+    "startup menu and export file behavior",
+    "save/reload and host lifecycle",
+    "simultaneous clients/join/rejoin",
+    "F210 and DLC visual qualification",
+    "performance",
+    "complete visual/stable acceptance"
+  ],
+  "published_package_bytes_written": 0
+}

@@ -228,7 +228,7 @@ class FakeBackend:
         self.xauth_calls.append((list(argv), authority_input))
         return 0
 
-    def load_probe(self, path):
+    def load_probe(self, path, pin):
         return self.probe
 
     def stop_signal(self, stdin, timeout):
@@ -480,6 +480,32 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
                     self.assertEqual(validated.authority.read_bytes(), b"foreign-authority")
                 if target == "viewer":
                     self.assertEqual(validated.viewer.read_bytes(), b"foreign-viewer")
+
+    def test_changed_probe_cannot_execute_before_runtime_pin_recheck(self):
+        # Exercise the production source loader, not the fake. A replaced
+        # .py module must be refused without running its top-level statements.
+        temporary, checkout, root, pins = self.make_layout()
+        self.addCleanup(temporary.cleanup)
+        probe = Path(temporary.name) / "bound_probe.py"
+        sentinel = Path(temporary.name) / "unverified-probe-executed"
+        malicious = "from pathlib import Path\nPath(" + repr(str(sentinel)) + ").write_text('ran')\n"
+        # The substituted source has the *same byte length*: the cryptographic
+        # pin, not just file-size validation, must precede import.
+        probe.write_bytes("# authenticated passive probe\n".ljust(len(malicious), "#").encode("utf-8"))
+        pins["probe_display"] = {
+            "path": str(probe), "bytes": probe.stat().st_size, "sha256": digest(probe),
+        }
+        with self.admitted_probe(pins):
+            validated = DISPLAY.validate_plan(self.plan(root, pins), checkout)
+        probe.write_bytes(malicious.encode("utf-8"))
+        self.assertEqual(probe.stat().st_size, pins["probe_display"]["bytes"])
+        with self.linux():
+            self.assert_refuses(
+                lambda: DISPLAY.start_display(validated, DISPLAY.SystemBackend()),
+                "qualified display helper (bytes|identity) differ",
+            )
+        self.assertFalse(sentinel.exists(), "unverified probe code must never execute")
+        self.assertEqual(list(root.iterdir()), [])
 
     def test_rehashes_execution_inputs_before_output_or_spawn(self):
         validated, backend, _ = self.validated_backend()
