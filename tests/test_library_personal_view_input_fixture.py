@@ -425,16 +425,6 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "native research state changed"):
             self.lua.execute("emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name='mir-research-browser'});open_library('');tick()")
 
-    def test_named_gui_assignment_tripwire_has_forbidden_and_read_only_opponents(self):
-        for source in ('player.opened = root', 'query.text = "gear"', 'root.opened = nil',
-                       'player.opened\t= root', 'query.text\n = "gear"'):
-            with self.subTest(source=source):
-                self.assertIsNotNone(GUI_FIELD_ASSIGNMENT.search(source))
-        for source in ('if player.opened == root then', 'query.text ~= "gear"',
-                       'local text = query.text', 'root.opened ~= nil'):
-            with self.subTest(source=source):
-                self.assertIsNone(GUI_FIELD_ASSIGNMENT.search(source))
-
     def test_executed_observer_cannot_write_gui_fields_through_aliases(self):
         for statement in (
             'local alias=player;alias.opened=nil',
@@ -488,6 +478,29 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)
         self.assertNotIn("style.width", code)
         self.assertNotIn("style.height", code)
+
+    def test_passive_ui_assignment_check_rejects_its_intended_mutations(self):
+        # This lexical guard is deliberately narrow. Its opponents prove the
+        # intended dot-field checks work; they do not establish a Lua sandbox.
+        for code in (
+            "player.opened = root",
+            'query.text = "gear"',
+            "root.opened = nil",
+            "player.opened\t= root",
+            'query.text\n= "gear"',
+            "query.text=player.name",
+        ):
+            with self.subTest(forbidden_assignment=code):
+                self.assertIsNotNone(GUI_FIELD_ASSIGNMENT.search(code))
+        for code in (
+            "if player.opened == root then return end",
+            'if query.text ~= "gear" then return end',
+            "local opened = player.opened",
+            "myplayer.opened = root",
+            "player.opened_caption = root",
+        ):
+            with self.subTest(read_or_unrelated_field=code):
+                self.assertIsNone(GUI_FIELD_ASSIGNMENT.search(code))
 
 
 if __name__ == "__main__":
