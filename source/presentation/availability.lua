@@ -4,6 +4,7 @@
 -- not catalogue rows, do not create technologies, and deliberately do not
 -- reproduce the historical compiler's broad skip ledger.
 local M = {}
+local bob_core_selection = require("compatibility.bob_core_selection")
 
 local SPACE_AGE = "space-age"
 local NATIVE_RESEARCH_PRODUCTIVITY = "research-productivity"
@@ -24,17 +25,6 @@ local F210_BOBTECH_ANGEL_REQUIRED = {
   "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
   "angelsrefining", "angelsrefininggraphics", "angelspetrochem", "angelspetrochemgraphics",
   "angelssmelting", "angelssmeltinggraphics",
-}
-
-local F210_BOB_CORE_REQUIRED = {
-  "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
-}
-
-local F210_BOB_CORE_EXCLUDED = {
-  "angelsbioprocessing", "angelsbioprocessinggraphics", "angelsrefining", "angelsrefininggraphics",
-  "angelspetrochem", "angelspetrochemgraphics", "angelssmelting", "angelssmeltinggraphics",
-  "Krastorio2", "Krastorio2-spaced-out",
-  "pycoalprocessing", "pyalienlife", "pyhightech",
 }
 
 local function withheld_material(family, reason)
@@ -144,14 +134,7 @@ local function is_f210_bobtech_angel(active_mods, target)
 end
 
 local function is_f210_bob_core(active_mods, target)
-  if type(target) ~= "table" or target.id ~= "f210" or target.factorio_version ~= "2.1"
-      or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOB_CORE_REQUIRED) then
-    return false
-  end
-  for _, name in ipairs(F210_BOB_CORE_EXCLUDED) do
-    if active_mods[name] ~= nil then return false end
-  end
-  return true
+  return bob_core_selection.status(active_mods, target) == "selected"
 end
 
 -- Only a direct lookup by the exact authored early-stage identity is allowed.
