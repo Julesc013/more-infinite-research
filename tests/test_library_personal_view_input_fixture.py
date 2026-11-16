@@ -2,12 +2,12 @@
 import argparse
 import json
 from pathlib import Path
-import re
 import subprocess
 import sys
 import unittest
 
 import mir_test_versions as SHARED
+from library_observer_authority import GUI_FIELD_ASSIGNMENT, LUA_GUI_AUTHORITY
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,7 +26,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.globals().package_version = package
         self.lua.globals().fixture_version = fixture_version
         self.lua.globals().multiplayer = multiplayer
-        self.lua.execute(r'''
+        self.lua.execute(LUA_GUI_AUTHORITY + r'''
           callbacks={events={}}
           storage={}
           logs={}
@@ -37,9 +37,12 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
             gui_type={custom=99},controllers={character=1,cutscene=6}}
           script={active_mods={base=base_version, ["more-infinite-research"]=package_version,
             ["mir-fixture-library-personal-view-input"]=fixture_version},
-            on_init=function(fn) callbacks.init=fn end,
-            on_event=function(event,fn) callbacks.events[event]=fn end}
-          remote={add_interface=function(name,values) interfaces[name]=values end}
+            on_init=function(fn) callbacks.init=observer_callback(fn) end,
+            on_event=function(event,fn) callbacks.events[event]=observer_callback(fn) end}
+          remote={add_interface=function(name,values)
+            for key,fn in pairs(values) do values[key]=observer_callback(fn) end
+            interfaces[name]=values
+          end}
           helpers={table_to_json=function(value) return value end,
             write_file=function(path,value,append,index)
               assert(append==false and index==1 and writes[path]==nil)
@@ -49,16 +52,17 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           next_gui_index=0
           local function element(kind,name)
             next_gui_index=next_gui_index+1
-            return {valid=true,type=kind,name=name,index=next_gui_index,get_mod=function() return "more-infinite-research" end}
+            return gui_state({valid=true,type=kind,name=name,index=next_gui_index,
+              get_mod=function() return "more-infinite-research" end},name)
           end
           force={valid=true,name="player",current_research=nil,research_progress=0,research_queue={},
             worker_robots_storage_bonus=0}
-          player={valid=true,connected=true,index=1,force=force,display_scale=1.25,
+          player=gui_state({valid=true,connected=true,index=1,force=force,display_scale=1.25,
             display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
-            gui={screen={}},opened=nil}
-          player2={valid=true,connected=true,index=2,force=force,display_scale=1.25,
+            gui={screen={}},opened=nil},"player")
+          player2=gui_state({valid=true,connected=true,index=2,force=force,display_scale=1.25,
             display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
-            gui={screen={}},opened=nil}
+            gui={screen={}},opened=nil},"player2")
           game={tick=0,connected_players={player},is_multiplayer=function() return multiplayer end,get_player=function(index)
             if index==1 then return player end
             if index==2 then return player2 end
@@ -101,7 +105,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
             end
             player.gui.screen.mir_research_browser=nil;player.opened=nil
           end
-          assert(load(actor_source,"@mir-fixture-library-personal-view-input/control.lua"))()
+          observer_callback(assert(load(actor_source,"@mir-fixture-library-personal-view-input/control.lua")))()
           function initialize() callbacks.init() end
           function emit(id,row) return callbacks.events[id](row) end
           function tick()
@@ -421,7 +425,41 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "native research state changed"):
             self.lua.execute("emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name='mir-research-browser'});open_library('');tick()")
 
-    def test_metadata_protocol_and_no_mutation_authority(self):
+    def test_named_gui_assignment_tripwire_has_forbidden_and_read_only_opponents(self):
+        for source in ('player.opened = root', 'query.text = "gear"', 'root.opened = nil',
+                       'player.opened\t= root', 'query.text\n = "gear"'):
+            with self.subTest(source=source):
+                self.assertIsNotNone(GUI_FIELD_ASSIGNMENT.search(source))
+        for source in ('if player.opened == root then', 'query.text ~= "gear"',
+                       'local text = query.text', 'root.opened ~= nil'):
+            with self.subTest(source=source):
+                self.assertIsNone(GUI_FIELD_ASSIGNMENT.search(source))
+
+    def test_executed_observer_cannot_write_gui_fields_through_aliases(self):
+        for statement in (
+            'local alias=player;alias.opened=nil',
+            'local alias=player.gui.screen.mir_research_browser.mir_library_tabs.'
+            'mir_library_research_page.mir_library_filters.mir_library_query;alias.text="forged"',
+        ):
+            with self.subTest(statement=statement):
+                self.setUp(actor_source='script.on_event(defines.events.on_tick,function() ' + statement + ' end)')
+                self.lua.execute('open_library("engine text")')
+                with self.assertRaisesRegex(Exception, "observer GUI mutation"):
+                    self.lua.execute('tick()')
+                self.lua.execute('''
+                  local root=player.gui.screen.mir_research_browser
+                  local query=root.mir_library_tabs.mir_library_research_page.mir_library_filters.mir_library_query
+                  assert(player.opened==root and query.text=="engine text")
+                  -- A failed callback must not make subsequent engine input read-only.
+                  query.text="next engine input";player.opened=nil
+                  assert(query.text=="next engine input" and player.opened==nil)
+                ''')
+
+    def test_module_loading_has_the_same_gui_write_boundary_as_callbacks(self):
+        with self.assertRaisesRegex(Exception, "observer GUI mutation: player.opened"):
+            self.setUp(actor_source='local alias=player;alias.opened=false')
+
+    def test_metadata_protocol_and_passive_observer_tripwires(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-personal-view-input",
@@ -439,7 +477,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         for forbidden in ["remote.call", "script.raise_event", "server_save", "auto_save", "require(",
                           "research_queue =", ".researched =", ".level ="]:
             self.assertNotIn(forbidden, code)
-        self.assertIsNone(re.search(r"\\b(?:player|root|query)\\.(?:text|opened)\\s*=(?!=)", code))
+        self.assertIsNone(GUI_FIELD_ASSIGNMENT.search(code))
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
         self.assertIn('begin_observation(player, "singleplayer-load")', code)
