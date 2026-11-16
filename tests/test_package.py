@@ -235,6 +235,9 @@ class PackageTests(unittest.TestCase):
                 editions, _ = pack.read_editions(source)
                 unfiltered_info = json.loads(source_files["info.json"])
                 unfiltered = pack.select_edition(source_files, unfiltered_info, target, editions)
+                # Preserve the independently pinned published filename while
+                # the editable source uses its canonical source-release label.
+                unfiltered[F110_PLUS_MIGRATION] = unfiltered.pop("migrations/more-infinite-research_5.0.0.json")
                 unfiltered["info.json"] = (json.dumps(unfiltered_info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
                 excluded = set()
                 if target != "f210":
@@ -246,6 +249,52 @@ class PackageTests(unittest.TestCase):
                                  {path: value for path, value in unfiltered.items() if path not in excluded})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_canonical_migration_source_keeps_one_published_identity_and_unchanged_bytes(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        self.assertTrue((source / canonical).is_file())
+        self.assertFalse((source / F110_PLUS_MIGRATION).exists())
+        body = (source / canonical).read_bytes()
+        self.assertEqual(hashlib.sha256(body).hexdigest().upper(), F110_PLUS_MIGRATION_SHA256)
+        files = {"info.json": (source / "info.json").read_bytes(), canonical: body}
+        before = dict(files)
+        _, rows = pack.members(source, committed_files=files)
+        emitted = dict(rows)
+        self.assertEqual(files, before, "aliasing mutated caller-owned frozen inputs")
+        self.assertNotIn(canonical, emitted)
+        self.assertEqual(emitted[F110_PLUS_MIGRATION], body)
+        self.assertEqual([name for name in emitted if name.startswith("migrations/")], [F110_PLUS_MIGRATION])
+
+    def test_historical_migration_source_and_foreign_fixture_are_not_rewritten(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        body = (source / canonical).read_bytes()
+        legacy = {"info.json": (source / "info.json").read_bytes(), F110_PLUS_MIGRATION: body}
+        _, rows = pack.members(source, committed_files=legacy)
+        self.assertEqual(dict(rows)[F110_PLUS_MIGRATION], body)
+        self.assertNotIn(canonical, dict(rows))
+        foreign_info = json.loads(legacy["info.json"])
+        foreign_info["name"] = "independent-fixture"
+        foreign = {"info.json": json.dumps(foreign_info).encode(), canonical: body}
+        _, rows = pack.members(source, committed_files=foreign)
+        self.assertIn(canonical, dict(rows))
+        self.assertNotIn(F110_PLUS_MIGRATION, dict(rows))
+
+    def test_ambiguous_migration_aliases_refuse_before_creating_an_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            (source / "migrations").mkdir(parents=True)
+            metadata = (ROOT / "source/info.json").read_bytes()
+            (source / "info.json").write_bytes(metadata)
+            body = b'{"technology": [["laser-turret-speed-8", "laser-shooting-speed-8"]]}\n'
+            for name in ("more-infinite-research_5.0.0.json", "more-infinite-research_5.0.11000.json"):
+                (source / "migrations" / name).write_bytes(body)
+            output = root / ("more-infinite-research_" + json.loads(metadata)["version"] + ".zip")
+            with self.assertRaisesRegex(ValueError, "Ambiguous canonical and published migration"):
+                pack.build(source, output)
+            self.assertFalse(output.exists())
 
     def test_early_target_selection_excludes_all_normal_migration_members(self):
         source = ROOT / "source"

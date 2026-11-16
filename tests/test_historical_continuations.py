@@ -203,7 +203,7 @@ class HistoricalContinuationTests(unittest.TestCase):
         ''')
 
     def test_f110_laser_bridge_migration_has_only_the_owned_legacy_mapping(self):
-        migration = PLAYER / "migrations/more-infinite-research_5.0.11000.json"
+        migration = PLAYER / "migrations/more-infinite-research_5.0.0.json"
         self.assertEqual({"technology": [["laser-turret-speed-8", "laser-shooting-speed-8"]]},
                          json.loads(migration.read_text(encoding="utf-8")))
 
