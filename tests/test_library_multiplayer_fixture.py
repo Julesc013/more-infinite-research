@@ -4255,6 +4255,87 @@ throw 'unexpected fake display mode'
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_composed_session_entry_accepts_only_the_pinned_canonical_display_cli_outside_its_runtime_checkout(self):
+        """Exercise the exact session assignment before any display or game start."""
+        old_source = subprocess.run(
+            ["git", "show", "e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Assert-Session','Get-SessionHash','Test-Within','Assert-NoReparse','Resolve-Existing','Resolve-BuildInput')
+          if($env:MIR_TEST_EXPECT-ceq'new'){$names+=@('Resolve-PrivateDisplayCli','Assert-PrivateDisplayProgramPins')}
+          foreach($name in $names){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "session definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $entry=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $candidate.Left.Extent.Text -ceq '$linuxPrivateDisplays.display_cli'
+          },$true))
+          if($entry.Count-ne1){throw 'session display CLI entry is absent or ambiguous'}
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $repoRoot=Join-Path $env:MIR_TEST_WORK 'repo';$buildRoot=Join-Path $repoRoot 'build'
+          $null=New-Item -ItemType Directory -Path (Join-Path $repoRoot 'tools/lib/validation') -Force
+          $null=New-Item -ItemType Directory -Path $buildRoot -Force
+          function Write-Program([string]$Path,[string]$Body,[string]$ModuleBody){
+            $null=New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force
+            [IO.File]::WriteAllText($Path,$Body,$encoding)
+            $module=Join-Path (Split-Path -Parent $Path) 'lib/validation/LinuxLibraryDisplay.py'
+            $null=New-Item -ItemType Directory -Path (Split-Path -Parent $module) -Force
+            [IO.File]::WriteAllText($module,$ModuleBody,$encoding)
+            return $module
+          }
+          function Set-ProgramPins([string]$Path,[string]$Module){
+            $script:linuxPrivateDisplays=[ordered]@{
+              display_cli=$Path
+              display_cli_sha256=(Get-SessionHash $Path)
+              display_module_sha256=(Get-SessionHash $Module)
+            }
+          }
+          function Invoke-SessionDisplayEntry{
+            Invoke-Expression $entry[0].Extent.Text
+          }
+          $canonical=Join-Path $repoRoot 'tools/Invoke-LibraryLinuxDisplay.py'
+          $canonicalModule=Write-Program $canonical 'canonical-cli' 'canonical-module'
+          Set-ProgramPins $canonical $canonicalModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($env:MIR_TEST_EXPECT-ceq'old'){
+            if($failure-notmatch'private display CLI is outside checkout build'){throw "old session entry did not reproduce the composed failure:$failure"}
+            'PASS old composed session entry refused canonical CLI'
+            return
+          }
+          if($null-ne$failure-or$linuxPrivateDisplays.display_cli-cne(Resolve-Path -LiteralPath $canonical).Path){throw "new session entry did not admit canonical CLI:$failure"}
+          $external=Join-Path $env:MIR_TEST_WORK 'outside/Invoke-LibraryLinuxDisplay.py'
+          $externalModule=Write-Program $external 'canonical-cli' 'canonical-module';Set-ProgramPins $external $externalModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'neither checkout build input nor canonical CLI'){throw "external same-hash CLI was admitted:$failure"}
+          $legacy=Join-Path $buildRoot 'legacy/Invoke-LibraryLinuxDisplay.py'
+          $legacyModule=Write-Program $legacy 'legacy-cli' 'legacy-module';Set-ProgramPins $legacy $legacyModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($null-ne$failure-or$linuxPrivateDisplays.display_cli-cne(Resolve-Path -LiteralPath $legacy).Path){throw "legacy build CLI changed:$failure"}
+          Set-ProgramPins $canonical $canonicalModule;$linuxPrivateDisplays.display_module_sha256=('0'*64)
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display module hash differs'){throw "wrong sibling module hash was admitted:$failure"}
+          'PASS composed session display CLI admission'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-composed-display-entry-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-e794.ps1"
+            old_session.write_bytes(old_source.stdout)
+            for name, source, expected in (("old", old_session, "old"), ("new", SESSION, "new")):
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EXPECT": expected},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
     def test_private_display_result_continuity_rejects_57b8_substitutions(self):
         old_source = subprocess.run(
             ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerSession.ps1"],

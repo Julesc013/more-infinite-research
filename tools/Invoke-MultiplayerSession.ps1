@@ -66,6 +66,25 @@ function Resolve-BuildInput([string]$Path, [ValidateSet('Leaf','Container')][str
   Assert-Session (Test-Within $buildRoot $resolved) "$Label is outside checkout build"
   return $resolved
 }
+function Resolve-PrivateDisplayCli([string]$Path) {
+  # A historical caller may stage its admitted CLI beneath this session's
+  # checkout build.  The current Linux route instead authenticates the
+  # canonical repository CLI while its runtime checkout is the owned session
+  # output root.  Do not admit another external executable merely because it
+  # has a supplied digest.
+  $resolved = Resolve-Existing $Path 'Leaf' 'private display CLI'
+  if (Test-Within $buildRoot $resolved) { return $resolved }
+  $canonical = Resolve-Existing (Join-Path $repoRoot 'tools/Invoke-LibraryLinuxDisplay.py') 'Leaf' 'canonical private display CLI'
+  Assert-Session ($resolved -ceq $canonical) 'private display CLI is neither checkout build input nor canonical CLI'
+  return $resolved
+}
+function Assert-PrivateDisplayProgramPins {
+  $cli = Resolve-PrivateDisplayCli ([string]$linuxPrivateDisplays.display_cli)
+  Assert-Session ((Get-SessionHash $cli) -ceq ([string]$linuxPrivateDisplays.display_cli_sha256).ToUpperInvariant()) 'private display CLI hash differs'
+  $module = Resolve-Existing (Join-Path (Split-Path -Parent $cli) 'lib/validation/LinuxLibraryDisplay.py') 'Leaf' 'private display module'
+  Assert-Session ((Get-SessionHash $module) -ceq ([string]$linuxPrivateDisplays.display_module_sha256).ToUpperInvariant()) 'private display module hash differs'
+  return $cli
+}
 function Resolve-BuildOutput([string]$Path, [string]$Label) {
   Assert-Session (-not [string]::IsNullOrWhiteSpace($Path)) "$Label is absent"
   $full = [IO.Path]::GetFullPath($Path)
@@ -1082,9 +1101,8 @@ if($spec.ContainsKey('linux_private_displays')){
   foreach($field in @('python','display_cli','checkout')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$linuxPrivateDisplays[$field])) "private display binding differs: $field"}
   foreach($field in @('display_cli_sha256','display_module_sha256')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and[string]$linuxPrivateDisplays[$field]-cmatch'^[A-Fa-f0-9]{64}$') "private display hash differs: $field"}
   $linuxPrivateDisplays.python=Resolve-Existing ([string]$linuxPrivateDisplays.python) 'Leaf' 'private display Python'
-  $linuxPrivateDisplays.display_cli=Resolve-BuildInput ([string]$linuxPrivateDisplays.display_cli) 'Leaf' 'private display CLI'
+  $linuxPrivateDisplays.display_cli=Assert-PrivateDisplayProgramPins
   $linuxPrivateDisplays.checkout=Resolve-Existing ([string]$linuxPrivateDisplays.checkout) 'Container' 'private display checkout'
-  Assert-Session ((Get-SessionHash $linuxPrivateDisplays.display_cli)-ceq([string]$linuxPrivateDisplays.display_cli_sha256).ToUpperInvariant()) 'private display CLI hash differs'
   $linuxPrivateDisplays.probe_display=Resolve-Existing ([string]$linuxPrivateDisplays.probe_display) 'Leaf' 'private display probe'
   Assert-Session ([string]$linuxPrivateDisplays.probe_display_sha256-cmatch'^[A-Fa-f0-9]{64}'-and(Get-SessionHash $linuxPrivateDisplays.probe_display)-ceq([string]$linuxPrivateDisplays.probe_display_sha256).ToUpperInvariant()-and[string]$linuxPrivateDisplays.probe_display_sha256-ceq'F2DF1A32CA48119010E5DBE42326B3ED46E13A01A08B487AFDF0CDA5B180B423') 'private display probe hash differs'
   Assert-Session ((Get-SessionHash $linuxPrivateDisplays.python)-ceq(Get-PrivateDisplayProbePythonPin)) 'private display Python hash differs'
