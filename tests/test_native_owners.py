@@ -233,11 +233,50 @@ class NativeOwnersTests(unittest.TestCase):
           end) == nil)
         ''')
 
-    def test_missing_owner_and_lookup_failure_are_not_admitted(self):
+    def test_missing_owner_and_non_callable_lookup_are_not_admitted(self):
         self.lua.execute('''
           assert(owners.data_worker_robot_speed_owner(function() return nil end) == nil)
-          assert(owners.runtime_worker_robot_speed_owner(function() error("foreign lookup failure") end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return nil end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return false end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return {} end) == nil)
           assert(owners.data_worker_robot_speed_owner(nil) == nil)
+        ''')
+
+    def test_unexpected_lookup_or_admission_error_does_not_select_later_owner(self):
+        self.lua.execute('''
+          local six = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5")
+
+          local lookup_calls = {}
+          local lookup_ok, lookup_owner = pcall(function()
+            return owners.runtime_worker_robot_speed_owner(function(name)
+              lookup_calls[#lookup_calls + 1] = name
+              if name == "worker-robots-speed-7" then error("foreign lookup failure") end
+              if name == six.name then return six end
+              return nil
+            end)
+          end)
+          assert(lookup_ok == false,
+            "earlier lookup failure selected later owner " .. tostring(lookup_owner))
+          assert(#lookup_calls == 1 and lookup_calls[1] == "worker-robots-speed-7")
+
+          local seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6")
+          seven.prototype.max_level = nil
+          setmetatable(seven.prototype, {__index = function(_, key)
+            if key == "max_level" then error("foreign property read failure") end
+            return nil
+          end})
+          local admission_calls = {}
+          local admission_ok, admission_owner = pcall(function()
+            return owners.runtime_worker_robot_speed_owner(function(name)
+              admission_calls[#admission_calls + 1] = name
+              if name == seven.name then return seven end
+              if name == six.name then return six end
+              return nil
+            end)
+          end)
+          assert(admission_ok == false,
+            "earlier admission failure selected later owner " .. tostring(admission_owner))
+          assert(#admission_calls == 1 and admission_calls[1] == "worker-robots-speed-7")
         ''')
 
     def test_unrelated_growth_is_never_examined_or_mutated(self):
