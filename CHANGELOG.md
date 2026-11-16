@@ -9,6 +9,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Apply the worker robot speed limit to Space Exploration's infinite research beginning at level 10.
 - Keep settings profile exports detached from caller metadata and reject values that cannot be exported without loss.
 - Show accurate Research Library availability when research is disabled by its effective settings or already exists.
+- Avoid invalid GUI style reads when refreshing the Research Library's Settings tab.
 - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
 - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
 - Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
