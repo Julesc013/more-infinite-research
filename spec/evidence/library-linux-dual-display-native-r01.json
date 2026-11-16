@@ -1,0 +1,122 @@
+{
+  "kind": "MIRLinuxLibraryDualDisplayNativeInfrastructureV1",
+  "recorded_at": "2026-11-17",
+  "raw_custody": {
+    "directory": "dual-display-smoke-originals-r01",
+    "files": 23,
+    "bytes": 32300,
+    "readback_file": "dual-display-smoke-readback-r01.json",
+    "readback_sha256": "CD5A428BBAC43BB2B98D56CEA35200E2FEA809123C2E8C515CD34D1CE2E28AA1",
+    "all_bodies_equal": true,
+    "actor_result_sha256": "A628A6F30C125AF6F9771BC57BF246D0FD6FD0EE02BD34EE067CB8D6EA1720AC",
+    "governed_result_sha256": "EA7C5F39D6BB757CFFC8FAC09D164CC3688C1B0FA39AEA4267575A578AB631A2"
+  },
+  "exact_inputs": {
+    "source": {
+      "commit": "f0cca685f16d747665fd719ed18fb08eb8c72dd8",
+      "tree": "20a5e0a407c55d876c3e628d9b4299f4cb904707"
+    },
+    "source_pins_sha256": "411076EC489DE05E1610952C38F57BB961B3DDD9F310EDAA250432D41B6B3234",
+    "parent_sha256": "86697A61F0827704A4A40DBECF6BB05CED6EBCFAF17E65305E270D941A4C2B52",
+    "governed_wrapper_sha256": "304E660203263CC313F75E7FC57C79DAE2B39D0DF3C9CDB69FE71760A157AEDA",
+    "runner_commit": "9c3234e4fff3ce8531f7f260585b994ded2d93c1",
+    "budgets": {
+      "peak_memory_mib": 1024,
+      "max_new_output_mib": 32,
+      "timeout_seconds": 90,
+      "display_deadline_seconds": 30
+    }
+  },
+  "actual_observations": {
+    "governed_process": {
+      "pid": 94904,
+      "session_id": 94904,
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 1.355039
+    },
+    "client_en": {
+      "display": ":193",
+      "helper_identity": {
+        "pid": 94913,
+        "start_ticks": 21995617,
+        "session_id": 94904
+      },
+      "display_identity": {
+        "pid": 94915,
+        "start_ticks": 21995626,
+        "session_id": 94904
+      },
+      "terminal_status": "stop"
+    },
+    "client_de": {
+      "display": ":194",
+      "helper_identity": {
+        "pid": 94918,
+        "start_ticks": 21995632,
+        "session_id": 94904
+      },
+      "display_identity": {
+        "pid": 94920,
+        "start_ticks": 21995640,
+        "session_id": 94904
+      },
+      "terminal_status": "eof"
+    },
+    "coexistence_and_control": {
+      "display_pids_distinct": true,
+      "partial_en_stdin_observed": true,
+      "de_eof_preserved_en_live_identity": true,
+      "en_completed_stop_frame": "s + top\\n"
+    },
+    "cleanup": {
+      "each_terminal_cleanup_errors_empty": true,
+      "each_terminal_pins_rechecked": true,
+      "each_terminal_authority_removed": true,
+      "each_terminal_private_viewer_restored": true,
+      "each_terminal_global_display_restored": true,
+      "global_paths_absent_after": [
+        "/tmp/.X11-unix/X193",
+        "/tmp/.X193-lock",
+        "/tmp/.X11-unix/X194",
+        "/tmp/.X194-lock"
+      ],
+      "remaining_factorio_or_x_processes": []
+    }
+  },
+  "verdict": {
+    "accepted": "Two concurrently owned private display infrastructure instances, their finite role/identity separation, stdin EOF/partial-frame handling and cleanup restoration for these exact inputs.",
+    "not_accepted": [
+      "Factorio or mod-library activation",
+      "Save access or gameplay",
+      "GUI input, client interaction, Library rendering, phase association or export",
+      "Performance, product-wide client behavior or stable qualification"
+    ],
+    "native_gui_acceptance": false
+  },
+  "independent_review": {
+    "path": "build/qualification/linux-library-full-protocol-preparation-r01/dual-private-display-smoke-independent-review-r01.json",
+    "sha256": "26C967D0B88C98D8B4FBAC9EEEB94A4D1BE0E26171C0B539CD0200C25361574B"
+  },
+  "durable_private_custody": {
+    "kind": "MIRLinuxLibraryDualDisplayRemoteReadbackV1",
+    "commit": "423f9dd9aca594a1d35befa5a6884374b5dd5425",
+    "tree": "35daa4e28441a66fcfee98c4c1be2ed1a6af6356",
+    "body_blob": "c8e7a6e1b36114b064787767dcee21099ce59a6a",
+    "inventory_blob": "45697ac9e62ab69314b73829aede40a0978801f9",
+    "body_sha256": "15287C384F6857FC1A7BBBB73F9DF67AF7173F83A93E75677B3DF1209DF38559",
+    "rows": 54,
+    "original_bytes": 92621,
+    "all_remote_bodies_equal_closed_originals": true,
+    "stable_acceptance": false,
+    "repository": "Julesc013/scratchpad",
+    "path": "projects/mir/runs/library-linux-dual-display-r01/original-bodies.json.gz",
+    "readback_sha256": "6BC4784F9AAB3DAC19F05BDBC1BEDA371690E38ED05CED97C0E72604F5DCD1BB"
+  },
+  "adverse_preparation_preserved": [
+    "dual-private-display-independent-review-r01.json: prospective NO-GO before exact peer rechecks and source stage materialization; R02 then admitted the corrected same-case plan",
+    "Display source CI head f0cca failed two Windows short-name temporary-root expectations; tested CLI/module bodies remain unchanged while host-only fixtures are corrected"
+  ],
+  "factorio_processes": 0,
+  "stable_acceptance": false
+}
