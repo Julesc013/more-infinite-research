@@ -55,11 +55,13 @@
   },
   "qualified_scope": {
     "included": [
-      "named F200/F210 paid-price Base and Space Age observations",
-      "named prepared-worker continuations"
+      "F200 canonical-profile import",
+      "F210 price2 ordinary/science/save/two-cold continuation",
+      "published5.0.15 prepared-worker positive adoption"
     ],
     "excluded": [
       "Space Exploration worker speed tail10 reset or continuation",
+      "worker post-write fault boundary",
       "complete current-package native matrix",
       "whole-product upgrade, client, GUI, performance or stable acceptance"
     ]
@@ -79,14 +81,35 @@
   "next_prepared_input": {
     "packet_sha256": "59BEFD4E5F833D65244CA1EB9BCDF1322B54F58E14F749B53E71F0DBA92F3FEF",
     "preparation_record": "build/qualification/linux-library-current-render-preparation-r01/personal-input-preparation-r01.json",
-    "status": "reviewed-and-staged-only",
-    "plan": 0,
-    "compose": 0,
-    "native": 0
+    "initial_status": "reviewed-and-staged-only before the later recorded Plan and Compose actions",
+    "plan": {
+      "status": "resource-admitted-no-library-or-process",
+      "expected_peak_mib": 4096,
+      "max_new_output_mib": 512,
+      "factorio_processes": 0,
+      "library_activations": 0
+    },
+    "compose": {
+      "status": "passed-offline-composition-only",
+      "factorio_processes": 0,
+      "original_library_restored": true
+    },
+    "service_observation": {
+      "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-service-observation-r01.json",
+      "observed_at": "2026-11-16T11:48:26Z",
+      "unit": "mir-library16-personal-input-r01.service",
+      "active_state": "active",
+      "sub_state": "running",
+      "main_pid": 53887,
+      "invocation_id": "3ed5d2d2d11948308423a47931e5e460",
+      "phase_files": 0,
+      "actor_result": false,
+      "final_verdict": "none"
+    }
   },
   "limits": [
     "This record establishes exact beta distribution and delivery only.",
-    "It does not turn staged input preparation into execution evidence.",
+    "The personal-view service observation is an in-progress status, not a final execution result.",
     "It does not resolve the Sage unprepared-history report or make it a release-arrival gate.",
     "It does not establish stable acceptance or a Mod Portal publication."
   ]
