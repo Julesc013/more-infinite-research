@@ -162,6 +162,28 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertEqual(self.lua.eval('report().phase'), "await-query-text")
         self.assertFalse(self.lua.eval("report().complete"))
 
+    def test_query_events_require_the_live_owned_query_element(self):
+        self.initialize_join_initial()
+        self.lua.execute(r'''
+          emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+          open_library("")
+          tick()
+        ''')
+        with self.assertRaisesRegex(Exception, "query click target invalid"):
+            self.lua.execute(
+                'emit(defines.events.on_gui_click,{player_index=1,element={valid=true,name="mir_library_query"}})'
+            )
+
+        for element in ('{valid=true,name="mir_library_query"}', '{valid=false,name="mir_library_query"}'):
+            with self.subTest(element=element):
+                self.setUp()
+                self.initialize_join_initial()
+                self.open_and_click_query()
+                with self.assertRaisesRegex(Exception, "query text target invalid"):
+                    self.lua.execute(
+                        "emit(defines.events.on_gui_text_changed,{player_index=1,element=" + element + "})"
+                    )
+
     def test_invalid_closed_element_is_not_dereferenced_and_deferred_retirement_is_required(self):
         self.initialize_join_initial()
         self.open_and_click_query()
@@ -221,7 +243,11 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         for forbidden in ["remote.call", "script.raise_event", "server_save", "auto_save", "require(",
                           "research_queue =", ".researched =", ".level ="]:
             self.assertNotIn(forbidden, code)
-        self.assertIsNone(re.search(r"\\b(?:player|root|query)\\.(?:text|opened)\\s*=(?!=)", code))
+        gui_assignment = re.compile(r"\b(?:player|root|query)\.(?:text|opened)\s*=(?!=)")
+        self.assertIsNone(gui_assignment.search(code))
+        for mutation in ('query.text = "gear"', 'player.opened = root'):
+            with self.subTest(mutation=mutation):
+                self.assertIsNotNone(gui_assignment.search(mutation))
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
 

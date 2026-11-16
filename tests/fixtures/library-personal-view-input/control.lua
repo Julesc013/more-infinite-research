@@ -265,7 +265,10 @@ local function on_click(event)
     fail("query click event out of order")
   end
   local element = event.element
-  if not valid(element) or element.name ~= PREFIX .. "query" then fail("query click target invalid") end
+  local player = player_for(current.player_index)
+  if player == nil then fail("observed player unavailable") end
+  local _, query = open_tree(player)
+  if not valid(element) or element ~= query then fail("query click target invalid") end
   record_event("query-click", {player_index = event.player_index, element_name = element.name})
   current.events.click = current.events.click + 1
   schedule("query-click")
@@ -279,7 +282,10 @@ local function on_text_changed(event)
     fail("query text event out of order")
   end
   local element = event.element
-  if valid(element) and element.name ~= PREFIX .. "query" then fail("query text target invalid") end
+  local player = player_for(current.player_index)
+  if player == nil then fail("observed player unavailable") end
+  local _, query = open_tree(player)
+  if not valid(element) or element ~= query then fail("query text target invalid") end
   record_event("query-text", {player_index = event.player_index, element_valid = valid(element),
     element_name = valid(element) and element.name or false})
   current.events.text = current.events.text + 1
