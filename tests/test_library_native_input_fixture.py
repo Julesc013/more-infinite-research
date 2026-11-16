@@ -10,8 +10,11 @@ import tempfile
 import unittest
 import zipfile
 
+import mir_test_versions as SHARED
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-native-input"
+MIR_517_F210 = SHARED.alias_for("5.0.17", "f210").distribution_version
 
 
 def plain(value):
@@ -738,9 +741,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().settings_probe_path = (ROOT / "tests/fixtures/library-legacy-settings-search/probe.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_input_observer(target,opponent,package_version,input_observer_version,layout_width,layout_columns)
-            local settings_api=input_observer_version=="0.3.10" or input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.3.13"
-            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3" or input_observer_version=="0.3.9" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7"
+          function run_input_observer(target,opponent,package_version,input_observer_version,layout_width,layout_columns,base_override)
+            local settings_api=input_observer_version=="0.3.10" or input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.3.13" or input_observer_version=="0.3.14"
+            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3" or input_observer_version=="0.3.9" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" or input_observer_version=="0.4.8"
             authored_page=authored_page or settings_api
             local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or authored_page or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
@@ -848,7 +851,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               local root=p.gui.screen[root_name]
               if not root or not root.valid then
                 root=element("frame",root_name);root.location=p.remembered_location or {x=200,y=100};root.style.width=1000
-                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.3.13" or input_observer_version=="0.4.7" then
+                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.3.13" or input_observer_version=="0.4.7" or input_observer_version=="0.3.14" or input_observer_version=="0.4.8" then
                   root.style.width=layout_width or 1000
                   if opponent=="missing-layout-width" then root.style.maximal_width=nil end
                   if opponent=="mismatched-layout-width" then root.style.minimal_width=999 end
@@ -875,7 +878,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 local previous_grid=filters.mir_library_filter_grid
                 local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
                 grid.column_count=layout_columns or 2;filters.mir_library_filter_grid=grid
-                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.3.13" or input_observer_version=="0.4.7" then grid.column_count=layout_columns or 5 end
+                if input_observer_version=="0.3.11" or input_observer_version=="0.3.12" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.3.13" or input_observer_version=="0.4.7" or input_observer_version=="0.3.14" or input_observer_version=="0.4.8" then grid.column_count=layout_columns or 5 end
                 for _,name in ipairs({"family","status","mode","sort","visibility"}) do
                   local id="mir_library_"..name
                   local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
@@ -1024,7 +1027,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 if opponent=="lose-other-focus" then en.focused=nil end
               end
             end
-            local base=target=="f200" and "2.0.77" or "2.1.23"
+            local base=base_override or (target=="f200" and "2.0.77" or "2.1.23")
             local active={base=base,["more-infinite-research"]=package_version or (target=="f200" and "5.0.20000" or "5.0.21000"),
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
@@ -1122,7 +1125,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
               end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
-              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" or input_observer_version=="0.4.3" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" then return end
+              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" or input_observer_version=="0.4.3" or input_observer_version=="0.4.4" or input_observer_version=="0.4.5" or input_observer_version=="0.4.6" or input_observer_version=="0.4.7" or input_observer_version=="0.4.8" then return end
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
@@ -1203,14 +1206,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
-              final=store[key] and store[key].native~=nil and api().report() or nil,native_input_evidence=false,final_calls=calls}
+              final=store[key] and store[key].native~=nil and api().report() or nil,storage_initialized=store[key]~=nil,
+              native_input_evidence=false,final_calls=calls}
           end
         ''')
 
     def run_case(self, target="f210", opponent=None, package_version=None, input_observer_version=None,
-                 layout_width=None, layout_columns=None):
+                 layout_width=None, layout_columns=None, base_override=None):
         return plain(self.lua.globals().run_input_observer(target, opponent, package_version,
-            input_observer_version, layout_width, layout_columns))
+            input_observer_version, layout_width, layout_columns, base_override))
 
     def test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence(self):
         for target in ("f200", "f210"):
@@ -2239,6 +2243,77 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertFalse(result["native_input_evidence"])
 
 
+    def test_517_f210_settings_observer_has_exact_metadata_and_full_input_lifecycle(self):
+        metadata = {
+            "input-517-settings-api": ("input-514-settings-api", "0.3.14"),
+            "exports-517": ("exports-514", "0.4.8"),
+        }
+        for kind, (previous_kind, version) in metadata.items():
+            with self.subTest(kind=kind):
+                previous = json.loads((FIXTURE / f"info-{previous_kind}-f210.json").read_text())
+                current = json.loads((FIXTURE / f"info-{kind}-f210.json").read_text())
+                self.assertEqual(current, dict(previous, version=version,
+                    dependencies=["base = 2.1.24", "~ more-infinite-research = " + MIR_517_F210]))
+        stages = ["research", "settings-options-baseline", "settings-options-repair",
+                  "settings-options-retained-default", "settings-options-no-match",
+                  "restore-settings-options-empty", "restore-research"]
+        result = self.run_case("f210", package_version=MIR_517_F210, input_observer_version="0.3.14",
+            layout_width=1000, layout_columns=5, base_override="2.1.24")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertTrue(result["storage_initialized"])
+        final = result["final"]
+        search = final["legacy_settings_search"]
+        self.assertTrue(search["completed"])
+        self.assertEqual(len(search["observations"]), 14)
+        for role in ("en", "de"):
+            rows = [row for row in search["observations"] if row["role"] == role]
+            self.assertEqual([row["stage"] for row in rows], stages)
+            self.assertEqual(rows[1]["observation"]["selected_tab"], 3)
+            self.assertLess(rows[2]["observation"]["list_count"], rows[1]["observation"]["list_count"])
+            self.assertEqual(rows[3]["observation"]["settings_text"], "default")
+            self.assertEqual(rows[4]["observation"]["settings_text"], "x" * 160)
+            self.assertEqual(rows[4]["observation"]["list_count"], 0)
+            self.assertEqual(rows[6]["observation"]["settings_text"], "")
+            self.assertEqual(rows[6]["observation"]["research_text"],
+                "recipe-prod-research_gears-1" if role == "en" else "recipe-prod-research_mining_drill-1")
+        self.assertEqual((final["phase"], final["private_queries"], final["actual_joins"],
+            final["requested_native_resets"], final["actual_removed_events"],
+            final["actual_library_closed_events"]), ("delivered", 48, 5, 2, 1, 2))
+        self.assertTrue(final["imported_earnings"])
+        self.assertFalse(final["fixture_seeds_credit"])
+        self.assertTrue(result["readonly_load"])
+        self.assertTrue(result["readonly_report"])
+        self.assertFalse(result["native_input_evidence"])
+
+
+    def test_517_f210_input_rejects_tuple_and_closure_before_state_write(self):
+        for opponent, base, player, observer in (
+            ("extra-mod", "2.1.24", MIR_517_F210, "0.3.14"),
+            ("helperfree-missing-active-observer", "2.1.24", MIR_517_F210, "0.3.14"),
+            (None, "2.1.23", MIR_517_F210, "0.3.14"),
+            (None, "2.1.25", MIR_517_F210, "0.3.14"),
+            (None, "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.3.14"),
+            (None, "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.3.14"),
+            (None, "2.1.24", MIR_517_F210, "0.3.13"),
+            (None, "2.1.24", MIR_517_F210, "0.3.15"),
+        ):
+            with self.subTest(opponent=opponent, base=base, player=player, observer=observer):
+                result = self.run_case("f210", opponent, player, observer, base_override=base)
+                self.assertFalse(result["ok"], result["message"])
+                self.assertFalse(result["storage_initialized"], result["message"])
+        for width, columns in ((1, 1), (440, 2), (620, 3), (960, 5)):
+            with self.subTest(width=width, columns=columns):
+                result = self.run_case("f210", package_version=MIR_517_F210,
+                    input_observer_version="0.3.14", layout_width=width, layout_columns=columns,
+                    base_override="2.1.24")
+                self.assertTrue(result["ok"], result["message"])
+            with self.subTest(width=width, wrong_columns=columns + 1):
+                with self.assertRaisesRegex(Exception, "authored research filter grid is malformed"):
+                    self.run_case("f210", package_version=MIR_517_F210,
+                        input_observer_version="0.3.14", layout_width=width, layout_columns=columns + 1,
+                        base_override="2.1.24")
+
+
 
 
 class LibrarySupportExportObserverControls(unittest.TestCase):
@@ -2247,7 +2322,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_export_observer(target,opponent,qualified,layout,override_base,override_mir,override_observer)
+          function run_export_observer(target,opponent,qualified,layout,override_base,override_mir,override_observer,initial_only)
             local key="mir5_library_native_input"
             local base=override_base or (target=="f200"and"2.0.77"or"2.1.23")
             local mir=override_mir or (target=="f200"and(qualified and(qualified=="510" and "5.0.20010" or (qualified=="508" and "5.0.20008" or "5.0.20007"))or"5.0.20000")or(qualified and(qualified=="510" and "5.0.21010" or (qualified=="508" and "5.0.21008" or "5.0.21007"))or"5.0.21000"))
@@ -2255,6 +2330,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             if qualified=="512" and not override_mir then mir=target=="f200" and "5.0.20012" or "5.0.21012" end
             if qualified=="513" and not override_mir then mir=target=="f200" and "5.0.20013" or "5.0.21013" end
             if qualified=="514" and not override_mir then mir=target=="f200" and "5.0.20014" or "5.0.21014" end
+            if qualified=="517" and not override_mir then mir="5.0.21017" end
             local original="mir-fixture-mir5-migration-origin-f200-110-source"
             local fixture=target=="f200"and"0.3.0"or"0.4.0"
             local callbacks,interfaces,store,players,decoded={},{},{},{},{}
@@ -2322,12 +2398,15 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=override_observer or (qualified and(qualified=="510" and "0.4.3" or (qualified=="508" and "0.4.2" or "0.4.1"))or"0.4.0")},
               on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
               on_event=function(id,f)callbacks[id]=f end}
+            if opponent=="extra-mod" then env.script.active_mods.extra="1.0.0" end
+            if opponent=="missing-active-observer" then env.script.active_mods["mir-fixture-mir5-active-mods-observer"]=nil end
             if qualified then env.script.active_mods[original]=nil end
             if qualified=="511" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.4" end
             if qualified=="512" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.5" end
             if qualified=="513" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.6" end
             if qualified=="514" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.7" end
-            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514",current_508=qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514",current_510=qualified=="510",current_511=qualified=="511",current_512=qualified=="512",current_513=qualified=="513",current_514=qualified=="514",
+            if qualified=="517" and not override_observer then env.script.active_mods["mir-fixture-mir5-library-native-input"]="0.4.8" end
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514" or qualified=="517",current_508=qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514" or qualified=="517",current_510=qualified=="510",current_511=qualified=="511",current_512=qualified=="512",current_513=qualified=="513",current_514=qualified=="514",current_517=qualified=="517",
               world=function()return{serial=native}end,
               assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
               imported=function()assert(native==1,"actual imported credit changed")end}
@@ -2335,12 +2414,14 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               assert(loadfile(support_path,"t",env))().register(context)
               return interfaces[context.interface]
             end
-            local api=register();callbacks.init()
+            local api=register();local initialized,init_error=pcall(callbacks.init)
+            if initial_only then return initialized,store[key]~=nil,tostring(init_error) end
+            assert(initialized,init_error)
             if qualified then
               assert(store[key].native==nil and not pcall(api.report),"early support baseline was admitted")
               callbacks[4]({tick=1});assert(callbacks[4]==nil,"support baseline kept its tick handler")
             end
-            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514"))
+            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508" or qualified=="510" or qualified=="511" or qualified=="512" or qualified=="513" or qualified=="514" or qualified=="517"))
             local en,de=player(0,"en"),player(2,"de")
             game.players,game.connected_players={[0]=en,[2]=de},{en,de}
             local function joined(index)
@@ -2658,6 +2739,35 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                 with self.subTest(target=target, base=wrong_base, player=wrong_player,
                     observer=wrong_observer), self.assertRaises(Exception):
                     run(target, "", "514", "authored", wrong_base, wrong_player, wrong_observer)
+
+
+    def test_517_f210_export_retains_full_protocol_and_rejects_tuple_before_state_write(self):
+        run = self.lua.globals().run_export_observer
+        self.assertEqual(run("f210", "", "517", "authored", "2.1.24"), (13, 5, 2, 0))
+        for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+            "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation", "missing-rejoin",
+            "missing-restart", "duplicate-settings-command", "early-server-commands", "post-load-server-command",
+            "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin", "duplicate-restart-role", "early-rejoin",
+            "zero-server-index"):
+            with self.subTest(opponent=opponent), self.assertRaises(Exception):
+                run("f210", opponent, "517", "authored", "2.1.24")
+        for opponent, base, player, observer in (
+            ("extra-mod", "2.1.24", MIR_517_F210, "0.4.8"),
+            ("missing-active-observer", "2.1.24", MIR_517_F210, "0.4.8"),
+            ("", "2.1.23", MIR_517_F210, "0.4.8"),
+            ("", "2.1.25", MIR_517_F210, "0.4.8"),
+            ("", "2.1.24", SHARED.alias_for("5.0.16", "f210").distribution_version, "0.4.8"),
+            ("", "2.1.24", SHARED.alias_for("5.0.18", "f210").distribution_version, "0.4.8"),
+            ("", "2.1.24", MIR_517_F210, "0.4.7"),
+            ("", "2.1.24", MIR_517_F210, "0.4.9"),
+        ):
+            with self.subTest(opponent=opponent, base=base, player=player, observer=observer):
+                initialized, state_written, message = run("f210", opponent, "517", "authored", base,
+                    player, observer, True)
+                self.assertFalse(initialized, message)
+                self.assertFalse(state_written, message)
+                if base != "2.1.24":
+                    self.assertIn("exact engine target differs", message)
 
 
 
