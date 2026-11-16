@@ -378,6 +378,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_angelbob_rebalance_space_age_profiles.py",
             "tests/test_dependency_declarations.py",
             "tests/test_library_native_input.py",
+            "tests/test_library_native_input_linux.py",
             "tests/test_library_profile_reader.py",
             "tests/test_f110_f200_runner.py",
             "tests/test_f100_f110_laser_runner.py",
