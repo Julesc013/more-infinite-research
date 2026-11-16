@@ -147,6 +147,32 @@ function Resolve-MIR441ExistingDirectoryAncestor {
   return $item.FullName
 }
 
+function Get-MIR441LinuxVolumeDevice {
+  param([Parameter(Mandatory)]$Volume)
+  # Linux snapshots intentionally use [ordered]@{} rows. Those are
+  # OrderedDictionary instances: member access adapts keys, but PSObject
+  # properties do not enumerate those keys. Read IDictionary rows directly;
+  # retain the PSCustomObject path for controlled callers and tests.
+  if($Volume-is[Collections.IDictionary]){
+    if(-not$Volume.Contains('device')-or-not$Volume.Contains('mount_id')){throw '[mir441-resource-linux-mount-device]'}
+    $deviceValue=$Volume['device'];$mountValue=$Volume['mount_id']
+  }else{
+    $deviceProperty=$Volume.PSObject.Properties['device'];$mountProperty=$Volume.PSObject.Properties['mount_id']
+    if($null-eq$deviceProperty-or$null-eq$mountProperty){throw '[mir441-resource-linux-mount-device]'}
+    $deviceValue=$deviceProperty.Value;$mountValue=$mountProperty.Value
+  }
+  if($deviceValue-isnot[string]-or[string]::IsNullOrWhiteSpace([string]$deviceValue)-or($mountValue-isnot[int]-and$mountValue-isnot[long])-or[int64]$mountValue-le0){
+    throw '[mir441-resource-linux-mount-device]'
+  }
+  $match=[regex]::Match([string]$deviceValue,'^(?<major>[0-9]+):(?<minor>[0-9]+)$')
+  if(-not$match.Success){throw '[mir441-resource-linux-mount-device]'}
+  [uint64]$major=0;[uint64]$minor=0
+  if(-not[uint64]::TryParse($match.Groups['major'].Value,[ref]$major)-or-not[uint64]::TryParse($match.Groups['minor'].Value,[ref]$minor)){
+    throw '[mir441-resource-linux-mount-device]'
+  }
+  return "$major`:$minor"
+}
+
 function Get-MIR441ResourceSnapshot {
   param([Parameter(Mandatory)][string]$WorkRoot)
   if($IsLinux){
@@ -154,13 +180,14 @@ function Get-MIR441ResourceSnapshot {
     $memory=[pscustomobject][ordered]@{total_bytes=[int64]$linux.memory.total_bytes;free_bytes=[int64]$linux.memory.available_bytes;cgroup_v2=$linux.cgroup_v2}
     $fullWorkRoot=[IO.Path]::GetFullPath($WorkRoot)
     $workMount=Invoke-MIR441LinuxResourceObservation -Operation mount-identity -Path $fullWorkRoot
+    $systemMount=Invoke-MIR441LinuxResourceObservation -Operation mount-identity -Path '/'
     $workDrive=[IO.DriveInfo]::new((Resolve-MIR441ExistingDirectoryAncestor -Path $fullWorkRoot));$systemDrive=[IO.DriveInfo]::new('/')
     if(-not$workDrive.IsReady-or-not$systemDrive.IsReady-or[string]$workMount.filesystem_type-cne'ext4'){throw '[mir441-resource-linux-work-filesystem]'}
     return [pscustomobject][ordered]@{
       observed_at=[DateTimeOffset]::UtcNow.ToString('o');work_root=$fullWorkRoot;platform=[ordered]@{os='linux';memory_policy='MemAvailable is physical-RAM headroom; Committed_AS and CommitLimit are not admission fields';commit_policy='inapplicable'}
       memory=$memory
-      work_volume=[ordered]@{name=[string]$workMount.mount_point;mount_id=[int64]$workMount.mount_id;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize;filesystem_type=[string]$workMount.filesystem_type}
-      system_volume=[ordered]@{name=$systemDrive.Name;free_bytes=[int64]$systemDrive.AvailableFreeSpace;total_bytes=[int64]$systemDrive.TotalSize;filesystem_type=$systemDrive.DriveFormat}
+      work_volume=[ordered]@{name=[string]$workMount.mount_point;mount_id=[int64]$workMount.mount_id;device=[string]$workMount.device;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize;filesystem_type=[string]$workMount.filesystem_type}
+      system_volume=[ordered]@{name=$systemDrive.Name;mount_id=[int64]$systemMount.mount_id;device=[string]$systemMount.device;free_bytes=[int64]$systemDrive.AvailableFreeSpace;total_bytes=[int64]$systemDrive.TotalSize;filesystem_type=$systemDrive.DriveFormat}
     }
   }
   $memory=Get-MIR441PhysicalMemorySnapshot
@@ -201,8 +228,16 @@ function Assert-MIR441ResourceAdmission {
   if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
   elseif($IsLinux-and$null-ne$snapshot.memory.cgroup_v2.effective_headroom_bytes-and[int64]$snapshot.memory.cgroup_v2.effective_headroom_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-cgroup]'}
   elseif(-not$IsLinux-and[int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
-  elseif([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-system-disk]'}
-  elseif([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-work-disk]'}
+  else{
+    [int64]$systemOutputAllowance=2*$EstimatedPeakBytes
+    if($IsLinux){
+      $systemDevice=Get-MIR441LinuxVolumeDevice -Volume $snapshot.system_volume
+      $workDevice=Get-MIR441LinuxVolumeDevice -Volume $snapshot.work_volume
+      if($systemDevice-cne$workDevice){$systemOutputAllowance=0L}
+    }
+    if([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+$systemOutputAllowance){$failure='[mir441-resource-admission-system-disk]'}
+    elseif([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-work-disk]'}
+  }
   if($failure){
     # Retain the actual throwing snapshot; a later sample cannot explain a
     # prelaunch refusal or live interruption. Admission thresholds are exact.

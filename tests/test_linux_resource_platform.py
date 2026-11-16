@@ -113,11 +113,41 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         )
         status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/work/future/output")
         self.assertEqual(0, status)
-        self.assertEqual({"mount_id": 36, "mount_point": "/work", "filesystem_type": "ext4"}, payload["value"])
+        self.assertEqual({"mount_id": 36, "device": "8:1", "mount_point": "/work", "filesystem_type": "ext4"}, payload["value"])
         status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/Work/future/output")
         self.assertEqual(0, status)
-        self.assertEqual({"mount_id": 35, "mount_point": "/", "filesystem_type": "ext4"}, payload["value"])
+        self.assertEqual({"mount_id": 35, "device": "8:1", "mount_point": "/", "filesystem_type": "ext4"}, payload["value"])
         status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "relative")
+        self.assertEqual(2, status)
+        self.assertEqual("mir441-linux-mount-identity", payload["code"])
+
+    def test_mount_identity_binds_the_underlying_device_not_only_mount_id(self) -> None:
+        temporary, proc = self.make_fixture()
+        self.addCleanup(lambda: shutil.rmtree(temporary, ignore_errors=True))
+        write(
+            proc / "self" / "mountinfo",
+            "35 25 8:1 / / rw,relatime - ext4 /dev/root rw\n"
+            "36 35 8:1 / /work rw,relatime - ext4 /dev/work rw\n",
+        )
+        status, root = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/")
+        self.assertEqual(0, status)
+        status, bind = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/work/output")
+        self.assertEqual(0, status)
+        self.assertNotEqual(root["value"]["mount_id"], bind["value"]["mount_id"])
+        self.assertEqual("8:1", root["value"]["device"])
+        self.assertEqual(root["value"]["device"], bind["value"]["device"])
+
+        write(
+            proc / "self" / "mountinfo",
+            "35 25 8:1 / / rw,relatime - ext4 /dev/root rw\n"
+            "36 35 8:2 / /work rw,relatime - ext4 /dev/work rw\n",
+        )
+        status, distinct = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/work/output")
+        self.assertEqual(0, status)
+        self.assertEqual("8:2", distinct["value"]["device"])
+
+        write(proc / "self" / "mountinfo", "35 25 malformed / / rw,relatime - ext4 /dev/root rw\n")
+        status, payload = self.run_helper("mount-identity", "--proc-root", str(proc), "--path", "/")
         self.assertEqual(2, status)
         self.assertEqual("mir441-linux-mount-identity", payload["code"])
 

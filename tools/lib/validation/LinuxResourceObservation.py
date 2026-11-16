@@ -50,6 +50,15 @@ def parse_uint(value: str, code: str) -> int:
     raise AssertionError("unreachable")
 
 
+def parse_device(value: str, code: str) -> str:
+    match = re.fullmatch(r"([0-9]+):([0-9]+)", value)
+    if match is None:
+        fail(code)
+    major = parse_uint(match.group(1), code)
+    minor = parse_uint(match.group(2), code)
+    return f"{major}:{minor}"
+
+
 def read_meminfo(proc_root: Path) -> dict[str, int]:
     found: dict[str, int] = {}
     for line in read_text(proc_root / "meminfo", "mir441-linux-proc-meminfo").splitlines():
@@ -110,7 +119,7 @@ def mount_identity(proc_root: Path, path: str) -> dict[str, int | str]:
     if "\x00" in path or not path.startswith("/"):
         fail("mir441-linux-mount-identity")
     candidate = posixpath.normpath(path)
-    matches: list[tuple[int, int, int, str, str]] = []
+    matches: list[tuple[int, int, int, str, str, str]] = []
     for index, line in enumerate(read_text(proc_root / "self" / "mountinfo", "mir441-linux-mount-identity").splitlines()):
         pieces = line.split(" - ", 1)
         if len(pieces) != 2:
@@ -121,17 +130,18 @@ def mount_identity(proc_root: Path, path: str) -> dict[str, int | str]:
         if len(fields) < 5 or len(trailer) < 3:
             fail("mir441-linux-mount-identity")
         mount_id = parse_uint(fields[0], "mir441-linux-mount-identity")
+        device = parse_device(fields[2], "mir441-linux-mount-identity")
         mount_point = unescape_mount(fields[4], "mir441-linux-mount-identity")
         if not mount_point.startswith("/") or "\x00" in mount_point:
             fail("mir441-linux-mount-identity")
         prefix = mount_point.rstrip("/") or "/"
         contained = candidate == prefix or (prefix != "/" and candidate.startswith(prefix + "/")) or prefix == "/"
         if contained:
-            matches.append((len(prefix), index, mount_id, mount_point, trailer[0]))
+            matches.append((len(prefix), index, mount_id, device, mount_point, trailer[0]))
     if not matches:
         fail("mir441-linux-mount-identity")
-    _, _, mount_id, mount_point, filesystem_type = max(matches, key=lambda row: (row[0], row[1]))
-    return {"mount_id": mount_id, "mount_point": mount_point, "filesystem_type": filesystem_type}
+    _, _, mount_id, device, mount_point, filesystem_type = max(matches, key=lambda row: (row[0], row[1]))
+    return {"mount_id": mount_id, "device": device, "mount_point": mount_point, "filesystem_type": filesystem_type}
 
 
 def cgroup_leaf(mount_root: str, mount_point: Path, cgroup_path: str) -> Path:
