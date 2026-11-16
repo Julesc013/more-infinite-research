@@ -3,7 +3,7 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.1"
+local VERSION = "0.1.2"
 local MIR = "more-infinite-research"
 local MIR_VERSION = "5.0.21016"
 local ROOT = "mir_research_browser"
@@ -51,6 +51,7 @@ local function state()
       events = {shortcut = 0, tab = 0, tab_click = 0, click = 0, text = 0, close = 0},
       event_log = {},
       snapshots = {},
+      written = {},
       active_mods_reported = false
     }
   end
@@ -121,15 +122,23 @@ local function native_snapshot(player)
   }
 end
 
+local function readable_style(style, field)
+  if style == nil then fail("style unavailable") end
+  local ok, value = pcall(function() return style[field] end)
+  if not ok or (value ~= nil and not finite(value)) then fail("style field unavailable") end
+  return value
+end
+
 local function geometry(player, root)
   local location, style = root.location, root.style
-  if type(location) ~= "table" or type(style) ~= "table" then fail("root geometry unavailable") end
+  if type(location) ~= "table" then fail("root geometry unavailable") end
   local row = {
-    x = location.x, y = location.y, width = style.width, height = style.height,
-    maximal_width = style.maximal_width
+    x = location.x, y = location.y, minimal_width = readable_style(style, "minimal_width"),
+    maximal_width = readable_style(style, "maximal_width"),
+    minimal_height = readable_style(style, "minimal_height"),
+    maximal_height = readable_style(style, "maximal_height")
   }
-  if not finite(row.x) or not finite(row.y) or not finite(row.width) or row.width <= 0
-    or not finite(row.height) or row.height <= 0 or not finite(row.maximal_width) or row.maximal_width <= 0 then
+  if not finite(row.x) or not finite(row.y) then
     fail("root geometry unavailable")
   end
   if not finite(player.display_scale) or player.display_scale <= 0
@@ -172,14 +181,8 @@ end
 local function tab_bar_identity(tabs)
   local result = {name = tabs.name, type = tabs.type, index = tabs.index or false}
   local style = tabs.style
-  if style ~= nil then
-    for _, field in ipairs({"width", "height", "minimal_width", "maximal_width", "minimal_height", "maximal_height"}) do
-      local value = style[field]
-      if value ~= nil then
-        if not finite(value) or value <= 0 then fail("tab-bar geometry unavailable") end
-        result[field] = value
-      end
-    end
+  for _, field in ipairs({"minimal_width", "maximal_width", "minimal_height", "maximal_height"}) do
+    result[field] = readable_style(style, field)
   end
   return result
 end
@@ -205,6 +208,29 @@ local function schedule(stage_name)
     fail("multiple unsettled GUI events")
   end
   current.pending = {stage = stage_name, tick = game.tick + 1}
+end
+
+local function write_phase(player, row)
+  local current = state()
+  if helpers == nil or type(helpers.table_to_json) ~= "function" or type(helpers.write_file) ~= "function" then
+    fail("phase output helpers unavailable")
+  end
+  local name = string.format("mir-library-personal-view-input/%02d-%s.json", #current.snapshots, row.stage)
+  if current.written[name] then fail("phase output already written") end
+  helpers.write_file(name, helpers.table_to_json({
+    schema = 1,
+    fixture = FIXTURE,
+    version = VERSION,
+    active_mods = current.active_mods,
+    phase = current.phase,
+    complete = current.phase == "complete",
+    events = current.events,
+    event_log = current.event_log,
+    snapshot = row,
+    snapshots = current.snapshots,
+    native_snapshot_unchanged = current.native ~= nil
+  }), false, player.index)
+  current.written[name] = true
 end
 
 local function record_snapshot(stage_name)
@@ -237,6 +263,7 @@ local function record_snapshot(stage_name)
   end
   if #current.snapshots >= MAX_SNAPSHOTS then fail("too many GUI snapshots") end
   current.snapshots[#current.snapshots + 1] = row
+  return player, row
 end
 
 local function settle(event)
@@ -244,34 +271,36 @@ local function settle(event)
   local pending = current.pending
   if pending == nil or event.tick < pending.tick then return end
   current.pending = nil
+  local player, row
   if pending.stage == "initial" then
-    record_snapshot("initial")
+    player, row = record_snapshot("initial")
     current.phase = "await-open"
   elseif pending.stage == "open" then
-    record_snapshot("open")
+    player, row = record_snapshot("open")
     current.phase = "await-help-tab"
   elseif pending.stage == "help-tab" then
-    record_snapshot("help-tab")
+    player, row = record_snapshot("help-tab")
     current.phase = "await-research-tab"
   elseif pending.stage == "research-tab" then
-    record_snapshot("research-tab")
+    player, row = record_snapshot("research-tab")
     current.phase = "await-query-click"
   elseif pending.stage == "query-click" then
-    record_snapshot("query-click")
+    player, row = record_snapshot("query-click")
     current.phase = "await-query-text"
   elseif pending.stage == "text" then
-    record_snapshot("text")
+    player, row = record_snapshot("text")
     local latest = current.snapshots[#current.snapshots]
     current.phase = latest.query == "gear" and "await-close" or "await-query-text"
   elseif pending.stage == "closed" then
-    record_snapshot("closed")
+    player, row = record_snapshot("closed")
     current.phase = "await-reopen"
   elseif pending.stage == "reopen" then
-    record_snapshot("reopen")
+    player, row = record_snapshot("reopen")
     current.phase = "complete"
   else
     fail("unknown deferred stage")
   end
+  write_phase(player, row)
 end
 
 local function on_join(event)
