@@ -13,7 +13,7 @@ local M = {}
 
 local STORAGE_KEY = "mir_caps"
 local SCHEMA = 1
-local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7", "worker-robots-speed-10"}
+local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
 local active_mods = script and script.active_mods or mods or {}
 local worker_modifiers
 if active_mods.Krastorio2 and active_mods["Krastorio2-spaced-out"]

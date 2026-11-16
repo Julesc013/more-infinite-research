@@ -1228,10 +1228,7 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "superseded worker tail gained restoration rights")
         ''')
 
-    def test_se_tail_ten_cap_survives_ordinary_event_without_claiming_foreign_ownership(self):
-        # The pre-fix 6/7-only selection is retained in PR review evidence.
-        # Keep this host control self-contained so shallow CI can exercise the
-        # lifecycle invariant without needing to fetch that historical tree.
+    def test_release_scope_does_not_select_tail_ten_for_configuration_or_events(self):
         self.lua.execute('''
           local six = worker("worker-robots-speed-6")
           six.prototype.max_level = 6
@@ -1250,34 +1247,15 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           boot({[1] = player_force, [2] = foreign_force}, nil, nil, {worker_limit = 10})
           lifecycle.on_configuration_changed()
           local saved = storage.mir_caps and storage.mir_caps.owned_disabled or {}
-          assert(not player.enabled and saved[1] and saved[1][player.name]
-            and saved[1][player.name].disabled == true,
-            "current configuration must cap the admitted SE tail ten")
-          assert(not foreign.enabled and saved[2] and saved[2][foreign.name]
-            and saved[2][foreign.name].disabled == false,
-            "current configuration must retain the foreign-disable baseline")
+          assert(player.enabled and not foreign.enabled and next(saved) == nil,
+            "release scope selected the deferred SE tail ten during configuration")
           player.enabled = true
           lifecycle.on_research_finished({force = player_force, research = player})
-          assert(not player.enabled and saved[1][player.name].disabled == true,
-            "ordinary tail-ten completion released MIR's cap ownership")
+          assert(player.enabled and next(saved) == nil,
+            "release scope selected the deferred SE tail ten after ordinary research")
           lifecycle.on_research_finished({force = foreign_force, research = foreign})
-          assert(not foreign.enabled and saved[2][foreign.name].disabled == false,
-            "ordinary tail-ten completion claimed a foreign disablement")
-        ''')
-
-    def test_historical_worker_allowlist_does_not_create_tail_ten_restoration_rights(self):
-        self.lua.execute('''
-          local name = "worker-robots-speed-10"
-          local tail = worker(name)
-          tail.level, tail.enabled, tail.visible_when_disabled = 11, false, true
-          local predecessor = f200_worker_legacy(1, 10, name)
-          boot({[1] = force(1, {[name] = tail})}, predecessor, nil,
-            {target_id = "f200", worker_limit = 0})
-          lifecycle.on_configuration_changed()
-          assert(not tail.enabled and tail.visible_when_disabled
-            and storage.mir_caps.legacy_caps_checked
-            and next(storage.mir_caps.owned_disabled) == nil,
-            "unpublished historical tail ten acquired a restoration right")
+          assert(not foreign.enabled and next(saved) == nil,
+            "release scope claimed ownership of the deferred foreign SE tail")
         ''')
 
     def test_disabled_gear_feature_never_gains_enablement_from_old_or_current_rights(self):
