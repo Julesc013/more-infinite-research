@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-mir5-worker-speed-cap-ten",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "title": "MIR F200 SE worker-speed tail-ten current-state Source17 successor fixture",
   "author": "MIR maintainers",
   "description": "Disposable F200 SE current-state reset-event Source17 successor fixture; not a reporter save.",

@@ -36,7 +36,7 @@ local STAGES = {
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
   ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
-  ["current-successor17"] = {version = "0.11.0", cap = 10, mir = "5.0.20017"},
+  ["current-successor17"] = {version = "0.12.0", cap = 10, mir = "5.0.20017"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -852,6 +852,24 @@ local function begin_current_state(stage)
   return state, post_reset
 end
 
+local function current_completed_snapshot(state, phase, player, foreign, earned, label)
+  local snapshot = current_header(phase, state.current_successor_stage)
+  snapshot.pre_reset, snapshot.post_reset, snapshot.pre_work, snapshot.post_completion = copy(state.pre_reset),
+    copy(state.post_reset), copy(state.pre_work), copy(state.post_completion)
+  snapshot.post_reset_player_bonus = state.current_player_bonus_before
+  snapshot.ordinary_native_completion_count, snapshot.level_eleven_start_count = state.ordinary_native_completion_count,
+    state.level_eleven_start_count
+  snapshot.level_eleven_queue_attempt = copy(state.level_eleven_queue_attempt)
+  snapshot.lab = lab_snapshot(state, label)
+  snapshot.post_completion_hold_ticks, snapshot.reset_rows, snapshot.native_reset_events = state.post_completion_hold_ticks,
+    copy(state.reset_rows), copy(state.native_reset_events)
+  snapshot.ordinary_events = copy(state.ordinary_events)
+  snapshot.player, snapshot.foreign, snapshot.earned_above_cap = player, foreign, earned
+  snapshot.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
+  snapshot.on_load_read_only = phase == "cold"
+  return snapshot
+end
+
 local function tick_current_state(state)
   if #(state.outside_reset_events or {}) ~= 0 then
     fail("current-state observed reset outside the declared three-force boundary")
@@ -897,18 +915,7 @@ local function tick_current_state(state)
     state.post_completion.end_earned_above_cap = copy(earned)
     state.post_completion.end_lab = ending_lab
     state.phase = "current-complete"
-    local complete = current_header("complete", state.current_successor_stage)
-    complete.pre_reset, complete.post_reset, complete.post_reset_player_bonus = copy(state.pre_reset), copy(state.post_reset),
-      state.current_player_bonus_before
-    complete.pre_work, complete.post_completion = copy(state.pre_work), copy(state.post_completion)
-    complete.ordinary_native_completion_count, complete.level_eleven_start_count = state.ordinary_native_completion_count,
-      state.level_eleven_start_count
-    complete.level_eleven_queue_attempt, complete.lab = copy(state.level_eleven_queue_attempt), ending_lab
-    complete.post_completion_hold_ticks, complete.reset_rows, complete.native_reset_events = state.post_completion_hold_ticks,
-      copy(state.reset_rows), copy(state.native_reset_events)
-    complete.ordinary_events = copy(state.ordinary_events)
-    complete.player, complete.foreign, complete.earned_above_cap = player, foreign, earned
-    complete.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
+    local complete = current_completed_snapshot(state, "complete", player, foreign, earned, "current complete")
     current_emit("complete", complete)
     game.server_save(CURRENT_SAVE)
     cold_requested, cold_logged = false, true
@@ -917,18 +924,7 @@ local function tick_current_state(state)
   if state.phase ~= "current-complete" then fail("current-state fixture phase differs") end
   if not cold_requested or cold_logged then return end
   local player, foreign, earned = assert_current_post_completion(state, "current cold")
-  local cold = current_header("cold", state.current_successor_stage)
-  cold.pre_reset, cold.post_reset, cold.pre_work, cold.post_completion = copy(state.pre_reset), copy(state.post_reset),
-    copy(state.pre_work), copy(state.post_completion)
-  cold.post_reset_player_bonus, cold.player, cold.foreign, cold.earned_above_cap = state.current_player_bonus_before,
-    player, foreign, earned
-  cold.ordinary_native_completion_count, cold.level_eleven_start_count = state.ordinary_native_completion_count,
-    state.level_eleven_start_count
-  cold.on_load_read_only, cold.lab = true, lab_snapshot(state, "current cold")
-  cold.post_completion_hold_ticks, cold.reset_rows, cold.native_reset_events = state.post_completion_hold_ticks,
-    copy(state.reset_rows), copy(state.native_reset_events)
-  cold.ordinary_events = copy(state.ordinary_events)
-  cold.completed_forces = {player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
+  local cold = current_completed_snapshot(state, "cold", player, foreign, earned, "current cold")
   current_emit("cold", cold)
   cold_logged = true
 end
