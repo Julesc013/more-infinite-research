@@ -2389,6 +2389,66 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
+    def test_unrecorded_mod_selection_refusal_reports_only_the_rejecting_tuple_without_writes(self):
+        for target in ("f200", "f210"):
+            for opponent in ("added", "removed", "updated", "false-zero", "malformed"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua=self.world(target);lua.globals().opponent=opponent
+                    lua.execute(r'''
+                      for _,f in pairs(game.forces)do local c=f.technologies[CANONICAL]
+                        c.level=4;c.researched=false;c.saved_progress=0;f.research_queue={};f.research_progress=0
+                      end
+                      local name="sage-\1"..string.rep("x",100)
+                      local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                      script.active_mods["unrelated-unchanged"]="7.0"
+                      event.mod_changes["unrelated-unchanged"]={old_version="7.0",new_version="7.0"}
+                      if opponent=="added"then
+                        event.mod_changes[name]={new_version="new\2"};script.active_mods[name]="new\2"
+                      elseif opponent=="removed"then
+                        event.mod_changes[name]={old_version="old\3"};script.active_mods[name]=nil
+                      elseif opponent=="updated"then
+                        event.mod_changes[name]={old_version="old\4",new_version="new\5"};script.active_mods[name]="new\5"
+                      elseif opponent=="false-zero"then
+                        event.mod_changes[name]={old_version=false,new_version=0};script.active_mods[name]=false
+                      else
+                        event.mod_changes[name]=setmetatable({}, {__index=function()error("rejecting row metamethod invoked")end})
+                        script.active_mods[name]="active\6"
+                      end
+                      local before=all_frames();writes=0
+                      local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                      assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
+                      assert(not tostring(message):find("rejecting row metamethod invoked",1,true))
+                      assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                      assert(message:find("previous_mir="..event.mod_changes["more-infinite-research"].old_version,1,true))
+                      assert(message:find("new_mir="..script.active_mods["more-infinite-research"],1,true))
+                      assert(message:find("startup_changed=false",1,true) and message:find("saved_route=absent",1,true)
+                        and message:find("current_route=default",1,true))
+                      local escaped_name="sage-\\x01"..string.rep("x",90)
+                      assert(message:find("rejecting_mod_name="..escaped_name,1,true))
+                      assert(not message:find("unrelated-unchanged",1,true))
+                      if opponent=="added"then
+                        assert(message:find("rejecting_old_version=absent",1,true))
+                        assert(message:find("rejecting_new_version=new\\x02",1,true))
+                        assert(message:find("rejecting_active_version=new\\x02",1,true))
+                      elseif opponent=="removed"then
+                        assert(message:find("rejecting_old_version=old\\x03",1,true))
+                        assert(message:find("rejecting_new_version=absent",1,true))
+                        assert(message:find("rejecting_active_version=absent",1,true))
+                      elseif opponent=="updated"then
+                        assert(message:find("rejecting_old_version=old\\x04",1,true))
+                        assert(message:find("rejecting_new_version=new\\x05",1,true))
+                        assert(message:find("rejecting_active_version=new\\x05",1,true))
+                      elseif opponent=="false-zero"then
+                        assert(message:find("rejecting_old_version=false",1,true))
+                        assert(message:find("rejecting_new_version=0",1,true))
+                        assert(message:find("rejecting_active_version=false",1,true))
+                      else
+                        assert(message:find("rejecting_old_version=malformed-table",1,true))
+                        assert(message:find("rejecting_new_version=malformed-table",1,true))
+                        assert(message:find("rejecting_active_version=active\\x06",1,true))
+                      end
+                    ''')
+
 
 class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
     """A saved MIR route plus surviving native work is not a whole-modpack lock."""
