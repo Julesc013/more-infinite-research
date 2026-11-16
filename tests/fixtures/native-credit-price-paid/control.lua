@@ -95,6 +95,19 @@ local function assert_endpoint(state)
   require_ok(t.research_unit_count==C.next_count,"post-completion LDS next count differs")
   C.require_carriers(f)
   for name,value in pairs(wanted)do require_ok(C.close(f.recipes[name].productivity_bonus,value),"F1 vector differs "..name)end
+  local source=state.source_frame;require_ok(source,"source frame was not captured")
+  local current=frame(state)
+  for name,value in pairs(source.bonuses)do
+    if wanted[name]==nil then require_ok(C.close(current.bonuses[name],value),"unrelated F1 bonus changed "..name)end
+  end
+  for name,value in pairs(source.mains)do
+    if name~=C.main then require_ok(equal(current.mains[name],value),"unrelated F1 main state changed "..name)end
+  end
+  for name,value in pairs(source.technologies)do
+    if name~=C.main then require_ok(equal(current.technologies[name],value),"unrelated F1 technology changed "..name)end
+  end
+  require_ok(equal(current.unchanged,source.unchanged) and equal(current.prototypes,source.prototypes),
+    "unrelated F1 native frame changed")
   if state.endpoint then require_ok(equal(frame(state),state.endpoint),"immutable paid endpoint differs")end
 end
 local function begin(state)
@@ -124,7 +137,7 @@ script.on_configuration_changed(function(event)
   C.require_source(force(),game.difficulty_settings.technology_price_multiplier,inventory(state))
   C.require_carriers(force())
   storage[KEY]=state
-  state.phase="await-continue";state.source_frame=frame(state);marker("source",state,{})
+  cold=false;state.phase="await-continue";state.source_frame=frame(state);marker("source",state,{})
 end)
 commands.add_command("mir-native-credit-price-paid","Continue only the reviewed paid LDS observer.",function(command)
   local state=storage[KEY]
@@ -132,6 +145,7 @@ commands.add_command("mir-native-credit-price-paid","Continue only the reviewed 
   require_ok(state and state.phase=="await-continue" and state.source_frame and equal(frame(state),state.source_frame),
     "reviewed source frame differs before continuation")
   begin(state);marker("pre-lab",state)
+  rcon.print("[MIR516_PAID_CONTINUE]")
 end)
 script.on_load(function()cold=true end)
 script.on_event(defines.events.on_research_finished,function(event)
@@ -149,6 +163,7 @@ script.on_event(defines.events.on_research_finished,function(event)
 end)
 script.on_event(defines.events.on_tick,function()
   local state=storage[KEY];if not state then return end
+  if state.phase=="await-continue" then return end
   if cold then
     require_ok(state.phase=="saved" and game.tick==state.saved_tick+1,"cold observation is not one update after save")
     assert_endpoint(state);marker("cold",state);cold=false;return

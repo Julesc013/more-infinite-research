@@ -41,10 +41,11 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           end
         ''')
 
-    def story(self, opponent=None):
+    def story(self, opponent=None, post_drift=False):
         self.lua.globals().opponent = opponent or ""
+        self.lua.globals().post_drift = post_drift
         self.lua.execute(r'''
-          local callbacks,logs,saves={},{},{}
+          local callbacks,logs,saves,acks={},{},{},{}
           storage={};queue_writes=0;insert_calls=0;lab_enable_writes=0
           local f={technologies={},recipes={},research_progress=0,index=1,name="player"}
           local game={tick=0,forces={player=f},difficulty_settings={technology_price_multiplier=1},surfaces={{}}}
@@ -112,11 +113,12 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
               quality="2.1.23",recycler="2.1.23",["elevated-rails"]="2.1.23",
               ["more-infinite-research"]="5.0.21016",[C.fixture]="0.4.0"}},defines={inventory={lab_input=1},events={on_research_finished=1,on_tick=2}},
             helpers={table_to_json=function(value)logs[#logs+1]=clone(value);return "record"end},log=function()end,
-            require=require,pairs=pairs,ipairs=ipairs,next=next,type=type,math=math,error=error,commands={}}
+            require=require,pairs=pairs,ipairs=ipairs,next=next,type=type,math=math,error=error,commands={},rcon={}}
           env.script.on_configuration_changed=function(callback)callbacks.config=callback end
           env.script.on_load=function(callback)callbacks.load=callback end
           env.script.on_event=function(id,callback)callbacks[id==1 and "finished" or "tick"]=callback end
           env.commands.add_command=function(name,_,callback)callbacks.command=callback;callbacks.command_name=name end
+          env.rcon.print=function(message)acks[#acks+1]=message end
           env.game.server_save=function(name)saves[#saves+1]={name=name,tick=game.tick}end
           assert(loadfile(fixture_path.."/control.lua","t",env))()
           last_game,last_force,last_lab=game,f,lab
@@ -132,7 +134,7 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
             if opponent~="source-partial" and opponent~="bad-transition" then callbacks.command{player_index=nil,parameter="continue"}end
             return
           end
-          callbacks.config(event)
+          callbacks.load();callbacks.config(event)
           assert(logs[1].kind=="source")
           local bonus_count,status_count=0,0
           for _ in pairs(logs[1].frame.bonuses)do bonus_count=bonus_count+1 end
@@ -144,8 +146,12 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           local private_count=0;for _,row in pairs(logs[1].private_costs)do
             private_count=private_count+1;assert(row.ignore==true and row.native_count==1 and row.prototype_count==1)
           end;assert(private_count==6,"private carrier cost marker differs")
+          tick();tick()
+          assert(game.difficulty_settings.technology_price_multiplier==1 and queue_writes==0 and insert_calls==0
+            and lab_enable_writes==0,"idle continuation barrier mutated native work")
           callbacks.command{player_index=nil,parameter="continue"};tick()
-          assert(queue_writes==1 and insert_calls==4 and lab_enable_writes==1,"ordinary work was not uniquely admitted")
+          assert(queue_writes==1 and insert_calls==4 and lab_enable_writes==1 and #acks==1 and acks[1]=="[MIR516_PAID_CONTINUE]",
+            "ordinary work was not uniquely admitted")
           for _,name in ipairs(packs)do inv.counts[name]=0 end
           main.level=4;main.researched=false;main.saved_progress=0;f.current_research=nil;queue={};f.research_progress=0
           f.recipes["low-density-structure"].productivity_bonus=.3
@@ -153,6 +159,7 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           f.recipes["scrap-recycling"].productivity_bonus=.1
           f.recipes["cerys-nuclear-scrap-recycling"].productivity_bonus=.1
           for index=1,95 do f.recipes["mir-vector-synthetic-scrap-"..index].productivity_bonus=.1 end
+          if post_drift then f.recipes["plastic-bar"].productivity_bonus=.1 end
           callbacks.finished{research=main,by_script=false};tick()
           assert(#saves==1 and saves[1].name=="mir516-native-credit-price-paid")
           assert(logs[2].kind=="pre-lab" and logs[2].map_price==2)
@@ -195,6 +202,10 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
                 self.assertEqual(0, self.lua.eval("queue_writes"))
                 self.assertEqual(0, self.lua.eval("insert_calls"))
                 self.assertEqual(0, self.lua.eval("lab_enable_writes"))
+
+    def test_endpoint_refuses_an_unrelated_f1_bonus_drift(self):
+        with self.assertRaisesRegex(LuaError, "unrelated F1 bonus changed plastic-bar"):
+            self.story(post_drift=True)
 
     def test_false_and_zero_source_values_are_real_required_values(self):
         self.story()
