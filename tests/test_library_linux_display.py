@@ -248,7 +248,11 @@ class FakeBackend:
 class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
     def make_layout(self):
         temporary = tempfile.TemporaryDirectory()
-        root = Path(temporary.name)
+        # ``TemporaryDirectory.name`` can be a Windows 8.3 alias.  The
+        # production plan deliberately resolves the accepted root before it
+        # derives output paths, so the ordinary fixture must use that same
+        # canonical spelling when it states its expected paths.
+        root = Path(temporary.name).resolve(strict=True)
         checkout = root / "checkout"
         output = checkout / "build" / "p"
         output.mkdir(parents=True)
@@ -307,6 +311,43 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
                 self.assertEqual(validated.socket.name, "X" + display[1:])
                 self.assertEqual(validated.lock.name, ".X" + display[1:] + "-lock")
                 self.assertEqual(validated.viewer, root / "runtime" / "viewer.sock")
+
+        # A junction-shaped temporary root reproduces the Windows CI failure:
+        # the input spelling is a valid alias, while the validated output is
+        # intentionally canonical.  The old lexical expected path differs;
+        # the canonical expected path must match without weakening validation.
+        if os.name == "nt":
+            temporary = tempfile.TemporaryDirectory()
+            self.addCleanup(temporary.cleanup)
+            parent = Path(temporary.name).resolve(strict=True)
+            canonical = parent / "canonical"
+            canonical.mkdir()
+            junction = parent / "junction"
+            command_file = parent / "make-junction.cmd"
+            command_file.write_text(
+                f'@echo off\r\nmklink /J "{junction}" "{canonical}"\r\n', encoding="ascii"
+            )
+            created = subprocess.run(
+                ["cmd.exe", "/d", "/c", str(command_file)],
+                capture_output=True, text=True, check=False, timeout=10,
+            )
+            self.assertEqual(created.returncode, 0, f"{created.stdout}\n{created.stderr}\n{created.args!r}")
+            self.addCleanup(lambda: os.rmdir(junction) if os.path.lexists(junction) else None)
+
+            checkout = junction / "checkout"
+            root = checkout / "build" / "p" / "case"
+            root.mkdir(parents=True)
+            pins = {}
+            for name in ("xtigervnc", "xauth", "probe_display"):
+                path = parent / name
+                path.write_bytes((name + "\n").encode("ascii"))
+                pins[name] = {"path": str(path), "bytes": path.stat().st_size, "sha256": digest(path)}
+            with self.admitted_probe(pins):
+                validated = DISPLAY.validate_plan(self.plan(root, pins), checkout)
+            old_lexical_viewer = root / "runtime" / "viewer.sock"
+            canonical_viewer = canonical / "checkout" / "build" / "p" / "case" / "runtime" / "viewer.sock"
+            self.assertNotEqual(validated.viewer, old_lexical_viewer)
+            self.assertEqual(validated.viewer, canonical_viewer)
 
         temporary, checkout, root, pins = self.make_layout()
         self.addCleanup(temporary.cleanup)
