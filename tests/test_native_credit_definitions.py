@@ -133,6 +133,7 @@ class NativeCreditDefinitionTests(unittest.TestCase):
               assert(row.type == "technology" and row.icon == "__base__/graphics/technology/automation-1.png"
                 and row.icon_size == 256 and row.level == 1 and row.upgrade == true
                 and row.hidden == true and row.enabled == false and row.visible_when_disabled == false
+                and row.ignore_tech_cost_multiplier == true
                 and row.max_level == "infinite" and row.unit.count == 1 and row.unit.time == 1
                 and #row.unit.ingredients == 1 and row.unit.ingredients[1][1] == "automation-science-pack"
                 and row.unit.ingredients[1][2] == 1 and #row.effects == 1
@@ -145,6 +146,51 @@ class NativeCreditDefinitionTests(unittest.TestCase):
           first.effects[1].change, first.unit.ingredients[1][1] = 99, "corrupted-science"
           assert(second.effects[1].change == -.1 and second.unit.ingredients[1][1] == "automation-science-pack")
           assert(raw.recipe["copper-plate"].name == "copper-plate")
+        ''')
+
+    def test_private_carriers_keep_one_unit_cost_at_each_map_price(self):
+        self.lua.execute(r'''
+          local function copy(value)
+            if type(value) ~= "table" then return value end
+            local out = {}
+            for key, item in pairs(value) do out[key] = copy(item) end
+            return out
+          end
+          local function same(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not same(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          local function effective_count(row, multiplier)
+            if row.ignore_tech_cost_multiplier ~= true then
+              error("private native credit carrier lacks map-price exemption")
+            end
+            local count = row.unit and row.unit.count
+            if count ~= 1 then error("private native credit carrier has non-unit base cost") end
+            return row.ignore_tech_cost_multiplier and count or count * multiplier
+          end
+
+          for _, multiplier in ipairs({.5, 1, 2, 4}) do
+            local technologies, raw = inputs()
+            local public_before = copy(technologies)
+            local added = credit.append(technologies, raw, values(10), {recipe_productivity=true})
+            for _, row in ipairs(added) do
+              assert(effective_count(row, multiplier) == 1, "private carrier inherited map price")
+            end
+            for index, row in ipairs(public_before) do
+              assert(same(technologies[index], row), "map-price exemption mutated a public main")
+            end
+            assert(raw.recipe["copper-plate"].name == "copper-plate")
+
+            for _, opponent in ipairs({"missing", "false"}) do
+              local malformed = copy(added[1])
+              malformed.ignore_tech_cost_multiplier = opponent == "missing" and nil or false
+              local ok, message = pcall(effective_count, malformed, multiplier)
+              assert(not ok and tostring(message):find("map%-price exemption"), opponent)
+            end
+          end
         ''')
 
     def test_scalar_tuning_and_named_absence_change_only_their_authored_pairs(self):
