@@ -28,12 +28,12 @@ class LibraryModelTests(unittest.TestCase):
             {name="missing-bobtech", removal="bobtech", selected=false},
             {name="missing-space-age", removal="space-age", selected=false},
             {name="Angel", addition="angelsbioprocessing", selected=false},
-            {name="Angel-before-floor", addition="angelsbioprocessing", minimum="2.1.24", selected=false},
+            {name="Angel-with-raised-metadata", addition="angelsbioprocessing", minimum="2.1.24", selected=false},
             {name="partial-before-overhaul", removal="bobtech", addition="Krastorio2", selected=false},
             {name="Krastorio", addition="Krastorio2", error="unsupported overhaul selection"},
             {name="Py", addition="pycoalprocessing", error="unsupported overhaul selection"},
-            {name="raised-floor", minimum="2.1.24", error="target minimum base"},
-            {name="floor-before-overhaul", minimum="2.1.24", addition="Krastorio2", error="target minimum base"},
+            {name="raised-metadata", minimum="2.1.24", selected=true},
+            {name="raised-metadata-overhaul", minimum="2.1.24", addition="Krastorio2", error="unsupported overhaul selection"},
             {name="wrong-target", target="f200", selected=false},
             {name="wrong-line", line="2.0", selected=false}
           }
@@ -602,9 +602,14 @@ class LibraryModelTests(unittest.TestCase):
           assert(#availability.rows(bobtech_angel, f210, empty_force, "zinc", enabled_streams) == 0,
             "the F210 explanation list must not invent a family outside its captured withholding")
           f210.minimum_base = "2.1.24"
+          local raised_metadata_rows = availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams)
+          assert(#raised_metadata_rows == 1 and raised_metadata_rows[1].family == "research_material_lead"
+            and raised_metadata_rows[1].reason == "not-available-in-bobtech-angel-profile",
+            "a declared F210 minimum change must preserve the exact BobTech omission")
+          f210.factorio_version = "2.0"
           assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
-            "a different F210 target record must not reuse this closure")
-          f210.minimum_base = "2.1.23"
+            "a wrong Factorio line must not reuse the BobTech explanation")
+          f210.factorio_version = "2.1"
           bobtech_angel.Krastorio2 = true
           assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
             "an excluded mixed closure must not reuse the BobTech explanation")

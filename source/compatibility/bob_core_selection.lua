@@ -23,7 +23,6 @@ function M.status(active, target)
       or type(active) ~= "table" then return "unrelated" end
   for _, name in ipairs(REQUIRED) do if active[name] == nil then return "unrelated" end end
   if any_active(active, ANGEL) then return "unrelated" end
-  if target.minimum_base ~= "2.1.23" then return "unsupported-floor" end
   if any_active(active, UNSUPPORTED) then return "unsupported-overhaul" end
   return "selected"
 end

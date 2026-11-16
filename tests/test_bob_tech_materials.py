@@ -264,20 +264,27 @@ class BobTechMaterialTests(unittest.TestCase):
             self.assertEqual(expected[row["name"]], [ingredient[0] for ingredient in row["unit"]["ingredients"]])
         self.assertTrue(all(report["reason"] == "configured" for report in reports.values()))
 
-    def test_profile_gate_admits_changed_versions_only_for_the_same_raw_contract(self):
-        self.assertEqual(5, len(self.rows()))
+    def test_profile_gate_ignores_target_minimum_metadata_but_keeps_the_same_raw_contract(self):
+        self.lua.globals().mods = self.active_mods()
+        baseline_settings = _plain(self.lua.execute(
+            'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
+        ))
+        baseline = _plain(self.rows())
+        self.assertEqual(5, len(baseline))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
+        self.assertEqual(0, len(self.rows()))
+        self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f210", "2.0", "2.1.24"')
         self.assertEqual(0, len(self.rows()))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"')
         self.lua.execute('target.minimum_base = "2.1.24"')
-        with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
-            self.rows()
-        self.lua.execute('target.minimum_base = "2.1.23"')
+        self.assertEqual(baseline, _plain(self.rows()))
+        self.assertEqual(baseline_settings, _plain(self.lua.execute(
+            'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
+        )))
 
         # Captured versions lock the qualified evidence, but an unchanged named
         # raw contract remains applicable across an official patch or graphics
         # package version change.  Semantic admission remains validate_raw.
-        baseline = _plain(self.rows())
         for changed in ("base", "space-age", "bobtech", "angelssmeltinggraphics"):
             mods = dict(self.facts["required_mods"])
             mods[changed] = "2.1.24" if changed in ("base", "space-age") else "changed"

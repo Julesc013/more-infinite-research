@@ -410,6 +410,8 @@ class BobCoreMaterialTests(unittest.TestCase):
 
     def test_profile_is_no_angel_only_and_outputs_are_detached(self):
         baseline = _plain(self.rows())
+        self.lua.execute('target.minimum_base = "2.1.24"')
+        self.assertEqual(baseline, _plain(self.rows()))
         changed = dict(self.facts["required_mods"])
         changed["bobtech"] = "newer"
         self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, changed))))
