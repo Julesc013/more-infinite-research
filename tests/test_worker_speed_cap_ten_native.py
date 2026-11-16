@@ -340,6 +340,151 @@ end
             frame["unrelated_sentinel"]["level"], frame["unrelated_sentinel"]["valid"],
         )
 
+    @staticmethod
+    def _current_admin_helper_source():
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        prefix = "local function apply_current_admin_sequence"
+        return prefix + source.split(prefix, 1)[1].split("local function begin_current_observe", 1)[0]
+
+    def _run_current_admin_proxy(self, helper_source: str, callback_disables_gate: bool):
+        runner = self.lua.execute(r'''
+local WORKER = "worker-robots-speed-10"
+local PROBE = "automation"
+local EARNED_LEVEL = 13
+local PARTIAL = .27
+local FOREIGN_PROGRESS = .42
+local set_current_prerequisites
+local technology
+''' + helper_source + r'''
+
+return function(callback_disables_gate)
+  local writes, frames, boundaries = {}, {}, {}
+  local current_boundary = "before-admin"
+  local function snapshot(values)
+    return {level=values.level, researched=values.researched, enabled=values.enabled,
+      visible_when_disabled=values.visible_when_disabled}
+  end
+  local function target(role)
+    local values = {level=1, researched=false, enabled=false, visible_when_disabled=true}
+    local proxy = {}
+    setmetatable(proxy, {
+      __index = function(_, key) return values[key] end,
+      __newindex = function(_, key, value)
+        values[key] = value
+        writes[#writes + 1] = {role=role, field=key, value=value, boundary=current_boundary}
+        if callback_disables_gate and (key == "level" or key == "researched") then
+          values.enabled = false
+          values.visible_when_disabled = true
+          writes[#writes + 1] = {role=role, field="callback-disable", value=false,
+            boundary=current_boundary}
+        end
+      end,
+    })
+    return proxy, values
+  end
+  local function force(role)
+    local worker, values = target(role)
+    local force = {role=role, worker=worker}
+    setmetatable(force, {
+      __newindex = function(subject, key, value)
+        rawset(subject, key, value)
+        writes[#writes + 1] = {role=role, field=key, value=value, boundary=current_boundary}
+      end,
+    })
+    return force, values
+  end
+  local player, player_values = force("player")
+  local foreign, foreign_values = force("foreign")
+  local earned, earned_values = force("earned")
+  set_current_prerequisites = function(force, foreign_role, label)
+    writes[#writes + 1] = {role=force.role, field="prerequisites", value=foreign_role,
+      boundary=current_boundary}
+  end
+  technology = function(force, name)
+    assert(name == WORKER or name == "automation")
+    return force.worker
+  end
+  local function frame(action)
+    frames[#frames + 1] = {action=action, player=snapshot(player_values),
+      foreign=snapshot(foreign_values), earned=snapshot(earned_values)}
+  end
+  local hooks = {
+    before = function(action)
+      current_boundary = action
+      boundaries[#boundaries + 1] = "before:" .. action
+    end,
+    after = function(action)
+      frame(action)
+      boundaries[#boundaries + 1] = "after:" .. action
+    end,
+  }
+  apply_current_admin_sequence(player, foreign, earned, "proxy", hooks)
+  return {writes=writes, frames=frames, boundaries=boundaries}
+end
+''')
+        return runner(callback_disables_gate)
+
+    @staticmethod
+    def _lua_rows(table):
+        return [table[index] for index in range(1, len(table) + 1)]
+
+    def test_current_admin_target_setters_are_sequential_and_restore_gates_after_callbacks(self):
+        helper = self._current_admin_helper_source()
+        actual = self._run_current_admin_proxy(helper, True)
+        writes = self._lua_rows(actual["writes"])
+        target_fields = {"level", "researched", "enabled", "visible_when_disabled"}
+        expected_levels = {"player": 10, "foreign": 11, "earned": 13}
+        for role, level in expected_levels.items():
+            with self.subTest(role=role):
+                target_writes = [row for row in writes if row["role"] == role and row["field"] in target_fields]
+                self.assertEqual([("level", level), ("researched", False), ("enabled", True),
+                                  ("visible_when_disabled", False)],
+                                 [(row["field"], row["value"]) for row in target_writes])
+                for row in target_writes:
+                    if row["field"] != "level":
+                        self.assertIs(type(row["value"]), bool)
+        ordered_writes = [(row["role"], row["field"]) for row in writes
+                          if row["field"] in target_fields | {"research_queue", "research_progress"}]
+        self.assertEqual([
+            ("player", "level"), ("player", "researched"), ("player", "enabled"), ("player", "visible_when_disabled"),
+            ("player", "research_queue"), ("player", "research_progress"),
+            ("foreign", "level"), ("foreign", "researched"), ("foreign", "enabled"), ("foreign", "visible_when_disabled"),
+            ("foreign", "research_queue"), ("foreign", "research_progress"),
+            ("earned", "level"), ("earned", "researched"), ("earned", "enabled"), ("earned", "visible_when_disabled"),
+            ("earned", "research_queue"),
+        ], ordered_writes)
+        self.assertEqual([
+            "before:prerequisites", "after:prerequisites", "before:player-target", "after:player-target",
+            "before:player-queue", "after:player-queue", "before:player-progress", "after:player-progress",
+            "before:foreign-target", "after:foreign-target", "before:foreign-queue", "after:foreign-queue",
+            "before:foreign-progress", "after:foreign-progress", "before:earned-target", "after:earned-target",
+            "before:earned-queue", "after:earned-queue",
+        ], [actual["boundaries"][index] for index in range(1, len(actual["boundaries"]) + 1)])
+        frames = {row["action"]: row for row in self._lua_rows(actual["frames"])}
+        for action, role, level in (("player-target", "player", 10), ("foreign-target", "foreign", 11),
+                                    ("earned-target", "earned", 13)):
+            with self.subTest(frame=action):
+                self.assertEqual((level, False, True, False),
+                                 (frames[action][role]["level"], frames[action][role]["researched"],
+                                  frames[action][role]["enabled"], frames[action][role]["visible_when_disabled"]))
+
+        flags_first_mutant = helper
+        for level in ("10", "11", "EARNED_LEVEL"):
+            original = (f"owner.level = {level}\n  owner.researched = false\n  owner.enabled = true\n"
+                        "  owner.visible_when_disabled = false")
+            flags_first_mutant = flags_first_mutant.replace(
+                original,
+                f"owner.enabled = true\n  owner.visible_when_disabled = false\n  owner.level = {level}\n  owner.researched = false",
+            )
+        self.assertNotEqual(helper, flags_first_mutant)
+        flags_frames = {row["action"]: row for row in self._lua_rows(
+            self._run_current_admin_proxy(flags_first_mutant, True)["frames"])}
+        for action, role in (("player-target", "player"), ("foreign-target", "foreign"),
+                             ("earned-target", "earned")):
+            with self.subTest(mutant="flags-first", frame=action):
+                self.assertEqual((False, True), (flags_frames[action][role]["enabled"],
+                                                 flags_frames[action][role]["visible_when_disabled"]))
+
     def test_current_state_reset_roles_keep_the_declared_three_force_boundary(self):
         old = self.current_state_result("old")
         self.assertFalse(old["ok"])

@@ -759,7 +759,10 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("player-target")
   local owner = technology(player, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 10, false, true, false
+  owner.level = 10
+  owner.researched = false
+  owner.enabled = true
+  owner.visible_when_disabled = false
   after("player-target")
   before("player-queue")
   player.research_queue = {owner, owner}
@@ -770,7 +773,10 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("foreign-target")
   owner = technology(foreign, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = 11, false, true, false
+  owner.level = 11
+  owner.researched = false
+  owner.enabled = true
+  owner.visible_when_disabled = false
   after("foreign-target")
   before("foreign-queue")
   foreign.research_queue = {technology(foreign, PROBE)}
@@ -781,7 +787,10 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("earned-target")
   owner = technology(earned, WORKER)
-  owner.level, owner.researched, owner.enabled, owner.visible_when_disabled = EARNED_LEVEL, false, true, false
+  owner.level = EARNED_LEVEL
+  owner.researched = false
+  owner.enabled = true
+  owner.visible_when_disabled = false
   after("earned-target")
   before("earned-queue")
   earned.research_queue = {}
