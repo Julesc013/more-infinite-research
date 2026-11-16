@@ -230,24 +230,23 @@ local function history_context(event, route, state, current, rejected)
   for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
     local change = type(changes) == "table" and changes[name]
     if type(change) == "table" then
-      parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+      if getmetatable(change) == nil then
+        parts[#parts + 1] = name .. "=" .. value(rawget(change, "old_version")) .. "->" .. value(rawget(change, "new_version"))
+      else
+        parts[#parts + 1] = name .. "=malformed-table"
+      end
     end
   end
   if rejected ~= nil then
     local row = rejected.row
-    local active_row = rejected.active
     local function row_value(record, key)
       if type(record) ~= "table" or getmetatable(record) ~= nil then return "malformed-" .. type(record) end
       return rejected_value(rawget(record, key))
     end
-    local function active_value(record)
-      if type(record) ~= "table" or getmetatable(record) ~= nil then return "malformed-" .. type(record) end
-      return rejected_value(rawget(record, rejected.name))
-    end
     parts[#parts + 1] = "rejecting_mod_name=" .. rejected_value(rejected.name)
     parts[#parts + 1] = "rejecting_old_version=" .. row_value(row, "old_version")
     parts[#parts + 1] = "rejecting_new_version=" .. row_value(row, "new_version")
-    parts[#parts + 1] = "rejecting_active_version=" .. active_value(active_row)
+    parts[#parts + 1] = "rejecting_active_version=" .. rejected_value(rejected.active_version)
   end
   return " [" .. table.concat(parts, " ") .. "]"
 end
@@ -845,6 +844,7 @@ local function default_origin(event, initializing, state)
   end
   local new_selection = false
   for name, item in pairs(event.mod_changes) do
+    -- Refuse malformed event rows below without invoking their metamethods.
     if name ~= MIR and type(item) == "table" and getmetatable(item) == nil and rawget(item, "old_version") == nil then
       new_selection = true
     end
@@ -895,10 +895,12 @@ local function default_origin(event, initializing, state)
     local plain = type(item) == "table" and getmetatable(item) == nil
     local old = plain and rawget(item, "old_version")
     local new = plain and rawget(item, "new_version")
-    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (not plain or old == nil
-        or old ~= new or new ~= active[name]) then
-      recover_error("default transfer requires the unchanged mod selection", nil, event, state, {kind="default"},
-        {name=name, row=item, active=active})
+    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) then
+      local active_version = active[name]
+      if not plain or old == nil or old ~= new or new ~= active_version then
+        recover_error("default transfer requires the unchanged mod selection", nil, event, state, {kind="default"},
+          {name=name, row=item, active_version=active_version})
+      end
     end
   end
   local known = DEFAULT_ORIGINS[target.id]

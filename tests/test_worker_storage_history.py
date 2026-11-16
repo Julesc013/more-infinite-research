@@ -2391,7 +2391,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
 
     def test_unrecorded_mod_selection_refusal_reports_only_the_rejecting_tuple_without_writes(self):
         for target in ("f200", "f210"):
-            for opponent in ("added", "removed", "updated", "false-zero", "malformed"):
+            for opponent in ("added", "removed", "updated", "active-proxy", "false-zero", "malformed"):
                 with self.subTest(target=target, opponent=opponent):
                     lua=self.world(target);lua.globals().opponent=opponent
                     lua.execute(r'''
@@ -2406,13 +2406,17 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                         event.mod_changes[name]={new_version="new\2"};script.active_mods[name]="new\2"
                       elseif opponent=="removed"then
                         event.mod_changes[name]={old_version="old\3"};script.active_mods[name]=nil
-                      elseif opponent=="updated"then
+                      elseif opponent=="updated" or opponent=="active-proxy"then
                         event.mod_changes[name]={old_version="old\4",new_version="new\5"};script.active_mods[name]="new\5"
                       elseif opponent=="false-zero"then
                         event.mod_changes[name]={old_version=false,new_version=0};script.active_mods[name]=false
                       else
                         event.mod_changes[name]=setmetatable({}, {__index=function()error("rejecting row metamethod invoked")end})
                         script.active_mods[name]="active\6"
+                      end
+                      if opponent=="active-proxy"then
+                        local original=script.active_mods
+                        script.active_mods=setmetatable({}, {__index=function(_,key)return original[key]end})
                       end
                       local before=all_frames();writes=0
                       local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
@@ -2434,7 +2438,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                         assert(message:find("rejecting_old_version=old\\x03",1,true))
                         assert(message:find("rejecting_new_version=absent",1,true))
                         assert(message:find("rejecting_active_version=absent",1,true))
-                      elseif opponent=="updated"then
+                      elseif opponent=="updated" or opponent=="active-proxy"then
                         assert(message:find("rejecting_old_version=old\\x04",1,true))
                         assert(message:find("rejecting_new_version=new\\x05",1,true))
                         assert(message:find("rejecting_active_version=new\\x05",1,true))
@@ -2448,6 +2452,29 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                         assert(message:find("rejecting_active_version=active\\x06",1,true))
                       end
                     ''')
+
+    def test_named_malformed_rejected_row_does_not_invoke_context_metamethods(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua=self.world(target)
+                lua.execute(r'''
+                  for _,f in pairs(game.forces)do local c=f.technologies[CANONICAL]
+                    c.level=4;c.researched=false;c.saved_progress=0;f.research_queue={};f.research_progress=0
+                  end
+                  local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                  event.mod_changes.secretas=setmetatable({}, {__index=function()error("named rejecting row metamethod invoked")end})
+                  script.active_mods.secretas="1.0"
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                  assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
+                  assert(not tostring(message):find("named rejecting row metamethod invoked",1,true))
+                  assert(message:find("secretas=malformed-table",1,true))
+                  assert(message:find("rejecting_mod_name=secretas",1,true))
+                  assert(message:find("rejecting_old_version=malformed-table",1,true))
+                  assert(message:find("rejecting_new_version=malformed-table",1,true))
+                  assert(message:find("rejecting_active_version=1.0",1,true))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
 
 
 class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
