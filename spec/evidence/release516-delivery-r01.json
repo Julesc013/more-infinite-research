@@ -1,0 +1,93 @@
+{
+  "kind": "MIR516VerifiedBetaDeliveryRecordV1",
+  "verdict": "PASS-scoped-GitHub-beta-delivery-not-stable",
+  "recorded_on": "2026-11-16",
+  "release": {
+    "id": 446951554,
+    "title": "MIR 5.0.16",
+    "tag": "v5.0.16",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.16",
+    "published_at": "2026-11-16T11:37:08Z",
+    "prerelease": true,
+    "immutable": false,
+    "public_assets": 19,
+    "zip_assets": 17,
+    "checksum_assets": 2
+  },
+  "promotion": {
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/2024",
+    "merged_at": "2026-11-16T11:11:07Z",
+    "main": "9c3ec803b5a51105507e5c86f29b7e523716f274",
+    "frozen_release_selection": "01cfbb3a32ee95d1466d9f39669fc237ef7162ea",
+    "whole_tree": "7f589c2d83c7d3d72a8e0eb5a81f857fd104bb5d",
+    "player_tree": "35fd7a3fd9d490b7c3c118f443a270a2ac157c17",
+    "signed_tag_verified": true
+  },
+  "delivery": {
+    "anonymous_public_assets_verified": 19,
+    "primary_dist_files_verified": 21,
+    "dist": "dist/v5.0.16",
+    "package_inventory_sha256": "049647E9520675E5302BA21FB5F80423B7DE355DB253FF9D9D2C7890A0ED46BD",
+    "orchestration_receipt": {
+      "path": "build/qualification/mir516-release-orchestration-aero-r01/verified-delivery.json",
+      "sha256": "CDA86075C232CC14022383F07D4B43D47F5E314E9C73A8DC588E0877EAFA8A31"
+    },
+    "checks": {
+      "promotion_head": "fe031989b158e48b3f71293a0ad6b573c33e184f",
+      "main_head": "9c3ec803b5a51105507e5c86f29b7e523716f274",
+      "promotion_and_main_passed": [
+        "branch-policy",
+        "host-controls",
+        "native-tooling-controls",
+        "verification-plan"
+      ],
+      "administration_prepublication": "passed",
+      "distinct_immutability_probe": "passed; releases remain mutable"
+    }
+  },
+  "preservation": {
+    "prior_releases": 105,
+    "prior_assets": 632,
+    "prior_tag_rows": 325,
+    "latest_stable_tag": "v4.7.3",
+    "all_prior_projections_unchanged": true,
+    "full_f40_package_set": "preserved but unselected because the Space Exploration tail10 route lacks an upgrade-preservation verdict"
+  },
+  "qualified_scope": {
+    "included": [
+      "named F200/F210 paid-price Base and Space Age observations",
+      "named prepared-worker continuations"
+    ],
+    "excluded": [
+      "Space Exploration worker speed tail10 reset or continuation",
+      "complete current-package native matrix",
+      "whole-product upgrade, client, GUI, performance or stable acceptance"
+    ]
+  },
+  "open_work": {
+    "sage_unprepared_history": {
+      "original_inputs_release_gate": false,
+      "functional_resolution": false
+    },
+    "stable_acceptance": false,
+    "remaining": [
+      "Library input/export and client/personal-view lifecycle",
+      "Space Exploration tail10 and other applicable historical/provider cases",
+      "physical-output and coherent performance/stress acceptance"
+    ]
+  },
+  "next_prepared_input": {
+    "packet_sha256": "59BEFD4E5F833D65244CA1EB9BCDF1322B54F58E14F749B53E71F0DBA92F3FEF",
+    "preparation_record": "build/qualification/linux-library-current-render-preparation-r01/personal-input-preparation-r01.json",
+    "status": "reviewed-and-staged-only",
+    "plan": 0,
+    "compose": 0,
+    "native": 0
+  },
+  "limits": [
+    "This record establishes exact beta distribution and delivery only.",
+    "It does not turn staged input preparation into execution evidence.",
+    "It does not resolve the Sage unprepared-history report or make it a release-arrival gate.",
+    "It does not establish stable acceptance or a Mod Portal publication."
+  ]
+}
