@@ -3,20 +3,26 @@ import argparse
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-personal-view-input"
+OLD_SINGLEPLAYER_FIXTURE_COMMIT = "a6ace8a48dd59b3f5eb46722273d7545e0de7011"
+FIXTURE_CONTROL_PATH = "tests/fixtures/library-personal-view-input/control.lua"
 
 
 class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
-    def setUp(self, *, base="2.1.24", package="5.0.21016", extra_mods=None):
+    def setUp(self, *, base="2.1.24", package="5.0.21016", extra_mods=None,
+              actor_source=None, fixture_version="0.1.5", multiplayer=False):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
-        self.lua.globals().actor_source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.lua.globals().actor_source = actor_source or (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.lua.globals().base_version = base
         self.lua.globals().package_version = package
+        self.lua.globals().fixture_version = fixture_version
+        self.lua.globals().multiplayer = multiplayer
         self.lua.execute(r'''
           callbacks={events={}}
           storage={}
@@ -27,7 +33,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
             on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},
             gui_type={custom=99},controllers={character=1,cutscene=6}}
           script={active_mods={base=base_version, ["more-infinite-research"]=package_version,
-            ["mir-fixture-library-personal-view-input"]="0.1.4"},
+            ["mir-fixture-library-personal-view-input"]=fixture_version},
             on_init=function(fn) callbacks.init=fn end,
             on_event=function(event,fn) callbacks.events[event]=fn end}
           remote={add_interface=function(name,values) interfaces[name]=values end}
@@ -47,7 +53,14 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           player={valid=true,connected=true,index=1,force=force,display_scale=1.25,
             display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
             gui={screen={}},opened=nil}
-          game={tick=0,get_player=function(index) return index==1 and player or nil end}
+          player2={valid=true,connected=true,index=2,force=force,display_scale=1.25,
+            display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
+            gui={screen={}},opened=nil}
+          game={tick=0,connected_players={player},is_multiplayer=function() return multiplayer end,get_player=function(index)
+            if index==1 then return player end
+            if index==2 then return player2 end
+            return nil
+          end}
           setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
           function build_root(query_text, x, y)
             local function readable_style(values)
@@ -103,6 +116,18 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
     def initialize_join_initial(self):
         self.lua.execute("initialize();emit(defines.events.on_player_joined_game,{player_index=1});tick()")
 
+    def initialize_singleplayer_initial(self):
+        self.lua.execute("initialize();tick();tick()")
+
+    def source_at(self, commit):
+        return subprocess.run(
+            ["git", "show", f"{commit}:{FIXTURE_CONTROL_PATH}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
     def open_and_click_query(self):
         self.lua.execute(r'''
           emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
@@ -122,7 +147,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         ''')
 
     def complete_real_event_model(self):
-        self.initialize_join_initial()
+        self.initialize_singleplayer_initial()
         self.open_and_click_query()
         self.lua.execute(r'''
           local query=player.gui.screen.mir_research_browser.mir_library_tabs.mir_library_research_page
@@ -151,7 +176,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           assert(observed.events.shortcut==2 and observed.events.tab==2 and observed.events.tab_click==2
             and observed.events.click==1 and observed.events.text==4
             and observed.events.close==1)
-          assert(#observed.event_log==13 and observed.event_log[1].kind=="joined")
+          assert(#observed.event_log==13 and observed.event_log[1].kind=="singleplayer-load")
           assert(observed.event_log[2].kind=="shortcut" and observed.event_log[3].kind=="tab-click")
           assert(observed.event_log[4].kind=="tab-selected" and observed.event_log[6].kind=="tab-selected")
           assert(observed.event_log[7].kind=="query-click" and observed.event_log[12].kind=="closed")
@@ -175,9 +200,57 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         ''')
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.4|more-infinite-research@5.0.21016",
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.5|more-infinite-research@5.0.21016",
         )
         self.assertEqual(self.lua.eval("#logs"), 1)
+
+    def test_singleplayer_load_bootstrap_replaces_only_the_missing_join_event(self):
+        old_source = self.source_at(OLD_SINGLEPLAYER_FIXTURE_COMMIT)
+        self.setUp(actor_source=old_source, fixture_version="0.1.4")
+        with self.assertRaisesRegex(Exception, "assertion failed"):
+            self.lua.execute('initialize();tick();assert(report().phase=="await-open")')
+
+        self.setUp()
+        self.initialize_singleplayer_initial()
+        self.lua.execute(r'''
+          local observed=report()
+          assert(observed.phase=="await-open" and #observed.event_log==1)
+          assert(observed.event_log[1].kind=="singleplayer-load" and observed.event_log[1].player_index==1)
+          assert(writes["mir-library-personal-view-input/01-initial.json"] ~= nil)
+        ''')
+
+    def test_bootstrap_requires_one_connected_player_and_real_join_does_not_rebootstrap(self):
+        self.lua.execute(r'''
+          initialize()
+          game.connected_players={}
+          tick()
+          assert(report().phase=="await-join" and #report().event_log==0 and next(writes)==nil)
+          game.connected_players={player,player2}
+          tick()
+          assert(report().phase=="await-join" and #report().event_log==0 and next(writes)==nil)
+          game.connected_players={{valid=false,connected=true,index=1}}
+          tick()
+          assert(report().phase=="await-join" and #report().event_log==0 and next(writes)==nil)
+          game.connected_players={player}
+          tick();tick()
+          assert(report().phase=="await-open" and #report().event_log==1)
+          assert(report().event_log[1].kind=="singleplayer-load")
+        ''')
+
+        self.setUp()
+        self.lua.execute(r'''
+          initialize()
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          tick();tick()
+          assert(report().phase=="await-open" and #report().event_log==1)
+          assert(report().event_log[1].kind=="joined")
+        ''')
+
+        self.setUp(multiplayer=True)
+        self.lua.execute(r'''
+          initialize();tick();tick()
+          assert(report().phase=="await-join" and #report().event_log==0 and next(writes)==nil)
+        ''')
 
     def test_wrong_tuple_or_extra_mod_refuses_before_event_observation(self):
         for base, package, extra in [
@@ -232,7 +305,6 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.execute(r'''
           initialize()
           player.controller_type=defines.controllers.cutscene
-          emit(defines.events.on_player_joined_game,{player_index=1})
           tick()
           assert(report().phase=="settling-initial" and next(writes)==nil)
           emit(defines.events.on_gui_click,{player_index=1,element={valid=true,name="base_welcome_confirm"}})
@@ -251,7 +323,6 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.execute(r'''
           initialize()
           player.opened={valid=true,name="base_welcome"}
-          emit(defines.events.on_player_joined_game,{player_index=1})
           tick()
           assert(report().phase=="settling-initial" and next(writes)==nil)
           emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
@@ -325,7 +396,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-personal-view-input",
-            "version": "0.1.4",
+            "version": "0.1.5",
             "title": "MIR Library personal-view input observer",
             "author": "MIR maintainers",
             "factorio_version": "2.1",
@@ -338,6 +409,9 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIsNone(re.search(r"\\b(?:player|root|query)\\.(?:text|opened)\\s*=(?!=)", code))
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
+        self.assertIn('begin_observation(player, "singleplayer-load")', code)
+        self.assertIn('begin_observation(player, "joined")', code)
+        self.assertIn("if game.is_multiplayer() then return end", code)
         self.assertIn("script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)", code)
         self.assertIn('helpers.write_file(name, helpers.table_to_json({', code)
         self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)
