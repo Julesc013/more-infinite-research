@@ -13,7 +13,7 @@ CURRENT_TUPLES = (("2.0.77", "5.0.20016"), ("2.1.24", "5.0.21016"))
 RETAINED_014_REVISION = "2fd5d0fcfd1e4173284bbae8d61a8293d439977c"
 RETAINED_CONTROL_PATH = "tests/fixtures/library-render-capture/control.lua"
 RETAINED_INFO_PATH = "tests/fixtures/library-render-capture/info.json"
-RETAINED_015_REVISION = "2bf6d04aad4cfaf897d947c36c0904afb58dce7b"
+RETAINED_015_REVISION = "15f1c5d02574873dbbac7957c254acc2563b7341"
 ACTIVE_MODS_OBSERVER = re.compile(
     r'^-- MIR_ACTIVE_MODS_OBSERVER_BEGIN\n.*?^-- MIR_ACTIVE_MODS_OBSERVER_END\n',
     re.MULTILINE | re.DOTALL,
