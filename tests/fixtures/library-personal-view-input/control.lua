@@ -3,9 +3,12 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.5"
 local MIR = "more-infinite-research"
-local MIR_VERSION = "5.0.21016"
+local VERSION = script.active_mods[FIXTURE]
+local TUPLES = {
+  ["0.1.5"] = {base = "2.1.24", mir = "5.0.21016"},
+  ["0.1.6"] = {base = "2.1.24", mir = "5.0.21017"}
+}
 local ROOT = "mir_research_browser"
 local PREFIX = "mir_library_"
 local SHORTCUT = "mir-research-browser"
@@ -67,7 +70,9 @@ local function record_event(kind, facts)
 end
 
 local function active_mods()
-  local required = {base = "2.1.24", [MIR] = MIR_VERSION, [FIXTURE] = VERSION}
+  local tuple = TUPLES[VERSION]
+  if tuple == nil then fail("exact active-mod selection required") end
+  local required = {base = tuple.base, [MIR] = tuple.mir, [FIXTURE] = VERSION}
   local rows, count = {}, 0
   for name, version in pairs(script.active_mods) do
     if type(name) ~= "string" or type(version) ~= "string" or required[name] ~= version then
@@ -507,9 +512,10 @@ local function on_closed(event)
 end
 
 script.on_init(function()
+  local observed_mods = active_mods()
   local current = state()
   if current.initialized then fail("observer initialized twice") end
-  current.active_mods = active_mods()
+  current.active_mods = observed_mods
   log("[MIR_ACTIVE_MODS] " .. current.active_mods)
   current.active_mods_reported = true
   current.initialized = true

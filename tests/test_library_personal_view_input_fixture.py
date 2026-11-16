@@ -7,11 +7,14 @@ import subprocess
 import sys
 import unittest
 
+import mir_test_versions as SHARED
+
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-personal-view-input"
 OLD_SINGLEPLAYER_FIXTURE_COMMIT = "a6ace8a48dd59b3f5eb46722273d7545e0de7011"
 FIXTURE_CONTROL_PATH = "tests/fixtures/library-personal-view-input/control.lua"
+MIR_517_F210 = SHARED.alias_for("5.0.17", "f210").distribution_version
 
 
 class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
@@ -204,6 +207,25 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         )
         self.assertEqual(self.lua.eval("#logs"), 1)
 
+    def test_current_017_tuple_retains_the_passive_eight_phase_protocol(self):
+        self.setUp(package=MIR_517_F210, fixture_version="0.1.6")
+        self.complete_real_event_model()
+        self.lua.execute(r'''
+          local observed=report()
+          assert(observed.complete and observed.phase=="complete")
+          assert(observed.events.shortcut==2 and observed.events.tab==2 and observed.events.tab_click==2
+            and observed.events.click==1 and observed.events.text==4 and observed.events.close==1)
+          assert(#observed.event_log==13 and #observed.snapshots==8)
+          assert(writes["mir-library-personal-view-input/01-initial.json"].version=="0.1.6")
+          assert(writes["mir-library-personal-view-input/08-reopen.json"].complete)
+          local count=0;for _ in pairs(writes) do count=count+1 end;assert(count==8)
+        ''')
+        self.assertEqual(
+            self.lua.eval("logs[1]"),
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.6|more-infinite-research@"
+            + MIR_517_F210,
+        )
+
     def test_singleplayer_load_bootstrap_replaces_only_the_missing_join_event(self):
         old_source = self.source_at(OLD_SINGLEPLAYER_FIXTURE_COMMIT)
         self.setUp(actor_source=old_source, fixture_version="0.1.4")
@@ -253,20 +275,27 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         ''')
 
     def test_wrong_tuple_or_extra_mod_refuses_before_event_observation(self):
-        for base, package, extra in [
-            ("2.1.23", "5.0.21016", None),
-            ("2.1.24", "5.0.21015", None),
-            ("2.1.24", "5.0.21016", {"observer": "1.0.0"}),
+        for base, package, fixture_version, extra in [
+            ("2.1.23", "5.0.21016", "0.1.5", None),
+            ("2.1.24", "5.0.21015", "0.1.5", None),
+            ("2.1.24", MIR_517_F210, "0.1.5", None),
+            ("2.0.77", MIR_517_F210, "0.1.6", None),
+            ("2.1.24", "5.0.21016", "0.1.6", None),
+            ("2.1.24", MIR_517_F210, "0.1.6", {"observer": "1.0.0"}),
         ]:
-            with self.subTest(base=base, package=package, extra=extra):
-                self.setUp(base=base, package=package, extra_mods=extra)
+            with self.subTest(base=base, package=package, fixture_version=fixture_version, extra=extra):
+                self.setUp(base=base, package=package, fixture_version=fixture_version, extra_mods=extra)
                 with self.assertRaisesRegex(Exception, "exact active-mod selection"):
                     self.lua.execute("initialize()")
                 self.assertEqual(self.lua.eval("#logs"), 0)
+                self.assertTrue(self.lua.eval("storage.mir_personal_view_input == nil"))
+                self.assertTrue(self.lua.eval("next(writes) == nil"))
         self.setUp()
         self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.3"')
         with self.assertRaisesRegex(Exception, "exact active-mod selection"):
             self.lua.execute("initialize()")
+        self.assertTrue(self.lua.eval("storage.mir_personal_view_input == nil"))
+        self.assertTrue(self.lua.eval("next(writes) == nil"))
 
     def test_wrong_order_refuses_and_missing_shortcut_or_text_stays_incomplete(self):
         self.initialize_join_initial()
@@ -402,6 +431,10 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
             "factorio_version": "2.1",
             "dependencies": ["base = 2.1.24", "~ more-infinite-research = 5.0.21016"],
         })
+        info_517 = json.loads((FIXTURE / "info-517.json").read_text(encoding="utf-8"))
+        self.assertEqual(info_517, dict(info, version="0.1.6", dependencies=[
+            "base = 2.1.24", "~ more-infinite-research = " + MIR_517_F210,
+        ]))
         code = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         for forbidden in ["remote.call", "script.raise_event", "server_save", "auto_save", "require(",
                           "research_queue =", ".researched =", ".level ="]:
