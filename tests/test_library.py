@@ -4159,7 +4159,7 @@ class LibraryTests(unittest.TestCase):
             "an unrelated ordinary research should keep its native list caption")
           library.set_cap_provider(function(force)
             assert(force == player.force)
-            return {[tail_id] = 8}
+            return {[retired_id] = 4, [tail_id] = 8}
           end)
 
           local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
@@ -4216,6 +4216,20 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress == progress
             and queue[1] == tail and queue[2] == tail,
             "Library navigation changed literal worker objects, levels, bonus or native queue state")
+
+          -- Repeat the native finite endpoint only when the effective limit
+          -- actually differs; an identical limit needlessly clips the label.
+          library.set_cap_provider(function() return {[retired_id] = 2, [tail_id] = 8} end)
+          local lower_cap_root = library.open(player, {family="worker-robots-storage", selected=retired_id})
+          local lower_cap_items = research_content(lower_cap_root).mir_library_list_pane.mir_library_results.items
+          local lower_cap_label
+          for _, item in ipairs(lower_cap_items) do
+            if item[2] == "[img=technology/" .. retired_id .. "] " then lower_cap_label = item[3] end
+          end
+          assert(lower_cap_label and lower_cap_label[1] == "mir-browser.list-stage-finite-capped"
+            and lower_cap_label[3] == 4 and lower_cap_label[4] == 2,
+            "a distinct effective finite limit must remain visible in the list label")
+          library.set_cap_provider(function() return {[retired_id] = 4, [tail_id] = 8} end)
 
           -- The stage relationship belongs to the complete prepared
           -- declarations, not the current filtered list. Each lone visible

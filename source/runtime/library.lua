@@ -1151,7 +1151,9 @@ local function list_caption(row, player, stage)
   if type(stage) ~= "table" then return text end
   local cap = whole_number(row.cap, 1) and row.cap or nil
   if whole_number(stage.fixed_maximum, 1) then
-    if cap then return {"mir-browser.list-stage-finite-capped", text, stage.fixed_maximum, cap} end
+    if cap and cap ~= stage.fixed_maximum then
+      return {"mir-browser.list-stage-finite-capped", text, stage.fixed_maximum, cap}
+    end
     return {"mir-browser.list-stage-finite", text, stage.fixed_maximum}
   end
   if cap then return {"mir-browser.list-stage-capped", text, row.progression, cap} end
