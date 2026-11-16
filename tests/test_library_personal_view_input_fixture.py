@@ -24,9 +24,10 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           interfaces={}
           writes={}
           defines={events={on_player_joined_game=1,on_lua_shortcut=2,on_gui_click=3,
-            on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},gui_type={custom=99}}
+            on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},
+            gui_type={custom=99},controllers={character=1,cutscene=6}}
           script={active_mods={base=base_version, ["more-infinite-research"]=package_version,
-            ["mir-fixture-library-personal-view-input"]="0.1.2"},
+            ["mir-fixture-library-personal-view-input"]="0.1.3"},
             on_init=function(fn) callbacks.init=fn end,
             on_event=function(event,fn) callbacks.events[event]=fn end}
           remote={add_interface=function(name,values) interfaces[name]=values end}
@@ -42,7 +43,8 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           force={valid=true,name="player",current_research=nil,research_progress=0,research_queue={},
             worker_robots_storage_bonus=0}
           player={valid=true,connected=true,index=1,force=force,display_scale=1.25,
-            display_resolution={width=1920,height=1080},gui={screen={}},opened=nil}
+            display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
+            gui={screen={}},opened=nil}
           game={tick=0,get_player=function(index) return index==1 and player or nil end}
           setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
           function build_root(query_text, x, y)
@@ -165,7 +167,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         ''')
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.2|more-infinite-research@5.0.21016",
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.3|more-infinite-research@5.0.21016",
         )
         self.assertEqual(self.lua.eval("#logs"), 1)
 
@@ -181,7 +183,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
                     self.lua.execute("initialize()")
                 self.assertEqual(self.lua.eval("#logs"), 0)
         self.setUp()
-        self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.1"')
+        self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.2"')
         with self.assertRaisesRegex(Exception, "exact active-mod selection"):
             self.lua.execute("initialize()")
 
@@ -216,6 +218,25 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.execute("initialize();emit(defines.events.on_player_joined_game,{player_index=1});helpers=nil")
         with self.assertRaisesRegex(Exception, "phase output helpers unavailable"):
             self.lua.execute("tick()")
+
+    def test_pre_shortcut_base_events_and_cutscene_wait_do_not_count_as_mir_input(self):
+        self.setUp()
+        self.lua.execute(r'''
+          initialize()
+          player.controller_type=defines.controllers.cutscene
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          tick()
+          assert(report().phase=="settling-initial" and next(writes)==nil)
+          emit(defines.events.on_gui_click,{player_index=1,element={valid=true,name="base_welcome_confirm"}})
+          emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+          assert(report().events.setup==2 and report().events.shortcut==0 and report().events.close==0)
+          player.controller_type=defines.controllers.character
+          tick()
+          assert(report().phase=="await-open")
+          local initial=writes["mir-library-personal-view-input/01-initial.json"]
+          assert(initial and initial.snapshot.controller_type==defines.controllers.character)
+          assert(initial.events.setup==2 and initial.events.shortcut==0)
+        ''')
 
     def test_invalid_closed_element_is_not_dereferenced_and_deferred_retirement_is_required(self):
         self.initialize_join_initial()
@@ -279,7 +300,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-personal-view-input",
-            "version": "0.1.2",
+            "version": "0.1.3",
             "title": "MIR Library personal-view input observer",
             "author": "MIR maintainers",
             "factorio_version": "2.1",
@@ -294,6 +315,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
         self.assertIn("script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)", code)
         self.assertIn('helpers.write_file(name, helpers.table_to_json({', code)
+        self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)
         self.assertNotIn("style.width", code)
         self.assertNotIn("style.height", code)
 

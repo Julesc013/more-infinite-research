@@ -3,7 +3,7 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.2"
+local VERSION = "0.1.3"
 local MIR = "more-infinite-research"
 local MIR_VERSION = "5.0.21016"
 local ROOT = "mir_research_browser"
@@ -12,6 +12,7 @@ local SHORTCUT = "mir-research-browser"
 local MAX_EVENTS = 32
 local MAX_QUEUE = 128
 local MAX_SNAPSHOTS = 40
+local MAX_INITIAL_READY_TICKS = 1800
 
 local function fail(message)
   error("[MIR personal-view input] " .. message)
@@ -48,7 +49,7 @@ local function state()
   if storage.mir_personal_view_input == nil then
     storage.mir_personal_view_input = {
       phase = "await-join",
-      events = {shortcut = 0, tab = 0, tab_click = 0, click = 0, text = 0, close = 0},
+      events = {setup = 0, shortcut = 0, tab = 0, tab_click = 0, click = 0, text = 0, close = 0},
       event_log = {},
       snapshots = {},
       written = {},
@@ -201,13 +202,35 @@ local function record_open_shell(row, player, root, tabs)
   end
 end
 
-local function schedule(stage_name)
+local function schedule(stage_name, deadline)
   local current = state()
   if current.pending ~= nil then
     if current.pending.stage == "text" and stage_name == "text" then return end
     fail("multiple unsettled GUI events")
   end
-  current.pending = {stage = stage_name, tick = game.tick + 1}
+  current.pending = {stage = stage_name, tick = game.tick + 1, deadline = deadline}
+end
+
+local function before_first_shortcut(current)
+  return current.events.shortcut == 0
+    and (current.phase == "settling-initial" or current.phase == "await-open")
+end
+
+local function mir_gui_element(element)
+  if not valid(element) or type(element.name) ~= "string" then return false end
+  return element.name == ROOT or string.sub(element.name, 1, #PREFIX) == PREFIX
+end
+
+local function record_setup_event(kind, event, include_element)
+  local current = state()
+  current.events.setup = current.events.setup + 1
+  local facts = {player_index = event.player_index, gui_type = event.gui_type}
+  if include_element then
+    local element = event.element
+    facts.element_valid = valid(element)
+    facts.element_name = valid(element) and element.name or false
+  end
+  record_event(kind, facts)
 end
 
 local function write_phase(player, row)
@@ -246,6 +269,12 @@ local function record_snapshot(stage_name)
     local root = screen and screen[ROOT]
     if valid(root) then fail("Library root should be retired") end
     if player.opened ~= nil and player.opened == root then fail("Library root remained opened") end
+    if stage_name == "initial" then
+      if type(player.controller_type) ~= "number" or player.controller_type == defines.controllers.cutscene then
+        fail("player controller is not usable")
+      end
+      row.controller_type = player.controller_type
+    end
   elseif stage_name == "help-tab" then
     local root, tabs = library_tree(player)
     if player.opened ~= root or tabs.selected_tab_index ~= 4 then fail("Help tab was not selected") end
@@ -273,6 +302,16 @@ local function settle(event)
   current.pending = nil
   local player, row
   if pending.stage == "initial" then
+    player = player_for(current.player_index)
+    if player == nil then fail("observed player unavailable") end
+    if type(player.controller_type) ~= "number" then fail("player controller is not usable") end
+    if player.controller_type == defines.controllers.cutscene then
+      if type(pending.deadline) ~= "number" or event.tick >= pending.deadline then
+        fail("player controller did not leave cutscene")
+      end
+      current.pending = pending
+      return
+    end
     player, row = record_snapshot("initial")
     current.phase = "await-open"
   elseif pending.stage == "open" then
@@ -310,7 +349,7 @@ local function on_join(event)
   if current.phase ~= "await-join" then fail("unexpected player join") end
   record_event("joined", {player_index = player.index})
   current.player_index = player.index
-  schedule("initial")
+  schedule("initial", game.tick + MAX_INITIAL_READY_TICKS)
   current.phase = "settling-initial"
 end
 
@@ -335,6 +374,11 @@ end
 
 local function on_click(event)
   local current = state()
+  if event ~= nil and event.player_index == current.player_index and before_first_shortcut(current)
+    and not mir_gui_element(event.element) then
+    record_setup_event("setup-click", event, true)
+    return
+  end
   if event == nil or event.player_index ~= current.player_index then
     fail("query click event out of order")
   end
@@ -362,6 +406,11 @@ end
 
 local function on_selected_tab_changed(event)
   local current = state()
+  if event ~= nil and event.player_index == current.player_index and before_first_shortcut(current)
+    and not mir_gui_element(event.element) then
+    record_setup_event("setup-tab-selected", event, true)
+    return
+  end
   if event == nil or event.player_index ~= current.player_index then fail("tab selection event out of order") end
   if current.phase == "await-help-tab" then
     record_event("tab-selected", {player_index = event.player_index})
@@ -381,6 +430,11 @@ end
 
 local function on_text_changed(event)
   local current = state()
+  if event ~= nil and event.player_index == current.player_index and before_first_shortcut(current)
+    and not mir_gui_element(event.element) then
+    record_setup_event("setup-text", event, true)
+    return
+  end
   if (current.phase ~= "await-query-text" and current.phase ~= "settling-text")
     or event == nil or event.player_index ~= current.player_index then
     fail("query text event out of order")
@@ -397,6 +451,12 @@ end
 
 local function on_closed(event)
   local current = state()
+  if event ~= nil and event.player_index == current.player_index and before_first_shortcut(current) then
+    -- Base may already have retired its welcome element.  Its close is setup
+    -- evidence only; do not inspect that element before MIR is opened.
+    record_setup_event("setup-closed", event, false)
+    return
+  end
   if current.phase ~= "await-close" or event == nil or event.player_index ~= current.player_index then
     fail("close event out of order")
   end
