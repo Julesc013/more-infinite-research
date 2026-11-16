@@ -4483,7 +4483,7 @@ def no_network_sockets(pid):
 
     def test_private_display_result_continuity_rejects_57b8_substitutions(self):
         old_source = subprocess.run(
-            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerSession.ps1"],
+            ["git", "show", "57b8cd6da9b07a76f6b328dc7442d0c223c1c619:tools/Invoke-MultiplayerSession.ps1"],
             cwd=ROOT, capture_output=True, check=False,
         )
         self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
@@ -4739,7 +4739,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
 
     def test_compose_only_disposes_the_borrowed_library_lease_when_restoration_throws(self):
         old_source = subprocess.run(
-            ["git", "show", "57b8cd6da:tools/Invoke-MultiplayerFixture.ps1"],
+            ["git", "show", "57b8cd6da9b07a76f6b328dc7442d0c223c1c619:tools/Invoke-MultiplayerFixture.ps1"],
             cwd=ROOT, capture_output=True, check=False,
         )
         self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
