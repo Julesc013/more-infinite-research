@@ -83,6 +83,16 @@ class VersionAliasTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "target"):
                     alias_for("5.0.16", target)
 
+    def test_array_and_scalar_target_declarations_refuse_before_dictionary_access(self):
+        for payload in ("[]", '"not-a-target-document"', "0", "null"):
+            with self.subTest(payload=payload), tempfile.TemporaryDirectory() as temporary:
+                fixture = Path(temporary) / "root"
+                declaration = fixture / "targets/editions.json"
+                declaration.parent.mkdir(parents=True)
+                declaration.write_text(payload, encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "target declaration is malformed"):
+                    declared_targets(root=fixture)
+
     def test_malformed_current_changelog_heading_refuses_without_falling_back_to_history(self):
         with tempfile.TemporaryDirectory() as temporary:
             fixture = Path(temporary)

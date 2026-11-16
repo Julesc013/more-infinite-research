@@ -72,7 +72,9 @@ def declared_targets(root=ROOT):
             document = json.loads((root / relative).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
             raise ValueError("MIR test target declaration is unavailable: " + relative.as_posix()) from error
-        rows = document.get("targets") if isinstance(document, dict) else None
+        if not isinstance(document, dict):
+            raise ValueError("MIR test target declaration is malformed: " + relative.as_posix())
+        rows = document.get("targets")
         if document.get("schema") != 1 or not isinstance(rows, dict):
             raise ValueError("MIR test target declaration is malformed: " + relative.as_posix())
         for target, metadata in rows.items():
