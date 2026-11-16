@@ -272,7 +272,8 @@ local function record_snapshot(stage_name)
     local screen = player.gui and player.gui.screen
     local root = screen and screen[ROOT]
     if valid(root) then fail("Library root should be retired") end
-    if player.opened ~= nil and player.opened == root then fail("Library root remained opened") end
+    if stage_name == "initial" and player.opened ~= nil then fail("player UI is not usable") end
+    if stage_name == "closed" and player.opened ~= nil and player.opened == root then fail("Library root remained opened") end
     if stage_name == "initial" then
       if type(player.controller_type) ~= "number" or player.controller_type == defines.controllers.cutscene then
         fail("player controller is not usable")
@@ -312,6 +313,13 @@ local function settle(event)
     if player.controller_type == defines.controllers.cutscene then
       if type(pending.deadline) ~= "number" or event.tick >= pending.deadline then
         fail("player controller did not leave cutscene")
+      end
+      current.pending = pending
+      return
+    end
+    if player.opened ~= nil then
+      if type(pending.deadline) ~= "number" or event.tick >= pending.deadline then
+        fail("player UI did not become usable")
       end
       current.pending = pending
       return

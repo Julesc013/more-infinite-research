@@ -246,6 +246,23 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           assert(initial.events.setup==2 and initial.events.shortcut==0)
         ''')
 
+    def test_initial_waits_for_actual_base_ui_dismissal_before_reporting_ready(self):
+        self.setUp()
+        self.lua.execute(r'''
+          initialize()
+          player.opened={valid=true,name="base_welcome"}
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          tick()
+          assert(report().phase=="settling-initial" and next(writes)==nil)
+          emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+          assert(report().events.setup==1 and report().events.shortcut==0)
+          player.opened=nil
+          tick()
+          local initial=writes["mir-library-personal-view-input/01-initial.json"]
+          assert(initial and initial.phase=="await-open" and initial.snapshot.controller_type==defines.controllers.character)
+          assert(report().phase=="await-open" and report().complete==false)
+        ''')
+
     def test_invalid_closed_element_is_not_dereferenced_and_deferred_retirement_is_required(self):
         self.initialize_join_initial()
         self.open_and_click_query()
