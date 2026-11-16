@@ -235,6 +235,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_migration_origins_f200_120_successor_controls.py",
             "tests/test_migration_origins_successor_controls.py",
             "tests/test_modern_targets.py",
+            "tests/test_lua_table_values.py",
             "tests/test_k2_base_catalogue.py",
             "tests/test_k2_native_space_age.py",
             "tests/test_space_exploration_catalogue.py",
@@ -460,6 +461,9 @@ class HostControlsTests(unittest.TestCase):
             for prepared in observer_record["profiles_and_archives"]
             for member in prepared["archive"]["members"]
         )
+        render_control = (ROOT / "tests/test_library_render_capture.py").read_text(encoding="utf-8")
+        render_revisions = set(re.findall(r'^RETAINED_\d+_REVISION = "([0-9a-f]{40})"$', render_control, re.MULTILINE))
+        self.assertTrue(render_revisions)
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
@@ -467,6 +471,8 @@ class HostControlsTests(unittest.TestCase):
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
             for revision in observer_revisions:
                 self.assertRegex(revision, r"^[0-9a-f]{40}$")
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
+            for revision in render_revisions:
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", workflow)

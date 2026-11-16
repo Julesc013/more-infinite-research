@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import unittest
 
+from lua_table_values import from_lua
 import test_bob_plates_f210_pipeline as pipeline
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,7 +61,7 @@ class BobTechProgressionF210PipelineTests(unittest.TestCase):
             with self.subTest(case=case):
                 lua, error = self.stage(case)
                 self.assertIsNone(error)
-                emitted = pipeline._plain(lua.globals().emitted)
+                emitted = from_lua(lua, lua.globals().emitted)
                 expected = self.context["cases"][case]["expected"]
                 self.assertEqual(count, len(expected))
                 for name, published in expected.items():
@@ -74,7 +75,7 @@ class BobTechProgressionF210PipelineTests(unittest.TestCase):
                 lua, error = self.stage(case, startup={"mir-cost-base-research-speed": 500,
                     "mir-research-time-research-speed": 45, "mir-effect-per-level-research-speed": 25})
                 self.assertIsNone(error)
-                actual = pipeline._plain(lua.globals().emitted)["research-speed-7"]
+                actual = from_lua(lua, lua.globals().emitted)["research-speed-7"]
                 expected = self.context["cases"][case]["expected"]["research-speed-7"]
                 self.assertEqual(expected["unit"]["ingredients"], actual["unit"]["ingredients"])
                 self.assertEqual(expected["prerequisites"], actual["prerequisites"])
