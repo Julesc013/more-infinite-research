@@ -23,9 +23,9 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           logs={}
           interfaces={}
           defines={events={on_player_joined_game=1,on_lua_shortcut=2,on_gui_click=3,
-            on_gui_text_changed=4,on_gui_closed=5,on_tick=6},gui_type={custom=99}}
+            on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},gui_type={custom=99}}
           script={active_mods={base=base_version, ["more-infinite-research"]=package_version,
-            ["mir-fixture-library-personal-view-input"]="0.1.0"},
+            ["mir-fixture-library-personal-view-input"]="0.1.1"},
             on_init=function(fn) callbacks.init=fn end,
             on_event=function(event,fn) callbacks.events[event]=fn end}
           remote={add_interface=function(name,values) interfaces[name]=values end}
@@ -44,10 +44,15 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
             root.location={x=x or 20,y=y or 30}
             root.style={width=1100,height=800,maximal_width=1100}
             local tabs=element("tabbed-pane","mir_library_tabs");tabs.selected_tab_index=1
+            tabs.style={width=1068,maximal_width=1068}
+            tabs.mir_library_tab_research=element("tab","mir_library_tab_research")
+            tabs.mir_library_tab_help=element("tab","mir_library_tab_help")
             local page=element("scroll-pane","mir_library_research_page");page.visible=true
+            local help=element("scroll-pane","mir_library_help_content");help.visible=true
             local filters=element("flow","mir_library_filters")
             local query=element("textfield","mir_library_query");query.text=query_text or ""
             filters.mir_library_query=query;page.mir_library_filters=filters;tabs.mir_library_research_page=page
+            tabs.mir_library_help_content=help
             root.mir_library_tabs=tabs
             return root,query
           end
@@ -84,6 +89,15 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
           local root,query=open_library("")
           tick()
+          local tabs=root.mir_library_tabs
+          emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+          tabs.selected_tab_index=4
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+          tick()
+          emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})
+          tabs.selected_tab_index=1
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+          tick()
           emit(defines.events.on_gui_click,{player_index=1,element=query})
           tick()
         ''')
@@ -115,21 +129,26 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.lua.execute(r'''
           local observed=report()
           assert(observed.complete and observed.phase=="complete")
-          assert(observed.events.shortcut==2 and observed.events.click==1 and observed.events.text==4
+          assert(observed.events.shortcut==2 and observed.events.tab==2 and observed.events.tab_click==2
+            and observed.events.click==1 and observed.events.text==4
             and observed.events.close==1)
-          assert(#observed.event_log==9 and observed.event_log[1].kind=="joined")
-          assert(observed.event_log[2].kind=="shortcut" and observed.event_log[3].kind=="query-click")
-          assert(observed.event_log[8].kind=="closed" and observed.event_log[9].kind=="shortcut")
+          assert(#observed.event_log==13 and observed.event_log[1].kind=="joined")
+          assert(observed.event_log[2].kind=="shortcut" and observed.event_log[3].kind=="tab-click")
+          assert(observed.event_log[4].kind=="tab-selected" and observed.event_log[6].kind=="tab-selected")
+          assert(observed.event_log[7].kind=="query-click" and observed.event_log[12].kind=="closed")
+          assert(observed.event_log[13].kind=="shortcut")
           assert(observed.close_gui_type==defines.gui_type.custom and observed.native_snapshot_unchanged)
-          assert(#observed.snapshots==6)
+          assert(#observed.snapshots==8)
           assert(observed.snapshots[1].stage=="initial" and observed.snapshots[2].stage=="open")
-          assert(observed.snapshots[3].stage=="query-click" and observed.snapshots[4].query=="gear")
-          assert(observed.snapshots[5].stage=="closed" and observed.snapshots[6].stage=="reopen")
-          assert(observed.snapshots[6].geometry.x==20 and observed.snapshots[6].geometry.width==1100)
+          assert(observed.snapshots[3].stage=="help-tab" and observed.snapshots[3].tab_index==4)
+          assert(observed.snapshots[4].stage=="research-tab" and observed.snapshots[4].tab_index==1)
+          assert(observed.snapshots[5].stage=="query-click" and observed.snapshots[6].query=="gear")
+          assert(observed.snapshots[7].stage=="closed" and observed.snapshots[8].stage=="reopen")
+          assert(observed.snapshots[8].geometry.x==20 and observed.snapshots[8].geometry.width==1100)
         ''')
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.0|more-infinite-research@5.0.21016",
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.1|more-infinite-research@5.0.21016",
         )
         self.assertEqual(self.lua.eval("#logs"), 1)
 
@@ -144,6 +163,10 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
                 with self.assertRaisesRegex(Exception, "exact active-mod selection"):
                     self.lua.execute("initialize()")
                 self.assertEqual(self.lua.eval("#logs"), 0)
+        self.setUp()
+        self.lua.execute('script.active_mods["mir-fixture-library-personal-view-input"]="0.1.0"')
+        with self.assertRaisesRegex(Exception, "exact active-mod selection"):
+            self.lua.execute("initialize()")
 
     def test_wrong_order_refuses_and_missing_shortcut_or_text_stays_incomplete(self):
         self.initialize_join_initial()
@@ -161,6 +184,16 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.open_and_click_query()
         self.assertEqual(self.lua.eval('report().phase'), "await-query-text")
         self.assertFalse(self.lua.eval("report().complete"))
+
+        self.setUp()
+        self.initialize_join_initial()
+        self.lua.execute(r'''
+          emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+          local root=open_library("");tick()
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=root.mir_library_tabs})
+        ''')
+        with self.assertRaisesRegex(Exception, "Help tab was not selected"):
+            self.lua.execute("tick()")
 
     def test_invalid_closed_element_is_not_dereferenced_and_deferred_retirement_is_required(self):
         self.initialize_join_initial()
@@ -203,6 +236,19 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
 
         self.setUp()
         self.initialize_join_initial()
+        self.lua.execute(r'''
+          emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+          local root=open_library("");tick()
+          local tabs=root.mir_library_tabs;tabs.selected_tab_index=4
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs});tick()
+          tabs.selected_tab_index=1;tabs.style.width=1067
+          emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+        ''')
+        with self.assertRaisesRegex(Exception, "tab-bar identity or geometry was not retained"):
+            self.lua.execute("tick()")
+
+        self.setUp()
+        self.initialize_join_initial()
         self.lua.execute("force.worker_robots_storage_bonus=1")
         with self.assertRaisesRegex(Exception, "native research state changed"):
             self.lua.execute("emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name='mir-research-browser'});open_library('');tick()")
@@ -211,7 +257,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info, {
             "name": "mir-fixture-library-personal-view-input",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "title": "MIR Library personal-view input observer",
             "author": "MIR maintainers",
             "factorio_version": "2.1",
@@ -224,6 +270,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIsNone(re.search(r"\\b(?:player|root|query)\\.(?:text|opened)\\s*=(?!=)", code))
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
+        self.assertIn("script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)", code)
 
 
 if __name__ == "__main__":

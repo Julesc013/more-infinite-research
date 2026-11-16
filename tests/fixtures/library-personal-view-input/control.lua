@@ -3,7 +3,7 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.0"
+local VERSION = "0.1.1"
 local MIR = "more-infinite-research"
 local MIR_VERSION = "5.0.21016"
 local ROOT = "mir_research_browser"
@@ -48,7 +48,7 @@ local function state()
   if storage.mir_personal_view_input == nil then
     storage.mir_personal_view_input = {
       phase = "await-join",
-      events = {shortcut = 0, click = 0, text = 0, close = 0},
+      events = {shortcut = 0, tab = 0, tab_click = 0, click = 0, text = 0, close = 0},
       event_log = {},
       snapshots = {},
       active_mods_reported = false
@@ -144,22 +144,58 @@ local function geometry(player, root)
   return row
 end
 
-local function open_tree(player)
+local function library_tree(player)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
   if not valid(root) or root.type ~= "frame" or type(root.get_mod) ~= "function" or root.get_mod() ~= MIR then
     fail("owned Library root absent")
   end
   local tabs = root[PREFIX .. "tabs"]
-  local page = valid(tabs) and tabs[PREFIX .. "research_page"] or nil
+  if not valid(tabs) or tabs.type ~= "tabbed-pane" or tabs.name ~= PREFIX .. "tabs" then
+    fail("Library tab bar unavailable")
+  end
+  return root, tabs
+end
+
+local function research_tree(player)
+  local root, tabs = library_tree(player)
+  local page = tabs[PREFIX .. "research_page"]
   local filters = valid(page) and page[PREFIX .. "filters"] or nil
   local query = valid(filters) and filters[PREFIX .. "query"] or nil
-  if not valid(tabs) or tabs.type ~= "tabbed-pane" or tabs.selected_tab_index ~= 1
-    or not valid(page) or page.type ~= "scroll-pane" or page.visible ~= true
+  if tabs.selected_tab_index ~= 1 or not valid(page) or page.type ~= "scroll-pane" or page.visible ~= true
     or not valid(filters) or not valid(query) or query.type ~= "textfield" or type(query.text) ~= "string" then
     fail("Research personal view unavailable")
   end
   return root, query
+end
+
+local function tab_bar_identity(tabs)
+  local result = {name = tabs.name, type = tabs.type, index = tabs.index or false}
+  local style = tabs.style
+  if style ~= nil then
+    for _, field in ipairs({"width", "height", "minimal_width", "maximal_width", "minimal_height", "maximal_height"}) do
+      local value = style[field]
+      if value ~= nil then
+        if not finite(value) or value <= 0 then fail("tab-bar geometry unavailable") end
+        result[field] = value
+      end
+    end
+  end
+  return result
+end
+
+local function record_open_shell(row, player, root, tabs)
+  row.geometry = geometry(player, root)
+  row.tab_bar = tab_bar_identity(tabs)
+  row.tab_index = tabs.selected_tab_index
+  local current = state()
+  if current.open_geometry == nil then
+    current.open_geometry, current.tab_bar = row.geometry, row.tab_bar
+  elseif not equal(current.open_geometry, row.geometry) then
+    fail("root geometry was not retained")
+  elseif not equal(current.tab_bar, row.tab_bar) then
+    fail("tab-bar identity or geometry was not retained")
+  end
 end
 
 local function schedule(stage_name)
@@ -184,17 +220,20 @@ local function record_snapshot(stage_name)
     local root = screen and screen[ROOT]
     if valid(root) then fail("Library root should be retired") end
     if player.opened ~= nil and player.opened == root then fail("Library root remained opened") end
+  elseif stage_name == "help-tab" then
+    local root, tabs = library_tree(player)
+    if player.opened ~= root or tabs.selected_tab_index ~= 4 then fail("Help tab was not selected") end
+    record_open_shell(row, player, root, tabs)
   else
-    local root, query = open_tree(player)
+    local root, query = research_tree(player)
+    local tabs = root[PREFIX .. "tabs"]
     if player.opened ~= root then fail("Library root is not opened") end
     row.query = query.text
-    row.geometry = geometry(player, root)
-    if stage_name == "open" and row.query ~= "" then fail("initial query is not empty") end
-    if stage_name == "reopen" then
-      if row.query ~= "gear" then fail("query was not retained") end
-      if not equal(current.open_geometry, row.geometry) then fail("root geometry was not retained") end
+    record_open_shell(row, player, root, tabs)
+    if (stage_name == "open" or stage_name == "research-tab") and row.query ~= "" then
+      fail("initial query is not empty")
     end
-    if stage_name == "open" then current.open_geometry = row.geometry end
+    if stage_name == "reopen" and row.query ~= "gear" then fail("query was not retained") end
   end
   if #current.snapshots >= MAX_SNAPSHOTS then fail("too many GUI snapshots") end
   current.snapshots[#current.snapshots + 1] = row
@@ -210,6 +249,12 @@ local function settle(event)
     current.phase = "await-open"
   elseif pending.stage == "open" then
     record_snapshot("open")
+    current.phase = "await-help-tab"
+  elseif pending.stage == "help-tab" then
+    record_snapshot("help-tab")
+    current.phase = "await-research-tab"
+  elseif pending.stage == "research-tab" then
+    record_snapshot("research-tab")
     current.phase = "await-query-click"
   elseif pending.stage == "query-click" then
     record_snapshot("query-click")
@@ -261,7 +306,21 @@ end
 
 local function on_click(event)
   local current = state()
-  if current.phase ~= "await-query-click" or event == nil or event.player_index ~= current.player_index then
+  if event == nil or event.player_index ~= current.player_index then
+    fail("query click event out of order")
+  end
+  if current.phase == "await-help-tab" or current.phase == "settling-help-tab"
+    or current.phase == "await-research-tab" or current.phase == "settling-research-tab" then
+    local element = event.element
+    local name = valid(element) and element.name or false
+    local expected = (current.phase == "await-help-tab" or current.phase == "settling-help-tab")
+      and PREFIX .. "tab_help" or PREFIX .. "tab_research"
+    if name ~= false and name ~= expected then fail("tab click target invalid") end
+    record_event("tab-click", {player_index = event.player_index, element_valid = valid(element), element_name = name})
+    current.events.tab_click = current.events.tab_click + 1
+    return
+  end
+  if current.phase ~= "await-query-click" then
     fail("query click event out of order")
   end
   local element = event.element
@@ -270,6 +329,25 @@ local function on_click(event)
   current.events.click = current.events.click + 1
   schedule("query-click")
   current.phase = "settling-query-click"
+end
+
+local function on_selected_tab_changed(event)
+  local current = state()
+  if event == nil or event.player_index ~= current.player_index then fail("tab selection event out of order") end
+  if current.phase == "await-help-tab" then
+    record_event("tab-selected", {player_index = event.player_index})
+    current.events.tab = current.events.tab + 1
+    schedule("help-tab")
+    current.phase = "settling-help-tab"
+  elseif current.phase == "await-research-tab" then
+    record_event("tab-selected", {player_index = event.player_index})
+    current.events.tab = current.events.tab + 1
+    if current.events.tab ~= 2 then fail("distinct tab selections required") end
+    schedule("research-tab")
+    current.phase = "settling-research-tab"
+  else
+    fail("tab selection event out of order")
+  end
 end
 
 local function on_text_changed(event)
@@ -316,6 +394,7 @@ end)
 script.on_event(defines.events.on_player_joined_game, on_join)
 script.on_event(defines.events.on_lua_shortcut, on_shortcut)
 script.on_event(defines.events.on_gui_click, on_click)
+script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)
 script.on_event(defines.events.on_gui_text_changed, on_text_changed)
 script.on_event(defines.events.on_gui_closed, on_closed)
 script.on_event(defines.events.on_tick, settle)
