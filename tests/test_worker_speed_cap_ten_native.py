@@ -149,6 +149,13 @@ local function load_stage(path,common,stage,game,storage,settings,markers,logs,f
   env._G=env;setmetatable(env,{__index=function(_,k)return _G[k]end});local ok,msg=pcall(assert(loadfile(path,"t",env)));return ok and e or nil,tostring(msg)
 end
 local function call(f,e)if type(f)~="function"then return false,"missing callback"end;local ok,msg=pcall(f,e);return ok,tostring(msg)end
+-- Factorio advances an infinite technology before the ordinary completion event.
+-- Both flows share this engine sequence; effect/science/queue oracles stay local.
+local function finish_infinite_level(technology,completed_level,callback,tick)
+  assert(technology.level==completed_level,"ordinary research must finish its current level")
+  technology.level=completed_level+1
+  return call(callback,{research=technology,by_script=false,tick=tick})
+end
 
 function flow(source_path,old_path,successor_path,common,mode,opponent)
   local wrong=opponent=="wrong-runtime-energy";local player=force("player",1,wrong);local game={tick=0,forces={player=player,[1]=player},surfaces={}}
@@ -182,9 +189,10 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   local owner=player.technologies[WORKER]
   if opponent=="await-eleven"then owner.level=11;ok,result=call(successor.events[3],{research=owner,tick=0});return{ok=ok,message=result}end
   game.tick=1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end
-  if opponent=="scripted-finish"then ok,result=call(successor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result}end
-  player.research_queue={};owner.level=10;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result}end
-  owner.level=11;player.worker_robots_speed_modifier=state.player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  if opponent=="scripted-finish"then owner.level=11;ok,result=call(successor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result}end
+  if opponent=="preincrement-finish"then owner.level=10;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result}end
+  player.research_queue={};ok,result=finish_infinite_level(owner,10,successor.events[2],1);if not ok then return{ok=false,message=result}end
+  player.worker_robots_speed_modifier=state.player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(successor.events[3],{research=owner,tick=1});return{ok=ok,message=result}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end end
   for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"successor16",game,storage,settings(10),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
@@ -244,7 +252,7 @@ function current_state_flow(old_path,successor_path,successor17_path,observe_pat
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="scripted-finish"then owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
   if opponent=="preincrement-finish"then owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result,state=state}end
-  player.research_queue={};owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  player.research_queue={};ok,result=finish_infinite_level(owner,10,actor.events[2],1);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="missing-ordinary-event"then state.ordinary_events={} end
   player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
@@ -975,7 +983,8 @@ end
         self.assertEqual(("5.0.20015", "5.0.20016"), (markers[0]["mir_version"], markers[2]["mir_version"]))
         complete = markers[3]
         self.assertEqual((1, 0), (complete["ordinary_native_completion_count"], complete["level_eleven_start_count"]))
-        self.assertEqual((WORKER, False), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"]))
+        self.assertEqual((WORKER, False, 10, 11), (complete["ordinary_events"][1]["name"], complete["ordinary_events"][1]["by_script"],
+                                                    complete["ordinary_events"][1]["completed_level"], complete["ordinary_events"][1]["event_post_increment_level"]))
         self.assertEqual((WORKER, False), (complete["ordinary"][1]["name"], complete["ordinary"][1]["by_script"]))
         self.assertEqual((2, 1, 0), (len(markers[0]["player"]["queue"]["queue"]), len(markers[2]["player"]["queue"]["queue"]), len(complete["player"]["queue"]["queue"])))
         self.assertEqual(3600, complete["player"]["research_unit_energy"])
@@ -994,7 +1003,7 @@ end
         self.assertTrue(electricity_admin["ok"])
         self.assertEqual(ELECTRICITY, electricity_admin["state"]["scripted_administrative_events"][1]["name"])
         preinit = self.flow_result("successor", "preinit-unrelated"); self.assertTrue(preinit["ok"]); self.assertIsNone(preinit["state"])
-        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-electricity": "foreign automation electricity prerequisite is absent", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
+        for opponent, phrase in {"source-worker": "source stage observed non-administrative research completion", "missing-electricity": "foreign automation electricity prerequisite is absent", "missing-predecessor": "player worker prerequisite is not researched: worker-robots-speed-9", "missing-deep": "player worker prerequisite is not researched: se-deep-space-science-pack-1", "skip-caps": "cap-ten did not retain only current level-ten work", "partial-drift": "cap-ten did not retain only current level-ten work", "foreign-reenabled": "foreign disabled sentinel differs", "scripted-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "preincrement-finish": "scripted or non-level-ten completion cannot satisfy ordinary cap-ten work", "await-eleven": "level eleven research started", "after-eleven": "level eleven research started", "wrong-runtime-energy": "worker research-unit contract differs"}.items():
             with self.subTest(opponent=opponent):
                 result = self.flow_result("successor", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
         control = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
