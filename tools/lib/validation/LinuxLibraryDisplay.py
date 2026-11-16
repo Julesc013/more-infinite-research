@@ -306,9 +306,18 @@ class SystemBackend:
                                 stderr=subprocess.DEVNULL, timeout=5, check=False)
         return result.returncode
 
-    def load_probe(self, path: Path):
+    def load_probe(self, path: Path, pin: dict[str, object]):
         if self._probe_loader is not None:
             return self._probe_loader(path)
+        # Authenticate the exact bytes before evaluating Python code. A later
+        # preflight hash check cannot undo import-time effects of a replaced
+        # probe at the same pathname.
+        info = _regular(path, "qualified display helper")
+        require(info.st_size == pin["bytes"], "qualified display helper bytes differ")
+        with path.open("rb") as stream:
+            raw = stream.read(info.st_size + 1)
+        require(len(raw) == info.st_size and hashlib.sha256(raw).hexdigest().upper() == pin["sha256"],
+                "qualified display helper identity differs")
         specification = importlib.util.spec_from_file_location("mir_linux_library_display_probe", path)
         require(specification is not None and specification.loader is not None,
                 "qualified display helper cannot be imported")
@@ -316,7 +325,7 @@ class SystemBackend:
         original = sys.dont_write_bytecode
         try:
             sys.dont_write_bytecode = True
-            specification.loader.exec_module(module)
+            exec(compile(raw, str(path), "exec"), module.__dict__)
         finally:
             sys.dont_write_bytecode = original
         return module
@@ -405,8 +414,8 @@ def _owned_directory(backend: SystemBackend, path: Path, uid: int, mode: int, la
     return (info.st_dev, info.st_ino)
 
 
-def _load_probe(backend: SystemBackend, path: Path):
-    probe = backend.load_probe(path)
+def _load_probe(backend: SystemBackend, plan: ValidatedPlan):
+    probe = backend.load_probe(plan.probe_display, plan.raw["probe_display"])
     for name in ("PINS", "VIEWER_RELATIVE", "display_binding", "viewer_binding",
                  "no_network_sockets", "listener_inode_present", "unix_listeners"):
         require(hasattr(probe, name), f"qualified display helper lacks {name}")
@@ -454,7 +463,7 @@ def _server_argv(plan: ValidatedPlan, probe) -> list[str]:
 def start_display(plan: ValidatedPlan, backend: Optional[SystemBackend] = None) -> DisplayState:
     """Start exactly the admitted display and publish a no-secret ready receipt."""
     backend = backend or SystemBackend()
-    probe = _load_probe(backend, plan.probe_display)
+    probe = _load_probe(backend, plan)
     uid: Optional[int] = None
     process = None
     identity: Optional[dict[str, int]] = None
