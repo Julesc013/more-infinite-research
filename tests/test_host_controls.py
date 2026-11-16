@@ -464,6 +464,10 @@ class HostControlsTests(unittest.TestCase):
         render_control = (ROOT / "tests/test_library_render_capture.py").read_text(encoding="utf-8")
         render_revisions = set(re.findall(r'^RETAINED_\d+_REVISION = "([0-9a-f]{40})"$', render_control, re.MULTILINE))
         self.assertTrue(render_revisions)
+        multiplayer_control = (ROOT / "tests/test_library_multiplayer_fixture.py").read_text(encoding="utf-8")
+        multiplayer_revisions = set(re.findall(
+            r'"([0-9a-f]{40}):tools/Invoke-Multiplayer(?:Fixture|Session)\.ps1"', multiplayer_control))
+        self.assertTrue(multiplayer_revisions)
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
@@ -473,6 +477,8 @@ class HostControlsTests(unittest.TestCase):
                 self.assertRegex(revision, r"^[0-9a-f]{40}$")
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
             for revision in render_revisions:
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
+            for revision in multiplayer_revisions:
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", workflow)
