@@ -12,6 +12,17 @@ superseded_by: []
 
 # Imported Library native input and lifecycle observation
 
+## Exact 5.0.17 F210 preparation
+
+The following new F210-only identities bind the unchanged Settings and export protocols to the current 2.1.24 distribution tuple. Earlier metadata, archive identities and evidence remain unchanged.
+
+| Case | Observer | Select as `info.json` | Exact engine and MIR |
+|---|---|---|---|
+| Settings search, then full native input/lifecycle | 0.3.14 | `info-input-517-settings-api-f210.json` | Base 2.1.24 / MIR 5.0.21017 |
+| Support exports | 0.4.8 | `info-exports-517-f210.json` | Base 2.1.24 / MIR 5.0.21017 |
+
+Both variants require exactly Base, MIR, active-mod observer0.1.0 and the selected observer. They retain fourteen EN/DE Settings observations, forty-eight queries, five joins, two resets, the full thirteen-click/two-server-command export lifecycle, strict responsive width/hierarchy checks and imported native/foreign-work assertions. Wrong Base patch, MIR/observer version or closure member refuses before fixture state is written. This is receiver/protocol preparation only; it does not recreate the protected F210 source, establish desktop/client behavior or provide native/stable acceptance.
+
 ## Exact 5.0.14 preparation
 
 The following new identities bind the same existing protocols to the published 5.0.14 beta. The 5.0.13 and earlier metadata and evidence keep their original identities.
