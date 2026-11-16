@@ -360,6 +360,20 @@ local function worker_owner(force)
   end, worker_modifiers)
 end
 
+local function preflight_worker_owners(forces)
+  local planned = {}
+  if not forces then return planned end
+  for _, force in pairs(forces) do
+    if valid_force(force) then
+      -- Keep an explicit row even when the current native shape has no
+      -- admissible owner. The importer must consume this one observed result,
+      -- rather than treating nil as a reason to read after its marker write.
+      planned[force.index] = {owner = worker_owner(force)}
+    end
+  end
+  return planned
+end
+
 local function native_owner_admitted(force, row)
   return valid_force(force) and cap_admission.admits_native_owner(function(name)
     return force.technologies and force.technologies[name] or nil
@@ -668,7 +682,8 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
     -- Preserve unavailable current investment before any cap reconciliation
     -- can rewrite the same native queue and drop its now-disabled head.
     cancel_unavailable_research(force)
-    local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
+    local owner_plan = valid_force(force) and selected_owners and selected_owners[force.index] or nil
+    local owner = owner_plan and owner_plan.owner or nil
     if current then
       reconcile_force(force, owned_disabled, owner, selected_owners ~= nil, nil,
         imported_reenabled and imported_reenabled[force.index], discovery_observed)
@@ -801,10 +816,6 @@ local function import_legacy_caps_on_configuration(event)
 
   local current = existing_state()
   if current and current.legacy_caps_checked == true then return nil end
-  current = ensure_state()
-  -- Preserve this marker even when no candidate is currently admitted or the
-  -- old bucket is malformed. A reused force index must never re-open import.
-  current.legacy_caps_checked = true
 
   -- A version label alone grants no per-row ownership. Retain ordinary tuple
   -- admission before the exceptional predecessor reader, and
@@ -812,19 +823,28 @@ local function import_legacy_caps_on_configuration(event)
   -- schema. The decoder still requires the exact per-row provenance/state.
   local direct_f200_hop = type(legacy_bucket) == "table"
     and legacy_bucket.policy_version == 3 and direct_f200_to_f210_transition(event)
-  -- The one-time marker above keeps this exceptional construction out of
+  -- The one-time marker below keeps this exceptional construction out of
   -- ordinary control parsing, cold loads and subsequent configurations.
   local f200_allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
 
-  local selected_owners, imported_reenabled = {}, {}
-  if not game or not game.forces then return selected_owners end
+  -- A failed native property read makes the exact worker owner unknown. Read
+  -- every force before allocating caps state or consuming the one-time legacy
+  -- marker, so a caught configuration error cannot suppress a later import.
+  local owner_plan = preflight_worker_owners(game and game.forces)
+  current = ensure_state()
+  -- Preserve this marker even when no candidate is currently admitted or the
+  -- old bucket is malformed. A reused force index must never re-open import.
+  current.legacy_caps_checked = true
+
+  local imported_reenabled = {}
+  if not game or not game.forces then return owner_plan end
   for _, force in pairs(game.forces) do
     if valid_force(force) then
       -- Revalidate the native tail even if the new worker cap is unlimited;
       -- importing its historical restoration right still depends on that
       -- exact current owner.
-      local owner = worker_owner(force)
-      selected_owners[force.index] = owner
+      local plan = owner_plan[force.index]
+      local owner = plan and plan.owner or nil
       local _, admitted = full_limits_for(force, true, owner, true)
       local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner)
       -- Public policy-v1 used a distinct, boolean component ledger.  Its
@@ -844,7 +864,7 @@ local function import_legacy_caps_on_configuration(event)
       end
     end
   end
-  return selected_owners, imported_reenabled
+  return owner_plan, imported_reenabled
 end
 
 local function event_force(event)

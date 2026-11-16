@@ -1228,6 +1228,62 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "superseded worker tail gained restoration rights")
         ''')
 
+    def test_worker_owner_preflight_failure_preserves_legacy_import_marker_and_queue(self):
+        self.lua.execute('''
+          local function run(fault)
+            local six = worker("worker-robots-speed-6")
+            local technologies = {[six.name] = six}
+            if fault == "lookup" then
+              setmetatable(technologies, {__index = function(_, name)
+                if name == "worker-robots-speed-7" then error("foreign lookup failure") end
+                return nil
+              end})
+            else
+              local seven = worker("worker-robots-speed-7")
+              seven.prototype.max_level = nil
+              setmetatable(seven.prototype, {__index = function(_, key)
+                if key == "max_level" then error("foreign property read failure") end
+                return nil
+              end})
+              technologies[seven.name] = seven
+            end
+            local f = modern_queued_force(1, technologies, {six}, six, .42, false)
+            local current = {schema = 1, owned_disabled = {}, preserved = {keep = true}}
+            boot({[1] = f}, legacy({six.name}, {1}), current)
+            local ok = pcall(lifecycle.on_configuration_changed)
+            assert(not ok, "worker-owner failure was treated as an absent owner")
+            assert(storage.mir_caps == current and current.legacy_caps_checked == nil
+              and current.preserved.keep and next(current.owned_disabled) == nil,
+              "worker-owner preflight consumed the legacy import marker")
+            assert(f.queue_writes == 0 and f.current_research == six and f.research_progress == .42
+              and #f.research_queue == 1 and f.research_queue[1] == six,
+              "worker-owner preflight rewrote the native queue")
+          end
+          run("lookup")
+          run("admission")
+        ''')
+
+    def test_worker_owner_preflight_consumes_an_absent_owner_without_a_second_lookup(self):
+        self.lua.execute('''
+          local reads = {}
+          local technologies = setmetatable({}, {__index = function(_, name)
+            if name == "worker-robots-speed-7" or name == "worker-robots-speed-6"
+                or name == "worker-robots-speed-10" then
+              reads[name] = (reads[name] or 0) + 1
+              if reads[name] > 1 then error("worker owner was re-read after preflight") end
+            end
+            return nil
+          end})
+          local f = force(1, technologies)
+          boot({[1] = f}, legacy({}, {}), nil)
+          lifecycle.on_configuration_changed()
+          assert(storage.mir_caps.legacy_caps_checked == true and next(storage.mir_caps.owned_disabled) == nil,
+            "absent worker owner did not preserve ordinary one-shot import behavior")
+          assert(reads["worker-robots-speed-7"] == 1 and reads["worker-robots-speed-6"] == 1
+            and reads["worker-robots-speed-10"] == 1,
+            "legacy import did not consume the recorded absent worker owner")
+        ''')
+
     def test_se_tail_ten_cap_survives_ordinary_event_without_claiming_foreign_ownership(self):
         # The pre-fix 6/7-only selection is retained in PR review evidence.
         # Keep this host control self-contained so shallow CI can exercise the
