@@ -4255,6 +4255,151 @@ throw 'unexpected fake display mode'
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_private_display_continuity_normalizes_verified_tuple_bindings_and_retains_probe_failure(self):
+        """Run the Session's actual no-X continuity child against JSON receipt shapes."""
+        old_source = subprocess.run(
+            ["git", "show", "c528c3990ab3479760537cc7208bd69423f7d4fd:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          foreach($name in @('Assert-Session','Get-SessionHash','Assert-PrivateDisplayContinuity')){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "continuity definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $root -Force
+          $python=$env:MIR_TEST_PYTHON;$pythonHash=(Get-FileHash -LiteralPath $python -Algorithm SHA256).Hash.ToUpperInvariant()
+          $realPython=(& $python -c 'import os,sys;print(os.path.realpath(sys.executable))').Trim()
+          if([string]::IsNullOrWhiteSpace($realPython)){throw 'actual Python path is absent'}
+          $pythonJson=$realPython|ConvertTo-Json -Compress;$pythonHashJson=$pythonHash|ConvertTo-Json -Compress
+          $authority=Join-Path $root 'authority';[IO.File]::WriteAllText($authority,'test authority',$encoding)
+          $env:MIR_TEST_AUTHORITY=$authority
+          $probe=Join-Path $root 'probe.py'
+          $probeTemplate=@'
+import builtins
+import io
+import os
+import stat
+import sys
+from pathlib import Path
+
+PINS = {__PYTHON__: __PYTHON_HASH__}
+_open = builtins.open
+_readlink = os.readlink
+_lstat = os.lstat
+
+class ReceiptStat:
+    st_mode = stat.S_IFREG | 0o600
+    st_dev = 501
+    st_ino = 502
+
+def fake_open(path, *args, **kwargs):
+    if str(path) == '/proc/31337/stat':
+        tail = ['S', '0', '0', '4242'] + ['0'] * 15 + ['999']
+        return io.StringIO('31337 (mir display) ' + ' '.join(tail))
+    return _open(path, *args, **kwargs)
+
+def fake_readlink(path):
+    if str(path) == '/proc/31337/exe':
+        return sys.executable
+    return _readlink(path)
+
+def fake_lstat(path):
+    if os.path.abspath(str(path)) == os.path.abspath(os.environ['MIR_TEST_AUTHORITY']):
+        return ReceiptStat()
+    return _lstat(path)
+
+builtins.open = fake_open
+os.readlink = fake_readlink
+os.lstat = fake_lstat
+
+def display_binding(server, socket, lock):
+    value = {
+        'socket_device_inode': [40, 10],
+        'lock_device_inode': [40, 11],
+        'uid': 1000,
+        'pid': server.pid,
+        'listeners': [('/tmp/.X11-unix/X193', '601'), ('@/tmp/.X11-unix/X193', '602')],
+    }
+    if os.environ.get('MIR_TEST_CONTINUITY_MODE') == 'mismatch':
+        value['uid'] = 1001
+    if os.environ.get('MIR_TEST_CONTINUITY_MODE') == 'unsupported':
+        value['listeners'] = {'not-a-json-binding'}
+    return value
+
+def viewer_binding(server, path):
+    return {
+        'device_inode': [40, 12],
+        'uid': 1000,
+        'mode': '0600',
+        'listener': ('runtime/viewer.sock', '603'),
+        'pid': server.pid,
+        'working_directory': '/owned/role-root',
+    }
+
+def no_network_sockets(pid):
+    if pid != 31337:
+        raise RuntimeError('unexpected display PID')
+'@
+          [IO.File]::WriteAllText($probe,$probeTemplate.Replace('__PYTHON__',$pythonJson).Replace('__PYTHON_HASH__',$pythonHashJson),$encoding)
+          $ready=Join-Path $root 'display-ready.json'
+          $receipt=[ordered]@{
+            display=':193'
+            display_identity=[ordered]@{pid=[Int64]31337;session_id=[Int64]4242;start_ticks=[Int64]999}
+            display_binding=[ordered]@{socket_device_inode=@(40,10);lock_device_inode=@(40,11);uid=[Int64]1000;pid=[Int64]31337;listeners=@(@('/tmp/.X11-unix/X193','601'),@('@/tmp/.X11-unix/X193','602'))}
+            viewer_binding=[ordered]@{device_inode=@(40,12);uid=[Int64]1000;mode='0600';listener=@('runtime/viewer.sock','603');pid=[Int64]31337;working_directory='/owned/role-root'}
+            authority_device_inode=@(501,502)
+          }
+          if($env:MIR_TEST_MODE-ceq'wrong-type'){$receipt.display_binding.uid=$true}
+          [IO.File]::WriteAllText($ready,($receipt|ConvertTo-Json -Depth 10 -Compress),$encoding)
+          $script:linuxPrivateDisplays=[ordered]@{python=$python;probe_display=$probe;probe_display_sha256=(Get-SessionHash $probe)}
+          $display=[pscustomobject]@{ready=$receipt;role=[pscustomobject]@{ready=$ready;authority=$authority}}
+          $env:MIR_TEST_CONTINUITY_MODE=$env:MIR_TEST_MODE
+          $failure=$null;try{Assert-PrivateDisplayContinuity $display}catch{$failure=$_.Exception.Message}
+          switch($env:MIR_TEST_EXPECT){
+            'old-refusal' {
+              if($failure-notmatch'private display continuity probe refused$'){throw "old tuple/list mismatch was not reproduced:$failure"}
+            }
+            'pass' {
+              if($null-ne$failure){throw "normalized tuple/list binding was refused:$failure"}
+            }
+            'mismatch' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: display binding differs'){throw "binding mismatch lost its bounded Python failure:$failure"}
+            }
+            'unsupported' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: binding JSON value differs'){throw "unsupported binding shape was admitted or obscured:$failure"}
+            }
+            'wrong-type' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: display binding differs'){throw "numeric binding type substitution was admitted:$failure"}
+            }
+            default {throw 'unknown continuity expectation'}
+          }
+          'PASS actual continuity Python tuple/list normalization and refusal evidence'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-display-continuity-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-c528.ps1"
+            old_session.write_bytes(old_source.stdout)
+            cases = (
+                ("old", old_session, "valid", "old-refusal"),
+                ("current", SESSION, "valid", "pass"),
+                ("mismatch", SESSION, "mismatch", "mismatch"),
+                ("unsupported", SESSION, "unsupported", "unsupported"),
+                ("wrong-type", SESSION, "wrong-type", "wrong-type"),
+            )
+            for name, source, mode, expected in cases:
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_PYTHON": sys.executable, "MIR_TEST_MODE": mode, "MIR_TEST_EXPECT": expected},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
     def test_composed_session_entry_accepts_only_the_pinned_canonical_display_cli_outside_its_runtime_checkout(self):
         """Exercise the exact session assignment before any display or game start."""
         old_source = subprocess.run(

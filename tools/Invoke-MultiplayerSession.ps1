@@ -293,7 +293,21 @@ viewer=module.viewer_binding(server,module.Path(os.path.join(os.path.dirname(aut
 module.no_network_sockets(pid)
 info=os.lstat(authority)
 if not(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode)==0o600 and [info.st_dev,info.st_ino]==ready['authority_device_inode']): raise RuntimeError('authority identity differs')
-if display!=ready['display_binding'] or viewer!=ready['viewer_binding']: raise RuntimeError('display binding differs')
+def json_binding(value):
+  if value is None or type(value) in (str,int,bool): return value
+  if type(value) in (list,tuple): return [json_binding(item) for item in value]
+  if type(value) is dict:
+    if any(type(key) is not str for key in value): raise RuntimeError('binding JSON key differs')
+    return {key:json_binding(item) for key,item in value.items()}
+  raise RuntimeError('binding JSON value differs')
+def same_json(left,right):
+  if type(left) is not type(right): return False
+  if type(left) is dict:
+    return left.keys()==right.keys() and all(same_json(left[key],right[key]) for key in left)
+  if type(left) is list:
+    return len(left)==len(right) and all(same_json(a,b) for a,b in zip(left,right))
+  return left==right
+if not same_json(json_binding(display),ready['display_binding']) or not same_json(json_binding(viewer),ready['viewer_binding']): raise RuntimeError('display binding differs')
 print(json.dumps({'status':'verified','ready_sha256':hashlib.sha256(ready_raw).hexdigest().upper(),'identity':observed},sort_keys=True))
 '@
   $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$linuxPrivateDisplays.python;$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
@@ -302,7 +316,11 @@ print(json.dumps({'status':'verified','ready_sha256':hashlib.sha256(ready_raw).h
   Assert-Session ($process.Start()) 'private display continuity probe did not start'
   try{
     $stdout=$process.StandardOutput.ReadToEnd();$stderr=$process.StandardError.ReadToEnd();$process.WaitForExit()
-    Assert-Session ($process.ExitCode-eq0-and[Text.UTF8Encoding]::new($false).GetByteCount($stdout)-le32KB-and[Text.UTF8Encoding]::new($false).GetByteCount($stderr)-le8KB) 'private display continuity probe refused'
+    $utf8=[Text.UTF8Encoding]::new($false);$stdoutBytes=$utf8.GetByteCount($stdout);$stderrBytes=$utf8.GetByteCount($stderr)
+    if($process.ExitCode-ne0-or$stdoutBytes-gt32KB-or$stderrBytes-gt8KB){
+      $detail=if($stderrBytes-gt8KB){'stderr exceeds 8192 bytes'}elseif([string]::IsNullOrWhiteSpace($stderr)){'(none)'}else{$stderr.Trim()}
+      Assert-Session $false ('private display continuity probe refused: exit='+$process.ExitCode+'; stdout_bytes='+$stdoutBytes+'; stderr_bytes='+$stderrBytes+'; stderr='+$detail)
+    }
     $value=$stdout.Trim()|ConvertFrom-Json -AsHashtable
     Assert-Session ($value-is[Collections.IDictionary]-and$value.Keys.Count-eq3-and$value.status-ceq'verified'-and$value.ready_sha256-ceq(Get-SessionHash ([string]$Display.role.ready))-and$value.identity-is[Collections.IDictionary]-and$value.identity.Keys.Count-eq3) 'private display continuity receipt differs'
     foreach($name in @('pid','start_ticks','session_id')){Assert-Session ($value.identity[$name]-is[Int64]-and$value.identity[$name]-eq[Int64]$Display.ready.display_identity[$name]) 'private display continuity identity differs'}
