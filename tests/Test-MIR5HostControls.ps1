@@ -207,6 +207,7 @@ $controls = @(
   [ordered]@{path='tests/test_runtime_benchmark_analysis.py';lua=$false},
   [ordered]@{path='tests/test_pack.py';lua=$false},
   [ordered]@{path='tests/test_startup_timings.py';lua=$false},
+  [ordered]@{path='tests/test_whole_product_heavy_f210_data_admission_evidence.py';lua=$false},
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
   [ordered]@{path='tests/test_input_filesystem_boundaries.py';lua=$false},
   [ordered]@{path='tests/test_linux_resource_platform.py';lua=$false},
