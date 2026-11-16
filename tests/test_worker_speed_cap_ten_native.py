@@ -83,7 +83,7 @@ local stages = {
   ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
   ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
-  ["current-successor17"]={fixture="0.10.0",mir="5.0.20017",cap=10}
+  ["current-successor17"]={fixture="0.11.0",mir="5.0.20017",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -278,7 +278,7 @@ end
                                         (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
                                         (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016"),
                                         (CURRENT_OBSERVE, "0.9.0", "5.0.20016"),
-                                        (CURRENT_SUCCESSOR17, "0.10.0", "5.0.20017")):
+                                        (CURRENT_SUCCESSOR17, "0.11.0", "5.0.20017")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -379,21 +379,37 @@ local technology
 ''' + helper_source + r'''
 
 return function(callback_disables_gate)
-  local writes, frames, boundaries = {}, {}, {}
+  local writes, frames, boundaries, setter_effects = {}, {}, {}, {}
   local current_boundary = "before-admin"
   local function snapshot(values)
     return {level=values.level, researched=values.researched, enabled=values.enabled,
       visible_when_disabled=values.visible_when_disabled}
   end
   local function target(role)
-    local values = {level=1, researched=false, enabled=false, visible_when_disabled=true}
+    local values = {level=10, researched=true, enabled=false, visible_when_disabled=true,
+      initial_level=10, pending_level_write=false}
     local proxy = {}
     setmetatable(proxy, {
       __index = function(_, key) return values[key] end,
       __newindex = function(_, key, value)
-        values[key] = value
+        if key == "researched" and value == false then
+          values.researched = false
+            -- Model only the retained r01 observed level->researched=false outcome;
+            -- this is not a general LuaTechnology setter rule.
+          if values.pending_level_write then values.level = values.initial_level end
+          values.pending_level_write = false
+          setter_effects[#setter_effects + 1] = {role=role, effect="researched-false-restores-initial-level",
+            level=values.level}
+        elseif key == "level" then
+            -- The 2.0.77 SDK documents that a level write reenables the technology.
+          values.level, values.enabled, values.pending_level_write = value, true, true
+          setter_effects[#setter_effects + 1] = {role=role, effect="level-write-reenables",
+            level=values.level, enabled=values.enabled}
+        else
+          values[key] = value
+        end
         writes[#writes + 1] = {role=role, field=key, value=value, boundary=current_boundary}
-        if callback_disables_gate and (key == "level" or key == "researched") then
+        if callback_disables_gate and key == "level" then
           values.enabled = false
           values.visible_when_disabled = true
           writes[#writes + 1] = {role=role, field="callback-disable", value=false,
@@ -440,7 +456,7 @@ return function(callback_disables_gate)
     end,
   }
   apply_current_admin_sequence(player, foreign, earned, "proxy", hooks)
-  return {writes=writes, frames=frames, boundaries=boundaries}
+  return {writes=writes, frames=frames, boundaries=boundaries, setter_effects=setter_effects}
 end
 ''')
         return runner(callback_disables_gate)
@@ -449,7 +465,7 @@ end
     def _lua_rows(table):
         return [table[index] for index in range(1, len(table) + 1)]
 
-    def test_current_admin_target_setters_are_sequential_and_restore_gates_after_callbacks(self):
+    def test_current_admin_target_setters_model_observed_reversal_and_documented_reenable(self):
         helper = self._current_admin_helper_source()
         actual = self._run_current_admin_proxy(helper, True)
         writes = self._lua_rows(actual["writes"])
@@ -458,7 +474,7 @@ end
         for role, level in expected_levels.items():
             with self.subTest(role=role):
                 target_writes = [row for row in writes if row["role"] == role and row["field"] in target_fields]
-                self.assertEqual([("level", level), ("researched", False), ("enabled", True),
+                self.assertEqual([("researched", False), ("level", level), ("enabled", True),
                                   ("visible_when_disabled", False)],
                                  [(row["field"], row["value"]) for row in target_writes])
                 for row in target_writes:
@@ -467,11 +483,11 @@ end
         ordered_writes = [(row["role"], row["field"]) for row in writes
                           if row["field"] in target_fields | {"research_queue", "research_progress"}]
         self.assertEqual([
-            ("player", "level"), ("player", "researched"), ("player", "enabled"), ("player", "visible_when_disabled"),
+            ("player", "researched"), ("player", "level"), ("player", "enabled"), ("player", "visible_when_disabled"),
             ("player", "research_queue"), ("player", "research_progress"),
-            ("foreign", "level"), ("foreign", "researched"), ("foreign", "enabled"), ("foreign", "visible_when_disabled"),
+            ("foreign", "researched"), ("foreign", "level"), ("foreign", "enabled"), ("foreign", "visible_when_disabled"),
             ("foreign", "research_queue"), ("foreign", "research_progress"),
-            ("earned", "level"), ("earned", "researched"), ("earned", "enabled"), ("earned", "visible_when_disabled"),
+            ("earned", "researched"), ("earned", "level"), ("earned", "enabled"), ("earned", "visible_when_disabled"),
             ("earned", "research_queue"),
         ], ordered_writes)
         self.assertEqual([
@@ -489,15 +505,40 @@ end
                                  (frames[action][role]["level"], frames[action][role]["researched"],
                                   frames[action][role]["enabled"], frames[action][role]["visible_when_disabled"]))
 
+        effects = self._lua_rows(actual["setter_effects"])
+        self.assertEqual([
+            ("player", "researched-false-restores-initial-level", 10),
+            ("player", "level-write-reenables", 10),
+            ("foreign", "researched-false-restores-initial-level", 10),
+            ("foreign", "level-write-reenables", 11),
+            ("earned", "researched-false-restores-initial-level", 10),
+            ("earned", "level-write-reenables", 13),
+        ], [(row["role"], row["effect"], row["level"]) for row in effects])
+        self.assertTrue(all(row["enabled"] is True for row in effects if row["effect"] == "level-write-reenables"))
+
+        level_first_mutant = helper
         flags_first_mutant = helper
         for level in ("10", "11", "EARNED_LEVEL"):
-            original = (f"owner.level = {level}\n  owner.researched = false\n  owner.enabled = true\n"
+            original = (f"owner.researched = false\n  owner.level = {level}\n  owner.enabled = true\n"
                         "  owner.visible_when_disabled = false")
+            level_first_mutant = level_first_mutant.replace(
+                original,
+                f"owner.level = {level}\n  owner.researched = false\n  owner.enabled = true\n"
+                "  owner.visible_when_disabled = false",
+            )
             flags_first_mutant = flags_first_mutant.replace(
                 original,
-                f"owner.enabled = true\n  owner.visible_when_disabled = false\n  owner.level = {level}\n  owner.researched = false",
+                f"owner.enabled = true\n  owner.visible_when_disabled = false\n  owner.researched = false\n  owner.level = {level}",
             )
+        self.assertNotEqual(helper, level_first_mutant)
         self.assertNotEqual(helper, flags_first_mutant)
+        level_first_frames = {row["action"]: row for row in self._lua_rows(
+            self._run_current_admin_proxy(level_first_mutant, True)["frames"])}
+        for action, role in (("foreign-target", "foreign"), ("earned-target", "earned")):
+            with self.subTest(mutant="level-first", frame=action):
+                self.assertEqual((10, False, True, False),
+                                 (level_first_frames[action][role]["level"], level_first_frames[action][role]["researched"],
+                                  level_first_frames[action][role]["enabled"], level_first_frames[action][role]["visible_when_disabled"]))
         flags_frames = {row["action"]: row for row in self._lua_rows(
             self._run_current_admin_proxy(flags_first_mutant, True)["frames"])}
         for action, role in (("player-target", "player"), ("foreign-target", "foreign"),
@@ -617,7 +658,7 @@ end
                           "current-pre-work", "current-complete", "current-cold"}, set(markers))
         for phase, marker in markers.items():
             with self.subTest(phase=phase):
-                self.assertEqual(("current-successor17", "0.10.0", "5.0.20017"),
+                self.assertEqual(("current-successor17", "0.11.0", "5.0.20017"),
                                  (marker["stage"], marker["fixture_stage"], marker["mir_version"]))
         self.assertEqual("candidate17-reset-event-enforced", markers["current-post-reset"]["outcome"])
         for phase in (markers["current-complete"], markers["current-cold"]):

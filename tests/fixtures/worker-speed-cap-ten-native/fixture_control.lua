@@ -36,7 +36,7 @@ local STAGES = {
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
   ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
-  ["current-successor17"] = {version = "0.10.0", cap = 10, mir = "5.0.20017"},
+  ["current-successor17"] = {version = "0.11.0", cap = 10, mir = "5.0.20017"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -762,8 +762,8 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("player-target")
   local owner = technology(player, WORKER)
-  owner.level = 10
   owner.researched = false
+  owner.level = 10
   owner.enabled = true
   owner.visible_when_disabled = false
   after("player-target")
@@ -776,8 +776,8 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("foreign-target")
   owner = technology(foreign, WORKER)
-  owner.level = 11
   owner.researched = false
+  owner.level = 11
   owner.enabled = true
   owner.visible_when_disabled = false
   after("foreign-target")
@@ -790,8 +790,8 @@ local function apply_current_admin_sequence(player, foreign, earned, label, hook
 
   before("earned-target")
   owner = technology(earned, WORKER)
-  owner.level = EARNED_LEVEL
   owner.researched = false
+  owner.level = EARNED_LEVEL
   owner.enabled = true
   owner.visible_when_disabled = false
   after("earned-target")
