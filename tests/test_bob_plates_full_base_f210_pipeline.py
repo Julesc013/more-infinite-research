@@ -21,10 +21,10 @@ PUBLISHED_RESULT_SHA256 = "2AAF8E6831993B6303A30E5EE32026B6C090C77C3D6EB8D0653B3
 PUBLISHED_RAW_SHA256 = "80462037B1982AF008B845D1389045C69E8D0BF58C0D7BC7A287BD4B4FC4024F"
 B6_SHA256 = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
 
-# Reuse the sparse Bob Plates conversion/contract helpers rather than creating
-# a parallel Lua table adapter or a second public-row comparison convention.
+# Keep the independent Bob Plates public-row contract local to its donor.
 sys.path.insert(0, str(ROOT / "tests"))
-from test_bob_plates_f210_pipeline import _lua_value, _plain, _technology_contract  # noqa: E402
+from lua_table_values import from_lua as _plain, to_lua as _lua_value  # noqa: E402
+from test_bob_plates_f210_pipeline import _technology_contract  # noqa: E402
 
 
 def _sha256(path: Path) -> str:
@@ -65,7 +65,7 @@ class BobPlatesFullBaseF210PipelineTests(unittest.TestCase):
         self._lua_target(lua)
         lua.globals().captured_raw = _lua_value(lua, deepcopy(raw_override or self.context["raw"]))
         lua.globals().active_mods = _lua_value(lua, deepcopy(mods_override or self.selection))
-        return lua.execute(r'''
+        result = lua.execute(r'''
           mods, script, helpers, log = active_mods, nil, {}, function() end
           data = {raw = captured_raw}
           setting_rows, emitted, technology_writes = {}, {}, 0
@@ -88,6 +88,7 @@ class BobPlatesFullBaseF210PipelineTests(unittest.TestCase):
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
           return profile, emitted, technology_writes
         ''')
+        return lua, *result
 
     def test_upstream_projection_and_b6_rows_are_independent_and_exactly_bound(self):
         self.assertEqual("q005", self.context["scope"]["case"])
@@ -125,8 +126,8 @@ class BobPlatesFullBaseF210PipelineTests(unittest.TestCase):
         self.assertEqual("space-age", self.selector_result(no_core_owner))
 
     def test_q005_raw_preflight_and_full_pipeline_render_all_31_independent_b6_rows(self):
-        profile, emitted, technology_writes = self.stage()
-        emitted = _plain(emitted)
+        lua, profile, emitted, technology_writes = self.stage()
+        emitted = _plain(lua, emitted)
         expected = self.context["published_expected_rows"]
         restored = {name: emitted[name] for name in expected if name in emitted}
         self.assertEqual("base", profile)
