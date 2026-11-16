@@ -662,6 +662,132 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(not pcall(history.on_load) and writes==0 and storage.mir_worker_storage_route==state)
         ''')
 
+    def test_public_prepare_does_not_swallow_failures_after_native_writes(self):
+        for point in ("first-write", "queue", "later-force", "work-price"):
+            with self.subTest(point=point):
+                self.setUp()
+                self.lua.globals().failure_point = point
+                self.lua.execute(r'''
+                  seed();local original={7,3,6}
+                  assert(player.worker_robots_storage_bonus==original[1])
+                  assert(uninvested.worker_robots_storage_bonus==original[2])
+                  assert(suspended.worker_robots_storage_bonus==original[3])
+                  local previous
+                  if failure_point=="later-force"then
+                    previous={schema=2,kind="route",current={kind="default"}}
+                    storage.mir_worker_storage_route=previous
+                  end
+                  if failure_point=="queue"then
+                    local mt=getmetatable(player);local write=mt.__newindex
+                    mt.__newindex=function(o,k,v)
+                      write(o,k,v)
+                      if k=="research_queue"then error("injected after native queue assignment")end
+                    end
+                  else
+                    local f=failure_point=="later-force"and suspended or player
+                    local holder=f.technologies[ID];local mt=getmetatable(holder)
+                    local read,write=mt.__index,mt.__newindex
+                    if failure_point=="work-price"then
+                      mt.__index=function(o,k)
+                        if k=="research_unit_count"and read(o,"level")>4 then return 1 end
+                        return read(o,k)
+                      end
+                    else
+                      mt.__newindex=function(o,k,v)
+                        write(o,k,v)
+                        if k=="level"then error("injected after native holder write")end
+                      end
+                    end
+                  end
+                  local ok,message=pcall(history.command,{parameter="prepare"},nil)
+                  assert(not ok,"public command swallowed a failure after native writes")
+                  assert(tostring(message):find("reload the original",1,true),tostring(message))
+                  local cause=failure_point=="work-price"and"native transferred work price differs"
+                    or failure_point=="queue"and"injected after native queue assignment"
+                    or "injected after native holder write"
+                  assert(tostring(message):find(cause,1,true),tostring(message))
+                  assert(writes>0 and storage.mir_worker_storage_route==previous)
+                  if previous then assert(previous.schema==2 and previous.kind=="route"and previous.current.kind=="default")end
+                  -- Failure containment is not rollback: retain the actual
+                  -- partial frame, and do not manufacture a committed history.
+                  if failure_point=="first-write"then
+                    assert(writes==1 and player.technologies[CANONICAL].level==8)
+                    assert(player.technologies[ID].level==8 and player.worker_robots_storage_bonus==11)
+                  elseif failure_point=="later-force"then
+                    assert(player.technologies[CANONICAL].level==4 and player.technologies[ID].level==8)
+                    assert(suspended.technologies[CANONICAL].level==7 and suspended.technologies[ID].level==7)
+                    assert(suspended.worker_robots_storage_bonus==9)
+                  else
+                    assert(player.technologies[CANONICAL].level==4 and player.technologies[ID].level==8)
+                    assert(player.research_queue[1].name==ID and player.worker_robots_storage_bonus==7)
+                  end
+                  assert(#messages==0,"post-write failure was reduced to an ordinary reply")
+                  -- If a host caller catches the fatal error, another prepare
+                  -- still refuses the invested holder without adding writes.
+                  local before=writes
+                  assert(pcall(history.command,{parameter="prepare"},nil))
+                  assert(writes==before and #messages==1 and messages[1]:find("MIR-WORKER-HISTORY",1,true))
+                ''')
+
+    def test_public_resume_does_not_swallow_failure_after_queue_assignment(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27
+          assert(history.prepare(nil));writes=0
+          local state=storage.mir_worker_storage_route
+          local mt=getmetatable(suspended);local write=mt.__newindex
+          mt.__newindex=function(o,k,v)
+            write(o,k,v)
+            if k=="research_queue"then error("injected after resume queue assignment")end
+          end
+          local ok,message=pcall(history.command,{parameter="resume suspended"},nil)
+          assert(not ok and tostring(message):find("reload the original",1,true),tostring(message))
+          assert(tostring(message):find("injected after resume queue assignment",1,true),tostring(message))
+          assert(writes==1 and storage.mir_worker_storage_route==state)
+          assert(suspended.research_queue[1].name==OTHER and suspended.research_queue[2].name==ID)
+          assert(suspended.research_progress==.42 and suspended.worker_robots_storage_bonus==6)
+          assert(state.forces[3].pending and #messages==0)
+          -- assign_queue must still restore its force-local event gate.
+          local read=mt.__index
+          mt.__index=function(o,k)if k=="research_progress"then return nil end;return read(o,k)end
+          ok,message=pcall(history.on_research_event,{research=suspended.technologies[ID]})
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true))
+        ''')
+
+    def test_public_recovery_preflight_refusal_is_readonly_and_can_be_corrected(self):
+        self.lua.execute(r'''
+          seed();creators[CANONICAL]="foreign-infinite"
+          local queue=player.research_queue
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(writes==0 and storage.mir_worker_storage_route==nil and player.research_queue==queue)
+          assert(player.worker_robots_storage_bonus==7 and suspended.worker_robots_storage_bonus==6)
+          assert(#messages==1 and messages[1]:find("MIR-WORKER-HISTORY",1,true))
+          creators[CANONICAL]="more-infinite-research"
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(storage.mir_worker_storage_route.kind=="prepared")
+          assert(player.worker_robots_storage_bonus==7 and suspended.worker_robots_storage_bonus==6)
+          local before=writes
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(writes==before and #messages==3 and messages[3]:find("Already prepared",1,true))
+        ''')
+
+    def test_public_resume_preflight_refusal_and_ordinary_success_preserve_work(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27
+          assert(history.prepare(nil));writes=0
+          local holder=suspended.technologies[ID]
+          holder.prerequisites.foundation.researched=false
+          assert(pcall(history.command,{parameter="resume suspended"},nil))
+          assert(writes==0 and #suspended.research_queue==1 and suspended.research_progress==.42)
+          assert(#messages==1 and messages[1]:find("prerequisite",1,true))
+          holder.prerequisites.foundation.researched=true
+          assert(pcall(history.command,{parameter="resume suspended"},nil))
+          assert(suspended.research_queue[1].name==OTHER and suspended.research_queue[2].name==ID)
+          assert(suspended.research_progress==.42 and holder.saved_progress==.27)
+          assert(suspended.worker_robots_storage_bonus==6 and #messages==2)
+        ''')
+
     def test_multiple_queue_occurrences_authorize_only_their_actual_count(self):
         self.lua.execute(r'''
           seed();player.research_queue={CANONICAL,CANONICAL,OTHER};player.research_progress=.375
@@ -2261,6 +2387,93 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   assert(writes==0 and same(before,all_frames()))
                   if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
                   else assert(not ok and storage[OWNER_KEY]==nil)end
+                ''')
+
+    def test_unrecorded_mod_selection_refusal_reports_only_the_rejecting_tuple_without_writes(self):
+        for target in ("f200", "f210"):
+            for opponent in ("added", "removed", "updated", "active-proxy", "false-zero", "malformed"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua=self.world(target);lua.globals().opponent=opponent
+                    lua.execute(r'''
+                      for _,f in pairs(game.forces)do local c=f.technologies[CANONICAL]
+                        c.level=4;c.researched=false;c.saved_progress=0;f.research_queue={};f.research_progress=0
+                      end
+                      local name="sage-\1"..string.rep("x",100)
+                      local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                      script.active_mods["unrelated-unchanged"]="7.0"
+                      event.mod_changes["unrelated-unchanged"]={old_version="7.0",new_version="7.0"}
+                      if opponent=="added"then
+                        event.mod_changes[name]={new_version="new\2"};script.active_mods[name]="new\2"
+                      elseif opponent=="removed"then
+                        event.mod_changes[name]={old_version="old\3"};script.active_mods[name]=nil
+                      elseif opponent=="updated" or opponent=="active-proxy"then
+                        event.mod_changes[name]={old_version="old\4",new_version="new\5"};script.active_mods[name]="new\5"
+                      elseif opponent=="false-zero"then
+                        event.mod_changes[name]={old_version=false,new_version=0};script.active_mods[name]=false
+                      else
+                        event.mod_changes[name]=setmetatable({}, {__index=function()error("rejecting row metamethod invoked")end})
+                        script.active_mods[name]="active\6"
+                      end
+                      if opponent=="active-proxy"then
+                        local original=script.active_mods
+                        script.active_mods=setmetatable({}, {__index=function(_,key)return original[key]end})
+                      end
+                      local before=all_frames();writes=0
+                      local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                      assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
+                      assert(not tostring(message):find("rejecting row metamethod invoked",1,true))
+                      assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                      assert(message:find("previous_mir="..event.mod_changes["more-infinite-research"].old_version,1,true))
+                      assert(message:find("new_mir="..script.active_mods["more-infinite-research"],1,true))
+                      assert(message:find("startup_changed=false",1,true) and message:find("saved_route=absent",1,true)
+                        and message:find("current_route=default",1,true))
+                      local escaped_name="sage-\\x01"..string.rep("x",90)
+                      assert(message:find("rejecting_mod_name="..escaped_name,1,true))
+                      assert(not message:find("unrelated-unchanged",1,true))
+                      if opponent=="added"then
+                        assert(message:find("rejecting_old_version=absent",1,true))
+                        assert(message:find("rejecting_new_version=new\\x02",1,true))
+                        assert(message:find("rejecting_active_version=new\\x02",1,true))
+                      elseif opponent=="removed"then
+                        assert(message:find("rejecting_old_version=old\\x03",1,true))
+                        assert(message:find("rejecting_new_version=absent",1,true))
+                        assert(message:find("rejecting_active_version=absent",1,true))
+                      elseif opponent=="updated" or opponent=="active-proxy"then
+                        assert(message:find("rejecting_old_version=old\\x04",1,true))
+                        assert(message:find("rejecting_new_version=new\\x05",1,true))
+                        assert(message:find("rejecting_active_version=new\\x05",1,true))
+                      elseif opponent=="false-zero"then
+                        assert(message:find("rejecting_old_version=false",1,true))
+                        assert(message:find("rejecting_new_version=0",1,true))
+                        assert(message:find("rejecting_active_version=false",1,true))
+                      else
+                        assert(message:find("rejecting_old_version=malformed-table",1,true))
+                        assert(message:find("rejecting_new_version=malformed-table",1,true))
+                        assert(message:find("rejecting_active_version=active\\x06",1,true))
+                      end
+                    ''')
+
+    def test_named_malformed_rejected_row_does_not_invoke_context_metamethods(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua=self.world(target)
+                lua.execute(r'''
+                  for _,f in pairs(game.forces)do local c=f.technologies[CANONICAL]
+                    c.level=4;c.researched=false;c.saved_progress=0;f.research_queue={};f.research_progress=0
+                  end
+                  local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                  event.mod_changes.secretas=setmetatable({}, {__index=function()error("named rejecting row metamethod invoked")end})
+                  script.active_mods.secretas="1.0"
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                  assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
+                  assert(not tostring(message):find("named rejecting row metamethod invoked",1,true))
+                  assert(message:find("secretas=malformed-table",1,true))
+                  assert(message:find("rejecting_mod_name=secretas",1,true))
+                  assert(message:find("rejecting_old_version=malformed-table",1,true))
+                  assert(message:find("rejecting_new_version=malformed-table",1,true))
+                  assert(message:find("rejecting_active_version=1.0",1,true))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
                 ''')
 
 

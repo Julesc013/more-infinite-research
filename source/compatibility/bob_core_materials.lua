@@ -35,20 +35,6 @@ local function stream_for(values, definition)
   return stream
 end
 
-local function continuation_description(definition, stream)
-  -- The captured default tail displayed 150. At the default 2 percent and
-  -- the declared threefold productivity ceiling, that is also the useful
-  -- level bound selected by runtime.lifecycle when max_level is 0. The
-  -- runtime later reads the effective named RecipePrototype cap after any
-  -- prototype policy, so this data-stage caption is not a second cap policy.
-  local useful = math.ceil(definition.productivity_ceiling * 100 / stream.effect_percent)
-  local limit = stream.max_level > 0 and math.min(stream.max_level, useful) or useful
-  return {"", {"technology-description.more-infinite-research.recipe_productivity"}, "\n",
-    {"mod-setting-name.ips-max-level-stream", {"", {"description.productivity-bonus"}, ": ",
-      {"item-name." .. definition.item}}}, ": ", tostring(limit)}
-end
-
-
 function M.technologies(values, raw, active_mods, return_context)
   if not M.applies(active_mods) then return {} end
   local streams = {}
@@ -67,7 +53,11 @@ function M.technologies(values, raw, active_mods, return_context)
     local stream = streams[index]
     local early = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
-    continuation.localised_description = continuation_description(definition, stream)
+    -- The shared caption reports the useful ceiling (150 at the captured
+    -- default) when max_level is zero. Runtime still reads the effective
+    -- named RecipePrototype cap after policy, so this is not a second cap
+    -- policy.
+    continuation.localised_description = stages.continuation_description(definition, stream)
     if unavailable[definition.key] then
       stages.retain_disabled(early)
       stages.retain_disabled(continuation)

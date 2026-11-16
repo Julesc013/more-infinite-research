@@ -43,7 +43,7 @@ end
 
 local function select(lookup, admits, modifiers)
   if type(lookup) ~= "function" then return nil end
-  for index = 1, 2 do
+  for index = 1, #CANDIDATES do
     local candidate = CANDIDATES[index]
     local called, technology = pcall(lookup, candidate.name)
     if called then

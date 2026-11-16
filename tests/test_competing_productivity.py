@@ -505,7 +505,7 @@ class CompetingProductivityTests(unittest.TestCase):
               on_player_locale_changed=function() end, on_player_changed_force=function() end, on_player_joined_game=function() end,
               open=function() return nil end}
           end
-          package.preload["research.catalogue"] = function() return {declared=function() return {} end} end
+          package.preload["research.catalogue"] = function() return {prepare=function() end,declared=function() return {} end} end
           package.preload["api.v1.runtime"] = function() return {get_version=function() return {} end, get_capabilities=function() return {} end, get_research=function() return {} end} end
           package.preload["runtime.settings_profile"] = function() return {export_string=function() return "" end, validate_string=function() return {} end} end
           package.preload["runtime.settings_commands"] = function() return {export=function() end, validate=function() end} end

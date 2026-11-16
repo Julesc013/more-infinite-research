@@ -211,6 +211,7 @@ class NativeFamilyCreditDefinitionTests(unittest.TestCase):
               local id="mir-native-credit-"..family.."-shared-route-"..direction
               local expected={type="technology",name=id,icon="__base__/graphics/technology/automation-1.png",
                 icon_size=256,level=1,upgrade=true,hidden=true,enabled=false,visible_when_disabled=false,
+                ignore_tech_cost_multiplier=true,
                 max_level="infinite",order="zz[mir-native-credit]-"..id,
                 effects={{type="change-recipe-productivity",recipe="shared-route",
                   change=direction=="positive" and change or -change}},

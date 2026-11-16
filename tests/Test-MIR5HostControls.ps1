@@ -95,6 +95,7 @@ $controls = @(
   [ordered]@{path='tests/test_native_family_paid_credits.py';lua=$true},
   [ordered]@{path='tests/test_native_credit_vectors.py';lua=$true},
   [ordered]@{path='tests/test_native_credit_vector_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_native_credit_price_paid.py';lua=$true},
   [ordered]@{path='tests/test_known_base_addition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_legacy_module_credits.py';lua=$true},
   [ordered]@{path='tests/test_legacy_cannon_credits.py';lua=$true},
@@ -133,6 +134,7 @@ $controls = @(
   [ordered]@{path='tests/test_legacy_boolean_cap_fixture.py';lua=$true},
     [ordered]@{path='tests/test_f200_foreign_cap_baseline_fixture.py';lua=$true},
   [ordered]@{path='tests/test_native_owner_cap_order_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_worker_speed_cap_ten_native.py';lua=$true},
   [ordered]@{path='tests/test_f200_legacy_worker_fixture.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_migration.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_transition_fixture.py';lua=$true},
@@ -172,6 +174,7 @@ $controls = @(
   [ordered]@{path='tests/test_scripted_effects_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_settings_profile.py';lua=$true},
   [ordered]@{path='tests/test_profile_native_witness.py';lua=$true},
+  [ordered]@{path='tests/test_profile_native_runner.py';lua=$true},
   [ordered]@{path='tests/test_settings_commands.py';lua=$true},
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
@@ -199,6 +202,8 @@ $controls = @(
   [ordered]@{path='tests/test_pack.py';lua=$false},
   [ordered]@{path='tests/test_startup_timings.py';lua=$false},
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
+  [ordered]@{path='tests/test_input_filesystem_boundaries.py';lua=$false},
+  [ordered]@{path='tests/test_linux_resource_platform.py';lua=$false},
   [ordered]@{path='tools/check_repository.py';lua=$false}
 )
 

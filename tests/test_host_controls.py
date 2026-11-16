@@ -289,6 +289,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_native_family_paid_credits.py",
             "tests/test_native_credit_vectors.py",
             "tests/test_native_credit_vector_fixture.py",
+            "tests/test_native_credit_price_paid.py",
             "tests/test_known_base_addition_fixture.py",
             "tests/test_legacy_module_credits.py",
             "tests/test_legacy_cannon_credits.py",
@@ -327,6 +328,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_legacy_boolean_cap_fixture.py",
             "tests/test_f200_foreign_cap_baseline_fixture.py",
             "tests/test_native_owner_cap_order_fixture.py",
+            "tests/test_worker_speed_cap_ten_native.py",
             "tests/test_f200_legacy_worker_fixture.py",
             "tests/test_k2_imersite_migration.py",
             "tests/test_k2_imersite_transition_fixture.py",
@@ -366,6 +368,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_scripted_effects_lifecycle.py",
             "tests/test_settings_profile.py",
             "tests/test_profile_native_witness.py",
+            "tests/test_profile_native_runner.py",
             "tests/test_settings_commands.py",
             "tests/test_properties.py",
             "tests/test_replay.py",
@@ -393,6 +396,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_pack.py",
             "tests/test_startup_timings.py",
             "tests/test_host_controls.py",
+            "tests/test_input_filesystem_boundaries.py",
+            "tests/test_linux_resource_platform.py",
             "tools/check_repository.py",
         ])
         self.assertEqual(len(set(paths)), len(paths))

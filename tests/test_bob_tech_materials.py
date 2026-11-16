@@ -264,20 +264,27 @@ class BobTechMaterialTests(unittest.TestCase):
             self.assertEqual(expected[row["name"]], [ingredient[0] for ingredient in row["unit"]["ingredients"]])
         self.assertTrue(all(report["reason"] == "configured" for report in reports.values()))
 
-    def test_profile_gate_admits_changed_versions_only_for_the_same_raw_contract(self):
-        self.assertEqual(5, len(self.rows()))
+    def test_profile_gate_ignores_target_minimum_metadata_but_keeps_the_same_raw_contract(self):
+        self.lua.globals().mods = self.active_mods()
+        baseline_settings = _plain(self.lua.execute(
+            'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
+        ))
+        baseline = _plain(self.rows())
+        self.assertEqual(5, len(baseline))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
+        self.assertEqual(0, len(self.rows()))
+        self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f210", "2.0", "2.1.24"')
         self.assertEqual(0, len(self.rows()))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"')
         self.lua.execute('target.minimum_base = "2.1.24"')
-        with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
-            self.rows()
-        self.lua.execute('target.minimum_base = "2.1.23"')
+        self.assertEqual(baseline, _plain(self.rows()))
+        self.assertEqual(baseline_settings, _plain(self.lua.execute(
+            'package.loaded["research.settings"] = nil; return require("research.settings").prototypes()'
+        )))
 
         # Captured versions lock the qualified evidence, but an unchanged named
         # raw contract remains applicable across an official patch or graphics
         # package version change.  Semantic admission remains validate_raw.
-        baseline = _plain(self.rows())
         for changed in ("base", "space-age", "bobtech", "angelssmeltinggraphics"):
             mods = dict(self.facts["required_mods"])
             mods[changed] = "2.1.24" if changed in ("base", "space-age") else "changed"
@@ -330,6 +337,21 @@ class BobTechMaterialTests(unittest.TestCase):
             with self.assertRaisesRegex(Exception, "angels-plate-tin changed: availability or productivity flags"):
                 self.rows(raw=changed)
 
+    def test_named_item_reskin_is_unconsumed_but_item_presence_remains_required(self):
+        baseline = _plain(self.rows())
+        reskinned = self.raw_fixture()
+        reskinned_item = reskinned["item"]["bob-tin-plate"]
+        reskinned_item["icon"] = "__reskin__/graphics/icons/bob-tin-plate.png"
+        reskinned_item["icon_size"] = 128
+        before = _plain(reskinned)
+        self.assertEqual(baseline, _plain(self.rows(raw=reskinned)))
+        self.assertEqual(before, _plain(reskinned))
+
+        missing = self.raw_fixture()
+        missing["item"]["bob-tin-plate"] = None
+        with self.assertRaisesRegex(Exception, "bob-tin-plate is unavailable"):
+            self.rows(raw=missing)
+
     def test_named_preflight_rejects_route_owner_and_stage_drift_without_scanning(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')
         raw = self.raw_fixture()
@@ -361,6 +383,70 @@ class BobTechMaterialTests(unittest.TestCase):
         missing_tail_gate["technology"]["space-science-pack"] = None
         with self.assertRaisesRegex(Exception, "recipe-prod-research_material_gunmetal-4 has missing prerequisite space-science-pack"):
             self.rows(raw=missing_tail_gate)
+
+    def test_ordinary_recipe_rows_have_the_same_meaning_in_both_consumers(self):
+        family = deepcopy(self.facts["families"][0])
+        for route in family["routes"]:
+            route["enabled"] = False
+        definition = _lua_value(self.lua, family)
+        preflight = self.lua.eval(r'''function(raw, definition)
+          require("compatibility.material_routes").preflight(raw, definition,
+            function(message) error(message, 0) end)
+          return true
+        end''')
+        for module, method in (("material_routes", "preflight"), ("bob_tech_materials", "technologies")):
+            actual = self.lua.eval(
+                'debug.getinfo(require("compatibility.' + module + '").' + method + ', "S").source'
+            )
+            self.assertEqual("@" + (ROOT / "source/compatibility" / (module + ".lua")).as_posix(),
+                             actual.replace("\\", "/"))
+
+        # These cases describe ordinary deterministic recipe semantics, not
+        # the spelling or location of either consumer's validation function.
+        cases = [
+            ("ordinary", {}, {}, True),
+            ("certain legacy probability", {"probability": 1}, {}, True),
+            ("certain independent probability", {"independent_probability": 1}, {}, True),
+            ("full shared probability", {"shared_probability": {"min": 0, "max": 1}}, {}, True),
+            ("zero catalyst", {"catalyst_amount": 0}, {}, True),
+            ("zero extra yield", {"extra_count_fraction": 0}, {}, True),
+            ("ingredient statistics", {}, {"ignored_by_stats": 1}, True),
+            ("explicit productivity zero", {"ignored_by_productivity": 0, "ignored_by_stats": 1}, {}, True),
+            ("wrong result", {"name": "wrong-material"}, {}, False),
+            ("wrong type", {"type": "fluid"}, {}, False),
+            ("wrong amount", {"amount": 5}, {}, False),
+            ("random legacy yield", {"probability": 0.5}, {}, False),
+            ("random independent yield", {"independent_probability": 0.5}, {}, False),
+            ("partial shared probability", {"shared_probability": {"min": 0.1, "max": 1}}, {}, False),
+            ("catalyst", {"catalyst_amount": 1}, {}, False),
+            ("extra yield", {"extra_count_fraction": 0.5}, {}, False),
+            ("productivity exclusion", {"ignored_by_productivity": 1}, {}, False),
+            ("native stats exclusion", {"ignored_by_stats": 1}, {}, False),
+            ("invalid numeric exclusion", {"ignored_by_productivity": False}, {}, False),
+            ("wrong ingredient amount", {}, {"amount": 41}, False),
+        ]
+        baseline = _plain(self.rows())
+        recipe_name = family["routes"][0]["recipe"]
+        for name, product_fields, ingredient_fields, accepted in cases:
+            with self.subTest(case=name):
+                raw = self.raw_fixture()
+                recipe = raw["recipe"][recipe_name]
+                for key, value in product_fields.items():
+                    recipe["results"][1][key] = _lua_value(self.lua, value)
+                for key, value in ingredient_fields.items():
+                    recipe["ingredients"][1][key] = _lua_value(self.lua, value)
+                # JSON distinguishes false from numeric zero in this ownership
+                # check, unlike Python's ordinary equality for those values.
+                before = json.dumps(_plain(raw), sort_keys=True)
+                if accepted:
+                    self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+                    self.assertIs(preflight(raw, definition), True)
+                else:
+                    with self.assertRaisesRegex(Exception, recipe_name + " changed"):
+                        self.rows(raw=raw)
+                    with self.assertRaisesRegex(Exception, recipe_name + " changed"):
+                        preflight(raw, definition)
+                self.assertEqual(before, json.dumps(_plain(raw), sort_keys=True))
 
     def test_effective_productivity_exclusion_distinguishes_products_from_inputs(self):
         route = self.facts["families"][0]["routes"][0]

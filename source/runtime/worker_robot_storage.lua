@@ -198,7 +198,7 @@ local function same_family_engine_patch(event)
   return true
 end
 
-local function history_context(event, route, state, current)
+local function history_context(event, route, state, current, rejected)
   local function value(item)
     if type(item) == "string" then
       return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
@@ -207,6 +207,12 @@ local function history_context(event, route, state, current)
     end
     if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
     return "unknown"
+  end
+  local function rejected_value(item)
+    if item == nil then return "absent" end
+    if type(item) == "string" then return value(item) end
+    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
+    return "malformed-" .. type(item)
   end
   local details = type(event) == "table" and event or {}
   local changes = details.mod_changes
@@ -224,14 +230,29 @@ local function history_context(event, route, state, current)
   for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
     local change = type(changes) == "table" and changes[name]
     if type(change) == "table" then
-      parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+      if getmetatable(change) == nil then
+        parts[#parts + 1] = name .. "=" .. value(rawget(change, "old_version")) .. "->" .. value(rawget(change, "new_version"))
+      else
+        parts[#parts + 1] = name .. "=malformed-table"
+      end
     end
+  end
+  if rejected ~= nil then
+    local row = rejected.row
+    local function row_value(record, key)
+      if type(record) ~= "table" or getmetatable(record) ~= nil then return "malformed-" .. type(record) end
+      return rejected_value(rawget(record, key))
+    end
+    parts[#parts + 1] = "rejecting_mod_name=" .. rejected_value(rejected.name)
+    parts[#parts + 1] = "rejecting_old_version=" .. row_value(row, "old_version")
+    parts[#parts + 1] = "rejecting_new_version=" .. row_value(row, "new_version")
+    parts[#parts + 1] = "rejecting_active_version=" .. rejected_value(rejected.active_version)
   end
   return " [" .. table.concat(parts, " ") .. "]"
 end
 
-local function recover_error(reason, route, event, state, current)
-  if event ~= nil then reason = reason .. history_context(event, route, state, current) end
+local function recover_error(reason, route, event, state, current, rejected)
+  if event ~= nil then reason = reason .. history_context(event, route, state, current, rejected) end
   refuse(reason .. "; keep the protected original COPY. Load a separate copy with the previous mod selection"
     .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
     .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
@@ -823,7 +844,10 @@ local function default_origin(event, initializing, state)
   end
   local new_selection = false
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and type(item) == "table" and item.old_version == nil then new_selection = true end
+    -- Refuse malformed event rows below without invoking their metamethods.
+    if name ~= MIR and type(item) == "table" and getmetatable(item) == nil and rawget(item, "old_version") == nil then
+      new_selection = true
+    end
   end
   if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
       or change.old_version == "5.0.20001" and new_selection) then
@@ -868,9 +892,15 @@ local function default_origin(event, initializing, state)
     return {kind=prepared and "prepared-default" or "recorded-default", old_version=old, new_version=active[MIR]}
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
-        or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
-      recover_error("default transfer requires the unchanged mod selection", nil, event, state, {kind="default"})
+    local plain = type(item) == "table" and getmetatable(item) == nil
+    local old = plain and rawget(item, "old_version")
+    local new = plain and rawget(item, "new_version")
+    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) then
+      local active_version = active[name]
+      if not plain or old == nil or old ~= new or new ~= active_version then
+        recover_error("default transfer requires the unchanged mod selection", nil, event, state, {kind="default"},
+          {name=name, row=item, active_version=active_version})
+      end
     end
   end
   local known = DEFAULT_ORIGINS[target.id]
@@ -1655,7 +1685,7 @@ function M.default_owner_on_forces_merged(event)
   return true, "native-merge-metadata-only"
 end
 
-function M.prepare(route)
+local function prepare(route, before_apply)
   if storage[OWNER_KEY] ~= nil then recover_error("ordinary native default ownership cannot use legacy preparation") end
   local state = checked_state()
   if state and state.schema == 2 and state.kind == "prepared" then
@@ -1693,6 +1723,7 @@ function M.prepare(route)
   end
   if #plans == 0 then recover_error("native force/private frames are unavailable") end
   -- All forces/contracts/work were checked before the first native setter.
+  if before_apply then before_apply() end
   for _, plan in ipairs(plans) do
     local frame, holder = plan.source, plan.private
     holder.level = frame.next_level -- sole native materialization; clears researched=true.
@@ -1713,7 +1744,9 @@ function M.prepare(route)
   return true, "Prepared " .. #plans .. " forces. Save this COPY under a new name, exit immediately, then add the provider without changing MIR settings."
 end
 
-function M.resume(force, route)
+function M.prepare(route) return prepare(route) end
+
+local function resume(force, route, before_apply)
   local state = checked_state()
   if not state or state.schema ~= 2 or state.kind ~= "prepared" then recover_error("no prepared work exists") end
   local all = prepared_current(state, fact(route))
@@ -1729,12 +1762,15 @@ function M.resume(force, route)
     if not prerequisite.researched then recover_error("preserved worker prerequisite is unavailable") end
   end
   local queue = clone(frame.queue); queue[#queue + 1] = recovery.id
+  if before_apply then before_apply() end
   assign_queue(force, frame, queue)
   frame.technology.saved_progress = frame.saved_progress
   if frame.current then force.research_progress = frame.current_progress end
   prepared_current(state, fact(route))
   return true, "Queued the preserved worker partial work for force " .. force.name .. "."
 end
+
+function M.resume(force, route) return resume(force, route) end
 
 function M.command(command, route)
   command = command or {}
@@ -1743,12 +1779,21 @@ function M.command(command, route)
   if command.player_index and (not player or player.admin ~= true) then reply("Only an administrator or server may prepare recovery."); return end
   local operation, name = tostring(command.parameter or ""):match("^%s*(%S+)%s*(.-)%s*$")
   local ok, result, message
-  if operation == "prepare" and name == "" then ok, result, message = pcall(M.prepare, route)
+  -- A refusal before application is a normal command reply. Native setters
+  -- cannot be rolled back here: a later failure must stop the script rather
+  -- than return to a running game with a partially transferred frame.
+  local applying = false
+  local function before_apply() applying = true end
+  if operation == "prepare" and name == "" then ok, result, message = pcall(prepare, route, before_apply)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
-    ok, result, message = pcall(M.resume, force, route)
+    ok, result, message = pcall(resume, force, route, before_apply)
   else reply("Usage: /mir-worker-storage-recovery prepare | resume <force-name>"); return end
+  if not ok and applying then
+    error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
+      .. " before trying recovery again: " .. tostring(result), 0)
+  end
   reply(ok and message or tostring(result))
 end
 
