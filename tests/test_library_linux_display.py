@@ -6,6 +6,7 @@ real process tree.
 """
 
 import contextlib
+import builtins
 import hashlib
 import importlib.util
 import io
@@ -13,8 +14,10 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import tempfile
+import time
 import types
 import unittest
 from unittest import mock
@@ -26,6 +29,12 @@ SPEC = importlib.util.spec_from_file_location("mir_linux_library_display", MODUL
 DISPLAY = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = DISPLAY
 SPEC.loader.exec_module(DISPLAY)
+
+ENTRY_PATH = ROOT / "tools" / "Invoke-LibraryLinuxDisplay.py"
+ENTRY_SPEC = importlib.util.spec_from_file_location("mir_linux_library_display_entry", ENTRY_PATH)
+ENTRY = importlib.util.module_from_spec(ENTRY_SPEC)
+sys.modules[ENTRY_SPEC.name] = ENTRY
+ENTRY_SPEC.loader.exec_module(ENTRY)
 
 
 def digest(path):
@@ -105,6 +114,8 @@ class FakeBackend:
         self.process = FakeProcess()
         self.identity = {"pid": self.process.pid, "start_ticks": 314159, "session_id": self.session_value}
         self.stale_identity = None
+        self.timeout_once = False
+        self.stale_after_timeout = None
         self.spawn_calls = []
         self.xauth_calls = []
         self.terminate_calls = 0
@@ -195,6 +206,8 @@ class FakeBackend:
 
     def terminate(self, process):
         self.terminate_calls += 1
+        if self.timeout_once:
+            return
         process.returncode = 0
         self.socket_present = False
         self.lock_present = False
@@ -205,6 +218,10 @@ class FakeBackend:
         self.terminate(process)
 
     def wait(self, process, timeout):
+        if self.timeout_once:
+            self.timeout_once = False
+            self.stale_identity = self.stale_after_timeout
+            raise subprocess.TimeoutExpired("Xtigervnc", timeout)
         return process.returncode
 
     def xauth(self, argv, authority_input):
@@ -317,6 +334,26 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
             plan_path.write_bytes(oversized)
             self.assert_refuses(lambda: DISPLAY.load_bound_plan(plan_path, hashlib.sha256(oversized).hexdigest().upper(), checkout), "plan size differs")
 
+    def test_bound_plan_hashes_the_same_raw_buffer_it_parses(self):
+        temporary, checkout, root, pins = self.make_layout()
+        self.addCleanup(temporary.cleanup)
+        plan_path = Path(temporary.name) / "plan.json"
+        raw = json.dumps(self.plan(root, pins), separators=(",", ":")).encode("utf-8")
+        replacement = b'{"not":"the original plan"}'
+        plan_path.write_bytes(raw)
+        original_read = Path.read_bytes
+
+        def read_then_replace(path):
+            value = original_read(path)
+            if path == plan_path:
+                plan_path.write_bytes(replacement)
+            return value
+
+        with self.admitted_probe(pins), mock.patch.object(Path, "read_bytes", read_then_replace):
+            validated = DISPLAY.load_bound_plan(plan_path, hashlib.sha256(raw).hexdigest().upper(), checkout)
+        self.assertEqual(validated.role, "client-en")
+        self.assertEqual(plan_path.read_bytes(), replacement)
+
     def test_schema_cli_has_no_execution_backend_or_x_side_effect(self):
         temporary, checkout, root, pins = self.make_layout()
         self.addCleanup(temporary.cleanup)
@@ -336,6 +373,35 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
         self.assertEqual(result["factorio_processes"], 0)
         self.assertFalse((root / "authority").exists())
         self.assertFalse((root / "runtime").exists())
+
+    def test_loader_refuses_wrong_module_pin_before_compilation(self):
+        with mock.patch.object(builtins, "compile", side_effect=AssertionError("module must not compile")):
+            with self.assertRaisesRegex(RuntimeError, "module identity differs"):
+                ENTRY.load_verified_module(MODULE_PATH, "0" * 64)
+
+    def test_loader_compiles_the_verified_module_buffer_once(self):
+        loaded = ENTRY.load_verified_module(MODULE_PATH, digest(MODULE_PATH))
+        self.assertEqual(loaded.PLAN_KIND, "MIRLinuxLibraryDisplayPlanV1")
+        self.assertTrue(callable(loaded.main))
+
+    def test_stop_signal_keeps_partial_stdin_framing_bounded(self):
+        backend = DISPLAY.SystemBackend()
+        read_descriptor, write_descriptor = os.pipe()
+        stream = os.fdopen(read_descriptor, "rb", buffering=0)
+        self.addCleanup(stream.close)
+        try:
+            os.write(write_descriptor, b"sto")
+            with mock.patch.object(DISPLAY.select, "select", return_value=([read_descriptor], [], [])):
+                started = time.monotonic()
+                self.assertIsNone(backend.stop_signal(stream, 0.01))
+                self.assertLess(time.monotonic() - started, 0.25)
+            with mock.patch.object(DISPLAY.select, "select", return_value=([], [], [])):
+                self.assertIsNone(backend.stop_signal(stream, 0.01))
+            os.write(write_descriptor, b"p\n")
+            with mock.patch.object(DISPLAY.select, "select", return_value=([read_descriptor], [], [])):
+                self.assertEqual(backend.stop_signal(stream, 0.01), "stop")
+        finally:
+            os.close(write_descriptor)
 
     def test_probe_pin_is_fixed_in_production_and_changed_member_refuses(self):
         self.assertEqual(
@@ -404,6 +470,7 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
         )
         self.assertNotIn(cookie, durable)
         self.assertGreaterEqual(backend.probe.network_checks, 2)
+        self.assertEqual(backend.probe.idle_calls, 0)
 
     def test_eof_and_deadline_are_bounded_without_factorio_or_library_authority(self):
         for signal_values, expected in ((["eof"], "eof"), ([None, None, None, None, None], "deadline")):
@@ -482,6 +549,27 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed-cleanup")
         self.assertFalse(result["pins_rechecked"])
         self.assertEqual(backend.terminate_calls, 1)
+
+    def test_forced_cleanup_rechecks_the_owned_identity_before_kill(self):
+        for stale_after_timeout, expected_kills in (
+            (None, 1),
+            ({"pid": 40193, "start_ticks": 314160, "session_id": 7001}, 0),
+        ):
+            with self.subTest(stale_after_timeout=stale_after_timeout):
+                validated, backend, _ = self.validated_backend()
+                backend.timeout_once = True
+                backend.stale_after_timeout = stale_after_timeout
+                with self.linux():
+                    state = DISPLAY.start_display(validated, backend)
+                    result = DISPLAY.stop_display(state, "stop")
+                self.assertEqual(result["status"], "failed-cleanup")
+                self.assertEqual(backend.terminate_calls, 1 + expected_kills)
+                self.assertEqual(backend.kill_calls, expected_kills)
+                if stale_after_timeout is None:
+                    self.assertFalse(validated.authority.exists())
+                else:
+                    self.assertTrue(validated.authority.exists())
+                    self.assertNotIn(validated.authority, backend.unlink_calls)
 
 
 if __name__ == "__main__":

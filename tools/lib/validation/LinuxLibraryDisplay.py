@@ -214,7 +214,8 @@ def load_bound_plan(path: Path | str, expected_sha256: str, checkout: Path | str
     digest = _scalar(expected_sha256, "plan SHA-256")
     require(re.fullmatch(r"[0-9A-F]{64}", digest) is not None, "plan SHA-256 differs")
     raw = plan_path.read_bytes()
-    require(len(raw) == info.st_size and _sha256(plan_path) == digest, "raw plan bytes differ")
+    require(len(raw) == info.st_size and hashlib.sha256(raw).hexdigest().upper() == digest,
+            "raw plan bytes differ")
     return validate_plan(_strict_json(raw, "plan"), checkout)
 
 
@@ -237,6 +238,7 @@ class SystemBackend:
 
     def __init__(self, probe_loader=None):
         self._probe_loader = probe_loader
+        self._stop_partial = bytearray()
 
     def now(self) -> float:
         return time.monotonic()
@@ -320,13 +322,35 @@ class SystemBackend:
         return module
 
     def stop_signal(self, stdin: BinaryIO, timeout: float) -> Optional[str]:
-        readable, _, _ = select.select([stdin], [], [], timeout)
+        """Read at most one finite control frame without waiting for a newline.
+
+        ``select`` only promises at least one byte; ``readline`` could then
+        wait past the owner's deadline for an unterminated frame.  Preserve a
+        bounded partial frame across polls and let the caller's monotonic
+        deadline decide when no complete ``stop`` frame arrives.
+        """
+        try:
+            descriptor = stdin.fileno()
+        except (AttributeError, OSError) as error:
+            raise DisplayError("owned display stdin is unavailable") from error
+        readable, _, _ = select.select([descriptor], [], [], timeout)
         if not readable:
             return None
-        line = stdin.readline(129)
-        if line in (b"", ""):
-            return "eof"
-        if line in (b"stop\n", "stop\r\n", "stop\n"):
+        try:
+            chunk = os.read(descriptor, 128 - len(self._stop_partial))
+        except BlockingIOError:
+            return None
+        if not chunk:
+            return "eof" if not self._stop_partial else "invalid"
+        self._stop_partial.extend(chunk)
+        newline = self._stop_partial.find(b"\n")
+        if newline < 0:
+            return "invalid" if len(self._stop_partial) >= 128 else None
+        complete = bytes(self._stop_partial)
+        self._stop_partial.clear()
+        if newline != len(complete) - 1:
+            return "invalid"
+        if complete in (b"stop\n", b"stop\r\n"):
             return "stop"
         return "invalid"
 
@@ -383,7 +407,7 @@ def _owned_directory(backend: SystemBackend, path: Path, uid: int, mode: int, la
 
 def _load_probe(backend: SystemBackend, path: Path):
     probe = backend.load_probe(path)
-    for name in ("PINS", "VIEWER_RELATIVE", "idle_host", "display_binding", "viewer_binding",
+    for name in ("PINS", "VIEWER_RELATIVE", "display_binding", "viewer_binding",
                  "no_network_sockets", "listener_inode_present", "unix_listeners"):
         require(hasattr(probe, name), f"qualified display helper lacks {name}")
     require(probe.VIEWER_RELATIVE == "runtime/viewer.sock", "qualified display helper viewer path differs")
@@ -397,7 +421,10 @@ def _preflight_execution(plan: ValidatedPlan, backend: SystemBackend, probe) -> 
             "qualified display helper Xtigervnc pin differs")
     require(probe.PINS.get(str(plan.xauth)) == plan.raw["xauth"]["sha256"],
             "qualified display helper xauth pin differs")
-    probe.idle_host()
+    # Global host idleness, resource admission, campaign ownership, and any
+    # finite peer display receipt belong to the governed parent.  This leaf
+    # owns exactly one derived role display, so it must not reject a valid
+    # already-admitted :193 while the parent starts the independent :194.
     shared = Path("/tmp/.X11-unix")
     shared_info = backend.lstat(shared)
     require(stat.S_ISDIR(shared_info.st_mode) and not stat.S_ISLNK(shared_info.st_mode) and shared_info.st_uid == 0
@@ -502,6 +529,8 @@ def start_display(plan: ValidatedPlan, backend: Optional[SystemBackend] = None) 
                     try:
                         backend.wait(process, 5)
                     except subprocess.TimeoutExpired:
+                        require(backend.poll(process) is None and backend.process_identity(process.pid) == identity,
+                                "owned display process identity changed before forced startup cleanup")
                         backend.kill(process)
                         backend.wait(process, 5)
             except Exception as cleanup_error:
@@ -612,6 +641,9 @@ def stop_display(state: DisplayState, reason: str, error: Optional[str] = None) 
                 try:
                     backend.wait(process, 5)
                 except subprocess.TimeoutExpired:
+                    require(backend.poll(process) is None
+                            and backend.process_identity(process.pid) == state.process_identity,
+                            "owned display process identity changed before forced cleanup")
                     backend.kill(process)
                     backend.wait(process, 5)
                     cleanup_errors.append("display required forced cleanup")
