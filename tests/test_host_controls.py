@@ -204,6 +204,7 @@ class HostControlsTests(unittest.TestCase):
         self.assertEqual(paths, [
             "tests/test_generator.py",
             "tests/test_library_render_capture.py",
+            "tests/test_library_personal_view_input_fixture.py",
             "tests/test_continuation_ownership.py",
             "tests/test_native_research_speed_finite_fixture.py",
             "tests/test_secretas_continuation.py",
