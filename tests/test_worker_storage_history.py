@@ -662,6 +662,132 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(not pcall(history.on_load) and writes==0 and storage.mir_worker_storage_route==state)
         ''')
 
+    def test_public_prepare_does_not_swallow_failures_after_native_writes(self):
+        for point in ("first-write", "queue", "later-force", "work-price"):
+            with self.subTest(point=point):
+                self.setUp()
+                self.lua.globals().failure_point = point
+                self.lua.execute(r'''
+                  seed();local original={7,3,6}
+                  assert(player.worker_robots_storage_bonus==original[1])
+                  assert(uninvested.worker_robots_storage_bonus==original[2])
+                  assert(suspended.worker_robots_storage_bonus==original[3])
+                  local previous
+                  if failure_point=="later-force"then
+                    previous={schema=2,kind="route",current={kind="default"}}
+                    storage.mir_worker_storage_route=previous
+                  end
+                  if failure_point=="queue"then
+                    local mt=getmetatable(player);local write=mt.__newindex
+                    mt.__newindex=function(o,k,v)
+                      write(o,k,v)
+                      if k=="research_queue"then error("injected after native queue assignment")end
+                    end
+                  else
+                    local f=failure_point=="later-force"and suspended or player
+                    local holder=f.technologies[ID];local mt=getmetatable(holder)
+                    local read,write=mt.__index,mt.__newindex
+                    if failure_point=="work-price"then
+                      mt.__index=function(o,k)
+                        if k=="research_unit_count"and read(o,"level")>4 then return 1 end
+                        return read(o,k)
+                      end
+                    else
+                      mt.__newindex=function(o,k,v)
+                        write(o,k,v)
+                        if k=="level"then error("injected after native holder write")end
+                      end
+                    end
+                  end
+                  local ok,message=pcall(history.command,{parameter="prepare"},nil)
+                  assert(not ok,"public command swallowed a failure after native writes")
+                  assert(tostring(message):find("reload the original",1,true),tostring(message))
+                  local cause=failure_point=="work-price"and"native transferred work price differs"
+                    or failure_point=="queue"and"injected after native queue assignment"
+                    or "injected after native holder write"
+                  assert(tostring(message):find(cause,1,true),tostring(message))
+                  assert(writes>0 and storage.mir_worker_storage_route==previous)
+                  if previous then assert(previous.schema==2 and previous.kind=="route"and previous.current.kind=="default")end
+                  -- Failure containment is not rollback: retain the actual
+                  -- partial frame, and do not manufacture a committed history.
+                  if failure_point=="first-write"then
+                    assert(writes==1 and player.technologies[CANONICAL].level==8)
+                    assert(player.technologies[ID].level==8 and player.worker_robots_storage_bonus==11)
+                  elseif failure_point=="later-force"then
+                    assert(player.technologies[CANONICAL].level==4 and player.technologies[ID].level==8)
+                    assert(suspended.technologies[CANONICAL].level==7 and suspended.technologies[ID].level==7)
+                    assert(suspended.worker_robots_storage_bonus==9)
+                  else
+                    assert(player.technologies[CANONICAL].level==4 and player.technologies[ID].level==8)
+                    assert(player.research_queue[1].name==ID and player.worker_robots_storage_bonus==7)
+                  end
+                  assert(#messages==0,"post-write failure was reduced to an ordinary reply")
+                  -- If a host caller catches the fatal error, another prepare
+                  -- still refuses the invested holder without adding writes.
+                  local before=writes
+                  assert(pcall(history.command,{parameter="prepare"},nil))
+                  assert(writes==before and #messages==1 and messages[1]:find("MIR-WORKER-HISTORY",1,true))
+                ''')
+
+    def test_public_resume_does_not_swallow_failure_after_queue_assignment(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27
+          assert(history.prepare(nil));writes=0
+          local state=storage.mir_worker_storage_route
+          local mt=getmetatable(suspended);local write=mt.__newindex
+          mt.__newindex=function(o,k,v)
+            write(o,k,v)
+            if k=="research_queue"then error("injected after resume queue assignment")end
+          end
+          local ok,message=pcall(history.command,{parameter="resume suspended"},nil)
+          assert(not ok and tostring(message):find("reload the original",1,true),tostring(message))
+          assert(tostring(message):find("injected after resume queue assignment",1,true),tostring(message))
+          assert(writes==1 and storage.mir_worker_storage_route==state)
+          assert(suspended.research_queue[1].name==OTHER and suspended.research_queue[2].name==ID)
+          assert(suspended.research_progress==.42 and suspended.worker_robots_storage_bonus==6)
+          assert(state.forces[3].pending and #messages==0)
+          -- assign_queue must still restore its force-local event gate.
+          local read=mt.__index
+          mt.__index=function(o,k)if k=="research_progress"then return nil end;return read(o,k)end
+          ok,message=pcall(history.on_research_event,{research=suspended.technologies[ID]})
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true))
+        ''')
+
+    def test_public_recovery_preflight_refusal_is_readonly_and_can_be_corrected(self):
+        self.lua.execute(r'''
+          seed();creators[CANONICAL]="foreign-infinite"
+          local queue=player.research_queue
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(writes==0 and storage.mir_worker_storage_route==nil and player.research_queue==queue)
+          assert(player.worker_robots_storage_bonus==7 and suspended.worker_robots_storage_bonus==6)
+          assert(#messages==1 and messages[1]:find("MIR-WORKER-HISTORY",1,true))
+          creators[CANONICAL]="more-infinite-research"
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(storage.mir_worker_storage_route.kind=="prepared")
+          assert(player.worker_robots_storage_bonus==7 and suspended.worker_robots_storage_bonus==6)
+          local before=writes
+          assert(pcall(history.command,{parameter="prepare"},nil))
+          assert(writes==before and #messages==3 and messages[3]:find("Already prepared",1,true))
+        ''')
+
+    def test_public_resume_preflight_refusal_and_ordinary_success_preserve_work(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27
+          assert(history.prepare(nil));writes=0
+          local holder=suspended.technologies[ID]
+          holder.prerequisites.foundation.researched=false
+          assert(pcall(history.command,{parameter="resume suspended"},nil))
+          assert(writes==0 and #suspended.research_queue==1 and suspended.research_progress==.42)
+          assert(#messages==1 and messages[1]:find("prerequisite",1,true))
+          holder.prerequisites.foundation.researched=true
+          assert(pcall(history.command,{parameter="resume suspended"},nil))
+          assert(suspended.research_queue[1].name==OTHER and suspended.research_queue[2].name==ID)
+          assert(suspended.research_progress==.42 and holder.saved_progress==.27)
+          assert(suspended.worker_robots_storage_bonus==6 and #messages==2)
+        ''')
+
     def test_multiple_queue_occurrences_authorize_only_their_actual_count(self):
         self.lua.execute(r'''
           seed();player.research_queue={CANONICAL,CANONICAL,OTHER};player.research_progress=.375
