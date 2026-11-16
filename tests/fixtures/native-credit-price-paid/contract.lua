@@ -7,7 +7,7 @@ local M={
   base="2.1.23", main="recipe-prod-research_low_density_structure-1", lab="mir-vector-lab",
   lab_speed=115200, sentinel="mir-vector-sentinel", formula="8000*2^(L-1)", seconds=60,
   noncarrier="mir-vector-independent-processing",
-  price=2, source_stock=168, insertion=63832, consumed=64000, next_count=128000,
+  price=2, source_stock=168, insertion=63832, refill_request=1000, consumed=64000, next_count=128000,
   packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"},
   carriers={
     "mir-native-credit-research_low_density_structure-low-density-structure-positive",

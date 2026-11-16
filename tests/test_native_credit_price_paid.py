@@ -46,15 +46,17 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
         self.lua.globals().post_drift = post_drift
         self.lua.execute(r'''
           local callbacks,logs,saves,acks={},{},{},{}
-          storage={};queue_writes=0;insert_calls=0;lab_enable_writes=0
+          storage={};queue_writes=0;insert_calls=0;partial_insertions=0;lab_enable_writes=0
           local f={technologies={},recipes={},research_progress=0,index=1,name="player"}
           local game={tick=0,forces={player=f},difficulty_settings={technology_price_multiplier=1},surfaces={{}}}
           local packs=C.packs
-          local inv={counts={}}
+          local inv={counts={},capacity=200}
           inv.insert=function(row)
             insert_calls=insert_calls+1
-            inv.counts[row.name]=(inv.counts[row.name]or 0)+row.count
-            return row.count
+            local accepted=math.min(row.count,inv.capacity-(inv.counts[row.name]or 0))
+            if accepted<row.count then partial_insertions=partial_insertions+1 end
+            inv.counts[row.name]=(inv.counts[row.name]or 0)+accepted
+            return accepted
           end
           inv.get_item_count=function(name)return inv.counts[name]or 0 end
           for _,name in ipairs(packs)do inv.counts[name]=C.source_stock end
@@ -123,6 +125,7 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           assert(loadfile(fixture_path.."/control.lua","t",env))()
           last_game,last_force,last_lab=game,f,lab
           if opponent=="source-partial" then f.research_progress=.1 end
+          if opponent=="source-lab-active" then lab.disabled_by_script=false;lab_enable_writes=0 end
           if opponent=="wrong-carrier" then f.technologies[C.carriers[6]].level=2 end
           if opponent=="wrong-ingredients" then main.research_unit_ingredients[4].amount=2 end
           if opponent=="wrong-cost" then main.prototype.ignore_tech_cost_multiplier=true end
@@ -131,6 +134,7 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           local function tick()game.tick=game.tick+1;callbacks.tick()end
           if opponent~="" then
             callbacks.config(event)
+            if opponent=="prelab-lab-active" then lab.disabled_by_script=false;lab_enable_writes=0 end
             if opponent~="source-partial" and opponent~="bad-transition" then callbacks.command{player_index=nil,parameter="continue"}end
             return
           end
@@ -139,7 +143,8 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           local bonus_count,status_count=0,0
           for _ in pairs(logs[1].frame.bonuses)do bonus_count=bonus_count+1 end
           for _ in pairs(logs[1].frame.technologies)do status_count=status_count+1 end
-          assert(bonus_count==109 and status_count==34 and logs[1].map_price==1,"source marker is not the complete F1 frame")
+          assert(bonus_count==109 and status_count==34 and logs[1].map_price==1 and logs[1].lab.name==C.lab
+            and logs[1].lab.disabled_by_script==true,"source marker is not the complete F1 frame")
           for _,section in ipairs({"mains","queue","unchanged","inventory","units","bonuses","technologies","prototypes"})do
             assert(logs[1].frame[section]~=nil,"missing live source section "..section)
           end
@@ -149,37 +154,54 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           tick();tick()
           assert(game.difficulty_settings.technology_price_multiplier==1 and queue_writes==0 and insert_calls==0
             and lab_enable_writes==0,"idle continuation barrier mutated native work")
-          callbacks.command{player_index=nil,parameter="continue"};tick()
-          assert(queue_writes==1 and insert_calls==4 and lab_enable_writes==1 and #acks==1 and acks[1]=="[MIR516_PAID_CONTINUE]",
+          callbacks.command{player_index=nil,parameter="continue"}
+          assert(queue_writes==1 and insert_calls==0 and lab_enable_writes==1 and #acks==1 and acks[1]=="[MIR516_PAID_CONTINUE]",
             "ordinary work was not uniquely admitted")
-          for _,name in ipairs(packs)do inv.counts[name]=0 end
-          main.level=4;main.researched=false;main.saved_progress=0;f.current_research=nil;queue={};f.research_progress=0
-          f.recipes["low-density-structure"].productivity_bonus=.3
-          f.recipes["casting-low-density-structure"].productivity_bonus=.3
-          f.recipes["scrap-recycling"].productivity_bonus=.1
-          f.recipes["cerys-nuclear-scrap-recycling"].productivity_bonus=.1
-          for index=1,95 do f.recipes["mir-vector-synthetic-scrap-"..index].productivity_bonus=.1 end
-          if post_drift then f.recipes["plastic-bar"].productivity_bonus=.1 end
-          callbacks.finished{research=main,by_script=false};tick()
+          local consumed=0
+          for _=1,2000 do
+            tick()
+            if not lab.disabled_by_script and f.current_research==main then
+              local amount=math.min(100,inv.counts[packs[1]])
+              assert(amount>0,"capacity-limited refill starved the queued LDS")
+              for _,name in ipairs(packs)do assert(inv.counts[name]>=amount);inv.counts[name]=inv.counts[name]-amount end
+              consumed=consumed+amount
+              if consumed==C.consumed then
+                main.level=4;main.researched=false;main.saved_progress=0;f.current_research=nil;queue={};f.research_progress=0
+                f.recipes["low-density-structure"].productivity_bonus=.3
+                f.recipes["casting-low-density-structure"].productivity_bonus=.3
+                f.recipes["scrap-recycling"].productivity_bonus=.1
+                f.recipes["cerys-nuclear-scrap-recycling"].productivity_bonus=.1
+                for index=1,95 do f.recipes["mir-vector-synthetic-scrap-"..index].productivity_bonus=.1 end
+                if post_drift then f.recipes["plastic-bar"].productivity_bonus=.1 end
+                callbacks.finished{research=main,by_script=false}
+                assert(lab.disabled_by_script==true,"natural completion did not disable the observer lab")
+                tick();break
+              end
+            end
+          end
+          assert(consumed==C.consumed and partial_insertions>0 and insert_calls>4,"bounded native refill did not use actual partial returns")
           assert(#saves==1 and saves[1].name=="mir516-native-credit-price-paid")
-          assert(logs[2].kind=="pre-lab" and logs[2].map_price==2)
+          assert(logs[2].kind=="pre-lab" and logs[2].map_price==2 and logs[2].lab.disabled_by_script==true)
           assert(logs[3].kind=="save" and logs[3].map_price==2 and #logs[3].science.completion_events==1
-            and logs[3].science.completion_events[1].by_script==false)
+            and logs[3].science.completion_events[1].by_script==false and logs[3].lab.disabled_by_script==true)
           local snapshot=clone(storage)
           game.tick=storage.mir_native_credit_price_paid_observer.saved_tick;callbacks.load();tick()
           assert(storage.mir_native_credit_price_paid_observer.phase=="saved")
           game.tick=storage.mir_native_credit_price_paid_observer.saved_tick;callbacks.load();tick()
           assert(storage.mir_native_credit_price_paid_observer.phase=="saved")
+          assert(logs[4].kind=="cold" and logs[4].map_price==2 and logs[4].lab.disabled_by_script==true)
+          assert(logs[5].kind=="cold" and logs[5].map_price==2 and logs[5].lab.disabled_by_script==true)
           return {storage=snapshot,price=game.difficulty_settings.technology_price_multiplier,
             next_count=main.research_unit_count,queue_writes=queue_writes,insert_calls=insert_calls,
-            lab_enable_writes=lab_enable_writes,logs=logs,saves=saves}
+            lab_enable_writes=lab_enable_writes,partial_insertions=partial_insertions,logs=logs,saves=saves}
         ''')
-        return self.lua.eval("{queue_writes=queue_writes,insert_calls=insert_calls,lab_enable_writes=lab_enable_writes}")
+        return self.lua.eval("{queue_writes=queue_writes,insert_calls=insert_calls,partial_insertions=partial_insertions,lab_enable_writes=lab_enable_writes}")
 
     def test_current_transition_consumes_exactly_one_paid_lds_and_cold_observes_only(self):
         result = self.story()
         self.assertEqual(1, result["queue_writes"])
-        self.assertEqual(4, result["insert_calls"])
+        self.assertGreater(result["insert_calls"], 4)
+        self.assertGreater(result["partial_insertions"], 0)
         self.assertEqual(1, result["lab_enable_writes"])
         self.assertEqual(2, self.lua.eval("last_game.difficulty_settings.technology_price_multiplier"))
         self.assertEqual(128000, self.lua.eval("last_force.technologies[C.main].research_unit_count"))
@@ -195,6 +217,8 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
             "wrong-cost": "pre-lab LDS state differs",
             "wrong-ingredients": "LDS ingredient differs",
             "wrong-carrier": "LDS carrier state differs",
+            "source-lab-active": "source observer lab is not disabled",
+            "prelab-lab-active": "pre-lab observer lab is not disabled",
         }.items():
             with self.subTest(opponent=opponent):
                 with self.assertRaisesRegex(LuaError, message):

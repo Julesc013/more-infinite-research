@@ -82,6 +82,7 @@ local function marker(kind,state,detail)
   for _,name in ipairs(C.packs)do current[name]=inv.get_item_count(name)end
   log("[mir-native-credit-price-paid] "..helpers.table_to_json({kind=kind,tick=game.tick,mods=script.active_mods,
     phase=state.phase,map_price=game.difficulty_settings.technology_price_multiplier,frame=frame(state),detail=detail,
+    lab={name=state.lab.name,disabled_by_script=state.lab.disabled_by_script},
     private_costs=private_costs(),science={source_inventory=state.source_inventory,inserted=state.inserted or{},
       current_inventory=current,consumed=state.consumed or{},completion_events=state.completion_events or{}},
     saved={name=state.saved_name,tick=state.saved_tick},
@@ -90,6 +91,7 @@ local function marker(kind,state,detail)
 end
 local function assert_endpoint(state)
   local f=force();local q=C.queue(f);local t=main();local wanted=expected_bonus()
+  require_ok(state.lab.disabled_by_script==true,"saved observer lab is not disabled")
   require_ok(game.difficulty_settings.technology_price_multiplier==C.price and t.level==4 and t.researched==false
     and t.saved_progress==0 and q.current==false and #q.names==0 and q.progress==0,"saved LDS state differs")
   require_ok(t.research_unit_count==C.next_count,"post-completion LDS next count differs")
@@ -112,27 +114,38 @@ local function assert_endpoint(state)
 end
 local function begin(state)
   local f=force();local inv=inventory(state)
+  require_ok(state.lab.disabled_by_script==true,"pre-lab observer lab is not disabled")
   game.difficulty_settings.technology_price_multiplier=C.price
   C.require_pre_lab(f,game.difficulty_settings.technology_price_multiplier,inv)
-  state.phase="feeding";state.inserted={};state.deadline=game.tick+60000
+  state.phase="pre-lab-accepted";state.inserted={};state.deadline=game.tick+60000
 end
-local function feed_and_queue(state)
-  local inv=inventory(state)
-  for _,name in ipairs(C.packs)do
-    local inserted=inv.insert{name=name,count=C.insertion}
-    require_ok(inserted==C.insertion,"no-surplus science insertion differs "..name)
-    state.inserted[name]=inserted
-  end
+local function start_work(state)
+  require_ok(state.phase=="pre-lab-accepted" and state.lab.disabled_by_script==true,"paid LDS start differs")
   force().research_queue={main()}
   local q=C.queue(force());require_ok(q.current==C.main and #q.names==1 and q.names[1]==C.main and q.progress==0,
-    "LDS queue differs after feed")
+    "LDS queue differs after pre-lab")
   state.lab.disabled_by_script=false;state.phase="earning"
+end
+local function refill(state)
+  local inv=inventory(state)
+  for _,name in ipairs(C.packs)do
+    local prior=state.inserted[name] or 0
+    local remaining=C.insertion-prior
+    if remaining>0 then
+      local requested=math.min(C.refill_request,remaining)
+      local accepted=inv.insert{name=name,count=requested}
+      require_ok(type(accepted)=="number" and accepted==math.floor(accepted) and accepted>=0 and accepted<=requested,
+        "native science refill return differs "..name)
+      state.inserted[name]=prior+accepted
+    end
+  end
 end
 
 script.on_configuration_changed(function(event)
   C.require_tuple(script.active_mods,event)
   require_ok(storage[KEY]==nil,"paid observer already initialized")
   local state={phase="source-retained",lab=retained_lab(),source_inventory={}}
+  require_ok(state.lab.disabled_by_script==true,"source observer lab is not disabled")
   for _,name in ipairs(C.packs)do state.source_inventory[name]=inventory(state).get_item_count(name)end
   C.require_source(force(),game.difficulty_settings.technology_price_multiplier,inventory(state))
   C.require_carriers(force())
@@ -145,6 +158,7 @@ commands.add_command("mir-native-credit-price-paid","Continue only the reviewed 
   require_ok(state and state.phase=="await-continue" and state.source_frame and equal(frame(state),state.source_frame),
     "reviewed source frame differs before continuation")
   begin(state);marker("pre-lab",state)
+  start_work(state)
   rcon.print("[MIR516_PAID_CONTINUE]")
 end)
 script.on_load(function()cold=true end)
@@ -157,6 +171,8 @@ script.on_event(defines.events.on_research_finished,function(event)
   for _,name in ipairs(C.packs)do
     local spent=(state.source_inventory[name]+state.inserted[name])-inventory(state).get_item_count(name)
     require_ok(spent==C.consumed,"exact LDS science consumption differs "..name)
+    require_ok(state.inserted[name]==C.insertion and inventory(state).get_item_count(name)==0,
+      "paid LDS refill endpoint differs "..name)
     state.consumed=state.consumed or{};state.consumed[name]=spent
   end
   state.phase="save-pending";state.finished_tick=game.tick
@@ -169,7 +185,7 @@ script.on_event(defines.events.on_tick,function()
     assert_endpoint(state);marker("cold",state);cold=false;return
   end
   require_ok(game.tick<=state.deadline,"paid LDS observer deadline exceeded")
-  if state.phase=="feeding"then feed_and_queue(state)
+  if state.phase=="earning"then refill(state)
   elseif state.phase=="save-pending"then
     assert_endpoint(state);state.endpoint=frame(state);state.phase="saved";state.saved_tick=game.tick
     state.saved_name="mir516-native-credit-price-paid";marker("save",state);game.server_save(state.saved_name)
