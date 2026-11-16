@@ -1,6 +1,7 @@
 """Worker continuation identity guards; host doubles are not native save proof."""
 import argparse
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -2387,6 +2388,78 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   assert(writes==0 and same(before,all_frames()))
                   if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
                   else assert(not ok and storage[OWNER_KEY]==nil)end
+                ''')
+
+    def test_absent_old11_changed_selection_reports_actual_context_against_baseline_source(self):
+        baseline = "2230114113a275a5a86dd76df6c1ea769555d326"
+        baseline_source = subprocess.check_output(
+            ["git", "show", f"{baseline}:source/runtime/worker_robot_storage.lua"],
+            cwd=Path(__file__).resolve().parents[1], text=True,
+        )
+        self.assertIn('recover_error("default transfer requires the unchanged mod selection"', baseline_source)
+        self.assertNotIn("default_selection_error", baseline_source)
+        for target in ("f200", "f210"):
+            for patch in (15, 16):
+                with self.subTest(target=target, patch=patch):
+                    lua = self.world(target)
+                    lua.globals().baseline_source = baseline_source
+                    lua.globals().new_patch = patch
+                    lua.execute(r'''
+                      local target=require("platform.target")
+                      target.distribution_version=string.format("5.0.%d",(package_family=="f200"and 20000 or 21000)+new_patch)
+                      script.active_mods["more-infinite-research"]=target.distribution_version
+                      package.loaded["runtime.worker_robot_storage"]=nil;history=require("runtime.worker_robot_storage")
+                      local baseline=assert(load(baseline_source,"published-worker-history-context","t",_G))()
+                      seed_owner()
+                      local old=package_family=="f200"and"5.0.20011"or"5.0.21011"
+                      local event=owner_event(old)
+                      script.active_mods["sage-added"]="1.2.3";event.mod_changes["sage-added"]={new_version="1.2.3"}
+                      event.mod_changes["sage-removed"]={old_version="2.0.0"}
+                      script.active_mods["sage-updated"]="3.0.1";event.mod_changes["sage-updated"]={old_version="3.0.0",new_version="3.0.1"}
+                      local function reject(module)
+                        local before=all_frames();writes=0
+                        local ok,message=pcall(module.plan_default_owner_transfer,event,nil,false)
+                        assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                        return tostring(message)
+                      end
+                      local old_message=reject(baseline)
+                      assert(not old_message:find("changed_mod_count=",1,true))
+                      local message=reject(history)
+                      assert(message:find("previous_mir="..old,1,true))
+                      assert(message:find("new_mir="..target.distribution_version,1,true))
+                      assert(message:find("startup_changed=false",1,true)and message:find("saved_route=absent",1,true))
+                      assert(message:find("current_route=default",1,true)and message:find("changed_mod_count=3",1,true))
+                      assert(message:find("changed_mods=sage-added:absent->1.2.3,sage-removed:2.0.0->absent,sage-updated:3.0.0->3.0.1",1,true))
+                      assert(message:find("changes_omitted=0",1,true)and message:find("MIR-owned default infinite worker4",1,true))
+                    ''')
+
+    def test_absent_changed_selection_context_is_sorted_bounded_escaped_and_read_only(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  seed_owner();local old=package_family=="f200"and"5.0.20011"or"5.0.21011";local prior
+                  for _,reverse in ipairs{false,true}do
+                    local event=owner_event(old)
+                    for step=1,40 do
+                      local index=reverse and 41-step or step
+                      local name=string.format("helper-%02d-",index)..string.rep("\195\169",60).."\0\n"
+                      local version=string.rep("\195\169",60).."\0\n"
+                      script.active_mods[name]=version
+                      event.mod_changes[name]={old_version="old\0\n",new_version=version}
+                    end
+                    local before=all_frames();writes=0
+                    local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                    assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                    assert(not message:find("[%z\1-\31\127-\255]")and #message<4096)
+                    assert(message:find("changed_mod_count=40",1,true)and message:find("changes_omitted=34",1,true))
+                    assert(message:find("helper-01-",1,true)and message:find("helper-06-",1,true))
+                    assert(not message:find("helper-07-",1,true))
+                    assert(message:find("\\xC3",1,true)and message:find("\\x00",1,true))
+                    local context=message:match("%[previous_mir=.*")
+                    if prior then assert(context==prior,"context depends on mod-change insertion order")end
+                    prior=context
+                  end
                 ''')
 
 
