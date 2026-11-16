@@ -7,6 +7,8 @@ Date: 2026-11-16
     - Apply the worker robot speed limit to Space Exploration's infinite research beginning at level 10.
     - Avoid invalid GUI style reads when refreshing the Research Library's Settings tab.
     - Reject incomplete internal preservation interfaces before changing research.
+    - Distinguish finite and continuing research stages with the same localized name in the Research Library, including effective
+      limits.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.16
