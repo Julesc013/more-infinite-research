@@ -1655,7 +1655,7 @@ function M.default_owner_on_forces_merged(event)
   return true, "native-merge-metadata-only"
 end
 
-function M.prepare(route)
+local function prepare(route, before_apply)
   if storage[OWNER_KEY] ~= nil then recover_error("ordinary native default ownership cannot use legacy preparation") end
   local state = checked_state()
   if state and state.schema == 2 and state.kind == "prepared" then
@@ -1693,6 +1693,7 @@ function M.prepare(route)
   end
   if #plans == 0 then recover_error("native force/private frames are unavailable") end
   -- All forces/contracts/work were checked before the first native setter.
+  if before_apply then before_apply() end
   for _, plan in ipairs(plans) do
     local frame, holder = plan.source, plan.private
     holder.level = frame.next_level -- sole native materialization; clears researched=true.
@@ -1713,7 +1714,9 @@ function M.prepare(route)
   return true, "Prepared " .. #plans .. " forces. Save this COPY under a new name, exit immediately, then add the provider without changing MIR settings."
 end
 
-function M.resume(force, route)
+function M.prepare(route) return prepare(route) end
+
+local function resume(force, route, before_apply)
   local state = checked_state()
   if not state or state.schema ~= 2 or state.kind ~= "prepared" then recover_error("no prepared work exists") end
   local all = prepared_current(state, fact(route))
@@ -1729,12 +1732,15 @@ function M.resume(force, route)
     if not prerequisite.researched then recover_error("preserved worker prerequisite is unavailable") end
   end
   local queue = clone(frame.queue); queue[#queue + 1] = recovery.id
+  if before_apply then before_apply() end
   assign_queue(force, frame, queue)
   frame.technology.saved_progress = frame.saved_progress
   if frame.current then force.research_progress = frame.current_progress end
   prepared_current(state, fact(route))
   return true, "Queued the preserved worker partial work for force " .. force.name .. "."
 end
+
+function M.resume(force, route) return resume(force, route) end
 
 function M.command(command, route)
   command = command or {}
@@ -1743,12 +1749,21 @@ function M.command(command, route)
   if command.player_index and (not player or player.admin ~= true) then reply("Only an administrator or server may prepare recovery."); return end
   local operation, name = tostring(command.parameter or ""):match("^%s*(%S+)%s*(.-)%s*$")
   local ok, result, message
-  if operation == "prepare" and name == "" then ok, result, message = pcall(M.prepare, route)
+  -- A refusal before application is a normal command reply. Native setters
+  -- cannot be rolled back here: a later failure must stop the script rather
+  -- than return to a running game with a partially transferred frame.
+  local applying = false
+  local function before_apply() applying = true end
+  if operation == "prepare" and name == "" then ok, result, message = pcall(prepare, route, before_apply)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
-    ok, result, message = pcall(M.resume, force, route)
+    ok, result, message = pcall(resume, force, route, before_apply)
   else reply("Usage: /mir-worker-storage-recovery prepare | resume <force-name>"); return end
+  if not ok and applying then
+    error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
+      .. " before trying recovery again: " .. tostring(result), 0)
+  end
   reply(ok and message or tostring(result))
 end
 
