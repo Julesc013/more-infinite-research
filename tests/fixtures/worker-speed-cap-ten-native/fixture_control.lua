@@ -650,7 +650,9 @@ local function assert_current_post_completion(state, label)
   local earned_support = current_force_snapshot(force_by_index(state.earned_index, label .. " earned"), label .. " earned")
   local ordinary = state.ordinary_events
   if type(ordinary) ~= "table" or #ordinary ~= 1 or type(ordinary[1]) ~= "table"
-      or ordinary[1].name ~= WORKER or ordinary[1].by_script ~= false or type(ordinary[1].tick) ~= "number" then
+      or ordinary[1].name ~= WORKER or ordinary[1].by_script ~= false
+      or ordinary[1].completed_level ~= 10 or ordinary[1].event_post_increment_level ~= 11
+      or type(ordinary[1].tick) ~= "number" then
     fail(label .. " ordinary native level-ten event differs")
   end
   if not same_current_support_rows(state.current_pre_work_frames.player, player_support)
@@ -895,12 +897,15 @@ function M.apply(stage)
       if type(state) ~= "table" or state.phase ~= "current-await-ordinary-level-ten" then return end
       local player = game.forces.player
       if event.research == nil or event.research.force ~= player or event.research.name ~= WORKER then return end
-      if event.by_script ~= false or event.research.level ~= 10 then
+      -- Infinite research advances to level 11 before on_research_finished fires.
+      if event.by_script ~= false or event.research.level ~= 11 then
         fail("scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work")
       end
       state.ordinary_native_completion_count = state.ordinary_native_completion_count + 1
       if state.ordinary_native_completion_count ~= 1 then fail("second current-state worker completion occurred") end
-      state.ordinary_events[#state.ordinary_events + 1] = {name = WORKER, by_script = false, tick = event.tick}
+      state.ordinary_events[#state.ordinary_events + 1] = {
+        name = WORKER, by_script = false, completed_level = 10,
+        event_post_increment_level = event.research.level, tick = event.tick}
       state.phase = "current-ordinary-level-ten-finished"
       return
     end
