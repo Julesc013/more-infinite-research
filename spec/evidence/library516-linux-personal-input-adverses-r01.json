@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "kind": "MIR516LinuxPersonalInputAdverseObservationsV1",
+  "status": "failed-pipelines-with-separate-retained-state-observation",
+  "reviewed_on": "2026-11-17",
+  "inputs": {
+    "public_tag": "v5.0.16",
+    "source_commit": "9c3ec803b5a51105507e5c86f29b7e523716f274",
+    "player_tree": "35fd7a3fd9d490b7c3c118f443a270a2ac157c17",
+    "package": "more-infinite-research_5.0.21016.zip",
+    "package_bytes": 1044274,
+    "package_sha256": "79DCF8F0086F266D63A8BA5387DC1E4713D08FB68E712BD8F7D9198EA6AB3EF3",
+    "engine": "2.1.24 Linux graphical",
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "selection": "Base, exact MIR and one passive observer; Space Age is not enabled",
+    "observer_versions": {
+      "r01": "0.1.4",
+      "r02": "0.1.5",
+      "r03": "0.1.5"
+    },
+    "fresh_ui_seed_sha256": "0E55566E6B3DDFE8C0A195AE33BF843F3DC1231DC8B028BE1FC5DACEBF44EE49",
+    "seed_scope": "Fresh UI origin only, not historical or prepared-save evidence",
+    "runner_commit": "9c3234e4fff3ce8531f7f260585b994ded2d93c1",
+    "admission_peak_mib": 4096,
+    "output_budget_mib": 512,
+    "reserves_reduced": false
+  },
+  "runs": [
+    {
+      "case": "r01",
+      "status": "failed-pipeline-preserved",
+      "packet_sha256": "59BEFD4E5F833D65244CA1EB9BCDF1322B54F58E14F749B53E71F0DBA92F3FEF",
+      "raw_readback": {
+        "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-adverse-originals-readback-r01.json",
+        "bytes": 3518,
+        "sha256": "66E161D21381DB44248E8E5E28C99B59CCD831651921A612DB8168344FA8A64F"
+      },
+      "original_files": 18,
+      "original_bytes": 3897446,
+      "failure": "Initial readiness timed out after one setup Escape; no phase file or MIR input witness."
+    },
+    {
+      "case": "r02",
+      "status": "failed-pipeline-preserved",
+      "packet_sha256": "12AF6FFFF2BB50763238E8EFEEA2B04B2ACCD7B94CCBCFE1B064E7E2CF3C9A79",
+      "raw_readback": {
+        "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-adverse-originals-readback-r02.json",
+        "bytes": 3696,
+        "sha256": "C6154FA2B0C1E446EF580CCD58BC9BE8EB17BAC6803F57A8AFAFC5AF74E479A6"
+      },
+      "original_files": 19,
+      "original_bytes": 17743512,
+      "failure": "The first device capture rejected an actual DirectColor visual before MIR input."
+    },
+    {
+      "case": "r03",
+      "status": "failed-pipeline-preserved",
+      "packet_sha256": "78957A56D7F20601156CCEB1999132A46F7CC09E71991043691587545D276658",
+      "raw_readback": {
+        "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-originals-readback-r03.json",
+        "bytes": 87544,
+        "sha256": "25C02E2668D8EF7B18CB44451A9FA06528CDC0AA7CD6F2C67D4E5FEEE4758F4A"
+      },
+      "original_files": 58,
+      "original_bytes": 173383296,
+      "failure": "Completed phase files were rejected because the original reader allowed only singleplayer-load, while the pinned fixture truthfully recorded joined."
+    }
+  ],
+  "r03_separate_post_reader": {
+    "status": "reviewed-retained-event-state-and-capture-integrity-observation-only",
+    "reader": {
+      "path": "build/qualification/linux-library-current-render-preparation-r01/Validate-PersonalViewFiles-r03-post-origin-reader.py",
+      "bytes": 8007,
+      "sha256": "A913CB93E1FA2BC64018C4355B209A283DC1ACC3DFF66380E2A430A0E20C96CA"
+    },
+    "independent_controls": {
+      "path": "build/qualification/linux-library-current-render-preparation-r01/Test-ValidatePersonalViewFiles-r03-post-origin-reader.py",
+      "bytes": 5154,
+      "sha256": "B1FF3F16057889D8A405D2A5380155EF750D6C9D248D2F433713F61D2D383D86"
+    },
+    "controls_passed": 16,
+    "result": {
+      "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-retained-post-origin-reader-r03.stdout.json",
+      "bytes": 373,
+      "sha256": "E9B1B1F01F72053FAEA8327D859BB09D3F072770E7F7F701442E3E1A4F263039"
+    },
+    "original_failure_relabelled": false,
+    "native_reexecution": false,
+    "first_event": {
+      "player_index": 1,
+      "tick": 0,
+      "kind": "joined"
+    },
+    "phase_files": 8,
+    "captures_with_valid_hash_and_png_structure": 7,
+    "final_event_counts": {
+      "setup": 0,
+      "shortcut": 2,
+      "tab": 2,
+      "tab_click": 2,
+      "click": 1,
+      "text": 4,
+      "close": 1
+    },
+    "query_retained": "gear",
+    "native_state": "No current research, progress zero, empty queue, worker-storage bonus zero remained unchanged; this observes non-mutation, not earned-research preservation.",
+    "geometry_scope": "Recorded root geometry and public tabbed-pane structure remain equal through the event sequence; actual pixels require separate comparison.",
+    "visual_association": {
+      "status": "adverse",
+      "examples": [
+        {
+          "capture": "02b-help-tab",
+          "png_sha256": "ED8995C9CA735DF85DBDF45C524A6367364F9EFF8862EB8843862568E99AAD65",
+          "phase_tab": "Help",
+          "visible_tab": "Research"
+        },
+        {
+          "capture": "03-selected-research",
+          "png_sha256": "697C45F85FE10C3E47B2DA50FF756B1B4FCE96393251A3B286F87A3434DDAAEB",
+          "phase_tab": "Research",
+          "visible_tab": "Help"
+        }
+      ],
+      "conclusion": "The screenshots show the preceding view. Image integrity and deferred phase state do not establish phase-matched rendered pixels."
+    }
+  },
+  "restoration": {
+    "all_owner_records_restored_library_controls_and_temporary_archives": true,
+    "seed_unchanged": true,
+    "terminal_no_factorio": true
+  },
+  "custody": {
+    "primary_originals": "build/qualification/gunmetal-library16-personal-input-r01-adverse-originals; build/qualification/gunmetal-library16-personal-input-r02-adverse-originals; build/qualification/gunmetal-library16-personal-input-r03-originals",
+    "raw_bodies_hash_verified": true,
+    "private_remote_raw_capsule_published": false,
+    "prior_collection_refusals_and_partial_copy_interruption_preserved": true,
+    "scope": "Original native results, staged helper bodies and adverse records stay unchanged. Additive post-readers do not convert failed executions into clean passes."
+  },
+  "next_action": "Review the bounded capture-presentation barrier, then obtain a fresh same-input phase-to-visible-state comparison; do not repeat the unchanged input case merely to obtain the revised reader result.",
+  "limitations": [
+    "No visual or personal-view GUI acceptance.",
+    "No localized-input, scroll/resize, export/import, real-client lifecycle, performance or stable acceptance.",
+    "No historical save, earned research, paid partial-work or original MIR4 design-parity acceptance.",
+    "No current source17 or other engine/mod selection qualification."
+  ],
+  "stable_acceptance": false
+}
