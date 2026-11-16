@@ -1,0 +1,116 @@
+{
+  "kind": "MIRCurrent17PersonalLeafActualIndependentReviewV1",
+  "review_scope": "One retained current17 Base 2.1.24 English personal-view input execution only. This review does not establish imported/protected-source support, Settings or Unicode input, drag/resize/scroll, export, two-client/client, performance, or stable acceptance.",
+  "packet_sha256": "E2172D4ABE7809C233D42141BB8902983DE3D9E3E881C859AAC1CAC213F000A0",
+  "raw_custody": {
+    "readback_file": "current17-leaf-originals-readback-r01.json",
+    "readback_sha256": "58DBB1D43D6EC9927DD477212B5238B9D131FEE0D0922C0CF86789F2AC236FBC",
+    "indexed_paths": 83,
+    "indexed_bytes": 172930624,
+    "independent_local_hash_readback": "83/83 indexed body size and SHA-256 rows match the retained output/stage corpus."
+  },
+  "executed_identity": {
+    "candidate_sha256": "4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615",
+    "observer_sha256": "5843C947C1748913BB6A0ABAA8B7DC91704785DC196A709A133EFBAF19C029D4",
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "actor_plan_sha256": "6B819464EE88C1FDC454E55F7C553DBF9DFF0CD84F85E8F3F7A550C24D6589C2",
+    "actor_sha256": "0F9A06E92D8EA9A395B873351EE859934E8919AE86D601E1B0EA98A057682FF8",
+    "input_driver_sha256": "82325C015822D32F208A1CFDCCF7FF5CC6D72782FF5224C745CFF8B951DACB7C",
+    "input_helper_sha256": "4E737F0D92A040391FDAD76C34B7448C44B26A27B3D09F15F131B899A5B13DCB",
+    "reader_sha256": "3A08750523680A09EC176C1215782E1A9B68F02F85AB5B32885026FBBC6141F4",
+    "active_mods": [
+      "base@2.1.24",
+      "mir-fixture-library-personal-view-input@0.1.6",
+      "more-infinite-research@5.0.21017"
+    ]
+  },
+  "actual_result": {
+    "owner_status": "passed-personal-view-input-only",
+    "actor_status": "passed-native-personal-view-input",
+    "service_invocation_id": "71951c72b12d4d1dbe935f570c08326d",
+    "factorio_pid": 82309,
+    "factorio_start_ticks": 21183997,
+    "window": 2097203,
+    "native_processes": 1,
+    "terminal_main_pid": 0,
+    "terminal_result": "success",
+    "terminal_exec_main_status": 0,
+    "resource_process_exit": 0,
+    "resource_process_timed_out": false,
+    "completion_predicate_observed": false,
+    "controlled_termination": "Factorio logged SIGTERM after the completed actor observation; this is not a natural-exit or performance result."
+  },
+  "independent_readback": {
+    "retained_reader_stdout_sha256": "F39629D71794F67C34F09FC3028E152F6EEF2A1E615DEB1B1D913D87C2A1C4BD",
+    "retained_reader_exit": 0,
+    "phase_files": 9,
+    "captures": 7,
+    "input_calls": 8,
+    "input_actions": [
+      "setup-tab",
+      "shortcut-click",
+      "help-click",
+      "research-click",
+      "query-click",
+      "gear-text",
+      "escape",
+      "shortcut-reopen-click"
+    ],
+    "same_live_identity_across_all_inputs": {
+      "process_id": 82309,
+      "session_id": 82297,
+      "start_ticks": 21183997,
+      "process_start_utc": "2026-11-16T16:39:33.970000Z",
+      "window": 2097203
+    },
+    "all_eight_spec_binding_hashes_and_actor_plan_locators_match": true,
+    "all_eight_leaf_process_identity_checks_true": true,
+    "all_eight_leaf_native_gui_acceptance_false": true,
+    "fixture_event_counts": {
+      "shortcut": 2,
+      "tab": 2,
+      "tab_click": 2,
+      "click": 1,
+      "text": 4,
+      "close": 1,
+      "setup": 0
+    },
+    "native_snapshot_unchanged": {
+      "current": false,
+      "progress": 0,
+      "queue": {},
+      "worker_robots_storage_bonus": 0
+    }
+  },
+  "visual_review": {
+    "independently_viewed_original_pngs": {
+      "02-after-open": "Research tab visibly selected with Library list/detail content.",
+      "02b-help-tab": "Help tab visibly selected with current17/Base 2.1.24/MIR 5.0.21017 diagnostic content.",
+      "03-selected-research": "Research tab visibly selected after Help.",
+      "04-gear": "Search field visibly contains gear with the matching Iron gear wheel productivity result."
+    },
+    "prespecified_pixel_readback_file": "current17-leaf-prespecified-layout-pixels-r01.json",
+    "prespecified_pixel_readback_sha256": "9FD708656AB111635F00D7737B1E68FB1B81EA4A850A47740E1A1C1D9F07846D",
+    "title_roi_zero_difference_passes": true,
+    "queue_settings_zero_difference_rule_passes": false,
+    "queue_settings_adverse": "206 differing pixels at the predeclared shared border columns 778, 779, 980, 981 and 982. The unchanged zero threshold remains retained; this alone does not establish a positional shift."
+  },
+  "restoration": {
+    "readback_file": "current17-leaf-restoration-readback-r01.json",
+    "readback_sha256": "7C88536D1BB3CF6491C3A629E1AAABE446014193776B7E170D4251E31DC1D39D",
+    "owner_before_after_equal": true,
+    "five_current17_paths_verified": true,
+    "archive_restoration_errors": [],
+    "remaining_factorio_xvnc_xvfb": []
+  },
+  "collector_label_adverse": {
+    "raw_receipt_nominal_kind_scope": "R04",
+    "executed_collector_sha256": "5DB41064DF160CB9DCB436B1B9DA2D3BC1F24538D3A5C2D49A544D4F39232620",
+    "disposition": "Retained unchanged. Do not treat its nominal old16 archive labels as evidence for this current17 case; current17 identity and all five restored owner states are established by the packet-bound raw bodies and separate restoration readback.",
+    "future_corrected_collector_sha256": "ED1A45E97E2AD099EF9512FC15333E6026A90418A3D0391A6126BA4136348CE6",
+    "future_collector_executed": false,
+    "native_rerun_or_recollection": false
+  },
+  "verdict": "CASE_REVIEW_PASS_NARROW",
+  "native_gui_acceptance": "One current17 English personal-view click/text/Escape/Tab sequence has retained event, phase, image, input-binding and restoration evidence. It is not full GUI/client/export acceptance."
+}
