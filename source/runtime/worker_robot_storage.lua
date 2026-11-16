@@ -149,6 +149,7 @@ local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local target = require("platform.target")
 local effective_values = require("runtime.configuration")
+local configuration_context = require("runtime.configuration_change_context")
 local pending = false
 local default_head_pending = false
 local default_mutating_force
@@ -199,21 +200,6 @@ local function same_family_engine_patch(event)
 end
 
 local function history_context(event, route, state, current, rejected)
-  local function value(item)
-    if type(item) == "string" then
-      return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
-        return string.format("\\x%02X", string.byte(byte))
-      end))
-    end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "unknown"
-  end
-  local function rejected_value(item)
-    if item == nil then return "absent" end
-    if type(item) == "string" then return value(item) end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "malformed-" .. type(item)
-  end
   local details = type(event) == "table" and event or {}
   local changes = details.mod_changes
   local mir = type(changes) == "table" and changes[MIR]
@@ -222,31 +208,19 @@ local function history_context(event, route, state, current, rejected)
   local active = script and script.active_mods or {}
   local saved = state == nil and "absent" or state.schema == 1 and "finite"
     or state.kind == "prepared" and "prepared-" .. state.phase or state.current.kind
-  local parts = {"previous_mir=" .. value(previous),
-    "new_mir=" .. value(type(mir) == "table" and mir.new_version or active[MIR]),
-    "startup_changed=" .. value(details.mod_startup_settings_changed),
-    "saved_route=" .. value(saved),
-    "current_route=" .. value(current and current.kind or route and "finite" or "unobserved")}
+  local parts = {"previous_mir=" .. configuration_context.value(previous),
+    "new_mir=" .. configuration_context.value(type(mir) == "table" and mir.new_version or active[MIR]),
+    "startup_changed=" .. configuration_context.value(details.mod_startup_settings_changed),
+    "saved_route=" .. configuration_context.value(saved),
+    "current_route=" .. configuration_context.value(current and current.kind or route and "finite" or "unobserved")}
   for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
     local change = type(changes) == "table" and changes[name]
     if type(change) == "table" then
-      if getmetatable(change) == nil then
-        parts[#parts + 1] = name .. "=" .. value(rawget(change, "old_version")) .. "->" .. value(rawget(change, "new_version"))
-      else
-        parts[#parts + 1] = name .. "=malformed-table"
-      end
+      parts[#parts + 1] = configuration_context.row_pair(name, change)
     end
   end
   if rejected ~= nil then
-    local row = rejected.row
-    local function row_value(record, key)
-      if type(record) ~= "table" or getmetatable(record) ~= nil then return "malformed-" .. type(record) end
-      return rejected_value(rawget(record, key))
-    end
-    parts[#parts + 1] = "rejecting_mod_name=" .. rejected_value(rejected.name)
-    parts[#parts + 1] = "rejecting_old_version=" .. row_value(row, "old_version")
-    parts[#parts + 1] = "rejecting_new_version=" .. row_value(row, "new_version")
-    parts[#parts + 1] = "rejecting_active_version=" .. rejected_value(rejected.active_version)
+    for _, field in ipairs(configuration_context.rejected_fields(rejected)) do parts[#parts + 1] = field end
   end
   return " [" .. table.concat(parts, " ") .. "]"
 end
