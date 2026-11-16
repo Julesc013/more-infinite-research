@@ -118,7 +118,14 @@ class BobAngelCatalogueTests(unittest.TestCase):
                          if row["name"].startswith("mir-native-credit-")}
         if len(reviewed) != 27 or len(public_review) != 7 or len(original_credits) != 20:
             raise AssertionError("Bob/Angel intent requires seven public dispositions and twenty exact dormant carriers")
-        if not catalogue._same(credit_review, original_credits):
+        # Historical r02 intent precedes the independently justified map-price
+        # correction. Prove that it is the only projected difference before
+        # comparing every retained historical field.
+        historical_credits = deepcopy(original_credits)
+        for row in historical_credits.values():
+            if row.pop("ignore_tech_cost_multiplier", None) is not True:
+                raise AssertionError("current native credit carrier lacks the reviewed map-price exemption")
+        if not catalogue._same(credit_review, historical_credits):
             raise AssertionError("Bob/Angel native comparison credit descriptors differ from independent published routes")
         for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
             if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
