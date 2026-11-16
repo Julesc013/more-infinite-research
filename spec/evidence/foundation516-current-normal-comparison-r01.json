@@ -105,5 +105,12 @@
   ],
   "whole_product_performance_qualified": false,
   "stable_acceptance": false,
-  "release16_published": false
+  "public_release_context": {
+    "observed_tag": "v5.0.16",
+    "published_at": "2026-11-16T11:37:08Z",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.16",
+    "public_f200_sha256": "EC76E089FC3A66280A3B3E1F149B55217480489E1FF55B009A3B9A50E7890A2C",
+    "measured_candidate_is_public_release": false,
+    "disposition": "The measured BCCF candidate remains a distinct unpublished package. The existing public release is preserved; these measurements are not relabelled as public-release performance evidence."
+  }
 }
