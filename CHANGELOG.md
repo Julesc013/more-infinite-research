@@ -11,7 +11,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Show accurate Research Library availability when research is disabled by its effective settings or already exists.
 - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
 - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
-- Reject malformed supplied settings-profile format or codec headers instead of treating false or zero as omitted.
+- Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting values.
 
 ## [5.0.15] - 2026-11-16
 

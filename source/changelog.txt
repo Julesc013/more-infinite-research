@@ -9,7 +9,8 @@ Version: 5.0.16
     - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original
       save.
     - Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
-    - Reject malformed supplied settings-profile format or codec headers instead of treating false or zero as omitted.
+    - Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting
+      values.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.15
