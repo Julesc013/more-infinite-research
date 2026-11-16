@@ -24,6 +24,7 @@ SUCCESSOR = FIXTURE / "successor16"
 CURRENT_OLD_NEGATIVE = FIXTURE / "current-old15"
 CURRENT_SUCCESSOR = FIXTURE / "current-successor16"
 CURRENT_OBSERVE = FIXTURE / "current-observe16"
+CURRENT_SUCCESSOR17 = FIXTURE / "current-successor17"
 LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
@@ -81,7 +82,8 @@ local stages = {
   successor16={fixture="0.6.0",mir="5.0.20016",cap=10},
   ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
-  ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10}
+  ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
+  ["current-successor17"]={fixture="0.10.0",mir="5.0.20017",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -98,6 +100,7 @@ function data_case(settings_wrapper,data_wrapper,settings_common,data_common,sta
   local env={mods=copy(closure),data={raw=raw,extend=function(_,v)for _,x in ipairs(v)do rows[#rows+1]=x end end},
     settings={startup={["mir-max-level-worker-robots-speed"]={value=cap}}},log=function(row)logs[#logs+1]=row end}
   env.mods[FIXTURE],env.mods["more-infinite-research"]=expected.fixture,expected.mir
+  if opponent=="stale-mir17"then env.mods["more-infinite-research"]="5.0.20016"end
   local tables={}for k,v in pairs(table)do tables[k]=v end;tables.deepcopy=copy;env.table=tables
   env.require=function(n)if n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_settings"then return assert(loadfile(settings_common,"t",env))()end
     assert(n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_data_final");return assert(loadfile(data_common,"t",env))()end
@@ -188,7 +191,7 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY],player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
 
-function current_state_flow(old_path,successor_path,observe_path,common,mode,opponent)
+function current_state_flow(old_path,successor_path,successor17_path,observe_path,common,mode,opponent)
   local player,foreign,earned=force("player",1,false),force("mir5-worker-speed-cap-ten-foreign",2,false),force("mir5-worker-speed-cap-ten-earned",3,false)
   for _,value in ipairs({player,foreign,earned})do value.technologies["stone-wall"].enabled=true end
   local game={tick=0,forces={player=player,[1]=player,[foreign.name]=foreign,[foreign.index]=foreign,[earned.name]=earned,[earned.index]=earned},surfaces={}}
@@ -198,11 +201,12 @@ function current_state_flow(old_path,successor_path,observe_path,common,mode,opp
   local stage,path
   if mode=="old"then stage,path="current-old15",old_path
   elseif mode=="observe"then stage,path="current-observe16",observe_path
+  elseif mode=="candidate17"then stage,path="current-successor17",successor17_path
   else stage,path="current-successor16",successor_path end
   local actor,message=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not actor then return{ok=false,message=message}end
   local function install_reset(force)
     force._external_reset=function(value)
-      if mode=="candidate" and opponent~="candidate-no-cap" then caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
+      if (mode=="candidate" or mode=="candidate17") and opponent~="candidate-no-cap" then caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
     end
     force._reset_dispatch=function(value)
       if opponent=="missing-reset-event" then return end
@@ -238,13 +242,14 @@ function current_state_flow(old_path,successor_path,observe_path,common,mode,opp
   if opponent=="post-boundary-sentinel-write"then player.technologies["stone-wall"].enabled=true end
   if opponent=="post-boundary-bonus-drift"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.1 end
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
-  if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
-  player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  if opponent=="scripted-finish"then owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
+  if opponent=="preincrement-finish"then owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result,state=state}end
+  player.research_queue={};owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
   if opponent=="missing-ordinary-event"then state.ordinary_events={} end
-  owner.level=11;player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end end
-  for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"current-successor16",game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
+  for _=1,2 do local cold,cmsg=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
 ''')
@@ -252,7 +257,7 @@ end
     def data_result(self, stage: str, opponent: str = ""):
         directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR,
                      "current-old15": CURRENT_OLD_NEGATIVE, "current-successor16": CURRENT_SUCCESSOR,
-                     "current-observe16": CURRENT_OBSERVE}[stage]
+                     "current-observe16": CURRENT_OBSERVE, "current-successor17": CURRENT_SUCCESSOR17}[stage]
         return self.lua.eval("data_case")(str(directory / "settings-updates.lua"), str(directory / "data-final-fixes.lua"),
                                           str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
@@ -263,6 +268,7 @@ end
     def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("current_state_flow")(str(CURRENT_OLD_NEGATIVE / "control.lua"),
                                                    str(CURRENT_SUCCESSOR / "control.lua"),
+                                                   str(CURRENT_SUCCESSOR17 / "control.lua"),
                                                    str(CURRENT_OBSERVE / "control.lua"),
                                                    str(fixture_control), mode, opponent)
 
@@ -271,7 +277,8 @@ end
                                         (SUCCESSOR, "0.6.0", "5.0.20016"),
                                         (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
                                         (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016"),
-                                        (CURRENT_OBSERVE, "0.9.0", "5.0.20016")):
+                                        (CURRENT_OBSERVE, "0.9.0", "5.0.20016"),
+                                        (CURRENT_SUCCESSOR17, "0.10.0", "5.0.20017")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -280,7 +287,8 @@ end
 
     def test_data_preflight_retains_actual_tail_ten_contract_and_only_adds_fixture_lab(self):
         for stage, cap in (("source15", 0), ("old-negative15", 10), ("successor16", 10),
-                           ("current-old15", 10), ("current-successor16", 10), ("current-observe16", 10)):
+                           ("current-old15", 10), ("current-successor16", 10), ("current-observe16", 10),
+                           ("current-successor17", 10)):
             with self.subTest(stage=stage):
                 result = self.data_result(stage)
                 self.assertTrue(result["ok"], result["message"])
@@ -301,13 +309,23 @@ end
                     self.assertEqual(expected_mods, reported)
                     self.assertEqual(20, len(reported))
         current_successor = self.data_result("current-successor16")
+        current_successor17 = self.data_result("current-successor17")
         observe = self.data_result("current-observe16")
         def lab_signature(row):
             return (row["name"], row["minable"], row["energy_source"]["type"], row["researching_speed"],
                     tuple(row["inputs"][index] for index in range(1, len(row["inputs"]) + 1)))
+        def prototype_signature(result):
+            worker = result["raw"]["technology"][WORKER]
+            return (worker["max_level"], worker["effects"][1]["type"], worker["effects"][1]["modifier"],
+                    tuple(worker["prerequisites"][index] for index in range(1, len(worker["prerequisites"]) + 1)),
+                    worker["unit"]["count_formula"], worker["unit"]["time"],
+                    tuple((worker["unit"]["ingredients"][index][1], worker["unit"]["ingredients"][index][2])
+                          for index in range(1, len(worker["unit"]["ingredients"]) + 1)),
+                    result["raw"]["int-setting"][CAP]["default_value"], lab_signature(result["rows"][1]))
+        self.assertEqual(prototype_signature(current_successor), prototype_signature(current_successor17))
         self.assertEqual(lab_signature(current_successor["rows"][1]), lab_signature(observe["rows"][1]))
-        self.assertEqual((1, 1), (len(current_successor["rows"]), len(observe["rows"])))
-        self.assertEqual((1, 0), (len(current_successor["logs"]), len(observe["logs"])))
+        self.assertEqual((1, 1, 1), (len(current_successor["rows"]), len(current_successor17["rows"]), len(observe["rows"])))
+        self.assertEqual((1, 1, 0), (len(current_successor["logs"]), len(current_successor17["logs"]), len(observe["logs"])))
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
@@ -316,6 +334,9 @@ end
         self.assertFalse(old_bad["ok"]); self.assertIn("SE worker-speed effect differs", old_bad["message"])
         self.assertFalse(observe_bad["ok"]); self.assertIn("SE worker-speed effect differs", observe_bad["message"])
         self.assertEqual((1, 0), (len(old_bad["logs"]), len(observe_bad["logs"])))
+        stale_mir = self.data_result("current-successor17", "stale-mir17")
+        self.assertFalse(stale_mir["ok"])
+        self.assertIn("fixture stage version differs", stale_mir["message"])
 
     @staticmethod
     def _current_markers(result):
@@ -339,6 +360,151 @@ end
             frame["unrelated_sentinel"]["enabled"], frame["unrelated_sentinel"]["visible"],
             frame["unrelated_sentinel"]["level"], frame["unrelated_sentinel"]["valid"],
         )
+
+    @staticmethod
+    def _current_admin_helper_source():
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        prefix = "local function apply_current_admin_sequence"
+        return prefix + source.split(prefix, 1)[1].split("local function begin_current_observe", 1)[0]
+
+    def _run_current_admin_proxy(self, helper_source: str, callback_disables_gate: bool):
+        runner = self.lua.execute(r'''
+local WORKER = "worker-robots-speed-10"
+local PROBE = "automation"
+local EARNED_LEVEL = 13
+local PARTIAL = .27
+local FOREIGN_PROGRESS = .42
+local set_current_prerequisites
+local technology
+''' + helper_source + r'''
+
+return function(callback_disables_gate)
+  local writes, frames, boundaries = {}, {}, {}
+  local current_boundary = "before-admin"
+  local function snapshot(values)
+    return {level=values.level, researched=values.researched, enabled=values.enabled,
+      visible_when_disabled=values.visible_when_disabled}
+  end
+  local function target(role)
+    local values = {level=1, researched=false, enabled=false, visible_when_disabled=true}
+    local proxy = {}
+    setmetatable(proxy, {
+      __index = function(_, key) return values[key] end,
+      __newindex = function(_, key, value)
+        values[key] = value
+        writes[#writes + 1] = {role=role, field=key, value=value, boundary=current_boundary}
+        if callback_disables_gate and (key == "level" or key == "researched") then
+          values.enabled = false
+          values.visible_when_disabled = true
+          writes[#writes + 1] = {role=role, field="callback-disable", value=false,
+            boundary=current_boundary}
+        end
+      end,
+    })
+    return proxy, values
+  end
+  local function force(role)
+    local worker, values = target(role)
+    local force = {role=role, worker=worker}
+    setmetatable(force, {
+      __newindex = function(subject, key, value)
+        rawset(subject, key, value)
+        writes[#writes + 1] = {role=role, field=key, value=value, boundary=current_boundary}
+      end,
+    })
+    return force, values
+  end
+  local player, player_values = force("player")
+  local foreign, foreign_values = force("foreign")
+  local earned, earned_values = force("earned")
+  set_current_prerequisites = function(force, foreign_role, label)
+    writes[#writes + 1] = {role=force.role, field="prerequisites", value=foreign_role,
+      boundary=current_boundary}
+  end
+  technology = function(force, name)
+    assert(name == WORKER or name == "automation")
+    return force.worker
+  end
+  local function frame(action)
+    frames[#frames + 1] = {action=action, player=snapshot(player_values),
+      foreign=snapshot(foreign_values), earned=snapshot(earned_values)}
+  end
+  local hooks = {
+    before = function(action)
+      current_boundary = action
+      boundaries[#boundaries + 1] = "before:" .. action
+    end,
+    after = function(action)
+      frame(action)
+      boundaries[#boundaries + 1] = "after:" .. action
+    end,
+  }
+  apply_current_admin_sequence(player, foreign, earned, "proxy", hooks)
+  return {writes=writes, frames=frames, boundaries=boundaries}
+end
+''')
+        return runner(callback_disables_gate)
+
+    @staticmethod
+    def _lua_rows(table):
+        return [table[index] for index in range(1, len(table) + 1)]
+
+    def test_current_admin_target_setters_are_sequential_and_restore_gates_after_callbacks(self):
+        helper = self._current_admin_helper_source()
+        actual = self._run_current_admin_proxy(helper, True)
+        writes = self._lua_rows(actual["writes"])
+        target_fields = {"level", "researched", "enabled", "visible_when_disabled"}
+        expected_levels = {"player": 10, "foreign": 11, "earned": 13}
+        for role, level in expected_levels.items():
+            with self.subTest(role=role):
+                target_writes = [row for row in writes if row["role"] == role and row["field"] in target_fields]
+                self.assertEqual([("level", level), ("researched", False), ("enabled", True),
+                                  ("visible_when_disabled", False)],
+                                 [(row["field"], row["value"]) for row in target_writes])
+                for row in target_writes:
+                    if row["field"] != "level":
+                        self.assertIs(type(row["value"]), bool)
+        ordered_writes = [(row["role"], row["field"]) for row in writes
+                          if row["field"] in target_fields | {"research_queue", "research_progress"}]
+        self.assertEqual([
+            ("player", "level"), ("player", "researched"), ("player", "enabled"), ("player", "visible_when_disabled"),
+            ("player", "research_queue"), ("player", "research_progress"),
+            ("foreign", "level"), ("foreign", "researched"), ("foreign", "enabled"), ("foreign", "visible_when_disabled"),
+            ("foreign", "research_queue"), ("foreign", "research_progress"),
+            ("earned", "level"), ("earned", "researched"), ("earned", "enabled"), ("earned", "visible_when_disabled"),
+            ("earned", "research_queue"),
+        ], ordered_writes)
+        self.assertEqual([
+            "before:prerequisites", "after:prerequisites", "before:player-target", "after:player-target",
+            "before:player-queue", "after:player-queue", "before:player-progress", "after:player-progress",
+            "before:foreign-target", "after:foreign-target", "before:foreign-queue", "after:foreign-queue",
+            "before:foreign-progress", "after:foreign-progress", "before:earned-target", "after:earned-target",
+            "before:earned-queue", "after:earned-queue",
+        ], [actual["boundaries"][index] for index in range(1, len(actual["boundaries"]) + 1)])
+        frames = {row["action"]: row for row in self._lua_rows(actual["frames"])}
+        for action, role, level in (("player-target", "player", 10), ("foreign-target", "foreign", 11),
+                                    ("earned-target", "earned", 13)):
+            with self.subTest(frame=action):
+                self.assertEqual((level, False, True, False),
+                                 (frames[action][role]["level"], frames[action][role]["researched"],
+                                  frames[action][role]["enabled"], frames[action][role]["visible_when_disabled"]))
+
+        flags_first_mutant = helper
+        for level in ("10", "11", "EARNED_LEVEL"):
+            original = (f"owner.level = {level}\n  owner.researched = false\n  owner.enabled = true\n"
+                        "  owner.visible_when_disabled = false")
+            flags_first_mutant = flags_first_mutant.replace(
+                original,
+                f"owner.enabled = true\n  owner.visible_when_disabled = false\n  owner.level = {level}\n  owner.researched = false",
+            )
+        self.assertNotEqual(helper, flags_first_mutant)
+        flags_frames = {row["action"]: row for row in self._lua_rows(
+            self._run_current_admin_proxy(flags_first_mutant, True)["frames"])}
+        for action, role in (("player-target", "player"), ("foreign-target", "foreign"),
+                             ("earned-target", "earned")):
+            with self.subTest(mutant="flags-first", frame=action):
+                self.assertEqual((False, True), (flags_frames[action][role]["enabled"],
+                                                 flags_frames[action][role]["visible_when_disabled"]))
 
     def test_current_state_reset_roles_keep_the_declared_three_force_boundary(self):
         old = self.current_state_result("old")
@@ -422,7 +588,9 @@ end
         self.assertEqual((1, 0, 2), (complete["ordinary_native_completion_count"],
                                      complete["level_eleven_start_count"], complete["post_completion_hold_ticks"]))
         for phase in (complete, cold):
-            self.assertEqual((WORKER, False), (phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"]))
+            self.assertEqual((WORKER, False, 10, 11), (
+                phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"],
+                phase["ordinary_events"][1]["completed_level"], phase["ordinary_events"][1]["event_post_increment_level"]))
             self.assertIsInstance(phase["ordinary_events"][1]["tick"], int)
         self.assertAlmostEqual(complete["post_reset_player_bonus"] + .65,
                                complete["post_completion"]["player"]["worker"]["bonus"])
@@ -439,6 +607,35 @@ end
                           "worker-speed-cap-ten/current-pre-work.json", "worker-speed-cap-ten/current-complete.json",
                           "worker-speed-cap-ten/current-cold.json", "worker-speed-cap-ten/current-cold.json"],
                          [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
+
+    def test_current_successor17_runs_the_shared_current_lifecycle_with_source17_headers(self):
+        candidate = self.current_state_result("candidate17")
+        self.assertTrue(candidate["ok"], candidate["message"])
+        self.assertEqual((1, 1), (candidate["saves"], candidate["labs"]))
+        markers = self._current_markers(candidate)
+        self.assertEqual({"current-provider", "current-admin-observed", "current-pre-reset", "current-post-reset",
+                          "current-pre-work", "current-complete", "current-cold"}, set(markers))
+        for phase, marker in markers.items():
+            with self.subTest(phase=phase):
+                self.assertEqual(("current-successor17", "0.10.0", "5.0.20017"),
+                                 (marker["stage"], marker["fixture_stage"], marker["mir_version"]))
+        self.assertEqual("candidate17-reset-event-enforced", markers["current-post-reset"]["outcome"])
+        for phase in (markers["current-complete"], markers["current-cold"]):
+            event = phase["ordinary_events"][1]
+            self.assertEqual((WORKER, False, 10, 11),
+                             (event["name"], event["by_script"], event["completed_level"],
+                              event["event_post_increment_level"]))
+        self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-admin-observed.json",
+                          "worker-speed-cap-ten/current-pre-reset.json", "worker-speed-cap-ten/current-post-reset.json",
+                          "worker-speed-cap-ten/current-pre-work.json", "worker-speed-cap-ten/current-complete.json",
+                          "worker-speed-cap-ten/current-cold.json", "worker-speed-cap-ten/current-cold.json"],
+                         [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
+        for opponent in ("scripted-finish", "preincrement-finish"):
+            with self.subTest(opponent=opponent):
+                adverse = self.current_state_result("candidate17", opponent)
+                self.assertFalse(adverse["ok"])
+                self.assertIn("scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
+                              adverse["message"])
 
     def test_current_observe_role_records_interleaved_public_boundaries_then_stops_before_reset(self):
         result = self.current_state_result("observe")
@@ -548,6 +745,7 @@ end
             "await-eleven": "level eleven research started",
             "after-eleven": "level eleven research started",
             "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
+            "preincrement-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
         }.items():
             with self.subTest(opponent=opponent):
                 result = self.current_state_result("candidate", opponent)
