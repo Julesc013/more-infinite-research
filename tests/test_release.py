@@ -147,9 +147,9 @@ class ReleaseTests(unittest.TestCase):
             changelog = changelog.replace(old_header, requested_header, 1)
         changelog_path.write_bytes(changelog.encode("utf-8"))
 
-    @classmethod
-    def _archive_name(cls, target, distribution_version=None):
-        return release._archive_name(target, distribution_version or cls.BASE_DISTRIBUTION_VERSION)
+    @staticmethod
+    def _archive_name(target, source_release="5.0.0"):
+        return alias_for(source_release, target).archive_name
 
     def test_current_authored_changelog_alias_matches_canonical_f210_player_metadata(self):
         alias = current_alias("f210")
@@ -189,7 +189,7 @@ class ReleaseTests(unittest.TestCase):
             first_output = temporary / "first-output"
             inventory = release.freeze(first_source, first_output, revision=commit)
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = {self._archive_name(target, "5.0.21002") for target in self.NORMAL_TARGETS}
+            expected = {self._archive_name(target, "5.0.2") for target in self.NORMAL_TARGETS}
             self.assertEqual({path.name for path in first_output.iterdir()},
                              expected | {release.SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual(inventory["kind"], release.KIND)
@@ -251,8 +251,8 @@ class ReleaseTests(unittest.TestCase):
                 early_target_record=release.package.EARLY_TARGET_RECORD,
             )
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = ({self._archive_name(target, "5.1.21000") for target in self.NORMAL_TARGETS}
-                        | {self._archive_name(target, "5.1.21000") for target in release.EARLY_TARGETS}
+            expected = ({self._archive_name(target, "5.1.0") for target in self.NORMAL_TARGETS}
+                        | {self._archive_name(target, "5.1.0") for target in release.EARLY_TARGETS}
                         | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual({path.name for path in frozen.iterdir()}, expected)
             self.assertEqual(inventory["release"], {
@@ -286,7 +286,7 @@ class ReleaseTests(unittest.TestCase):
             for asset in cohort["assets"]:
                 with self.subTest(target=asset["target"]), zipfile.ZipFile(frozen / asset["name"]) as archive:
                     info = json.loads(archive.read(asset["root"] + "/info.json"))
-                    self.assertEqual(asset["name"], self._archive_name(asset["target"], "5.1.21000"))
+                    self.assertEqual(asset["name"], self._archive_name(asset["target"], "5.1.0"))
                     self.assertEqual(info["version"], asset["version"])
                     self.assertEqual(info["dependencies"][0], "base >= " + asset["minimum_base"])
                     self.assertNotIn("support", asset)
@@ -328,10 +328,10 @@ class ReleaseTests(unittest.TestCase):
                                           if asset["target"] == "f210"),
                                      "MIR " + source_version + " for Factorio 2.1.23 (zip)")
                     self.assertEqual(
-                        frozen / self._archive_name("f013", distribution_version),
+                        frozen / self._archive_name("f013", source_version),
                         frozen / ("more-infinite-research_" + f013_version + ".zip"),
                     )
-                    self.assertTrue((frozen / self._archive_name("f013", distribution_version)).is_file())
+                    self.assertTrue((frozen / self._archive_name("f013", source_version)).is_file())
                     self.assertEqual(release.verify(source, frozen), inventory)
 
     # The malformed codec literals below are verifier adversaries, not aliases
