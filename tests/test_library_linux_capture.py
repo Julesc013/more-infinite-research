@@ -220,7 +220,10 @@ class CaptureControls(unittest.TestCase):
     def test_live_path_primitives_rehash_tools_and_preserve_existing_files(self):
         # Filesystem-only check on the host; no native/X operation is reached.
         with tempfile.TemporaryDirectory() as directory:
-            workspace = Path(directory) / 'checkout'; workspace.mkdir()
+            # The host's temporary directory can itself be a Windows junction
+            # or short-name alias. Build a valid canonical fixture; production
+            # must continue refusing caller-supplied aliased capture paths.
+            workspace = Path(directory).resolve(strict=True) / 'checkout'; workspace.mkdir()
             root = workspace / 'build/p/captures'; root.mkdir(parents=True)
             tool = workspace / 'xwd'; tool.write_bytes(b'pinned-tool')
             spec, _ = requests()
