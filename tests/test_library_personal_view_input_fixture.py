@@ -16,12 +16,13 @@ FIXTURE_CONTROL_PATH = "tests/fixtures/library-personal-view-input/control.lua"
 
 class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
     def setUp(self, *, base="2.1.24", package="5.0.21016", extra_mods=None,
-              actor_source=None, fixture_version="0.1.5"):
+              actor_source=None, fixture_version="0.1.5", multiplayer=False):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().actor_source = actor_source or (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.lua.globals().base_version = base
         self.lua.globals().package_version = package
         self.lua.globals().fixture_version = fixture_version
+        self.lua.globals().multiplayer = multiplayer
         self.lua.execute(r'''
           callbacks={events={}}
           storage={}
@@ -55,7 +56,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           player2={valid=true,connected=true,index=2,force=force,display_scale=1.25,
             display_resolution={width=1920,height=1080},controller_type=defines.controllers.character,
             gui={screen={}},opened=nil}
-          game={tick=0,connected_players={player},get_player=function(index)
+          game={tick=0,connected_players={player},is_multiplayer=function() return multiplayer end,get_player=function(index)
             if index==1 then return player end
             if index==2 then return player2 end
             return nil
@@ -245,6 +246,12 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
           assert(report().event_log[1].kind=="joined")
         ''')
 
+        self.setUp(multiplayer=True)
+        self.lua.execute(r'''
+          initialize();tick();tick()
+          assert(report().phase=="await-join" and #report().event_log==0 and next(writes)==nil)
+        ''')
+
     def test_wrong_tuple_or_extra_mod_refuses_before_event_observation(self):
         for base, package, extra in [
             ("2.1.23", "5.0.21016", None),
@@ -404,6 +411,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
         self.assertIn('begin_observation(player, "singleplayer-load")', code)
         self.assertIn('begin_observation(player, "joined")', code)
+        self.assertIn("if game.is_multiplayer() then return end", code)
         self.assertIn("script.on_event(defines.events.on_gui_selected_tab_changed, on_selected_tab_changed)", code)
         self.assertIn('helpers.write_file(name, helpers.table_to_json({', code)
         self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)

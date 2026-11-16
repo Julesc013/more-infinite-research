@@ -314,6 +314,7 @@ end
 local function bootstrap_singleplayer_load()
   local current = state()
   if current.phase ~= "await-join" then return end
+  if game.is_multiplayer() then return end
   local players = game.connected_players
   if players == nil or #players ~= 1 then return end
   local joined = players[1]
