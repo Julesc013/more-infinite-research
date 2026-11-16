@@ -105,11 +105,26 @@
       "phase_files": 0,
       "actor_result": false,
       "final_verdict": "none"
+    },
+    "terminal_adverse": {
+      "path": "build/qualification/linux-library-current-render-preparation-r01/personal-input-adverse-independent-review-r01.json",
+      "status": "failed-observer-initialization-no-input-acceptance",
+      "original_files": 18,
+      "original_bytes": 3897446,
+      "fixture_version": "0.1.4",
+      "cause": "The observer waited only for on_player_joined_game, which does not occur when a single-player save loads; no initial phase was scheduled.",
+      "phase_files": 0,
+      "mir_input_delivery": "unobserved",
+      "original_library_restored": true,
+      "seed_unchanged": true,
+      "remaining_native_processes": 0,
+      "product_defect_established": false,
+      "native_acceptance": false
     }
   },
   "limits": [
     "This record establishes exact beta distribution and delivery only.",
-    "The personal-view service observation is an in-progress status, not a final execution result.",
+    "The retained personal-view service observation is historical in-progress status; the later terminal adverse is not an input-acceptance or product verdict.",
     "It does not resolve the Sage unprepared-history report or make it a release-arrival gate.",
     "It does not establish stable acceptance or a Mod Portal publication."
   ]
