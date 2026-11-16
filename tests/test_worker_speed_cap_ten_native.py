@@ -218,10 +218,11 @@ function current_state_flow(old_path,successor_path,common,mode,opponent)
   if opponent=="post-boundary-sentinel-write"then player.technologies["stone-wall"].enabled=true end
   if opponent=="post-boundary-bonus-drift"then player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.1 end
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
-  if opponent=="scripted-finish"then ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
-  player.research_queue={};owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  if opponent=="scripted-finish"then owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
+  if opponent=="preincrement-finish"then owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result,state=state}end
+  player.research_queue={};owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
   if opponent=="missing-ordinary-event"then state.ordinary_events={} end
-  owner.level=11;player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end end
   for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"current-successor16",game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
@@ -383,7 +384,9 @@ end
         self.assertEqual((1, 0, 2), (complete["ordinary_native_completion_count"],
                                      complete["level_eleven_start_count"], complete["post_completion_hold_ticks"]))
         for phase in (complete, cold):
-            self.assertEqual((WORKER, False), (phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"]))
+            self.assertEqual((WORKER, False, 10, 11), (
+                phase["ordinary_events"][1]["name"], phase["ordinary_events"][1]["by_script"],
+                phase["ordinary_events"][1]["completed_level"], phase["ordinary_events"][1]["event_post_increment_level"]))
             self.assertIsInstance(phase["ordinary_events"][1]["tick"], int)
         self.assertAlmostEqual(complete["post_reset_player_bonus"] + .65,
                                complete["post_completion"]["player"]["worker"]["bonus"])
@@ -414,6 +417,7 @@ end
             "await-eleven": "level eleven research started",
             "after-eleven": "level eleven research started",
             "scripted-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
+            "preincrement-finish": "scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
         }.items():
             with self.subTest(opponent=opponent):
                 result = self.current_state_result("candidate", opponent)
