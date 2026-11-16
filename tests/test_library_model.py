@@ -196,6 +196,45 @@ class LibraryModelTests(unittest.TestCase):
           assert(ids["research-speed-7"], "runtime adapter omitted an unrelated MIR continuation")
         ''')
 
+    def test_runtime_catalogue_requires_and_invokes_pure_prepare_at_control_parse(self):
+        self.lua.execute('''
+          local prepared, declared = 0, 0
+          package.preload["research.catalogue"] = function()
+            return {
+              prepare = function(foreign, withheld, finite_speed, worker, split)
+                prepared = prepared + 1
+                assert(foreign == nil and withheld == nil and finite_speed == false
+                  and worker == nil and split == nil)
+              end,
+              declared = function()
+                declared = declared + 1
+                return {{id="prepared-row", settings={"prepared-setting"}}}
+              end
+            }
+          end
+          script, mods, prototypes, game = {active_mods={base="2.1.23"}}, nil, nil, nil
+          package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+          local runtime = require("runtime.catalogue")
+          assert(prepared == 1 and declared == 0, "prepare must be exactly control-parse work")
+          local first = runtime.declared()
+          assert(declared == 1 and first[1].id == "prepared-row")
+          first[1].id, first[1].settings[1] = "foreign", "foreign"
+          local second = runtime.declared()
+          assert(declared == 2 and second[1].id == "prepared-row" and second[1].settings[1] == "prepared-setting")
+        ''')
+
+        self.lua.execute('''
+          local declared = 0
+          package.preload["research.catalogue"] = function()
+            return {declared=function() declared = declared + 1; error("must not declare") end}
+          end
+          script, mods, prototypes, game = {active_mods={base="2.1.23"}}, nil, nil, nil
+          package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+          local ok, message = pcall(require, "runtime.catalogue")
+          assert(not ok and tostring(message):find("prepare", 1, true), tostring(message))
+          assert(declared == 0, "missing prepare reached declaration work")
+        ''')
+
     def test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse(self):
         editions = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
         profiles = [
