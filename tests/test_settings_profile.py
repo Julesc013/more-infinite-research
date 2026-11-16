@@ -280,6 +280,55 @@ class SettingsProfileTests(unittest.TestCase):
           assert(settings.startup["ips-enable-research_gears"].value == true)
         ''')
 
+    def test_profile_header_defaults_only_absent_values_and_refuses_false_or_zero(self):
+        # Old raw profiles legitimately omit transport headers. A supplied
+        # header is instead an identity claim: false, zero and wrong typed
+        # values must not be treated as that legacy absence.
+        self.lua.execute(r'''
+          local enabled, time = "ips-enable-research_gears", "ips-research-time-research_gears"
+          local legacy = {schema=1, settings={[enabled]=false, [time]=0}}
+          local canonical = {schema=1, format=1, codec="canonical-json-deflate-base64",
+            settings={[enabled]=false, [time]=0}}
+          decoded.legacy_headers, decoded.canonical_headers = legacy, canonical
+          for _, case in ipairs({
+            {name="legacy_headers", source=legacy}, {name="canonical_headers", source=canonical}
+          }) do
+            local profile, err = codec.decode("MIRSET1:" .. case.name, helpers)
+            assert(profile and err == nil and profile.format == 1
+              and profile.codec == "canonical-json-deflate-base64")
+            settings.startup[config.import_setting_name].value = "MIRSET1:" .. case.name
+            local values = config.effective_values(settings.startup, helpers)
+            assert(values[enabled] == false and values[time] == 0, case.name)
+            assert(case.source.format == nil or case.source.format == 1)
+            assert(case.source.codec == nil or case.source.codec == "canonical-json-deflate-base64")
+            assert(case.source.settings[enabled] == false and case.source.settings[time] == 0)
+          end
+
+          local invalid = {
+            false_value=false, zero_value=0, boolean_value=true, string_value="wrong", table_value={}, numeric_value=2
+          }
+          for _, field in ipairs({"format", "codec"}) do
+            for label, value in pairs(invalid) do
+              local name = field .. "_" .. label
+              local source = {schema=1, settings={[enabled]=false, [time]=0}}
+              source[field] = value
+              decoded[name] = source
+              local profile, err = codec.decode("MIRSET1:" .. name, helpers)
+              assert(profile == nil and type(err) == "string"
+                and err:find("unsupported profile " .. field, 1, true), name .. ": " .. tostring(err))
+              settings.startup[enabled].value, settings.startup[time].value = true, 17
+              settings.startup[config.import_setting_name].value = "MIRSET1:" .. name
+              local reports = {}
+              local values = config.effective_values(settings.startup, helpers,
+                function(message) reports[#reports + 1] = message end)
+              assert(values[enabled] == true and values[time] == 17 and #reports == 1, name)
+              assert(source[field] == value, name .. " mutated decoded input")
+              assert(source.settings[enabled] == false and source.settings[time] == 0,
+                name .. " mutated decoded settings")
+            end
+          end
+        ''')
+
     def test_missing_profile_helpers_fall_back_and_fresh_resolution_recovers(self):
         # The same published fixture requires raw fallback while helpers are
         # absent, then valid import after availability changes. Do not restore
