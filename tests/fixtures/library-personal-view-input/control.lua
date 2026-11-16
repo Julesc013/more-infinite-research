@@ -3,7 +3,7 @@
 -- records resulting public GUI and native state after MIR has handled each
 -- event on the following tick.
 local FIXTURE = "mir-fixture-library-personal-view-input"
-local VERSION = "0.1.4"
+local VERSION = "0.1.5"
 local MIR = "more-infinite-research"
 local MIR_VERSION = "5.0.21016"
 local ROOT = "mir_research_browser"
@@ -300,8 +300,33 @@ local function record_snapshot(stage_name)
   return player, row
 end
 
+local function begin_observation(player, origin)
+  local current = state()
+  if current.phase ~= "await-join" then return false end
+  if player == nil then fail("observed player unavailable") end
+  record_event(origin, {player_index = player.index})
+  current.player_index = player.index
+  schedule("initial", game.tick + MAX_INITIAL_READY_TICKS)
+  current.phase = "settling-initial"
+  return true
+end
+
+local function bootstrap_singleplayer_load()
+  local current = state()
+  if current.phase ~= "await-join" then return end
+  local players = game.connected_players
+  if players == nil or #players ~= 1 then return end
+  local joined = players[1]
+  if not valid(joined) or joined.connected ~= true or type(joined.index) ~= "number" then return end
+  local player = player_for(joined.index)
+  if player == nil then return end
+  begin_observation(player, "singleplayer-load")
+end
+
 local function settle(event)
   local current = state()
+  bootstrap_singleplayer_load()
+  current = state()
   local pending = current.pending
   if pending == nil or event.tick < pending.tick then return end
   current.pending = nil
@@ -359,10 +384,7 @@ local function on_join(event)
   local player = player_for(event and event.player_index)
   if player == nil then fail("joined player unavailable") end
   if current.phase ~= "await-join" then fail("unexpected player join") end
-  record_event("joined", {player_index = player.index})
-  current.player_index = player.index
-  schedule("initial", game.tick + MAX_INITIAL_READY_TICKS)
-  current.phase = "settling-initial"
+  begin_observation(player, "joined")
 end
 
 local function on_shortcut(event)
