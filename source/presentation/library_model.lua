@@ -480,30 +480,7 @@ local function row_matches(row, view, technology, context)
     or recipe_id_matches(technology, view.search, context)
 end
 
--- A finite authored head and its continuation share their family, localized
--- subject and first level. Keep their native identities separate while
--- presenting the finite head before the continuation before or after labels
--- arrive from the asynchronous translation cache.
-local function same_declared_stage(left, right)
-  return type(left) == "table" and type(right) == "table"
-    and type(left.family) == "string" and left.family == right.family
-    and type(left.locale_key) == "string" and left.locale_key == right.locale_key
-    and finite_integer(left.progression) and left.progression == right.progression
-    and (left.fixed_maximum ~= nil or right.fixed_maximum ~= nil)
-end
-
-local function staged_before(left, right)
-  if not same_declared_stage(left, right) then return nil end
-  local left_fixed = finite_integer(left.fixed_maximum) and left.fixed_maximum > 0
-  local right_fixed = finite_integer(right.fixed_maximum) and right.fixed_maximum > 0
-  if left_fixed ~= right_fixed then return left_fixed end
-  if left_fixed and left.fixed_maximum ~= right.fixed_maximum then return left.fixed_maximum < right.fixed_maximum end
-  return nil
-end
-
 local function ordered(left, right, sort)
-  local staged = staged_before(left, right)
-  if staged ~= nil then return staged end
   if sort == "name-asc" or sort == "name-desc" then
     local left_name, right_name = ascii_casefold(left.name), ascii_casefold(right.name)
     if left_name ~= right_name then

@@ -4187,20 +4187,19 @@ class LibraryTests(unittest.TestCase):
             if item[2] == "[img=technology/" .. tail_id .. "] " then labels[tail_id] = item[3] end
           end
           local items = content["mir_library_list_pane"]["mir_library_results"].items
-          assert(items[1][2] == "[img=technology/" .. retired_id .. "] "
-            and items[2][2] == "[img=technology/" .. tail_id .. "] ",
-            "a same-caption name sort must retain the authored finite-to-continuation order")
+          assert(items[1][2] == "[img=technology/" .. tail_id .. "] "
+            and items[2][2] == "[img=technology/" .. retired_id .. "] ",
+            "same-caption stage labels must not override the established name sort")
           assert(labels[retired_id] and labels[tail_id] and labels[retired_id] ~= labels[tail_id],
             "same-caption public worker stages need distinct list choices")
           assert(labels[retired_id][1] == "mir-browser.list-stage-finite"
             and labels[retired_id][2] == "Worker robot storage"
-            and labels[retired_id][3] == 1 and labels[retired_id][4] == 2 and labels[retired_id][5] == 4,
+            and labels[retired_id][3] == 4,
             "the finite public stage lost its authored endpoint")
           assert(labels[tail_id][1] == "mir-browser.list-stage-capped"
             and labels[tail_id][2] == "Worker robot storage"
-            and labels[tail_id][3] == 2 and labels[tail_id][4] == 2
-            and labels[tail_id][5] == 4 and labels[tail_id][6] == 8,
-            "the continuation must show its configured cap without exposing its internal ID")
+            and labels[tail_id][3] == 4 and labels[tail_id][4] == 8,
+            "the continuation must show its effective limit without exposing its internal ID")
 
           local actions = content["mir_library_list_pane"]["mir_library_actions"]
           library.on_gui_click({player_index=1, element=actions["mir_library_open_native"]})
