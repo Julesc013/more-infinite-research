@@ -866,7 +866,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
                 "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
             "more-infinite-research_" + MIR_517_F210 + ".zip":
-                "4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615",
+                "5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50",
         })
 
     def test_multiplayer_wrapper_admits_only_the_current_linux_f210_api_profile_before_composition(self):
@@ -883,7 +883,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Invoke-Expression $node[0].Extent.Text
           function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_CURRENT_LINUX_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
           $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
-          $mir='4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
           $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
           if($selected.kind-cne'mir5-library-api-consumers-current-linux-f210-native-selection'-or$selected.base-cne'2.1.24'-or$selected.mir-cne'5.0.21017'-or$selected.build_version-ne87808-or$selected.linux_private_displays-ne$true-or$selected.fixture_archive_sha256-cne'CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'-or$selected.fixture_source_revision-cne'3c6cf808745fe88741ceea0a33bf950cec8f8176'){throw 'current Linux API target differs'}
           function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Engine=$engine){

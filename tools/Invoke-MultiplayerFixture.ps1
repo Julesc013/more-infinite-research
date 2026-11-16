@@ -219,7 +219,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-api-consumers-current-linux-f210-native-selection';factorio_line='2.1';base='2.1.24'
       engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
-      mir_archive_sha256='4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
       fixture_archive_sha256='CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'
       fixture_source_revision='3c6cf808745fe88741ceea0a33bf950cec8f8176'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.2','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
