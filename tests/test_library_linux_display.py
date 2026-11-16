@@ -446,14 +446,16 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
         temporary, checkout, root, pins = self.make_layout()
         self.addCleanup(temporary.cleanup)
         probe = Path(temporary.name) / "bound_probe.py"
-        probe.write_text("PINS = {}\n", encoding="utf-8")
+        sentinel = Path(temporary.name) / "unverified-probe-executed"
+        malicious = "from pathlib import Path\nPath(" + repr(str(sentinel)) + ").write_text('ran')\n"
+        # The substituted source has the *same byte length*: the cryptographic
+        # pin, not just file-size validation, must precede import.
+        probe.write_text("# authenticated passive probe\n".ljust(len(malicious), "#"), encoding="utf-8")
         pins["probe_display"] = {
             "path": str(probe), "bytes": probe.stat().st_size, "sha256": digest(probe),
         }
         with self.admitted_probe(pins):
             validated = DISPLAY.validate_plan(self.plan(root, pins), checkout)
-        sentinel = Path(temporary.name) / "unverified-probe-executed"
-        malicious = "from pathlib import Path\nPath(" + repr(str(sentinel)) + ").write_text('ran')\n"
         probe.write_text(malicious, encoding="utf-8")
         with self.linux():
             self.assert_refuses(
