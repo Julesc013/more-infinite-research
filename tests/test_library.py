@@ -986,6 +986,7 @@ class LibraryTests(unittest.TestCase):
             return {
               gear_id = function() return "recipe-prod-research_gears-1" end,
               internal_credit_ids = function() return library_private_credit_ids or {} end,
+              prepare = function() end,
               declared = function()
                 return library_declarations or {
                   {id = "recipe-prod-research_gears-1", name = "Iron gear wheel productivity",
@@ -4343,7 +4344,7 @@ class LibraryTests(unittest.TestCase):
     def test_real_model_host_preserves_hidden_visibility_and_full_family_callbacks(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = function()
-            return {internal_credit_ids = function() return {} end, declared = function()
+            return {internal_credit_ids = function() return {} end, prepare = function() end, declared = function()
               return {
                 {id = "recipe-prod-research_gears-1", family = "research_gears", progression = 1,
                   native_order = "p[research_gears]"},
