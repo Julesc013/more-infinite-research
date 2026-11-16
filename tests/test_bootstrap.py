@@ -22,6 +22,14 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
+          -- Test-owned expected identities. Keep this independent from
+          -- bootstrap's local selector declaration.
+          TEST_COMPETING_PROVIDER_IDS = {
+            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
+            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
+            "crafting-efficiency-2", "ProductivityResearch"
+          }
+
           function install_modules(caps_enabled, repair_enabled, scripted_active, native_credit_active)
             CAP_ACTIVE = caps_enabled == true
             REPAIR_ACTIVE = repair_enabled == true
@@ -772,14 +780,7 @@ class BootstrapTests(unittest.TestCase):
             return {id="f200", recipe_productivity=true}
           end
           load_control()
-          -- Test-owned identities are intentionally literal: a missing source
-          -- entry must leave that provider's removed transition unrecognized.
-          local providers = {
-            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
-            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
-            "crafting-efficiency-2", "ProductivityResearch"
-          }
-          for _, name in ipairs(providers) do
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
             handlers.configuration({mod_startup_settings_changed=true,
               mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
                 [name]={old_version='1.0.0'}}})
@@ -795,14 +796,7 @@ class BootstrapTests(unittest.TestCase):
 
     def test_named_productivity_providers_activate_only_the_f200_adapter(self):
         self.lua.execute('''
-          -- These literal names are an independent interface expectation, not
-          -- an import of bootstrap's local selector table.
-          local providers = {
-            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
-            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
-            "crafting-efficiency-2", "ProductivityResearch"
-          }
-          for _, name in ipairs(providers) do
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
             install_modules(false, false, false, true)
             install_runtime(nil, {[name]="1.0.0"})
             package.loaded["runtime.competing_productivity"] = nil
@@ -907,14 +901,9 @@ class BootstrapTests(unittest.TestCase):
 
     def test_f210_current_productivity_provider_preflights_without_a_mod_change(self):
         self.lua.execute('''
-          local providers = {
-            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
-            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
-            "crafting-efficiency-2", "ProductivityResearch"
-          }
           local changed = {mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.21000'}}}
-          for _, name in ipairs(providers) do
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
             install_modules(false, false, false, true)
             install_runtime(nil, {[name]='2.1.0'})
             package.loaded["runtime.competing_productivity"] = nil
