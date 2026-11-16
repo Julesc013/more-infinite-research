@@ -217,7 +217,7 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
         names = [member["name"] for member in json.loads((FIXTURE / "archive-manifest.json").read_text())["source"]["members"]]
         with tempfile.TemporaryDirectory() as directory:
             directory = Path(directory)
-            source, derived = directory / "source.zip", directory / "derived.zip"
+            source, derived, altered = directory / "source.zip", directory / "derived.zip", directory / "altered.zip"
             with zipfile.ZipFile(source, "w") as archive:
                 for name in names:
                     archive.writestr(name, b"old-control" if name == helper.CONTROL else name.encode("ascii"))
@@ -230,6 +230,11 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "member order or names"):
                 helper.verify(source, derived, source_hash, old_hash, helper.sha256(new))
             helper.derive(source, derived, new, source_hash, old_hash)
+            with zipfile.ZipFile(altered, "w") as archive:
+                for name, body in helper.rows(derived):
+                    archive.writestr(name, b"changed-world" if name.endswith("level.dat0") else body)
+            with self.assertRaisesRegex(ValueError, "non-observer member changed"):
+                helper.verify(source, altered, source_hash, old_hash, helper.sha256(new))
             with self.assertRaisesRegex(ValueError, "source archive hash"):
                 helper.verify(source, derived, "00" * 32, old_hash, helper.sha256(new))
             with self.assertRaisesRegex(ValueError, "observer replacement hash"):
