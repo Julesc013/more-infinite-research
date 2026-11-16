@@ -10,6 +10,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Keep settings profile exports detached from caller metadata and reject values that cannot be exported without loss.
 - Show accurate Research Library availability when research is disabled by its effective settings or already exists.
 - Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
+- Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
 
 ## [5.0.15] - 2026-11-16
 
