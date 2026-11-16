@@ -225,6 +225,70 @@ function Assert-PrivateDisplayChildIdentity($Process,$Identity) {
   Assert-Session ($null-ne$Process-and$null-ne$Identity-and$Identity.id -is [Int32] -and $Identity.start_utc_ticks -is [Int64]) 'private display child identity is absent'
   Assert-Session (-not$Process.HasExited-and$Process.Id -eq [int]$Identity.id-and$Process.StartTime.ToUniversalTime().Ticks -eq [Int64]$Identity.start_utc_ticks) 'private display child identity changed'
 }
+function Get-PrivateDisplayProbePythonPin {
+  Assert-Session ($linuxPrivateDisplays.Contains('probe_display')-and$linuxPrivateDisplays.Contains('probe_display_sha256')) 'private display probe binding is absent'
+  $probe=Resolve-Existing ([string]$linuxPrivateDisplays.probe_display) 'Leaf' 'private display probe'
+  Assert-Session ((Get-SessionHash $probe)-ceq([string]$linuxPrivateDisplays.probe_display_sha256).ToUpperInvariant()) 'private display probe changed'
+  try{$text=[Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes($probe))}catch{throw '[mir5-multiplayer-session] private display probe text differs'}
+  $python=Resolve-Existing ([string]$linuxPrivateDisplays.python) 'Leaf' 'private display Python'
+  $matches=@([regex]::Matches($text,'(?m)^\s*["''](?<path>[^"'']+)["'']\s*:\s*["''](?<hash>[A-F0-9]{64})["'']\s*,?\s*$')|Where-Object {$_.Groups['path'].Value-ceq$python})
+  Assert-Session ($matches.Count-eq1) 'private display Python pin differs'
+  return [string]$matches[0].Groups['hash'].Value
+}
+function Assert-PrivateDisplayInterpreterPin {
+  $python=Resolve-Existing ([string]$linuxPrivateDisplays.python) 'Leaf' 'private display Python'
+  Assert-Session ((Get-SessionHash $python)-ceq(Get-PrivateDisplayProbePythonPin)) 'private display Python changed'
+  return $python
+}
+function Assert-PrivateDisplayContinuity($Display) {
+  Assert-Session ($null-ne$Display-and$null-ne$Display.ready-and$linuxPrivateDisplays.Contains('probe_display')-and$linuxPrivateDisplays.Contains('probe_display_sha256')) 'private display continuity binding is absent'
+  $probe=[string]$linuxPrivateDisplays.probe_display;$expected=[string]$linuxPrivateDisplays.probe_display_sha256
+  Assert-Session ($expected-cmatch'^[A-Fa-f0-9]{64}'-and(Get-SessionHash $probe)-ceq$expected.ToUpperInvariant()) 'private display probe changed before client start'
+  # The qualified helper is evaluated from its one verified source buffer. It
+  # supplies only read-only binding checks; it never performs host-idle policy,
+  # starts X, or opens a network listener.  This parent repeats the retained
+  # PID/start/session/socket/viewer/authority proof immediately before every
+  # Factorio client, rather than trusting a ready receipt by presence alone.
+  $code=@'
+import hashlib,json,os,stat,sys,types
+probe_path,expected,ready_path,authority=sys.argv[1:5]
+raw=open(probe_path,'rb').read()
+if hashlib.sha256(raw).hexdigest().upper()!=expected: raise RuntimeError('probe hash differs')
+sys.dont_write_bytecode=True
+module=types.ModuleType('mir_display_probe');exec(compile(raw,probe_path,'exec'),module.__dict__)
+python_path=os.path.realpath(sys.executable)
+python_hash=hashlib.sha256(open(python_path,'rb').read()).hexdigest().upper()
+if getattr(module,'PINS',{}).get(python_path)!=python_hash: raise RuntimeError('probe Python pin differs')
+ready_raw=open(ready_path,'rb').read()
+ready=json.loads(ready_raw.decode('utf-8'))
+identity=ready['display_identity'];pid=int(identity['pid'])
+tail=open('/proc/%d/stat'%pid,encoding='utf-8').read().rsplit(')',1)[1].split()
+observed={'pid':pid,'session_id':int(tail[3]),'start_ticks':int(tail[19])}
+if observed!=identity: raise RuntimeError('display identity differs')
+class Server:
+  def __init__(self,pid): self.pid=pid
+  def poll(self): return None
+server=Server(pid)
+display=module.display_binding(server,module.Path('/tmp/.X11-unix/X'+str(ready['display'])[1:]),module.Path('/tmp/.X'+str(ready['display'])[1:]+'-lock'))
+viewer=module.viewer_binding(server,module.Path(os.path.join(os.path.dirname(authority),'runtime','viewer.sock')))
+module.no_network_sockets(pid)
+info=os.lstat(authority)
+if not(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode)==0o600 and [info.st_dev,info.st_ino]==ready['authority_device_inode']): raise RuntimeError('authority identity differs')
+if display!=ready['display_binding'] or viewer!=ready['viewer_binding']: raise RuntimeError('display binding differs')
+print(json.dumps({'status':'verified','ready_sha256':hashlib.sha256(ready_raw).hexdigest().upper(),'identity':observed},sort_keys=True))
+'@
+  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$linuxPrivateDisplays.python;$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @('-c',$code,$probe,$expected,[string]$Display.role.ready,[string]$Display.role.authority)){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) 'private display continuity probe did not start'
+  try{
+    $stdout=$process.StandardOutput.ReadToEnd();$stderr=$process.StandardError.ReadToEnd();$process.WaitForExit()
+    Assert-Session ($process.ExitCode-eq0-and[Text.UTF8Encoding]::new($false).GetByteCount($stdout)-le32KB-and[Text.UTF8Encoding]::new($false).GetByteCount($stderr)-le8KB) 'private display continuity probe refused'
+    $value=$stdout.Trim()|ConvertFrom-Json -AsHashtable
+    Assert-Session ($value-is[Collections.IDictionary]-and$value.Keys.Count-eq3-and$value.status-ceq'verified'-and$value.ready_sha256-ceq(Get-SessionHash ([string]$Display.role.ready))-and$value.identity-is[Collections.IDictionary]-and$value.identity.Keys.Count-eq3) 'private display continuity receipt differs'
+    foreach($name in @('pid','start_ticks','session_id')){Assert-Session ($value.identity[$name]-is[Int64]-and$value.identity[$name]-eq[Int64]$Display.ready.display_identity[$name]) 'private display continuity identity differs'}
+  }finally{$process.Dispose()}
+}
 function Complete-PrivateDisplayOutput($Copies,$Streams) {
   $failure=$null
   foreach($copy in @($Copies)){try{$null=$copy.GetAwaiter().GetResult()}catch{if($null-eq$failure){$failure=$_}}}
@@ -249,7 +313,8 @@ function Start-PrivateDisplay($Role) {
   $stdout=Resolve-BuildOutput (Join-Path $workroot ('display-'+[string]$Role.locale+'.stdout.log')) 'private display stdout'
   $stderr=Resolve-BuildOutput (Join-Path $workroot ('display-'+[string]$Role.locale+'.stderr.log')) 'private display stderr'
   Assert-Session (-not(Test-Path -LiteralPath $stdout)-and-not(Test-Path -LiteralPath $stderr)) 'private display output already exists'
-  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$linuxPrivateDisplays.python;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
+  $python=Assert-PrivateDisplayInterpreterPin
+  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=$python;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
   $start.RedirectStandardInput=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
   foreach($argument in @([string]$linuxPrivateDisplays.display_cli,'--module-sha256',[string]$linuxPrivateDisplays.display_module_sha256,'--mode','execute','--checkout',[string]$linuxPrivateDisplays.checkout,'--plan',[string]$Role.plan,'--plan-sha256',[string]$Role.plan_sha256)){$null=$start.ArgumentList.Add($argument)}
   $process=$null;$identity=$null
@@ -1006,13 +1071,16 @@ if($spec.ContainsKey('linux_private_displays')){
   Assert-Session ($fixtureCase-ceq'library-multiplayer'-and$apiClientConsumers-and-not$standaloneIdentityDiscovery) 'private displays differ from the current Library route'
   Assert-Session ($spec.linux_private_displays-is[System.Collections.IDictionary]) 'private display binding differs'
   $linuxPrivateDisplays=$spec.linux_private_displays
-  Assert-Session ($linuxPrivateDisplays.Keys.Count-eq6-and$linuxPrivateDisplays.Contains('python')-and$linuxPrivateDisplays.Contains('display_cli')-and$linuxPrivateDisplays.Contains('display_cli_sha256')-and$linuxPrivateDisplays.Contains('display_module_sha256')-and$linuxPrivateDisplays.Contains('checkout')-and$linuxPrivateDisplays.Contains('roles')) 'private display binding shape differs'
+  Assert-Session ($linuxPrivateDisplays.Keys.Count-eq8-and$linuxPrivateDisplays.Contains('python')-and$linuxPrivateDisplays.Contains('display_cli')-and$linuxPrivateDisplays.Contains('display_cli_sha256')-and$linuxPrivateDisplays.Contains('display_module_sha256')-and$linuxPrivateDisplays.Contains('checkout')-and$linuxPrivateDisplays.Contains('probe_display')-and$linuxPrivateDisplays.Contains('probe_display_sha256')-and$linuxPrivateDisplays.Contains('roles')) 'private display binding shape differs'
   foreach($field in @('python','display_cli','checkout')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$linuxPrivateDisplays[$field])) "private display binding differs: $field"}
   foreach($field in @('display_cli_sha256','display_module_sha256')){Assert-Session ($linuxPrivateDisplays[$field]-is[string]-and[string]$linuxPrivateDisplays[$field]-cmatch'^[A-Fa-f0-9]{64}$') "private display hash differs: $field"}
   $linuxPrivateDisplays.python=Resolve-Existing ([string]$linuxPrivateDisplays.python) 'Leaf' 'private display Python'
   $linuxPrivateDisplays.display_cli=Resolve-BuildInput ([string]$linuxPrivateDisplays.display_cli) 'Leaf' 'private display CLI'
   $linuxPrivateDisplays.checkout=Resolve-Existing ([string]$linuxPrivateDisplays.checkout) 'Container' 'private display checkout'
   Assert-Session ((Get-SessionHash $linuxPrivateDisplays.display_cli)-ceq([string]$linuxPrivateDisplays.display_cli_sha256).ToUpperInvariant()) 'private display CLI hash differs'
+  $linuxPrivateDisplays.probe_display=Resolve-Existing ([string]$linuxPrivateDisplays.probe_display) 'Leaf' 'private display probe'
+  Assert-Session ([string]$linuxPrivateDisplays.probe_display_sha256-cmatch'^[A-Fa-f0-9]{64}'-and(Get-SessionHash $linuxPrivateDisplays.probe_display)-ceq([string]$linuxPrivateDisplays.probe_display_sha256).ToUpperInvariant()-and[string]$linuxPrivateDisplays.probe_display_sha256-ceq'F2DF1A32CA48119010E5DBE42326B3ED46E13A01A08B487AFDF0CDA5B180B423') 'private display probe hash differs'
+  Assert-Session ((Get-SessionHash $linuxPrivateDisplays.python)-ceq(Get-PrivateDisplayProbePythonPin)) 'private display Python hash differs'
   $roles=@($linuxPrivateDisplays.roles);Assert-Session ($roles.Count-eq2) 'private display role count differs'
   $roleLocales=[Collections.Generic.List[string]]::new()
   foreach($role in $roles){
@@ -1105,7 +1173,10 @@ if ($collectProcessMemoryObservations) {
 $records = [Collections.Generic.List[object]]::new()
 $apiClientLoadMarkers = [Collections.Generic.List[object]]::new()
 $liveLogs = @((Join-Path $serverWriteData 'factorio-current.log')) + @($clients | ForEach-Object { Join-Path $_.write_data 'factorio-current.log' })
-$deadline = [DateTime]::UtcNow.AddSeconds($(if($standaloneIdentityDiscovery){180}else{900}))
+# The leaf permits up to 900 seconds, including its owned display teardown.
+# Reserve the final minute for the session's client/server/display cleanup so
+# its enclosing 900-second governor does not race a live display at expiry.
+$deadline = [DateTime]::UtcNow.AddSeconds($(if($standaloneIdentityDiscovery){180}elseif($null-ne$linuxPrivateDisplays){840}else{900}))
 $server = $null; $activeClients = @()
 $baseServer = @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--rcon-bind',('127.0.0.1:' + [string]$rconPort),'--rcon-password',$rconPassword)
 function Start-Server([string]$Name, [string]$Save) {
@@ -1129,6 +1200,7 @@ function Start-Clients([string]$Phase) {
     if($null-ne$privateDisplays){
       Assert-Session ($displayByLocale.ContainsKey([string]$client.locale)) 'private display locale is unavailable'
       $display=$displayByLocale[[string]$client.locale]
+      Assert-PrivateDisplayContinuity $display
       $graphicsRoot=Join-Path $client.write_data ('linux-graphics-'+$Phase)
       Assert-Session (-not(Test-Path -LiteralPath $graphicsRoot)) 'private display phase graphics root already exists'
       $null=New-Item -ItemType Directory -Path $graphicsRoot

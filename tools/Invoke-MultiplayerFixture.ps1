@@ -22,6 +22,9 @@ param(
   # plans.  This wrapper does not own global host-idle/campaign admission or
   # create a second governor; the governed session owns their lifetime.
   [System.Collections.IDictionary]$LinuxPrivateDisplays,
+  # Validate the complete current Linux composition without creating a world,
+  # starting a display, activating a client, or claiming a seed result.
+  [switch]$ComposeOnly,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -217,6 +220,8 @@ function Assert-MultiplayerFixtureSelection {
       engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
       mir_archive_sha256='4DF21917FD94BD78329310C2440B68078E8240EE3CE100C2847CB444E6F38615'
+      fixture_archive_sha256='CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'
+      fixture_source_revision='3c6cf808745fe88741ceea0a33bf950cec8f8176'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.2','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.2.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
       api_consumer_archive_sha256=[ordered]@{
@@ -331,6 +336,16 @@ function Assert-MultiplayerFixtureSelection {
     foreach($entry in $apiArchives.GetEnumerator()){
       Assert-Session ($entry.Key -is [string] -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$' -and $archives.Contains([string]$entry.Key) -and $archives[[string]$entry.Key] -ceq [string]$entry.Value) "standalone API consumer archive differs: $($entry.Key)"
     }
+  }
+  if($target.Contains('fixture_archive_sha256')){
+    $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
+    Assert-Session ($target.fixture_archive_sha256 -is [string] -and $target.fixture_archive_sha256 -cmatch '^[A-F0-9]{64}$') 'current Library fixture archive binding differs'
+    # This projection archive is purposefully not part of the reusable profile
+    # document: the profile's four library-control hashes bind Base/MIR/A15/
+    # API consumers, while the wrapper binds this selected source projection
+    # separately before it can activate the full six-mod session.
+    Assert-Session ($target.optional_archives -ccontains $fixtureArchive) 'current Library fixture archive selection differs'
+    Assert-Session ($target.Contains('fixture_source_revision') -and $target.fixture_source_revision -is [string] -and $target.fixture_source_revision -cmatch '^[0-9a-f]{40}$') 'current Library fixture source revision differs'
   }
   foreach($entry in $archives.GetEnumerator()){
     Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
@@ -780,6 +795,125 @@ function Invoke-MultiplayerFixturePreparation {
     if(-not $completed -and $null-ne$install){Remove-StandaloneIdentityFixtureArchive -Install $install}
   }
 }
+function Assert-LinuxDisplayPinnedFile {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Expected,[Parameter(Mandatory)][string]$Label,[ValidateRange(1,64MB)][int64]$MaximumBytes=256KB)
+  Assert-Session ($Expected -cmatch '^[A-Fa-f0-9]{64}$' -and (Test-Path -LiteralPath $Path -PathType Leaf)) "$Label is absent"
+  $item=Get-Item -LiteralPath $Path -Force
+  Assert-Session (($item.Attributes -band [IO.FileAttributes]::ReparsePoint)-eq0 -and $item.Length-gt0-and$item.Length-le$MaximumBytes) "$Label identity differs"
+  Assert-Session ((Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$Expected.ToUpperInvariant()) "$Label hash differs"
+  return $item.FullName
+}
+function Get-LinuxDisplayProbePythonPin {
+  param([Parameter(Mandatory)][string]$ProbePath,[Parameter(Mandatory)][string]$PythonPath)
+  try{$text=[Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes($ProbePath))}catch{throw '[mir5-multiplayer-fixture] private display probe text differs'}
+  $matches=@([regex]::Matches($text,'(?m)^\s*["''](?<path>[^"'']+)["'']\s*:\s*["''](?<hash>[A-F0-9]{64})["'']\s*,?\s*$')|Where-Object {$_.Groups['path'].Value-ceq$PythonPath})
+  Assert-Session ($matches.Count-eq1) 'private display probe Python pin differs'
+  return $matches[0].Groups['hash'].Value
+}
+function Invoke-LinuxDisplaySchema {
+  param([Parameter(Mandatory)]$Binding,[Parameter(Mandatory)]$Role,[Parameter(Mandatory)][string]$Label,[scriptblock]$SchemaInvoker)
+  if($null-ne$SchemaInvoker){& $SchemaInvoker $Binding $Role $Label;return}
+  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$Binding.python;$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @([string]$Binding.display_cli,'--module-sha256',[string]$Binding.display_module_sha256,'--mode','schema','--checkout',[string]$Binding.checkout,'--plan',[string]$Role.plan,'--plan-sha256',[string]$Role.plan_sha256)){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) "$Label schema process did not start"
+  try{
+    $stdout=$process.StandardOutput.ReadToEnd();$stderr=$process.StandardError.ReadToEnd();$process.WaitForExit()
+    Assert-Session ($process.ExitCode-eq0-and[Text.UTF8Encoding]::new($false).GetByteCount($stdout)-le8KB-and[Text.UTF8Encoding]::new($false).GetByteCount($stderr)-le8KB) "$Label schema validation refused"
+    $value=$stdout.Trim()|ConvertFrom-Json -AsHashtable
+    Assert-Session ($value-is[Collections.IDictionary]-and$value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'validated-schema-only'-and$value.role-ceq[string]$Role.role-and$value.display-ceq[string]$Role.display-and$value.factorio_processes-eq0) "$Label schema receipt differs"
+  }finally{$process.Dispose()}
+}
+function New-LinuxPrivateDisplayRuntime {
+  param([Parameter(Mandatory)][Collections.IDictionary]$Binding,[Parameter(Mandatory)]$Context,[scriptblock]$SchemaInvoker,[ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedProbeSha256='F2DF1A32CA48119010E5DBE42326B3ED46E13A01A08B487AFDF0CDA5B180B423')
+  Assert-Session ($Binding.Keys.Count-eq6-and$Binding.Contains('python')-and$Binding.Contains('display_cli')-and$Binding.Contains('display_cli_sha256')-and$Binding.Contains('display_module_sha256')-and$Binding.Contains('checkout')-and$Binding.Contains('roles')) 'current Linux private-display plan shape differs'
+  foreach($name in @('python','display_cli','checkout','display_cli_sha256','display_module_sha256')){Assert-Session ($Binding[$name]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$Binding[$name])) "current Linux private-display $name differs"}
+  $pythonCandidate=Assert-LinuxDisplayPinnedFile -Path ([string]$Binding.python) -Expected ((Get-FileHash -LiteralPath ([string]$Binding.python) -Algorithm SHA256).Hash) -Label 'private display Python' -MaximumBytes 64MB
+  $cli=Assert-LinuxDisplayPinnedFile -Path ([string]$Binding.display_cli) -Expected ([string]$Binding.display_cli_sha256) -Label 'private display CLI'
+  $module=Assert-LinuxDisplayPinnedFile -Path (Join-Path (Split-Path -Parent $cli) 'lib/validation/LinuxLibraryDisplay.py') -Expected ([string]$Binding.display_module_sha256) -Label 'private display module'
+  $checkout=(Resolve-Path -LiteralPath ([string]$Binding.checkout)).Path
+  $checkoutItem=Get-Item -LiteralPath $checkout -Force
+  Assert-Session ($checkoutItem.PSIsContainer-and(($checkoutItem.Attributes-band[IO.FileAttributes]::ReparsePoint)-eq0)) 'private display checkout differs'
+  Assert-Session ((Join-Path $checkout 'build/p')-and(Test-Path -LiteralPath (Join-Path $checkout 'build/p') -PathType Container)) 'private display checkout build root differs'
+  $roles=@($Binding.roles)
+  Assert-Session ($roles.Count-eq2) 'current Linux private-display role count differs'
+  $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $probePath=$null;$probeHash=$null
+  foreach($role in $roles){
+    Assert-Session ($role-is[Collections.IDictionary]-and$role.Keys.Count-eq10) 'private display role envelope differs'
+    foreach($name in @('locale','role','display','geometry','plan','plan_sha256','ready','result','role_root','authority')){Assert-Session ($role.Contains($name)-and$role[$name]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$role[$name])) "private display role field differs: $name"}
+    $locale=[string]$role.locale;Assert-Session ($locale-cin@('en','de')-and$seen.Add($locale)) 'private display locales differ'
+    Assert-Session ([string]$role.role-ceq('client-'+$locale)-and[string]$role.display-ceq$(if($locale-ceq'en'){':193'}else{':194'})-and[string]$role.geometry-ceq'1280x720') 'private display role identity differs'
+    $planPath=Assert-LinuxDisplayPinnedFile -Path ([string]$role.plan) -Expected ([string]$role.plan_sha256) -Label ('private display '+$locale+' plan')
+    $originalPlan=(Get-Content -LiteralPath $planPath -Raw -Encoding utf8)|ConvertFrom-Json -AsHashtable
+    Assert-Session ($originalPlan-is[Collections.IDictionary]-and$originalPlan.Contains('probe_display')-and$originalPlan.probe_display-is[Collections.IDictionary]) 'private display plan probe differs'
+    $probe=$originalPlan.probe_display
+    Assert-Session ($probe.Keys.Count-eq3-and$probe.Contains('path')-and$probe.Contains('bytes')-and$probe.Contains('sha256')-and$probe.path-is[string]-and$probe.bytes-is[Int64]-and$probe.sha256-is[string]-and$probe.sha256-cmatch'^[A-Fa-f0-9]{64}$') 'private display plan probe shape differs'
+    $resolvedProbe=Assert-LinuxDisplayPinnedFile -Path ([string]$probe.path) -Expected ([string]$probe.sha256) -Label ('private display '+$locale+' probe')
+    Assert-Session ((Get-Item -LiteralPath $resolvedProbe -Force).Length-eq[Int64]$probe.bytes) 'private display plan probe bytes differ'
+    Assert-Session ($null-eq$probePath-or($probePath-ceq$resolvedProbe-and$probeHash-ceq[string]$probe.sha256.ToUpperInvariant())) 'private display plans bind different probes'
+    $probePath=$resolvedProbe;$probeHash=[string]$probe.sha256.ToUpperInvariant()
+  }
+  Assert-Session ($probeHash-ceq$ExpectedProbeSha256.ToUpperInvariant()) 'private display probe is not the qualified F2DF helper'
+  $python=Assert-LinuxDisplayPinnedFile -Path $pythonCandidate -Expected (Get-LinuxDisplayProbePythonPin -ProbePath $probePath -PythonPath $pythonCandidate) -Label 'private display Python' -MaximumBytes 64MB
+  foreach($role in $roles){
+    Invoke-LinuxDisplaySchema -Binding ([ordered]@{python=$python;display_cli=$cli;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$checkout}) -Role $role -Label ('private display '+[string]$role.locale+' original') -SchemaInvoker $SchemaInvoker
+  }
+  $runtimeBuild=Join-Path $Context.root 'build/p';$null=New-Item -ItemType Directory -Path $runtimeBuild
+  $runtimePlans=Join-Path $Context.root 'display-plans';$null=New-Item -ItemType Directory -Path $runtimePlans
+  $runtimeRoles=[Collections.Generic.List[object]]::new()
+  foreach($role in @($roles|Sort-Object locale)){
+    $locale=[string]$role.locale;$roleRoot=Join-Path $runtimeBuild ('client-'+$locale)
+    Assert-Session (-not(Test-Path -LiteralPath $roleRoot));$null=New-Item -ItemType Directory -Path $roleRoot
+    $raw=Get-Content -LiteralPath ([string]$role.plan) -Raw -Encoding utf8
+    Assert-Session ([Text.UTF8Encoding]::new($false).GetByteCount($raw)-le8KB) 'private display plan exceeds bound'
+    $plan=$raw|ConvertFrom-Json -AsHashtable
+    Assert-Session ($plan-is[Collections.IDictionary]) 'private display plan body differs'
+    $plan.role_root=$roleRoot
+    $runtimePlan=Join-Path $runtimePlans ('client-'+$locale+'.json')
+    [IO.File]::WriteAllText($runtimePlan,(ConvertTo-Json -InputObject $plan -Depth 12 -Compress)+"`n",[Text.UTF8Encoding]::new($false))
+    $runtimeHash=(Get-FileHash -LiteralPath $runtimePlan -Algorithm SHA256).Hash.ToUpperInvariant()
+    $runtime=[ordered]@{locale=$locale;role=[string]$role.role;display=[string]$role.display;geometry=[string]$role.geometry;plan=$runtimePlan;plan_sha256=$runtimeHash;ready=(Join-Path $roleRoot 'display-ready.json');result=(Join-Path $roleRoot 'display-result.json');role_root=$roleRoot;authority=(Join-Path $roleRoot 'authority')}
+    Invoke-LinuxDisplaySchema -Binding ([ordered]@{python=$python;display_cli=$cli;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$Context.root}) -Role $runtime -Label ('private display '+$locale+' runtime') -SchemaInvoker $SchemaInvoker
+    $runtimeRoles.Add([pscustomobject]$runtime)
+  }
+  return [ordered]@{python=$python;display_cli=$cli;display_cli_sha256=[string]$Binding.display_cli_sha256;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$Context.root;probe_display=$probePath;probe_display_sha256=$probeHash;roles=@($runtimeRoles.ToArray())}
+}
+function New-MultiplayerSessionLayout {
+  param(
+    [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$EngineData,
+    [Parameter(Mandatory)]$Target,[bool]$StandaloneClientNames=$false
+  )
+  if(-not(Test-Path -LiteralPath $Context.root)){$null=New-Item -ItemType Directory -Path $Context.root -ErrorAction Stop}
+  $serverWrite=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path $serverWrite
+  $null=New-Item -ItemType Directory -Path (Join-Path $serverWrite 'saves')
+  $serverConfig=Join-Path $Context.root 'server.ini'
+  New-MIRDirectLibraryStartupConfig -Path $serverConfig -EngineDataDirectory $EngineData -WriteDataDirectory $serverWrite
+  $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw|ConvertFrom-Json -AsHashtable
+  $settings.name='MIR5 private loopback clients';$settings.description='';$settings.visibility=@{public=$false;lan=$false};$settings.require_user_verification=$false
+  foreach($name in @('username','password','token','game_password')){$settings[$name]=''}
+  $settings.max_players=2;$settings.auto_pause=$false;$settings.autosave_interval=0
+  $serverSettings=Join-Path $Context.root 'server-settings.json'
+  [IO.File]::WriteAllText($serverSettings,($settings|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+  $udpProbes=@();$tcpProbe=$null
+  try{
+    foreach($index in 0..2){$probe=[Net.Sockets.UdpClient]::new([Net.Sockets.AddressFamily]::InterNetwork);$probe.Client.Bind([Net.IPEndPoint]::new([Net.IPAddress]::Loopback,0));$udpProbes+=,$probe}
+    $udpPorts=@($udpProbes|ForEach-Object {[int]$_.Client.LocalEndPoint.Port})
+    $tcpProbe=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$tcpProbe.Start();$rconPort=[int]$tcpProbe.LocalEndpoint.Port
+  }finally{foreach($probe in $udpProbes){$probe.Dispose()};if($null-ne$tcpProbe){$tcpProbe.Stop()}}
+  $clients=@();$clientIndex=1
+  foreach($locale in @('en','de')){
+    $write=Join-Path $Context.root ('client-'+$locale);$null=New-Item -ItemType Directory -Path $write
+    $config=Join-Path $Context.root ('client-'+$locale+'.ini');New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $EngineData -WriteDataDirectory $write -Graphics
+    $text=[IO.File]::ReadAllText($config).Replace('locale=en',('locale='+$locale));[IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
+    $name=if($StandaloneClientNames){'standalone-'+$locale}elseif($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+    $platform=if($Target.PSObject.Properties['linux_private_displays']-and$Target.linux_private_displays-eq$true){'linux64'}else{'win64'}
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$Target.base;build_version=$Target.build_version;build_mode='full';platform=$platform}}
+    [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
+  }
+  return [pscustomobject]@{server_write=$serverWrite;server_config=$serverConfig;server_settings=$serverSettings;udp_ports=$udpPorts;server_port=$udpPorts[0];rcon_port=$rconPort;rcon_password=[guid]::NewGuid().ToString('D');clients=$clients}
+}
 $output=Resolve-MIR441RecoveryScratchPath -Path $OutputRoot
 Assert-Session (-not(Test-Path -LiteralPath $output) -or @(Get-ChildItem -LiteralPath $output -Force).Count -eq 0) 'output is not empty'
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
@@ -832,7 +966,7 @@ if($linuxPrivateDisplays){
   Assert-Session (@($LinuxPrivateDisplays.roles).Count -eq 2) 'current Linux private-display role count differs'
 }
 if($standaloneF210){
-  $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
+  $standaloneFixtureSourceRevision=if($target.PSObject.Properties['fixture_source_revision']){[string]$target.fixture_source_revision}else{Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo}
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
   $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks -MIRVersion $target.mir}
@@ -869,9 +1003,64 @@ Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'librar
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
+$activation=$null;$resources=$null;$failure=$null
+$linuxDisplayRuntime=$null
+if($linuxPrivateDisplays){
+  # Current Linux display plans must be schema-accepted before a CreateOnly
+  # world is considered. Their runtime roots are always direct children of the
+  # one future governed session root, never caller-selected sibling paths.
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
+  $null=New-Item -ItemType Directory -Path $resources.root
+  $linuxDisplayRuntime=New-LinuxPrivateDisplayRuntime -Binding $LinuxPrivateDisplays -Context $resources
+}
+if($ComposeOnly){
+  Assert-Session ($linuxPrivateDisplays-and-not$StandaloneIdentityDiscovery-and$FixtureCase-ceq'library-multiplayer') 'ComposeOnly is limited to the current Linux Library selection'
+  $baseRows=Read-MIRDirectLibraryStartupProfile -Path $profile
+  $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
+  $declaredHashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$declaredHashes[[string]$entry.Key]=[string]$entry.Value}
+  $mirRows=@($selection.mods|Where-Object {[string]$_.name-ceq'more-infinite-research'-and$_.enabled-eq$true})
+  Assert-Session ($mirRows.Count-eq1) 'ComposeOnly MIR archive selection differs'
+  Assert-Session ($target.PSObject.Properties['fixture_archive_sha256']-and$null-ne$standaloneLibraryFixture) 'ComposeOnly current Library fixture projection is absent'
+  $fixtureArchiveName='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
+  $fixtureArchive=Join-Path $library $fixtureArchiveName
+  Assert-LinuxDisplayPinnedFile -Path $fixtureArchive -Expected ([string]$target.fixture_archive_sha256) -Label 'ComposeOnly current Library fixture archive' -MaximumBytes 64MB|Out-Null
+  Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory ([string]$standaloneLibraryFixture.source)
+  $declaredHashes[$fixtureArchiveName]=[string]$target.fixture_archive_sha256
+  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version})
+  Assert-Session ($actualHashes.Keys.Count-eq$declaredHashes.Keys.Count) 'ComposeOnly selected archive closure differs'
+  foreach($name in $declaredHashes.Keys){Assert-Session ($actualHashes.ContainsKey($name)-and[string]$actualHashes[$name]-ceq[string]$declaredHashes[$name]) "ComposeOnly archive hash differs: $name"}
+  Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $selection -EngineIdentity $engineIdentity -ArchiveHashes $actualHashes -ErrorPrefix 'mir5-multiplayer-compose'
+  $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$false
+  $leasePath=Join-Path $library '.mir-library.lock';$lease=[IO.File]::Open($leasePath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+  $record=$null
+  try{
+    $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $actualHashes -SettingsMode Defaults -LibraryLock $lease
+    Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+    $prospectiveSeed=Join-Path $layout.server_write 'saves/seed.zip'
+    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
+    foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
+    $record=[ordered]@{
+      kind='MIR5LibraryMultiplayerComposeV1';case=$FixtureCase;status='composed-zero-native'
+      native_processes=0;factorio_processes=0;display_processes=0;engine=$engineIdentity
+      profile_sha256=(Get-FileHash -LiteralPath $profile -Algorithm SHA256).Hash.ToUpperInvariant();archive_sha256=$actualHashes
+      runtime_display=$linuxDisplayRuntime;session_root=$resources.root
+      server_config_sha256=(Get-FileHash -LiteralPath $layout.server_config -Algorithm SHA256).Hash.ToUpperInvariant()
+      client_config_sha256=@($layout.clients|ForEach-Object {(Get-FileHash -LiteralPath $_.config -Algorithm SHA256).Hash.ToUpperInvariant()})
+      seed_status='not-created';release_qualification=$false
+    }
+  }finally{
+    if($null-ne$activation-and-not$activation.closed){
+      $restoration=Complete-MIRLibraryActivation -Activation $activation
+      if($null-ne$record){$record.library_control_restoration=$restoration}
+    }
+    $lease.Dispose()
+  }
+  Assert-Session ($null-ne$record) 'ComposeOnly did not reach a zero-native composition record'
+  $record.process_runs=@($resources.runs.ToArray());Write-MIRNativeProbeResult -Context $resources -Record $record
+  exit 0
+}
 $preparationResult=Invoke-MultiplayerFixturePreparation -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -FixtureCase $FixtureCase -PreparationRoot $preparation -RepoRoot $repo -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -DiscoveryFixture $discoveryFixture
 $prepared=$preparationResult.prepared;$seed=[string]$preparationResult.seed;$discoveryInstall=$preparationResult.install
-$activation=$null;$resources=$null;$failure=$null
 $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
@@ -881,56 +1070,10 @@ $record=[ordered]@{
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
-  $null=New-Item -ItemType Directory -Path $resources.root
-  $serverWrite=Join-Path $resources.root 'server'
-  $null=New-Item -ItemType Directory -Path $serverWrite
-  $null=New-Item -ItemType Directory -Path (Join-Path $serverWrite 'saves')
-  $serverConfig=Join-Path $resources.root 'server.ini'
-  New-MIRDirectLibraryStartupConfig -Path $serverConfig -EngineDataDirectory $engineData -WriteDataDirectory $serverWrite
-  $settings=Get-Content -LiteralPath (Join-Path $engineData 'server-settings.example.json') -Raw|ConvertFrom-Json -AsHashtable
-  $settings.name='MIR5 private loopback clients';$settings.description=''
-  $settings.visibility=@{public=$false;lan=$false};$settings.require_user_verification=$false
-  foreach($name in @('username','password','token','game_password')){$settings[$name]=''}
-  $settings.max_players=2;$settings.auto_pause=$false;$settings.autosave_interval=0
-  $serverSettings=Join-Path $resources.root 'server-settings.json'
-  [IO.File]::WriteAllText($serverSettings,($settings|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
-  # Let Windows allocate available loopback ports. Fixed ports can be in its
-  # excluded ranges (the first native run failed with WSAEACCES/10013).
-  $udpProbes=@();$tcpProbe=$null
-  try {
-    foreach($index in 0..2){
-      $probe=[Net.Sockets.UdpClient]::new([Net.Sockets.AddressFamily]::InterNetwork)
-      $probe.Client.Bind([Net.IPEndPoint]::new([Net.IPAddress]::Loopback,0))
-      $udpProbes+=,$probe
-    }
-    $udpPorts=@($udpProbes|ForEach-Object {[int]$_.Client.LocalEndPoint.Port})
-    $tcpProbe=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$tcpProbe.Start()
-    $rconPort=[int]$tcpProbe.LocalEndpoint.Port
-  } finally {
-    foreach($probe in $udpProbes){$probe.Dispose()}
-    if($null -ne $tcpProbe){$tcpProbe.Stop()}
-  }
-  $serverPort=$udpPorts[0];$clientIndex=1
-  $record.loopback_ports=[ordered]@{udp=$udpPorts;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
-  $clients=@()
-  $rconPassword=[guid]::NewGuid().ToString('D')
-  foreach($locale in @('en','de')){
-    $write=Join-Path $resources.root ('client-'+$locale)
-    $null=New-Item -ItemType Directory -Path $write
-    $config=Join-Path $resources.root ('client-'+$locale+'.ini')
-    New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $write -Graphics
-    $text=[IO.File]::ReadAllText($config).Replace('locale=en',('locale='+$locale))
-    [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
-    $name=if($standaloneClientNames){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
-    # Isolated disposable identities contain no online token or personal data.
-    # Discovery alone uses the bounded synthetic label for its actual join
-    # marker; every route still keeps its token and write-data isolated.
-    $platform=if($target.PSObject.Properties['linux_private_displays']-and$target.linux_private_displays-eq$true){'linux64'}else{'win64'}
-    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform=$platform}}
-    [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
-    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
-  }
+  if($null-eq$resources){$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot}
+  $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$standaloneClientNames
+  $serverWrite=$layout.server_write;$serverConfig=$layout.server_config;$serverSettings=$layout.server_settings;$serverPort=$layout.server_port;$rconPort=$layout.rcon_port;$rconPassword=$layout.rcon_password;$clients=@($layout.clients)
+  $record.loopback_ports=[ordered]@{udp=$layout.udp_ports;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
   $pairedArm=$null
   if($FixtureCase -ceq 'library-paired-browser'){
     Assert-Session ($selection.kind -ceq 'mir5-library-paired-browser-f200-native-selection') 'paired browser profile kind differs'
@@ -973,7 +1116,9 @@ try {
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
     if($linuxPrivateDisplays){
-      $spec.linux_private_displays=$LinuxPrivateDisplays
+      # The caller envelope was schema-checked before CreateOnly.  The session
+      # receives only context-local role roots and their freshly bound plans.
+      $spec.linux_private_displays=$linuxDisplayRuntime
     }
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
@@ -987,7 +1132,9 @@ try {
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash
   $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
   $sessionArguments=@('-NoLogo','-NoProfile','-File',(Join-Path $PSScriptRoot 'Invoke-MultiplayerSession.ps1'),'-SpecPath',$specPath)
-  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}else{1000})}
+  # Every display leaf has a hard 900-second maximum.  The containing session
+  # cannot outlive that bound on the Linux route, including its teardown.
+  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}elseif($linuxPrivateDisplays){900}else{1000})}
   if(-not $StandaloneIdentityDiscovery -and -not $standaloneF210){$processArguments.FactorioSteamIdentity=$true}
   $record.process=Invoke-MIRNativeProbeProcess @processArguments
   $session=Get-Content -LiteralPath (Join-Path $resources.root 'session.json') -Raw|ConvertFrom-Json
