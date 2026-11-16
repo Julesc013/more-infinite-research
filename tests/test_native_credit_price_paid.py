@@ -285,9 +285,23 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
         }
         manifest = json.loads((FIXTURE / "archive-manifest.json").read_text())
         self.assertEqual(expected, manifest["borrowed_data_stage_members"])
+        text_members = {"data.lua", "data-final-fixes.lua"}
         for name, digest in expected.items():
-            self.assertEqual(digest, hashlib.sha256((OLD_FIXTURE / name).read_bytes()).hexdigest().upper())
+            old_bytes = (OLD_FIXTURE / name).read_bytes()
+            if name in text_members:
+                self.assertNotIn(b"\r\r\n", old_bytes)
+                old_bytes = old_bytes.replace(b"\r\n", b"\n")
+                self.assertNotIn(b"\r", old_bytes)
+            self.assertEqual(digest, hashlib.sha256(old_bytes).hexdigest().upper())
             self.assertEqual(digest, hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest().upper())
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(directory)
+            for name in text_members:
+                canonical = (OLD_FIXTURE / name).read_bytes().replace(b"\r\n", b"\n")
+                for suffix, variant in (("lf", canonical), ("crlf", canonical.replace(b"\n", b"\r\n"))):
+                    copied = directory / f"{name}.{suffix}"
+                    copied.write_bytes(variant)
+                    self.assertEqual(expected[name], hashlib.sha256(copied.read_bytes().replace(b"\r\n", b"\n")).hexdigest().upper())
         metadata = json.loads((FIXTURE / "info.json").read_text())
         self.assertEqual("0.4.0", metadata["version"])
         self.assertEqual(["base = 2.1.23", "space-age = 2.1.23", "more-infinite-research = 5.0.21016"], metadata["dependencies"])
