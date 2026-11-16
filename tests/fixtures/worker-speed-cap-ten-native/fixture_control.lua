@@ -36,6 +36,7 @@ local STAGES = {
   ["current-old15"] = {version = "0.7.0", cap = 10, mir = "5.0.20015"},
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
   ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
+  ["current-successor17"] = {version = "0.10.0", cap = 10, mir = "5.0.20017"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -825,7 +826,8 @@ local function begin_current_state(stage)
   local player, foreign, earned = current_named_forces("current fixture admin")
   local state = {phase = "current-admin-setup", current_state = true, player_force_index = player.index,
     ordinary_native_completion_count = 0, level_eleven_start_count = 0, ordinary_events = {},
-    reset_call_count = 0, reset_rows = {}, native_reset_events = {}, admin_intent = current_admin_intent()}
+    reset_call_count = 0, reset_rows = {}, native_reset_events = {}, admin_intent = current_admin_intent(),
+    current_successor_stage = stage}
   storage[CURRENT_KEY] = state
   state.foreign_index, state.earned_index = foreign.index, earned.index
   apply_current_admin_sequence(player, foreign, earned, "current", nil)
@@ -895,7 +897,7 @@ local function tick_current_state(state)
     state.post_completion.end_earned_above_cap = copy(earned)
     state.post_completion.end_lab = ending_lab
     state.phase = "current-complete"
-    local complete = current_header("complete", "current-successor16")
+    local complete = current_header("complete", state.current_successor_stage)
     complete.pre_reset, complete.post_reset, complete.post_reset_player_bonus = copy(state.pre_reset), copy(state.post_reset),
       state.current_player_bonus_before
     complete.pre_work, complete.post_completion = copy(state.pre_work), copy(state.post_completion)
@@ -915,7 +917,7 @@ local function tick_current_state(state)
   if state.phase ~= "current-complete" then fail("current-state fixture phase differs") end
   if not cold_requested or cold_logged then return end
   local player, foreign, earned = assert_current_post_completion(state, "current cold")
-  local cold = current_header("cold", "current-successor16")
+  local cold = current_header("cold", state.current_successor_stage)
   cold.pre_reset, cold.post_reset, cold.pre_work, cold.post_completion = copy(state.pre_reset), copy(state.post_reset),
     copy(state.pre_work), copy(state.post_completion)
   cold.post_reset_player_bonus, cold.player, cold.foreign, cold.earned_above_cap = state.current_player_bonus_before,
@@ -934,6 +936,7 @@ end
 function M.apply(stage, report_active_mods)
   local expected = STAGES[stage]
   if expected == nil then fail("unknown control stage") end
+  local current_successor = stage == "current-successor16" or stage == "current-successor17"
   if stage == "current-observe16" then
     if type(report_active_mods) ~= "function" then fail("current observe active-mod observer callback differs") end
     check_closure(stage)
@@ -978,7 +981,7 @@ function M.apply(stage, report_active_mods)
       begin_current_observe()
       return
     end
-    if stage == "current-old15" or stage == "current-successor16" then
+    if stage == "current-old15" or current_successor then
       local state, post_reset = begin_current_state(stage)
       if stage == "current-old15" then
         local player, foreign, earned = assert_current_old_post_reset(state, "current published15 adverse")
@@ -990,7 +993,8 @@ function M.apply(stage, report_active_mods)
       end
       local player, foreign, earned = assert_current_candidate_post_reset(state, "current candidate pre-work")
       post_reset.outcome, post_reset.player, post_reset.foreign, post_reset.earned_above_cap =
-        "candidate16-reset-event-enforced", player, foreign, earned
+        stage == "current-successor16" and "candidate16-reset-event-enforced" or "candidate17-reset-event-enforced",
+        player, foreign, earned
       state.post_reset = copy(post_reset)
       current_emit("post-reset", post_reset)
       state.current_player_bonus_before = player.worker.bonus
@@ -1038,7 +1042,7 @@ function M.apply(stage, report_active_mods)
       if type(state) == "table" then current_observe_event(state, "on_research_finished", event) end
       return
     end
-    if stage == "current-successor16" then
+    if current_successor then
       local state = storage[CURRENT_KEY]
       if type(state) ~= "table" or state.phase ~= "current-await-ordinary-level-ten" then return end
       local player = game.forces.player
@@ -1072,7 +1076,7 @@ function M.apply(stage, report_active_mods)
       end
       fail("source stage observed non-administrative research completion")
     end
-    local state = storage[stage == "current-successor16" and CURRENT_KEY or KEY]
+    local state = storage[current_successor and CURRENT_KEY or KEY]
     if type(state) ~= "table" or state.phase ~= "await-ordinary-level-ten" then return end
     local player = game.forces.player
     if event.research == nil or event.research.force ~= player or event.research.name ~= WORKER then return end
@@ -1091,8 +1095,8 @@ function M.apply(stage, report_active_mods)
       if type(state) == "table" then current_observe_event(state, "on_research_started", event) end
       return
     end
-    if stage ~= "successor16" and stage ~= "current-successor16" then return end
-    local state = storage[stage == "current-successor16" and CURRENT_KEY or KEY]
+    if stage ~= "successor16" and not current_successor then return end
+    local state = storage[current_successor and CURRENT_KEY or KEY]
     if type(state) ~= "table" then return end
     local player = game.forces.player
     if event.research ~= nil and event.research.force == player and event.research.name == WORKER
@@ -1108,7 +1112,7 @@ function M.apply(stage, report_active_mods)
       if type(state) == "table" then current_observe_event(state, "on_technology_effects_reset", event) end
       return
     end
-    if stage ~= "current-old15" and stage ~= "current-successor16" then return end
+    if stage ~= "current-old15" and not current_successor then return end
     local state = storage[CURRENT_KEY]
     if type(state) ~= "table" or state.current_state ~= true or event.force == nil then return end
     local row = {force_index = event.force.index, force_name = event.force.name,
@@ -1149,7 +1153,7 @@ function M.apply(stage, report_active_mods)
       current_observe_trace(state)
       error(CURRENT_OBSERVE_TOKEN)
     end
-    if stage == "current-successor16" then
+    if current_successor then
       local state = storage[CURRENT_KEY]
       if type(state) ~= "table" then fail("current-state fixture state is absent") end
       tick_current_state(state)

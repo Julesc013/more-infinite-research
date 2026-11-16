@@ -24,6 +24,7 @@ SUCCESSOR = FIXTURE / "successor16"
 CURRENT_OLD_NEGATIVE = FIXTURE / "current-old15"
 CURRENT_SUCCESSOR = FIXTURE / "current-successor16"
 CURRENT_OBSERVE = FIXTURE / "current-observe16"
+CURRENT_SUCCESSOR17 = FIXTURE / "current-successor17"
 LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
@@ -81,7 +82,8 @@ local stages = {
   successor16={fixture="0.6.0",mir="5.0.20016",cap=10},
   ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
-  ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10}
+  ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
+  ["current-successor17"]={fixture="0.10.0",mir="5.0.20017",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -98,6 +100,7 @@ function data_case(settings_wrapper,data_wrapper,settings_common,data_common,sta
   local env={mods=copy(closure),data={raw=raw,extend=function(_,v)for _,x in ipairs(v)do rows[#rows+1]=x end end},
     settings={startup={["mir-max-level-worker-robots-speed"]={value=cap}}},log=function(row)logs[#logs+1]=row end}
   env.mods[FIXTURE],env.mods["more-infinite-research"]=expected.fixture,expected.mir
+  if opponent=="stale-mir17"then env.mods["more-infinite-research"]="5.0.20016"end
   local tables={}for k,v in pairs(table)do tables[k]=v end;tables.deepcopy=copy;env.table=tables
   env.require=function(n)if n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_settings"then return assert(loadfile(settings_common,"t",env))()end
     assert(n=="__mir-fixture-mir5-worker-speed-cap-ten__/fixture_data_final");return assert(loadfile(data_common,"t",env))()end
@@ -188,7 +191,7 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY],player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
 
-function current_state_flow(old_path,successor_path,observe_path,common,mode,opponent)
+function current_state_flow(old_path,successor_path,successor17_path,observe_path,common,mode,opponent)
   local player,foreign,earned=force("player",1,false),force("mir5-worker-speed-cap-ten-foreign",2,false),force("mir5-worker-speed-cap-ten-earned",3,false)
   for _,value in ipairs({player,foreign,earned})do value.technologies["stone-wall"].enabled=true end
   local game={tick=0,forces={player=player,[1]=player,[foreign.name]=foreign,[foreign.index]=foreign,[earned.name]=earned,[earned.index]=earned},surfaces={}}
@@ -198,11 +201,12 @@ function current_state_flow(old_path,successor_path,observe_path,common,mode,opp
   local stage,path
   if mode=="old"then stage,path="current-old15",old_path
   elseif mode=="observe"then stage,path="current-observe16",observe_path
+  elseif mode=="candidate17"then stage,path="current-successor17",successor17_path
   else stage,path="current-successor16",successor_path end
   local actor,message=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not actor then return{ok=false,message=message}end
   local function install_reset(force)
     force._external_reset=function(value)
-      if mode=="candidate" and opponent~="candidate-no-cap" then caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
+      if (mode=="candidate" or mode=="candidate17") and opponent~="candidate-no-cap" then caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
     end
     force._reset_dispatch=function(value)
       if opponent=="missing-reset-event" then return end
@@ -245,7 +249,7 @@ function current_state_flow(old_path,successor_path,observe_path,common,mode,opp
   player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end end
-  for _=1,2 do local cold,cmsg=load_stage(successor_path,common,"current-successor16",game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
+  for _=1,2 do local cold,cmsg=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
 ''')
@@ -253,7 +257,7 @@ end
     def data_result(self, stage: str, opponent: str = ""):
         directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR,
                      "current-old15": CURRENT_OLD_NEGATIVE, "current-successor16": CURRENT_SUCCESSOR,
-                     "current-observe16": CURRENT_OBSERVE}[stage]
+                     "current-observe16": CURRENT_OBSERVE, "current-successor17": CURRENT_SUCCESSOR17}[stage]
         return self.lua.eval("data_case")(str(directory / "settings-updates.lua"), str(directory / "data-final-fixes.lua"),
                                           str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
@@ -264,6 +268,7 @@ end
     def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("current_state_flow")(str(CURRENT_OLD_NEGATIVE / "control.lua"),
                                                    str(CURRENT_SUCCESSOR / "control.lua"),
+                                                   str(CURRENT_SUCCESSOR17 / "control.lua"),
                                                    str(CURRENT_OBSERVE / "control.lua"),
                                                    str(fixture_control), mode, opponent)
 
@@ -272,7 +277,8 @@ end
                                         (SUCCESSOR, "0.6.0", "5.0.20016"),
                                         (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
                                         (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016"),
-                                        (CURRENT_OBSERVE, "0.9.0", "5.0.20016")):
+                                        (CURRENT_OBSERVE, "0.9.0", "5.0.20016"),
+                                        (CURRENT_SUCCESSOR17, "0.10.0", "5.0.20017")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -281,7 +287,8 @@ end
 
     def test_data_preflight_retains_actual_tail_ten_contract_and_only_adds_fixture_lab(self):
         for stage, cap in (("source15", 0), ("old-negative15", 10), ("successor16", 10),
-                           ("current-old15", 10), ("current-successor16", 10), ("current-observe16", 10)):
+                           ("current-old15", 10), ("current-successor16", 10), ("current-observe16", 10),
+                           ("current-successor17", 10)):
             with self.subTest(stage=stage):
                 result = self.data_result(stage)
                 self.assertTrue(result["ok"], result["message"])
@@ -302,13 +309,23 @@ end
                     self.assertEqual(expected_mods, reported)
                     self.assertEqual(20, len(reported))
         current_successor = self.data_result("current-successor16")
+        current_successor17 = self.data_result("current-successor17")
         observe = self.data_result("current-observe16")
         def lab_signature(row):
             return (row["name"], row["minable"], row["energy_source"]["type"], row["researching_speed"],
                     tuple(row["inputs"][index] for index in range(1, len(row["inputs"]) + 1)))
+        def prototype_signature(result):
+            worker = result["raw"]["technology"][WORKER]
+            return (worker["max_level"], worker["effects"][1]["type"], worker["effects"][1]["modifier"],
+                    tuple(worker["prerequisites"][index] for index in range(1, len(worker["prerequisites"]) + 1)),
+                    worker["unit"]["count_formula"], worker["unit"]["time"],
+                    tuple((worker["unit"]["ingredients"][index][1], worker["unit"]["ingredients"][index][2])
+                          for index in range(1, len(worker["unit"]["ingredients"]) + 1)),
+                    result["raw"]["int-setting"][CAP]["default_value"], lab_signature(result["rows"][1]))
+        self.assertEqual(prototype_signature(current_successor), prototype_signature(current_successor17))
         self.assertEqual(lab_signature(current_successor["rows"][1]), lab_signature(observe["rows"][1]))
-        self.assertEqual((1, 1), (len(current_successor["rows"]), len(observe["rows"])))
-        self.assertEqual((1, 0), (len(current_successor["logs"]), len(observe["logs"])))
+        self.assertEqual((1, 1, 1), (len(current_successor["rows"]), len(current_successor17["rows"]), len(observe["rows"])))
+        self.assertEqual((1, 1, 0), (len(current_successor["logs"]), len(current_successor17["logs"]), len(observe["logs"])))
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
@@ -317,6 +334,9 @@ end
         self.assertFalse(old_bad["ok"]); self.assertIn("SE worker-speed effect differs", old_bad["message"])
         self.assertFalse(observe_bad["ok"]); self.assertIn("SE worker-speed effect differs", observe_bad["message"])
         self.assertEqual((1, 0), (len(old_bad["logs"]), len(observe_bad["logs"])))
+        stale_mir = self.data_result("current-successor17", "stale-mir17")
+        self.assertFalse(stale_mir["ok"])
+        self.assertIn("fixture stage version differs", stale_mir["message"])
 
     @staticmethod
     def _current_markers(result):
@@ -587,6 +607,35 @@ end
                           "worker-speed-cap-ten/current-pre-work.json", "worker-speed-cap-ten/current-complete.json",
                           "worker-speed-cap-ten/current-cold.json", "worker-speed-cap-ten/current-cold.json"],
                          [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
+
+    def test_current_successor17_runs_the_shared_current_lifecycle_with_source17_headers(self):
+        candidate = self.current_state_result("candidate17")
+        self.assertTrue(candidate["ok"], candidate["message"])
+        self.assertEqual((1, 1), (candidate["saves"], candidate["labs"]))
+        markers = self._current_markers(candidate)
+        self.assertEqual({"current-provider", "current-admin-observed", "current-pre-reset", "current-post-reset",
+                          "current-pre-work", "current-complete", "current-cold"}, set(markers))
+        for phase, marker in markers.items():
+            with self.subTest(phase=phase):
+                self.assertEqual(("current-successor17", "0.10.0", "5.0.20017"),
+                                 (marker["stage"], marker["fixture_stage"], marker["mir_version"]))
+        self.assertEqual("candidate17-reset-event-enforced", markers["current-post-reset"]["outcome"])
+        for phase in (markers["current-complete"], markers["current-cold"]):
+            event = phase["ordinary_events"][1]
+            self.assertEqual((WORKER, False, 10, 11),
+                             (event["name"], event["by_script"], event["completed_level"],
+                              event["event_post_increment_level"]))
+        self.assertEqual(["worker-speed-cap-ten/current-provider.json", "worker-speed-cap-ten/current-admin-observed.json",
+                          "worker-speed-cap-ten/current-pre-reset.json", "worker-speed-cap-ten/current-post-reset.json",
+                          "worker-speed-cap-ten/current-pre-work.json", "worker-speed-cap-ten/current-complete.json",
+                          "worker-speed-cap-ten/current-cold.json", "worker-speed-cap-ten/current-cold.json"],
+                         [candidate["files"][index]["path"] for index in range(1, len(candidate["files"]) + 1)])
+        for opponent in ("scripted-finish", "preincrement-finish"):
+            with self.subTest(opponent=opponent):
+                adverse = self.current_state_result("candidate17", opponent)
+                self.assertFalse(adverse["ok"])
+                self.assertIn("scripted or non-level-ten current-state completion cannot satisfy ordinary cap-ten work",
+                              adverse["message"])
 
     def test_current_observe_role_records_interleaved_public_boundaries_then_stops_before_reset(self):
         result = self.current_state_result("observe")
