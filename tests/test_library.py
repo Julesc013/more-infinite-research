@@ -10,6 +10,34 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_refresh_handles_unavailable_readable_style_bounds(self):
+        self.lua.execute('''
+          for _, missing in ipairs{{maximal_width=true}, {maximal_height=true},
+              {maximal_width=true, maximal_height=true}} do
+            boot()
+            local root = library.open(player, {tab="settings", settings_scope="research"})
+            local page = root.mir_library_tabs.mir_library_settings_content
+            local query = page.mir_library_settings_query
+            local style = page.style
+            local native_read = getmetatable(style).__index
+            getmetatable(style).__index = function(target, key)
+              if missing[key] then return nil end
+              return native_read(target, key)
+            end
+            local before_level, before_enabled = gear.level, gear.enabled
+            local before_progress = player.force.research_progress
+            query.text = "gear"
+            library.on_gui_text_changed({player_index=player.index, element=query})
+            assert(storage.mir_library.players[player.index].settings_query == "gear")
+            assert(page.mir_library_settings_query.text == "gear")
+            assert(page.mir_library_settings_toolbar.valid
+              and page.mir_library_settings_dynamic.valid)
+            assert(gear.level == before_level and gear.enabled == before_enabled
+              and player.force.research_progress == before_progress,
+              "Settings presentation changed native research")
+          end
+        ''')
+
     def test_retained_title_restyles_through_the_shared_native_element_setter(self):
         self.lua.execute(r'''
           boot()
@@ -1121,6 +1149,7 @@ class LibraryTests(unittest.TestCase):
             return setmetatable({}, {
               __index = function(_, key)
                 if key=="name" then return style_name or "default" end
+                if key=="width" or key=="height" then error("LuaStyle." .. key .. " is write only") end
                 return values[key]
               end,
               __newindex = function(_, key, value)

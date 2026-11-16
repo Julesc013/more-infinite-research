@@ -1809,8 +1809,8 @@ end
 
 local function update_settings_content(content, view, preserve_query, translations, context)
   if not valid(content) then return end
-  local width = content.style and (content.style.maximal_width or content.style.width) or 592
-  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
+  local width = content.style and content.style.maximal_width or 592
+  local available_height = content.style and content.style.maximal_height or 220
   local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
   if not valid(content[PREFIX .. "settings_search_label"])
