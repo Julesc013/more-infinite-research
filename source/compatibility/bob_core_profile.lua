@@ -26,10 +26,6 @@ local VISIBLE = {
 
 function M.applies(active)
   local status = selection.status(active, target)
-  if status == "unsupported-floor" then
-    error("MIR unsupported F210 Bob Core saved-profile transition: target minimum base is "
-      .. tostring(target.minimum_base) .. ", expected 2.1.23", 2)
-  end
   if status == "unsupported-overhaul" then
     error("MIR unsupported F210 Bob Core saved-profile transition: captured closure has an unsupported overhaul selection", 2)
   end

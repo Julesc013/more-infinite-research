@@ -127,7 +127,7 @@ end
 
 local function is_f210_bobtech_angel(active_mods, target)
   if type(target) ~= "table" or target.id ~= "f210" or target.factorio_version ~= "2.1"
-      or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOBTECH_ANGEL_REQUIRED) then
+      or not has_every(active_mods, F210_BOBTECH_ANGEL_REQUIRED) then
     return false
   end
   return active_mods.Krastorio2 == nil and active_mods["Krastorio2-spaced-out"] == nil
