@@ -14,6 +14,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "source"
@@ -29,29 +31,6 @@ UPSTREAM_RESULT_SHA256 = {
     "q097": "FB4574840BBD890B8864574256450F11D7F77AFB94161A9C3E34A30FF2F93A26",
     "q098": "C44DE8A261719CF3C0176ACF20D4AB322043D1F740EB92118674265B552E15C3",
 }
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
-
-
-def _plain(value):
-    if not hasattr(value, "items"):
-        return value
-    items = dict(value.items())
-    if items and set(items) == set(range(1, len(items) + 1)):
-        return [_plain(items[index]) for index in range(1, len(items) + 1)]
-    return {key: _plain(nested) for key, nested in items.items()}
 
 
 def _sha256(path: Path) -> str:
@@ -167,7 +146,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
             results={{type="item",name="bob-lead-ore",amount=1}}}
         ''')
         for name in ("recipe-prod-research_material_lead-1", "recipe-prod-research_material_lead-4"):
-            row = _plain(lua.globals().emitted[name])
+            row = _plain(lua, lua.globals().emitted[name])
             self.assertFalse(row["enabled"])
             self.assertEqual([
                 {"type": "change-recipe-productivity", "recipe": "bob-lead-plate", "change": .02},
@@ -199,7 +178,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         return self.facts["cases"][case]["published_rows"]
 
     def _restored_rows(self, lua, case):
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         expected = self._expected_rows(case)
         return {name: emitted[name] for name in expected if name in emitted}
 
@@ -272,8 +251,8 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
                   package.loaded["research.catalogue"] = nil
                   runtime_declared = require("research.catalogue").declared()
                 ''')
-                declared = _plain(lua.globals().runtime_declared)
-                settings_rows = _plain(lua.globals().setting_rows)
+                declared = _plain(lua, lua.globals().runtime_declared)
+                settings_rows = _plain(lua, lua.globals().setting_rows)
                 for name, published in self._expected_rows(case).items():
                     matches = [row for row in declared if row["id"] == name]
                     self.assertEqual(1, len(matches), name)
@@ -309,14 +288,16 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
     def test_runtime_descriptors_name_every_published_identity_and_bounded_lead_routes(self):
         for case, expected_count in (("q097", 31), ("q098", 16)):
             with self.subTest(case=case):
-                rows = _plain(self.stage(case).globals().declared)
+                lua = self.stage(case)
+                rows = _plain(lua, lua.globals().declared)
                 declared = {row["id"]: row for row in rows}
                 expected = self._expected_rows(case)
                 self.assertEqual(len(rows), len(declared))
                 self.assertEqual(expected_count, len(expected))
                 self.assertEqual(set(expected), set(expected) & set(declared))
 
-        declared = {row["id"]: row for row in _plain(self.stage("q097").globals().declared)}
+        lua = self.stage("q097")
+        declared = {row["id"]: row for row in _plain(lua, lua.globals().declared)}
         for identifier, progression in (
             ("recipe-prod-research_material_lead-1", 1),
             ("recipe-prod-research_material_lead-4", 4),
@@ -336,7 +317,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         mods = {row["name"]: row["version"] for row in self.context["cases"]["q097"]["selection"]}
         mods.pop("bobplates")
         lua = self.stage("q097", raw_override=raw, mods_override=mods)
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         self.assertTrue(set(self._expected_rows("q097")).isdisjoint(emitted), emitted.keys())
         lua.execute('assert(package.loaded["compatibility.material_returns"]==nil)')
 
