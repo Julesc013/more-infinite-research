@@ -117,10 +117,10 @@ local function begin(state)
   require_ok(state.lab.disabled_by_script==true,"pre-lab observer lab is not disabled")
   game.difficulty_settings.technology_price_multiplier=C.price
   C.require_pre_lab(f,game.difficulty_settings.technology_price_multiplier,inv)
-  state.phase="pre-lab-accepted";state.inserted={};state.deadline=game.tick+60000
+  state.phase="feeding";state.inserted={};state.deadline=game.tick+60000
 end
 local function start_work(state)
-  require_ok(state.phase=="pre-lab-accepted" and state.lab.disabled_by_script==true,"paid LDS start differs")
+  require_ok(state.phase=="feeding" and state.lab.disabled_by_script==true,"paid LDS start differs")
   force().research_queue={main()}
   local q=C.queue(force());require_ok(q.current==C.main and #q.names==1 and q.names[1]==C.main and q.progress==0,
     "LDS queue differs after pre-lab")

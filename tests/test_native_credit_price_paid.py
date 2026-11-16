@@ -181,7 +181,8 @@ class NativeCreditPricePaidFixtureTests(unittest.TestCase):
           end
           assert(consumed==C.consumed and partial_insertions>0 and insert_calls>4,"bounded native refill did not use actual partial returns")
           assert(#saves==1 and saves[1].name=="mir516-native-credit-price-paid")
-          assert(logs[2].kind=="pre-lab" and logs[2].map_price==2 and logs[2].lab.disabled_by_script==true)
+          assert(logs[2].kind=="pre-lab" and logs[2].phase=="feeding" and logs[2].map_price==2
+            and logs[2].lab.disabled_by_script==true)
           assert(logs[3].kind=="save" and logs[3].map_price==2 and #logs[3].science.completion_events==1
             and logs[3].science.completion_events[1].by_script==false and logs[3].lab.disabled_by_script==true)
           local snapshot=clone(storage)
