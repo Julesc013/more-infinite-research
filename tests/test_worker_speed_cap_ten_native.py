@@ -149,6 +149,13 @@ local function load_stage(path,common,stage,game,storage,settings,markers,logs,f
   env._G=env;setmetatable(env,{__index=function(_,k)return _G[k]end});local ok,msg=pcall(assert(loadfile(path,"t",env)));return ok and e or nil,tostring(msg)
 end
 local function call(f,e)if type(f)~="function"then return false,"missing callback"end;local ok,msg=pcall(f,e);return ok,tostring(msg)end
+-- Factorio advances an infinite technology before the ordinary completion event.
+-- Both flows share this engine sequence; effect/science/queue oracles stay local.
+local function finish_infinite_level(technology,completed_level,callback,tick)
+  assert(technology.level==completed_level,"ordinary research must finish its current level")
+  technology.level=completed_level+1
+  return call(callback,{research=technology,by_script=false,tick=tick})
+end
 
 function flow(source_path,old_path,successor_path,common,mode,opponent)
   local wrong=opponent=="wrong-runtime-energy";local player=force("player",1,wrong);local game={tick=0,forces={player=player,[1]=player},surfaces={}}
@@ -184,7 +191,7 @@ function flow(source_path,old_path,successor_path,common,mode,opponent)
   game.tick=1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end
   if opponent=="scripted-finish"then owner.level=11;ok,result=call(successor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result}end
   if opponent=="preincrement-finish"then owner.level=10;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result}end
-  player.research_queue={};owner.level=11;ok,result=call(successor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result}end
+  player.research_queue={};ok,result=finish_infinite_level(owner,10,successor.events[2],1);if not ok then return{ok=false,message=result}end
   player.worker_robots_speed_modifier=state.player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(successor.events[3],{research=owner,tick=1});return{ok=ok,message=result}end
   for _=1,3 do game.tick=game.tick+1;ok,result=call(successor.events[1]);if not ok then return{ok=false,message=result}end end
@@ -245,7 +252,7 @@ function current_state_flow(old_path,successor_path,successor17_path,observe_pat
   game.tick=1;ok,result=call(actor.events[1]);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="scripted-finish"then owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=true,tick=1});return{ok=ok,message=result,state=state}end
   if opponent=="preincrement-finish"then owner.level=10;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});return{ok=ok,message=result,state=state}end
-  player.research_queue={};owner.level=11;ok,result=call(actor.events[2],{research=owner,by_script=false,tick=1});if not ok then return{ok=false,message=result,state=state}end
+  player.research_queue={};ok,result=finish_infinite_level(owner,10,actor.events[2],1);if not ok then return{ok=false,message=result,state=state}end
   if opponent=="missing-ordinary-event"then state.ordinary_events={} end
   player.worker_robots_speed_modifier=state.current_player_bonus_before+.65;for n in pairs(state.lab_feed)do game.lab.input.items[n]=50 end;caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
   if opponent=="after-eleven"then ok,result=call(actor.events[3],{research=owner,tick=1});return{ok=ok,message=result,state=state}end
