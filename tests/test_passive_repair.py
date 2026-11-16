@@ -107,7 +107,6 @@ class PassiveRepairTests(unittest.TestCase):
             player._friends[2], ally._friends[1] = true, true
             state, admitted = damage(game, {enabled = true}, state, allied_gate, 700)
             assert(admitted.accepted and not admitted.postponed)
-            assert(#state.queue == 2 and state.queue[2] == 41)
             assert(#state.queue == 1 and state.queue[1] == 41 and state.scheduled)
             for tick = 720, 1260, repair.repair_interval_ticks do
               local _, waiting = scheduled(tick)
