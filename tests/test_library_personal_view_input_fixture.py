@@ -15,6 +15,7 @@ FIXTURE = ROOT / "tests/fixtures/library-personal-view-input"
 OLD_SINGLEPLAYER_FIXTURE_COMMIT = "a6ace8a48dd59b3f5eb46722273d7545e0de7011"
 FIXTURE_CONTROL_PATH = "tests/fixtures/library-personal-view-input/control.lua"
 MIR_517_F210 = SHARED.alias_for("5.0.17", "f210").distribution_version
+PASSIVE_UI_ASSIGNMENT = re.compile(r"\b(?:player|root|query)\.(?:text|opened)\s*=(?!=)")
 
 
 class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
@@ -439,7 +440,7 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         for forbidden in ["remote.call", "script.raise_event", "server_save", "auto_save", "require(",
                           "research_queue =", ".researched =", ".level ="]:
             self.assertNotIn(forbidden, code)
-        self.assertIsNone(re.search(r"\\b(?:player|root|query)\\.(?:text|opened)\\s*=(?!=)", code))
+        self.assertIsNone(PASSIVE_UI_ASSIGNMENT.search(code))
         self.assertEqual(code.count("[MIR_ACTIVE_MODS] "), 1)
         self.assertIn("script.on_event(defines.events.on_tick, settle)", code)
         self.assertIn('begin_observation(player, "singleplayer-load")', code)
@@ -450,6 +451,29 @@ class LibraryPersonalViewInputFixtureControls(unittest.TestCase):
         self.assertIn("MAX_INITIAL_READY_TICKS = 1800", code)
         self.assertNotIn("style.width", code)
         self.assertNotIn("style.height", code)
+
+    def test_passive_ui_assignment_check_rejects_its_intended_mutations(self):
+        # This lexical guard is deliberately narrow. Its opponents prove the
+        # intended dot-field checks work; they do not establish a Lua sandbox.
+        for code in (
+            "player.opened = root",
+            'query.text = "gear"',
+            "root.opened = nil",
+            "player.opened\t= root",
+            'query.text\n= "gear"',
+            "query.text=player.name",
+        ):
+            with self.subTest(forbidden_assignment=code):
+                self.assertIsNotNone(PASSIVE_UI_ASSIGNMENT.search(code))
+        for code in (
+            "if player.opened == root then return end",
+            'if query.text ~= "gear" then return end',
+            "local opened = player.opened",
+            "myplayer.opened = root",
+            "player.opened_caption = root",
+        ):
+            with self.subTest(read_or_unrelated_field=code):
+                self.assertIsNone(PASSIVE_UI_ASSIGNMENT.search(code))
 
 
 if __name__ == "__main__":
