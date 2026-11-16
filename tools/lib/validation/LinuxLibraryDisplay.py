@@ -456,9 +456,10 @@ def start_display(plan: ValidatedPlan, backend: Optional[SystemBackend] = None) 
         runtime_identity = _owned_directory(backend, plan.runtime, uid, 0o700, "private runtime directory")
         log = _open_exclusive(backend, plan.log)
         log_identity = _owned_regular(backend, plan.log, uid, 0o600, "owned display log")
-        env = dict(os.environ, DISPLAY=plan.display, XAUTHORITY=str(plan.authority),
-                   LIBGL_ALWAYS_SOFTWARE="1", MESA_SHADER_CACHE_DISABLE="true", __GL_SHADER_DISK_CACHE="0",
-                   XDG_CACHE_HOME=str(plan.root / "cache"), XDG_CONFIG_HOME=str(plan.root / "config"))
+        # This boundary starts no graphical client.  Do not inherit the full
+        # renderer's cache/config environment or manufacture unrelated role
+        # root outputs: only the private display and authority are added.
+        env = dict(os.environ, DISPLAY=plan.display, XAUTHORITY=str(plan.authority))
         process = backend.spawn(_server_argv(plan, probe), env, plan.root, log)
         identity = backend.process_identity(process.pid)
         require(identity["pid"] == process.pid and identity["session_id"] == backend.session(os.getpid()),
