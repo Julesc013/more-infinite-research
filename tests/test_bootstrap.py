@@ -1135,6 +1135,55 @@ class BootstrapTests(unittest.TestCase):
         self.assertIn('require("runtime.bootstrap")', control)
         self.assertIn("remote.add_interface", control)
 
+    def test_required_catalogue_worker_exports_refuse_before_bootstrap_registration(self):
+        self.lua.execute(r'''
+          local actual_catalogue = require("runtime.catalogue")
+          local names = {
+            "worker_storage_route", "worker_default_split", "finite_research_speed_provider"
+          }
+          for _, name in ipairs(names) do
+            for _, kind in ipairs({"missing", "nonfunction"}) do
+              install_modules(false); install_runtime()
+              local supplied = {}
+              for key, value in pairs(actual_catalogue) do supplied[key] = value end
+              supplied[name] = kind == "nonfunction" and false or nil
+              package.loaded["runtime.catalogue"] = nil
+              package.loaded["runtime.worker_robot_storage"] = nil
+              package.loaded["runtime.finite_research_speed"] = nil
+              package.preload["runtime.catalogue"] = function() return supplied end
+              local ok, message = pcall(load_control)
+              assert(not ok and tostring(message):find("MIR runtime catalogue requires callable " .. name, 1, true),
+                kind .. " required catalogue export was treated as an absent result: " .. name)
+              assert(next(remote.interfaces) == nil and next(commands.registered) == nil
+                and handlers.init == nil and handlers.configuration == nil and handlers.load == nil
+                and next(handlers.events) == nil and next(handlers.nth) == nil,
+                kind .. " export registered a callback or command before refusal: " .. name)
+              assert(next(lifecycle_calls) == nil and next(library_calls) == nil
+                and package.loaded["runtime.worker_robot_storage"] == nil
+                and package.loaded["runtime.finite_research_speed"] == nil,
+                kind .. " export reached worker, finite-speed, lifecycle or Library application: " .. name)
+            end
+          end
+        ''')
+
+    def test_callable_catalogue_worker_exports_keep_absent_results(self):
+        self.lua.execute(r'''
+          install_modules(false); install_runtime()
+          local catalogue = require("runtime.catalogue")
+          catalogue.worker_storage_route = function() return nil end
+          catalogue.worker_default_split = function() return false end
+          catalogue.finite_research_speed_provider = function() return nil end
+          local ok, message = pcall(load_control)
+          assert(ok, message)
+          ok, message = pcall(handlers.init)
+          assert(ok, message)
+          ok, message = pcall(handlers.configuration, {mod_changes = {}})
+          assert(ok, message)
+          assert(lifecycle_calls.init == 1 and lifecycle_calls.configuration ~= nil
+            and library_calls.init == 1 and library_calls.configuration ~= nil,
+            "callable absent worker results lost the ordinary lifecycle route")
+        ''')
+
     def test_k2_carrier_lifecycle_is_independent_of_caps_and_scripted_features(self):
         self.lua.execute('''
           install_modules(false,false,false)
