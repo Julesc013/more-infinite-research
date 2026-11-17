@@ -337,7 +337,8 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
               tabs.selected_tab_index=4
               emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
               tick()
-              assert(report().phase=="await-help-click" and #report().snapshots==3)
+              assert(report().phase=="await-help-click" and #report().snapshots==3
+                and writes["mir-library-localized-search-native/03-help-tab.json"]==nil)
               emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
               tick()
               assert(report().phase=="await-research-click" and #report().snapshots==4)
@@ -359,6 +360,11 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
         )
         with self.assertRaisesRegex(Exception, "tab selection differs"):
             self.exec("emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=player.gui.screen.mir_research_browser.mir_library_tabs})")
+
+        self.setUp()
+        self.prepare_open()
+        with self.assertRaisesRegex(Exception, "tab selection differs"):
+            self.exec("local tabs=player.gui.screen.mir_research_browser.mir_library_tabs;tabs.selected_tab_index=1;emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})")
 
         self.setUp()
         self.prepare_open()
