@@ -1,0 +1,148 @@
+{
+  "kind": "MIR517Source15Cap0PausedNativeAndStdinAdverseRecordV1",
+  "recorded": "2026-11-17",
+  "status": "closed-adverse-and-limited-no-command-characterization",
+  "scope": "The closed Source15/MIR15/SE cap0 readiness attempts and first stdin-console adverse are retained exactly. This record does not report an RCON query outcome.",
+  "inputs": {
+    "engine": {
+      "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+      "version": "2.0.77",
+      "bytes": 43530192,
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published_mir15": {
+      "path": "dist/v5.0.15/more-infinite-research_5.0.20015.zip",
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+    },
+    "source_actor": {
+      "commit": "71b1db48cf25f17765a49455ab2a2fbd6561b9cc",
+      "role": "original Source15 actor"
+    },
+    "source_a0": {
+      "path": "build/qualification/source15-cap0-observation-r01/inputs/A0.zip",
+      "bytes": 842004,
+      "sha256": "A0E0C6216C0AEC2317AC1A88B80BBDC7BC7A1F581A787D7FA82F3DEF3F0F8DFC"
+    },
+    "source_observation": {
+      "path": "build/qualification/source15-cap0-observation-r01/inputs/source.json",
+      "bytes": 2572,
+      "sha256": "B9F726CB4CCADFBC3EC27B6F8C718B1B9B3A2139A54BD5B254F470D89965EFED"
+    },
+    "fixture": {
+      "version": "0.4.0",
+      "bytes": 10228,
+      "sha256": "356F539FC6C73DFE145F239760371360ADB5FE679381D23ABC7265FF10440412"
+    }
+  },
+  "closed_attempts": [
+    {
+      "revision": "R04",
+      "terminal": {
+        "path": "build/qualification/source15-cap0-observation-r01/terminal.json",
+        "sha256": "AD234C6C10914CF69396ABA7C21C3355B15A49953A33913038C6E8EE5EA9E5B3"
+      },
+      "status": "adverse-stop",
+      "condition": "The governor rejected a sampled completion predicate without its required observation callback before process creation.",
+      "native_processes": 0,
+      "pids": [],
+      "console_commands": 0,
+      "qualification": "No engine, Source15 load or applicability observation occurred."
+    },
+    {
+      "revision": "R05",
+      "terminal": {
+        "path": "build/qualification/source15-cap0-observation-r01/terminal-r05.json",
+        "sha256": "76D924B4053D21943085C51ED0DB0AA4C5D7909FB3A520B4A21C6DB4207B3631"
+      },
+      "status": "adverse-stop",
+      "pid": 140928,
+      "condition": "The server Boolean setting failed before Source15 loaded.",
+      "console_commands": 0,
+      "qualification": "No Source15 applicability observation or query was made."
+    },
+    {
+      "revision": "R06",
+      "terminal": {
+        "path": "build/qualification/source15-cap0-observation-r01/terminal-r06.json",
+        "sha256": "AEFC82F83777F2089C847F18AB89EDC43710F53EDF6C3365CED0ED1E171DAEEB"
+      },
+      "independent_review": {
+        "path": "build/qualification/source15-cap0-observation-review-r01/INDEPENDENT-RESULT-REVIEW-r06.json",
+        "sha256": "2C30FB652F83C1ECAF220CE21A87A0C8FDA0D37A6A8897915EF1A08F4B0A709F"
+      },
+      "status": "observed-paused-readiness-only",
+      "pid": 136616,
+      "supervised_exit_code": -1,
+      "console_commands": 0,
+      "selected_mods": {
+        "script_bearing": 14,
+        "asset_only": 6,
+        "full_runtime_observed": false
+      },
+      "prerequisite_flags_observed": false,
+      "qualification": "One paused no-command readiness characterization only; it is not original-successor ordinary work, a save, a cold read or a native query result."
+    },
+    {
+      "revision": "R02-stdin-console",
+      "terminal": {
+        "path": "build/qualification/source15-cap0-console-query-r01/terminal-r02.json",
+        "sha256": "BEE95FB7F749383EDEC4556DD8551E40ABEA9DB81F05332C10F118B3CDEC8512"
+      },
+      "independent_review": {
+        "path": "build/qualification/source15-cap0-observation-review-r01/INDEPENDENT-CONSOLE-RESULT-REVIEW-r02.json",
+        "sha256": "E9691DF4D51348C81D09D6C30E0F0904E3198FC7DFBA80BF676045234AC7DA6A"
+      },
+      "status": "adverse-stop",
+      "pid": 144860,
+      "condition": "The primary console-write ledger failure was masked by a closed-pipe Dispose exception during cleanup, so the console receipt was lost.",
+      "console_marker_observed": false,
+      "console_commands": 0,
+      "delivery_interpretation": "The zero command count is not evidence that the attempted query was not delivered.",
+      "qualification": "No source flags, RCON result, query result or delivery conclusion is established."
+    }
+  ],
+  "preservation": {
+    "a0_preserved": true,
+    "direct_library_controls_restored": 4,
+    "owned_archives_restored": 2,
+    "factorio_processes_remaining": 0,
+    "new_save_created": false,
+    "reference_only": [
+      "The exact archives, temporary files and local library originals named by the closed receipts remain locally preserved where applicable; this record does not transport new bodies for them."
+    ]
+  },
+  "private_custody": {
+    "local_root": "build/qualification/source15-cap0-private-custody-r01",
+    "commit": "baae496f1d6df156fd9162272436b2eb564f346e",
+    "tree": "3e895b3df0a4cb38917c57ad53c31139fe6943d6",
+    "capsule_blob": "0a004e5feca834cbd6f9f2e685f8cf76c9c3d614",
+    "index_blob": "710033f7ceefbd0456a4c643ae328ec2cd9adc9d",
+    "compressed_bytes": 538336,
+    "compressed_sha256": "3ABAF41FC456DBF3B1B7F271BE51C65ABC4A8B82F12D8644B28C297EC8D894D8",
+    "logical_rows": 280,
+    "unique_bodies": 227,
+    "original_bytes": 1572193,
+    "independent_remote_readback": {
+      "path": "build/qualification/source15-cap0-private-custody-r01/INDEPENDENT-REMOTE-READBACK-r01.json",
+      "sha256": "9E6386268DA4404F1AF1AB410BD8492EBD4EF144EA8FCFA0F70E255DC1A68D82",
+      "verdict": "GO-for-private-custody-integrity-only"
+    }
+  },
+  "shared_tooling_context": {
+    "PR2075": {
+      "merged_commit_prefix": "2cae83",
+      "meaning": "Shared verification and cleanup tooling correction, not engine-query qualification."
+    },
+    "PR2077": {
+      "merged_commit_prefix": "3e27",
+      "focused_controls": 86,
+      "meaning": "Shared cleanup preservation correction, not engine-query qualification."
+    }
+  },
+  "limits": [
+    "No reseed, MIR-causality conclusion, successful native query or stable claim is made.",
+    "Original-successor ordinary work, save and two-cold behavior remain unverified.",
+    "A future RCON query had not run when this record was written."
+  ]
+}
