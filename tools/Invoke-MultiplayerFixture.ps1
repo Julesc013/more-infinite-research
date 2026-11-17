@@ -221,9 +221,31 @@ function Assert-MultiplayerFixtureSelection {
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
       mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
       fixture_archive_sha256='CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
       fixture_source_revision='3c6cf808745fe88741ceea0a33bf950cec8f8176'
+      fixture_source_metadata='info-f210-current-517.json';fixture_version='0.1.2'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.2','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.2.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
+      # The responsive observer is a new current Linux target.  It does not
+      # alter the retained fixed-grid fixture, archive, or historical profile.
+      fixture_case='library-multiplayer';target='f210-current-linux-responsive'
+      kind='mir5-library-api-consumers-current-linux-responsive-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='E7340D20575B726BF25BBBAC85257E82A6BF2B657A97C4C9A687A0500752CEFD'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.3.zip'
+      fixture_source_revision='ef6e173a628fd8acd5e95975c40c515c2cc2ba23'
+      fixture_source_metadata='info-f210-current-517-responsive.json';fixture_version='0.1.3'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.3','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.3.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
       api_consumer_archive_sha256=[ordered]@{
         'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
         'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
@@ -338,14 +360,13 @@ function Assert-MultiplayerFixtureSelection {
     }
   }
   if($target.Contains('fixture_archive_sha256')){
-    $fixtureArchive='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
-    Assert-Session ($target.fixture_archive_sha256 -is [string] -and $target.fixture_archive_sha256 -cmatch '^[A-F0-9]{64}$') 'current Library fixture archive binding differs'
+    Assert-Session ($target.fixture_archive_sha256 -is [string] -and $target.fixture_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $target.Contains('fixture_archive_name') -and $target.fixture_archive_name -is [string] -and $target.fixture_archive_name -cmatch '^mir-fixture-mir5-library-multiplayer_0\.1\.(2|3)\.zip$') 'current Library fixture archive binding differs'
     # This projection archive is purposefully not part of the reusable profile
     # document: the profile's four library-control hashes bind Base/MIR/A15/
     # API consumers, while the wrapper binds this selected source projection
     # separately before it can activate the full six-mod session.
-    Assert-Session ($target.optional_archives -ccontains $fixtureArchive) 'current Library fixture archive selection differs'
-    Assert-Session ($target.Contains('fixture_source_revision') -and $target.fixture_source_revision -is [string] -and $target.fixture_source_revision -cmatch '^[0-9a-f]{40}$') 'current Library fixture source revision differs'
+    Assert-Session ($target.optional_archives -ccontains $target.fixture_archive_name) 'current Library fixture archive selection differs'
+    Assert-Session ($target.Contains('fixture_source_revision') -and $target.fixture_source_revision -is [string] -and $target.fixture_source_revision -cmatch '^[0-9a-f]{40}$' -and $target.Contains('fixture_source_metadata') -and $target.fixture_source_metadata -is [string] -and $target.fixture_source_metadata -ceq'info-f210-current-517'+$(if($target.fixture_archive_name-ceq'mir-fixture-mir5-library-multiplayer_0.1.3.zip'){'-responsive'})+'.json' -and $target.Contains('fixture_version') -and $target.fixture_version -is [string] -and $target.fixture_version -ceq$(if($target.fixture_archive_name-ceq'mir-fixture-mir5-library-multiplayer_0.1.3.zip'){'0.1.3'}else{'0.1.2'})) 'current Library fixture source binding differs'
   }
   foreach($entry in $archives.GetEnumerator()){
     Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
@@ -983,7 +1004,13 @@ if($standaloneF210){
   $standaloneFixtureSourceRevision=if($target.PSObject.Properties['fixture_source_revision']){[string]$target.fixture_source_revision}else{Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo}
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
-  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks -MIRVersion $target.mir}
+  if($positivePrivateStateChecks){
+    $standaloneLibraryFixture=New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'
+  }else{
+    $fixtureProjectionArguments=@{RepoRoot=$repo;OutputRoot=$output;SourceRevision=$standaloneFixtureSourceRevision;SpaceAgeLibrary=$spaceAgeLibrary;PrivateCreditChecks=$privateCreditChecks;MIRVersion=$target.mir}
+    if($target.PSObject.Properties['fixture_source_metadata']){$fixtureProjectionArguments.CurrentLinuxMetadata=[string]$target.fixture_source_metadata}
+    $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection @fixtureProjectionArguments
+  }
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
     $apiConsumerSourceRevision=$standaloneFixtureSourceRevision
@@ -1035,7 +1062,7 @@ if($ComposeOnly){
   $mirRows=@($selection.mods|Where-Object {[string]$_.name-ceq'more-infinite-research'-and$_.enabled-eq$true})
   Assert-Session ($mirRows.Count-eq1) 'ComposeOnly MIR archive selection differs'
   Assert-Session ($target.PSObject.Properties['fixture_archive_sha256']-and$null-ne$standaloneLibraryFixture) 'ComposeOnly current Library fixture projection is absent'
-  $fixtureArchiveName='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
+  $fixtureArchiveName=[string]$target.fixture_archive_name
   $fixtureArchive=Join-Path $library $fixtureArchiveName
   Assert-LinuxDisplayPinnedFile -Path $fixtureArchive -Expected ([string]$target.fixture_archive_sha256) -Label 'ComposeOnly current Library fixture archive' -MaximumBytes 64MB|Out-Null
   Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory ([string]$standaloneLibraryFixture.source)
