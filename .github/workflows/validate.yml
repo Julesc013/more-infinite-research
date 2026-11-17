@@ -38,6 +38,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 3c6cf808745fe88741ceea0a33bf950cec8f8176
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
@@ -188,6 +192,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 3c6cf808745fe88741ceea0a33bf950cec8f8176
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c

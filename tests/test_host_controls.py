@@ -356,6 +356,23 @@ class HostControlsTests(unittest.TestCase):
         multiplayer_revisions = set(re.findall(
             r'"([0-9a-f]{40}):tools/Invoke-Multiplayer(?:Fixture|Session)\.ps1"', multiplayer_control))
         self.assertTrue(multiplayer_revisions)
+        multiplayer_wrapper = (ROOT / "tools/Invoke-MultiplayerFixture.ps1").read_text(encoding="utf-8")
+        multiplayer_fixture_source_revisions = set(re.findall(
+            r"fixture_source_revision='([0-9a-f]{40})'", multiplayer_wrapper))
+        self.assertTrue(multiplayer_fixture_source_revisions)
+
+        def assert_multiplayer_fixture_source_fetches(candidate_workflow: str) -> None:
+            candidate_jobs = dict(re.findall(
+                r"(?ms)^  ([a-z-]+):\n(.*?)(?=^  [a-z-]+:\n|\Z)", candidate_workflow))
+            for job in ("verification-plan", "host-controls"):
+                for revision in multiplayer_fixture_source_revisions:
+                    self.assertIn("git fetch --no-tags --depth=1 origin " + revision, candidate_jobs[job], (job, revision))
+
+        assert_multiplayer_fixture_source_fetches(workflow)
+        missing_fixture_fetch = "git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_fixture_source_fetches(workflow.replace(missing_fixture_fetch, "", 1))
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
