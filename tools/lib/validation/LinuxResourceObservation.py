@@ -415,9 +415,25 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
             fail("mir441-owned-session-identity")
         if root is not None and root["session_id"] != session_id:
             fail("mir441-owned-session-identity")
-        owned = {row["pid"]: row for row in iter_proc_stats(proc_root) if row["session_id"] == session_id}
-        if root is not None and root_pid not in owned:
-            fail("mir441-owned-session-identity")
+        rows = iter_proc_stats(proc_root)
+        scanned_root = next((row for row in rows if row["pid"] == root_pid), None)
+        owned = {row["pid"]: row for row in rows if row["session_id"] == session_id}
+        if scanned_root is not None:
+            if scanned_root["start_ticks"] != root_start_ticks:
+                fail("mir441-owned-root-identity")
+            if scanned_root["session_id"] != session_id:
+                fail("mir441-owned-session-identity")
+            root = scanned_root
+        elif root is not None:
+            reread_root = read_proc_stat(proc_root, root_pid, missing_is_exit=True)
+            if reread_root is None:
+                root = None
+            else:
+                if reread_root["start_ticks"] != root_start_ticks:
+                    fail("mir441-owned-root-identity")
+                if reread_root["session_id"] != session_id:
+                    fail("mir441-owned-session-identity")
+                fail("mir441-owned-session-identity")
     elif root is None:
         return {
             "root_exited": True,
