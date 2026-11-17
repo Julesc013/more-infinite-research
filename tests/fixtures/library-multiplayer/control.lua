@@ -60,7 +60,8 @@ local function responsive_current_linux()
     and script.active_mods.base == "2.1.24"
     and script.active_mods["more-infinite-research"] == "5.0.21017"
     and (script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.3"
-      or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.4")
+      or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.4"
+      or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.5")
 end
 
 local RESPONSIVE_FILTER_COLUMNS = {[1]=true, [2]=true, [3]=true, [5]=true}
@@ -529,6 +530,19 @@ local function localized_caption_shape(caption, key)
   return "key-matches=" .. tostring(caption[1] == key) .. ", argument-type=" .. type(caption[2])
 end
 
+local function context_presence(context)
+  local names = {
+    "mir_library_context_current", "mir_library_context_queued",
+    "mir_library_context_queue_count", "mir_library_context_queue_position",
+    "mir_library_context_not_queued",
+  }
+  local facts = {}
+  for _, name in ipairs(names) do
+    facts[#facts + 1] = name .. "=" .. (valid(context[name]) and "present" or "absent")
+  end
+  return table.concat(facts, ",")
+end
+
 local function live_detail(player, retained, expected)
   local root, query, _, _, detail = frame_parts(player)
   if root ~= retained.root or query ~= retained.query then
@@ -542,16 +556,25 @@ local function live_detail(player, retained, expected)
     fail("native Library refresh level differs (" .. localized_caption_shape(valid(level) and level.caption, "mir-browser.level") .. ")")
   end
   local current, queued = context["mir_library_context_current"], context["mir_library_context_queued"]
-  if expected.current and not valid(current) then fail("native Library refresh lost current research context") end
-  if not expected.current and valid(current) then fail("native Library refresh retained stale current research context") end
-  if expected.current and valid(queued) then fail("native Library refresh mixed current and queued context") end
+  local presence = context_presence(context)
+  if expected.current and not valid(current) then fail("native Library refresh lost current research context (" .. presence .. ")") end
+  if not expected.current and valid(current) then fail("native Library refresh retained stale current research context (" .. presence .. ")") end
+  if expected.current and valid(queued) then fail("native Library refresh mixed current and queued context (" .. presence .. ")") end
   if not expected.current and expected.count > 0 and not valid(queued) then
-    fail("native Library refresh lost queued research context")
+    fail("native Library refresh lost queued research context (" .. presence .. ")")
+  end
+  if expected.count == 0 and valid(queued) then
+    fail("native Library refresh retained stale queued research context (" .. presence .. ")")
+  end
+  if valid(context["mir_library_context_not_queued"]) then
+    fail("native Library refresh emitted unsupported not-queued context label (" .. presence .. ")")
   end
   if expected.count == 0 then
-    if valid(context["mir_library_context_queue_count"]) or valid(context["mir_library_context_queue_position"])
-        or not valid(context["mir_library_context_not_queued"]) then
-      fail("native Library refresh retained stale queue labels")
+    local stale = {}
+    if valid(context["mir_library_context_queue_count"]) then stale[#stale + 1] = "count" end
+    if valid(context["mir_library_context_queue_position"]) then stale[#stale + 1] = "position" end
+    if #stale > 0 then
+      fail("native Library refresh retained stale queue labels (" .. table.concat(stale, ",") .. "; " .. presence .. ")")
     end
   else
     local count, position = context["mir_library_context_queue_count"], context["mir_library_context_queue_position"]
