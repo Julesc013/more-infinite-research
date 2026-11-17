@@ -388,6 +388,10 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn(missing_v014_fixture_fetch, workflow)
         with self.assertRaises(AssertionError):
             assert_multiplayer_historical_input_fetches(workflow.replace(missing_v014_fixture_fetch, "", 1))
+        missing_v015_fixture_fetch = "git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_v015_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_v015_fixture_fetch, "", 1))
         missing_availability_actor_fetch = "git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c\n          if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }\n"
         self.assertIn(missing_availability_actor_fetch, workflow)
         with self.assertRaises(AssertionError):

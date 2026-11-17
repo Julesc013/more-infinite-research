@@ -44,6 +44,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af
           if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
@@ -202,6 +204,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af
           if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }
           git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4

@@ -273,6 +273,26 @@ function Assert-MultiplayerFixtureSelection {
       session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
     }
     [ordered]@{
+      # This queue-context successor keeps the responsive 0.1.3/0.1.4 routes
+      # immutable while binding the actual settled-queue display contract.
+      fixture_case='library-multiplayer';target='f210-current-linux-responsive-v015'
+      kind='mir5-library-api-consumers-current-linux-responsive-v015-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='CAC05BAE5E3D67D85681B9C0FEC376D71809A7A4E6811A274C6468ADD8ED36FC'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.5.zip'
+      fixture_source_revision='0dac003903a317137cf993b5bd22074a3e5013a8'
+      fixture_source_metadata='info-f210-current-517-responsive-v015.json';fixture_version='0.1.5'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.5','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.5.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
       fixture_case='library-paired-browser';target='f200'
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002';build_version=84539
@@ -384,6 +404,7 @@ function Assert-MultiplayerFixtureSelection {
       'mir-fixture-mir5-library-multiplayer_0.1.2.zip'=[ordered]@{metadata='info-f210-current-517.json';version='0.1.2'}
       'mir-fixture-mir5-library-multiplayer_0.1.3.zip'=[ordered]@{metadata='info-f210-current-517-responsive.json';version='0.1.3'}
       'mir-fixture-mir5-library-multiplayer_0.1.4.zip'=[ordered]@{metadata='info-f210-current-517-responsive-v014.json';version='0.1.4'}
+      'mir-fixture-mir5-library-multiplayer_0.1.5.zip'=[ordered]@{metadata='info-f210-current-517-responsive-v015.json';version='0.1.5'}
     }
     $fixtureBinding=if($target.Contains('fixture_archive_name')){$currentFixtureBindings[[string]$target.fixture_archive_name]}else{$null}
     Assert-Session ($target.fixture_archive_sha256 -is [string] -and $target.fixture_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $target.Contains('fixture_archive_name') -and $target.fixture_archive_name -is [string] -and $null-ne$fixtureBinding) 'current Library fixture archive binding differs'
@@ -521,7 +542,7 @@ function Get-StandaloneF210NativeFixtureRawGitMemberBytes {
     [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$Member
   )
-  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive.json','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
+  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517-responsive-v015.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive.json','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
   Assert-Session ($allowed-ccontains$Member) "standalone F210 fixture member is not admitted: $FixtureDirectory/$Member"
   $path='tests/fixtures/'+$FixtureDirectory+'/'+$Member
   $start=[Diagnostics.ProcessStartInfo]::new()
@@ -546,7 +567,7 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     [switch]$SpaceAgeLibrary,
     [switch]$PrivateCreditChecks,
     [ValidateSet('5.0.21000','5.0.21004','5.0.21017')][string]$MIRVersion='5.0.21000',
-    [ValidateSet('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json')][string]$CurrentLinuxMetadata='info-f210-current-517.json'
+    [ValidateSet('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive-v015.json')][string]$CurrentLinuxMetadata='info-f210-current-517.json'
   )
   Assert-Session ($MIRVersion-cne'5.0.21004' -or (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks)) 'current504 projection admits only the four-mod Base fixture'
   Assert-Session ($MIRVersion-ceq'5.0.21017' -or $CurrentLinuxMetadata-ceq'info-f210-current-517.json') 'current Linux fixture metadata admits only MIR 5.0.21017'
@@ -558,7 +579,7 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
   $privateCreditMetadata='info-f210-private-credits.json'
-  $currentLinuxMetadataOptions=@('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json')
+  $currentLinuxMetadataOptions=@('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive-v015.json')
   $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)+$currentLinuxMetadataOptions
   $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
@@ -571,7 +592,7 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     Assert-Session (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks) 'current Linux Library projection admits only Base API consumers'
     Assert-Session ($currentLinuxMetadataOptions-ccontains$CurrentLinuxMetadata-and$canonicalNames-ccontains$CurrentLinuxMetadata) 'current Linux Library fixture metadata is absent'
     $currentInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $CurrentLinuxMetadata))|ConvertFrom-Json -AsHashtable
-    $expectedCurrentVersions=[ordered]@{'info-f210-current-517.json'='0.1.2';'info-f210-current-517-responsive.json'='0.1.3';'info-f210-current-517-responsive-v014.json'='0.1.4'}
+    $expectedCurrentVersions=[ordered]@{'info-f210-current-517.json'='0.1.2';'info-f210-current-517-responsive.json'='0.1.3';'info-f210-current-517-responsive-v014.json'='0.1.4';'info-f210-current-517-responsive-v015.json'='0.1.5'}
     $expectedCurrentVersion=$expectedCurrentVersions[$CurrentLinuxMetadata]
     Assert-Session ([string]$currentInfo.name-ceq[string]$f200Info.name -and [string]$currentInfo.version-ceq$expectedCurrentVersion -and [string]$currentInfo.factorio_version-ceq'2.1' -and ((@($currentInfo.dependencies)-join'|')-ceq'base >= 2.1.24|more-infinite-research = 5.0.21017')) 'current Linux Library fixture metadata differs'
   }
