@@ -49,6 +49,14 @@ local CLOSURE = {
   ["space-exploration-menu-simulations"] = "0.7.4", ["space-exploration-postprocess"] = "0.7.5",
   informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3",
 }
+local SOURCE_PRODUCER_FLAGS = {
+  player = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = false,
+    [ELECTRICITY] = false, [PROBE] = false},
+  foreign = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = true,
+    [ELECTRICITY] = true, [PROBE] = false},
+  earned = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = false,
+    [ELECTRICITY] = false, [PROBE] = false},
+}
 local cold_requested, cold_logged = false, false
 local source_producer_cold_requested, source_producer_cold_logged = false, false
 
@@ -347,17 +355,12 @@ local function assert_source_producer_flags(state, label)
   local earned = force_by_index(state.earned_index, label .. " earned")
   for _, row in ipairs({{force = player, role = "player"}, {force = foreign, role = "foreign"},
       {force = earned, role = "earned"}}) do
-    for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE}) do
+    for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, PROBE}) do
       local value = technology(row.force, name)
-      if value.researched ~= true or value.enabled ~= true or value.valid ~= true then
-        fail(label .. " " .. row.role .. " direct worker prerequisite differs: " .. name)
+      if value.researched ~= SOURCE_PRODUCER_FLAGS[row.role][name] or value.enabled ~= true
+          or value.level ~= 1 or value.valid ~= true then
+        fail(label .. " " .. row.role .. " named flag differs: " .. name)
       end
-    end
-  end
-  for _, name in ipairs({AUTOMATION_SCIENCE, ELECTRICITY}) do
-    local value = technology(foreign, name)
-    if value.researched ~= true or value.enabled ~= true or value.valid ~= true then
-      fail(label .. " foreign direct automation prerequisite differs: " .. name)
     end
   end
 end

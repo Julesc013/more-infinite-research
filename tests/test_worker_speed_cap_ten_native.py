@@ -1071,7 +1071,9 @@ end
         self.assertEqual(1, source.count(marker))
         opponents = {
             "cleared-direct-flag": ('  technology(player, PREDECESSOR).researched = false\n' + marker,
-                                    "source-producer player direct worker prerequisite differs"),
+                                    "source-producer player named flag differs: worker-robots-speed-9"),
+            "changed-unchecked-player-automation": ('  technology(player, PROBE).researched = true\n' + marker,
+                                                      "source-producer player named flag differs: automation"),
             "changed-player-queue": ('  player.research_queue = {}\n' + marker,
                                      "source-producer scripted player seed differs"),
         }
