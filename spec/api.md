@@ -87,6 +87,8 @@ Do not compute completed levels as `level - 1` for every finite or staged techno
 
 Programming errors in explicit data calls fail with a stable prefix and contextual code, such as `MIR_API:invalid_definition`, `duplicate_identity`, `missing_target`, `unsupported_capability`, `unsupported_engine` or `ownership_conflict`. Optional integration absence is handled by the caller before mutation. Runtime queries return an unavailable/error result for expected missing state; they must not initialize storage, change research or throw merely because a requested optional technology is absent. Do not promise an `unsupported_api_version` error if the caller has not actually negotiated a version.
 
+The Generator reports an authored rejection category through a fresh call-local output table; the API renders that category separately from the unchanged human error text. Unexpected lookup/publication exceptions retain `invalid_definition` and their original text, even when they contain words such as “missing” or “duplicate technology”. The output table is internal and transient, not a public result or saved history. Preflight refusals precede intended prototype writes; a native publication exception does not promise rollback of writes the engine may already have performed.
+
 `API-03` — No claim that this API authenticates an extension's identity or sandboxes Lua. Mods sharing the data stage can bypass it. Runtime interface names may already have consumers: inspect existing registration before adding/replacing one. Never remove another interface to resolve a collision.
 
 ## Runtime registration
