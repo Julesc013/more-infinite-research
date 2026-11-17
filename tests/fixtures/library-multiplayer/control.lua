@@ -20,6 +20,8 @@ local DETAIL_TITLE = "mir_library_detail_title"
 local DETAIL_EMPTY = "mir_library_detail_empty"
 local ACTIONS = "mir_library_actions"
 local OPEN_NATIVE = "mir_library_open_native"
+local AVAILABILITY_VIEWPORT = "mir_library_availability_viewport"
+local AVAILABILITY_ENTRIES = "mir_library_availability_entries"
 local AVAILABILITY = {"mir_library_availability_1", "mir_library_availability_2"}
 local AVAILABILITY_FAMILIES = {
   "research_agricultural_growth_speed",
@@ -57,7 +59,8 @@ local function responsive_current_linux()
   return script ~= nil and script.active_mods ~= nil
     and script.active_mods.base == "2.1.24"
     and script.active_mods["more-infinite-research"] == "5.0.21017"
-    and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.3"
+    and (script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.3"
+      or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.4")
 end
 
 local RESPONSIVE_FILTER_COLUMNS = {[1]=true, [2]=true, [3]=true, [5]=true}
@@ -709,43 +712,148 @@ local function localized_key(value)
   return type(value) == "table" and value[1] or nil
 end
 
+local function bounded_key(value)
+  local key = type(value) == "string" and value or localized_key(value)
+  if type(key) ~= "string" then return nil end
+  return key:sub(1, 160)
+end
+
+local function gui_facts(element)
+  if not valid(element) then return {valid=false} end
+  local children = element.children
+  return {
+    valid=true,
+    name=type(element.name) == "string" and element.name or nil,
+    type=type(element.type) == "string" and element.type or nil,
+    child_count=type(children) == "table" and #children or nil,
+  }
+end
+
+local function caption_facts(label)
+  if not valid(label) then return {valid=false} end
+  local caption = label.caption
+  return {
+    valid=true,
+    type=type(label.type) == "string" and label.type or nil,
+    entry=bounded_key(caption),
+    subject=type(caption) == "table" and bounded_key(caption[2]) or nil,
+    reason=type(caption) == "table" and bounded_key(caption[3]) or nil,
+  }
+end
+
+local function availability_rows()
+  if space_age_library() then
+    return {{
+      name=AVAILABILITY[1], status="not-added",
+      subject="technology-name.more-infinite-research.research_lab_productivity",
+      reason="mir-browser.availability-native-research-productivity",
+    }}
+  end
+  local rows = {}
+  for index, name in ipairs(AVAILABILITY) do
+    rows[index] = {
+      name=name, status="not-added",
+      subject="technology-name.more-infinite-research." .. AVAILABILITY_FAMILIES[index],
+      reason="mir-browser.availability-requires-space-age",
+    }
+  end
+  return rows
+end
+
+local function availability_parts(content)
+  local viewport = valid(content) and content[AVAILABILITY_VIEWPORT] or nil
+  local entries = valid(viewport) and viewport[AVAILABILITY_ENTRIES] or nil
+  return viewport, entries
+end
+
+local function availability_facts(player, root, filters, content, status, rows)
+  local viewport, entries = availability_parts(content)
+  local active = script and script.active_mods or nil
+  local facts = {
+    schema=1,
+    kind="MIRLibraryAvailabilityFactsV1",
+    case=CASE,
+    player={index=player and player.index or nil, locale=player and player.locale or nil},
+    request={tab="availability", search=""},
+    target={
+      base=type(active) == "table" and active.base or nil,
+      mir=type(active) == "table" and active["more-infinite-research"] or nil,
+      fixture=type(active) == "table" and active["mir-fixture-mir5-library-multiplayer"] or nil,
+      space_age=type(active) == "table" and active[SPACE_AGE] or nil,
+    },
+    expected_status="not-added",
+    actual_status=valid(status) and status.selected_index or nil,
+    root=gui_facts(root), content=gui_facts(content), viewport=gui_facts(viewport), entries=gui_facts(entries),
+    rows={},
+  }
+  for index, row in ipairs(rows) do
+    facts.rows[index] = {
+      name=row.name, expected={entry="mir-browser.availability-entry", subject=row.subject, reason=row.reason, status=row.status},
+      actual=caption_facts(valid(entries) and entries[row.name] or nil),
+    }
+  end
+  return facts
+end
+
+local function availability_fail(message, facts)
+  local target = facts.target or {}
+  local rows = facts.rows or {}
+  local first = rows[1] or {}
+  local expected, actual = first.expected or {}, first.actual or {}
+  fail(message .. " (availability target=" .. tostring(target.base) .. "/" .. tostring(target.mir)
+    .. "/" .. tostring(target.fixture) .. "; expected=" .. tostring(expected.subject) .. "/" .. tostring(expected.reason)
+    .. "; actual=" .. tostring(actual.subject) .. "/" .. tostring(actual.reason) .. ")")
+end
+
 local function assert_availability(player)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
   local filters, content, tabs = research_parts(root)
   local query = valid(filters) and filters[QUERY] or nil
+  local status = nil
+  if root ~= nil and valid(root) then
+    status = filter_control(root, filters, "mir_library_visibility")
+  end
+  local rows = availability_rows()
+  local facts = availability_facts(player, root, filters, content, status, rows)
+  log("[MIR5_LIBRARY_AVAILABILITY] " .. helpers.table_to_json(facts))
   local children = valid(content) and content.children or nil
   if not valid(root) or root.type ~= "frame" or root.visible ~= true or not valid(query) or query.text ~= ""
       or not valid(content) or children == nil then
-    fail("native Availability browser GUI tree is incomplete")
+    availability_fail("native Availability browser GUI tree is incomplete", facts)
+  end
+  if not valid(status) or status.type ~= "drop-down" or status.selected_index ~= 3 then
+    availability_fail("native Availability terminal status differs", facts)
   end
   local results, actions = browser_list_parts(content)
   if valid(results) or valid(content[DETAIL]) or valid(actions) then
-    fail("Availability exposed research results or actions")
+    availability_fail("Availability exposed research results or actions", facts)
   end
-  if space_age_library() then
-    local label = content[AVAILABILITY[1]]
+  local viewport, entries = availability_parts(content)
+  local viewport_children = valid(viewport) and viewport.children or nil
+  local entry_children = valid(entries) and entries.children or nil
+  if not valid(viewport) or viewport.type ~= "scroll-pane" or viewport.horizontal_scroll_policy ~= "never"
+      or viewport.vertical_scroll_policy ~= "auto" or type(viewport_children) ~= "table" or #viewport_children ~= 1
+      or viewport_children[1] ~= entries or not valid(entries) or entries.type ~= "flow" or entries.direction ~= "vertical"
+      or type(entry_children) ~= "table" or #children ~= 1 or children[1] ~= viewport
+      or #entry_children ~= #rows then
+    availability_fail("Availability terminal viewport structure differs", facts)
+  end
+  for index, row in ipairs(rows) do
+    local label = entries[row.name]
     local caption = valid(label) and label.caption or nil
     if not valid(label) or label.type ~= "label" or localized_key(caption) ~= "mir-browser.availability-entry"
-        or localized_key(caption[2]) ~= "technology-name.more-infinite-research.research_lab_productivity"
-        or localized_key(caption[3]) ~= "mir-browser.availability-native-research-productivity"
-        or valid(content[AVAILABILITY[2]]) or #children ~= 1 then
-      fail("Space Age native research-productivity Availability differs")
-    end
-    return
-  end
-  for index, name in ipairs(AVAILABILITY) do
-    local label = content[name]
-    local caption = valid(label) and label.caption or nil
-    if not valid(label) or label.type ~= "label" or localized_key(caption) ~= "mir-browser.availability-entry"
-        or localized_key(caption[2]) ~= "technology-name.more-infinite-research." .. AVAILABILITY_FAMILIES[index]
-        or localized_key(caption[3]) ~= "mir-browser.availability-requires-space-age" then
-      fail("native Availability terminal label differs: " .. AVAILABILITY_FAMILIES[index])
+        or localized_key(caption[2]) ~= row.subject or localized_key(caption[3]) ~= row.reason
+        or entry_children[index] ~= label or valid(content[row.name]) then
+      local family = row.subject:match("%.([^%.]+)$") or row.name
+      availability_fail(space_age_library() and "Space Age native research-productivity Availability differs"
+        or "native Availability terminal label differs: " .. family, facts)
     end
   end
-  if #children ~= #AVAILABILITY then
-    fail("native Availability terminal label count differs")
+  if space_age_library() and valid(entries[AVAILABILITY[2]]) then
+    availability_fail("Space Age native research-productivity Availability differs", facts)
   end
+  return facts
 end
 
 local function measure(state, label, callback)
@@ -1131,7 +1239,8 @@ local function closure()
   if private_credit and standalone_identity_discovery() then
     fail("private-credit Library fixture cannot use standalone identity discovery")
   end
-  local fixture_version = current517 and (responsive_current_linux() and "0.1.3" or "0.1.2")
+  local fixture_version = current517 and (responsive_current_linux()
+      and script.active_mods["mir-fixture-mir5-library-multiplayer"] or "0.1.2")
     or (positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",

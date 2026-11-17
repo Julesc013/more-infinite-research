@@ -79,6 +79,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local DETAIL_EMPTY="mir_library_detail_empty"
             local ACTIONS="mir_library_actions"
             local OPEN_NATIVE="mir_library_open_native"
+            local AVAILABILITY_VIEWPORT="mir_library_availability_viewport"
+            local AVAILABILITY_ENTRIES="mir_library_availability_entries"
             local AVAILABILITY={"mir_library_availability_1","mir_library_availability_2"}
             local AVAILABILITY_FAMILIES={"research_agricultural_growth_speed","research_spoilage_preservation"}
             local key="mir5_library_multiplayer"
@@ -102,6 +104,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               f210={base="2.1.23",mir="5.0.21000"},
               ["f210-current-linux"]={base="2.1.24",mir="5.0.21017",current_linux=true},
               ["f210-current-linux-responsive"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true},
+              ["f210-current-linux-responsive-v014"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true,current_linux_responsive_v014=true},
               ["f210-current504"]={base="2.1.23",mir="5.0.21004"},
               ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
               ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
@@ -120,7 +123,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             if opponent=="f210-wrong-mir-version" then mir_version="5.0.21001"
             elseif opponent=="unsupported-target-base" then base_version="2.1.24" end
-            local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
+            local players, markers, screenshots, saves, lab_diagnostics, availability_diagnostics = {}, {}, {}, {}, {}, {}
             local seed_diagnostics={}
             local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
@@ -348,7 +351,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               filters[FAMILY]=element("drop-down",FAMILY)
               filters[FAMILY].selected_index=options.family=="all" and 2 or (options.family=="external" and 3 or 1)
               filters.mir_library_visibility=element("drop-down","mir_library_visibility")
-              filters.mir_library_visibility.selected_index=options.visibility
+              filters.mir_library_visibility.selected_index=options.tab=="availability" and (opponent=="availability-wrong-status" and 2 or 3) or options.visibility
               filters[SORT]=element("drop-down",SORT)
               filters[SORT].selected_index=options.sort=="native" and 2 or 1
               local tabs=element("tabbed-pane",TABS)
@@ -394,25 +397,34 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 return detail
               end
               if options.tab=="availability" then
+                local viewport=element(opponent=="availability-viewport-wrong" and "flow" or "scroll-pane",AVAILABILITY_VIEWPORT)
+                viewport.horizontal_scroll_policy=opponent=="availability-viewport-policy" and "auto" or "never"
+                viewport.vertical_scroll_policy="auto";viewport.children={}
+                local entries=element("flow",AVAILABILITY_ENTRIES)
+                entries.direction=opponent=="availability-entries-wrong" and "horizontal" or "vertical";entries.children={}
+                content[AVAILABILITY_VIEWPORT]=viewport;content.children[#content.children+1]=viewport
+                viewport[AVAILABILITY_ENTRIES]=entries;viewport.children[#viewport.children+1]=entries
+                local function add_label(index,name,subject,reason)
+                  local label=element("label",name)
+                  label.caption={"mir-browser.availability-entry",{subject},{reason}}
+                  if opponent=="availability-wrong-subject" and index==1 then label.caption[2]={"technology-name.more-infinite-research.research_spoilage_preservation"} end
+                  if opponent=="availability-wrong-reason" and index==1 then label.caption[3]={"mir-browser.availability-native-research-productivity"} end
+                  entries[name]=label;entries.children[#entries.children+1]=label
+                  return label
+                end
                 if selected.space_age then
-                  local label=element("label",AVAILABILITY[1])
-                  label.caption={"mir-browser.availability-entry",
-                    {"technology-name.more-infinite-research.research_lab_productivity"},
-                    {opponent=="sa-availability-wrong" and "mir-browser.availability-requires-space-age" or "mir-browser.availability-native-research-productivity"}}
-                  content[AVAILABILITY[1]]=label
-                  content.children[#content.children+1]=label
+                  add_label(1,AVAILABILITY[1],"technology-name.more-infinite-research.research_lab_productivity",
+                    opponent=="sa-availability-wrong" and "mir-browser.availability-requires-space-age" or "mir-browser.availability-native-research-productivity")
                 elseif opponent~="missing-availability-label" then
                   for index,name in ipairs(AVAILABILITY) do
-                    local label=element("label",name)
-                    label.caption={"mir-browser.availability-entry",
-                      {"technology-name.more-infinite-research."..AVAILABILITY_FAMILIES[index]},
-                      {"mir-browser.availability-requires-space-age"}}
-                    content[name]=label
-                    content.children[#content.children+1]=label
+                    add_label(index,name,"technology-name.more-infinite-research."..AVAILABILITY_FAMILIES[index],"mir-browser.availability-requires-space-age")
                   end
                 end
+                if opponent=="availability-order" and #entries.children==2 then entries.children[1],entries.children[2]=entries.children[2],entries.children[1] end
                 if opponent=="extra-availability-label" then
-                  content.children[#content.children+1]=element("label","mir_library_availability_unexpected")
+                  local extra=element("label","mir_library_availability_unexpected");entries.mir_library_availability_unexpected=extra;entries.children[#entries.children+1]=extra
+                elseif opponent=="availability-direct-label" then
+                  content[AVAILABILITY[1]]=element("label",AVAILABILITY[1])
                 end
                 wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                 return
@@ -594,7 +606,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local fixture_version=selected.current_linux_responsive and "0.1.3" or (selected.current_linux and "0.1.2" or (selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")))))
+            local fixture_version=selected.current_linux_responsive_v014 and "0.1.4" or (selected.current_linux_responsive and "0.1.3" or (selected.current_linux and "0.1.2" or (selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0"))))))
             local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if selected.space_age then
               active_mods["elevated-rails"]="2.1.23"
@@ -634,6 +646,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               helpers={table_to_json=function(value)
                 if value.seed_stage then seed_diagnostics[#seed_diagnostics+1]=value
                 elseif value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
+                elseif value.kind=="MIRLibraryAvailabilityFactsV1" then availability_diagnostics[#availability_diagnostics+1]=value
                 else markers[#markers+1]=value end
                 return "{}"
               end,create_profiler=create_profiler},
@@ -650,7 +663,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] ")
                     or value:match("^%[MIR5_LIBRARY_STANDALONE_IDENTITY%] ")
                     or value:match("^%[MIR5_LIBRARY_POSITIVE_SEED%] ")
-                    or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] "))
+                    or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] ")
+                    or value:match("^%[MIR5_LIBRARY_AVAILABILITY%] "))
                 end
               end,
             }
@@ -779,16 +793,21 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
-              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
+              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,availability_diagnostics=availability_diagnostics,lab_insert_counts=insert_counts,
               rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
               private_query_order=private_query_order,positive_seed_resets=reset_count,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls}
           end
         ''')
 
-    def run_case(self, opponent=None, target="f200"):
+    def run_case(self, opponent=None, target="f200", control=CONTROL):
+        previous = self.lua.globals().control_path
+        self.lua.globals().control_path = Path(control).as_posix()
         self.lua.globals().opponent = opponent
         self.lua.globals().target = target
-        return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
+        try:
+            return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
+        finally:
+            self.lua.globals().control_path = previous
 
     def test_profiles_and_fixture_metadata_pin_the_four_finite_base_closures(self):
         cases = (
@@ -2668,6 +2687,68 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual(wrong_tuple["storage_entries"], 0)
         self.assertIn("unsupported native Library target base", wrong_tuple["message"])
 
+    def test_availability_terminal_uses_the_authored_viewport_entries_and_records_all_rows(self):
+        accepted = self.run_case(target="f210-current-linux-responsive")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual(len(accepted["availability_diagnostics"]), 2)
+        for facts, locale in zip(accepted["availability_diagnostics"], ("en", "de")):
+            self.assertEqual(facts["kind"], "MIRLibraryAvailabilityFactsV1")
+            self.assertEqual(facts["player"]["locale"], locale)
+            self.assertEqual(facts["target"], {
+                "base": "2.1.24", "mir": MIR_517_F210, "fixture": "0.1.3",
+            })
+            self.assertEqual(facts["actual_status"], 3)
+            self.assertEqual(facts["viewport"], {
+                "valid": True, "name": "mir_library_availability_viewport", "type": "scroll-pane", "child_count": 1,
+            })
+            self.assertEqual(facts["entries"], {
+                "valid": True, "name": "mir_library_availability_entries", "type": "flow", "child_count": 2,
+            })
+            self.assertEqual([(row["expected"]["subject"], row["expected"]["reason"], row["actual"]["subject"], row["actual"]["reason"])
+                              for row in facts["rows"]], [
+                ("technology-name.more-infinite-research.research_agricultural_growth_speed", "mir-browser.availability-requires-space-age",
+                 "technology-name.more-infinite-research.research_agricultural_growth_speed", "mir-browser.availability-requires-space-age"),
+                ("technology-name.more-infinite-research.research_spoilage_preservation", "mir-browser.availability-requires-space-age",
+                 "technology-name.more-infinite-research.research_spoilage_preservation", "mir-browser.availability-requires-space-age"),
+            ])
+
+        v014 = self.run_case(target="f210-current-linux-responsive-v014")
+        self.assertTrue(v014["ok"], v014["message"])
+        self.assertEqual({facts["target"]["fixture"] for facts in v014["availability_diagnostics"]}, {"0.1.4"})
+
+        for opponent, message in {
+            "availability-wrong-status": "Availability terminal status differs",
+            "availability-viewport-wrong": "Availability terminal viewport structure differs",
+            "availability-viewport-policy": "Availability terminal viewport structure differs",
+            "availability-entries-wrong": "Availability terminal viewport structure differs",
+            "missing-availability-label": "Availability terminal viewport structure differs",
+            "extra-availability-label": "Availability terminal viewport structure differs",
+            "availability-order": "native Availability terminal label differs",
+            "availability-direct-label": "native Availability terminal label differs",
+            "availability-wrong-subject": "native Availability terminal label differs",
+            "availability-wrong-reason": "native Availability terminal label differs",
+        }.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux-responsive")
+                self.assertFalse(rejected["ok"])
+                self.assertIn(message, rejected["message"])
+                self.assertIn("availability target=2.1.24/5.0.21017/0.1.3", rejected["message"])
+
+    def test_old_direct_availability_assumption_fails_the_current_viewport_shape(self):
+        historic = subprocess.run(
+            ["git", "show", "b8be5c1cdffcde416fe1afe03c294a7924a5e52c:tests/fixtures/library-multiplayer/control.lua"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(historic.returncode, 0, historic.stderr.decode("utf-8", "replace"))
+        with tempfile.TemporaryDirectory(prefix="mir5-availability-direct-") as directory:
+            old_control = Path(directory) / "control.lua"
+            old_control.write_bytes(historic.stdout)
+            old = self.run_case(target="f210-current-linux-responsive", control=old_control)
+        self.assertFalse(old["ok"])
+        self.assertIn("native Availability terminal label differs", old["message"])
+        current = self.run_case(target="f210-current-linux-responsive")
+        self.assertTrue(current["ok"], current["message"])
+
     def test_current_linux_responsive_fixture_projection_is_exact_and_current_only(self):
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
@@ -3622,8 +3703,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "second-feed-rejected": "actual Library refresh laboratory rejected automation-science-pack during second science feed",
             "wrong-force-event": "native foreign-force callback differs",
             "foreign-force-gui": "native public browser GUI tree is incomplete",
-            "missing-availability-label": "Availability terminal label differs",
-            "extra-availability-label": "Availability terminal label count differs",
+            "missing-availability-label": "Availability terminal viewport structure differs",
+            "extra-availability-label": "Availability terminal viewport structure differs",
             "caption-wrong-level-key": "native Library refresh level differs",
             "caption-numeric-level": "native Library refresh level differs",
             "caption-wrong-level": "native Library refresh level differs",
@@ -4977,7 +5058,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
 
     def test_compose_only_binds_the_responsive_fixture_archive_instead_of_the_retained_archive(self):
         old_source = subprocess.run(
-            ["git", "show", "HEAD:tools/Invoke-MultiplayerFixture.ps1"],
+            ["git", "show", "d5b1870841722afdad80e115a0eb38b24dc035c4:tools/Invoke-MultiplayerFixture.ps1"],
             cwd=ROOT, capture_output=True, check=False,
         )
         self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
