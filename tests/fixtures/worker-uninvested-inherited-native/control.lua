@@ -118,13 +118,33 @@ local function frames()
   return result
 end
 
+-- Standard labs are not required to expose the get-by-unit-number prototype
+-- flag.  This scenario owns an exact fixed placement, so its retained entity
+-- is located through that placement and then authenticated by unit and force.
+local function saved_lab()
+  local surface = game.surfaces[1]
+  return surface and surface.find_entity and surface.find_entity(LAB_NAME, {0, 0}) or false
+end
+
+local function checked_saved_lab(state, force)
+  check(type(state.setup.lab_unit) == "number", "saved source lab unit is unavailable")
+  local lab = saved_lab()
+  check(lab ~= nil and lab ~= false, "saved source lab entity is unavailable")
+  check(lab.valid == true, "saved source lab entity is invalid")
+  check(lab.unit_number == state.setup.lab_unit, "saved source lab unit differs")
+  check(lab.name == LAB_NAME, "saved source lab name differs")
+  check(lab.force and lab.force.index == force.index and lab.force.name == force.name,
+    "saved source lab force differs")
+  return lab
+end
+
 -- This is observational only.  The retained source lab is scenario-owned
 -- setup, so an entity change must be diagnosed before the ordinary-research
 -- leg considers changing any of its fields.
 local function lab_entity_frame()
   local state = storage[KEY]
   local lookup_unit = state and state.setup and state.setup.lab_unit or false
-  local entity = type(lookup_unit) == "number" and game.get_entity_by_unit_number(lookup_unit) or false
+  local entity = saved_lab()
   local result = {lookup_unit = lookup_unit, exists = entity ~= false and entity ~= nil,
     valid = entity and entity.valid == true or false, unit_number = false, name = false,
     force = {index = false, name = false}, same_force = false, disabled_by_script = false, is_updatable = false,
@@ -289,8 +309,9 @@ local function pristine_owners()
 end
 
 local function feed_ordinary_lab()
-  local state, lab = storage[KEY], game.get_entity_by_unit_number(storage[KEY].setup.lab_unit)
-  check(lab and lab.valid and not lab.disabled_by_script, "ordinary lab stopped before completion")
+  local state, force = storage[KEY], game.forces[LAB_FORCE]
+  local lab = checked_saved_lab(state, force)
+  check(not lab.disabled_by_script, "ordinary lab stopped before completion")
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   lab.energy = 1000000000 -- owned test-power stimulus; native lab energy remains bounded by its buffer.
   for _, name in ipairs(PACKS) do
@@ -313,14 +334,7 @@ local function begin_ordinary()
   -- post-MIR entity facts before an invariant refusal or any ordinary-leg
   -- mutation, so an engine/MIR/entity discrepancy is not collapsed to prose.
   marker("candidate-before-ordinary-lab-check")
-  check(type(state.setup.lab_unit) == "number", "saved source lab unit is unavailable")
-  local lab = game.get_entity_by_unit_number(state.setup.lab_unit)
-  check(lab ~= nil, "saved source lab entity is unavailable")
-  check(lab.valid == true, "saved source lab entity is invalid")
-  check(lab.unit_number == state.setup.lab_unit, "saved source lab unit differs")
-  check(lab.name == LAB_NAME, "saved source lab name differs")
-  check(lab.force and lab.force.index == force.index and lab.force.name == force.name,
-    "saved source lab force differs")
+  local lab = checked_saved_lab(state, force)
   check(lab.disabled_by_script == true, "saved source lab disabled-by-script flag differs")
   local owner = force.technologies[OWNER]
   check(owner and owner.researched == false and owner.level == 4, "ordinary owner is unavailable")
@@ -339,8 +353,7 @@ local function settle_ordinary(event)
   if not event.research or event.research.force ~= force or event.research.name ~= OWNER then return end
   check(state.phase == "ordinary-running", "ordinary completion has no issued phase")
   check(event.by_script == false, "ordinary worker completion was scripted")
-  local lab = game.get_entity_by_unit_number(state.setup.lab_unit)
-  check(lab and lab.valid, "ordinary lab is unavailable")
+  local lab = checked_saved_lab(state, force)
   local inventory, consumed = lab.get_inventory(defines.inventory.lab_input), {}
   for _, name in ipairs(PACKS) do
     local remaining = inventory.get_item_count(name)

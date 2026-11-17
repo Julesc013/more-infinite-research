@@ -95,8 +95,9 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             return values
           end
           local player, enemy, neutral = force("player", 1), force("enemy", 2), force("neutral", 3)
+          local nauvis = {}
           local game = {tick=0, forces={player=player,enemy=enemy,neutral=neutral}, difficulty_settings={technology_price_multiplier=1},
-            surfaces={nauvis={}}}
+            surfaces={nauvis=nauvis,[1]=nauvis}}
           game.create_force = function(name)
             local next_index = 1; for _ in pairs(game.forces) do next_index = next_index + 1 end
             local result = force(name, next_index)
@@ -113,7 +114,12 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             entities[#entities + 1] = entity
             return entity
           end
+          game.surfaces.nauvis.find_entity = function(name, position)
+            assert(type(position) == "table" and position[1] == 0 and position[2] == 0, "unexpected lab lookup position")
+            for _, entity in ipairs(entities) do if entity.name == name then return entity end end
+          end
           game.get_entity_by_unit_number = function(unit)
+            if opponent == "no-unit-number-prototype-flag" then return nil end
             for _, entity in ipairs(entities) do if entity.unit_number == unit then return entity end end
           end
           game.server_save = function(name) saves[#saves + 1] = name end
@@ -199,7 +205,7 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           end
           local lab = game.forces["mir-worker-uninvested-lab"]
           if opponent == "candidate-lab-missing" then
-            entities[1].unit_number = -1
+            entities[1].name = "not-a-lab"
           elseif opponent == "candidate-lab-invalid" then
             entities[1].valid = false
           elseif opponent == "candidate-lab-wrong-force" then
@@ -346,6 +352,10 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
         self.assertTrue(frame["is_updatable"])
         self.assertEqual(0, frame["energy"])
         self.assertEqual(0, frame["input_inventory"]["automation-science-pack"])
+
+    def test_standard_lab_lookup_does_not_require_the_unit_number_prototype_flag(self):
+        result = self.world("f210", "addition", "no-unit-number-prototype-flag")
+        self.assertTrue(result["ordinary"]["completed"])
 
     def test_candidate_lab_guard_reports_the_actual_retained_entity_fault(self):
         for opponent, expected in (
