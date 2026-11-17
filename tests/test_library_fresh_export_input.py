@@ -358,7 +358,7 @@ class LibraryFreshExportInputControls(unittest.TestCase):
             "factorio_version": "2.1",
             "dependencies": ["base = 2.1.24", "~ more-infinite-research = " + MIR_517_F210],
         }
-        self.assertEqual(json.loads((FIXTURE / "info-current17-f210.json").read_text(encoding="utf-8")), expected)
+        self.assertEqual(json.loads((FIXTURE / "info.json").read_text(encoding="utf-8")), expected)
         code = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         for forbidden in ("remote.call", "script.raise_event", "server_save", "auto_save", "require(",
                           ".researched =", ".level =", "research_queue =", "player.opened ="):
