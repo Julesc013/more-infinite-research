@@ -36,6 +36,9 @@ ELECTRICITY = "electricity"
 UNRELATED = "mir-fixture-unrelated-disabled"
 CURRENT_SENTINEL = "stone-wall"
 CAP = "mir-max-level-worker-robots-speed"
+# Independent native oracle: mir516-se-cap-preconditions-r01/.../preconditions.json
+# SHA256 644CE236FBEBEFF24F74D72F2F770FAE2D107FF1529371C1E081EC5980E7B758.
+PREDECESSOR_LEVEL = 9
 PACKS = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "utility-science-pack", "space-science-pack", "se-rocket-science-pack",
@@ -112,7 +115,7 @@ function data_case(settings_wrapper,data_wrapper,settings_common,data_common,sta
 end
 
 local function tech(name,force,wrong_energy)
-  local t={name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+  local t={name=name,valid=true,force=force,level=name==PREDECESSOR and 9 or 1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
     prototype={max_level=4294967295,effects=name==WORKER and {{type="worker-robot-speed",modifier=.65}} or {}},
     prerequisites={},research_unit_count=3200,research_unit_energy=wrong_energy and 60 or 3600,research_unit_ingredients=runtime_packs()}
   if name==WORKER then t.prerequisites[PREDECESSOR]={name=PREDECESSOR};t.prerequisites[DEEP]={name=DEEP}end;return t
@@ -1042,6 +1045,7 @@ end
             "foreign": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: True, ELECTRICITY: True, AUTOMATION: False},
             "earned_above_cap": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
         }
+        expected_levels = {PREDECESSOR: PREDECESSOR_LEVEL, DEEP_SCIENCE: 1, AUTOMATION_SCIENCE: 1, ELECTRICITY: 1, AUTOMATION: 1}
         for role, expected in expected_frames.items():
             with self.subTest(role=role):
                 frame = source["worker_frames"][role]
@@ -1054,7 +1058,7 @@ end
                 self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION}, set(flags.keys()))
                 for name, researched in expected_researched[role].items():
                     value = flags[name]
-                    self.assertEqual((researched, True, 1, True),
+                    self.assertEqual((researched, True, expected_levels[name], True),
                                      (value["researched"], value["enabled"], value["level"], value["valid"]),
                                      f"{role}/{name}")
         expected_cold = dict(source)
@@ -1074,6 +1078,8 @@ end
                                     "source-producer player named flag differs: worker-robots-speed-9"),
             "changed-unchecked-player-automation": ('  technology(player, PROBE).researched = true\n' + marker,
                                                       "source-producer player named flag differs: automation"),
+            "changed-predecessor-level": ('  technology(player, PREDECESSOR).level = 8\n' + marker,
+                                            "source-producer player named flag differs: worker-robots-speed-9"),
             "changed-player-queue": ('  player.research_queue = {}\n' + marker,
                                      "source-producer scripted player seed differs"),
         }
@@ -1142,12 +1148,13 @@ end
             "foreign": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: True, ELECTRICITY: True, AUTOMATION: False},
             "earned_above_cap": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
         }
+        expected_levels = {PREDECESSOR: PREDECESSOR_LEVEL, DEEP_SCIENCE: 1, AUTOMATION_SCIENCE: 1, ELECTRICITY: 1, AUTOMATION: 1}
         for force_name in ("player", "foreign", "earned_above_cap"):
             flags = preconditions["prerequisite_flags"][force_name]
             self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION}, set(flags.keys()))
             for technology_name in (PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION):
                 value = flags[technology_name]
-                self.assertEqual((expected_researched[force_name][technology_name], True, 1, True),
+                self.assertEqual((expected_researched[force_name][technology_name], True, expected_levels[technology_name], True),
                                  (value["researched"], value["enabled"], value["level"], value["valid"]),
                                  f"{force_name}/{technology_name}")
         self.assertEqual((10, 11, 13), (preconditions["worker_frames"]["player"]["level"],

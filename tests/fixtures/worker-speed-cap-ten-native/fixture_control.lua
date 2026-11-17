@@ -50,12 +50,15 @@ local CLOSURE = {
   informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3",
 }
 local SOURCE_PRODUCER_FLAGS = {
-  player = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = false,
-    [ELECTRICITY] = false, [PROBE] = false},
-  foreign = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = true,
-    [ELECTRICITY] = true, [PROBE] = false},
-  earned = {[PREDECESSOR] = true, [DEEP_SCIENCE] = true, [AUTOMATION_SCIENCE] = false,
-    [ELECTRICITY] = false, [PROBE] = false},
+  player = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = false, level = 1}, [ELECTRICITY] = {researched = false, level = 1},
+    [PROBE] = {researched = false, level = 1}},
+  foreign = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = true, level = 1}, [ELECTRICITY] = {researched = true, level = 1},
+    [PROBE] = {researched = false, level = 1}},
+  earned = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = false, level = 1}, [ELECTRICITY] = {researched = false, level = 1},
+    [PROBE] = {researched = false, level = 1}},
 }
 local cold_requested, cold_logged = false, false
 local source_producer_cold_requested, source_producer_cold_logged = false, false
@@ -357,8 +360,9 @@ local function assert_source_producer_flags(state, label)
       {force = earned, role = "earned"}}) do
     for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, PROBE}) do
       local value = technology(row.force, name)
-      if value.researched ~= SOURCE_PRODUCER_FLAGS[row.role][name] or value.enabled ~= true
-          or value.level ~= 1 or value.valid ~= true then
+      local expected = SOURCE_PRODUCER_FLAGS[row.role][name]
+      if value.researched ~= expected.researched or value.enabled ~= true
+          or value.level ~= expected.level or value.valid ~= true then
         fail(label .. " " .. row.role .. " named flag differs: " .. name)
       end
     end
