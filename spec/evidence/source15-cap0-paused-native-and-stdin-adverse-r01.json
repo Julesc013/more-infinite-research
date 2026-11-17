@@ -144,6 +144,6 @@
   "limits": [
     "No reseed, MIR-causality conclusion, successful native query or stable claim is made.",
     "Original-successor ordinary work, save and two-cold behavior remain unverified.",
-    "A future RCON query had not run when this record was written."
+    "RCON execution and its later outcomes are outside this closed-record scope."
   ]
 }
