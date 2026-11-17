@@ -41,6 +41,41 @@ class WorkerStorageHistoryTests(unittest.TestCase):
         self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute('game={forces={}};install_worker_recovery_facts()')
 
+    @staticmethod
+    def old_text_classifier_counterfactual(source):
+        """Model the former classifier with a deliberately changed private reason."""
+        marker = "local LEGACY_UNKNOWN_CONTINUATION = {}\n\n"
+        current = '''    local legacy_plan, legacy_reason = legacy_preflight(event, route)
+    if legacy_reason == LEGACY_UNKNOWN_CONTINUATION then
+      recover_error("previous continuation ownership is unknown", route, event, state)
+    end
+    plan = legacy_plan
+'''
+        former = '''    local ok, result = pcall(legacy_preflight, event, route)
+    if not ok then
+      if tostring(result):find("previous continuation ownership is unknown", 1, true) then
+        recover_error("previous continuation ownership is unknown", route, event, state)
+      end
+      error(result, 0)
+    end
+    plan = result
+'''
+        if source.count(marker) != 1 or source.count("return nil, LEGACY_UNKNOWN_CONTINUATION") != 1:
+            raise AssertionError("worker history structured legacy reason changed")
+        if source.count(current) != 1:
+            raise AssertionError("worker history structured reason consumer changed")
+        return (source.replace(marker, "", 1)
+                .replace("return nil, LEGACY_UNKNOWN_CONTINUATION",
+                         'refuse("legacy provenance wording drifted", route)', 1)
+                .replace(current, former, 1))
+
+    def load_worker_history_counterfactual(self, source):
+        self.lua.globals().worker_history_counterfactual = source
+        self.lua.execute(r'''
+          history=assert(load(worker_history_counterfactual,
+            "@worker-history-text-classifier-counterfactual.lua"))()
+        ''')
+
     def test_fresh_route_is_detached_and_two_cold_loads_are_read_only(self):
         self.lua.execute(r'''
           local selected=route(9);history.on_init(selected)
@@ -89,6 +124,53 @@ class WorkerStorageHistoryTests(unittest.TestCase):
             assert(storage.mir_worker_storage_route==nil)
           end
           assert(history.preflight(upgrade("5.0.21008"),nil)==nil)
+        ''')
+
+    def test_legacy_unknown_reason_is_structured_not_text_classified(self):
+        source = (Path(__file__).resolve().parents[1] / "source/runtime/worker_robot_storage.lua").read_text()
+        self.load_worker_history_counterfactual(self.old_text_classifier_counterfactual(source))
+        self.lua.execute(r'''
+          local ok,message=pcall(history.preflight,upgrade("5.0.21008"),route(4))
+          assert(not ok and tostring(message):find("legacy provenance wording drifted",1,true))
+          assert(not tostring(message):find("previous_mir=",1,true))
+          assert(storage.mir_worker_storage_route==nil)
+        ''')
+        self.setUp()
+        self.lua.execute(r'''
+          local ok,message=pcall(history.preflight,upgrade("5.0.21008"),route(4))
+          assert(not ok and tostring(message):find("previous continuation ownership is unknown",1,true))
+          assert(tostring(message):find("previous_mir=5.0.21008",1,true))
+          assert(storage.mir_worker_storage_route==nil)
+        ''')
+
+    def test_unexpected_legacy_lookup_propagates_without_history_recovery(self):
+        source = (Path(__file__).resolve().parents[1] / "source/runtime/worker_robot_storage.lua").read_text()
+        self.load_worker_history_counterfactual(self.old_text_classifier_counterfactual(source))
+        self.lua.execute(r'''
+          local candidate=setmetatable({technology="worker-robots-storage-5",
+            predecessor="worker-robots-storage-4",owned=true,legacy_compatible=true,
+            finite={{name="worker-robots-storage-4",max_level=4,provider="foreign-finite"}}},
+            {__index=function(_,key)
+              assert(key=="level");error("unexpected lookup: previous continuation ownership is unknown")
+            end})
+          local ok,message=pcall(history.preflight,upgrade("5.0.21008"),candidate)
+          assert(not ok and tostring(message):find("MIR worker storage history: previous continuation ownership is unknown",1,true))
+          assert(tostring(message):find("previous_mir=5.0.21008",1,true))
+          assert(storage.mir_worker_storage_route==nil)
+        ''')
+        self.setUp()
+        self.lua.execute(r'''
+          local candidate=setmetatable({technology="worker-robots-storage-5",
+            predecessor="worker-robots-storage-4",owned=true,legacy_compatible=true,
+            finite={{name="worker-robots-storage-4",max_level=4,provider="foreign-finite"}}},
+            {__index=function(_,key)
+              assert(key=="level");error("unexpected lookup: previous continuation ownership is unknown")
+            end})
+          local ok,message=pcall(history.preflight,upgrade("5.0.21008"),candidate)
+          assert(not ok and tostring(message):find("unexpected lookup: previous continuation ownership is unknown",1,true))
+          assert(not tostring(message):find("MIR-WORKER-HISTORY",1,true))
+          assert(not tostring(message):find("previous_mir=",1,true))
+          assert(storage.mir_worker_storage_route==nil)
         ''')
 
     def test_exact_transported_legacy_emission_is_admitted_but_lookalikes_are_not(self):

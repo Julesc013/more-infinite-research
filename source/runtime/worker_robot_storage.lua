@@ -115,6 +115,11 @@ local function legacy_emission(event, route)
     and (row.selected == "infinite" or integer(row.selected))
 end
 
+-- This is deliberately private control flow, not player-facing prose.  The
+-- legacy preflight has one expected authority refusal that needs the bounded
+-- migration context below; all other errors must retain their original cause.
+local LEGACY_UNKNOWN_CONTINUATION = {}
+
 local function legacy_preflight(event, route)
   local prior = checked(storage[KEY])
   if prior ~= nil then
@@ -128,7 +133,7 @@ local function legacy_preflight(event, route)
   local first_install = type(mir) == "table" and mir.old_version == nil
     and script and script.active_mods and mir.new_version == script.active_mods[MIR]
   if not first_install and not legacy_emission(event, route) then
-    refuse("previous continuation ownership is unknown", route)
+    return nil, LEGACY_UNKNOWN_CONTINUATION
   end
   return {schema=1, route=copy(route)}
 end
@@ -524,14 +529,11 @@ function M.preflight(event, route, owner_plan)
     checked({schema=1, route=route})
     plan = {schema=1, route=copy(route)}
   else
-    local ok, result = pcall(legacy_preflight, event, route)
-    if not ok then
-      if tostring(result):find("previous continuation ownership is unknown", 1, true) then
-        recover_error("previous continuation ownership is unknown", route, event, state)
-      end
-      error(result, 0)
+    local legacy_plan, legacy_reason = legacy_preflight(event, route)
+    if legacy_reason == LEGACY_UNKNOWN_CONTINUATION then
+      recover_error("previous continuation ownership is unknown", route, event, state)
     end
-    plan = result
+    plan = legacy_plan
   end
   local empty = empty_private()
   if #empty > 0 then return {recovery=true, legacy=plan, empty=empty} end
