@@ -1205,6 +1205,104 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       no_foreign_write(force)
                     ''')
 
+    def test_published_m4_base_with_only_new_mods_preserves_known_paid_mask(self):
+        for target, patch in (("f200", False), ("f210", False), ("f210", True)):
+            for explicit_base in (False, True):
+                with self.subTest(target=target, patch=patch, explicit_base=explicit_base):
+                    self.setUp()
+                    self._published_m4_base(target, target)
+                    self.lua.globals().base_target = target
+                    self.lua.globals().base_patch = patch
+                    self.lua.globals().explicit_base = explicit_base
+                    self.lua.execute('''
+                      local old=base_target=="f200" and "4.7.20003" or "4.7.21003"
+                      local changes={["more-infinite-research"]={old_version=old,
+                        new_version=BASE_ACTIVE["more-infinite-research"]},
+                        ["new-extra-a"]={new_version="1.2.3"},["new-extra-b"]={new_version="2.3.4"}}
+                      BASE_ACTIVE["new-extra-a"]="1.2.3";BASE_ACTIVE["new-extra-b"]="2.3.4"
+                      if explicit_base then changes.base={old_version=BASE_ACTIVE.base,new_version=BASE_ACTIVE.base} end
+                      if base_patch then BASE_ACTIVE.base="2.1.24";changes.base={old_version="2.1.23",new_version="2.1.24"} end
+                      reload_credits(BASE_ACTIVE,base_target)
+                      local force=make_collected_force(1,8,published_base_mask,false)
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      local detached=force.technologies["recipe-prod-research_plastic-1"]
+                      main.saved_progress=.27;detached.saved_progress=.31
+                      local queue={main,main,force.technologies.foreign}
+                      force.research_queue=queue;force.current_research=main
+                      native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes=changes})
+                      for family,recipes in pairs(GROUPS) do
+                        close(own_contribution(force,family,recipes[1].recipe),.7)
+                      end
+                      close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                      assert(record(force,"research_steel","new-unpaid-steel").offset==-7)
+                      assert(main.level==8 and not main.researched and main.saved_progress==.27
+                        and detached.level==8 and detached.saved_progress==.31
+                        and force.research_queue==queue and force.current_research==main and force.research_progress==.42)
+                      for _=1,2 do
+                        reload_credits(BASE_ACTIVE,base_target);native_credits.on_load()
+                        native_credits.on_configuration_changed()
+                        close(own_contribution(force,"research_steel","steel-plate"),.7)
+                        close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                        assert(force.research_queue==queue and main.saved_progress==.27 and detached.saved_progress==.31)
+                      end
+                      no_foreign_write(force)
+                    ''')
+
+    def test_m4_added_mod_route_requires_complete_prior_base_proof_before_writes(self):
+        opponents = ("missing-change", "old-present", "updated", "removed", "wrong-new", "malformed",
+                     "metatable", "startup", "unknown-startup", "invalid-startup", "unknown-origin",
+                     "wrong-engine", "wrong-destination", "cross-engine", "private-main", "incomplete-old-mask")
+        for target in ("f200", "f210"):
+            for opponent in opponents:
+                with self.subTest(target=target, opponent=opponent):
+                    self.setUp()
+                    self._published_m4_base(target, target)
+                    self.lua.globals().base_target = target
+                    self.lua.globals().opponent = opponent
+                    self.lua.execute('''
+                      local old=base_target=="f200" and "4.7.20003" or "4.7.21003"
+                      BASE_ACTIVE.extra="1.0.0"
+                      local changes={["more-infinite-research"]={old_version=old,
+                        new_version=BASE_ACTIVE["more-infinite-research"]},extra={new_version="1.0.0"}}
+                      local startup=false
+                      if opponent=="missing-change" then changes.extra=nil end
+                      if opponent=="old-present" then changes.extra.old_version="1.0.0" end
+                      if opponent=="updated" then changes.extra.old_version="0.9.0" end
+                      if opponent=="removed" then changes.gone={old_version="1.0.0"} end
+                      if opponent=="wrong-new" then changes.extra.new_version="2.0.0" end
+                      if opponent=="malformed" then changes.extra=false end
+                      if opponent=="metatable" then changes.extra=setmetatable({}, {__index={new_version="1.0.0"}}) end
+                      if opponent=="startup" then startup=true end
+                      if opponent=="unknown-startup" then startup=nil end
+                      if opponent=="invalid-startup" then startup="false" end
+                      if opponent=="unknown-origin" then changes["more-infinite-research"].old_version=old.."0" end
+                      if opponent=="wrong-engine" then BASE_ACTIVE.base=base_target=="f200" and "2.0.76" or "2.1.22" end
+                      if opponent=="wrong-destination" then
+                        BASE_ACTIVE["more-infinite-research"]=base_target=="f200" and "5.0.21003" or "5.0.20003"
+                        changes["more-infinite-research"].new_version=BASE_ACTIVE["more-infinite-research"]
+                      end
+                      if opponent=="cross-engine" then
+                        BASE_ACTIVE.base=base_target=="f200" and "2.1.23" or "2.0.77"
+                        BASE_ACTIVE["more-infinite-research"]=base_target=="f200" and "5.0.21003" or "5.0.20003"
+                        changes["more-infinite-research"].new_version=BASE_ACTIVE["more-infinite-research"]
+                        changes.base={old_version=base_target=="f200" and "2.0.77" or "2.1.23",new_version=BASE_ACTIVE.base}
+                      end
+                      if opponent=="incomplete-old-mask" then GROUPS.research_plastic=nil end
+                      reload_credits(BASE_ACTIVE,base_target)
+                      local force=make_collected_force(1,8,published_base_mask,opponent=="private-main")
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      main.saved_progress=.27;local queue={main,main,force.technologies.foreign}
+                      force.research_queue=queue;force.current_research=main
+                      local ok,message=pcall(native_credits.on_configuration_changed,
+                        {mod_startup_settings_changed=startup,mod_changes=changes})
+                      assert(not ok and tostring(message):find("native family",1,true),"unproven M4 old Base closure admitted")
+                      assert(next(storage)==nil,"refusal allocated MIR history")
+                      for _,s in pairs(force._states) do assert(s.writes.level==0 and s.writes.enabled==0) end
+                      assert(force.research_queue==queue and force.current_research==main and force.research_progress==.42
+                        and main.level==8 and main.saved_progress==.27)
+                      no_foreign_write(force)
+                    ''')
+
     def test_published_f200_base_direct_reader_refuses_unproven_inputs_before_writes(self):
         opponents=("startup", "unknown-startup", "unchanged-provider", "removed-provider", "observer",
                    "unknown-origin", "wrong-family", "wrong-active-engine", "engine-change",
@@ -1324,7 +1422,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     def test_published_f210_m4_base_patch24_reader_refuses_other_inputs_before_writes(self):
         opponents = ("old-below-floor", "downgrade", "missing-base", "new-mismatch", "cross-family",
-                     "changed-settings", "foreign-mod", "invalid-settings-flag")
+                     "changed-settings", "updated-extra", "invalid-settings-flag")
         for opponent in opponents:
             with self.subTest(opponent=opponent):
                 self.setUp()
@@ -1348,8 +1446,8 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     changes["more-infinite-research"].new_version="5.0.20015"
                   end
                   if opponent=="changed-settings" then changed=true end
-                  if opponent=="foreign-mod" then
-                    BASE_ACTIVE.foreign="1.0.0";changes.foreign={new_version="1.0.0"}
+                  if opponent=="updated-extra" then
+                    BASE_ACTIVE.foreign="1.0.0";changes.foreign={old_version="0.9.0",new_version="1.0.0"}
                   end
                   if opponent=="invalid-settings-flag" then changed="false" end
                   reload_credits(BASE_ACTIVE,"f210")
