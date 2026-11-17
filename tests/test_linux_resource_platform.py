@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -10,11 +11,24 @@ import time
 import unittest
 import uuid
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "tools" / "lib" / "validation" / "LinuxResourceObservation.py"
 LAUNCHER = ROOT / "tools" / "lib" / "validation" / "LinuxNativeLaunch.py"
+
+
+def load_observation_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+OBSERVATION = load_observation_module("mir_linux_resource_observation", HELPER)
 
 
 def write(path: Path, text: str) -> None:
@@ -82,6 +96,27 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         )
         self.assertEqual("", completed.stderr)
         return completed.returncode, json.loads(completed.stdout)
+
+    @staticmethod
+    def run_session_race(module, *, initial_root, scan_rows, root_after_scan):
+        child = {"pid": 101, "ppid": 1, "start_ticks": 1001, "session_id": 100}
+        root_reads = [initial_root, root_after_scan]
+
+        def read_stat(_proc_root, pid, *, missing_is_exit):
+            assert missing_is_exit
+            if pid == 100:
+                return root_reads.pop(0)
+            if pid == 101:
+                return child
+            raise AssertionError(f"unexpected pid {pid}")
+
+        with (
+            mock.patch.object(module, "read_proc_stat", side_effect=read_stat),
+            mock.patch.object(module, "iter_proc_stats", return_value=scan_rows),
+            mock.patch.object(module, "read_status_rss", return_value=12 * 1024),
+            mock.patch.object(module, "read_private_memory", return_value=(5 * 1024, 5 * 1024)),
+        ):
+            return module.process_tree(Path("/synthetic/proc"), 100, 1000, 100)
 
     def test_snapshot_reads_memavailable_and_every_cgroup_v2_ancestor(self) -> None:
         temporary, proc = self.make_fixture()
@@ -521,6 +556,109 @@ try {{
         )
         self.assertEqual(2, status)
         self.assertEqual("mir441-owned-root-identity", payload["code"])
+
+    def test_process_tree_accepts_a_mid_scan_root_exit_and_retains_its_session_orphan(self) -> None:
+        """The leader can retire between the initial stat and proc scan."""
+        root = {"pid": 100, "ppid": 1, "start_ticks": 1000, "session_id": 100}
+        child = {"pid": 101, "ppid": 1, "start_ticks": 1001, "session_id": 100}
+
+        source = HELPER.read_text(encoding="utf-8")
+        replacement = """        rows = iter_proc_stats(proc_root)
+        scanned_root = next((row for row in rows if row[\"pid\"] == root_pid), None)
+        owned = {row[\"pid\"]: row for row in rows if row[\"session_id\"] == session_id}
+        if scanned_root is not None:
+            if scanned_root[\"start_ticks\"] != root_start_ticks:
+                fail(\"mir441-owned-root-identity\")
+            if scanned_root[\"session_id\"] != session_id:
+                fail(\"mir441-owned-session-identity\")
+            root = scanned_root
+        elif root is not None:
+            reread_root = read_proc_stat(proc_root, root_pid, missing_is_exit=True)
+            if reread_root is None:
+                root = None
+            else:
+                if reread_root[\"start_ticks\"] != root_start_ticks:
+                    fail(\"mir441-owned-root-identity\")
+                if reread_root[\"session_id\"] != session_id:
+                    fail(\"mir441-owned-session-identity\")
+                fail(\"mir441-owned-session-identity\")
+"""
+        old = """        owned = {row[\"pid\"]: row for row in iter_proc_stats(proc_root) if row[\"session_id\"] == session_id}
+        if root is not None and root_pid not in owned:
+            fail(\"mir441-owned-session-identity\")
+"""
+        self.assertEqual(1, source.count(replacement))
+        old_source = source.replace(replacement, old)
+        with tempfile.TemporaryDirectory(prefix="mir-linux-resource-root-exit-") as directory:
+            old_path = Path(directory) / "LinuxResourceObservation.py"
+            old_path.write_text(old_source, encoding="utf-8")
+            old_module = load_observation_module(f"mir_linux_resource_observation_old_{uuid.uuid4().hex}", old_path)
+            with self.assertRaises(old_module.ObservationFailure) as old_failure:
+                self.run_session_race(old_module, initial_root=root, scan_rows=[child], root_after_scan=None)
+        self.assertEqual("mir441-owned-session-identity", old_failure.exception.code)
+
+        value = self.run_session_race(OBSERVATION, initial_root=root, scan_rows=[child], root_after_scan=None)
+        self.assertTrue(value["root_exited"])
+        self.assertEqual([101], [row["id"] for row in value["children"]])
+        self.assertEqual(12 * 1024, value["working_set_bytes"])
+
+    def test_process_tree_refuses_an_alive_root_omitted_from_the_session_scan(self) -> None:
+        root = {"pid": 100, "ppid": 1, "start_ticks": 1000, "session_id": 100}
+        child = {"pid": 101, "ppid": 1, "start_ticks": 1001, "session_id": 100}
+        with self.assertRaises(OBSERVATION.ObservationFailure) as failure:
+            self.run_session_race(OBSERVATION, initial_root=root, scan_rows=[child], root_after_scan=root)
+        self.assertEqual("mir441-owned-session-identity", failure.exception.code)
+
+    def test_process_tree_requires_a_matching_identity_if_root_appears_after_initial_absence(self) -> None:
+        replaced_root = {"pid": 100, "ppid": 1, "start_ticks": 9999, "session_id": 100}
+        with self.assertRaises(OBSERVATION.ObservationFailure) as failure:
+            self.run_session_race(
+                OBSERVATION, initial_root=None, scan_rows=[replaced_root], root_after_scan=replaced_root
+            )
+        self.assertEqual("mir441-owned-root-identity", failure.exception.code)
+
+    def test_process_tree_accepts_only_the_matching_root_identity_after_initial_absence(self) -> None:
+        root = {"pid": 100, "ppid": 1, "start_ticks": 1000, "session_id": 100}
+        child = {"pid": 101, "ppid": 1, "start_ticks": 1001, "session_id": 100}
+        value = self.run_session_race(OBSERVATION, initial_root=None, scan_rows=[root, child], root_after_scan=root)
+        self.assertFalse(value["root_exited"])
+        self.assertEqual([101], [row["id"] for row in value["children"]])
+
+    def test_process_tree_refuses_a_session_change_when_root_appears_after_initial_absence(self) -> None:
+        changed_root = {"pid": 100, "ppid": 1, "start_ticks": 1000, "session_id": 999}
+        with self.assertRaises(OBSERVATION.ObservationFailure) as failure:
+            self.run_session_race(OBSERVATION, initial_root=None, scan_rows=[changed_root], root_after_scan=changed_root)
+        self.assertEqual("mir441-owned-session-identity", failure.exception.code)
+
+    def test_linux_observer_preserves_owned_identity_failure_codes(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("PowerShell is unavailable for the governor control")
+        governor = ROOT / "tools" / "lib" / "validation" / "ResourceGovernor.ps1"
+        script = (
+            f". '{governor.as_posix()}';"
+            "$codes=@('mir441-owned-root-identity','mir441-owned-child-identity','mir441-owned-session-identity','other');"
+            "$codes|ForEach-Object {[pscustomobject]@{input=$_;output=(Resolve-MIR441LinuxObservationFailureCode -Code $_)}}|ConvertTo-Json -Compress"
+        )
+        completed = subprocess.run(
+            [pwsh, "-NoProfile", "-NonInteractive", "-Command", script],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        values = json.loads(completed.stdout)
+        self.assertEqual(
+            {
+                "mir441-owned-root-identity": "mir441-owned-root-identity",
+                "mir441-owned-child-identity": "mir441-owned-child-identity",
+                "mir441-owned-session-identity": "mir441-owned-session-identity",
+                "other": "mir441-resource-linux-observer",
+            },
+            {row["input"]: row["output"] for row in values},
+        )
 
     def test_tiny_output_budget_reaches_the_live_governor_at_its_declared_reserve(self) -> None:
         """Exercise the production monitor with host-only admission doubles.
