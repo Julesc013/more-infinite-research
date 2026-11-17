@@ -216,6 +216,25 @@ function Assert-FactorioConsoleConfirmationBoundary {
   try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $replayWriter -Timer $replayTimer -Kind confirmation-replay} finally {$replayWriter.Dispose();$replayMemory.Dispose()}
   $replayBoundaries=@($state.receipt.sends[1].output_boundaries)
   Assert-Probe ($state.receipt.send_count-eq2-and$state.receipt.sends[1].output_boundaries_complete-and$replayBoundaries.Count-eq2-and$replayBoundaries[0].kind-ceq'stdout'-and$replayBoundaries[0].path-ceq$stdout-and$replayBoundaries[1].kind-ceq'stderr'-and$replayBoundaries[1].path-ceq$stderr-and$replayBoundaries[0].bytes-ge$commandBoundaries[0].bytes-and$replayBoundaries[1].bytes-ge$commandBoundaries[1].bytes-and$state.streams[0].confirmation_start_offset-eq$firstOffsets[0]-and$state.streams[1].confirmation_start_offset-eq$firstOffsets[1]) 'console-replay-fresh-monotone-boundaries'
+  $regressedStdout=Join-Path $consoleRoot 'regressed-stdout.txt';$regressedStderr=Join-Path $consoleRoot 'regressed-stderr.txt'
+  [IO.File]::WriteAllText($regressedStdout,($ready+('x'*(65536-$ready.Length))+'after-command-floor'),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($regressedStderr,'',[Text.UTF8Encoding]::new($false))
+  $regressedState=New-MIR441FactorioConsoleStartup -Definition $startup
+  Add-MIR441FactorioConsoleStartupOutput -State $regressedState -Kind stdout -Path $regressedStdout
+  Add-MIR441FactorioConsoleStartupOutput -State $regressedState -Kind stderr -Path $regressedStderr
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $regressedState)-and$regressedState.ready_marker_seen-and-not$regressedState.confirmation_marker_seen) 'console-regression-pre-send-ready'
+  $regressedCommandMemory=[IO.MemoryStream]::new();$regressedCommandWriter=[IO.StreamWriter]::new($regressedCommandMemory,[Text.UTF8Encoding]::new($false));$regressedTimer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $regressedState -Writer $regressedCommandWriter -Timer $regressedTimer -Kind command} finally {$regressedCommandWriter.Dispose();$regressedCommandMemory.Dispose()}
+  $firstRegressionBoundary=[int64]$regressedState.receipt.sends[0].output_boundaries[0].bytes
+  $regressedHandle=[IO.File]::Open($regressedStdout,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::ReadWrite)
+  try {$regressedHandle.SetLength([int64]$regressedState.streams[0].offset)} finally {$regressedHandle.Dispose()}
+  [IO.File]::AppendAllText($regressedStdout,'x',[Text.UTF8Encoding]::new($false))
+  [IO.File]::AppendAllText($regressedStderr,$confirmation,[Text.UTF8Encoding]::new($false))
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $regressedState)-and$regressedState.confirmation_marker_seen) 'console-regression-truncate-regrow-passes-reader-offset'
+  $regressedReplayMemory=[IO.MemoryStream]::new();$regressedReplayWriter=[IO.StreamWriter]::new($regressedReplayMemory,[Text.UTF8Encoding]::new($false));$regressedError=''
+  try {Send-MIR441FactorioConsoleStartupLine -State $regressedState -Writer $regressedReplayWriter -Timer $regressedTimer -Kind confirmation-replay}catch{$regressedError=$_.Exception.Message}finally{$regressedReplayWriter.Dispose();$regressedReplayMemory.Dispose();$regressedTimer.Stop()}
+  $regressedReplayBoundaries=@($regressedState.receipt.sends[1].output_boundaries)
+  Assert-Probe ($regressedError.Contains('[mir441-factorio-console-baseline]')-and$regressedState.receipt.send_count-eq2-and$regressedState.receipt.sends[0].output_boundaries_complete-and-not$regressedState.receipt.sends[1].output_boundaries_complete-and$regressedReplayBoundaries.Count-eq1-and$regressedReplayBoundaries[0].kind-ceq'stdout'-and$regressedReplayBoundaries[0].bytes-lt$firstRegressionBoundary) 'console-replay-regressed-postflush-floor-refused'
 }
 function Assert-FactorioConsolePostFlushBoundaryFailure {
   $consoleRoot=Join-Path $root 'factorio-console-postflush-boundary-failure';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null

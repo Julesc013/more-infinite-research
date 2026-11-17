@@ -654,12 +654,17 @@ function Send-MIR441FactorioConsoleStartupLine {
   # A post-send observation failure must not turn an already-delivered command
   # into a receipt that claims no command was sent.
   $State.receipt.sends.Add($send)
+  $priorSend=if($Kind-ceq'confirmation-replay'){$State.receipt.sends[$State.receipt.sends.Count-2]}else{$null}
   foreach($stream in $State.streams){
     try {
       $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
       # Each boundary is a conservative post-flush floor.  Output present at
       # or before it may have arrived too quickly to attribute to this send.
       $send.output_boundaries.Add([ordered]@{kind=$stream.kind;path=$stream.path;bytes=$bytes})
+      if($Kind-ceq'confirmation-replay'){
+        $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$stream.kind-and$_.path-ceq$stream.path})
+        if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or$bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
+      }
       if($Kind-ceq'command'){
         # Preserve the first-send confirmation boundary used by the existing
         # confirmation reader.  Replays get their own receipt floor above but
