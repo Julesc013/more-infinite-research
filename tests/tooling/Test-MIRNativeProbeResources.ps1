@@ -416,9 +416,25 @@ try {
     $tenGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-peak-budget') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot
     Assert-Probe ([int64]$tenGiBBudget.peak_memory_bytes -eq $tenGiB) 'ten-gib-declared-peak-admitted'
     [IO.Directory]::CreateDirectory($tenGiBBudget.root)|Out-Null
-    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 1200; exit 0') -TimeoutSeconds 20
+    $tenGiBRelease=Join-Path $tenGiBBudget.root 'two-samples.release'
+    $tenGiBChild=Join-Path $tenGiBBudget.root 'wait-for-two-samples.ps1'
+    [IO.File]::WriteAllText($tenGiBChild,@'
+param([Parameter(Mandatory)][string]$ReleasePath)
+$deadline=[DateTime]::UtcNow.AddSeconds(10)
+while(-not(Test-Path -LiteralPath $ReleasePath -PathType Leaf)){
+  if([DateTime]::UtcNow-ge$deadline){exit 17}
+  Start-Sleep -Milliseconds 50
+}
+'@,[Text.UTF8Encoding]::new($false))
+    $tenGiBState=[pscustomobject]@{sample_events=0}
+    $tenGiBSample={
+      param($event)
+      $tenGiBState.sample_events++
+      if($tenGiBState.sample_events-eq2){[IO.File]::WriteAllText($tenGiBRelease,'observed',[Text.UTF8Encoding]::new($false))}
+    }.GetNewClosure()
+    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-File',$tenGiBChild,'-ReleasePath',$tenGiBRelease) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $tenGiBSample
     $tenGiBRunning=@(Get-Content -LiteralPath $tenGiBRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12}|Where-Object {$null-ne$_.PSObject.Properties['process']})
-    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBRunning.Count-ge2-and[int64]$tenGiBRunning[0].process.expected_peak_memory_bytes-eq$tenGiB) 'ten-gib-process-budget-forwarded-across-samples'
+    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBState.sample_events-ge2-and(Test-Path -LiteralPath $tenGiBRelease)-and$tenGiBRunning.Count-ge2-and@($tenGiBRunning|Where-Object {[int64]$_.process.expected_peak_memory_bytes-ne$tenGiB}).Count-eq0) 'ten-gib-process-budget-forwarded-across-samples'
     Assert-Probe ($null-eq$boundarySnapshot.PSObject.Properties['process']) 'snapshot-source-not-mutated-across-samples'
     $boundarySnapshot.memory.free_bytes=$tenGiBMemoryRequired-1
     Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-insufficient-memory') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot} '[mir441-resource-admission-memory]'
