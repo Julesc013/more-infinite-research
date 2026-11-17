@@ -47,6 +47,15 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.native_credits"] = function()
               local module = {}
+              module.preflight_family_transition = function(event)
+                local plan = {family_snapshot = true}
+                credit_calls.family_event = event
+                credit_calls.family_plan = plan
+                return plan
+              end
+              module.needs_research_events = function() return false end
+              module.on_research_finished = function() return false end
+              module.on_research_cancelled = function() return false end
               module.preflight_legacy_preference_transition = function(event, provider_relevant)
                 credit_calls.preflight = (credit_calls.preflight or 0) + 1
                 credit_calls.last_preflight_event = event
@@ -57,10 +66,11 @@ class BootstrapTests(unittest.TestCase):
               for _, name in ipairs({"on_init", "on_configuration_changed", "on_load",
                   "on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
                 local callback = name
-                module[callback] = function(event)
+                module[callback] = function(event, plan)
                   credit_calls[callback] = (credit_calls[callback] or 0) + 1
                   credit_calls.last_event = event
                   if callback == "on_configuration_changed" then
+                    credit_calls.applied_family_plan = plan
                     table.insert(configuration_order, "native-credit-reconcile")
                   end
                 end
@@ -678,6 +688,72 @@ class BootstrapTests(unittest.TestCase):
             and library_calls.configuration==nil and module_credit_calls.preflight==nil
             and cannon_credit_calls.preflight==nil)
         ''')
+
+    def test_native_credit_required_exports_refuse_before_bootstrap_registration(self):
+        for target_id in ("f200", "f210"):
+            for export in ("preflight_family_transition", "needs_research_events",
+                           "on_research_finished", "on_research_cancelled"):
+                for opponent in ("missing", "false", "table"):
+                    with self.subTest(target=target_id, export=export, opponent=opponent):
+                        self.setUp()
+                        self.lua.globals().target_id = target_id
+                        self.lua.globals().export_name = export
+                        self.lua.globals().opponent = opponent
+                        self.lua.execute(r'''
+                          install_modules(false,false,false,true);install_runtime()
+                          local credit_factory=package.preload["runtime.native_credits"]
+                          local supplied=credit_factory()
+                          if opponent=="missing" then supplied[export_name]=nil
+                          elseif opponent=="false" then supplied[export_name]=false
+                          else supplied[export_name]={} end
+                          assert(type(supplied[export_name])~="function")
+                          package.preload["runtime.native_credits"]=function()return supplied end
+                          local target_factory=package.preload["platform.target"]
+                          package.preload["platform.target"]=function()
+                            local target=target_factory();target.id=target_id;return target
+                          end
+                          local ok,message=pcall(load_control)
+                          assert(not ok and tostring(message):find(
+                            "MIR runtime native credits requires callable "..export_name,1,true),
+                            "required credit export was treated as optional: "..export_name)
+                          assert(next(remote.interfaces)==nil and next(commands.registered)==nil
+                            and handlers.init==nil and handlers.configuration==nil and handlers.load==nil
+                            and next(handlers.events)==nil and next(handlers.nth)==nil,
+                            "invalid credit interface registered callbacks or commands")
+                          assert(next(lifecycle_calls)==nil and next(library_calls)==nil
+                            and next(credit_calls)==nil and next(module_credit_calls)==nil
+                            and next(cannon_credit_calls)==nil and next(gun_credit_calls)==nil,
+                            "invalid credit interface reached a lifecycle writer")
+                        ''')
+
+    def test_family_credit_plan_is_forwarded_without_recomputing_or_dropping_it(self):
+        self.lua.execute(r'''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          local event={mod_changes={}}
+          handlers.configuration(event)
+          assert(credit_calls.family_event==event and credit_calls.family_plan.family_snapshot)
+          assert(credit_calls.applied_family_plan==credit_calls.family_plan,
+            "configuration discarded the admitted family plan")
+        ''')
+
+    def test_inactive_native_credit_subsystem_does_not_require_or_load_its_interface(self):
+        for target_id in ("f200", "f210", "f018"):
+            with self.subTest(target=target_id):
+                self.setUp()
+                self.lua.globals().target_id = target_id
+                self.lua.execute(r'''
+                  install_modules(false,false,false,false);install_runtime()
+                  package.preload["runtime.native_credits"]=function()
+                    error("inactive credit module was imported")
+                  end
+                  local target_factory=package.preload["platform.target"]
+                  package.preload["platform.target"]=function()
+                    local target=target_factory();target.id=target_id;return target
+                  end
+                  load_control();handlers.init();handlers.configuration({mod_changes={}});handlers.load()
+                  assert(package.loaded["runtime.native_credits"]==nil and next(credit_calls)==nil)
+                  assert(lifecycle_calls.configuration~=nil and library_calls.configuration~=nil)
+                ''')
 
     def test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes(self):
         import test_native_family_paid_credits as paid_fixture
