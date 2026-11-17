@@ -43,12 +43,13 @@ def receive_packet(connection):
 
 
 class RawRconPeer:
-    def __init__(self, handler):
+    def __init__(self, handler, expect_connection=True):
+        self.expect_connection = expect_connection
         self._listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._listener.bind(("127.0.0.1", 0))
         self._listener.listen(1)
-        self._listener.settimeout(10)
+        self._listener.settimeout(10 if self.expect_connection else 2)
         self.port = self._listener.getsockname()[1]
         self.handler = handler
         self.error = None
@@ -60,6 +61,9 @@ class RawRconPeer:
             with connection:
                 connection.settimeout(10)
                 self.handler(connection)
+        except TimeoutError:
+            if self.expect_connection:
+                self.error = AssertionError("raw RCON peer received no client connection")
         except ConnectionResetError:
             # Refusal paths may close immediately after the intentionally bad
             # peer frame; the test has already checked the preceding wire row.
@@ -113,6 +117,8 @@ def command_handler(password, expected_commands, mode="success"):
                 connection.sendall(struct.pack("<i", 9) + b"short-body")
             elif mode == "invalid-utf8":
                 connection.sendall(packet(request_id, 0, b"\xff"))
+            elif mode == "interior-nul":
+                connection.sendall(packet(request_id, 0, b"before\0after"))
             elif mode == "truncated":
                 full = packet(request_id, 0, b"truncated")
                 connection.sendall(full[:-3])
@@ -122,14 +128,15 @@ def command_handler(password, expected_commands, mode="success"):
     return handler
 
 
-def run_helper(port, password, commands):
+def run_helper(port, password, commands, authentication_request_id=43101):
     script = r'''
-param([string]$Helper,[int]$Port,[string]$Password,[string]$CommandsJson)
+param([string]$Helper,[int]$Port,[string]$PasswordJson,[string]$CommandsJson,[int]$AuthenticationRequestId)
 $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
 . $Helper
 try {
+  $Password=[string]($PasswordJson|ConvertFrom-Json)
   $commands=@($CommandsJson|ConvertFrom-Json -AsHashtable)
-  $receipt=Invoke-MIRLoopbackRconCommands -Port $Port -Password $Password -Commands $commands
+  $receipt=Invoke-MIRLoopbackRconCommands -Port $Port -Password $Password -Commands $commands -AuthenticationRequestId $AuthenticationRequestId
   [pscustomobject]@{ok=$true;receipt=$receipt}|ConvertTo-Json -Depth 12 -Compress
 } catch {
   [pscustomobject]@{ok=$false;message=$_.Exception.Message;has_cleanup=$_.Exception.Data.Contains('mir_loopback_rcon_cleanup_facts');cleanup_facts=$_.Exception.Data['mir_loopback_rcon_cleanup_facts'];receipt=$_.Exception.Data['mir_loopback_rcon_receipt']}|ConvertTo-Json -Depth 12 -Compress
@@ -138,9 +145,12 @@ try {
     with tempfile.TemporaryDirectory() as temporary:
         runner = Path(temporary) / "loopback-rcon-runner.ps1"
         runner.write_text(script, encoding="utf-8")
+        # Passing the numeric id separately verifies that the helper guards
+        # the reserved wire sentinel before it reaches a listening peer.
         result = subprocess.run(
             ["pwsh", "-NoLogo", "-NoProfile", "-File", str(runner), "-Helper", str(HELPER), "-Port", str(port),
-             "-Password", password, "-CommandsJson", json.dumps(commands, ensure_ascii=False)],
+             "-PasswordJson", json.dumps(password, ensure_ascii=False), "-CommandsJson", json.dumps(commands, ensure_ascii=False),
+             "-AuthenticationRequestId", str(authentication_request_id)],
             cwd=ROOT, capture_output=True, text=True, timeout=20,
         )
     if result.returncode:
@@ -149,6 +159,24 @@ try {
 
 
 class LoopbackRconTests(unittest.TestCase):
+    def test_reserved_authentication_id_refuses_before_peer_connection(self):
+        # A legacy equality check would accept a type-2/-1 auth failure as
+        # successful authentication. The current helper must not connect at all.
+        def forged_auth_failure(connection):
+            request_id, packet_type, payload = receive_packet(connection)
+            self.assertEqual((request_id, packet_type, payload), (-1, 3, b"generic-nonempty-password"))
+            connection.sendall(packet(-1, 2, b""))
+
+        with RawRconPeer(forged_auth_failure, expect_connection=False) as peer:
+            payload, raw = run_helper(peer.port, "generic-nonempty-password", ["/silent-command noop"],
+                                      authentication_request_id=-1)
+        self.assertFalse(payload["ok"])
+        self.assertIn("authentication request id is invalid", payload["message"])
+        self.assertTrue(payload["has_cleanup"])
+        self.assertIsNone(payload["cleanup_facts"])
+        self.assertIsNone(payload["receipt"])
+        self.assertNotIn("generic-nonempty-password", raw.stdout + raw.stderr)
+
     def test_refused_connect_retains_open_cleanup_facts(self):
         reservation = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         reservation.bind(("127.0.0.1", 0))
@@ -209,6 +237,7 @@ class LoopbackRconTests(unittest.TestCase):
                                ("wrong-id", "command response differs"),
                                ("wrong-type", "command response differs"), ("bad-terminator", "packet terminators are invalid"),
                                ("bad-length", "packet length is invalid"), ("invalid-utf8", "response payload is not strict UTF-8"),
+                               ("interior-nul", "response payload contains interior NUL"),
                                ("truncated", "connection closed during packet read")):
             with self.subTest(mode=mode), RawRconPeer(command_handler(password, [command], mode)) as peer:
                 payload, raw = run_helper(peer.port, password, [command])
@@ -229,13 +258,19 @@ class LoopbackRconTests(unittest.TestCase):
     def test_bounds_and_one_line_rejections_happen_before_network(self):
         password = "generic-nonempty-password"
         cases = [([], "command count is invalid"), (["one", "two", "three"], "command count is invalid"),
-                 (["line\nbreak"], "command is not one line"), (["x" * 16385], "command exceeds byte bound")]
+                 (["line\nbreak"], "command is not one line"), (["nul\0command"], "command contains NUL"),
+                 (["x" * 16385], "command exceeds byte bound")]
         for commands, expected in cases:
             with self.subTest(commands=commands):
                 payload, raw = run_helper(1, password, commands)
                 self.assertFalse(payload["ok"])
                 self.assertIn(expected, payload["message"])
                 self.assertNotIn(password, raw.stdout)
+
+        payload, raw = run_helper(1, "nul\0password", ["one"])
+        self.assertFalse(payload["ok"])
+        self.assertIn("password contains NUL", payload["message"])
+        self.assertNotIn("nul\0password", raw.stdout + raw.stderr)
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ function Get-MIRLoopbackRconSha256([byte[]]$Bytes) {
 }
 function Get-MIRLoopbackRconUtf8Bytes([string]$Value,[string]$Label,[int]$MaximumBytes,[switch]$OneLine) {
   Assert-MIRLoopbackRcon (-not[string]::IsNullOrEmpty($Value)) "$Label is empty"
+  Assert-MIRLoopbackRcon ($Value.IndexOf([char]0)-lt0) "$Label contains NUL"
   if($OneLine){Assert-MIRLoopbackRcon ($Value.IndexOfAny([char[]]@("`r","`n"))-lt0) "$Label is not one line"}
   try{$bytes=[Text.UTF8Encoding]::new($false,$true).GetBytes($Value)}catch{throw "[mir-loopback-rcon] $Label is not strict UTF-8"}
   Assert-MIRLoopbackRcon ($bytes.Length-le$MaximumBytes) "$Label exceeds byte bound"
@@ -47,6 +48,7 @@ function Read-MIRLoopbackRconPacket([IO.Stream]$Stream) {
   [byte[]]$packet=Read-MIRLoopbackRconExact $Stream $length
   Assert-MIRLoopbackRcon ($packet[$length-2]-eq0-and$packet[$length-1]-eq0) 'packet terminators are invalid'
   if($length-eq10){$payload=[byte[]]::new(0)}else{$payload=[byte[]]$packet[8..($length-3)]}
+  Assert-MIRLoopbackRcon (-not($payload-contains[byte]0)) 'response payload contains interior NUL'
   try{$text=[Text.UTF8Encoding]::new($false,$true).GetString($payload)}catch{throw '[mir-loopback-rcon] response payload is not strict UTF-8'}
   return [pscustomobject][ordered]@{id=(ConvertFrom-MIRLoopbackRconInt32 ([byte[]]$packet[0..3]));type=(ConvertFrom-MIRLoopbackRconInt32 ([byte[]]$packet[4..7]));payload_base64=[Convert]::ToBase64String($payload);payload_byte_length=$payload.Length;payload_text=$text;payload_sha256=(Get-MIRLoopbackRconSha256 $payload)}
 }
@@ -61,6 +63,7 @@ function Open-MIRLoopbackRconSession {
     [ValidateRange(1,30000)][int]$IoTimeoutMilliseconds=5000,
     [int]$AuthenticationRequestId=43101
   )
+  Assert-MIRLoopbackRcon ($AuthenticationRequestId-ge1-and$AuthenticationRequestId-le2147483645) 'authentication request id is invalid'
   [byte[]]$null=Get-MIRLoopbackRconUtf8Bytes -Value $Password -Label 'password' -MaximumBytes 65526
   $tcp=[Net.Sockets.TcpClient]::new([Net.Sockets.AddressFamily]::InterNetwork);$stream=$null;$timer=[Diagnostics.Stopwatch]::StartNew()
   try {
@@ -99,6 +102,7 @@ function Send-MIRLoopbackRconCommand {
   Assert-MIRLoopbackRcon ($Session.commands.Count-lt2) 'command bound exceeded'
   [byte[]]$commandBytes=Get-MIRLoopbackRconUtf8Bytes -Value $Command -Label 'command' -MaximumBytes 16384 -OneLine
   if(-not$PSBoundParameters.ContainsKey('RequestId')){$RequestId=$Session.authentication_request_id+$Session.commands.Count+1}
+  Assert-MIRLoopbackRcon ($RequestId-ge1) 'command request id is invalid'
   $row=[pscustomobject][ordered]@{order=($Session.commands.Count+1);request_id=$RequestId;command_sha256=(Get-MIRLoopbackRconSha256 $commandBytes);command_bytes=$commandBytes.Length;write_monotonic_milliseconds=$null;response_monotonic_milliseconds=$null;complete=$false;response=$null}
   [void]$Session.commands.Add($row)
   Write-MIRLoopbackRconPacket -Stream $Session.stream -Id $RequestId -Type 2 -Payload $Command -Label 'command' -OneLine
@@ -139,6 +143,7 @@ function Invoke-MIRLoopbackRconCommands {
     [ValidateRange(1,30000)][int]$IoTimeoutMilliseconds=5000
   )
   Assert-MIRLoopbackRcon ($Commands.Count-ge1-and$Commands.Count-le2) 'command count is invalid'
+  Assert-MIRLoopbackRcon ($FirstCommandRequestId-ge1-and([int64]$FirstCommandRequestId+$Commands.Count-1)-le[int]::MaxValue) 'command request id is invalid'
   foreach($command in $Commands){$null=Get-MIRLoopbackRconUtf8Bytes -Value $command -Label 'command' -MaximumBytes 16384 -OneLine}
   $session=$null;$primaryFailure=$null;$result=$null
   try {
