@@ -205,10 +205,44 @@ function Assert-FactorioConsoleConfirmationBoundary {
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.ready_marker_seen-and-not$state.confirmation_marker_seen) 'console-pre-send-markers-not-confirmed'
   $memory=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false));$timer=[Diagnostics.Stopwatch]::StartNew()
   try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command} finally {$writer.Dispose();$memory.Dispose()}
+  $commandBoundaries=@($state.receipt.sends[0].output_boundaries)
   Assert-Probe ($state.receipt.send_count-eq1-and$state.streams[0].confirmation_start_offset-eq(Get-Item -LiteralPath $stdout).Length-and$state.streams[1].confirmation_start_offset-eq(Get-Item -LiteralPath $stderr).Length) 'console-command-baselines-both-streams'
+  Assert-Probe ($state.receipt.sends[0].output_boundaries_complete-and$commandBoundaries.Count-eq2-and$commandBoundaries[0].kind-ceq'stdout'-and$commandBoundaries[0].path-ceq$stdout-and$commandBoundaries[0].bytes-eq(Get-Item -LiteralPath $stdout).Length-and$commandBoundaries[1].kind-ceq'stderr'-and$commandBoundaries[1].path-ceq$stderr-and$commandBoundaries[1].bytes-eq(Get-Item -LiteralPath $stderr).Length) 'console-command-postflush-boundaries-both-streams'
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and-not$state.confirmation_marker_seen) 'console-pre-send-backlog-cannot-replay'
   [IO.File]::AppendAllText($stderr,$confirmation,[Text.UTF8Encoding]::new($false))
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.confirmation_marker_seen) 'console-post-send-confirmation-observed'
+  $firstOffsets=@($state.streams|ForEach-Object {[int64]$_.confirmation_start_offset})
+  $replayMemory=[IO.MemoryStream]::new();$replayWriter=[IO.StreamWriter]::new($replayMemory,[Text.UTF8Encoding]::new($false));$replayTimer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $replayWriter -Timer $replayTimer -Kind confirmation-replay} finally {$replayWriter.Dispose();$replayMemory.Dispose()}
+  $replayBoundaries=@($state.receipt.sends[1].output_boundaries)
+  Assert-Probe ($state.receipt.send_count-eq2-and$state.receipt.sends[1].output_boundaries_complete-and$replayBoundaries.Count-eq2-and$replayBoundaries[0].kind-ceq'stdout'-and$replayBoundaries[0].path-ceq$stdout-and$replayBoundaries[1].kind-ceq'stderr'-and$replayBoundaries[1].path-ceq$stderr-and$replayBoundaries[0].bytes-ge$commandBoundaries[0].bytes-and$replayBoundaries[1].bytes-ge$commandBoundaries[1].bytes-and$state.streams[0].confirmation_start_offset-eq$firstOffsets[0]-and$state.streams[1].confirmation_start_offset-eq$firstOffsets[1]) 'console-replay-fresh-monotone-boundaries'
+}
+function Assert-FactorioConsolePostFlushBoundaryFailure {
+  $consoleRoot=Join-Path $root 'factorio-console-postflush-boundary-failure';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null
+  $startup=[ordered]@{command='/c game.print("mir-native-console-boundary-failure")';ready_marker='MIR_CONSOLE_READY'}
+  $stdout=Join-Path $consoleRoot 'stdout.txt';$stderr=Join-Path $consoleRoot 'stderr.txt'
+  [IO.File]::WriteAllText($stdout,'pre-send-stdout',[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($stderr,'pre-send-stderr',[Text.UTF8Encoding]::new($false))
+  $state=New-MIR441FactorioConsoleStartup -Definition $startup
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stdout -Path $stdout
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stderr -Path $stderr
+  $priorGetItem=if(Test-Path -LiteralPath Function:Get-Item){(Get-Item -LiteralPath Function:Get-Item).ScriptBlock}else{$null}
+  $failingPath=$stderr
+  $mockGetItem={
+    param([string]$LiteralPath)
+    if($LiteralPath-ceq$failingPath){throw [IO.IOException]::new('simulated post-flush stderr boundary failure')}
+    return Microsoft.PowerShell.Management\Get-Item -LiteralPath $LiteralPath
+  }.GetNewClosure()
+  $memory=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false));$timer=[Diagnostics.Stopwatch]::StartNew();$actual=''
+  try {
+    Set-Item -Path Function:Get-Item -Value $mockGetItem
+    try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command}catch{$actual=$_.Exception.Message}
+  } finally {
+    if($null-ne$priorGetItem){Set-Item -Path Function:Get-Item -Value $priorGetItem}else{Remove-Item -Path Function:Get-Item -ErrorAction SilentlyContinue}
+    $writer.Dispose();$memory.Dispose()
+  }
+  $boundaries=@($state.receipt.sends[0].output_boundaries)
+  Assert-Probe ($actual.Contains('[mir441-factorio-console-baseline]')-and$state.receipt.send_count-eq1-and$state.receipt.sends.Count-eq1-and$state.receipt.sends[0].kind-ceq'command'-and-not$state.receipt.sends[0].output_boundaries_complete-and$boundaries.Count-eq1-and$boundaries[0].kind-ceq'stdout'-and$boundaries[0].path-ceq$stdout-and$boundaries[0].bytes-eq([int64][IO.File]::ReadAllBytes($stdout).Length)-and$state.streams[0].confirmation_start_offset-eq$boundaries[0].bytes-and$null-eq$state.streams[1].confirmation_start_offset) 'console-postflush-boundary-failure-retains-successful-send'
 }
 function Assert-FactorioConsoleStartup {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$Child)
@@ -257,21 +291,23 @@ try {
   $closedState=New-MIR441FactorioConsoleStartup -Definition $startup
   $closedStream=[IO.MemoryStream]::new();$closedWriter=[IO.StreamWriter]::new($closedStream,[Text.UTF8Encoding]::new($false));$closedWriter.Dispose();$closedWriterError='';$closedTimer=[Diagnostics.Stopwatch]::StartNew()
   try {Send-MIR441FactorioConsoleStartupLine -State $closedState -Writer $closedWriter -Timer $closedTimer -Kind command}catch{$closedWriterError=$_.Exception.Message}finally{$closedStream.Dispose()}
-  Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0) 'console-closed-writer-refusal'
+  Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0-and$closedState.receipt.sends.Count-eq0) 'console-closed-writer-refusal'
   $ordinaryRecord=Join-Path $consoleRoot 'ordinary-input.txt';$ordinaryPid=Join-Path $consoleRoot 'ordinary.pid'
   $ordinary=Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$ordinaryRecord,'-PidPath',$ordinaryPid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup
   $ordinaryInput=@(Get-Content -LiteralPath $ordinaryRecord)
   $ordinaryReceipt=$ordinary.result.console_startup
   $ordinaryOut=Get-Content -Raw -LiteralPath $ordinary.stdout
   Assert-Probe ($ordinary.status-ceq'passed'-and$ordinaryInput.Count-eq1-and$ordinaryInput[0]-ceq$command) 'console-delayed-ready-single-delivery'
-  Assert-Probe ($ordinaryOut.Contains('MIR_CONSOLE_EARLY_INPUT=False')-and$ordinaryReceipt.ready_marker_observed-and$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-ge150-and$ordinaryReceipt.send_count-eq1-and$ordinaryReceipt.sends.Count-eq1-and$ordinaryReceipt.sends[0].order-eq1-and$ordinaryReceipt.sends[0].kind-ceq'command'-and$ordinaryReceipt.sends[0].command_sha256-ceq$expectedHash-and$ordinaryReceipt.sends[0].elapsed_monotonic_milliseconds-ge$ordinaryReceipt.ready_elapsed_monotonic_milliseconds) 'console-ready-gate-receipt'
+  $ordinaryBoundaries=@($ordinaryReceipt.sends[0].output_boundaries)
+  Assert-Probe ($ordinaryOut.Contains('MIR_CONSOLE_EARLY_INPUT=False')-and$ordinaryReceipt.ready_marker_observed-and$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-ge150-and$ordinaryReceipt.send_count-eq1-and$ordinaryReceipt.sends.Count-eq1-and$ordinaryReceipt.sends[0].order-eq1-and$ordinaryReceipt.sends[0].kind-ceq'command'-and$ordinaryReceipt.sends[0].command_sha256-ceq$expectedHash-and$ordinaryReceipt.sends[0].elapsed_monotonic_milliseconds-ge$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-and$ordinaryReceipt.sends[0].output_boundaries_complete-and$ordinaryBoundaries.Count-eq2-and$ordinaryBoundaries[0].kind-ceq'stdout'-and$ordinaryBoundaries[0].path-ceq$ordinary.stdout-and$ordinaryBoundaries[1].kind-ceq'stderr'-and$ordinaryBoundaries[1].path-ceq$ordinary.stderr) 'console-ready-gate-receipt'
   Assert-Probe ((-not$ordinaryReceipt.confirmation_marker_observed)-and$ordinaryReceipt.command_sha256-ceq$expectedHash-and($ordinaryReceipt|ConvertTo-Json -Depth 12 -Compress).Contains($command)-eq$false) 'console-single-receipt-hash-only'
   $confirmationRecord=Join-Path $consoleRoot 'confirmation-input.txt';$confirmationPid=Join-Path $consoleRoot 'confirmation.pid'
   $confirmation=Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$confirmationRecord,'-PidPath',$confirmationPid,'-Mode','confirmation') -TimeoutSeconds 20 -ConsoleStartup $startup
   $confirmationInput=@(Get-Content -LiteralPath $confirmationRecord)
   $confirmationReceipt=$confirmation.result.console_startup
   Assert-Probe ($confirmation.status-ceq'passed'-and$confirmationInput.Count-eq2-and@($confirmationInput|Where-Object {$_-cne$command}).Count-eq0) 'console-confirmation-replays-same-command'
-  Assert-Probe ($confirmationReceipt.confirmation_marker_observed-and$confirmationReceipt.send_count-eq2-and$confirmationReceipt.sends.Count-eq2-and$confirmationReceipt.sends[0].kind-ceq'command'-and$confirmationReceipt.sends[1].kind-ceq'confirmation-replay'-and$confirmationReceipt.sends[1].order-eq2-and$confirmationReceipt.sends[1].command_sha256-ceq$expectedHash-and$confirmationReceipt.sends[1].elapsed_monotonic_milliseconds-ge$confirmationReceipt.confirmation_elapsed_monotonic_milliseconds) 'console-confirmation-bounded-receipt'
+  $confirmationFirstBoundaries=@($confirmationReceipt.sends[0].output_boundaries);$confirmationReplayBoundaries=@($confirmationReceipt.sends[1].output_boundaries)
+  Assert-Probe ($confirmationReceipt.confirmation_marker_observed-and$confirmationReceipt.send_count-eq2-and$confirmationReceipt.sends.Count-eq2-and$confirmationReceipt.sends[0].kind-ceq'command'-and$confirmationReceipt.sends[1].kind-ceq'confirmation-replay'-and$confirmationReceipt.sends[1].order-eq2-and$confirmationReceipt.sends[1].command_sha256-ceq$expectedHash-and$confirmationReceipt.sends[1].elapsed_monotonic_milliseconds-ge$confirmationReceipt.confirmation_elapsed_monotonic_milliseconds-and$confirmationReceipt.sends[0].output_boundaries_complete-and$confirmationReceipt.sends[1].output_boundaries_complete-and$confirmationFirstBoundaries.Count-eq2-and$confirmationReplayBoundaries.Count-eq2-and$confirmationReplayBoundaries[0].bytes-ge$confirmationFirstBoundaries[0].bytes-and$confirmationReplayBoundaries[1].bytes-ge$confirmationFirstBoundaries[1].bytes) 'console-confirmation-bounded-receipt'
   $invalidLaunch=Join-Path $consoleRoot 'invalid-launch.txt';$invalidPid=Join-Path $consoleRoot 'invalid.pid';$beforeIndex=$Context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command="/c invalid`nsecond";ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-newline]'
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command=('/c '+('x'*16382));ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-command]'
@@ -312,6 +348,7 @@ try {
   Assert-ImportBoundary
   Assert-OwnedChildExitRace
   Assert-FactorioConsoleConfirmationBoundary
+  Assert-FactorioConsolePostFlushBoundaryFailure
   $child=(Get-Command pwsh -ErrorAction Stop).Source
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'zero') -ExpectedPeakMemoryMiB 0} '[mir441-resource-peak-budget-required]'
   $occupied=Join-Path $root 'occupied';[IO.Directory]::CreateDirectory($occupied)|Out-Null;[IO.File]::WriteAllText((Join-Path $occupied 'row'),'x')
