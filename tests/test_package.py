@@ -11,6 +11,8 @@ import unittest
 import zipfile
 import zlib
 
+from mir_test_versions import current_alias, current_source_release
+
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("mir_native_package", ROOT / "tools/package.py")
 pack = importlib.util.module_from_spec(spec)
@@ -34,9 +36,8 @@ F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 class PackageTests(unittest.TestCase):
     def test_source_header_is_a_heading_not_an_entry_mention(self):
-        source_distribution = json.loads(
-            (ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-        source_version = pack.source_changelog_version(source_distribution)
+        source_distribution = current_alias("f210").distribution_version
+        source_version = current_source_release()
         entry = ("-" * 99 + "\nVersion: " + source_version + "\n\n  Changes:\n"
                  "    - Example source label: Version: 5.0.0\n").encode("utf-8")
         files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
@@ -107,9 +108,6 @@ class PackageTests(unittest.TestCase):
 
     def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
         source = ROOT / "source"
-        canonical = json.loads((source / "info.json").read_text(encoding="utf-8"))["version"]
-        major, minor, encoded = canonical.split(".")
-        source_patch = int(encoded) % 100
         published = json.loads((ROOT / "spec/inventory/target-load-order-470.json").read_text())
         dependencies = {row["target"]: row["dependencies"] for row in published["records"]}
         sif_ordering = "? space-is-fake"
@@ -180,10 +178,7 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
-                self.assertEqual(
-                    info["version"],
-                    f"{major}.{minor}.{target[1:]}{source_patch:02d}",
-                )
+                self.assertEqual(info["version"], current_alias(target).distribution_version)
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
                 probability = "independent_probability" if target == "f210" else "probability"
@@ -235,6 +230,9 @@ class PackageTests(unittest.TestCase):
                 editions, _ = pack.read_editions(source)
                 unfiltered_info = json.loads(source_files["info.json"])
                 unfiltered = pack.select_edition(source_files, unfiltered_info, target, editions)
+                # Preserve the independently pinned published filename while
+                # the editable source uses its canonical source-release label.
+                unfiltered[F110_PLUS_MIGRATION] = unfiltered.pop("migrations/more-infinite-research_5.0.0.json")
                 unfiltered["info.json"] = (json.dumps(unfiltered_info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
                 excluded = set()
                 if target != "f210":
@@ -246,6 +244,52 @@ class PackageTests(unittest.TestCase):
                                  {path: value for path, value in unfiltered.items() if path not in excluded})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_canonical_migration_source_keeps_one_published_identity_and_unchanged_bytes(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        self.assertTrue((source / canonical).is_file())
+        self.assertFalse((source / F110_PLUS_MIGRATION).exists())
+        body = (source / canonical).read_bytes()
+        self.assertEqual(hashlib.sha256(body).hexdigest().upper(), F110_PLUS_MIGRATION_SHA256)
+        files = {"info.json": (source / "info.json").read_bytes(), canonical: body}
+        before = dict(files)
+        _, rows = pack.members(source, committed_files=files)
+        emitted = dict(rows)
+        self.assertEqual(files, before, "aliasing mutated caller-owned frozen inputs")
+        self.assertNotIn(canonical, emitted)
+        self.assertEqual(emitted[F110_PLUS_MIGRATION], body)
+        self.assertEqual([name for name in emitted if name.startswith("migrations/")], [F110_PLUS_MIGRATION])
+
+    def test_historical_migration_source_and_foreign_fixture_are_not_rewritten(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        body = (source / canonical).read_bytes()
+        legacy = {"info.json": (source / "info.json").read_bytes(), F110_PLUS_MIGRATION: body}
+        _, rows = pack.members(source, committed_files=legacy)
+        self.assertEqual(dict(rows)[F110_PLUS_MIGRATION], body)
+        self.assertNotIn(canonical, dict(rows))
+        foreign_info = json.loads(legacy["info.json"])
+        foreign_info["name"] = "independent-fixture"
+        foreign = {"info.json": json.dumps(foreign_info).encode(), canonical: body}
+        _, rows = pack.members(source, committed_files=foreign)
+        self.assertIn(canonical, dict(rows))
+        self.assertNotIn(F110_PLUS_MIGRATION, dict(rows))
+
+    def test_ambiguous_migration_aliases_refuse_before_creating_an_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            (source / "migrations").mkdir(parents=True)
+            metadata = (ROOT / "source/info.json").read_bytes()
+            (source / "info.json").write_bytes(metadata)
+            body = b'{"technology": [["laser-turret-speed-8", "laser-shooting-speed-8"]]}\n'
+            for name in ("more-infinite-research_5.0.0.json", "more-infinite-research_5.0.11000.json"):
+                (source / "migrations" / name).write_bytes(body)
+            output = root / ("more-infinite-research_" + json.loads(metadata)["version"] + ".zip")
+            with self.assertRaisesRegex(ValueError, "Ambiguous canonical and published migration"):
+                pack.build(source, output)
+            self.assertFalse(output.exists())
 
     def test_early_target_selection_excludes_all_normal_migration_members(self):
         source = ROOT / "source"
@@ -370,8 +414,9 @@ class PackageTests(unittest.TestCase):
     def test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            package_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-            package_root = "more-infinite-research_" + package_version
+            alias = current_alias("f210")
+            package_version = alias.distribution_version
+            package_root = alias.archive_root
             def git(*arguments):
                 return subprocess.check_output(["git", "-C", str(root), *arguments])
             git("init", "-q")
@@ -415,9 +460,6 @@ class PackageTests(unittest.TestCase):
     def test_staged_and_canonical_target_record_layouts_have_identical_selected_members(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-            major, minor, encoded = source_version.split(".")
-            source_patch = int(encoded) % 100
             staged_repository = temporary / "staged"
             canonical_repository = temporary / "canonical"
             staged_repository.mkdir()
@@ -430,9 +472,10 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210"})
             for target_id, edition in editions.items():
                 with self.subTest(target=target_id):
-                    version = f"{major}.{minor}.{target_id[1:]}{source_patch:02d}"
-                    member_root = "more-infinite-research_" + version
-                    filename = member_root + ".zip"
+                    alias = current_alias(target_id)
+                    version = alias.distribution_version
+                    member_root = alias.archive_root
+                    filename = alias.archive_name
                     staged = pack.build(
                         staged_repository / "source/mir5", staged_repository / "out" / filename,
                         revision=staged_commit, target=target_id, target_record="targets/mir5/editions.json")
@@ -474,8 +517,7 @@ class PackageTests(unittest.TestCase):
 
     def test_every_edition_gets_the_complete_master_history_and_preserves_player_assets(self):
         source = ROOT / "source"
-        source_version = pack.source_changelog_version(
-            json.loads((source / "info.json").read_text(encoding="utf-8"))["version"])
+        source_version = current_source_release()
         recovered = json.loads((ROOT / "spec/inventory/package-presentation-472.json").read_bytes())
         self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
         self.assertEqual(len(recovered["records"]), 9)

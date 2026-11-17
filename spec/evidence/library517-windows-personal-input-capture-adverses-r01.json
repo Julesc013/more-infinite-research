@@ -1,0 +1,308 @@
+{
+  "kind": "MIR517WindowsPersonalInputCaptureAdversesV1",
+  "status": "ADVERSE-capture-timeout-personal-input-unverified",
+  "recorded": "2026-11-17",
+  "requirements": [
+    "RUN-04",
+    "VER-01",
+    "VER-03",
+    "VER-06",
+    "CONT-10"
+  ],
+  "source": {
+    "commit": "051320652fa390b99af9c15162c42b94f7533651",
+    "player_tree": "3f49d4861ee19a56c933b058c6a9b9f662ca94e0",
+    "tree": "8044a752c2e6c03450ab57fbce8e986439ba40b6",
+    "equivalent_integrated_tree_commit": "28f65a7bbfdbfc2a94ec8bbf3bb3111595993d7d"
+  },
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\library-personal-input-source17-r01\\more-infinite-research_5.0.21017.zip",
+    "bytes": 1046436,
+    "sha256": "F3D196FF09187289DF3B4578E998DF3E29687BC74C54EC45A838BE280D5D7C25"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+    "bytes": 49415632,
+    "sha256": "421DA29B40CE3EDD35C5C9516B46469F426218063464BFAC8FA49AA3C9CD39C0"
+  },
+  "base_info": {
+    "path": "D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\data\\base\\info.json",
+    "bytes": 193,
+    "sha256": "9565BEF9FCC0E53C032D0DD238B467CFFE4DED03466F3CF65E8F1D84AAF4637C"
+  },
+  "fixture": {
+    "name": "mir-fixture-library-personal-view-input",
+    "version": "0.1.6",
+    "base": "2.1.24",
+    "mir": "5.0.21017"
+  },
+  "observer": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-input-source17-freeze-r01\\inputs\\mir-fixture-library-personal-view-input_0.1.6.zip",
+    "bytes": 5613,
+    "sha256": "8552BFC2AB9A067045DCF09725CC12977E2C12516016DC385DD6B33C87A256E0"
+  },
+  "selected_mods": [
+    "base@2.1.24",
+    "mir-fixture-library-personal-view-input@0.1.6",
+    "more-infinite-research@5.0.21017"
+  ],
+  "settings_mode": "Defaults",
+  "protected_source_seed": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-input-source17-freeze-r01\\inputs\\protected-source14-base2123-seed.zip",
+    "bytes": 171150,
+    "sha256": "C6501B18DD0EF5E30F27D853D0914DA15D607C570C7DD597EBB59E3ABD01DEC5"
+  },
+  "source_seed_scope": {
+    "engine_version": "2.1.23",
+    "mir_version": "5.0.21014",
+    "producer_record": "spec/evidence/library514-public-server-export-native-r01.json",
+    "frozen_copy_record": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-input-source17-freeze-r01\\FIXTURE-AND-SEED-r01.json",
+    "scope": "Recorded fresh Base-only natural-create seed, with no players. Prospective engine/mod upgrade to2.1.24/MIR17; no unchanged-engine, paid-history or Sage incident claim."
+  },
+  "resources": {
+    "native_gui_clients": 1,
+    "serial_peak_mib": 4096,
+    "max_new_output_mib": 512,
+    "scenario": "one Base-only real Library personal-view client; preserves matched renderer declaration and canonical reserves; separate from Foundation8192MiB"
+  },
+  "timeout_seconds": 240,
+  "requested_window_size": "2560x1440",
+  "observed_viewport": null,
+  "attempts": [
+    {
+      "owner_revision": "r05",
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\EXECUTION-PLAN-r05.json",
+        "bytes": 7373,
+        "sha256": "94D590262CB883BBC570388A13AC5551F5901998EA884FF5CAD718169F616FAA"
+      },
+      "owner": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\Invoke-PersonalViewCapture-r05.ps1",
+        "bytes": 21490,
+        "sha256": "CCCA07C6051FD0A8A11A2D1AB1AF453F94A5F9E56AA573210A2B90DECCAE4B5B"
+      },
+      "process": {
+        "process_id": 145520,
+        "process_start_utc": "2026-11-17T01:45:45.1077362Z",
+        "executable": "D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+        "engine_sha256": "421DA29B40CE3EDD35C5C9516B46469F426218063464BFAC8FA49AA3C9CD39C0",
+        "owner_started_utc": "2026-11-17T01:45:44.7305918+00:00"
+      },
+      "native_processes": 1,
+      "endpoint": "supervised identity-bound abort; not natural success",
+      "governed_status": "interrupted",
+      "window": {
+        "id": 160694700,
+        "app": "process:D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+        "title": "Factorio 2.1.24"
+      },
+      "agent_capture_calls": 1,
+      "agent_activation_calls": 0,
+      "agent_mouse_key_text_calls": 0,
+      "screenshots_returned": 0,
+      "fixture_phase_receipts": 0,
+      "capture_error": "window capture timed out: timed out waiting on channel",
+      "fixture_initialization_marker": null,
+      "result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native\\result.json",
+        "bytes": 6239,
+        "sha256": "E2D747BBE657C79688468F02D6CF5E1258A0A3030C567AEC89923D103D058190"
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native\\process-1.resources.jsonl",
+        "bytes": 14987,
+        "sha256": "63C5FF5602DF79C832C51D21BA01E17FE44F61430B5251950B23E290934CAC6D"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native\\process-1.stdout.txt",
+        "bytes": 15629,
+        "sha256": "616E3092CFF89EC82A9D2170003F8A2AE3F3B3C590022C88B4924C2E388D6518"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "agent_action_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native\\desktop-input-actions.jsonl",
+        "bytes": 497,
+        "sha256": "881FA76EE13E4FE3D15C77E16AF81028FD3A2CDF0024DFC95A07990D99ED5079"
+      },
+      "independent_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-review-r01\\INDEPENDENT-RESULT-REVIEW-r01.json",
+        "bytes": 5395,
+        "sha256": "6341C600444BB3E16E3469614A34934BA340BD9C2B647ECD7AE3BAF9D440317D"
+      },
+      "library_rows_restored": 5,
+      "seeds_unchanged": true,
+      "factorio_zero": true,
+      "cleanup_errors": []
+    },
+    {
+      "owner_revision": "r06",
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\EXECUTION-PLAN-r06.json",
+        "bytes": 8220,
+        "sha256": "346A66C4FF18AB21A82D9E904BF0965F8AA2EB66760617698DEE137B68916D80"
+      },
+      "owner": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\Invoke-PersonalViewCapture-r06.ps1",
+        "bytes": 24040,
+        "sha256": "2C9D8921652FD1E8B33B9D25991391A1C8627EC39FDD1463F98DE42D7F4809B2"
+      },
+      "process": {
+        "process_id": 15176,
+        "process_start_utc": "2026-11-17T02:30:09.7761088Z",
+        "executable": "D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+        "engine_sha256": "421DA29B40CE3EDD35C5C9516B46469F426218063464BFAC8FA49AA3C9CD39C0",
+        "owner_started_utc": "2026-11-17T02:30:09.6036020+00:00"
+      },
+      "native_processes": 1,
+      "endpoint": "supervised identity-bound abort; not natural success",
+      "governed_status": "interrupted",
+      "window": {
+        "id": 41879184,
+        "app": "process:D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+        "title": "Factorio 2.1.24"
+      },
+      "agent_capture_calls": 1,
+      "agent_activation_calls": 1,
+      "agent_mouse_key_text_calls": 0,
+      "screenshots_returned": 0,
+      "fixture_phase_receipts": 0,
+      "capture_error": "window capture timed out: timed out waiting on channel",
+      "fixture_initialization_marker": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\write-data\\factorio-current.log",
+        "line": "  13.363 Script @__mir-fixture-library-personal-view-input__/control.lua:519: [MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-personal-view-input@0.1.6|more-infinite-research@5.0.21017",
+        "line_sha256": "4ED154D409B0257A34891E47AD3E9647B15C2A3A07A50DB4F51A78431B3B0796",
+        "tuple": "base@2.1.24|mir-fixture-library-personal-view-input@0.1.6|more-infinite-research@5.0.21017"
+      },
+      "result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\result.json",
+        "bytes": 6800,
+        "sha256": "4017E9057B1EC2D837F0D1B22F695A0030116C8307F2BA367E4CD1BF329BCFB4"
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\process-1.resources.jsonl",
+        "bytes": 20533,
+        "sha256": "A4E56B2A5B2F9D7EB898C1572C694E26552E337B3CD16A8316D31DEE1E3229C7"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\process-1.stdout.txt",
+        "bytes": 18992,
+        "sha256": "EE35DACE3D985E013B4F8C3AED52260AB1B2815D8F8941D26C35229DAFCBDE99"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "agent_action_log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native\\desktop-input-actions.jsonl",
+        "bytes": 700,
+        "sha256": "39656A95F186C0757480F079C7FABD5F40A350BAC02FDDBAA130342F4ECE4C0F"
+      },
+      "independent_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-review-r01\\INDEPENDENT-RESULT-REVIEW-r02.json",
+        "bytes": 4603,
+        "sha256": "E3E21ED1BFC345090035D05AB96B0FF674DAACBA77607D76BDE47529CA38BC22"
+      },
+      "library_rows_restored": 5,
+      "seeds_unchanged": true,
+      "factorio_zero": true,
+      "cleanup_errors": []
+    }
+  ],
+  "actual_counts": {
+    "factorio_processes": 2,
+    "successful_desktop_images": 0,
+    "agent_mouse_key_text_calls": 0,
+    "completed_personal_input_sequences": 0,
+    "fixture_phase_receipts": 0
+  },
+  "post_run_input_readbacks": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\POST-EXECUTE-INPUT-PINS-r01.json",
+      "bytes": 5353,
+      "sha256": "85489C6230507C4AB4875D9012F2B11B8C55BCF48BD8DE5AD4CF17267BA675D1"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\POST-EXECUTE-INPUT-PINS-r02.json",
+      "bytes": 5331,
+      "sha256": "065ECA93CB3DBD18D0C25A6EFEE7C966EEEF3987481F4DEC460C7B172AC37136"
+    }
+  ],
+  "agent_attempt_facts": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\ROOT-SKY-ATTEMPT-FACTS-r01.json",
+    "bytes": 4736,
+    "sha256": "377E8B120509106D15FA812FC2B32C73C108108BF2AEFAA54793CB5F5D3ADA7F"
+  },
+  "observations": [
+    "The first capture was requested during startup; its final log evidence stops in sprite loading, without fixture initialization or map/script-init evidence.",
+    "The successor required one complete fixture-owned runtime tuple before requesting capture. It observed the map/script load and exact tuple, then activated its returned owned window and requested one capture.",
+    "Each capture call timed out without returning an image. No mouse, key, text, seven-action sequence, or passive phase receipt followed.",
+    "Both explicit aborts retained actual governed process/stream/ledger identity and restored all five library rows and both protected seed bodies. All eleven declared input bodies per run rehashed unchanged; Factorio count is zero.",
+    "An earlier zero-native composition failed before installation because the reused archive helper lacked its caller context. Its adverse receipt and false restoration flag are preserved; explicit bindings and a real-helper control precede the corrected compositions."
+  ],
+  "composition_adverse_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-review-r01\\ACTUAL-COMPOSE-ADVERSE-REVIEW-r04.json",
+    "bytes": 3208,
+    "sha256": "FF9C89E50BD5581B03DAE3C8BEDD8595BEDE0F23F8773F1386B92A32B8AC3527"
+  },
+  "composition_results": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\COMPOSE-r05-r01.json",
+      "bytes": 4242,
+      "sha256": "FCB6A87197D6AA8FE359560B8DA4AFE0CF9FE419E0E72FB2FEC82216799C3B2B"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01\\COMPOSE-r06-r01.json",
+      "bytes": 4242,
+      "sha256": "D1B2CA1EE2DFAFC84061FED50D96AE1D2AED3C436D92B5330C8957C8ACA8EDFF"
+    }
+  ],
+  "qualification": {
+    "reviewed_adverse_and_abort_restoration_only": true,
+    "personal_input": false,
+    "visual": false,
+    "save_or_upgrade_safety": false,
+    "native_functional_output": false,
+    "client_or_multiplayer": false,
+    "performance": false,
+    "stable": false
+  },
+  "limits": [
+    "The readiness marker establishes fixture initialization, not visible UI correctness or completed migration/gameplay acceptance.",
+    "No cause is assigned to the capture timeout. Blank or locked desktop, MIR fault, and general capture-helper failure are not inferred.",
+    "No helper reset, alternate capture, or further capture under unchanged conditions is authorized by this result.",
+    "The existing qualified F200 English/German renderer remains bound to its original package8827/source075; this record does not relabel it for the new source.",
+    "Published14/15/16 bytes remain fixed. This private17 artifact is not a release or stable-completion verdict."
+  ],
+  "raw_custody": {
+    "local_packet": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-personal-view17-blackglass-r01",
+    "local_native_roots": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r01-native",
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-personal-view17-f210-r02-native"
+    ],
+    "private_remote_status": "fresh-remote-index-and-all-bodies-independently-read-back",
+    "repository": "Julesc013/scratchpad",
+    "repository_private_verified": true,
+    "commit": "c2ebf4be816bc85349be1b1ef6da2ae5a7af3119",
+    "tree": "eb0599f8d2c5b25825b49ad9477b7701468cffb0",
+    "index_path": "projects/mir/runs/mir517-audit-input-adverse-blackglass-r01/private-capsule-index.json",
+    "index_blob": "621add85755fcf4048fd03e5d587e8f893a0611c",
+    "index_sha256": "F19BE7B76EBEB92709C25A7ED11E3B62C82AF19B951F52B4AF128B9828B4CC99",
+    "capsule_path": "projects/mir/runs/mir517-audit-input-adverse-blackglass-r01/original-bodies.json.gz",
+    "capsule_blob": "71097f0c710fdeeee36b5160d528b5804e964295",
+    "capsule_bytes": 2321843,
+    "capsule_sha256": "97E175EAE5AD14B9EC8358EBE3976A72698A238A5E983A4BC94D299EA3BA7CB8",
+    "retained_rows": 275,
+    "unique_bodies": 211,
+    "retained_bytes": 5368153,
+    "independent_readback": {
+      "path": "build/qualification/mir517-audit-input-adverse-private-r01/ROOT-INDEPENDENT-REMOTE-READBACK-r01.json",
+      "sha256": "C1ED3EE196346D42409947DA55B7FF8CB9398051E0CD3E18FB163FD841A1266E"
+    },
+    "limits": "Only the closed whitelist is transported. Engine executable and input seed ZIP bodies remain excluded exact references; the three protected input seed copies rehash locally. Public claim/review documents written after capture are outside this private capsule."
+  }
+}

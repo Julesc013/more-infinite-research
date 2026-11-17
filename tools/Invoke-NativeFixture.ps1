@@ -55,6 +55,45 @@ function Assert-Fixture([bool]$Condition,[string]$Message) {
 function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
+function New-FixtureWorkingInputSave([string]$InputSave,[string]$ExpectedSha256,$Resources) {
+  $source=(Resolve-Path -LiteralPath $InputSave).Path
+  $expected=$ExpectedSha256.ToUpperInvariant()
+  $sourceItem=Get-Item -LiteralPath $source -Force
+  Assert-Fixture ($sourceItem -is [IO.FileInfo] -and $sourceItem.Length -gt 0 -and (Get-FixtureSha $source) -ceq $expected) 'protected input save changed before working-copy admission'
+  $root=[IO.Path]::GetFullPath([string]$Resources.root)
+  Assert-Fixture ((Test-Path -LiteralPath $root -PathType Container) -and -not (($sourceItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)) 'working input save root or protected source differs'
+  $working=[IO.Path]::GetFullPath((Join-Path $root 'input-save-working.zip'))
+  $comparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
+  Assert-Fixture ($working.StartsWith($root.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar,$comparison) -and -not (Test-Path -LiteralPath $working)) 'working input save path is not a fresh owned child'
+  $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Resources
+  Assert-Fixture ([int64]$sourceItem.Length -lt [int64]$remaining) 'working input save exceeds the declared native output budget'
+  $sourceStream=$null;$workingStream=$null;$created=$false;$copyFailure=$null
+  try {
+    $sourceStream=[IO.File]::Open($source,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+    $workingStream=[IO.File]::Open($working,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $created=$true
+    $sourceStream.CopyTo($workingStream)
+    $workingStream.Flush($true)
+  } catch {
+    $copyFailure=$_
+  } finally {
+    if($null -ne $workingStream){$workingStream.Dispose()}
+    if($null -ne $sourceStream){$sourceStream.Dispose()}
+  }
+  if($null -ne $copyFailure){
+    if($created -and (Test-Path -LiteralPath $working -PathType Leaf)){Remove-Item -LiteralPath $working -Force}
+    throw $copyFailure
+  }
+  try {
+    $workingItem=Get-Item -LiteralPath $working -Force
+    Assert-Fixture ($workingItem -is [IO.FileInfo] -and $workingItem.Length -eq $sourceItem.Length -and (Get-FixtureSha $source) -ceq $expected -and (Get-FixtureSha $working) -ceq $expected) 'working input save byte verification differs'
+    $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Resources
+    return [ordered]@{mode='copy';protected_path=$source;protected_sha256=$expected;protected_bytes=[int64]$sourceItem.Length;path=$working;sha256=$expected;bytes=[int64]$workingItem.Length}
+  } catch {
+    if(Test-Path -LiteralPath $working -PathType Leaf){Remove-Item -LiteralPath $working -Force}
+    throw
+  }
+}
 function Get-FixtureSettingsArguments([Collections.IDictionary]$ProfileDefinition,[string]$Path,[string]$Sha256,[bool]$RestrictedMode,[string]$InputSave,[string]$Case) {
   $mode=if($ProfileDefinition.Contains('settings_mode')){[string]$ProfileDefinition.settings_mode}else{'Defaults'}
   if(-not $Path -and -not $Sha256){
@@ -861,7 +900,7 @@ $record=[ordered]@{
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
   observation=if($CreateOnly){'native-create-runtime-load-only'}elseif($activeSeed){'native-active-save-preparation-only'}else{'native-fixture-production-and-two-cold-reloads'}
   max_new_output_mib=$MaxNewOutputMiB
-  input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
+  input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant();bytes=[int64](Get-Item -LiteralPath $inputSave -Force).Length}}else{$null}
   release_qualification=$false
 }
 if($selectedSettings.SettingsMode -ceq 'File'){$record.settings=@{mode='File';path=$selectedSettings.SettingsPath;sha256=$selectedSettings.SettingsSha256}}
@@ -877,6 +916,14 @@ try{
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
+  $workingInputSave=$null
+  if($inputSave){
+    # A retained source save is provenance, never the engine's writable
+    # --start-server argument.  The copy is ordinary context output, so the
+    # existing resource ledger charges it before any Factorio process begins.
+    $workingInputSave=New-FixtureWorkingInputSave -InputSave $inputSave -ExpectedSha256 $ExpectedInputSaveSha256 -Resources $resources
+    $record.input_save_working_copy=$workingInputSave
+  }
   $config=Join-Path $resources.root 'config.ini'
   if($historicalProcess){
     # Older engines use the retained direct-library minimal form.  Do not
@@ -908,7 +955,7 @@ try{
     $record.active_mods_observer=[ordered]@{name=[string]$actualObserver.name;version=[string]$actualObserver.version;source=[string]$activeModsObserverBinding.source;archive=[string]$actualObserver.path;sha256=Get-FixtureSha ([string]$actualObserver.path)}
   }
   $activeSave=if($activeSeed){Join-Path $writeData 'saves/mir5-native-active.zip'}else{$null}
-  $seed=$inputSave
+  $seed=if($null -ne $workingInputSave){[string]$workingInputSave.path}else{$null}
   if(-not $seed){
     # `game.server_save` does not write from Factorio's single-player
     # --create context.  Repair's active preparation therefore earns its
@@ -1023,6 +1070,11 @@ try{
     if($inputSave){
       $record.input_save_byte_identical=(Get-FixtureSha $inputSave) -ceq $ExpectedInputSaveSha256.ToUpperInvariant()
       Assert-Fixture $record.input_save_byte_identical 'native fixture changed the supplied historical save'
+    }
+    if($null -ne $workingInputSave){
+      Assert-Fixture (Test-Path -LiteralPath $workingInputSave.path -PathType Leaf) 'native fixture working input save is absent after engine execution'
+      $finalItem=Get-Item -LiteralPath $workingInputSave.path -Force
+      $record.input_save_working_copy_final=@{path=[string]$workingInputSave.path;sha256=Get-FixtureSha $workingInputSave.path;bytes=[int64]$finalItem.Length}
     }
   }catch{
     $record.library_control_restoration_failure=$_.Exception.Message

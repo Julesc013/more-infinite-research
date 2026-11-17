@@ -10,6 +10,7 @@ import sys
 import unittest
 from native_credit_oracle import legacy_cannon_credit_rows, legacy_module_credit_rows, native_credit_carrier_rows
 from worker_storage_recovery_fixture import expected_private_worker_row
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,29 +22,6 @@ UPSTREAM_RAW_SHA256 = {
     "se": "24B2518F425CD57DAE869D37D0D6ED468F011B228B8D357E039306E59CE00BBD",
     "k2se": "53D55E243F1E2B5A7D861E736F12D16D4356E56A6FAF0EC28C0B76C78E06074F",
 }
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
-
-
-def _plain(value):
-    if not hasattr(value, "items"):
-        return value
-    items = dict(value.items())
-    if items and set(items) == set(range(1, len(items) + 1)):
-        return [_plain(items[index]) for index in range(1, len(items) + 1)]
-    return {key: _plain(nested) for key, nested in items.items()}
 
 
 def _sha256(path: Path) -> str:
@@ -118,14 +96,16 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         return lua
 
     def test_asset_only_k2_archives_do_not_deactivate_space_exploration(self):
-        baseline = _plain(self.stage("se").globals().emitted)
+        baseline_lua = self.stage("se")
+        baseline = _plain(baseline_lua, baseline_lua.globals().emitted)
         active = deepcopy(self.context["cases"]["se"]["selection"])
         active.update({"Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7"})
-        self.assertEqual(baseline, _plain(self.stage("se", mods=active).globals().emitted))
+        active_lua = self.stage("se", mods=active)
+        self.assertEqual(baseline, _plain(active_lua, active_lua.globals().emitted))
 
     def assert_pipeline_rows(self, case):
         lua = self.stage(case)
-        emitted = _plain(lua.globals().emitted).get("technology", {})
+        emitted = _plain(lua, lua.globals().emitted).get("technology", {})
         expected = self.facts["captures"][case]["technologies"]
         boundary = self.context["pre_engine_prerequisite_boundary"]
         pre_engine_prerequisites = (
@@ -257,17 +237,19 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
             self.assertNotEqual(frozen["prerequisites"][name], expected_native_se[name], name)
 
     def test_nondefault_stream_setting_is_applied_and_declared_cap_remains_bounded(self):
-        default = _plain(self.stage("se").globals().emitted)["technology"]["recipe-prod-research_belts-1"]
-        configured = _plain(self.stage("se", {
+        default_lua = self.stage("se")
+        default = _plain(default_lua, default_lua.globals().emitted)["technology"]["recipe-prod-research_belts-1"]
+        configured_lua = self.stage("se", {
             "ips-effect-per-level-research_belts": {"value": 17},
             "ips-cost-growth-research_belts": {"value": 3},
-        }).globals().emitted)["technology"]["recipe-prod-research_belts-1"]
+        })
+        configured = _plain(configured_lua, configured_lua.globals().emitted)["technology"]["recipe-prod-research_belts-1"]
         default_effects = [effect["change"] for effect in default["effects"] if effect["type"] == "change-recipe-productivity"]
         configured_effects = [effect["change"] for effect in configured["effects"] if effect["type"] == "change-recipe-productivity"]
         self.assertTrue(default_effects)
         self.assertEqual([value * 1.7 for value in default_effects], configured_effects)
         lua = self.stage("se")
-        settings = _plain(lua.execute('return require("research.settings").prototypes()'))
+        settings = _plain(lua, lua.execute('return require("research.settings").prototypes()'))
         growth = next(row for row in settings if row["name"] == "ips-cost-growth-research_belts")
         effect = next(row for row in settings if row["name"] == "ips-effect-per-level-research_belts")
         self.assertEqual(1000, growth["maximum_value"])
@@ -279,7 +261,8 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         original = self.context["cases"]["se"]["raw"]
         self.context["cases"]["se"]["raw"] = broken
         try:
-            emitted = _plain(self.stage("se").globals().emitted)["technology"]
+            lua = self.stage("se")
+            emitted = _plain(lua, lua.globals().emitted)["technology"]
             advanced_circuit = emitted["recipe-prod-research_advanced_circuit-1"]
             self.assertNotIn(
                 "se-recycle-substation",

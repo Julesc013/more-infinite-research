@@ -115,24 +115,6 @@ local function legacy_emission(event, route)
     and (row.selected == "infinite" or integer(row.selected))
 end
 
-local function legacy_preflight(event, route)
-  local prior = checked(storage[KEY])
-  if prior ~= nil then
-    if not same(prior, route) then refuse("finite endpoint or creator changed", route) end
-    return nil
-  end
-  if route == nil then return nil end
-  checked({schema=1, route=route})
-  local changes = type(event) == "table" and event.mod_changes
-  local mir = type(changes) == "table" and changes[MIR]
-  local first_install = type(mir) == "table" and mir.old_version == nil
-    and script and script.active_mods and mir.new_version == script.active_mods[MIR]
-  if not first_install and not legacy_emission(event, route) then
-    refuse("previous continuation ownership is unknown", route)
-  end
-  return {schema=1, route=copy(route)}
-end
-
 local function legacy_apply(plan)
   if plan ~= nil then storage[KEY] = plan end
 end
@@ -149,6 +131,7 @@ local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local target = require("platform.target")
 local effective_values = require("runtime.configuration")
+local configuration_context = require("runtime.configuration_change_context")
 local pending = false
 local default_head_pending = false
 local default_mutating_force
@@ -199,21 +182,6 @@ local function same_family_engine_patch(event)
 end
 
 local function history_context(event, route, state, current, rejected)
-  local function value(item)
-    if type(item) == "string" then
-      return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
-        return string.format("\\x%02X", string.byte(byte))
-      end))
-    end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "unknown"
-  end
-  local function rejected_value(item)
-    if item == nil then return "absent" end
-    if type(item) == "string" then return value(item) end
-    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
-    return "malformed-" .. type(item)
-  end
   local details = type(event) == "table" and event or {}
   local changes = details.mod_changes
   local mir = type(changes) == "table" and changes[MIR]
@@ -222,31 +190,19 @@ local function history_context(event, route, state, current, rejected)
   local active = script and script.active_mods or {}
   local saved = state == nil and "absent" or state.schema == 1 and "finite"
     or state.kind == "prepared" and "prepared-" .. state.phase or state.current.kind
-  local parts = {"previous_mir=" .. value(previous),
-    "new_mir=" .. value(type(mir) == "table" and mir.new_version or active[MIR]),
-    "startup_changed=" .. value(details.mod_startup_settings_changed),
-    "saved_route=" .. value(saved),
-    "current_route=" .. value(current and current.kind or route and "finite" or "unobserved")}
+  local parts = {"previous_mir=" .. configuration_context.value(previous),
+    "new_mir=" .. configuration_context.value(type(mir) == "table" and mir.new_version or active[MIR]),
+    "startup_changed=" .. configuration_context.value(details.mod_startup_settings_changed),
+    "saved_route=" .. configuration_context.value(saved),
+    "current_route=" .. configuration_context.value(current and current.kind or route and "finite" or "unobserved")}
   for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
     local change = type(changes) == "table" and changes[name]
     if type(change) == "table" then
-      if getmetatable(change) == nil then
-        parts[#parts + 1] = name .. "=" .. value(rawget(change, "old_version")) .. "->" .. value(rawget(change, "new_version"))
-      else
-        parts[#parts + 1] = name .. "=malformed-table"
-      end
+      parts[#parts + 1] = configuration_context.row_pair(name, change)
     end
   end
   if rejected ~= nil then
-    local row = rejected.row
-    local function row_value(record, key)
-      if type(record) ~= "table" or getmetatable(record) ~= nil then return "malformed-" .. type(record) end
-      return rejected_value(rawget(record, key))
-    end
-    parts[#parts + 1] = "rejecting_mod_name=" .. rejected_value(rejected.name)
-    parts[#parts + 1] = "rejecting_old_version=" .. row_value(row, "old_version")
-    parts[#parts + 1] = "rejecting_new_version=" .. row_value(row, "new_version")
-    parts[#parts + 1] = "rejecting_active_version=" .. rejected_value(rejected.active_version)
+    for _, field in ipairs(configuration_context.rejected_fields(rejected)) do parts[#parts + 1] = field end
   end
   return " [" .. table.concat(parts, " ") .. "]"
 end
@@ -257,6 +213,26 @@ local function recover_error(reason, route, event, state, current, rejected)
     .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
     .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
     .. " verified history; this command cannot infer it", route)
+end
+
+local function legacy_preflight(event, route)
+  local prior = checked(storage[KEY])
+  if prior ~= nil then
+    if not same(prior, route) then refuse("finite endpoint or creator changed", route) end
+    return nil
+  end
+  if route == nil then return nil end
+  checked({schema=1, route=route})
+  local changes = type(event) == "table" and event.mod_changes
+  local mir = type(changes) == "table" and changes[MIR]
+  local first_install = type(mir) == "table" and mir.old_version == nil
+    and script and script.active_mods and mir.new_version == script.active_mods[MIR]
+  if not first_install and not legacy_emission(event, route) then
+    -- Enrich the actual refusal here; unexpected lookup errors keep their
+    -- original identity and must never be classified from their prose.
+    recover_error("previous continuation ownership is unknown", route, event)
+  end
+  return {schema=1, route=copy(route)}
 end
 
 local function fields(value, allowed)
@@ -550,14 +526,7 @@ function M.preflight(event, route, owner_plan)
     checked({schema=1, route=route})
     plan = {schema=1, route=copy(route)}
   else
-    local ok, result = pcall(legacy_preflight, event, route)
-    if not ok then
-      if tostring(result):find("previous continuation ownership is unknown", 1, true) then
-        recover_error("previous continuation ownership is unknown", route, event, state)
-      end
-      error(result, 0)
-    end
-    plan = result
+    plan = legacy_preflight(event, route)
   end
   local empty = empty_private()
   if #empty > 0 then return {recovery=true, legacy=plan, empty=empty} end
@@ -651,9 +620,9 @@ local DEFAULT_ORIGINS = {
     ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
--- This schema-2/default preparation is the published11 producer contract,
--- not evidence that any earlier or current package created the witness.
-local PREPARED_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
+-- These exact published11 producers support schema-2/default preparation
+-- and the separately checked, uninvested Base+MIR admission below.
+local PUBLISHED11_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -720,9 +689,10 @@ local function owner_record()
   local older_idle = value.producer.kind == "published473-idle-default"
   local published_default = value.producer.kind == "published473-default"
   local prepared_default = value.producer.kind == "prepared-default"
+  local published11_empty = value.producer.kind == "published511-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default)
+      and not older_empty and not older_idle and not published_default and not published11_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -739,9 +709,9 @@ local function owner_record()
       or older_idle and value.producer.old_version ~= "4.7.20003"
       or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
-      or prepared_default and value.producer.old_version ~= PREPARED_DEFAULT_ORIGINS[edition]
+      or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
@@ -821,6 +791,35 @@ local function older_default_origin(event, change, active, base_hop)
   return {kind="published473-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
+local function published11_empty_origin(event, change, active)
+  -- Published11 Base+MIR always authored infinite C4, even when disabled or
+  -- capped. It could leave an inherited save without a route record. Rebuild
+  -- that exact prior selection; an unchanged foreign mod is not an addition.
+  -- Settings need not be reconstructed only because every force must still
+  -- prove zero worker investment before this producer can be committed.
+  if type(change) ~= "table" or getmetatable(change) ~= nil
+      or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]
+      or producer_edition(active[MIR]) ~= target.id
+      or tonumber(change.old_version:sub(-2)) > tonumber(active[MIR]:sub(-2))
+      or getmetatable(event.mod_changes) ~= nil then return nil end
+  for name, item in pairs(event.mod_changes) do
+    if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then return nil end
+    local old, new = item.old_version, item.new_version
+    if type(new) ~= "string" or new == "" or new ~= active[name]
+        or old ~= nil and (type(old) ~= "string" or old == "")
+        or name ~= "base" and name ~= MIR and old ~= nil then return nil end
+  end
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR then
+      if ENGINE_MODS[name] or type(version) ~= "string" or version == "" then return nil end
+      local addition = event.mod_changes[name]
+      if type(addition) ~= "table" or addition.old_version ~= nil or addition.new_version ~= version then return nil end
+    end
+  end
+  if not same_family_engine_patch(event) then return nil end
+  return {kind="published511-empty-default", old_version=change.old_version, new_version=active[MIR]}
+end
+
 local function default_origin(event, initializing, state)
   local active = script and script.active_mods or {}
   if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
@@ -838,16 +837,20 @@ local function default_origin(event, initializing, state)
     recover_error("default transfer package-change event is inconsistent")
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
-  if state == nil and event.mod_startup_settings_changed ~= false
-      and not (base_hop and change.old_version == "4.7.20003") then
-    recover_error("unrecorded default source requires unchanged startup settings")
-  end
   local new_selection = false
   for name, item in pairs(event.mod_changes) do
     -- Refuse malformed event rows below without invoking their metamethods.
     if name ~= MIR and type(item) == "table" and getmetatable(item) == nil and rawget(item, "old_version") == nil then
       new_selection = true
     end
+  end
+  if state == nil and (event.mod_startup_settings_changed == true or new_selection) then
+    local empty = published11_empty_origin(event, change, active)
+    if empty then return empty end
+  end
+  if state == nil and event.mod_startup_settings_changed ~= false
+      and not (base_hop and change.old_version == "4.7.20003") then
+    recover_error("unrecorded default source requires unchanged startup settings")
   end
   if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
       or change.old_version == "5.0.20001" and new_selection) then
@@ -861,7 +864,7 @@ local function default_origin(event, initializing, state)
       recover_error("legacy prepared/finite conversion is not a default-owner transfer")
     end
     if prepared and base_hop then recover_error("prepared default engine hop remains unqualified") end
-    if prepared and (not change or change.old_version ~= PREPARED_DEFAULT_ORIGINS[target.id]) then
+    if prepared and (not change or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]) then
       recover_error("prepared default requires its published11 producer package event", nil, event, state, {kind="default"})
     end
     -- This saved fact authenticates the old MIR default. The caller also
@@ -1113,6 +1116,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       if (initializing or refresh) and (source.next_level ~= 4 or source.researched
           or source.saved_progress ~= 0 or source.occurrences ~= 0) then
         recover_error("first initialization/new force cannot adopt existing default work")
+      end
+      if not owned and producer.kind == "published511-empty-default"
+          and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
+            or source.occurrences ~= 0 or source.current == recovery.canonical) then
+        recover_error("published11 empty default source has invested or queued worker work")
       end
       if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
         if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then

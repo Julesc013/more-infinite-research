@@ -83,12 +83,39 @@ class WorkerStorageHistoryTests(unittest.TestCase):
 
     def test_unknown_prior_save_is_not_inferred_from_current_prototype_or_version(self):
         self.lua.execute(r'''
+          local writes=0
+          storage=setmetatable({}, {__newindex=function()
+            writes=writes+1;error("unknown legacy history wrote storage",0)
+          end})
           for _,old in ipairs({"5.0.21008","4.7.21003","4.7.20003"}) do
             local ok,message=pcall(history.preflight,upgrade(old),route(4))
             assert(not ok and tostring(message):find("previous continuation ownership is unknown",1,true))
-            assert(storage.mir_worker_storage_route==nil)
+            assert(tostring(message):find("previous_mir="..old,1,true))
+            assert(tostring(message):find("new_mir=5.0.21009",1,true))
+            assert(tostring(message):find("saved_route=absent",1,true) and tostring(message):find("current_route=finite",1,true))
+            assert(rawget(storage,"mir_worker_storage_route")==nil and writes==0)
           end
           assert(history.preflight(upgrade("5.0.21008"),nil)==nil)
+        ''')
+
+    def test_late_checked_route_lookup_keeps_its_exact_error_without_history_enrichment(self):
+        self.lua.execute(r'''
+          local writes=0
+          storage=setmetatable({}, {__newindex=function()
+            writes=writes+1;error("late checked route lookup wrote storage",0)
+          end})
+          local candidate=setmetatable({technology="worker-robots-storage-5",
+            predecessor="worker-robots-storage-4",owned=true,legacy_compatible=true,
+            finite={{name="worker-robots-storage-4",max_level=4,provider="foreign-finite"}}},
+            {__index=function(_,key)
+              assert(key=="level")
+              error("late checked route lookup: previous continuation ownership is unknown",0)
+            end})
+          local ok,observed=pcall(history.preflight,upgrade("5.0.21008"),candidate)
+          assert(not ok and observed=="late checked route lookup: previous continuation ownership is unknown")
+          assert(not tostring(observed):find("MIR-WORKER-HISTORY",1,true))
+          assert(not tostring(observed):find("previous_mir=",1,true))
+          assert(rawget(storage,"mir_worker_storage_route")==nil and writes==0)
         ''')
 
     def test_exact_transported_legacy_emission_is_admitted_but_lookalikes_are_not(self):
@@ -113,6 +140,27 @@ class WorkerStorageHistoryTests(unittest.TestCase):
           selected.legacy_compatible=false
           assert(not pcall(history.preflight,upgrade("4.7.21003"),selected))
           assert(storage.mir_worker_storage_route==nil)
+        ''')
+
+    def test_unexpected_legacy_read_error_is_not_classified_by_its_prose(self):
+        self.lua.execute(r'''
+          local rendered=0
+          local opaque=setmetatable({}, {__tostring=function()
+            rendered=rendered+1
+            return "decoy: previous continuation ownership is unknown"
+          end})
+          for _,failure in ipairs({"decoy: previous continuation ownership is unknown", opaque,
+              "unrelated legacy lookup failure"}) do
+            local writes=0
+            storage=setmetatable({}, {
+              __index=function(_,key) if key=="mir" then error(failure,0) end end,
+              __newindex=function() writes=writes+1;error("unexpected history write",0) end})
+            local before=storage
+            local ok,observed=pcall(history.preflight,upgrade("4.7.21003"),route(9))
+            assert(not ok and observed==failure,"unexpected read error was replaced")
+            assert(storage==before and rawget(storage,"mir_worker_storage_route")==nil and writes==0)
+          end
+          assert(rendered==0,"unexpected error was rendered for classification")
         ''')
 
     def test_malformed_saved_chain_is_rejected(self):
@@ -2367,7 +2415,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                       assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
                     ''')
 
-    def test_empty_unchanged_qol_accepts_but_added_removed_updated_and_official_mismatch_refuse(self):
+    def test_empty_unchanged_and_published11_added_qol_accept_but_changed_prior_selection_refuses(self):
         for target in ("f200","f210"):
             for opponent in ("unchanged","added","removed","updated","official"):
                 lua=self.world(target);lua.globals().opponent=opponent
@@ -2385,7 +2433,19 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   local before=all_frames();writes=0
                   local ok,plan=pcall(history.plan_default_owner_transfer,event,nil,false)
                   assert(writes==0 and same(before,all_frames()))
-                  if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
+                  -- Published11 authored infinite C4 even when capped or disabled.
+                  -- Its proved prior Base+MIR selection and empty native frames
+                  -- admit this addition without inferring a previous work contract.
+                  if opponent=="unchanged"or opponent=="added"then
+                    local kind=opponent=="added"and"published511-empty-default"or"unchanged-mir5-default"
+                    assert(ok and plan.record.producer.kind==kind)
+                    assert(history.apply_default_owner_transfer(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
@@ -3147,7 +3207,7 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                 ''')
 
 
-    def test_new_selection_keeps_only_existing_501_empty_exception(self):
+    def test_new_selection_keeps_only_proved_501_and_published11_empty_origins(self):
         for target in ("f200", "f210"):
             for patch in range(12):
                 lua=self.world(target);lua.globals().patch=patch
@@ -3160,6 +3220,17 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                   if package_family=="f200"and patch==1 then
                     assert(ok and plan.record.producer.kind=="older-mir501-empty-default")
                     assert(history.default_owner_apply(plan))
+                  elseif patch==11 then
+                    -- The immutable published11 Base+MIR producer retained
+                    -- infinite C4 under cap/enable settings; no force has work.
+                    assert(ok and plan.record.producer.kind=="published511-empty-default")
+                    assert(history.default_owner_apply(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 

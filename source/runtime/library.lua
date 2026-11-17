@@ -65,6 +65,7 @@ local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 -- Closing a view drops that working cache and retains only issued native IDs.
 local translation_caches = {}
 local declaration_cache
+local stage_annotation_cache
 -- Credit carriers are genuine native technologies for migration/runtime
 -- accounting, but never Library research. The catalogue supplies this small
 -- exact identity map at control parse; it is not inferred from hidden flags
@@ -1107,6 +1108,58 @@ local function caption(row, player)
   return row.id or ""
 end
 
+-- Group complete authored declarations, not filtered live rows. A ready-only,
+-- completed-only or personal view must retain an individual finite or
+-- continuation label even when its declared sibling is not displayed.
+local function stage_annotations()
+  if stage_annotation_cache ~= nil then return stage_annotation_cache end
+  local families, groups, annotations = {}, {}, {}
+  for _, row in ipairs(authored_declarations()) do
+    if type(row) == "table" and type(row.family) == "string" and row.family ~= ""
+        and type(row.locale_key) == "string" and row.locale_key ~= ""
+        and whole_number(row.progression, 1) then
+      local locales = families[row.family]
+      if locales == nil then locales = {}; families[row.family] = locales end
+      local progressions = locales[row.locale_key]
+      if progressions == nil then progressions = {}; locales[row.locale_key] = progressions end
+      local group = progressions[row.progression]
+      if group == nil then
+        group = {}
+        progressions[row.progression] = group
+        groups[#groups + 1] = group
+      end
+      group[#group + 1] = row
+    end
+  end
+  for _, group in ipairs(groups) do
+    local bounded = false
+    for _, row in ipairs(group) do
+      if whole_number(row.fixed_maximum, 1) then bounded = true; break end
+    end
+    if bounded and #group > 1 then
+      for _, row in ipairs(group) do
+        annotations[row.id] = {fixed_maximum = row.fixed_maximum}
+      end
+    end
+  end
+  stage_annotation_cache = annotations
+  return stage_annotation_cache
+end
+
+local function list_caption(row, player, stage)
+  local text = caption(row, player)
+  if type(stage) ~= "table" then return text end
+  local cap = whole_number(row.cap, 1) and row.cap or nil
+  if whole_number(stage.fixed_maximum, 1) then
+    if cap and cap ~= stage.fixed_maximum then
+      return {"mir-browser.list-stage-finite-capped", text, stage.fixed_maximum, cap}
+    end
+    return {"mir-browser.list-stage-finite", text, stage.fixed_maximum}
+  end
+  if cap then return {"mir-browser.list-stage-capped", text, row.progression, cap} end
+  return {"mir-browser.list-stage-continuation", text, row.progression}
+end
+
 local function row_index(rows, selected)
   for index, row in ipairs(rows) do
     if row.id == selected then return index end
@@ -1556,9 +1609,10 @@ local function update_research_content(content, player, view, context, translati
   end
 
   local rows = rows_for(player, view, context, translations)
+  local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
-    local text = caption(row, player)
+    local text = list_caption(row, player, stages[row.id])
     item_labels[index] = known_technology(player, row.id)
       and {"", "[img=technology/" .. row.id .. "] ", text} or text
   end
@@ -1809,8 +1863,8 @@ end
 
 local function update_settings_content(content, view, preserve_query, translations, context)
   if not valid(content) then return end
-  local width = content.style and (content.style.maximal_width or content.style.width) or 592
-  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
+  local width = content.style and content.style.maximal_width or 592
+  local available_height = content.style and content.style.maximal_height or 220
   local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
   if not valid(content[PREFIX .. "settings_search_label"])
@@ -3166,6 +3220,7 @@ end
 function M.on_configuration_changed()
   reconnect_translation_caches()
   declaration_cache = nil
+  stage_annotation_cache = nil
   setting_groups_cache = nil
   setting_prototype_cache = nil
   local legacy = legacy_browser_state()

@@ -14,6 +14,21 @@ local diagnostics = helpers and type(helpers.write_file) == "function" and requi
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
+local worker_storage_route_export
+local worker_default_split_export
+local finite_research_speed_provider_export
+if target.id == "f200" or target.id == "f210" then
+  local function required_catalogue_export(name)
+    local value = catalogue[name]
+    if type(value) ~= "function" then
+      error("MIR runtime catalogue requires callable " .. name, 2)
+    end
+    return value
+  end
+  worker_storage_route_export = required_catalogue_export("worker_storage_route")
+  worker_default_split_export = required_catalogue_export("worker_default_split")
+  finite_research_speed_provider_export = required_catalogue_export("finite_research_speed_provider")
+end
 local finite_research_speed = (target.id == "f200" or target.id == "f210")
   and require("runtime.finite_research_speed")
 local worker_robot_storage = (target.id == "f200" or target.id == "f210")
@@ -23,16 +38,16 @@ if worker_robot_storage then
   worker_robot_storage.configure(worker_values and worker_values.max_level, worker_values and worker_values.enabled)
 end
 local function worker_storage_route()
-  return type(catalogue.worker_storage_route) == "function" and catalogue.worker_storage_route() or nil
+  if worker_storage_route_export == nil then return nil end
+  return worker_storage_route_export()
 end
-local WORKER_DEFAULT_SPLIT = worker_robot_storage and type(catalogue.worker_default_split) == "function"
-  and catalogue.worker_default_split() or false
+local WORKER_DEFAULT_SPLIT = worker_robot_storage and worker_default_split_export() or false
 local function worker_storage_mutating(event)
   return worker_robot_storage and worker_robot_storage.default_owner_mutating(event) or false
 end
 local function finite_research_speed_provider()
-  return type(catalogue.finite_research_speed_provider) == "function"
-    and catalogue.finite_research_speed_provider() or nil
+  if finite_research_speed_provider_export == nil then return nil end
+  return finite_research_speed_provider_export()
 end
 local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local native_credits, legacy_module_credits, legacy_cannon_credits
@@ -50,45 +65,42 @@ if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
   if target.recipe_productivity == true then native_gun_credits = require("runtime.native_gun_credits") end
 end
--- A bounded foreign-owner adapter is needed only while its named provider is
--- present. It owns no module discovery and is imported before callbacks.
-local competing_productivity
-if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~= nil
-    or active_mods["plates-n-circuit-productivity"] ~= nil
-    or active_mods.Science_packs_productivity ~= nil
-    or active_mods["bioflux-productivity"] ~= nil
-    or active_mods["fish-productivity"] ~= nil
-    or active_mods["crafting-efficiency-2"] ~= nil
-    or active_mods.ProductivityResearch ~= nil)
-    and target.id == "f200" then
-  competing_productivity = require("runtime.competing_productivity")
-end
-
 -- A removed provider is absent from script.active_mods by the time the
 -- configuration callback runs. Keep this finite list aligned with the exact
 -- F200 runtime adapters; it also recognizes a current F210 provider without
 -- importing the F200 adapter.
 local COMPETING_PROVIDER_IDS = {
-  ExpandedProductivityResearch = true,
-  ["plates-n-circuit-productivity"] = true,
-  Science_packs_productivity = true,
-  ["bioflux-productivity"] = true,
-  ["fish-productivity"] = true,
-  ["crafting-efficiency-2"] = true,
-  ProductivityResearch = true,
+  "ExpandedProductivityResearch",
+  "plates-n-circuit-productivity",
+  "Science_packs_productivity",
+  "bioflux-productivity",
+  "fish-productivity",
+  "crafting-efficiency-2",
+  "ProductivityResearch",
 }
+
+local function has_competing_provider(values)
+  if type(values) ~= "table" then return false end
+  for index = 1, #COMPETING_PROVIDER_IDS do
+    if values[COMPETING_PROVIDER_IDS[index]] ~= nil then return true end
+  end
+  return false
+end
+
+-- A bounded foreign-owner adapter is needed only while its named provider is
+-- present. It owns no module discovery and is imported before callbacks.
+local competing_productivity
+if target.id == "f200" and has_competing_provider(active_mods) then
+  competing_productivity = require("runtime.competing_productivity")
+end
 
 local function relevant_competing_provider_transition(event)
   if competing_productivity ~= nil then return true end
-  if type(active_mods) == "table" then
-    for name in pairs(COMPETING_PROVIDER_IDS) do
-      if active_mods[name] ~= nil then return true end
-    end
-  end
+  if has_competing_provider(active_mods) then return true end
   local changes = event and event.mod_changes
   if type(changes) ~= "table" then return false end
-  for name in pairs(COMPETING_PROVIDER_IDS) do
-    local change = changes[name]
+  for index = 1, #COMPETING_PROVIDER_IDS do
+    local change = changes[COMPETING_PROVIDER_IDS[index]]
     if type(change) == "table" and type(change.old_version) == "string" then return true end
   end
   return false

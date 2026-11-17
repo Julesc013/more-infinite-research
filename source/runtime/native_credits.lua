@@ -23,7 +23,15 @@ local PUBLISHED_F200_M4_VERSIONS = {
   ["4.7.20002"] = true,
   ["4.7.20003"] = true,
 }
-local groups = type(catalogue.native_credit_groups) == "function" and catalogue.native_credit_groups() or nil
+local function require_catalogue_export(name)
+  local exported = catalogue[name]
+  if type(exported) ~= "function" then
+    error("MIR native credits require runtime catalogue export " .. name, 2)
+  end
+  return exported
+end
+
+local groups = require_catalogue_export("native_credit_groups")()
 local DESCRIPTORS = definitions.descriptors(groups)
 local GALORE_DESCRIPTOR
 for _, row in ipairs(DESCRIPTORS) do
@@ -773,7 +781,7 @@ local function preflight_galore(context, fresh, selected_force)
             if not context.beta_unchanged then
               family_failure("unknown first paid Galore mask; restore original save and inputs; a known source mask is required")
             end
-            local retired = type(catalogue.galore_sulfur_retired) == "function" and catalogue.galore_sulfur_retired()
+            local retired = require_catalogue_export("galore_sulfur_retired")()
             prior = observation.included or retired == true
           end
           local wanted = ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
