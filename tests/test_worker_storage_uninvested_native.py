@@ -27,7 +27,9 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
             for key,value in pairs(left)do if not same(value,right[key])then return false end end
             for key in pairs(right)do if left[key]==nil then return false end end;return true
           end
-          helpers={table_to_json=function(body)markers[#markers+1]=deep(body);return "{}"end,
+          capture_body_by_reference=false
+          helpers={table_to_json=function(body)
+              markers[#markers+1]=capture_body_by_reference and body or deep(body);return "{}"end,
             write_file=function(path,text,append)written[#written+1]={path=path,text=text,append=append}end}
           function tech(name, level, readonly)
             local values={name=name,valid=true,level=level or 1,researched=false,enabled=true,
@@ -162,6 +164,26 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                   assert(game.forces.player.technologies["worker-robots-storage-4"].level==4)
                   assert(game.forces["mir-worker-uninvested-native-foreign"].technologies["worker-robots-storage-4"].level==4)
                 ''')
+
+    def test_source_ready_exports_a_detached_exact_foreign_public_frame(self):
+        self.lua.globals().world("2.0.77", "4.7.20002")
+        self.lua.execute(r'''
+          capture_body_by_reference=true
+          handlers.init()
+          local state=storage.mir_worker_storage_uninvested_native
+          local observed=markers[1].source_foreign
+          assert(observed~=false and not rawequal(observed,state.source_foreign))
+          assert(observed.current=="automation" and observed.progress==.42
+            and #observed.queue==2 and observed.queue[1]=="automation" and observed.queue[2]=="logistics")
+          assert(observed.logistics.saved==.27 and observed.disabled.enabled==false
+            and observed.disabled.visible==true and observed.bonus==.75)
+          assert(observed.rows["steam-power"].researched==true and observed.rows.electronics.researched==true
+            and observed.rows["automation-science-pack"].researched==true)
+          assert(observed.rows.automation.researched==false and observed.rows.logistics.researched==false
+            and observed.rows["worker-robots-speed-4"].level==4)
+          observed.rows.automation.saved=99
+          assert(state.source_foreign.rows.automation.saved==0)
+        ''')
 
     def test_candidate_trigger_arms_preserve_foreign_rows_then_complete_save_and_two_colds(self):
         for target in ("f200", "f210"):

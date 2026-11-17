@@ -219,6 +219,7 @@ local function emit(stage, extra)
   local body = {schema=1, role="published11-uninvested-worker-storage", stage=stage, tick=game.tick,
     fixture_version=script.active_mods[FIXTURE], mir_version=script.active_mods[MIR], mods=copy(script.active_mods),
     frames=frames, worker_frames=worker_frames(), pre_config=state and state.pre_config or false,
+    source_foreign=state and state.source_foreign and copy(state.source_foreign) or false,
     candidate_event=state and state.candidate_event or false, lab=state and lab_frame(state) or {present=false}, extra=extra}
   local text = helpers.table_to_json(body)
   log("MIR_WORKER_UNINVESTED_NATIVE " .. text)
