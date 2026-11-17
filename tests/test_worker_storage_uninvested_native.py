@@ -31,35 +31,51 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           helpers={table_to_json=function(body)
               markers[#markers+1]=capture_body_by_reference and body or deep(body);return "{}"end,
             write_file=function(path,text,append)written[#written+1]={path=path,text=text,append=append}end}
-          function tech(name, level, readonly)
+           function tech(name, level, readonly, on_researched)
             local values={name=name,valid=true,level=level or 1,researched=false,enabled=true,
               visible_when_disabled=false,saved_progress=0,research_unit_count=100,prerequisites={}}
+             local function assign(key, value)
+               if key=="researched" and value==true and values.researched==false and on_researched~=nil then on_researched() end
+               values[key]=value
+             end
             values.research_recursive=function()
-              values.researched=true;values.enabled=true
+               assign("researched",true);values.enabled=true
               if recursive_trap~=nil then recursive_trap.researched=true end
             end
-            values.native_set=function(key,value)values[key]=value end
+             values.native_set=function(key,value)assign(key,value)end
             local proxy={};setmetatable(proxy,{__index=function(_,key)
                 if key=="saved_progress" and values.name=="logistics" and source_saved_readback~=nil then return source_saved_readback end
                 return values[key]end,
               __newindex=function(_,key,value)
-                if readonly then error("worker C4 write before ordinary completion: "..key) end;values[key]=value
+                 if readonly then error("worker C4 write before ordinary completion: "..key) end;assign(key,value)
               end})
             return proxy
           end
           function make_force(name,index)
-            local technologies={
-              ["worker-robots-storage-4"]=tech("worker-robots-storage-4",4,true),
-              ["worker-robots-storage-2"]=tech("worker-robots-storage-2",2,false),
-              ["worker-robots-storage-3"]=tech("worker-robots-storage-3",3,false),
-              ["steam-power"]=tech("steam-power",1,false),electronics=tech("electronics",1,false),
-              ["automation-science-pack"]=tech("automation-science-pack",1,false),automation=tech("automation",1,false),
-              logistics=tech("logistics",1,false),["logistic-science-pack"]=tech("logistic-science-pack",1,false),
-              ["chemical-science-pack"]=tech("chemical-science-pack",1,false),["production-science-pack"]=tech("production-science-pack",1,false),
-              ["utility-science-pack"]=tech("utility-science-pack",1,false),["worker-robots-speed-4"]=tech("worker-robots-speed-4",4,false),
-            }
-            local values={name=name,index=index,valid=true,technologies=technologies,research_enabled=true,research_progress=0,
+             local technologies={}
+             local values={name=name,index=index,valid=true,technologies=technologies,research_enabled=true,research_progress=0,
               worker_robots_storage_bonus=0,worker_robots_speed_modifier=0,research_queue={}}
+             local function researched_effect(technology_name)
+               return function()
+                 local amount=researched_bonus_effects[technology_name] or 0
+                 values.worker_robots_storage_bonus=values.worker_robots_storage_bonus+amount
+               end
+             end
+             technologies["worker-robots-storage-4"]=tech("worker-robots-storage-4",4,true)
+             technologies["worker-robots-storage-2"]=tech("worker-robots-storage-2",2,false,researched_effect("worker-robots-storage-2"))
+             technologies["worker-robots-storage-3"]=tech("worker-robots-storage-3",3,false,researched_effect("worker-robots-storage-3"))
+             technologies["worker-robots-storage-2"].native_set("research_unit_count",300)
+             technologies["worker-robots-storage-3"].native_set("research_unit_count",450)
+             technologies["steam-power"]=tech("steam-power",1,false,researched_effect("steam-power"))
+             technologies.electronics=tech("electronics",1,false,researched_effect("electronics"))
+             technologies["automation-science-pack"]=tech("automation-science-pack",1,false,researched_effect("automation-science-pack"))
+             technologies.automation=tech("automation",1,false,researched_effect("automation"))
+             technologies.logistics=tech("logistics",1,false,researched_effect("logistics"))
+             technologies["logistic-science-pack"]=tech("logistic-science-pack",1,false,researched_effect("logistic-science-pack"))
+             technologies["chemical-science-pack"]=tech("chemical-science-pack",1,false,researched_effect("chemical-science-pack"))
+             technologies["production-science-pack"]=tech("production-science-pack",1,false,researched_effect("production-science-pack"))
+             technologies["utility-science-pack"]=tech("utility-science-pack",1,false,researched_effect("utility-science-pack"))
+             technologies["worker-robots-speed-4"]=tech("worker-robots-speed-4",4,false,researched_effect("worker-robots-speed-4"))
             local force={};setmetatable(force,{__index=function(_,key)
               if key=="current_research"then local first=values.research_queue[1];return first and values.technologies[first.name]or nil end
               if key=="research_progress" and source_progress_readback~=nil then return source_progress_readback end
@@ -114,8 +130,9 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
               get_inventory=function(kind)return kind==1 and input or modules end}
           end
           function world(base,mir)
-            storage={};markers={};logs={};written={};saved_name=nil;recursive_trap=nil
+             storage={};markers={};logs={};written={};saved_name=nil;recursive_trap=nil
             source_progress_readback=nil;source_saved_readback=nil;source_bonus_readback=nil;labs_created=0
+             researched_bonus_effects={["worker-robots-storage-2"]=1,["worker-robots-storage-3"]=1}
             local player=make_force("player",1);local forces={player=player,[1]=player};local next_index=2
             game={tick=0,forces=forces,surfaces={[1]={create_entity=function(spec)
               assert(spec.name=="mir-worker-uninvested-native-lab"and spec.force==player);labs_created=labs_created+1;return make_lab()end}},
@@ -143,8 +160,10 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           storage={};assert(next(storage)==nil)
         '''.replace("published_version", repr(published)))
 
-    def candidate_admission(self, target, settings_changed):
+    def candidate_admission(self, target, settings_changed, before_candidate=None):
         self.source_to_middle(target)
+        if before_candidate is not None:
+            self.lua.execute(before_candidate)
         candidate = "5.0.20017" if target == "f200" else "5.0.21017"
         published = "5.0.20011" if target == "f200" else "5.0.21011"
         self.lua.globals().settings_changed = settings_changed
@@ -276,10 +295,23 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                       assert(mir_change.name=="more-infinite-research" and mir_change.old_version_present==true
                         and mir_change.new_version==script.active_mods["more-infinite-research"])
                       handlers[1]();assert(state.phase=="ordinary-active" and state.lab~=nil)
+                      local prefix=state.ordinary_prefix
+                      assert(prefix.before.bonus==0 and prefix.after.bonus==2
+                        and prefix.expected_delta==2 and prefix.observed_delta==2 and #prefix.rows==2)
+                      for index,name in ipairs({"worker-robots-storage-2","worker-robots-storage-3"}) do
+                        local item=prefix.rows[index]
+                        assert(item.name==name and item.before.researched==false and item.after.researched==true
+                          and item.newly_researched==true and #item.effects==1
+                          and item.effects[1].type=="worker-robot-storage" and item.effects[1].modifier==1
+                          and item.before.level==index+1 and item.after.level==index+1
+                          and item.before.count==({300,450})[index] and item.after.count==({300,450})[index]
+                          and item.before.enabled==item.after.enabled and item.before.visible==item.after.visible
+                          and item.before.saved==0 and item.after.saved==0)
+                      end
                       local player=game.forces.player
                       assert(player.current_research.name=="mir-worker-storage-default-4")
                       player.technologies["mir-worker-storage-default-4"].native_set("level",5)
-                      player.worker_robots_storage_bonus=1
+                      player.worker_robots_storage_bonus=3
                       handlers[2]({research={name="mir-worker-storage-default-4",force=player},by_script=false,tick=10})
                       assert(state.phase=="ordinary-finished");handlers[1]()
                       assert(state.phase=="ordinary-saved" and saved_name=="worker-storage-uninvested-native")
@@ -294,8 +326,71 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                         game,storage=saved_game,saved_storage
                         handlers[1]();assert(same(before,storage))
                       end
-                      assert(markers[#markers].stage=="cold")
+                      assert(markers[#markers].stage=="cold" and markers[#markers].ordinary_prefix.expected_delta==2
+                        and markers[#markers].ordinary_prefix.observed_delta==2)
                     ''')
+
+    def test_ordinary_prefix_effect_receipt_allows_an_already_researched_prefix_once(self):
+        self.candidate_admission("f200", False, r'''
+          local player=game.forces.player
+          player.technologies["worker-robots-storage-2"].researched=true
+          assert(player.worker_robots_storage_bonus==1)
+        ''')
+        self.lua.execute(r'''
+          handlers[1]()
+          local prefix=storage.mir_worker_storage_uninvested_native.ordinary_prefix
+          assert(prefix.before.bonus==1 and prefix.after.bonus==2)
+          assert(prefix.rows[1].before.researched==true and prefix.rows[1].after.researched==true
+            and prefix.rows[1].newly_researched==false)
+          assert(prefix.rows[2].before.researched==false and prefix.rows[2].after.researched==true
+            and prefix.rows[2].newly_researched==true)
+          assert(prefix.expected_delta==1 and prefix.observed_delta==1)
+        ''')
+
+    def test_ordinary_prefix_effect_refuses_wrong_or_unexpected_native_grant_before_lab(self):
+        cases = {
+            "wrong-prefix-effect": 'researched_bonus_effects["worker-robots-storage-2"]=2',
+            "unexpected-science-grant": 'researched_bonus_effects["automation-science-pack"]=1',
+        }
+        for name, mutation in cases.items():
+            with self.subTest(name=name):
+                self.candidate_admission("f200", False)
+                self.lua.execute(r'''
+                  local state=storage.mir_worker_storage_uninvested_native
+                  local markers_before,writes_before=#markers,#written
+                ''' + mutation + r'''
+                  assert(not pcall(handlers[1]))
+                  assert(state.phase=="candidate-admitted" and state.lab==nil)
+                  assert(#markers==markers_before and #written==writes_before)
+                ''')
+
+    def test_ordinary_prefix_snapshot_refuses_a_change_before_config_or_work(self):
+        for mutation in ('player.technologies["worker-robots-storage-2"].researched=true',
+                         'player.technologies["worker-robots-storage-3"].enabled=false'):
+            with self.subTest(mutation=mutation):
+                self.source_to_middle("f200")
+                self.lua.execute(r'''
+                  script.active_mods["more-infinite-research"]="5.0.20017"
+                  script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
+                  local player=game.forces.player;local foreign=game.forces["mir-worker-uninvested-native-foreign"]
+                  install_candidate(player);install_candidate(foreign);handlers.init()
+                ''' + mutation + r'''
+                  apply_expected_default_transfer()
+                  local state=storage.mir_worker_storage_uninvested_native;local markers_before,writes_before=#markers,#written
+                  assert(not pcall(function() handlers.configuration({mod_startup_settings_changed=false,mod_changes={
+                    ["more-infinite-research"]={old_version="5.0.20011",new_version="5.0.20017"},
+                    ["mir-worker-storage-uninvested-native"]={new_version="0.13.0"}}}) end))
+                  assert(state.phase=="candidate-awaiting-config" and #markers==markers_before and #written==writes_before)
+                ''')
+                self.candidate_admission("f200", False)
+                self.lua.execute(r'''
+                  local state=storage.mir_worker_storage_uninvested_native;local player=game.forces.player
+                ''' + mutation + r'''
+                  local markers_before,writes_before=#markers,#written
+                  assert(not pcall(handlers[1]))
+                  assert(state.phase=="candidate-admitted" and state.lab==nil
+                    and #markers==markers_before and #written==writes_before)
+                ''')
 
     def test_post_source_drift_refuses_before_candidate_observation_or_worker_write(self):
         for mutation in ('foreign.research_queue={"logistics"}',
@@ -372,7 +467,7 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
             for _=1,4 do input.counts[pack]=63;handlers[1]();assert(input.counts[pack]==200) end
             assert(state.inserted[pack]==748 and state.inserted[pack]>=675)
           end
-          player.technologies["mir-worker-storage-default-4"].native_set("level",5);player.worker_robots_storage_bonus=1
+          player.technologies["mir-worker-storage-default-4"].native_set("level",5);player.worker_robots_storage_bonus=3
           handlers[2]({research={name="mir-worker-storage-default-4",force=player},by_script=false,tick=10})
           local inserted_before=deep(state.inserted)
           for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
