@@ -65,7 +65,7 @@ if($LinuxMountAdmissionOnly){
   return
 }
 function New-BenchmarkMemoryCallbacks {
-  param([Parameter(Mandatory)]$Sampler)
+  param([Parameter(Mandatory)]$Sampler,[string]$ReleasePath='')
   $state=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
   $registerMemorySampler=${function:Register-MIROwnedProcessMemoryProcess}
   $addMemorySample=${function:Add-MIROwnedProcessMemorySample}
@@ -77,6 +77,7 @@ function New-BenchmarkMemoryCallbacks {
     if($null-eq$state.registration){throw '[mir5-native-probe-benchmark-registration]'}
     & $addMemorySample -Sampler $Sampler
     $state.sample_events++
+    if($ReleasePath.Length-gt0-and$state.sample_events-eq2){[IO.File]::WriteAllText($ReleasePath,'observed',[Text.UTF8Encoding]::new($false))}
   }.GetNewClosure()
   $exit={
     param($event)
@@ -459,12 +460,12 @@ while(-not(Test-Path -LiteralPath $ReleasePath -PathType Leaf)){
     Assert-Probe ($null-eq$runRecord.result.PSObject.Properties['sample_milliseconds']) 'default-governor-result-shape'
     $benchmarkRoot=Join-Path $context.root 'benchmark-observation';[IO.Directory]::CreateDirectory($benchmarkRoot)|Out-Null
     $benchmarkSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $benchmarkCallbacks=New-BenchmarkMemoryCallbacks -Sampler $benchmarkSampler
     $benchmarkLedger=Join-Path $benchmarkRoot 'resources.jsonl'
     # Keep the controlled child alive until two real callbacks occur. A fixed
     # 900 ms sleep could expire during loaded-host resource scans before the
     # second 250 ms observation. Short-lived exit races are tested separately.
     $benchmarkReady=Join-Path $benchmarkRoot 'two-samples.ready'
+    $benchmarkCallbacks=New-BenchmarkMemoryCallbacks -Sampler $benchmarkSampler -ReleasePath $benchmarkReady
     $benchmarkChild=Join-Path $benchmarkRoot 'wait-for-samples.ps1'
     [IO.File]::WriteAllText($benchmarkChild,@'
 param([Parameter(Mandatory)][string]$Ready)
@@ -474,25 +475,16 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
   Start-Sleep -Milliseconds 50
 }
 '@,[Text.UTF8Encoding]::new($false))
-    $benchmarkOriginalSample=$benchmarkCallbacks.sample
-    $benchmarkState=$benchmarkCallbacks.state
-    $benchmarkObservedSample={
-      param($event)
-      & $benchmarkOriginalSample $event
-      if($benchmarkState.sample_events-ge2){[IO.File]::WriteAllText($benchmarkReady,'observed')}
-    }.GetNewClosure()
-    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$benchmarkReady) -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkObservedSample -OwnedProcessExitCallback $benchmarkCallbacks.exit
+    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$benchmarkReady) -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkCallbacks.sample -OwnedProcessExitCallback $benchmarkCallbacks.exit
     $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmarkSampler
-    Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkCallbacks.state.sample_events-ge2-and$benchmarkCallbacks.state.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
+    Assert-Probe ($benchmarkRun.status-ceq'passed'-and(Test-Path -LiteralPath $benchmarkReady)-and$benchmarkCallbacks.state.sample_events-ge2-and$benchmarkCallbacks.state.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
     $probeSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler
-    # As with the direct Factorio actor below, allow the controlled child to
-    # survive loaded-host resource scans before the first 250 ms cadence wait.
-    # Short-lived process exit races have their own opposing control above.
-    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 2') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
+    $probeReady=Join-Path $benchmarkRoot 'two-samples-probe.ready'
+    $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler -ReleasePath $probeReady
+    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$probeReady) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
     $probeReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $probeSampler
-    $probeObservationPassed=($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2)
+    $probeObservationPassed=($probeRun.status-ceq'passed'-and(Test-Path -LiteralPath $probeReady)-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2)
     if(-not$probeObservationPassed){
       # Keep the failed CI observation visible even when finally removes its
       # disposable context. Emit only bounded statuses/counts and fixed reasons.
@@ -508,13 +500,11 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
     }
     Assert-Probe $probeObservationPassed 'probe-wrapper-benchmark-observation'
     $factorioSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler
-    # The direct actor includes registration and memory reads before its first
-    # 250 ms cadence wait. Keep the two-observation assertion but give this
-    # controlled host child enough lifetime on a loaded hosted runner.
-    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 4') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
+    $factorioReady=Join-Path $benchmarkRoot 'two-samples-factorio.ready'
+    $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler -ReleasePath $factorioReady
+    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$factorioReady) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
     $factorioReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $factorioSampler
-    $factorioObservationPassed=$factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2
+    $factorioObservationPassed=$factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and(Test-Path -LiteralPath $factorioReady)-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2
     if(-not$factorioObservationPassed){
       $details=[ordered]@{run_status=$factorioObservation.status;sample_events=$factorioCallbacks.state.sample_events;exit_events=$factorioCallbacks.state.exit_events;receipt_status=$factorioReceipt.status;observation_count=$factorioReceipt.observations.Count;incomplete_reasons=@($factorioReceipt.incomplete_reasons|Select-Object -First 8)}
       Write-Host ('[mir5-native-factorio-observation-details] '+($details|ConvertTo-Json -Compress))
