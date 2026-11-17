@@ -32,7 +32,10 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           function tech(name, level, readonly)
             local values={name=name,valid=true,level=level or 1,researched=false,enabled=true,
               visible_when_disabled=false,saved_progress=0,research_unit_count=100,prerequisites={}}
-            values.research_recursive=function()values.researched=true;values.enabled=true end
+            values.research_recursive=function()
+              values.researched=true;values.enabled=true
+              if recursive_trap~=nil then recursive_trap.researched=true end
+            end
             values.native_set=function(key,value)values[key]=value end
             local proxy={};setmetatable(proxy,{__index=function(_,key)return values[key]end,
               __newindex=function(_,key,value)
@@ -86,7 +89,7 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
               get_inventory=function(kind)return kind==1 and input or modules end}
           end
           function world(base,mir)
-            storage={};markers={};logs={};written={};saved_name=nil
+            storage={};markers={};logs={};written={};saved_name=nil;recursive_trap=nil
             local player=make_force("player",1);local forces={player=player,[1]=player};local next_index=2
             game={tick=0,forces=forces,surfaces={[1]={create_entity=function(spec)
               assert(spec.name=="mir-worker-uninvested-native-lab"and spec.force==player);return make_lab()end}},
@@ -148,6 +151,7 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
         control_source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertNotIn("mir_worker_storage_route", control_source)
         self.assertNotIn("storage.mir_", control_source)
+        self.assertNotIn("research_recursive()", control_source)
 
     def test_source_is_removed_for_base_mir_only_published11_middle(self):
         for target in ("f200", "f210"):
@@ -170,6 +174,8 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                       local state=storage.mir_worker_storage_uninvested_native
                       assert(state.phase=="candidate-admitted" and state.candidate_event.trigger==expected_trigger)
                       assert(state.candidate_event.startup_settings_changed==settings_changed and #state.candidate_event.mod_changes==2)
+                      assert(state.pre_config.worker_frames["1"].name=="player"
+                        and state.pre_config.worker_frames["2"].name=="mir-worker-uninvested-native-foreign")
                       local fixture_change,mir_change=state.candidate_event.mod_changes[1],state.candidate_event.mod_changes[2]
                       assert(fixture_change.name=="mir-worker-storage-uninvested-native" and fixture_change.old_version_present==false
                         and fixture_change.new_version=="0.13.0")
@@ -223,6 +229,60 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           assert(#markers==markers_before and #written==writes_before)
           assert(player.technologies["worker-robots-storage-4"].level==4)
         ''')
+
+    def test_ordinary_direct_prerequisite_writes_do_not_traverse_an_unlisted_technology(self):
+        self.candidate_admission("f200", False)
+        self.lua.execute(r'''
+          local player=game.forces.player
+          local unlisted=tech("unlisted-base-ancestor",1,false)
+          player.technologies[unlisted.name]=unlisted
+          recursive_trap=unlisted
+          handlers[1]()
+          assert(storage.mir_worker_storage_uninvested_native.phase=="ordinary-active")
+          assert(unlisted.researched==false)
+        ''')
+
+    def test_candidate_refuses_an_invested_third_force_before_marker_or_fixture_write(self):
+        self.source_to_middle("f200")
+        self.lua.execute(r'''
+          script.active_mods["more-infinite-research"]="5.0.20017"
+          script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
+          local third=game.create_force("mir-worker-uninvested-native-third")
+          install_candidate(game.forces.player);install_candidate(game.forces["mir-worker-uninvested-native-foreign"]);install_candidate(third)
+          third.technologies["worker-robots-storage-4"].native_set("researched",true)
+          local marker_count,write_count=#markers,#written
+          assert(not pcall(handlers.init))
+          assert(next(storage)==nil and #markers==marker_count and #written==write_count)
+        ''')
+
+    def test_candidate_serializes_an_uninvested_third_force_in_the_all_worker_map(self):
+        self.source_to_middle("f200")
+        self.lua.execute(r'''
+          script.active_mods["more-infinite-research"]="5.0.20017"
+          script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
+          local third=game.create_force("mir-worker-uninvested-native-third")
+          install_candidate(game.forces.player);install_candidate(game.forces["mir-worker-uninvested-native-foreign"]);install_candidate(third)
+          handlers.init()
+          local state=storage.mir_worker_storage_uninvested_native
+          assert(state.pre_config.worker_frames["3"].name=="mir-worker-uninvested-native-third")
+          assert(markers[#markers].worker_frames["3"].name=="mir-worker-uninvested-native-third")
+        ''')
+
+    def test_candidate_refuses_invested_or_queued_head_before_marker_or_fixture_write(self):
+        for mutation in ('head.native_set("researched",true)', 'player.research_queue={"mir-worker-storage-head-4"}'):
+            with self.subTest(mutation=mutation):
+                self.source_to_middle("f200")
+                self.lua.execute(r'''
+                  script.active_mods["more-infinite-research"]="5.0.20017"
+                  script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
+                  local player=game.forces.player;local foreign=game.forces["mir-worker-uninvested-native-foreign"]
+                  install_candidate(player);install_candidate(foreign)
+                  local head=player.technologies["mir-worker-storage-head-4"]
+                ''' + mutation + r'''
+                  local marker_count,write_count=#markers,#written
+                  assert(not pcall(handlers.init))
+                  assert(next(storage)==nil and #markers==marker_count and #written==write_count)
+                ''')
 
     def test_candidate_init_reads_candidate_pair_without_reseeding(self):
         self.source_to_middle("f200")

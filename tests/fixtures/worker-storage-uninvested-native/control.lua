@@ -90,6 +90,35 @@ local function worker_frame(force)
     ordinary=optional_row(force, DEFAULT), head=optional_row(force, HEAD)}
 end
 
+-- Factorio exposes forces both by name and by numeric index.  Snapshot each
+-- valid force once by its stable native index so an empty-origin admission
+-- cannot overlook an invested third force merely because it is not the
+-- player or the fixture's named foreign force.
+local function applicable_forces()
+  local by_index, indices = {}, {}
+  for _, force in pairs(game.forces) do
+    if force ~= nil and force.valid ~= false then
+      local index = force.index
+      check(type(index) == "number" and index > 0 and index % 1 == 0, "valid force index")
+      if by_index[index] == nil then
+        by_index[index] = force
+        indices[#indices + 1] = index
+      end
+    end
+  end
+  table.sort(indices)
+  local forces = {}
+  for _, index in ipairs(indices) do forces[#forces + 1] = by_index[index] end
+  return forces
+end
+
+local function worker_frames(forces)
+  forces = forces or applicable_forces()
+  local frames = {}
+  for _, force in ipairs(forces) do frames[tostring(force.index)] = worker_frame(force) end
+  return frames
+end
+
 local function unrelated_frame(force)
   local rows = {}
   for _, name in ipairs(SOURCE_FOREIGN.setup_rows) do rows[name] = row(force, name) end
@@ -137,10 +166,20 @@ local function assert_empty_worker(force, candidate)
       "candidate ordinary C4 is invested")
     check(frame.current ~= DEFAULT, "candidate ordinary C4 is current before work")
     for _, name in ipairs(frame.queue) do check(name ~= DEFAULT, "candidate ordinary C4 is queued before work") end
+    check(frame.head.level == 4 and frame.head.researched == false and frame.head.saved == 0,
+      "candidate head C4 is invested")
+    check(frame.current ~= HEAD, "candidate head C4 is current before work")
+    for _, name in ipairs(frame.queue) do check(name ~= HEAD, "candidate head C4 is queued before work") end
   else
     check(frame.ordinary == false and frame.head == false, "published4.7 source contains candidate identities")
   end
   return frame
+end
+
+local function assert_all_empty_worker(candidate)
+  local forces = applicable_forces()
+  for _, force in ipairs(forces) do assert_empty_worker(force, candidate) end
+  return worker_frames(forces)
 end
 
 local function lab_frame(state)
@@ -179,7 +218,7 @@ local function emit(stage, extra)
   end
   local body = {schema=1, role="published11-uninvested-worker-storage", stage=stage, tick=game.tick,
     fixture_version=script.active_mods[FIXTURE], mir_version=script.active_mods[MIR], mods=copy(script.active_mods),
-    frames=frames, pre_config=state and state.pre_config or false,
+    frames=frames, worker_frames=worker_frames(), pre_config=state and state.pre_config or false,
     candidate_event=state and state.candidate_event or false, lab=state and lab_frame(state) or {present=false}, extra=extra}
   local text = helpers.table_to_json(body)
   log("MIR_WORKER_UNINVESTED_NATIVE " .. text)
@@ -191,8 +230,7 @@ local function source_setup()
   check(storage[KEY] == nil, "source fixture already initialized")
   local player = game.forces.player
   local foreign = game.forces[FOREIGN] or game.create_force(FOREIGN)
-  assert_empty_worker(player, false)
-  assert_empty_worker(foreign, false)
+  assert_all_empty_worker(false)
   -- These are real Base technologies and a real Base native modifier.  They
   -- deliberately do not touch the worker-storage C4 continuation.
   for _, name in ipairs({"steam-power", "electronics", "automation-science-pack"}) do
@@ -210,10 +248,9 @@ local function source_setup()
   technology(foreign, DISABLED).visible_when_disabled = true
   foreign.worker_robots_speed_modifier = SOURCE_FOREIGN.worker_speed_modifier
   local unrelated = assert_source_foreign(foreign)
-  assert_empty_worker(player, false)
-  assert_empty_worker(foreign, false)
+  local workers = assert_all_empty_worker(false)
   storage[KEY] = {schema=1, phase="source-ready", source_base=script.active_mods.base,
-    source_mir=selected.old, foreign_index=foreign.index, source_foreign=unrelated}
+    source_mir=selected.old, foreign_index=foreign.index, source_foreign=unrelated, source_workers=workers}
   emit("source-ready", {source_role=true, worker_storage_written=false})
 end
 
@@ -233,10 +270,10 @@ local function candidate_event(event)
   check(foreign and foreign.valid ~= false, "source foreign force absent")
   -- This is the first fixture callback after MIR17's configuration handler.
   -- It reads public native state only; candidate worker writes begin on a later tick.
-  assert_empty_worker(game.forces.player, true)
-  assert_empty_worker(foreign, true)
+  local workers = assert_all_empty_worker(true)
   assert_source_foreign(foreign)
   same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/pre-config-foreign")
+  same(state.pre_config.worker_frames, workers, "$/pre-config-worker-frames")
   state.candidate_event = {startup_settings_changed=event.mod_startup_settings_changed,
     trigger=event.mod_startup_settings_changed and "startup-settings-plus-fixture-addition" or "fixture-addition", mod_changes=rows}
   state.phase = "candidate-admitted"
@@ -256,10 +293,12 @@ local function start_ordinary()
     expected[name] = nil
   end
   check(next(expected) == nil, "ordinary prerequisite set differs")
-  for _, name in ipairs(ORDINARY_PREREQUISITES) do technology(player, name).research_recursive() end
+  -- The bounded authored prerequisite list is validated above.  Complete only
+  -- those exact public rows: recursive research would silently traverse an
+  -- unobserved Base graph and obscure the source/candidate boundary.
+  for _, name in ipairs(ORDINARY_PREREQUISITES) do technology(player, name).researched = true end
   local foreign = game.forces[FOREIGN]
-  assert_empty_worker(player, true)
-  assert_empty_worker(foreign, true)
+  assert_all_empty_worker(true)
   assert_source_foreign(foreign)
   same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/ordinary-foreign")
   local surface = game.surfaces[1]
@@ -272,7 +311,8 @@ local function start_ordinary()
     check(count > 0, "ordinary lab feed " .. pack)
     state.inserted[pack] = count
   end
-  state.before_work = {player=worker_frame(player), foreign=worker_frame(foreign), foreign_unrelated=unrelated_frame(foreign)}
+  state.before_work = {player=worker_frame(player), foreign=worker_frame(foreign), worker_frames=worker_frames(),
+    foreign_unrelated=unrelated_frame(foreign)}
   state.phase = "ordinary-active"
   emit("ordinary-started", {scripted_queue_after_admission=true})
 end
@@ -288,7 +328,7 @@ local function save_after_ordinary()
   local ordinary = row(player, DEFAULT)
   check(ordinary.level == 5 and ordinary.researched == false and player.worker_robots_storage_bonus == state.before_work.player.bonus + 1,
     "ordinary default C4 effect")
-  state.closed, state.closed_lab, state.phase = {player=worker_frame(player), foreign=worker_frame(foreign),
+  state.closed, state.closed_lab, state.phase = {player=worker_frame(player), foreign=worker_frame(foreign), worker_frames=worker_frames(),
     foreign_unrelated=unrelated_frame(foreign)}, lab_frame(state), "ordinary-saved"
   emit("ordinary-saved", {ordinary_native_completion_count=1})
   check(game.is_multiplayer(), "server save requires owned server")
@@ -299,7 +339,8 @@ local function cold()
   local state = storage[KEY]
   check(state and state.phase == "ordinary-saved" and state.closed ~= nil, "cold requires closed candidate save")
   local foreign = game.forces[FOREIGN]
-  local actual = {player=worker_frame(game.forces.player), foreign=worker_frame(foreign), foreign_unrelated=unrelated_frame(foreign)}
+  local actual = {player=worker_frame(game.forces.player), foreign=worker_frame(foreign), worker_frames=worker_frames(),
+    foreign_unrelated=unrelated_frame(foreign)}
   same(state.closed, actual, "$/cold")
   same(state.closed_lab, lab_frame(state), "$/cold-lab")
   emit("cold", {on_load_read_only=true})
@@ -354,11 +395,10 @@ script.on_init(function()
     check(storage[KEY] == nil, "candidate fixture must not retain source actor storage")
     local foreign = game.forces[FOREIGN]
     check(foreign and foreign.valid ~= false, "candidate source foreign force absent")
-    assert_empty_worker(game.forces.player, true)
-    assert_empty_worker(foreign, true)
+    local workers = assert_all_empty_worker(true)
     assert_source_foreign(foreign)
     storage[KEY] = {schema=1, phase="candidate-awaiting-config", source_base=script.active_mods.base,
-      pre_config={player=worker_frame(game.forces.player), foreign=worker_frame(foreign),
+      pre_config={player=worker_frame(game.forces.player), foreign=worker_frame(foreign), worker_frames=workers,
         foreign_unrelated=unrelated_frame(foreign)}}
     emit("candidate-pre-configuration", {public_read_only=true})
   end
