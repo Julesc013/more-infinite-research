@@ -173,12 +173,31 @@
   "promotion_state_at_recording": {
     "main_promotion_commit": "7cd3ae1ff4910699eb9ceeb70681f02659f0deec",
     "whole_tree": "ec6bc0828eee91b0cef15cf83fc541b357367e6c",
-    "main_ci": "running",
-    "publication": "not-started"
+    "main_ci": "passed-before-publication",
+    "publication": {
+      "status": "published-github-beta-delivery",
+      "release_id": 448678916,
+      "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.17",
+      "tag": "v5.0.17",
+      "published_at_utc": "2026-11-17T13:44:09Z",
+      "prerelease": true,
+      "latest_stable": "v4.7.3",
+      "asset_count": 19,
+      "anonymous_and_local_delivery": {
+        "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/anonymous-and-local-delivery-r01.json",
+        "sha256": "970E6E1369047A4E8E373113193200699C13452A8ECCCEF8F1C9D9CB17015D30",
+        "result": "All 19 anonymous downloads and corresponding primary local delivery files match their staged identities."
+      },
+      "independent_final_delivery_review": {
+        "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/release517-final-delivery-independent-review-r01.json",
+        "sha256": "445A2A87B12B9F8410413966F3F45AB6952CF020281FC376A1C71B5E1372E90C",
+        "verdict": "GO_GITHUB_BETA_DELIVERY_ADOPTED"
+      }
+    }
   },
   "scope_limits": [
     "This record covers only the exact published11 uninvested Base-only continuation and the two recorded candidate triggers.",
     "It does not close Kal9001, DEMEMZEA, Sage, other reporter histories, paid or foreign work, removed or updated providers, unknown histories, or any unobserved selection/settings state.",
-    "It does not establish Library, GUI, export, client, performance, stress, stable acceptance, release publication, or a retarget of the frozen Source17 assets."
+    "It does not establish Library, GUI, export, client, performance, stress, stable acceptance, or a retarget of the frozen Source17 assets. The separate GitHub beta delivery record above is not a stable-acceptance verdict."
   ]
 }
