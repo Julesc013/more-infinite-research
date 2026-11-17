@@ -85,7 +85,7 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
                 return function(technology)
                   if opponent == "ordinary-add-research-refused" then return false end
                   if current ~= nil or #queue ~= 0 or type(technology) ~= "table" then return false end
-                  for _, prerequisite in ipairs(technology.prerequisites or {}) do
+                  for _, prerequisite in pairs(technology.prerequisites or {}) do
                     assert(prerequisite.researched == true, "native research prerequisite is not researched")
                   end
                   queue, current, progress = {technology}, technology, technology.saved_progress
@@ -234,8 +234,13 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           for _, f in pairs(game.forces) do
             f.technologies[OWNER] = technology(OWNER,4); f.technologies[OWNER].force=f
             f.technologies[OWNER].prerequisites = {}
-            for _, name in ipairs(OWNER_PREREQUISITES) do
-              f.technologies[OWNER].prerequisites[#f.technologies[OWNER].prerequisites + 1] = f.technologies[name]
+            local order = OWNER_PREREQUISITES
+            if opponent == "ordinary-prerequisites-reordered" then
+              order = {"worker-robots-storage-3", "utility-science-pack", "production-science-pack",
+                "worker-robots-storage-2", "chemical-science-pack", "logistic-science-pack", "automation-science-pack"}
+            end
+            for _, name in ipairs(order) do
+              f.technologies[OWNER].prerequisites[name] = f.technologies[name]
             end
             f.technologies[OWNER].research_unit_count, f.technologies[OWNER].research_unit_energy = 675, 3600
             f.technologies[OWNER].research_unit_ingredients = {}
@@ -417,6 +422,15 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
         self.assertEqual(3600, preparation["owner_before_admission"]["unit"]["energy"])
         self.assertFalse(preparation["owner_before_admission"]["current"])
         self.assertTrue(preparation["owner_after_admission"]["current"])
+
+    def test_ordinary_lab_uses_the_factorio_name_keyed_prerequisite_dictionary(self):
+        result = self.world("f210", "addition", "ordinary-prerequisites-reordered")
+        self.assertTrue(result["ordinary"]["completed"])
+        self.assertEqual(
+            ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack",
+             "utility-science-pack", "worker-robots-storage-2", "worker-robots-storage-3"],
+            list(result["lab_preparation"]["direct_prerequisites"].values()),
+        )
 
     def test_ordinary_lab_refuses_bad_prerequisite_state_or_native_admission(self):
         for opponent, expected in (

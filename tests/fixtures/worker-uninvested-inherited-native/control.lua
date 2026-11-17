@@ -352,9 +352,9 @@ end
 
 local function direct_owner_prerequisites(owner)
   local names, seen = {}, {}
-  for _, prerequisite in ipairs(owner.prerequisites or {}) do
-    local name = prerequisite and prerequisite.name
-    check(type(name) == "string" and OWNER_PREREQUISITE_SET[name] and not seen[name],
+  for name, prerequisite in pairs(owner.prerequisites or {}) do
+    check(type(name) == "string" and prerequisite and prerequisite.name == name
+      and OWNER_PREREQUISITE_SET[name] and not seen[name],
       "ordinary owner direct prerequisite is unsupported")
     seen[name] = true
     names[#names + 1] = name
