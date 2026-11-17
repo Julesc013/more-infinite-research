@@ -100,6 +100,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               f200={base="2.0.77",mir="5.0.20000"},
               f210={base="2.1.23",mir="5.0.21000"},
               ["f210-current-linux"]={base="2.1.24",mir="5.0.21017",current_linux=true},
+              ["f210-current-linux-responsive"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true},
               ["f210-current504"]={base="2.1.23",mir="5.0.21004"},
               ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
               ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
@@ -335,6 +336,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local target=client
               if opponent=="view-crosspollution" and client.index==2 then target=en end
               local root=element("frame",ROOT_NAME);root.visible=true
+              if selected.current_linux_responsive then
+                root.style.width=1024
+                if opponent=="responsive-filter-width-zero" then root.style.maximal_width=0 end
+              end
               local filters=element("flow",FILTERS)
               root[FILTERS]=filters
               filters[QUERY]=element("textfield",QUERY)
@@ -352,12 +357,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
-              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+              if selected.current_linux_responsive or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
                 filters.type,filters.direction="flow","vertical"
                 local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
-                grid.column_count=2;filters.mir_library_filter_grid=grid
+                local responsive_columns={
+                  ["responsive-filter-columns-1"]=1,["responsive-filter-columns-2"]=2,
+                  ["responsive-filter-columns-3"]=3,["responsive-filter-columns-5"]=5,
+                  ["responsive-filter-columns-0"]=0,["responsive-filter-columns-4"]=4,
+                }
+                grid.column_count=selected.current_linux_responsive and (responsive_columns[opponent] or 5) or 2
+                filters.mir_library_filter_grid=grid
                 for _,name in ipairs({"family","status","mode","sort","visibility"}) do
                   local id="mir_library_"..name
                   local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
@@ -481,7 +492,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local detail=browser_detail()
               if opponent=="detail-width-narrow" then detail.style.width=180 end
               local facts=detail
-              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" then
+              if selected.current_linux_responsive or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" then
                 facts=element("scroll-pane","mir_library_research_facts")
                 detail.mir_library_research_facts=facts
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
@@ -582,7 +593,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local fixture_version=selected.current_linux and "0.1.2" or (selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0"))))
+            local fixture_version=selected.current_linux_responsive and "0.1.3" or (selected.current_linux and "0.1.2" or (selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")))))
             local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if selected.space_age then
               active_mods["elevated-rails"]="2.1.23"
@@ -590,8 +601,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               active_mods.recycler="2.1.23"
               active_mods["space-age"]="2.1.23"
             end
-            local private_without_api=(selected.private_credits or selected.current_linux) and opponent=="private-credit-missing-api"
-            if (opponent=="f210-api-consumers" or (selected.current_linux and opponent==nil) or selected.space_age or selected.private_credits) and not private_without_api then
+            local private_without_api=(selected.private_credits or selected.current_linux or selected.current_linux_responsive) and opponent=="private-credit-missing-api"
+            if (opponent=="f210-api-consumers" or (selected.current_linux and opponent==nil) or selected.current_linux_responsive or selected.space_age or selected.private_credits) and not private_without_api then
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
             elseif opponent=="f210-api-alpha-only" then
@@ -660,7 +671,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local success,value=pcall(callback,event)
               return success,tostring(value)
             end
-            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls} end
+            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls,storage_entries=storage[key] and 1 or 0} end
             if opponent=="fake-connected" then
               ok,result=call(callbacks.events[2],{player_index=1})
               return {ok=ok,message=result,phase=storage[key].phase,markers=markers}
@@ -2577,6 +2588,61 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 rejected = self.run_case(opponent, target="f210-current-linux")
                 self.assertFalse(rejected["ok"])
                 self.assertIn("unexpected non-base F210-current multiplayer closure", rejected["message"])
+
+    def test_current_linux_responsive_filter_grid_records_only_authored_columns(self):
+        for columns in (1, 2, 3, 5):
+            with self.subTest(columns=columns):
+                accepted = self.run_case(f"responsive-filter-columns-{columns}", target="f210-current-linux-responsive")
+                self.assertTrue(accepted["ok"], accepted["message"])
+                self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+                self.assertNotIn("responsive_filter_layout", accepted["markers"][0]["witnesses"])
+                for marker in accepted["markers"][1:]:
+                    observed = marker["witnesses"]["responsive_filter_layout"]
+                    self.assertEqual(observed["en"], {"columns": columns, "frame_maximal_width": 1024})
+                    self.assertEqual(observed["de"], {"columns": columns, "frame_maximal_width": 1024})
+
+        for opponent in ("responsive-filter-columns-0", "responsive-filter-columns-4", "responsive-filter-width-zero"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux-responsive")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("authored responsive research filter grid is malformed", rejected["message"])
+
+        wrong_tuple = self.run_case("f210-wrong-mir-version", target="f210-current-linux-responsive")
+        self.assertFalse(wrong_tuple["ok"])
+        self.assertEqual(wrong_tuple["storage_entries"], 0)
+        self.assertIn("unsupported native Library target base", wrong_tuple["message"])
+
+    def test_current_linux_responsive_fixture_projection_is_exact_and_current_only(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "responsive projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $head=(& git -C $env:MIR_TEST_REPO rev-parse HEAD).Trim()
+          if($head-notmatch'^[0-9a-f]{40}$'){throw 'responsive fixture source revision is unavailable'}
+          $projection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $head -MIRVersion '5.0.21017' -CurrentLinuxMetadata 'info-f210-current-517-responsive.json'
+          $info=Get-Content -LiteralPath (Join-Path $projection.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($projection.members.Count-ne3-or$projection.source_metadata-cne'info-f210-current-517-responsive.json' -or [string]$info.name-cne'mir-fixture-mir5-library-multiplayer' -or [string]$info.version-cne'0.1.3' -or [string]$info.factorio_version-cne'2.1' -or ((@($info.dependencies)-join'|')-cne'base >= 2.1.24|more-infinite-research = 5.0.21017')){throw 'responsive projection metadata or member selection differs'}
+          $names=@(Get-ChildItem -LiteralPath $projection.source -File|ForEach-Object {$_.Name}|Sort-Object)
+          if(($names-join'|')-cne'control.lua|info.json|settings-updates.lua'){throw 'responsive projection runtime member set differs'}
+          $rejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_STAGE 'wrong-version') -SourceRevision $head -MIRVersion '5.0.21000' -CurrentLinuxMetadata 'info-f210-current-517-responsive.json'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'responsive metadata was admitted for a non-current MIR version'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-linux-fixture-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True,
+                text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_f210_space_age_api_client_fixture_requires_the_exact_native_and_library_vectors(self):
         accepted = self.run_case(target="f210-space-age")

@@ -474,7 +474,7 @@ function Get-StandaloneF210NativeFixtureRawGitMemberBytes {
     [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$Member
   )
-  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
+  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517-responsive.json','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
   Assert-Session ($allowed-ccontains$Member) "standalone F210 fixture member is not admitted: $FixtureDirectory/$Member"
   $path='tests/fixtures/'+$FixtureDirectory+'/'+$Member
   $start=[Diagnostics.ProcessStartInfo]::new()
@@ -498,9 +498,11 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [switch]$SpaceAgeLibrary,
     [switch]$PrivateCreditChecks,
-    [ValidateSet('5.0.21000','5.0.21004','5.0.21017')][string]$MIRVersion='5.0.21000'
+    [ValidateSet('5.0.21000','5.0.21004','5.0.21017')][string]$MIRVersion='5.0.21000',
+    [ValidateSet('info-f210-current-517.json','info-f210-current-517-responsive.json')][string]$CurrentLinuxMetadata='info-f210-current-517.json'
   )
   Assert-Session ($MIRVersion-cne'5.0.21004' -or (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks)) 'current504 projection admits only the four-mod Base fixture'
+  Assert-Session ($MIRVersion-ceq'5.0.21017' -or $CurrentLinuxMetadata-ceq'info-f210-current-517.json') 'current Linux fixture metadata admits only MIR 5.0.21017'
   # The checked-in fixture retains F200 metadata and its developer README.
   # Every F210 route stages precisely three runtime members. The selected
   # metadata is the only Base/Space Age distinction; it is copied unchanged.
@@ -509,20 +511,21 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
   $privateCreditMetadata='info-f210-private-credits.json'
-  $currentLinuxMetadata='info-f210-current-517.json'
-  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata,$currentLinuxMetadata)
+  $currentLinuxMetadataOptions=@('info-f210-current-517.json','info-f210-current-517-responsive.json')
+  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)+$currentLinuxMetadataOptions
   $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
   $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info.json'))|ConvertFrom-Json -AsHashtable
   $f210BaseInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info-f210.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$f200Info.name-ceq'mir-fixture-mir5-library-multiplayer' -and [string]$f200Info.version-ceq'0.1.0' -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone F210 canonical F200 fixture metadata differs'
   Assert-Session ([string]$f210BaseInfo.name-ceq[string]$f200Info.name -and [string]$f210BaseInfo.version-ceq[string]$f200Info.version -and [string]$f210BaseInfo.factorio_version-ceq'2.1' -and ((@($f210BaseInfo.dependencies)-join '|')-ceq'base >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 canonical Base fixture metadata differs'
-  $metadata=if($MIRVersion-ceq'5.0.21017'){$currentLinuxMetadata}elseif($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  $metadata=if($MIRVersion-ceq'5.0.21017'){$CurrentLinuxMetadata}elseif($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
   if($MIRVersion-ceq'5.0.21017'){
     Assert-Session (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks) 'current Linux Library projection admits only Base API consumers'
-    Assert-Session ($canonicalNames-ccontains$currentLinuxMetadata) 'current Linux Library fixture metadata is absent'
-    $currentInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $currentLinuxMetadata))|ConvertFrom-Json -AsHashtable
-    Assert-Session ([string]$currentInfo.name-ceq[string]$f200Info.name -and [string]$currentInfo.version-ceq'0.1.2' -and [string]$currentInfo.factorio_version-ceq'2.1' -and ((@($currentInfo.dependencies)-join'|')-ceq'base >= 2.1.24|more-infinite-research = 5.0.21017')) 'current Linux Library fixture metadata differs'
+    Assert-Session ($currentLinuxMetadataOptions-ccontains$CurrentLinuxMetadata-and$canonicalNames-ccontains$CurrentLinuxMetadata) 'current Linux Library fixture metadata is absent'
+    $currentInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $CurrentLinuxMetadata))|ConvertFrom-Json -AsHashtable
+    $expectedCurrentVersion=if($CurrentLinuxMetadata-ceq'info-f210-current-517-responsive.json'){'0.1.3'}else{'0.1.2'}
+    Assert-Session ([string]$currentInfo.name-ceq[string]$f200Info.name -and [string]$currentInfo.version-ceq$expectedCurrentVersion -and [string]$currentInfo.factorio_version-ceq'2.1' -and ((@($currentInfo.dependencies)-join'|')-ceq'base >= 2.1.24|more-infinite-research = 5.0.21017')) 'current Linux Library fixture metadata differs'
   }
   if($SpaceAgeLibrary){
     Assert-Session ($canonicalNames-ccontains$spaceAgeMetadata) 'standalone F210 Space Age fixture metadata is absent'

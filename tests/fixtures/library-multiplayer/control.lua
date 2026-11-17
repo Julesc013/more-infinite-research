@@ -48,6 +48,19 @@ local function private_credit_browser_probe()
     and (script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.3.0"
       or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.4.0")
 end
+
+-- The current Linux observer has a separate fixture identity because the
+-- authored research filter grid is responsive.  Keep every retained fixture
+-- on its original exact two-column contract; this observer records the
+-- finite, source-authored column set instead of forcing an obsolete width.
+local function responsive_current_linux()
+  return script ~= nil and script.active_mods ~= nil
+    and script.active_mods.base == "2.1.24"
+    and script.active_mods["more-infinite-research"] == "5.0.21017"
+    and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.3"
+end
+
+local RESPONSIVE_FILTER_COLUMNS = {[1]=true, [2]=true, [3]=true, [5]=true}
 local positive_state = script and script.active_mods
   and script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.4.0"
   and require("positive-state") or nil
@@ -254,17 +267,30 @@ local function filter_control(root, filters, name)
   if not valid(filters) then return nil end
   local grid = valid(filters) and filters.mir_library_filter_grid
   if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
-      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+      or not valid(grid) or grid.type ~= "table" then
     fail("authored research filter grid is malformed")
   end
-  if name == "mir_library_query" then return filters[name] end
+  local layout = nil
+  if responsive_current_linux() then
+    local columns = grid.column_count
+    local viewport = root.style and root.style.maximal_width
+    if type(columns) ~= "number" or columns % 1 ~= 0 or not RESPONSIVE_FILTER_COLUMNS[columns]
+        or type(viewport) ~= "number" or viewport <= 0 then
+      fail("authored responsive research filter grid is malformed (columns=" .. tostring(columns)
+        .. "; frame-maximal-width=" .. tostring(viewport) .. ")")
+    end
+    layout = {columns=columns, frame_maximal_width=viewport}
+  elseif grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name], layout end
   local field = grid[name .. "_field"]
   local control = valid(field) and field[name]
   if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
       or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
     fail("authored research filter field is malformed")
   end
-  return control
+  return control, layout
 end
 
 local function research_parts(root)
@@ -310,7 +336,7 @@ local function frame_parts(player)
   local root = screen and screen[ROOT]
   if not valid(root) or root.type ~= "frame" or root.visible ~= true then fail("native browser root is absent or hidden") end
   local filters, content, tabs = research_parts(root)
-  local query, sort = valid(filters) and filters[QUERY] or nil, filter_control(root, filters, SORT)
+  local query, sort, filter_layout = valid(filters) and filters[QUERY] or nil, filter_control(root, filters, SORT)
   local results, actions = browser_list_parts(content)
   local detail = valid(content) and content[DETAIL] or nil
   if not valid(query) or query.type ~= "textfield" or not valid(sort) or sort.type ~= "drop-down"
@@ -329,24 +355,30 @@ local function frame_parts(player)
       or results_style.minimal_width + detail_style.minimal_width > content_width then
     fail("native public browser list/detail pane geometry differs")
   end
-  return root, query, sort, results, detail
+  return root, query, sort, results, detail, filter_layout
 end
 
 local function assert_view(player, locale)
   local expected = VIEWS[locale]
-  local root, query, sort, results = frame_parts(player)
+  local root, query, sort, results, _, filter_layout = frame_parts(player)
   if query.text ~= expected.query or sort.selected_index ~= expected.sort_index
       or results.selected_index ~= 1 or #results.items ~= 1 then
     fail("personal browser query or selected view differs for locale " .. locale)
   end
-  return root, query
+  return root, query, filter_layout
 end
 
 local function assert_personal_views(english, german)
-  local en_root, en_query = assert_view(english, "en")
-  local de_root, de_query = assert_view(german, "de")
+  local en_root, en_query, en_layout = assert_view(english, "en")
+  local de_root, de_query, de_layout = assert_view(german, "de")
   if en_root == de_root or en_query == de_query or en_query.text == de_query.text then
     fail("two clients share a browser root or query")
+  end
+  if responsive_current_linux() then
+    if type(en_layout) ~= "table" or type(de_layout) ~= "table" then
+      fail("responsive Library fixture did not observe both client filter layouts")
+    end
+    return {en=en_layout, de=de_layout}
   end
 end
 
@@ -779,6 +811,12 @@ local function marker(stage, state)
     rendering_pending_external_png_readback=true,
     screenshot_requests_are_not_headless_rendering_proof=true,
   }
+  if responsive_current_linux() and stage ~= "ready" then
+    if type(state.responsive_filter_layout) ~= "table" then
+      fail("responsive Library fixture did not retain an observed filter layout")
+    end
+    witnesses.responsive_filter_layout = state.responsive_filter_layout
+  end
   if space_age_library() then witnesses.space_age_library=true end
   if stage == "completed" and private_credit_browser_probe() then
     witnesses.private_credit_visibility = state.private_credit_visibility
@@ -888,7 +926,7 @@ local function restore_initial_views(state, english, german)
   measure(state, "first_open", function() open(english, VIEWS.en) end)
   measure(state, "search", function() open(german, VIEWS.de) end)
   measure(state, "refresh", function() open(english, VIEWS.en) end)
-  assert_personal_views(english, german)
+  state.responsive_filter_layout = assert_personal_views(english, german)
   assert_native(state, english.force)
   remember_live_views(english, german)
 
@@ -935,7 +973,7 @@ local function assert_live_queue_view(state, level, count, current)
   if german_root ~= retained.root or german_query ~= retained.query then
     fail("native Library refresh replaced the second owned root or query")
   end
-  assert_personal_views(english, german)
+  state.responsive_filter_layout = assert_personal_views(english, german)
 end
 
 local function begin_native_cancellation(state)
@@ -1031,7 +1069,7 @@ local function run_rejoin(state, english, german)
     open(english, VIEWS.en)
     open(german, VIEWS.de)
   end)
-  assert_personal_views(english, german)
+  state.responsive_filter_layout = assert_personal_views(english, german)
   assert_native(state, english.force)
   screenshot(state, "rejoin", english)
   screenshot(state, "rejoin", german)
@@ -1093,7 +1131,8 @@ local function closure()
   if private_credit and standalone_identity_discovery() then
     fail("private-credit Library fixture cannot use standalone identity discovery")
   end
-  local fixture_version = current517 and "0.1.2" or (positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))))
+  local fixture_version = current517 and (responsive_current_linux() and "0.1.3" or "0.1.2")
+    or (positive_state and "0.4.0" or (private_credit and "0.3.0" or (space_age and "0.2.0" or (standalone_identity_discovery() and "0.1.1" or "0.1.0"))))
   local allowed = {base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
