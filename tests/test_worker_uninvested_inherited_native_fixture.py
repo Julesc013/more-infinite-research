@@ -160,10 +160,11 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
 
     def test_published16_negative_reaches_the_pre_mir_marker_without_actor_work(self):
         for family in ("f200", "f210"):
-            with self.subTest(family=family):
-                result = self.world(family, "startup", negative=True)
-                self.assertEqual("startup-changed", result["trigger"])
-                self.assertEqual(2, len(result["saves"]))
+            for mode, expected in (("startup", "startup-changed"), ("addition", "added-inert")):
+                with self.subTest(family=family, mode=mode):
+                    result = self.world(family, mode, negative=True)
+                    self.assertEqual(expected, result["trigger"])
+                    self.assertEqual(2, len(result["saves"]))
 
     def test_worker_investment_refuses_before_candidate_research(self):
         self.world("f200", "startup", "worker-invested")
