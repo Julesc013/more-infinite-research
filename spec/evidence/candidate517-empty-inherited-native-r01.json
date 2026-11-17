@@ -85,7 +85,7 @@
       }
     },
     "f210": {
-      "status": "execution-complete-independent-adoption-pending",
+      "status": "adopted-scoped-native-result",
       "engine": {
         "base_version": "2.1.24",
         "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF"
@@ -127,12 +127,17 @@
         },
         "restored": true
       },
+      "actual_review": {
+        "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-actual-independent-review-r01.json",
+        "sha256": "1BD3DADE1223DE08903E908B56AE033FD8B97AB3C943BCC03E82B99C9ED01A92",
+        "kind": "MIRPublished11EmptyInheritedF210ActualIndependentReviewV1",
+        "verdict": "GO_SCOPED_F210_PUBLISHED11_EMPTY_NATIVE_SEQUENCE"
+      },
       "review_inputs": {
-        "actual_result_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-actual-independent-review-r01.json",
         "retained_source_packet_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-retained-source-packet-review-r01.json",
         "retained_source_controller_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-retained-source-controller-review-r01.json",
         "platform_observer_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/linux-resource-observer-race-review-r01.json",
-        "disposition": "The execution materials are retained for the separate independent actual-result adoption. This record intentionally does not adopt an F210 verdict before that review is reported."
+        "disposition": "The independently adopted result is scoped to this exact retained-source chain."
       },
       "private_raw_custody": {
         "primary_capsule": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-original-bodies.json.gz",
@@ -147,6 +152,19 @@
     "f200_partial_r12": "build/qualification/worker517-uninvested-native-aero-r01/f200-r12-actual-partial-review-r01.json",
     "f210_partial_r06": "build/qualification/worker517-uninvested-native-aero-r01/f210-r06-actual-partial-independent-review-r01.json",
     "disposition": "Earlier partial completions are retained as adverses and are not additional accepted chains."
+  },
+  "combined_beta_scope_review": {
+    "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/release517-worker-beta-final-scope-review-r01.json",
+    "sha256": "7BF1F95D9FB20FA5FA1B0407BECEA44FCA12D2181D0AF85F71ACBD6AB4B680F9",
+    "kind": "MIR517WorkerBetaExactSnapshotIndependentReviewV1",
+    "verdict": "GO_EXACT_BETA_PROMOTION_AND_PUBLICATION_GATES_ONLY",
+    "limit": "This supports only the exact scoped beta-promotion/publication decision. It is neither a stable acceptance verdict nor publication itself."
+  },
+  "promotion_state_at_recording": {
+    "main_promotion_commit": "7cd3ae1ff4910699eb9ceeb70681f02659f0deec",
+    "whole_tree": "ec6bc0828eee91b0cef15cf83fc541b357367e6c",
+    "main_ci": "running",
+    "publication": "not-started"
   },
   "scope_limits": [
     "This record covers only the exact published11 uninvested Base-only continuation and the two recorded candidate triggers.",
