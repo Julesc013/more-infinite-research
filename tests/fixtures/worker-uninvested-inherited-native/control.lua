@@ -157,19 +157,21 @@ local function assert_base_worker_prerequisites(force)
   end
 end
 
-local function restore_scenario_lab_before_mir(event)
+local function restore_scenario_lab_before_mir(event, stage)
   local state, force = storage[KEY], game.forces[LAB_FORCE]
+  check(stage == "published11" or stage == "candidate", "scenario restoration stage is invalid")
   check(state and state.setup and force, "scenario source restoration is unavailable")
   assert_all_empty_canonical()
   assert_base_worker_prerequisites(force)
   local bonus, speed = force.worker_robots_storage_bonus, force.laboratory_speed_modifier
-  state.restoration = {role = "scenario-lab-bonus-and-speed", baseline_bonus = BASE_WORKER_BONUS,
+  state.restoration = {role = "scenario-lab-bonus-and-speed", stage = stage, baseline_bonus = BASE_WORKER_BONUS,
     bonus_delta = SCENARIO_BONUS_DELTA, speed_delta = SCENARIO_LAB_SPEED,
     engine_bonus = bonus, engine_speed = speed,
     disposition = bonus == BASE_WORKER_BONUS and speed == 0 and "restore"
       or bonus == BASE_WORKER_BONUS + SCENARIO_BONUS_DELTA and speed == SCENARIO_LAB_SPEED and "unchanged"
       or "refuse"}
-  marker("engine-before-scenario-restoration", event)
+  marker(stage == "published11" and "engine-before-scenario-restoration"
+    or "candidate-engine-before-scenario-restoration", event)
   if bonus == BASE_WORKER_BONUS and speed == 0 then
     force.worker_robots_storage_bonus = bonus + SCENARIO_BONUS_DELTA
     force.laboratory_speed_modifier = speed + SCENARIO_LAB_SPEED
@@ -181,6 +183,8 @@ local function restore_scenario_lab_before_mir(event)
     and force.laboratory_speed_modifier == SCENARIO_LAB_SPEED,
     "scenario lab restoration did not reach its declared frame")
   if state.restoration.disposition == "restore" then state.restoration.disposition = "restored" end
+  state.restoration_history = state.restoration_history or {}
+  state.restoration_history[stage] = copy(state.restoration)
 end
 
 local function equal(value, expected, path)
@@ -355,7 +359,7 @@ script.on_configuration_changed(function(event)
     exact_active({base = target.base, ["more-infinite-research"] = target.inherited})
     check(event.mod_startup_settings_changed == false, "published11 source settings changed")
     exact_changes(rows, { ["more-infinite-research"] = {old_version = target.source, new_version = target.inherited} })
-    restore_scenario_lab_before_mir(event)
+    restore_scenario_lab_before_mir(event, "published11")
     state.phase, state.pending = "inherited-entry", "inherited"
     marker("inherited11-before-configuration", event)
     return
@@ -374,7 +378,9 @@ script.on_configuration_changed(function(event)
         [INERT] = {old_version = nil, new_version = "0.1.0"}})
       mode = "added-inert"
     end
-    state.phase, state.trigger = "candidate-entry", mode
+    state.trigger = mode
+    if candidate_version == target.candidate then restore_scenario_lab_before_mir(event, "candidate") end
+    state.phase = "candidate-entry"
     if candidate_version == target.negative then state.pending = nil else state.pending = "candidate" end
     marker("before-configuration", event)
     return
