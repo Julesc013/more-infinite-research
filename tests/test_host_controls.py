@@ -373,6 +373,10 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn(missing_fixture_fetch, workflow)
         with self.assertRaises(AssertionError):
             assert_multiplayer_fixture_source_fetches(workflow.replace(missing_fixture_fetch, "", 1))
+        missing_v014_fixture_fetch = "git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_v014_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_fixture_source_fetches(workflow.replace(missing_v014_fixture_fetch, "", 1))
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:

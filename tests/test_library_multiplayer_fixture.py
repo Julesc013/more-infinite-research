@@ -20,6 +20,7 @@ CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
 CURRENT_LINUX_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-f210-2124.json"
 CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124.json"
+CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124-v014.json"
 STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-f210-2123.json"
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
@@ -920,6 +921,28 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         ])
         self.assertEqual(profile["archive_sha256"], json.loads(CURRENT_LINUX_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))["archive_sha256"])
 
+    def test_current_linux_responsive_v014_f210_api_client_profile_keeps_controls_separate_from_the_fixture_archive(self):
+        profile = json.loads(CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-linux-responsive-v014-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-current-linux-responsive-v014", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.24",
+            "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.24", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", MIR_517_F210, True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.4", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"],
+                         json.loads(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))["archive_sha256"])
+        self.assertNotIn("mir-fixture-mir5-library-multiplayer_0.1.4.zip", profile["archive_sha256"])
+
     def test_multiplayer_wrapper_admits_only_the_current_linux_f210_api_profile_before_composition(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -931,6 +954,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
           },$true))
           if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
           Invoke-Expression $node[0].Extent.Text
           function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_CURRENT_LINUX_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
           $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
@@ -990,6 +1014,42 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
                      MIR_TEST_RESPONSIVE_PROFILE=str(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_binds_the_v014_availability_fixture_through_a_separate_source_projection(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_RESPONSIVE_V014_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-linux-responsive-v014-f210-native-selection'-or$selected.fixture_archive_name-cne'mir-fixture-mir5-library-multiplayer_0.1.4.zip'-or$selected.fixture_archive_sha256-cne'B3714EE98C860BCD873B9AA00678C93F1D74D55D22AE54E49C3B70811548C706'-or$selected.fixture_source_revision-cne'b96435710ab415dcff9aa5614fc9868956f6d5af'-or$selected.fixture_source_metadata-cne'info-f210-current-517-responsive-v014.json'-or$selected.fixture_version-cne'0.1.4'){throw 'v014 Availability fixture target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168}catch{return}
+            throw "v014 Availability profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'retained responsive fixture version' {param($s)($s.mods|Where-Object name -CEQ 'mir-fixture-mir5-library-multiplayer').version='0.1.3'}
+          Assert-Rejected 'wrong target' {param($s)$s.target='f210-current-linux-responsive'}
+          Assert-Rejected 'wrong Base tuple' {param($s)($s.mods|Where-Object name -CEQ 'base').version='2.1.23'}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s.archive_sha256['more-infinite-research_5.0.21017.zip']='A'*64}
+          Assert-Rejected 'missing beta' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESPONSIVE_V014_PROFILE=str(CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -2005,15 +2065,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $sourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
           $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output') -SourceRevision $sourceRevision
           $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
           $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
           $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SourceRevision $sourceRevision -SpaceAgeLibrary
           $spaceAgeInfo=Get-Content -LiteralPath (Join-Path $spaceAge.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
+          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
           $spaceAgeArchive=New-SourceArchive -Library $library -Source $spaceAge.source -Members @('control.lua','info.json','settings-updates.lua')
           $private=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'private-credit-output') -SourceRevision $sourceRevision -PrivateCreditChecks
           $privateInfo=Get-Content -LiteralPath (Join-Path $private.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
+          if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
           $privateArchive=New-SourceArchive -Library $library -Source $private.source -Members @('control.lua','info.json','settings-updates.lua')
           $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerRaw=Join-Path $root 'observer-raw';$null=New-Item -ItemType Directory -Path $observerRaw
           foreach($member in @('data-final-fixes.lua','info.json')){[IO.File]::WriteAllBytes((Join-Path $observerRaw $member),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $repo -SourceRevision $sourceRevision -FixtureDirectory 'active-mods-observer' -Member $member))}
@@ -2776,6 +2836,35 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True,
                 text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current_linux_responsive_v014_fixture_projection_is_exact_raw_git_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "v014 projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $source='b96435710ab415dcff9aa5614fc9868956f6d5af'
+          $projection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $source -MIRVersion '5.0.21017' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v014.json'
+          $info=Get-Content -LiteralPath (Join-Path $projection.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($projection.source_revision-cne$source-or$projection.members.Count-ne3-or$projection.source_metadata-cne'info-f210-current-517-responsive-v014.json'-or [string]$info.name-cne'mir-fixture-mir5-library-multiplayer'-or [string]$info.version-cne'0.1.4'-or [string]$info.factorio_version-cne'2.1'-or ((@($info.dependencies)-join'|')-cne'base >= 2.1.24|more-infinite-research = 5.0.21017')){throw 'v014 projection metadata differs'}
+          $names=@(Get-ChildItem -LiteralPath $projection.source -File|ForEach-Object {$_.Name}|Sort-Object)
+          if(($names-join'|')-cne'control.lua|info.json|settings-updates.lua'){throw 'v014 projection runtime member set differs'}
+          $rejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_STAGE 'wrong-version') -SourceRevision $source -MIRVersion '5.0.21000' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v014.json'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'v014 raw Git projection admitted a non-current MIR version'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-v014-fixture-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
                 env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
                 check=False,
             )
