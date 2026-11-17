@@ -10,7 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
-from test_k2_base_catalogue import _lua_value, _plain
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, NATIVE_FAMILY_RECIPES, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
 from worker_storage_recovery_fixture import expected_private_worker_row
 
@@ -193,7 +193,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         return lua
 
     def assert_foreign_input_unchanged(self, lua, raw):
-        actual = _plain(lua.globals().data.raw)
+        actual = _plain(lua, lua.globals().data.raw)
         for kind, rows in raw.items():
             for name, row in rows.items():
                 row = deepcopy(row)
@@ -204,7 +204,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
 
     def test_complete_native_definitions_and_foreign_inputs(self):
         lua = self.stage()
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         complete = deepcopy(self.expected_complete_data)
         complete["technology"]["mir-worker-storage-preservation-4"] = expected_private_worker_row("automation-science-pack")
         self.assertTrue(catalogue._same(complete, emitted),
@@ -223,7 +223,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # source recipe/technology/item/lab tables used for this construction.
         self.assert_foreign_input_unchanged(lua, self.inputs["raw"])
         self.assertEqual(lua.globals().publications, 2)  # shortcut, one complete technology publication
-        declared = _plain(lua.execute('return require("research.catalogue").declared()'))
+        declared = _plain(lua, lua.execute('return require("research.catalogue").declared()'))
         self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
 
     def test_disabled_named_water_gate_refuses_enabled_routes_before_publication(self):
@@ -236,7 +236,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # admission check must add no later publication or Bob/Angel research.
         self.assertEqual(lua.globals().publications, lua.globals().data_publications)
         self.assertNotIn("recipe-prod-research_bullets-1",
-                         _plain(lua.globals().emitted).get("technology", {}))
+                         _plain(lua, lua.globals().emitted).get("technology", {}))
         self.assert_foreign_input_unchanged(lua, raw)
 
         # The published independent rows name exactly which forward streams
@@ -252,7 +252,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
             self.assertTrue(name.startswith("recipe-prod-") and name.endswith("-1"), name)
             startup["ips-enable-" + name[len("recipe-prod-"):-2]] = {"value": False}
         lua = self.stage(raw=raw, startup=startup)
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         self.assertEqual(lua.globals().publications, 2)
         for name in gated_rows:
             self.assertFalse(emitted["technology"][name]["enabled"], name)
@@ -260,7 +260,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
 
     def test_all_875_settings_match_published_fields_with_reviewed_growth_bound(self):
         lua = self.stage()
-        rows = _plain(lua.execute('return require("research.settings").prototypes()'))
+        rows = _plain(lua, lua.execute('return require("research.settings").prototypes()'))
         actual = {}
         for row in rows:
             actual.setdefault(row["type"], {})[row["name"]] = row

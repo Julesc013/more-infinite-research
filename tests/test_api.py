@@ -444,6 +444,87 @@ class ApiTests(unittest.TestCase):
             {"missing-recipe"}, .02) end, "missing_target")
         ''')
 
+    def test_native_publication_exception_words_do_not_choose_api_error_codes(self):
+        for fresh in (self.fresh, self.fresh_f200):
+            fresh()
+            self.lua.execute('''
+              local operations = {
+                function() api.add_technology(definition("native-failure-single")) end,
+                function() api.add_technologies({definition("native-failure-family")}) end,
+                function() api.add_productivity(definition("native-failure-recipe"),
+                  {"iron-gear-wheel"}, .02) end,
+              }
+              local messages = {
+                "unexpected native exception: missing reserved target",
+                "unexpected native exception: duplicate technology mentioned in context",
+                "MIR technology preflight: duplicate technology is only native exception prose",
+              }
+              for _, operation in ipairs(operations) do
+                for _, original in ipairs(messages) do
+                  local attempts = 0
+                  data.extend = function()
+                    attempts = attempts + 1
+                    error(original, 0)
+                  end
+                  local ok, message = pcall(operation)
+                  assert(not ok and tostring(message):find("MIR_API:invalid_definition: ", 1, true),
+                    "native exception prose changed the category: " .. tostring(message))
+                  assert(tostring(message):find(original, 1, true), "original native error was lost")
+                  assert(attempts == 1 and data.writes == 0,
+                    "publication must be attempted once; this mock throws before its first write")
+                end
+              end
+            ''')
+
+    def test_raw_lookup_and_post_write_exception_words_stay_nonpreflight(self):
+        for fresh in (self.fresh, self.fresh_f200):
+            fresh()
+            self.lua.execute('''
+              local untouched = {}
+              data.raw.technology = setmetatable(untouched, {__index=function()
+                error("duplicate missing raw lookup sentinel", 0)
+              end})
+              local ok, message = pcall(api.add_technologies,
+                {definition("native-lookup-failure-family")})
+              assert(not ok and tostring(message):find("MIR_API:invalid_definition: ", 1, true),
+                tostring(message))
+              assert(tostring(message):find("duplicate missing raw lookup sentinel", 1, true),
+                "raw lookup cause was lost")
+              assert(data.writes == 0 and next(untouched) == nil,
+                "raw lookup failure was relabelled as publication")
+            ''')
+
+            fresh()
+            self.lua.execute('''
+              local name = "native-post-write-failure-productivity"
+              data.extend = function(self, rows)
+                self.writes = self.writes + 1
+                self.raw.technology[rows[1].name] = rows[1]
+                error("missing duplicate technology publication sentinel", 0)
+              end
+              local ok, message = pcall(api.add_productivity, definition(name), {"iron-gear-wheel"}, .02)
+              assert(not ok and tostring(message):find("MIR_API:invalid_definition: ", 1, true),
+                tostring(message))
+              assert(tostring(message):find("missing duplicate technology publication sentinel", 1, true),
+                "post-write publication cause was lost")
+              assert(data.writes == 1 and data.raw.technology[name] ~= nil,
+                "post-write publication failure was relabelled as clean preflight")
+            ''')
+
+    def test_validation_reason_is_independent_of_technology_names(self):
+        for fresh in (self.fresh, self.fresh_f200):
+            fresh()
+            self.lua.execute('''
+              local a = definition("missing-cycle-a", {"missing-cycle-b"})
+              local b = definition("missing-cycle-b", {"missing-cycle-a"})
+              refused(function() api.add_technologies({a, b}) end, "invalid_definition")
+              refused(function() api.add_technology(definition("genuine-missing", {"absent"})) end,
+                "missing_target")
+              api.add_technology(definition("genuine-duplicate"))
+              refused(function() api.add_technology(definition("genuine-duplicate")) end,
+                "duplicate_identity")
+            ''')
+
     def test_native_publication_error_is_rethrown_with_its_context(self):
         self.fresh()
         self.lua.execute('''

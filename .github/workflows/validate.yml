@@ -32,6 +32,28 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 29da2a250efa9235c9bde0f5bf9f4a9013f990a3
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
+          git fetch --no-tags --depth=1 origin a6ace8a48dd59b3f5eb46722273d7545e0de7011
+          if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 3c6cf808745fe88741ceea0a33bf950cec8f8176
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
@@ -64,6 +86,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained Library render actor fetch failed.' }
           git fetch --no-tags --depth=1 origin 15f1c5d02574873dbbac7957c254acc2563b7341
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.5 Library render fixture fetch failed.' }
+          git fetch --no-tags --depth=1 origin c0990641a21517e8747f5a5266a4e2535793904e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.6 Library render fixture fetch failed.' }
           git fetch --no-tags --depth=1 origin ced35555dcaefdf09126f176cff2efdfc0fcec78
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866
@@ -168,6 +192,28 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 29da2a250efa9235c9bde0f5bf9f4a9013f990a3
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
+          git fetch --no-tags --depth=1 origin a6ace8a48dd59b3f5eb46722273d7545e0de7011
+          if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin c528c3990ab3479760537cc7208bd69423f7d4fd
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer continuity-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 3c6cf808745fe88741ceea0a33bf950cec8f8176
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8
+          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d5b1870841722afdad80e115a0eb38b24dc035c4
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d88e1b13c334235dc1a7457af733ce812cd2d99c
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
+          git fetch --no-tags --depth=1 origin e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained multiplayer counterfactual source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
           if ($LASTEXITCODE -ne 0) { throw 'Exact captured F210 K2 profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin a9754abcd7405e1ddffa9f4dc8051b71d00855fe
@@ -200,6 +246,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained Library render actor fetch failed.' }
           git fetch --no-tags --depth=1 origin 15f1c5d02574873dbbac7957c254acc2563b7341
           if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.5 Library render fixture fetch failed.' }
+          git fetch --no-tags --depth=1 origin c0990641a21517e8747f5a5266a4e2535793904e
+          if ($LASTEXITCODE -ne 0) { throw 'Exact retained 0.1.6 Library render fixture fetch failed.' }
           git fetch --no-tags --depth=1 origin ced35555dcaefdf09126f176cff2efdfc0fcec78
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866

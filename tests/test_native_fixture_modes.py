@@ -210,6 +210,75 @@ if($call.Count-ne1){throw 'actual create stage bypasses selected arguments'}
                                 capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
+    def test_protected_input_save_is_copied_and_only_the_owned_copy_reaches_start_server(self):
+        script = r'''
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'runner parse failed'}
+foreach($name in @('Assert-Fixture','Get-FixtureSha','New-FixtureWorkingInputSave')){
+ $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+ if($node.Count-ne1){throw "working input helper missing: $name"};Invoke-Expression $node[0].Extent.Text
+}
+$seedAssignment=@($ast.FindAll({param($n)
+ $n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$seed' -and $n.Right.Extent.Text.Contains('$workingInputSave.path')
+},$true))
+$modernProduction=@($ast.FindAll({param($n)
+ $n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$record.production' -and $n.Right.Extent.Text.Contains("'--server-settings',`$server,'--bind','127.0.0.1','--start-server',`$seed")
+},$true))
+if($seedAssignment.Count-ne1-or$modernProduction.Count-ne1){throw 'actual owned seed to modern start-server route missing or ambiguous'}
+function Get-MIRNativeProbeRemainingOutputBytes {param($Context) return [int64]$Context.remaining}
+$source=Join-Path $env:MIR_TEST_TEMP 'protected-source.zip';$owned=Join-Path $env:MIR_TEST_TEMP 'owned-context'
+[IO.Directory]::CreateDirectory($owned)|Out-Null
+$original=[Text.Encoding]::UTF8.GetBytes('protected-native-save-bytes')
+[IO.File]::WriteAllBytes($source,$original)
+$expected=Get-FixtureSha $source
+$resources=[pscustomobject]@{root=$owned;remaining=[int64]1MB}
+$working=New-FixtureWorkingInputSave -InputSave $source -ExpectedSha256 $expected -Resources $resources
+if($working.mode-cne'copy'-or$working.path-ceq$source-or$working.protected_path-cne$source-or$working.sha256-cne$expected-or$working.bytes-ne$original.Length){throw 'working-copy initial receipt differs'}
+$inputSave=$source;$workingInputSave=$working;$seed=$null
+. ([scriptblock]::Create($seedAssignment[0].Extent.Text))
+$record=[ordered]@{};$server=Join-Path $owned 'server-settings.json';$completion=$null;$script:engineStart=''
+function Invoke-FixtureStage {param([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion)
+ $index=[array]::IndexOf([string[]]$StageArguments,'--start-server')
+ if($Name-cne'production'-or$index-lt0-or$index-eq($StageArguments.Count-1)){throw 'engine double did not receive an actual production start-server argument'}
+ $script:engineStart=[string]$StageArguments[$index+1]
+ [IO.File]::WriteAllBytes($script:engineStart,[Text.Encoding]::UTF8.GetBytes('graceful-engine-save-back'))
+ return [pscustomobject]@{stage=$Name;arguments=@($StageArguments)}
+}
+. ([scriptblock]::Create($modernProduction[0].Extent.Text))
+if($script:engineStart-cne$working.path-or(Get-FixtureSha $source)-cne$expected-or(Get-FixtureSha $working.path)-ceq$expected-or$record.production.arguments[$record.production.arguments.Count-1]-cne$working.path){throw 'owned-copy production route or protected-source preservation differs'}
+# This is the exact former direct seed assignment, exercised with the same
+# production statement and graceful engine double.  It proves why retaining
+# only a post-run protected-source hash is insufficient without the copy.
+[IO.File]::WriteAllBytes($source,$original)
+$inputSave=$source;$seed=$inputSave;$record=[ordered]@{};$script:engineStart=''
+. ([scriptblock]::Create($modernProduction[0].Extent.Text))
+if($script:engineStart-cne$source-or(Get-FixtureSha $source)-ceq$expected){throw 'direct protected-source counterfactual did not expose the graceful save-back mutation'}
+[IO.File]::WriteAllBytes($source,$original)
+Remove-Item -LiteralPath $working.path -Force
+foreach($mode in @('wrong-pin','budget','preexisting')){
+ $resources.remaining=[int64]1MB
+ if($mode-ceq'wrong-pin'){$hash='0'*64}else{$hash=$expected}
+ if($mode-ceq'budget'){$resources.remaining=[int64]$original.Length}
+ if($mode-ceq'preexisting'){[IO.File]::WriteAllBytes($working.path,[Text.Encoding]::UTF8.GetBytes('do-not-overwrite'))}
+ $refused=$false;try{New-FixtureWorkingInputSave -InputSave $source -ExpectedSha256 $hash -Resources $resources|Out-Null}catch{$refused=$true}
+ if(-not$refused){throw "prelaunch input-copy refusal missing: $mode"}
+ if($mode-ceq'preexisting'){
+  if([Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($working.path))-cne'do-not-overwrite'){throw 'prelaunch copy overwrote an existing owned output'}
+  Remove-Item -LiteralPath $working.path -Force
+ }elseif(Test-Path -LiteralPath $working.path){throw "prelaunch rejection left a partial working copy: $mode"}
+ if((Get-FixtureSha $source)-cne$expected){throw "prelaunch rejection changed protected source: $mode"}
+}
+'PASS protected source stays immutable while the actual start-server argument is writable owned output'
+'''
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="native-fixture-working-copy-") as directory:
+            result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                    env=dict(os.environ, MIR_TEST_RUNNER=str(ROOT / 'tools/Invoke-NativeFixture.ps1'),
+                                             MIR_TEST_TEMP=directory), capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def test_absent_full_and_create_modes_refuse_any_mir_selection_or_hash(self):
         script = r'''
 $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest

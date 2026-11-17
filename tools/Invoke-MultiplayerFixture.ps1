@@ -18,6 +18,13 @@ param(
   # two-client predicate.  It is deliberately opt-in so the qualified Library
   # session continues to use its original profile, identities and GUI path.
   [switch]$StandaloneIdentityDiscovery,
+  # The current Linux route receives two already-composed, hash-bound display
+  # plans.  This wrapper does not own global host-idle/campaign admission or
+  # create a second governor; the governed session owns their lifetime.
+  [System.Collections.IDictionary]$LinuxPrivateDisplays,
+  # Validate the complete current Linux composition without creating a world,
+  # starting a display, activating a client, or claiming a seed result.
+  [switch]$ComposeOnly,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -27,6 +34,9 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 function Assert-Session([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir5-multiplayer-fixture] $Message"}
 }
+$loopbackRconHelper=(Resolve-Path -LiteralPath (Join-Path $repo 'tools/lib/validation/LoopbackRcon.ps1')).Path
+$loopbackRconHelperItem=Get-Item -LiteralPath $loopbackRconHelper
+$loopbackRconHelperIdentity=[ordered]@{path=$loopbackRconHelper;bytes=[int64]$loopbackRconHelperItem.Length;sha256=(Get-FileHash -LiteralPath $loopbackRconHelper -Algorithm SHA256).Hash.ToUpperInvariant()}
 Assert-Session (-not $CollectProcessLifetimePeaks -or ($CollectProcessMemoryObservations -and
   -not $StandaloneIdentityDiscovery -and $FixtureCase -cin @('library-multiplayer','library-paired-browser'))) 'lifetime peak counters require opted-in Library memory observations'
 function Assert-MultiplayerFixtureSelection {
@@ -205,6 +215,87 @@ function Assert-MultiplayerFixtureSelection {
       api_client_consumers=$true
     }
     [ordered]@{
+      # This is the current Linux-only fresh Library route.  It deliberately
+      # remains a separate target: it does not retag the retained 2.1.23
+      # Windows selections or make their receipts portable by assertion.
+      fixture_case='library-multiplayer';target='f210-current-linux'
+      kind='mir5-library-api-consumers-current-linux-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.2.zip'
+      fixture_source_revision='3c6cf808745fe88741ceea0a33bf950cec8f8176'
+      fixture_source_metadata='info-f210-current-517.json';fixture_version='0.1.2'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.2','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.2.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
+      # The responsive observer is a new current Linux target.  It does not
+      # alter the retained fixed-grid fixture, archive, or historical profile.
+      fixture_case='library-multiplayer';target='f210-current-linux-responsive'
+      kind='mir5-library-api-consumers-current-linux-responsive-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='E7340D20575B726BF25BBBAC85257E82A6BF2B657A97C4C9A687A0500752CEFD'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.3.zip'
+      fixture_source_revision='ef6e173a628fd8acd5e95975c40c515c2cc2ba23'
+      fixture_source_metadata='info-f210-current-517-responsive.json';fixture_version='0.1.3'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.3','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.3.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
+      # This Availability-observer successor keeps the responsive route
+      # separate from both the retained fixed-grid and 0.1.3 inputs.
+      fixture_case='library-multiplayer';target='f210-current-linux-responsive-v014'
+      kind='mir5-library-api-consumers-current-linux-responsive-v014-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='B3714EE98C860BCD873B9AA00678C93F1D74D55D22AE54E49C3B70811548C706'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.4.zip'
+      fixture_source_revision='b96435710ab415dcff9aa5614fc9868956f6d5af'
+      fixture_source_metadata='info-f210-current-517-responsive-v014.json';fixture_version='0.1.4'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.4','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.4.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
+      # This queue-context successor keeps the responsive 0.1.3/0.1.4 routes
+      # immutable while binding the actual settled-queue display contract.
+      fixture_case='library-multiplayer';target='f210-current-linux-responsive-v015'
+      kind='mir5-library-api-consumers-current-linux-responsive-v015-f210-native-selection';factorio_line='2.1';base='2.1.24'
+      engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21017';build_version=87808
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      mir_archive_sha256='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+      fixture_archive_sha256='CAC05BAE5E3D67D85681B9C0FEC376D71809A7A4E6811A274C6468ADD8ED36FC'
+      fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.5.zip'
+      fixture_source_revision='0dac003903a317137cf993b5bd22074a3e5013a8'
+      fixture_source_metadata='info-f210-current-517-responsive-v015.json';fixture_version='0.1.5'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.5','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21017.zip','mir-fixture-mir5-library-multiplayer_0.1.5.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_consumer_archive_sha256=[ordered]@{
+        'mir-fixture-mir5-api-alpha_0.1.0.zip'='DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904'
+        'mir-fixture-mir5-api-beta_0.1.0.zip'='943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894'
+      }
+      session_expected_peak_memory_mib=7168;standalone_f210=$true;api_client_consumers=$true;linux_private_displays=$true
+    }
+    [ordered]@{
       fixture_case='library-paired-browser';target='f200'
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002';build_version=84539
@@ -310,6 +401,22 @@ function Assert-MultiplayerFixtureSelection {
     foreach($entry in $apiArchives.GetEnumerator()){
       Assert-Session ($entry.Key -is [string] -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$' -and $archives.Contains([string]$entry.Key) -and $archives[[string]$entry.Key] -ceq [string]$entry.Value) "standalone API consumer archive differs: $($entry.Key)"
     }
+  }
+  if($target.Contains('fixture_archive_sha256')){
+    $currentFixtureBindings=[ordered]@{
+      'mir-fixture-mir5-library-multiplayer_0.1.2.zip'=[ordered]@{metadata='info-f210-current-517.json';version='0.1.2'}
+      'mir-fixture-mir5-library-multiplayer_0.1.3.zip'=[ordered]@{metadata='info-f210-current-517-responsive.json';version='0.1.3'}
+      'mir-fixture-mir5-library-multiplayer_0.1.4.zip'=[ordered]@{metadata='info-f210-current-517-responsive-v014.json';version='0.1.4'}
+      'mir-fixture-mir5-library-multiplayer_0.1.5.zip'=[ordered]@{metadata='info-f210-current-517-responsive-v015.json';version='0.1.5'}
+    }
+    $fixtureBinding=if($target.Contains('fixture_archive_name')){$currentFixtureBindings[[string]$target.fixture_archive_name]}else{$null}
+    Assert-Session ($target.fixture_archive_sha256 -is [string] -and $target.fixture_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $target.Contains('fixture_archive_name') -and $target.fixture_archive_name -is [string] -and $null-ne$fixtureBinding) 'current Library fixture archive binding differs'
+    # This projection archive is purposefully not part of the reusable profile
+    # document: the profile's four library-control hashes bind Base/MIR/A15/
+    # API consumers, while the wrapper binds this selected source projection
+    # separately before it can activate the full six-mod session.
+    Assert-Session ($target.optional_archives -ccontains $target.fixture_archive_name) 'current Library fixture archive selection differs'
+    Assert-Session ($target.Contains('fixture_source_revision') -and $target.fixture_source_revision -is [string] -and $target.fixture_source_revision -cmatch '^[0-9a-f]{40}$' -and $target.Contains('fixture_source_metadata') -and $target.fixture_source_metadata -is [string] -and $target.fixture_source_metadata -ceq$fixtureBinding.metadata -and $target.Contains('fixture_version') -and $target.fixture_version -is [string] -and $target.fixture_version -ceq$fixtureBinding.version) 'current Library fixture source binding differs'
   }
   foreach($entry in $archives.GetEnumerator()){
     Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
@@ -438,7 +545,7 @@ function Get-StandaloneF210NativeFixtureRawGitMemberBytes {
     [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$Member
   )
-  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
+  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-current-517-responsive-v015.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive.json','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
   Assert-Session ($allowed-ccontains$Member) "standalone F210 fixture member is not admitted: $FixtureDirectory/$Member"
   $path='tests/fixtures/'+$FixtureDirectory+'/'+$Member
   $start=[Diagnostics.ProcessStartInfo]::new()
@@ -462,9 +569,11 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [switch]$SpaceAgeLibrary,
     [switch]$PrivateCreditChecks,
-    [ValidateSet('5.0.21000','5.0.21004')][string]$MIRVersion='5.0.21000'
+    [ValidateSet('5.0.21000','5.0.21004','5.0.21017')][string]$MIRVersion='5.0.21000',
+    [ValidateSet('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive-v015.json')][string]$CurrentLinuxMetadata='info-f210-current-517.json'
   )
   Assert-Session ($MIRVersion-cne'5.0.21004' -or (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks)) 'current504 projection admits only the four-mod Base fixture'
+  Assert-Session ($MIRVersion-ceq'5.0.21017' -or $CurrentLinuxMetadata-ceq'info-f210-current-517.json') 'current Linux fixture metadata admits only MIR 5.0.21017'
   # The checked-in fixture retains F200 metadata and its developer README.
   # Every F210 route stages precisely three runtime members. The selected
   # metadata is the only Base/Space Age distinction; it is copied unchanged.
@@ -473,14 +582,23 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
   $privateCreditMetadata='info-f210-private-credits.json'
-  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)
+  $currentLinuxMetadataOptions=@('info-f210-current-517.json','info-f210-current-517-responsive.json','info-f210-current-517-responsive-v014.json','info-f210-current-517-responsive-v015.json')
+  $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)+$currentLinuxMetadataOptions
   $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
   $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info.json'))|ConvertFrom-Json -AsHashtable
   $f210BaseInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info-f210.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$f200Info.name-ceq'mir-fixture-mir5-library-multiplayer' -and [string]$f200Info.version-ceq'0.1.0' -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone F210 canonical F200 fixture metadata differs'
   Assert-Session ([string]$f210BaseInfo.name-ceq[string]$f200Info.name -and [string]$f210BaseInfo.version-ceq[string]$f200Info.version -and [string]$f210BaseInfo.factorio_version-ceq'2.1' -and ((@($f210BaseInfo.dependencies)-join '|')-ceq'base >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 canonical Base fixture metadata differs'
-  $metadata=if($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  $metadata=if($MIRVersion-ceq'5.0.21017'){$CurrentLinuxMetadata}elseif($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
+  if($MIRVersion-ceq'5.0.21017'){
+    Assert-Session (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks) 'current Linux Library projection admits only Base API consumers'
+    Assert-Session ($currentLinuxMetadataOptions-ccontains$CurrentLinuxMetadata-and$canonicalNames-ccontains$CurrentLinuxMetadata) 'current Linux Library fixture metadata is absent'
+    $currentInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $CurrentLinuxMetadata))|ConvertFrom-Json -AsHashtable
+    $expectedCurrentVersions=[ordered]@{'info-f210-current-517.json'='0.1.2';'info-f210-current-517-responsive.json'='0.1.3';'info-f210-current-517-responsive-v014.json'='0.1.4';'info-f210-current-517-responsive-v015.json'='0.1.5'}
+    $expectedCurrentVersion=$expectedCurrentVersions[$CurrentLinuxMetadata]
+    Assert-Session ([string]$currentInfo.name-ceq[string]$f200Info.name -and [string]$currentInfo.version-ceq$expectedCurrentVersion -and [string]$currentInfo.factorio_version-ceq'2.1' -and ((@($currentInfo.dependencies)-join'|')-ceq'base >= 2.1.24|more-infinite-research = 5.0.21017')) 'current Linux Library fixture metadata differs'
+  }
   if($SpaceAgeLibrary){
     Assert-Session ($canonicalNames-ccontains$spaceAgeMetadata) 'standalone F210 Space Age fixture metadata is absent'
     $f210SpaceAgeInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $spaceAgeMetadata))|ConvertFrom-Json -AsHashtable
@@ -752,6 +870,136 @@ function Invoke-MultiplayerFixturePreparation {
     if(-not $completed -and $null-ne$install){Remove-StandaloneIdentityFixtureArchive -Install $install}
   }
 }
+function Assert-LinuxDisplayPinnedFile {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Expected,[Parameter(Mandatory)][string]$Label,[ValidateRange(1,64MB)][int64]$MaximumBytes=256KB)
+  Assert-Session ($Expected -cmatch '^[A-Fa-f0-9]{64}$' -and (Test-Path -LiteralPath $Path -PathType Leaf)) "$Label is absent"
+  $item=Get-Item -LiteralPath $Path -Force
+  Assert-Session (($item.Attributes -band [IO.FileAttributes]::ReparsePoint)-eq0 -and $item.Length-gt0-and$item.Length-le$MaximumBytes) "$Label identity differs"
+  Assert-Session ((Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$Expected.ToUpperInvariant()) "$Label hash differs"
+  return $item.FullName
+}
+function Get-LinuxDisplayProbePythonPin {
+  param([Parameter(Mandatory)][string]$ProbePath,[Parameter(Mandatory)][string]$PythonPath)
+  try{$text=[Text.UTF8Encoding]::new($false,$true).GetString([IO.File]::ReadAllBytes($ProbePath))}catch{throw '[mir5-multiplayer-fixture] private display probe text differs'}
+  $matches=@([regex]::Matches($text,'(?m)^\s*["''](?<path>[^"'']+)["'']\s*:\s*["''](?<hash>[A-F0-9]{64})["'']\s*,?\s*$')|Where-Object {$_.Groups['path'].Value-ceq$PythonPath})
+  Assert-Session ($matches.Count-eq1) 'private display probe Python pin differs'
+  return $matches[0].Groups['hash'].Value
+}
+function Invoke-LinuxDisplaySchema {
+  param([Parameter(Mandatory)]$Binding,[Parameter(Mandatory)]$Role,[Parameter(Mandatory)][string]$Label,[scriptblock]$SchemaInvoker)
+  if($null-ne$SchemaInvoker){& $SchemaInvoker $Binding $Role $Label;return}
+  $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=[string]$Binding.python;$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @([string]$Binding.display_cli,'--module-sha256',[string]$Binding.display_module_sha256,'--mode','schema','--checkout',[string]$Binding.checkout,'--plan',[string]$Role.plan,'--plan-sha256',[string]$Role.plan_sha256)){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) "$Label schema process did not start"
+  try{
+    $stdout=$process.StandardOutput.ReadToEnd();$stderr=$process.StandardError.ReadToEnd();$process.WaitForExit()
+    Assert-Session ($process.ExitCode-eq0-and[Text.UTF8Encoding]::new($false).GetByteCount($stdout)-le8KB-and[Text.UTF8Encoding]::new($false).GetByteCount($stderr)-le8KB) "$Label schema validation refused"
+    $value=$stdout.Trim()|ConvertFrom-Json -AsHashtable
+    Assert-Session ($value-is[Collections.IDictionary]-and$value.kind-ceq'MIRLinuxLibraryDisplayResultV1'-and$value.status-ceq'validated-schema-only'-and$value.role-ceq[string]$Role.role-and$value.display-ceq[string]$Role.display-and$value.factorio_processes-eq0) "$Label schema receipt differs"
+  }finally{$process.Dispose()}
+}
+function New-LinuxPrivateDisplayRuntime {
+  param([Parameter(Mandatory)][Collections.IDictionary]$Binding,[Parameter(Mandatory)]$Context,[scriptblock]$SchemaInvoker,[ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedProbeSha256='F2DF1A32CA48119010E5DBE42326B3ED46E13A01A08B487AFDF0CDA5B180B423')
+  Assert-Session ($Binding.Keys.Count-eq6-and$Binding.Contains('python')-and$Binding.Contains('display_cli')-and$Binding.Contains('display_cli_sha256')-and$Binding.Contains('display_module_sha256')-and$Binding.Contains('checkout')-and$Binding.Contains('roles')) 'current Linux private-display plan shape differs'
+  foreach($name in @('python','display_cli','checkout','display_cli_sha256','display_module_sha256')){Assert-Session ($Binding[$name]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$Binding[$name])) "current Linux private-display $name differs"}
+  $pythonCandidate=Assert-LinuxDisplayPinnedFile -Path ([string]$Binding.python) -Expected ((Get-FileHash -LiteralPath ([string]$Binding.python) -Algorithm SHA256).Hash) -Label 'private display Python' -MaximumBytes 64MB
+  $cli=Assert-LinuxDisplayPinnedFile -Path ([string]$Binding.display_cli) -Expected ([string]$Binding.display_cli_sha256) -Label 'private display CLI'
+  $module=Assert-LinuxDisplayPinnedFile -Path (Join-Path (Split-Path -Parent $cli) 'lib/validation/LinuxLibraryDisplay.py') -Expected ([string]$Binding.display_module_sha256) -Label 'private display module'
+  $checkout=(Resolve-Path -LiteralPath ([string]$Binding.checkout)).Path
+  $checkoutItem=Get-Item -LiteralPath $checkout -Force
+  Assert-Session ($checkoutItem.PSIsContainer-and(($checkoutItem.Attributes-band[IO.FileAttributes]::ReparsePoint)-eq0)) 'private display checkout differs'
+  Assert-Session ((Join-Path $checkout 'build/p')-and(Test-Path -LiteralPath (Join-Path $checkout 'build/p') -PathType Container)) 'private display checkout build root differs'
+  $roles=@($Binding.roles)
+  Assert-Session ($roles.Count-eq2) 'current Linux private-display role count differs'
+  $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $probePath=$null;$probeHash=$null;$authenticatedPlans=@{}
+  foreach($role in $roles){
+    Assert-Session ($role-is[Collections.IDictionary]-and$role.Keys.Count-eq10) 'private display role envelope differs'
+    foreach($name in @('locale','role','display','geometry','plan','plan_sha256','ready','result','role_root','authority')){Assert-Session ($role.Contains($name)-and$role[$name]-is[string]-and-not[string]::IsNullOrWhiteSpace([string]$role[$name])) "private display role field differs: $name"}
+    $locale=[string]$role.locale;Assert-Session ($locale-cin@('en','de')-and$seen.Add($locale)) 'private display locales differ'
+    Assert-Session ([string]$role.role-ceq('client-'+$locale)-and[string]$role.display-ceq$(if($locale-ceq'en'){':193'}else{':194'})-and[string]$role.geometry-ceq'1280x720') 'private display role identity differs'
+    $planPath=Assert-LinuxDisplayPinnedFile -Path ([string]$role.plan) -Expected ([string]$role.plan_sha256) -Label ('private display '+$locale+' plan')
+    try{$planBytes=[IO.File]::ReadAllBytes($planPath);$planText=[Text.UTF8Encoding]::new($false,$true).GetString($planBytes)}catch{throw '[mir5-multiplayer-fixture] private display plan text differs'}
+    Assert-Session ($planBytes.Length-gt0-and$planBytes.Length-le8KB) 'private display plan exceeds bound'
+    $sha=[Security.Cryptography.SHA256]::Create();try{$planHash=-join($sha.ComputeHash($planBytes)|ForEach-Object {$_.ToString('X2')})}finally{$sha.Dispose()}
+    Assert-Session ($planHash-ceq[string]$role.plan_sha256.ToUpperInvariant()) 'private display plan changed while reading'
+    try{$originalPlan=$planText|ConvertFrom-Json -AsHashtable}catch{throw '[mir5-multiplayer-fixture] private display plan JSON differs'}
+    $authenticatedPlans[$locale]=[pscustomobject]@{path=$planPath;sha256=$planHash;raw=$planText;plan=$originalPlan}
+    Assert-Session ($originalPlan-is[Collections.IDictionary]-and$originalPlan.Contains('probe_display')-and$originalPlan.probe_display-is[Collections.IDictionary]) 'private display plan probe differs'
+    $probe=$originalPlan.probe_display
+    Assert-Session ($probe.Keys.Count-eq3-and$probe.Contains('path')-and$probe.Contains('bytes')-and$probe.Contains('sha256')-and$probe.path-is[string]-and$probe.bytes-is[Int64]-and$probe.sha256-is[string]-and$probe.sha256-cmatch'^[A-Fa-f0-9]{64}$') 'private display plan probe shape differs'
+    $resolvedProbe=Assert-LinuxDisplayPinnedFile -Path ([string]$probe.path) -Expected ([string]$probe.sha256) -Label ('private display '+$locale+' probe')
+    Assert-Session ((Get-Item -LiteralPath $resolvedProbe -Force).Length-eq[Int64]$probe.bytes) 'private display plan probe bytes differ'
+    Assert-Session ($null-eq$probePath-or($probePath-ceq$resolvedProbe-and$probeHash-ceq[string]$probe.sha256.ToUpperInvariant())) 'private display plans bind different probes'
+    $probePath=$resolvedProbe;$probeHash=[string]$probe.sha256.ToUpperInvariant()
+  }
+  Assert-Session ($probeHash-ceq$ExpectedProbeSha256.ToUpperInvariant()) 'private display probe is not the qualified F2DF helper'
+  $python=Assert-LinuxDisplayPinnedFile -Path $pythonCandidate -Expected (Get-LinuxDisplayProbePythonPin -ProbePath $probePath -PythonPath $pythonCandidate) -Label 'private display Python' -MaximumBytes 64MB
+  foreach($role in $roles){
+    Invoke-LinuxDisplaySchema -Binding ([ordered]@{python=$python;display_cli=$cli;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$checkout}) -Role $role -Label ('private display '+[string]$role.locale+' original') -SchemaInvoker $SchemaInvoker
+  }
+  $runtimeBuild=Join-Path $Context.root 'build/p';$null=New-Item -ItemType Directory -Path $runtimeBuild
+  $runtimePlans=Join-Path $Context.root 'display-plans';$null=New-Item -ItemType Directory -Path $runtimePlans
+  $runtimeRoles=[Collections.Generic.List[object]]::new()
+  foreach($role in @($roles|Sort-Object locale)){
+    $locale=[string]$role.locale;$roleRoot=Join-Path $runtimeBuild ('client-'+$locale)
+    Assert-Session (-not(Test-Path -LiteralPath $roleRoot));$null=New-Item -ItemType Directory -Path $roleRoot
+    $admitted=$authenticatedPlans[$locale]
+    Assert-Session ($null-ne$admitted-and$admitted.sha256-ceq[string]$role.plan_sha256.ToUpperInvariant()) 'private display authenticated plan is absent'
+    $plan=$admitted.raw|ConvertFrom-Json -AsHashtable
+    Assert-Session ($plan-is[Collections.IDictionary]) 'private display plan body differs'
+    $leafPlanFields=@('schema','kind','role','geometry','role_root','deadline_seconds','xtigervnc','xauth','probe_display')
+    Assert-Session ($plan.Keys.Count-eq$leafPlanFields.Count-and$admitted.plan.Keys.Count-eq$leafPlanFields.Count) 'private display admitted plan shape differs'
+    foreach($field in $leafPlanFields){Assert-Session ($plan.Contains($field)-and$admitted.plan.Contains($field)) "private display admitted plan field differs: $field"}
+    $sameGeometry=(@($plan.geometry)-join',')-ceq(@($admitted.plan.geometry)-join',')
+    $sameProbe=($plan.probe_display.path-ceq$admitted.plan.probe_display.path)-and($plan.probe_display.bytes-eq$admitted.plan.probe_display.bytes)-and($plan.probe_display.sha256-ceq$admitted.plan.probe_display.sha256)
+    Assert-Session (($plan.role-ceq[string]$role.role)-and($plan.role-ceq$admitted.plan.role)-and$sameGeometry-and($plan.deadline_seconds-eq$admitted.plan.deadline_seconds)-and$sameProbe) 'private display runtime plan differs from its admitted source'
+    $plan.role_root=$roleRoot
+    $runtimePlan=Join-Path $runtimePlans ('client-'+$locale+'.json')
+    [IO.File]::WriteAllText($runtimePlan,(ConvertTo-Json -InputObject $plan -Depth 12 -Compress)+"`n",[Text.UTF8Encoding]::new($false))
+    $runtimeHash=(Get-FileHash -LiteralPath $runtimePlan -Algorithm SHA256).Hash.ToUpperInvariant()
+    $runtime=[ordered]@{locale=$locale;role=[string]$role.role;display=[string]$role.display;geometry=[string]$role.geometry;plan=$runtimePlan;plan_sha256=$runtimeHash;ready=(Join-Path $roleRoot 'display-ready.json');result=(Join-Path $roleRoot 'display-result.json');role_root=$roleRoot;authority=(Join-Path $roleRoot 'authority')}
+    Invoke-LinuxDisplaySchema -Binding ([ordered]@{python=$python;display_cli=$cli;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$Context.root}) -Role $runtime -Label ('private display '+$locale+' runtime') -SchemaInvoker $SchemaInvoker
+    $runtimeRoles.Add([pscustomobject]$runtime)
+  }
+  return [ordered]@{python=$python;display_cli=$cli;display_cli_sha256=[string]$Binding.display_cli_sha256;display_module_sha256=[string]$Binding.display_module_sha256;checkout=$Context.root;probe_display=$probePath;probe_display_sha256=$probeHash;roles=@($runtimeRoles.ToArray())}
+}
+function New-MultiplayerSessionLayout {
+  param(
+    [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$EngineData,
+    [Parameter(Mandatory)]$Target,[bool]$StandaloneClientNames=$false
+  )
+  if(-not(Test-Path -LiteralPath $Context.root)){$null=New-Item -ItemType Directory -Path $Context.root -ErrorAction Stop}
+  $serverWrite=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path $serverWrite
+  $null=New-Item -ItemType Directory -Path (Join-Path $serverWrite 'saves')
+  $serverConfig=Join-Path $Context.root 'server.ini'
+  New-MIRDirectLibraryStartupConfig -Path $serverConfig -EngineDataDirectory $EngineData -WriteDataDirectory $serverWrite
+  $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw|ConvertFrom-Json -AsHashtable
+  $settings.name='MIR5 private loopback clients';$settings.description='';$settings.visibility=@{public=$false;lan=$false};$settings.require_user_verification=$false
+  foreach($name in @('username','password','token','game_password')){$settings[$name]=''}
+  $settings.max_players=2;$settings.auto_pause=$false;$settings.autosave_interval=0
+  $serverSettings=Join-Path $Context.root 'server-settings.json'
+  [IO.File]::WriteAllText($serverSettings,($settings|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+  $udpProbes=@();$tcpProbe=$null
+  try{
+    foreach($index in 0..2){$probe=[Net.Sockets.UdpClient]::new([Net.Sockets.AddressFamily]::InterNetwork);$probe.Client.Bind([Net.IPEndPoint]::new([Net.IPAddress]::Loopback,0));$udpProbes+=,$probe}
+    $udpPorts=@($udpProbes|ForEach-Object {[int]$_.Client.LocalEndPoint.Port})
+    $tcpProbe=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$tcpProbe.Start();$rconPort=[int]$tcpProbe.LocalEndpoint.Port
+  }finally{foreach($probe in $udpProbes){$probe.Dispose()};if($null-ne$tcpProbe){$tcpProbe.Stop()}}
+  $clients=@();$clientIndex=1
+  foreach($locale in @('en','de')){
+    $write=Join-Path $Context.root ('client-'+$locale);$null=New-Item -ItemType Directory -Path $write
+    $config=Join-Path $Context.root ('client-'+$locale+'.ini');New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $EngineData -WriteDataDirectory $write -Graphics
+    $text=[IO.File]::ReadAllText($config).Replace('locale=en',('locale='+$locale));[IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
+    $name=if($StandaloneClientNames){'standalone-'+$locale}elseif($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+    $platform=if($Target.PSObject.Properties['linux_private_displays']-and$Target.linux_private_displays-eq$true){'linux64'}else{'win64'}
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$Target.base;build_version=$Target.build_version;build_mode='full';platform=$platform}}
+    [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
+  }
+  return [pscustomobject]@{server_write=$serverWrite;server_config=$serverConfig;server_settings=$serverSettings;udp_ports=$udpPorts;server_port=$udpPorts[0];rcon_port=$rconPort;rcon_password=[guid]::NewGuid().ToString('D');clients=$clients}
+}
 $output=Resolve-MIR441RecoveryScratchPath -Path $OutputRoot
 Assert-Session (-not(Test-Path -LiteralPath $output) -or @(Get-ChildItem -LiteralPath $output -Force).Count -eq 0) 'output is not empty'
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
@@ -796,11 +1044,24 @@ $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.sta
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
 $positivePrivateStateChecks=($target.PSObject.Properties['positive_private_state_checks'] -and $target.positive_private_state_checks -eq $true)
+$usesLinuxPrivateDisplays=($target.PSObject.Properties['linux_private_displays'] -and $target.linux_private_displays -eq $true)
+if($usesLinuxPrivateDisplays){
+  Assert-Session ($LinuxPrivateDisplays -is [System.Collections.IDictionary]) 'current Linux Library selection requires two bound private-display plans'
+  Assert-Session ($LinuxPrivateDisplays.Keys.Count -eq 6 -and $LinuxPrivateDisplays.Contains('python') -and $LinuxPrivateDisplays.Contains('display_cli') -and $LinuxPrivateDisplays.Contains('display_cli_sha256') -and $LinuxPrivateDisplays.Contains('display_module_sha256') -and $LinuxPrivateDisplays.Contains('checkout') -and $LinuxPrivateDisplays.Contains('roles')) 'current Linux private-display plan shape differs'
+  Assert-Session ($LinuxPrivateDisplays.python -is [string] -and $LinuxPrivateDisplays.display_cli -is [string] -and $LinuxPrivateDisplays.checkout -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -is [string] -and $LinuxPrivateDisplays.display_module_sha256 -is [string] -and $LinuxPrivateDisplays.display_cli_sha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $LinuxPrivateDisplays.display_module_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'current Linux private-display pins differ'
+  Assert-Session (@($LinuxPrivateDisplays.roles).Count -eq 2) 'current Linux private-display role count differs'
+}
 if($standaloneF210){
-  $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
+  $standaloneFixtureSourceRevision=if($target.PSObject.Properties['fixture_source_revision']){[string]$target.fixture_source_revision}else{Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo}
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
-  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks -MIRVersion $target.mir}
+  if($positivePrivateStateChecks){
+    $standaloneLibraryFixture=New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'
+  }else{
+    $fixtureProjectionArguments=@{RepoRoot=$repo;OutputRoot=$output;SourceRevision=$standaloneFixtureSourceRevision;SpaceAgeLibrary=$spaceAgeLibrary;PrivateCreditChecks=$privateCreditChecks;MIRVersion=$target.mir}
+    if($target.PSObject.Properties['fixture_source_metadata']){$fixtureProjectionArguments.CurrentLinuxMetadata=[string]$target.fixture_source_metadata}
+    $standaloneLibraryFixture=New-StandaloneF210LibraryFixtureSourceProjection @fixtureProjectionArguments
+  }
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
     $apiConsumerSourceRevision=$standaloneFixtureSourceRevision
@@ -834,9 +1095,65 @@ Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'librar
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
+$activation=$null;$resources=$null;$failure=$null
+$linuxDisplayRuntime=$null
+if($usesLinuxPrivateDisplays){
+  # Current Linux display plans must be schema-accepted before a CreateOnly
+  # world is considered. Their runtime roots are always direct children of the
+  # one future governed session root, never caller-selected sibling paths.
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
+  $null=New-Item -ItemType Directory -Path $resources.root
+  $linuxDisplayRuntime=New-LinuxPrivateDisplayRuntime -Binding $LinuxPrivateDisplays -Context $resources
+}
+if($ComposeOnly){
+  Assert-Session ($usesLinuxPrivateDisplays-and-not$StandaloneIdentityDiscovery-and$FixtureCase-ceq'library-multiplayer') 'ComposeOnly is limited to the current Linux Library selection'
+  $baseRows=Read-MIRDirectLibraryStartupProfile -Path $profile
+  $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
+  $declaredHashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$declaredHashes[[string]$entry.Key]=[string]$entry.Value}
+  $mirRows=@($selection.mods|Where-Object {[string]$_.name-ceq'more-infinite-research'-and$_.enabled-eq$true})
+  Assert-Session ($mirRows.Count-eq1) 'ComposeOnly MIR archive selection differs'
+  Assert-Session ($target.PSObject.Properties['fixture_archive_sha256']-and$null-ne$standaloneLibraryFixture) 'ComposeOnly current Library fixture projection is absent'
+  $fixtureArchiveName=[string]$target.fixture_archive_name
+  $fixtureArchive=Join-Path $library $fixtureArchiveName
+  Assert-LinuxDisplayPinnedFile -Path $fixtureArchive -Expected ([string]$target.fixture_archive_sha256) -Label 'ComposeOnly current Library fixture archive' -MaximumBytes 64MB|Out-Null
+  Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory ([string]$standaloneLibraryFixture.source)
+  $declaredHashes[$fixtureArchiveName]=[string]$target.fixture_archive_sha256
+  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version})
+  Assert-Session ($actualHashes.Keys.Count-eq$declaredHashes.Keys.Count) 'ComposeOnly selected archive closure differs'
+  foreach($name in $declaredHashes.Keys){Assert-Session ($actualHashes.ContainsKey($name)-and[string]$actualHashes[$name]-ceq[string]$declaredHashes[$name]) "ComposeOnly archive hash differs: $name"}
+  Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $selection -EngineIdentity $engineIdentity -ArchiveHashes $actualHashes -ErrorPrefix 'mir5-multiplayer-compose'
+  $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$false
+  $leasePath=Join-Path $library '.mir-library.lock';$lease=[IO.File]::Open($leasePath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+  $record=$null;$activation=$null
+  try{
+    try{
+      $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $actualHashes -SettingsMode Defaults -LibraryLock $lease
+      Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+      $prospectiveSeed=Join-Path $layout.server_write 'saves/seed.zip'
+      Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
+      foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
+      $record=[ordered]@{
+        kind='MIR5LibraryMultiplayerComposeV1';case=$FixtureCase;status='composed-zero-native'
+        native_processes=0;factorio_processes=0;display_processes=0;engine=$engineIdentity
+        profile_sha256=(Get-FileHash -LiteralPath $profile -Algorithm SHA256).Hash.ToUpperInvariant();archive_sha256=$actualHashes
+        runtime_display=$linuxDisplayRuntime;session_root=$resources.root
+        server_config_sha256=(Get-FileHash -LiteralPath $layout.server_config -Algorithm SHA256).Hash.ToUpperInvariant()
+        client_config_sha256=@($layout.clients|ForEach-Object {(Get-FileHash -LiteralPath $_.config -Algorithm SHA256).Hash.ToUpperInvariant()})
+        seed_status='not-created';release_qualification=$false
+      }
+    }finally{
+      if($null-ne$activation-and-not$activation.closed){
+        $restoration=Complete-MIRLibraryActivation -Activation $activation
+        if($null-ne$record){$record.library_control_restoration=$restoration}
+      }
+    }
+  }finally{$lease.Dispose()}
+  Assert-Session ($null-ne$record) 'ComposeOnly did not reach a zero-native composition record'
+  $record.process_runs=@($resources.runs.ToArray());Write-MIRNativeProbeResult -Context $resources -Record $record
+  exit 0
+}
 $preparationResult=Invoke-MultiplayerFixturePreparation -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -FixtureCase $FixtureCase -PreparationRoot $preparation -RepoRoot $repo -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -DiscoveryFixture $discoveryFixture
 $prepared=$preparationResult.prepared;$seed=[string]$preparationResult.seed;$discoveryInstall=$preparationResult.install
-$activation=$null;$resources=$null;$failure=$null
 $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
@@ -846,55 +1163,10 @@ $record=[ordered]@{
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
-  $null=New-Item -ItemType Directory -Path $resources.root
-  $serverWrite=Join-Path $resources.root 'server'
-  $null=New-Item -ItemType Directory -Path $serverWrite
-  $null=New-Item -ItemType Directory -Path (Join-Path $serverWrite 'saves')
-  $serverConfig=Join-Path $resources.root 'server.ini'
-  New-MIRDirectLibraryStartupConfig -Path $serverConfig -EngineDataDirectory $engineData -WriteDataDirectory $serverWrite
-  $settings=Get-Content -LiteralPath (Join-Path $engineData 'server-settings.example.json') -Raw|ConvertFrom-Json -AsHashtable
-  $settings.name='MIR5 private loopback clients';$settings.description=''
-  $settings.visibility=@{public=$false;lan=$false};$settings.require_user_verification=$false
-  foreach($name in @('username','password','token','game_password')){$settings[$name]=''}
-  $settings.max_players=2;$settings.auto_pause=$false;$settings.autosave_interval=0
-  $serverSettings=Join-Path $resources.root 'server-settings.json'
-  [IO.File]::WriteAllText($serverSettings,($settings|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
-  # Let Windows allocate available loopback ports. Fixed ports can be in its
-  # excluded ranges (the first native run failed with WSAEACCES/10013).
-  $udpProbes=@();$tcpProbe=$null
-  try {
-    foreach($index in 0..2){
-      $probe=[Net.Sockets.UdpClient]::new([Net.Sockets.AddressFamily]::InterNetwork)
-      $probe.Client.Bind([Net.IPEndPoint]::new([Net.IPAddress]::Loopback,0))
-      $udpProbes+=,$probe
-    }
-    $udpPorts=@($udpProbes|ForEach-Object {[int]$_.Client.LocalEndPoint.Port})
-    $tcpProbe=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$tcpProbe.Start()
-    $rconPort=[int]$tcpProbe.LocalEndpoint.Port
-  } finally {
-    foreach($probe in $udpProbes){$probe.Dispose()}
-    if($null -ne $tcpProbe){$tcpProbe.Stop()}
-  }
-  $serverPort=$udpPorts[0];$clientIndex=1
-  $record.loopback_ports=[ordered]@{udp=$udpPorts;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
-  $clients=@()
-  $rconPassword=[guid]::NewGuid().ToString('D')
-  foreach($locale in @('en','de')){
-    $write=Join-Path $resources.root ('client-'+$locale)
-    $null=New-Item -ItemType Directory -Path $write
-    $config=Join-Path $resources.root ('client-'+$locale+'.ini')
-    New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $write -Graphics
-    $text=[IO.File]::ReadAllText($config).Replace('locale=en',('locale='+$locale))
-    [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
-    $name=if($standaloneClientNames){'standalone-'+$locale}elseif($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
-    # Isolated disposable identities contain no online token or personal data.
-    # Discovery alone uses the bounded synthetic label for its actual join
-    # marker; every route still keeps its token and write-data isolated.
-    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
-    [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
-    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
-  }
+  if($null-eq$resources){$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot}
+  $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$standaloneClientNames
+  $serverWrite=$layout.server_write;$serverConfig=$layout.server_config;$serverSettings=$layout.server_settings;$serverPort=$layout.server_port;$rconPort=$layout.rcon_port;$rconPassword=$layout.rcon_password;$clients=@($layout.clients)
+  $record.loopback_ports=[ordered]@{udp=$layout.udp_ports;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
   $pairedArm=$null
   if($FixtureCase -ceq 'library-paired-browser'){
     Assert-Session ($selection.kind -ceq 'mir5-library-paired-browser-f200-native-selection') 'paired browser profile kind differs'
@@ -922,7 +1194,7 @@ try {
       foreach($client in $clients){foreach($stage in @('first-open','first-open-settled','search','refresh','reopen','reopen-settled')){Join-Path $client.write_data ('script-output/mir5-library-paired-browser/'+$stage+'-*.png')}}
     }
   )
-  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword;loopback_rcon=$loopbackRconHelperIdentity}
   if($StandaloneIdentityDiscovery){
     $spec.standalone_identity_discovery=$true
     $spec.identity_discovery=[ordered]@{engine_sha256=[string]$target.engine_sha256;mir_archive_sha256=[string]$target.mir_archive_sha256;observer_archive_sha256=[string]$target.observer_sha256;fixture_version='0.1.1';join_budget_seconds=180;environmental_only=$true}
@@ -936,6 +1208,11 @@ try {
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
+    if($usesLinuxPrivateDisplays){
+      # The caller envelope was schema-checked before CreateOnly.  The session
+      # receives only context-local role roots and their freshly bound plans.
+      $spec.linux_private_displays=$linuxDisplayRuntime
+    }
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){
@@ -948,7 +1225,9 @@ try {
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash
   $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
   $sessionArguments=@('-NoLogo','-NoProfile','-File',(Join-Path $PSScriptRoot 'Invoke-MultiplayerSession.ps1'),'-SpecPath',$specPath)
-  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}else{1000})}
+  # Every display leaf has a hard 900-second maximum.  The containing session
+  # cannot outlive that bound on the Linux route, including its teardown.
+  $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}elseif($usesLinuxPrivateDisplays){900}else{1000})}
   if(-not $StandaloneIdentityDiscovery -and -not $standaloneF210){$processArguments.FactorioSteamIdentity=$true}
   $record.process=Invoke-MIRNativeProbeProcess @processArguments
   $session=Get-Content -LiteralPath (Join-Path $resources.root 'session.json') -Raw|ConvertFrom-Json

@@ -877,6 +877,43 @@ class LibraryModelTests(unittest.TestCase):
           assert(observed(forward, "name-desc") == desc and observed(reverse, "name-desc") == desc)
         ''')
 
+    def test_name_sort_remains_transitive_for_finite_and_continuing_same_caption_stages(self):
+        self.lua.execute('''
+          local head_id = "worker-robots-storage-4"
+          local tail_id = "mir-worker-storage-default-4"
+          local ordinary_id = "transport-belt-productivity"
+          local technologies = {
+            [head_id] = technology(head_id),
+            [tail_id] = technology(tail_id),
+            [ordinary_id] = technology(ordinary_id)
+          }
+          local declared = {
+            {id = head_id, family = "worker-robots-storage", progression = 4,
+              locale_key = "technology-name.worker-robots-storage", fixed_maximum = 4},
+            {id = tail_id, family = "worker-robots-storage", progression = 4,
+              locale_key = "technology-name.worker-robots-storage"},
+            {id = ordinary_id, family = "worker-robots-storage", progression = 9,
+              locale_key = "technology-name.transport-belt-productivity"}
+          }
+          local function observed(translations)
+            local rows = model.rows({technologies = technologies, research_queue = {}}, declared, {
+              family = "worker-robots-storage", sort = "name-asc"
+            }, translations)
+            local ids = {}
+            for index, row in ipairs(rows) do ids[index] = row.id end
+            return table.concat(ids, ",")
+          end
+          local expected = tail_id .. "," .. ordinary_id .. "," .. head_id
+          assert(observed({}) == expected,
+            "the untranslated finite stage must not override the established name comparator")
+          assert(observed({
+            [head_id] = "Worker robot cargo size",
+            [tail_id] = "mir-worker-storage-default-4",
+            [ordinary_id] = "Transport belt productivity"
+          }) == expected,
+            "the translated finite stage must not create a non-transitive name comparator")
+        ''')
+
     def test_search_filters_modes_status_and_hidden_entries(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"

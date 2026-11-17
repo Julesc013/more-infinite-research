@@ -1272,8 +1272,11 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertIn('mods["crafting-efficiency-2"]', (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
         self.assertIn("mods.ProductivityResearch", (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
         bootstrap = (PLAYER / "runtime/bootstrap.lua").read_text(encoding="utf-8")
-        self.assertIn('active_mods["crafting-efficiency-2"]', bootstrap)
-        self.assertIn("active_mods.ProductivityResearch", bootstrap)
+        # Keep authored identities explicit without requiring inlined lookups.
+        # test_bootstrap.py independently exercises every provider's activation,
+        # current/removed relevance and F210 adapter-import boundary.
+        for provider in ("crafting-efficiency-2", "ProductivityResearch"):
+            self.assertIn(provider, bootstrap)
         self.assertNotIn("ProductivityResearchForEveryone", bootstrap)
         self.assertNotIn("ProductivityResearchForEveryoneFG", bootstrap)
         self.assertNotIn("require(", runtime[runtime.index("function M.on_init"):])

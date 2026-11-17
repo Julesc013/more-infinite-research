@@ -12,6 +12,8 @@ import tempfile
 import unittest
 import zipfile
 
+from mir_test_versions import alias_for, current_alias, current_source_release
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("mir5_release", ROOT / "tools/release.py")
@@ -21,7 +23,7 @@ SPEC.loader.exec_module(release)
 
 class ReleaseTests(unittest.TestCase):
     NORMAL_TARGETS = ("f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210")
-    BASE_DISTRIBUTION_VERSION = "5.0.21000"
+    BASE_DISTRIBUTION_VERSION = alias_for("5.0.0", "f210").distribution_version
     _default_fixture_template = None
 
     @staticmethod
@@ -113,8 +115,7 @@ class ReleaseTests(unittest.TestCase):
 
     @staticmethod
     def _set_source_release(source, source_version):
-        major, minor, patch = source_version.split(".")
-        distribution_version = major + "." + minor + "." + str(21000 + int(patch)).zfill(5)
+        distribution_version = alias_for(source_version, "f210").distribution_version
         info_path = source / "info.json"
         info = json.loads(info_path.read_text(encoding="utf-8"))
         old_distribution = info["version"]
@@ -146,9 +147,17 @@ class ReleaseTests(unittest.TestCase):
             changelog = changelog.replace(old_header, requested_header, 1)
         changelog_path.write_bytes(changelog.encode("utf-8"))
 
-    @classmethod
-    def _archive_name(cls, target, distribution_version=None):
-        return release._archive_name(target, distribution_version or cls.BASE_DISTRIBUTION_VERSION)
+    @staticmethod
+    def _archive_name(target, source_release="5.0.0"):
+        return alias_for(source_release, target).archive_name
+
+    def test_current_authored_changelog_alias_matches_canonical_f210_player_metadata(self):
+        alias = current_alias("f210")
+        self.assertEqual(alias.source_release, current_source_release())
+        info = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["version"], alias.distribution_version)
+        target = (ROOT / "source/platform/target.lua").read_text(encoding="utf-8")
+        self.assertEqual(target.count('distribution_version="' + alias.distribution_version + '"'), 1)
 
     @staticmethod
     def _body(output):
@@ -180,7 +189,7 @@ class ReleaseTests(unittest.TestCase):
             first_output = temporary / "first-output"
             inventory = release.freeze(first_source, first_output, revision=commit)
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = {self._archive_name(target, "5.0.21002") for target in self.NORMAL_TARGETS}
+            expected = {self._archive_name(target, "5.0.2") for target in self.NORMAL_TARGETS}
             self.assertEqual({path.name for path in first_output.iterdir()},
                              expected | {release.SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual(inventory["kind"], release.KIND)
@@ -242,8 +251,8 @@ class ReleaseTests(unittest.TestCase):
                 early_target_record=release.package.EARLY_TARGET_RECORD,
             )
             self.assertEqual(release.TARGETS, self.NORMAL_TARGETS)
-            expected = ({self._archive_name(target, "5.1.21000") for target in self.NORMAL_TARGETS}
-                        | {self._archive_name(target, "5.1.21000") for target in release.EARLY_TARGETS}
+            expected = ({self._archive_name(target, "5.1.0") for target in self.NORMAL_TARGETS}
+                        | {self._archive_name(target, "5.1.0") for target in release.EARLY_TARGETS}
                         | {release.SUMS_NAME, release.EARLY_SUMS_NAME, release.INVENTORY_NAME})
             self.assertEqual({path.name for path in frozen.iterdir()}, expected)
             self.assertEqual(inventory["release"], {
@@ -277,7 +286,7 @@ class ReleaseTests(unittest.TestCase):
             for asset in cohort["assets"]:
                 with self.subTest(target=asset["target"]), zipfile.ZipFile(frozen / asset["name"]) as archive:
                     info = json.loads(archive.read(asset["root"] + "/info.json"))
-                    self.assertEqual(asset["name"], self._archive_name(asset["target"], "5.1.21000"))
+                    self.assertEqual(asset["name"], self._archive_name(asset["target"], "5.1.0"))
                     self.assertEqual(info["version"], asset["version"])
                     self.assertEqual(info["dependencies"][0], "base >= " + asset["minimum_base"])
                     self.assertNotIn("support", asset)
@@ -319,12 +328,14 @@ class ReleaseTests(unittest.TestCase):
                                           if asset["target"] == "f210"),
                                      "MIR " + source_version + " for Factorio 2.1.23 (zip)")
                     self.assertEqual(
-                        frozen / self._archive_name("f013", distribution_version),
+                        frozen / self._archive_name("f013", source_version),
                         frozen / ("more-infinite-research_" + f013_version + ".zip"),
                     )
-                    self.assertTrue((frozen / self._archive_name("f013", distribution_version)).is_file())
+                    self.assertTrue((frozen / self._archive_name("f013", source_version)).is_file())
                     self.assertEqual(release.verify(source, frozen), inventory)
 
+    # The malformed codec literals below are verifier adversaries, not aliases
+    # for historical package/archive identities.
     def test_freeze_refuses_invalid_canonical_f210_metadata_and_changelog(self):
         def set_info_version(source, version):
             path = source / "info.json"

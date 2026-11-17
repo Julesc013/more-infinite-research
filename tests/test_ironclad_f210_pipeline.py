@@ -18,7 +18,7 @@ F200_PROFILE = ROOT / "tests/profiles/bob-angel-f200-2077.json"
 ENGINE = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
 B6 = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
 sys.path.insert(0, str(ROOT / "tests"))
-from test_bob_plates_f210_pipeline import _lua_value, _plain  # noqa: E402
+from lua_table_values import from_lua as _plain, to_lua as _lua_value  # noqa: E402
 
 
 def contract(row):
@@ -133,7 +133,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
             with self.subTest(case=case_id):
                 lua = self.stage(case_id)
                 self.assertTrue(lua.globals().outcome, str(lua.globals().message))
-                row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
+                row = _plain(lua, lua.globals().emitted)["weapon-shooting-speed-7"]
                 expected = self.context["cases"][case_id]["expected"][row["name"]]
                 self.assertEqual(contract(expected), contract(row))
                 self.assertEqual(1, lua.globals().publications)
@@ -149,13 +149,13 @@ class IroncladF210PipelineTests(unittest.TestCase):
             "mir-research-time-weapon-shooting-speed": {"value": 45},
         })
         self.assertTrue(lua.globals().outcome, str(lua.globals().message))
-        row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
+        row = _plain(lua, lua.globals().emitted)["weapon-shooting-speed-7"]
         self.assertEqual([0.25, 0.25, 0.8125], [effect["modifier"] for effect in row["effects"]])
         self.assertEqual(45, row["unit"]["time"])
         self.assertEqual("19200*2^(L-7)", row["unit"]["count_formula"])
         disabled = self.stage("q117", startup={"mir-enable-weapon-shooting-speed": {"value": False}})
         self.assertTrue(disabled.globals().outcome, str(disabled.globals().message))
-        row = _plain(disabled.globals().emitted)["weapon-shooting-speed-7"]
+        row = _plain(disabled, disabled.globals().emitted)["weapon-shooting-speed-7"]
         self.assertFalse(row["enabled"])
         self.assertEqual([0.4, 0.4, 1.3], [effect["modifier"] for effect in row["effects"]])
 
@@ -168,7 +168,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
             with self.subTest(startup=startup):
                 lua = self.stage("q117", startup=startup)
                 self.assertTrue(lua.globals().outcome, str(lua.globals().message))
-                row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
+                row = _plain(lua, lua.globals().emitted)["weapon-shooting-speed-7"]
                 native = self.context["cases"]["q117"]["raw"]["technology"]["weapon-shooting-speed-6"]["effects"]
                 self.assertEqual(native, row["effects"])
 
@@ -187,7 +187,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
         default = self.stage_raw(inputs["raw"], mods, "f200")
         self.assertTrue(default.globals().outcome, str(default.globals().message))
         default_effects = {effect.get("ammo_category"): effect.get("modifier") for effect in
-                           _plain(default.globals().emitted)["weapon-shooting-speed-7"]["effects"]
+                           _plain(default, default.globals().emitted)["weapon-shooting-speed-7"]["effects"]
                            if effect.get("type") == "gun-speed"}
         self.assertEqual(0.4, default_effects["bullet"])
         self.assertEqual(0.4, default_effects["shotgun-shell"])
@@ -203,7 +203,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
                 lua = self.stage_raw(inputs["raw"], mods, "f200", startup)
                 self.assertTrue(lua.globals().outcome, str(lua.globals().message))
                 effects = {effect.get("ammo_category"): effect.get("modifier") for effect in
-                           _plain(lua.globals().emitted)["weapon-shooting-speed-7"]["effects"]
+                           _plain(lua, lua.globals().emitted)["weapon-shooting-speed-7"]["effects"]
                            if effect.get("type") == "gun-speed"}
                 for category in ("bullet", "shotgun-shell", "cannon-shell", "rocket"):
                     self.assertEqual(native_by_category[category], effects[category])
@@ -218,7 +218,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
             with self.subTest(modifier=modifier):
                 lua = self.stage("q117", mutate=rebalance)
                 self.assertTrue(lua.globals().outcome, str(lua.globals().message))
-                row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
+                row = _plain(lua, lua.globals().emitted)["weapon-shooting-speed-7"]
                 self.assertEqual(1.3, row["effects"][-1]["modifier"])
 
     def test_missing_or_invalid_mortar_source_refuses_before_publication(self):
@@ -261,7 +261,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
           first.scale = 99
           fresh_scale = module.continuation_effect().scale
         ''')
-        self.assertEqual(before, _plain(lua.globals().captured_raw))
+        self.assertEqual(before, _plain(lua, lua.globals().captured_raw))
         self.assertEqual(3.25, lua.globals().fresh_scale)
 
     def test_no_provider_and_f200_keep_their_existing_continuation_surface(self):
@@ -280,7 +280,7 @@ class IroncladF210PipelineTests(unittest.TestCase):
               assert(not catalogue.is_ironclad(active_mods))
               return catalogue.continuations(active_mods)
             ''')
-            weapon = next(row for row in _plain(rows) if row["id"] == "weapon-shooting-speed-7")
+            weapon = next(row for row in _plain(lua, rows) if row["id"] == "weapon-shooting-speed-7")
             self.assertEqual(["bullet", "shotgun-shell"], [effect["ammo_category"] for effect in weapon["effects"]])
             self.assertIsNone(lua.globals().package.loaded["compatibility.ironclad"])
 

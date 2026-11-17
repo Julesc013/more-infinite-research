@@ -163,6 +163,8 @@ function Invoke-MIRNativeProbeProcess {
     $entry=[ordered]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$failure.Exception.Message}
     $consoleReceipt=$failure.Exception.Data['mir441_factorio_console_startup']
     if($consoleReceipt-is[Collections.IDictionary] -or $consoleReceipt-is[pscustomobject]){$entry.console_startup=$consoleReceipt}
+    $cleanupFacts=$failure.Exception.Data['mir441_process_cleanup_facts']
+    if($cleanupFacts-is[Collections.IEnumerable]-and$cleanupFacts-isnot[string]){$entry.cleanup_facts=@($cleanupFacts)}
     $terminal=$failure.Exception.Data['mir441_process_result']
     if($terminal-is[pscustomobject]-and
       @('status','exit_code','passed','timed_out','completion_predicate_observed'|Where-Object {$null-eq$terminal.PSObject.Properties[$_]}).Count-eq0-and

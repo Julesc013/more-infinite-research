@@ -2649,6 +2649,49 @@ class GeneratorTests(unittest.TestCase):
           assert(environment.writes == 1 and environment.emitted[1].name == "alpha-1")
         ''')
 
+    def test_rejection_facts_distinguish_absent_references_from_malformed_definitions(self):
+        self.lua.execute('''
+          local function rejected(rows, environment, reason, message)
+            local facts = {}
+            local ok, actual = pcall(generator.install, rows, environment, facts)
+            assert(not ok and facts.reason == reason,
+              "wrong authored rejection category: " .. tostring(facts.reason))
+            assert(tostring(actual):find(message, 1, true), "original human reason was lost")
+            assert(environment.writes == 0, "preflight rejection published prototypes")
+          end
+          local a, b = build(), build()
+          rejected({a, b}, world(), "duplicate_identity", "within MIR emission")
+          local occupied = world(); occupied.raw.technology[a.name] = {}
+          rejected({a}, occupied, "duplicate_identity", "already exists")
+          a = build(); a.unit.ingredients[1][1] = "absent-science"
+          rejected({a}, world(), "missing_target", "research ingredient")
+          a = build(); a.unit.ingredients[1][2] = 0
+          rejected({a}, world(), "invalid_definition", "research ingredient")
+          a = build(); a.prerequisites = {"absent-prerequisite"}
+          rejected({a}, world(), "missing_target", "missing prerequisite")
+          a = build(); a.effects[1].recipe = "absent-recipe"
+          rejected({a}, world(), "missing_target", "missing recipe effect target")
+          a = build(); a.effects[1].recipe = false
+          rejected({a}, world(), "invalid_definition", "missing recipe effect target")
+          a = build(); a.name = "missing-word-in-a-valid-identity"; a.unit.count = 0
+          a.unit.count_formula = nil
+          rejected({a}, world(), "invalid_definition", "invalid research count")
+          rejected({[1]=build(), [3]=build()}, world(), "invalid_definition", "missing entry")
+          a, b = build(), build(); a.name = "cycle-a"; b.name = "cycle-b"
+          a.prerequisites = {b.name}; b.prerequisites = {a.name}
+          rejected({a, b}, world(), "invalid_definition", "cycle")
+
+          local environment, facts = world(), {}
+          environment.extend = function() error("unexpected native missing target", 0) end
+          local ok, message = pcall(generator.install, {build()}, environment, facts)
+          assert(not ok and message == "unexpected native missing target" and next(facts) == nil,
+            "a native exception acquired an invented preflight category")
+          environment, facts = world(), {}
+          generator.install({build()}, environment, facts)
+          assert(environment.writes == 1 and next(facts) == nil,
+            "successful publication retained a rejection or changed write count")
+        ''')
+
     def test_all_family_failures_precede_first_write(self):
         self.lua.execute('''
           local a, b = build(), build(); b.name = "second-1"; b.effects[1].recipe = "missing"

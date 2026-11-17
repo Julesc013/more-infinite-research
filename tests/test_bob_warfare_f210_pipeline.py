@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import unittest
 
-from test_space_exploration_pipeline import _lua_value, _plain
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTEXT = ROOT / "tests/fixtures/bob-warfare-f210-upstream-context.json.gz"
@@ -95,7 +95,7 @@ class BobWarfareF210PipelineTests(unittest.TestCase):
         for case in sorted(CASES):
             with self.subTest(case=case):
                 lua = self.stage(case)
-                rows = _plain(lua.globals().emitted)
+                rows = _plain(lua, lua.globals().emitted)
                 for name, expected in self.context["cases"][case]["expected"].items():
                     self.assertEqual(contract(expected), contract(rows[name]), case + ":" + name)
                 self.assertEqual(1, lua.globals().technology_publications)
@@ -115,8 +115,8 @@ class BobWarfareF210PipelineTests(unittest.TestCase):
                         raw["recipe"][recipe_name]["maximum_productivity"] = maximum
 
                     lua = self.stage(case, mutate=capped)
-                    self.assertEqual(expected_recipe, _plain(lua.globals().data.raw.recipe[recipe_name]))
-                    emitted = _plain(lua.globals().emitted)
+                    self.assertEqual(expected_recipe, _plain(lua, lua.globals().data.raw.recipe[recipe_name]))
+                    emitted = _plain(lua, lua.globals().emitted)
                     for name, expected in self.context["cases"][case]["expected"].items():
                         self.assertEqual(contract(expected), contract(emitted[name]), case + ":" + name)
                     self.assertEqual(1, lua.globals().technology_publications)
@@ -140,7 +140,7 @@ class BobWarfareF210PipelineTests(unittest.TestCase):
             "ips-effect-per-level-research_armor_components": {"value": 8},
             "mir-effect-per-level-laser-shooting-speed": {"value": 75},
         })
-        rows = _plain(lua.globals().emitted)
+        rows = _plain(lua, lua.globals().emitted)
         armor = rows["recipe-prod-research_armor_components-1"]
         self.assertEqual("(300+10*(L-1))*1.5^(L-1)", armor["unit"]["count_formula"])
         self.assertEqual(45, armor["unit"]["time"])
@@ -167,7 +167,7 @@ class BobWarfareF210PipelineTests(unittest.TestCase):
     def test_absent_provider_does_not_import_armor_body(self):
         lua = self.stage("q083", remove_provider=True)
         self.assertIsNone(lua.execute('return package.loaded["compatibility.modern_catalogue.bob_warfare"]'))
-        self.assertNotIn("recipe-prod-research_armor_components-1", _plain(lua.globals().emitted))
+        self.assertNotIn("recipe-prod-research_armor_components-1", _plain(lua, lua.globals().emitted))
 
 
 if __name__ == "__main__":
