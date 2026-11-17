@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.17
+Date: 2026-11-17
+
+  Bugfixes:
+
+    - Preserve known recipe-productivity earning rights when upgrading a MIR 4.7.3 Base save while adding mods.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.16
 Date: 2026-11-16
 
