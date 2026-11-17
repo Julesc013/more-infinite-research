@@ -25,9 +25,20 @@ local loaded = false
 local SOURCE_FOREIGN = {current=CURRENT, queue={CURRENT, QUEUED}, progress=.42,
   queued_saved=.27, disabled_enabled=false, disabled_visible=true, worker_speed_modifier=.75,
   setup_rows={"steam-power", "electronics", "automation-science-pack", CURRENT, QUEUED, DISABLED}}
+local FLOAT_TOLERANCE = 1e-7
 
 local function fail(reason) error("[worker-storage-uninvested-native] " .. reason, 2) end
 local function check(value, reason) if not value then fail(reason) end end
+
+local function near(actual, expected, reason)
+  check(type(actual) == "number" and type(expected) == "number"
+    and math.abs(actual - expected) <= FLOAT_TOLERANCE, reason)
+end
+
+local function number_text(value, reason)
+  check(type(value) == "number", reason)
+  return string.format("%.17g", value)
+end
 
 local function copy(value)
   if type(value) ~= "table" then return value end
@@ -130,11 +141,11 @@ end
 
 local function assert_source_foreign(force)
   local actual = unrelated_frame(force)
-  check(actual.current == SOURCE_FOREIGN.current and actual.progress == SOURCE_FOREIGN.progress,
-    "foreign current/progress differs")
+  check(actual.current == SOURCE_FOREIGN.current, "foreign current differs")
+  near(actual.progress, SOURCE_FOREIGN.progress, "foreign current progress differs")
   check(#actual.queue == #SOURCE_FOREIGN.queue, "foreign queue length differs")
   for index, name in ipairs(SOURCE_FOREIGN.queue) do check(actual.queue[index] == name, "foreign queue differs") end
-  check(actual.logistics.saved == SOURCE_FOREIGN.queued_saved, "foreign suspended progress differs")
+  near(actual.logistics.saved, SOURCE_FOREIGN.queued_saved, "foreign suspended progress differs")
   check(actual.disabled.enabled == SOURCE_FOREIGN.disabled_enabled and actual.disabled.visible == SOURCE_FOREIGN.disabled_visible,
     "foreign disabled flag differs")
   check(actual.bonus == SOURCE_FOREIGN.worker_speed_modifier, "foreign native bonus differs")
@@ -152,6 +163,58 @@ local function assert_source_foreign(force)
     end
   end
   return actual
+end
+
+local function same_source_row(expected, actual, saved_near, path)
+  check(type(expected) == "table" and type(actual) == "table", path .. " row type differs")
+  for key, value in pairs(expected) do
+    if key == "saved" and saved_near then near(actual[key], value, path .. "/saved differs")
+    else same(value, actual[key], path .. "/" .. tostring(key)) end
+  end
+  for key in pairs(actual) do check(expected[key] ~= nil, path .. "/" .. tostring(key) .. " unexpected") end
+end
+
+-- Only the public research fractions can differ by the engine's recorded
+-- floating representation.  Identity, levels, flags, counts and bonuses stay
+-- exact; this is intentionally not a numeric-tolerant deep comparison.
+local function same_source_foreign(expected, actual, path)
+  path = path or "$/foreign"
+  check(type(expected) == "table" and type(actual) == "table", path .. " type differs")
+  same(expected.current, actual.current, path .. "/current")
+  near(actual.progress, expected.progress, path .. "/progress differs")
+  same(expected.queue, actual.queue, path .. "/queue")
+  same_source_row(expected.automation, actual.automation, false, path .. "/automation")
+  same_source_row(expected.logistics, actual.logistics, true, path .. "/logistics")
+  same_source_row(expected.disabled, actual.disabled, false, path .. "/disabled")
+  same(expected.bonus, actual.bonus, path .. "/bonus")
+  check(type(expected.rows) == "table" and type(actual.rows) == "table", path .. "/rows type differs")
+  for name, row in pairs(expected.rows) do
+    same_source_row(row, actual.rows[name], name == QUEUED, path .. "/rows/" .. name)
+  end
+  for name in pairs(actual.rows) do check(expected.rows[name] ~= nil, path .. "/rows/" .. name .. " unexpected") end
+end
+
+local function optional_boolean(read)
+  local ok, value = pcall(read)
+  if ok and type(value) == "boolean" then return {supported=true, value=value} end
+  return {supported=false, value=false}
+end
+
+local function emit_unaccepted_source_setup(foreign)
+  local actual = unrelated_frame(foreign)
+  local body = {schema=1, role="published11-uninvested-worker-storage", stage="source-unaccepted-after-final-setup",
+    accepted=false, source_role=true, current=actual.current, expected_current=SOURCE_FOREIGN.current,
+    progress=actual.progress, progress_text=number_text(actual.progress, "source progress type"),
+    expected_progress=SOURCE_FOREIGN.progress, expected_progress_text=number_text(SOURCE_FOREIGN.progress, "expected progress type"),
+    logistics_saved=actual.logistics.saved, logistics_saved_text=number_text(actual.logistics.saved, "source saved type"),
+    expected_logistics_saved=SOURCE_FOREIGN.queued_saved,
+    expected_logistics_saved_text=number_text(SOURCE_FOREIGN.queued_saved, "expected saved type"),
+    foreign=copy(actual), research_queue_enabled={supported=false, value=false,
+      reason="not-declared-2.0.77-runtime-api"},
+    research_enabled=optional_boolean(function() return foreign.research_enabled end)}
+  local text = helpers.table_to_json(body)
+  log("MIR_WORKER_UNINVESTED_NATIVE_UNACCEPTED " .. text)
+  helpers.write_file("worker-storage-uninvested-native/source-unaccepted-after-final-setup.json", text .. "\n", false)
 end
 
 local function assert_empty_worker(force, candidate)
@@ -248,6 +311,9 @@ local function source_setup()
   technology(foreign, DISABLED).enabled = false
   technology(foreign, DISABLED).visible_when_disabled = true
   foreign.worker_robots_speed_modifier = SOURCE_FOREIGN.worker_speed_modifier
+  -- This intentionally precedes acceptance/storage.  It preserves the exact
+  -- engine-facing post-setter frame when the later source assertion refuses.
+  emit_unaccepted_source_setup(foreign)
   local unrelated = assert_source_foreign(foreign)
   local workers = assert_all_empty_worker(false)
   storage[KEY] = {schema=1, phase="source-ready", source_base=script.active_mods.base,
@@ -273,7 +339,7 @@ local function candidate_event(event)
   -- It reads public native state only; candidate worker writes begin on a later tick.
   local workers = assert_all_empty_worker(true)
   assert_source_foreign(foreign)
-  same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/pre-config-foreign")
+  same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/pre-config-foreign")
   same(state.pre_config.worker_frames, workers, "$/pre-config-worker-frames")
   state.candidate_event = {startup_settings_changed=event.mod_startup_settings_changed,
     trigger=event.mod_startup_settings_changed and "startup-settings-plus-fixture-addition" or "fixture-addition", mod_changes=rows}
@@ -298,17 +364,19 @@ local function start_ordinary()
   -- those exact public rows: recursive research would silently traverse an
   -- unobserved Base graph and obscure the source/candidate boundary.
   for _, name in ipairs(ORDINARY_PREREQUISITES) do technology(player, name).researched = true end
+  check(ordinary.research_unit_count == 675, "ordinary default exact science cost")
   local foreign = game.forces[FOREIGN]
   assert_all_empty_worker(true)
   assert_source_foreign(foreign)
-  same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/ordinary-foreign")
+  same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/ordinary-foreign")
   local surface = game.surfaces[1]
   local lab = surface.create_entity{name=LAB, position={0, 0}, force=player}
   check(lab and lab.valid ~= false and lab.prototype.get_researching_speed("normal") == 3600, "owned ordinary lab")
   state.lab, state.inserted = lab, {}
   player.research_queue = {DEFAULT}
+  local input = lab.get_inventory(defines.inventory.lab_input)
   for _, pack in ipairs(SCIENCE) do
-    local count = lab.get_inventory(defines.inventory.lab_input).insert{name=pack, count=800}
+    local count = input.insert{name=pack, count=200}
     check(count > 0, "ordinary lab feed " .. pack)
     state.inserted[pack] = count
   end
@@ -318,6 +386,17 @@ local function start_ordinary()
   emit("ordinary-started", {scripted_queue_after_admission=true})
 end
 
+local function supply_ordinary_science(state)
+  local input = state.lab.get_inventory(defines.inventory.lab_input)
+  for _, pack in ipairs(SCIENCE) do
+    if input.get_item_count(pack) < 64 then
+      local count = input.insert{name=pack, count=200}
+      check(count > 0, "ordinary lab refill " .. pack)
+      state.inserted[pack] = state.inserted[pack] + count
+    end
+  end
+end
+
 local function save_after_ordinary()
   local state, player = storage[KEY], game.forces.player
   check(state.phase == "ordinary-finished", "ordinary save phase")
@@ -325,7 +404,7 @@ local function save_after_ordinary()
   check(state.lab.valid ~= false, "ordinary lab missing")
   state.lab.disabled_by_script = true
   assert_source_foreign(foreign)
-  same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/saved-foreign")
+  same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/saved-foreign")
   local ordinary = row(player, DEFAULT)
   check(ordinary.level == 5 and ordinary.researched == false and player.worker_robots_storage_bonus == state.before_work.player.bonus + 1,
     "ordinary default C4 effect")
@@ -365,6 +444,7 @@ function M.on_tick()
   local state = storage[KEY]
   if loaded then loaded = false; if state and state.phase == "ordinary-saved" then cold() end; return end
   if state and state.phase == "candidate-admitted" then start_ordinary()
+  elseif state and state.phase == "ordinary-active" then supply_ordinary_science(state)
   elseif state and state.phase == "ordinary-finished" then save_after_ordinary() end
 end
 
@@ -376,7 +456,7 @@ function M.on_finished(event)
   local foreign = game.forces[FOREIGN]
   emit("ordinary-callback-observed", {name=event.research.name, by_script=event.by_script, force=event.research.force.name})
   assert_source_foreign(foreign)
-  same(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/completion-foreign")
+  same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/completion-foreign")
   state.ordinary = {{name=DEFAULT, tick=event.tick, by_script=false}}
   state.phase = "ordinary-finished"
 end

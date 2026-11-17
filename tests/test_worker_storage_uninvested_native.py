@@ -39,7 +39,9 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
               if recursive_trap~=nil then recursive_trap.researched=true end
             end
             values.native_set=function(key,value)values[key]=value end
-            local proxy={};setmetatable(proxy,{__index=function(_,key)return values[key]end,
+            local proxy={};setmetatable(proxy,{__index=function(_,key)
+                if key=="saved_progress" and values.name=="logistics" and source_saved_readback~=nil then return source_saved_readback end
+                return values[key]end,
               __newindex=function(_,key,value)
                 if readonly then error("worker C4 write before ordinary completion: "..key) end;values[key]=value
               end})
@@ -56,10 +58,12 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
               ["chemical-science-pack"]=tech("chemical-science-pack",1,false),["production-science-pack"]=tech("production-science-pack",1,false),
               ["utility-science-pack"]=tech("utility-science-pack",1,false),["worker-robots-speed-4"]=tech("worker-robots-speed-4",4,false),
             }
-            local values={name=name,index=index,valid=true,technologies=technologies,research_progress=0,
+            local values={name=name,index=index,valid=true,technologies=technologies,research_enabled=true,research_progress=0,
               worker_robots_storage_bonus=0,worker_robots_speed_modifier=0,research_queue={}}
             local force={};setmetatable(force,{__index=function(_,key)
               if key=="current_research"then local first=values.research_queue[1];return first and values.technologies[first.name]or nil end
+              if key=="research_progress" and source_progress_readback~=nil then return source_progress_readback end
+              if key=="worker_robots_speed_modifier" and source_bonus_readback~=nil then return source_bonus_readback end
               return values[key]
             end,__newindex=function(_,key,value)
               if key=="research_queue"then local rows={};for i,item in ipairs(value)do
@@ -70,6 +74,7 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           end
           function install_candidate(force)
             local ordinary=tech("mir-worker-storage-default-4",4,true)
+            ordinary.native_set("research_unit_count",675)
             ordinary.native_set("prerequisites",{
               ["worker-robots-storage-2"]=force.technologies["worker-robots-storage-2"],
               ["worker-robots-storage-3"]=force.technologies["worker-robots-storage-3"],
@@ -84,17 +89,21 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           end
           function make_lab()
             local input={counts={}};function input.get_item_count(name)return input.counts[name]or 0 end
-            function input.insert(item)input.counts[item.name]=(input.counts[item.name]or 0)+item.count;return item.count end
+            function input.insert(item)
+              local accepted=math.min(item.count,200-(input.counts[item.name]or 0))
+              input.counts[item.name]=(input.counts[item.name]or 0)+accepted;return accepted
+            end
             local modules={};function modules.is_empty()return true end
-            return {valid=true,unit_number=91,disabled_by_script=false,
+            return {valid=true,unit_number=91,disabled_by_script=false,test_input=input,
               prototype={get_researching_speed=function()return 3600 end},
               get_inventory=function(kind)return kind==1 and input or modules end}
           end
           function world(base,mir)
             storage={};markers={};logs={};written={};saved_name=nil;recursive_trap=nil
+            source_progress_readback=nil;source_saved_readback=nil;source_bonus_readback=nil;labs_created=0
             local player=make_force("player",1);local forces={player=player,[1]=player};local next_index=2
             game={tick=0,forces=forces,surfaces={[1]={create_entity=function(spec)
-              assert(spec.name=="mir-worker-uninvested-native-lab"and spec.force==player);return make_lab()end}},
+              assert(spec.name=="mir-worker-uninvested-native-lab"and spec.force==player);labs_created=labs_created+1;return make_lab()end}},
               is_multiplayer=function()return true end,server_save=function(name)saved_name=name end}
             function game.create_force(name)local force=make_force(name,next_index);next_index=next_index+1;forces[name]=force;forces[force.index]=force;return force end
             script.active_mods={base=base,["more-infinite-research"]=mir,["mir-worker-storage-uninvested-native"]="0.13.0"}
@@ -110,7 +119,8 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
         self.lua.execute(r'''
           handlers.init()
           assert(storage.mir_worker_storage_uninvested_native.phase=="source-ready")
-          assert(#markers==1 and markers[1].stage=="source-ready")
+          assert(#markers==2 and markers[1].stage=="source-unaccepted-after-final-setup"
+            and markers[1].accepted==false and markers[2].stage=="source-ready")
           script.active_mods["more-infinite-research"]=published_version
           script.active_mods["mir-worker-storage-uninvested-native"]=nil
           -- Actual removal discards the fixture's private storage.  No actor is
@@ -171,7 +181,7 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           capture_body_by_reference=true
           handlers.init()
           local state=storage.mir_worker_storage_uninvested_native
-          local observed=markers[1].source_foreign
+          local observed=markers[2].source_foreign
           assert(observed~=false and not rawequal(observed,state.source_foreign))
           assert(observed.current=="automation" and observed.progress==.42
             and #observed.queue==2 and observed.queue[1]=="automation" and observed.queue[2]=="logistics")
@@ -184,6 +194,41 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           observed.rows.automation.saved=99
           assert(state.source_foreign.rows.automation.saved==0)
         ''')
+
+    def test_source_final_setup_diagnostic_precedes_refusal_without_storage_lab_or_save(self):
+        self.lua.globals().world("2.0.77", "4.7.20002")
+        self.lua.execute(r'''
+          source_progress_readback=.4200002
+          assert(not pcall(handlers.init))
+          assert(storage.mir_worker_storage_uninvested_native==nil and labs_created==0 and saved_name==nil)
+          assert(#markers==1 and markers[1].stage=="source-unaccepted-after-final-setup" and markers[1].accepted==false)
+          local observed=markers[1]
+          assert(observed.current=="automation" and observed.expected_current=="automation")
+          assert(observed.progress==.4200002 and observed.progress_text==string.format("%.17g",.4200002))
+          assert(observed.expected_progress==.42 and observed.expected_progress_text==string.format("%.17g",.42))
+          assert(observed.research_queue_enabled.supported==false
+            and observed.research_queue_enabled.reason=="not-declared-2.0.77-runtime-api")
+          assert(observed.research_enabled.supported==true and observed.research_enabled.value==true)
+          assert(#written==1 and written[1].path=="worker-storage-uninvested-native/source-unaccepted-after-final-setup.json")
+        ''')
+
+    def test_source_fraction_rounding_is_bounded_but_real_fraction_or_bonus_drift_refuses(self):
+        for progress, saved in ((".42+5e-8", ".27+5e-8"),):
+            with self.subTest(progress=progress, saved=saved):
+                self.lua.globals().world("2.0.77", "4.7.20002")
+                self.lua.execute("source_progress_readback=" + progress + ";source_saved_readback=" + saved + r'''
+                  handlers.init()
+                  assert(storage.mir_worker_storage_uninvested_native.phase=="source-ready" and #markers==2)
+                ''')
+        for assignment in ("source_progress_readback=.42+1.1e-7", "source_saved_readback=.27+1.1e-7",
+                           "source_bonus_readback=.75+1e-9"):
+            with self.subTest(assignment=assignment):
+                self.lua.globals().world("2.0.77", "4.7.20002")
+                self.lua.execute(assignment + r'''
+                  assert(not pcall(handlers.init))
+                  assert(storage.mir_worker_storage_uninvested_native==nil and #markers==1)
+                  assert(markers[1].stage=="source-unaccepted-after-final-setup")
+                ''')
 
     def test_candidate_trigger_arms_preserve_foreign_rows_then_complete_save_and_two_colds(self):
         for target in ("f200", "f210"):
@@ -262,6 +307,28 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           handlers[1]()
           assert(storage.mir_worker_storage_uninvested_native.phase=="ordinary-active")
           assert(unlisted.researched==false)
+        ''')
+
+    def test_ordinary_science_refills_to_actual_capacity_and_stops_after_completion(self):
+        self.candidate_admission("f200", False)
+        self.lua.execute(r'''
+          handlers[1]()
+          local state=storage.mir_worker_storage_uninvested_native;local player=game.forces.player
+          local input=state.lab.test_input
+          assert(player.technologies["mir-worker-storage-default-4"].research_unit_count==675)
+          for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack"}) do
+            assert(input.counts[pack]==200 and state.inserted[pack]==200)
+            for _=1,4 do input.counts[pack]=63;handlers[1]();assert(input.counts[pack]==200) end
+            assert(state.inserted[pack]==748 and state.inserted[pack]>=675)
+          end
+          player.technologies["mir-worker-storage-default-4"].native_set("level",5);player.worker_robots_storage_bonus=1
+          handlers[2]({research={name="mir-worker-storage-default-4",force=player},by_script=false,tick=10})
+          local inserted_before=deep(state.inserted)
+          for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack"}) do input.counts[pack]=63 end
+          handlers[1]()
+          assert(state.phase=="ordinary-saved" and same(inserted_before,state.inserted))
         ''')
 
     def test_candidate_refuses_an_invested_third_force_before_marker_or_fixture_write(self):
