@@ -175,7 +175,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
     def make_locale_ready(self):
         self.exec("player.locale='de';tick()")
 
-    def through_query_click(self):
+    def prepare_open(self):
         self.begin()
         self.make_locale_ready()
         self.exec(
@@ -186,15 +186,37 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
               emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
               local root,query=open_library("recipe-prod-research_mining_drill-1",{})
               tick()
+            '''
+        )
+
+    def through_query_click(self, *, selected_first=True):
+        self.prepare_open()
+        self.lua.globals().selected_first = selected_first
+        self.exec(
+            r'''
+              local root=player.gui.screen.mir_research_browser
               local tabs=root.mir_library_tabs
-              emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
-              tabs.selected_tab_index=4
-              emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+              if selected_first then
+                tabs.selected_tab_index=4
+                emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+                emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+              else
+                emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+                tabs.selected_tab_index=4
+                emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+              end
               tick()
-              emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})
-              tabs.selected_tab_index=1
-              emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+              if selected_first then
+                tabs.selected_tab_index=1
+                emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+                emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})
+              else
+                emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})
+                tabs.selected_tab_index=1
+                emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+              end
               tick()
+              local query=root.mir_library_tabs.mir_library_research_page.mir_library_filters.mir_library_query
               emit(defines.events.on_gui_click,{player_index=1,element=query})
               tick()
             '''
@@ -257,6 +279,12 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
               assert(observed.snapshots[3].tab_bar_index==observed.snapshots[4].tab_bar_index)
               assert(observed.snapshots[4].tab_bar_index==observed.snapshots[5].tab_bar_index)
               assert(observed.snapshots[10].tab_bar_index~=observed.snapshots[3].tab_bar_index)
+              assert(observed.event_log[4].kind=="tab-selected" and observed.event_log[4].stage=="help-tab")
+              assert(observed.event_log[5].kind=="tab-click" and observed.event_log[5].stage=="help-tab")
+              assert(observed.event_log[6].kind=="tab-selected" and observed.event_log[6].stage=="research-tab")
+              assert(observed.event_log[7].kind=="tab-click" and observed.event_log[7].stage=="research-tab")
+              assert(observed.snapshots[4].tick>observed.event_log[4].tick and observed.snapshots[4].tick>observed.event_log[5].tick)
+              assert(observed.snapshots[5].tick>observed.event_log[6].tick and observed.snapshots[5].tick>observed.event_log[7].tick)
               local expected_caption="Eisenzahnrad-Produktivit"..string.char(195,164).."t"
               assert(observed.snapshots[8].result.caption==expected_caption)
               assert(observed.snapshots[10].result.icon=="[img=technology/recipe-prod-research_gears-1] ")
@@ -279,6 +307,69 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
             "mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|"
             "mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017",
         )
+
+    def test_native_selected_first_pair_rejects_the_retained_click_first_policy(self):
+        # R03 retained 2.1.24 facts record selected -> click on the same tick.
+        # The mutant represents the original 9a click-first transition without
+        # adding a shallow-CI dependency on historical actor bytes.
+        old_policy = CONTROL.read_text(encoding="utf-8").replace(
+            "if pair == nil or pair.selected or tabs.selected_tab_index ~= pair.index then",
+            "if pair == nil or not pair.clicked or pair.selected or tabs.selected_tab_index ~= pair.index then",
+            1,
+        )
+        self.setUp(actor_source=old_policy)
+        self.prepare_open()
+        with self.assertRaisesRegex(Exception, "tab selection differs"):
+            self.exec(
+                "local tabs=player.gui.screen.mir_research_browser.mir_library_tabs;tabs.selected_tab_index=4;"
+                "emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})"
+            )
+
+        self.setUp()
+        self.through_query_click(selected_first=True)
+        self.exec("assert(report().events.tab_selected==2 and report().events.tab_click==2 and #report().snapshots==6)")
+
+    def test_tab_pair_permits_click_first_but_never_snapshots_an_incomplete_pair(self):
+        self.prepare_open()
+        self.exec(
+            r'''
+              local tabs=player.gui.screen.mir_research_browser.mir_library_tabs
+              tabs.selected_tab_index=4
+              emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+              tick()
+              assert(report().phase=="await-help-click" and #report().snapshots==3
+                and writes["mir-library-localized-search-native/03-help-tab.json"]==nil)
+              emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_help})
+              tick()
+              assert(report().phase=="await-research-click" and #report().snapshots==4)
+            '''
+        )
+
+        self.setUp()
+        self.through_query_click(selected_first=False)
+        self.exec("assert(report().events.tab_selected==2 and report().events.tab_click==2 and #report().snapshots==6)")
+
+    def test_tab_pair_refuses_duplicate_or_wrong_tab_facts(self):
+        self.prepare_open()
+        self.exec(
+            r'''
+              local tabs=player.gui.screen.mir_research_browser.mir_library_tabs
+              tabs.selected_tab_index=4
+              emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})
+            '''
+        )
+        with self.assertRaisesRegex(Exception, "tab selection differs"):
+            self.exec("emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=player.gui.screen.mir_research_browser.mir_library_tabs})")
+
+        self.setUp()
+        self.prepare_open()
+        with self.assertRaisesRegex(Exception, "tab selection differs"):
+            self.exec("local tabs=player.gui.screen.mir_research_browser.mir_library_tabs;tabs.selected_tab_index=1;emit(defines.events.on_gui_selected_tab_changed,{player_index=1,element=tabs})")
+
+        self.setUp()
+        self.prepare_open()
+        with self.assertRaisesRegex(Exception, "tab click differs"):
+            self.exec("local tabs=player.gui.screen.mir_research_browser.mir_library_tabs;emit(defines.events.on_gui_click,{player_index=1,element=tabs.mir_library_tab_research})")
 
     def test_locale_waits_without_writes_then_refuses_the_wrong_locale(self):
         self.begin()

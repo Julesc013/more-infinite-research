@@ -98,6 +98,23 @@ local function schedule(stage_name, deadline)
   current.pending = {stage = stage_name, tick = game.tick + 1, deadline = deadline}
 end
 
+local function begin_tab_pair(stage_name, tab_index, tab_name, next_phase)
+  local current = state()
+  if current.tab_pair ~= nil then fail("prior tab pair remains unsettled") end
+  current.tab_pair = {stage = stage_name, index = tab_index, name = tab_name, clicked = false, selected = false}
+  current.phase = next_phase
+end
+
+local function settle_tab_pair()
+  local current, pair = state(), state().tab_pair
+  if pair == nil then fail("tab pair differs") end
+  if pair.clicked and pair.selected then
+    schedule(pair.stage)
+    current.tab_pair = nil
+    current.phase = "settling-" .. pair.stage
+  end
+end
+
 local function technology_row(technology)
   if not valid(technology) or type(technology.name) ~= "string" or type(technology.level) ~= "number"
       or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean" then
@@ -287,8 +304,8 @@ local function settle(event)
   local written_player, row = record_snapshot(pending.stage)
   if pending.stage == "initial" then current.phase = "await-setup-close"
   elseif pending.stage == "setup-closed" then current.phase = "await-open"
-  elseif pending.stage == "open" then current.phase = "await-help-click"
-  elseif pending.stage == "help-tab" then current.phase = "await-research-click"
+  elseif pending.stage == "open" then begin_tab_pair("help-tab", 4, PREFIX .. "tab_help", "await-help-click")
+  elseif pending.stage == "help-tab" then begin_tab_pair("research-tab", 1, PREFIX .. "tab_research", "await-research-click")
   elseif pending.stage == "research-tab" then current.phase = "await-query-click"
   elseif pending.stage == "query-click" then current.phase = "await-clear"
   elseif pending.stage == "cleared" then current.phase = "await-localized-query"
@@ -333,16 +350,15 @@ local function on_click(event)
     query = observed_query
   end
   local element = event.element
-  if current.phase == "await-help-click" then
-    if element ~= tabs[PREFIX .. "tab_help"] then fail("Help click differs") end
+  if current.phase == "await-help-click" or current.phase == "await-research-click" then
+    local pair = current.tab_pair
+    if pair == nil or pair.clicked or not valid(element) or element ~= tabs[pair.name] then
+      fail("tab click differs")
+    end
     current.events.tab_click = current.events.tab_click + 1
-    record_event("help-click", {player_index = event.player_index, element = element.name})
-    current.phase = "await-help-selected"
-  elseif current.phase == "await-research-click" then
-    if element ~= tabs[PREFIX .. "tab_research"] then fail("Research click differs") end
-    current.events.tab_click = current.events.tab_click + 1
-    record_event("research-click", {player_index = event.player_index, element = element.name})
-    current.phase = "await-research-selected"
+    pair.clicked = true
+    record_event("tab-click", {player_index = event.player_index, stage = pair.stage, element = element.name})
+    settle_tab_pair()
   elseif current.phase == "await-query-click" then
     if element ~= query then fail("query click differs") end
     current.events.query_click = current.events.query_click + 1
@@ -361,18 +377,15 @@ local function on_tab_selected(event)
   if player == nil then fail("localized-search player unavailable") end
   local _, tabs = root_tree(player)
   if event.element ~= tabs then fail("tab selection differs") end
-  if current.phase == "await-help-selected" then
-    if tabs.selected_tab_index ~= 4 then fail("Help tab was not selected") end
+  if current.phase == "await-help-click" or current.phase == "await-research-click" then
+    local pair = current.tab_pair
+    if pair == nil or pair.selected or tabs.selected_tab_index ~= pair.index then
+      fail("tab selection differs")
+    end
     current.events.tab_selected = current.events.tab_selected + 1
-    record_event("help-selected", {player_index = event.player_index, tab_index = tabs.selected_tab_index})
-    schedule("help-tab")
-    current.phase = "settling-help-tab"
-  elseif current.phase == "await-research-selected" then
-    if tabs.selected_tab_index ~= 1 then fail("Research tab was not selected") end
-    current.events.tab_selected = current.events.tab_selected + 1
-    record_event("research-selected", {player_index = event.player_index, tab_index = tabs.selected_tab_index})
-    schedule("research-tab")
-    current.phase = "settling-research-tab"
+    pair.selected = true
+    record_event("tab-selected", {player_index = event.player_index, stage = pair.stage, tab_index = tabs.selected_tab_index})
+    settle_tab_pair()
   else
     fail("tab selection out of order")
   end
