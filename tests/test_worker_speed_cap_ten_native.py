@@ -25,6 +25,7 @@ CURRENT_OLD_NEGATIVE = FIXTURE / "current-old15"
 CURRENT_SUCCESSOR = FIXTURE / "current-successor16"
 CURRENT_OBSERVE = FIXTURE / "current-observe16"
 CURRENT_SUCCESSOR17 = FIXTURE / "current-successor17"
+SOURCE_PRODUCER15 = FIXTURE / "source-producer15"
 LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
@@ -83,7 +84,8 @@ local stages = {
   ["current-old15"]={fixture="0.7.0",mir="5.0.20015",cap=10},
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
   ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
-  ["current-successor17"]={fixture="0.12.0",mir="5.0.20017",cap=10}
+  ["current-successor17"]={fixture="0.12.0",mir="5.0.20017",cap=10},
+  ["source-producer15"]={fixture="0.13.0",mir="5.0.20015",cap=0}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -260,18 +262,52 @@ function current_state_flow(old_path,successor_path,successor17_path,observe_pat
   for _=1,2 do local cold,cmsg=load_stage(path,common,stage,game,storage,settings(),markers,logs,files);if not cold then return{ok=false,message=cmsg}end;ok,result=call(cold.load);if not ok then return{ok=false,message=result}end;game.tick=game.tick+1;ok,result=call(cold.events[1]);if not ok then return{ok=false,message=result}end end
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
+
+function source_producer_flow(path,common,cold)
+  local player=force("player",1,false);player._reset_bonus=.65
+  local game={tick=0,forces={player=player,[1]=player},surfaces={}}
+  function game.create_force(name)
+    local value=force(name,#game.forces+1,false)
+    value._reset_bonus=name=="mir5-worker-speed-cap-ten-foreign" and 1.3 or 2.6
+    game.forces[name],game.forces[value.index]=value,value
+    return value
+  end
+  local saves,labs=0,0
+  function game.server_save() saves=saves+1 end
+  local storage,markers,logs,files={mir_caps={}}, {},{},{}
+  local function settings()return{startup={
+    ["mir-max-level-worker-robots-speed"]={value=0},["mir-settings-profile-import"]={value=""}}}end
+  local actor,message=load_stage(path,common,"source-producer15",game,storage,settings(),markers,logs,files)
+  if not actor then return{ok=false,message=message}end
+  local ok,result=call(actor.init)
+  if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
+  if cold then
+    local observed,observed_message=load_stage(path,common,"source-producer15",game,storage,settings(),markers,logs,files)
+    if not observed then return{ok=false,message=observed_message,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
+    ok,result=call(observed.load);if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
+    game.tick=game.tick+1;ok,result=call(observed.events[1])
+  end
+  local state=storage[KEY]
+  return{ok=ok,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,
+    player=player,foreign=game.forces[state and state.foreign_index],earned=game.forces[state and state.earned_index]}
+end
 ''')
 
     def data_result(self, stage: str, opponent: str = ""):
         directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR,
                      "current-old15": CURRENT_OLD_NEGATIVE, "current-successor16": CURRENT_SUCCESSOR,
-                     "current-observe16": CURRENT_OBSERVE, "current-successor17": CURRENT_SUCCESSOR17}[stage]
+                      "current-observe16": CURRENT_OBSERVE, "current-successor17": CURRENT_SUCCESSOR17,
+                      "source-producer15": SOURCE_PRODUCER15}[stage]
         return self.lua.eval("data_case")(str(directory / "settings-updates.lua"), str(directory / "data-final-fixes.lua"),
                                           str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
     def flow_result(self, mode: str = "successor", opponent: str = ""):
         return self.lua.eval("flow")(str(SOURCE / "control.lua"), str(OLD_NEGATIVE / "control.lua"), str(SUCCESSOR / "control.lua"),
                                      str(FIXTURE / "fixture_control.lua"), mode, opponent)
+
+    def source_producer_result(self, cold: bool = False, fixture_control: Path = FIXTURE / "fixture_control.lua"):
+        return self.lua.eval("source_producer_flow")(str(SOURCE_PRODUCER15 / "control.lua"),
+                                                       str(fixture_control), cold)
 
     def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.lua.eval("current_state_flow")(str(CURRENT_OLD_NEGATIVE / "control.lua"),
@@ -286,7 +322,8 @@ end
                                         (CURRENT_OLD_NEGATIVE, "0.7.0", "5.0.20015"),
                                         (CURRENT_SUCCESSOR, "0.8.0", "5.0.20016"),
                                         (CURRENT_OBSERVE, "0.9.0", "5.0.20016"),
-                                        (CURRENT_SUCCESSOR17, "0.12.0", "5.0.20017")):
+                                         (CURRENT_SUCCESSOR17, "0.12.0", "5.0.20017"),
+                                         (SOURCE_PRODUCER15, "0.13.0", "5.0.20015")):
             with self.subTest(stage=directory.name):
                 info = json.loads((directory / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual(("mir-fixture-mir5-worker-speed-cap-ten", version, "2.0"),
@@ -296,7 +333,7 @@ end
     def test_data_preflight_retains_actual_tail_ten_contract_and_only_adds_fixture_lab(self):
         for stage, cap in (("source15", 0), ("old-negative15", 10), ("successor16", 10),
                            ("current-old15", 10), ("current-successor16", 10), ("current-observe16", 10),
-                           ("current-successor17", 10)):
+                            ("current-successor17", 10), ("source-producer15", 0)):
             with self.subTest(stage=stage):
                 result = self.data_result(stage)
                 self.assertTrue(result["ok"], result["message"])
@@ -334,6 +371,8 @@ end
         self.assertEqual(lab_signature(current_successor["rows"][1]), lab_signature(observe["rows"][1]))
         self.assertEqual((1, 1, 1), (len(current_successor["rows"]), len(current_successor17["rows"]), len(observe["rows"])))
         self.assertEqual((1, 1, 0), (len(current_successor["logs"]), len(current_successor17["logs"]), len(observe["logs"])))
+        self.assertEqual(prototype_signature(self.data_result("source15")),
+                         prototype_signature(self.data_result("source-producer15")))
         for opponent, phrase in (("wrong-cap", "worker-speed cap startup differs"), ("wrong-effect", "SE worker-speed effect differs"), ("wrong-formula", "SE worker-speed research unit differs")):
             with self.subTest(opponent=opponent):
                 result = self.data_result("successor16", opponent); self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
@@ -975,6 +1014,76 @@ end
                             for force in ("player", "foreign", "earned")))
         self.assertNotIn("cap_owner", {key: adverse[key] for key in adverse})
         self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/preconditions.json", "worker-speed-cap-ten/old-negative.json"], [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
+
+    def test_published15_cap_zero_source_producer_records_validated_frames_and_read_only_cold(self):
+        result = self.source_producer_result(cold=True)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((0, 0), (result["saves"], result["labs"]))
+        rows = [result["markers"][index] for index in range(1, len(result["markers"]) + 1)]
+        self.assertEqual(["source-producer", "source-producer-cold"], [row["phase"] for row in rows])
+        def observed(value):
+            if hasattr(value, "keys"):
+                return {key: observed(value[key]) for key in value.keys()}
+            return value
+        source, cold = (observed(row) for row in rows)
+        self.assertEqual(("published15-cap-zero-source-producer", "0.13.0", "5.0.20015", 0, 20, True),
+                         (source["role"], source["fixture_stage"], source["mir_version"], source["cap"],
+                          source["active_mod_count"], source["foreign_queue_admitted"]))
+        self.assertEqual("post-final-producer-validation", source["source_snapshot_role"])
+        self.assertEqual(("source-producer-ready", "5.0.20015"),
+                         (source["source_state"]["phase"], source["source_state"]["source_mir"]))
+        expected_frames = {
+            "player": (10, False, True, False, 0, .65, (WORKER, WORKER), .27),
+            "foreign": (11, False, False, False, 0, 1.3, (AUTOMATION,), .42),
+            "earned_above_cap": (13, False, True, False, 0, 2.6, (), 0),
+        }
+        expected_researched = {
+            "player": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
+            "foreign": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: True, ELECTRICITY: True, AUTOMATION: False},
+            "earned_above_cap": {PREDECESSOR: True, DEEP_SCIENCE: True, AUTOMATION_SCIENCE: False, ELECTRICITY: False, AUTOMATION: False},
+        }
+        for role, expected in expected_frames.items():
+            with self.subTest(role=role):
+                frame = source["worker_frames"][role]
+                queue = frame["queue"]
+                self.assertEqual(expected, (frame["level"], frame["researched"], frame["enabled"], frame["visible"],
+                                            frame["saved_progress"], frame["bonus"],
+                                            tuple(queue["queue"][index] for index in range(1, len(queue["queue"]) + 1)),
+                                            queue["progress"]))
+                flags = source["prerequisite_flags"][role]
+                self.assertEqual({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, AUTOMATION}, set(flags.keys()))
+                for name, researched in expected_researched[role].items():
+                    value = flags[name]
+                    self.assertEqual((researched, True, 1, True),
+                                     (value["researched"], value["enabled"], value["level"], value["valid"]),
+                                     f"{role}/{name}")
+        expected_cold = dict(source)
+        expected_cold["phase"] = "source-producer-cold"
+        expected_cold["source_snapshot_role"] = "same-version-source-cold-read-only"
+        expected_cold["on_load_read_only"] = True
+        self.assertEqual(expected_cold, cold)
+        self.assertEqual(["worker-speed-cap-ten/source-producer.json", "worker-speed-cap-ten/source-producer-cold.json"],
+                         [result["files"][index]["path"] for index in range(1, len(result["files"]) + 1)])
+
+    def test_source_producer_refuses_post_final_flag_or_queue_drift_before_accepted_marker(self):
+        source = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        marker = '  source_producer_marker("source-producer", state)\n'
+        self.assertEqual(1, source.count(marker))
+        opponents = {
+            "cleared-direct-flag": ('  technology(player, PREDECESSOR).researched = false\n' + marker,
+                                    "source-producer player direct worker prerequisite differs"),
+            "changed-player-queue": ('  player.research_queue = {}\n' + marker,
+                                     "source-producer scripted player seed differs"),
+        }
+        for name, (replacement, phrase) in opponents.items():
+            with self.subTest(opponent=name), tempfile.TemporaryDirectory(prefix=f"mir5-source-producer-{name}-") as work:
+                mutated = Path(work) / "fixture_control.lua"
+                mutated.write_text(source.replace(marker, replacement), encoding="utf-8", newline="\n")
+                result = self.source_producer_result(fixture_control=mutated)
+            self.assertFalse(result["ok"])
+            self.assertIn(phrase, result["message"])
+            self.assertEqual((0, 0, 0), (len(result["markers"]), len(result["files"]), result["saves"]))
+            self.assertEqual(0, result["labs"])
 
     def test_successor_cap_keeps_one_ordinary_tail_ten_completion_then_two_cold_reads(self):
         result = self.flow_result(); self.assertTrue(result["ok"], result["message"]); self.assertEqual((1, 1), (result["saves"], result["labs"]))
