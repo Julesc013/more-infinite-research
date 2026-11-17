@@ -644,16 +644,37 @@ function Send-MIR441FactorioConsoleStartupLine {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
   if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
   try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
-  if($Kind-ceq'command'){
-    foreach($stream in $State.streams){
-      try {
-        $stream.confirmation_start_offset=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
-        $stream.confirmation_tail=''
-      } catch {throw '[mir441-factorio-console-baseline]'}
-    }
-  }
   $State.receipt.send_count++
-  $State.receipt.sends.Add([ordered]@{order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command;elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)})
+  $send=[ordered]@{
+    order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command
+    elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)
+    output_boundaries=[Collections.Generic.List[object]]::new();output_boundaries_complete=$false
+  }
+  # Record that WriteLine and Flush succeeded before observing output files.
+  # A post-send observation failure must not turn an already-delivered command
+  # into a receipt that claims no command was sent.
+  $State.receipt.sends.Add($send)
+  $priorSend=if($Kind-ceq'confirmation-replay'){$State.receipt.sends[$State.receipt.sends.Count-2]}else{$null}
+  foreach($stream in $State.streams){
+    try {
+      $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+      # Each boundary is a conservative post-flush floor.  Output present at
+      # or before it may have arrived too quickly to attribute to this send.
+      $send.output_boundaries.Add([ordered]@{kind=$stream.kind;path=$stream.path;bytes=$bytes})
+      if($Kind-ceq'confirmation-replay'){
+        $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$stream.kind-and$_.path-ceq$stream.path})
+        if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or$bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
+      }
+      if($Kind-ceq'command'){
+        # Preserve the first-send confirmation boundary used by the existing
+        # confirmation reader.  Replays get their own receipt floor above but
+        # do not widen that original causal boundary.
+        $stream.confirmation_start_offset=$bytes
+        $stream.confirmation_tail=''
+      }
+    } catch {throw '[mir441-factorio-console-baseline]'}
+  }
+  $send.output_boundaries_complete=$true
 }
 
 function Invoke-MIR441MonitoredProcess {

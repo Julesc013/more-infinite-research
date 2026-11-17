@@ -65,7 +65,7 @@ if($LinuxMountAdmissionOnly){
   return
 }
 function New-BenchmarkMemoryCallbacks {
-  param([Parameter(Mandatory)]$Sampler)
+  param([Parameter(Mandatory)]$Sampler,[string]$ReleasePath='')
   $state=[pscustomobject]@{registration=$null;sample_events=0;exit_events=0}
   $registerMemorySampler=${function:Register-MIROwnedProcessMemoryProcess}
   $addMemorySample=${function:Add-MIROwnedProcessMemorySample}
@@ -77,6 +77,7 @@ function New-BenchmarkMemoryCallbacks {
     if($null-eq$state.registration){throw '[mir5-native-probe-benchmark-registration]'}
     & $addMemorySample -Sampler $Sampler
     $state.sample_events++
+    if($ReleasePath.Length-gt0-and$state.sample_events-eq2){[IO.File]::WriteAllText($ReleasePath,'observed',[Text.UTF8Encoding]::new($false))}
   }.GetNewClosure()
   $exit={
     param($event)
@@ -205,10 +206,63 @@ function Assert-FactorioConsoleConfirmationBoundary {
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.ready_marker_seen-and-not$state.confirmation_marker_seen) 'console-pre-send-markers-not-confirmed'
   $memory=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false));$timer=[Diagnostics.Stopwatch]::StartNew()
   try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command} finally {$writer.Dispose();$memory.Dispose()}
+  $commandBoundaries=@($state.receipt.sends[0].output_boundaries)
   Assert-Probe ($state.receipt.send_count-eq1-and$state.streams[0].confirmation_start_offset-eq(Get-Item -LiteralPath $stdout).Length-and$state.streams[1].confirmation_start_offset-eq(Get-Item -LiteralPath $stderr).Length) 'console-command-baselines-both-streams'
+  Assert-Probe ($state.receipt.sends[0].output_boundaries_complete-and$commandBoundaries.Count-eq2-and$commandBoundaries[0].kind-ceq'stdout'-and$commandBoundaries[0].path-ceq$stdout-and$commandBoundaries[0].bytes-eq(Get-Item -LiteralPath $stdout).Length-and$commandBoundaries[1].kind-ceq'stderr'-and$commandBoundaries[1].path-ceq$stderr-and$commandBoundaries[1].bytes-eq(Get-Item -LiteralPath $stderr).Length) 'console-command-postflush-boundaries-both-streams'
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and-not$state.confirmation_marker_seen) 'console-pre-send-backlog-cannot-replay'
   [IO.File]::AppendAllText($stderr,$confirmation,[Text.UTF8Encoding]::new($false))
   Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $state)-and$state.confirmation_marker_seen) 'console-post-send-confirmation-observed'
+  $firstOffsets=@($state.streams|ForEach-Object {[int64]$_.confirmation_start_offset})
+  $replayMemory=[IO.MemoryStream]::new();$replayWriter=[IO.StreamWriter]::new($replayMemory,[Text.UTF8Encoding]::new($false));$replayTimer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $replayWriter -Timer $replayTimer -Kind confirmation-replay} finally {$replayWriter.Dispose();$replayMemory.Dispose()}
+  $replayBoundaries=@($state.receipt.sends[1].output_boundaries)
+  Assert-Probe ($state.receipt.send_count-eq2-and$state.receipt.sends[1].output_boundaries_complete-and$replayBoundaries.Count-eq2-and$replayBoundaries[0].kind-ceq'stdout'-and$replayBoundaries[0].path-ceq$stdout-and$replayBoundaries[1].kind-ceq'stderr'-and$replayBoundaries[1].path-ceq$stderr-and$replayBoundaries[0].bytes-ge$commandBoundaries[0].bytes-and$replayBoundaries[1].bytes-ge$commandBoundaries[1].bytes-and$state.streams[0].confirmation_start_offset-eq$firstOffsets[0]-and$state.streams[1].confirmation_start_offset-eq$firstOffsets[1]) 'console-replay-fresh-monotone-boundaries'
+  $regressedStdout=Join-Path $consoleRoot 'regressed-stdout.txt';$regressedStderr=Join-Path $consoleRoot 'regressed-stderr.txt'
+  [IO.File]::WriteAllText($regressedStdout,($ready+('x'*(65536-$ready.Length))+'after-command-floor'),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($regressedStderr,'',[Text.UTF8Encoding]::new($false))
+  $regressedState=New-MIR441FactorioConsoleStartup -Definition $startup
+  Add-MIR441FactorioConsoleStartupOutput -State $regressedState -Kind stdout -Path $regressedStdout
+  Add-MIR441FactorioConsoleStartupOutput -State $regressedState -Kind stderr -Path $regressedStderr
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $regressedState)-and$regressedState.ready_marker_seen-and-not$regressedState.confirmation_marker_seen) 'console-regression-pre-send-ready'
+  $regressedCommandMemory=[IO.MemoryStream]::new();$regressedCommandWriter=[IO.StreamWriter]::new($regressedCommandMemory,[Text.UTF8Encoding]::new($false));$regressedTimer=[Diagnostics.Stopwatch]::StartNew()
+  try {Send-MIR441FactorioConsoleStartupLine -State $regressedState -Writer $regressedCommandWriter -Timer $regressedTimer -Kind command} finally {$regressedCommandWriter.Dispose();$regressedCommandMemory.Dispose()}
+  $firstRegressionBoundary=[int64]$regressedState.receipt.sends[0].output_boundaries[0].bytes
+  $regressedHandle=[IO.File]::Open($regressedStdout,[IO.FileMode]::Open,[IO.FileAccess]::Write,[IO.FileShare]::ReadWrite)
+  try {$regressedHandle.SetLength([int64]$regressedState.streams[0].offset)} finally {$regressedHandle.Dispose()}
+  [IO.File]::AppendAllText($regressedStdout,'x',[Text.UTF8Encoding]::new($false))
+  [IO.File]::AppendAllText($regressedStderr,$confirmation,[Text.UTF8Encoding]::new($false))
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $regressedState)-and$regressedState.confirmation_marker_seen) 'console-regression-truncate-regrow-passes-reader-offset'
+  $regressedReplayMemory=[IO.MemoryStream]::new();$regressedReplayWriter=[IO.StreamWriter]::new($regressedReplayMemory,[Text.UTF8Encoding]::new($false));$regressedError=''
+  try {Send-MIR441FactorioConsoleStartupLine -State $regressedState -Writer $regressedReplayWriter -Timer $regressedTimer -Kind confirmation-replay}catch{$regressedError=$_.Exception.Message}finally{$regressedReplayWriter.Dispose();$regressedReplayMemory.Dispose();$regressedTimer.Stop()}
+  $regressedReplayBoundaries=@($regressedState.receipt.sends[1].output_boundaries)
+  Assert-Probe ($regressedError.Contains('[mir441-factorio-console-baseline]')-and$regressedState.receipt.send_count-eq2-and$regressedState.receipt.sends[0].output_boundaries_complete-and-not$regressedState.receipt.sends[1].output_boundaries_complete-and$regressedReplayBoundaries.Count-eq1-and$regressedReplayBoundaries[0].kind-ceq'stdout'-and$regressedReplayBoundaries[0].bytes-lt$firstRegressionBoundary) 'console-replay-regressed-postflush-floor-refused'
+}
+function Assert-FactorioConsolePostFlushBoundaryFailure {
+  $consoleRoot=Join-Path $root 'factorio-console-postflush-boundary-failure';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null
+  $startup=[ordered]@{command='/c game.print("mir-native-console-boundary-failure")';ready_marker='MIR_CONSOLE_READY'}
+  $stdout=Join-Path $consoleRoot 'stdout.txt';$stderr=Join-Path $consoleRoot 'stderr.txt'
+  [IO.File]::WriteAllText($stdout,'pre-send-stdout',[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($stderr,'pre-send-stderr',[Text.UTF8Encoding]::new($false))
+  $state=New-MIR441FactorioConsoleStartup -Definition $startup
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stdout -Path $stdout
+  Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stderr -Path $stderr
+  $priorGetItem=if(Test-Path -LiteralPath Function:Get-Item){(Get-Item -LiteralPath Function:Get-Item).ScriptBlock}else{$null}
+  $failingPath=$stderr
+  $mockGetItem={
+    param([string]$LiteralPath)
+    if($LiteralPath-ceq$failingPath){throw [IO.IOException]::new('simulated post-flush stderr boundary failure')}
+    return Microsoft.PowerShell.Management\Get-Item -LiteralPath $LiteralPath
+  }.GetNewClosure()
+  $memory=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false));$timer=[Diagnostics.Stopwatch]::StartNew();$actual=''
+  try {
+    Set-Item -Path Function:Get-Item -Value $mockGetItem
+    try {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command}catch{$actual=$_.Exception.Message}
+  } finally {
+    if($null-ne$priorGetItem){Set-Item -Path Function:Get-Item -Value $priorGetItem}else{Remove-Item -Path Function:Get-Item -ErrorAction SilentlyContinue}
+    $writer.Dispose();$memory.Dispose()
+  }
+  $boundaries=@($state.receipt.sends[0].output_boundaries)
+  Assert-Probe ($actual.Contains('[mir441-factorio-console-baseline]')-and$state.receipt.send_count-eq1-and$state.receipt.sends.Count-eq1-and$state.receipt.sends[0].kind-ceq'command'-and-not$state.receipt.sends[0].output_boundaries_complete-and$boundaries.Count-eq1-and$boundaries[0].kind-ceq'stdout'-and$boundaries[0].path-ceq$stdout-and$boundaries[0].bytes-eq([int64][IO.File]::ReadAllBytes($stdout).Length)-and$state.streams[0].confirmation_start_offset-eq$boundaries[0].bytes-and$null-eq$state.streams[1].confirmation_start_offset) 'console-postflush-boundary-failure-retains-successful-send'
 }
 function Assert-FactorioConsoleStartup {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$Child)
@@ -257,21 +311,23 @@ try {
   $closedState=New-MIR441FactorioConsoleStartup -Definition $startup
   $closedStream=[IO.MemoryStream]::new();$closedWriter=[IO.StreamWriter]::new($closedStream,[Text.UTF8Encoding]::new($false));$closedWriter.Dispose();$closedWriterError='';$closedTimer=[Diagnostics.Stopwatch]::StartNew()
   try {Send-MIR441FactorioConsoleStartupLine -State $closedState -Writer $closedWriter -Timer $closedTimer -Kind command}catch{$closedWriterError=$_.Exception.Message}finally{$closedStream.Dispose()}
-  Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0) 'console-closed-writer-refusal'
+  Assert-Probe ($closedWriterError.Contains('[mir441-factorio-console-write]')-and$closedState.receipt.send_count-eq0-and$closedState.receipt.sends.Count-eq0) 'console-closed-writer-refusal'
   $ordinaryRecord=Join-Path $consoleRoot 'ordinary-input.txt';$ordinaryPid=Join-Path $consoleRoot 'ordinary.pid'
   $ordinary=Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$ordinaryRecord,'-PidPath',$ordinaryPid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup
   $ordinaryInput=@(Get-Content -LiteralPath $ordinaryRecord)
   $ordinaryReceipt=$ordinary.result.console_startup
   $ordinaryOut=Get-Content -Raw -LiteralPath $ordinary.stdout
   Assert-Probe ($ordinary.status-ceq'passed'-and$ordinaryInput.Count-eq1-and$ordinaryInput[0]-ceq$command) 'console-delayed-ready-single-delivery'
-  Assert-Probe ($ordinaryOut.Contains('MIR_CONSOLE_EARLY_INPUT=False')-and$ordinaryReceipt.ready_marker_observed-and$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-ge150-and$ordinaryReceipt.send_count-eq1-and$ordinaryReceipt.sends.Count-eq1-and$ordinaryReceipt.sends[0].order-eq1-and$ordinaryReceipt.sends[0].kind-ceq'command'-and$ordinaryReceipt.sends[0].command_sha256-ceq$expectedHash-and$ordinaryReceipt.sends[0].elapsed_monotonic_milliseconds-ge$ordinaryReceipt.ready_elapsed_monotonic_milliseconds) 'console-ready-gate-receipt'
+  $ordinaryBoundaries=@($ordinaryReceipt.sends[0].output_boundaries)
+  Assert-Probe ($ordinaryOut.Contains('MIR_CONSOLE_EARLY_INPUT=False')-and$ordinaryReceipt.ready_marker_observed-and$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-ge150-and$ordinaryReceipt.send_count-eq1-and$ordinaryReceipt.sends.Count-eq1-and$ordinaryReceipt.sends[0].order-eq1-and$ordinaryReceipt.sends[0].kind-ceq'command'-and$ordinaryReceipt.sends[0].command_sha256-ceq$expectedHash-and$ordinaryReceipt.sends[0].elapsed_monotonic_milliseconds-ge$ordinaryReceipt.ready_elapsed_monotonic_milliseconds-and$ordinaryReceipt.sends[0].output_boundaries_complete-and$ordinaryBoundaries.Count-eq2-and$ordinaryBoundaries[0].kind-ceq'stdout'-and$ordinaryBoundaries[0].path-ceq$ordinary.stdout-and$ordinaryBoundaries[1].kind-ceq'stderr'-and$ordinaryBoundaries[1].path-ceq$ordinary.stderr) 'console-ready-gate-receipt'
   Assert-Probe ((-not$ordinaryReceipt.confirmation_marker_observed)-and$ordinaryReceipt.command_sha256-ceq$expectedHash-and($ordinaryReceipt|ConvertTo-Json -Depth 12 -Compress).Contains($command)-eq$false) 'console-single-receipt-hash-only'
   $confirmationRecord=Join-Path $consoleRoot 'confirmation-input.txt';$confirmationPid=Join-Path $consoleRoot 'confirmation.pid'
   $confirmation=Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$confirmationRecord,'-PidPath',$confirmationPid,'-Mode','confirmation') -TimeoutSeconds 20 -ConsoleStartup $startup
   $confirmationInput=@(Get-Content -LiteralPath $confirmationRecord)
   $confirmationReceipt=$confirmation.result.console_startup
   Assert-Probe ($confirmation.status-ceq'passed'-and$confirmationInput.Count-eq2-and@($confirmationInput|Where-Object {$_-cne$command}).Count-eq0) 'console-confirmation-replays-same-command'
-  Assert-Probe ($confirmationReceipt.confirmation_marker_observed-and$confirmationReceipt.send_count-eq2-and$confirmationReceipt.sends.Count-eq2-and$confirmationReceipt.sends[0].kind-ceq'command'-and$confirmationReceipt.sends[1].kind-ceq'confirmation-replay'-and$confirmationReceipt.sends[1].order-eq2-and$confirmationReceipt.sends[1].command_sha256-ceq$expectedHash-and$confirmationReceipt.sends[1].elapsed_monotonic_milliseconds-ge$confirmationReceipt.confirmation_elapsed_monotonic_milliseconds) 'console-confirmation-bounded-receipt'
+  $confirmationFirstBoundaries=@($confirmationReceipt.sends[0].output_boundaries);$confirmationReplayBoundaries=@($confirmationReceipt.sends[1].output_boundaries)
+  Assert-Probe ($confirmationReceipt.confirmation_marker_observed-and$confirmationReceipt.send_count-eq2-and$confirmationReceipt.sends.Count-eq2-and$confirmationReceipt.sends[0].kind-ceq'command'-and$confirmationReceipt.sends[1].kind-ceq'confirmation-replay'-and$confirmationReceipt.sends[1].order-eq2-and$confirmationReceipt.sends[1].command_sha256-ceq$expectedHash-and$confirmationReceipt.sends[1].elapsed_monotonic_milliseconds-ge$confirmationReceipt.confirmation_elapsed_monotonic_milliseconds-and$confirmationReceipt.sends[0].output_boundaries_complete-and$confirmationReceipt.sends[1].output_boundaries_complete-and$confirmationFirstBoundaries.Count-eq2-and$confirmationReplayBoundaries.Count-eq2-and$confirmationReplayBoundaries[0].bytes-ge$confirmationFirstBoundaries[0].bytes-and$confirmationReplayBoundaries[1].bytes-ge$confirmationFirstBoundaries[1].bytes) 'console-confirmation-bounded-receipt'
   $invalidLaunch=Join-Path $consoleRoot 'invalid-launch.txt';$invalidPid=Join-Path $consoleRoot 'invalid.pid';$beforeIndex=$Context.process_index
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command="/c invalid`nsecond";ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-newline]'
   Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$invalidLaunch,'-PidPath',$invalidPid) -TimeoutSeconds 20 -ConsoleStartup ([ordered]@{command=('/c '+('x'*16382));ready_marker='MIR_CONSOLE_READY'})} '[mir441-factorio-console-startup-command]'
@@ -312,6 +368,7 @@ try {
   Assert-ImportBoundary
   Assert-OwnedChildExitRace
   Assert-FactorioConsoleConfirmationBoundary
+  Assert-FactorioConsolePostFlushBoundaryFailure
   $child=(Get-Command pwsh -ErrorAction Stop).Source
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'zero') -ExpectedPeakMemoryMiB 0} '[mir441-resource-peak-budget-required]'
   $occupied=Join-Path $root 'occupied';[IO.Directory]::CreateDirectory($occupied)|Out-Null;[IO.File]::WriteAllText((Join-Path $occupied 'row'),'x')
@@ -360,9 +417,25 @@ try {
     $tenGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-peak-budget') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot
     Assert-Probe ([int64]$tenGiBBudget.peak_memory_bytes -eq $tenGiB) 'ten-gib-declared-peak-admitted'
     [IO.Directory]::CreateDirectory($tenGiBBudget.root)|Out-Null
-    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 1200; exit 0') -TimeoutSeconds 20
+    $tenGiBRelease=Join-Path $tenGiBBudget.root 'two-samples.release'
+    $tenGiBChild=Join-Path $tenGiBBudget.root 'wait-for-two-samples.ps1'
+    [IO.File]::WriteAllText($tenGiBChild,@'
+param([Parameter(Mandatory)][string]$ReleasePath)
+$deadline=[DateTime]::UtcNow.AddSeconds(10)
+while(-not(Test-Path -LiteralPath $ReleasePath -PathType Leaf)){
+  if([DateTime]::UtcNow-ge$deadline){exit 17}
+  Start-Sleep -Milliseconds 50
+}
+'@,[Text.UTF8Encoding]::new($false))
+    $tenGiBState=[pscustomobject]@{sample_events=0}
+    $tenGiBSample={
+      param($event)
+      $tenGiBState.sample_events++
+      if($tenGiBState.sample_events-eq2){[IO.File]::WriteAllText($tenGiBRelease,'observed',[Text.UTF8Encoding]::new($false))}
+    }.GetNewClosure()
+    $tenGiBRun=Invoke-MIRNativeProbeProcess -Context $tenGiBBudget -FilePath $child -Arguments @('-NoProfile','-File',$tenGiBChild,'-ReleasePath',$tenGiBRelease) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $tenGiBSample
     $tenGiBRunning=@(Get-Content -LiteralPath $tenGiBRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12}|Where-Object {$null-ne$_.PSObject.Properties['process']})
-    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBRunning.Count-ge2-and[int64]$tenGiBRunning[0].process.expected_peak_memory_bytes-eq$tenGiB) 'ten-gib-process-budget-forwarded-across-samples'
+    Assert-Probe ($tenGiBRun.status-ceq'passed'-and$tenGiBState.sample_events-ge2-and(Test-Path -LiteralPath $tenGiBRelease)-and$tenGiBRunning.Count-ge2-and@($tenGiBRunning|Where-Object {[int64]$_.process.expected_peak_memory_bytes-ne$tenGiB}).Count-eq0) 'ten-gib-process-budget-forwarded-across-samples'
     Assert-Probe ($null-eq$boundarySnapshot.PSObject.Properties['process']) 'snapshot-source-not-mutated-across-samples'
     $boundarySnapshot.memory.free_bytes=$tenGiBMemoryRequired-1
     Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'ten-gib-insufficient-memory') -ExpectedPeakMemoryMiB 10240 -MaxNewOutputMiB 1 -UseExactOutputRoot} '[mir441-resource-admission-memory]'
@@ -387,12 +460,12 @@ try {
     Assert-Probe ($null-eq$runRecord.result.PSObject.Properties['sample_milliseconds']) 'default-governor-result-shape'
     $benchmarkRoot=Join-Path $context.root 'benchmark-observation';[IO.Directory]::CreateDirectory($benchmarkRoot)|Out-Null
     $benchmarkSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $benchmarkCallbacks=New-BenchmarkMemoryCallbacks -Sampler $benchmarkSampler
     $benchmarkLedger=Join-Path $benchmarkRoot 'resources.jsonl'
     # Keep the controlled child alive until two real callbacks occur. A fixed
     # 900 ms sleep could expire during loaded-host resource scans before the
     # second 250 ms observation. Short-lived exit races are tested separately.
     $benchmarkReady=Join-Path $benchmarkRoot 'two-samples.ready'
+    $benchmarkCallbacks=New-BenchmarkMemoryCallbacks -Sampler $benchmarkSampler -ReleasePath $benchmarkReady
     $benchmarkChild=Join-Path $benchmarkRoot 'wait-for-samples.ps1'
     [IO.File]::WriteAllText($benchmarkChild,@'
 param([Parameter(Mandatory)][string]$Ready)
@@ -402,25 +475,16 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
   Start-Sleep -Milliseconds 50
 }
 '@,[Text.UTF8Encoding]::new($false))
-    $benchmarkOriginalSample=$benchmarkCallbacks.sample
-    $benchmarkState=$benchmarkCallbacks.state
-    $benchmarkObservedSample={
-      param($event)
-      & $benchmarkOriginalSample $event
-      if($benchmarkState.sample_events-ge2){[IO.File]::WriteAllText($benchmarkReady,'observed')}
-    }.GetNewClosure()
-    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$benchmarkReady) -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkObservedSample -OwnedProcessExitCallback $benchmarkCallbacks.exit
+    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$benchmarkReady) -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkCallbacks.sample -OwnedProcessExitCallback $benchmarkCallbacks.exit
     $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmarkSampler
-    Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkCallbacks.state.sample_events-ge2-and$benchmarkCallbacks.state.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
+    Assert-Probe ($benchmarkRun.status-ceq'passed'-and(Test-Path -LiteralPath $benchmarkReady)-and$benchmarkCallbacks.state.sample_events-ge2-and$benchmarkCallbacks.state.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
     $probeSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler
-    # As with the direct Factorio actor below, allow the controlled child to
-    # survive loaded-host resource scans before the first 250 ms cadence wait.
-    # Short-lived process exit races have their own opposing control above.
-    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 2') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
+    $probeReady=Join-Path $benchmarkRoot 'two-samples-probe.ready'
+    $probeCallbacks=New-BenchmarkMemoryCallbacks -Sampler $probeSampler -ReleasePath $probeReady
+    $probeRun=Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$probeReady) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $probeCallbacks.sample -OwnedProcessExitCallback $probeCallbacks.exit
     $probeReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $probeSampler
-    $probeObservationPassed=($probeRun.status-ceq'passed'-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2)
+    $probeObservationPassed=($probeRun.status-ceq'passed'-and(Test-Path -LiteralPath $probeReady)-and$probeCallbacks.state.sample_events-ge2-and$probeCallbacks.state.exit_events-eq1-and$probeReceipt.status-ceq'complete-observation'-and$probeReceipt.observations.Count-ge2)
     if(-not$probeObservationPassed){
       # Keep the failed CI observation visible even when finally removes its
       # disposable context. Emit only bounded statuses/counts and fixed reasons.
@@ -436,13 +500,11 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
     }
     Assert-Probe $probeObservationPassed 'probe-wrapper-benchmark-observation'
     $factorioSampler=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots @([pscustomobject]@{phase='benchmark';role='factorio'})
-    $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler
-    # The direct actor includes registration and memory reads before its first
-    # 250 ms cadence wait. Keep the two-observation assertion but give this
-    # controlled host child enough lifetime on a loaded hosted runner.
-    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 4') -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
+    $factorioReady=Join-Path $benchmarkRoot 'two-samples-factorio.ready'
+    $factorioCallbacks=New-BenchmarkMemoryCallbacks -Sampler $factorioSampler -ReleasePath $factorioReady
+    $factorioObservation=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-File',$benchmarkChild,'-Ready',$factorioReady) -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $factorioCallbacks.sample -OwnedProcessExitCallback $factorioCallbacks.exit
     $factorioReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $factorioSampler
-    $factorioObservationPassed=$factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2
+    $factorioObservationPassed=$factorioObservation.status-ceq'passed'-and$factorioObservation.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and(Test-Path -LiteralPath $factorioReady)-and$factorioCallbacks.state.sample_events-ge2-and$factorioCallbacks.state.exit_events-eq1-and$factorioReceipt.status-ceq'complete-observation'-and$factorioReceipt.observations.Count-ge2
     if(-not$factorioObservationPassed){
       $details=[ordered]@{run_status=$factorioObservation.status;sample_events=$factorioCallbacks.state.sample_events;exit_events=$factorioCallbacks.state.exit_events;receipt_status=$factorioReceipt.status;observation_count=$factorioReceipt.observations.Count;incomplete_reasons=@($factorioReceipt.incomplete_reasons|Select-Object -First 8)}
       Write-Host ('[mir5-native-factorio-observation-details] '+($details|ConvertTo-Json -Compress))
