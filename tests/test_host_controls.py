@@ -353,30 +353,45 @@ class HostControlsTests(unittest.TestCase):
         render_revisions = set(re.findall(r'^RETAINED_\d+_REVISION = "([0-9a-f]{40})"$', render_control, re.MULTILINE))
         self.assertTrue(render_revisions)
         multiplayer_control = (ROOT / "tests/test_library_multiplayer_fixture.py").read_text(encoding="utf-8")
-        multiplayer_revisions = set(re.findall(
-            r'"([0-9a-f]{40}):tools/Invoke-Multiplayer(?:Fixture|Session)\.ps1"', multiplayer_control))
-        self.assertTrue(multiplayer_revisions)
+        multiplayer_historical_inputs = set(re.findall(
+            r'"([0-9a-f]{40}):(tools/Invoke-Multiplayer(?:Fixture|Session)\.ps1|tests/fixtures/library-multiplayer/control\.lua)"',
+            multiplayer_control,
+        ))
+        self.assertTrue(multiplayer_historical_inputs)
+        self.assertEqual(
+            {path for _, path in multiplayer_historical_inputs},
+            {
+                "tools/Invoke-MultiplayerFixture.ps1",
+                "tools/Invoke-MultiplayerSession.ps1",
+                "tests/fixtures/library-multiplayer/control.lua",
+            },
+        )
+        multiplayer_revisions = {revision for revision, _ in multiplayer_historical_inputs}
         multiplayer_wrapper = (ROOT / "tools/Invoke-MultiplayerFixture.ps1").read_text(encoding="utf-8")
         multiplayer_fixture_source_revisions = set(re.findall(
             r"fixture_source_revision='([0-9a-f]{40})'", multiplayer_wrapper))
         self.assertTrue(multiplayer_fixture_source_revisions)
 
-        def assert_multiplayer_fixture_source_fetches(candidate_workflow: str) -> None:
+        def assert_multiplayer_historical_input_fetches(candidate_workflow: str) -> None:
             candidate_jobs = dict(re.findall(
                 r"(?ms)^  ([a-z-]+):\n(.*?)(?=^  [a-z-]+:\n|\Z)", candidate_workflow))
             for job in ("verification-plan", "host-controls"):
-                for revision in multiplayer_fixture_source_revisions:
+                for revision in multiplayer_fixture_source_revisions | multiplayer_revisions:
                     self.assertIn("git fetch --no-tags --depth=1 origin " + revision, candidate_jobs[job], (job, revision))
 
-        assert_multiplayer_fixture_source_fetches(workflow)
+        assert_multiplayer_historical_input_fetches(workflow)
         missing_fixture_fetch = "git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }\n"
         self.assertIn(missing_fixture_fetch, workflow)
         with self.assertRaises(AssertionError):
-            assert_multiplayer_fixture_source_fetches(workflow.replace(missing_fixture_fetch, "", 1))
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_fixture_fetch, "", 1))
         missing_v014_fixture_fetch = "git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }\n"
         self.assertIn(missing_v014_fixture_fetch, workflow)
         with self.assertRaises(AssertionError):
-            assert_multiplayer_fixture_source_fetches(workflow.replace(missing_v014_fixture_fetch, "", 1))
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_v014_fixture_fetch, "", 1))
+        missing_availability_actor_fetch = "git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c\n          if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }\n"
+        self.assertIn(missing_availability_actor_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_availability_actor_fetch, "", 1))
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
