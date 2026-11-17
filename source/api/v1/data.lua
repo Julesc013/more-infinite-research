@@ -259,15 +259,15 @@ local function data_stage()
   return stage
 end
 
-local function error_code(message)
-  if message:find("duplicate technology", 1, true) then return "duplicate_identity" end
-  if message:find("missing", 1, true) then return "missing_target" end
-  return "invalid_definition"
-end
-
 local function publish(prototypes, stage)
-  local ok, result = pcall(generator.install, prototypes, stage)
-  if not ok then fail(error_code(tostring(result)), tostring(result)) end
+  local rejection
+  local ok, result = pcall(generator.install, prototypes, stage, function(reason)
+    rejection = reason
+  end)
+  if not ok then
+    if rejection then fail(rejection, tostring(result)) end
+    fail("invalid_definition", tostring(result))
+  end
   local names = {}
   for index, prototype in ipairs(prototypes) do names[index] = prototype.name end
   return names

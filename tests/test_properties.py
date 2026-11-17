@@ -205,8 +205,9 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {first, second}, stage)
           return ok, stage.writes
         '''
-        duplicate_guard = 'if names[name] then reject("duplicate technology " .. name .. " within MIR emission") end'
-        mutant = self._mutate(duplicate_guard, 'if false then reject("duplicate technology " .. name .. " within MIR emission") end')
+        duplicate_guard = 'if names[name] then reject("duplicate_identity", "duplicate technology " .. name .. " within MIR emission") end'
+        mutant = self._mutate(duplicate_guard,
+            'if false then reject("duplicate_identity", "duplicate technology " .. name .. " within MIR emission") end')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "identity oracle did not kill the duplicate-guard mutant")
@@ -235,8 +236,9 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {first, second}, stage)
           return ok, stage.writes
         '''
-        cycle_guard = 'if #queue ~= count then reject("local prerequisite cycle") end'
-        mutant = self._mutate(cycle_guard, 'if false then reject("local prerequisite cycle") end')
+        cycle_guard = 'if #queue ~= count then reject("invalid_definition", "local prerequisite cycle") end'
+        mutant = self._mutate(cycle_guard,
+            'if false then reject("invalid_definition", "local prerequisite cycle") end')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "graph oracle did not kill the local-cycle mutant")

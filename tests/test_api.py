@@ -444,6 +444,45 @@ class ApiTests(unittest.TestCase):
             {"missing-recipe"}, .02) end, "missing_target")
         ''')
 
+    def test_generator_rejection_categories_are_not_inferred_from_exception_prose(self):
+        self.fresh()
+        self.lua.execute('''
+          local local_first = definition("mir-api-record-local-duplicate")
+          local local_second = definition("mir-api-record-local-duplicate")
+          refused(function() api.add_technologies({local_first, local_second}) end, "duplicate_identity")
+          local existing = definition("mir-api-record-existing-duplicate")
+          assert(api.add_technology(existing) == existing.name)
+          refused(function() api.add_technology(existing) end, "duplicate_identity")
+          local prerequisite = definition("mir-api-record-missing-prerequisite")
+          prerequisite.prerequisites = {"mir-api-record-absent-prerequisite"}
+          refused(function() api.add_technology(prerequisite) end, "missing_target")
+          refused(function() api.add_productivity(definition("mir-api-record-missing-recipe"),
+            {"mir-api-record-absent-recipe"}, .02) end, "missing_target")
+        ''')
+
+        self.fresh()
+        self.lua.execute('''
+          data.raw.technology = setmetatable({}, {__index=function()
+            error("duplicate missing raw lookup sentinel")
+          end})
+          local ok, message = pcall(api.add_technology, definition("mir-api-record-raw-error"))
+          assert(not ok and tostring(message):find("MIR_API:invalid_definition", 1, true), tostring(message))
+          assert(tostring(message):find("duplicate missing raw lookup sentinel", 1, true), tostring(message))
+          assert(data.writes == 0, "raw lookup failure wrote during preflight")
+        ''')
+
+        self.fresh()
+        self.lua.execute('''
+          data.extend = function(self)
+            self.writes = self.writes + 1
+            error("missing duplicate publication sentinel")
+          end
+          local ok, message = pcall(api.add_technology, definition("mir-api-record-publication-error"))
+          assert(not ok and tostring(message):find("MIR_API:invalid_definition", 1, true), tostring(message))
+          assert(tostring(message):find("missing duplicate publication sentinel", 1, true), tostring(message))
+          assert(data.writes == 1, "publication failure was relabelled as a clean preflight rejection")
+        ''')
+
     def test_native_publication_error_is_rethrown_with_its_context(self):
         self.fresh()
         self.lua.execute('''

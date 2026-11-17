@@ -2665,6 +2665,45 @@ class GeneratorTests(unittest.TestCase):
           refused({[1]=build(),[3]=build()}, world(), "missing entry")
         ''')
 
+    def test_rejection_callback_keeps_direct_errors_readable(self):
+        with self.assertRaisesRegex(Exception, "MIR technology preflight: technologies must not be empty"):
+            self.lua.execute('generator.install({}, world())')
+
+        self.lua.execute('''
+          local function rejected(row, environment, reason, fragment)
+            local observed_reason, observed_message
+            local ok, failure = pcall(generator.install, {row}, environment, function(actual, message)
+              observed_reason, observed_message = actual, message
+            end)
+            assert(not ok and environment.writes == 0, "rejected family wrote prototypes")
+            assert(type(failure) == "string" and observed_reason == reason
+              and observed_message == tostring(failure), tostring(failure))
+            assert(tostring(failure):find(fragment, 1, true), tostring(failure))
+          end
+
+          local invalid = build(); invalid.unit.count = 0
+          rejected(invalid, world(), "invalid_definition", "invalid research count")
+          local duplicate = build(); duplicate.name = "generator-record-duplicate"
+          local existing = world(); existing.raw.technology[duplicate.name] = {}
+          rejected(duplicate, existing, "duplicate_identity", "duplicate technology")
+          local prerequisite = build(); prerequisite.prerequisites = {"generator-record-missing"}
+          rejected(prerequisite, world(), "missing_target", "missing prerequisite")
+          local recipe = build(); recipe.effects = {{type="unlock-recipe", recipe="generator-record-missing"}}
+          rejected(recipe, world(), "missing_target", "missing recipe effect target")
+
+          local lookup = world()
+          lookup.raw.technology = setmetatable({}, {__index=function()
+            error("duplicate missing raw lookup sentinel")
+          end})
+          local observed_reason
+          local ok, failure = pcall(generator.install, {build()}, lookup, function(reason)
+            observed_reason = reason
+          end)
+          assert(not ok and lookup.writes == 0)
+          assert(type(failure) == "string" and observed_reason == nil)
+          assert(tostring(failure):find("duplicate missing raw lookup sentinel", 1, true))
+        ''')
+
     def test_item_science_is_not_limited_to_tools(self):
         self.lua.execute('''
           local environment = world(); environment.raw.item = environment.raw.tool; environment.raw.tool = {}
