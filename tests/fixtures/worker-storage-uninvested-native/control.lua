@@ -17,6 +17,13 @@ local DISABLED = "worker-robots-speed-4"
 local SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"}
 local ORDINARY_PREREQUISITES = {"worker-robots-storage-2", "worker-robots-storage-3", "automation-science-pack",
   "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"}
+-- These are the exact two Base prefix effects that the explicit ordinary
+-- prerequisite writes may apply. LuaTechnology exposes the public row; the
+-- force bonus is the native observation that the vector was applied.
+local ORDINARY_PREFIXES = {
+  {name="worker-robots-storage-2", level=2, count=300, effects={{type="worker-robot-storage", modifier=1}}},
+  {name="worker-robots-storage-3", level=3, count=450, effects={{type="worker-robot-storage", modifier=1}}},
+}
 local TUPLES = {
   ["2.0.77"] = {old="4.7.20002", published="5.0.20011", negative="5.0.20016", candidate="5.0.20017"},
   ["2.1.23"] = {old="4.7.21002", published="5.0.21011", negative="5.0.21016", candidate="5.0.21017"},
@@ -99,6 +106,50 @@ local function worker_frame(force)
     current=force.current_research and force.current_research.name or false,
     progress=force.research_progress, queue=queue(force), canonical=row(force, CANONICAL),
     ordinary=optional_row(force, DEFAULT), head=optional_row(force, HEAD)}
+end
+
+-- The effect vectors are the fixed Base contract. The paired before/after
+-- force-bonus delta below is the native observation; LuaTechnology itself does
+-- not expose prototype effects at runtime.
+local function ordinary_prefix_snapshot(force)
+  check(type(force.worker_robots_storage_bonus) == "number", "ordinary prefix bonus type")
+  local rows = {}
+  for _, prefix in ipairs(ORDINARY_PREFIXES) do
+    local actual = row(force, prefix.name)
+    check(actual.name == prefix.name and actual.level == prefix.level and actual.count == prefix.count
+      and actual.saved == 0 and type(actual.researched) == "boolean" and type(actual.enabled) == "boolean"
+      and type(actual.visible) == "boolean", "ordinary prefix public row differs: " .. prefix.name)
+    rows[#rows + 1] = {row=actual, effects=copy(prefix.effects)}
+  end
+  return {bonus=force.worker_robots_storage_bonus, rows=rows}
+end
+
+local function assert_ordinary_prefix_transition(before, after)
+  check(type(before) == "table" and type(after) == "table" and type(before.rows) == "table"
+    and type(after.rows) == "table", "ordinary prefix receipt shape")
+  check(#before.rows == #ORDINARY_PREFIXES and #after.rows == #ORDINARY_PREFIXES,
+    "ordinary prefix receipt count")
+  local rows, expected_delta = {}, 0
+  for index, prefix in ipairs(ORDINARY_PREFIXES) do
+    local prior, current = before.rows[index], after.rows[index]
+    check(type(prior) == "table" and type(current) == "table" and type(prior.row) == "table"
+      and type(current.row) == "table", "ordinary prefix row shape")
+    same(prior.effects, prefix.effects, "$/ordinary-prefix/" .. prefix.name .. "/before-effects")
+    same(current.effects, prefix.effects, "$/ordinary-prefix/" .. prefix.name .. "/after-effects")
+    check(#prefix.effects == 1 and prefix.effects[1].type == "worker-robot-storage"
+      and prefix.effects[1].modifier == 1, "ordinary prefix Base effect differs: " .. prefix.name)
+    for _, field in ipairs({"name", "level", "enabled", "visible", "saved", "count"}) do
+      same(prior.row[field], current.row[field], "$/ordinary-prefix/" .. prefix.name .. "/" .. field)
+    end
+    check(prior.row.name == prefix.name and type(prior.row.researched) == "boolean"
+      and type(current.row.researched) == "boolean" and current.row.researched == true,
+      "ordinary prefix identity or researched transition differs: " .. prefix.name)
+    local newly_researched = prior.row.researched == false
+    if newly_researched then expected_delta = expected_delta + prefix.effects[1].modifier end
+    rows[#rows + 1] = {name=prefix.name, effects=copy(prefix.effects), before=copy(prior.row),
+      after=copy(current.row), newly_researched=newly_researched}
+  end
+  return rows, expected_delta
 end
 
 -- Factorio exposes forces both by name and by numeric index.  Snapshot each
@@ -323,6 +374,7 @@ local function emit(stage, extra)
     fixture_version=script.active_mods[FIXTURE], mir_version=script.active_mods[MIR], mods=copy(script.active_mods),
     frames=frames, worker_frames=worker_frames(), pre_config=state and state.pre_config or false,
     source_foreign=state and state.source_foreign and copy(state.source_foreign) or false,
+    ordinary_prefix=state and state.ordinary_prefix and copy(state.ordinary_prefix) or false,
     candidate_event=state and state.candidate_event or false, lab=state and lab_frame(state) or {present=false}, extra=extra}
   local text = helpers.table_to_json(body)
   log("MIR_WORKER_UNINVESTED_NATIVE " .. text)
@@ -380,6 +432,7 @@ local function candidate_event(event)
   local workers = assert_all_empty_worker(true)
   assert_source_foreign(foreign)
   same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/pre-config-foreign")
+  same(state.pre_config.ordinary_prefix, ordinary_prefix_snapshot(game.forces.player), "$/pre-config-prefix")
   local flag_deltas = worker_flag_transition(state.pre_config.worker_frames, workers)
   state.candidate_event = {startup_settings_changed=event.mod_startup_settings_changed,
     trigger=event.mod_startup_settings_changed and "startup-settings-plus-fixture-addition" or "fixture-addition", mod_changes=rows,
@@ -401,10 +454,19 @@ local function start_ordinary()
     expected[name] = nil
   end
   check(next(expected) == nil, "ordinary prerequisite set differs")
+  local prefix_before = ordinary_prefix_snapshot(player)
+  check(state.pre_config.player.bonus == prefix_before.bonus, "ordinary prefix pre-config bonus differs")
+  same(state.pre_config.ordinary_prefix, prefix_before, "$/ordinary-prefix/pre-configuration")
   -- The bounded authored prerequisite list is validated above.  Complete only
   -- those exact public rows: recursive research would silently traverse an
   -- unobserved Base graph and obscure the source/candidate boundary.
   for _, name in ipairs(ORDINARY_PREREQUISITES) do technology(player, name).researched = true end
+  local prefix_after = ordinary_prefix_snapshot(player)
+  local prefix_rows, expected_delta = assert_ordinary_prefix_transition(prefix_before, prefix_after)
+  local observed_delta = prefix_after.bonus - prefix_before.bonus
+  check(observed_delta == expected_delta, "ordinary prefix native effect delta differs")
+  state.ordinary_prefix = {before=prefix_before, after=prefix_after, rows=prefix_rows,
+    expected_delta=expected_delta, observed_delta=observed_delta}
   check(ordinary.research_unit_count == 675, "ordinary default exact science cost")
   local foreign = game.forces[FOREIGN]
   assert_all_empty_worker(true)
@@ -521,7 +583,7 @@ script.on_init(function()
     assert_source_foreign(foreign)
     storage[KEY] = {schema=1, phase="candidate-awaiting-config", source_base=script.active_mods.base,
       pre_config={player=worker_frame(game.forces.player), foreign=worker_frame(foreign), worker_frames=workers,
-        foreign_unrelated=unrelated_frame(foreign)}}
+        foreign_unrelated=unrelated_frame(foreign), ordinary_prefix=ordinary_prefix_snapshot(game.forces.player)}}
     emit("candidate-pre-configuration", {public_read_only=true})
   end
 end)
