@@ -34,6 +34,9 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 function Assert-Session([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir5-multiplayer-fixture] $Message"}
 }
+$loopbackRconHelper=(Resolve-Path -LiteralPath (Join-Path $repo 'tools/lib/validation/LoopbackRcon.ps1')).Path
+$loopbackRconHelperItem=Get-Item -LiteralPath $loopbackRconHelper
+$loopbackRconHelperIdentity=[ordered]@{path=$loopbackRconHelper;bytes=[int64]$loopbackRconHelperItem.Length;sha256=(Get-FileHash -LiteralPath $loopbackRconHelper -Algorithm SHA256).Hash.ToUpperInvariant()}
 Assert-Session (-not $CollectProcessLifetimePeaks -or ($CollectProcessMemoryObservations -and
   -not $StandaloneIdentityDiscovery -and $FixtureCase -cin @('library-multiplayer','library-paired-browser'))) 'lifetime peak counters require opted-in Library memory observations'
 function Assert-MultiplayerFixtureSelection {
@@ -1191,7 +1194,7 @@ try {
       foreach($client in $clients){foreach($stage in @('first-open','first-open-settled','search','refresh','reopen','reopen-settled')){Join-Path $client.write_data ('script-output/mir5-library-paired-browser/'+$stage+'-*.png')}}
     }
   )
-  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword;loopback_rcon=$loopbackRconHelperIdentity}
   if($StandaloneIdentityDiscovery){
     $spec.standalone_identity_discovery=$true
     $spec.identity_discovery=[ordered]@{engine_sha256=[string]$target.engine_sha256;mir_archive_sha256=[string]$target.mir_archive_sha256;observer_archive_sha256=[string]$target.observer_sha256;fixture_version='0.1.1';join_budget_seconds=180;environmental_only=$true}

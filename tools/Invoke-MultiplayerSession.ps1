@@ -3,7 +3,7 @@
 # validates the selected library, configs, and player-data files before calling
 # this script. Spec fields: engine, engine_sha256, archive_library, workroot,
 # seed_save, seed_sha256, server_config, server_settings, server_write_data,
-# port, rcon_port, rcon_password, clients, expected_screenshots. Screenshot
+# port, rcon_port, rcon_password, loopback_rcon, clients, expected_screenshots. Screenshot
 # entries are absolute client write-data patterns: availability/initial/settled/rejoin/restart-*.png
 # for each locale.
 [CmdletBinding()]
@@ -20,6 +20,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'lib/validation/OwnedProcessMemorySampler.ps1')
+$loopbackRconHelper=(Join-Path $PSScriptRoot 'lib/validation/LoopbackRcon.ps1')
 
 function Assert-Session([bool]$Condition, [string]$Message) {
   if (-not $Condition) { throw "[mir5-multiplayer-session] $Message" }
@@ -470,81 +471,9 @@ function Save-PairedBrowserServerPhaseLog([string]$Source, [ValidateSet('initial
   Assert-Session (Test-PairedBrowserBytePrefix $phaseBytes $copiedBytes) "paired Browser $Phase server log snapshot bytes differ"
   return $copied
 }
-function Write-RconInt32([IO.Stream]$Stream, [int]$Value) {
-  $bytes = [BitConverter]::GetBytes($Value)
-  if (-not [BitConverter]::IsLittleEndian) { [Array]::Reverse($bytes) }
-  $Stream.Write($bytes, 0, $bytes.Length)
-}
-function Read-RconExact([IO.Stream]$Stream, [int]$Count) {
-  Assert-Session ($Count -ge 0 -and $Count -le 65536) 'RCON packet read length is invalid'
-  $bytes = [byte[]]::new($Count)
-  $offset = 0
-  while ($offset -lt $Count) {
-    $read = $Stream.Read($bytes, $offset, $Count - $offset)
-    Assert-Session ($read -gt 0) 'RCON connection closed during packet read'
-    $offset += $read
-  }
-  return ,$bytes
-}
-function Convert-RconInt32([byte[]]$Bytes) {
-  Assert-Session ($Bytes.Length -eq 4) 'RCON integer encoding is invalid'
-  if ([BitConverter]::IsLittleEndian) { return [BitConverter]::ToInt32($Bytes, 0) }
-  $copy = [byte[]]$Bytes.Clone()
-  [Array]::Reverse($copy)
-  return [BitConverter]::ToInt32($copy, 0)
-}
-function Write-RconPacket([IO.Stream]$Stream, [int]$Id, [int]$Type, [string]$Payload) {
-  $body = [Text.UTF8Encoding]::new($false).GetBytes($Payload)
-  Assert-Session ($body.Length -le 65526) 'RCON payload is too large'
-  Write-RconInt32 $Stream (10 + $body.Length)
-  Write-RconInt32 $Stream $Id
-  Write-RconInt32 $Stream $Type
-  $Stream.Write($body, 0, $body.Length)
-  $Stream.WriteByte(0)
-  $Stream.WriteByte(0)
-  $Stream.Flush()
-}
-function Read-RconPacket([IO.Stream]$Stream) {
-  $length = Convert-RconInt32 (Read-RconExact $Stream 4)
-  Assert-Session ($length -ge 10 -and $length -le 65536) 'RCON packet length is invalid'
-  $packet = Read-RconExact $Stream $length
-  Assert-Session ($packet[$length - 2] -eq 0 -and $packet[$length - 1] -eq 0) 'RCON packet terminators are invalid'
-  $id = Convert-RconInt32 ([byte[]]$packet[0..3])
-  $type = Convert-RconInt32 ([byte[]]$packet[4..7])
-  return [pscustomobject]@{ id=$id; type=$type }
-}
 function Invoke-LoopbackRconKicks([int]$Port, [string]$Password) {
-  $tcp = [Net.Sockets.TcpClient]::new()
-  $stream = $null
-  try {
-    $tcp.SendTimeout = 5000
-    $tcp.ReceiveTimeout = 5000
-    $connect = $tcp.ConnectAsync([Net.IPAddress]::Loopback, $Port)
-    Assert-Session ($connect.Wait(5000)) 'RCON loopback connection timed out'
-    $connect.GetAwaiter().GetResult()
-    $stream = $tcp.GetStream()
-    $stream.ReadTimeout = 5000
-    $stream.WriteTimeout = 5000
-    $requestId = 43101
-    Write-RconPacket $stream $requestId 3 $Password
-    $auth = $null
-    foreach ($attempt in 1..2) {
-      $packet = Read-RconPacket $stream
-      if ($packet.type -eq 2) { $auth = $packet; break }
-      Assert-Session ($packet.type -eq 0 -and $packet.id -eq $requestId) 'RCON authentication response differs'
-    }
-    Assert-Session ($null -ne $auth -and $auth.id -eq $requestId) 'RCON authentication failed'
-    foreach ($name in @('MIR5English','MIR5Deutsch')) {
-      $requestId++
-      Write-RconPacket $stream $requestId 2 ("/kick $name MIR5-rejoin-test")
-      $response = Read-RconPacket $stream
-      Assert-Session ($response.id -eq $requestId -and $response.type -eq 0) 'RCON kick response differs'
-    }
-  }
-  finally {
-    if ($null -ne $stream) { $stream.Dispose() }
-    $tcp.Dispose()
-  }
+  $receipt=Invoke-MIRLoopbackRconCommands -Port $Port -Password $Password -AuthenticationRequestId 43101 -FirstCommandRequestId 43102 -Commands @('/kick MIR5English MIR5-rejoin-test','/kick MIR5Deutsch MIR5-rejoin-test')
+  Assert-Session ($receipt.command_attempts-eq2-and$receipt.commands.Count-eq2-and$receipt.commands[0].request_id-eq43102-and$receipt.commands[1].request_id-eq43103-and@($receipt.commands|Where-Object {-not $_.complete}).Count-eq0) 'RCON kick receipt differs'
 }
 function Assert-Active {
   foreach ($record in $records) {
@@ -1008,6 +937,14 @@ if ($SelfCheck) {
 if ($RconSelfCheck) {
   Assert-Session ($RconCheckPort -gt 0 -and $RconCheckPort -le 65535) 'RCON self-check port is invalid'
   Assert-Session ($RconCheckPassword -cmatch '^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$') 'RCON self-check password must be a temporary GUID'
+  $canonicalLoopbackRconHelper=(Resolve-Path -LiteralPath $loopbackRconHelper).Path
+  $canonicalLoopbackRconRead=$null
+  try {
+    $canonicalLoopbackRconRead=[IO.File]::Open($canonicalLoopbackRconHelper,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+    . $canonicalLoopbackRconHelper
+  } finally {
+    if($null-ne$canonicalLoopbackRconRead){$canonicalLoopbackRconRead.Dispose()}
+  }
   Invoke-LoopbackRconKicks $RconCheckPort $RconCheckPassword
   [pscustomobject]@{status='passed-nonnative-rcon-self-check';port=$RconCheckPort;commands=2}
   return
@@ -1051,7 +988,7 @@ $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spe
 $collectProcessLifetimePeaks = Get-ProcessLifetimePeakOptIn -Spec $spec -FixtureCase $fixtureCase -CollectMemory $collectProcessMemoryObservations
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer' -or $spaceAgeLibrary){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
-foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
+foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','loopback_rcon','clients','expected_screenshots')) {
   Assert-Session $spec.ContainsKey($field) "session spec lacks $field"
 }
 $engine = Resolve-Existing ([string]$spec.engine) 'Leaf' 'engine'
@@ -1084,6 +1021,21 @@ $rconPort = [int]$spec.rcon_port
 Assert-Session ($rconPort -ge 1024 -and $rconPort -le 65535) 'RCON port must be an OS-assigned loopback user port'
 $rconPassword = [string]$spec.rcon_password
 Assert-Session ($rconPassword -cmatch '^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$') 'RCON password must be a temporary GUID'
+$loopbackBinding=$spec.loopback_rcon
+Assert-Session ($loopbackBinding-is[System.Collections.IDictionary]-and$loopbackBinding.Keys.Count-eq3-and$loopbackBinding.Contains('path')-and$loopbackBinding.Contains('bytes')-and$loopbackBinding.Contains('sha256')) 'RCON helper binding differs'
+$boundLoopbackHelper=Resolve-Existing ([string]$loopbackBinding.path) 'Leaf' 'RCON helper'
+$expectedLoopbackHelper=(Resolve-Path -LiteralPath $loopbackRconHelper).Path
+Assert-Session ($boundLoopbackHelper-ceq$expectedLoopbackHelper-and($loopbackBinding.bytes-is[int]-or$loopbackBinding.bytes-is[long])-and[string]$loopbackBinding.sha256-cmatch'^[A-Fa-f0-9]{64}$') 'RCON helper binding differs'
+$boundLoopbackRconRead=$null
+try {
+  $boundLoopbackRconRead=[IO.File]::Open($expectedLoopbackHelper,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+  $loopbackRconSha=[Security.Cryptography.SHA256]::Create()
+  try{$actualLoopbackRconSha=-join($loopbackRconSha.ComputeHash($boundLoopbackRconRead)|ForEach-Object {$_.ToString('X2')})}finally{$loopbackRconSha.Dispose()}
+  Assert-Session ([int64]$loopbackBinding.bytes-eq$boundLoopbackRconRead.Length-and$actualLoopbackRconSha-ceq([string]$loopbackBinding.sha256).ToUpperInvariant()) 'RCON helper binding differs'
+  . $expectedLoopbackHelper
+} finally {
+  if($null-ne$boundLoopbackRconRead){$boundLoopbackRconRead.Dispose()}
+}
 $settings = Get-Content -LiteralPath $serverSettings -Raw | ConvertFrom-Json -AsHashtable
 Assert-Session ($settings.ContainsKey('require_user_verification') -and $settings.require_user_verification -eq $false) 'server settings must disable user verification'
 $clients = @($spec.clients)

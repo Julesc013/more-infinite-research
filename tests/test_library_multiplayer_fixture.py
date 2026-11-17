@@ -5442,6 +5442,9 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
         self.assertIn("Start-Clients 'initial'", session)
         self.assertIn("Start-Clients 'restart'", session)
         self.assertIn("Invoke-LoopbackRconKicks", session)
+        self.assertIn("Invoke-MIRLoopbackRconCommands", session)
+        self.assertIn("LoopbackRcon.ps1", session)
+        self.assertIn("loopback_rcon=$loopbackRconHelperIdentity", wrapper)
         self.assertIn("$patterns.Count -eq 10", session)
         self.assertIn("$clientPatterns.Count -eq 5", session)
 
