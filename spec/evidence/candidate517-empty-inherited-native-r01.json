@@ -73,6 +73,7 @@
       },
       "actual_review": {
         "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f200-r13-actual-independent-review-r01.json",
+        "sha256": "D9BD68D73FABA7A63A69660108E06D85E3CCF819F292EAB36592B53131997603",
         "kind": "MIRPublished11EmptyInheritedF200ActualIndependentReviewV1",
         "verdict": "GO_SCOPED_F200_PUBLISHED11_EMPTY_NATIVE_SEQUENCE"
       },
@@ -134,9 +135,18 @@
         "verdict": "GO_SCOPED_F210_PUBLISHED11_EMPTY_NATIVE_SEQUENCE"
       },
       "review_inputs": {
-        "retained_source_packet_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-retained-source-packet-review-r01.json",
-        "retained_source_controller_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-retained-source-controller-review-r01.json",
-        "platform_observer_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/linux-resource-observer-race-review-r01.json",
+        "retained_source_packet_review": {
+          "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-retained-source-packet-review-r01.json",
+          "sha256": "A8B839ACDA35184C9A7057E6974CEA04B679B49D2898095B49211F01E6368375"
+        },
+        "retained_source_controller_review": {
+          "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-retained-source-controller-review-r01.json",
+          "sha256": "310A66624D30637E3F0AF643985D60577EC0DE6EE2A23A10E7B3696A6347623D"
+        },
+        "platform_observer_review": {
+          "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/linux-resource-observer-race-review-r01.json",
+          "sha256": "3480209E73BB1DF476EED210FFF2B6F92FC5C9691A33BE470363D0DE6662DB05"
+        },
         "disposition": "The independently adopted result is scoped to this exact retained-source chain."
       },
       "private_raw_custody": {
