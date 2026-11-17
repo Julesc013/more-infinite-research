@@ -115,24 +115,6 @@ local function legacy_emission(event, route)
     and (row.selected == "infinite" or integer(row.selected))
 end
 
-local function legacy_preflight(event, route)
-  local prior = checked(storage[KEY])
-  if prior ~= nil then
-    if not same(prior, route) then refuse("finite endpoint or creator changed", route) end
-    return nil
-  end
-  if route == nil then return nil end
-  checked({schema=1, route=route})
-  local changes = type(event) == "table" and event.mod_changes
-  local mir = type(changes) == "table" and changes[MIR]
-  local first_install = type(mir) == "table" and mir.old_version == nil
-    and script and script.active_mods and mir.new_version == script.active_mods[MIR]
-  if not first_install and not legacy_emission(event, route) then
-    refuse("previous continuation ownership is unknown", route)
-  end
-  return {schema=1, route=copy(route)}
-end
-
 local function legacy_apply(plan)
   if plan ~= nil then storage[KEY] = plan end
 end
@@ -231,6 +213,26 @@ local function recover_error(reason, route, event, state, current, rejected)
     .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
     .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
     .. " verified history; this command cannot infer it", route)
+end
+
+local function legacy_preflight(event, route)
+  local prior = checked(storage[KEY])
+  if prior ~= nil then
+    if not same(prior, route) then refuse("finite endpoint or creator changed", route) end
+    return nil
+  end
+  if route == nil then return nil end
+  checked({schema=1, route=route})
+  local changes = type(event) == "table" and event.mod_changes
+  local mir = type(changes) == "table" and changes[MIR]
+  local first_install = type(mir) == "table" and mir.old_version == nil
+    and script and script.active_mods and mir.new_version == script.active_mods[MIR]
+  if not first_install and not legacy_emission(event, route) then
+    -- Enrich the actual refusal here; unexpected lookup errors keep their
+    -- original identity and must never be classified from their prose.
+    recover_error("previous continuation ownership is unknown", route, event)
+  end
+  return {schema=1, route=copy(route)}
 end
 
 local function fields(value, allowed)
@@ -524,14 +526,7 @@ function M.preflight(event, route, owner_plan)
     checked({schema=1, route=route})
     plan = {schema=1, route=copy(route)}
   else
-    local ok, result = pcall(legacy_preflight, event, route)
-    if not ok then
-      if tostring(result):find("previous continuation ownership is unknown", 1, true) then
-        recover_error("previous continuation ownership is unknown", route, event, state)
-      end
-      error(result, 0)
-    end
-    plan = result
+    plan = legacy_preflight(event, route)
   end
   local empty = empty_private()
   if #empty > 0 then return {recovery=true, legacy=plan, empty=empty} end
