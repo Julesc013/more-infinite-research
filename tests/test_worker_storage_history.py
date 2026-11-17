@@ -2415,7 +2415,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                       assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
                     ''')
 
-    def test_empty_unchanged_qol_accepts_but_added_removed_updated_and_official_mismatch_refuse(self):
+    def test_empty_unchanged_and_published11_added_qol_accept_but_changed_prior_selection_refuses(self):
         for target in ("f200","f210"):
             for opponent in ("unchanged","added","removed","updated","official"):
                 lua=self.world(target);lua.globals().opponent=opponent
@@ -2433,7 +2433,19 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   local before=all_frames();writes=0
                   local ok,plan=pcall(history.plan_default_owner_transfer,event,nil,false)
                   assert(writes==0 and same(before,all_frames()))
-                  if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
+                  -- Published11 authored infinite C4 even when capped or disabled.
+                  -- Its proved prior Base+MIR selection and empty native frames
+                  -- admit this addition without inferring a previous work contract.
+                  if opponent=="unchanged"or opponent=="added"then
+                    local kind=opponent=="added"and"published511-empty-default"or"unchanged-mir5-default"
+                    assert(ok and plan.record.producer.kind==kind)
+                    assert(history.apply_default_owner_transfer(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
@@ -3195,7 +3207,7 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                 ''')
 
 
-    def test_new_selection_keeps_only_existing_501_empty_exception(self):
+    def test_new_selection_keeps_only_proved_501_and_published11_empty_origins(self):
         for target in ("f200", "f210"):
             for patch in range(12):
                 lua=self.world(target);lua.globals().patch=patch
@@ -3208,6 +3220,17 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                   if package_family=="f200"and patch==1 then
                     assert(ok and plan.record.producer.kind=="older-mir501-empty-default")
                     assert(history.default_owner_apply(plan))
+                  elseif patch==11 then
+                    -- The immutable published11 Base+MIR producer retained
+                    -- infinite C4 under cap/enable settings; no force has work.
+                    assert(ok and plan.record.producer.kind=="published511-empty-default")
+                    assert(history.default_owner_apply(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
