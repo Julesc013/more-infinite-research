@@ -7,6 +7,7 @@ local MIR = "more-infinite-research"
 local VERSION = script.active_mods[FIXTURE]
 local ROOT, PREFIX = "mir_research_browser", "mir_library_"
 local MAX_EVENTS, MAX_PHASES, MAX_TEXT = 24, 7, 65536
+local LOCALE_READY_TICKS = 1800
 local SETTINGS_FILE = "more-infinite-research/settings/mir-settings-profile.txt"
 local DIAGNOSTICS_FILE = "more-infinite-research/mir.log"
 
@@ -75,8 +76,8 @@ end
 
 local function role_for(player)
   if not valid(player) then fail("export client unavailable") end
-  if player.name == "MIR5English" and player.locale == "en" then return "en" end
-  if player.name == "MIR5Deutsch" and player.locale == "de" then return "de" end
+  if player.name == "MIR5English" then return "en" end
+  if player.name == "MIR5Deutsch" then return "de" end
   fail("export client role differs")
 end
 
@@ -87,7 +88,7 @@ local function player_for(index)
   return player
 end
 
-local function pair()
+local function joined_pair()
   local current = state()
   local en, de = player_for(current.roles.en), player_for(current.roles.de)
   if en == nil or de == nil or role_for(en) ~= "en" or role_for(de) ~= "de" or en == de or en.force ~= de.force then
@@ -96,6 +97,12 @@ local function pair()
   local count = 0
   for _ in pairs(game.connected_players) do count = count + 1 end
   if count ~= 2 then fail("exactly two connected export clients required") end
+  return en, de
+end
+
+local function pair()
+  local en, de = joined_pair()
+  if en.locale ~= "en" or de.locale ~= "de" then fail("export client locale differs") end
   return en, de
 end
 
@@ -121,7 +128,7 @@ local function fresh_frame()
     fail("fresh native frame differs")
   end
   local row = technology_row(gear)
-  if row.name ~= "recipe-prod-research_gears-1" or row.level ~= 3 or row.researched ~= true
+  if row.name ~= "recipe-prod-research_gears-1" or row.level ~= 3 or row.researched ~= false
       or row.enabled ~= true or math.abs(recipe.productivity_bonus - 0.2) > 0.000001 then
     fail("fresh earned provider frame differs")
   end
@@ -239,6 +246,16 @@ local function settle(event)
   local current = state()
   local pending = current.pending
   if pending == nil or event.tick < pending.tick then return end
+  if pending.kind == "locale-ready" then
+    local en, de = joined_pair()
+    if en.locale == "en" and de.locale == "de" then
+      current.pending = {kind = "baseline", tick = event.tick + 1}
+      current.phase = "settling-baseline"
+    elseif event.tick >= pending.deadline then
+      fail("export client locale did not become ready")
+    end
+    return
+  end
   current.pending = nil
   if pending.kind == "baseline" then
     current.fresh_frame = fresh_frame()
@@ -264,9 +281,9 @@ local function on_join(event)
   if current.roles[role] ~= nil then fail("duplicate export client role") end
   current.roles[role] = player.index
   if current.roles.en ~= nil and current.roles.de ~= nil then
-    pair()
-    current.pending = {kind = "baseline", tick = game.tick + 1}
-    current.phase = "settling-baseline"
+    joined_pair()
+    current.pending = {kind = "locale-ready", tick = game.tick + 1, deadline = game.tick + LOCALE_READY_TICKS}
+    current.phase = "await-locales"
   end
 end
 
@@ -285,6 +302,7 @@ local function on_click(event)
   if action == nil or action.kind ~= button_kind then fail("export action differs") end
   local player = player_for(event.player_index)
   if player == nil or role_for(player) ~= action.role then fail("export client role differs") end
+  pair()
   assert_click_path(player, element, action)
   if #current.actions >= #ACTIONS or #current.actions >= MAX_EVENTS then fail("export event bound exceeded") end
   current.click = {action = action.name, role = action.role, player_index = player.index,

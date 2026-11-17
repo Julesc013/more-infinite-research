@@ -66,7 +66,7 @@ class LibraryFreshExportInputControls(unittest.TestCase):
           force={valid=true,name="player",current_research=nil,research_progress=0,research_queue={},
             worker_robots_storage_bonus=0,
             technologies={ ["recipe-prod-research_gears-1"]={name="recipe-prod-research_gears-1",level=3,
-              researched=true,enabled=true}},
+              researched=false,enabled=true}},
             recipes={ ["iron-gear-wheel"]={productivity_bonus=.2}}}
           local function player(index,name,locale)
             return gui_state({valid=true,connected=true,index=index,name=name,locale=locale,force=force,
@@ -74,11 +74,15 @@ class LibraryFreshExportInputControls(unittest.TestCase):
           end
           player_en=player(1,"MIR5English","en")
           player_de=player(2,"MIR5Deutsch","de")
+           player_other=player(3,"MIR5Other","en")
+           foreign_force={valid=true,name="enemy"}
           game={tick=0,connected_players={player_en,player_de},get_player=function(index)
             if index==1 then return player_en end
             if index==2 then return player_de end
+             if index==3 then return player_other end
             return nil
           end}
+           function connected(...) game.connected_players={...} end
           function root_for(player,tab)
             local root=element(nil,"frame","mir_research_browser",{tags={["more-infinite-research.library-root.v1"]=true}})
             local tabs=element(root,"tabbed-pane","mir_library_tabs",{selected_tab_index=tab})
@@ -149,10 +153,88 @@ class LibraryFreshExportInputControls(unittest.TestCase):
           emit(defines.events.on_player_joined_game,{player_index=1})
           emit(defines.events.on_player_joined_game,{player_index=2})
           tick()
+          assert(storage.mir_fresh_export_input.phase=="settling-baseline")
+          assert(next(writes[1])==nil and next(writes[2])==nil)
+          tick()
           local current=storage.mir_fresh_export_input
-          assert(current.phase=="ready" and current.fresh_frame.gear.level==3)
+          assert(current.phase=="ready" and current.fresh_frame.gear.level==3 and current.fresh_frame.gear.researched==false)
           assert(writes[1]["mir-library-fresh-export-input/00-baseline.json"]~=nil)
         ''')
+
+    def test_r09_completed_gear_is_unresearched_and_truthy_flag_refuses(self):
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.setUp(actor_source=source.replace("row.researched ~= false", "row.researched ~= true"))
+        self.lua.execute(r'''
+          initialize()
+          force.technologies["recipe-prod-research_gears-1"].researched=true
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          emit(defines.events.on_player_joined_game,{player_index=2})
+          tick();tick()
+          assert(writes[1]["mir-library-fresh-export-input/00-baseline.json"]~=nil)
+        ''')
+
+        self.setUp()
+        self.lua.execute(r'''
+          initialize()
+          force.technologies["recipe-prod-research_gears-1"].researched=true
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          emit(defines.events.on_player_joined_game,{player_index=2})
+          tick()
+        ''')
+        with self.assertRaisesRegex(Exception, "fresh earned provider frame differs"):
+            self.lua.execute("tick()")
+        self.assertTrue(self.lua.eval("next(writes[1]) == nil and next(writes[2]) == nil"))
+
+    def test_join_identity_waits_for_localized_pair_without_phase_writes(self):
+        self.lua.execute(r'''
+          initialize()
+          player_de.locale="en"
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          emit(defines.events.on_player_joined_game,{player_index=2})
+          local current=storage.mir_fresh_export_input
+          assert(current.phase=="await-locales" and current.roles.en==1 and current.roles.de==2)
+          assert(next(writes[1])==nil and next(writes[2])==nil)
+          tick()
+          assert(current.phase=="await-locales" and next(writes[1])==nil and next(writes[2])==nil)
+          player_de.locale="de"
+          tick()
+          assert(current.phase=="settling-baseline" and next(writes[1])==nil and next(writes[2])==nil)
+          tick()
+          assert(current.phase=="ready" and writes[1]["mir-library-fresh-export-input/00-baseline.json"]~=nil)
+        ''')
+
+    def test_join_readiness_rejects_persistent_wrong_locale_and_identity_faults(self):
+        self.lua.execute(r'''
+          initialize()
+          player_de.locale="en"
+          emit(defines.events.on_player_joined_game,{player_index=1})
+          emit(defines.events.on_player_joined_game,{player_index=2})
+          game.tick=1799
+        ''')
+        with self.assertRaisesRegex(Exception, "locale did not become ready"):
+            self.lua.execute("tick()")
+        self.assertTrue(self.lua.eval("next(writes[1]) == nil and next(writes[2]) == nil"))
+
+        for fault, expected in (
+            ('emit(defines.events.on_player_joined_game,{player_index=1})', "duplicate export client role"),
+            ('emit(defines.events.on_player_joined_game,{player_index=3})', "unexpected export client join"),
+            ('player_de.connected=false;tick()', "exact export client pair differs"),
+            ('player_de.force=foreign_force;tick()', "exact export client pair differs"),
+        ):
+            with self.subTest(fault=fault):
+                self.setUp()
+                self.lua.execute(r'''
+                  initialize()
+                  emit(defines.events.on_player_joined_game,{player_index=1})
+                ''')
+                if "player_index=3" in fault:
+                    self.lua.execute('emit(defines.events.on_player_joined_game,{player_index=2})')
+                    self.lua.execute('connected(player_en,player_de,player_other)')
+                elif "connected=false" in fault or "foreign_force" in fault:
+                    self.lua.execute('emit(defines.events.on_player_joined_game,{player_index=2})')
+                with self.assertRaisesRegex(Exception, expected):
+                    self.lua.execute(fault)
+                self.assertTrue(self.lua.eval("next(writes[1]) == nil and next(writes[2]) == nil"))
 
     def test_six_actual_export_clicks_defer_gui_reads_and_bind_role_local_bytes(self):
         self.initialize_baseline()
@@ -238,6 +320,7 @@ class LibraryFreshExportInputControls(unittest.TestCase):
           initialize()
           emit(defines.events.on_player_joined_game,{player_index=1})
           emit(defines.events.on_player_joined_game,{player_index=2})
+          tick()
           helpers=nil
         ''')
         with self.assertRaisesRegex(Exception, "phase output helpers unavailable"):
@@ -286,7 +369,10 @@ class LibraryFreshExportInputControls(unittest.TestCase):
         self.assertIn('"00-baseline.json"', code)
         self.assertIn('"MIRSET1 preview differs"', code)
         self.assertIn('"fresh earned provider frame differs"', code)
+        self.assertIn("LOCALE_READY_TICKS = 1800", code)
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
+        self.assertIn("0dac003903a317137cf993b5bd22074a3e5013a8", readme)
+        self.assertIn("locale=en", readme)
         self.assertIn("R09", readme)
         self.assertIn("does not prove desktop delivery", readme)
 
