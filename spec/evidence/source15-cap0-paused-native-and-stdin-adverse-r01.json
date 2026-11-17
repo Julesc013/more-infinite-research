@@ -20,12 +20,12 @@
       "role": "original Source15 actor"
     },
     "source_a0": {
-      "path": "build/qualification/source15-cap0-observation-r01/inputs/A0.zip",
+      "path": "build/qualification/mir516-se-speed-cap-ten-r04/source-adoption-custody/source.zip",
       "bytes": 842004,
       "sha256": "A0E0C6216C0AEC2317AC1A88B80BBDC7BC7A1F581A787D7FA82F3DEF3F0F8DFC"
     },
     "source_observation": {
-      "path": "build/qualification/source15-cap0-observation-r01/inputs/source.json",
+      "path": "build/qualification/mir516-se-speed-cap-ten-r04/source-adoption-custody/source.json",
       "bytes": 2572,
       "sha256": "B9F726CB4CCADFBC3EC27B6F8C718B1B9B3A2139A54BD5B254F470D89965EFED"
     },
@@ -131,13 +131,14 @@
   },
   "shared_tooling_context": {
     "PR2075": {
-      "merged_commit_prefix": "2cae83",
-      "meaning": "Shared verification and cleanup tooling correction, not engine-query qualification."
+      "meaning": "Shared verification and cleanup tooling correction, not engine-query qualification.",
+      "merged_commit": "2caed5447dbc18b73b7f9a295b66993a630997a3",
+      "focused_controls": 83
     },
     "PR2077": {
-      "merged_commit_prefix": "3e27",
       "focused_controls": 86,
-      "meaning": "Shared cleanup preservation correction, not engine-query qualification."
+      "meaning": "Shared cleanup preservation correction, not engine-query qualification.",
+      "merged_commit": "3e27f6b339a7f530b47ddf9a403f217ed6a1d71d"
     }
   },
   "limits": [
