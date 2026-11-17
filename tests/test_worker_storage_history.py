@@ -1958,20 +1958,21 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
 
     def test_first_owner_refusals_report_the_actual_473_event_base_and_current_route(self):
         cases=(
-            ("f210", "4.7.21003", "2.1.24", "2.1.23", "2.1.24",
-             "older default source requires unchanged startup settings"),
-            ("f200", "4.7.20003", "2.0.76", "2.0.77", "2.0.76",
-             "older default source requires its qualified Base engine"),
+            ("f210", "4.7.21003", "2.1.24", "2.1.23", "2.1.24", True,
+             "unrecorded default source requires unchanged startup settings"),
+            ("f200", "4.7.20003", "2.0.76", "2.0.77", "2.0.76", False,
+             "older default source requires its qualified Base engine and unchanged settings"),
         )
-        for target, old, active_base, old_base, new_base, reason in cases:
+        for target, old, active_base, old_base, new_base, startup, reason in cases:
             with self.subTest(target=target, reason=reason):
                 lua=self.older_world(target)
                 lua.globals().old=old;lua.globals().active_base=active_base
                 lua.globals().old_base=old_base;lua.globals().new_base=new_base
+                lua.globals().startup=startup
                 lua.globals().reason=reason
                 lua.execute(r'''
                   local event=older_event(old,false);script.active_mods.base=active_base
-                  event.mod_startup_settings_changed=true
+                  event.mod_startup_settings_changed=startup
                   event.mod_changes.base={old_version=old_base,new_version=new_base}
                   local before=all_frames();writes=0
                   local ok,message=pcall(history.default_owner_preflight,event,nil,true)
@@ -1979,7 +1980,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   message=tostring(message);assert(message:find(reason,1,true))
                   assert(message:find("previous_mir="..old,1,true))
                   assert(message:find("new_mir=5.0."..(package_family=="f210"and"21012"or"20012"),1,true))
-                  assert(message:find("startup_changed=true",1,true))
+                  assert(message:find("startup_changed="..tostring(startup),1,true))
                   assert(message:find("saved_route=absent",1,true)and message:find("current_route=default",1,true))
                   assert(message:find("active_base="..active_base,1,true))
                   assert(message:find("qualified_minimum_base="..(package_family=="f210"and"2.1.23"or"2.0.77"),1,true))
@@ -1989,13 +1990,13 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     def test_first_owner_refusal_escapes_the_available_base_event_without_writes(self):
         lua=self.older_world("f210")
         lua.execute(r'''
-          local event=older_event("4.7.21003",false);event.mod_startup_settings_changed=true
+          local event=older_event("4.7.21003",false);event.mod_startup_settings_changed=false
           event.mod_changes.base={old_version="2.1.23\0\nold",new_version="2.1.24"}
           script.active_mods.base="2.1.24";local before=all_frames();writes=0
           local ok,message=pcall(history.default_owner_preflight,event,nil,true)
           assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
           message=tostring(message)
-          assert(message:find("older default source requires its qualified Base engine",1,true))
+          assert(message:find("older default source requires its qualified Base engine and unchanged settings",1,true))
           assert(message:find("base_event=base=2.1.23\\x00\\x0Aold->2.1.24",1,true))
           assert(message:find("current_route=default",1,true)and not message:find("\0",1,true))
         ''')
@@ -2476,7 +2477,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                       assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
                     ''')
 
-    def test_empty_unchanged_qol_accepts_but_added_removed_updated_and_official_mismatch_refuse(self):
+    def test_empty_unchanged_and_published11_added_qol_accept_but_changed_prior_selection_refuses(self):
         for target in ("f200","f210"):
             for opponent in ("unchanged","added","removed","updated","official"):
                 lua=self.world(target);lua.globals().opponent=opponent
@@ -2494,7 +2495,19 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                   local before=all_frames();writes=0
                   local ok,plan=pcall(history.plan_default_owner_transfer,event,nil,false)
                   assert(writes==0 and same(before,all_frames()))
-                  if opponent=="unchanged"then assert(ok);assert(history.apply_default_owner_transfer(plan))
+                  -- Published11 authored infinite C4 even when capped or disabled.
+                  -- Its proved prior Base+MIR selection and empty native frames
+                  -- admit this addition without inferring a previous work contract.
+                  if opponent=="unchanged"or opponent=="added"then
+                    local kind=opponent=="added"and"published511-empty-default"or"unchanged-mir5-default"
+                    assert(ok and plan.record.producer.kind==kind)
+                    assert(history.apply_default_owner_transfer(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 
@@ -3256,7 +3269,7 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                 ''')
 
 
-    def test_new_selection_keeps_only_existing_501_empty_exception(self):
+    def test_new_selection_keeps_only_proved_501_and_published11_empty_origins(self):
         for target in ("f200", "f210"):
             for patch in range(12):
                 lua=self.world(target);lua.globals().patch=patch
@@ -3269,6 +3282,17 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
                   if package_family=="f200"and patch==1 then
                     assert(ok and plan.record.producer.kind=="older-mir501-empty-default")
                     assert(history.default_owner_apply(plan))
+                  elseif patch==11 then
+                    -- The immutable published11 Base+MIR producer retained
+                    -- infinite C4 under cap/enable settings; no force has work.
+                    assert(ok and plan.record.producer.kind=="published511-empty-default")
+                    assert(history.default_owner_apply(plan))
+                    for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                      assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                      assert(a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
+                      assert(a.bonus==b.bonus and a.progress==b.progress and a.other_saved==b.other_saved)
+                      assert(same(a.queue,b.queue)and same(a.private,b.private)and same(a.debit,b.debit))
+                    end
                   else assert(not ok and storage[OWNER_KEY]==nil)end
                 ''')
 

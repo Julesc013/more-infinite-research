@@ -627,9 +627,9 @@ local DEFAULT_ORIGINS = {
     ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
--- This schema-2/default preparation is the published11 producer contract,
--- not evidence that any earlier or current package created the witness.
-local PREPARED_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
+-- These exact published11 producers support schema-2/default preparation
+-- and the separately checked, uninvested Base+MIR admission below.
+local PUBLISHED11_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -696,9 +696,10 @@ local function owner_record()
   local older_idle = value.producer.kind == "published473-idle-default"
   local published_default = value.producer.kind == "published473-default"
   local prepared_default = value.producer.kind == "prepared-default"
+  local published11_empty = value.producer.kind == "published511-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default)
+      and not older_empty and not older_idle and not published_default and not published11_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -715,9 +716,9 @@ local function owner_record()
       or older_idle and value.producer.old_version ~= "4.7.20003"
       or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
-      or prepared_default and value.producer.old_version ~= PREPARED_DEFAULT_ORIGINS[edition]
+      or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
@@ -746,11 +747,8 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
     or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
     and same_family_engine_patch(event)
-  if not base_hop and not same_edition then
-    default_origin_error("older default source requires its qualified Base engine", event, state, current)
-  end
-  if not base_hop and event.mod_startup_settings_changed ~= false then
-    default_origin_error("older default source requires unchanged startup settings", event, state, current)
+  if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false) then
+    default_origin_error("older default source requires its qualified Base engine and unchanged settings", event, state, current)
   end
   for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
     if active[name] ~= nil then default_origin_error("older default source requires its Base-only profile", event, state, current) end
@@ -808,6 +806,35 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   return {kind="published473-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
+local function published11_empty_origin(event, change, active)
+  -- Published11 Base+MIR always authored infinite C4, even when disabled or
+  -- capped. It could leave an inherited save without a route record. Rebuild
+  -- that exact prior selection; an unchanged foreign mod is not an addition.
+  -- Settings need not be reconstructed only because every force must still
+  -- prove zero worker investment before this producer can be committed.
+  if type(change) ~= "table" or getmetatable(change) ~= nil
+      or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]
+      or producer_edition(active[MIR]) ~= target.id
+      or tonumber(change.old_version:sub(-2)) > tonumber(active[MIR]:sub(-2))
+      or getmetatable(event.mod_changes) ~= nil then return nil end
+  for name, item in pairs(event.mod_changes) do
+    if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then return nil end
+    local old, new = item.old_version, item.new_version
+    if type(new) ~= "string" or new == "" or new ~= active[name]
+        or old ~= nil and (type(old) ~= "string" or old == "")
+        or name ~= "base" and name ~= MIR and old ~= nil then return nil end
+  end
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR then
+      if ENGINE_MODS[name] or type(version) ~= "string" or version == "" then return nil end
+      local addition = event.mod_changes[name]
+      if type(addition) ~= "table" or addition.old_version ~= nil or addition.new_version ~= version then return nil end
+    end
+  end
+  if not same_family_engine_patch(event) then return nil end
+  return {kind="published511-empty-default", old_version=change.old_version, new_version=active[MIR]}
+end
+
 local function default_origin(event, initializing, state, current)
   local active = script and script.active_mods or {}
   if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
@@ -829,12 +856,6 @@ local function default_origin(event, initializing, state, current)
     default_origin_error("default transfer package-change event is inconsistent", event, state, current)
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
-  local older_default = state == nil and change
-    and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003")
-  if state == nil and event.mod_startup_settings_changed ~= false
-      and not (base_hop and change.old_version == "4.7.20003") and not older_default then
-    default_origin_error("unrecorded default source requires unchanged startup settings", event, state, current)
-  end
   local new_selection = false
   for name, item in pairs(event.mod_changes) do
     -- Refuse malformed event rows below without invoking their metamethods.
@@ -842,7 +863,16 @@ local function default_origin(event, initializing, state, current)
       new_selection = true
     end
   end
-  if older_default or state == nil and change and change.old_version == "5.0.20001" and new_selection then
+  if state == nil and (event.mod_startup_settings_changed == true or new_selection) then
+    local empty = published11_empty_origin(event, change, active)
+    if empty then return empty end
+  end
+  if state == nil and event.mod_startup_settings_changed ~= false
+      and not (base_hop and change.old_version == "4.7.20003") then
+    default_origin_error("unrecorded default source requires unchanged startup settings", event, state, current)
+  end
+  if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
+      or change.old_version == "5.0.20001" and new_selection) then
     return older_default_origin(event, change, active, base_hop, state, current)
   end
   local engine_patch_valid = same_family_engine_patch(event)
@@ -854,25 +884,30 @@ local function default_origin(event, initializing, state, current)
     if state.schema ~= 2 or state.kind ~= "route" and not prepared or state.current.kind ~= "default" then
       default_origin_error("legacy prepared/finite conversion is not a default-owner transfer", event, state, current)
     end
-    if prepared and base_hop then default_origin_error("prepared default engine hop remains unqualified", event, state, current) end
-    if prepared and (not change or change.old_version ~= PREPARED_DEFAULT_ORIGINS[target.id]) then
-      default_origin_error("prepared default requires its published11 producer package event", event, state, current)
+    if prepared and base_hop then
+      default_origin_error("prepared default engine hop remains unqualified", event, state, current)
+    end
+    if prepared and (not change or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]) then
+      default_origin_error("prepared default requires its published11 producer package event", event, state, current,
+        {kind="default"})
     end
     -- This saved fact authenticates the old MIR default. The caller also
     -- checks the surviving full native contract and every force's work.
     -- Other mods may change without invalidating those independent facts.
     for name, item in pairs(event.mod_changes) do
       if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then
-        default_origin_error("recorded default has an invalid mod-change entry", event, state, current)
+        default_origin_error("recorded default has an invalid mod-change entry", event, state, current, {kind="default"})
       end
       local old, new = item.old_version, item.new_version
       if old ~= nil and (type(old) ~= "string" or old == "")
           or new ~= nil and (type(new) ~= "string" or new == "")
           or old == nil and new == nil or new ~= active[name] then
-        default_origin_error("recorded default mod-change entry disagrees with active mods", event, state, current)
+        default_origin_error("recorded default mod-change entry disagrees with active mods", event, state, current,
+          {kind="default"})
       end
       if base_hop and name ~= MIR and name ~= "base" and old ~= new then
-        default_origin_error("recorded default engine hop requires the unchanged Base-only selection", event, state, current)
+        default_origin_error("recorded default engine hop requires the unchanged Base-only selection", event, state,
+          current, {kind="default"})
       end
     end
     if change and type(change.old_version) ~= "string" then
@@ -1108,6 +1143,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       if (initializing or refresh) and (source.next_level ~= 4 or source.researched
           or source.saved_progress ~= 0 or source.occurrences ~= 0) then
         recover_error("first initialization/new force cannot adopt existing default work")
+      end
+      if not owned and producer.kind == "published511-empty-default"
+          and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
+            or source.occurrences ~= 0 or source.current == recovery.canonical) then
+        recover_error("published11 empty default source has invested or queued worker work")
       end
       if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
         if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
