@@ -22,6 +22,14 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
+          -- Test-owned expected identities. Keep this independent from
+          -- bootstrap's local selector declaration.
+          TEST_COMPETING_PROVIDER_IDS = {
+            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
+            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
+            "crafting-efficiency-2", "ProductivityResearch"
+          }
+
           function install_modules(caps_enabled, repair_enabled, scripted_active, native_credit_active)
             CAP_ACTIVE = caps_enabled == true
             REPAIR_ACTIVE = repair_enabled == true
@@ -772,16 +780,68 @@ class BootstrapTests(unittest.TestCase):
             return {id="f200", recipe_productivity=true}
           end
           load_control()
-          handlers.configuration({mod_startup_settings_changed=true,
-            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
-              ['fish-productivity']={old_version='1.0.0'}}})
-          assert(credit_calls.last_preflight_provider_relevant == true,
-            "removed named provider did not retain legacy-preflight relevance")
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            handlers.configuration({mod_startup_settings_changed=true,
+              mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
+                [name]={old_version='1.0.0'}}})
+            assert(credit_calls.last_preflight_provider_relevant == true,
+              "removed named provider did not retain legacy-preflight relevance: " .. name)
+          end
           handlers.configuration({mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
               unrelated={old_version='1.0.0'}}})
           assert(credit_calls.last_preflight_provider_relevant == false,
             "unrelated removed mod was marked as competing-provider relevance")
+        ''')
+
+    def test_named_productivity_providers_activate_only_the_f200_adapter(self):
+        self.lua.execute('''
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            install_modules(false, false, false, true)
+            install_runtime(nil, {[name]="1.0.0"})
+            package.loaded["runtime.competing_productivity"] = nil
+            package.preload["platform.target"] = function()
+              return {id="f200", recipe_productivity=true}
+            end
+            local loads, configurations = 0, 0
+            package.preload["runtime.competing_productivity"] = function()
+              loads = loads + 1
+              return {
+                active = function() return false end,
+                on_configuration_changed = function() configurations = configurations + 1 end,
+                on_init = function() end,
+                on_load = function() end,
+                on_research_finished = function() end,
+                on_research_reversed = function() end,
+                on_technology_effects_reset = function() end,
+                on_research_started = function() end,
+                on_research_cancelled = function() end,
+                on_force_created = function() end,
+                on_force_reset = function() end,
+                on_forces_merged = function() end
+              }
+            end
+            load_control()
+            assert(loads == 1, "F200 did not activate the named provider adapter: " .. name)
+            handlers.configuration({mod_changes={}})
+            assert(credit_calls.last_preflight_provider_relevant == true and configurations == 1,
+              "F200 provider did not retain configuration relevance: " .. name)
+          end
+
+          install_modules(false, false, false, true)
+          install_runtime(nil, {unrelated="1.0.0"})
+          package.loaded["runtime.competing_productivity"] = nil
+          package.preload["platform.target"] = function()
+            return {id="f200", recipe_productivity=true}
+          end
+          package.preload["runtime.competing_productivity"] = function()
+            error("absent F200 provider loaded the competing-productivity adapter")
+          end
+          load_control()
+          handlers.configuration({mod_changes={}})
+          assert(credit_calls.last_preflight_provider_relevant == false
+              and package.loaded["runtime.competing_productivity"] == nil,
+            "unrelated F200 profile acquired a competing provider")
         ''')
 
     def test_native_credit_preflight_stops_configuration_before_lifecycle_writes(self):
@@ -841,26 +901,30 @@ class BootstrapTests(unittest.TestCase):
 
     def test_f210_current_productivity_provider_preflights_without_a_mod_change(self):
         self.lua.execute('''
-          install_modules(false, false, false, true)
-          install_runtime(nil, {ProductivityResearch='2.1.0'})
-          package.preload["platform.target"] = function()
-            return {id="f210", recipe_productivity=true}
-          end
-          package.preload["runtime.competing_productivity"] = function()
-            error("F210 loaded the F200 competing-productivity adapter")
-          end
-          CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
-          load_control()
-
           local changed = {mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.21000'}}}
-          local ok, message = pcall(handlers.configuration, changed)
-          assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
-          assert(credit_calls.preflight == 1 and credit_calls.last_preflight_event == changed
-            and credit_calls.last_preflight_provider_relevant == true)
-          assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
-            and library_calls.configuration == nil,
-            "current F210 provider allowed configuration writes before preflight refusal")
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            install_modules(false, false, false, true)
+            install_runtime(nil, {[name]='2.1.0'})
+            package.loaded["runtime.competing_productivity"] = nil
+            package.preload["platform.target"] = function()
+              return {id="f210", recipe_productivity=true}
+            end
+            package.preload["runtime.competing_productivity"] = function()
+              error("F210 loaded the F200 competing-productivity adapter")
+            end
+            CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
+            load_control()
+
+            local ok, message = pcall(handlers.configuration, changed)
+            assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
+            assert(credit_calls.preflight == 1 and credit_calls.last_preflight_event == changed
+              and credit_calls.last_preflight_provider_relevant == true,
+              "current F210 provider was not recognized: " .. name)
+            assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
+              and library_calls.configuration == nil and package.loaded["runtime.competing_productivity"] == nil,
+              "current F210 provider loaded the F200 adapter or allowed configuration writes: " .. name)
+          end
 
           CREDIT_PREFLIGHT_ERROR = nil
           install_modules(false, false, false, true)
