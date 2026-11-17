@@ -87,6 +87,21 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
             force.technologies[ordinary.name]=ordinary
             force.technologies["mir-worker-storage-head-4"]=tech("mir-worker-storage-head-4",4,true)
           end
+           function apply_expected_default_transfer()
+             local seen={}
+             for _,force in pairs(game.forces) do
+               if force.valid~=false and not seen[force.index] then
+                 seen[force.index]=true
+                 local canonical=force.technologies["worker-robots-storage-4"]
+                 local ordinary=force.technologies["mir-worker-storage-default-4"]
+                 local head=force.technologies["mir-worker-storage-head-4"]
+                 local enabled,visible=canonical.enabled,canonical.visible_when_disabled
+                 canonical.native_set("enabled",false);canonical.native_set("visible_when_disabled",visible)
+                 ordinary.native_set("enabled",enabled);ordinary.native_set("visible_when_disabled",visible)
+                 head.native_set("enabled",false);head.native_set("visible_when_disabled",false)
+               end
+             end
+           end
           function make_lab()
             local input={counts={}};function input.get_item_count(name)return input.counts[name]or 0 end
             function input.insert(item)
@@ -139,6 +154,9 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           -- Candidate data identities exist before its first read-only on_init.
           install_candidate(game.forces.player);install_candidate(game.forces["mir-worker-uninvested-native-foreign"])
           handlers.init()
+           -- Model only the documented public flag effects of MIR's native
+           -- default transfer between the observer's pre-config and config callbacks.
+           apply_expected_default_transfer()
           local state=storage.mir_worker_storage_uninvested_native
           assert(state.phase=="candidate-awaiting-config" and state.pre_config~=nil)
           handlers.configuration({mod_startup_settings_changed=settings_changed,mod_changes={
@@ -241,6 +259,15 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                       local state=storage.mir_worker_storage_uninvested_native
                       assert(state.phase=="candidate-admitted" and state.candidate_event.trigger==expected_trigger)
                       assert(state.candidate_event.startup_settings_changed==settings_changed and #state.candidate_event.mod_changes==2)
+                       local flags=state.candidate_event.worker_flag_transitions
+                       assert(flags["1"].canonical.before.enabled==true and flags["1"].canonical.after.enabled==false)
+                       assert(flags["1"].ordinary.after.enabled==flags["1"].canonical.before.enabled
+                         and flags["1"].ordinary.after.visible==flags["1"].canonical.before.visible)
+                       assert(flags["1"].head.after.enabled==false and flags["1"].head.after.visible==false)
+                       assert(flags["2"].canonical.after.enabled==false
+                         and flags["2"].ordinary.after.enabled==flags["2"].canonical.before.enabled
+                         and flags["2"].ordinary.after.visible==flags["2"].canonical.before.visible
+                         and flags["2"].head.after.enabled==false and flags["2"].head.after.visible==false)
                       assert(state.pre_config.worker_frames["1"].name=="player"
                         and state.pre_config.worker_frames["2"].name=="mir-worker-uninvested-native-foreign")
                       local fixture_change,mir_change=state.candidate_event.mod_changes[1],state.candidate_event.mod_changes[2]
@@ -283,6 +310,29 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
                   script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
                   local count=#markers;assert(not pcall(handlers.init));assert(#markers==count and next(storage)==nil)
                   assert(game.forces.player.technologies["worker-robots-storage-4"].level==4)
+                ''')
+
+    def test_candidate_transfer_refuses_any_nonflag_work_or_foreign_mutation(self):
+        cases = {
+            "bonus": 'game.forces.player.worker_robots_storage_bonus=1',
+            "queue": 'game.forces.player.research_queue={"worker-robots-storage-4"}',
+            "work": 'game.forces.player.technologies["worker-robots-storage-4"].native_set("level",5)',
+            "foreign-flag": 'game.forces["mir-worker-uninvested-native-foreign"].technologies.automation.native_set("enabled",false)',
+        }
+        for name, mutation in cases.items():
+            with self.subTest(name=name):
+                self.source_to_middle("f200")
+                self.lua.execute(r'''
+                  script.active_mods["more-infinite-research"]="5.0.20017"
+                  script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
+                  install_candidate(game.forces.player);install_candidate(game.forces["mir-worker-uninvested-native-foreign"])
+                  handlers.init();apply_expected_default_transfer()
+                  local state=storage.mir_worker_storage_uninvested_native;local count=#markers
+                ''' + mutation + r'''
+                  assert(not pcall(function() handlers.configuration({mod_startup_settings_changed=false,mod_changes={
+                    ["more-infinite-research"]={old_version="5.0.20011",new_version="5.0.20017"},
+                    ["mir-worker-storage-uninvested-native"]={new_version="0.13.0"}}}) end))
+                  assert(state.phase=="candidate-awaiting-config" and #markers==count)
                 ''')
 
     def test_ordinary_start_refuses_an_unexpected_prerequisite_set_before_lab_or_queue_write(self):
@@ -351,10 +401,18 @@ class WorkerStorageUninvestedNativeTests(unittest.TestCase):
           script.active_mods["mir-worker-storage-uninvested-native"]="0.13.0"
           local third=game.create_force("mir-worker-uninvested-native-third")
           install_candidate(game.forces.player);install_candidate(game.forces["mir-worker-uninvested-native-foreign"]);install_candidate(third)
-          handlers.init()
+          handlers.init();apply_expected_default_transfer()
           local state=storage.mir_worker_storage_uninvested_native
           assert(state.pre_config.worker_frames["3"].name=="mir-worker-uninvested-native-third")
           assert(markers[#markers].worker_frames["3"].name=="mir-worker-uninvested-native-third")
+          handlers.configuration({mod_startup_settings_changed=false,mod_changes={
+            ["more-infinite-research"]={old_version="5.0.20011",new_version="5.0.20017"},
+            ["mir-worker-storage-uninvested-native"]={new_version="0.13.0"}}})
+          local flags=state.candidate_event.worker_flag_transitions["3"]
+          assert(flags.canonical.after.enabled==false
+            and flags.ordinary.after.enabled==flags.canonical.before.enabled
+            and flags.ordinary.after.visible==flags.canonical.before.visible
+            and flags.head.after.enabled==false and flags.head.after.visible==false)
         ''')
 
     def test_candidate_refuses_invested_or_queued_head_before_marker_or_fixture_write(self):

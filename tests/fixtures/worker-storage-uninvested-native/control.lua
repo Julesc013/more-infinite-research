@@ -245,6 +245,46 @@ local function assert_all_empty_worker(candidate)
   return worker_frames(forces)
 end
 
+local function same_worker_nonflag_row(before, after, path)
+  check(type(before) == "table" and type(after) == "table", path .. " row type differs")
+  for _, field in ipairs({"name", "level", "researched", "saved", "count"}) do
+    same(before[field], after[field], path .. "/" .. field)
+  end
+  check(type(before.enabled) == "boolean" and type(before.visible) == "boolean"
+    and type(after.enabled) == "boolean" and type(after.visible) == "boolean", path .. " flag type differs")
+end
+
+-- MIR's native default transfer owns only these public flags.  The fixture
+-- admits that explicit transition while retaining every work and force field.
+local function worker_flag_transition(before, after)
+  check(type(before) == "table" and type(after) == "table", "worker transition frame type")
+  local deltas = {}
+  for index, prior in pairs(before) do
+    local current = after[index]
+    check(type(prior) == "table" and type(current) == "table", "worker transition force is absent: " .. tostring(index))
+    for _, field in ipairs({"name", "index", "bonus", "current", "progress"}) do
+      same(prior[field], current[field], "$/worker-transition/" .. tostring(index) .. "/" .. field)
+    end
+    same(prior.queue, current.queue, "$/worker-transition/" .. tostring(index) .. "/queue")
+    same_worker_nonflag_row(prior.canonical, current.canonical, "$/worker-transition/" .. tostring(index) .. "/canonical")
+    same_worker_nonflag_row(prior.ordinary, current.ordinary, "$/worker-transition/" .. tostring(index) .. "/ordinary")
+    same_worker_nonflag_row(prior.head, current.head, "$/worker-transition/" .. tostring(index) .. "/head")
+    check(current.canonical.enabled == false and current.canonical.visible == prior.canonical.visible,
+      "canonical transfer flags differ")
+    check(current.ordinary.enabled == prior.canonical.enabled and current.ordinary.visible == prior.canonical.visible,
+      "ordinary holder does not inherit source canonical flags")
+    check(current.head.enabled == false and current.head.visible == false, "head gate is not disabled and hidden")
+    deltas[index] = {canonical={before={enabled=prior.canonical.enabled, visible=prior.canonical.visible},
+      after={enabled=current.canonical.enabled, visible=current.canonical.visible}},
+      ordinary={before={enabled=prior.ordinary.enabled, visible=prior.ordinary.visible},
+        after={enabled=current.ordinary.enabled, visible=current.ordinary.visible}},
+      head={before={enabled=prior.head.enabled, visible=prior.head.visible},
+        after={enabled=current.head.enabled, visible=current.head.visible}}}
+  end
+  for index in pairs(after) do check(before[index] ~= nil, "unexpected worker transition force: " .. tostring(index)) end
+  return deltas
+end
+
 local function lab_frame(state)
   local lab = state.lab
   if lab == nil then return {present=false} end
@@ -340,9 +380,10 @@ local function candidate_event(event)
   local workers = assert_all_empty_worker(true)
   assert_source_foreign(foreign)
   same_source_foreign(state.pre_config.foreign_unrelated, unrelated_frame(foreign), "$/pre-config-foreign")
-  same(state.pre_config.worker_frames, workers, "$/pre-config-worker-frames")
+  local flag_deltas = worker_flag_transition(state.pre_config.worker_frames, workers)
   state.candidate_event = {startup_settings_changed=event.mod_startup_settings_changed,
-    trigger=event.mod_startup_settings_changed and "startup-settings-plus-fixture-addition" or "fixture-addition", mod_changes=rows}
+    trigger=event.mod_startup_settings_changed and "startup-settings-plus-fixture-addition" or "fixture-addition", mod_changes=rows,
+    worker_flag_transitions=flag_deltas}
   state.phase = "candidate-admitted"
   emit("candidate-admitted", {worker_storage_written=false})
 end
