@@ -205,8 +205,8 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {first, second}, stage)
           return ok, stage.writes
         '''
-        duplicate_guard = 'if names[name] then reject("duplicate technology " .. name .. " within MIR emission") end'
-        mutant = self._mutate(duplicate_guard, 'if false then reject("duplicate technology " .. name .. " within MIR emission") end')
+        duplicate_guard = 'if names[name] then'
+        mutant = self._mutate(duplicate_guard, 'if false then')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "identity oracle did not kill the duplicate-guard mutant")
@@ -220,9 +220,8 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {submitted}, stage)
           return ok, stage.writes
         '''
-        existing_guard = 'if existing then\n      local maximum = type(existing) == "table" and existing.max_level'
-        mutant = self._mutate(existing_guard,
-            'if false then\n      local maximum = type(existing) == "table" and existing.max_level')
+        existing_guard = 'if existing then'
+        mutant = self._mutate(existing_guard, 'if false then')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "identity oracle did not kill the existing-owner guard mutant")
@@ -235,8 +234,8 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {first, second}, stage)
           return ok, stage.writes
         '''
-        cycle_guard = 'if #queue ~= count then reject("local prerequisite cycle") end'
-        mutant = self._mutate(cycle_guard, 'if false then reject("local prerequisite cycle") end')
+        cycle_guard = 'if #queue ~= count then'
+        mutant = self._mutate(cycle_guard, 'if false then')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "graph oracle did not kill the local-cycle mutant")
@@ -248,7 +247,7 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {invalid}, stage)
           return ok, stage.writes
         '''
-        recipe_guard = 'if type(effect.recipe) ~= "string" or not (raw.recipe and raw.recipe[effect.recipe]) then'
+        recipe_guard = 'if not (raw.recipe and raw.recipe[effect.recipe]) then'
         mutant = self._mutate(recipe_guard, 'if false then')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
