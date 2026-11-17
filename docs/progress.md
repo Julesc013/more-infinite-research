@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-17
+last_reviewed: 2026-11-18
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,12 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Source17 public delivery read back on Black Glass (2026-11-18)
+
+The [independent public-download readback](../spec/evidence/candidate517-blackglass-public-delivery-r01.json) verifies existing GitHub prerelease `v5.0.17`, published at2026-11-17T13:44:09Z (00:44:09AEDT on18November). All19 public assets download anonymously, match their GitHub digests and the17 checksum entries, and pass ZIP CRC checks where applicable. The two current-engine packages match the previously held Black Glass bytes. All17 ZIPs, both sums, matching notes and upload text are now hash-verified in primary `dist/v5.0.17`. The annotated tag targets main `7cd3ae1ff4910699eb9ceeb70681f02659f0deec`, tree `ec6bc0828eee91b0cef15cf83fc541b357367e6c`; all four exact-main checks succeeded. No artifact was rebuilt, replaced or republished.
+
+This is download and delivery evidence. Separate inherited-worker native reviews, freeze and publication-probe custody retain their own authority and limits; this readback does not substitute for them or close an individual player report. MIR4.7.3 remains the latest stable release. MIR5 stable acceptance, remaining Library/input/export and original-save/provider cases, and whole-product performance/stress work remain incomplete.
 
 ## Uninvested published11 worker upgrade candidate (2026-11-17)
 
