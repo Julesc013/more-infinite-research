@@ -13,6 +13,10 @@ local SCENARIO_BONUS_DELTA = 4.25
 local SCENARIO_LAB_SPEED = 3600
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "production-science-pack", "utility-science-pack"}
+local OWNER_WORKER_PREREQUISITES = {"worker-robots-storage-2", "worker-robots-storage-3"}
+local PACK_SET, OWNER_PREREQUISITE_SET = {}, {}
+for _, name in ipairs(PACKS) do PACK_SET[name], OWNER_PREREQUISITE_SET[name] = true, true end
+for _, name in ipairs(OWNER_WORKER_PREREQUISITES) do OWNER_PREREQUISITE_SET[name] = true end
 local cold_loaded = false
 
 local function check(value, reason)
@@ -175,7 +179,7 @@ local function marker(name, event)
       inherited = target.inherited, negative = target.negative, candidate = target.candidate}, active_mods = active_snapshot(), forces = frames(), configuration = event and {
       startup_changed = event.mod_startup_settings_changed, mod_changes = changes(event)} or false,
     setup = copy(state.setup), restoration = copy(state.restoration) or false, ordinary = copy(state.ordinary),
-    lab_entity = lab_entity_frame()}
+    lab_entity = lab_entity_frame(), lab_preparation = copy(state.lab_preparation) or false}
   local text = helpers.table_to_json(row)
   helpers.write_file("worker-uninvested/" .. name .. ".json", text, false)
   log("[MIR_WORKER_UNINVESTED] " .. text)
@@ -308,6 +312,100 @@ local function pristine_owners()
   for _, force in pairs(game.forces) do pristine_owner(force) end
 end
 
+local function prerequisite_observation(force, name)
+  local technology = force.technologies[name]
+  return {name = name, exists = technology ~= nil, researched = technology and technology.researched or false,
+    saved_progress = technology and technology.saved_progress or false,
+    occurrences = technology and occurrences(force, name) or false,
+    current = force.current_research and force.current_research.name == name or false,
+    queue = technology and queue_names(force) or false}
+end
+
+local function owner_observation(force, owner)
+  local ingredients = {}
+  for _, ingredient in ipairs(owner.research_unit_ingredients or {}) do
+    ingredients[#ingredients + 1] = {name = ingredient.name, amount = ingredient.amount}
+  end
+  table.sort(ingredients, function(left, right) return left.name < right.name end)
+  return {name = owner.name, level = owner.level, researched = owner.researched, enabled = owner.enabled,
+    visible_when_disabled = owner.visible_when_disabled, hidden = owner.prototype and owner.prototype.hidden or false,
+    saved_progress = owner.saved_progress, occurrences = occurrences(force, owner.name),
+    current = force.current_research and force.current_research.name == owner.name or false,
+    queue = queue_names(force), unit = {count = owner.research_unit_count, energy = owner.research_unit_energy,
+      ingredients = ingredients}}
+end
+
+local function assert_owner_unit(owner)
+  check(owner.enabled == true and owner.visible_when_disabled == false
+    and owner.prototype and owner.prototype.hidden == false, "ordinary owner enabled/hidden state differs")
+  check(owner.research_unit_count == 675 and owner.research_unit_energy == 3600,
+    "ordinary owner research unit differs")
+  local seen, ingredients = {}, owner.research_unit_ingredients
+  check(type(ingredients) == "table" and #ingredients == #PACKS, "ordinary owner science ingredients differ")
+  for _, ingredient in ipairs(ingredients) do
+    check(type(ingredient) == "table" and PACK_SET[ingredient.name] and ingredient.amount == 1
+      and not seen[ingredient.name], "ordinary owner science ingredients differ")
+    seen[ingredient.name] = true
+  end
+  for _, name in ipairs(PACKS) do check(seen[name], "ordinary owner science ingredients differ") end
+end
+
+local function direct_owner_prerequisites(owner)
+  local names, seen = {}, {}
+  for _, prerequisite in ipairs(owner.prerequisites or {}) do
+    local name = prerequisite and prerequisite.name
+    check(type(name) == "string" and OWNER_PREREQUISITE_SET[name] and not seen[name],
+      "ordinary owner direct prerequisite is unsupported")
+    seen[name] = true
+    names[#names + 1] = name
+  end
+  for _, name in ipairs(PACKS) do check(seen[name], "ordinary owner science prerequisite is absent") end
+  for _, name in ipairs(OWNER_WORKER_PREREQUISITES) do
+    check(seen[name], "ordinary owner worker prerequisite is absent")
+  end
+  check(#names == #PACKS + #OWNER_WORKER_PREREQUISITES, "ordinary owner direct prerequisite count differs")
+  table.sort(names)
+  return names
+end
+
+local function benign_unlock_effects(technology)
+  local prototype, result = technology and technology.prototype, {}
+  local effects = prototype and prototype.effects
+  check(type(effects) == "table", "ordinary science prerequisite effects are unavailable")
+  for _, effect in ipairs(effects) do
+    check(type(effect) == "table" and effect.type == "unlock-recipe" and type(effect.recipe) == "string",
+      "ordinary science prerequisite has a non-recipe effect")
+    result[#result + 1] = effect.recipe
+  end
+  table.sort(result)
+  return result
+end
+
+local function prepare_ordinary_lab_prerequisites(force, owner)
+  local names = direct_owner_prerequisites(owner)
+  local before, after, prepared = {}, {}, {}
+  for _, name in ipairs(names) do
+    local technology = force.technologies[name]
+    before[#before + 1] = prerequisite_observation(force, name)
+    if PACK_SET[name] then
+      check(technology and type(technology.researched) == "boolean" and technology.saved_progress == 0
+        and occurrences(force, name) == 0, "ordinary science prerequisite has prior work")
+      local effects = benign_unlock_effects(technology)
+      if not technology.researched then technology.researched = true end
+      prepared[#prepared + 1] = {name = name, effects = effects, researched = technology.researched}
+    else
+      check(technology and technology.researched == true and technology.saved_progress == 0
+        and occurrences(force, name) == 0, "ordinary worker prerequisite changed")
+    end
+    after[#after + 1] = prerequisite_observation(force, name)
+  end
+  local value = {kind = "owner-direct-science-prerequisites", owner = OWNER,
+    direct_prerequisites = names, before = before, after = after, prepared = prepared,
+    owner_before_admission = owner_observation(force, owner)}
+  storage[KEY].lab_preparation = value
+  return value
+end
+
 local function feed_ordinary_lab()
   local state, force = storage[KEY], game.forces[LAB_FORCE]
   local lab = checked_saved_lab(state, force)
@@ -339,12 +437,18 @@ local function begin_ordinary()
   local owner = force.technologies[OWNER]
   check(owner and owner.researched == false and owner.level == 4, "ordinary owner is unavailable")
   check(game.difficulty_settings.technology_price_multiplier == 1, "map price must remain one")
-  force.research_queue = {owner}
+  assert_owner_unit(owner)
+  local preparation = prepare_ordinary_lab_prerequisites(force, owner)
+  check(force.add_research(owner) == true, "ordinary owner native research admission refused")
+  check(force.current_research == owner and #force.research_queue == 1 and force.research_queue[1] == owner,
+    "ordinary owner native research is not singly current")
+  preparation.owner_after_admission = owner_observation(force, owner)
   lab.disabled_by_script, lab.energy = false, 1000000000
   local feed = {}
   for _, name in ipairs(PACKS) do feed[name] = {supplied = 0, consumed = 0} end
   state.phase, state.ordinary = "ordinary-running", {force = force.name, feed = feed, completed = false,
     deadline = game.tick + 3600}
+  marker("candidate-lab-prerequisites-prepared")
   marker("candidate-before-ordinary")
 end
 

@@ -57,17 +57,23 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           local candidate = family == "f200" and "5.0.20017" or "5.0.21017"
           local MIR, C4, OWNER, DEBIT = "more-infinite-research", "worker-robots-storage-4",
             "mir-worker-storage-default-4", "mir-worker-storage-head-4"
+          local OWNER_PREREQUISITES = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "utility-science-pack", "worker-robots-storage-2", "worker-robots-storage-3"}
+          local OWNER_PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "utility-science-pack"}
           local callbacks, markers, saves, entities = {}, {}, {}, {}
           local function technology(name, level)
             return {name=name, level=level or 1, researched=false, enabled=true,
-              visible_when_disabled=false, saved_progress=0}
+              visible_when_disabled=false, saved_progress=0,
+              prototype={hidden=false,effects={{type="unlock-recipe",recipe=name.."-recipe"}}}}
           end
           local function force(name, index)
             local values = {name=name, index=index, technologies={}, worker_robots_storage_bonus=0,
               laboratory_speed_modifier=0}
             local queue, current, progress = {}, nil, 0
-            for _, id in ipairs({"automation-science-pack", "automation", "logistics", "steel-processing", "worker-robots-storage-1",
-                "worker-robots-storage-2", "worker-robots-storage-3", C4}) do
+            for _, id in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+                "production-science-pack", "utility-science-pack", "automation", "logistics", "steel-processing",
+                "worker-robots-storage-1", "worker-robots-storage-2", "worker-robots-storage-3", C4}) do
               local row = technology(id, tonumber(id:match("(%d+)$")) or 1); row.force = values
               values.technologies[id] = row
             end
@@ -75,6 +81,18 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               if key == "research_queue" then return queue end
               if key == "current_research" then return current end
               if key == "research_progress" then return progress end
+              if key == "add_research" then
+                return function(technology)
+                  if opponent == "ordinary-add-research-refused" then return false end
+                  if current ~= nil or #queue ~= 0 or type(technology) ~= "table" then return false end
+                  for _, prerequisite in ipairs(technology.prerequisites or {}) do
+                    assert(prerequisite.researched == true, "native research prerequisite is not researched")
+                  end
+                  queue, current, progress = {technology}, technology, technology.saved_progress
+                  technology.saved_progress = 0
+                  return true
+                end
+              end
             end, __newindex=function(_, key, value)
               if key == "research_queue" then
                 for _, technology in ipairs(value) do
@@ -215,7 +233,21 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           end
           for _, f in pairs(game.forces) do
             f.technologies[OWNER] = technology(OWNER,4); f.technologies[OWNER].force=f
+            f.technologies[OWNER].prerequisites = {}
+            for _, name in ipairs(OWNER_PREREQUISITES) do
+              f.technologies[OWNER].prerequisites[#f.technologies[OWNER].prerequisites + 1] = f.technologies[name]
+            end
+            f.technologies[OWNER].research_unit_count, f.technologies[OWNER].research_unit_energy = 675, 3600
+            f.technologies[OWNER].research_unit_ingredients = {}
+            for _, name in ipairs(OWNER_PACKS) do
+              f.technologies[OWNER].research_unit_ingredients[#f.technologies[OWNER].research_unit_ingredients + 1] = {name=name,amount=1}
+            end
             f.technologies[DEBIT] = technology(DEBIT,4); f.technologies[DEBIT].force=f; f.technologies[DEBIT].enabled=false
+          end
+          if opponent == "ordinary-prerequisite-work" then
+            lab.technologies["utility-science-pack"].saved_progress = .25
+          elseif opponent == "ordinary-prerequisite-nonunlock-effect" then
+            lab.technologies["utility-science-pack"].prototype.effects = {{type="worker-robot-storage",modifier=1}}
           end
           local tick_ok, tick_message = pcall(callbacks[2])
           if opponent == "candidate-late-mir-bonus-loss" or opponent == "candidate-late-mir-speed-loss" then
@@ -228,6 +260,14 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               or opponent == "candidate-lab-invalid" and "saved source lab entity is invalid"
               or opponent == "candidate-lab-wrong-force" and "saved source lab force differs"
               or "saved source lab disabled-by-script flag differs"
+            assert(not tick_ok and tostring(tick_message):find(expected, 1, true), tostring(tick_message))
+            assert(#saves == 2); actor_result={source_error=tostring(tick_message), marker_rows=marker_rows}; return
+          end
+          if opponent == "ordinary-prerequisite-work" or opponent == "ordinary-prerequisite-nonunlock-effect"
+              or opponent == "ordinary-add-research-refused" then
+            local expected = opponent == "ordinary-prerequisite-work" and "ordinary science prerequisite has prior work"
+              or opponent == "ordinary-prerequisite-nonunlock-effect" and "ordinary science prerequisite has a non-recipe effect"
+              or "ordinary owner native research admission refused"
             assert(not tick_ok and tostring(tick_message):find(expected, 1, true), tostring(tick_message))
             assert(#saves == 2); actor_result={source_error=tostring(tick_message), marker_rows=marker_rows}; return
           end
@@ -248,7 +288,8 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             ordinary=env.storage.mir_worker_uninvested_inherited_native.ordinary,
             restoration=env.storage.mir_worker_uninvested_inherited_native.restoration,
             restorations=env.storage.mir_worker_uninvested_inherited_native.restoration_history,
-            lab_bonus=lab.worker_robots_storage_bonus, marker_rows=marker_rows}
+            lab_bonus=lab.worker_robots_storage_bonus, marker_rows=marker_rows,
+            lab_preparation=env.storage.mir_worker_uninvested_inherited_native.lab_preparation}
         ''')
         return lua.globals().actor_result
 
@@ -356,6 +397,36 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
     def test_standard_lab_lookup_does_not_require_the_unit_number_prototype_flag(self):
         result = self.world("f210", "addition", "no-unit-number-prototype-flag")
         self.assertTrue(result["ordinary"]["completed"])
+
+    def test_ordinary_lab_prepares_only_the_direct_science_prerequisites_before_native_admission(self):
+        result = self.world("f200", "startup")
+        preparation = result["lab_preparation"]
+        self.assertEqual("owner-direct-science-prerequisites", preparation["kind"])
+        self.assertEqual("mir-worker-storage-default-4", preparation["owner"])
+        self.assertEqual(
+            ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack",
+             "utility-science-pack", "worker-robots-storage-2", "worker-robots-storage-3"],
+            list(preparation["direct_prerequisites"].values()),
+        )
+        self.assertEqual(
+            ["automation-science-pack", "chemical-science-pack", "logistic-science-pack", "production-science-pack",
+             "utility-science-pack"],
+            [row["name"] for row in preparation["prepared"].values()],
+        )
+        self.assertEqual(675, preparation["owner_before_admission"]["unit"]["count"])
+        self.assertEqual(3600, preparation["owner_before_admission"]["unit"]["energy"])
+        self.assertFalse(preparation["owner_before_admission"]["current"])
+        self.assertTrue(preparation["owner_after_admission"]["current"])
+
+    def test_ordinary_lab_refuses_bad_prerequisite_state_or_native_admission(self):
+        for opponent, expected in (
+            ("ordinary-prerequisite-work", "ordinary science prerequisite has prior work"),
+            ("ordinary-prerequisite-nonunlock-effect", "ordinary science prerequisite has a non-recipe effect"),
+            ("ordinary-add-research-refused", "ordinary owner native research admission refused"),
+        ):
+            with self.subTest(opponent=opponent):
+                result = self.world("f200", "addition", opponent)
+                self.assertIn(expected, result["source_error"])
 
     def test_candidate_lab_guard_reports_the_actual_retained_entity_fault(self):
         for opponent, expected in (
