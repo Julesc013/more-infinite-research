@@ -118,6 +118,33 @@ local function frames()
   return result
 end
 
+-- This is observational only.  The retained source lab is scenario-owned
+-- setup, so an entity change must be diagnosed before the ordinary-research
+-- leg considers changing any of its fields.
+local function lab_entity_frame()
+  local state = storage[KEY]
+  local lookup_unit = state and state.setup and state.setup.lab_unit or false
+  local entity = type(lookup_unit) == "number" and game.get_entity_by_unit_number(lookup_unit) or false
+  local result = {lookup_unit = lookup_unit, exists = entity ~= false and entity ~= nil,
+    valid = entity and entity.valid == true or false, unit_number = false, name = false,
+    force = {index = false, name = false}, same_force = false, disabled_by_script = false, is_updatable = false,
+    energy = false, input_inventory = {}}
+  if not result.valid then return result end
+  result.unit_number = entity.unit_number or false
+  result.name = entity.name or false
+  result.force = {index = entity.force and entity.force.index or false,
+    name = entity.force and entity.force.name or false}
+  result.same_force = entity.force == game.forces[LAB_FORCE]
+  result.disabled_by_script = entity.disabled_by_script == true
+  result.is_updatable = entity.is_updatable == true
+  result.energy = entity.energy or false
+  local inventory = entity.get_inventory and entity.get_inventory(defines.inventory.lab_input) or false
+  for _, name in ipairs(PACKS) do
+    result.input_inventory[name] = inventory and inventory.get_item_count and inventory.get_item_count(name) or false
+  end
+  return result
+end
+
 local function marker(name, event)
   local state = storage[KEY]
   local target = tuple()
@@ -127,7 +154,8 @@ local function marker(name, event)
     tick = game.tick, target = {id = target.id, family = target.id, base = target.base, source = target.source,
       inherited = target.inherited, negative = target.negative, candidate = target.candidate}, active_mods = active_snapshot(), forces = frames(), configuration = event and {
       startup_changed = event.mod_startup_settings_changed, mod_changes = changes(event)} or false,
-    setup = copy(state.setup), restoration = copy(state.restoration) or false, ordinary = copy(state.ordinary)}
+    setup = copy(state.setup), restoration = copy(state.restoration) or false, ordinary = copy(state.ordinary),
+    lab_entity = lab_entity_frame()}
   local text = helpers.table_to_json(row)
   helpers.write_file("worker-uninvested/" .. name .. ".json", text, false)
   log("[MIR_WORKER_UNINVESTED] " .. text)
@@ -281,8 +309,19 @@ end
 
 local function begin_ordinary()
   local state, force = storage[KEY], game.forces[LAB_FORCE]
-  local lab = state.setup.lab_unit and game.get_entity_by_unit_number(state.setup.lab_unit)
-  check(lab and lab.valid and lab.force == force and lab.disabled_by_script, "saved source lab changed")
+  -- The configuration callback has completed before this tick.  Retain the
+  -- post-MIR entity facts before an invariant refusal or any ordinary-leg
+  -- mutation, so an engine/MIR/entity discrepancy is not collapsed to prose.
+  marker("candidate-before-ordinary-lab-check")
+  check(type(state.setup.lab_unit) == "number", "saved source lab unit is unavailable")
+  local lab = game.get_entity_by_unit_number(state.setup.lab_unit)
+  check(lab ~= nil, "saved source lab entity is unavailable")
+  check(lab.valid == true, "saved source lab entity is invalid")
+  check(lab.unit_number == state.setup.lab_unit, "saved source lab unit differs")
+  check(lab.name == LAB_NAME, "saved source lab name differs")
+  check(lab.force and lab.force.index == force.index and lab.force.name == force.name,
+    "saved source lab force differs")
+  check(lab.disabled_by_script == true, "saved source lab disabled-by-script flag differs")
   local owner = force.technologies[OWNER]
   check(owner and owner.researched == false and owner.level == 4, "ordinary owner is unavailable")
   check(game.difficulty_settings.technology_price_multiplier == 1, "map price must remain one")

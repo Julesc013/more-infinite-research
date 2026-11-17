@@ -107,8 +107,8 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             local values = {}
             local inventory = {insert=function(row) values[row.name] = (values[row.name] or 0) + row.count; return row.count end,
               get_item_count=function(name) return values[name] or 0 end}
-            local entity = {valid=true, unit_number=100 + #entities, force=spec.force, disabled_by_script=true,
-              energy=0, get_inventory=function() return inventory end}
+            local entity = {valid=true, unit_number=100 + #entities, name=spec.name, force=spec.force,
+              disabled_by_script=true, is_updatable=true, energy=0, get_inventory=function() return inventory end}
             entity.consume_all = function() for name in pairs(values) do values[name] = 0 end end
             entities[#entities + 1] = entity
             return entity
@@ -121,8 +121,10 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           for level = 1,3 do
             prototype_rows["worker-robots-storage-"..level] = {effects={{type="worker-robot-storage",modifier=1}}}
           end
-          local env = {game=game, storage={}, prototypes={technology=prototype_rows}, helpers={table_to_json=function() return "{}" end,
-              write_file=function(path) markers[#markers + 1] = path end}, log=function() end,
+          local pending_marker, marker_rows
+          local env = {game=game, storage={}, prototypes={technology=prototype_rows}, helpers={table_to_json=function(row)
+                pending_marker = row; return "{}" end,
+              write_file=function(path) markers[#markers + 1] = path; marker_rows = marker_rows or {}; marker_rows[path] = pending_marker end}, log=function() end,
             defines={inventory={lab_input=1},events={on_research_finished=1,on_tick=2}},
             script={active_mods={base=base,[MIR]=source},on_init=function(fn) callbacks.init=fn end,
               on_configuration_changed=function(fn) callbacks.config=fn end,
@@ -191,17 +193,37 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               candidate_version=selected}; return
           end
           if opponent == "candidate-late-mir-bonus-loss" then
-            source_lab.worker_robots_storage_bonus, source_lab.laboratory_speed_modifier = 3, 0
+            source_lab.worker_robots_storage_bonus = 3
+          elseif opponent == "candidate-late-mir-speed-loss" then
+            source_lab.laboratory_speed_modifier = 0
           end
           local lab = game.forces["mir-worker-uninvested-lab"]
+          if opponent == "candidate-lab-missing" then
+            entities[1].unit_number = -1
+          elseif opponent == "candidate-lab-invalid" then
+            entities[1].valid = false
+          elseif opponent == "candidate-lab-wrong-force" then
+            entities[1].force = player
+          elseif opponent == "candidate-lab-enabled" then
+            entities[1].disabled_by_script = false
+          end
           for _, f in pairs(game.forces) do
             f.technologies[OWNER] = technology(OWNER,4); f.technologies[OWNER].force=f
             f.technologies[DEBIT] = technology(DEBIT,4); f.technologies[DEBIT].force=f; f.technologies[DEBIT].enabled=false
           end
           local tick_ok, tick_message = pcall(callbacks[2])
-          if opponent == "candidate-late-mir-bonus-loss" then
+          if opponent == "candidate-late-mir-bonus-loss" or opponent == "candidate-late-mir-speed-loss" then
             assert(not tick_ok, tostring(tick_message))
             assert(#saves == 2); actor_result={source_error=tostring(tick_message)}; return
+          end
+          if opponent == "candidate-lab-missing" or opponent == "candidate-lab-invalid"
+              or opponent == "candidate-lab-wrong-force" or opponent == "candidate-lab-enabled" then
+            local expected = opponent == "candidate-lab-missing" and "saved source lab entity is unavailable"
+              or opponent == "candidate-lab-invalid" and "saved source lab entity is invalid"
+              or opponent == "candidate-lab-wrong-force" and "saved source lab force differs"
+              or "saved source lab disabled-by-script flag differs"
+            assert(not tick_ok and tostring(tick_message):find(expected, 1, true), tostring(tick_message))
+            assert(#saves == 2); actor_result={source_error=tostring(tick_message), marker_rows=marker_rows}; return
           end
           assert(tick_ok, tostring(tick_message)); assert(lab.current_research.name == OWNER)
           for _=1,7 do
@@ -220,7 +242,7 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             ordinary=env.storage.mir_worker_uninvested_inherited_native.ordinary,
             restoration=env.storage.mir_worker_uninvested_inherited_native.restoration,
             restorations=env.storage.mir_worker_uninvested_inherited_native.restoration_history,
-            lab_bonus=lab.worker_robots_storage_bonus}
+            lab_bonus=lab.worker_robots_storage_bonus, marker_rows=marker_rows}
         ''')
         return lua.globals().actor_result
 
@@ -301,9 +323,50 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
         self.assertLess(markers.index("worker-uninvested/candidate-engine-before-scenario-restoration.json"),
                         markers.index("worker-uninvested/before-configuration.json"))
 
-    def test_candidate_late_bonus_loss_refuses_without_a_cold_restore(self):
-        result = self.world("f210", "startup", "candidate-late-mir-bonus-loss")
-        self.assertIn("frame number differs at lab-force/bonus", result["source_error"])
+    def test_candidate_late_scenario_lab_mutation_refuses_without_a_cold_restore(self):
+        for opponent, expected in (
+            ("candidate-late-mir-bonus-loss", "frame number differs at lab-force/bonus"),
+            ("candidate-late-mir-speed-loss", "frame number differs at lab-force/laboratory_speed"),
+        ):
+            with self.subTest(opponent=opponent):
+                result = self.world("f210", "startup", opponent)
+                self.assertIn(expected, result["source_error"])
+
+    def test_candidate_marker_records_the_saved_lab_before_the_ordinary_leg(self):
+        result = self.world("f200", "startup")
+        frame = result["marker_rows"]["worker-uninvested/candidate-before-ordinary-lab-check.json"]["lab_entity"]
+        self.assertTrue(frame["exists"])
+        self.assertTrue(frame["valid"])
+        self.assertEqual(100, frame["unit_number"])
+        self.assertEqual("lab", frame["name"])
+        self.assertEqual(4, frame["force"]["index"])
+        self.assertEqual("mir-worker-uninvested-lab", frame["force"]["name"])
+        self.assertTrue(frame["same_force"])
+        self.assertTrue(frame["disabled_by_script"])
+        self.assertTrue(frame["is_updatable"])
+        self.assertEqual(0, frame["energy"])
+        self.assertEqual(0, frame["input_inventory"]["automation-science-pack"])
+
+    def test_candidate_lab_guard_reports_the_actual_retained_entity_fault(self):
+        for opponent, expected in (
+            ("candidate-lab-missing", "saved source lab entity is unavailable"),
+            ("candidate-lab-invalid", "saved source lab entity is invalid"),
+            ("candidate-lab-wrong-force", "saved source lab force differs"),
+            ("candidate-lab-enabled", "saved source lab disabled-by-script flag differs"),
+        ):
+            with self.subTest(opponent=opponent):
+                result = self.world("f210", "addition", opponent)
+                self.assertIn(expected, result["source_error"])
+                frame = result["marker_rows"]["worker-uninvested/candidate-before-ordinary-lab-check.json"]["lab_entity"]
+                if opponent == "candidate-lab-missing":
+                    self.assertFalse(frame["exists"])
+                elif opponent == "candidate-lab-invalid":
+                    self.assertFalse(frame["valid"])
+                elif opponent == "candidate-lab-wrong-force":
+                    self.assertEqual("player", frame["force"]["name"])
+                    self.assertFalse(frame["same_force"])
+                else:
+                    self.assertFalse(frame["disabled_by_script"])
 
 
 if __name__ == "__main__":
