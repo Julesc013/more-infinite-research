@@ -83,12 +83,39 @@ class WorkerStorageHistoryTests(unittest.TestCase):
 
     def test_unknown_prior_save_is_not_inferred_from_current_prototype_or_version(self):
         self.lua.execute(r'''
+          local writes=0
+          storage=setmetatable({}, {__newindex=function()
+            writes=writes+1;error("unknown legacy history wrote storage",0)
+          end})
           for _,old in ipairs({"5.0.21008","4.7.21003","4.7.20003"}) do
             local ok,message=pcall(history.preflight,upgrade(old),route(4))
             assert(not ok and tostring(message):find("previous continuation ownership is unknown",1,true))
-            assert(storage.mir_worker_storage_route==nil)
+            assert(tostring(message):find("previous_mir="..old,1,true))
+            assert(tostring(message):find("new_mir=5.0.21009",1,true))
+            assert(tostring(message):find("saved_route=absent",1,true) and tostring(message):find("current_route=finite",1,true))
+            assert(rawget(storage,"mir_worker_storage_route")==nil and writes==0)
           end
           assert(history.preflight(upgrade("5.0.21008"),nil)==nil)
+        ''')
+
+    def test_late_checked_route_lookup_keeps_its_exact_error_without_history_enrichment(self):
+        self.lua.execute(r'''
+          local writes=0
+          storage=setmetatable({}, {__newindex=function()
+            writes=writes+1;error("late checked route lookup wrote storage",0)
+          end})
+          local candidate=setmetatable({technology="worker-robots-storage-5",
+            predecessor="worker-robots-storage-4",owned=true,legacy_compatible=true,
+            finite={{name="worker-robots-storage-4",max_level=4,provider="foreign-finite"}}},
+            {__index=function(_,key)
+              assert(key=="level")
+              error("late checked route lookup: previous continuation ownership is unknown",0)
+            end})
+          local ok,observed=pcall(history.preflight,upgrade("5.0.21008"),candidate)
+          assert(not ok and observed=="late checked route lookup: previous continuation ownership is unknown")
+          assert(not tostring(observed):find("MIR-WORKER-HISTORY",1,true))
+          assert(not tostring(observed):find("previous_mir=",1,true))
+          assert(rawget(storage,"mir_worker_storage_route")==nil and writes==0)
         ''')
 
     def test_exact_transported_legacy_emission_is_admitted_but_lookalikes_are_not(self):
