@@ -10,15 +10,11 @@ local item_types = {
   "space-platform-starter-pack"
 }
 
-local function reject(message)
-  error("MIR technology preflight: " .. message, 3)
-end
-
 local function finite(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
 end
 
-local function sequence(value, label)
+local function sequence(value, label, reject)
   if type(value) ~= "table" or getmetatable(value) ~= nil then reject(label .. " must be a plain array") end
   local count = 0
   for key in pairs(value) do
@@ -38,8 +34,15 @@ local function item_exists(raw, name)
   return false
 end
 
-function M.install(prototypes, data_stage)
-  local count = sequence(prototypes, "technologies")
+-- The optional fresh output table retains an authored rejection category for
+-- internal callers. Human error text and unexpected native exceptions remain
+-- unchanged; no category is inferred from their wording.
+function M.install(prototypes, data_stage, rejection)
+  local function reject(message, reason)
+    if rejection then rejection.reason = reason or "invalid_definition" end
+    error("MIR technology preflight: " .. message, 3)
+  end
+  local count = sequence(prototypes, "technologies", reject)
   if count == 0 then reject("technologies must not be empty") end
   local raw = data_stage.raw
   local names, indegree, followers = {}, {}, {}
@@ -52,12 +55,12 @@ function M.install(prototypes, data_stage)
       reject("entry " .. index .. " must name a technology")
     end
     local name = prototype.name
-    if names[name] then reject("duplicate technology " .. name .. " within MIR emission") end
+    if names[name] then reject("duplicate technology " .. name .. " within MIR emission", "duplicate_identity") end
     local existing = raw.technology and raw.technology[name]
     if existing then
       local maximum = type(existing) == "table" and existing.max_level
       reject("duplicate technology " .. name .. " already exists in data.raw.technology (max_level="
-        .. tostring(maximum == nil and "single" or maximum) .. ")")
+        .. tostring(maximum == nil and "single" or maximum) .. ")", "duplicate_identity")
     end
     names[name], indegree[name], followers[name] = prototype, 0, {}
   end
@@ -74,18 +77,21 @@ function M.install(prototypes, data_stage)
     elseif type(unit.count_formula) ~= "string" or unit.count_formula == "" then
       reject(name .. " needs a research count or formula")
     end
-    local ingredient_count = sequence(unit.ingredients, name .. " ingredients")
+    local ingredient_count = sequence(unit.ingredients, name .. " ingredients", reject)
     if ingredient_count == 0 then reject(name .. " has no research ingredients") end
     for _, ingredient in ipairs(unit.ingredients) do
       if type(ingredient) ~= "table" or type(ingredient[1]) ~= "string"
         or not finite(ingredient[2]) or ingredient[2] < 1 or ingredient[2] > 65535
-        or ingredient[2] ~= math.floor(ingredient[2]) or not item_exists(raw, ingredient[1]) then
+        or ingredient[2] ~= math.floor(ingredient[2]) then
         reject(name .. " has an invalid or missing research ingredient")
+      end
+      if not item_exists(raw, ingredient[1]) then
+        reject(name .. " has an invalid or missing research ingredient", "missing_target")
       end
     end
     local seen = {}
     local prerequisites = prototype.prerequisites or {}
-    sequence(prerequisites, name .. " prerequisites")
+    sequence(prerequisites, name .. " prerequisites", reject)
     for _, prerequisite in ipairs(prerequisites) do
       if type(prerequisite) ~= "string" or seen[prerequisite] then reject(name .. " has invalid prerequisites") end
       seen[prerequisite] = true
@@ -94,17 +100,20 @@ function M.install(prototypes, data_stage)
         local next_nodes = followers[prerequisite]
         next_nodes[#next_nodes + 1] = name
       elseif not (raw.technology and raw.technology[prerequisite]) then
-        reject(name .. " has missing prerequisite " .. prerequisite)
+        reject(name .. " has missing prerequisite " .. prerequisite, "missing_target")
       end
     end
     local effects = prototype.effects or {}
-    sequence(effects, name .. " effects")
+    sequence(effects, name .. " effects", reject)
     for _, effect in ipairs(effects) do
       if type(effect) ~= "table" or type(effect.type) ~= "string" then reject(name .. " has an invalid effect") end
       if effect.modifier ~= nil and not finite(effect.modifier) then reject(name .. " has a nonfinite modifier") end
       if effect.type == "change-recipe-productivity" or effect.type == "unlock-recipe" then
-        if type(effect.recipe) ~= "string" or not (raw.recipe and raw.recipe[effect.recipe]) then
+        if type(effect.recipe) ~= "string" then
           reject(name .. " has a missing recipe effect target")
+        end
+        if not (raw.recipe and raw.recipe[effect.recipe]) then
+          reject(name .. " has a missing recipe effect target", "missing_target")
         end
         if effect.type == "change-recipe-productivity" and not finite(effect.change) then
           reject(name .. " has invalid recipe productivity")
