@@ -115,6 +115,27 @@ class WorkerStorageHistoryTests(unittest.TestCase):
           assert(storage.mir_worker_storage_route==nil)
         ''')
 
+    def test_unexpected_legacy_read_error_is_not_classified_by_its_prose(self):
+        self.lua.execute(r'''
+          local rendered=0
+          local opaque=setmetatable({}, {__tostring=function()
+            rendered=rendered+1
+            return "decoy: previous continuation ownership is unknown"
+          end})
+          for _,failure in ipairs({"decoy: previous continuation ownership is unknown", opaque,
+              "unrelated legacy lookup failure"}) do
+            local writes=0
+            storage=setmetatable({}, {
+              __index=function(_,key) if key=="mir" then error(failure,0) end end,
+              __newindex=function() writes=writes+1;error("unexpected history write",0) end})
+            local before=storage
+            local ok,observed=pcall(history.preflight,upgrade("4.7.21003"),route(9))
+            assert(not ok and observed==failure,"unexpected read error was replaced")
+            assert(storage==before and rawget(storage,"mir_worker_storage_route")==nil and writes==0)
+          end
+          assert(rendered==0,"unexpected error was rendered for classification")
+        ''')
+
     def test_malformed_saved_chain_is_rejected(self):
         self.lua.execute(r'''
           for _,opponent in ipairs({"schema","level","gap","provider","endpoint","extra","sparse"}) do
