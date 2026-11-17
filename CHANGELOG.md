@@ -10,6 +10,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Avoid invalid GUI style reads when refreshing the Research Library's Settings tab.
 - Reject incomplete internal preservation interfaces before changing research.
 - Distinguish finite and continuing research stages with the same localized name in the Research Library, including effective limits.
+- Keep original integration errors intact and report missing research or unknown history only for those verified conditions.
 
 ## [5.0.16] - 2026-11-16
 

@@ -9,6 +9,7 @@ Date: 2026-11-16
     - Reject incomplete internal preservation interfaces before changing research.
     - Distinguish finite and continuing research stages with the same localized name in the Research Library, including effective
       limits.
+    - Keep original integration errors intact and report missing research or unknown history only for those verified conditions.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.16

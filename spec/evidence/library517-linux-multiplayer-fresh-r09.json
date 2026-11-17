@@ -1,0 +1,254 @@
+{
+  "kind": "MIRFreshLinuxLibraryMultiplayerNativeChainV1",
+  "review_scope": "Frozen fresh six-mod two-client Library/API scenario only; not current-primary or imported-save acceptance.",
+  "verdict": "ACCEPTED_FROZEN_FUNCTIONAL_SCOPE_PARTIAL_VISUAL",
+  "source": {
+    "player_producer": "33b440c039e92978237265e467b5fb2a988bdeee",
+    "player_tree": "33452f1139806acef9413d9822e092171e50344b",
+    "player_archive": "more-infinite-research_5.0.21017.zip",
+    "player_archive_sha256": "5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50",
+    "controller_commit": "d57441d571fdd6a8311a982a01d50a1aed72e4e4",
+    "controller_tree": "209d3353ae2810fc1d8ad6674edd2d68f55e74b2",
+    "fixture_producer": "0dac003903a317137cf993b5bd22074a3e5013a8",
+    "fixture_version": "0.1.5",
+    "fixture_sha256": "CAC05BAE5E3D67D85681B9C0FEC376D71809A7A4E6811A274C6468ADD8ED36FC",
+    "profile": "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124-v015.json",
+    "profile_sha256": "059FD465BFFD3F970C39F463465CFADEC6C54D84C02419F37665AB24697F1EFB"
+  },
+  "engine": {
+    "factorio": "2.1.24",
+    "build": 87808,
+    "platform": "linux64 graphical full build; Base-only selection",
+    "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "private_display_geometry": [
+      1280,
+      720
+    ],
+    "timing_acceptance": false
+  },
+  "execution": {
+    "packet_sha256": "29FCD786319C8EE2778B9CA9B8FBF59BD3A76039B7DF6D2D433E97DD98756575",
+    "compose_zero_native": true,
+    "execute_dispatches": 1,
+    "owner_result_sha256": "5BF2AB8918A52AD5733E2A87157CC63F04C33745D0CA11B16F223198CE08BC74",
+    "wrapper_result_sha256": "CF8E2D869FB86A4F145238CC6A8CB85191769C4961342AB2DAF2875A9AB94339",
+    "client_count": 2,
+    "actual_join_events": 6,
+    "phases": [
+      "initial",
+      "rejoin",
+      "restart"
+    ],
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "ordinary_lab_completions": 2,
+    "by_script": false,
+    "started_events": 3,
+    "queue_lengths": [
+      2,
+      1,
+      0
+    ],
+    "gear_level": 3,
+    "gear_recipe_bonus": 0.2,
+    "science_consumed_per_named_pack": 2,
+    "science_packs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack"
+    ],
+    "cancelled_events": 1,
+    "foreign_force_created_events": 1,
+    "foreign_force_and_personal_view_checks": true,
+    "root_query_identity_preserved_during_live_refresh": true,
+    "host_restart_observed": true,
+    "on_load_read_only": true,
+    "api_client_load_observations": 6,
+    "input_save_byte_identical": true,
+    "seed_sha256": "E5DCA406A5DC9E2318446BF2BD09BF271DD68102F7E3B1B76F559C345C49BDFB",
+    "restart_save_sha256": "8E2AA3ADEA061206847A42F6B6F325AFADC93510DD2A329764F008B209FFFE16",
+    "final_save_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "completion_scope": "Supervised scenario completion/controlled shutdown; not every client process natural-exit evidence. Fixture accelerates gear research count/time only, so ordinary tuning and physical output are not qualified."
+  },
+  "visual_review": {
+    "owner_viewed_originals": 10,
+    "unobscured": 8,
+    "partly_occluded": 2,
+    "occluded_images": [
+      "initial-1.png",
+      "settled-1.png"
+    ],
+    "occlusion": "Native science-achievement notifications cover English detail content; no clean ten-view visual claim.",
+    "image_records": [
+      {
+        "image": "availability-2.png",
+        "locale": "de",
+        "sha256": "7DACF9FEBEA32DAEF312379EDD8F00683F81C4192A360B3782E1E218979DC27E",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "initial-2.png",
+        "locale": "de",
+        "sha256": "440A6D47F2520DBD093A53BAEA718939C36CA090386F38BF727086404A21BBA4",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "rejoin-2.png",
+        "locale": "de",
+        "sha256": "EF5805C8D08B494F76E013BFA06A8748383DB6904463298ABE861BE62DDDD8F8",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "restart-2.png",
+        "locale": "de",
+        "sha256": "8EB988C35D95E64132E6112AA4320BBAD6A65B38AF9C0D0A7680F55424C97972",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "settled-2.png",
+        "locale": "de",
+        "sha256": "0F2AC1ED3FDBB25E9F3FAB494DBFB300767E8562876B693931415DB764DDED2C",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "availability-1.png",
+        "locale": "en",
+        "sha256": "49CC8199EF6D97E88E2C4005A083004B13EE5F220A543B559FD95268E1B46874",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "initial-1.png",
+        "locale": "en",
+        "sha256": "15BE112D9CB8D952F72DF378F3FDABE0420DDDEEFDB9C757DEE314F760E6F51C",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "partly-occluded-native-achievement-notifications"
+      },
+      {
+        "image": "rejoin-1.png",
+        "locale": "en",
+        "sha256": "92604F52F681EE8090FC7B666929AFF9B5AE4EDA2F3E7BD668543BF9DD78189C",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "restart-1.png",
+        "locale": "en",
+        "sha256": "E998F29E8C3BAC2076BF1AAE39547058FC46F2A1AF28E0684E3C8C21D3B6AE28",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "unobscured-examined-viewport"
+      },
+      {
+        "image": "settled-1.png",
+        "locale": "en",
+        "sha256": "1F48A33D4991228C1045D30E15F30D66142590E5FB9123B4D17C98CFD1C13A20",
+        "dimensions": [
+          1280,
+          720
+        ],
+        "owner_viewed_original": true,
+        "visual_status": "partly-occluded-native-achievement-notifications"
+      }
+    ],
+    "scope": "Localized Availability, distinct selections and retained views at this viewport; no actual keyboard/scroll/arbitrary-scale acceptance."
+  },
+  "restoration": {
+    "four_direct_library_controls_restored": true,
+    "five_temporary_archive_slots_removed": true,
+    "prior_mir15_sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+    "remaining_factorio_or_display_processes": 0,
+    "restoration_errors": []
+  },
+  "raw_custody": {
+    "full_primary_capsule": "build/qualification/linux-library-multiplayer-current17-preparation-r01/native-original-custody-r09.json.gz",
+    "full_primary_sha256": "01F1F6A4E7E6A3B1AD8FE5F6C9A31DA599A809D891AB1B77A3677711051CB6DE",
+    "full_original_count": 239,
+    "full_original_bytes": 27525639,
+    "private_repository": "Julesc013/scratchpad",
+    "private_commit": "6da9f7251b09e5814dde0254dbbd5339d29abe62",
+    "private_case_tree": "27df3f7cce5d1c3e18023a0aff32f17180178bc9",
+    "private_path": "projects/mir/evidence/mir517-linux-multiplayer-r09-private-custody-r01",
+    "private_export_sha256": "AD0B56AA1EE7E41B5EFD4102A1AF66943F28A49DF28FDE280CB189E81794ADE8",
+    "private_export_original_count": 238,
+    "private_export_original_bytes": 27518146,
+    "local_only_original": {
+      "relative_path": "session/session-spec.json",
+      "bytes": 7493,
+      "sha256": "3D5236371B03A72DA3299B79D07117CBD93518E40C58F046B666ECBCAA348054",
+      "disposition": "Contains a generated test-control credential. Exact original remains protected locally; private repository retains a clearly marked non-executable credential-free projection."
+    },
+    "fresh_remote_readback_sha256": "CF6925FCC2D74680F424FD17E3EBF54F73E90F694E43E248A0F04A41272F16EF",
+    "fresh_remote_files_verified": 56,
+    "remote_all_239_originals_claimed": false
+  },
+  "independent_reviews": {
+    "native_actual": "0E387DAD380B70E0F1FB7E2EC577B68B9C63246F13BD728839F1265F655703F4",
+    "original_pixels_owner": "4B6D488577A8A82D3F2CA24E40E5A91EDF7749F3C8B546929FAFDF1CEB20C79E",
+    "private_export": "2EB3E8251E8A2AD68EF08265FC563D5106CF29008470E0FC50B632D676A3E832",
+    "checked_merge_parent": "68D8F30CFBCADD254258CBADCF63CEB7BFD8D6B6D7D7793BA981BFBA9B896374"
+  },
+  "integration": {
+    "pr": 2051,
+    "merge": "a8877e803fa10e42164e279bef0d7d5cacd1ef32",
+    "actual_parent": "4375b1927bf442f31347ca9595b936e87af4a290",
+    "tree": "7a4be74b6eadf3bee6b8b8762e3365d0abbb8be5",
+    "four_required_exact_head_checks": "completed-success at d574",
+    "player_source_unchanged_by_tools_merge": true
+  },
+  "adverses_retained": "R01–R08 native/preparation refusals and original fixture versions remain preserved. The empty-queue observer and its host model had required a nonexistent label; the corrected actor rejects stale current/queued/count/position/invented-not-queued labels. The durable985 host run failed one sorted exclusion expectation; d574 fixes only three test strings, and final CI passes.",
+  "remaining_limits": [
+    "Current-primary whole-package native acceptance remains separate.",
+    "Fresh six-join save is not the protected31-row imported history or A612 predecessor.",
+    "Actual keyboard/mouse/scroll and six proposed fresh GUI export clicks are not established by this scripted fixture. The historical13-action imported protocol remains separate.",
+    "Two English detail captures require unobscured follow-up.",
+    "Windows, arbitrary sizes/scales, normal tuning/physical output and performance remain separate."
+  ],
+  "stable_acceptance": false,
+  "native_gui_acceptance": "partial-visual-with-exact-functional-result"
+}

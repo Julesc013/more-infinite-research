@@ -14,6 +14,15 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Frozen Source17 fresh Linux multiplayer protocol accepted (2026-11-17)
+
+The [fresh two-client result](../spec/evidence/library517-linux-multiplayer-fresh-r09.json) accepts the exact Factorio2.1.24/Base Linux case at player archive5B22/source33, controllerd574 and fixture0.1.5/CAC. Two clients make six joins across initial, reconnect and host-restart phases. Native lab work completes two researches with `by_script=false`, queue2→1→0, gear level3/bonus20%, two of each named science consumed, one cancellation and preserved foreign-force/personal-view checks. The restart/final saves and six API client-load observations are retained. Captured controls/temporary archives restore, original15 remains unchanged and no game/display process remains. This fixture accelerates gear count/time; it does not qualify normal tuning or physical output.
+
+All ten original1280x720 images were viewed. Eight are unobscured; native achievement notifications cover English initial/settled detail content, so the visual verdict remains partial. The accepted functional result does not establish genuine keyboard/scroll/export input. Fresh GUI export work uses its own passive observer and actual-input controller; the protected31-row/13-action imported protocol remains a separate obligation. This older frozen player tree is not relabelled as current-primary qualification.
+
+[PR2051](https://github.com/Julesc013/more-infinite-research/pull/2051) merges after independent review and four successful final-head checks. All239 original bodies (27525639 bytes) remain in primary custody. Fresh canonical private-Git readback verifies238 byte-identical originals, exact owned input ZIPs and controller/review bindings; the one credential-bearing session spec stays local with its exact identity and a clearly marked credential-free projection. Earlier failed preparations/observers and their receipts remain preserved. Stable, imported-history, whole-product and performance gates remain open.
+
+
 ## Source17 initialized-window capture remains unverified (2026-11-17)
 
 The [two Windows personal-input attempts](../spec/evidence/library517-windows-personal-input-capture-adverses-r01.json) retain actual Factorio2.1.24 launches using the same private Source17 package and passive observer0.1.6. The first capture timed out during startup, before a runtime fixture marker or map/script initialization was observed. The reviewed successor waited for exactly one fixture-owned three-mod initialization marker, then activated its returned owned window and requested one capture; that capture also timed out. Neither attempt returned an image, sent mouse/key/text input or produced a personal-view phase receipt. This is a capture barrier without a diagnosed cause, not GUI or migration/gameplay qualification. No further unchanged capture, helper reset or alternate capture is authorized by these results.
