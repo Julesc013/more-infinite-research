@@ -105,8 +105,7 @@ local function unrelated_frame(force)
   local steel_processing = force.technologies["steel-processing"]
   return {bonus = force.worker_robots_storage_bonus, laboratory_speed = force.laboratory_speed_modifier,
     current = force.current_research and force.current_research.name or false, progress = force.research_progress,
-    queue = queue_names(force), queue_enabled = force.research_queue_enabled,
-    steel_processing_saved = steel_processing and steel_processing.saved_progress or false}
+    queue = queue_names(force), steel_processing_saved = steel_processing and steel_processing.saved_progress or false}
 end
 
 local function frames()
@@ -160,13 +159,11 @@ local function setup_source()
     "Base unrelated technologies are unavailable")
   assert_all_empty_canonical()
   player.technologies["automation-science-pack"].researched = true
-  player.research_queue_enabled = true
   player.research_queue = {player.technologies.automation, player.technologies.logistics}
   player.research_progress = .27
   player.technologies["steel-processing"].saved_progress = .31
   local lab_force = game.forces[LAB_FORCE] or game.create_force(LAB_FORCE)
   check(lab_force and lab_force.technologies, "lab force is unavailable")
-  lab_force.research_queue_enabled = true
   for level = 1, 3 do
     local technology = lab_force.technologies["worker-robots-storage-" .. level]
     check(technology ~= nil, "worker prerequisite is unavailable")
@@ -186,8 +183,7 @@ local function setup_source()
   return {player = unrelated_frame(player), lab = unrelated_frame(lab_force), lab_unit = lab.unit_number,
     administrative_setup = {player_current = "automation", player_queue = {"automation", "logistics"},
       player_detached = {technology = "steel-processing", saved_progress = .31}, lab_force = LAB_FORCE,
-      foreign_bonus = 7.25, laboratory_speed = 3600, player_queue_enabled = true, lab_queue_enabled = true,
-      researched_worker_prerequisites = {1, 2, 3}}}
+      foreign_bonus = 7.25, laboratory_speed = 3600, researched_worker_prerequisites = {1, 2, 3}}}
 end
 
 local function verify_setup(completed)

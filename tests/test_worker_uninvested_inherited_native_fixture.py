@@ -34,7 +34,16 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             source_text = source_text.replace(
                 'player.technologies["automation-science-pack"].researched = true',
                 '-- intentionally omitted by the old-source counterfactual')
-        lua.globals().actor_text = (source_text if opponent in {"old-optics", "missing-automation-prereq"}
+        elif opponent == "old-player-queue-enabled":
+            source_text = source_text.replace(
+                'player.research_queue = {player.technologies.automation, player.technologies.logistics}',
+                'player.research_queue_enabled = true\n  player.research_queue = {player.technologies.automation, player.technologies.logistics}')
+        elif opponent == "old-lab-queue-enabled":
+            source_text = source_text.replace(
+                'check(lab_force and lab_force.technologies, "lab force is unavailable")',
+                'check(lab_force and lab_force.technologies, "lab force is unavailable")\n  lab_force.research_queue_enabled = true')
+        lua.globals().actor_text = (source_text if opponent in {"old-optics", "missing-automation-prereq",
+                                                                "old-player-queue-enabled", "old-lab-queue-enabled"}
                                     else "")
         lua.globals().family = family
         lua.globals().mode = mode
@@ -55,7 +64,7 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           end
           local function force(name, index)
             local values = {name=name, index=index, technologies={}, worker_robots_storage_bonus=0,
-              laboratory_speed_modifier=0, research_queue_enabled=false}
+              laboratory_speed_modifier=0}
             local queue, current, progress = {}, nil, 0
             for _, id in ipairs({"automation-science-pack", "automation", "logistics", "steel-processing", "worker-robots-storage-1",
                 "worker-robots-storage-2", "worker-robots-storage-3", C4}) do
@@ -68,7 +77,6 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               if key == "research_progress" then return progress end
             end, __newindex=function(_, key, value)
               if key == "research_queue" then
-                assert(values.research_queue_enabled == true, "research queue is disabled")
                 for _, technology in ipairs(value) do
                   if technology.name == "automation" or technology.name == "logistics"
                     or technology.name == "steel-processing" then
@@ -78,7 +86,11 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
                 end
                 queue = value; current = queue[1]; progress = current and current.saved_progress or 0
                 if current then current.saved_progress = 0 end
-              elseif key == "research_progress" then progress = value else rawset(values, key, value) end
+              elseif key == "research_progress" then
+                progress = value
+              else
+                error("unsupported LuaForce write " .. tostring(key))
+              end
             end})
             return values
           end
@@ -114,9 +126,11 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             or assert(loadfile(actor_path, "t", env))
           actor(); callbacks.init(); game.tick=game.tick+1
           local source_ok, source_error = pcall(callbacks[2])
-          if opponent == "old-optics" or opponent == "missing-automation-prereq" then
+          if opponent == "old-optics" or opponent == "missing-automation-prereq"
+              or opponent == "old-player-queue-enabled" or opponent == "old-lab-queue-enabled" then
             local expected = opponent == "old-optics" and "Base unrelated technologies are unavailable"
-              or "research requires automation-science-pack"
+              or opponent == "missing-automation-prereq" and "research requires automation-science-pack"
+              or "unsupported LuaForce write research_queue_enabled"
             assert(not source_ok and tostring(source_error):find(expected, 1, true))
             actor_result={source_error=tostring(source_error)}; return
           end
@@ -205,6 +219,12 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
         self.world("f200", "startup")
         result = self.world("f200", "startup", "missing-automation-prereq")
         self.assertIn("research requires automation-science-pack", result["source_error"])
+
+    def test_source_refuses_the_retired_queue_enabled_force_property(self):
+        for opponent in ("old-player-queue-enabled", "old-lab-queue-enabled"):
+            with self.subTest(opponent=opponent):
+                result = self.world("f200", "startup", opponent)
+                self.assertIn("unsupported LuaForce write research_queue_enabled", result["source_error"])
 
 
 if __name__ == "__main__":
