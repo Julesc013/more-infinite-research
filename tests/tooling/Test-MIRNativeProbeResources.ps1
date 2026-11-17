@@ -348,6 +348,50 @@ try {
   } finally {Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $sender}
   $seamRun=$Context.runs[$Context.runs.Count-1]
   Assert-Probe ($seamError.Contains('[mir5-native-probe-console-owned-send-error]')-and$seamRun.status-ceq'interrupted'-and$seamRun.console_startup.command_sha256-ceq$expectedHash-and$seamRun.console_startup.ready_marker_observed-and$seamRun.console_startup.send_count-eq0-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $seamPid)) -ErrorAction SilentlyContinue)) 'console-writer-failure-cleans'
+  # A write-side primary can leave buffered input while its base stream is
+  # already closed. This reproduces the cleanup masking boundary without an
+  # engine: the primary identity and receipt must survive every later cleanup.
+  $primaryDisposeRecord=Join-Path $consoleRoot 'primary-dispose-input.txt';$primaryDisposePid=Join-Path $consoleRoot 'primary-dispose.pid';$primaryDisposeError=$null
+  $expectedPrimary=[InvalidOperationException]::new('[mir441-factorio-console-write] controlled-primary')
+  $expectedPrimary.Data['controlled_primary_data']='preserved'
+  try {
+    $primaryDisposeSender={
+      param($State,$Writer,$Timer,$Kind)
+      $Writer.AutoFlush=$false
+      $Writer.Write('pending-buffered-input')
+      $Writer.BaseStream.Dispose()
+      throw $expectedPrimary
+    }.GetNewClosure()
+    Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $primaryDisposeSender
+    try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$primaryDisposeRecord,'-PidPath',$primaryDisposePid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup|Out-Null}catch{$primaryDisposeError=$_}
+  } finally {Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $sender}
+  $primaryDisposeRun=$Context.runs[$Context.runs.Count-1]
+  $primaryDisposeFacts=@($primaryDisposeError.Exception.Data['mir441_process_cleanup_facts'])
+  $primaryStdinFact=@($primaryDisposeFacts|Where-Object {$_.step-ceq'stdinwriter-dispose'})
+  $primaryLaterFacts=@($primaryDisposeFacts|Where-Object {$_.step-in@('process-dispose','temporary-root-remove','main-lock-dispose')})
+  $primaryCleanupSteps=@('process-stop-on-failure','interrupted-ledger-write','process-stop-finally','output-copy-wait','output-stream-dispose','stdinwriter-dispose','process-dispose','temporary-root-remove','account-lock-dispose','main-lock-dispose')
+  $primaryObservedSteps=@($primaryDisposeFacts|ForEach-Object {$_.step})
+  Assert-Probe ($null-ne$primaryDisposeError-and[object]::ReferenceEquals($primaryDisposeError.Exception,$expectedPrimary)-and$primaryDisposeError.Exception.Data['controlled_primary_data']-ceq'preserved'-and$primaryDisposeRun.status-ceq'interrupted'-and$primaryDisposeRun.console_startup.command_sha256-ceq$expectedHash-and$primaryDisposeRun.console_startup.ready_marker_observed-and$primaryDisposeRun.cleanup_facts.Count-eq$primaryDisposeFacts.Count-and$primaryStdinFact.Count-eq1-and-not$primaryStdinFact[0].succeeded-and$primaryLaterFacts.Count-eq3-and@($primaryLaterFacts|Where-Object {-not $_.attempted-or-not $_.succeeded}).Count-eq0-and@($primaryCleanupSteps|Where-Object {$_-notin$primaryObservedSteps}).Count-eq0-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $primaryDisposePid)) -ErrorAction SilentlyContinue)) 'console-primary-dispose-preserves-primary-and-later-cleanup'
+  $heavyLock=Join-Path $repo 'build/tmp/mir-heavy.lock';$reacquiredLock=$null
+  try {$reacquiredLock=[IO.File]::Open($heavyLock,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None);Assert-Probe $true 'console-primary-dispose-releases-main-lock'} finally {if($null-ne$reacquiredLock){$reacquiredLock.Dispose()}}
+  # A disposal error after an otherwise successful send must still be adverse:
+  # the command receipt remains available, but no natural result is invented.
+  $cleanupOnlyRecord=Join-Path $consoleRoot 'cleanup-only-input.txt';$cleanupOnlyPid=Join-Path $consoleRoot 'cleanup-only.pid';$cleanupOnlyError=$null
+  try {
+    $cleanupOnlySender={
+      param($State,$Writer,$Timer,$Kind)
+      & $sender $State $Writer $Timer $Kind
+      $Writer.AutoFlush=$false
+      $Writer.Write('pending-buffered-input')
+      $Writer.BaseStream.Dispose()
+    }.GetNewClosure()
+    Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $cleanupOnlySender
+    try {Invoke-MIRNativeProbeFactorioProcess -Context $Context -FilePath $Child -Arguments @('-NoProfile','-File',$actor,'-Record',$cleanupOnlyRecord,'-PidPath',$cleanupOnlyPid,'-Mode','ordinary') -TimeoutSeconds 20 -ConsoleStartup $startup|Out-Null}catch{$cleanupOnlyError=$_}
+  } finally {Set-Item -Path Function:Send-MIR441FactorioConsoleStartupLine -Value $sender}
+  $cleanupOnlyRun=$Context.runs[$Context.runs.Count-1]
+  $cleanupOnlyFacts=@($cleanupOnlyError.Exception.Data['mir441_process_cleanup_facts']|Where-Object {$null-ne$_})
+  $cleanupOnlyStdinFact=@($cleanupOnlyFacts|Where-Object {$null-ne$_.PSObject.Properties['step']-and$_.step-ceq'stdinwriter-dispose'})
+  Assert-Probe ($null-ne$cleanupOnlyError-and$cleanupOnlyError.Exception.Message-ceq'[mir441-process-cleanup]'-and$cleanupOnlyRun.status-ceq'interrupted'-and$cleanupOnlyRun.console_startup.command_sha256-ceq$expectedHash-and$cleanupOnlyRun.console_startup.send_count-eq1-and$cleanupOnlyRun.cleanup_facts.Count-eq$cleanupOnlyFacts.Count-and$cleanupOnlyStdinFact.Count-eq1-and-not$cleanupOnlyStdinFact[0].succeeded-and$null-eq($cleanupOnlyRun.PSObject.Properties['result'])-and$null-eq(Get-Process -Id ([int](Get-Content -Raw -LiteralPath $cleanupOnlyPid)) -ErrorAction SilentlyContinue)) 'console-cleanup-only-failure-remains-adverse-with-receipt'
 }
 try {
   [IO.Directory]::CreateDirectory($root)|Out-Null
