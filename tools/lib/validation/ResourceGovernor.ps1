@@ -25,6 +25,12 @@ public static class MIR441MemoryNative {
   return [pscustomobject][ordered]@{total_bytes=[int64]($info.PhysicalTotal.ToUInt64()*$page);free_bytes=[int64]($info.PhysicalAvailable.ToUInt64()*$page);committed_bytes=[int64]($info.CommitTotal.ToUInt64()*$page);commit_limit_bytes=[int64]($info.CommitLimit.ToUInt64()*$page)}
 }
 
+function Resolve-MIR441LinuxObservationFailureCode {
+  param([string]$Code)
+  if($Code-match'^mir441-linux-[a-z0-9-]+$'-or$Code-cin@('mir441-owned-root-identity','mir441-owned-child-identity','mir441-owned-session-identity')){return $Code}
+  return 'mir441-resource-linux-observer'
+}
+
 function Invoke-MIR441LinuxResourceObservation {
   param(
     [Parameter(Mandatory)][ValidateSet('snapshot','mount-identity','process-identity','process-tree')][string]$Operation,
@@ -54,8 +60,7 @@ function Invoke-MIR441LinuxResourceObservation {
   if($lines.Count-ne1){throw '[mir441-resource-linux-observer-output]'}
   try{$envelope=([string]$lines[0]|ConvertFrom-Json -Depth 100)}catch{throw '[mir441-resource-linux-observer-json]'}
   if($exit-ne0-or$null-eq$envelope-or-not[bool]$envelope.ok){
-    $code=[string]$envelope.code
-    if($code-notmatch'^mir441-linux-[a-z0-9-]+$'){$code='mir441-resource-linux-observer'}
+    $code=Resolve-MIR441LinuxObservationFailureCode -Code ([string]$envelope.code)
     throw ('['+$code+']')
   }
   return $envelope.value
