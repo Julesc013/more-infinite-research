@@ -8,6 +8,9 @@ local DEBIT = "mir-worker-storage-head-4"
 local INERT = "mir-worker-uninvested-inherited-addition"
 local LAB_FORCE = "mir-worker-uninvested-lab"
 local LAB_NAME = "lab"
+local BASE_WORKER_BONUS = 3
+local SCENARIO_BONUS_DELTA = 4.25
+local SCENARIO_LAB_SPEED = 3600
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "production-science-pack", "utility-science-pack"}
 local cold_loaded = false
@@ -124,7 +127,7 @@ local function marker(name, event)
     tick = game.tick, target = {id = target.id, family = target.id, base = target.base, source = target.source,
       inherited = target.inherited, negative = target.negative, candidate = target.candidate}, active_mods = active_snapshot(), forces = frames(), configuration = event and {
       startup_changed = event.mod_startup_settings_changed, mod_changes = changes(event)} or false,
-    setup = copy(state.setup), ordinary = copy(state.ordinary)}
+    setup = copy(state.setup), restoration = copy(state.restoration) or false, ordinary = copy(state.ordinary)}
   local text = helpers.table_to_json(row)
   helpers.write_file("worker-uninvested/" .. name .. ".json", text, false)
   log("[MIR_WORKER_UNINVESTED] " .. text)
@@ -138,6 +141,46 @@ end
 
 local function assert_all_empty_canonical()
   for _, force in pairs(game.forces) do assert_empty_canonical(force) end
+end
+
+local function assert_base_worker_prerequisites(force)
+  for level = 1, 3 do
+    local name = "worker-robots-storage-" .. level
+    local technology = force.technologies[name]
+    local prototype = prototypes and prototypes.technology and prototypes.technology[name]
+    local effects = prototype and prototype.effects
+    local effect = effects and #effects == 1 and effects[1]
+    check(technology and technology.level == level and technology.researched == true
+      and technology.saved_progress == 0 and occurrences(force, name) == 0
+      and effect and effect.type == "worker-robot-storage" and effect.modifier == 1,
+      "Base worker prerequisite changed before scenario restoration")
+  end
+end
+
+local function restore_scenario_lab_before_mir(event)
+  local state, force = storage[KEY], game.forces[LAB_FORCE]
+  check(state and state.setup and force, "scenario source restoration is unavailable")
+  assert_all_empty_canonical()
+  assert_base_worker_prerequisites(force)
+  local bonus, speed = force.worker_robots_storage_bonus, force.laboratory_speed_modifier
+  state.restoration = {role = "scenario-lab-bonus-and-speed", baseline_bonus = BASE_WORKER_BONUS,
+    bonus_delta = SCENARIO_BONUS_DELTA, speed_delta = SCENARIO_LAB_SPEED,
+    engine_bonus = bonus, engine_speed = speed,
+    disposition = bonus == BASE_WORKER_BONUS and speed == 0 and "restore"
+      or bonus == BASE_WORKER_BONUS + SCENARIO_BONUS_DELTA and speed == SCENARIO_LAB_SPEED and "unchanged"
+      or "refuse"}
+  marker("engine-before-scenario-restoration", event)
+  if bonus == BASE_WORKER_BONUS and speed == 0 then
+    force.worker_robots_storage_bonus = bonus + SCENARIO_BONUS_DELTA
+    force.laboratory_speed_modifier = speed + SCENARIO_LAB_SPEED
+  else
+    check(bonus == BASE_WORKER_BONUS + SCENARIO_BONUS_DELTA and speed == SCENARIO_LAB_SPEED,
+      "engine changed scenario-owned lab state before MIR")
+  end
+  check(force.worker_robots_storage_bonus == BASE_WORKER_BONUS + SCENARIO_BONUS_DELTA
+    and force.laboratory_speed_modifier == SCENARIO_LAB_SPEED,
+    "scenario lab restoration did not reach its declared frame")
+  if state.restoration.disposition == "restore" then state.restoration.disposition = "restored" end
 end
 
 local function equal(value, expected, path)
@@ -170,8 +213,11 @@ local function setup_source()
     technology.researched = true -- explicitly labelled source setup, never C4.
   end
   assert_empty_canonical(lab_force)
-  lab_force.worker_robots_storage_bonus = 7.25 -- explicit foreign-bonus sentinel.
-  lab_force.laboratory_speed_modifier = 3600
+  assert_base_worker_prerequisites(lab_force)
+  check(lab_force.worker_robots_storage_bonus == BASE_WORKER_BONUS and lab_force.laboratory_speed_modifier == 0,
+    "Base worker/source laboratory baseline differs")
+  lab_force.worker_robots_storage_bonus = lab_force.worker_robots_storage_bonus + SCENARIO_BONUS_DELTA
+  lab_force.laboratory_speed_modifier = lab_force.laboratory_speed_modifier + SCENARIO_LAB_SPEED
   local surface = game.surfaces.nauvis or game.surfaces[1]
   check(surface and type(surface.create_entity) == "function", "source surface is unavailable")
   local lab = surface.create_entity{name = LAB_NAME, position = {0, 0}, force = lab_force}
@@ -183,7 +229,8 @@ local function setup_source()
   return {player = unrelated_frame(player), lab = unrelated_frame(lab_force), lab_unit = lab.unit_number,
     administrative_setup = {player_current = "automation", player_queue = {"automation", "logistics"},
       player_detached = {technology = "steel-processing", saved_progress = .31}, lab_force = LAB_FORCE,
-      foreign_bonus = 7.25, laboratory_speed = 3600, researched_worker_prerequisites = {1, 2, 3}}}
+      base_worker_bonus = BASE_WORKER_BONUS, foreign_bonus_delta = SCENARIO_BONUS_DELTA,
+      foreign_bonus = 7.25, laboratory_speed = SCENARIO_LAB_SPEED, researched_worker_prerequisites = {1, 2, 3}}}
 end
 
 local function verify_setup(completed)
@@ -308,6 +355,7 @@ script.on_configuration_changed(function(event)
     exact_active({base = target.base, ["more-infinite-research"] = target.inherited})
     check(event.mod_startup_settings_changed == false, "published11 source settings changed")
     exact_changes(rows, { ["more-infinite-research"] = {old_version = target.source, new_version = target.inherited} })
+    restore_scenario_lab_before_mir(event)
     state.phase, state.pending = "inherited-entry", "inherited"
     marker("inherited11-before-configuration", event)
     return

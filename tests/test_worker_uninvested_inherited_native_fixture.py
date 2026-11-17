@@ -99,7 +99,9 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             surfaces={nauvis={}}}
           game.create_force = function(name)
             local next_index = 1; for _ in pairs(game.forces) do next_index = next_index + 1 end
-            local result = force(name, next_index); game.forces[name] = result; return result
+            local result = force(name, next_index)
+            if name == "mir-worker-uninvested-lab" then result.worker_robots_storage_bonus = 3 end
+            game.forces[name] = result; return result
           end
           game.surfaces.nauvis.create_entity = function(spec)
             local values = {}
@@ -115,7 +117,11 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             for _, entity in ipairs(entities) do if entity.unit_number == unit then return entity end end
           end
           game.server_save = function(name) saves[#saves + 1] = name end
-          local env = {game=game, storage={}, helpers={table_to_json=function() return "{}" end,
+          local prototype_rows = {}
+          for level = 1,3 do
+            prototype_rows["worker-robots-storage-"..level] = {effects={{type="worker-robot-storage",modifier=1}}}
+          end
+          local env = {game=game, storage={}, prototypes={technology=prototype_rows}, helpers={table_to_json=function() return "{}" end,
               write_file=function(path) markers[#markers + 1] = path end}, log=function() end,
             defines={inventory={lab_input=1},events={on_research_finished=1,on_tick=2}},
             script={active_mods={base=base,[MIR]=source},on_init=function(fn) callbacks.init=fn end,
@@ -137,9 +143,27 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           assert(source_ok, tostring(source_error))
           assert(saves[1] == "worker-uninvested-source473")
           env.script.active_mods[MIR] = inherited
-          callbacks.config({mod_startup_settings_changed=false,
+          local source_lab = game.forces["mir-worker-uninvested-lab"]
+          if opponent == "engine-reset-before-config" then
+            source_lab.worker_robots_storage_bonus, source_lab.laboratory_speed_modifier = 3, 0
+          elseif opponent == "wrong-engine-bonus" then
+            source_lab.worker_robots_storage_bonus, source_lab.laboratory_speed_modifier = 2, 0
+          end
+          local inherited_ok, inherited_error = pcall(callbacks.config, {mod_startup_settings_changed=false,
             mod_changes={[MIR]={old_version=source,new_version=inherited}}})
-          game.tick=game.tick+1; callbacks[2](); assert(saves[2] == "worker-uninvested-inherited11")
+          if opponent == "wrong-engine-bonus" then
+            assert(not inherited_ok and tostring(inherited_error):find("engine changed scenario-owned lab state before MIR", 1, true))
+            assert(#saves == 1); actor_result={source_error=tostring(inherited_error)}; return
+          end
+          assert(inherited_ok, tostring(inherited_error))
+          if opponent == "late-mir-bonus-change" then source_lab.worker_robots_storage_bonus = 8 end
+          game.tick=game.tick+1
+          local inherited_tick_ok, inherited_tick_error = pcall(callbacks[2])
+          if opponent == "late-mir-bonus-change" then
+            assert(not inherited_tick_ok and tostring(inherited_tick_error):find("frame number differs at lab-force/bonus", 1, true))
+            assert(#saves == 1); actor_result={source_error=tostring(inherited_tick_error)}; return
+          end
+          assert(inherited_tick_ok, tostring(inherited_tick_error)); assert(saves[2] == "worker-uninvested-inherited11")
           local selected = negative and (family == "f200" and "5.0.20016" or "5.0.21016") or candidate
           env.script.active_mods[MIR] = selected
           local startup = mode == "startup"
@@ -180,7 +204,9 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           callbacks.load(); game.tick=game.tick+1; callbacks[2]()
           assert(markers[#markers] == "worker-uninvested/cold.json", tostring(markers[#markers]))
           actor_result={markers=markers,saves=saves,trigger=env.storage.mir_worker_uninvested_inherited_native.trigger,
-            ordinary=env.storage.mir_worker_uninvested_inherited_native.ordinary}
+            ordinary=env.storage.mir_worker_uninvested_inherited_native.ordinary,
+            restoration=env.storage.mir_worker_uninvested_inherited_native.restoration,
+            lab_bonus=lab.worker_robots_storage_bonus}
         ''')
         return lua.globals().actor_result
 
@@ -225,6 +251,30 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = self.world("f200", "startup", opponent)
                 self.assertIn("unsupported LuaForce write research_queue_enabled", result["source_error"])
+
+    def test_exact_engine_reset_restores_only_the_scenario_lab_delta(self):
+        result = self.world("f200", "startup", "engine-reset-before-config")
+        self.assertEqual("restored", result["restoration"]["disposition"])
+        self.assertEqual(3, result["restoration"]["engine_bonus"])
+        self.assertEqual(0, result["restoration"]["engine_speed"])
+        self.assertEqual(8.25, result["lab_bonus"])
+        markers = list(result["markers"].values())
+        self.assertLess(markers.index("worker-uninvested/engine-before-scenario-restoration.json"),
+                        markers.index("worker-uninvested/inherited11-before-configuration.json"))
+
+    def test_unchanged_engine_does_not_reapply_the_scenario_lab_delta(self):
+        result = self.world("f210", "startup")
+        self.assertEqual("unchanged", result["restoration"]["disposition"])
+        self.assertEqual(7.25, result["restoration"]["engine_bonus"])
+        self.assertEqual(3600, result["restoration"]["engine_speed"])
+        self.assertEqual(8.25, result["lab_bonus"])
+
+    def test_wrong_engine_baseline_and_late_mir_bonus_change_refuse(self):
+        for opponent, reason in (("wrong-engine-bonus", "engine changed scenario-owned lab state before MIR"),
+                                 ("late-mir-bonus-change", "frame number differs at lab-force/bonus")):
+            with self.subTest(opponent=opponent):
+                result = self.world("f200", "startup", opponent)
+                self.assertIn(reason, result["source_error"])
 
 
 if __name__ == "__main__":
