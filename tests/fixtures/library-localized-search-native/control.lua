@@ -357,7 +357,7 @@ local function on_click(event)
     end
     current.events.tab_click = current.events.tab_click + 1
     pair.clicked = true
-    record_event(pair.stage .. "-click", {player_index = event.player_index, element = element.name})
+    record_event("tab-click", {player_index = event.player_index, stage = pair.stage, element = element.name})
     settle_tab_pair()
   elseif current.phase == "await-query-click" then
     if element ~= query then fail("query click differs") end
@@ -384,7 +384,7 @@ local function on_tab_selected(event)
     end
     current.events.tab_selected = current.events.tab_selected + 1
     pair.selected = true
-    record_event(pair.stage .. "-selected", {player_index = event.player_index, tab_index = tabs.selected_tab_index})
+    record_event("tab-selected", {player_index = event.player_index, stage = pair.stage, tab_index = tabs.selected_tab_index})
     settle_tab_pair()
   else
     fail("tab selection out of order")

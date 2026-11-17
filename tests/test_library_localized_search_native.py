@@ -279,8 +279,10 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
               assert(observed.snapshots[3].tab_bar_index==observed.snapshots[4].tab_bar_index)
               assert(observed.snapshots[4].tab_bar_index==observed.snapshots[5].tab_bar_index)
               assert(observed.snapshots[10].tab_bar_index~=observed.snapshots[3].tab_bar_index)
-              assert(observed.event_log[4].kind=="help-tab-selected" and observed.event_log[5].kind=="help-tab-click")
-              assert(observed.event_log[6].kind=="research-tab-selected" and observed.event_log[7].kind=="research-tab-click")
+              assert(observed.event_log[4].kind=="tab-selected" and observed.event_log[4].stage=="help-tab")
+              assert(observed.event_log[5].kind=="tab-click" and observed.event_log[5].stage=="help-tab")
+              assert(observed.event_log[6].kind=="tab-selected" and observed.event_log[6].stage=="research-tab")
+              assert(observed.event_log[7].kind=="tab-click" and observed.event_log[7].stage=="research-tab")
               assert(observed.snapshots[4].tick>observed.event_log[4].tick and observed.snapshots[4].tick>observed.event_log[5].tick)
               assert(observed.snapshots[5].tick>observed.event_log[6].tick and observed.snapshots[5].tick>observed.event_log[7].tick)
               local expected_caption="Eisenzahnrad-Produktivit"..string.char(195,164).."t"
