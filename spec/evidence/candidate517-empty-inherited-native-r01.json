@@ -1,0 +1,156 @@
+{
+  "kind": "MIR517Published11EmptyInheritedNativeEvidenceV1",
+  "schema": 1,
+  "recorded_scope": "Exact Base-only published11 uninvested worker continuation; no reporter closure or general history admission.",
+  "frozen_candidate": {
+    "source_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "release_snapshot_commit": "0e4c5bb89e7c05260e50fadbab5e2166e4cec217",
+    "release_snapshot_tree": "ec6bc0828eee91b0cef15cf83fc541b357367e6c",
+    "source_version": "5.0.17",
+    "packages": {
+      "f200": {
+        "sha256": "B0BFA7418CFF77F249262C98864A386FA022C73E59B29EC30D028AE279A6AB27",
+        "bytes": 1046681
+      },
+      "f210": {
+        "sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+        "bytes": 1047107
+      }
+    }
+  },
+  "actor_and_controller": {
+    "scenario_actor_commit": "5615ed2b7726d08cd481396e107fbf2b95d42587",
+    "scenario_actor_sha256": "17DAD69B5D41A5EE2C996AC6DA17FAFD388A0F60E4314FFF517A9CFCC1698183",
+    "original_controller_commit": "b076cfa27453041fe022eebf1982f70338a5438f",
+    "fixed_linux_resource_observer_commit": "3c8f3fa2aba4054868ce75eccbd603da1770ce91"
+  },
+  "family_results": {
+    "f200": {
+      "status": "adopted-scoped-native-result",
+      "engine": {
+        "base_version": "2.0.77",
+        "sha256": "09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3"
+      },
+      "history": {
+        "source_version": "4.7.20003",
+        "inherited_version": "5.0.20011",
+        "candidate_version": "5.0.20017",
+        "original_inherited_save_sha256": "9E8151CD6DA6C3A13EFF0B477D9A8CA81F6286AB281DF0BB484D128617D61AB9",
+        "original_inherited_save_bytes": 521134,
+        "scenario_only_derivative_sha256": "ACF7F22B1F73F299C8BEEB77BF6AC53708C2E7D10B2BC937C6E561C2B74FAC15",
+        "derivation_manifest_sha256": "F906FF49E6894FC9B100597EA7432097194C964997A4A61D8DACA18EB3A04C02",
+        "derivative_limit": "Only the embedded scenario control changed. The manifest proves that the native and MIR state members retained their original bytes; this is not a MIR-history edit."
+      },
+      "packet_sha256": "71B0A8309DA71C0731B2565E5D0AE6777E2E85ECE580953BB5CABAA412F6A03E",
+      "owner_sha256": "8BC5AB7063CAC89E5DD932CEE7C10615BC8A7715BF66AA138438537A0828FE92",
+      "observed": {
+        "published16_negative_triggers": [
+          "startup-settings-change",
+          "inert-mod-addition"
+        ],
+        "candidate17_accepted_triggers": [
+          "startup-settings-change",
+          "inert-mod-addition"
+        ],
+        "accepted_ordinary_completions": 2,
+        "science_consumption_per_completion": {
+          "named_packs": 5,
+          "per_pack": 675,
+          "by_script": false
+        },
+        "bonus_before_after": [
+          7.25,
+          8.25
+        ],
+        "cold_loads": 4,
+        "candidate_save_crc_checks": 2,
+        "processes": {
+          "factorio": 8,
+          "crc": 2
+        },
+        "restored": true
+      },
+      "actual_review": {
+        "primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f200-r13-actual-independent-review-r01.json",
+        "kind": "MIRPublished11EmptyInheritedF200ActualIndependentReviewV1",
+        "verdict": "GO_SCOPED_F200_PUBLISHED11_EMPTY_NATIVE_SEQUENCE"
+      },
+      "private_raw_custody": {
+        "primary_capsule": "build/qualification/worker517-uninvested-native-aero-r01/f200-r13-original-bodies.json.gz",
+        "capsule_sha256": "3C6DB4CE182EB7EDAF446AEBAD43331745835F5E0CEE2D1B1B392599B93B9ACE",
+        "body_count": 102,
+        "raw_bytes": 9230877,
+        "scope": "Raw saves and process bodies remain in private Q custody and the primary qualification folder; no raw save is copied into this repository evidence file."
+      }
+    },
+    "f210": {
+      "status": "execution-complete-independent-adoption-pending",
+      "engine": {
+        "base_version": "2.1.24",
+        "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF"
+      },
+      "history": {
+        "source_version": "4.7.21003",
+        "inherited_version": "5.0.21011",
+        "candidate_version": "5.0.21017",
+        "original_inherited_save_sha256": "45AD83C801859952F61CC71F62B81AA711F6CE89CE372CF5BC52EBA9A5F78C35",
+        "original_inherited_save_bytes": 835931,
+        "source_input_disposition": "The protected original inherited11 save was used unmodified; no scenario derivative or ZIP edit was used."
+      },
+      "packet_sha256": "2B0D72351972C801F980CF2940D1F4C9AE0C2E7AAF297FB8FD38F0318FE2C84B",
+      "owner_sha256": "B311458ED834E07A0E3FB6EC8F70B5F833E7C319031BDDF92D376D89CCD67839",
+      "recorded_execution": {
+        "published16_negative_triggers": [
+          "startup-settings-change",
+          "inert-mod-addition"
+        ],
+        "candidate17_triggers_recorded": [
+          "startup-settings-change",
+          "inert-mod-addition"
+        ],
+        "ordinary_completions_recorded": 2,
+        "science_consumption_per_completion": {
+          "named_packs": 5,
+          "per_pack": 675,
+          "by_script": false
+        },
+        "bonus_before_after": [
+          7.25,
+          8.25
+        ],
+        "cold_loads_recorded": 4,
+        "candidate_save_crc_checks": 2,
+        "processes": {
+          "factorio": 8,
+          "crc": 2
+        },
+        "restored": true
+      },
+      "review_inputs": {
+        "actual_result_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-actual-independent-review-r01.json",
+        "retained_source_packet_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-retained-source-packet-review-r01.json",
+        "retained_source_controller_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/f210-retained-source-controller-review-r01.json",
+        "platform_observer_review_primary_path": "build/qualification/worker517-uninvested-native-aero-r01/linux-resource-observer-race-review-r01.json",
+        "disposition": "The execution materials are retained for the separate independent actual-result adoption. This record intentionally does not adopt an F210 verdict before that review is reported."
+      },
+      "private_raw_custody": {
+        "primary_capsule": "build/qualification/worker517-uninvested-native-aero-r01/f210-r07-original-bodies.json.gz",
+        "capsule_sha256": "46599E60952059BF7D074372DE0DC1554C09AD3C1E0B0F5DAA4F0D1D2489CF03",
+        "file_count": 101,
+        "raw_bytes": 12324475,
+        "scope": "Raw saves and process bodies remain in private Q custody and the primary qualification folder; no raw save is copied into this repository evidence file."
+      }
+    }
+  },
+  "retained_adverses": {
+    "f200_partial_r12": "build/qualification/worker517-uninvested-native-aero-r01/f200-r12-actual-partial-review-r01.json",
+    "f210_partial_r06": "build/qualification/worker517-uninvested-native-aero-r01/f210-r06-actual-partial-independent-review-r01.json",
+    "disposition": "Earlier partial completions are retained as adverses and are not additional accepted chains."
+  },
+  "scope_limits": [
+    "This record covers only the exact published11 uninvested Base-only continuation and the two recorded candidate triggers.",
+    "It does not close Kal9001, DEMEMZEA, Sage, other reporter histories, paid or foreign work, removed or updated providers, unknown histories, or any unobserved selection/settings state.",
+    "It does not establish Library, GUI, export, client, performance, stress, stable acceptance, release publication, or a retarget of the frozen Source17 assets."
+  ]
+}
