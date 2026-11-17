@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Published17 fresh Linux export input accepted (2026-11-18)
+
+The [fresh export-input case](../spec/evidence/library517-linux-fresh-export-input-r09.json) independently accepts the exact published5.0.17 packageC311/playerfdaf on Factorio2.1.24/Base Linux. Two private English/German clients perform ten real clicks and two already-open skips across twelve fixed steps. All six next-tick export phases pass actual role-local file/preview and prior-snapshot checks: full settings888, compact deviations0 and diagnostics on each client. The six-mod closure and native fresh frame remain unchanged; the startup server report stays separate. The immutable83D seed, initial working-copy identity and expected mutable server-save output are preserved.
+
+Root viewed all twelve original before-captures before issuing a point; independent review viewed all twelve after-captures and replayed all291 original bodies (122000737 bytes). Three Factorio roles and both private display owners exit cleanly, their private X resources restore, and all direct-library controls and temporary archives restore without errors. The two governed processes are zero-native composition and the native actor, not two separate gameplay scenarios. Elapsed supervision is not performance evidence.
+
+The earlier R08 attempt remains adverse: server stdin was closed by its private actor, producing an EOF error before input/export. The corrected actor keeps an unwritten owned pipe open until process exit; the existing fatal check remains unchanged. The old actor fails two of twelve focused controls and its successor passes all twelve. This closes only the fixed fresh export slice. Actual typing/clear/scroll/resize/Unicode, protected imported input, current-case save/reload, Windows capture/input, full localization, all-scale design parity, whole-product performance and stable acceptance remain incomplete. Both retained client queries are already populated, so the next localized-search case requires a real reviewed clear gesture rather than a fabricated empty GUI.
+
 ## Source17 public delivery read back on Black Glass (2026-11-18)
 
 The [independent public-download readback](../spec/evidence/candidate517-blackglass-public-delivery-r01.json) verifies existing GitHub prerelease `v5.0.17`, published at2026-11-17T13:44:09Z (00:44:09AEDT on18November). All19 public assets download anonymously, match their GitHub digests and the17 checksum entries, and pass ZIP CRC checks where applicable. The two current-engine packages match the previously held Black Glass bytes. All17 ZIPs, both sums, matching notes and upload text are now hash-verified in primary `dist/v5.0.17`. The annotated tag targets main `7cd3ae1ff4910699eb9ceeb70681f02659f0deec`, tree `ec6bc0828eee91b0cef15cf83fc541b357367e6c`; all four exact-main checks succeeded. No artifact was rebuilt, replaced or republished.
