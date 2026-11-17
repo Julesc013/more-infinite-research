@@ -352,6 +352,50 @@ class HostControlsTests(unittest.TestCase):
         render_control = (ROOT / "tests/test_library_render_capture.py").read_text(encoding="utf-8")
         render_revisions = set(re.findall(r'^RETAINED_\d+_REVISION = "([0-9a-f]{40})"$', render_control, re.MULTILINE))
         self.assertTrue(render_revisions)
+        multiplayer_control = (ROOT / "tests/test_library_multiplayer_fixture.py").read_text(encoding="utf-8")
+        multiplayer_historical_inputs = set(re.findall(
+            r'"([0-9a-f]{40}):(tools/Invoke-Multiplayer(?:Fixture|Session)\.ps1|tests/fixtures/library-multiplayer/control\.lua)"',
+            multiplayer_control,
+        ))
+        self.assertTrue(multiplayer_historical_inputs)
+        self.assertEqual(
+            {path for _, path in multiplayer_historical_inputs},
+            {
+                "tools/Invoke-MultiplayerFixture.ps1",
+                "tools/Invoke-MultiplayerSession.ps1",
+                "tests/fixtures/library-multiplayer/control.lua",
+            },
+        )
+        multiplayer_revisions = {revision for revision, _ in multiplayer_historical_inputs}
+        multiplayer_wrapper = (ROOT / "tools/Invoke-MultiplayerFixture.ps1").read_text(encoding="utf-8")
+        multiplayer_fixture_source_revisions = set(re.findall(
+            r"fixture_source_revision='([0-9a-f]{40})'", multiplayer_wrapper))
+        self.assertTrue(multiplayer_fixture_source_revisions)
+
+        def assert_multiplayer_historical_input_fetches(candidate_workflow: str) -> None:
+            candidate_jobs = dict(re.findall(
+                r"(?ms)^  ([a-z-]+):\n(.*?)(?=^  [a-z-]+:\n|\Z)", candidate_workflow))
+            for job in ("verification-plan", "host-controls"):
+                for revision in multiplayer_fixture_source_revisions | multiplayer_revisions:
+                    self.assertIn("git fetch --no-tags --depth=1 origin " + revision, candidate_jobs[job], (job, revision))
+
+        assert_multiplayer_historical_input_fetches(workflow)
+        missing_fixture_fetch = "git fetch --no-tags --depth=1 origin ef6e173a628fd8acd5e95975c40c515c2cc2ba23\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_fixture_fetch, "", 1))
+        missing_v014_fixture_fetch = "git fetch --no-tags --depth=1 origin b96435710ab415dcff9aa5614fc9868956f6d5af\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v014 current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_v014_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_v014_fixture_fetch, "", 1))
+        missing_v015_fixture_fetch = "git fetch --no-tags --depth=1 origin 0dac003903a317137cf993b5bd22074a3e5013a8\n          if ($LASTEXITCODE -ne 0) { throw 'Exact responsive v015 current Linux multiplayer fixture-source fetch failed.' }\n"
+        self.assertIn(missing_v015_fixture_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_v015_fixture_fetch, "", 1))
+        missing_availability_actor_fetch = "git fetch --no-tags --depth=1 origin b8be5c1cdffcde416fe1afe03c294a7924a5e52c\n          if ($LASTEXITCODE -ne 0) { throw 'Exact retained direct Availability actor-source fetch failed.' }\n"
+        self.assertIn(missing_availability_actor_fetch, workflow)
+        with self.assertRaises(AssertionError):
+            assert_multiplayer_historical_input_fetches(workflow.replace(missing_availability_actor_fetch, "", 1))
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
@@ -361,6 +405,8 @@ class HostControlsTests(unittest.TestCase):
                 self.assertRegex(revision, r"^[0-9a-f]{40}$")
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
             for revision in render_revisions:
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
+            for revision in multiplayer_revisions:
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", workflow)

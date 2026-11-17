@@ -10,12 +10,18 @@ import sys
 import tempfile
 import unittest
 
+import mir_test_versions as SHARED
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-multiplayer"
 CONTROL = FIXTURE / "control.lua"
 F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
+CURRENT_LINUX_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-f210-2124.json"
+CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124.json"
+CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124-v014.json"
+CURRENT_LINUX_RESPONSIVE_V015_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-current-linux-responsive-f210-2124-v015.json"
 STANDALONE_F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-standalone-f210-2123.json"
 F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-f210-2123.json"
 STANDALONE_F210_API_CONSUMERS_PROFILE = ROOT / "tests/profiles/library-api-consumers-standalone-f210-2123.json"
@@ -25,6 +31,7 @@ PRIVATE_CREDITS_BASE_PROFILE = ROOT / "tests/profiles/library-api-consumers-priv
 PRIVATE_CREDITS_SPACE_AGE_PROFILE = ROOT / "tests/profiles/library-api-consumers-private-credits-space-age-standalone-f210-2123.json"
 RESTORATION_PREVIEW_PROFILE = ROOT / "tests/profiles/library-restoration-cfeac3-space-age-standalone-f210-2123.json"
 RESTORATION_PREVIEW_CALLER = ROOT / "tools/Invoke-LibraryRestorationPreview.ps1"
+MIR_517_F210 = SHARED.alias_for("5.0.17", "f210").distribution_version
 PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-multiplayer/info-f210-private-credits.json"
 F200_PRIVATE_CREDITS_PROFILE = ROOT / "tests/profiles/library-private-credits-current-f200-2077.json"
 F200_PRIVATE_CREDITS_INFO = ROOT / "tests/fixtures/library-private-credits-f200/info.json"
@@ -74,6 +81,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local DETAIL_EMPTY="mir_library_detail_empty"
             local ACTIONS="mir_library_actions"
             local OPEN_NATIVE="mir_library_open_native"
+            local AVAILABILITY_VIEWPORT="mir_library_availability_viewport"
+            local AVAILABILITY_ENTRIES="mir_library_availability_entries"
             local AVAILABILITY={"mir_library_availability_1","mir_library_availability_2"}
             local AVAILABILITY_FAMILIES={"research_agricultural_growth_speed","research_spoilage_preservation"}
             local key="mir5_library_multiplayer"
@@ -95,6 +104,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local targets={
               f200={base="2.0.77",mir="5.0.20000"},
               f210={base="2.1.23",mir="5.0.21000"},
+              ["f210-current-linux"]={base="2.1.24",mir="5.0.21017",current_linux=true},
+              ["f210-current-linux-responsive"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true},
+              ["f210-current-linux-responsive-v014"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true,current_linux_responsive_v014=true},
+              ["f210-current-linux-responsive-v015"]={base="2.1.24",mir="5.0.21017",current_linux_responsive=true,current_linux_responsive_v015=true},
               ["f210-current504"]={base="2.1.23",mir="5.0.21004"},
               ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
               ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
@@ -113,7 +126,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             if opponent=="f210-wrong-mir-version" then mir_version="5.0.21001"
             elseif opponent=="unsupported-target-base" then base_version="2.1.24" end
-            local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
+            local players, markers, screenshots, saves, lab_diagnostics, availability_diagnostics = {}, {}, {}, {}, {}, {}
             local seed_diagnostics={}
             local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
@@ -330,6 +343,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local target=client
               if opponent=="view-crosspollution" and client.index==2 then target=en end
               local root=element("frame",ROOT_NAME);root.visible=true
+              if selected.current_linux_responsive then
+                root.style.width=1024
+                if opponent=="responsive-filter-width-zero" then root.style.maximal_width=0 end
+              end
               local filters=element("flow",FILTERS)
               root[FILTERS]=filters
               filters[QUERY]=element("textfield",QUERY)
@@ -337,7 +354,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               filters[FAMILY]=element("drop-down",FAMILY)
               filters[FAMILY].selected_index=options.family=="all" and 2 or (options.family=="external" and 3 or 1)
               filters.mir_library_visibility=element("drop-down","mir_library_visibility")
-              filters.mir_library_visibility.selected_index=options.visibility
+              filters.mir_library_visibility.selected_index=options.tab=="availability" and (opponent=="availability-wrong-status" and 2 or 3) or options.visibility
               filters[SORT]=element("drop-down",SORT)
               filters[SORT].selected_index=options.sort=="native" and 2 or 1
               local tabs=element("tabbed-pane",TABS)
@@ -347,12 +364,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
-              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+              if selected.current_linux_responsive or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
                 filters.type,filters.direction="flow","vertical"
                 local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
-                grid.column_count=2;filters.mir_library_filter_grid=grid
+                local responsive_columns={
+                  ["responsive-filter-columns-1"]=1,["responsive-filter-columns-2"]=2,
+                  ["responsive-filter-columns-3"]=3,["responsive-filter-columns-5"]=5,
+                  ["responsive-filter-columns-0"]=0,["responsive-filter-columns-4"]=4,
+                }
+                grid.column_count=selected.current_linux_responsive and (responsive_columns[opponent] or 5) or 2
+                filters.mir_library_filter_grid=grid
                 for _,name in ipairs({"family","status","mode","sort","visibility"}) do
                   local id="mir_library_"..name
                   local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
@@ -377,25 +400,34 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 return detail
               end
               if options.tab=="availability" then
+                local viewport=element(opponent=="availability-viewport-wrong" and "flow" or "scroll-pane",AVAILABILITY_VIEWPORT)
+                viewport.horizontal_scroll_policy=opponent=="availability-viewport-policy" and "auto" or "never"
+                viewport.vertical_scroll_policy="auto";viewport.children={}
+                local entries=element("flow",AVAILABILITY_ENTRIES)
+                entries.direction=opponent=="availability-entries-wrong" and "horizontal" or "vertical";entries.children={}
+                content[AVAILABILITY_VIEWPORT]=viewport;content.children[#content.children+1]=viewport
+                viewport[AVAILABILITY_ENTRIES]=entries;viewport.children[#viewport.children+1]=entries
+                local function add_label(index,name,subject,reason)
+                  local label=element("label",name)
+                  label.caption={"mir-browser.availability-entry",{subject},{reason}}
+                  if opponent=="availability-wrong-subject" and index==1 then label.caption[2]={"technology-name.more-infinite-research.research_spoilage_preservation"} end
+                  if opponent=="availability-wrong-reason" and index==1 then label.caption[3]={"mir-browser.availability-native-research-productivity"} end
+                  entries[name]=label;entries.children[#entries.children+1]=label
+                  return label
+                end
                 if selected.space_age then
-                  local label=element("label",AVAILABILITY[1])
-                  label.caption={"mir-browser.availability-entry",
-                    {"technology-name.more-infinite-research.research_lab_productivity"},
-                    {opponent=="sa-availability-wrong" and "mir-browser.availability-requires-space-age" or "mir-browser.availability-native-research-productivity"}}
-                  content[AVAILABILITY[1]]=label
-                  content.children[#content.children+1]=label
+                  add_label(1,AVAILABILITY[1],"technology-name.more-infinite-research.research_lab_productivity",
+                    opponent=="sa-availability-wrong" and "mir-browser.availability-requires-space-age" or "mir-browser.availability-native-research-productivity")
                 elseif opponent~="missing-availability-label" then
                   for index,name in ipairs(AVAILABILITY) do
-                    local label=element("label",name)
-                    label.caption={"mir-browser.availability-entry",
-                      {"technology-name.more-infinite-research."..AVAILABILITY_FAMILIES[index]},
-                      {"mir-browser.availability-requires-space-age"}}
-                    content[name]=label
-                    content.children[#content.children+1]=label
+                    add_label(index,name,"technology-name.more-infinite-research."..AVAILABILITY_FAMILIES[index],"mir-browser.availability-requires-space-age")
                   end
                 end
+                if opponent=="availability-order" and #entries.children==2 then entries.children[1],entries.children[2]=entries.children[2],entries.children[1] end
                 if opponent=="extra-availability-label" then
-                  content.children[#content.children+1]=element("label","mir_library_availability_unexpected")
+                  local extra=element("label","mir_library_availability_unexpected");entries.mir_library_availability_unexpected=extra;entries.children[#entries.children+1]=extra
+                elseif opponent=="availability-direct-label" then
+                  content[AVAILABILITY[1]]=element("label",AVAILABILITY[1])
                 end
                 wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                 return
@@ -476,7 +508,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local detail=browser_detail()
               if opponent=="detail-width-narrow" then detail.style.width=180 end
               local facts=detail
-              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" then
+              if selected.current_linux_responsive or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" then
                 facts=element("scroll-pane","mir_library_research_facts")
                 detail.mir_library_research_facts=facts
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
@@ -520,9 +552,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               context["mir_library_context_status"].caption={"mir-browser.context-status",{current or queued>0 and "mir-browser.status-queued" or "mir-browser.status-ready"}}
               context["mir_library_context_current"]=current and element("label","mir_library_context_current") or nil
               context["mir_library_context_queued"]=(not current and queued>0) and element("label","mir_library_context_queued") or nil
-              context["mir_library_context_not_queued"]=queued==0 and element("label","mir_library_context_not_queued") or nil
               context["mir_library_context_queue_count"]=queued>0 and element("label","mir_library_context_queue_count") or nil
               context["mir_library_context_queue_position"]=queued>0 and element("label","mir_library_context_queue_position") or nil
+              if queued==0 then
+                if opponent=="stale-current-context" then context["mir_library_context_current"]=element("label","mir_library_context_current")
+                elseif opponent=="stale-queued-context" then context["mir_library_context_queued"]=element("label","mir_library_context_queued")
+                elseif opponent=="stale-queue-count-context" then context["mir_library_context_queue_count"]=element("label","mir_library_context_queue_count")
+                elseif opponent=="stale-queue-position-context" then context["mir_library_context_queue_position"]=element("label","mir_library_context_queue_position")
+                elseif opponent=="invented-not-queued-context" then context["mir_library_context_not_queued"]=element("label","mir_library_context_not_queued") end
+              end
               local level_key="mir-browser.level"
               local level=tostring(force.technologies[gear].level)
               local count,position=tostring(queued),tostring(1)
@@ -577,7 +615,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return true
             end
             local discovery=opponent=="standalone-identity-discovery"
-            local fixture_version=selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")))
+            local fixture_version=selected.current_linux_responsive_v015 and "0.1.5" or (selected.current_linux_responsive_v014 and "0.1.4" or (selected.current_linux_responsive and "0.1.3" or (selected.current_linux and "0.1.2" or (selected.positive_state and "0.4.0" or (selected.private_credits and "0.3.0" or (selected.space_age and "0.2.0" or (discovery and "0.1.1" or "0.1.0")))))))
             local active_mods={base=base_version,["more-infinite-research"]=mir_version,["mir-fixture-mir5-library-multiplayer"]=fixture_version,["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
             if selected.space_age then
               active_mods["elevated-rails"]="2.1.23"
@@ -585,8 +623,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               active_mods.recycler="2.1.23"
               active_mods["space-age"]="2.1.23"
             end
-            local private_without_api=selected.private_credits and opponent=="private-credit-missing-api"
-            if (opponent=="f210-api-consumers" or selected.space_age or selected.private_credits) and not private_without_api then
+            local private_without_api=(selected.private_credits or selected.current_linux or selected.current_linux_responsive) and opponent=="private-credit-missing-api"
+            if (opponent=="f210-api-consumers" or (selected.current_linux and opponent==nil) or selected.current_linux_responsive or selected.space_age or selected.private_credits) and not private_without_api then
               active_mods["mir-fixture-mir5-api-alpha"]="0.1.0"
               active_mods["mir-fixture-mir5-api-beta"]="0.1.0"
             elseif opponent=="f210-api-alpha-only" then
@@ -617,6 +655,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               helpers={table_to_json=function(value)
                 if value.seed_stage then seed_diagnostics[#seed_diagnostics+1]=value
                 elseif value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
+                elseif value.kind=="MIRLibraryAvailabilityFactsV1" then availability_diagnostics[#availability_diagnostics+1]=value
                 else markers[#markers+1]=value end
                 return "{}"
               end,create_profiler=create_profiler},
@@ -633,7 +672,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] ")
                     or value:match("^%[MIR5_LIBRARY_STANDALONE_IDENTITY%] ")
                     or value:match("^%[MIR5_LIBRARY_POSITIVE_SEED%] ")
-                    or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] "))
+                    or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] ")
+                    or value:match("^%[MIR5_LIBRARY_AVAILABILITY%] "))
                 end
               end,
             }
@@ -655,7 +695,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local success,value=pcall(callback,event)
               return success,tostring(value)
             end
-            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls} end
+            ok,result=call(callbacks.init);if not ok then return {ok=false,message=result,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls,storage_entries=storage[key] and 1 or 0} end
             if opponent=="fake-connected" then
               ok,result=call(callbacks.events[2],{player_index=1})
               return {ok=ok,message=result,phase=storage[key].phase,markers=markers}
@@ -762,16 +802,21 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
-              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
+              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,availability_diagnostics=availability_diagnostics,lab_insert_counts=insert_counts,
               rejected_bulk_inserts=rejected_bulk_inserts,private_query_calls=private_query_calls,
               private_query_order=private_query_order,positive_seed_resets=reset_count,seed_diagnostics=seed_diagnostics,researched_set_calls=researched_set_calls}
           end
         ''')
 
-    def run_case(self, opponent=None, target="f200"):
+    def run_case(self, opponent=None, target="f200", control=CONTROL):
+        previous = self.lua.globals().control_path
+        self.lua.globals().control_path = Path(control).as_posix()
         self.lua.globals().opponent = opponent
         self.lua.globals().target = target
-        return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
+        try:
+            return plain(self.lua.eval("run_library_multiplayer_fixture(control_path,opponent,target)"))
+        finally:
+            self.lua.globals().control_path = previous
 
     def test_profiles_and_fixture_metadata_pin_the_four_finite_base_closures(self):
         cases = (
@@ -834,6 +879,280 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A",
         })
         self.assertNotIn("mir-fixture-mir5-api-beta-production", {row["name"] for row in profile["mods"]})
+
+    def test_current_linux_f210_api_client_profile_binds_the_exact_current_six_mod_closure(self):
+        profile = json.loads(CURRENT_LINUX_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-linux-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-current-linux", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.24",
+            "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.24", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", MIR_517_F210, True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.2", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], {
+            "mir-fixture-mir5-api-alpha_0.1.0.zip":
+                "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+            "mir-fixture-mir5-api-beta_0.1.0.zip":
+                "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+            "more-infinite-research_" + MIR_517_F210 + ".zip":
+                "5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50",
+        })
+
+    def test_current_linux_responsive_f210_api_client_profile_binds_a_separate_six_mod_closure(self):
+        profile = json.loads(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-linux-responsive-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-current-linux-responsive", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.24",
+            "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.24", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", MIR_517_F210, True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.3", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"], json.loads(CURRENT_LINUX_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))["archive_sha256"])
+
+    def test_current_linux_responsive_v014_f210_api_client_profile_keeps_controls_separate_from_the_fixture_archive(self):
+        profile = json.loads(CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-linux-responsive-v014-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-current-linux-responsive-v014", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.24",
+            "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.24", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", MIR_517_F210, True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.4", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"],
+                         json.loads(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))["archive_sha256"])
+        self.assertNotIn("mir-fixture-mir5-library-multiplayer_0.1.4.zip", profile["archive_sha256"])
+
+    def test_current_linux_responsive_v015_f210_api_client_profile_keeps_controls_separate_from_the_fixture_archive(self):
+        profile = json.loads(CURRENT_LINUX_RESPONSIVE_V015_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(profile["kind"], "mir5-library-api-consumers-current-linux-responsive-v015-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"],
+                          profile["session_expected_peak_memory_mib"]),
+                         ("f210-current-linux-responsive-v015", "2.1", "Defaults", 7168))
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.24",
+            "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+        })
+        self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]], [
+            ("base", "2.1.24", True),
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", MIR_517_F210, True),
+            ("mir-fixture-mir5-library-multiplayer", "0.1.5", True),
+            ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+            ("mir-fixture-mir5-api-beta", "0.1.0", True),
+        ])
+        self.assertEqual(profile["archive_sha256"],
+                         json.loads(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))["archive_sha256"])
+        self.assertNotIn("mir-fixture-mir5-library-multiplayer_0.1.5.zip", profile["archive_sha256"])
+
+    def test_multiplayer_wrapper_admits_only_the_current_linux_f210_api_profile_before_composition(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_CURRENT_LINUX_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-linux-f210-native-selection'-or$selected.base-cne'2.1.24'-or$selected.mir-cne'5.0.21017'-or$selected.build_version-ne87808-or$selected.linux_private_displays-ne$true-or$selected.fixture_archive_sha256-cne'CED93A4FDBB955E3C8FC82487CB27F1236AD7B4E4FFC95156737B2890BDBA862'-or$selected.fixture_source_revision-cne'3c6cf808745fe88741ceea0a33bf950cec8f8176'){throw 'current Linux API target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate,[string]$Engine=$engine){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $Engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168}catch{return}
+            throw "current Linux API profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'wrong engine argument' {} ('A'*64)
+          Assert-Rejected 'wrong Base tuple' {param($s)($s.mods|Where-Object name -CEQ 'base').version='2.1.23'}
+          Assert-Rejected 'wrong MIR tuple' {param($s)($s.mods|Where-Object name -CEQ 'more-infinite-research').version='5.0.21016'}
+          Assert-Rejected 'missing alpha' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-alpha')}
+          Assert-Rejected 'missing beta' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s.archive_sha256['more-infinite-research_5.0.21017.zip']='A'*64}
+          Assert-Rejected 'wrong alpha archive' {param($s)$s.archive_sha256['mir-fixture-mir5-api-alpha_0.1.0.zip']='A'*64}
+          Assert-Rejected 'wrong beta archive' {param($s)$s.archive_sha256['mir-fixture-mir5-api-beta_0.1.0.zip']='A'*64}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_CURRENT_LINUX_PROFILE=str(CURRENT_LINUX_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_binds_the_responsive_current_linux_fixture_before_composition(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_RESPONSIVE_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-linux-responsive-f210-native-selection'-or$selected.fixture_archive_name-cne'mir-fixture-mir5-library-multiplayer_0.1.3.zip'-or$selected.fixture_archive_sha256-cne'E7340D20575B726BF25BBBAC85257E82A6BF2B657A97C4C9A687A0500752CEFD'-or$selected.fixture_source_revision-cne'ef6e173a628fd8acd5e95975c40c515c2cc2ba23'-or$selected.fixture_source_metadata-cne'info-f210-current-517-responsive.json'-or$selected.fixture_version-cne'0.1.3'){throw 'responsive current Linux fixture target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168}catch{return}
+            throw "responsive current Linux profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'retained fixture version' {param($s)($s.mods|Where-Object name -CEQ 'mir-fixture-mir5-library-multiplayer').version='0.1.2'}
+          Assert-Rejected 'wrong Base tuple' {param($s)($s.mods|Where-Object name -CEQ 'base').version='2.1.23'}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s.archive_sha256['more-infinite-research_5.0.21017.zip']='A'*64}
+          Assert-Rejected 'missing beta' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESPONSIVE_PROFILE=str(CURRENT_LINUX_RESPONSIVE_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_binds_the_v014_availability_fixture_through_a_separate_source_projection(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_RESPONSIVE_V014_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-linux-responsive-v014-f210-native-selection'-or$selected.fixture_archive_name-cne'mir-fixture-mir5-library-multiplayer_0.1.4.zip'-or$selected.fixture_archive_sha256-cne'B3714EE98C860BCD873B9AA00678C93F1D74D55D22AE54E49C3B70811548C706'-or$selected.fixture_source_revision-cne'b96435710ab415dcff9aa5614fc9868956f6d5af'-or$selected.fixture_source_metadata-cne'info-f210-current-517-responsive-v014.json'-or$selected.fixture_version-cne'0.1.4'){throw 'v014 Availability fixture target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168}catch{return}
+            throw "v014 Availability profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'retained responsive fixture version' {param($s)($s.mods|Where-Object name -CEQ 'mir-fixture-mir5-library-multiplayer').version='0.1.3'}
+          Assert-Rejected 'wrong target' {param($s)$s.target='f210-current-linux-responsive'}
+          Assert-Rejected 'wrong Base tuple' {param($s)($s.mods|Where-Object name -CEQ 'base').version='2.1.23'}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s.archive_sha256['more-infinite-research_5.0.21017.zip']='A'*64}
+          Assert-Rejected 'missing beta' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESPONSIVE_V014_PROFILE=str(CURRENT_LINUX_RESPONSIVE_V014_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_multiplayer_wrapper_binds_the_v015_queue_context_fixture_through_a_separate_source_projection(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq 'Assert-MultiplayerFixtureSelection'
+          },$true))
+          if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $node[0].Extent.Text
+          function Read-Profile {Get-Content -LiteralPath $env:MIR_TEST_RESPONSIVE_V015_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF'
+          $mir='5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50'
+          $selected=Assert-MultiplayerFixtureSelection -Selection (Read-Profile) -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168
+          if($selected.kind-cne'mir5-library-api-consumers-current-linux-responsive-v015-f210-native-selection'-or$selected.fixture_archive_name-cne'mir-fixture-mir5-library-multiplayer_0.1.5.zip'-or$selected.fixture_archive_sha256-cne'CAC05BAE5E3D67D85681B9C0FEC376D71809A7A4E6811A274C6468ADD8ED36FC'-or$selected.fixture_source_revision-cne'0dac003903a317137cf993b5bd22074a3e5013a8'-or$selected.fixture_source_metadata-cne'info-f210-current-517-responsive-v015.json'-or$selected.fixture_version-cne'0.1.5'){throw 'v015 queue-context fixture target differs'}
+          function Assert-Rejected([string]$Name,[scriptblock]$Mutate){
+            $selection=Read-Profile;&$Mutate $selection
+            try{$null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 7168}catch{return}
+            throw "v015 queue-context profile accepted opponent: $Name"
+          }
+          Assert-Rejected 'retained v014 fixture version' {param($s)($s.mods|Where-Object name -CEQ 'mir-fixture-mir5-library-multiplayer').version='0.1.4'}
+          Assert-Rejected 'wrong target' {param($s)$s.target='f210-current-linux-responsive-v014'}
+          Assert-Rejected 'wrong Base tuple' {param($s)($s.mods|Where-Object name -CEQ 'base').version='2.1.23'}
+          Assert-Rejected 'wrong current MIR archive' {param($s)$s.archive_sha256['more-infinite-research_5.0.21017.zip']='A'*64}
+          Assert-Rejected 'missing beta' {param($s)$s.mods=@($s.mods|Where-Object name -CNE 'mir-fixture-mir5-api-beta')}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
+                     MIR_TEST_RESPONSIVE_V015_PROFILE=str(CURRENT_LINUX_RESPONSIVE_V015_F210_API_CONSUMERS_PROFILE)),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_linux_display_typed_envelope_survives_the_current_target_branch(self):
+        old_source = subprocess.run(
+            ["git", "show", "d5b1870841722afdad80e115a0eb38b24dc035c4:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Invoke-EntryBinding([string]$Path,[bool]$RouteFlag,$Envelope){
+            $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw $errors[0].Message}
+            $paramText=$ast.ParamBlock.Extent.Text
+            $assignments=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.AssignmentStatementAst]-and($candidate.Left.Extent.Text-ceq'$usesLinuxPrivateDisplays'-or$candidate.Left.Extent.Text-ceq'$linuxPrivateDisplays')},$true))
+            if($assignments.Count-ne1){throw 'current Linux display target assignment is absent or ambiguous'}
+            $assignment=$assignments[0].Extent.Text;$routeLiteral=if($RouteFlag){'$true'}else{'$false'}
+            $probe=[scriptblock]::Create($paramText+"`nSet-StrictMode -Version Latest`n`$target=[pscustomobject]@{linux_private_displays="+$routeLiteral+"}`n"+$assignment+"`nif("+$routeLiteral+"){if(-not(`$LinuxPrivateDisplays-is[Collections.IDictionary])-or-not`$usesLinuxPrivateDisplays){throw 'typed current envelope branch differs'}}else{if(`$null-ne`$LinuxPrivateDisplays-or`$usesLinuxPrivateDisplays){throw 'typed legacy envelope branch differs'}}`n[ordered]@{selected=`$usesLinuxPrivateDisplays}")
+            return & $probe -ArchiveLibrary 'library' -FactorioBin 'factorio' -ProfilePath 'profile' -FixtureSources @('fixture') -ExpectedMIRArchiveSha256 ('C'*64) -OutputRoot 'output' -LinuxPrivateDisplays $Envelope -RepoRoot $env:MIR_TEST_ROOT
+          }
+          $envelope=[ordered]@{python='python';display_cli='display';display_cli_sha256=('A'*64);display_module_sha256=('B'*64);checkout='checkout';roles=@()}
+          $current=Invoke-EntryBinding $env:MIR_TEST_WRAPPER $true $envelope;if($current.selected-ne$true){throw 'current typed current-route branch differs'}
+          $legacy=Invoke-EntryBinding $env:MIR_TEST_WRAPPER $false $null;if($legacy.selected-ne$false){throw 'current typed legacy-route branch differs'}
+          foreach($case in @([pscustomobject]@{flag=$true;envelope=$envelope;name='current'},[pscustomobject]@{flag=$false;envelope=$null;name='legacy'})){$oldFailure=$null;try{Invoke-EntryBinding $env:MIR_TEST_OLD_WRAPPER $case.flag $case.envelope|Out-Null}catch{$oldFailure=$_.Exception.Message};if($oldFailure-notmatch'Cannot convert value'){throw "d5 typed-envelope counterfactual differs:$($case.name)/$oldFailure"}}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-linux-display-param-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-d5.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_ROOT": str(ROOT), "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_OLD_WRAPPER": str(old_wrapper)},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_standalone_f210_api_client_profile_binds_the_exact_current_six_mod_closure(self):
         profile = json.loads(STANDALONE_F210_API_CONSUMERS_PROFILE.read_text(encoding="utf-8"))
@@ -1586,7 +1905,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         wrapper = WRAPPER.read_text(encoding="utf-8")
-        self.assertIn("build_version=$target.build_version", wrapper)
+        self.assertIn("build_version=$Target.build_version", wrapper)
         self.assertNotIn("'last-played-version'=@{game_version=$target.base;build_version=84539", wrapper)
 
     def test_f210_closure_uses_the_existing_two_client_lifecycle_and_refuses_drift(self):
@@ -1668,19 +1987,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $tokens=$null;$errors=$null
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw $errors[0].Message}
-          $loops=@($ast.FindAll({param($candidate)
-            $candidate -is [Management.Automation.Language.ForEachStatementAst] -and
-            $candidate.Extent.Text.Contains("foreach(`$locale in @('en','de'))") -and
-            $candidate.Extent.Text.Contains('player-data.json')
+          $layouts=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and
+            $candidate.Name -ceq 'New-MultiplayerSessionLayout'
           },$true))
-          if($loops.Count-ne1){throw 'client player-data writer loop is absent or ambiguous'}
-          $loopText=$loops[0].Extent.Text
-          $nameModes=@($ast.FindAll({param($candidate)
-            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
-            $candidate.Left.Extent.Text -ceq '$standaloneClientNames'
-          },$true))
-          if($nameModes.Count-ne1){throw 'client player-data name-mode assignment is absent or ambiguous'}
-          $nameModeText=$nameModes[0].Extent.Text
+          if($layouts.Count-ne1){throw 'client player-data layout writer is absent or ambiguous'}
+          $layoutText=$layouts[0].Extent.Text
           $sessionTokens=$null;$sessionErrors=$null
           $sessionAst=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$sessionTokens,[ref]$sessionErrors)
           if($sessionErrors.Count){throw $sessionErrors[0].Message}
@@ -1693,18 +2005,17 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $sessionNameCheck=$sessionNameChecks[0].Extent.Text
           function Invoke-ClientPlayerDataWriter([bool]$Discovery,[bool]$StandaloneF210,[string]$Label){
             $root=Join-Path $env:MIR_TEST_WORK $Label;$null=New-Item -ItemType Directory -Path $root
-            $resources=[pscustomobject]@{root=$root};$engineData='isolated-engine-data'
+            $resources=[pscustomobject]@{root=$root};$engineData=(Join-Path $root 'engine-data');$null=New-Item -ItemType Directory -Path $engineData
+            [IO.File]::WriteAllText((Join-Path $engineData 'server-settings.example.json'),'{}',[Text.UTF8Encoding]::new($false))
             $target=[pscustomobject]@{base='2.1.23';build_version=87750;standalone_f210=$StandaloneF210}
-            $StandaloneIdentityDiscovery=$Discovery;$standaloneF210=$StandaloneF210
-            Invoke-Expression $nameModeText
-            $udpPorts=@(41000,41001,41002);$clientIndex=1;$clients=@()
             function New-MIRDirectLibraryStartupConfig {
               param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory,[switch]$Graphics)
               [IO.File]::WriteAllText($Path,"[path]`nread-data=$EngineDataDirectory`nwrite-data=$WriteDataDirectory`n[general]`nlocale=en`n",[Text.UTF8Encoding]::new($false))
             }
-            $null=Invoke-Expression $loopText
-            if($clientIndex -ne 3 -or @($clients).Count -ne 2){throw 'actual client player-data loop did not emit both clients'}
-            return [pscustomobject]@{root=$root;clients=@($clients)}
+            Invoke-Expression $layoutText
+            $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$Discovery
+            if(@($layout.clients).Count-ne2){throw 'actual client player-data layout did not emit both clients'}
+            return [pscustomobject]@{root=$root;clients=@($layout.clients)}
           }
           function Assert-Route([object]$Route,[string[]]$ExpectedNames){
             $clients=@($Route.clients)
@@ -1820,15 +2131,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $sourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
           $normal=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'normal-output') -SourceRevision $sourceRevision
           $normalInfo=Get-Content -LiteralPath (Join-Path $normal.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
+          if($normal.members.Count-ne3 -or $normal.source_metadata-cne'info-f210.json' -or ((@($normal.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive-v015.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210-space-age.json|info.json|README.md') -or [string]$normalInfo.factorio_version-cne'2.1' -or [string]$normalInfo.version-cne'0.1.0' -or ((@($normalInfo.dependencies)-join'|')-cne'base >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'normal F210 projection metadata differs'}
           $fixtureArchive=New-SourceArchive -Library $library -Source $normal.source -Members @('control.lua','info.json','settings-updates.lua')
           $spaceAge=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'space-age-output') -SourceRevision $sourceRevision -SpaceAgeLibrary
           $spaceAgeInfo=Get-Content -LiteralPath (Join-Path $spaceAge.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
+          if($spaceAge.members.Count-ne3 -or $spaceAge.source_metadata-cne'info-f210-space-age.json' -or ((@($spaceAge.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive-v015.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-private-credits.json|info-f210.json|info.json|README.md') -or [string]$spaceAgeInfo.factorio_version-cne'2.1' -or [string]$spaceAgeInfo.version-cne'0.2.0' -or ((@($spaceAgeInfo.dependencies)-join'|')-cne'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'Space Age F210 projection metadata differs'}
           $spaceAgeArchive=New-SourceArchive -Library $library -Source $spaceAge.source -Members @('control.lua','info.json','settings-updates.lua')
           $private=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot (Join-Path $root 'private-credit-output') -SourceRevision $sourceRevision -PrivateCreditChecks
           $privateInfo=Get-Content -LiteralPath (Join-Path $private.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-          if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
+          if($private.members.Count-ne3 -or $private.source_metadata-cne'info-f210-private-credits.json' -or ((@($private.excluded_canonical_members)-join'|')-cne'info-f210-current-517-responsive-v014.json|info-f210-current-517-responsive-v015.json|info-f210-current-517-responsive.json|info-f210-current-517.json|info-f210-space-age.json|info-f210.json|info.json|README.md') -or [string]$privateInfo.factorio_version-cne'2.1' -or [string]$privateInfo.version-cne'0.3.0' -or ((@($privateInfo.dependencies)-join'|')-cne'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')){throw 'private-credit F210 projection metadata differs'}
           $privateArchive=New-SourceArchive -Library $library -Source $private.source -Members @('control.lua','info.json','settings-updates.lua')
           $canonicalObserver=Join-Path $repo 'tests/fixtures/active-mods-observer';$observerRaw=Join-Path $root 'observer-raw';$null=New-Item -ItemType Directory -Path $observerRaw
           foreach($member in @('data-final-fixes.lua','info.json')){[IO.File]::WriteAllBytes((Join-Path $observerRaw $member),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $repo -SourceRevision $sourceRevision -FixtureDirectory 'active-mods-observer' -Member $member))}
@@ -2086,7 +2397,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $fixtures=@{
             'api-alpha'=@('control.lua','data.lua','graphics/icon.png','info.json','info-f200.json')
             'api-beta'=@('control.lua','data-final-fixes.lua','graphics/icon.png','info.json','info-f200.json')
-            'library-multiplayer'=@('README.md','control.lua','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')
+            'library-multiplayer'=@('README.md','control.lua','info-f210-current-517-responsive.json','info-f210-current-517.json','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')
             'active-mods-observer'=@('data-final-fixes.lua','info-f200.json','info.json')
           }
           function New-FixtureGitRepository([string]$Destination,[scriptblock]$Mutation){
@@ -2467,6 +2778,192 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 rejected = self.run_case(opponent, target="f210")
                 self.assertFalse(rejected["ok"])
                 self.assertIn("unexpected non-base F210 multiplayer closure", rejected["message"])
+
+    def test_current_linux_f210_closure_requires_the_current_fixture_and_both_api_consumers(self):
+        accepted = self.run_case(target="f210-current-linux")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+        for opponent in ("f210-api-alpha-only", "f210-api-beta-only", "f210-api-alpha-wrong-version",
+                         "f210-api-beta-production"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("unexpected non-base F210-current multiplayer closure", rejected["message"])
+
+    def test_current_linux_responsive_filter_grid_records_only_authored_columns(self):
+        for columns in (1, 2, 3, 5):
+            with self.subTest(columns=columns):
+                accepted = self.run_case(f"responsive-filter-columns-{columns}", target="f210-current-linux-responsive")
+                self.assertTrue(accepted["ok"], accepted["message"])
+                self.assertEqual((accepted["phase"], accepted["join_events"]), ("completed", 6))
+                self.assertNotIn("responsive_filter_layout", accepted["markers"][0]["witnesses"])
+                for marker in accepted["markers"][1:]:
+                    observed = marker["witnesses"]["responsive_filter_layout"]
+                    self.assertEqual(observed["en"], {"columns": columns, "frame_maximal_width": 1024})
+                    self.assertEqual(observed["de"], {"columns": columns, "frame_maximal_width": 1024})
+
+        for opponent in ("responsive-filter-columns-0", "responsive-filter-columns-4", "responsive-filter-width-zero"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux-responsive")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("authored responsive research filter grid is malformed", rejected["message"])
+
+        wrong_tuple = self.run_case("f210-wrong-mir-version", target="f210-current-linux-responsive")
+        self.assertFalse(wrong_tuple["ok"])
+        self.assertEqual(wrong_tuple["storage_entries"], 0)
+        self.assertIn("unsupported native Library target base", wrong_tuple["message"])
+
+    def test_availability_terminal_uses_the_authored_viewport_entries_and_records_all_rows(self):
+        accepted = self.run_case(target="f210-current-linux-responsive")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual(len(accepted["availability_diagnostics"]), 2)
+        for facts, locale in zip(accepted["availability_diagnostics"], ("en", "de")):
+            self.assertEqual(facts["kind"], "MIRLibraryAvailabilityFactsV1")
+            self.assertEqual(facts["player"]["locale"], locale)
+            self.assertEqual(facts["target"], {
+                "base": "2.1.24", "mir": MIR_517_F210, "fixture": "0.1.3",
+            })
+            self.assertEqual(facts["actual_status"], 3)
+            self.assertEqual(facts["viewport"], {
+                "valid": True, "name": "mir_library_availability_viewport", "type": "scroll-pane", "child_count": 1,
+            })
+            self.assertEqual(facts["entries"], {
+                "valid": True, "name": "mir_library_availability_entries", "type": "flow", "child_count": 2,
+            })
+            self.assertEqual([(row["expected"]["subject"], row["expected"]["reason"], row["actual"]["subject"], row["actual"]["reason"])
+                              for row in facts["rows"]], [
+                ("technology-name.more-infinite-research.research_agricultural_growth_speed", "mir-browser.availability-requires-space-age",
+                 "technology-name.more-infinite-research.research_agricultural_growth_speed", "mir-browser.availability-requires-space-age"),
+                ("technology-name.more-infinite-research.research_spoilage_preservation", "mir-browser.availability-requires-space-age",
+                 "technology-name.more-infinite-research.research_spoilage_preservation", "mir-browser.availability-requires-space-age"),
+            ])
+
+        v014 = self.run_case(target="f210-current-linux-responsive-v014")
+        self.assertTrue(v014["ok"], v014["message"])
+        self.assertEqual({facts["target"]["fixture"] for facts in v014["availability_diagnostics"]}, {"0.1.4"})
+
+        for opponent, message in {
+            "availability-wrong-status": "Availability terminal status differs",
+            "availability-viewport-wrong": "Availability terminal viewport structure differs",
+            "availability-viewport-policy": "Availability terminal viewport structure differs",
+            "availability-entries-wrong": "Availability terminal viewport structure differs",
+            "missing-availability-label": "Availability terminal viewport structure differs",
+            "extra-availability-label": "Availability terminal viewport structure differs",
+            "availability-order": "native Availability terminal label differs",
+            "availability-direct-label": "native Availability terminal label differs",
+            "availability-wrong-subject": "native Availability terminal label differs",
+            "availability-wrong-reason": "native Availability terminal label differs",
+        }.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux-responsive")
+                self.assertFalse(rejected["ok"])
+                self.assertIn(message, rejected["message"])
+                self.assertIn("availability target=2.1.24/5.0.21017/0.1.3", rejected["message"])
+
+    def test_old_direct_availability_assumption_fails_the_current_viewport_shape(self):
+        historic = subprocess.run(
+            ["git", "show", "b8be5c1cdffcde416fe1afe03c294a7924a5e52c:tests/fixtures/library-multiplayer/control.lua"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(historic.returncode, 0, historic.stderr.decode("utf-8", "replace"))
+        with tempfile.TemporaryDirectory(prefix="mir5-availability-direct-") as directory:
+            old_control = Path(directory) / "control.lua"
+            old_control.write_bytes(historic.stdout)
+            old = self.run_case(target="f210-current-linux-responsive", control=old_control)
+        self.assertFalse(old["ok"])
+        self.assertIn("native Availability terminal label differs", old["message"])
+        current = self.run_case(target="f210-current-linux-responsive")
+        self.assertTrue(current["ok"], current["message"])
+
+    def test_current_linux_responsive_fixture_projection_is_exact_and_current_only(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "responsive projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $head=(& git -C $env:MIR_TEST_REPO rev-parse HEAD).Trim()
+          if($head-notmatch'^[0-9a-f]{40}$'){throw 'responsive fixture source revision is unavailable'}
+          $projection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $head -MIRVersion '5.0.21017' -CurrentLinuxMetadata 'info-f210-current-517-responsive.json'
+          $info=Get-Content -LiteralPath (Join-Path $projection.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($projection.members.Count-ne3-or$projection.source_metadata-cne'info-f210-current-517-responsive.json' -or [string]$info.name-cne'mir-fixture-mir5-library-multiplayer' -or [string]$info.version-cne'0.1.3' -or [string]$info.factorio_version-cne'2.1' -or ((@($info.dependencies)-join'|')-cne'base >= 2.1.24|more-infinite-research = 5.0.21017')){throw 'responsive projection metadata or member selection differs'}
+          $names=@(Get-ChildItem -LiteralPath $projection.source -File|ForEach-Object {$_.Name}|Sort-Object)
+          if(($names-join'|')-cne'control.lua|info.json|settings-updates.lua'){throw 'responsive projection runtime member set differs'}
+          $rejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_STAGE 'wrong-version') -SourceRevision $head -MIRVersion '5.0.21000' -CurrentLinuxMetadata 'info-f210-current-517-responsive.json'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'responsive metadata was admitted for a non-current MIR version'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-linux-fixture-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True,
+                text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current_linux_responsive_v014_fixture_projection_is_exact_raw_git_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "v014 projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $source='b96435710ab415dcff9aa5614fc9868956f6d5af'
+          $projection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $source -MIRVersion '5.0.21017' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v014.json'
+          $info=Get-Content -LiteralPath (Join-Path $projection.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($projection.source_revision-cne$source-or$projection.members.Count-ne3-or$projection.source_metadata-cne'info-f210-current-517-responsive-v014.json'-or [string]$info.name-cne'mir-fixture-mir5-library-multiplayer'-or [string]$info.version-cne'0.1.4'-or [string]$info.factorio_version-cne'2.1'-or ((@($info.dependencies)-join'|')-cne'base >= 2.1.24|more-infinite-research = 5.0.21017')){throw 'v014 projection metadata differs'}
+          $names=@(Get-ChildItem -LiteralPath $projection.source -File|ForEach-Object {$_.Name}|Sort-Object)
+          if(($names-join'|')-cne'control.lua|info.json|settings-updates.lua'){throw 'v014 projection runtime member set differs'}
+          $rejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_STAGE 'wrong-version') -SourceRevision $source -MIRVersion '5.0.21000' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v014.json'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'v014 raw Git projection admitted a non-current MIR version'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-v014-fixture-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current_linux_responsive_v015_fixture_projection_is_exact_raw_git_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in @('Get-StandaloneF210NativeFixtureGitMembers','Get-StandaloneF210NativeFixtureRawGitMemberBytes','New-StandaloneF210LibraryFixtureSourceProjection')){
+            $node=@($ast.FindAll({param($candidate) $candidate -is [Management.Automation.Language.FunctionDefinitionAst] -and $candidate.Name -ceq $name},$true))
+            if($node.Count-ne1){throw "v015 projection function is absent or ambiguous: $name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $source='0dac003903a317137cf993b5bd22074a3e5013a8'
+          $projection=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $source -MIRVersion '5.0.21017' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v015.json'
+          $info=Get-Content -LiteralPath (Join-Path $projection.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          if($projection.source_revision-cne$source-or$projection.members.Count-ne3-or$projection.source_metadata-cne'info-f210-current-517-responsive-v015.json'-or [string]$info.name-cne'mir-fixture-mir5-library-multiplayer'-or [string]$info.version-cne'0.1.5'-or [string]$info.factorio_version-cne'2.1'-or ((@($info.dependencies)-join'|')-cne'base >= 2.1.24|more-infinite-research = 5.0.21017')){throw 'v015 projection metadata differs'}
+          $names=@(Get-ChildItem -LiteralPath $projection.source -File|ForEach-Object {$_.Name}|Sort-Object)
+          if(($names-join'|')-cne'control.lua|info.json|settings-updates.lua'){throw 'v015 projection runtime member set differs'}
+          $rejected=$false;try{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $env:MIR_TEST_REPO -OutputRoot (Join-Path $env:MIR_TEST_STAGE 'wrong-version') -SourceRevision $source -MIRVersion '5.0.21000' -CurrentLinuxMetadata 'info-f210-current-517-responsive-v015.json'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'v015 raw Git projection admitted a non-current MIR version'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-v015-fixture-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_f210_space_age_api_client_fixture_requires_the_exact_native_and_library_vectors(self):
         accepted = self.run_case(target="f210-space-age")
@@ -3390,8 +3887,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "second-feed-rejected": "actual Library refresh laboratory rejected automation-science-pack during second science feed",
             "wrong-force-event": "native foreign-force callback differs",
             "foreign-force-gui": "native public browser GUI tree is incomplete",
-            "missing-availability-label": "Availability terminal label differs",
-            "extra-availability-label": "Availability terminal label count differs",
+            "missing-availability-label": "Availability terminal viewport structure differs",
+            "extra-availability-label": "Availability terminal viewport structure differs",
             "caption-wrong-level-key": "native Library refresh level differs",
             "caption-numeric-level": "native Library refresh level differs",
             "caption-wrong-level": "native Library refresh level differs",
@@ -3400,6 +3897,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "caption-noncanonical-queue-count": "native Library refresh queue facts differ",
             "caption-wrong-queue-position": "native Library refresh queue facts differ",
             "caption-noncanonical-queue-position": "native Library refresh queue facts differ",
+            "stale-current-context": "native Library refresh retained stale current research context",
+            "stale-queued-context": "native Library refresh retained stale queued research context",
+            "stale-queue-count-context": "native Library refresh retained stale queue labels",
+            "stale-queue-position-context": "native Library refresh retained stale queue labels",
+            "invented-not-queued-context": "native Library refresh emitted unsupported not-queued context label",
         }
         for opponent, message in expected.items():
             with self.subTest(opponent=opponent):
@@ -3407,6 +3909,37 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertIn("[mir5-library-multiplayer]", result["message"])
                 self.assertIn(message, result["message"])
+                if opponent.endswith("-context"):
+                    self.assertIn("mir_library_context_", result["message"])
+
+    def test_v015_requires_actual_absent_settled_queue_contexts(self):
+        historic = subprocess.run(
+            ["git", "show", "b96435710ab415dcff9aa5614fc9868956f6d5af:tests/fixtures/library-multiplayer/control.lua"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(historic.returncode, 0, historic.stderr.decode("utf-8", "replace"))
+        with tempfile.TemporaryDirectory(prefix="mir5-v015-queue-context-") as directory:
+            old_control = Path(directory) / "control.lua"
+            old_control.write_bytes(historic.stdout)
+            old = self.run_case(target="f210-current-linux-responsive-v014", control=old_control)
+        self.assertFalse(old["ok"])
+        self.assertIn("native Library refresh retained stale queue labels", old["message"])
+
+        current = self.run_case(target="f210-current-linux-responsive-v015")
+        self.assertTrue(current["ok"], current["message"])
+        self.assertEqual((current["phase"], current["join_events"]), ("completed", 6))
+        for opponent, message in {
+            "stale-current-context": "retained stale current research context",
+            "stale-queued-context": "retained stale queued research context",
+            "stale-queue-count-context": "retained stale queue labels",
+            "stale-queue-position-context": "retained stale queue labels",
+            "invented-not-queued-context": "emitted unsupported not-queued context label",
+        }.items():
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case(opponent, target="f210-current-linux-responsive-v015")
+                self.assertFalse(rejected["ok"])
+                self.assertIn(message, rejected["message"])
+                self.assertIn("mir_library_context_", rejected["message"])
 
     def test_fixture_preflights_the_exact_unordered_gear_science_vector(self):
         source = CONTROL.read_text(encoding="utf-8")
@@ -4026,6 +4559,783 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_private_display_ready_receipts_are_typed_and_failed_starts_clean_their_live_child(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Get-SessionHash','Test-Within','Assert-NoReparse','Resolve-Existing','Read-DisplayReady','Assert-PrivateDisplayChildIdentity','Get-PrivateDisplayProbePythonPin','Assert-PrivateDisplayInterpreterPin','Complete-PrivateDisplayOutput','Stop-PrivateDisplayChild','Start-PrivateDisplay','Stop-PrivateDisplay')
+          foreach($name in $names){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "private display definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $workroot -Force
+          function Resolve-BuildOutput([string]$Path,[string]$Label){
+            $full=[IO.Path]::GetFullPath($Path)
+            if(-not$full.StartsWith($workroot,[StringComparison]::OrdinalIgnoreCase)){throw "$Label escapes workroot"}
+            return $full
+          }
+          function Resolve-BuildInput([string]$Path,[string]$Type,[string]$Label){
+            if(-not(Test-Path -LiteralPath $Path -PathType $Type)){throw "$Label is absent"}
+            return Resolve-BuildOutput $Path $Label
+          }
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $fake=Join-Path $workroot 'fake-display.ps1'
+          $fakeBody=@'
+param([Parameter(ValueFromRemainingArguments=$true)]$rest)
+$encoding=[Text.UTF8Encoding]::new($false)
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'bad-ready'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,'{"kind":"bad"}',$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding);exit 0}}
+}
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  Start-Sleep -Milliseconds 400
+  exit 0
+}
+if($env:MIR_TEST_DISPLAY_MODE -ceq 'success'){
+  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
+}
+throw 'unexpected fake display mode'
+'@
+          [IO.File]::WriteAllText($fake,$fakeBody,$encoding)
+          $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
+          $pythonHash=(Get-FileHash -LiteralPath $pwsh -Algorithm SHA256).Hash.ToUpperInvariant()
+          $probe=Join-Path $workroot 'probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$pwsh+"': '"+$pythonHash+"',`n}`n"),$encoding)
+          $script:linuxPrivateDisplays=[ordered]@{python=$pwsh;display_cli=$fake;display_module_sha256=('A'*64);checkout=$workroot;probe_display=$probe;probe_display_sha256=(Get-FileHash -LiteralPath $probe -Algorithm SHA256).Hash.ToUpperInvariant()}
+          function New-Role([string]$Name){
+            $root=Join-Path $workroot $Name;$null=New-Item -ItemType Directory -Path $root
+            return [ordered]@{locale='en';role='client-en';display=':193';geometry='1280x720';plan=(Join-Path $root 'plan.json');plan_sha256=('A'*64);ready=(Join-Path $root 'display-ready.json');result=(Join-Path $root 'display-result.json');role_root=$root;authority=(Join-Path $root 'authority')}
+          }
+          function New-Ready($Role){
+            [ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]101;start_ticks=[Int64]102;session_id=[Int64]103};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}
+          }
+          function Refuses([scriptblock]$Block,[string]$Name){$failed=$false;try{&$Block}catch{$failed=$true};if(-not$failed){throw "private display receipt admitted:$Name"}}
+          $typed=New-Role 'typed'
+          $typedReady=New-Ready $typed
+          [IO.File]::WriteAllText($typed.ready,($typedReady|ConvertTo-Json -Compress),$encoding)
+          $actual=Read-DisplayReady $typed
+          if($actual.geometry[0]-ne1280-or$actual.geometry[1]-ne720){throw 'typed geometry was not retained'}
+          $typedReady.geometry='1280x720'
+          [IO.File]::WriteAllText($typed.ready,($typedReady|ConvertTo-Json -Compress),$encoding)
+          Refuses {Read-DisplayReady $typed|Out-Null} 'legacy geometry string'
+          $bad=New-Role 'bad'
+          $workroot=$bad.role_root
+          $env:MIR_TEST_DISPLAY_MODE='bad-ready';$env:MIR_TEST_READY=$bad.ready;$env:MIR_TEST_PID=Join-Path $bad.role_root 'child.pid';$env:MIR_TEST_STOPPED=Join-Path $bad.role_root 'stopped'
+          $failure=$null
+          try{Start-PrivateDisplay $bad|Out-Null}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display ready receipt differs'){throw "malformed ready failure differs:$failure"}
+          if(-not(Test-Path -LiteralPath $env:MIR_TEST_STOPPED)){throw 'failed start did not stop its live child'}
+          $badPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw)
+          if($null-ne(Get-Process -Id $badPid -ErrorAction SilentlyContinue)){throw 'failed start left its display child live'}
+          $linger=New-Role 'linger';$lingerReady=New-Ready $linger
+          $workroot=$linger.role_root
+          $env:MIR_TEST_DISPLAY_MODE='linger';$env:MIR_TEST_READY=$linger.ready;$env:MIR_TEST_PID=Join-Path $linger.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($lingerReady|ConvertTo-Json -Compress)
+          $display=Start-PrivateDisplay $linger
+          $lingerPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw)
+          $closedInput=[pscustomobject]@{}
+          $closedInput|Add-Member -MemberType ScriptMethod -Name WriteLine -Value {param([string]$Value)throw 'early stdin closed'}
+          $closedInput|Add-Member -MemberType ScriptMethod -Name Close -Value {}
+          $display.stdin=$closedInput
+          $failure=$null
+          try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display stdin stop failed'){throw "early stdin failure differs:$failure"}
+          if($null-ne(Get-Process -Id $lingerPid -ErrorAction SilentlyContinue)){throw 'early stdin cleanup left its display child live'}
+          function New-StopResult($Ready){
+            [ordered]@{kind='MIRLinuxLibraryDisplayResultV1';status='stop';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]$Ready.display_identity.pid;start_ticks=[Int64]$Ready.display_identity.start_ticks;session_id=[Int64]$Ready.display_identity.session_id};factorio_processes=0;cleanup_errors=@();pins_rechecked=$true;display_exit=0;global_display_restored=$true;private_viewer_restored=$true;authority_removed=$true}
+          }
+          function Assert-ResultContinuityRefusal([string]$Name,[scriptblock]$Mutate){
+            $role=New-Role ('result-'+$Name);$ready=New-Ready $role;$result=New-StopResult $ready;& $Mutate $result
+            $workroot=$role.role_root;$env:MIR_TEST_DISPLAY_MODE='success';$env:MIR_TEST_READY=$role.ready;$env:MIR_TEST_PID=Join-Path $role.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($ready|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$role.result;$env:MIR_TEST_VALID_RESULT=($result|ConvertTo-Json -Compress)
+            $display=Start-PrivateDisplay $role;$childPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw);$failure=$null
+            try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message}
+            if($failure-notmatch'private display restoration receipt differs'){throw "result continuity failure differs:$Name/$failure"}
+            if($null-ne(Get-Process -Id $childPid -ErrorAction SilentlyContinue)){throw "result continuity cleanup left its child live:$Name"}
+          }
+          $success=New-Role 'result-success';$successReady=New-Ready $success;$successResult=New-StopResult $successReady
+          $workroot=$success.role_root;$env:MIR_TEST_DISPLAY_MODE='success';$env:MIR_TEST_READY=$success.ready;$env:MIR_TEST_PID=Join-Path $success.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($successReady|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$success.result;$env:MIR_TEST_VALID_RESULT=($successResult|ConvertTo-Json -Compress)
+          $display=Start-PrivateDisplay $success;Stop-PrivateDisplay $display
+          if(-not$display.closed){throw 'matching display result was not accepted'}
+          Assert-ResultContinuityRefusal 'display' {param($result)$result.display=':194'}
+          Assert-ResultContinuityRefusal 'geometry' {param($result)$result.geometry=@([Int64]1281,[Int64]720)}
+          Assert-ResultContinuityRefusal 'identity' {param($result)$result.display_identity.pid=[Int64]104}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-private-display-", dir=ROOT / "build/tmp") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_private_display_continuity_normalizes_verified_tuple_bindings_and_retains_probe_failure(self):
+        """Run the Session's actual no-X continuity child against JSON receipt shapes."""
+        old_source = subprocess.run(
+            ["git", "show", "c528c3990ab3479760537cc7208bd69423f7d4fd:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          foreach($name in @('Assert-Session','Get-SessionHash','Assert-PrivateDisplayContinuity')){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "continuity definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $root -Force
+          $python=$env:MIR_TEST_PYTHON;$pythonHash=(Get-FileHash -LiteralPath $python -Algorithm SHA256).Hash.ToUpperInvariant()
+          $realPython=(& $python -c 'import os,sys;print(os.path.realpath(sys.executable))').Trim()
+          if([string]::IsNullOrWhiteSpace($realPython)){throw 'actual Python path is absent'}
+          $pythonJson=$realPython|ConvertTo-Json -Compress;$pythonHashJson=$pythonHash|ConvertTo-Json -Compress
+          $authority=Join-Path $root 'authority';[IO.File]::WriteAllText($authority,'test authority',$encoding)
+          $env:MIR_TEST_AUTHORITY=$authority
+          $probe=Join-Path $root 'probe.py'
+          $probeTemplate=@'
+import builtins
+import io
+import os
+import stat
+import sys
+from pathlib import Path
+
+PINS = {__PYTHON__: __PYTHON_HASH__}
+_open = builtins.open
+_readlink = os.readlink
+_lstat = os.lstat
+
+class ReceiptStat:
+    st_mode = stat.S_IFREG | 0o600
+    st_dev = 501
+    st_ino = 502
+
+def fake_open(path, *args, **kwargs):
+    if str(path) == '/proc/31337/stat':
+        tail = ['S', '0', '0', '4242'] + ['0'] * 15 + ['999']
+        return io.StringIO('31337 (mir display) ' + ' '.join(tail))
+    return _open(path, *args, **kwargs)
+
+def fake_readlink(path):
+    if str(path) == '/proc/31337/exe':
+        return sys.executable
+    return _readlink(path)
+
+def fake_lstat(path):
+    if os.path.abspath(str(path)) == os.path.abspath(os.environ['MIR_TEST_AUTHORITY']):
+        return ReceiptStat()
+    return _lstat(path)
+
+builtins.open = fake_open
+os.readlink = fake_readlink
+os.lstat = fake_lstat
+
+def display_binding(server, socket, lock):
+    value = {
+        'socket_device_inode': [40, 10],
+        'lock_device_inode': [40, 11],
+        'uid': 1000,
+        'pid': server.pid,
+        'listeners': [('/tmp/.X11-unix/X193', '601'), ('@/tmp/.X11-unix/X193', '602')],
+    }
+    if os.environ.get('MIR_TEST_CONTINUITY_MODE') == 'mismatch':
+        value['uid'] = 1001
+    if os.environ.get('MIR_TEST_CONTINUITY_MODE') == 'unsupported':
+        value['listeners'] = {'not-a-json-binding'}
+    return value
+
+def viewer_binding(server, path):
+    return {
+        'device_inode': [40, 12],
+        'uid': 1000,
+        'mode': '0600',
+        'listener': ('runtime/viewer.sock', '603'),
+        'pid': server.pid,
+        'working_directory': '/owned/role-root',
+    }
+
+def no_network_sockets(pid):
+    if pid != 31337:
+        raise RuntimeError('unexpected display PID')
+'@
+          [IO.File]::WriteAllText($probe,$probeTemplate.Replace('__PYTHON__',$pythonJson).Replace('__PYTHON_HASH__',$pythonHashJson),$encoding)
+          $ready=Join-Path $root 'display-ready.json'
+          $receipt=[ordered]@{
+            display=':193'
+            display_identity=[ordered]@{pid=[Int64]31337;session_id=[Int64]4242;start_ticks=[Int64]999}
+            display_binding=[ordered]@{socket_device_inode=@(40,10);lock_device_inode=@(40,11);uid=[Int64]1000;pid=[Int64]31337;listeners=@(@('/tmp/.X11-unix/X193','601'),@('@/tmp/.X11-unix/X193','602'))}
+            viewer_binding=[ordered]@{device_inode=@(40,12);uid=[Int64]1000;mode='0600';listener=@('runtime/viewer.sock','603');pid=[Int64]31337;working_directory='/owned/role-root'}
+            authority_device_inode=@(501,502)
+          }
+          if($env:MIR_TEST_MODE-ceq'wrong-type'){$receipt.display_binding.uid=$true}
+          [IO.File]::WriteAllText($ready,($receipt|ConvertTo-Json -Depth 10 -Compress),$encoding)
+          $script:linuxPrivateDisplays=[ordered]@{python=$python;probe_display=$probe;probe_display_sha256=(Get-SessionHash $probe)}
+          $display=[pscustomobject]@{ready=$receipt;role=[pscustomobject]@{ready=$ready;authority=$authority}}
+          $env:MIR_TEST_CONTINUITY_MODE=$env:MIR_TEST_MODE
+          $failure=$null;try{Assert-PrivateDisplayContinuity $display}catch{$failure=$_.Exception.Message}
+          switch($env:MIR_TEST_EXPECT){
+            'old-refusal' {
+              if($failure-notmatch'private display continuity probe refused$'){throw "old tuple/list mismatch was not reproduced:$failure"}
+            }
+            'pass' {
+              if($null-ne$failure){throw "normalized tuple/list binding was refused:$failure"}
+            }
+            'mismatch' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: display binding differs'){throw "binding mismatch lost its bounded Python failure:$failure"}
+            }
+            'unsupported' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: binding JSON value differs'){throw "unsupported binding shape was admitted or obscured:$failure"}
+            }
+            'wrong-type' {
+              if($failure-notmatch'private display continuity probe refused: exit=1;' -or $failure-notmatch'RuntimeError: display binding differs'){throw "numeric binding type substitution was admitted:$failure"}
+            }
+            default {throw 'unknown continuity expectation'}
+          }
+          'PASS actual continuity Python tuple/list normalization and refusal evidence'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-display-continuity-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-c528.ps1"
+            old_session.write_bytes(old_source.stdout)
+            cases = (
+                ("old", old_session, "valid", "old-refusal"),
+                ("current", SESSION, "valid", "pass"),
+                ("mismatch", SESSION, "mismatch", "mismatch"),
+                ("unsupported", SESSION, "unsupported", "unsupported"),
+                ("wrong-type", SESSION, "wrong-type", "wrong-type"),
+            )
+            for name, source, mode, expected in cases:
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_PYTHON": sys.executable, "MIR_TEST_MODE": mode, "MIR_TEST_EXPECT": expected},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
+    def test_composed_session_entry_accepts_only_the_pinned_canonical_display_cli_outside_its_runtime_checkout(self):
+        """Exercise the exact session assignment before any display or game start."""
+        old_source = subprocess.run(
+            ["git", "show", "e794de8b198e1b53affcb9bbd7291a5b7c8cf1cb:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Assert-Session','Get-SessionHash','Test-Within','Assert-NoReparse','Resolve-Existing','Resolve-BuildInput')
+          if($env:MIR_TEST_EXPECT-ceq'new'){$names+=@('Resolve-PrivateDisplayCli','Assert-PrivateDisplayProgramPins')}
+          foreach($name in $names){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "session definition is absent or ambiguous:$name"}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $entry=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $candidate.Left.Extent.Text -ceq '$linuxPrivateDisplays.display_cli'
+          },$true))
+          if($entry.Count-ne1){throw 'session display CLI entry is absent or ambiguous'}
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $repoRoot=Join-Path $env:MIR_TEST_WORK 'repo';$buildRoot=Join-Path $repoRoot 'build'
+          $null=New-Item -ItemType Directory -Path (Join-Path $repoRoot 'tools/lib/validation') -Force
+          $null=New-Item -ItemType Directory -Path $buildRoot -Force
+          function Write-Program([string]$Path,[string]$Body,[string]$ModuleBody){
+            $null=New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force
+            [IO.File]::WriteAllText($Path,$Body,$encoding)
+            $module=Join-Path (Split-Path -Parent $Path) 'lib/validation/LinuxLibraryDisplay.py'
+            $null=New-Item -ItemType Directory -Path (Split-Path -Parent $module) -Force
+            [IO.File]::WriteAllText($module,$ModuleBody,$encoding)
+            return $module
+          }
+          function Set-ProgramPins([string]$Path,[string]$Module){
+            $script:linuxPrivateDisplays=[ordered]@{
+              display_cli=$Path
+              display_cli_sha256=(Get-SessionHash $Path)
+              display_module_sha256=(Get-SessionHash $Module)
+            }
+          }
+          function Invoke-SessionDisplayEntry{
+            Invoke-Expression $entry[0].Extent.Text
+          }
+          $canonical=Join-Path $repoRoot 'tools/Invoke-LibraryLinuxDisplay.py'
+          $canonicalModule=Write-Program $canonical 'canonical-cli' 'canonical-module'
+          Set-ProgramPins $canonical $canonicalModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($env:MIR_TEST_EXPECT-ceq'old'){
+            if($failure-notmatch'private display CLI is outside checkout build'){throw "old session entry did not reproduce the composed failure:$failure"}
+            'PASS old composed session entry refused canonical CLI'
+            return
+          }
+          if($null-ne$failure-or$linuxPrivateDisplays.display_cli-cne(Resolve-Path -LiteralPath $canonical).Path){throw "new session entry did not admit canonical CLI:$failure"}
+          $external=Join-Path $env:MIR_TEST_WORK 'outside/Invoke-LibraryLinuxDisplay.py'
+          $externalModule=Write-Program $external 'canonical-cli' 'canonical-module';Set-ProgramPins $external $externalModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'neither checkout build input nor canonical CLI'){throw "external same-hash CLI was admitted:$failure"}
+          $legacy=Join-Path $buildRoot 'legacy/Invoke-LibraryLinuxDisplay.py'
+          $legacyModule=Write-Program $legacy 'legacy-cli' 'legacy-module';Set-ProgramPins $legacy $legacyModule
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($null-ne$failure-or$linuxPrivateDisplays.display_cli-cne(Resolve-Path -LiteralPath $legacy).Path){throw "legacy build CLI changed:$failure"}
+          Set-ProgramPins $canonical $canonicalModule;$linuxPrivateDisplays.display_module_sha256=('0'*64)
+          $failure=$null;try{Invoke-SessionDisplayEntry}catch{$failure=$_.Exception.Message}
+          if($failure-notmatch'private display module hash differs'){throw "wrong sibling module hash was admitted:$failure"}
+          'PASS composed session display CLI admission'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-composed-display-entry-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-e794.ps1"
+            old_session.write_bytes(old_source.stdout)
+            for name, source, expected in (("old", old_session, "old"), ("new", SESSION, "new")):
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EXPECT": expected},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
+    def test_private_display_result_continuity_rejects_57b8_substitutions(self):
+        old_source = subprocess.run(
+            ["git", "show", "57b8cd6da9b07a76f6b328dc7442d0c223c1c619:tools/Invoke-MultiplayerSession.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION_UNDER_TEST,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $names=@('Get-SessionHash','Test-Within','Assert-NoReparse','Resolve-Existing','Read-DisplayReady','Assert-PrivateDisplayChildIdentity','Get-PrivateDisplayProbePythonPin','Assert-PrivateDisplayInterpreterPin','Complete-PrivateDisplayOutput','Stop-PrivateDisplayChild','Start-PrivateDisplay','Stop-PrivateDisplay')
+          # The 57b8 counterfactual first neutralizes its unrelated StrictMode
+          # stdin-message evaluation defect, then isolates its result-policy fields.
+          foreach($name in $names){$node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true));if($node.Count-ne1){throw "private display definition is absent or ambiguous:$name"};$text=$node[0].Extent.Text;if($name-ceq'Stop-PrivateDisplay'-and$env:MIR_TEST_EXPECT_REJECT-cne'true'){$text=$text.Replace('$stdinFailure=Stop-PrivateDisplayChild $Display.process $Display.stdin $Display.identity','$null=$Display.stdin.WriteLine(''stop'');$Display.stdin.Close();Assert-Session ($Display.process.WaitForExit(15000)) ''counterfactual display did not stop'';$stdinFailure=$null').Replace('Assert-Session ($null-eq$stdinFailure) (''private display stdin stop failed: ''+$stdinFailure.Exception.Message)','$null=$null');if($text-notmatch'counterfactual display did not stop'){throw '57b8 counterfactual teardown replacement did not apply'}};Invoke-Expression $text}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition-and$env:MIR_TEST_EXPECT_REJECT-cne'true'-and$Message-like'private display stdin stop failed:*'){return};if(-not$Condition){throw $Message}}
+          $workroot=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$null=New-Item -ItemType Directory -Path $workroot -Force
+          function Resolve-BuildOutput([string]$Path,[string]$Label){$full=[IO.Path]::GetFullPath($Path);if(-not$full.StartsWith($workroot,[StringComparison]::OrdinalIgnoreCase)){throw "$Label escapes workroot"};return $full}
+          function Resolve-BuildInput([string]$Path,[string]$Type,[string]$Label){if(-not(Test-Path -LiteralPath $Path -PathType $Type)){throw "$Label is absent"};return Resolve-BuildOutput $Path $Label}
+          $encoding=[Text.UTF8Encoding]::new($false);$fake=Join-Path $workroot 'fake-display.ps1'
+          [IO.File]::WriteAllText($fake,@'
+param([Parameter(ValueFromRemainingArguments=$true)]$rest)
+$encoding=[Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+[IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
+'@,$encoding)
+          $pwsh=(Get-Command pwsh -ErrorAction Stop).Source;$pythonHash=(Get-FileHash -LiteralPath $pwsh -Algorithm SHA256).Hash.ToUpperInvariant();$probe=Join-Path $workroot 'probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$pwsh+"': '"+$pythonHash+"',`n}`n"),$encoding)
+          $script:linuxPrivateDisplays=[ordered]@{python=$pwsh;display_cli=$fake;display_module_sha256=('A'*64);checkout=$workroot;probe_display=$probe;probe_display_sha256=(Get-FileHash -LiteralPath $probe -Algorithm SHA256).Hash.ToUpperInvariant()}
+          function New-Role([string]$Name){$root=Join-Path $workroot $Name;$null=New-Item -ItemType Directory -Path $root;[ordered]@{locale='en';role='client-en';display=':193';geometry='1280x720';plan=(Join-Path $root 'plan.json');plan_sha256=('A'*64);ready=(Join-Path $root 'display-ready.json');result=(Join-Path $root 'display-result.json');role_root=$root;authority=(Join-Path $root 'authority')}}
+          function New-Ready(){[ordered]@{kind='MIRLinuxLibraryDisplayReadyV1';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]101;start_ticks=[Int64]102;session_id=[Int64]103};display_binding=[ordered]@{};viewer_binding=[ordered]@{};authority_device_inode=@(1,2);factorio_processes=0}}
+          function New-Result($Ready){[ordered]@{kind='MIRLinuxLibraryDisplayResultV1';status='stop';role='client-en';display=':193';geometry=@(1280,720);display_identity=[ordered]@{pid=[Int64]$Ready.display_identity.pid;start_ticks=[Int64]$Ready.display_identity.start_ticks;session_id=[Int64]$Ready.display_identity.session_id};factorio_processes=0;global_display_restored=$true;private_viewer_restored=$true;authority_removed=$true}}
+          function Exercise([string]$Name,[scriptblock]$Mutate){$role=New-Role $Name;$ready=New-Ready;$result=New-Result $ready;& $Mutate $result;$workroot=$role.role_root;$env:MIR_TEST_READY=$role.ready;$env:MIR_TEST_PID=Join-Path $role.role_root 'child.pid';$env:MIR_TEST_VALID_READY=($ready|ConvertTo-Json -Compress);$env:MIR_TEST_RESULT=$role.result;$env:MIR_TEST_VALID_RESULT=($result|ConvertTo-Json -Compress);$display=Start-PrivateDisplay $role;$childPid=[int](Get-Content -LiteralPath $env:MIR_TEST_PID -Raw);$failure=$null;try{Stop-PrivateDisplay $display}catch{$failure=$_.Exception.Message};if($env:MIR_TEST_EXPECT_REJECT-ceq'true'){if($failure-notmatch'private display restoration receipt differs'){throw "continuity refusal differs:$Name/$failure"}}elseif($null-ne$failure-or-not$display.closed){throw "57b8 admitted-state counterfactual differs:$Name/$failure"};if($null-ne(Get-Process -Id $childPid -ErrorAction SilentlyContinue)){throw "continuity cleanup left child live:$Name"}}
+          Exercise 'display' {param($value)$value.display=':194'}
+          Exercise 'geometry' {param($value)$value.geometry=@([Int64]1281,[Int64]720)}
+          Exercise 'identity' {param($value)$value.display_identity.session_id=[Int64]104}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-display-result-", dir=ROOT / "build/tmp") as work:
+            old_session = Path(work) / "Invoke-MultiplayerSession-57b8.ps1"
+            old_session.write_bytes(old_source.stdout)
+            for name, source, expect_reject in (("current", SESSION, "true"), ("old", old_session, "false")):
+                result = subprocess.run(
+                    ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                    capture_output=True, text=True,
+                    env={**os.environ, "MIR_TEST_SESSION_UNDER_TEST": str(source), "MIR_TEST_WORK": str(Path(work) / name), "MIR_TEST_EXPECT_REJECT": expect_reject},
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, name + ": " + result.stdout + result.stderr)
+
+    def test_private_display_client_graphics_roots_are_phase_local(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq'Start-Clients'},$true))
+          if($node.Count-ne1){throw 'actual client starter missing or ambiguous'}
+          Invoke-Expression $node[0].Extent.Text
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK)
+          $serverWriteData=Join-Path $root 'server';$null=New-Item -ItemType Directory -Path $serverWriteData
+          $clients=@()
+          foreach($locale in @('en','de')){
+            $write=Join-Path $root ('client-'+$locale);$null=New-Item -ItemType Directory -Path $write
+            $clients+=[pscustomobject]@{name=$(if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'});locale=$locale;config=(Join-Path $write 'client.ini');port=$(if($locale-ceq'en'){1001}else{1002});write_data=$write}
+          }
+          $authorities=@{}
+          $displayByLocale=@{}
+          foreach($client in $clients){
+            $authority=Join-Path $client.write_data 'authority';[IO.File]::WriteAllText($authority,'authority',[Text.UTF8Encoding]::new($false))
+            $authorities[$client.locale]=$authority;$displayByLocale[$client.locale]=[pscustomobject]@{role=[pscustomobject]@{authority=$authority;display=(':' + $(if($client.locale-ceq'en'){193}else{194}))}}
+          }
+          $linuxPrivateDisplays=[ordered]@{roles=@()};$library='unused';$serverPort=1000;$clientGraphics=@();$fixtureCase='library-multiplayer';$markerPrefix='MIR5_LIBRARY_MP';$apiClientConsumers=$false
+           $script:serverLog='';$script:environments=[Collections.Generic.List[object]]::new();$script:continuity=@()
+           function Assert-PrivateDisplayContinuity($Display){$script:continuity+=,[string]$Display.role.display}
+          function Read-LogText([string]$Path){return $script:serverLog}
+          function Start-Native([string]$Name,$NativeArguments,$Environment){
+            if($null-eq$Environment){throw 'private display client lost its graphics environment'}
+            $script:environments.Add([pscustomobject]@{name=$Name;environment=$Environment})
+            $parts=$Name.Split('-');$phase=$parts[1];$locale=$parts[2]
+            $join=@{initial=1;rejoin=2;restart=3}[$phase]
+            $player=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+            $script:serverLog+="[$markerPrefix`_JOIN] $player $join`n"
+            return [pscustomobject]@{name=$Name}
+          }
+          function Wait-For([string]$Description,[scriptblock]$Predicate){if(-not(&$Predicate)){throw "missing expected $Description"};return $true}
+          foreach($phase in @('initial','rejoin','restart')){
+            $actors=@(Start-Clients $phase)
+            if($actors.Count-ne2){throw "phase lost client actors:$phase"}
+          }
+          if($script:environments.Count-ne6){throw 'client graphics environments differ'}
+           if((@($script:continuity|Sort-Object)-join',')-cne':193,:193,:193,:194,:194,:194'){throw 'client starts skipped their display continuity check'}
+          $actual=[Collections.Generic.List[string]]::new()
+          foreach($entry in $script:environments){
+            $cache=[string]$entry.environment['XDG_CACHE_HOME'];$config=[string]$entry.environment['XDG_CONFIG_HOME']
+            if(-not(Test-Path -LiteralPath $cache -PathType Container)-or-not(Test-Path -LiteralPath $config -PathType Container)){throw 'phase-local graphics directories are absent'}
+            $cacheRelative=[IO.Path]::GetRelativePath($root,$cache).Replace('\','/')
+            $configRelative=[IO.Path]::GetRelativePath($root,$config).Replace('\','/')
+            $actual.Add($cacheRelative);$actual.Add($configRelative)
+            if($cacheRelative-notmatch'^client-(en|de)/linux-graphics-(initial|rejoin|restart)/cache$'-or$configRelative-notmatch'^client-(en|de)/linux-graphics-(initial|rejoin|restart)/config$'){throw 'phase-local graphics root differs'}
+          }
+          if((@($actual|Sort-Object -Unique)).Count-ne12){throw 'client phases reused graphics paths'}
+          foreach($client in $clients){
+            if(Test-Path -LiteralPath (Join-Path $client.write_data 'linux-cache')){throw 'legacy shared cache root was recreated'}
+            if(Test-Path -LiteralPath (Join-Path $client.write_data 'linux-config')){throw 'legacy shared config root was recreated'}
+          }
+          $before=@(Get-ChildItem -LiteralPath $root -Recurse -Force).Count
+          $failure=$null;try{Start-Clients 'unknown'|Out-Null}catch{$failure=$_.Exception.Message}
+          if($failure-cne'unknown client phase'){throw "unknown phase refusal differs:$failure"}
+          if(@(Get-ChildItem -LiteralPath $root -Recurse -Force).Count-ne$before){throw 'unknown phase created graphics output'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-phase-graphics-", dir=ROOT / "build/tmp") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_SESSION": str(SESSION), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current_linux_private_display_session_reserves_cleanup_inside_leaf_deadline(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)
+            $candidate -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $candidate.Extent.Text.Contains('$deadline = [DateTime]::UtcNow.AddSeconds')
+          },$true))
+          if($node.Count-ne1){throw 'session deadline assignment is absent or ambiguous'}
+          function Assert-Deadline([bool]$Discovery,$Displays,[int]$Expected){
+            $standaloneIdentityDiscovery=$Discovery;$linuxPrivateDisplays=$Displays;$deadline=$null
+            $before=[DateTime]::UtcNow;Invoke-Expression $node[0].Extent.Text
+            $seconds=($deadline-$before).TotalSeconds
+            if($seconds-lt($Expected-1)-or$seconds-gt($Expected+1)){throw "deadline differs:$Expected/$seconds"}
+          }
+          Assert-Deadline $false ([ordered]@{roles=@()}) 840
+          Assert-Deadline $false $null 900
+          Assert-Deadline $true ([ordered]@{roles=@()}) 180
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+            capture_output=True, text=True,
+            env={**os.environ, "MIR_TEST_SESSION": str(SESSION)}, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_linux_display_runtime_composition_derives_role_display_from_exact_nine_field_leaf_plans_before_native_preparation(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $script:leafFields=@('schema','kind','role','geometry','role_root','deadline_seconds','xtigervnc','xauth','probe_display')
+          function Assert-CanonicalLeafPlan([Collections.IDictionary]$Plan,$Role,[string]$Label){
+            Assert-Session ($Plan.Keys.Count-eq$script:leafFields.Count) ($Label+' plan field count differs')
+            foreach($field in $script:leafFields){Assert-Session ($Plan.Contains($field)) ($Label+' plan field differs: '+$field)}
+            Assert-Session (-not$Plan.Contains('display')) ($Label+' plan accepts a raw display field')
+            Assert-Session ([string]$Plan.schema-ceq'MIRLinuxLibraryDisplayPlanV1'-and[string]$Plan.kind-ceq'MIRLinuxLibraryDisplayPlanV1'-and[string]$Plan.role-ceq[string]$Role.role) ($Label+' plan identity differs')
+            Assert-Session ((@($Plan.geometry)-join',')-ceq'1280,720'-and[string]$Plan.role_root-ceq[string]$Role.role_root-and[int]$Plan.deadline_seconds-eq900) ($Label+' plan geometry or root differs')
+            foreach($pinName in @('xtigervnc','xauth','probe_display')){
+              $pin=$Plan[$pinName]
+              Assert-Session ($pin-is[Collections.IDictionary]-and$pin.Keys.Count-eq3-and$pin.Contains('path')-and$pin.Contains('bytes')-and$pin.Contains('sha256')-and$pin.path-is[string]-and$pin.bytes-is[Int64]-and$pin.sha256-cmatch'^[A-Fa-f0-9]{64}$') ($Label+' '+$pinName+' pin differs')
+            }
+          }
+          function New-Pin([string]$Path){$item=Get-Item -LiteralPath $Path -Force;[ordered]@{path=$item.FullName;bytes=[Int64]$item.Length;sha256=(Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToUpperInvariant()}}
+          foreach($name in @('Assert-LinuxDisplayPinnedFile','Get-LinuxDisplayProbePythonPin','Invoke-LinuxDisplaySchema','New-LinuxPrivateDisplayRuntime')){
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.FunctionDefinitionAst]-and$candidate.Name-ceq$name},$true))
+            if($node.Count-ne1){throw "missing runtime composition definition:$name"};Invoke-Expression $node[0].Extent.Text
+          }
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$input=Join-Path $root 'input-checkout';$null=New-Item -ItemType Directory -Path (Join-Path $input 'build/p') -Force
+          $python=Join-Path $root 'python';[IO.File]::WriteAllText($python,'# fake Python',[Text.UTF8Encoding]::new($false))
+          $cli=Join-Path $input 'tools/Invoke-LibraryLinuxDisplay.py';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $cli) -Force;[IO.File]::WriteAllText($cli,'# fake CLI',[Text.UTF8Encoding]::new($false))
+          $module=Join-Path $input 'tools/lib/validation/LinuxLibraryDisplay.py';$null=New-Item -ItemType Directory -Path (Split-Path -Parent $module) -Force;[IO.File]::WriteAllText($module,'# fake module',[Text.UTF8Encoding]::new($false))
+          $xtigervnc=Join-Path $root 'Xtigervnc';[IO.File]::WriteAllText($xtigervnc,'# fake Xtigervnc',[Text.UTF8Encoding]::new($false))
+          $xauth=Join-Path $root 'xauth';[IO.File]::WriteAllText($xauth,'# fake xauth',[Text.UTF8Encoding]::new($false))
+          $pythonHash=(Get-FileHash -LiteralPath $python -Algorithm SHA256).Hash.ToUpperInvariant()
+          $probe=Join-Path $root 'qualified-probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$python+"': '"+$pythonHash+"',`n}`n"),[Text.UTF8Encoding]::new($false))
+          $probeHash=(Get-FileHash -LiteralPath $probe -Algorithm SHA256).Hash.ToUpperInvariant()
+          $roles=@()
+          foreach($locale in @('en','de')){
+            $roleRoot=Join-Path $input ('build/p/input-'+$locale);$null=New-Item -ItemType Directory -Path $roleRoot
+            $plan=[ordered]@{schema='MIRLinuxLibraryDisplayPlanV1';kind='MIRLinuxLibraryDisplayPlanV1';role=('client-'+$locale);geometry=@(1280,720);role_root=$roleRoot;deadline_seconds=900;xtigervnc=(New-Pin $xtigervnc);xauth=(New-Pin $xauth);probe_display=(New-Pin $probe)}
+            $path=Join-Path $input ('plan-'+$locale+'.json');[IO.File]::WriteAllText($path,(ConvertTo-Json -InputObject $plan -Depth 10),[Text.UTF8Encoding]::new($false))
+            $roles += [ordered]@{locale=$locale;role=('client-'+$locale);display=$(if($locale-ceq'en'){':193'}else{':194'});geometry='1280x720';plan=$path;plan_sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash;ready=(Join-Path $roleRoot 'display-ready.json');result=(Join-Path $roleRoot 'display-result.json');role_root=$roleRoot;authority=(Join-Path $roleRoot 'authority')}
+          }
+          foreach($role in $roles){
+            Assert-Session ($role.Keys.Count-eq10-and$role.Contains('display')-and$role.Contains('role')-and$role.Contains('plan')) 'caller role envelope is not the distinct ten-field display binding'
+          }
+          $binding=[ordered]@{python=$python;display_cli=$cli;display_cli_sha256=(Get-FileHash -LiteralPath $cli -Algorithm SHA256).Hash;display_module_sha256=(Get-FileHash -LiteralPath $module -Algorithm SHA256).Hash;checkout=$input;roles=$roles}
+          $runtime=Join-Path $root 'runtime';$null=New-Item -ItemType Directory -Path $runtime
+          $context=[pscustomobject]@{root=$runtime};$script:schemas=[Collections.Generic.List[object]]::new();$script:planSwapped=$false
+          $schema={param($actualBinding,$actualRole,$label)
+            $script:schemas.Add([pscustomobject]@{checkout=[string]$actualBinding.checkout;role=$actualRole;label=$label})
+            $candidate=Get-Content -LiteralPath ([string]$actualRole.plan) -Raw|ConvertFrom-Json -AsHashtable
+            Assert-CanonicalLeafPlan -Plan $candidate -Role $actualRole -Label $label
+            if($label-ceq'private display en original'){
+              $before=[IO.File]::ReadAllBytes([string]$actualRole.plan);$replacement=[regex]::Replace([Text.UTF8Encoding]::new($false).GetString($before),'"deadline_seconds"\s*:\s*900','"deadline_seconds": 800',1)
+              $after=[Text.UTF8Encoding]::new($false).GetBytes($replacement)
+              if($before.Length-ne$after.Length-or$replacement-ceq[Text.UTF8Encoding]::new($false).GetString($before)){throw 'same-size plan replacement model differs'}
+              [IO.File]::WriteAllBytes([string]$actualRole.plan,$after);$script:planSwapped=$true
+            }
+            if($label-match'runtime'){
+              if([string]$actualBinding.checkout-cne$context.root){throw 'runtime checkout was not the one governed context'}
+            }
+          }
+          $derived=New-LinuxPrivateDisplayRuntime -Binding $binding -Context $context -SchemaInvoker $schema -ExpectedProbeSha256 $probeHash
+          if(-not$script:planSwapped-or$script:schemas.Count-ne4 -or (@($script:schemas|Where-Object {$_.label-match'original'}).Count-ne2) -or (@($script:schemas|Where-Object {$_.label-match'runtime'}).Count-ne2)){throw 'original/runtime schema preflight count differs'}
+          if($derived.Keys.Count-ne8-or$derived.probe_display-cne$probe-or$derived.probe_display_sha256-cne$probeHash){throw 'derived probe binding differs'}
+          foreach($role in @($derived.roles)){
+            if(-not $role.plan.StartsWith((Join-Path $runtime 'display-plans')) -or -not $role.authority.StartsWith($role.role_root)){throw 'derived role paths differ'}
+            $plan=Get-Content -LiteralPath $role.plan -Raw|ConvertFrom-Json -AsHashtable
+            Assert-CanonicalLeafPlan -Plan $plan -Role $role -Label ('derived '+[string]$role.locale)
+            if($plan.role_root-cne$role.role_root-or$plan.probe_display.sha256-cne$derived.probe_display_sha256-or$plan.deadline_seconds-ne900){throw ('derived role plan changed non-role input: '+[string]$role.locale+'/'+[string]$plan.role_root+'/'+[string]$role.role_root+'/'+[string]$plan.probe_display.sha256+'/'+[string]$derived.probe_display_sha256+'/'+[string]$plan.deadline_seconds)}
+          }
+          $extraRoot=Join-Path $root 'extra-display';$null=New-Item -ItemType Directory -Path $extraRoot
+          $extraRoles=@()
+          foreach($role in $roles){
+            $copy=[ordered]@{};foreach($entry in $role.GetEnumerator()){$copy[$entry.Key]=$entry.Value}
+            $extraPlan=Get-Content -LiteralPath ([string]$role.plan) -Raw|ConvertFrom-Json -AsHashtable;$extraPlan.display=[string]$role.display
+            $extraPath=Join-Path $input ('extra-plan-'+[string]$role.locale+'.json');[IO.File]::WriteAllText($extraPath,(ConvertTo-Json -InputObject $extraPlan -Depth 10),[Text.UTF8Encoding]::new($false))
+            $copy.plan=$extraPath;$copy.plan_sha256=(Get-FileHash -LiteralPath $extraPath -Algorithm SHA256).Hash;$extraRoles += $copy
+          }
+          $extra=[ordered]@{};foreach($entry in $binding.GetEnumerator()){$extra[$entry.Key]=$entry.Value};$extra.roles=@($extraRoles)
+          $extraCaught=$false;try{New-LinuxPrivateDisplayRuntime -Binding $extra -Context ([pscustomobject]@{root=$extraRoot}) -SchemaInvoker $schema -ExpectedProbeSha256 $probeHash|Out-Null}catch{$extraCaught=$true}
+          if(-not$extraCaught-or(Test-Path -LiteralPath (Join-Path $extraRoot 'build'))){throw 'raw display leaf plan did not refuse before a runtime root'}
+          $bad=[ordered]@{};foreach($entry in $binding.GetEnumerator()){$bad[$entry.Key]=$entry.Value};$bad.roles=@($roles|ForEach-Object {$copy=[ordered]@{};foreach($entry in $_.GetEnumerator()){$copy[$entry.Key]=$entry.Value};$copy.plan_sha256=('0'*64);$copy})
+          $blocked=Join-Path $root 'blocked';$null=New-Item -ItemType Directory -Path $blocked
+          $caught=$false;try{New-LinuxPrivateDisplayRuntime -Binding $bad -Context ([pscustomobject]@{root=$blocked}) -SchemaInvoker $schema|Out-Null}catch{$caught=$true}
+          if(-not$caught-or(Test-Path -LiteralPath (Join-Path $blocked 'build'))){throw 'wrong original plan hash mutated a runtime root'}
+        '''
+        old_source = subprocess.run(
+            ["git", "show", "d88e1b13c334235dc1a7457af733ce812cd2d99c:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        with tempfile.TemporaryDirectory(prefix="mir5-linux-display-runtime-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-d88.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            current = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_WORK": str(Path(work) / "current")},
+                check=False,
+            )
+            self.assertEqual(current.returncode, 0, current.stdout + current.stderr)
+            old = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(old_wrapper), "MIR_TEST_WORK": str(Path(work) / "old")},
+                check=False,
+            )
+            self.assertNotEqual(old.returncode, 0, old.stdout + old.stderr)
+            self.assertIn("private display admitted plan field differs: display", old.stdout + old.stderr)
+
+    def test_compose_only_disposes_the_borrowed_library_lease_when_restoration_throws(self):
+        old_source = subprocess.run(
+            ["git", "show", "57b8cd6da9b07a76f6b328dc7442d0c223c1c619:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Invoke-RestorationFailure([string]$Path,[string]$Name){
+            $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw $errors[0].Message}
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.IfStatementAst]-and$candidate.Extent.Text.Contains('if($ComposeOnly)')},$true))
+            if($node.Count-ne1){throw 'ComposeOnly branch is absent or ambiguous'}
+            $body=$node[0].Extent.Text.Replace('exit 0','$script:composeExited=$true')
+            $root=Join-Path ([IO.Path]::GetFullPath($env:MIR_TEST_WORK)) $Name;$null=New-Item -ItemType Directory -Path $root
+            $library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+            $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
+            $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
+            $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
+            $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
+            $selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})}
+            $target=[pscustomobject]@{fixture_archive_sha256=('B'*64);fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.2.zip'};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
+            $LinuxPrivateDisplays=[ordered]@{};$linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false
+            function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+            function Invoke-MultiplayerFixturePreparation {throw 'CreateOnly must not run'}
+            function Invoke-MIRNativeProbeProcess {throw 'native process must not run'}
+            function Read-MIRDirectLibraryStartupProfile {param($Path) @()}
+            function Get-MIRDirectLibraryStartupEngineIdentity {param($FactorioBin,$EngineDataDirectory) [ordered]@{sha256='E'*64;base_version='2.1.24'}}
+            function Assert-LinuxDisplayPinnedFile {param($Path,$Expected,$Label,$MaximumBytes) $Path}
+            function Assert-MIRLibraryFixtureArchive {param($Archive,$SourceDirectory)}
+            function Get-MIRDirectLibraryStartupArchiveHashes {param($LibraryDirectory,$EngineDataDirectory,$BaseRows,$MirArchive) @{'more-infinite-research_5.0.21017.zip'=('A'*64);'mir-fixture-mir5-library-multiplayer_0.1.2.zip'=('B'*64)}}
+            function Assert-MIRDirectLibraryStartupDeclaredInputs {param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,$ErrorPrefix)}
+            function New-MultiplayerSessionLayout {param($Context,$EngineData,$Target,$StandaloneClientNames)
+              $server=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path (Join-Path $server 'saves') -Force
+              $serverConfig=Join-Path $Context.root 'server.ini';$serverSettings=Join-Path $Context.root 'server-settings.json';$clientConfig=Join-Path $Context.root 'client.ini'
+              foreach($path in @($serverConfig,$serverSettings,$clientConfig)){[IO.File]::WriteAllText($path,'x',[Text.UTF8Encoding]::new($false))}
+              [pscustomobject]@{server_write=$server;server_config=$serverConfig;server_settings=$serverSettings;server_port=3001;rcon_port=3002;rcon_password='secret';clients=@([pscustomobject]@{config=$clientConfig;port=3003})}
+            }
+            function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$LibraryLock)[pscustomobject]@{closed=$false}}
+            function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+            function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments)}
+            function Complete-MIRLibraryActivation {param($Activation)$Activation.closed=$true;throw 'expected restoration failure'}
+            function Write-MIRNativeProbeResult {param($Context,$Record)throw 'result write must not run'}
+            $failure=$null;try{Invoke-Expression $body}catch{$failure=$_.Exception.Message}
+            $leaseVariable=Get-Variable -Name lease -ErrorAction SilentlyContinue
+            if($null-eq$leaseVariable){throw ('ComposeOnly did not create a borrowed lease: '+[string]$failure)}
+            $stream=$leaseVariable.Value
+            $disposed=$stream.SafeFileHandle.IsClosed;$reopened=$false;$probe=$null
+            try{$probe=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None);$reopened=$true}catch{}
+            if($null-ne$probe){$probe.Dispose()}
+            if(-not$disposed){$stream.Dispose()}
+            return [pscustomobject]@{failure=$failure;disposed=$disposed;reopened=$reopened}
+          }
+          $current=Invoke-RestorationFailure $env:MIR_TEST_WRAPPER 'current'
+          $old=Invoke-RestorationFailure $env:MIR_TEST_OLD_WRAPPER 'old'
+          if($current.failure-notmatch'expected restoration failure'-or-not$current.disposed-or-not$current.reopened){throw 'current ComposeOnly did not release the borrowed lease after restoration failure'}
+          if($old.failure-notmatch'expected restoration failure'-or$old.disposed-or$old.reopened){throw '57b8 counterfactual no longer exposes the borrowed-lease leak'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-compose-lease-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-57b8.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_OLD_WRAPPER": str(old_wrapper), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_compose_only_uses_activation_and_launch_validation_without_preparation_or_native_processes(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.IfStatementAst]-and$candidate.Extent.Text.Contains('if($ComposeOnly)')},$true))
+          if($node.Count-ne1){throw 'ComposeOnly branch is absent or ambiguous'}
+          $body=$node[0].Extent.Text.Replace('exit 0','$script:composeExited=$true')
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $root=[IO.Path]::GetFullPath($env:MIR_TEST_WORK);$library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+          $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
+          $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
+          $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
+          $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer';$selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})};$target=[pscustomobject]@{fixture_archive_sha256=('B'*64);fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.2.zip'};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
+          $linuxDisplayRuntime=[ordered]@{roles=@()};$script:preparationCalls=0;$script:nativeCalls=0;$script:activationCalls=0;$script:launchCalls=0;$script:writeCalls=0;$script:composeExited=$false
+          function Invoke-MultiplayerFixturePreparation {$script:preparationCalls++;throw 'CreateOnly must not run'}
+          function Invoke-MIRNativeProbeProcess {$script:nativeCalls++;throw 'native process must not run'}
+          function Read-MIRDirectLibraryStartupProfile {param($Path) @()}
+          function Get-MIRDirectLibraryStartupEngineIdentity {param($FactorioBin,$EngineDataDirectory) [ordered]@{sha256='E'*64;base_version='2.1.24'}}
+          function Assert-LinuxDisplayPinnedFile {param($Path,$Expected,$Label,$MaximumBytes) $Path}
+          function Assert-MIRLibraryFixtureArchive {param($Archive,$SourceDirectory)}
+          function Get-MIRDirectLibraryStartupArchiveHashes {param($LibraryDirectory,$EngineDataDirectory,$BaseRows,$MirArchive) @{'more-infinite-research_5.0.21017.zip'=('A'*64);'mir-fixture-mir5-library-multiplayer_0.1.2.zip'=('B'*64)}}
+          function Assert-MIRDirectLibraryStartupDeclaredInputs {param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,$ErrorPrefix)}
+          function New-MultiplayerSessionLayout {param($Context,$EngineData,$Target,$StandaloneClientNames)
+            $server=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path (Join-Path $server 'saves') -Force
+            $serverConfig=Join-Path $Context.root 'server.ini';$serverSettings=Join-Path $Context.root 'server-settings.json';$clientConfig=Join-Path $Context.root 'client.ini'
+            foreach($path in @($serverConfig,$serverSettings,$clientConfig)){[IO.File]::WriteAllText($path,'x',[Text.UTF8Encoding]::new($false))}
+            [pscustomobject]@{server_write=$server;server_config=$serverConfig;server_settings=$serverSettings;server_port=3001;rcon_port=3002;rcon_password='secret';clients=@([pscustomobject]@{config=$clientConfig;port=3003})}
+          }
+          function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$LibraryLock)$script:activationCalls++;[pscustomobject]@{closed=$false}}
+          function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+          function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments)$script:launchCalls++;if($Arguments-ccontains'factorio'){throw 'unexpected executable argument'}}
+          function Complete-MIRLibraryActivation {param($Activation)$Activation.closed=$true;[ordered]@{status='restored-direct-library-controls'}}
+          function Write-MIRNativeProbeResult {param($Context,$Record)$script:writeCalls++;$script:record=$Record}
+          Invoke-Expression $body
+          if(-not$script:composeExited-or$script:preparationCalls-ne0-or$script:nativeCalls-ne0-or$script:activationCalls-ne1-or$script:launchCalls-ne2-or$script:writeCalls-ne1){throw 'ComposeOnly did not retain its zero-native activation/launch boundaries'}
+          if($script:record.status-cne'composed-zero-native'-or$script:record.factorio_processes-ne0-or$script:record.display_processes-ne0-or$script:record.seed_status-cne'not-created'-or$script:record.library_control_restoration.status-cne'restored-direct-library-controls'-or$script:record.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.2.zip']-cne('B'*64)){throw 'ComposeOnly receipt differs'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-compose-only-", dir=ROOT / "build/tmp") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_WORK": work},
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_compose_only_binds_the_responsive_fixture_archive_instead_of_the_retained_archive(self):
+        old_source = subprocess.run(
+            ["git", "show", "d5b1870841722afdad80e115a0eb38b24dc035c4:tools/Invoke-MultiplayerFixture.ps1"],
+            cwd=ROOT, capture_output=True, check=False,
+        )
+        self.assertEqual(old_source.returncode, 0, old_source.stderr.decode("utf-8", "replace"))
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Invoke-ResponsiveCompose([string]$Path,[string]$Name){
+            $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($Path,[ref]$tokens,[ref]$errors)
+            if($errors.Count){throw $errors[0].Message}
+            $node=@($ast.FindAll({param($candidate)$candidate-is[Management.Automation.Language.IfStatementAst]-and$candidate.Extent.Text.Contains('if($ComposeOnly)')},$true))
+            if($node.Count-ne1){throw 'ComposeOnly branch is absent or ambiguous'}
+            $body=$node[0].Extent.Text.Replace('exit 0','$script:composeExited=$true')
+            $root=Join-Path ([IO.Path]::GetFullPath($env:MIR_TEST_WORK)) $Name;$null=New-Item -ItemType Directory -Path $root
+            $library=Join-Path $root 'library';$null=New-Item -ItemType Directory -Path $library
+            $profile=Join-Path $root 'profile.json';[IO.File]::WriteAllText($profile,'{}',[Text.UTF8Encoding]::new($false))
+            $engine=Join-Path $root 'factorio';[IO.File]::WriteAllText($engine,'engine',[Text.UTF8Encoding]::new($false));$engineData=Join-Path $root 'data';$null=New-Item -ItemType Directory -Path $engineData
+            $resources=[pscustomobject]@{root=(Join-Path $root 'session');runs=[Collections.Generic.List[object]]::new()};$null=New-Item -ItemType Directory -Path $resources.root
+            $ComposeOnly=$true;$usesLinuxPrivateDisplays=$true;$StandaloneIdentityDiscovery=$false;$FixtureCase='library-multiplayer'
+            $selection=[ordered]@{archive_sha256=[ordered]@{'more-infinite-research_5.0.21017.zip'=('A'*64)};mods=@([ordered]@{name='more-infinite-research';version='5.0.21017';enabled=$true})}
+            $target=[pscustomobject]@{fixture_archive_sha256=('B'*64);fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.3.zip'};$standaloneLibraryFixture=[pscustomobject]@{source=(Join-Path $root 'fixture-source')};$null=New-Item -ItemType Directory -Path $standaloneLibraryFixture.source
+            $linuxDisplayRuntime=[ordered]@{roles=@()};$script:composeExited=$false;$script:archiveName=$null
+            function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+            function Read-MIRDirectLibraryStartupProfile {param($Path) @()}
+            function Get-MIRDirectLibraryStartupEngineIdentity {param($FactorioBin,$EngineDataDirectory) [ordered]@{sha256='E'*64;base_version='2.1.24'}}
+            function Assert-LinuxDisplayPinnedFile {param($Path,$Expected,$Label,$MaximumBytes)
+              $script:archiveName=[IO.Path]::GetFileName($Path)
+              if($script:archiveName-cne'mir-fixture-mir5-library-multiplayer_0.1.3.zip'-or$Expected-cne('B'*64)){throw 'responsive fixture archive selection differs'}
+            }
+            function Assert-MIRLibraryFixtureArchive {param($Archive,$SourceDirectory) if([IO.Path]::GetFileName($Archive)-cne'mir-fixture-mir5-library-multiplayer_0.1.3.zip'){throw 'responsive archive validation differs'}}
+            function Get-MIRDirectLibraryStartupArchiveHashes {param($LibraryDirectory,$EngineDataDirectory,$BaseRows,$MirArchive) @{'more-infinite-research_5.0.21017.zip'=('A'*64);'mir-fixture-mir5-library-multiplayer_0.1.3.zip'=('B'*64)}}
+            function Assert-MIRDirectLibraryStartupDeclaredInputs {param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,$ErrorPrefix)}
+            function New-MultiplayerSessionLayout {param($Context,$EngineData,$Target,$StandaloneClientNames)
+              $server=Join-Path $Context.root 'server';$null=New-Item -ItemType Directory -Path (Join-Path $server 'saves') -Force
+              $serverConfig=Join-Path $Context.root 'server.ini';$serverSettings=Join-Path $Context.root 'server-settings.json';$clientConfig=Join-Path $Context.root 'client.ini'
+              foreach($path in @($serverConfig,$serverSettings,$clientConfig)){[IO.File]::WriteAllText($path,'x',[Text.UTF8Encoding]::new($false))}
+              [pscustomobject]@{server_write=$server;server_config=$serverConfig;server_settings=$serverSettings;server_port=3001;rcon_port=3002;rcon_password='secret';clients=@([pscustomobject]@{config=$clientConfig;port=3003})}
+            }
+            function Start-MIRLibraryActivation {param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$LibraryLock)[pscustomobject]@{closed=$false}}
+            function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+            function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments)}
+            function Complete-MIRLibraryActivation {param($Activation)$Activation.closed=$true;[ordered]@{status='restored-direct-library-controls'}}
+            function Write-MIRNativeProbeResult {param($Context,$Record)$script:record=$Record}
+            Invoke-Expression $body
+            if(-not$script:composeExited-or$script:archiveName-cne'mir-fixture-mir5-library-multiplayer_0.1.3.zip'-or$script:record.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.3.zip']-cne('B'*64)){throw 'responsive ComposeOnly binding differs'}
+          }
+          Invoke-ResponsiveCompose $env:MIR_TEST_WRAPPER 'current'
+          $oldFailed=$false;try{Invoke-ResponsiveCompose $env:MIR_TEST_OLD_WRAPPER 'old'}catch{$oldFailed=$true}
+          if(-not$oldFailed){throw 'retained fixed-fixture ComposeOnly path accepted responsive fixture input'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-responsive-compose-", dir=ROOT / "build/tmp") as work:
+            old_wrapper = Path(work) / "Invoke-MultiplayerFixture-fixed-012.ps1"
+            old_wrapper.write_bytes(old_source.stdout)
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True, text=True,
+                env={**os.environ, "MIR_TEST_WRAPPER": str(WRAPPER), "MIR_TEST_OLD_WRAPPER": str(old_wrapper), "MIR_TEST_WORK": work},
+                check=False,
+            )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_api_client_mode_requires_exact_new_load_markers_for_each_join_phase(self):
