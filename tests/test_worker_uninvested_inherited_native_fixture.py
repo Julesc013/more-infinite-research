@@ -27,6 +27,15 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
     def world(self, family: str, mode: str, opponent: str | None = None, negative: bool = False):
         lua = self.LuaRuntime(unpack_returned_tuples=True)
         lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
+        source_text = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        if opponent == "old-optics":
+            source_text = source_text.replace('"steel-processing"', '"optics"')
+        elif opponent == "missing-automation-prereq":
+            source_text = source_text.replace(
+                'player.technologies["automation-science-pack"].researched = true',
+                '-- intentionally omitted by the old-source counterfactual')
+        lua.globals().actor_text = (source_text if opponent in {"old-optics", "missing-automation-prereq"}
+                                    else "")
         lua.globals().family = family
         lua.globals().mode = mode
         lua.globals().opponent = opponent or ""
@@ -46,9 +55,9 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
           end
           local function force(name, index)
             local values = {name=name, index=index, technologies={}, worker_robots_storage_bonus=0,
-              laboratory_speed_modifier=0}
+              laboratory_speed_modifier=0, research_queue_enabled=false}
             local queue, current, progress = {}, nil, 0
-            for _, id in ipairs({"automation", "logistics", "optics", "worker-robots-storage-1",
+            for _, id in ipairs({"automation-science-pack", "automation", "logistics", "steel-processing", "worker-robots-storage-1",
                 "worker-robots-storage-2", "worker-robots-storage-3", C4}) do
               local row = technology(id, tonumber(id:match("(%d+)$")) or 1); row.force = values
               values.technologies[id] = row
@@ -59,6 +68,14 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               if key == "research_progress" then return progress end
             end, __newindex=function(_, key, value)
               if key == "research_queue" then
+                assert(values.research_queue_enabled == true, "research queue is disabled")
+                for _, technology in ipairs(value) do
+                  if technology.name == "automation" or technology.name == "logistics"
+                    or technology.name == "steel-processing" then
+                    assert(values.technologies["automation-science-pack"].researched == true,
+                      "research requires automation-science-pack")
+                  end
+                end
                 queue = value; current = queue[1]; progress = current and current.saved_progress or 0
                 if current then current.saved_progress = 0 end
               elseif key == "research_progress" then progress = value else rawset(values, key, value) end
@@ -93,7 +110,17 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
               on_configuration_changed=function(fn) callbacks.config=fn end,
               on_event=function(event, fn) callbacks[event]=fn end,on_load=function(fn) callbacks.load=fn end}}
           env._G = env; setmetatable(env, {__index=_G})
-          assert(loadfile(actor_path, "t", env))(); callbacks.init(); game.tick=game.tick+1; callbacks[2]()
+          local actor = actor_text ~= "" and assert(load(actor_text, "@control.lua", "t", env))
+            or assert(loadfile(actor_path, "t", env))
+          actor(); callbacks.init(); game.tick=game.tick+1
+          local source_ok, source_error = pcall(callbacks[2])
+          if opponent == "old-optics" or opponent == "missing-automation-prereq" then
+            local expected = opponent == "old-optics" and "Base unrelated technologies are unavailable"
+              or "research requires automation-science-pack"
+            assert(not source_ok and tostring(source_error):find(expected, 1, true))
+            actor_result={source_error=tostring(source_error)}; return
+          end
+          assert(source_ok, tostring(source_error))
           assert(saves[1] == "worker-uninvested-source473")
           env.script.active_mods[MIR] = inherited
           callbacks.config({mod_startup_settings_changed=false,
@@ -168,6 +195,16 @@ class WorkerUninvestedInheritedNativeFixtureTests(unittest.TestCase):
 
     def test_worker_investment_refuses_before_candidate_research(self):
         self.world("f200", "startup", "worker-invested")
+
+    def test_missing_retired_optics_does_not_block_the_source_sentinel(self):
+        self.world("f200", "startup")
+        result = self.world("f200", "startup", "old-optics")
+        self.assertIn("Base unrelated technologies are unavailable", result["source_error"])
+
+    def test_source_queue_requires_the_explicit_base_prerequisite(self):
+        self.world("f200", "startup")
+        result = self.world("f200", "startup", "missing-automation-prereq")
+        self.assertIn("research requires automation-science-pack", result["source_error"])
 
 
 if __name__ == "__main__":
