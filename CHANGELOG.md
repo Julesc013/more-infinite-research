@@ -6,11 +6,11 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.
-- Keep earned research-limit restoration rights when a technology cannot be read instead of treating the failure as missing research.
-- Reconcile unrelated research limits after a force merge even when worker cargo history cannot be adopted.
-- Reject changed internal recipe-productivity amounts before altering saved bonuses.
-- Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
+- Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.
+- Factorio 2.0/2.1: Keep earned research-limit restoration rights when a technology cannot be read instead of treating the failure as missing research.
+- Factorio 2.0/2.1: Reconcile unrelated research limits after a force merge even when worker cargo history cannot be adopted.
+- Factorio 2.0/2.1: Reject changed internal recipe-productivity amounts before altering saved bonuses.
+- Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
 
 ## [5.0.17] - 2026-11-17
 
