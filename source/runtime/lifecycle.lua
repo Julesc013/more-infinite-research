@@ -120,7 +120,10 @@ end
 -- Metadata only nominates these bounded declarations. A live exact prototype
 -- and an existing caps ledger are still required before any flag is restored.
 local RESTORATION_BY_ID = {}
-local RESTORATION_DECLARATIONS = type(catalogue.restoration_only) == "function" and catalogue.restoration_only() or {}
+if type(catalogue.restoration_only) ~= "function" then
+  error("MIR caps require runtime catalogue export restoration_only", 2)
+end
+local RESTORATION_DECLARATIONS = catalogue.restoration_only() or {}
 local LEGACY_RESTORATION_DECLARATIONS = {}
 for index, declaration in ipairs(DECLARATIONS) do LEGACY_RESTORATION_DECLARATIONS[index] = declaration end
 for _, declaration in ipairs(RESTORATION_DECLARATIONS) do

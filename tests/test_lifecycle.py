@@ -145,6 +145,48 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_restoration_catalogue_export_is_required_before_runtime_writes_or_registration(self):
+        for expression in ("nil", "false", "{}", '"not-callable"'):
+            with self.subTest(export=expression):
+                self.setUp()
+                self.lua.globals().replacement_expression = expression
+                self.lua.execute(r'''
+                  local name="recipe-prod-research_gears-1"
+                  local t=technology(name,11,true);local f=force(1,{[name]=t})
+                  boot({[1]=f},10,"")
+                  local catalogue=require("runtime.catalogue")
+                  catalogue.restoration_only=assert(load("return "..replacement_expression))()
+                  package.loaded["runtime.lifecycle"]=nil
+                  storage=setmetatable({},{__newindex=function()error("forbidden parse-time storage write")end})
+                  game=setmetatable({},{__index=function()error("forbidden parse-time game read")end})
+                  local registrations=0
+                  script.on_event=function()registrations=registrations+1;error("forbidden parse-time registration")end
+                  local ok,message=pcall(require,"runtime.lifecycle")
+                  assert(not ok and tostring(message):find("require runtime catalogue export restoration_only",1,true))
+                  assert(next(storage)==nil and t.enabled and registrations==0)
+                ''')
+
+    def test_callable_restoration_absence_remains_valid_and_export_failures_keep_their_cause(self):
+        for expression in ("nil", "false", "{}"):
+            with self.subTest(result=expression):
+                self.setUp()
+                self.lua.globals().result_expression = expression
+                self.lua.execute(r'''
+                  boot({},0,"")
+                  local calls=0;local catalogue=require("runtime.catalogue")
+                  catalogue.restoration_only=function()
+                    calls=calls+1;return assert(load("return "..result_expression))()
+                  end
+                  package.loaded["runtime.lifecycle"]=nil
+                  assert(type(require("runtime.lifecycle").on_configuration_changed)=="function")
+                  assert(calls==1 and next(storage)==nil)
+                  local cause={reason="synthetic-required-export-failure"}
+                  catalogue.restoration_only=function()error(cause)end
+                  package.loaded["runtime.lifecycle"]=nil
+                  local ok,message=pcall(require,"runtime.lifecycle")
+                  assert(not ok and message==cause and next(storage)==nil)
+                ''')
+
     def test_full_worker_owner_is_capped_from_first_four_and_public_head_stays_retired(self):
         self.lua.execute(r'''
           for _, configured in ipairs({0, 4, 8}) do
