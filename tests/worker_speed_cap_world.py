@@ -312,6 +312,9 @@ function producer_successor_flow(source_path,old_path,successor_path,common,mode
   if opponent=="changed-bonus"then player.worker_robots_speed_modifier=2 end
   if opponent=="enabled-foreign"then foreign.technologies[WORKER].enabled=true end
   if opponent=="enabled-earned"then earned.technologies[WORKER].enabled=true end
+  for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+    if opponent=="saved-"..row[1]then row[2].technologies[WORKER].saved_progress=.2 end
+  end
   local stage,path=mode=="old" and "producer-old15" or "producer-successor17",mode=="old" and old_path or successor_path
   local actor,message=load_stage(path,common,stage,game,storage,world.settings(10),world.markers,world.logs,world.files)
   if not actor then return world.result(false,message)end
@@ -338,6 +341,9 @@ function producer_successor_flow(source_path,old_path,successor_path,common,mode
   player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.65
   for name in pairs(state.lab_feed)do game.lab.input.items[name]=50 end
   caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+    if opponent=="late-saved-"..row[1]then row[2].technologies[WORKER].saved_progress=.2 end
+  end
   for _=1,3 do game.tick=game.tick+1;ok,msg=call(actor.events[1]);if not ok then return world.result(false,msg)end end
   local before_cold=copy(storage)
   for number=1,2 do
@@ -347,6 +353,9 @@ function producer_successor_flow(source_path,old_path,successor_path,common,mode
     ok,msg=call(cold.load);if not ok then return world.result(false,msg)end
     if opponent=="cold-write"then storage[KEY].unexpected_cold_write=number end
     if opponent=="cold-origin"then state.producer_origin.source_mir="5.0.20016"end
+    for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+      if opponent=="cold-saved-"..row[1]then row[2].technologies[WORKER].saved_progress=.2 end
+    end
     game.tick=game.tick+1;ok,msg=call(cold.events[1]);if not ok then return world.result(false,msg)end
   end
   local result=world.result(true,"ordinary and cold controls complete")

@@ -291,6 +291,18 @@ local function lab_snapshot(state, label)
     input_total = input_total, input_by_name = input_by_name}
 end
 
+-- This producer contract has no deferred worker work: current work remains
+-- on level ten and its retry is removed. Preserve that fact through every
+-- new transition record; other historical fixture protocols are unchanged.
+local function assert_producer_saved_progress(player, foreign, earned, label)
+  for _, row in ipairs({{name = "player", frame = player}, {name = "foreign", frame = foreign},
+      {name = "earned", frame = earned}}) do
+    if not close(row.frame.saved_progress, 0) then
+      fail("producer source " .. label .. " saved progress differs: " .. row.name)
+    end
+  end
+end
+
 local function marker(phase, state, role)
   local player, foreign, earned = observe_all(state, phase)
   local mods, active_mod_count = active_mods_snapshot()
@@ -322,6 +334,7 @@ local function marker(phase, state, role)
         or origin.phase ~= "source-producer-ready" or origin.source_mir ~= state.source_mir or origin.role ~= role then
       fail("producer source successor provenance differs")
     end
+    assert_producer_saved_progress(player, foreign, earned, phase)
     snapshot.role, snapshot.source_origin = role, copy(origin)
     snapshot.source_mir, snapshot.active_mir = state.source_mir, script.active_mods["more-infinite-research"]
   end
@@ -1216,6 +1229,7 @@ function M.apply(stage, report_active_mods)
         assert_foreign_cap(foreign, state, "producer source successor configuration")
         assert_earned_cap(earned, state, "producer source successor configuration")
       end
+      assert_producer_saved_progress(player, foreign, earned, "configuration")
     else
       assert_seeded_prerequisites(state, "cap-ten configuration")
     end

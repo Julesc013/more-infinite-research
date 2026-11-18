@@ -1019,6 +1019,18 @@ end
         self.assertTrue(wrong["ok"], wrong["message"])
         self.assertFalse(wrong["cold_storage_unchanged"], "The cold-state invariant must detect a forbidden saved-state write")
 
+    def test_producer_saved_work_is_validated_at_each_transition_output(self):
+        for prefix, expected_saves in (("saved-", 0), ("late-saved-", 0), ("cold-saved-", 1)):
+            for role in ("player", "foreign", "earned"):
+                with self.subTest(stage=prefix, force=role):
+                    result = self.producer_transition_result(opponent=prefix + role)
+                    self.assertFalse(result["ok"], prefix + role)
+                    self.assertIn("saved progress", result["message"])
+                    self.assertEqual(expected_saves, result["saves"])
+                    if prefix == "saved-":
+                        self.assertEqual(0, result["labs"])
+                        self.assertTrue(result["rejected_fixture_state_unchanged"])
+
     def test_producer_admission_state_guard_detects_a_forbidden_early_write(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
         call = "      assert_ready_producer_source(state)\n"
