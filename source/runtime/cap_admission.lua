@@ -51,6 +51,14 @@ local function declared_contract(declaration)
   return recipes, #admission.recipes + (adoption and #adoption.recipes or 0)
 end
 
+local function read_failure(phase, name, cause)
+  -- Engine failures normally carry text; retain its named read context.
+  -- Internal code can throw a value: preserve that value without invoking a
+  -- possibly failing renderer or replacing its identity with new prose.
+  if type(cause) ~= "string" then error(cause, 0) end
+  error("MIR native cap owner " .. phase .. " failed for " .. name .. ": " .. cause, 3)
+end
+
 function M.admits_native_owner(lookup, declaration, configured_change)
   if type(lookup) ~= "function" then error("MIR cap owner lookup must be callable", 2) end
   local change = configured_change == nil and 0.1 or configured_change
@@ -65,15 +73,22 @@ function M.admits_native_owner(lookup, declaration, configured_change)
   if type(change) ~= "number" or change ~= change or change <= 0 or change == math.huge then return false end
   local recipes, recipe_count = declared_contract(declaration)
   if recipes == nil then return false end
-  -- Optional absence and an observed incompatible shape decline admission.
-  -- An unexpected read failure is a different result: preserve its original
-  -- cause, never convert it into authority to discard a restoration right.
-  local technology = lookup(declaration.id)
+  local ok, technology = pcall(lookup, declaration.id)
+  -- A failed native read is not proof of a missing owner. Treating that
+  -- exception as false can cause lifecycle to discard an earned restoration
+  -- right before the original read failure is diagnosed.
+  if not ok then read_failure("lookup", declaration.id, technology) end
   if technology == nil then return false end
-  local prototype = technology.prototype
-  return technology.name == declaration.id and prototype ~= nil
-    and prototype.max_level == INFINITE_MAX_LEVEL
-    and exact_recipes(recipes, recipe_count, prototype.effects, change)
+  local kind = type(technology)
+  if kind ~= "table" and kind ~= "userdata" then return false end
+  local checked, accepted = pcall(function()
+    local prototype = technology.prototype
+    return technology.name == declaration.id and prototype ~= nil
+      and prototype.max_level == INFINITE_MAX_LEVEL
+      and exact_recipes(recipes, recipe_count, prototype.effects, change)
+  end)
+  if not checked then read_failure("admission", declaration.id, accepted) end
+  return accepted == true
 end
 
 return M
