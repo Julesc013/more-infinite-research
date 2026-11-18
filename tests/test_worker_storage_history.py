@@ -1486,6 +1486,109 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
                   writes=0;assert(not history.default_owner_apply(plan));history.apply(legacy);assert(writes==0)
                 ''')
 
+    def test_provider_addition_after_successive_updates_preserves_origin_and_native_work(self):
+        for target in ("f200", "f210"):
+            for sequence in ("direct", "one-update", "two-updates", "separate"):
+                for scalar in (0, 2):
+                    with self.subTest(target=target, sequence=sequence, scalar=scalar):
+                        lua=self.world(target)
+                        lua.globals().sequence=sequence;lua.globals().scalar=scalar
+                        lua.execute(r'''
+                          full_source(scalar,true)
+                          player.research_queue={ORDINARY,ORDINARY,OTHER};player.research_progress=.375
+                          local target=package.loaded["platform.target"]
+                          local prefix=package_family=="f200"and"5.0.200"or"5.0.210"
+                          local producer=copy(storage[OWNER_KEY].producer)
+                          local steps=sequence=="one-update"and{16}or sequence=="two-updates"and{14,16}
+                            or sequence=="separate"and{14,16,17}or{}
+                          for _,patch in ipairs(steps)do
+                            local previous=target.distribution_version
+                            target.distribution_version=prefix..string.format("%02d",patch)
+                            script.active_mods["more-infinite-research"]=target.distribution_version
+                            local before=all_frames();writes=0
+                            local plan=history.default_owner_preflight(owner_event(previous),nil,true)
+                            assert(not history.default_owner_apply(plan)and writes==0 and same(before,all_frames()))
+                            assert(same(producer,storage[OWNER_KEY].producer))
+                          end
+                          local previous=target.distribution_version
+                          target.distribution_version=prefix.."17"
+                          script.active_mods["more-infinite-research"]=target.distribution_version
+                          finite_entry(1);local event=provider_event()
+                          if sequence~="separate"then
+                            event.mod_changes["more-infinite-research"]={old_version=previous,new_version=target.distribution_version}
+                          end
+                          local before=all_frames();local foreign=foreign_frames()
+                          local owner=storage[OWNER_KEY];local state=storage.mir_worker_storage_route
+                          local plan,legacy=delegate(event)
+                          assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner
+                            and storage.mir_worker_storage_route==state)
+                          history.default_owner_apply(plan);history.apply(legacy)
+                          assert(same(producer,storage[OWNER_KEY].producer)and producer.new_version==prefix.."12")
+                          assert(same(foreign,foreign_frames()))
+                          for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                            local queue=copy(b.queue)
+                            for i,name in ipairs(queue)do if name==ORDINARY then queue[i]=ID end end
+                            assert(a.private.level==b.owner.level and a.private.saved==b.owner.saved)
+                            assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.debit,b.debit))
+                            assert(same(a.queue,queue)and a.progress==b.progress)
+                            assert(a.current==(b.current==ORDINARY and ID or b.current))
+                          end
+                          local after=all_frames();owner=storage[OWNER_KEY];state=storage.mir_worker_storage_route
+                          -- Host module reconstruction checks are not native save/cold-load evidence.
+                          for i=1,2 do
+                            package.loaded["runtime.worker_robot_storage"]=nil
+                            history=require("runtime.worker_robot_storage");writes=0
+                            local saved_game,saved_prototypes=game,prototypes
+                            game=setmetatable({},{__index=function()error("on_load game access")end})
+                            prototypes=setmetatable({},{__index=function()error("on_load prototype access")end})
+                            history.on_load();history.default_owner_on_load()
+                            game,prototypes=saved_game,saved_prototypes
+                            assert(writes==0 and same(after,all_frames())and storage[OWNER_KEY]==owner
+                              and storage.mir_worker_storage_route==state)
+                          end
+                          local f=uninvested;local bonus=f.worker_robots_storage_bonus
+                          f.research_queue={OTHER};f.research_progress=.23;f.technologies[ID].level=5
+                          assert(history.on_research_event({research=f.technologies[ID],by_script=false},true))
+                          assert(f.worker_robots_storage_bonus==bonus+scalar and not f.technologies[ID].enabled)
+                          assert(not state.forces[f.index].pending and same(producer,storage[OWNER_KEY].producer))
+                          assert(same(foreign,foreign_frames()))
+                        ''')
+
+    def test_intervening_updates_do_not_authorize_contradictory_package_or_provider_events(self):
+        for target in ("f200", "f210"):
+            for opponent in ("false-change", "non-table", "missing-old", "non-string-old", "before-origin",
+                             "future-old", "other-edition", "legacy-old", "missing-new", "wrong-new",
+                             "provider-update", "unrelated-update"):
+                with self.subTest(target=target, opponent=opponent):
+                    lua=self.world(target);lua.globals().opponent=opponent
+                    lua.execute(r'''
+                      full_source(2,true);local target=package.loaded["platform.target"]
+                      local prefix=package_family=="f200"and"5.0.200"or"5.0.210"
+                      local previous=target.distribution_version
+                      target.distribution_version=prefix.."16";script.active_mods["more-infinite-research"]=target.distribution_version
+                      history.default_owner_apply(history.default_owner_preflight(owner_event(previous),nil,true))
+                      target.distribution_version=prefix.."17";script.active_mods["more-infinite-research"]=target.distribution_version
+                      finite_entry(1);local event=provider_event()
+                      local mir={old_version=prefix.."16",new_version=prefix.."17"};event.mod_changes["more-infinite-research"]=mir
+                      if opponent=="false-change"then event.mod_changes["more-infinite-research"]=false
+                      elseif opponent=="non-table"then event.mod_changes["more-infinite-research"]="16"
+                      elseif opponent=="missing-old"then mir.old_version=nil
+                      elseif opponent=="non-string-old"then mir.old_version=16
+                      elseif opponent=="before-origin"then mir.old_version=prefix.."11"
+                      elseif opponent=="future-old"then mir.old_version=prefix.."18"
+                      elseif opponent=="other-edition"then mir.old_version=(package_family=="f200"and"5.0.210"or"5.0.200").."16"
+                      elseif opponent=="legacy-old"then mir.old_version="4.7.21003"
+                      elseif opponent=="missing-new"then mir.new_version=nil
+                      elseif opponent=="wrong-new"then mir.new_version=prefix.."16"
+                      elseif opponent=="provider-update"then event.mod_changes.provider.old_version="0.9"
+                      else event.mod_changes.other={old_version="1",new_version="2"};script.active_mods.other="2"end
+                      local before=all_frames();local owner=storage[OWNER_KEY];local state=storage.mir_worker_storage_route;writes=0
+                      local ok,message=pcall(history.default_owner_preflight,event,provider_route(5),true)
+                      assert(not ok and tostring(message):find("MIR-WORKER-HISTORY",1,true))
+                      assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner
+                        and storage.mir_worker_storage_route==state)
+                    ''')
+
     def test_unpaid_private_finish_earns_old_scalar_without_foreign_first_or_head_debit(self):
         lua=self.world();lua.execute(r'''
           full_source(2,true);finite_entry(1);handover()
@@ -2730,6 +2833,35 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
           script.active_mods.base="2.1.24";creators[ORDINARY]="foreign"
           assert(not pcall(history.default_owner_preflight,later,nil,true)and writes==0 and same(before,all_frames()))
         ''')
+
+    def test_provider_addition_after_qualified_engine_hop_keeps_f200_provenance(self):
+        for scalar in (0, 2):
+            with self.subTest(scalar=scalar):
+                lua=self.world("f200");lua.globals().scalar=scalar
+                lua.execute(r'''
+                  full_source(scalar,true);local producer=copy(storage[OWNER_KEY].producer);local before=all_frames()
+                  local target=package.loaded["platform.target"]
+                  target.id="f210";target.minimum_base="2.1.23";target.distribution_version="5.0.21016"
+                  for _,id in ipairs{CANONICAL,ORDINARY,HEAD,ID}do
+                    for _,effect in ipairs(prototypes.technology[id].effects)do effect.hidden=false end
+                  end
+                  script.active_mods.base="2.1.23";script.active_mods["more-infinite-research"]="5.0.21016"
+                  local hop={mod_startup_settings_changed=true,mod_changes={base={old_version="2.0.77",new_version="2.1.23"},
+                    ["more-infinite-research"]={old_version="5.0.20012",new_version="5.0.21016"}}}
+                  assert(not history.default_owner_apply(history.default_owner_preflight(hop,nil,true)))
+                  assert(writes==0 and same(before,all_frames())and same(producer,storage[OWNER_KEY].producer))
+                  target.distribution_version="5.0.21017";script.active_mods["more-infinite-research"]="5.0.21017"
+                  finite_entry(1);local event=provider_event()
+                  event.mod_changes["more-infinite-research"]={old_version="5.0.21016",new_version="5.0.21017"}
+                  before=all_frames();local plan,legacy=delegate(event)
+                  assert(writes==0 and same(before,all_frames()))
+                  history.default_owner_apply(plan);history.apply(legacy)
+                  assert(same(producer,storage[OWNER_KEY].producer)and producer.new_version=="5.0.20012")
+                  for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                    assert(a.bonus==b.bonus and a.private.level==b.owner.level and a.private.saved==b.owner.saved)
+                    assert(a.progress==b.progress and a.other_saved==b.other_saved)
+                  end
+                ''')
 
     def test_hop_is_not_a_new_mod_unknown_engine_downgrade_or_unrecorded_adoption(self):
         opponents=("old-base","new-base","missing-base","old-package","new-mod","unchanged-qol","space-age","private-work","foreign-source","unrecorded")
