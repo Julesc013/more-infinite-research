@@ -158,6 +158,11 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.lifecycle"] = function()
               return {
+                preflight = function(configuration_changed)
+                  local plan = {configuration_changed=configuration_changed}
+                  lifecycle_calls.cap_plan = plan
+                  return plan
+                end,
                 preflight_worker_storage_split_caps = function(plan)
                   lifecycle_calls.worker_cap_plan = plan
                   return nil
@@ -170,8 +175,12 @@ class BootstrapTests(unittest.TestCase):
                   return { ["recipe-prod-research_gears-1"] = 2 }
                 end,
                 caps_active = function() return CAP_ACTIVE end,
-                on_init = function() lifecycle_calls.init = (lifecycle_calls.init or 0) + 1 end,
-                on_configuration_changed = function(event)
+                on_init = function(plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==false)
+                  lifecycle_calls.init = (lifecycle_calls.init or 0) + 1
+                end,
+                on_configuration_changed = function(event,plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==true)
                   lifecycle_calls.configuration = event
                   table.insert(configuration_order, "lifecycle")
                 end,
@@ -365,6 +374,43 @@ class BootstrapTests(unittest.TestCase):
                     assert(table.concat(order,",")=="owner-preflight,legacy-preflight,cap-preflight,legacy-commit,gate-only-apply,cap-noop",table.concat(order,","))
                     assert(lifecycle_calls.configuration.marker=="gate-only"and library_calls.configuration.marker=="gate-only")
                   end
+                ''')
+
+    def test_cap_admission_preflight_failure_precedes_other_lifecycle_writers(self):
+        for callback in ("init", "configuration"):
+            with self.subTest(callback=callback):
+                self.setUp()
+                self.lua.globals().fault_callback = callback
+                self.lua.execute('''
+                  install_modules(true,true,true,true)
+                  install_runtime(nil,{["space-age"]="2.1.23"});load_control()
+                  local cause={boundary="cap-preflight"}
+                  require("runtime.lifecycle").preflight=function()error(cause)end
+                  local ok,reason=pcall(handlers[fault_callback],{})
+                  assert(not ok and reason==cause,"bootstrap lost the original cap admission failure")
+                  assert(lifecycle_calls.init==nil and lifecycle_calls.configuration==nil
+                    and credit_calls.on_init==nil and credit_calls.on_configuration_changed==nil
+                    and library_calls.init==nil and library_calls.configuration==nil
+                    and scripted_calls.init==nil and scripted_calls.configuration==nil
+                    and #configuration_order==0,
+                    "cap admission ran after another reconciler wrote")
+                ''')
+
+    def test_required_cap_preflight_export_fails_before_callback_registration(self):
+        for export in (None, False, "wrong"):
+            with self.subTest(export=export):
+                self.setUp()
+                self.lua.globals().bad_cap_preflight = export
+                self.lua.execute('''
+                  install_modules(false,false,false,false);install_runtime()
+                  local original=package.preload["runtime.lifecycle"]
+                  package.preload["runtime.lifecycle"]=function()
+                    local lifecycle=original();lifecycle.preflight=bad_cap_preflight;return lifecycle
+                  end
+                  local ok,reason=pcall(load_control)
+                  assert(not ok and tostring(reason):find("caps requires callable preflight",1,true))
+                  assert(handlers.init==nil and handlers.configuration==nil
+                    and next(handlers.events)==nil,"broken cap composition registered handlers")
                 ''')
 
     def test_gun_credit_preflight_runs_before_every_configuration_writer(self):

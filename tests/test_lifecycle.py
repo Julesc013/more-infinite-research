@@ -1487,6 +1487,144 @@ class LifecycleTests(unittest.TestCase):
             "cap presentation rewrote native work")
         ''')
 
+    def test_native_cap_observation_failure_preserves_right_and_later_restoration(self):
+        for boundary in ("lookup", "predicate"):
+            with self.subTest(boundary=boundary):
+                self.setUp()
+                self.lua.globals().fault_boundary = boundary
+                self.lua.execute('''
+                  local name="low-density-structure-productivity"
+                  local exact=technology(name,3,true)
+                  exact.prototype={max_level=4294967295,effects={
+                    {type="change-recipe-productivity",recipe="low-density-structure",change=.1},
+                    {type="change-recipe-productivity",recipe="casting-low-density-structure",change=.1}}}
+                  local f=force(44,{[name]=exact},{},nil,nil);exact.force=f
+                  boot({[44]=f},0,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+                    {["ips-max-level-research_low_density_structure"]=2})
+                  handlers.init()
+                  local state=storage.mir_caps
+                  local right=state.owned_disabled[44][name]
+                  assert(not exact.enabled and right.disabled==true)
+                  local technologies,prototype=f.technologies,exact.prototype
+                  local cause={boundary=fault_boundary}
+                  if fault_boundary=="lookup" then
+                    f.technologies=setmetatable({},{__index=function(_,key)
+                      if key==name then error(cause) end
+                      return technologies[key]
+                    end})
+                  else
+                    exact.prototype=setmetatable({},{__index=function()error(cause)end})
+                  end
+                  local lifecycle=require("runtime.lifecycle")
+                  local ok,reason=pcall(lifecycle.on_research_finished,{research=exact})
+                  assert(not ok and reason==cause,"unexpected owner failure lost its original cause")
+                  assert(storage.mir_caps==state and state.owned_disabled[44][name]==right
+                    and right.disabled==true and not exact.enabled,
+                    "failed observation discarded restoration rights or changed native flags")
+                  f.technologies,exact.prototype=technologies,prototype
+                  exact.level=2
+                  lifecycle.on_research_reversed{research=exact}
+                  assert(exact.enabled and exact.level==2,
+                    "recovery after the failed observation did not restore earned cap right")
+                  lifecycle.on_research_reversed{research=exact}
+                  assert(exact.enabled,"repeated reconciliation consumed restoration incorrectly")
+                ''')
+
+    def test_late_cap_observation_failure_precedes_all_force_writes(self):
+        for callback in ("init", "configuration"):
+            for kind in ("native", "authored"):
+                with self.subTest(callback=callback, kind=kind):
+                    self.setUp()
+                    self.lua.globals().fault_callback = callback
+                    self.lua.globals().fault_kind = kind
+                    self.lua.execute('''
+                      local name="low-density-structure-productivity"
+                      local function owner()
+                        local t=technology(name,3,true)
+                        t.prototype={max_level=4294967295,effects={
+                          {type="change-recipe-productivity",recipe="low-density-structure",change=.1},
+                          {type="change-recipe-productivity",recipe="casting-low-density-structure",change=.1}}}
+                        return t
+                      end
+                      local one,two=owner(),owner()
+                      local f1=force(41,{[name]=one},{one},one,.37)
+                      local f2=force(42,{[name]=two},{two},two,.29)
+                      one.force,two.force=f1,f2
+                      boot({f1,f2},2,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+                        {["ips-max-level-research_low_density_structure"]=2})
+                      local cause={boundary="late-"..fault_kind}
+                      local original=f2.technologies
+                      local rejected=fault_kind=="native" and name or "recipe-prod-research_gears-1"
+                      f2.technologies=setmetatable({},{__index=function(_,key)
+                        if key==rejected then error(cause) end
+                        return original[key]
+                      end})
+                      local lifecycle=require("runtime.lifecycle")
+                      local ok,reason=pcall(lifecycle["on_"..(fault_callback=="init" and "init" or "configuration_changed")],{})
+                      assert(not ok and reason==cause,"late observation failure was hidden")
+                      assert(storage.mir_caps==nil,"failed all-force admission allocated durable cap state")
+                      assert(one.enabled and two.enabled and one.level==3 and two.level==3,
+                        "late admission failure followed an earlier native cap write")
+                      assert(f1.current_research==one and f1.research_progress==.37
+                        and #f1.research_queue==1 and f2.current_research==two
+                        and f2.research_progress==.29 and #f2.research_queue==1,
+                        "failed admission changed unrelated paid work")
+                    ''')
+
+    def test_cap_admission_distinguishes_optional_shape_and_unexpected_failure(self):
+        self.lua.execute('''
+          local admission=require("runtime.cap_admission")
+          local declaration={id="native-productivity",native_owner_identity="native-productivity",
+            ownership_kind="nativeowner",native_admission={effect_type="change-recipe-productivity",recipes={"gear"}}}
+          assert(not admission.admits_native_owner(function()return nil end,declaration))
+          assert(not admission.admits_native_owner(function()return {name="other"}end,declaration))
+          assert(not admission.admits_native_owner(function()error("must not query malformed declaration")end,{}))
+          local cause={unexpected=true}
+          local ok,reason=pcall(admission.admits_native_owner,function()error(cause)end,declaration)
+          assert(not ok and reason==cause,"lookup error became optional absence")
+          local exact={name=declaration.id,prototype={max_level=4294967295,effects={
+            {type="change-recipe-productivity",recipe="gear",change=.1}}}}
+          assert(admission.admits_native_owner(function()return exact end,declaration))
+          exact.prototype.effects[2]={type="change-recipe-productivity",recipe="foreign",change=.1}
+          assert(not admission.admits_native_owner(function()return exact end,declaration),
+            "extra native effect was silently ignored")
+          assert(not pcall(admission.admits_native_owner,false,declaration),
+            "missing required lookup was treated as absent optional technology")
+        ''')
+
+    def test_cap_observation_failure_preserves_force_boundary_and_legacy_rights(self):
+        for callback in ("on_force_created", "on_force_reset", "on_forces_merged", "on_configuration_changed"):
+            with self.subTest(callback=callback):
+                self.setUp()
+                self.lua.globals().fault_callback = callback
+                self.lua.execute('''
+                  local name="recipe-prod-research_gears-1"
+                  local main=technology(name,3,true)
+                  local f=force(44,{[name]=main},{main},main,.37);main.force=f
+                  local right={disabled=true}
+                  local legacy={policy_version=3,retained="do not consume"}
+                  local saved={mir={maximum_level_control=legacy},mir_caps={schema=1,
+                    owned_disabled={[44]={[name]=right},[43]={[name]={disabled=true}}}}}
+                  boot({[44]=f},2,"",saved,nil,0)
+                  local original=f.technologies
+                  local cause={boundary=fault_callback}
+                  f.technologies=setmetatable({},{__index=function(_,key)
+                    if key==name then error(cause)end
+                    return original[key]
+                  end})
+                  local ok,reason=pcall(require("runtime.lifecycle")[fault_callback],
+                    {force=f,destination=f,source_index=43})
+                  assert(not ok and reason==cause,"force-boundary read failure was hidden")
+                  assert(storage==saved and saved.mir.maximum_level_control==legacy
+                    and saved.mir_caps.owned_disabled[44][name]==right
+                    and saved.mir_caps.owned_disabled[43][name].disabled
+                    and saved.mir_caps.legacy_caps_checked==nil,
+                    "failed force admission cleared or consumed existing rights")
+                  assert(main.enabled and main.level==3 and f.current_research==main
+                    and f.research_progress==.37 and #f.research_queue==1,
+                    "failed force admission rewrote research")
+                ''')
+
     def test_published_worker_cap_boundary_preserves_earned_bonus_and_partial_work(self):
         self.lua.execute('''
           -- The old worker control independently fixes the inclusive 10 cap,
