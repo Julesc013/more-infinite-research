@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-se-worker-speed-provider-admitted",
+  "version": "0.3.0",
+  "title": "MIR SE worker-speed old-cap opponent fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable published15 cap opponent; not a player save.",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "space-exploration = 0.7.57", "more-infinite-research = 5.0.20015"]
+}

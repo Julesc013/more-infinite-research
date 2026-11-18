@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-se-worker-speed-provider-admitted",
+  "version": "0.4.0",
+  "title": "MIR SE worker-speed candidate continuation fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable worker-speed candidate continuation fixture; not a player save.",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "space-exploration = 0.7.57", "more-infinite-research = 5.0.20018"]
+}
