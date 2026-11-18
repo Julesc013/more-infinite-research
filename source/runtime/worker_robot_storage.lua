@@ -1313,7 +1313,14 @@ local function provider_addition(event, route, owned)
       route, details, checked_state(), fact(route))
   end
   local mir = event.mod_changes[MIR]
-  if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
+  local previous = type(mir) == "table" and mir.old_version
+  -- The producer is immutable origin evidence, including across the admitted
+  -- engine hop. The event names the immediately preceding installed package.
+  -- Current native ownership survives intervening updates; the event must still
+  -- stay in this edition and cannot predate its origin or downgrade a later patch.
+  if mir ~= nil and (producer_edition(previous) ~= target.id
+      or tonumber(previous:sub(-2)) < tonumber(owned.producer.new_version:sub(-2))
+      or tonumber(previous:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or mir.new_version ~= script.active_mods[MIR]) then
     recover_error("full default handover package event is inconsistent", route)
   end
