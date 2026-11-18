@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## SE source constructor native-write adverse (2026-11-19)
+
+The [separate r02 batch](../spec/evidence/se-worker-speed-provider-native-writes-gunmetal-r02-adverse.json), using the checked indexed-collection correction from [PR2126](https://github.com/Julesc013/more-infinite-research/pull/2126), reaches past the declared prerequisite grant loop and then stops in source queue setup. The native `research_progress` setter reports `No research in progress` at the combined queue/progress assignment. One process exits1 naturally; no accepted source marker/save, admission or cold reload follows. Independent review rehashes all ten copied bodies; the library restores, cleanup is empty and no Factorio remains. The earlier r01 failure remains separate and unchanged.
+
+The next constructor must sequence native queue/current/progress writes and read/assert idle zero instead of assigning progress to an idle force. Host controls must enforce that engine restriction and reject the old ordering. This is a fixture-side API sequencing failure, not a player-source defect or a preservation verdict. The exact packages, failed packet and working output remain retained; source, candidate, ordinary/save/reload, reporter and stable qualification remain incomplete.
+
 ## SE provider-admission source fixture adverse (2026-11-19)
 
 The [first provider-admission batch](../spec/evidence/se-worker-speed-provider-admission-gunmetal-r01-adverse.json) stops in its source process on exact headless Factorio2.0.77, SE0.7.57, published MIR5.0.20015 and the twenty-mod selection. The frozen fixture incorrectly requires the native technology collection to have Lua type `table`; it refuses before its first declared prerequisite research grant, source marker or save. One process exits1 naturally. Admission and cold reload do not run. All library controls/archives restore, no Factorio remains, and independent review rehashes all ten copied bodies with no mismatch. This establishes a fixture-contract failure, not a player-source defect or an accepted predecessor.
