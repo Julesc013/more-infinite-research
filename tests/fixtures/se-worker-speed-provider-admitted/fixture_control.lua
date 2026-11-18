@@ -8,6 +8,9 @@ local CURRENT, QUEUED = "mir-fixture-se-worker-speed-provider-unrelated", "mir-f
 local FOREIGN, EARNED = "mir5-se-worker-speed-provider-foreign", "mir5-se-worker-speed-provider-earned"
 local LAB = "mir-fixture-se-worker-speed-provider-lab"
 local CAP = "mir-max-level-worker-robots-speed"
+local UINT32_MAX, WORKER_ENERGY = 4294967295, 3600
+local WORKER_UNITS = {[10] = 3200, [11] = 6400, [13] = 25600}
+local REMAINING_UNITS, LAB_TOP_UP_REQUEST = 2336, 200
 local SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack",
   "space-science-pack", "se-rocket-science-pack", "se-energy-science-pack-4", "se-deep-space-science-pack-1"}
 local STAGES = {
@@ -83,10 +86,27 @@ local function expected_parents(row)
   local names = copy(row.parents); table.sort(names); return names
 end
 
+local function assert_worker_runtime(row, label)
+  check(row.research_unit_count == WORKER_UNITS[row.level] and row.research_unit_energy == WORKER_ENERGY,
+    label .. " worker research unit differs")
+  local ingredients = row.research_unit_ingredients
+  local expected, seen, count = {}, {}, 0
+  for _, name in ipairs(SCIENCE) do expected[name] = true end
+  check(type(ingredients) == "table", label .. " worker science count differs")
+  for _, ingredient in pairs(ingredients) do
+    local name = type(ingredient) == "table" and ingredient.name
+    check(type(name) == "string" and expected[name] == true and seen[name] ~= true and ingredient.amount == 1,
+      label .. " worker science differs")
+    seen[name], count = true, count + 1
+  end
+  check(count == #SCIENCE, label .. " worker science count differs")
+end
+
 local function assert_fixed_contract(force, label)
   for _, declared in ipairs(fixture.rows) do
     local row = technology(force, declared.name)
-    check(row.prototype ~= nil and row.prototype.max_level ~= "infinite", label .. " finite row differs: " .. declared.name)
+    check(row.prototype ~= nil and type(row.prototype.max_level) == "number" and row.prototype.max_level ~= UINT32_MAX,
+      label .. " finite row differs: " .. declared.name)
     check(same(parent_names(row), expected_parents(declared)), label .. " direct parents differ: " .. declared.name)
   end
   for name, modifier in pairs(fixture.expected_worker_effects) do
@@ -96,8 +116,9 @@ local function assert_fixed_contract(force, label)
       and close(effects[1].modifier, modifier), label .. " worker-speed effect differs: " .. name)
   end
   local target = technology(force, WORKER)
-  check(target.prototype and target.prototype.max_level == "infinite", label .. " worker target is not infinite")
+  check(target.prototype and target.prototype.max_level == UINT32_MAX, label .. " worker target is not infinite")
   check(same(parent_names(target), {DEEP, PREDECESSOR}), label .. " worker target direct parents differ")
+  assert_worker_runtime(target, label)
 end
 
 local function assert_declared_order(label)
@@ -182,13 +203,37 @@ local function assert_snapshot(state, expected, label)
   return actual
 end
 
+local function lab_observation(lab, label)
+  check(lab and lab.valid ~= false, label .. " candidate lab is absent")
+  local inventory = lab.get_inventory(defines.inventory.lab_input)
+  check(inventory ~= nil, label .. " candidate lab input is absent")
+  local input = {}
+  for _, name in ipairs(SCIENCE) do
+    local count = inventory.get_item_count(name)
+    check(type(count) == "number" and count >= 0 and count == math.floor(count),
+      label .. " candidate lab inventory differs: " .. name)
+    input[name] = count
+  end
+  return {valid = lab.valid ~= false, name = lab.name, unit_number = lab.unit_number or false,
+    disabled_by_script = lab.disabled_by_script == true, input = input}
+end
+
+local function candidate_observation(candidate)
+  if candidate == nil then return false end
+  check(type(candidate) == "table", "candidate state differs")
+  return {phase = candidate.phase or false, pre_work = copy(candidate.pre_work or false),
+    ordinary_events = copy(candidate.ordinary_events or {}), level_eleven_starts = candidate.level_eleven_starts or 0,
+    hold_ticks = candidate.hold_ticks or false, feed = copy(candidate.feed or false), closed = copy(candidate.closed or false),
+    lab = candidate.lab and lab_observation(candidate.lab, "candidate marker") or false}
+end
+
 local function emit(phase, state, extra)
   local body = {schema = 1, role = stage, phase = phase, tick = game.tick, fixture_version = script.active_mods[FIXTURE],
     mir_version = script.active_mods[MIR], cap = settings.startup[CAP].value, active_mods = copy(script.active_mods),
     active_mod_tuple = active_tuple(), source_provenance = state and copy(state.provenance) or false,
     source = state and state.source and copy(state.source) or false,
     admission = state and state.admission and copy(state.admission) or false,
-    candidate = state and state.candidate and copy(state.candidate) or false, extra = extra or {}}
+    candidate = state and candidate_observation(state.candidate) or false, extra = extra or {}}
   local text = helpers.table_to_json(body)
   log("[MIR_SE_WORKER_SPEED_PROVIDER phase=" .. phase .. "] " .. text)
   helpers.write_file("se-worker-speed-provider/" .. phase .. ".json", text .. "\n", false)
@@ -243,7 +288,7 @@ local function begin_source()
   storage[KEY] = state
   state.source = source_snapshot(state, "source")
   assert_source_expected(state.source, "source")
-  emit("source", state, {completed_rows_observed = true, native_execution = false})
+  emit("source", state, {completed_rows_observed = true})
 end
 
 local function assert_source_provenance(state, label)
@@ -253,8 +298,23 @@ local function assert_source_provenance(state, label)
   check(type(state.source) == "table", label .. " source observation is absent")
 end
 
-local function assert_ready_source(state, label)
+local function assert_recorded_source(state, label)
   assert_source_provenance(state, label)
+  assert_source_expected(state.source, label)
+  for _, role in ipairs({"player", "foreign", "earned"}) do
+    local completed = state.source.completed and state.source.completed[role]
+    check(type(completed) == "table" and type(completed.rows) == "table" and type(completed.order) == "table"
+      and #completed.order == #fixture.rows, label .. " recorded completed rows are absent: " .. role)
+    for _, declared in ipairs(fixture.rows) do
+      local row = completed.rows[declared.name]
+      check(type(row) == "table" and row.researched == true and row.saved == 0,
+        label .. " recorded completed row differs: " .. declared.name)
+    end
+  end
+end
+
+local function assert_ready_source(state, label)
+  assert_recorded_source(state, label)
   local actual = assert_snapshot(state, state.source, label)
   assert_source_expected(actual, label)
   return actual
@@ -278,20 +338,26 @@ end
 
 local function assert_candidate_normalized(state, label)
   local current = source_snapshot(state, label)
-  -- Candidate MIR is allowed to remove only the duplicated future queue row;
-  -- all source flags, finite prerequisite rows, worker levels and force work remain bound.
   check(same(current.completed, state.source.completed), label .. " completed prerequisite rows differ")
-  check(same(current.foreign, state.source.foreign) and same(current.earned, state.source.earned),
-    label .. " foreign or earned source frame differs")
-  check(current.player.current == WORKER and close(current.player.progress, .27) and same(current.player.queue, {WORKER})
-    and current.player.worker.level == 10 and current.player.worker.researched == false and current.player.worker.saved == 0
-    and close(current.player.bonus, 5.0), label .. " candidate player cap frame differs")
+  local function projected(actual, source, enabled, visible, queue, role)
+    check(actual.name == source.name and actual.index == source.index and close(actual.bonus, source.bonus)
+      and actual.current == source.current and close(actual.progress, source.progress) and same(actual.queue, queue)
+      and actual.worker.level == source.worker.level and actual.worker.researched == source.worker.researched
+      and actual.worker.saved == 0 and actual.worker.enabled == enabled and actual.worker.visible == visible,
+      label .. " candidate " .. role .. " cap frame differs")
+  end
+  -- MIR alone may remove the duplicated player queue tail and apply the literal
+  -- above-cap gate policy.  Every other public source field remains bound.
+  projected(current.player, state.source.player, true, false, {WORKER}, "player")
+  projected(current.foreign, state.source.foreign, false, true, {CURRENT, QUEUED}, "foreign")
+  projected(current.earned, state.source.earned, false, true, {}, "earned")
   return current
 end
 
 local function begin_admission(event)
   assert_active("admission"); admission_event(event)
   local state = storage[KEY]; local actual = assert_ready_source(state, "admission")
+  cold_pending, cold_emitted = false, false
   state.admission = {phase = "holding", before = actual, ticks = 0, config_observed = true}
   state.phase = "admission-holding"
   emit("admission-pre-hold", state, {native_repair = false})
@@ -305,6 +371,7 @@ local function begin_old(event)
   check(type(event) == "table" and event.mod_startup_settings_changed == true and type(event.mod_changes) == "table", "old event differs")
   local change = event.mod_changes[FIXTURE]
   check(change and change.old_version == "0.2.0" and change.new_version == "0.3.0" and event.mod_changes[MIR] == nil, "old fixture change differs")
+  for name in pairs(event.mod_changes) do check(name == FIXTURE, "unexpected old mod change") end
   emit("old-opponent", state, {accepted = false, native_repair = false})
   fail("MIR_EXPECTED_SE_WORKER_SPEED_PROVIDER_OLD15_OPPONENT")
 end
@@ -315,54 +382,70 @@ local function begin_candidate(event)
   check(type(state) == "table" and type(state.admission) == "table" and state.admission.phase == "saved"
     and state.admission.config_observed == true and state.admission.ticks == 2
     and same(state.admission.before, state.source) and same(state.admission.after, state.source), "admitted source is absent")
-  assert_source_provenance(state, "candidate source")
+  assert_recorded_source(state, "candidate source")
   local actual = assert_candidate_normalized(state, "candidate configuration")
+  cold_pending, cold_emitted = false, false
   state.candidate = {phase = "awaiting-work", pre_work = actual, ordinary_events = {}, level_eleven_starts = 0}
   state.phase = "candidate-awaiting-work"
   emit("candidate-pre-work", state, {lab_created = false})
+end
+
+local function refill_lab(state, label, require_positive)
+  local inventory = state.candidate.lab and state.candidate.lab.get_inventory(defines.inventory.lab_input)
+  check(inventory ~= nil, label .. " candidate lab input is absent")
+  local row = {tick = game.tick, label = label, accepted = {}}
+  for _, name in ipairs(SCIENCE) do
+    local accepted = inventory.insert({name = name, count = LAB_TOP_UP_REQUEST})
+    check(type(accepted) == "number" and accepted >= 0 and accepted <= LAB_TOP_UP_REQUEST
+      and accepted == math.floor(accepted), label .. " science feed differs: " .. name)
+    if require_positive then check(accepted > 0, label .. " initial science feed differs: " .. name) end
+    state.candidate.feed.accepted[name] = (state.candidate.feed.accepted[name] or 0) + accepted
+    row.accepted[name] = accepted
+  end
+  state.candidate.feed.topups[#state.candidate.feed.topups + 1] = row
 end
 
 local function create_lab(state)
   local lab = game.surfaces[1].create_entity({name = LAB, position = {0, 0}, force = game.forces.player})
   check(lab and lab.valid ~= false, "candidate lab is absent")
   lab.disabled_by_script = false
-  local inventory = lab.get_inventory(defines.inventory.lab_input)
-  check(inventory ~= nil, "candidate lab input is absent")
-  state.candidate.lab, state.candidate.inserted = lab, {}
-  for _, name in ipairs(SCIENCE) do
-    local count = inventory.insert({name = name, count = 200})
-    check(type(count) == "number" and count > 0, "candidate science feed differs: " .. name)
-    state.candidate.inserted[name] = count
-  end
+  check(lab.get_inventory(defines.inventory.lab_input) ~= nil, "candidate lab input is absent")
+  state.candidate.lab, state.candidate.feed = lab, {accepted = {}, topups = {}}
+  refill_lab(state, "candidate initial", true)
 end
 
 local function assert_no_level_eleven(state, label)
   local player = game.forces.player
   local worker = technology(player, WORKER)
   check(state.candidate.level_eleven_starts == 0 and worker.level == 11 and worker.researched == false
-    and worker.enabled == false and player.current_research == nil and #queue_names(player) == 0 and player.research_progress == 0,
+    and worker.enabled == false and worker.visible_when_disabled == true and player.current_research == nil
+    and #queue_names(player) == 0 and player.research_progress == 0
+    and close(player.worker_robots_speed_modifier, state.candidate.pre_work.player.bonus + .65),
     label .. " level eleven started or queued")
 end
 
 local function assert_science(state, label)
   local inventory = state.candidate.lab and state.candidate.lab.get_inventory(defines.inventory.lab_input)
   check(inventory ~= nil, label .. " lab input is absent")
-  for name, inserted in pairs(state.candidate.inserted) do
+  for _, name in ipairs(SCIENCE) do
+    local inserted = state.candidate.feed.accepted[name]
     local remaining = inventory.get_item_count(name)
-    check(remaining > 0 and remaining < inserted, label .. " science consumption differs: " .. name)
+    check(type(inserted) == "number" and inserted >= REMAINING_UNITS and remaining > 0
+      and inserted - remaining == REMAINING_UNITS, label .. " science consumption differs: " .. name)
   end
 end
 
 local function close_candidate(state)
-  local player, foreign, earned = source_forces(state)
   assert_no_level_eleven(state, "candidate complete")
   local current = source_snapshot(state, "candidate complete")
+  check(same(current.completed, state.candidate.pre_work.completed), "candidate changed completed prerequisite rows")
   check(same(current.foreign, state.candidate.pre_work.foreign) and same(current.earned, state.candidate.pre_work.earned),
     "candidate changed foreign or earned frame")
   assert_science(state, "candidate complete")
-  state.candidate.closed = {player = current.player, foreign = current.foreign, earned = current.earned,
-    completed = current.completed, ordinary_events = copy(state.candidate.ordinary_events), lab = {disabled = state.candidate.lab.disabled_by_script}}
   state.candidate.lab.disabled_by_script = true
+  state.candidate.closed = {player = current.player, foreign = current.foreign, earned = current.earned,
+    completed = current.completed, ordinary_events = copy(state.candidate.ordinary_events),
+    lab = lab_observation(state.candidate.lab, "candidate complete")}
   state.candidate.phase, state.phase = "saved", "candidate-saved"
   emit("candidate-complete", state, {ordinary_completion_count = #state.candidate.ordinary_events})
   check(game.is_multiplayer(), "candidate save requires server")
@@ -441,6 +524,8 @@ function M.apply(value)
     if state.phase == "candidate-awaiting-work" then
       assert_candidate_normalized(state, "candidate before lab")
       create_lab(state); state.phase, state.candidate.phase = "candidate-working", "working"
+    elseif state.phase == "candidate-working" then
+      refill_lab(state, "candidate active", false)
     elseif state.phase == "candidate-holding" then
       assert_no_level_eleven(state, "candidate hold")
       state.candidate.hold_ticks = state.candidate.hold_ticks + 1

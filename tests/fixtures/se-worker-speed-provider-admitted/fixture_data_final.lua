@@ -50,10 +50,13 @@ local function worker_inputs(worker)
   if count ~= 2 or direct[PREDECESSOR] ~= true or direct[DEEP] ~= true then fail("worker-speed direct parents differ") end
   local effects = worker.effects
   if type(effects) ~= "table" or #effects ~= 1 or effects[1].type ~= "worker-robot-speed" or not close(effects[1].modifier, .65) then fail("worker-speed effect differs") end
+  if type(worker.unit) ~= "table" or worker.unit.count_formula ~= "0.2*(2^(L-6)*1000)" or worker.unit.time ~= 60 then
+    fail("worker-speed research formula differs")
+  end
   local inputs, seen = {}, {}
-  for _, ingredient in ipairs(worker.unit and worker.unit.ingredients or {}) do
+  for _, ingredient in ipairs(worker.unit.ingredients or {}) do
     local name, amount = ingredient.name or ingredient[1], ingredient.amount or ingredient[2]
-    if type(name) ~= "string" or seen[name] or type(amount) ~= "number" or amount <= 0 then fail("worker-speed science differs") end
+    if type(name) ~= "string" or seen[name] or amount ~= 1 then fail("worker-speed science differs") end
     seen[name], inputs[#inputs + 1] = true, name
   end
   if #inputs ~= 8 then fail("worker-speed science count differs") end
