@@ -1,0 +1,176 @@
+{
+  "kind": "MIRSEProviderCapSuccessorAcceptedV1",
+  "date": "2026-11-19",
+  "status": "accepted_bounded_native_sequence",
+  "scope": "Exact retained published15 SE robot-speed predecessor upgraded to the reviewed private18 package, with cap10, ordinary level10 completion, save and two independent cold processes. Not worker cargo or original reporter-save qualification.",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "distribution": "headless"
+  },
+  "selection": {
+    "space-exploration": "0.7.57",
+    "selected_mods": 20,
+    "dependencies": 17,
+    "fixture_name": "mir-fixture-se-worker-speed-provider-admitted",
+    "old_fixture": "0.3.0",
+    "candidate_fixture": "0.4.0"
+  },
+  "source": {
+    "head": "eebb2bd0bab0a892feda2bd955ac45d85337f2ee",
+    "player_tree": "64c8b052ee7224db6a2aaa8f8e2e7a0084888191",
+    "integration_pr": 2134,
+    "integration_merge": "4823e333a7dec4a53d416453964d34a04e70185a",
+    "fixture_blobs_unchanged_from": "8f391d29e04b38c402a472b2d712b8e82e823ff2"
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/packet.json",
+      "bytes": 23547,
+      "sha256": "09AAC25139D2E09E1B67B3D5D21F0BD084862AA6E114AAC8DCB29E9E52C329E1"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/Invoke-ProviderCap.ps1",
+      "bytes": 21352,
+      "sha256": "09C8CDE38B55529343FECEDF52627329A8F0E546ACC4965405C36010FE1EEBA4"
+    },
+    "reader": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/Verify-ProviderCap.py",
+      "bytes": 18815,
+      "sha256": "ABC3950F1C3CCC5C9D1210D351B6CEE19D6FA88F039F79E9DA7C69324884F562"
+    },
+    "composition": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/composition.json",
+      "bytes": 217341,
+      "sha256": "B869EF42A98BBE77F39101573D0D3AB9563AF00D2EACD874B92E7BB2BEA78B35"
+    },
+    "compose_review": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/REVIEW-COMPOSE.json",
+      "bytes": 3253,
+      "sha256": "A272C8E689C9DF0B9022FE136C0353E35329CBBE1121FAD70F924E0FF4C6FB02"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/REVIEW-EXECUTE.json",
+      "bytes": 3542,
+      "sha256": "65E107EE77F6E922ACC1F5C827AA50E876634AD73D51C85F3C82AF9633105777"
+    },
+    "exact_head_checks": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/ACTOR-CHECKS-r01.json",
+      "bytes": 1362,
+      "sha256": "D2C9C9AAB372FBC756FB88B43DFFDA4E47EABCA83B864B1F6B5C81AD6F5D42B2"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/terminal.json",
+      "bytes": 358932,
+      "sha256": "A259F612A276B752AF8FF2CA93469999BC0309B31076B7F660E1B4FFAECF4E63"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-cap-successor-native-r03/EXECUTE-READBACK.json",
+      "bytes": 57103,
+      "sha256": "B0281D6C09B2DAB964D9766FEFBBD8E0605D2CDB9C1A29F105C26AB1BF6D1907"
+    }
+  },
+  "independent_result_review": {
+    "path": "build/qualification/se-provider-cap-successor-native-r03/INDEPENDENT-RESULT-REVIEW-r01.json",
+    "bytes": 4560,
+    "sha256": "D29D091E23D6102C93E2E92FDFDE1ABAEED656A3D1D4DAB84FEF0A74574C7675"
+  },
+  "player_archive": {
+    "version": "5.0.20018",
+    "bytes": 1052778,
+    "sha256": "7046DDBD02ECF99BEA4853DBB8C0C4AD58E2457B8917808F4AD3114B6560E87A",
+    "private_only": true
+  },
+  "protected": {
+    "source": {
+      "bytes": 833284,
+      "sha256": "7FAD213E47A0AB6B2660FE67C4047213B5048063A5F571C82321EBF148D243C7",
+      "crc_entries": 55
+    },
+    "candidate": {
+      "bytes": 854638,
+      "sha256": "C34EEFC45055D467E6FE3F68C5C60070D61A775F5AFB3C10CBF027E449155825",
+      "crc_entries": 55
+    }
+  },
+  "actual": {
+    "native_processes": 4,
+    "owned_pids": [
+      340844,
+      343002,
+      345440,
+      347596
+    ],
+    "stage_exits": {
+      "old": 1,
+      "candidate": 137,
+      "cold1": 0,
+      "cold2": 0
+    },
+    "candidate_stop": "Governed completion predicate after ordinary completion and a closed save; exit137, not a timeout.",
+    "old_opponent": "Exact public15 expected token and natural exit1; stored-frame reader passes. No old cap qualification.",
+    "pre_work_tick": 3,
+    "ordinary_event": {
+      "name": "worker-robots-speed-10",
+      "by_script": false,
+      "completed_level": 10,
+      "event_post_increment_level": 11,
+      "tick": 586
+    },
+    "closed_tick": 588,
+    "closed_hold_elapsed_ticks": 2,
+    "level_eleven_starts": 0,
+    "player_bonus_before": 5,
+    "player_bonus_after": 5.65,
+    "player_worker_after": {
+      "level": 11,
+      "researched": false,
+      "enabled": false,
+      "visible": true,
+      "saved": 0
+    },
+    "unrelated_force_frames_preserved": true,
+    "completed_prerequisites_per_force": 196,
+    "observed_forces": 3,
+    "science_consumed_each": 2336,
+    "science_tool_types": 8,
+    "native_ordinary_completions": 1,
+    "cold_processes": 2,
+    "both_cold_inputs_equal_same_protected_successor": true,
+    "closed_frames_bonuses_queues_partials_lab_inventory_and_event_count_preserved": true
+  },
+  "custody": {
+    "readback_rehashed_bodies": 109,
+    "hash_mismatches": 0,
+    "protected_source_unchanged": true,
+    "library_restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0,
+    "output_accounting": {
+      "max_new_output_bytes": 1073741824,
+      "copied_custody_bytes": 16414347,
+      "case_bytes": 16414347,
+      "terminal_reserve_bytes": 1048576
+    }
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 4,
+    "admission_wait_seconds": 30
+  },
+  "earlier_adverse_preserved": "spec/evidence/se-worker-speed-provider-cap-successor-gunmetal-r01-adverse.json",
+  "not_established": [
+    "worker-cargo capacity or cap repair",
+    "mining or ore productivity",
+    "known-paid fixed-credit preservation",
+    "successive worker-cargo updates then provider handover",
+    "original reporter reproduction",
+    "GUI/client or performance acceptance",
+    "release or stable acceptance"
+  ],
+  "release_published": false,
+  "published_assets_changed": false,
+  "stable_acceptance": false
+}
