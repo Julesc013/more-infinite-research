@@ -54,7 +54,7 @@
       "The inspected bootstrap does not register the ordinary on_tick event; several independent scheduled needs use on_nth_tick.",
       "The on_load path reconnects feature locals and conditionally reconstructs passive-repair and translation subscriptions; its source comments forbid save writes and game access.",
       "runtime/lifecycle.lua on_load body is empty; lifecycle mutation belongs to initialization/configuration.",
-      "Existing host test bodies assert an absent ordinary on_tick after on_load, guarded game access, and preservation of the saved passive-repair queue/members while reconstructing a scheduler."
+      "Pinned host tests assert no ordinary on_tick after on_load, guarded game access, and identity of the saved passive-repair queue/members tables plus selected bucket fields while reconstructing the scheduler. They do not assert preservation of existing nested member values or queue order."
     ],
     "limit": "Source/text predicates inspect code and existing test assertions. They do not execute the test suite or prove joining-clients on an actual current candidate."
   },
@@ -93,14 +93,23 @@
       "lifecycle_on_load_empty": true,
       "static_host_asserts_no_on_tick": true,
       "static_host_asserts_no_world_access": true,
-      "static_host_preserves_repair_queue": true,
       "prior_native_distinct_clients": true,
       "prior_native_rejoin_restart": true,
       "prior_native_not_release": true,
       "prior_native_not_14": true,
-      "current14_source_identical": true
+      "current14_source_identical": true,
+      "static_host_asserts_repair_table_identity_only": true
     },
-    "method": "Exact fetched Git blobs plus JSON shape/text predicates; no Lua or native process."
+    "method": "Exact fetched Git blobs plus JSON shape/text predicates; no Lua or native process.",
+    "fidelity_correction": {
+      "reviewed_on": "2026-11-18",
+      "review": "https://github.com/Julesc013/more-infinite-research/pull/1925",
+      "pinned_test_blob": "fb0ddeb3c8723a4dc696db7823072eaa84a1a536",
+      "old_claim": "The pinned host controls establish preservation of all saved passive-repair queue/member values across on_load.",
+      "corrected_claim": "The pinned load test checks queue/member table identity, selected bucket fields, absence of a normal on_tick, and guarded game access. Its root __newindex guard does not detect mutation of existing nested member values or changed queue order.",
+      "follow_up": "PR #1927 separately proposes stronger nested-value, queue-order, and repeated host on_load assertions; its results are not retroactively included among these 18 dated static checks and are not native cold loads.",
+      "scope": "Evidence wording/predicate fidelity only; no rerun of the historic 18 checks or promotion of a host control to current native client acceptance."
+    }
   },
   "next_finite_gate": [
     {
