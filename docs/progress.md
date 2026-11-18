@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Cap admission preserves unexpected failures (2026-11-18; development correction)
+
+The architecture audit's F02 fault is reproduced against the unchanged production readers: both lookup and prototype-predicate exceptions become ordinary absence, and a recorded cap-restoration right is discarded. Four late-force cases additionally demonstrate that merely propagating the exception is insufficient when an earlier force can already have changed. Original failing logs and source copies remain in primary `build/qualification/cap-admission-errors-blackglass-r01`.
+
+The correction propagates the original cause, distinguishes observed optional absence or incompatible shapes, and preflights bounded cap admissions before dependent queue, cap, force-cleanup and legacy-marker writes. Bootstrap obtains these observations before other initialization/configuration reconcilers write; cap application consumes the same prototype observations. Named research events retain their subject/queued-unavailable scope, and force cleanup uses the observed live-force indices rather than indexing a retired native force. No new persisted schema or history inference is introduced.
+
+Pinned Lupa2.6/Lua5.2 passes the affected lifecycle40, bootstrap41, legacy-cap-lifecycle45, discovery9, continuation-ownership20, early-adapter1, native-owner-adoption13 and legacy-cap15 methods; the competing-productivity control passes with its one pre-existing skip. Controls retain optional absence, malformed declarations, extra effects, original non-string error identity, preserved source/destination rights and legacy markers, and restoration after a recovered read. The first drafts' unrelated-worker probes and incomplete composition doubles remain recorded as adverse host results. Independent review, exact-head CI and affected native continuation/save/cold-load qualification remain required. Published5.0.17 bytes are unchanged; this is neither reporter closure nor stable acceptance.
+
 ## Published17 fresh Linux export input accepted (2026-11-18)
 
 The [fresh export-input case](../spec/evidence/library517-linux-fresh-export-input-r09.json) independently accepts the exact published5.0.17 packageC311/playerfdaf on Factorio2.1.24/Base Linux. Two private English/German clients perform ten real clicks and two already-open skips across twelve fixed steps. All six next-tick export phases pass actual role-local file/preview and prior-snapshot checks: full settings888, compact deviations0 and diagnostics on each client. The six-mod closure and native fresh frame remain unchanged; the startup server report stays separate. The immutable83D seed, initial working-copy identity and expected mutable server-save output are preserved.

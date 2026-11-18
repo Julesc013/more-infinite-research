@@ -1323,6 +1323,7 @@ class LibraryTests(unittest.TestCase):
             package.loaded["runtime.lifecycle"] = nil
             package.preload["runtime.lifecycle"] = function()
               return {caps_active=function() return caps_active end,cap_limits=function() return {} end,
+                preflight=function()return {}end,
                 on_init=function() end,on_configuration_changed=function() end,on_load=function() end,
                 on_research_finished=function() native_cap_completions=native_cap_completions+1 end,
                 on_technology_effects_reset=function(event) native_policy_reset_force=event.force end,

@@ -21,6 +21,7 @@ local function required_runtime_export(module, component, name)
   end
   return value
 end
+required_runtime_export(lifecycle, "caps", "preflight")
 local worker_storage_route_export
 local worker_default_split_export
 local finite_research_speed_provider_export
@@ -355,13 +356,14 @@ local function add_command()
 end
 
 local function on_init()
+  local cap_plan = lifecycle.preflight(false)
   if worker_robot_storage then
     worker_robot_storage.on_init(worker_storage_route())
     worker_robot_storage.default_owner_on_init(worker_storage_route(), WORKER_DEFAULT_SPLIT)
   end
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
-  lifecycle.on_init()
+  lifecycle.on_init(cap_plan)
   if native_credits then native_credits.on_init() end
   if native_gun_credits then native_gun_credits.on_init() end
   if competing_productivity then competing_productivity.on_init() end
@@ -387,6 +389,7 @@ local function discard_absent_competing_productivity_state()
 end
 
 local function on_configuration_changed(event)
+  local cap_plan = lifecycle.preflight(true)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
   local mir = type(changes) == "table" and changes["more-infinite-research"]
@@ -446,7 +449,7 @@ local function on_configuration_changed(event)
   end
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
-  lifecycle.on_configuration_changed(event)
+  lifecycle.on_configuration_changed(event, cap_plan)
   if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
   if competing_productivity then
     competing_productivity.on_configuration_changed(event)
