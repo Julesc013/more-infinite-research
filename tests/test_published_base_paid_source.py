@@ -18,6 +18,11 @@ FACTS = FIXTURE / "captured-facts.json"
 DESCRIPTION = FIXTURE / "description.json"
 
 
+def has_level_assignment(text: str) -> bool:
+    """Reject a real public technology-level assignment, not comparisons."""
+    return re.search(r"\.level\s*=(?!=)", text) is not None
+
+
 class NativeRow:
     """A Python userdata row exposed to Lua through Lupa's normal index bridge."""
 
@@ -58,7 +63,8 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
         self.assertEqual(facts["finite_prerequisite_order"], list(ROWS))
         self.assertEqual(facts["finite_direct_parents"], ROWS)
         self.assertEqual(len(facts["finite_prerequisite_order"]), 23)
-        self.assertEqual(description["multiplayer_compatible"], True)
+        self.assertEqual(description["multiplayer-compatible"], True)
+        self.assertNotIn("multiplayer_compatible", description)
 
     def test_source_constructs_real_paid_levels_and_persists_endpoint_after_two_elapsed_ticks(self) -> None:
         self.save_source()
@@ -176,7 +182,13 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
         text = CONTROL.read_text(encoding="utf-8")
         for forbidden in ("research_all", "research_recursive", "script.raise_event"):
             self.assertNotIn(forbidden, text)
-        self.assertIsNone(re.search(r"\\.level\\s*=(?!=)", text))
+        self.assertFalse(has_level_assignment(text))
+        for assignment in ("technology.level = 2", "technology.level\t=2", "technology.level= 2"):
+            with self.subTest(assignment=assignment):
+                self.assertTrue(has_level_assignment(assignment))
+        for non_assignment in ("technology.level == 2", "technology.level ~= 2", "technology.level >= 2"):
+            with self.subTest(non_assignment=non_assignment):
+                self.assertFalse(has_level_assignment(non_assignment))
         self.assertIn("research_queue = rows", text)
         self.assertIn("force.research_progress = progress", text)
         self.assertIn("game.server_save(SAVE_NAME)", text)
