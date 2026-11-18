@@ -492,12 +492,16 @@ local function projected_fixed_offset(force, observation, record, galore_baselin
   return offset
 end
 
-local function preflight_fixed_offsets(fixed_plans, galore_baselines)
+local function preflight_fixed_offsets(fixed_plans, galore_baselines, discard_existing)
   for _, plan in pairs(fixed_plans or {}) do
     local records = records_for(plan.force, false)
     validate_records(records)
     for _, observation in ipairs(plan.observations) do
-      projected_fixed_offset(plan.force, observation, records and records[observation.descriptor.recipe], galore_baselines)
+      -- Force-created/reset clears this force's ledger before reconciliation.
+      -- It still validates any stale indexed record above, but its new carrier
+      -- plan must use the same fresh baseline the writer will see afterwards.
+      local record = not discard_existing and records and records[observation.descriptor.recipe] or nil
+      projected_fixed_offset(plan.force, observation, record, galore_baselines)
     end
   end
 end
@@ -983,7 +987,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
   local current = existing_state()
   local context, plans = legacy_family_context(event), {fixed_credits=M.preflight_fixed_credits(selected_force)}
   plans.galore_baselines = preflight_galore(context, fresh, selected_force)
-  preflight_fixed_offsets(plans.fixed_credits, plans.galore_baselines)
+  preflight_fixed_offsets(plans.fixed_credits, plans.galore_baselines, fresh == true)
   if next(COLLECTED_BY_MAIN) == nil and (groups == nil or next(groups) == nil)
       and (not current or current.families == nil) then return plans end
   local forces = selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}

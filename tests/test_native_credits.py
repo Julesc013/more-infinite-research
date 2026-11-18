@@ -760,6 +760,24 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           assert(first._states[first_positive.name].writes.level == 0
             and later._states[later_positive.name].writes.level == 0,
             "later range refusal changed an earlier or overflowing carrier")
+
+          -- A reset or reused force index deliberately discards its previous
+          -- fixed-credit ledger. Its preflight still validates that stale
+          -- record, but must use the fresh post-clear baseline rather than
+          -- falsely projecting one more unit from old inclusion state.
+          for _, boundary in ipairs({native_credits.on_force_created, native_credits.on_force_reset}) do
+            storage, game = {}, {forces={}}
+            local stale = make_force(7, {}, {[main_id]=2}, {[fish]=maximum_offset})
+            game.forces[stale.index] = stale
+            native_credits.on_init()
+            set_included(stale, fish, false)
+            local stale_positive = holder(stale, fish, "positive")
+            local ok, message = pcall(boundary, {force=stale})
+            assert(ok, message)
+            assert(ledger(stale, fish).included == false and ledger(stale, fish).offset == maximum_offset)
+            assert(stale._states[stale_positive.name].writes.level == 0,
+              "fresh force boundary used a stale record to write a carrier")
+          end
           descriptors, fixed_credit_scalars = original_descriptors, original_scalars
         ''')
 
