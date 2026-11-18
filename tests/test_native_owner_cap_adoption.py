@@ -186,7 +186,11 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
 
     def test_previously_proven_baseline_right_restores_after_adoption_and_cap_zero(self):
         before, after, metadata = self.stage()
-        lua = self.runtime(before, {"schema": 1, "owners": {}})
+        # The current package still constructed its fixed credit carriers;
+        # only native-owner adoption was absent in the predecessor frame.
+        # Reuse the data-stage map that proves their raw scalar rather than
+        # manufacturing a metadata-free current package.
+        lua = self.runtime(before, metadata)
         self.boot(lua, 2)
         lua.globals().handlers.init()
         retained = data_fixture.plain(lua.globals().storage)
@@ -243,6 +247,14 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 lua = self.runtime(owners, metadata if case != "no-metadata" else {"schema": 1, "owners": {}})
                 if case == "finite": lua.globals().world.technologies[name].prototype.max_level = 7
                 self.boot(lua, 2)
+                if case == "no-metadata":
+                    # This world contains current fixed holders.  A missing
+                    # construction map cannot silently treat their paid
+                    # scalar as optional absence.
+                    with self.assertRaisesRegex(LuaError, "MIR-FIXED-CREDIT"):
+                        lua.globals().handlers.init()
+                    self.assertIsNone(lua.globals().storage.mir_caps)
+                    continue
                 lua.globals().handlers.init()
                 self.assertTrue(lua.globals().world.technologies[name].enabled)
                 caps = lua.globals().storage.mir_caps
@@ -271,7 +283,8 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
           end
         ''')
         self.assertEqual(first, data_fixture.plain(lua.execute('return require("runtime.catalogue").declared()')))
-        for mutation in ("unknown-owner", "duplicate-recipe", "bad-change", "unknown-field"):
+        for mutation in ("unknown-owner", "duplicate-recipe", "bad-change", "unknown-field",
+                         "unknown-fixed-credit", "nonpositive-fixed-credit"):
             with self.subTest(mutation=mutation):
                 invalid = deepcopy(metadata)
                 row = invalid["owners"]["steel-plate-productivity"]
@@ -279,6 +292,9 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 if mutation == "duplicate-recipe": row["recipes"].append(row["recipes"][0])
                 if mutation == "bad-change": row["effect_change"] = "0.1"
                 if mutation == "unknown-field": row["foreign"] = True
+                if mutation == "unknown-fixed-credit": invalid["fixed_credits"]["foreign"] = .1
+                if mutation == "nonpositive-fixed-credit":
+                    invalid["fixed_credits"][next(iter(invalid["fixed_credits"]))] = 0
                 vm = self.runtime(owners, invalid)
                 with self.assertRaisesRegex(LuaError, "MIR native adoption data"):
                     self.boot(vm, 2)
@@ -293,7 +309,7 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
           local facts={}
           local payload=prototypes.mod_data["more-infinite-research-native-adoptions"].data
           local definitions=require("compatibility.modern_catalogue").native_owners(script.active_mods)
-          assert(select("#",require("research.native_adoption").read(payload,definitions,facts))==3)
+          assert(select("#",require("research.native_adoption").read(payload,definitions,facts))==4)
           assert(facts.galore_sulfur_retired==true)
         ''')
         for invalid in ("true", 1, {}):

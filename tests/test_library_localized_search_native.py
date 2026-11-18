@@ -46,9 +46,9 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
               interfaces={}
               defines={events={on_player_joined_game=1,on_lua_shortcut=2,on_gui_click=3,
                 on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},
-                gui_type={custom=99}}
+                gui_type={custom=99},controllers={character=1,spectator=2}}
               script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21017",
-                ["mir-fixture-library-localized-search-native"]="0.1.0",
+                ["mir-fixture-library-localized-search-native"]="0.1.1",
                 ["mir-fixture-mir5-api-alpha"]="0.1.0",
                 ["mir-fixture-mir5-api-beta"]="0.1.0",
                 ["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
@@ -82,6 +82,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
                 worker_robots_storage_bonus=0,technologies={["recipe-prod-research_gears-1"]=gear},
                 recipes={["iron-gear-wheel"]={productivity_bonus=0.2}}}
               player=gui_state({valid=true,connected=true,index=1,name="MIR5Deutsch",locale=initial_locale,
+                controller_type=defines.controllers.character,character={valid=true},
                 force=force,display_scale=1.25,display_resolution={width=1280,height=720},
                 gui={screen={}},opened=nil},"player")
               wrong_player=gui_state({valid=true,connected=true,index=2,name="MIR5English",locale="en",
@@ -175,22 +176,26 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
     def make_locale_ready(self):
         self.exec("player.locale='de';tick()")
 
-    def prepare_open(self):
+    def prepare_open(self, *, close_event=True):
         self.begin()
         self.make_locale_ready()
+        self.lua.globals().deliver_close_event = close_event
         self.exec(
             r'''
               retire_library()
-              emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+              if deliver_close_event then
+                emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+              end
               tick()
+              if not deliver_close_event then tick() end
               emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
               local root,query=open_library("recipe-prod-research_mining_drill-1",{})
               tick()
             '''
         )
 
-    def through_query_click(self, *, selected_first=True):
-        self.prepare_open()
+    def through_query_click(self, *, selected_first=True, close_event=True):
+        self.prepare_open(close_event=close_event)
         self.lua.globals().selected_first = selected_first
         self.exec(
             r'''
@@ -242,14 +247,18 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
             '''
         )
 
-    def close_and_reopen(self, *, retained=True, results=True):
+    def close_and_reopen(self, *, retained=True, results=True, close_event=True):
         self.lua.globals().reopened_retained = retained
         self.lua.globals().reopened_results = results
+        self.lua.globals().deliver_close_event = close_event
         self.exec(
             r'''
               retire_library()
-              emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+              if deliver_close_event then
+                emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})
+              end
               tick()
+              if not deliver_close_event then tick() end
               emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
               open_library(reopened_retained and "Eisenzahnrad" or "",reopened_results and expected_results() or {})
               tick()
@@ -303,10 +312,81 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
         )
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-localized-search-native@0.1.0|"
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-localized-search-native@0.1.1|"
             "mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|"
             "mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017",
         )
+
+    def test_retired_root_without_observer_close_event_is_observed_without_inventing_an_event(self):
+        self.begin()
+        self.make_locale_ready()
+        self.exec(
+            r'''
+              retire_library()
+              tick()
+              assert(report().phase=="settling-setup-closed" and report().events.close==0)
+              assert(writes["mir-library-localized-search-native/01-setup-closed.json"]==nil)
+              tick()
+              local row=writes["mir-library-localized-search-native/01-setup-closed.json"]
+              assert(row and row.next_phase=="await-open" and row.events.close==0)
+              assert(#row.event_log==1 and row.event_log[1].kind=="joined")
+              assert(row.snapshot.close_observation.root_absent and row.snapshot.close_observation.opened_absent)
+              assert(row.snapshot.close_observation.event_received==false)
+              assert(row.snapshot.close_observation.tick<row.snapshot.tick)
+              emit(defines.events.on_lua_shortcut,{player_index=1,prototype_name="mir-research-browser"})
+              open_library("recipe-prod-research_mining_drill-1",{})
+              tick()
+              assert(report().phase=="await-help-click")
+            '''
+        )
+
+    def test_retirement_observation_requires_live_character_empty_opened_and_retired_root(self):
+        self.begin()
+        self.make_locale_ready()
+        self.exec("for i=1,3 do tick() end;assert(report().phase=='await-setup-close' and #report().snapshots==1)")
+        for change in ("player.opened={valid=true}", "player.character=nil", "player.character.valid=false",
+                       "player.controller_type=defines.controllers.spectator", "player.connected=false"):
+            with self.subTest(change=change):
+                self.setUp()
+                self.begin()
+                self.make_locale_ready()
+                self.exec("retire_library();"+change)
+                with self.assertRaises(Exception):
+                    self.exec("tick()")
+                self.exec("assert(writes['mir-library-localized-search-native/01-setup-closed.json']==nil)")
+
+    def test_close_state_observation_cannot_hide_native_frame_changes(self):
+        self.begin()
+        self.make_locale_ready()
+        self.exec("retire_library();force.worker_robots_storage_bonus=1;tick()")
+        with self.assertRaisesRegex(Exception,"native fresh frame changed"):
+            self.exec("tick()")
+        self.exec("assert(report().events.close==0 and writes['mir-library-localized-search-native/01-setup-closed.json']==nil)")
+
+    def test_both_real_root_retirements_preserve_localized_query_without_fabricated_close_events(self):
+        self.through_query_click(close_event=False)
+        self.lua.globals().final_results = True
+        self.clear_and_type()
+        self.close_and_reopen(close_event=False)
+        self.exec(
+            r'''
+              local observed=report()
+              assert(observed.phase=="complete" and #observed.snapshots==10 and observed.events.close==0)
+              for _,event in ipairs(observed.event_log) do assert(event.kind~="closed") end
+              for _,index in ipairs({2,9}) do
+                local close=observed.snapshots[index].close_observation
+                assert(close.root_absent and close.opened_absent and close.event_received==false)
+              end
+              assert(observed.snapshots[10].query=="Eisenzahnrad" and observed.snapshots[10].result.count==1)
+            '''
+        )
+
+    def test_received_close_event_cannot_substitute_for_retiring_the_owned_root(self):
+        self.begin()
+        self.make_locale_ready()
+        self.exec("emit(defines.events.on_gui_closed,{player_index=1,gui_type=defines.gui_type.custom,element={valid=false}})")
+        with self.assertRaisesRegex(Exception,"Library root should be retired"):
+            self.exec("tick()")
 
     def test_native_selected_first_pair_rejects_the_retained_click_first_policy(self):
         # R03 retained 2.1.24 facts record selected -> click on the same tick.
@@ -473,7 +553,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
     def test_metadata_and_public_result_path_are_exact(self):
         metadata = json.loads(INFO.read_text(encoding="utf-8"))
         self.assertEqual(metadata["name"], FIXTURE_NAME)
-        self.assertEqual(metadata["version"], "0.1.0")
+        self.assertEqual(metadata["version"], "0.1.1")
         self.assertEqual(metadata["factorio_version"], "2.1")
         self.assertEqual(
             metadata["dependencies"],
