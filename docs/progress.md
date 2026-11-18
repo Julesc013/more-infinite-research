@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## SE source created; queue-wire reader adverse retained (2026-11-19)
+
+The [r03 result](../spec/evidence/se-worker-speed-provider-wire-queue-gunmetal-r03-adverse.json) creates a real published15 source on headless2.0.77/SE0.7.57, then stops at the external reader. The native process exits0 naturally and emits the exact twenty-mod source marker; player/foreign/earned speed bonuses are5.0/5.65/6.95, the intended active queues and partial progress remain, and all196 completed prerequisite rows are observed on all three forces. The idle earned force's empty Lua queue serializes as `{}`; the reader expects `[]` and rejects it. All library controls/archives restore, cleanup is empty and no Factorio remains. Independent review rehashes all fourteen readback bodies and CRC-checks the849928-byte FAD source ZIP with55 entries.
+
+The overall packet remains `NO-GO`: protected-source promotion, configuration admission and cold loading did not run. The independent review separately permits adoption of that exact already-created archive only. A new packet must bind the original adverse and source, explicitly handle the declared empty-queue wire representation, retain malformed/active-queue opponents, and continue admission/cold loading without recreating the world. Checked [PR2128](https://github.com/Julesc013/more-infinite-research/pull/2128) integrates the fixture's native queue/progress sequencing after all four checks on c983; original commits/branch remain reachable. This is no candidate cap, ordinary-work, cargo/mining, reporter or stable result. Published packages remain unchanged.
+
 ## SE source constructor native-write adverse (2026-11-19)
 
 The [separate r02 batch](../spec/evidence/se-worker-speed-provider-native-writes-gunmetal-r02-adverse.json), using the checked indexed-collection correction from [PR2126](https://github.com/Julesc013/more-infinite-research/pull/2126), reaches past the declared prerequisite grant loop and then stops in source queue setup. The native `research_progress` setter reports `No research in progress` at the combined queue/progress assignment. One process exits1 naturally; no accepted source marker/save, admission or cold reload follows. Independent review rehashes all ten copied bodies; the library restores, cleanup is empty and no Factorio remains. The earlier r01 failure remains separate and unchanged.
