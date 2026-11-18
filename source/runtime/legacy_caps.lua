@@ -45,6 +45,17 @@ local function field(object, name)
   return nil
 end
 
+-- Saved payloads above can be absent or malformed. Native observations below
+-- must distinguish that ordinary nonmatch from an unexpected read failure.
+local function native_field(object, name, label)
+  local ok, value = pcall(function() return object[name] end)
+  if not ok then
+    if type(value) ~= "string" then error(value, 0) end
+    error("MIR legacy cap " .. label .. " read failed: " .. value, 2)
+  end
+  return value
+end
+
 local function map_entry(map, key)
   if type(map) ~= "table" then return nil end
   return map[key]
@@ -278,19 +289,17 @@ local function disable_matches(record, policy, force_index, candidate, authority
 end
 
 local function native_technology(force, name)
-  local technologies = field(force, "technologies")
+  local technologies = native_field(force, "technologies", "technology collection for " .. name)
   if technologies == nil then return nil end
-  local ok, technology = pcall(function() return technologies[name] end)
-  if ok then return technology end
-  return nil
+  return native_field(technologies, name, "technology lookup for " .. name)
 end
 
-local function current_visibility_owned_state(technology)
-  return technology ~= nil and field(technology, "visible_when_disabled") == true
+local function current_visibility_owned_state(technology, name)
+  return technology ~= nil and native_field(technology, "visible_when_disabled", "visibility for " .. name) == true
 end
 
-local function current_disable_owned_state(technology)
-  return technology ~= nil and field(technology, "enabled") == false
+local function current_disable_owned_state(technology, name)
+  return technology ~= nil and native_field(technology, "enabled", "enablement for " .. name) == false
 end
 
 local function set_decision(facts, index, candidate, outcome)
@@ -323,11 +332,11 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
   end
   facts.legacy_policy3 = true
 
-  if force == nil or field(force, "valid") == false then
+  if force == nil or native_field(force, "valid", "force validity") == false then
     for index = 1, count do set_decision(facts, index, entries[index], "force_unavailable") end
     return rows, facts
   end
-  local force_index = field(force, "index")
+  local force_index = native_field(force, "index", "force index")
   if not positive_integer(force_index) then
     for index = 1, count do set_decision(facts, index, entries[index], "force_index_invalid") end
     return rows, facts
@@ -359,10 +368,10 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
         set_decision(facts, index, candidate, "policy_mismatch")
       elseif not visibility_matches(visibility_record, force_index, candidate, authority) then
         set_decision(facts, index, candidate, "visibility_record_mismatch")
-      elseif not current_visibility_owned_state(technology) then
+      elseif not current_visibility_owned_state(technology, candidate.name) then
         set_decision(facts, index, candidate, "visibility_state_changed")
       elseif disable_matches(disabled_record, policy, force_index, candidate, authority)
-          and unowned_record == nil and current_disable_owned_state(technology) then
+          and unowned_record == nil and current_disable_owned_state(technology, candidate.name) then
         rows[candidate.name] = {disabled = true, visible_when_disabled = visibility_record.value}
         facts.imported = facts.imported + 1
         set_decision(facts, index, candidate, "owned_disable_imported")
@@ -408,11 +417,11 @@ function M.import_boolean_for_force(legacy_bucket, force, candidates, current_ow
   end
   facts.legacy_policy1 = true
 
-  if force == nil or field(force, "valid") == false then
+  if force == nil or native_field(force, "valid", "force validity") == false then
     for index = 1, count do set_decision(facts, index, entries[index], "force_unavailable") end
     return rows, facts
   end
-  local force_index = field(force, "index")
+  local force_index = native_field(force, "index", "force index")
   if not positive_integer(force_index) then
     for index = 1, count do set_decision(facts, index, entries[index], "force_index_invalid") end
     return rows, facts
@@ -443,10 +452,10 @@ function M.import_boolean_for_force(legacy_bucket, force, candidates, current_ow
         set_decision(facts, index, candidate, "policy_mismatch")
       elseif visibility_marker ~= nil and type(visibility_marker) ~= "boolean" then
         set_decision(facts, index, candidate, "visibility_record_mismatch")
-      elseif visibility_marker ~= nil and not current_visibility_owned_state(technology) then
+      elseif visibility_marker ~= nil and not current_visibility_owned_state(technology, candidate.name) then
         set_decision(facts, index, candidate, "visibility_state_changed")
       elseif disabled_marker == true and unowned_marker == nil
-          and current_disable_owned_state(technology) then
+          and current_disable_owned_state(technology, candidate.name) then
         local row = visibility_marker ~= nil
           and {disabled = true, visible_when_disabled = visibility_marker}
           or {disabled = true}
