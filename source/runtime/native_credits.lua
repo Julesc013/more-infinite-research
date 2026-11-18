@@ -433,9 +433,17 @@ local function fixed_failure_detail(force, descriptor, expected, rejection)
     if type(item) == "number" or type(item) == "boolean" or type(item) == "string" or item == nil then return tostring(item) end
     return "<" .. type(item) .. ">"
   end
+  local function scalar(item)
+    if item == nil then return "absent" end
+    if type(item) ~= "number" or item ~= item or item == math.huge or item == -math.huge then return "invalid" end
+    return tostring(item)
+  end
   return "MIR native fixed credit has invalid construction or paid-state evidence [MIR-FIXED-CREDIT"
     .. " force=" .. value(force and force.index) .. " recipe=" .. descriptor.recipe
-    .. " expected_raw_change=" .. value(expected) .. " reason=" .. value(rejection and rejection.reason) .. "]"
+    .. " expected_raw_change=" .. scalar(expected) .. " reason=" .. value(rejection and rejection.reason)
+    .. " observed_positive=" .. scalar(rejection and rejection.positive)
+    .. " observed_negative=" .. scalar(rejection and rejection.negative)
+    .. " observed_main=" .. scalar(rejection and rejection.main) .. "]"
 end
 
 local function fixed_observations(force)

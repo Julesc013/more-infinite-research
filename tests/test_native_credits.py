@@ -622,6 +622,10 @@ class NativeCreditRuntimeTests(unittest.TestCase):
            local ok, message = pcall(native_credits.on_configuration_changed)
            assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
              "coordinated changed fixed scalar silently omitted the paid row")
+          assert(tostring(message):find("observed_positive=", 1, true)
+            and tostring(message):find("observed_negative=", 1, true)
+            and tostring(message):find("observed_main=", 1, true),
+            "fixed-carrier refusal omitted actual scalar observations")
           assert(ledger(force, fish).included == true and ledger(force, fish).offset == 0)
           assert(positive.level == 1 and force._states[positive.name].writes.level == 0)
 
