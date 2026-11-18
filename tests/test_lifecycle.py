@@ -145,6 +145,36 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_required_restoration_catalogue_export_cannot_silently_drop_rights(self):
+        for active in ({}, {"space-age": "2.1.23"}):
+            for missing in (None, False, "wrong", 12):
+                with self.subTest(active=active, missing=missing):
+                    self.setUp()
+                    self.lua.globals().bad_restoration_export = missing
+                    self.lua.globals().active_selection = self.lua.table_from(active)
+                    self.lua.execute('''
+                      boot({},0,"",nil,nil,0,active_selection)
+                      local catalogue=require("runtime.catalogue")
+                      catalogue.restoration_only=bad_restoration_export
+                      package.loaded["runtime.lifecycle"]=nil
+                      local before=storage
+                      local ok,reason=pcall(require,"runtime.lifecycle")
+                      assert(not ok,"missing required restoration catalogue became an empty selection")
+                      assert(tostring(reason):find("requires callable restoration_only",1,true))
+                      assert(storage==before and next(storage)==nil,
+                        "broken restoration interface allocated or rewrote cap rights")
+                    ''')
+        self.setUp()
+        self.lua.execute('''
+          boot({},0,"")
+          local catalogue=require("runtime.catalogue")
+          catalogue.restoration_only=function()return {}end
+          package.loaded["runtime.lifecycle"]=nil
+          local lifecycle=require("runtime.lifecycle")
+          lifecycle.on_load()
+          assert(next(storage)==nil,"valid empty restoration result initialized state")
+        ''')
+
     def test_full_worker_owner_is_capped_from_first_four_and_public_head_stays_retired(self):
         self.lua.execute(r'''
           for _, configured in ipairs({0, 4, 8}) do
