@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryLocalizedSearchNativeAdverseV1",
+  "status": "closed-after-one-input-request-adverse",
+  "source": {
+    "player_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "published_tag": "v5.0.17",
+    "player_archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "controller_commit": "6cbed74f2d9d51ae979c2db22dc521f7b6f63486",
+    "controller_tree": "d3bdbf447cda4d5aa32dad6fc2e5883e28e624b6",
+    "actor_sha256": "3105CFC5180CECFE801E030FBB10A18F021C083DAF1529084BE341083015B69A",
+    "owner_sha256": "7FD73F2DB7D2EA951E3C49D9682AB4DF3488F7511BD81BE0586F92581DBA7BCE",
+    "fixture_sha256": "C59C40732D43CC3BB906A082E0406BF215E4451C6C1093D8B06A72DC8E1A160C"
+  },
+  "inputs": {
+    "engine_version": "2.1.24",
+    "engine_variant": "Linux x64 graphical full build, Base selection",
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "protected_fresh_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "packet_sha256": "E40126720D7383AC304653DEF7805DE5DE89509CE0D02C0F54CE66A6E3A1A2BB",
+    "composition_sha256": "11B8D29F85A84FB3B27FD48358CBCD165DB421A7A9BF862DDC680858A46FE93B",
+    "execution_review_sha256": "0C34CD84B116F48074B6BECB9921FD10598461800515062F4B1A624CCC618281",
+    "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.0|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017"
+  },
+  "observed": {
+    "owner_service": "mir-library517-localized-search-r02.service",
+    "invocation_id": "7104f9af64e849bf8b3fe409b1d00e9a",
+    "service_terminal_state": "failed",
+    "loaded_producer_closure_passed": true,
+    "accepted_passive_phase": "00-initial",
+    "phase_sha256": "5E233EFC277ED3FE801A7765228C713B37EEEB73A385B697FF91A038812F6743",
+    "initial_modality": "Established by the existing root_tree check requiring player.opened == root before this phase is written.",
+    "before_capture_sha256": "BE393435E7426505CF7F59D8D5279B5EFBE5615619B5E8B58EA00A65132EE189",
+    "input_requests": 1,
+    "requested_action": "escape",
+    "xtest_trace": "One accepted keycode9 down and one accepted keycode9 up; no cleanup or extra input events.",
+    "native_gui_acceptance": false,
+    "completed_input_actions": 0,
+    "completed_phases": 1,
+    "actor_error": "bounded wait exhausted: actual next-tick personal-view phase",
+    "owner_error": "[mir441-linux-process-status]",
+    "post_request_capture_present": false,
+    "cause": "The retained observations do not establish why no close phase arrived. XTEST acceptance is not native GUI acceptance; the initial nonmodal hypothesis was disproved. The separate owner error is retained without asserting its unobserved process state."
+  },
+  "cleanup": {
+    "direct_child_exit_codes": {"server": 0, "client-de": 0, "display-de": 0},
+    "forced_children": 0,
+    "remaining_owned_session_processes": 0,
+    "private_display_restored": true,
+    "actor_cleanup_verified": true,
+    "owner_restored": true,
+    "restoration_errors": [],
+    "temporary_owned_archives_removed": 5,
+    "direct_library_controls_restored": true,
+    "protected_seed_unchanged": true,
+    "initial_executed_copy_verified": true,
+    "retained_mutable_working_copy_sha256": "28B81ABEAAA9E64F30E1E205A6031D3557E07FDC33E454A33E86B7C1ED418B15",
+    "retained_mutable_working_copy_bytes": 1283626,
+    "supervision_limit": "Linger=no; an owned SSH observer remained connected. No final-logout durability result."
+  },
+  "custody": {
+    "primary_directory": "build/qualification/library-localized-search-input-preparation-r01",
+    "capsule": "localized-search-r02-originals-r01.json.gz",
+    "capsule_sha256": "14B620ED23A97E46CBB5DAD8989BB2580B633EE5816AEF1A1026819C7D2222E8",
+    "capsule_bytes": 5910235,
+    "decoded_bodies": 59,
+    "decoded_bytes": 10375670,
+    "all_decoded_bodies_rehashed": true,
+    "disproved_experiment": "modal-precondition-disproved-draft-r01 preserves the four-file uncommitted nil-modal/shortcut experiment and its explicit withdrawal; it was never dispatched."
+  },
+  "next_diagnostic": "Use the existing identity-bound read-only capture child after the request and on a missing phase, before cleanup. Capture failure must preserve the original phase error and cannot permit another input or establish acceptance. Preserve the existing phase oracle and original fixture GUI-write prohibition.",
+  "scope_limits": [
+    "No accepted GUI close, localized query, clear, reopen, layout, Unicode, scrolling or resize result.",
+    "Not an original reporter or imported historical-world reproduction.",
+    "Not Windows, performance, current-development player-source qualification or stable acceptance.",
+    "The R01 cardinality failure and this R02 missing-phase failure remain distinct adverse observations.",
+    "The Linux monitor correction has independent OS-only evidence; it does not establish the actual process state that produced this owner error."
+  ]
+}
