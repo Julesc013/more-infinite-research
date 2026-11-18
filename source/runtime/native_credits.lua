@@ -807,6 +807,27 @@ local function family_histories(current, index)
   return histories
 end
 
+-- A new selection does not erase a known old Base mask. The event must prove
+-- that every extra mod is newly added, with no old provider updated/removed.
+-- Engine version and producer qualification remain the caller's decision.
+local function added_to_previous_base(changes, active)
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR_MOD then
+      local change = changes[name]
+      if type(change) ~= "table" or getmetatable(change) ~= nil
+          or rawget(change, "old_version") ~= nil or rawget(change, "new_version") ~= version then return false end
+    end
+  end
+  for name, change in pairs(changes) do
+    if name ~= "base" and name ~= MIR_MOD then
+      if type(name) ~= "string" or type(change) ~= "table" or getmetatable(change) ~= nil
+          or rawget(change, "old_version") ~= nil or type(rawget(change, "new_version")) ~= "string"
+          or rawget(change, "new_version") == "" or rawget(change, "new_version") ~= active[name] then return false end
+    end
+  end
+  return true
+end
+
 local function legacy_family_context(event)
   local changes = type(event) == "table" and event.mod_changes
   local mir = type(changes) == "table" and changes[MIR_MOD]
@@ -832,18 +853,21 @@ local function legacy_family_context(event)
   local m4_base, data_only_base = false, nil
   local m4_mask = CREDIT_CONTRACTS.published_m4_base_paid_recipe_sets(old)
   local data_only_mask = CREDIT_CONTRACTS.published_data_only_base_paid_recipe_sets(old)
+  local m4_added_base = valid and m4_mask ~= nil and not plain_base
+    and (old == "4.7.20003" and f200_destination or old == "4.7.21003" and f210_destination)
+    and event.mod_startup_settings_changed == false and added_to_previous_base(changes, active)
   -- These data-only producers have fixed recipe masks. Known startup
   -- changes (including modules=false) do not make that old mask unknowable.
   -- The separate exact MIR4 engine hop below also has a known old mask.
   local data_only_startup_known = data_only_mask ~= nil
     and type(event.mod_startup_settings_changed) == "boolean"
-  if plain_base and (old == "4.7.20003" or old == "4.7.21003" or data_only_mask ~= nil) then
+  if (plain_base or m4_added_base) and (old == "4.7.20003" or old == "4.7.21003" or data_only_mask ~= nil) then
     -- These published Base origins have independently known source masks,
     -- not today's collected output. Admit only their exact engine routes.
     local f200_origin = old == "4.7.20003" or data_only_mask ~= nil
     local base_change = changes.base
     local same_f200 = f200_origin and f200_destination and active.base == "2.0.77"
-      and (same_inputs or data_only_startup_known) and (base_change == nil or type(base_change) == "table"
+      and (same_inputs or m4_added_base or data_only_startup_known) and (base_change == nil or type(base_change) == "table"
         and base_change.old_version == "2.0.77" and base_change.new_version == "2.0.77")
     local exact_hop = f200_origin and type(base_change) == "table"
       and base_change.old_version == "2.0.77" and base_change.new_version == "2.1.23"
@@ -852,11 +876,12 @@ local function legacy_family_context(event)
     -- fixed mask proves retained earning rights even if old tuning changed.
     local m4_hop_mask_known = old == "4.7.20003" and m4_mask ~= nil and exact_hop
       and type(event.mod_startup_settings_changed) == "boolean"
-    local same_engine = old == "4.7.21003" and same_inputs and (base_change == nil
+    local same_engine = old == "4.7.21003" and (same_inputs or m4_added_base) and (base_change == nil
       or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
     -- This is one observed published Base migration, not a patch-family rule:
     -- 4.7.21003/Base2.1.23 may enter a current F210 successor on Base2.1.24
-    -- only with unchanged startup settings and no other active mod.
+    -- only with unchanged startup settings and a proven old Base-only closure.
+    -- Current extras must be fully witnessed additions, never prior providers.
     local exact_f210_patch24 = old == "4.7.21003" and f210_destination and active.base == "2.1.24"
       and type(base_change) == "table" and base_change.old_version == "2.1.23"
       and base_change.new_version == "2.1.24" and event.mod_startup_settings_changed == false
@@ -864,7 +889,7 @@ local function legacy_family_context(event)
       and (same_engine or exact_hop) or exact_f210_patch24)
       and (event.mod_startup_settings_changed == false or data_only_startup_known or m4_hop_mask_known)
     for name in pairs(changes) do
-      if name ~= MIR_MOD and name ~= "base" then admitted = false end
+      if name ~= MIR_MOD and name ~= "base" and not m4_added_base then admitted = false end
     end
     m4_base = admitted and data_only_mask == nil
     data_only_base = admitted and data_only_mask or nil
@@ -884,21 +909,9 @@ local function legacy_family_context(event)
   local beta_added_base = valid and beta_origin and event.mod_startup_settings_changed == false and not plain_base
     and (f200_destination and active.base:match("^2%.0%.") or f210_destination and active.base:match("^2%.1%."))
   if beta_added_base then
-    for name, version in pairs(active) do
-      if name ~= "base" and name ~= MIR_MOD then
-        local change = changes[name]
-        if type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= version then
-          beta_added_base = false
-        end
-      end
-    end
-    for name, change in pairs(changes) do
-      if name ~= MIR_MOD then
-        if type(change) ~= "table" or change.new_version ~= active[name] or active[name] == nil
-            or (name == "base" and change.old_version ~= active.base
-              or name ~= "base" and change.old_version ~= nil) then beta_added_base = false end
-      end
-    end
+    local base_change = changes.base
+    beta_added_base = added_to_previous_base(changes, active) and (base_change == nil
+      or type(base_change) == "table" and base_change.old_version == active.base and base_change.new_version == active.base)
   end
   local beta_base = beta_origin and (same_inputs and plain_base or beta_added_base)
   return {beta_base=beta_base, beta_unchanged=beta_unchanged, m4_base=m4_base,

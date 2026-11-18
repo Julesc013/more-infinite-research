@@ -4,6 +4,8 @@ Date: 2026-11-19
 
   Bugfixes:
 
+    - Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged
+      startup settings.
     - Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
     - Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo
       research mod.

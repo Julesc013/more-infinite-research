@@ -6,6 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged startup settings.
 - Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
 - Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.
 - Factorio 2.0/2.1: Keep earned research-limit restoration rights when a technology cannot be read instead of treating the failure as missing research.
