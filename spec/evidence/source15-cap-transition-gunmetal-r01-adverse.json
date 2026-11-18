@@ -1,0 +1,203 @@
+{
+  "kind": "MIRProducerCapTransitionAdverseEvidenceV1",
+  "status": "adverse_stopped_before_declared_old_cap_outcome",
+  "date": "2026-11-19",
+  "scope": "One disposable scripted published15/SE source configuration transition only. Candidate, ordinary successor work, both successor cold reloads, reporters, release and stable remain unqualified.",
+  "fixture_commit": "2b64a8bcef73c18b67d508d0a3685ae34c49e0dd",
+  "current_private_player_tree": "08bd039b58fec73a6fb1ca25a604ab94f15c6687",
+  "actual_engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "actual_player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "unconsumed_private_candidate": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/source15-cap-successor-2b64-r01/build/qualification/source15-cap-successor-native-r01/inputs-r02/more-infinite-research_5.0.20017.zip",
+    "bytes": 1052327,
+    "sha256": "3DC5EBEDDCF690783B6C976723905DB305A05B7935BA0E5F87E278BA571DC906"
+  },
+  "actual_fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/source15-cap-successor-2b64-r01/build/qualification/source15-cap-successor-native-r01/inputs-r02/mir-fixture-mir5-worker-speed-cap-ten_0.14.0.zip",
+    "bytes": 18834,
+    "sha256": "B862840845308CFEC9428BC9CCCE08BA1B72764BD39188C6CCDEF5E6565104AD"
+  },
+  "actual_mods": {
+    "base": "2.0.77",
+    "aai-containers": "0.3.2",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes-graphics": "0.7.1",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "aai-industry": "0.6.16",
+    "alien-biomes": "0.7.4",
+    "space-exploration": "0.7.57",
+    "more-infinite-research": "5.0.20015",
+    "space-exploration-postprocess": "0.7.5",
+    "mir-fixture-mir5-worker-speed-cap-ten": "0.14.0"
+  },
+  "source": {
+    "receipt": {
+      "path": "spec/evidence/source15-cap0-producer-gunmetal-r04.json",
+      "bytes": 5616,
+      "sha256": "3A8E221BBE605F58C40B9D715D0EE6A20C83825348B641B194C4B444F2400D48"
+    },
+    "sha256": "D6C2842F75083976D52FF2964F12375867840A87ADCBD6A7186AC8E10F7E5686",
+    "bytes": 842143,
+    "unchanged": true,
+    "prior_acceptance_retained": "Source creation and one same-version cold only."
+  },
+  "execution": {
+    "native_attempts": 1,
+    "owned_pids": [
+      259507
+    ],
+    "old_exit_code": 1,
+    "expected_old_token_observed": false,
+    "only_marker": "preconditions",
+    "actual_fixture_failure": "producer source configuration player named flag differs: worker-robots-speed-9",
+    "candidate_started": false,
+    "ordinary_successor_completion": false,
+    "successor_save": false,
+    "successor_cold_processes": 0,
+    "restored": true,
+    "remaining_factorio": 0,
+    "cleanup_errors": []
+  },
+  "observations": {
+    "changed_flags": [
+      {
+        "force": "player",
+        "technology": "worker-robots-speed-9",
+        "before": true,
+        "after": false
+      },
+      {
+        "force": "player",
+        "technology": "se-deep-space-science-pack-1",
+        "before": true,
+        "after": false
+      },
+      {
+        "force": "foreign",
+        "technology": "worker-robots-speed-9",
+        "before": true,
+        "after": false
+      },
+      {
+        "force": "foreign",
+        "technology": "se-deep-space-science-pack-1",
+        "before": true,
+        "after": false
+      },
+      {
+        "force": "earned_above_cap",
+        "technology": "worker-robots-speed-9",
+        "before": true,
+        "after": false
+      },
+      {
+        "force": "earned_above_cap",
+        "technology": "se-deep-space-science-pack-1",
+        "before": true,
+        "after": false
+      }
+    ],
+    "worker_bonus_before": [
+      0.65,
+      1.3,
+      2.6
+    ],
+    "worker_bonus_observed": [
+      0,
+      0.65,
+      1.95
+    ],
+    "player_current_queue_and_27_percent_progress_absent": true,
+    "foreign_automation_queue_and_42_percent_progress_retained": true,
+    "snapshot_boundary": "After preceding configuration callbacks, before fixture continuation metadata or lab writes."
+  },
+  "bounded_diagnosis": {
+    "candidate_writer": "Exact SE0.7.57 control.lua:1831-1855 calls always_do_migrations; scripts/migrate.lua:121 invokes fill_tech_gaps(true), which can set researched=false for children of unresearched prerequisites at193-201.",
+    "source_contract_gap": "Source producer grants the two direct prerequisite rows while leaving necessary earlier prerequisites unresearched. It was not qualified through a configuration change.",
+    "attribution_limit": "The observed snapshot is after all preceding mod callbacks; exclusive write attribution is not established. This is not a candidate-source or reporter-outcome finding."
+  },
+  "reviews": {
+    "compose": {
+      "path": "build/qualification/source15-cap-successor-native-r01/REVIEW-COMPOSE.json",
+      "bytes": 2206,
+      "sha256": "1E578FD876D4F7FF918DF43B363BEA5399EA1FB90C10AE35493AE8246C70CB82"
+    },
+    "execute": {
+      "path": "build/qualification/source15-cap-successor-native-r01/REVIEW-EXECUTE.json",
+      "bytes": 2890,
+      "sha256": "EB489073CD9B59A3CC82D2CAD01230FEC2569FF4AFC6701E491830C71C27F0F5"
+    },
+    "actual_result": {
+      "path": "build/qualification/source15-cap-successor-native-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 3566,
+      "sha256": "FFEE6E1C517899517415507C8AF6D6BAEBF92EA09D9AE27FE34B8A1266317A23"
+    }
+  },
+  "custody": {
+    "packet": {
+      "path": "build/qualification/source15-cap-successor-native-r01/packet-r02.json",
+      "bytes": 19980,
+      "sha256": "44406766F9F110746378290892B4BB21AABDDEEA409A159E37FA3C73620ED17E"
+    },
+    "owner": {
+      "path": "build/qualification/source15-cap-successor-native-r01/Invoke-ProducerTransition-r02.ps1",
+      "bytes": 20628,
+      "sha256": "DA5BAB648E0CF970874B44138C88D06E8F5829A2A7B2F13BF2F29E2064059EF2"
+    },
+    "reader": {
+      "path": "build/qualification/source15-cap-successor-native-r01/Verify-ProducerTransition.py",
+      "bytes": 29235,
+      "sha256": "1AD35537F12B74B79ABE6D6ECAD5149F2B36654FB8E185ABD1BFDBEA48C4CB33"
+    },
+    "composition": {
+      "path": "build/qualification/source15-cap-successor-native-r01/composition.json",
+      "bytes": 217126,
+      "sha256": "2373110188614EFB4FA4D33D200CF0AA2B5C7C33FDB09F9B981E475BBF561C16"
+    },
+    "terminal": {
+      "path": "build/qualification/source15-cap-successor-native-r01/terminal.json",
+      "bytes": 88007,
+      "sha256": "C780A0F9983876A1DA9093C2C05467D3E8EC232D006F690490155FC3CE99B1AB"
+    },
+    "readback": {
+      "path": "build/qualification/source15-cap-successor-native-r01/EXECUTE-READBACK.json",
+      "bytes": 7216,
+      "sha256": "35D6462442ECD07FBC66899574C5091B423B0B41B145CB4788F39F30E27D8390"
+    },
+    "preconditions": {
+      "path": "build/qualification/source15-cap-successor-native-r01/execute-custody/old/write/script-output/worker-speed-cap-ten/preconditions.json",
+      "bytes": 3049,
+      "sha256": "97E17E8B4DC0D0E12136024E1EC11B1F6C140F01D57EC39D25700DBFD82863F5"
+    },
+    "observed_delta": {
+      "path": "build/qualification/source15-cap-successor-native-r01/ADVERSE-OBSERVATIONS-r01.json",
+      "bytes": 5661,
+      "sha256": "27ABA9F54EFF8EA3157E590FD47408D6A1822FD6148359226760DD809BB08A20"
+    },
+    "original_bodies": 15,
+    "all_copied_bodies_independently_rehashed": true,
+    "primary_directory": "build/qualification/source15-cap-successor-native-r01"
+  },
+  "next_boundary": "Establish a provider-admitted positive prerequisite history before another upgrade qualification; retain source D6 and this adverse, independent preservation assertions and exact artifact identities. No post-load research reseeding.",
+  "published_bytes_changed": false,
+  "stable_acceptance": false
+}
