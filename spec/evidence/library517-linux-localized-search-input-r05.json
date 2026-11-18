@@ -1,0 +1,323 @@
+{
+  "kind": "MIRLibraryLocalizedSearchNativeInputEvidenceV1",
+  "status": "accepted-exact-public17-german-fresh-search-reopen-slice",
+  "scope": "Only the exact c123/a44 public 5.0.21017 player archive case: fresh protected 83D German client, retained initial query, real close/reopen, Help then Research, focused clear, one fixed ASCII query Eisenzahnrad, and final retained-query reopen under the pinned R06 actor and 0.1.2 passive observer fixture.",
+  "player": {
+    "source_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "version": "5.0.21017",
+    "archive_bytes": 1047107,
+    "archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191"
+  },
+  "engine": {
+    "version": "2.1.24",
+    "platform": "Linux graphical full build; Base-only active selection",
+    "executable_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF"
+  },
+  "controller": {
+    "source_head": "c123ea18ae50f91b41a10136674a4fbe7d6aac7f",
+    "source_tree": "a44d60878c3e44e54d103f1e7c3c4ff27dded1f5"
+  },
+  "packet": {
+    "path": "stage-r06/owner-packet-r06.json",
+    "bytes": 9577,
+    "sha256": "70C580D517902366216826C2AA1A123E7F2341E73D0FC24779AE48237985D1E8"
+  },
+  "composition": {
+    "path": "actual-composition-r05/actor-compose-result.json",
+    "bytes": 2497,
+    "sha256": "356D4F4EAEBA3653C0AA5367F93171AACAC8A743ACF8532C9C2784D3252BDFAF"
+  },
+  "actor": {
+    "path": "Run-LocalizedSearch-r06.py",
+    "bytes": 35092,
+    "sha256": "9A7317EF27D0DF476991172D130EF690702935CAA4C1DA881A2300A1AF2FF7E4"
+  },
+  "fixture": {
+    "version": "0.1.2",
+    "source_commit": "7aa40a208b7870085bc18b1eed99d00d1cc1c8e4",
+    "sha256": "55DDAF1B4A1D1FA43B99B37F6A590AA4784F2675FB1834986356FED3D59F28C1"
+  },
+  "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.2|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017",
+  "observations": {
+    "reviewed_inputs": 9,
+    "native_phase_files": 10,
+    "sequence": [
+      "00-escape-after: Library closed",
+      "01-click-after: Library reopened with original query",
+      "02-click-after: Help tab",
+      "03-click-after: Research tab",
+      "04-click-after: original query field focused",
+      "05-clear-after: empty focused field and 55 technology rows",
+      "06-text-after: Eisenzahnrad with one German gear result",
+      "07-escape-after: Library closed",
+      "08-click-after: final retained Eisenzahnrad query with one German gear result"
+    ],
+    "phases": [
+      {
+        "ordinal": 0,
+        "name": "initial",
+        "tick": 11551,
+        "sha256": "4206ADFB686E0774C56C8F1268DFBA816E5549E7EF357CCA7CEDBCA256ABBAC8"
+      },
+      {
+        "ordinal": 1,
+        "name": "setup-closed",
+        "tick": 15143,
+        "sha256": "DB08CCAAE51A8A2A9CD4C830F80393058ED0987B7194C4E4AC4F69F658FB6386"
+      },
+      {
+        "ordinal": 2,
+        "name": "open",
+        "tick": 20065,
+        "sha256": "B3BF9589A7BDBB38D6CC4031C6DAA1B72CB2099ACCCACDCF3DF60371C0ED281D"
+      },
+      {
+        "ordinal": 3,
+        "name": "help-tab",
+        "tick": 23799,
+        "sha256": "EE6E1CD334132EBDD7823675C4EE79F9765744CE543DD2320F3899C4347F89A7"
+      },
+      {
+        "ordinal": 4,
+        "name": "research-tab",
+        "tick": 26895,
+        "sha256": "AEBF269D794F26A0C9B70A402AE8C5802D1FEB3D54DD4440241D5E3214A0787A"
+      },
+      {
+        "ordinal": 5,
+        "name": "query-click",
+        "tick": 30791,
+        "sha256": "84978E2D618A2DD7FF4585BD6FCCACAF517784B4D9A5DF02924C04DFA3D887A7"
+      },
+      {
+        "ordinal": 6,
+        "name": "cleared",
+        "tick": 32846,
+        "sha256": "94EF704A53080C17F3C60097C2241331D127AFB1033C8485F4BC509756FAD2EF"
+      },
+      {
+        "ordinal": 7,
+        "name": "localized-query",
+        "tick": 35727,
+        "sha256": "333695E40AC59F1DC4D4B07C9D4EA5DA8E25F8EA72070FFB1B4744716579FB27"
+      },
+      {
+        "ordinal": 8,
+        "name": "closed",
+        "tick": 38370,
+        "sha256": "CC503DF0FDFD6A983B3A04651853D433B92D2EB739761A90C9B03E9FD27CEA29"
+      },
+      {
+        "ordinal": 9,
+        "name": "reopen",
+        "tick": 43096,
+        "sha256": "10663BC50A4E157C5542FC4DE24A39D521DCD2F88E1A40B7D357FE9E18E442BA"
+      }
+    ],
+    "final_reopen": {
+      "query": "Eisenzahnrad",
+      "result_count": 1,
+      "technology": "recipe-prod-research_gears-1",
+      "caption": "Eisenzahnrad-Produktivität",
+      "shortcut_tick": 43090,
+      "observed_tick": 43096,
+      "deadline_delta_ticks": 6,
+      "deadline_ticks": 1800,
+      "close_events": 0,
+      "native_frame_equal_to_initial": true,
+      "geometry_and_live_tab_identity_retained": true
+    },
+    "geometry": {
+      "x": 320,
+      "y": 54,
+      "logical_width": 853,
+      "logical_height": 720,
+      "display_width": 1280,
+      "display_height": 720,
+      "display_scale": 0.75
+    },
+    "unchanged_observed_native_frame": {
+      "force": "player",
+      "gear_level": 3,
+      "gear_researched": false,
+      "gear_enabled": true,
+      "gear_recipe_productivity": 0.2,
+      "current_research": false,
+      "progress": 0,
+      "queue_length": 0,
+      "worker_robots_storage_bonus": 0
+    },
+    "timing_limit": "The six-tick readiness observation is not a wall-clock or performance result."
+  },
+  "commands_and_captures": {
+    "method": "direct rehash of all three retained capture images per action; command equals transcript action; pinned actor validate_action passes; point request and input receipt agree with the transcript",
+    "result": "passed",
+    "actions": [
+      {
+        "ordinal": 0,
+        "action": "escape",
+        "control": "existing Library",
+        "trace_events": 2,
+        "capture_pins": {
+          "before": "BE393435E7426505CF7F59D8D5279B5EFBE5615619B5E8B58EA00A65132EE189",
+          "post_request": "597014458ACEE4F878E70B82D6CB5B4CD428C8C2D0BF259A2F409054FD0117A1",
+          "after": "86BE939CF693B930E071A64E85A48A8C174086DBEC2A6147D22F55BFA5D7E7BF"
+        }
+      },
+      {
+        "ordinal": 1,
+        "action": "click",
+        "control": "actual MIR Library shortcut",
+        "trace_events": 3,
+        "capture_pins": {
+          "before": "BAEE3056283FD412C0CC48C03CF2C9CC2F236AA4D68FEC4C1042BAECFD8BC0DC",
+          "post_request": "7BC129F66A976E5D86D4FEA2CDA94D150FDBE5046699E6B78BD717DDF5350B25",
+          "after": "83766E3D96C7E273BBC584BC2FA0EC2C43C12AF57EE5965815C0C0D8C15E7C8A"
+        }
+      },
+      {
+        "ordinal": 2,
+        "action": "click",
+        "control": "Help tab",
+        "trace_events": 3,
+        "capture_pins": {
+          "before": "D0E7694084B3644358F7A0D8E7BFCFAB0AAD3977F9753C56763B2E8CBD3EEF70",
+          "post_request": "AEB90B99524695D62388ACECAA5B5881F8D76730F9C1DCBF9D5F5ED39DEFF242",
+          "after": "19E15471B0EC560348992B12DA18BEEC11FE072E647232C1530E20D3B71C3A63"
+        }
+      },
+      {
+        "ordinal": 3,
+        "action": "click",
+        "control": "Research tab",
+        "trace_events": 3,
+        "capture_pins": {
+          "before": "1045C4774760B2D124A9FBF925E3EC5E26651D612E6465C49827DFF1BDBC5186",
+          "post_request": "62847535F665511E07DF05A224FA826804D625B8FCB6DB6A232B7BFAA54B8BA1",
+          "after": "29512CDB4443C22BEA45BBB15574CDDEF2E7D3021925F817C364A382A2756D1C"
+        }
+      },
+      {
+        "ordinal": 4,
+        "action": "click",
+        "control": "Research query field",
+        "trace_events": 3,
+        "capture_pins": {
+          "before": "4A3C351189FE97B3D866388EC2FBE15B6B1D3A1D9181A9BCB797E3AE936FF1A1",
+          "post_request": "AB0829B9ADC4A90CE5EF64DB3101CCFE92F5CD87A3ACB38189A7BE830C0A98DA",
+          "after": "9F56D228F8F49CFEF08B6CB832394F9B1D0D11D361C43EED692E73A6BD65BFA4"
+        }
+      },
+      {
+        "ordinal": 5,
+        "action": "clear",
+        "control": "focused query field",
+        "trace_events": 6,
+        "capture_pins": {
+          "before": "515A2A626EF8C79AC6806290312067F62A31105FF73F6C616F18BFE673C9A6CD",
+          "post_request": "B705FD21B20B0039F524A5D4583A63FE580265B8F14202530C76EE9FA2DA5305",
+          "after": "81B7A8AAC49C6F4811B28F8C5E59706FF1547BA9BC88253F4B9DD9017CA74F9E"
+        }
+      },
+      {
+        "ordinal": 6,
+        "action": "text",
+        "control": "focused query field",
+        "text": "Eisenzahnrad",
+        "trace_events": 26,
+        "capture_pins": {
+          "before": "81B7A8AAC49C6F4811B28F8C5E59706FF1547BA9BC88253F4B9DD9017CA74F9E",
+          "post_request": "0AE3B991E782F5A5E12513680D315C290AE68A8713AC513AC979EDC85F615DAB",
+          "after": "E610AB600EFE40A6091054525FEA2B1938BAAD91339AE06B7199C5272F65F0BC"
+        }
+      },
+      {
+        "ordinal": 7,
+        "action": "escape",
+        "control": "Library",
+        "trace_events": 2,
+        "capture_pins": {
+          "before": "0AE3B991E782F5A5E12513680D315C290AE68A8713AC513AC979EDC85F615DAB",
+          "post_request": "33D0E402360FE8954E45C8D6E9F0E1677A3ECF637D7E82D6EE42D8A118AA4683",
+          "after": "901B6D69578DEAD7537F0AE571ED87EB29A7098641642D90F600204039226DF6"
+        }
+      },
+      {
+        "ordinal": 8,
+        "action": "click",
+        "control": "actual MIR Library shortcut",
+        "trace_events": 3,
+        "capture_pins": {
+          "before": "3F0D3CCAEE04A70075404EB5992FABD8B3490F3CA43C66EF3B1F475DB3B81091",
+          "post_request": "7C9C3E5C8CDF1796CB37AA65A81315B689F5B9C1A09D205CC02E5E753D13F71E",
+          "after": "7560C9A205B1433D4A12E603F3D53BB250587315BD6EFF5D71FC456927827A00"
+        }
+      }
+    ],
+    "point_review_producer": "/root native execution owner",
+    "all_xtest_events_accepted": true,
+    "all_input_receipts_identity_checked": true,
+    "all_input_receipts_gui_acceptance_false_pending_phase_observation": true
+  },
+  "cleanup": {
+    "actor_result_sha256": "78CB3C5503D214A6DBDD23EF6311B4B35AE72FFC444208A991389BFCD7CA61D7",
+    "owner_result_sha256": "0D6FF5694CF760431145C60BD8FC4F0FAB0ADFAF2E0837A0FB3F0C212F15EA1B",
+    "initial_working_copy_matches_protected_seed": true,
+    "input_save_unchanged": true,
+    "executed_copy_initial_verified": true,
+    "expected_mutable_working_copy": {
+      "bytes": 1730299,
+      "sha256": "161E52296C03689B215AC0FD657B2E1DC451C57077A250C9A66778E04A83B4C3"
+    },
+    "server_client_display_exit_code": 0,
+    "controlled_shutdown_without_force": true,
+    "remaining_owned_session_processes": [],
+    "display_authority_removed": true,
+    "private_viewer_restored": true,
+    "global_display_restored": true,
+    "library_controls_restored": true,
+    "temporary_fixture_and_control_archives_removed": true,
+    "owner_restored": true,
+    "restoration_errors": []
+  },
+  "original_custody": {
+    "primary_relative_root": "build/qualification/library-localized-search-input-preparation-r01",
+    "originals": "localized-search-r05-originals-r01",
+    "capsule": {
+      "path": "localized-search-r05-originals-r01.json.gz",
+      "bytes": 86086997,
+      "sha256": "E6FB4954B44113B5AE7A5ECE485B56EDC1A95D43D3B873E14F1C1624E6DBC319",
+      "decoded_files": 265,
+      "decoded_raw_bytes": 142041118
+    },
+    "readback": {
+      "path": "localized-search-r05-original-readback-r01.json",
+      "sha256": "5A380BB298D91C3AD40A020D3721CB335A2F825B37CDAF0A02D38B65D871EA78"
+    },
+    "protected_seed": {
+      "bytes": 1064930,
+      "sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3"
+    },
+    "all_original_bodies_rehashed": true,
+    "transport_limit": "256MiB raw-body transport ceiling; executed case output budget remains512MiB and all native admission/reserves are unchanged."
+  },
+  "independent_review": {
+    "path": "r05-actual-native-independent-review-r01.json",
+    "sha256": "F9E5F006018A206257F00BD468EBA9BB8D17CF154B672E9D801C6FE0C6A74778",
+    "verdict": "ACCEPT_EXACT_PUBLIC17_GERMAN_FRESH_LOCALIZED_SEARCH_REOPEN_SLICE"
+  },
+  "earlier_adverses": [
+    "library517-linux-localized-search-r01-adverse.json",
+    "library517-linux-localized-search-r02-adverse.json",
+    "library517-linux-localized-search-r03-adverse.json",
+    "library517-linux-localized-search-r04-adverse.json"
+  ],
+  "causality_limit": "The successful R05 observation does not retroactively prove why R04 failed; R04 remains adverse evidence and this review makes no causal finding.",
+  "remaining_limits": [
+    "No Unicode entry, scrolling, resizing or all-scale design verdict.",
+    "No imported save, Windows, or current18 player acceptance.",
+    "This case does not reload its saved output or restart its host/client.",
+    "No whole-product performance, original reporter closure or stable verdict."
+  ]
+}
