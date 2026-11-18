@@ -466,6 +466,42 @@ local function fixed_observations(force)
   return out
 end
 
+-- A native infinite carrier has a uint32 level and represents zero at level
+-- one. Calculate the exact level adjustment before reconciliation so a later
+-- force cannot discover an unrepresentable offset after an earlier force was
+-- already changed. Galore's recorded baseline is part of the same fixed-row
+-- plan, rather than a special post-write adjustment.
+local function projected_fixed_offset(force, observation, record, galore_baselines)
+  local offset
+  if record == nil then
+    offset = observation.offset
+    local prior = galore_baselines and galore_baselines[force.index]
+    if observation.descriptor == GALORE_DESCRIPTOR and prior ~= nil then
+      offset = offset + ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
+    end
+  else
+    local old_included = record.included and 1 or 0
+    local new_included = observation.included and 1 or 0
+    offset = record.offset + (old_included - new_included) * observation.completed
+  end
+  if not integer(offset) or offset <= -UINT32_MAX or offset >= UINT32_MAX then
+    error("MIR native fixed credit projected carrier level exceeds the uint32 setter range"
+      .. " [MIR-FIXED-CREDIT force=" .. tostring(force.index)
+      .. " recipe=" .. observation.descriptor.recipe .. "]", 3)
+  end
+  return offset
+end
+
+local function preflight_fixed_offsets(fixed_plans, galore_baselines)
+  for _, plan in pairs(fixed_plans or {}) do
+    local records = records_for(plan.force, false)
+    validate_records(records)
+    for _, observation in ipairs(plan.observations) do
+      projected_fixed_offset(plan.force, observation, records and records[observation.descriptor.recipe], galore_baselines)
+    end
+  end
+end
+
 -- Error-path-only observation; no state/level writes or broad scans.
 local function family_failure_detail(force, descriptor, scope, rejection)
   local function text(value)
@@ -614,7 +650,9 @@ local function set_level_and_disable(technology, wanted)
 end
 
 local function apply_offset(observation, offset)
-  if not integer(offset) then error("MIR native credit offset is not integral", 3) end
+  if not integer(offset) or offset <= -UINT32_MAX or offset >= UINT32_MAX then
+    error("MIR native credit offset exceeds the uint32 carrier setter range", 3)
+  end
   local positive = offset > 0 and offset or 0
   local negative = offset < 0 and -offset or 0
   set_level_and_disable(observation.positive, 1 + positive)
@@ -637,14 +675,10 @@ local function reconcile_force(force, galore_baselines, prepared_observations)
   for index = 1, #observations do
     local observation = observations[index]
     local record = records[observation.descriptor.recipe]
+    local offset = projected_fixed_offset(force, observation, record, galore_baselines)
     if record == nil then
       -- MIR4 did not persist the prior preference.  Current inclusion and
       -- native carrier levels are the only honest first-upgrade baseline.
-      local prior = galore_baselines and galore_baselines[force.index]
-      local offset = observation.offset
-      if observation.descriptor == GALORE_DESCRIPTOR and prior ~= nil then
-        offset = offset + ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
-      end
       record = {
         included = observation.included,
         offset = offset,
@@ -654,10 +688,6 @@ local function reconcile_force(force, galore_baselines, prepared_observations)
         plans[#plans + 1] = {observation=observation, record=record, offset=offset}
       end
     else
-      local old_included = record.included and 1 or 0
-      local new_included = observation.included and 1 or 0
-      local offset = record.offset + (old_included - new_included) * observation.completed
-      if not integer(offset) then error("MIR native credit calculated a non-integral offset", 2) end
       plans[#plans + 1] = {observation = observation, record = record, offset = offset}
     end
   end
@@ -953,6 +983,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
   local current = existing_state()
   local context, plans = legacy_family_context(event), {fixed_credits=M.preflight_fixed_credits(selected_force)}
   plans.galore_baselines = preflight_galore(context, fresh, selected_force)
+  preflight_fixed_offsets(plans.fixed_credits, plans.galore_baselines)
   if next(COLLECTED_BY_MAIN) == nil and (groups == nil or next(groups) == nil)
       and (not current or current.families == nil) then return plans end
   local forces = selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}

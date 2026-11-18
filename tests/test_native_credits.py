@@ -706,6 +706,63 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           end
         ''')
 
+    def test_fixed_carrier_uint32_projection_preflights_every_force(self):
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          local original_descriptors, original_scalars = descriptors, fixed_credit_scalars
+          descriptors, fixed_credit_scalars = {}, {[fish]=.1}
+          for _, descriptor in ipairs(original_descriptors) do
+            if descriptor.recipe == fish then descriptors[#descriptors + 1] = descriptor end
+          end
+          local main_id = descriptor_for(fish).main_id
+          local maximum_offset = UINT32_MAX - 1
+
+          -- Level UINT32_MAX is a valid native carrier value for either sign.
+          -- The projection must accept both extrema rather than treating the
+          -- carrier's one-based level as an off-by-one refusal.
+          local positive = make_force(1, {}, {[main_id]=2}, {[fish]=maximum_offset})
+          local negative = make_force(2, {[fish]=false}, {[main_id]=2}, {[fish]=-maximum_offset})
+          game.forces[positive.index], game.forces[negative.index] = positive, negative
+          native_credits.on_init();native_credits.on_configuration_changed()
+          assert(holder(positive, fish, "positive").level == UINT32_MAX and ledger(positive, fish).offset == maximum_offset)
+          assert(holder(negative, fish, "negative").level == UINT32_MAX and ledger(negative, fish).offset == -maximum_offset)
+
+          -- An included completed main would add one more positive unit. The
+          -- target level becomes UINT32_MAX+1, so this must reject in the
+          -- all-force preflight before an earlier ordinary force is changed.
+          storage, game = {}, {forces={}}
+          local first = make_force(1, {}, {[main_id]=2}, {[fish]=0})
+          local later = make_force(2, {}, {[main_id]=2}, {[fish]=maximum_offset})
+          local first_positive = holder(first, fish, "positive")
+          local later_positive = holder(later, fish, "positive")
+          local function range_bound(technology)
+            local metatable = getmetatable(technology)
+            local original = metatable.__newindex
+            metatable.__newindex = function(object, key, value)
+              if key == "level" and value > UINT32_MAX then error("fixture uint32 overflow", 0) end
+              return original(object, key, value)
+            end
+          end
+          range_bound(first_positive);range_bound(later_positive)
+          local ordered = {[1]=first,[2]=later}
+          setmetatable(ordered, {__pairs=function()
+            local function iterate(_, key)
+              if key == nil then return 1, first end
+              if key == 1 then return 2, later end
+            end
+            return iterate, nil, nil
+          end})
+          game.forces = ordered
+          native_credits.on_init()
+          set_included(first, fish, false);set_included(later, fish, false)
+          local ok, message = pcall(native_credits.on_configuration_changed)
+          assert(not ok and tostring(message):find("projected carrier level exceeds the uint32 setter range", 1, true))
+          assert(first._states[first_positive.name].writes.level == 0
+            and later._states[later_positive.name].writes.level == 0,
+            "later range refusal changed an earlier or overflowing carrier")
+          descriptors, fixed_credit_scalars = original_descriptors, original_scalars
+        ''')
+
     def test_native_force_collection_userdata_is_iterated_at_configuration_boundaries(self):
         self.lua.globals().native_forces = object()
         self.lua.execute(r'''
