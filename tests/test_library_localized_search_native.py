@@ -545,6 +545,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
             ("player.character.valid=false", "live character controller"),
             ("player.connected=false", "player unavailable"),
             ("retire_library()", "root"),
+            ("player.opened={valid=true}", "owned localized-search root differs"),
             ("player.gui.screen.mir_research_browser.mir_library_tabs.selected_tab_index=4", "Research localized-search view"),
             ("player.gui.screen.mir_research_browser.location.x=321", "geometry"),
         )
@@ -568,6 +569,23 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
         self.setUp()
         self.prepare_delayed_reopen()
         self.exec('game.tick=report().pending.deadline;set_results(expected_results(),"Eisenzahnrad")')
+        with self.assertRaisesRegex(Exception, "reopen deadline"):
+            self.exec("tick()")
+        self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
+
+    def test_reopen_deadline_is_fixed_from_the_actual_shortcut_event(self):
+        self.prepare_delayed_reopen()
+        self.exec(r'''
+          local events=report().event_log
+          assert(events[#events].kind=="shortcut")
+          local opened_tick=events[#events].tick
+          assert(report().pending.deadline==opened_tick+1800)
+          for i=1,7 do
+            tick()
+            assert(report().pending.deadline==opened_tick+1800)
+          end
+          game.tick=opened_tick+1799
+        ''')
         with self.assertRaisesRegex(Exception, "reopen deadline"):
             self.exec("tick()")
         self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
