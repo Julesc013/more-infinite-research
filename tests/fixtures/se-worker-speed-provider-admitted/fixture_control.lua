@@ -66,8 +66,10 @@ local function assert_active(expected_stage)
 end
 
 local function technology(force, name)
-  check(force and force.valid ~= false and type(force.technologies) == "table", "force technologies unavailable")
-  local row = force.technologies[name]
+  check(force and force.valid ~= false, "force technologies unavailable")
+  local technologies = force.technologies
+  check(technologies ~= nil, "force technologies unavailable")
+  local row = technologies[name]
   check(row and row.valid ~= false and row.name == name, "technology is absent: " .. name)
   return row
 end

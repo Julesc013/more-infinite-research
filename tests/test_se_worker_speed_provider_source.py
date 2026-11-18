@@ -17,6 +17,19 @@ from se_worker_speed_provider_world import DEEP, FIXTURE, PREDECESSOR, WORKER, i
 FIXTURE_NAME = "mir-fixture-se-worker-speed-provider-admitted"
 
 
+class IndexedTechnologyMap:
+    """A Lupa userdata-backed indexed map, like Factorio's LuaCustomTable."""
+
+    def __init__(self, lookup, failure: Exception | None = None):
+        self.lookup = lookup
+        self.failure = failure
+
+    def __getitem__(self, name):
+        if self.failure is not None:
+            raise self.failure
+        return self.lookup(name)
+
+
 class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def setUp(self) -> None:
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -30,6 +43,13 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
 
     def stage(self, name: str) -> None:
         load_stage(self.lua, name)
+
+    def native_technology_map(self, failure: Exception | None = None) -> IndexedTechnologyMap:
+        self.lua.execute(r'''
+          native_technology_rows=game.forces.player.technologies
+          native_technology_lookup=function(name)return native_technology_rows[name]end
+        ''')
+        return IndexedTechnologyMap(self.lua.globals().native_technology_lookup, failure)
 
     def source(self) -> None:
         self.stage("source")
@@ -234,6 +254,29 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
                 self.assertFalse(ok)
                 self.assertIn(token, message)
                 self.lua.execute('assert(storage.mir5_se_worker_speed_provider_admitted==nil and #markers==0 and #saves==0)')
+
+    def test_source_accepts_native_indexed_technology_maps_and_propagates_index_read_failures(self):
+        self.lua.globals().native_technology_map = self.native_technology_map()
+        self.lua.execute('assert(type(native_technology_map) == "userdata");game.forces.player.technologies=native_technology_map')
+        self.source()
+        self.lua.execute(r'''
+          local state=storage.mir5_se_worker_speed_provider_admitted
+          assert(state.phase=="source-ready" and #state.source.completed.player.order==196)
+          assert(game.forces.player.technologies["worker-robots-speed-9"].researched==true)
+        ''')
+
+        self.setUp()
+        self.lua.globals().throwing_technology_map = self.native_technology_map(
+            RuntimeError("MIR_TEST_TECHNOLOGY_INDEX_READ_SENTINEL"))
+        self.lua.execute('assert(type(throwing_technology_map) == "userdata");game.forces.player.technologies=throwing_technology_map')
+        self.stage("source")
+        ok, message = self.call("init")
+        self.assertFalse(ok)
+        self.assertIn("MIR_TEST_TECHNOLOGY_INDEX_READ_SENTINEL", message)
+        self.lua.execute(r'''
+          assert(native_technology_rows["automation"].researched==false)
+          assert(storage.mir5_se_worker_speed_provider_admitted==nil and #markers==0 and #saves==0)
+        ''')
 
     def test_source_refuses_reordered_fixed_prerequisite_before_writes(self):
         self.stage("source")
