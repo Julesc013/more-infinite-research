@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.18
+Date: 2026-11-19
+
+  Bugfixes:
+
+    - Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.
+    - Keep earned research-limit restoration rights when a technology cannot be read instead of treating the failure as missing
+      research.
+    - Reconcile unrelated research limits after a force merge even when worker cargo history cannot be adopted.
+    - Reject changed internal recipe-productivity amounts before altering saved bonuses.
+    - Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.17
 Date: 2026-11-17
 
