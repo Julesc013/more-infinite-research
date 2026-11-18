@@ -476,6 +476,88 @@ class ProductTargetTests(unittest.TestCase):
         ''')
 
 
+    def test_k2se_drill_productivity_targets_manufacturing_not_ore_extraction(self):
+        """Source-bound scope guard for the unresolved mining-drill report, not native ore-yield proof."""
+        self.lua.execute(r'''
+          local profile = require("compatibility.modern_catalogue.k2_space_exploration")
+          local wanted = {
+            ["burner-mining-drill"] = 1,
+            ["electric-mining-drill"] = .5,
+            ["area-mining-drill"] = .25,
+            ["kr-quarry-drill"] = .25,
+            ["se-core-miner-drill"] = .25,
+          }
+          assert(profile.exact_product_target_families.research_mining_drill == true)
+          local effects = profile.definition_overrides.research_mining_drill.effects
+          local seen_effects = {}
+          assert(#effects == 5)
+          for _, effect in ipairs(effects) do
+            assert(wanted[effect.recipe] == effect.scale and not seen_effects[effect.recipe],
+              "drill-family effect must describe one named drill-manufacturing recipe")
+            seen_effects[effect.recipe] = true
+          end
+          local required = profile.required_product_targets.research_mining_drill
+          local seen_required = {}
+          assert(#required == 5)
+          for _, name in ipairs(required) do
+            assert(wanted[name] and not seen_required[name], "unexpected or duplicated required drill target")
+            seen_required[name] = true
+          end
+          local rules, seen_bindings = {}, {}
+          for _, binding in ipairs(profile.exact_product_bindings) do
+            if binding.family == "research_mining_drill" then
+              assert(binding.reject_explicit_productivity_denial == true
+                and binding.allow_shared_input_output == true and binding.include_recycling == true)
+              rules[#rules + 1] = binding
+              for _, name in ipairs(binding.recipes) do
+                assert(wanted[name] == binding.weight and not seen_bindings[name],
+                  "unexpected, duplicated or unweighted drill-manufacturing target")
+                seen_bindings[name] = true
+              end
+            end
+          end
+          assert(#rules == 3)
+          for name in pairs(wanted) do
+            assert(seen_effects[name] and seen_required[name] and seen_bindings[name])
+          end
+          local before = frozen_copy(rules)
+          local recipes = {}
+          for name in pairs(wanted) do
+            recipes[name] = recipe({}, {product("item", name)})
+          end
+          -- Mining an ore, and crafting a drill via an unbound alias, must not
+          -- become a recipe-productivity target merely because they exist.
+          recipes["synthetic-ore-extraction"] = recipe({}, {product("item", "iron-ore")})
+          recipes["synthetic-drill-alias"] = recipe({}, {product("item", "se-core-miner-drill")})
+          local baseline = targets.collect(recipes, targets.prepare(rules))
+          assert(#baseline.targets == 5)
+          for _, row in ipairs(baseline.targets) do
+            assert(row.family == "research_mining_drill" and wanted[row.recipe] == row.weight
+              and row.product_type == "item" and row.product_name == row.recipe)
+          end
+
+          -- Every denied opponent is a real named candidate in the authored
+          -- group, not an excluded/missing fixture recipe.
+          recipes["area-mining-drill"].allow_productivity = false
+          recipes["kr-quarry-drill"].maximum_productivity = 0
+          recipes["se-core-miner-drill"].results[1].ignored_by_productivity = 1
+          local guarded = targets.collect(recipes, targets.prepare(rules))
+          assert(#guarded.targets == 2 and guarded.targets[1].recipe == "burner-mining-drill"
+            and guarded.targets[2].recipe == "electric-mining-drill")
+          local unguarded = {}
+          for _, binding in ipairs(rules) do
+            local copy = {}
+            for key, value in pairs(binding) do copy[key] = value end
+            copy.reject_explicit_productivity_denial = false
+            unguarded[#unguarded + 1] = copy
+          end
+          local negative_control = targets.collect(recipes, targets.prepare(unguarded))
+          assert(#negative_control.targets == 4,
+            "unguarded comparator must expose the two explicitly denied recipe names")
+          assert(frozen_copy(rules) == before, "collection must not mutate authored bindings")
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
