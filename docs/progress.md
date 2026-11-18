@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Retained paid fixed-credit continuation accepted (2026-11-19)
+
+The [exact retained-partial run](../spec/evidence/static-paid-f200-retained-partial-current18-r07.json) resumes the protected public17 B7B1 source on full Factorio2.0.77/Space Age with current18 CADD/source60add. Three new native processes complete the remaining96 units of each of four science packs, preserve fish credit1 while the remaining main contribution advances to two levels, save, and cold-read two distinct working copies. Original source-A/source-B observations and their governed completion stops are adopted unchanged; neither source is recreated. The mandatory cross-stage gate passes, all five saved endpoints pass CRC/path/inode checks, controls restore, cleanup is empty and no Factorio remains. Independent actual-result review rehashes all74 originals/4,684,382bytes, verifies the five remote save identities and CRCs, and accepts only this bounded CADD/R12 sequence. This is not a release verdict.
+
+The controlled main has cost64, one-second units, map-price2 and a100percent-drain ordinary lab. Raw binary32 bonuses and empty Lua array objects remain preserved; a reviewed detached projection handles only those transport forms without changing science, queues, levels or provenance. Earlier native failures and held R11 observation writes remain adverse. This does not qualify original reporter saves, current F210, MIR4 Base-addition admission, Library/client/performance or stable acceptance.
+
 ## SE speed-cap successor and parse-time import correction accepted (2026-11-19)
 
 The [corrected private18 successor](../spec/evidence/se-worker-speed-provider-cap-successor-gunmetal-r03.json) passes its bounded native sequence on headless Factorio2.0.77 with Space Exploration0.7.57. It reuses the protected7FAD published15 admission save, retains the authentic old15 opponent, and completes ordinary worker robot speed level10 under cap10: the native event exposes next level11, the bonus rises5.0→5.65, and level11 cannot start. All196 completed prerequisite rows on each of three forces remain intact; unrelated queues, partial progress, flags and bonuses are preserved. The lab consumes2336 of each of eight science tools and retains196 each. After two elapsed hold ticks, the candidate saves; two separate cold processes read that same protected854638-byteC34 successor and preserve its complete closed research/lab state.
