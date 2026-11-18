@@ -298,7 +298,7 @@ def cgroup_snapshot(proc_root: Path) -> dict[str, Any]:
     }
 
 
-def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[str, int] | None:
+def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[str, Any] | None:
     path = proc_root / str(pid) / "stat"
     try:
         text = path.read_text(encoding="utf-8")
@@ -312,22 +312,23 @@ def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[
     if close < 3 or not text.startswith(str(pid) + " ("):
         fail("mir441-linux-process-stat")
     fields = text[close + 1 :].split()
-    if len(fields) <= 19:
+    if len(fields) <= 19 or re.fullmatch(r"[A-Za-z]", fields[0]) is None:
         fail("mir441-linux-process-stat")
     return {
         "pid": pid,
+        "state": fields[0],
         "ppid": parse_uint(fields[1], "mir441-linux-process-stat"),
         "session_id": parse_uint(fields[3], "mir441-linux-process-stat"),
         "start_ticks": parse_uint(fields[19], "mir441-linux-process-stat"),
     }
 
 
-def iter_proc_stats(proc_root: Path) -> list[dict[str, int]]:
+def iter_proc_stats(proc_root: Path) -> list[dict[str, Any]]:
     try:
         entries = list(proc_root.iterdir())
     except OSError:
         fail("mir441-linux-process-stat")
-    rows: list[dict[str, int]] = []
+    rows: list[dict[str, Any]] = []
     for entry in entries:
         if not entry.name.isascii() or not entry.name.isdecimal():
             continue
@@ -472,17 +473,46 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
         row = owned[pid]
         current = read_proc_stat(proc_root, pid, missing_is_exit=True)
         if current is None:
+            if pid == root_pid:
+                root = None
             continue
         if current["start_ticks"] != row["start_ticks"] or (session_id is not None and current["session_id"] != session_id):
             fail("mir441-owned-child-identity")
-        working += read_status_rss(proc_root, pid)
-        resident, swap = read_private_memory(proc_root, pid)
+        if pid == root_pid:
+            root = current
+        # A zombie still has a stat identity but has released its address space.
+        # Its status may omit VmRSS and smaps_rollup is no longer available.
+        # Continue accounting for every live member of the owned session.
+        if current.get("state") in {"Z", "X", "x"}:
+            continue
+        try:
+            rss = read_status_rss(proc_root, pid)
+            resident, swap = read_private_memory(proc_root, pid)
+        except ObservationFailure as memory_failure:
+            # Exit can occur between identity and either memory read. Only a
+            # re-observed exit of that exact identity makes this sample absent;
+            # a live malformed/unreadable process still retains the refusal.
+            try:
+                after = read_proc_stat(proc_root, pid, missing_is_exit=True)
+            except ObservationFailure:
+                raise memory_failure
+            if after is not None and (after["start_ticks"] != row["start_ticks"]
+                    or session_id is not None and after["session_id"] != session_id):
+                fail("mir441-owned-child-identity")
+            if after is None or after.get("state") in {"Z", "X", "x"}:
+                if pid == root_pid:
+                    root = after
+                continue
+            raise
+        # Commit one complete sample, never an RSS fragment whose private
+        # accounting became unavailable during a confirmed process exit.
+        working += rss
         private_resident += resident
         private_swap += swap
         if pid != root_pid:
             children.append({"id": pid, "start_ticks": row["start_ticks"], "session_id": row["session_id"]})
     return {
-        "root_exited": root is None,
+        "root_exited": root is None or root.get("state") in {"Z", "X", "x"},
         "root_identity": {"pid": root_pid, "start_ticks": root_start_ticks, "session_id": session_id},
         "working_set_bytes": working,
         "private_resident_bytes": private_resident,
