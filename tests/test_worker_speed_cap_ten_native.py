@@ -28,6 +28,8 @@ CURRENT_SUCCESSOR = FIXTURE / "current-successor16"
 CURRENT_OBSERVE = FIXTURE / "current-observe16"
 CURRENT_SUCCESSOR17 = FIXTURE / "current-successor17"
 SOURCE_PRODUCER15 = FIXTURE / "source-producer15"
+PRODUCER_OLD15 = FIXTURE / "producer-old15"
+PRODUCER_SUCCESSOR17 = FIXTURE / "producer-successor17"
 LUA_ROOT = ROOT / "source"
 WORKER = "worker-robots-speed-10"
 PREDECESSOR = "worker-robots-speed-9"
@@ -69,7 +71,8 @@ class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
         directory = {"source15": SOURCE, "old-negative15": OLD_NEGATIVE, "successor16": SUCCESSOR,
                      "current-old15": CURRENT_OLD_NEGATIVE, "current-successor16": CURRENT_SUCCESSOR,
                       "current-observe16": CURRENT_OBSERVE, "current-successor17": CURRENT_SUCCESSOR17,
-                      "source-producer15": SOURCE_PRODUCER15}[stage]
+                      "source-producer15": SOURCE_PRODUCER15, "producer-old15": PRODUCER_OLD15,
+                      "producer-successor17": PRODUCER_SUCCESSOR17}[stage]
         return self.world["data_case"](str(directory / "settings-updates.lua"), str(directory / "data-final-fixes.lua"),
                                           str(FIXTURE / "fixture_settings.lua"), str(FIXTURE / "fixture_data_final.lua"), stage, opponent)
 
@@ -80,6 +83,11 @@ class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
     def source_producer_result(self, cold: bool = False, fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.world["source_producer_flow"](str(SOURCE_PRODUCER15 / "control.lua"),
                                                        str(fixture_control), cold)
+
+    def producer_transition_result(self, mode: str = "successor", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
+        return self.world["producer_successor_flow"](
+            str(SOURCE_PRODUCER15 / "control.lua"), str(PRODUCER_OLD15 / "control.lua"),
+            str(PRODUCER_SUCCESSOR17 / "control.lua"), str(fixture_control), mode, opponent)
 
     def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.world["current_state_flow"](str(CURRENT_OLD_NEGATIVE / "control.lua"),
@@ -933,6 +941,115 @@ end
         self.assertTrue(result["logs"][2].startswith("[MIR_WORKER_SPEED_CAP_TEN phase=preconditions] "))
         self.assertEqual(["worker-speed-cap-ten/source.json", "worker-speed-cap-ten/preconditions.json"],
                          [result["files"][i]["path"] for i in range(1, len(result["files"]) + 1)])
+
+
+    def test_producer_transition_roles_pin_their_distinct_full_protocol(self):
+        for folder, version, mir in ((PRODUCER_OLD15, "0.14.0", "5.0.20015"),
+                                     (PRODUCER_SUCCESSOR17, "0.15.0", "5.0.20017")):
+            with self.subTest(role=folder.name):
+                info = json.loads((folder / "info.json").read_text(encoding="utf-8"))
+                self.assertEqual((ACTIVE_MODS_OBSERVER, version, "2.0"),
+                                 (info["name"], info["version"], info["factorio_version"]))
+                self.assertEqual(["base = 2.0.77", "space-exploration = 0.7.57", "more-infinite-research = " + mir], info["dependencies"])
+                result = self.data_result(folder.name)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(10, result["raw"]["int-setting"][CAP]["default_value"])
+                self.assertEqual("infinite", result["raw"]["technology"][WORKER]["max_level"])
+                self.assertEqual(1, len(result["rows"]))
+                self.assertEqual((version, mir), (result["mods"][ACTIVE_MODS_OBSERVER], result["mods"]["more-infinite-research"]))
+
+    def test_producer_successor_preserves_source_and_finishes_then_reads_twice_cold(self):
+        result = self.producer_transition_result()
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((1, 1, True), (result["labs"], result["saves"], result["cold_storage_unchanged"]))
+        state = result["state"]
+        self.assertEqual((True, "5.0.20015", "complete", 1, 0),
+                         (state["source_producer"], state["source_mir"], state["phase"],
+                          state["ordinary_native_completion_count"], state["level_eleven_start_count"]))
+        self.assertEqual(("source-producer-ready", "5.0.20015", "producer-successor17"),
+                         (state["producer_origin"]["phase"], state["producer_origin"]["source_mir"], state["producer_origin"]["role"]))
+        self.assertEqual((11, False, 1.3), (result["player"]["technologies"][WORKER]["level"],
+                         result["player"]["technologies"][WORKER]["enabled"], result["player"]["worker_robots_speed_modifier"]))
+        self.assertEqual((False, 1.3, .42), (result["foreign"]["technologies"][WORKER]["enabled"],
+                         result["foreign"]["worker_robots_speed_modifier"], result["foreign"]["research_progress"]))
+        self.assertEqual((13, False, 2.6), (result["earned"]["technologies"][WORKER]["level"],
+                         result["earned"]["technologies"][WORKER]["enabled"], result["earned"]["worker_robots_speed_modifier"]))
+        rows = self._lua_rows(result["markers"])
+        self.assertEqual(["source-producer", "preconditions", "pre-work", "complete", "cold", "cold"], [row["phase"] for row in rows])
+        for row in rows[2:]:
+            self.assertEqual(("producer-successor17", "0.15.0", "5.0.20015", "5.0.20017", 20),
+                             (row["role"], row["fixture_stage"], row["source_mir"], row["active_mir"], row["active_mod_count"]))
+            self.assertEqual(("source-producer-ready", "5.0.20015", "producer-successor17"),
+                             (row["source_origin"]["phase"], row["source_origin"]["source_mir"], row["source_origin"]["role"]))
+        self.assertEqual((10, .27, 1), (rows[2]["player"]["level"], rows[2]["player"]["queue"]["progress"], len(rows[2]["player"]["queue"]["queue"])))
+        self.assertEqual((1, False, 10, 11), (rows[3]["ordinary_native_completion_count"],
+                         rows[3]["ordinary_events"][1]["by_script"], rows[3]["ordinary_events"][1]["completed_level"],
+                         rows[3]["ordinary_events"][1]["event_post_increment_level"]))
+        self.assertTrue(all(row["on_load_read_only"] for row in rows[4:]))
+        legacy = self.flow_result()
+        self.assertTrue(legacy["ok"], legacy["message"])
+        for row in self._lua_rows(legacy["markers"]):
+            self.assertIsNone(row["role"])
+            self.assertIsNone(row["source_origin"])
+
+    def test_producer_successor_refuses_incompatible_origin_before_lab_or_save(self):
+        opponents = ("wrong-phase", "wrong-source", "not-producer", "absent-state", "wrong-player-index", "missing-force",
+                     "aliased-forces", "fractional-index", "wrong-force-name", "no-queue-admission", "prior-ordinary",
+                     "prior-start", "ordinary-history", "missing-ordinary-history", "missing-admin-history", "prior-lab",
+                     "prior-pre-work", "prior-completion", "prior-deadline", "prior-queue-attempt", "prior-origin", "wrong-saved-bonus")
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                result = self.producer_transition_result(opponent=opponent)
+                self.assertFalse(result["ok"], opponent)
+                self.assertIn("producer source", result["message"])
+                self.assertTrue(result["rejected_fixture_state_unchanged"], opponent)
+                self.assertEqual((0, 0), (result["labs"], result["saves"]))
+
+    def test_producer_successor_retains_admin_history_and_real_event_guards(self):
+        admitted = self.producer_transition_result(opponent="admin-history")
+        self.assertTrue(admitted["ok"], admitted["message"])
+        self.assertEqual((1, "scripted-prerequisite"), (len(admitted["state"]["scripted_administrative_events"]),
+                         admitted["state"]["scripted_administrative_events"][1]["setup_class"]))
+        for opponent in ("init", "skip-caps", "missing-prerequisite", "changed-progress", "changed-bonus",
+                         "enabled-foreign", "enabled-earned", "level-eleven-start", "scripted-completion", "preincrement-completion", "cold-origin"):
+            with self.subTest(opponent=opponent):
+                result = self.producer_transition_result(opponent=opponent)
+                self.assertFalse(result["ok"], opponent)
+        wrong = self.producer_transition_result(opponent="cold-write")
+        self.assertTrue(wrong["ok"], wrong["message"])
+        self.assertFalse(wrong["cold_storage_unchanged"], "The cold-state invariant must detect a forbidden saved-state write")
+
+    def test_producer_admission_state_guard_detects_a_forbidden_early_write(self):
+        original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
+        call = "      assert_ready_producer_source(state)\n"
+        self.assertEqual(1, original.count(call))
+        mutant = original.replace(call, "      state.forbidden_early_write = true\n" + call, 1)
+        temporary_parent = ROOT / "build" / "tmp"
+        temporary_parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="producer-admission-mutant-", dir=temporary_parent) as directory:
+            self.assertTrue(Path(directory).resolve().is_relative_to(temporary_parent.resolve()))
+            path = Path(directory) / "fixture_control.lua"
+            path.write_text(mutant, encoding="utf-8")
+            result = self.producer_transition_result(opponent="wrong-source", fixture_control=path)
+        self.assertFalse(result["ok"])
+        self.assertEqual((0, 0), (result["labs"], result["saves"]))
+        self.assertFalse(result["rejected_fixture_state_unchanged"],
+                         "The admission invariant must detect an actual forbidden fixture-state write")
+
+    def test_producer_old15_records_the_exact_opposing_outcome_without_labs(self):
+        result = self.producer_transition_result(mode="old")
+        self.assertFalse(result["ok"])
+        self.assertIn("MIR_EXPECTED_OLD15_CAP_NOT_ENFORCED", result["message"])
+        self.assertEqual((0, 0), (result["labs"], result["saves"]))
+        rows = self._lua_rows(result["markers"])
+        self.assertEqual(["source-producer", "preconditions", "old-negative"], [row["phase"] for row in rows])
+        row = rows[-1]
+        self.assertEqual(("producer-old15", "0.14.0", "5.0.20015", "5.0.20015"),
+                         (row["role"], row["fixture_stage"], row["source_mir"], row["active_mir"]))
+        self.assertEqual((10, 2, .27, .65), (row["player"]["level"], len(row["player"]["queue"]["queue"]),
+                         row["player"]["queue"]["progress"], row["player"]["bonus"]))
+        self.assertEqual((False, 1.3, True, 2.6), (row["foreign"]["enabled"], row["foreign"]["bonus"],
+                         row["earned_above_cap"]["enabled"], row["earned_above_cap"]["bonus"]))
 
 
 if __name__ == "__main__":
