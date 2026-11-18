@@ -138,8 +138,14 @@ class ContinuationOwnershipTests(unittest.TestCase):
                         assert(catalogue.native_credit_groups().research_processing_unit[1].change == .1)
                         local withheld = catalogue.restoration_only()
                         assert(#withheld == 1 and withheld[1].id == "steel-plate-productivity")
+                        assert(withheld[1].native_admission.effect_type == "change-recipe-productivity")
+                        assert(withheld[1].native_admission.recipes[1] == "steel-plate")
                         withheld[1].id = "caller mutation"
+                        withheld[1].native_admission.effect_type = "caller mutation"
+                        withheld[1].native_admission.recipes[1] = "caller mutation"
                         assert(catalogue.restoration_only()[1].id == "steel-plate-productivity")
+                        assert(catalogue.restoration_only()[1].native_admission.effect_type == "change-recipe-productivity")
+                        assert(catalogue.restoration_only()[1].native_admission.recipes[1] == "steel-plate")
                       else
                         assert(next(scalars) == nil and next(groups) == nil)
                         assert(#catalogue.restoration_only() == 0)

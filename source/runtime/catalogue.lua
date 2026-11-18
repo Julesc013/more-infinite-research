@@ -194,9 +194,11 @@ function M.restoration_only()
   if withheld_native_owners == nil or next(withheld_native_owners) == nil then return rows end
   for _, owner in ipairs(native_owner_definitions) do
     if withheld_native_owners[owner.id] ~= nil then
+      local recipes = {}
+      for index, recipe in ipairs(owner.admission.recipes) do recipes[index] = recipe end
       rows[#rows + 1] = {id=owner.id, family=owner.family, cap_setting=owner.setting,
         ownership_kind="nativeowner", native_owner_identity=owner.id,
-        native_admission=owner.admission,
+        native_admission={effect_type=owner.admission.effect_type, recipes=recipes},
         legacy_binding={source="native-owner", operation="preserve_native_owner"}}
     end
   end
