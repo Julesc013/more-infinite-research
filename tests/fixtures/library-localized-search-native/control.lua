@@ -42,9 +42,9 @@ local function same(left, right)
 end
 
 local function exact_active_mods()
-  if VERSION ~= "0.1.0" then fail("exact active-mod selection required") end
+  if VERSION ~= "0.1.1" then fail("exact active-mod selection required") end
   local expected = {
-    base = "2.1.24", [MIR] = "5.0.21017", [FIXTURE] = "0.1.0",
+    base = "2.1.24", [MIR] = "5.0.21017", [FIXTURE] = "0.1.1",
     ["mir-fixture-mir5-api-alpha"] = "0.1.0", ["mir-fixture-mir5-api-beta"] = "0.1.0",
     ["mir-fixture-mir5-active-mods-observer"] = "0.1.0"
   }
@@ -264,6 +264,17 @@ local function record_snapshot(stage_name)
     local screen = player.gui and player.gui.screen
     if screen and valid(screen[ROOT]) then fail("Library root should be retired") end
     if player.opened ~= nil then fail("Library close did not retire public root") end
+    if player.controller_type ~= defines.controllers.character or not valid(player.character) then
+      fail("Library close has no live character controller")
+    end
+    local observation = current.close_observation
+    if type(observation) ~= "table" or observation.stage ~= stage_name
+        or type(observation.event_received) ~= "boolean" or observation.tick >= game.tick then
+      fail("Library close observation differs")
+    end
+    row.close_observation = {event_received = observation.event_received, tick = observation.tick,
+      root_absent = true, opened_absent = true}
+    current.close_observation = nil
   elseif stage_name == "help-tab" then
     local root, tabs = root_tree(player)
     if tabs.selected_tab_index ~= 4 then fail("Help tab was not selected") end
@@ -293,6 +304,26 @@ end
 
 local function settle(event)
   local current, pending = state(), state().pending
+  if pending == nil and (current.phase == "await-setup-close" or current.phase == "await-close") then
+    local player = player_for(current.player_index)
+    if player == nil then fail("localized-search player unavailable") end
+    local screen = player.gui and player.gui.screen
+    local root = screen and screen[ROOT]
+    if not valid(root) then
+      -- A real close can retire the GUI without delivering a callback to this
+      -- later observer. Record the public state instead of inventing an event.
+      -- The external actor retains the reviewed input and before/after images.
+      if player.opened ~= nil then fail("Library close did not retire public root") end
+      if player.controller_type ~= defines.controllers.character or not valid(player.character) then
+        fail("Library close has no live character controller")
+      end
+      local stage = current.phase == "await-setup-close" and "setup-closed" or "closed"
+      current.close_observation = {stage = stage, tick = game.tick, event_received = false}
+      schedule(stage)
+      current.phase = "settling-" .. stage
+    end
+    return
+  end
   if pending == nil or event.tick < pending.tick then return end
   local player = player_for(current.player_index)
   if player == nil then fail("localized-search player unavailable") end
@@ -435,7 +466,9 @@ local function on_closed(event)
   current.events.close = current.events.close + 1
   record_event("closed", {player_index = event.player_index, gui_type = event.gui_type,
     element_valid = valid(event.element)})
-  schedule(current.phase == "await-setup-close" and "setup-closed" or "closed")
+  local stage = current.phase == "await-setup-close" and "setup-closed" or "closed"
+  current.close_observation = {stage = stage, tick = game.tick, event_received = true}
+  schedule(stage)
   current.phase = current.phase == "await-setup-close" and "settling-setup-closed" or "settling-closed"
 end
 

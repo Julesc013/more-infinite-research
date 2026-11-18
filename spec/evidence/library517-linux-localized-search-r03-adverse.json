@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryLocalizedSearchNativeAdverseV1",
+  "status": "closed-after-visible-root-retirement-missing-observer-phase",
+  "source": {
+    "player_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "player_archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "controller_commit": "c123ea18ae50f91b41a10136674a4fbe7d6aac7f",
+    "controller_tree": "a44d60878c3e44e54d103f1e7c3c4ff27dded1f5",
+    "controller_delta": "Original6c plus the reviewed Linux exit-observer source/test cherry-pick. Player tree unchanged.",
+    "actor_sha256": "AEB46B9ACCB7144DDC97FCD9B8B718FEE50C8410F8CADC4A19A73FB8C9186ACB",
+    "owner_sha256": "92D4D443418EB679277190C336579218CD79E023C09B2C4B850DEB6B7468C4CF",
+    "fixture_sha256": "C59C40732D43CC3BB906A082E0406BF215E4451C6C1093D8B06A72DC8E1A160C",
+    "fixture_version": "0.1.0"
+  },
+  "inputs": {
+    "engine_version": "2.1.24",
+    "engine_variant": "Linux x64 graphical full build, Base selection",
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "protected_fresh_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "packet_sha256": "B61E3E74AE95FA49353D5877EA1D6EA15957209A415C85B436DADA583D5D929F",
+    "composition_sha256": "162C07A1E5B3F45FCB66C2DC1DDF8BCEEAC5C57CA71B36B9BD86659D33EBEFA8",
+    "execution_review_sha256": "C48CBE045F6D89CE8BF40375644FB071C0284CA53707527FD5D14B9439B63C33",
+    "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.0|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017"
+  },
+  "observed": {
+    "service": "mir-library517-localized-search-r03.service",
+    "invocation_id": "951a2b33486842c3adf599c9e64781b1",
+    "service_terminal_exit": 1,
+    "accepted_passive_phase": "00-initial",
+    "phase_sha256": "EAC59299CF092431D7A3B96AA294B6191E3CABE7D3192CE89C91C506AAAF12CB",
+    "loaded_producer_closure_passed": true,
+    "input_requests": 1,
+    "xtest_trace": "One accepted keycode9 down/up Escape request; no extra input.",
+    "completed_input_actions": 0,
+    "actor_error": "bounded wait exhausted: actual next-tick personal-view phase",
+    "owner_error": "[mir441-process-exit] 1",
+    "before_capture_sha256": "BE393435E7426505CF7F59D8D5279B5EFBE5615619B5E8B58EA00A65132EE189",
+    "post_request_capture_sha256": "34A5184587CC6DDDA3FFC623F5D1E3291223FB9F95362AFA59FABC6CBFA56721",
+    "missing_phase_capture_sha256": "81513A81B6D1B29A086147023E5F3BFB440E903E2637636FA8F8B32F1814EAFE",
+    "image_observation": "Root viewed all three exact captures: the Library is visible before Escape and absent in both later images. The game and character remain visible. This is a visual observation, not the missing next-tick native/GUI phase.",
+    "cause_limit": "Why the passive fixture received or retained no close phase remains unverified. No keyboard-focus or player-source defect is established."
+  },
+  "cleanup": {
+    "direct_child_exit_codes": {"server": 0, "client-de": 0, "display-de": 0},
+    "forced_children": 0,
+    "remaining_owned_session_processes": 0,
+    "private_display_restored": true,
+    "actor_cleanup_verified": true,
+    "owner_restored": true,
+    "restoration_errors": [],
+    "direct_library_controls_restored": true,
+    "temporary_owned_archives_removed": 5,
+    "protected_seed_unchanged": true,
+    "initial_executed_copy_verified": true,
+    "mutable_working_copy_sha256": "7B2CCE2E9C0CDE738FAD5243E92B88245B5751108328FA0990D8A59DD4F02977",
+    "mutable_working_copy_bytes": 1327599,
+    "supervision_limit": "Owned SSH observer held because Linger=no; no final-logout durability result."
+  },
+  "custody": {
+    "primary_directory": "build/qualification/library-localized-search-input-preparation-r01",
+    "capsule": "localized-search-r03-originals-r01.json.gz",
+    "capsule_sha256": "FCEF9E7DE86C3BA32E7E4CCDC76FF8DD4E9F95B53B755318770FF90F64431CAD",
+    "capsule_bytes": 13643939,
+    "decoded_bodies": 71,
+    "decoded_bytes": 21190665,
+    "all_decoded_bodies_rehashed": true
+  },
+  "prospective_fixture_correction": "Observe retired-root/empty-opened public state during the two bounded close waits while requiring a live connected character and unchanged native frame. Record whether a close callback actually arrived and leave event counters/logs factual. Keep initial modality, next-tick validation and the complete query/reopen obligations. Observer0.1.1 is host-tested only; it has no native result here.",
+  "scope_limits": [
+    "No accepted complete localized-search, clear, reopen or native-frame-after-input verdict.",
+    "No reporter, imported-history, Windows, performance or stable qualification.",
+    "No change to the published player package, protected save or prior adverse records.",
+    "The monitored exit now retains the actual actor failure; it is not a general Linux resource/performance acceptance."
+  ]
+}
