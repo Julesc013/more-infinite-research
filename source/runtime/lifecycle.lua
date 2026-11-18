@@ -350,6 +350,13 @@ local function known_worker_tail(name)
   return false
 end
 
+local function excluded_family_member(name, excluded_family)
+  if excluded_family == nil then return false end
+  local row = DECLARATION_BY_ID[name] or RESTORATION_BY_ID[name]
+  if row then return (row.family or row.declaration.family) == excluded_family end
+  return excluded_family == "worker-robots-speed" and known_worker_tail(name)
+end
+
 local function has_worker_ownership(owned)
   if type(owned) ~= "table" then return false end
   for index = 1, #WORKER_TAIL_NAMES do
@@ -388,6 +395,30 @@ local function native_owner_admitted(force, row, observed)
   end, row.declaration, row.configured_effect_change)
 end
 
+local function authored_generated_prototype_state(force, row)
+  if not valid_force(force) then return nil end
+  local phase = "technology lookup"
+  local ok, technology, enabled = pcall(function()
+    local technologies = force.technologies
+    local technology = technologies and technologies[row.id] or nil
+    if not technology then return nil end
+    phase = "prototype lookup"
+    local prototype = technology.prototype
+    if not prototype then return technology, nil end
+    phase = "prototype enabled"
+    return technology, prototype.enabled
+  end)
+  if not ok then
+    -- Failed native observations cannot authenticate disappearance and must
+    -- not let either consumer discard an existing restoration right.
+    -- Preserve a structured native error object instead of flattening its
+    -- identity; ordinary string failures also name the technology and phase.
+    if type(technology) ~= "string" then error(technology, 0) end
+    error("MIR authored cap " .. phase .. " failed for " .. row.id .. ": " .. technology, 2)
+  end
+  return technology, enabled
+end
+
 -- Startup settings decide whether a stream may be considered, but the data
 -- stage can retain its identity with prototype.enabled=false when science or
 -- lab policy rejects it. Only that immutable default distinguishes the latter
@@ -395,8 +426,8 @@ end
 local function authored_generated_admitted(force, row, observed)
   if not valid_force(force) then return false end
   if observed then return observed.authored[row.id] == true end
-  local technology = force.technologies and force.technologies[row.id] or nil
-  return technology ~= nil and technology.prototype ~= nil and technology.prototype.enabled == true
+  local _, enabled = authored_generated_prototype_state(force, row)
+  return enabled == true
 end
 
 -- A retained generated identity can be deliberately disabled by the data
@@ -406,8 +437,8 @@ end
 local function authored_generated_prototype_disabled(force, row, observed)
   if not valid_force(force) then return nil end
   if observed then return observed.disabled[row.id] end
-  local technology = force.technologies and force.technologies[row.id] or nil
-  if technology and technology.prototype and technology.prototype.enabled == false then return technology end
+  local technology, enabled = authored_generated_prototype_state(force, row)
+  if enabled == false then return technology end
   return nil
 end
 
@@ -422,11 +453,11 @@ end
 -- A record exists only after this runtime changed an enabled technology to
 -- disabled, so later cap relaxation can restore neither a data-stage default
 -- nor foreign pre-disablement.
-local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled, observed)
+local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled, observed, excluded_family)
   if not valid_force(force) then return false end
   for index = 1, #ORDERED_DECLARATIONS do
     local row = ORDERED_DECLARATIONS[index]
-    if row.ownership_kind == "authored_generated" then
+    if row.family ~= excluded_family and row.ownership_kind == "authored_generated" then
       local technology = authored_generated_prototype_disabled(force, row, observed)
       if technology and technology.enabled == true then
         -- The caller probes with nil before allocating durable storage for an
@@ -454,7 +485,7 @@ local function reconcile_authored_prototype_disablement(force, owned_disabled, i
   return false
 end
 
-local function cancel_unavailable_research(force, observed)
+local function cancel_unavailable_research(force, observed, excluded_family)
   -- Native technology.saved_progress is the modern saved-work surface. Older
   -- engine adapters retain their existing cap/queue behavior.
   if platform_target.factorio_version ~= "2.0" and platform_target.factorio_version ~= "2.1" then return end
@@ -463,7 +494,7 @@ local function cancel_unavailable_research(force, observed)
   local function inspect(technology)
     local name = technology and technology.name
     local row = name and DECLARATION_BY_ID[name]
-    if row and row.ownership_kind == "authored_generated"
+    if row and row.family ~= excluded_family and row.ownership_kind == "authored_generated"
         and row.declaration.cancel_queued_when_unavailable == true
         and authored_generated_prototype_disabled(force, row, observed) then
       unavailable = unavailable or {}
@@ -478,21 +509,24 @@ local function cancel_unavailable_research(force, observed)
   if unavailable then caps.remove_unavailable_from_queue(force, unavailable) end
 end
 
-local function full_limits_for(force, include_worker, selected_owner, owner_resolved, observed)
+local function full_limits_for(force, include_worker, selected_owner, owner_resolved, observed, excluded_family)
   local limits, admitted = {}, {}
   if valid_force(force) then
     for name, row in pairs(STATIC_GENERATED_BY_ID) do
-      if authored_generated_admitted(force, row, observed) then limits[name], admitted[name] = effective_limit(row, force), true end
+      if row.family ~= excluded_family and authored_generated_admitted(force, row, observed) then
+        limits[name], admitted[name] = effective_limit(row, force), true
+      end
     end
     for name, row in pairs(NATIVE_OWNER_BY_ID) do
-      if row.enabled and native_owner_admitted(force, row, observed) then
+      if row.family ~= excluded_family and row.enabled and native_owner_admitted(force, row, observed) then
         limits[name], admitted[name] = effective_limit(row, force), true
       end
     end
     for name, row in pairs(RESTORATION_BY_ID) do
-      if native_owner_admitted(force, row, observed) then admitted[name] = true end
+      if not excluded_family_member(name, excluded_family)
+          and native_owner_admitted(force, row, observed) then admitted[name] = true end
     end
-    if WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker then
+    if excluded_family ~= "worker-robots-speed" and (WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker) then
       local owner = selected_owner
       if not owner_resolved then owner = worker_owner(force, observed) end
       if owner then limits[owner], admitted[owner] = WORKER_ROBOT_SPEED_LIMIT, true end
@@ -524,27 +558,29 @@ end
 -- Named research events observe their subject and unavailable queued rows;
 -- rare all-force events observe the authored list. Application consumes these
 -- facts rather than repeating admission reads after an earlier force changed.
-local function preflight_cap_admissions(forces, target_name, legacy)
+local function preflight_cap_admissions(forces, target_name, legacy, excluded_family)
   local planned = {}
   local current = existing_state()
   for _, force in pairs(forces or {}) do
     if valid_force(force) then
       local observed = {native = {}, authored = {}, disabled = {}}
       local function inspect(row)
+        if excluded_family_member(row.id, excluded_family) then return end
         if row.ownership_kind == "nativeowner" then
           observed.native[row.id] = native_owner_admitted(force, row)
         else
-          local technology = force.technologies and force.technologies[row.id] or nil
-          local prototype = technology and technology.prototype
-          observed.authored[row.id] = prototype ~= nil and prototype.enabled == true
-          if prototype and prototype.enabled == false then observed.disabled[row.id] = technology end
+          local technology, enabled = authored_generated_prototype_state(force, row)
+          observed.authored[row.id] = enabled == true
+          if enabled == false then observed.disabled[row.id] = technology end
         end
       end
       if target_name then
         local row = DECLARATION_BY_ID[target_name]
         if row then inspect(row) end
         local restoration = RESTORATION_BY_ID[target_name]
-        if restoration then observed.native[target_name] = native_owner_admitted(force, restoration) end
+        if restoration and not excluded_family_member(target_name, excluded_family) then
+          observed.native[target_name] = native_owner_admitted(force, restoration)
+        end
         local function inspect_queued(technology)
           local row = technology and DECLARATION_BY_ID[technology.name]
           if row and row.ownership_kind == "authored_generated"
@@ -555,20 +591,23 @@ local function preflight_cap_admissions(forces, target_name, legacy)
       else
         for _, row in ipairs(ORDERED_DECLARATIONS) do inspect(row) end
         for name, row in pairs(RESTORATION_BY_ID) do
-          observed.native[name] = native_owner_admitted(force, row)
+          if not excluded_family_member(name, excluded_family) then
+            observed.native[name] = native_owner_admitted(force, row)
+          end
         end
       end
       local owned = current and current.owned_disabled[force.index]
       local include_worker = has_worker_ownership(owned)
-      if legacy or (target_name == nil and (WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker))
-          or known_worker_tail(target_name) then
+      if excluded_family ~= "worker-robots-speed" and (legacy
+          or (target_name == nil and (WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker))
+          or known_worker_tail(target_name)) then
         observed.worker = worker_owner(force)
         observed.worker_observed = true
       end
       -- Resolve named recipe caps before allocating state or importing legacy
       -- markers as well. This is not a second native-admission observation.
       if target_name then event_limits_for(force, target_name, include_worker, observed)
-      else full_limits_for(force, include_worker, nil, false, observed) end
+      else full_limits_for(force, include_worker, nil, false, observed, excluded_family) end
       planned[force.index] = observed
     end
   end
@@ -605,11 +644,11 @@ end
 -- an owner no longer matches its exact effect contract, or a worker tail is
 -- superseded, discard only MIR's future restoration right. This fails closed:
 -- no uncertain ownership is converted into an enablement write.
-local function discard_unbound_ownership(force, owned_disabled, admitted, owner, workers_only, observed)
+local function discard_unbound_ownership(force, owned_disabled, admitted, owner, workers_only, observed, excluded_family)
   local owned = owned_disabled[force.index]
   if type(owned) ~= "table" then return owned end
   for name, row in pairs(owned) do
-    if not workers_only or known_worker_tail(name) then
+    if not excluded_family_member(name, excluded_family) and (not workers_only or known_worker_tail(name)) then
       -- A disabled authored prototype keeps a record that this runtime
       -- actually wrote. It must remain disabled until that prototype is
       -- admitted again, when caps.reconcile can restore only this proven right.
@@ -639,12 +678,13 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   return owned
 end
 
-local function restore_withheld_caps(force, owned_disabled, target_name, discovery_observed, observed)
+local function restore_withheld_caps(force, owned_disabled, target_name, discovery_observed, observed, excluded_family)
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   if type(owned) ~= "table" then return end
   local release = {}
   for name, row in pairs(RESTORATION_BY_ID) do
-    if (target_name == nil or target_name == name) and type(owned[name]) == "table"
+    if not excluded_family_member(name, excluded_family)
+        and (target_name == nil or target_name == name) and type(owned[name]) == "table"
         and native_owner_admitted(force, row, observed) then
       -- caps.reconcile visits supplied limits only. Zero here releases this
       -- existing ledger; no zero entry is exposed as a selected/new cap.
@@ -657,7 +697,7 @@ local function restore_withheld_caps(force, owned_disabled, target_name, discove
 end
 
 local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name, imported_reenabled,
-    discovery_observed, observed)
+    discovery_observed, observed, excluded_family)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   local include_worker = has_worker_ownership(owned)
@@ -667,7 +707,7 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if target_name then
     limits, admitted, owner = event_limits_for(force, target_name, include_worker, observed)
     if limits == nil then
-      restore_withheld_caps(force, owned_disabled, target_name, observation, observed)
+      restore_withheld_caps(force, owned_disabled, target_name, observation, observed, excluded_family)
       owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
       if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil
           and not retained_authored_prototype_disablement(force, target_name, observed) then
@@ -677,7 +717,7 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
       return
     end
   else
-    limits, admitted, owner = full_limits_for(force, include_worker, selected_owner, owner_resolved, observed)
+    limits, admitted, owner = full_limits_for(force, include_worker, selected_owner, owner_resolved, observed, excluded_family)
   end
   if type(owned_disabled) == "table" then
     if target_name then
@@ -688,15 +728,15 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
         if next(row) == nil then owned_disabled[force.index] = nil end
       end
       if known_worker_tail(target_name) then
-        discard_unbound_ownership(force, owned_disabled, admitted, owner, true, observed)
+        discard_unbound_ownership(force, owned_disabled, admitted, owner, true, observed, excluded_family)
       end
     else
-      owned = discard_unbound_ownership(force, owned_disabled, admitted, owner, nil, observed)
+      owned = discard_unbound_ownership(force, owned_disabled, admitted, owner, nil, observed, excluded_family)
     end
   end
   local targets = target_name and {[target_name] = true} or nil
   local _, result = caps.reconcile(force, limits, owned_disabled, targets, imported_reenabled, observation)
-  if target_name == nil then restore_withheld_caps(force, owned_disabled, nil, observation, observed) end
+  if target_name == nil then restore_withheld_caps(force, owned_disabled, nil, observation, observed, excluded_family) end
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
@@ -708,24 +748,35 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   end
 end
 
-local function stale_force_indices()
-  local stale, live = {}, {}
-  for _, force in pairs(game and game.forces or {}) do
-    if valid_force(force) then live[force.index] = true end
+local function force_snapshot()
+  local registry = game and game.forces
+  if registry == nil then return nil end
+  -- Indexed access can throw for a genuinely deleted force. Observe the
+  -- complete current registry once instead, before any ownership cleanup.
+  -- An iteration/property failure propagates without inventing absence.
+  local forces = {}
+  for _, force in pairs(registry) do
+    if valid_force(force) then forces[force.index] = force end
   end
+  return forces
+end
+
+local function stale_force_indices(forces)
+  local stale = {}
   local existing = existing_state()
   if existing then
     for index in pairs(existing.owned_disabled) do
-      if not live[index] then stale[#stale + 1] = index end
+      if not forces[index] then stale[#stale + 1] = index end
     end
   end
   return stale
 end
 
-local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled, discovery_observed, admissions, stale)
-  if not game or not game.forces then return end
-  admissions = admissions or preflight_cap_admissions(game.forces)
-  stale = stale or (clean_stale_forces and stale_force_indices() or {})
+local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled, discovery_observed, admissions, stale, observed_forces)
+  local forces = observed_forces or force_snapshot()
+  if forces == nil then return end
+  admissions = admissions or preflight_cap_admissions(forces)
+  stale = stale or (clean_stale_forces and stale_force_indices(forces) or {})
   -- Unlimited startup settings need no state unless a previous finite setting
   -- left an ownership transition that has to be restored exactly once, or an
   -- authored disabled prototype is currently force-enabled and needs this
@@ -735,7 +786,7 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
   if current and clean_stale_forces then
     for _, index in ipairs(stale) do owned_disabled[index] = nil end
   end
-  for _, force in pairs(game.forces) do
+  for _, force in pairs(forces) do
     local observed = valid_force(force) and admissions[force.index] or nil
     if current == nil and reconcile_authored_prototype_disablement(force, nil, nil, observed) then
       current = ensure_state()
@@ -875,7 +926,7 @@ end
 -- This is the sole reader of the published bucket. It is deliberately called
 -- only by on_configuration_changed: initialization and load never transport
 -- historical cap rights into a new save.
-local function import_legacy_caps_on_configuration(event, admissions)
+local function import_legacy_caps_on_configuration(event, forces, admissions)
   local mir = storage.mir
   local legacy_bucket = type(mir) == "table" and mir.maximum_level_control or nil
   if legacy_bucket == nil then return nil end
@@ -893,44 +944,62 @@ local function import_legacy_caps_on_configuration(event, admissions)
   -- ordinary control parsing, cold loads and subsequent configurations.
   local f200_allowlist = direct_f200_hop and legacy_caps.f200_direct_hop_allowlist(DECLARATIONS)
 
-  -- A failed native property read makes the exact worker owner unknown. Read
-  -- every force before allocating caps state or consuming the one-time legacy
-  -- marker, so a caught configuration error cannot suppress a later import.
-  local owner_plan = preflight_worker_owners(game and game.forces, admissions)
-  current = ensure_state()
-  -- Preserve this marker even when no candidate is currently admitted or the
-  -- old bucket is malformed. A reused force index must never re-open import.
-  current.legacy_caps_checked = true
-
-  local imported_reenabled = {}
-  if not game or not game.forces then return owner_plan end
-  for _, force in pairs(game.forces) do
-    if valid_force(force) then
-      -- Revalidate the native tail even if the new worker cap is unlimited;
-      -- importing its historical restoration right still depends on that
-      -- exact current owner.
-      local plan = owner_plan[force.index]
-      local owner = plan and plan.owner or nil
-      local observed = admissions[force.index]
-      local _, admitted = full_limits_for(force, true, owner, true, observed)
-      local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner, nil, observed)
-      -- Public policy-v1 used a distinct, boolean component ledger.  Its
-      -- marker is the only selector here; both readers still receive the
-      -- current preflighted candidate list and current ownership, so an old
-      -- version label cannot manufacture a restoration right.
-      local import_for_force = type(legacy_bucket) == "table" and legacy_bucket.policy_version == 1
-        and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
-      local rows, facts = import_for_force(legacy_bucket, force,
-        legacy_candidates(force, owner, false, observed), owned, LEGACY_ALLOWLIST)
-      merge_legacy_rows(current.owned_disabled, force.index, rows, facts, imported_reenabled)
-      if direct_f200_hop then
-        local predecessor_rows, predecessor_facts = legacy_caps.import_for_force(legacy_bucket, force,
-          legacy_candidates(force, owner, true, observed), current.owned_disabled[force.index], f200_allowlist)
-        merge_legacy_rows(current.owned_disabled, force.index, predecessor_rows,
-          predecessor_facts, imported_reenabled)
-      end
+  -- Bootstrap's immutable admission preflight precedes its worker writes.
+  -- Decode mutable native flags/current ownership here, after those transfers
+  -- settle; a pre-transfer ownership draft could reinstall a retired head.
+  -- This local plan does not promise rollback of earlier bootstrap writers.
+  -- Read and decode every force before consuming the one-time marker or
+  -- changing persistent ownership. Pruning/import operate on transient maps;
+  -- existing record objects remain shared but are never modified by either.
+  local owner_plan = preflight_worker_owners(forces, admissions)
+  local planned_owned, imported_reenabled = {}, {}
+  for index, force in pairs(forces or {}) do
+    local previous = current and current.owned_disabled[index]
+    if previous ~= nil then
+      if type(previous) ~= "table" then error("MIR legacy caps current ownership must be a table or nil", 2) end
+      local copy = {}
+      for name, record in pairs(previous) do copy[name] = record end
+      planned_owned[index] = copy
+    end
+    -- Revalidate the native tail even if the new worker cap is unlimited;
+    -- importing its historical restoration right still depends on that
+    -- exact current owner.
+    local observed = admissions[index]
+    local plan = owner_plan[index]
+    local owner = plan and plan.owner or nil
+    local _, admitted = full_limits_for(force, true, owner, true, observed)
+    local owned = discard_unbound_ownership(force, planned_owned, admitted, owner, nil, observed)
+    -- Public policy-v1 used a distinct, boolean component ledger.  Its
+    -- marker is the only selector here; both readers still receive the
+    -- current preflighted candidate list and current ownership, so an old
+    -- version label cannot manufacture a restoration right.
+    local import_for_force = type(legacy_bucket) == "table" and legacy_bucket.policy_version == 1
+      and legacy_caps.import_boolean_for_force or legacy_caps.import_for_force
+    local rows, facts = import_for_force(legacy_bucket, force,
+      legacy_candidates(force, owner, false, observed), owned, LEGACY_ALLOWLIST)
+    merge_legacy_rows(planned_owned, index, rows, facts, imported_reenabled)
+    if direct_f200_hop then
+      local predecessor_rows, predecessor_facts = legacy_caps.import_for_force(legacy_bucket, force,
+        legacy_candidates(force, owner, true, observed), planned_owned[index], f200_allowlist)
+      merge_legacy_rows(planned_owned, index, predecessor_rows,
+        predecessor_facts, imported_reenabled)
     end
   end
+
+  current = ensure_state()
+  -- The import commit performs no native reads or repeated decoding. Normal
+  -- cap reconciliation subsequently uses these retained ownership results.
+  for index in pairs(forces or {}) do
+    local previous, planned = current.owned_disabled[index], planned_owned[index]
+    if previous == nil or planned == nil then current.owned_disabled[index] = planned
+    else
+      for name in pairs(previous) do if planned[name] == nil then previous[name] = nil end end
+      for name, record in pairs(planned) do previous[name] = record end
+    end
+  end
+  -- A genuinely absent candidate or malformed payload still completes this
+  -- one-time check; reused force indexes cannot reopen historical authority.
+  current.legacy_caps_checked = true
   return owner_plan, imported_reenabled
 end
 
@@ -942,7 +1011,23 @@ local function event_force(event)
   return nil
 end
 
-local function reconcile_event(event, research_only, discovery_observed, clear_index)
+local function clear_force(index, excluded_family)
+  if type(index) ~= "number" then return end
+  local current = existing_state()
+  if not current then return end
+  local owned = current.owned_disabled[index]
+  if excluded_family and type(owned) == "table" then
+    for name in pairs(owned) do
+      if not excluded_family_member(name, excluded_family) then owned[name] = nil end
+    end
+    if next(owned) == nil then current.owned_disabled[index] = nil end
+  else
+    current.owned_disabled[index] = nil
+  end
+  discard_empty_state(current)
+end
+
+local function reconcile_event(event, research_only, discovery_observed, clear_index, excluded_family)
   -- One upstream discovery event can change every technology on its force.
   -- Reconcile only MIR's bounded admitted rows, rather than just the finished ID.
   if DISCOVERY_TREE and discovery_observed then research_only = false end
@@ -951,22 +1036,22 @@ local function reconcile_event(event, research_only, discovery_observed, clear_i
   local research = event and event.research
   local name = research_only and research and research.name or nil
   if research_only and type(name) ~= "string" then return end
-  local observed = preflight_cap_admissions({force}, name)[force.index]
-  local existing = existing_state()
-  if existing and type(clear_index) == "number" then existing.owned_disabled[clear_index] = nil end
-  cancel_unavailable_research(force, observed)
+  local observed = preflight_cap_admissions({force}, name, false, excluded_family)[force.index]
+  -- A failed observation must retain both source and destination rights.
+  clear_force(clear_index, excluded_family)
+  cancel_unavailable_research(force, observed, excluded_family)
   -- Named research callbacks need only cap reconciliation. Rare force/reset
   -- events also enforce authored disabled prototypes, even without a finite
   -- cap or prior ledger. Allocate only when an actual policy write is needed.
   local current = CAPS_ACTIVE and ensure_state() or existing_state()
   if not research_only then
-    if current == nil and reconcile_authored_prototype_disablement(force, nil, nil, observed) then
+    if current == nil and reconcile_authored_prototype_disablement(force, nil, nil, observed, excluded_family) then
       current = ensure_state()
     end
-    if current then reconcile_authored_prototype_disablement(force, current.owned_disabled, nil, observed) end
+    if current then reconcile_authored_prototype_disablement(force, current.owned_disabled, nil, observed, excluded_family) end
   end
   if not current then return end
-  reconcile_force(force, current.owned_disabled, nil, false, name, nil, discovery_observed, observed)
+  reconcile_force(force, current.owned_disabled, nil, false, name, nil, discovery_observed, observed, excluded_family)
   discard_empty_state(current)
 end
 
@@ -978,19 +1063,23 @@ function M.preflight(configuration_changed)
   local current = existing_state()
   local import_pending = configuration_changed and type(mir) == "table"
     and mir.maximum_level_control ~= nil and not (current and current.legacy_caps_checked == true)
-  local admissions = preflight_cap_admissions(game and game.forces, nil, import_pending)
-  return {admissions = admissions, stale = configuration_changed and stale_force_indices() or {}}
+  local forces = force_snapshot()
+  local admissions = preflight_cap_admissions(forces, nil, import_pending)
+  return {admissions = admissions, forces = forces,
+    stale = configuration_changed and stale_force_indices(forces or {}) or {}}
 end
 
 function M.on_init(observed)
-  observed = observed or M.preflight(false)
-  reconcile_all(false, nil, nil, true, observed.admissions)
+  observed = observed and observed.admissions and observed or M.preflight(false)
+  if observed.forces then reconcile_all(false, nil, nil, true, observed.admissions, nil, observed.forces) end
 end
 
 function M.on_configuration_changed(event, observed)
   observed = observed or M.preflight(true)
-  local owners, imported_reenabled = import_legacy_caps_on_configuration(event, observed.admissions)
-  reconcile_all(true, owners, imported_reenabled, true, observed.admissions, observed.stale)
+  local owners, imported_reenabled = import_legacy_caps_on_configuration(event, observed.forces, observed.admissions)
+  if observed.forces then
+    reconcile_all(true, owners, imported_reenabled, true, observed.admissions, observed.stale, observed.forces)
+  end
 end
 
 function M.on_force_created(event)
@@ -1003,8 +1092,11 @@ function M.on_force_reset(event)
   reconcile_event(event, false, true, valid_force(force) and force.index or nil)
 end
 
-function M.on_forces_merged(event)
-  reconcile_event(event, false, true, event and event.source_index)
+function M.on_forces_merged(event, excluded_family)
+  -- An unqualified family retains its native work and cap rights on both
+  -- forces. Unrelated families still receive ordinary merge reconciliation.
+  -- Force creation/reset clears every old right if an index is reused.
+  reconcile_event(event, false, true, event and event.source_index, excluded_family)
 end
 
 function M.on_research_finished(event)

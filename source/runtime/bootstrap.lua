@@ -690,7 +690,7 @@ local function on_forces_merged(event)
     local _, disposition = worker_robot_storage.default_owner_on_forces_merged(event)
     worker_merge_unqualified = disposition == "unqualified-native-merge-frame"
     if worker_merge_unqualified then
-      log("MIR worker storage: mixed native merge work retained without cap reconciliation; this draft case is unqualified")
+      log("MIR worker storage: mixed native merge work retained without worker-cargo cap reconciliation; this draft case is unqualified")
     end
   end
   if native_credits then native_credits.on_forces_merged(event, native_credit_plan) end
@@ -704,7 +704,7 @@ local function on_forces_merged(event)
     initialize_imersite(event.destination)
     reconcile_imersite(event.destination)
   end
-  if not worker_merge_unqualified then lifecycle.on_forces_merged(event) end
+  lifecycle.on_forces_merged(event, worker_merge_unqualified and "worker-robots-storage" or nil)
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
   if legacy_module_credits and event and event.destination then
