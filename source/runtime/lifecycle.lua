@@ -52,10 +52,16 @@ local function bounded_useful_limit(configured, useful)
   return configured > 0 and math.min(configured, useful) or useful
 end
 
+local function catalogue_export(name)
+  local exported = catalogue[name]
+  if type(exported) ~= "function" then error("MIR caps requires callable " .. name, 2) end
+  return exported
+end
+
 -- Resolve the authored catalogue and immutable startup values once while
 -- control is parsed. Event paths use these compact maps; they never ask the
 -- catalogue to rebuild or scan a family list.
-local DECLARATIONS = catalogue.declared()
+local DECLARATIONS = catalogue_export("declared")()
 local STREAM_VALUES = effective_values.streams
 if type(STREAM_VALUES) ~= "table" then error("MIR caps missing resolved stream values", 2) end
 local STATIC_GENERATED_BY_ID, DECLARATION_BY_ID, NATIVE_OWNER_BY_ID, ORDERED_DECLARATIONS = {}, {}, {}, {}
@@ -120,7 +126,7 @@ end
 -- Metadata only nominates these bounded declarations. A live exact prototype
 -- and an existing caps ledger are still required before any flag is restored.
 local RESTORATION_BY_ID = {}
-local RESTORATION_DECLARATIONS = type(catalogue.restoration_only) == "function" and catalogue.restoration_only() or {}
+local RESTORATION_DECLARATIONS = catalogue_export("restoration_only")()
 local LEGACY_RESTORATION_DECLARATIONS = {}
 for index, declaration in ipairs(DECLARATIONS) do LEGACY_RESTORATION_DECLARATIONS[index] = declaration end
 for _, declaration in ipairs(RESTORATION_DECLARATIONS) do
