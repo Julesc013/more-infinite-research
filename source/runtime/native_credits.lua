@@ -434,7 +434,10 @@ local function fixed_failure_detail(force, descriptor, expected, rejection)
     return "<" .. type(item) .. ">"
   end
   local function scalar(item)
-    if item == nil then return "absent" end
+    -- A rejection can occur before a later scalar is read. Do not imply that
+    -- its holder/effect was established absent merely because this diagnostic
+    -- path did not observe a value.
+    if item == nil then return "unavailable" end
     if type(item) ~= "number" or item ~= item or item == math.huge or item == -math.huge then return "invalid" end
     return tostring(item)
   end
