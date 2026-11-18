@@ -18,6 +18,16 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           package.cpath = ""
           storage, game = {}, {forces={}}
           native_credit_definitions = require("research.native_credit_definitions")
+           local catalogue = require("runtime.catalogue")
+           fixed_credit_scalars = {}
+           for _, descriptor in ipairs(native_credit_definitions.fixed_descriptors()) do
+             if descriptor.recipe ~= "vgal-coal-crushing" then fixed_credit_scalars[descriptor.recipe] = .1 end
+           end
+           catalogue.native_credit_scalars = function()
+             local out = {}
+             for recipe, change in pairs(fixed_credit_scalars) do out[recipe] = change end
+             return out
+           end
           native_credits = require("runtime.native_credits")
           descriptors = native_credit_definitions.descriptors()
           -- These default worlds contain the original twelve recipes, not
@@ -146,6 +156,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
             if d.recipe=="vgal-coal-crushing" then descriptors[#descriptors+1]=d;galore=d end
           end
           assert(galore)
+           fixed_credit_scalars[galore.recipe]=.17
           require("runtime.catalogue").galore_sulfur_retired=function()return galore_retired end
           script={active_mods={base="2.1.23",["space-age"]="2.1.23",
             ["fixture-galore-producer"]="0.1.0",["more-infinite-research"]="5.0.21003"}}
@@ -265,6 +276,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           package.loaded["runtime.native_credits"]=nil
           package.loaded["runtime.catalogue"]={
             native_credit_groups=function()return {} end,
+             native_credit_scalars=function()return {} end,
             galore_sulfur_retired=function()return false end,
           }
           local ok,loaded=pcall(require,"runtime.native_credits")
@@ -272,6 +284,9 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           native_credits=loaded
           assert(not native_credits.needs_research_events())
         ''')
+        # An empty construction map is legitimate only when no fixed carrier
+        # holder exists.  A later normal harness has the emitted row map.
+        self.setUp()
         self.galore_force(False,False)
         self.lua.execute(r'''
           native_credits.on_configuration_changed(beta_event)
@@ -301,6 +316,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
     def test_true_completed_level_one_to_false_writes_one_positive_credit_and_keeps_native_setter_hidden(self):
         self.lua.execute(r'''
           local fish = "fish-breeding"
+           fixed_credit_scalars[fish]=.025
           local force = make_force(1, {}, {['recipe-prod-research_breeding-1']={level=1, researched=true}}, nil, {[fish]=.025})
           game.forces[force.index] = force
           native_credits.on_init()
@@ -594,23 +610,96 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           native_credits.on_init()
           local positive = holder(force, fish, "positive")
           set_included(force, fish, false)
+          -- A coordinated foreign rewrite can make all three observed rows
+          -- agree with each other.  It still cannot replace the data-stage
+          -- raw scalar that authenticated this package's carrier pair.
+          local negative = holder(force, fish, "negative")
           positive.prototype.effects[1].change = .2
-          native_credits.on_configuration_changed()
+          negative.prototype.effects[1].change = -.2
+          for _, effect in ipairs(force.technologies[descriptor_for(fish).main_id].prototype.effects) do
+            if effect.recipe == fish then effect.change = .2 end
+          end
+           local ok, message = pcall(native_credits.on_configuration_changed)
+           assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+             "coordinated changed fixed scalar silently omitted the paid row")
           assert(ledger(force, fish).included == true and ledger(force, fish).offset == 0)
           assert(positive.level == 1 and force._states[positive.name].writes.level == 0)
 
           positive.prototype.effects[1].change = .1
-          force.technologies[descriptor_for(fish).main_id] = nil
-          native_credits.on_configuration_changed()
+           local descriptor = descriptor_for(fish)
+           local main = force.technologies[descriptor.main_id]
+           force.technologies[descriptor.main_id] = nil
+           ok, message = pcall(native_credits.on_configuration_changed)
+           assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+             "missing named fixed main silently omitted the paid row")
           assert(ledger(force, fish).included == true and ledger(force, fish).offset == 0)
+           force.technologies[descriptor.main_id] = main
 
           storage.mir_native_credits.forces[force.index][fish] = {included="broken", offset=0}
-          local ok, message = pcall(native_credits.on_configuration_changed)
+           ok, message = pcall(native_credits.on_configuration_changed)
           assert(not ok and tostring(message):find("unsupported native credit record", 1, true))
           assert(positive.level == 1, "malformed ledger mutated a holder before rejection")
           storage.mir_native_credits.forces[force.index][fish] = {included=true, offset=math.huge}
           ok, message = pcall(native_credits.on_configuration_changed)
           assert(not ok and tostring(message):find("unsupported native credit record", 1, true))
+        ''')
+
+    def test_optional_absence_required_paid_evidence_quantized_zero_and_all_force_preflight(self):
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          local force = make_force(1)
+          game.forces[force.index] = force
+          native_credits.on_init()
+          -- Galore was not constructed in this package: no declaration, no
+          -- main effect and no signed pair is a real optional absence.
+          assert(storage.mir_native_credits.forces[force.index]["vgal-coal-crushing"] == nil)
+          local before = {}
+          for name, state in pairs(force._states) do before[name] = {level=state.writes.level, enabled=state.writes.enabled} end
+          storage.mir_native_credits.forces[force.index]["vgal-coal-crushing"] = {included=true, offset=0}
+          local ok, message = pcall(native_credits.on_configuration_changed)
+          assert(not ok and tostring(message):find("required%-fixed%-credit%-absent"),
+            "a paid zero-offset record made optional absence acceptable")
+          for name, state in pairs(force._states) do
+            assert(state.writes.level == before[name].level and state.writes.enabled == before[name].enabled,
+              "required-absence rejection wrote a carrier")
+          end
+
+          -- The raw positive declaration is nonzero even when the F200
+          -- adapter observes its legitimate target quantum as zero.
+          storage, game = {}, {forces={}}
+          require("platform.target").id = "f200"
+          local standard_descriptors, standard_scalars = descriptors, fixed_credit_scalars
+          descriptors, fixed_credit_scalars = {}, {}
+          for _, descriptor in ipairs(standard_descriptors) do
+            if descriptor.recipe == fish then descriptors[#descriptors + 1] = descriptor end
+          end
+          fixed_credit_scalars[fish] = .00001
+          local rounded = make_force(2, {[fish]=true}, {['recipe-prod-research_breeding-1']=2}, nil, {[fish]=0})
+          game.forces[rounded.index] = rounded
+          native_credits.on_init()
+          assert(ledger(rounded, fish).included == true and ledger(rounded, fish).offset == 0,
+            "a target-quantized zero was treated as an absent paid row")
+          descriptors, fixed_credit_scalars = standard_descriptors, standard_scalars
+          require("platform.target").id = "f210"
+
+          storage, game = {}, {forces={}}
+          local first = make_force(3)
+          local later = make_force(4)
+          game.forces[first.index], game.forces[later.index] = first, later
+          local p, n = holder(later, fish, "positive"), holder(later, fish, "negative")
+          p.prototype.effects[1].change, n.prototype.effects[1].change = .2, -.2
+          for _, effect in ipairs(later.technologies[descriptor_for(fish).main_id].prototype.effects) do
+            if effect.recipe == fish then effect.change = .2 end
+          end
+          ok, message = pcall(native_credits.on_init)
+          assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+            "later force fixed-scalar fault was silently admitted")
+          assert(storage.mir_native_credits == nil,
+            "later force fault allocated a native ledger before refusal")
+          for _, state in pairs(first._states) do
+            assert(state.writes.level == 0 and state.writes.enabled == 0,
+              "later force fault allowed an earlier force carrier write")
+          end
         ''')
 
     def test_native_force_collection_userdata_is_iterated_at_configuration_boundaries(self):

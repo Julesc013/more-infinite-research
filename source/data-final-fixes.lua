@@ -331,8 +331,10 @@ if worker_default_available then
   end
   technologies[#technologies + 1] = recovery.head_debit(worker_default_authored, head_scalar)
 end
+local _, fixed_native_credit_scalars = require("research.native_credit_definitions").append(
+  technologies, data.raw, values, require("platform.target"), native_credit_groups)
 native_adoption_patch = modern and require("research.native_adoption").plan(
-  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
+  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups, fixed_native_credit_scalars,
   modern_selection.worker_storage, worker_default_available or nil)
 if electric_full then
   for _, technology in ipairs(technologies) do
@@ -361,8 +363,6 @@ if modern and require("research.product_target_extension").retain_galore_carbon_
   if not native_adoption_patch then error("MIR Galore missing private admission facts", 0) end
   native_adoption_patch.galore_sulfur_retired = true
 end
-require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"), native_credit_groups)
-
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.
 -- A removed optional recipe cannot make its hidden holder a startup failure.
 if require("platform.target").recipe_productivity == true then

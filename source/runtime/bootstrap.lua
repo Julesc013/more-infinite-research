@@ -57,8 +57,9 @@ if target.recipe_productivity == true then
   -- Absence of this optional subsystem is decided above. Its history and
   -- paid-work callbacks are mandatory once it is active; a broken interface
   -- must not skip admission or silently drop continuation events.
-  for _, name in ipairs({"preflight_family_transition", "needs_research_events",
-      "on_research_finished", "on_research_cancelled"}) do
+  for _, name in ipairs({"preflight_family_transition", "preflight_force_created",
+      "preflight_force_reset", "preflight_forces_merged", "preflight_technology_effects_reset",
+      "needs_research_events", "on_research_finished", "on_research_cancelled"}) do
     required_runtime_export(native_credits, "native credits", name)
   end
   legacy_module_credits = require("runtime.legacy_module_credits")
@@ -356,6 +357,7 @@ local function add_command()
 end
 
 local function on_init()
+  local native_credit_plan = native_credits and native_credits.preflight_family_transition(nil, true)
   local cap_plan = lifecycle.preflight(false)
   if worker_robot_storage then
     worker_robot_storage.on_init(worker_storage_route())
@@ -364,7 +366,7 @@ local function on_init()
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
   lifecycle.on_init(cap_plan)
-  if native_credits then native_credits.on_init() end
+  if native_credits then native_credits.on_init(native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_init() end
   if competing_productivity then competing_productivity.on_init() end
   if scripted_effects then scripted_effects.on_init() end
@@ -614,8 +616,9 @@ local function on_research_reversed(event)
 end
 
 local function on_technology_effects_reset(event)
+  local native_credit_plan = native_credits and native_credits.preflight_technology_effects_reset(event)
   if not worker_storage_mutating(event) then lifecycle.on_technology_effects_reset(event) end
-  if native_credits then native_credits.on_technology_effects_reset(event) end
+  if native_credits then native_credits.on_technology_effects_reset(event, native_credit_plan) end
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
   if legacy_module_credits then legacy_module_credits.on_technology_effects_reset(event) end
@@ -646,12 +649,13 @@ local function on_tower_planted_seed(event)
 end
 
 local function on_force_created(event)
+  local native_credit_plan = native_credits and native_credits.preflight_force_created(event)
   if worker_robot_storage then
     worker_robot_storage.on_force_created(event)
     worker_robot_storage.default_owner_on_force_created(event)
   end
   if event and event.force then initialize_imersite(event.force) end
-  if native_credits then native_credits.on_force_created(event) end
+  if native_credits then native_credits.on_force_created(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_force_created(event) end
   -- Authored prototype disablement may retain restoration rights even when
   -- all caps are unlimited. Clear those rights at existing force boundaries.
@@ -663,12 +667,13 @@ local function on_force_created(event)
 end
 
 local function on_force_reset(event)
+  local native_credit_plan = native_credits and native_credits.preflight_force_reset(event)
   if worker_robot_storage then
     worker_robot_storage.on_force_reset(event)
     worker_robot_storage.default_owner_on_force_reset(event)
   end
   if event and event.force then initialize_imersite(event.force) end
-  if native_credits then native_credits.on_force_reset(event) end
+  if native_credits then native_credits.on_force_reset(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_force_reset(event) end
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
@@ -678,6 +683,7 @@ local function on_force_reset(event)
 end
 
 local function on_forces_merged(event)
+  local native_credit_plan = native_credits and native_credits.preflight_forces_merged(event)
   local worker_merge_unqualified = false
   if worker_robot_storage then
     worker_robot_storage.on_forces_merged(event)
@@ -687,7 +693,7 @@ local function on_forces_merged(event)
       log("MIR worker storage: mixed native merge work retained without cap reconciliation; this draft case is unqualified")
     end
   end
-  if native_credits then native_credits.on_forces_merged(event) end
+  if native_credits then native_credits.on_forces_merged(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if imersite and event and event.destination then
     local state = imersite_state()
