@@ -4,6 +4,7 @@ Date: 2026-11-19
 
   Bugfixes:
 
+    - Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
     - Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo
       research mod.
     - Factorio 2.0/2.1: Keep earned research-limit restoration rights when a technology cannot be read instead of treating the
