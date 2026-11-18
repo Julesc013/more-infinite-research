@@ -13,6 +13,8 @@ param(
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,8192)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds = 30,
+  # Explicit CLI selection: headless distributions omit the GUI audio option.
+  [switch]$Headless,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 )
 
@@ -27,6 +29,17 @@ function Assert-MIR5PrototypeCapture {
 function Get-MIR5PrototypeCaptureSha256 {
   param([Parameter(Mandatory)][string]$Path)
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+
+function Get-MIR5PrototypeCaptureArguments {
+  param(
+    [Parameter(Mandatory)][string]$ConfigPath,
+    [Parameter(Mandatory)][string]$LibraryDirectory,
+    [switch]$Headless
+  )
+  $arguments = @('--config',$ConfigPath,'--mod-directory',$LibraryDirectory,'--no-log-rotation')
+  $arguments += @(Get-MIRNativeAudioArguments -Headless:$Headless)
+  return $arguments + @('--dump-data')
 }
 
 function Test-MIR5PrototypeCaptureContainedPath {
@@ -146,6 +159,7 @@ $record = [ordered]@{
     library_activation_sha256=Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
   }
   engine=[ordered]@{path=$engineIdentity.path;sha256=$engineIdentity.sha256;base_version=$engineIdentity.base_version;factorio_version=$engineLine}
+  headless_requested=[bool]$Headless
   profile_input=[ordered]@{path=$profileInput;sha256=Get-MIR5PrototypeCaptureSha256 $profileInput}
   mir_archive=$mir
   active_mods_observer=$null
@@ -189,7 +203,8 @@ try {
     }
   }
 
-  $arguments = @('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--dump-data')
+  $arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)
+  $record.arguments = $arguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
   $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
