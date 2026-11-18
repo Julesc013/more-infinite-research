@@ -445,12 +445,14 @@ end
 
 local function set_source_producer_target(force, level, enabled)
   local owner = technology(force, WORKER)
-  -- Gate flags are last: a level write may re-enable the technology.
+  -- Both the level setter and the effects-reset call (including its native
+  -- callbacks) can restore gates. Construct the intended source flags only
+  -- after those operations; later observations must never repair the frame.
   owner.researched = false
   owner.level = level
+  force.reset_technology_effects()
   owner.enabled = enabled
   owner.visible_when_disabled = false
-  force.reset_technology_effects()
   return owner
 end
 
