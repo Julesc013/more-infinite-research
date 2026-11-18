@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## SE provider-admission source fixture adverse (2026-11-19)
+
+The [first provider-admission batch](../spec/evidence/se-worker-speed-provider-admission-gunmetal-r01-adverse.json) stops in its source process on exact headless Factorio2.0.77, SE0.7.57, published MIR5.0.20015 and the twenty-mod selection. The frozen fixture incorrectly requires the native technology collection to have Lua type `table`; it refuses before its first declared prerequisite research grant, source marker or save. One process exits1 naturally. Admission and cold reload do not run. All library controls/archives restore, no Factorio remains, and independent review rehashes all ten copied bodies with no mismatch. This establishes a fixture-contract failure, not a player-source defect or an accepted predecessor.
+
+The fixture unit merged through checked [PR2124](https://github.com/Julesc013/more-infinite-research/pull/2124), with original commits/branch retained and player source unchanged. Its fixed196-row declaration matches the separately captured final prototypes; seventeen host fixture methods and eleven host-plan methods passed, but the ordinary-table host world missed the native indexed-collection boundary. The next correction must keep required named-row/validity checks and propagate failed reads while covering a non-table indexed collection. This failed packet, its raw output and earlier prerequisite adverse remain intact. A separately reviewed successor packet is required; no actual source bonus, configuration preservation, candidate work/save/reloads, reporter repair or stable acceptance follows. No release or published package changed.
+
 ## Source15 cap-transition adverse retained (2026-11-19)
 
 The [exact source15 transition attempt](../spec/evidence/source15-cap-transition-gunmetal-r01-adverse.json) reaches the published15 opponent on Factorio2.0.77/SE0.7.57 with all twenty selected identities, then stops at its prerequisite assertion before the declared old-cap token. One actual process exits1; the private current candidate, ordinary work, successor save and both cold reloads do not run. All original library controls/archives restore, no Factorio remains, and protected/working inputs remain the exact D6 source. Independent result review rehashes all fifteen copied bodies and returns `NO-GO-PRODUCER-TRANSITION`.
