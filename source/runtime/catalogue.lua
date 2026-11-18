@@ -5,21 +5,28 @@
 local catalogue = require("research.catalogue")
 local target = require("platform.target")
 local modern = require("compatibility.modern_catalogue")
+-- Pure transport/identity helpers are bound while control is parsed, including
+-- worlds with no native mod-data export. Callbacks must never import them.
+local modern_target = target.id == "f200" or target.id == "f210"
+local native_adoption = modern_target and require("research.native_adoption")
+local native_credit_definitions = modern_target and require("research.native_credit_definitions")
 
 local foreign_technology_prototypes
 local native_adoptions
+local native_owner_definitions
 local withheld_native_owners
 local native_credit_groups
 local native_credit_scalars
 local finite_research_speed_provider
 local worker_storage
 local admission_facts = {}
-if target.id == "f200" or target.id == "f210" then
+if modern_target then
   local native_data = prototypes and prototypes.mod_data
   local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
   if adopted ~= nil then
-    native_adoptions, withheld_native_owners, native_credit_groups, native_credit_scalars = require("research.native_adoption").read(adopted.data,
-      modern.native_owners(script and script.active_mods), admission_facts)
+    native_owner_definitions = modern.native_owners(script and script.active_mods)
+    native_adoptions, withheld_native_owners, native_credit_groups, native_credit_scalars = native_adoption.read(adopted.data,
+      native_owner_definitions, admission_facts)
     worker_storage = admission_facts.worker_storage
   end
   local live_technologies
@@ -138,13 +145,15 @@ end
 local M = {}
 
 function M.native_credit_groups()
-  return require("research.native_adoption").credit_groups(native_credit_groups)
+  if not modern_target then return {} end -- Older engines have no native transport.
+  return native_adoption.credit_groups(native_credit_groups)
 end
 
 -- Exact fixed-carrier rows that this current data stage emitted.  This remains
 -- immutable construction provenance, not an observation of a force or save.
 function M.native_credit_scalars()
-  return require("research.native_adoption").fixed_credit_scalars(native_credit_scalars)
+  if not modern_target then return {} end
+  return native_adoption.fixed_credit_scalars(native_credit_scalars)
 end
 
 function M.galore_sulfur_retired()
@@ -183,11 +192,13 @@ end
 function M.restoration_only()
   local rows = {}
   if withheld_native_owners == nil or next(withheld_native_owners) == nil then return rows end
-  for _, owner in ipairs(modern.native_owners(script and script.active_mods)) do
+  for _, owner in ipairs(native_owner_definitions) do
     if withheld_native_owners[owner.id] ~= nil then
+      local recipes = {}
+      for index, recipe in ipairs(owner.admission.recipes) do recipes[index] = recipe end
       rows[#rows + 1] = {id=owner.id, family=owner.family, cap_setting=owner.setting,
         ownership_kind="nativeowner", native_owner_identity=owner.id,
-        native_admission=owner.admission,
+        native_admission={effect_type=owner.admission.effect_type, recipes=recipes},
         legacy_binding={source="native-owner", operation="preserve_native_owner"}}
     end
   end
@@ -196,8 +207,10 @@ end
 
 function M.internal_credit_ids()
   local ids = catalogue.internal_credit_ids()
-  for _, row in ipairs(require("research.native_credit_definitions").collected_descriptors(native_credit_groups)) do
-    ids[row.positive_id], ids[row.negative_id] = true, true
+  if native_credit_groups ~= nil then
+    for _, row in ipairs(native_credit_definitions.collected_descriptors(native_credit_groups)) do
+      ids[row.positive_id], ids[row.negative_id] = true, true
+    end
   end
   return ids
 end

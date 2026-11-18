@@ -3,6 +3,9 @@
 -- continuation cross this boundary.
 -- Nonbinding decisions grant no new prototype mutation authority. This is not
 -- saved history, an inferred owner list, or permission to accept extra effects.
+-- These pure dependencies are also used by control-stage callers after parsing.
+local native_credit_definitions = require("research.native_credit_definitions")
+local worker_robot_storage = require("compatibility.worker_robot_storage")
 local M = {prototype_name="more-infinite-research-native-adoptions"}
 
 local NATIVE_FAMILIES = {
@@ -29,7 +32,7 @@ end
 function M.credit_groups(value)
   if value == nil then return {} end
   local out = {}
-  for _, row in ipairs(require("research.native_credit_definitions").collected_descriptors(value)) do
+  for _, row in ipairs(native_credit_definitions.collected_descriptors(value)) do
     out[row.family] = out[row.family] or {}
     out[row.family][#out[row.family] + 1] = {recipe=row.recipe, change=row.change}
   end
@@ -46,7 +49,7 @@ function M.fixed_credit_scalars(value)
   if value == nil then return {} end
   if type(value) ~= "table" or getmetatable(value) ~= nil then fail("invalid fixed native credits") end
   local allowed, out = {}, {}
-  for _, row in ipairs(require("research.native_credit_definitions").fixed_descriptors()) do
+  for _, row in ipairs(native_credit_definitions.fixed_descriptors()) do
     allowed[row.recipe] = true
   end
   for recipe, change in pairs(value) do
@@ -92,7 +95,7 @@ function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, 
   local credit_groups = M.credit_groups(credits)
   local fixed_credit_scalars = M.fixed_credit_scalars(fixed_credits)
   local worker_route = worker_storage ~= nil
-    and require("compatibility.worker_robot_storage").copy_route(worker_storage) or nil
+    and worker_robot_storage.copy_route(worker_storage) or nil
   for name in pairs(withheld_settings) do
     if owners[name] ~= nil then fail("native owner is both adopted and withheld") end
   end
@@ -182,7 +185,7 @@ function M.read(value, definitions, admission_facts)
   local credits = M.credit_groups(value.credits)
   local fixed_credits = M.fixed_credit_scalars(value.fixed_credits)
   local worker_storage = value.worker_storage ~= nil
-    and require("compatibility.worker_robot_storage").copy_route(value.worker_storage) or nil
+    and worker_robot_storage.copy_route(value.worker_storage) or nil
   if admission_facts ~= nil then
     admission_facts.galore_sulfur_retired = value.galore_sulfur_retired == true
     admission_facts.worker_storage = worker_storage
