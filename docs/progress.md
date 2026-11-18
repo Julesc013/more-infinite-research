@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## SE configuration observed; elapsed-hold fixture adverse retained (2026-11-19)
+
+The [retained-source r04 attempt](../spec/evidence/se-worker-speed-provider-elapsed-hold-gunmetal-r04-adverse.json) loads the exact FAD predecessor with published15 and fixture0.2 on headless2.0.77/SE0.7.57. One governed process observes the real configuration change, unchanged three-force frames and all196 completed rows per force, and writes a closed save. The before marker is tick0 and the saved marker tick1, although the actor has counted two callbacks. The unchanged reader correctly refuses the required two elapsed ticks; cold loading does not run. Independent review rehashes all73 retrieved bodies, retains the unaccepted3D075F save, and confirms the FAD protected source, restored library, empty cleanup and zero remaining Factorio.
+
+The overall result remains `NO-GO`. The fixture must derive elapsed time from a recorded starting tick and reject premature saving when the first callback shares the configuration tick; the two-tick threshold is retained. Apply the same explicit-time rule to the candidate hold where applicable, and add an opposing same-tick host sequence. Reuse FAD under its original identity instead of recreating the source. Two earlier malformed execution-review records were rejected before native activation, remain retained separately, and are excluded from the one native-process count. The corrected caller checks the actual serialized review through extracted controller functions before SSH writes; both prior malformed inputs refuse. No candidate, ordinary completion, reporter, release or stable claim follows, and player/published bytes remain unchanged.
+
 ## SE source created; queue-wire reader adverse retained (2026-11-19)
 
 The [r03 result](../spec/evidence/se-worker-speed-provider-wire-queue-gunmetal-r03-adverse.json) creates a real published15 source on headless2.0.77/SE0.7.57, then stops at the external reader. The native process exits0 naturally and emits the exact twenty-mod source marker; player/foreign/earned speed bonuses are5.0/5.65/6.95, the intended active queues and partial progress remain, and all196 completed prerequisite rows are observed on all three forces. The idle earned force's empty Lua queue serializes as `{}`; the reader expects `[]` and rejects it. All library controls/archives restore, cleanup is empty and no Factorio remains. Independent review rehashes all fourteen readback bodies and CRC-checks the849928-byte FAD source ZIP with55 entries.
