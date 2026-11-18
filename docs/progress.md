@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Localized-search native verifier adverse retained (2026-11-18)
+
+The [localized-search R01 adverse](../spec/evidence/library517-linux-localized-search-r01-adverse.json) retains one actual Factorio2.1.24/Base Linux server/client attempt on published5.0.17/C311, frozen controller6cbed and the unchanged protected83D fresh seed. The initial German passive phase passed, but the actor refused before any input or capture: its single-marker check encountered two correct active-mod reports on the server, from the data-stage observer and the newly added passive fixture initializer. The joining client had only the data-stage report. The observed six-mod identities agree; the verifier's cardinality assumption failed.
+
+All three direct children exit0, private display resources restore, the five owned temporary archives and direct-library controls restore, and the protected seed stays unchanged. The expected mutable server working copy is retained separately. Independent readback rehashes all48 original bodies/4635924bytes under primary `build/qualification/library-localized-search-input-preparation-r01`; the failed attempt remains adverse. The owned SSH observer stayed connected because the account had no linger setting, so this case establishes no final-logout durability guarantee.
+
+The prospective R03 actor authenticates each role's exact marker producers and complete identities while rejecting missing, duplicated, conflicting, malformed or unknown markers. Actual retained log controls reproduce the old failure and pass the correction; all13 earlier actor methods still pass. Independent source review accepts that bounded correction only. A new packet/context and actual composition review are required before another attempt; no localized input, pixel/layout, exported state, imported history, Windows, performance, later-source crash or stable verdict follows.
+
 ## Cap admission preserves unexpected failures (2026-11-18; development correction)
 
 The architecture audit's F02 fault is reproduced against the unchanged production readers: both lookup and prototype-predicate exceptions become ordinary absence, and a recorded cap-restoration right is discarded. Four late-force cases additionally demonstrate that merely propagating the exception is insufficient when an earlier force can already have changed. Original failing logs and source copies remain in primary `build/qualification/cap-admission-errors-blackglass-r01`.
