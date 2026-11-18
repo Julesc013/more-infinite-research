@@ -11,7 +11,7 @@ local CURRENT = "mir-fixture-se-worker-speed-provider-unrelated"
 local QUEUED = "mir-fixture-se-worker-speed-provider-queued"
 local STAGES = {
   source = {fixture = "0.1.0", mir = "5.0.20015", cap = 0},
-  admission = {fixture = "0.2.0", mir = "5.0.20015", cap = 0},
+  admission = {fixture = "0.2.1", mir = "5.0.20015", cap = 0},
   old = {fixture = "0.3.0", mir = "5.0.20015", cap = 10},
   candidate = {fixture = "0.4.0", mir = "5.0.20018", cap = 10},
 }

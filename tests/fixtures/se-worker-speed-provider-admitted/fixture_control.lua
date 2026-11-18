@@ -15,7 +15,7 @@ local SCIENCE = {"automation-science-pack", "logistic-science-pack", "chemical-s
   "space-science-pack", "se-rocket-science-pack", "se-energy-science-pack-4", "se-deep-space-science-pack-1"}
 local STAGES = {
   source = {fixture = "0.1.0", mir = "5.0.20015", cap = 0},
-  admission = {fixture = "0.2.0", mir = "5.0.20015", cap = 0},
+  admission = {fixture = "0.2.1", mir = "5.0.20015", cap = 0},
   old = {fixture = "0.3.0", mir = "5.0.20015", cap = 10},
   candidate = {fixture = "0.4.0", mir = "5.0.20018", cap = 10},
 }
@@ -237,7 +237,8 @@ local function candidate_observation(candidate)
   check(type(candidate) == "table", "candidate state differs")
   return {phase = candidate.phase or false, pre_work = copy(candidate.pre_work or false),
     ordinary_events = copy(candidate.ordinary_events or {}), level_eleven_starts = candidate.level_eleven_starts or 0,
-    hold_ticks = candidate.hold_ticks or false, feed = copy(candidate.feed or false), closed = copy(candidate.closed or false),
+    hold_ticks = candidate.hold_ticks or false, hold_start_tick = candidate.hold_start_tick or false,
+    hold_elapsed_ticks = candidate.hold_elapsed_ticks or false, feed = copy(candidate.feed or false), closed = copy(candidate.closed or false),
     lab = candidate.lab and lab_observation(candidate.lab, "candidate marker") or false}
 end
 
@@ -357,7 +358,7 @@ end
 local function admission_event(event)
   check(type(event) == "table" and event.mod_startup_settings_changed == false and type(event.mod_changes) == "table", "admission event differs")
   local change = event.mod_changes[FIXTURE]
-  check(change and change.old_version == "0.1.0" and change.new_version == "0.2.0" and event.mod_changes[MIR] == nil,
+  check(change and change.old_version == "0.1.0" and change.new_version == "0.2.1" and event.mod_changes[MIR] == nil,
     "admission fixture change differs")
   for name in pairs(event.mod_changes) do check(name == FIXTURE, "unexpected admission mod change") end
 end
@@ -365,7 +366,7 @@ end
 local function candidate_event(event)
   check(type(event) == "table" and event.mod_startup_settings_changed == true and type(event.mod_changes) == "table", "candidate event differs")
   local fixture_change, mir_change = event.mod_changes[FIXTURE], event.mod_changes[MIR]
-  check(fixture_change and fixture_change.old_version == "0.2.0" and fixture_change.new_version == "0.4.0", "candidate fixture change differs")
+  check(fixture_change and fixture_change.old_version == "0.2.1" and fixture_change.new_version == "0.4.0", "candidate fixture change differs")
   check(mir_change and mir_change.old_version == "5.0.20015" and mir_change.new_version == "5.0.20018", "candidate MIR change differs")
   for name in pairs(event.mod_changes) do check(name == FIXTURE or name == MIR, "unexpected candidate mod change") end
 end
@@ -392,7 +393,8 @@ local function begin_admission(event)
   assert_active("admission"); admission_event(event)
   local state = storage[KEY]; local actual = assert_ready_source(state, "admission")
   cold_pending, cold_emitted = false, false
-  state.admission = {phase = "holding", before = actual, ticks = 0, config_observed = true}
+  state.admission = {phase = "holding", before = actual, ticks = 0, start_tick = game.tick, elapsed_ticks = 0,
+    config_observed = true}
   state.phase = "admission-holding"
   emit("admission-pre-hold", state, {native_repair = false})
 end
@@ -400,11 +402,13 @@ end
 local function begin_old(event)
   assert_active("old")
   local state = storage[KEY]; assert_ready_source(state, "old opponent")
-  check(type(state.admission) == "table" and state.admission.phase == "saved" and state.admission.ticks == 2,
+  check(type(state.admission) == "table" and state.admission.phase == "saved" and type(state.admission.ticks) == "number"
+    and state.admission.ticks >= 2 and type(state.admission.start_tick) == "number"
+    and type(state.admission.elapsed_ticks) == "number" and state.admission.elapsed_ticks >= 2,
     "old opponent requires admitted source")
   check(type(event) == "table" and event.mod_startup_settings_changed == true and type(event.mod_changes) == "table", "old event differs")
   local change = event.mod_changes[FIXTURE]
-  check(change and change.old_version == "0.2.0" and change.new_version == "0.3.0" and event.mod_changes[MIR] == nil, "old fixture change differs")
+  check(change and change.old_version == "0.2.1" and change.new_version == "0.3.0" and event.mod_changes[MIR] == nil, "old fixture change differs")
   for name in pairs(event.mod_changes) do check(name == FIXTURE, "unexpected old mod change") end
   emit("old-opponent", state, {accepted = false, native_repair = false})
   fail("MIR_EXPECTED_SE_WORKER_SPEED_PROVIDER_OLD15_OPPONENT")
@@ -414,7 +418,9 @@ local function begin_candidate(event)
   assert_active("candidate"); candidate_event(event)
   local state = storage[KEY]
   check(type(state) == "table" and type(state.admission) == "table" and state.admission.phase == "saved"
-    and state.admission.config_observed == true and state.admission.ticks == 2
+    and state.admission.config_observed == true and type(state.admission.ticks) == "number" and state.admission.ticks >= 2
+    and type(state.admission.start_tick) == "number" and type(state.admission.elapsed_ticks) == "number"
+    and state.admission.elapsed_ticks >= 2
     and same(state.admission.before, state.source) and same(state.admission.after, state.source), "admitted source is absent")
   assert_recorded_source(state, "candidate source")
   local actual = assert_candidate_normalized(state, "candidate configuration")
@@ -531,6 +537,7 @@ function M.apply(value)
       completed_level = 10, event_post_increment_level = worker.level, tick = event.tick}
     check(#state.candidate.ordinary_events == 1, "candidate repeated ordinary completion")
     state.phase, state.candidate.phase, state.candidate.hold_ticks = "candidate-holding", "holding", 0
+    state.candidate.hold_start_tick, state.candidate.hold_elapsed_ticks = game.tick, 0
   end)
   script.on_event(defines.events.on_tick, function()
     local state = storage[KEY]
@@ -545,10 +552,14 @@ function M.apply(value)
     if stage == "admission" and type(state) == "table" and state.phase == "admission-holding" then
       local actual = assert_ready_source(state, "admission hold")
       check(same(actual, state.admission.before), "admission changed public state")
+      check(type(state.admission.start_tick) == "number" and game.tick >= state.admission.start_tick,
+        "admission hold tick differs")
       state.admission.ticks = state.admission.ticks + 1
-      if state.admission.ticks >= 2 then
+      state.admission.elapsed_ticks = game.tick - state.admission.start_tick
+      if state.admission.elapsed_ticks >= 2 then
         state.admission.after, state.admission.phase, state.phase = actual, "saved", "admission-saved"
-        emit("admission-saved", state, {hold_ticks = 2, native_repair = false})
+        emit("admission-saved", state, {hold_ticks = state.admission.ticks,
+          elapsed_ticks = state.admission.elapsed_ticks, native_repair = false})
         check(game.is_multiplayer(), "admission save requires server")
         game.server_save("se-worker-speed-provider-admission")
       end
@@ -562,8 +573,11 @@ function M.apply(value)
       refill_lab(state, "candidate active", false)
     elseif state.phase == "candidate-holding" then
       assert_no_level_eleven(state, "candidate hold")
+      check(type(state.candidate.hold_start_tick) == "number" and game.tick >= state.candidate.hold_start_tick,
+        "candidate hold tick differs")
       state.candidate.hold_ticks = state.candidate.hold_ticks + 1
-      if state.candidate.hold_ticks >= 2 then close_candidate(state) end
+      state.candidate.hold_elapsed_ticks = game.tick - state.candidate.hold_start_tick
+      if state.candidate.hold_elapsed_ticks >= 2 then close_candidate(state) end
     end
   end)
 end
