@@ -1,6 +1,7 @@
 -- Passive observer for the real German localized-search path from the
 -- accepted fresh R09 state. The governed actor supplies every desktop action;
--- this fixture only records public GUI and native facts on the next tick.
+-- this fixture only records public GUI and native facts after the event;
+-- reopened localized results have one finite asynchronous readiness wait.
 local FIXTURE = "mir-fixture-library-localized-search-native"
 local MIR = "more-infinite-research"
 local VERSION = script.active_mods[FIXTURE]
@@ -42,9 +43,9 @@ local function same(left, right)
 end
 
 local function exact_active_mods()
-  if VERSION ~= "0.1.1" then fail("exact active-mod selection required") end
+  if VERSION ~= "0.1.2" then fail("exact active-mod selection required") end
   local expected = {
-    base = "2.1.24", [MIR] = "5.0.21017", [FIXTURE] = "0.1.1",
+    base = "2.1.24", [MIR] = "5.0.21017", [FIXTURE] = "0.1.2",
     ["mir-fixture-mir5-api-alpha"] = "0.1.0", ["mir-fixture-mir5-api-beta"] = "0.1.0",
     ["mir-fixture-mir5-active-mods-observer"] = "0.1.0"
   }
@@ -221,11 +222,12 @@ local function record_shell(row, player, root, tabs, live_identity)
   end
 end
 
-local function result_row(page)
+local function result_row(page, wait_for_empty)
   local content = owned(page[PREFIX .. "research_content"], PREFIX .. "research_content", page)
   local list_pane = owned(content[PREFIX .. "list_pane"], PREFIX .. "list_pane", content, "flow")
   local results = owned(list_pane[PREFIX .. "results"], PREFIX .. "results", list_pane, "list-box")
   local items = results.items
+  if wait_for_empty and type(items) == "table" and next(items) == nil then return nil end
   if type(items) ~= "table" or #items ~= 1 then fail("localized result count differs") end
   local item = items[1]
   if type(item) ~= "table" or #item ~= 3 or item[1] ~= "" or item[2] ~= TARGET_PREFIX
@@ -256,6 +258,8 @@ local function record_snapshot(stage_name)
   local current = state()
   local player = player_for(current.player_index)
   if player == nil then fail("localized-search player unavailable") end
+  if stage_name == "reopen" and (player.controller_type ~= defines.controllers.character
+      or not valid(player.character)) then fail("Library reopen has no live character controller") end
   local native = native_frame(player)
   if current.native == nil then current.native = native
   elseif not same(current.native, native) then fail("native fresh frame changed") end
@@ -295,7 +299,10 @@ local function record_snapshot(stage_name)
     elseif stage_name == "localized-query" or stage_name == "reopen" then
       if row.query ~= LOCALIZED_QUERY then fail("localized query was not retained") end
     end
-    if stage_name == "localized-query" or stage_name == "reopen" then row.result = result_row(page) end
+    if stage_name == "localized-query" or stage_name == "reopen" then
+      row.result = result_row(page, stage_name == "reopen")
+      if row.result == nil then return nil end
+    end
   end
   if #current.snapshots >= MAX_SNAPSHOTS then fail("too many GUI snapshots") end
   current.snapshots[#current.snapshots + 1] = row
@@ -331,8 +338,16 @@ local function settle(event)
     if event.tick >= pending.deadline then fail("German locale did not become ready") end
     return
   end
-  current.pending = nil
+  if pending.stage == "reopen" and event.tick > pending.deadline then
+    fail("localized result not ready before reopen deadline")
+  end
   local written_player, row = record_snapshot(pending.stage)
+  if written_player == nil then
+    if pending.stage ~= "reopen" then fail("deferred snapshot unavailable") end
+    if event.tick >= pending.deadline then fail("localized result not ready before reopen deadline") end
+    return
+  end
+  current.pending = nil
   if pending.stage == "initial" then current.phase = "await-setup-close"
   elseif pending.stage == "setup-closed" then current.phase = "await-open"
   elseif pending.stage == "open" then begin_tab_pair("help-tab", 4, PREFIX .. "tab_help", "await-help-click")
@@ -365,7 +380,8 @@ local function on_shortcut(event)
   if current.phase ~= "await-open" and current.phase ~= "await-reopen" then fail("shortcut event out of order") end
   current.events.shortcut = current.events.shortcut + 1
   record_event("shortcut", {player_index = event.player_index, prototype_name = event.prototype_name})
-  schedule(current.phase == "await-open" and "open" or "reopen")
+  local stage = current.phase == "await-open" and "open" or "reopen"
+  schedule(stage, stage == "reopen" and game.tick + MAX_READY_TICKS or nil)
   current.phase = current.phase == "await-open" and "settling-open" or "settling-reopen"
 end
 

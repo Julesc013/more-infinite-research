@@ -48,7 +48,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
                 on_gui_selected_tab_changed=4,on_gui_text_changed=5,on_gui_closed=6,on_tick=7},
                 gui_type={custom=99},controllers={character=1,spectator=2}}
               script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21017",
-                ["mir-fixture-library-localized-search-native"]="0.1.1",
+                ["mir-fixture-library-localized-search-native"]="0.1.2",
                 ["mir-fixture-mir5-api-alpha"]="0.1.0",
                 ["mir-fixture-mir5-api-beta"]="0.1.0",
                 ["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
@@ -312,7 +312,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
         )
         self.assertEqual(
             self.lua.eval("logs[1]"),
-            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-localized-search-native@0.1.1|"
+            "[MIR_ACTIVE_MODS] base@2.1.24|mir-fixture-library-localized-search-native@0.1.2|"
             "mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|"
             "mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017",
         )
@@ -498,8 +498,97 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
         self.through_query_click()
         self.lua.globals().final_results = True
         self.clear_and_type()
-        with self.assertRaisesRegex(Exception, "localized result count differs"):
-            self.close_and_reopen(results=False)
+        self.close_and_reopen(results=False)
+        self.exec('assert(report().phase=="settling-reopen" and #report().snapshots==9);game.tick=report().pending.deadline-1')
+        with self.assertRaisesRegex(Exception, "localized result not ready before reopen deadline"):
+            self.exec("tick()")
+        self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
+
+    def prepare_delayed_reopen(self):
+        self.through_query_click()
+        self.lua.globals().final_results = True
+        self.clear_and_type()
+        self.close_and_reopen(results=False)
+
+    def test_reopen_waits_for_the_exact_localized_result_without_another_event(self):
+        self.prepare_delayed_reopen()
+        self.exec(r'''
+          assert(report().phase=="settling-reopen" and #report().snapshots==9)
+          assert(writes["mir-library-localized-search-native/09-reopen.json"]==nil)
+          local events=#report().event_log
+          for i=1,7 do tick() end
+          assert(#report().event_log==events and #report().snapshots==9)
+          set_results(expected_results(),"Eisenzahnrad")
+          tick()
+          assert(report().phase=="complete" and #report().snapshots==10)
+          assert(#report().event_log==events)
+          local row=writes["mir-library-localized-search-native/09-reopen.json"]
+          assert(row.snapshot.result.count==1 and row.snapshot.query=="Eisenzahnrad")
+          assert(row.native_snapshot_unchanged)
+        ''')
+
+    def test_reopen_wait_refuses_a_nonempty_wrong_result_immediately(self):
+        for items in ("{'raw-id'}", "{{'', 'wrong-icon', 'wrong-caption'}}", "{expected_results()[1], expected_results()[1]}"):
+            with self.subTest(items=items):
+                self.setUp()
+                self.prepare_delayed_reopen()
+                self.exec(f'set_results({items},"Eisenzahnrad")')
+                with self.assertRaisesRegex(Exception, "localized result"):
+                    self.exec("tick()")
+                self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
+
+    def test_reopen_wait_refuses_query_shell_controller_and_native_drift(self):
+        mutations = (
+            ("force.worker_robots_storage_bonus=1", "native fresh frame changed"),
+            ("set_results({},'wrong query')", "localized query was not retained"),
+            ("player.controller_type=defines.controllers.spectator", "live character controller"),
+            ("player.character.valid=false", "live character controller"),
+            ("player.connected=false", "player unavailable"),
+            ("retire_library()", "root"),
+            ("player.opened={valid=true}", "owned localized-search root differs"),
+            ("player.gui.screen.mir_research_browser.mir_library_tabs.selected_tab_index=4", "Research localized-search view"),
+            ("player.gui.screen.mir_research_browser.location.x=321", "geometry"),
+        )
+        for mutation, error in mutations:
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                self.prepare_delayed_reopen()
+                self.exec(mutation)
+                with self.assertRaisesRegex(Exception, error):
+                    self.exec("tick()")
+                self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
+
+    def test_reopen_deadline_accepts_ready_boundary_but_never_a_late_result(self):
+        self.prepare_delayed_reopen()
+        self.exec(r'''
+          game.tick=report().pending.deadline-1
+          set_results(expected_results(),"Eisenzahnrad")
+          tick()
+          assert(report().phase=="complete" and #report().snapshots==10)
+        ''')
+        self.setUp()
+        self.prepare_delayed_reopen()
+        self.exec('game.tick=report().pending.deadline;set_results(expected_results(),"Eisenzahnrad")')
+        with self.assertRaisesRegex(Exception, "reopen deadline"):
+            self.exec("tick()")
+        self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
+
+    def test_reopen_deadline_is_fixed_from_the_actual_shortcut_event(self):
+        self.prepare_delayed_reopen()
+        self.exec(r'''
+          local events=report().event_log
+          assert(events[#events].kind=="shortcut")
+          local opened_tick=events[#events].tick
+          assert(report().pending.deadline==opened_tick+1800)
+          for i=1,7 do
+            tick()
+            assert(report().pending.deadline==opened_tick+1800)
+          end
+          game.tick=opened_tick+1799
+        ''')
+        with self.assertRaisesRegex(Exception, "reopen deadline"):
+            self.exec("tick()")
+        self.exec('assert(#report().snapshots==9 and writes["mir-library-localized-search-native/09-reopen.json"]==nil)')
 
     def test_native_frame_and_query_retention_refuse_changes(self):
         self.begin()
@@ -553,7 +642,7 @@ class LocalizedSearchNativeFixtureControls(unittest.TestCase):
     def test_metadata_and_public_result_path_are_exact(self):
         metadata = json.loads(INFO.read_text(encoding="utf-8"))
         self.assertEqual(metadata["name"], FIXTURE_NAME)
-        self.assertEqual(metadata["version"], "0.1.1")
+        self.assertEqual(metadata["version"], "0.1.2")
         self.assertEqual(metadata["factorio_version"], "2.1")
         self.assertEqual(
             metadata["dependencies"],
