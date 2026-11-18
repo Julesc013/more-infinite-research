@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-se-worker-speed-provider-admitted",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "title": "MIR SE worker-speed config-admission fixture",
   "author": "MIR maintainers",
   "description": "Disposable SE worker-speed config observer; not a player save.",

@@ -52,7 +52,7 @@ local closure = {
   ["space-exploration-postprocess"]="0.7.5", informatron="0.4.0", ["aai-signal-transmission"]="0.5.3"
 }
 local stages = {
-  source={fixture="0.1.0",mir="5.0.20015",cap=0}, admission={fixture="0.2.0",mir="5.0.20015",cap=0},
+  source={fixture="0.1.0",mir="5.0.20015",cap=0}, admission={fixture="0.2.1",mir="5.0.20015",cap=0},
   old={fixture="0.3.0",mir="5.0.20015",cap=10}, candidate={fixture="0.4.0",mir="5.0.20018",cap=10}
 }
 local function copy(v)if type(v)~="table"then return v end local o={}for k,x in pairs(v)do o[k]=copy(x)end return o end
@@ -167,6 +167,7 @@ function provider_stage(wrapper, common, prerequisites, name)
 end
 function provider_call(name,event)local ok,message=pcall(handlers[name],event);return ok,tostring(message)end
 function provider_tick(count)for _=1,count do game.tick=game.tick+1;local ok,message=provider_call(1);if not ok then return false,message end end;return true,""end
+function provider_same_tick_callback(count)for _=1,count do local ok,message=provider_call(1);if not ok then return false,message end end;return true,""end
 function provider_candidate_normalize()
   local player=game.forces.player;local worker=player.technologies[WORKER]
   player.research_queue={worker};assert(player.current_research==worker);player.research_progress=.27
@@ -212,6 +213,14 @@ function provider_finish(by_script)
     local ok,message=provider_research_tick(false);if not ok then return false,message end
     ok,message=provider_tick(1);if not ok then return false,message end
     if game.forces.player.technologies[WORKER].level==11 then return true,""end
+  end
+  return false,"world research completion did not occur"
+end
+function provider_finish_at_completion_tick()
+  for _=1,64 do
+    local ok,message=provider_research_tick(false);if not ok then return false,message end
+    if game.forces.player.technologies[WORKER].level==11 then return true,"" end
+    ok,message=provider_tick(1);if not ok then return false,message end
   end
   return false,"world research completion did not occur"
 end

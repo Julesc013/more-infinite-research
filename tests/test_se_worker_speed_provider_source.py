@@ -59,7 +59,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def admitted(self) -> None:
         self.source()
         self.stage("admission")
-        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.0"}})
+        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.1"}})
         ok, message = self.call("configuration", event)
         self.assertTrue(ok, message)
         ok, message = self.lua.globals().provider_tick(2)
@@ -69,7 +69,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.admitted()
         self.lua.globals().provider_candidate_normalize()
         self.stage("candidate")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         ok, message = self.call("configuration", event)
         self.assertTrue(ok, message)
@@ -79,7 +79,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def test_static_metadata_and_fixed_contract_are_portable(self):
         expected = {
             "source": ("0.1.0", "5.0.20015", 0),
-            "admission": ("0.2.0", "5.0.20015", 0),
+            "admission": ("0.2.1", "5.0.20015", 0),
             "old": ("0.3.0", "5.0.20015", 10),
             "candidate": ("0.4.0", "5.0.20018", 10),
         }
@@ -158,7 +158,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
                     ["space-exploration-graphics-3"]="0.7.2",["space-exploration-graphics-4"]="0.7.2",
                     ["space-exploration-graphics-5"]="0.7.3",["space-exploration-menu-simulations"]="0.7.4",
                     ["space-exploration-postprocess"]="0.7.5",informatron="0.4.0",["aai-signal-transmission"]="0.5.3",
-                    ["mir-fixture-se-worker-speed-provider-admitted"]=(data_stage=="source"and"0.1.0"or data_stage=="admission"and"0.2.0"or data_stage=="old"and"0.3.0"or"0.4.0"),
+                    ["mir-fixture-se-worker-speed-provider-admitted"]=(data_stage=="source"and"0.1.0"or data_stage=="admission"and"0.2.1"or data_stage=="old"and"0.3.0"or"0.4.0"),
                     ["more-infinite-research"]=data_mir}
                   settings={startup={["mir-max-level-worker-robots-speed"]={value=data_cap}}};logs={};function log(value)logs[#logs+1]=value end
                   require=function(name)
@@ -191,8 +191,35 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
             assert(#completed.order==196 and completed.rows["worker-robots-speed-9"].researched==true
               and completed.rows["se-deep-space-science-pack-1"].researched==true)
           end
-          assert(state.admission.ticks==2 and #saves==1 and saves[1]=="se-worker-speed-provider-admission")
+          assert(state.admission.ticks==2 and state.admission.start_tick==0 and state.admission.elapsed_ticks==2
+            and #saves==1 and saves[1]=="se-worker-speed-provider-admission")
           assert(markers[1].phase=="source" and markers[2].phase=="admission-pre-hold" and markers[3].phase=="admission-saved")
+        ''')
+
+    def test_admission_requires_two_elapsed_ticks_even_when_the_first_callback_shares_the_configuration_tick(self):
+        self.source()
+        self.stage("admission")
+        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.1"}})
+        self.assertTrue(self.call("configuration", event)[0])
+
+        ok, message = self.lua.globals().provider_same_tick_callback(1)
+        self.assertTrue(ok, message)
+        self.lua.execute(r'''
+          local admission=storage.mir5_se_worker_speed_provider_admitted.admission
+          assert(admission.phase=="holding" and admission.start_tick==0 and admission.ticks==1 and admission.elapsed_ticks==0)
+          assert(#saves==0)
+        ''')
+
+        self.assertTrue(self.lua.globals().provider_tick(1)[0])
+        self.lua.execute(r'''
+          local admission=storage.mir5_se_worker_speed_provider_admitted.admission
+          assert(admission.phase=="holding" and admission.ticks==2 and admission.elapsed_ticks==1 and #saves==0)
+        ''')
+        self.assertTrue(self.lua.globals().provider_tick(1)[0])
+        self.lua.execute(r'''
+          local admission=storage.mir5_se_worker_speed_provider_admitted.admission
+          assert(admission.phase=="saved" and admission.ticks==3 and admission.elapsed_ticks==2)
+          assert(#saves==1 and saves[1]=="se-worker-speed-provider-admission")
         ''')
 
     def test_source_orders_dependent_queue_progress_writes_and_never_sets_idle_progress(self):
@@ -260,7 +287,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.source()
         self.stage("admission")
         self.assertTrue(self.call("load")[0])
-        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.0"}})
+        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.1"}})
         self.assertTrue(self.call("configuration", event)[0])
         self.assertTrue(self.lua.globals().provider_tick(1)[0])
         self.lua.execute('assert(storage.mir5_se_worker_speed_provider_admitted.phase=="admission-holding" and #saves==0)')
@@ -270,7 +297,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.lua.globals().provider_candidate_normalize()
         self.stage("candidate")
         self.assertTrue(self.call("load")[0])
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         self.assertTrue(self.call("configuration", event)[0])
         self.assertTrue(self.lua.globals().provider_tick(1)[0])
@@ -327,7 +354,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def test_admission_refuses_mutated_completed_state_without_repair(self):
         self.source()
         self.stage("admission")
-        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.0"}})
+        event = self.event(False, {FIXTURE_NAME: {"old_version": "0.1.0", "new_version": "0.2.1"}})
         ok, message = self.call("configuration", event)
         self.assertTrue(ok, message)
         self.lua.execute('game.forces.player.technologies["worker-robots-speed-1"].researched=false')
@@ -339,7 +366,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def test_old_opponent_is_passive_and_candidate_rejects_stale_provenance(self):
         self.admitted()
         self.stage("old")
-        old_event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.3.0"}})
+        old_event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.3.0"}})
         ok, message = self.call("configuration", old_event)
         self.assertFalse(ok)
         self.assertIn("MIR_EXPECTED_SE_WORKER_SPEED_PROVIDER_OLD15_OPPONENT", message)
@@ -347,7 +374,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.lua.globals().provider_candidate_normalize()
         self.lua.execute('storage.mir5_se_worker_speed_provider_admitted.provenance.source_mir="5.0.20014"')
         self.stage("candidate")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         ok, message = self.call("configuration", event)
         self.assertFalse(ok)
@@ -356,7 +383,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
     def test_old_opponent_rejects_an_extra_mod_change_before_its_expected_token(self):
         self.admitted()
         self.stage("old")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.3.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.3.0"},
             "undeclared-fixture": {"new_version": "1.0.0"}})
         ok, message = self.call("configuration", event)
         self.assertFalse(ok)
@@ -385,6 +412,8 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
           assert(#saves==2 and saves[2]=="se-worker-speed-provider-candidate")
           local marker=markers[#markers]
           assert(marker.phase=="candidate-complete" and state.candidate.closed.player.worker.saved==0)
+          assert(state.candidate.hold_start_tick==marker.candidate.hold_start_tick
+            and state.candidate.hold_elapsed_ticks==2 and marker.candidate.hold_elapsed_ticks==2)
           assert(marker.candidate.lab.valid==true and marker.candidate.lab.name=="mir-fixture-se-worker-speed-provider-lab"
             and marker.candidate.lab.unit_number==91 and marker.candidate.lab.disabled_by_script==true)
           for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","utility-science-pack",
@@ -392,6 +421,30 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
             assert(marker.candidate.lab.input[name]==64)
           end
           assert(marker.candidate.lab~=state.candidate.lab and marker.candidate.lab.get_inventory==nil)
+        ''')
+
+    def test_candidate_requires_two_elapsed_ticks_even_when_the_first_hold_callback_shares_the_completion_tick(self):
+        self.candidate_started()
+        self.assertTrue(self.lua.globals().provider_finish_at_completion_tick()[0])
+        self.lua.execute('assert(storage.mir5_se_worker_speed_provider_admitted.phase=="candidate-holding")')
+
+        ok, message = self.lua.globals().provider_same_tick_callback(1)
+        self.assertTrue(ok, message)
+        self.lua.execute(r'''
+          local candidate=storage.mir5_se_worker_speed_provider_admitted.candidate
+          assert(candidate.phase=="holding" and candidate.hold_ticks==1 and candidate.hold_elapsed_ticks==0)
+          assert(#saves==1)
+        ''')
+        self.assertTrue(self.lua.globals().provider_tick(1)[0])
+        self.lua.execute(r'''
+          local candidate=storage.mir5_se_worker_speed_provider_admitted.candidate
+          assert(candidate.phase=="holding" and candidate.hold_ticks==2 and candidate.hold_elapsed_ticks==1 and #saves==1)
+        ''')
+        self.assertTrue(self.lua.globals().provider_tick(1)[0])
+        self.lua.execute(r'''
+          local candidate=storage.mir5_se_worker_speed_provider_admitted.candidate
+          assert(candidate.phase=="saved" and candidate.hold_ticks==3 and candidate.hold_elapsed_ticks==2)
+          assert(#saves==2 and saves[2]=="se-worker-speed-provider-candidate")
         ''')
 
     def test_candidate_refills_bounded_lab_stacks_and_never_completes_with_exhausted_feed(self):
@@ -429,7 +482,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.admitted()
         self.lua.globals().provider_candidate_normalize()
         self.stage("candidate")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         ok, message = self.call("configuration", event)
         self.assertTrue(ok, message)
@@ -444,7 +497,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.lua.globals().provider_candidate_normalize()
         self.lua.execute('game.forces.player.technologies["worker-robots-speed-10"].enabled=false;game.forces.player.technologies["worker-robots-speed-10"].visible_when_disabled=true')
         self.stage("candidate")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         ok, message = self.call("configuration", event)
         self.assertFalse(ok)
@@ -474,7 +527,7 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.lua.execute('game.forces.player.technologies["worker-robots-speed-1"].saved_progress=1e-9')
         self.lua.globals().provider_candidate_normalize()
         self.stage("candidate")
-        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.0", "new_version": "0.4.0"},
+        event = self.event(True, {FIXTURE_NAME: {"old_version": "0.2.1", "new_version": "0.4.0"},
             "more-infinite-research": {"old_version": "5.0.20015", "new_version": "5.0.20018"}})
         ok, message = self.call("configuration", event)
         self.assertFalse(ok)
