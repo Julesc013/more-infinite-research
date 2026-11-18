@@ -1023,6 +1023,77 @@ class LifecycleTests(unittest.TestCase):
             "a malformed native owner gained cap ownership")
         ''')
 
+    def test_native_cap_fault_retains_proven_right_until_ordinary_below_cap_restoration(self):
+        # Host-only actual cap/lifecycle wiring. Both failures must abort before
+        # the event path can interpret a read error as an absent native owner.
+        # This is neither a Factorio cold load nor historical paid-work proof.
+        self.lua.execute(r'''
+          for _, fault in ipairs({"lookup", "prototype"}) do
+            local name = "low-density-structure-productivity"
+            local owner = technology(name, 3, true)
+            owner.prototype = {max_level = 4294967295, effects = {
+              {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1},
+              {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .1}
+            }}
+            local queued = technology("unrelated-native-cap-queue", 1, true)
+            local force_row = force(59, {[name] = owner, [queued.name] = queued}, {queued}, queued, .42)
+            owner.force, queued.force = force_row, force_row
+            force_row.worker_robots_storage_bonus = .17
+            boot({[59] = force_row}, 0, "", nil, nil, 0,
+              {["space-age"] = "2.1.23"}, nil,
+              {["ips-max-level-research_low_density_structure"] = 2})
+            handlers.init()
+            local right = storage.mir_caps.owned_disabled[59][name]
+            assert(right and right.disabled == true and not owner.enabled,
+              "fixture did not record MIR's actual native cap-disablement right")
+            local lifecycle = require("runtime.lifecycle")
+
+            if fault == "lookup" then
+              force_row.technologies[name] = nil
+              setmetatable(force_row.technologies, {__index = function(_, key)
+                if key == name then error("native cap lookup sentinel") end
+                return nil
+              end})
+            else
+              owner.prototype.max_level = nil
+              setmetatable(owner.prototype, {__index = function(_, key)
+                if key == "max_level" then error("native cap prototype sentinel") end
+                return nil
+              end})
+            end
+            local ok, message = pcall(lifecycle.on_research_finished, {research = owner})
+            assert(not ok, "native owner read fault was treated as legitimate absence")
+            local prefix = fault == "lookup" and "MIR native cap owner lookup failed for "
+              or "MIR native cap owner admission failed for "
+            assert(tostring(message):find(prefix .. name, 1, true)
+              and tostring(message):find("native cap " .. fault, 1, true),
+              "rejection discarded the native read phase, owner, or original cause")
+            assert(storage.mir_caps.owned_disabled[59][name] == right and right.disabled == true
+              and not owner.enabled and owner.level == 3,
+              "unexpected native read lost a previously proved restoration right")
+            assert(force_row.current_research == queued and force_row.research_progress == .42
+              and #force_row.research_queue == 1 and force_row.research_queue[1] == queued
+              and force_row.worker_robots_storage_bonus == .17,
+              "failed admission rewrote unrelated queue, paid partial or bonus")
+
+            if fault == "lookup" then
+              setmetatable(force_row.technologies, nil)
+              force_row.technologies[name] = owner
+            else
+              setmetatable(owner.prototype, nil)
+              owner.prototype.max_level = 4294967295
+            end
+            owner.level = 2
+            lifecycle.on_research_reversed({research = owner})
+            assert(owner.enabled and not owner.visible_when_disabled,
+              "valid below-cap event did not restore previously owned enablement")
+            assert(force_row.current_research == queued and force_row.research_progress == .42
+              and #force_row.research_queue == 1 and force_row.research_queue[1] == queued
+              and force_row.worker_robots_storage_bonus == .17,
+              "recovery changed unrelated current research, queue, partial work or bonus")
+          end
+        ''')
+
     def test_space_age_native_owner_effect_permutation_retains_only_proven_cap_rights(self):
         self.lua.execute('''
           local name = "low-density-structure-productivity"

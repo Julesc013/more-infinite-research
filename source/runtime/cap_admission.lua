@@ -66,14 +66,25 @@ function M.admits_native_owner(lookup, declaration, configured_change)
   local recipes, recipe_count = declared_contract(declaration)
   if recipes == nil then return false end
   local ok, technology = pcall(lookup, declaration.id)
-  if not ok or technology == nil then return false end
+  -- A failed native read is not proof of a missing owner. Treating that
+  -- exception as false can cause lifecycle to discard an earned restoration
+  -- right before the original read failure is diagnosed.
+  if not ok then
+    error("MIR native cap owner lookup failed for " .. declaration.id .. ": " .. tostring(technology), 2)
+  end
+  if technology == nil then return false end
+  local kind = type(technology)
+  if kind ~= "table" and kind ~= "userdata" then return false end
   local checked, accepted = pcall(function()
     local prototype = technology.prototype
     return technology.name == declaration.id and prototype ~= nil
       and prototype.max_level == INFINITE_MAX_LEVEL
       and exact_recipes(recipes, recipe_count, prototype.effects, change)
   end)
-  return checked and accepted or false
+  if not checked then
+    error("MIR native cap owner admission failed for " .. declaration.id .. ": " .. tostring(accepted), 2)
+  end
+  return accepted == true
 end
 
 return M
