@@ -268,10 +268,16 @@ end
 
 function source_producer_flow(path,common,cold)
   local player=force("player",1,false);player._reset_bonus=.65
+  -- The exact published15/SE native trace restores the enabled gate during
+  -- reset_technology_effects (including its callbacks). Model that observed
+  -- profile outcome here; the producer must seed its intended gates last.
+  local function source_reset_gate(value) value.technologies[WORKER].enabled=true end
+  player._external_reset=source_reset_gate
   local game={tick=0,forces={player=player,[1]=player},surfaces={}}
   function game.create_force(name)
     local value=force(name,#game.forces+1,false)
     value._reset_bonus=name=="mir5-worker-speed-cap-ten-foreign" and 1.3 or 2.6
+    value._external_reset=source_reset_gate
     game.forces[name],game.forces[value.index]=value,value
     return value
   end
