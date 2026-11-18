@@ -158,6 +158,18 @@ local function queue_names(force)
   return names
 end
 
+local function source_frame_facts(frame)
+  local worker, queue = frame.worker, {}
+  for _, name in ipairs(frame.queue) do queue[#queue + 1] = name end
+  local function number(value) return type(value) == "number" and string.format("%.17g", value) or tostring(value) end
+  return "force=" .. tostring(frame.name) .. ",index=" .. tostring(frame.index)
+    .. ",worker-level=" .. tostring(worker.level) .. ",worker-researched=" .. tostring(worker.researched)
+    .. ",worker-enabled=" .. tostring(worker.enabled) .. ",worker-visible=" .. tostring(worker.visible)
+    .. ",worker-saved=" .. tostring(worker.saved) .. ",current=" .. tostring(frame.current)
+    .. ",progress=" .. number(frame.progress) .. ",queue=[" .. table.concat(queue, ",") .. "]"
+    .. ",bonus=" .. number(frame.bonus)
+end
+
 local function worker_row(force, label)
   local worker = technology(force, WORKER)
   check(worker.saved_progress == 0, label .. " worker saved progress differs")
@@ -243,9 +255,12 @@ end
 
 local function set_target(force, level, enabled)
   local target = technology(force, WORKER)
-  target.researched, target.level = false, level
+  target.researched = false
+  target.level = level
   force.reset_technology_effects()
-  target.enabled, target.visible_when_disabled, target.saved_progress = enabled, false, 0
+  target.enabled = enabled
+  target.visible_when_disabled = false
+  target.saved_progress = 0
 end
 
 local function grant_declared_rows(force, label)
@@ -259,13 +274,28 @@ local function assert_source_expected(snapshot, label)
   local player, foreign, earned = snapshot.player, snapshot.foreign, snapshot.earned
   check(player.worker.level == 10 and player.worker.researched == false and player.worker.enabled == true
     and player.worker.visible == false and player.current == WORKER and close(player.progress, .27)
-    and same(player.queue, {WORKER, WORKER}) and close(player.bonus, 5.0), label .. " player source frame differs")
+    and same(player.queue, {WORKER, WORKER}) and close(player.bonus, 5.0),
+    label .. " player source frame differs: " .. source_frame_facts(player))
   check(foreign.worker.level == 11 and foreign.worker.researched == false and foreign.worker.enabled == false
     and foreign.worker.visible == false and foreign.current == CURRENT and close(foreign.progress, .42)
-    and same(foreign.queue, {CURRENT, QUEUED}) and close(foreign.bonus, 5.65), label .. " foreign source frame differs")
+    and same(foreign.queue, {CURRENT, QUEUED}) and close(foreign.bonus, 5.65),
+    label .. " foreign source frame differs: " .. source_frame_facts(foreign))
   check(earned.worker.level == 13 and earned.worker.researched == false and earned.worker.enabled == true
     and earned.worker.visible == false and earned.current == false and close(earned.progress, 0)
-    and #earned.queue == 0 and close(earned.bonus, 6.95), label .. " earned source frame differs")
+    and #earned.queue == 0 and close(earned.bonus, 6.95),
+    label .. " earned source frame differs: " .. source_frame_facts(earned))
+end
+
+local function queue_research(force, rows, progress, label)
+  force.research_queue = rows
+  local current = force.current_research
+  check(current and current.name == rows[1].name, label .. " current research differs after queue")
+  force.research_progress = progress
+end
+
+local function assert_idle_research(force, label)
+  check(force.current_research == nil and #queue_names(force) == 0 and force.research_progress == 0,
+    label .. " idle research differs")
 end
 
 local function begin_source()
@@ -280,11 +310,13 @@ local function begin_source()
     grant_declared_rows(row.force, "source " .. row.role)
     set_target(row.force, row.level, row.enabled)
   end
-  player.research_queue, player.research_progress = {technology(player, WORKER), technology(player, WORKER)}, .27
-  technology(foreign, CURRENT).researched, technology(foreign, QUEUED).researched = false, false
-  technology(foreign, CURRENT).enabled, technology(foreign, QUEUED).enabled = true, true
-  foreign.research_queue, foreign.research_progress = {technology(foreign, CURRENT), technology(foreign, QUEUED)}, .42
-  earned.research_queue, earned.research_progress = {}, 0
+  queue_research(player, {technology(player, WORKER), technology(player, WORKER)}, .27, "source player")
+  technology(foreign, CURRENT).researched = false
+  technology(foreign, QUEUED).researched = false
+  technology(foreign, CURRENT).enabled = true
+  technology(foreign, QUEUED).enabled = true
+  queue_research(foreign, {technology(foreign, CURRENT), technology(foreign, QUEUED)}, .42, "source foreign")
+  assert_idle_research(earned, "source earned")
   local state = {schema = 1, phase = "source-ready", provenance = {role = "source", source_mir = script.active_mods[MIR],
     fixture_version = script.active_mods[FIXTURE], ordered_prerequisite_count = #fixture.rows}, foreign_index = foreign.index, earned_index = earned.index}
   storage[KEY] = state
