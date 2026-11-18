@@ -195,6 +195,42 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
           assert(markers[1].phase=="source" and markers[2].phase=="admission-pre-hold" and markers[3].phase=="admission-saved")
         ''')
 
+    def test_source_orders_dependent_queue_progress_writes_and_never_sets_idle_progress(self):
+        ok, message = self.lua.globals().provider_old_combined_queue_progress()
+        self.assertFalse(ok)
+        self.assertIn("No research in progress", message)
+
+        self.setUp()
+        ok, message = self.lua.globals().provider_ordered_queue_progress_without_read()
+        self.assertTrue(ok, message)
+        self.lua.execute(r'''
+          local player=game.forces.player
+          assert(player.current_research==player.technologies["worker-robots-speed-10"] and player.research_progress==.27)
+        ''')
+
+        self.setUp()
+        self.source()
+        self.lua.execute(r'''
+          local state=storage.mir5_se_worker_speed_provider_admitted
+          local player=game.forces.player
+          local earned=game.forces["mir5-se-worker-speed-provider-earned"]
+          assert(player.current_research==player.technologies["worker-robots-speed-10"] and player.research_progress==.27)
+          assert(earned.current_research==nil and earned.research_progress==0 and #earned.research_queue==0)
+          assert(state.source.player.current=="worker-robots-speed-10" and state.source.earned.current==false)
+        ''')
+        ok, message = self.lua.globals().provider_idle_progress_write()
+        self.assertFalse(ok)
+        self.assertIn("No research in progress", message)
+
+        self.setUp()
+        self.candidate_started()
+        ok, message = self.lua.globals().provider_finish(False)
+        self.assertTrue(ok, message)
+        self.lua.execute(r'''
+          local player=game.forces.player
+          assert(player.current_research==nil and player.research_progress==0 and #player.research_queue==0)
+        ''')
+
     def test_admission_and_candidate_colds_are_read_only(self):
         self.admitted()
         self.stage("admission")

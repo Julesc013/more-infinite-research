@@ -84,7 +84,8 @@ local function make_force(name,index,rows)
   end
   technologies[WORKER].prerequisites[PREDECESSOR]=technologies[PREDECESSOR]
   technologies[WORKER].prerequisites[DEEP]=technologies[DEEP]
-  local values={name=name,index=index,valid=true,technologies=technologies,_queue={},research_progress=0,worker_robots_speed_modifier=0}
+  local values={name=name,index=index,valid=true,technologies=technologies,_queue={},_current_research=nil,
+    research_progress=0,worker_robots_speed_modifier=0}
   local force={}
   function force.reset_technology_effects()
     local worker=technologies[WORKER]
@@ -93,15 +94,22 @@ local function make_force(name,index,rows)
   end
   setmetatable(force,{__index=function(_,key)
       if key=="research_queue"then return values._queue end
-      if key=="current_research"then return values._queue[1] end
+      if key=="current_research"then return values._current_research end
       return values[key]
     end,__newindex=function(_,key,value)
+      if key=="research_progress"then
+        assert(values._current_research~=nil,"No research in progress.")
+        values.research_progress=value;return
+      end
       if key~="research_queue"then values[key]=value;return end
       local rows={};for index,item in ipairs(value)do
         local technology=type(item)=="string"and technologies[item]or item
         assert(technology and technology.name);rows[index]=technology
-      end;values._queue=rows
+      end;values._queue=rows;values._current_research=rows[1]
     end})
+  force._provider_complete_research=function()
+    values._queue={};values._current_research=nil;values.research_progress=0
+  end
   for _, technology in pairs(technologies) do technology.force=force end
   return force
 end
@@ -160,11 +168,27 @@ end
 function provider_call(name,event)local ok,message=pcall(handlers[name],event);return ok,tostring(message)end
 function provider_tick(count)for _=1,count do game.tick=game.tick+1;local ok,message=provider_call(1);if not ok then return false,message end end;return true,""end
 function provider_candidate_normalize()
-  local player=game.forces.player;player.research_queue={player.technologies[WORKER]};player.research_progress=.27
+  local player=game.forces.player;local worker=player.technologies[WORKER]
+  player.research_queue={worker};assert(player.current_research==worker);player.research_progress=.27
   player.technologies[WORKER].enabled=true;player.technologies[WORKER].visible_when_disabled=false
   local foreign=game.forces["mir5-se-worker-speed-provider-foreign"].technologies[WORKER]
   local earned=game.forces["mir5-se-worker-speed-provider-earned"].technologies[WORKER]
   foreign.enabled,foreign.visible_when_disabled=false,true;earned.enabled,earned.visible_when_disabled=false,true
+end
+function provider_old_combined_queue_progress()
+  local player=game.forces.player;local worker=player.technologies[WORKER]
+  local ok,message=pcall(function()player.research_queue,player.research_progress={worker,worker},.27 end)
+  return ok,tostring(message)
+end
+function provider_ordered_queue_progress_without_read()
+  local player=game.forces.player;local worker=player.technologies[WORKER]
+  local ok,message=pcall(function()player.research_queue={worker,worker};player.research_progress=.27 end)
+  return ok,tostring(message)
+end
+function provider_idle_progress_write()
+  local earned=game.forces["mir5-se-worker-speed-provider-earned"]
+  local ok,message=pcall(function()earned.research_progress=0 end)
+  return ok,tostring(message)
 end
 function provider_research_tick(by_script)
   local player=game.forces.player;local worker=player.technologies[WORKER]
@@ -179,7 +203,7 @@ function provider_research_tick(by_script)
     remaining=remaining-available;player._provider_remaining=remaining;player.research_progress=(required-remaining)/required
     if remaining>0 then return true,""end
   end
-  player.research_queue={};player.research_progress=0;worker.level=11;worker.researched=false;worker.enabled=false;worker.visible_when_disabled=true;player.reset_technology_effects()
+  player._provider_complete_research();worker.level=11;worker.researched=false;worker.enabled=false;worker.visible_when_disabled=true;player.reset_technology_effects()
   return provider_call(3,{research=worker,by_script=by_script,tick=game.tick})
 end
 function provider_finish(by_script)
