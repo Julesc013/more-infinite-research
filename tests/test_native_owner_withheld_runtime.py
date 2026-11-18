@@ -301,6 +301,16 @@ class WithheldRuntimeTests(unittest.TestCase):
                     install(d.main_id,d.main_id==id and actual_generated and 3 or 1)
                     install(d.positive_id);install(d.negative_id)
                   end
+                  -- The current data-stage construction record independently
+                  -- names each fixed signed pair.  Materialize every named
+                  -- source row, rather than presenting a partial world whose
+                  -- fixed main has no matching private carriers.
+                  local fixed=actual_data["more-infinite-research-native-adoptions"].data.fixed_credits or {}
+                  for _,d in ipairs(require("research.native_credit_definitions").fixed_descriptors()) do
+                    if fixed[d.recipe] ~= nil then
+                      install(d.main_id);install(d.positive_id);install(d.negative_id)
+                    end
+                  end
                   local lifecycle,runtime=parse(world,actual_data,nil,17,function(_,name)
                     assert(actual_technologies[name],"creation claim lacks actual source")
                     return {created="more-infinite-research"}

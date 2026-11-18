@@ -10,6 +10,7 @@ local foreign_technology_prototypes
 local native_adoptions
 local withheld_native_owners
 local native_credit_groups
+local native_credit_scalars
 local finite_research_speed_provider
 local worker_storage
 local admission_facts = {}
@@ -17,7 +18,7 @@ if target.id == "f200" or target.id == "f210" then
   local native_data = prototypes and prototypes.mod_data
   local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
   if adopted ~= nil then
-    native_adoptions, withheld_native_owners, native_credit_groups = require("research.native_adoption").read(adopted.data,
+    native_adoptions, withheld_native_owners, native_credit_groups, native_credit_scalars = require("research.native_adoption").read(adopted.data,
       modern.native_owners(script and script.active_mods), admission_facts)
     worker_storage = admission_facts.worker_storage
   end
@@ -138,6 +139,12 @@ local M = {}
 
 function M.native_credit_groups()
   return require("research.native_adoption").credit_groups(native_credit_groups)
+end
+
+-- Exact fixed-carrier rows that this current data stage emitted.  This remains
+-- immutable construction provenance, not an observation of a force or save.
+function M.native_credit_scalars()
+  return require("research.native_adoption").fixed_credit_scalars(native_credit_scalars)
 end
 
 function M.galore_sulfur_retired()

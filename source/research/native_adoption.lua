@@ -19,7 +19,8 @@ local function finite(value)
 end
 
 function M.prototype()
-  return {type="mod-data", name=M.prototype_name, data={schema=1, owners={}, withheld={}, credits={}}}
+  return {type="mod-data", name=M.prototype_name,
+    data={schema=1, owners={}, withheld={}, credits={}, fixed_credits={}}}
 end
 
 -- The existing credit constructor validates only these five authored families
@@ -35,6 +36,26 @@ function M.credit_groups(value)
   -- An explicitly empty family is still a complete current recipient set.
   -- Validation above has already restricted these keys and plain tables.
   for family in pairs(value) do out[family] = out[family] or {} end
+  return out
+end
+
+-- This is a compact declaration of rows emitted by the fixed carrier writer
+-- during this data stage.  It deliberately contains raw authored positive
+-- deltas, not target-rounded observations or any saved contribution.
+function M.fixed_credit_scalars(value)
+  if value == nil then return {} end
+  if type(value) ~= "table" or getmetatable(value) ~= nil then fail("invalid fixed native credits") end
+  local allowed, out = {}, {}
+  for _, row in ipairs(require("research.native_credit_definitions").fixed_descriptors()) do
+    allowed[row.recipe] = true
+  end
+  for recipe, change in pairs(value) do
+    if type(recipe) ~= "string" or recipe == "" or recipe:find("\0", 1, true)
+        or allowed[recipe] ~= true or not finite(change) or change <= 0 then
+      fail("invalid fixed native credit")
+    end
+    out[recipe] = change
+  end
   return out
 end
 
@@ -55,7 +76,7 @@ local function withheld_rows(value, allowed)
   return out
 end
 
-function M.plan(raw, targets, withheld, credits, worker_storage, worker_default_split)
+function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, worker_default_split)
   if worker_default_split ~= nil and type(worker_default_split) ~= "boolean" then fail("invalid worker default split") end
   local owners = {}
   for _, row in ipairs(targets or {}) do
@@ -69,12 +90,13 @@ function M.plan(raw, targets, withheld, credits, worker_storage, worker_default_
   end
   local withheld_settings = withheld_rows(withheld, NATIVE_FAMILIES)
   local credit_groups = M.credit_groups(credits)
+  local fixed_credit_scalars = M.fixed_credit_scalars(fixed_credits)
   local worker_route = worker_storage ~= nil
     and require("compatibility.worker_robot_storage").copy_route(worker_storage) or nil
   for name in pairs(withheld_settings) do
     if owners[name] ~= nil then fail("native owner is both adopted and withheld") end
   end
-  if next(owners) == nil and next(withheld_settings) == nil and next(credit_groups) == nil
+  if next(owners) == nil and next(withheld_settings) == nil and next(credit_groups) == nil and next(fixed_credit_scalars) == nil
       and worker_route == nil and worker_default_split == nil then return nil end
   local prototype = raw["mod-data"] and raw["mod-data"][M.prototype_name]
   if type(prototype) ~= "table" or prototype.type ~= "mod-data" or prototype.name ~= M.prototype_name
@@ -86,11 +108,17 @@ function M.plan(raw, targets, withheld, credits, worker_storage, worker_default_
         or next(prototype.data.credits) ~= nil) then
     fail("missing or changed private prototype")
   end
+  if prototype.data.fixed_credits ~= nil and (type(prototype.data.fixed_credits) ~= "table"
+      or next(prototype.data.fixed_credits) ~= nil) then
+    fail("missing or changed private prototype")
+  end
   for key in pairs(prototype.data) do
-    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits" then fail("changed private prototype data") end
+    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits" and key ~= "fixed_credits" then
+      fail("changed private prototype data")
+    end
   end
   return {prototype=prototype, owners=owners, withheld=withheld_settings, credits=credit_groups,
-    worker_storage=worker_route, worker_default_split=worker_default_split}
+    fixed_credits=fixed_credit_scalars, worker_storage=worker_route, worker_default_split=worker_default_split}
 end
 
 function M.apply(patch)
@@ -98,6 +126,7 @@ function M.apply(patch)
     patch.prototype.data.owners = patch.owners
     patch.prototype.data.withheld = patch.withheld
     patch.prototype.data.credits = patch.credits
+    patch.prototype.data.fixed_credits = patch.fixed_credits
     patch.prototype.data.worker_storage = patch.worker_storage
     patch.prototype.data.worker_default_split = patch.worker_default_split
     if patch.galore_sulfur_retired ~= nil then
@@ -113,7 +142,7 @@ function M.read(value, definitions, admission_facts)
     fail("invalid control data")
   end
   for key in pairs(value) do
-    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits"
+    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits" and key ~= "fixed_credits"
         and key ~= "galore_sulfur_retired" and key ~= "worker_storage" and key ~= "worker_default_split" then fail("unknown control field") end
   end
   if value.galore_sulfur_retired ~= nil and type(value.galore_sulfur_retired) ~= "boolean" then
@@ -151,6 +180,7 @@ function M.read(value, definitions, admission_facts)
     out[name] = {recipes=recipes, effect_change=row.effect_change, configured_change=row.configured_change}
   end
   local credits = M.credit_groups(value.credits)
+  local fixed_credits = M.fixed_credit_scalars(value.fixed_credits)
   local worker_storage = value.worker_storage ~= nil
     and require("compatibility.worker_robot_storage").copy_route(value.worker_storage) or nil
   if admission_facts ~= nil then
@@ -158,7 +188,7 @@ function M.read(value, definitions, admission_facts)
     admission_facts.worker_storage = worker_storage
     admission_facts.worker_default_split = value.worker_default_split == true
   end
-  return out, withheld, credits
+  return out, withheld, credits, fixed_credits
 end
 
 return M

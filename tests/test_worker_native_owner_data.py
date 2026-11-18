@@ -397,18 +397,19 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
             __newindex=function()error("wrote saved history")end})
           for _,split in ipairs({false,true})do
             local prototype=bridge.prototype();local before=deep(prototype)
-            local patch=bridge.plan({["mod-data"]={[prototype.name]=prototype}}, {},nil,nil,nil,split)
+            local patch=bridge.plan({["mod-data"]={[prototype.name]=prototype}}, {},nil,nil,nil,nil,split)
             same(prototype,before);bridge.apply(patch)
             assert(prototype.data.worker_default_split==split)
             local facts={}
-            assert(select("#",bridge.read(prototype.data,{},facts))==3)
+            local owners,withheld,credits,fixed=bridge.read(prototype.data,{},facts)
+            assert(next(owners)==nil and next(withheld)==nil and next(credits)==nil and next(fixed)==nil)
             assert(facts.worker_default_split==split)
           end
           local facts={};bridge.read({schema=1,owners={}}, {},facts)
           assert(facts.worker_default_split==false)
           for _,bad in ipairs({1,"true",{}})do
             assert(not pcall(bridge.read,{schema=1,owners={},worker_default_split=bad},{},{}))
-            assert(not pcall(bridge.plan,{}, {},nil,nil,nil,bad))
+            assert(not pcall(bridge.plan,{}, {},nil,nil,nil,nil,bad))
           end
         ''')
 
