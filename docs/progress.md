@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## SE cap-successor candidate event-time require adverse (2026-11-19)
+
+The [four-stage cap-successor attempt](../spec/evidence/se-worker-speed-provider-cap-successor-gunmetal-r01-adverse.json) reuses the protected833284-byte7FAD admission save on headless2.0.77/SE0.7.57. The old15/fixture0.3 stage emits its full tuple and `old-opponent` marker, retains all196 completed rows per force, passes the independent old reader and exits with the declared expected token. The private18B563/fixture0.4 candidate loads that same protected input and reaches MIR `on_configuration_changed`, but current MIR fails before candidate pre-work at `runtime/catalogue.lua:147`: an event-time `require` flows through fixed-credit preflight into bootstrap. No ordinary completion, candidate save or cold load is produced.
+
+This is overall `NO-GO`. Independent review rehashes all25 copied bodies, reads every entry in the55-member7FAD ZIP, and confirms its protected, old and candidate input copies match; library controls restore, cleanup is empty and no Factorio remains. The old expected opponent does not qualify cap restoration, and the candidate failure does not establish a broader historical/provider attribution. Preserve the source and this adverse result; correct and test the bounded late-`require` consumer path before a distinct reviewed successor packet. Reporter, release and stable claims remain out of scope; published assets are unchanged.
+
 ## SE retained predecessor admission and cold load accepted (2026-11-19)
 
 The [r05 continuation](../spec/evidence/se-worker-speed-provider-retained-admission-gunmetal-r05.json) accepts the exact retained FAD source through a real published15 configuration change and one independent cold load on headless2.0.77/SE0.7.57. The fixture0.2.1 before/saved markers are ticks0/2: three callbacks span two actual elapsed ticks. The new protected7FAD save is833284bytes; its cold marker at tick3 retains all three force frames, queues, partial progress, bonuses and196 completed rows per force. Independent review rehashes all87 retrieved bodies, CRC-checks both55-entry protected ZIPs, replays the actual admission/cold reader and verifies the cold input equals7FAD. The source archive remains unchanged, all library controls/archives restore, cleanup is empty and no Factorio remains. The server stops under the saved-completion predicate; the cold process exits0 naturally.
