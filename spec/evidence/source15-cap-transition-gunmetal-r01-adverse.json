@@ -133,7 +133,8 @@
   "bounded_diagnosis": {
     "candidate_writer": "Exact SE0.7.57 control.lua:1831-1855 calls always_do_migrations; scripts/migrate.lua:121 invokes fill_tech_gaps(true), which can set researched=false for children of unresearched prerequisites at193-201.",
     "source_contract_gap": "Source producer grants the two direct prerequisite rows while leaving necessary earlier prerequisites unresearched. It was not qualified through a configuration change.",
-    "attribution_limit": "The observed snapshot is after all preceding mod callbacks; exclusive write attribution is not established. This is not a candidate-source or reporter-outcome finding."
+    "attribution_limit": "The observed snapshot is after all preceding mod callbacks; exclusive write attribution is not established. This is not a candidate-source or reporter-outcome finding.",
+    "actual_published_MIR_scope": "Exact published15 body admits only worker speed6/7 to native speed ownership; its caps writer never writes levels or researched, it contains no reset_technology_effects call, and its researched assignments target worker storage. This excludes a direct MIR speed9 researched reversal or effects-reset explanation within that archive."
   },
   "reviews": {
     "compose": {
@@ -150,6 +151,11 @@
       "path": "build/qualification/source15-cap-successor-native-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
       "bytes": 3566,
       "sha256": "FFEE6E1C517899517415507C8AF6D6BAEBF92EA09D9AE27FE34B8A1266317A23"
+    },
+    "published_archive_scope_addendum": {
+      "path": "build/qualification/source15-cap-successor-native-r01/INDEPENDENT-RESULT-REVIEW-r01-ARCHIVE-SCOPE-ADDENDUM.json",
+      "bytes": 4054,
+      "sha256": "00C5696FBD2A0694CF13F503817955657A20F145BB2E8FD1DE404A78C067414A"
     }
   },
   "custody": {
