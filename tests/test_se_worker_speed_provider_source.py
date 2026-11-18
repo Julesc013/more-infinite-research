@@ -201,6 +201,14 @@ class SEWorkerSpeedProviderSourceTests(unittest.TestCase):
         self.assertIn("No research in progress", message)
 
         self.setUp()
+        ok, message = self.lua.globals().provider_ordered_queue_progress_without_read()
+        self.assertTrue(ok, message)
+        self.lua.execute(r'''
+          local player=game.forces.player
+          assert(player.current_research==player.technologies["worker-robots-speed-10"] and player.research_progress==.27)
+        ''')
+
+        self.setUp()
         self.source()
         self.lua.execute(r'''
           local state=storage.mir5_se_worker_speed_provider_admitted

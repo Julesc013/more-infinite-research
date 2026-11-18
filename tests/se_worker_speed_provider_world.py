@@ -84,7 +84,7 @@ local function make_force(name,index,rows)
   end
   technologies[WORKER].prerequisites[PREDECESSOR]=technologies[PREDECESSOR]
   technologies[WORKER].prerequisites[DEEP]=technologies[DEEP]
-  local values={name=name,index=index,valid=true,technologies=technologies,_queue={},_current_research=nil,_pending_research=nil,
+  local values={name=name,index=index,valid=true,technologies=technologies,_queue={},_current_research=nil,
     research_progress=0,worker_robots_speed_modifier=0}
   local force={}
   function force.reset_technology_effects()
@@ -94,12 +94,7 @@ local function make_force(name,index,rows)
   end
   setmetatable(force,{__index=function(_,key)
       if key=="research_queue"then return values._queue end
-      if key=="current_research"then
-        if values._current_research==nil and values._pending_research~=nil then
-          values._current_research=values._pending_research;values._pending_research=nil
-        end
-        return values._current_research
-      end
+      if key=="current_research"then return values._current_research end
       return values[key]
     end,__newindex=function(_,key,value)
       if key=="research_progress"then
@@ -110,10 +105,10 @@ local function make_force(name,index,rows)
       local rows={};for index,item in ipairs(value)do
         local technology=type(item)=="string"and technologies[item]or item
         assert(technology and technology.name);rows[index]=technology
-      end;values._queue=rows;values._current_research=nil;values._pending_research=rows[1]
+      end;values._queue=rows;values._current_research=rows[1]
     end})
   force._provider_complete_research=function()
-    values._queue={};values._current_research=nil;values._pending_research=nil;values.research_progress=0
+    values._queue={};values._current_research=nil;values.research_progress=0
   end
   for _, technology in pairs(technologies) do technology.force=force end
   return force
@@ -183,6 +178,11 @@ end
 function provider_old_combined_queue_progress()
   local player=game.forces.player;local worker=player.technologies[WORKER]
   local ok,message=pcall(function()player.research_queue,player.research_progress={worker,worker},.27 end)
+  return ok,tostring(message)
+end
+function provider_ordered_queue_progress_without_read()
+  local player=game.forces.player;local worker=player.technologies[WORKER]
+  local ok,message=pcall(function()player.research_queue={worker,worker};player.research_progress=.27 end)
   return ok,tostring(message)
 end
 function provider_idle_progress_write()
