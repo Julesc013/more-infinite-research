@@ -509,6 +509,105 @@ try {{
         self.assertEqual(4 * 10 * 1024, value["private_bytes"])
         self.assertEqual("smaps_rollup_private_resident_plus_swap", value["private_measure"])
 
+    def test_zombie_leader_has_no_address_space_but_live_session_child_is_still_counted(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="mir-linux-zombie-accounting-") as directory:
+            proc = Path(directory)
+            process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
+            process_files(proc, 101, 100, 1001, {101: ""}, session=100)
+            write(proc / "100/stat", proc_stat(100, 1, 1000, 100).replace(") S ", ") Z "))
+            write(proc / "100/status", "Name:\towned\nState:\tZ (zombie)\n")
+            (proc / "100/smaps_rollup").unlink()
+            value = OBSERVATION.process_tree(proc, 100, 1000, 100)
+            self.assertTrue(value["root_exited"])
+            self.assertEqual(12 * 1024, value["working_set_bytes"])
+            self.assertEqual(10 * 1024, value["private_bytes"])
+            self.assertEqual([101], [row["id"] for row in value["children"]])
+
+    def test_exit_between_identity_and_memory_reads_discards_only_that_terminal_sample(self) -> None:
+        for phase in ("rss", "private"):
+            for transition in ("vanished", "zombie"):
+                with self.subTest(phase=phase, transition=transition), tempfile.TemporaryDirectory(
+                    prefix="mir-linux-memory-exit-race-"
+                ) as directory:
+                    proc = Path(directory)
+                    process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
+                    process_files(proc, 101, 100, 1001, {101: ""}, session=100)
+                    rss, private = OBSERVATION.read_status_rss, OBSERVATION.read_private_memory
+
+                    def failed_read(function, label):
+                        def read(root, pid):
+                            if pid == 101:
+                                if transition == "vanished":
+                                    (proc / "101/stat").unlink()
+                                else:
+                                    write(proc / "101/stat", proc_stat(101, 100, 1001, 100).replace(") S ", ") Z "))
+                                raise OBSERVATION.ObservationFailure(label)
+                            return function(root, pid)
+                        return read
+
+                    with (
+                        mock.patch.object(OBSERVATION, "read_status_rss", side_effect=failed_read(
+                            rss, "mir441-linux-process-status") if phase == "rss" else rss),
+                        mock.patch.object(OBSERVATION, "read_private_memory", side_effect=failed_read(
+                            private, "mir441-linux-process-smaps") if phase == "private" else private),
+                    ):
+                        value = OBSERVATION.process_tree(proc, 100, 1000, 100)
+                    self.assertFalse(value["root_exited"])
+                    self.assertEqual([], value["children"])
+                    self.assertEqual(12 * 1024, value["working_set_bytes"])
+                    self.assertEqual(10 * 1024, value["private_bytes"])
+
+    def test_memory_read_fault_on_a_live_or_replaced_identity_is_not_terminal_absence(self) -> None:
+        for phase in ("rss", "private"):
+            for opponent in ("live", "reused-pid", "foreign-session"):
+                with self.subTest(phase=phase, opponent=opponent), tempfile.TemporaryDirectory(
+                    prefix="mir-linux-live-memory-fault-"
+                ) as directory:
+                    proc = Path(directory)
+                    process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
+                    process_files(proc, 101, 100, 1001, {101: ""}, session=100)
+                    label = "mir441-linux-process-status" if phase == "rss" else "mir441-linux-process-smaps"
+                    cause = OBSERVATION.ObservationFailure(label)
+                    original = OBSERVATION.read_status_rss if phase == "rss" else OBSERVATION.read_private_memory
+
+                    def failed_read(root, pid):
+                        if pid == 101:
+                            if opponent == "reused-pid":
+                                write(proc / "101/stat", proc_stat(101, 100, 9999, 100))
+                            elif opponent == "foreign-session":
+                                write(proc / "101/stat", proc_stat(101, 100, 1001, 999))
+                            raise cause
+                        return original(root, pid)
+
+                    method = "read_status_rss" if phase == "rss" else "read_private_memory"
+                    with mock.patch.object(OBSERVATION, method, side_effect=failed_read):
+                        with self.assertRaises(OBSERVATION.ObservationFailure) as raised:
+                            OBSERVATION.process_tree(proc, 100, 1000, 100)
+                    if opponent == "live":
+                        self.assertIs(cause, raised.exception)
+                    else:
+                        self.assertEqual("mir441-owned-child-identity", raised.exception.code)
+
+    @unittest.skipUnless(sys.platform == "linux" and hasattr(os, "waitid") and hasattr(os, "WNOWAIT"), "requires Linux procfs and an unreaped owned child")
+    def test_real_linux_zombie_is_observed_without_reading_its_released_memory(self) -> None:
+        pid = os.fork()
+        if pid == 0:
+            os.setsid()
+            os._exit(0)
+        try:
+            result = os.waitid(os.P_PID, pid, os.WEXITED | os.WNOWAIT)
+            self.assertEqual(0, result.si_status)
+            identity = OBSERVATION.read_proc_stat(Path("/proc"), pid, missing_is_exit=False)
+            value = OBSERVATION.process_tree(Path("/proc"), pid, identity["start_ticks"], pid)
+            self.assertTrue(value["root_exited"])
+            self.assertEqual([], value["children"])
+            self.assertEqual(0, value["working_set_bytes"])
+            self.assertEqual(0, value["private_bytes"])
+        finally:
+            reaped, status = os.waitpid(pid, 0)
+            self.assertEqual(pid, reaped)
+            self.assertEqual(0, status)
+
     def test_process_tree_refuses_replaced_root_or_foreign_child(self) -> None:
         temporary, proc = self.make_fixture()
         self.addCleanup(lambda: __import__("shutil").rmtree(temporary, ignore_errors=True))
