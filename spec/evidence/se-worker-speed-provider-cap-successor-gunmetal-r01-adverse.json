@@ -1,0 +1,114 @@
+{
+  "kind": "MIRSEProviderCapSuccessorAdverseV1",
+  "date": "2026-11-19",
+  "status": "adverse_candidate_event_time_require_after_expected_old_opponent",
+  "scope": "The exact retained admission input was used for the planned old15 opponent and current18 candidate stages. The old opponent is evidenced; the candidate stops during MIR on_configuration_changed before pre-work, ordinary completion, save, or either cold observation. Overall NO-GO.",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/packet.json",
+      "bytes": 22373,
+      "sha256": "4392B3C08C19C6D1E3D63D83A180621DEF9A723E967828CEE7F6E864A58FBADA"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/Invoke-ProviderCap.ps1",
+      "bytes": 21352,
+      "sha256": "67BB04A52A60E241CF194BA694EEABFFB0D549A41FAD321E4028AE78E677E264"
+    },
+    "reader": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/Verify-ProviderCap.py",
+      "bytes": 18815,
+      "sha256": "ABC3950F1C3CCC5C9D1210D351B6CEE19D6FA88F039F79E9DA7C69324884F562"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/terminal.json",
+      "bytes": 155478,
+      "sha256": "3758ED0B509279F3DD58ECD311A4D98E9761407B6B74EF09414386CA0C71B309"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/EXECUTE-READBACK.json",
+      "bytes": 12193,
+      "sha256": "F09A482442EC6BA3B321E9B61B14E768D423B14AEEFE525D86E361EEA19F4913",
+      "bodies": 25
+    },
+    "independent_result_review": {
+      "path": "build/qualification/se-provider-cap-successor-native-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 6027,
+      "sha256": "548320F988CE781560A307FAB9DC9FAA35B97740CA55976183B28511430A6474"
+    }
+  },
+  "inputs": {
+    "retained_admission_source": {
+      "bytes": 833284,
+      "sha256": "7FAD213E47A0AB6B2660FE67C4047213B5048063A5F571C82321EBF148D243C7",
+      "zip_entries": 55,
+      "full_entry_read_failures": 0
+    },
+    "old": {
+      "mir_version": "5.0.20015",
+      "fixture_version": "0.3.0"
+    },
+    "candidate": {
+      "mir_version": "5.0.20018",
+      "player_bytes": 1052503,
+      "player_sha256": "B5632E4F8CBA3B8202BB0B46AEDE99C285E99196180E1F5EF961070E41979508",
+      "fixture_version": "0.4.0",
+      "fixture_bytes": 14388,
+      "fixture_sha256": "5E0DDBE218E07A01EB8693F5B61E76B69EAE839BFEB8CB5C27DD1A9308FAA8E2"
+    }
+  },
+  "actual": {
+    "native_processes": 2,
+    "owned_pids": [327629, 329787],
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0,
+    "old_opponent": {
+      "exit_code": 1,
+      "timed_out": false,
+      "reader_passed": true,
+      "marker_role": "old",
+      "marker_phase": "old-opponent",
+      "marker_accepted": false,
+      "marker_native_repair": false,
+      "completed_rows_per_force": 196,
+      "expected_token": "MIR_EXPECTED_SE_WORKER_SPEED_PROVIDER_OLD15_OPPONENT"
+    },
+    "candidate": {
+      "loaded_retained_source": true,
+      "on_configuration_changed_entered": true,
+      "error": "__more-infinite-research__/runtime/catalogue.lua:147: Require can't be used outside of control.lua parsing.",
+      "call_chain": [
+        "runtime/catalogue.lua:147 fixed_credit_scalar_export",
+        "runtime/native_credits.lua:139 fixed_credit_scalars",
+        "runtime/native_credits.lua:453 fixed_observations",
+        "runtime/native_credits.lua:977 preflight_fixed_credits",
+        "runtime/native_credits.lua:988 preflight_family_transition",
+        "runtime/bootstrap.lua:433"
+      ],
+      "pre_work_marker": false,
+      "ordinary_completion": false,
+      "saved_output": false,
+      "cold_loads": 0
+    }
+  },
+  "custody": {
+    "readback_rehashed_bodies": 25,
+    "readback_hash_mismatches": 0,
+    "protected_source_unchanged": true,
+    "direct_library_controls_restored": true
+  },
+  "disposition": "Retain this adverse result and the unchanged 7FAD source. Correct and independently test the current package's event-time require path and any directly analogous late consumers before a distinct reviewed packet is considered. Do not recreate the predecessor or treat the old opponent as cap-successor qualification.",
+  "not_established": [
+    "qualified old cap restoration",
+    "candidate pre-work or ordinary completion",
+    "candidate save",
+    "either candidate cold observation",
+    "reporter reproduction",
+    "release or stable acceptance"
+  ],
+  "published_assets_changed": false
+}

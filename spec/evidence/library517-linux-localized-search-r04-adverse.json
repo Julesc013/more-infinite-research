@@ -1,0 +1,134 @@
+{
+  "kind": "MIRLibraryLocalizedSearchNativeAdverseV1",
+  "status": "adverse-final-reopen-unobserved",
+  "source": {
+    "commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "version": "5.0.21017"
+  },
+  "environment": {
+    "engine": "Factorio 2.1.24 graphical Linux build, Base-only selection",
+    "client_locale": "de",
+    "geometry": [
+      1280,
+      720
+    ]
+  },
+  "controller": {
+    "commit": "c123ea18ae50f91b41a10136674a4fbe7d6aac7f",
+    "packet_sha256": "C56BA703C3B26461A3F5C3658489E31AC8DFC7F677A6E4A2FBCA71237946E1C1",
+    "composition_sha256": "C3AF6DDC7755412E87663E58EB1D0D87D12B046A26A869084077721DBA9A39D5",
+    "actor_sha256": "F8FF3DC5DC9365D445C934826DA76207020FFD04387D48C4C0221D3437EB4821",
+    "fixture_version": "0.1.1",
+    "fixture_archive_sha256": "FABE3ABC07BA672A4D37462B1332A2E8F11DA3A6D9AF9A9214C9ECBDFE49ADFC",
+    "execute_review_sha256": "5E0A7331A0BC37B90DF7439F90BD7BC7A90324F23196B0A27AD3E34C543A262B"
+  },
+  "observed": {
+    "capture_reviewed_requests": 9,
+    "completed_input_steps": 8,
+    "phase_files": [
+      {
+        "file": "00-initial.json",
+        "bytes": 1866,
+        "sha256": "7BEFE7C7489827B3991C3EB6E2CF26C9131A514E1B43A7FDFEB3665F7F0CC03A",
+        "phase": "initial",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "01-setup-closed.json",
+        "bytes": 1981,
+        "sha256": "260BFC672B9698A5B7DD331388F186F796E325219156358B2D0F5EB53A775D7C",
+        "phase": "setup-closed",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "02-open.json",
+        "bytes": 2884,
+        "sha256": "1C7AA34C35F32E14EF02F3B010857D03FFC5A865A4E88BD8ECD630B3AF5218F1",
+        "phase": "open",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "03-help-tab.json",
+        "bytes": 3581,
+        "sha256": "CDD9EADF5B2937160FD3FAACBBBD0593B44BFCBA0108CD92F1EF2F748066F40D",
+        "phase": "help-tab",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "04-research-tab.json",
+        "bytes": 4425,
+        "sha256": "25A0E7386C569AF96F67E500468D0E7B2945AB3B3652695B205A1F037B544F2C",
+        "phase": "research-tab",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "05-query-click.json",
+        "bytes": 5090,
+        "sha256": "5C5B980F4E7C20B7D3107A2D5C480AAD3B0B13CA5F31B6633611749937A59777",
+        "phase": "query-click",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "06-cleared.json",
+        "bytes": 5665,
+        "sha256": "D8660C2CF04281365BD7FAC6D76A4C5664000E577DA5BAA339C11BED08C12FA4",
+        "phase": "cleared",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "07-localized-query.json",
+        "bytes": 7359,
+        "sha256": "6675F2A75CB01477F4F7746895181F226B22F72BB91A95EFA2F6D3E79B4716B7",
+        "phase": "localized-query",
+        "native_snapshot_unchanged": true
+      },
+      {
+        "file": "08-closed.json",
+        "bytes": 7353,
+        "sha256": "8EA922B719438A3992167F4F2EF594D19273F23E464DD001709719252656F1ED",
+        "phase": "closed",
+        "native_snapshot_unchanged": true
+      }
+    ],
+    "localized_query": "Eisenzahnrad",
+    "localized_target": "recipe-prod-research_gears-1",
+    "localized_result_count": 1,
+    "localized_caption": "Eisenzahnrad-Produktivität",
+    "second_close": {
+      "root_absent": true,
+      "opened_absent": true,
+      "event_received": false
+    },
+    "final_reopen": "Input request accepted by XTEST; no phase09 or post-input capture; server exits first."
+  },
+  "failure": {
+    "server_exit_code": 255,
+    "fixture_error": "[MIR localized Library search] localized result count differs",
+    "event": "on_tick",
+    "tick": 30366,
+    "location": "control.lua:229 result_row -> 298 record_snapshot -> 335 settle",
+    "owner_error": "[mir441-process-exit] 1",
+    "cause_limit": "The final row count and cause of its difference were not recorded; asynchronous rebuild versus product state loss requires separate investigation."
+  },
+  "custody": {
+    "controls_and_archives_restored": true,
+    "restoration_errors": [],
+    "native_child_cleanup_accepted": false,
+    "remaining_owned_session_processes": [],
+    "protected_seed_unchanged": true,
+    "protected_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "primary_relative_root": "build/qualification/library-localized-search-input-preparation-r01",
+    "originals": "localized-search-r04-originals-r01",
+    "capsule_sha256": "97481FB7662CA0D75A5BDB50E42995E95F360ADF4E5C8C6D06DB84257B2B86E8",
+    "capsule_bytes": 77762573,
+    "original_bodies": 252,
+    "raw_bytes": 129537936
+  },
+  "limits": [
+    "No complete localized-input or clean native-lifecycle acceptance.",
+    "No player source/package change or reporter-save closure.",
+    "No save/two-cold-load, imported-state, Unicode, scroll/resize, Windows, performance or stable verdict."
+  ]
+}

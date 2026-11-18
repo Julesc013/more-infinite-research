@@ -620,9 +620,9 @@ local DEFAULT_ORIGINS = {
     ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
--- This schema-2/default preparation is the published11 producer contract,
--- not evidence that any earlier or current package created the witness.
-local PREPARED_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
+-- These exact published11 producers support schema-2/default preparation
+-- and the separately checked, uninvested Base+MIR admission below.
+local PUBLISHED11_DEFAULT_ORIGINS = {f200="5.0.20011", f210="5.0.21011"}
 
 local function producer_edition(version)
   if type(version) ~= "string" then return nil end
@@ -689,9 +689,10 @@ local function owner_record()
   local older_idle = value.producer.kind == "published473-idle-default"
   local published_default = value.producer.kind == "published473-default"
   local prepared_default = value.producer.kind == "prepared-default"
+  local published11_empty = value.producer.kind == "published511-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default)
+      and not older_empty and not older_idle and not published_default and not published11_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -708,9 +709,9 @@ local function owner_record()
       or older_idle and value.producer.old_version ~= "4.7.20003"
       or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
-      or prepared_default and value.producer.old_version ~= PREPARED_DEFAULT_ORIGINS[edition]
+      or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]
           or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
@@ -790,6 +791,35 @@ local function older_default_origin(event, change, active, base_hop)
   return {kind="published473-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
+local function published11_empty_origin(event, change, active)
+  -- Published11 Base+MIR always authored infinite C4, even when disabled or
+  -- capped. It could leave an inherited save without a route record. Rebuild
+  -- that exact prior selection; an unchanged foreign mod is not an addition.
+  -- Settings need not be reconstructed only because every force must still
+  -- prove zero worker investment before this producer can be committed.
+  if type(change) ~= "table" or getmetatable(change) ~= nil
+      or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]
+      or producer_edition(active[MIR]) ~= target.id
+      or tonumber(change.old_version:sub(-2)) > tonumber(active[MIR]:sub(-2))
+      or getmetatable(event.mod_changes) ~= nil then return nil end
+  for name, item in pairs(event.mod_changes) do
+    if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then return nil end
+    local old, new = item.old_version, item.new_version
+    if type(new) ~= "string" or new == "" or new ~= active[name]
+        or old ~= nil and (type(old) ~= "string" or old == "")
+        or name ~= "base" and name ~= MIR and old ~= nil then return nil end
+  end
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR then
+      if ENGINE_MODS[name] or type(version) ~= "string" or version == "" then return nil end
+      local addition = event.mod_changes[name]
+      if type(addition) ~= "table" or addition.old_version ~= nil or addition.new_version ~= version then return nil end
+    end
+  end
+  if not same_family_engine_patch(event) then return nil end
+  return {kind="published511-empty-default", old_version=change.old_version, new_version=active[MIR]}
+end
+
 local function default_origin(event, initializing, state)
   local active = script and script.active_mods or {}
   if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
@@ -807,16 +837,20 @@ local function default_origin(event, initializing, state)
     recover_error("default transfer package-change event is inconsistent")
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
-  if state == nil and event.mod_startup_settings_changed ~= false
-      and not (base_hop and change.old_version == "4.7.20003") then
-    recover_error("unrecorded default source requires unchanged startup settings")
-  end
   local new_selection = false
   for name, item in pairs(event.mod_changes) do
     -- Refuse malformed event rows below without invoking their metamethods.
     if name ~= MIR and type(item) == "table" and getmetatable(item) == nil and rawget(item, "old_version") == nil then
       new_selection = true
     end
+  end
+  if state == nil and (event.mod_startup_settings_changed == true or new_selection) then
+    local empty = published11_empty_origin(event, change, active)
+    if empty then return empty end
+  end
+  if state == nil and event.mod_startup_settings_changed ~= false
+      and not (base_hop and change.old_version == "4.7.20003") then
+    recover_error("unrecorded default source requires unchanged startup settings")
   end
   if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
       or change.old_version == "5.0.20001" and new_selection) then
@@ -830,7 +864,7 @@ local function default_origin(event, initializing, state)
       recover_error("legacy prepared/finite conversion is not a default-owner transfer")
     end
     if prepared and base_hop then recover_error("prepared default engine hop remains unqualified") end
-    if prepared and (not change or change.old_version ~= PREPARED_DEFAULT_ORIGINS[target.id]) then
+    if prepared and (not change or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]) then
       recover_error("prepared default requires its published11 producer package event", nil, event, state, {kind="default"})
     end
     -- This saved fact authenticates the old MIR default. The caller also
@@ -1083,6 +1117,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
           or source.saved_progress ~= 0 or source.occurrences ~= 0) then
         recover_error("first initialization/new force cannot adopt existing default work")
       end
+      if not owned and producer.kind == "published511-empty-default"
+          and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
+            or source.occurrences ~= 0 or source.current == recovery.canonical) then
+        recover_error("published11 empty default source has invested or queued worker work")
+      end
       if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
         if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
           recover_error("older default source has unfinished native worker work")
@@ -1274,7 +1313,14 @@ local function provider_addition(event, route, owned)
       route, details, checked_state(), fact(route))
   end
   local mir = event.mod_changes[MIR]
-  if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
+  local previous = type(mir) == "table" and mir.old_version
+  -- The producer is immutable origin evidence, including across the admitted
+  -- engine hop. The event names the immediately preceding installed package.
+  -- Current native ownership survives intervening updates; the event must still
+  -- stay in this edition and cannot predate its origin or downgrade a later patch.
+  if mir ~= nil and (producer_edition(previous) ~= target.id
+      or tonumber(previous:sub(-2)) < tonumber(owned.producer.new_version:sub(-2))
+      or tonumber(previous:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or mir.new_version ~= script.active_mods[MIR]) then
     recover_error("full default handover package event is inconsistent", route)
   end

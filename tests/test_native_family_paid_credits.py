@@ -37,11 +37,12 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           function fixture_effect(value)
             return require("platform.target").id=="f200" and fixture_float32(value) or value
           end
-          function reload_credits(active,target_id)
+          function reload_credits(active,target_id,fixed)
             script={active_mods=active or {base="2.1.23",["space-age"]="2.1.23",["more-infinite-research"]="5.0.21003"}}
             require("platform.target").id=target_id or "f210"
             prototypes={technology={},mod_data={
-              ["more-infinite-research-native-adoptions"]={data={schema=1,owners={},withheld={},credits=copy(GROUPS)}}},
+              ["more-infinite-research-native-adoptions"]={data={schema=1,owners={},withheld={},credits=copy(GROUPS),
+                fixed_credits=copy(fixed or {})}}},
               get_history=function(_,name) return {created=foreign_creation==name and "foreign" or "more-infinite-research"} end}
             package.loaded["research.catalogue"]=nil
             package.loaded["runtime.catalogue"]=nil
@@ -317,15 +318,15 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       assert_partial_and_foreign()
                     ''')
 
-    def test_zero_noncollected_carrier_still_has_no_valid_credit_observation(self):
+    def test_unconstructed_noncollected_carrier_is_an_optional_absence(self):
         self.lua.execute(r'''
+          -- Neither the data-stage declaration nor any named holder is
+          -- present. This is optional absence, unlike a zero-valued emitted
+          -- carrier whose authenticated raw scalar is still nonzero.
           GROUPS={};reload_credits()
-          local force=make_force(1,nil,nil,nil,{["copper-plate"]=0});game.forces[1]=force
-          local positive=holder(force,"copper-plate","positive")
-          local negative=holder(force,"copper-plate","negative")
+          local force={index=1,valid=true,technologies={}};game.forces[1]=force
           native_credits.on_init()
-          assert(ledger(force,"copper-plate")==nil and positive.level==1 and negative.level==1)
-          assert(force._states[positive.name].writes.level==0 and force._states[negative.name].writes.level==0)
+          assert(ledger(force,"copper-plate")==nil)
         ''')
 
     def precision_attempt(self, target, family, authored, actual=None, units=None):

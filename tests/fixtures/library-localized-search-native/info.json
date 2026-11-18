@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-library-localized-search-native",
+  "version": "0.1.2",
+  "title": "MIR Library localized-search native observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.24",
+    "~ more-infinite-research = 5.0.21017",
+    "mir-fixture-mir5-api-alpha = 0.1.0",
+    "mir-fixture-mir5-api-beta = 0.1.0",
+    "mir-fixture-mir5-active-mods-observer = 0.1.0"
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "kind": "MIRSEProviderAdmissionNativeAdverseV1",
+  "status": "adverse_fixture_collection_contract_before_source_grants",
+  "date": "2026-11-19",
+  "scope": "Source construction apparatus only; no provider admission, cold reload, candidate upgrade, ordinary completion, reporter or stable qualification.",
+  "actor_commit": "5baee11728c92d8ff991cfcc1fdd4ab76951edd8",
+  "fixture_integration": {
+    "pr": 2124,
+    "merge": "08de9ce39a362525c563c63d573beab1be4e3796",
+    "reviewed_head": "5baee11728c92d8ff991cfcc1fdd4ab76951edd8",
+    "required_checks": "All four completed/success on exact reviewed head before merge/execution."
+  },
+  "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-5baee117-r01",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-5baee117-r01/build/qualification/se-provider-admission-native-r01/inputs/mir-fixture-se-worker-speed-provider-admitted_0.1.0.zip",
+    "bytes": 13897,
+    "sha256": "23224A5338DB715D62546EDEE4ECF6F77166E1EFF98249ABC2B2F303DBFAB452"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes-graphics": "0.7.1",
+    "alien-biomes": "0.7.4",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "mir-fixture-se-worker-speed-provider-admitted": "0.1.0",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "space-exploration": "0.7.57"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 3,
+    "admission_wait_seconds": 30
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-admission-native-r01/packet.json",
+      "bytes": 19069,
+      "sha256": "2403E4A9C3AFF8124395B28238338AC4E8C4D6C2ECBB7C34451208E326F78291"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-admission-native-r01/Invoke-ProviderAdmission.ps1",
+      "bytes": 19336,
+      "sha256": "3E951ACC712F6DA50845E7C2C696F5B6561E7FEC1D54800CD4A1765CC286F113"
+    },
+    "compose": {
+      "path": "build/qualification/se-provider-admission-native-r01/composition.json",
+      "bytes": 171722,
+      "sha256": "A2700113F749B8147F3926015BEA06B418754F15EDF4523902225CD53EAA56AE"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-admission-native-r01/REVIEW-EXECUTE.json",
+      "bytes": 4297,
+      "sha256": "3BA9BF14A80E466EC6A2A63733C3EC0D02B3ABABFD3485694B71C42A482189D7"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-admission-native-r01/terminal.json",
+      "bytes": 86269,
+      "sha256": "958B6578BC725660FE124222AAC54D5B0C08B9C18F7B4304789D020A759FD672"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-admission-native-r01/EXECUTE-READBACK.json",
+      "bytes": 4710,
+      "sha256": "10CEA05B75A9788B2B54FB321818F8D78B668B89156F38007D4AEEF90A0B4B97"
+    },
+    "independent_result_review": {
+      "path": "build/qualification/se-provider-admission-native-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 4897,
+      "sha256": "755A3995DB4CAF3AA80B091D3AE27B4C84A1842900C0EFA170E1E79724513B91"
+    }
+  },
+  "native": {
+    "planned_stages": [
+      "source",
+      "admission",
+      "cold"
+    ],
+    "processes": 1,
+    "owned_pids": [
+      278757
+    ],
+    "source_exit_code": 1,
+    "timed_out": false,
+    "declared_source_grants_reached": false,
+    "source_marker_or_save": false,
+    "admission_ran": false,
+    "cold_ran": false,
+    "remaining_factorio": 0,
+    "restored": true,
+    "cleanup_errors": [],
+    "protected_outputs": {}
+  },
+  "observed_error": {
+    "module": "mir-fixture-se-worker-speed-provider-admitted",
+    "event": "on_init",
+    "file": "fixture_control.lua",
+    "line": 69,
+    "text": "[se-worker-speed-provider] force technologies unavailable",
+    "rejected_guard": "force and force.valid ~= false and type(force.technologies) == \"table\"",
+    "first_prerequisite_write_after_guard": true,
+    "native_collection_type_name_captured": false
+  },
+  "independent_result": {
+    "verdict": "NO-GO",
+    "readback_bodies": 10,
+    "hash_mismatches": 0,
+    "attribution": "The frozen fixture rejects its native technology collection before its first declared research grant; no MIR/product defect is established."
+  },
+  "next_boundary": "Use the native indexed-collection contract, preserving required named-row/validity checks and propagating unexpected reads. Add non-table indexed-map, missing-row and throwing-read controls; retain original case and use a separately reviewed new packet.",
+  "nonclaims": [
+    "No inherited source accepted.",
+    "No actual runtime5.0/5.65/6.95 force bonuses observed.",
+    "No cargo/storage, mining, fixed-credit or original-reporter fix established.",
+    "No release or published package bytes changed."
+  ]
+}

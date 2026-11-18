@@ -477,6 +477,7 @@ class CompetingProductivityTests(unittest.TestCase):
           package.preload["platform.target"] = function() return {id="f200", factorio_version="2.0"} end
           package.preload["runtime.lifecycle"] = function()
             local module = {caps_active=function() return false end, cap_limits=function() return {} end,
+              preflight=function()return {}end,
               preflight_worker_storage_split_caps=function(plan) assert(plan==nil);return nil end,
               apply_worker_storage_split_caps=function(plan) assert(plan==nil)end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end}

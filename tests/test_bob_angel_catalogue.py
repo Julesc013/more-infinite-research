@@ -138,6 +138,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         cls.expected_complete_data["technology"].update(legacy_module_credit_rows(cls.inputs["raw"]["recipe"]))
         cls.expected_complete_data["technology"].update(legacy_cannon_credit_rows(cls.expected_data["technology"]))
         families = {}
+        fixed_credits = {}
         for family in NATIVE_FAMILY_RECIPES:
             main = cls.expected_data["technology"].get("recipe-prod-" + family + "-1")
             if main:
@@ -145,9 +146,17 @@ class BobAngelCatalogueTests(unittest.TestCase):
                     {"recipe": effect["recipe"], "change": effect["change"]}
                     for effect in main["effects"] if effect["type"] == "change-recipe-productivity"
                 ], key=lambda row: row["recipe"])
+        # This independent oracle already identifies the published fixed
+        # carrier rows and the raw recipe world.  The private construction
+        # map records precisely the rows data-final-fixes emits; it is not
+        # runtime credit history or a candidate-derived observation.
+        for _family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
+            if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
+                fixed_credits[recipe] = NATIVE_CREDIT_DEFAULT_SCALAR
         cls.expected_complete_data["mod-data"] = {"more-infinite-research-native-adoptions": {
             "type": "mod-data", "name": "more-infinite-research-native-adoptions",
-            "data": {"schema": 1, "owners": {}, "withheld": {}, "credits": families},
+            "data": {"schema": 1, "owners": {}, "withheld": {}, "credits": families,
+                     "fixed_credits": fixed_credits},
         }}
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
