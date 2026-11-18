@@ -32,7 +32,9 @@ local stages = {
   ["current-successor16"]={fixture="0.8.0",mir="5.0.20016",cap=10},
   ["current-observe16"]={fixture="0.9.0",mir="5.0.20016",cap=10},
   ["current-successor17"]={fixture="0.12.0",mir="5.0.20017",cap=10},
-  ["source-producer15"]={fixture="0.13.0",mir="5.0.20015",cap=0}
+  ["source-producer15"]={fixture="0.13.0",mir="5.0.20015",cap=0},
+  ["producer-old15"]={fixture="0.14.0",mir="5.0.20015",cap=10},
+  ["producer-successor17"]={fixture="0.15.0",mir="5.0.20017",cap=10}
 }
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v)do o[k]=copy(x)end return o end
 local function packs() local r={} for _,n in ipairs(PACKS)do r[#r+1]={n,1}end return r end
@@ -210,11 +212,8 @@ function current_state_flow(old_path,successor_path,successor17_path,observe_pat
   return{ok=true,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,player=player,foreign=game.forces[state.foreign_index],earned=game.forces[state.earned_index]}
 end
 
-function source_producer_flow(path,common,cold)
+local function producer_world()
   local player=force("player",1,false);player._reset_bonus=.65
-  -- The exact published15/SE native trace restores the enabled gate during
-  -- reset_technology_effects (including its callbacks). Model that observed
-  -- profile outcome here; the producer must seed its intended gates last.
   local function source_reset_gate(value) value.technologies[WORKER].enabled=true end
   player._external_reset=source_reset_gate
   local game={tick=0,forces={player=player,[1]=player},surfaces={}}
@@ -226,24 +225,144 @@ function source_producer_flow(path,common,cold)
     return value
   end
   local saves,labs=0,0
-  function game.server_save() saves=saves+1 end
+  game.surfaces[1]={create_entity=function()
+    labs=labs+1;local value={valid=true,disabled_by_script=false,unit_number=labs,input=inventory()}
+    function value.get_inventory(index)assert(index==1)return value.input end
+    game.lab=value;return value
+  end}
+  function game.server_save(name)assert(name=="mir5-worker-speed-cap-ten-complete");saves=saves+1 end
   local storage,markers,logs,files={mir_caps={}}, {},{},{}
-  local function settings()return{startup={
-    ["mir-max-level-worker-robots-speed"]={value=0},["mir-settings-profile-import"]={value=""}}}end
-  local actor,message=load_stage(path,common,"source-producer15",game,storage,settings(),markers,logs,files)
-  if not actor then return{ok=false,message=message}end
-  local ok,result=call(actor.init)
-  if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
-  if cold then
-    local observed,observed_message=load_stage(path,common,"source-producer15",game,storage,settings(),markers,logs,files)
-    if not observed then return{ok=false,message=observed_message,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
-    ok,result=call(observed.load);if not ok then return{ok=false,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=storage[KEY]}end
-    game.tick=game.tick+1;ok,result=call(observed.events[1])
+  local function settings(cap)return{startup={
+    ["mir-max-level-worker-robots-speed"]={value=cap},["mir-settings-profile-import"]={value=""}}}end
+  local function result(ok,message)
+    local state=storage[KEY]
+    return{ok=ok,message=message,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,
+      player=player,foreign=game.forces[state and state.foreign_index],earned=game.forces[state and state.earned_index]}
   end
-  local state=storage[KEY]
-  return{ok=ok,message=result,markers=markers,logs=logs,files=files,saves=saves,labs=labs,state=state,
-    player=player,foreign=game.forces[state and state.foreign_index],earned=game.forces[state and state.earned_index]}
+  return{game=game,player=player,storage=storage,markers=markers,logs=logs,files=files,settings=settings,result=result}
 end
+
+local function start_producer(path,common)
+  local world=producer_world()
+  local actor,message=load_stage(path,common,"source-producer15",world.game,world.storage,
+    world.settings(0),world.markers,world.logs,world.files)
+  if not actor then return nil,world.result(false,message)end
+  local ok,result=call(actor.init)
+  if not ok then return nil,world.result(false,result)end
+  return world
+end
+
+function source_producer_flow(path,common,cold)
+  local world,failure=start_producer(path,common);if not world then return failure end
+  local ok,result=true,"source initialized"
+  if cold then
+    local observed,message=load_stage(path,common,"source-producer15",world.game,world.storage,
+      world.settings(0),world.markers,world.logs,world.files)
+    if not observed then return world.result(false,message)end
+    ok,result=call(observed.load);if not ok then return world.result(false,result)end
+    world.game.tick=world.game.tick+1;ok,result=call(observed.events[1])
+  end
+  return world.result(ok,result)
+end
+
+local function same_saved(left,right)
+  if type(left)~="table" or type(right)~="table"then return left==right end
+  for key,value in pairs(left)do if not same_saved(value,right[key])then return false end end
+  for key in pairs(right)do if left[key]==nil then return false end end
+  return true
+end
+
+function producer_successor_flow(source_path,old_path,successor_path,common,mode,opponent,saved_progress)
+  local world,failure=start_producer(source_path,common);if not world then return failure end
+  local game,storage,player=world.game,world.storage,world.player
+  local state=storage[KEY];local foreign,earned=game.forces[state.foreign_index],game.forces[state.earned_index]
+  if opponent=="wrong-phase"then state.phase="source-seeded"end
+  if opponent=="wrong-source"then state.source_mir="5.0.20016"end
+  if opponent=="not-producer"then state.source_producer=false end
+  if opponent=="absent-state"then storage[KEY]=nil end
+  if opponent=="wrong-player-index"then state.player_force_index=state.foreign_index end
+  if opponent=="missing-force"then state.foreign_index=99 end
+  if opponent=="aliased-forces"then state.earned_index=state.foreign_index end
+  if opponent=="fractional-index"then state.foreign_index=2.5 end
+  if opponent=="wrong-force-name"then foreign.name="other-force"end
+  if opponent=="no-queue-admission"then state.foreign_queue_admitted=false end
+  if opponent=="prior-ordinary"then state.ordinary_native_completion_count=1 end
+  if opponent=="prior-start"then state.level_eleven_start_count=1 end
+  if opponent=="ordinary-history"then state.ordinary_events={{name=WORKER}}end
+  if opponent=="missing-ordinary-history"then state.ordinary_events=nil end
+  if opponent=="missing-admin-history"then state.scripted_administrative_events=nil end
+  if opponent=="prior-lab"then state.lab={}end
+  if opponent=="prior-pre-work"then state.pre_work={}end
+  if opponent=="prior-completion"then state.post_completion={}end
+  if opponent=="prior-deadline"then state.deadline_tick=123 end
+  if opponent=="prior-queue-attempt"then state.level_eleven_queue_attempt={}end
+  if opponent=="prior-origin"then state.producer_origin={}end
+  if opponent=="wrong-saved-bonus"then state.player_bonus_before=.8 end
+  if opponent=="admin-history"then
+    -- The double does not fire setter callbacks: supply this declared fixture
+    -- history to verify its retention, never to count it as ordinary work.
+    state.scripted_administrative_events={{name=PREDECESSOR,force_index=player.index,
+      by_script=true,level=9,tick=0,setup_class="scripted-prerequisite"}}
+  end
+  if mode~="old" and opponent~="skip-caps"then
+    for _,value in ipairs({player,foreign,earned})do caps.reconcile(value,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})end
+  end
+  if opponent=="missing-prerequisite"then foreign.technologies[ELECTRICITY].researched=false end
+  if opponent=="changed-progress"then player.research_progress=.1 end
+  if opponent=="changed-bonus"then player.worker_robots_speed_modifier=2 end
+  if opponent=="enabled-foreign"then foreign.technologies[WORKER].enabled=true end
+  if opponent=="enabled-earned"then earned.technologies[WORKER].enabled=true end
+  for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+    if opponent=="saved-"..row[1]then row[2].technologies[WORKER].saved_progress=saved_progress end
+  end
+  local stage,path=mode=="old" and "producer-old15" or "producer-successor17",mode=="old" and old_path or successor_path
+  local actor,message=load_stage(path,common,stage,game,storage,world.settings(10),world.markers,world.logs,world.files)
+  if not actor then return world.result(false,message)end
+  if opponent=="init"then local ok,msg=call(actor.init);return world.result(ok,msg)end
+  local before_configuration=copy(storage[KEY])
+  local ok,msg=call(actor.changed)
+  if not ok then
+    local result=world.result(false,msg)
+    result.rejected_fixture_state_unchanged=same_saved(before_configuration,storage[KEY])
+    return result
+  end
+  if mode=="old"then return world.result(ok,msg)end
+  game.tick=game.tick+1;ok,msg=call(actor.events[1]);if not ok then return world.result(false,msg)end
+  local owner=player.technologies[WORKER]
+  if opponent=="level-eleven-start"then
+    owner.level=11;ok,msg=call(actor.events[3],{research=owner,by_script=false,tick=1});return world.result(ok,msg)
+  end
+  if opponent=="scripted-completion" or opponent=="preincrement-completion"then
+    owner.level=opponent=="scripted-completion" and 11 or 10
+    ok,msg=call(actor.events[2],{research=owner,by_script=opponent=="scripted-completion",tick=1});return world.result(ok,msg)
+  end
+  player.research_queue={};ok,msg=finish_infinite_level(owner,10,actor.events[2],1)
+  if not ok then return world.result(false,msg)end
+  player.worker_robots_speed_modifier=player.worker_robots_speed_modifier+.65
+  for name in pairs(state.lab_feed)do game.lab.input.items[name]=50 end
+  caps.reconcile(player,{[WORKER]=10},storage.mir_caps,{[WORKER]=true})
+  for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+    if opponent=="late-saved-"..row[1]then row[2].technologies[WORKER].saved_progress=saved_progress end
+  end
+  for _=1,3 do game.tick=game.tick+1;ok,msg=call(actor.events[1]);if not ok then return world.result(false,msg)end end
+  local before_cold=copy(storage)
+  for number=1,2 do
+    local cold,cold_message=load_stage(successor_path,common,"producer-successor17",game,storage,
+      world.settings(10),world.markers,world.logs,world.files)
+    if not cold then return world.result(false,cold_message)end
+    ok,msg=call(cold.load);if not ok then return world.result(false,msg)end
+    if opponent=="cold-write"then storage[KEY].unexpected_cold_write=number end
+    if opponent=="cold-origin"then state.producer_origin.source_mir="5.0.20016"end
+    for _,row in ipairs({{"player",player},{"foreign",foreign},{"earned",earned}})do
+      if opponent=="cold-saved-"..row[1]then row[2].technologies[WORKER].saved_progress=saved_progress end
+    end
+    game.tick=game.tick+1;ok,msg=call(cold.events[1]);if not ok then return world.result(false,msg)end
+  end
+  local result=world.result(true,"ordinary and cold controls complete")
+  result.cold_storage_unchanged=same_saved(before_cold,storage)
+  return result
+end
+
 '''
 
 
@@ -255,4 +374,5 @@ def build_worker_speed_world(lua, lua_root: Path):
         "flow": lua.eval("flow"),
         "current_state_flow": lua.eval("current_state_flow"),
         "source_producer_flow": lua.eval("source_producer_flow"),
+        "producer_successor_flow": lua.eval("producer_successor_flow"),
     }
