@@ -1313,9 +1313,15 @@ local function provider_addition(event, route, owned)
       route, details, checked_state(), fact(route))
   end
   local mir = event.mod_changes[MIR]
-  if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
-      or mir.new_version ~= script.active_mods[MIR]) then
-    recover_error("full default handover package event is inconsistent", route)
+  -- The producer records the original ownership conversion. Ordinary updates
+  -- deliberately preserve it, so it is a lower bound, not the immediately
+  -- previous installed package. The event must still name a same-edition
+  -- predecessor between that conversion and the exact current package.
+  if mir ~= nil and (type(mir) ~= "table" or producer_edition(mir.old_version) ~= target.id
+      or mir.new_version ~= script.active_mods[MIR]
+      or tonumber(mir.old_version:sub(-2)) < tonumber(owned.producer.new_version:sub(-2))
+      or tonumber(mir.old_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))) then
+    recover_error("full default handover package event is inconsistent", route, event, checked_state(), fact(route))
   end
   for _, stage in ipairs(route.finite) do
     local change = event.mod_changes[stage.provider]

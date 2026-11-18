@@ -1486,6 +1486,120 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
                   writes=0;assert(not history.default_owner_apply(plan));history.apply(legacy);assert(writes==0)
                 ''')
 
+    def test_provider_addition_after_intervening_updates_preserves_original_authority_and_work(self):
+        for target in ("f200", "f210"):
+            for updates in ((), (16,), (14, 16)):
+                for reward in (0, 2):
+                    with self.subTest(target=target, updates=updates, reward=reward):
+                        lua = self.world(target)
+                        lua.globals().updates = lua.table_from(updates)
+                        lua.globals().reward = reward
+                        lua.execute(r'''
+                          full_source(reward,true)
+                          local target=require("platform.target")
+                          local prefix=target.id=="f200"and"5.0.200"or"5.0.210"
+                          local origin=copy(storage[OWNER_KEY].producer)
+                          local previous=prefix.."12"
+                          local original=all_frames()
+                          for _,patch in ipairs(updates)do
+                            target.distribution_version=prefix..patch
+                            script.active_mods["more-infinite-research"]=target.distribution_version
+                            history.default_owner_apply(history.default_owner_preflight(owner_event(previous),nil,true))
+                            assert(same(original,all_frames())and same(origin,storage[OWNER_KEY].producer))
+                            previous=target.distribution_version
+                          end
+                          target.distribution_version=prefix.."17"
+                          script.active_mods["more-infinite-research"]=target.distribution_version
+                          player.research_queue={ORDINARY,ORDINARY,OTHER};player.research_progress=.375
+                          finite_entry(1)
+                          local event=provider_event()
+                          event.mod_changes["more-infinite-research"]={old_version=previous,new_version=target.distribution_version}
+                          local before=all_frames();local foreign=foreign_frames();local old=storage[OWNER_KEY]
+                          local plan,legacy=delegate(event)
+                          assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old)
+                          assert(history.default_owner_apply(plan));history.apply(legacy)
+                          assert(same(origin,storage[OWNER_KEY].producer)and same(foreign,foreign_frames()))
+                          assert(storage.mir_worker_storage_route.forces[1].limit==9)
+                          for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                            assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.debit,b.debit))
+                            assert(a.private.level==b.owner.level and a.private.saved==b.owner.saved)
+                            local queue=copy(b.queue)
+                            for index,name in ipairs(queue)do if name==ORDINARY then queue[index]=ID end end
+                            assert(same(a.queue,queue)and a.progress==b.progress)
+                            assert(a.current==(b.current==ORDINARY and ID or b.current))
+                          end
+                          local after=all_frames();writes=0
+                          assert(not history.default_owner_apply(plan));history.apply(legacy)
+                          assert(writes==0 and same(after,all_frames())and same(origin,storage[OWNER_KEY].producer))
+                          -- Complete the unpaid force's pending old work through
+                          -- the established event path; no foreign first-level
+                          -- effect or cancelling debit is earned by this work.
+                          local f=uninvested;local bonus=f.worker_robots_storage_bonus
+                          local public=tech_frame(f.technologies[CANONICAL]);local head=tech_frame(f.technologies[HEAD])
+                          f.research_queue={OTHER};f.research_progress=.23;f.technologies[ID].level=5
+                          assert(history.on_research_event({research=f.technologies[ID],by_script=false},true))
+                          assert(f.worker_robots_storage_bonus==bonus+reward)
+                          assert(same(public,tech_frame(f.technologies[CANONICAL]))and same(head,tech_frame(f.technologies[HEAD])))
+                          assert(not storage.mir_worker_storage_route.forces[f.index].pending)
+                        ''')
+
+    def test_provider_addition_rejects_contradictory_package_changes_after_intervening_update(self):
+        opponents = ("malformed", "false", "missing-old", "missing-new", "old-number", "new-number",
+                     "before-origin", "future", "reverse-edition", "unknown-edition", "source-version", "wrong-new")
+        for target in ("f200", "f210"):
+            for opponent in opponents:
+                with self.subTest(target=target, opponent=opponent):
+                    lua = self.world(target)
+                    lua.globals().opponent = opponent
+                    lua.execute(r'''
+                      full_source(1,true)
+                      local target=require("platform.target")
+                      local prefix=target.id=="f200"and"5.0.200"or"5.0.210"
+                      target.distribution_version=prefix.."16";script.active_mods["more-infinite-research"]=target.distribution_version
+                      history.default_owner_apply(history.default_owner_preflight(owner_event(prefix.."12"),nil,true))
+                      target.distribution_version=prefix.."17";script.active_mods["more-infinite-research"]=target.distribution_version
+                      finite_entry(1);local event=provider_event()
+                      local change={old_version=prefix.."16",new_version=target.distribution_version}
+                      event.mod_changes["more-infinite-research"]=change
+                      if opponent=="malformed"then event.mod_changes["more-infinite-research"]="invalid"
+                      elseif opponent=="false"then event.mod_changes["more-infinite-research"]=false
+                      elseif opponent=="missing-old"then change.old_version=nil
+                      elseif opponent=="missing-new"then change.new_version=nil
+                      elseif opponent=="old-number"then change.old_version=16
+                      elseif opponent=="new-number"then change.new_version=17
+                      elseif opponent=="before-origin"then change.old_version=prefix.."11"
+                      elseif opponent=="future"then change.old_version=prefix.."18"
+                      elseif opponent=="reverse-edition"then change.old_version=target.id=="f200"and"5.0.21016"or"5.0.20016"
+                      elseif opponent=="unknown-edition"then change.old_version="5.0.22016"
+                      elseif opponent=="source-version"then change.old_version="5.0.16"
+                      else change.new_version=prefix.."18"end
+                      local before=all_frames();local old=storage[OWNER_KEY];local old_state=storage.mir_worker_storage_route;writes=0
+                      assert(not pcall(history.default_owner_preflight,event,provider_route(5),true))
+                      assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old and storage.mir_worker_storage_route==old_state)
+                    ''')
+
+    def test_provider_addition_after_prior_engine_hop_keeps_f200_producer(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          full_source(1,true);local origin=copy(storage[OWNER_KEY].producer)
+          local target=require("platform.target")
+          target.id="f210";target.minimum_base="2.1.23";target.distribution_version="5.0.21016"
+          -- F210 exposes the native default effect flag explicitly, as in
+          -- the separately established engine-hop controls below.
+          for _,id in ipairs{CANONICAL,ORDINARY,HEAD,ID}do
+            for _,effect in ipairs(prototypes.technology[id].effects)do effect.hidden=false end
+          end
+          script.active_mods.base="2.1.23";script.active_mods["more-infinite-research"]=target.distribution_version
+          local event=owner_event("5.0.20012");event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
+          history.default_owner_apply(history.default_owner_preflight(event,nil,true))
+          assert(same(origin,storage[OWNER_KEY].producer))
+          target.distribution_version="5.0.21017";script.active_mods["more-infinite-research"]=target.distribution_version
+          finite_entry(1);event=provider_event()
+          event.mod_changes["more-infinite-research"]={old_version="5.0.21016",new_version="5.0.21017"}
+          handover(event)
+          assert(same(origin,storage[OWNER_KEY].producer)and storage[OWNER_KEY].kind=="provider-retired")
+        ''')
+
     def test_unpaid_private_finish_earns_old_scalar_without_foreign_first_or_head_debit(self):
         lua=self.world();lua.execute(r'''
           full_source(2,true);finite_entry(1);handover()
