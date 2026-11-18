@@ -297,7 +297,7 @@ end
 local function assert_producer_saved_progress(player, foreign, earned, label)
   for _, row in ipairs({{name = "player", frame = player}, {name = "foreign", frame = foreign},
       {name = "earned", frame = earned}}) do
-    if not close(row.frame.saved_progress, 0) then
+    if type(row.frame.saved_progress) ~= "number" or row.frame.saved_progress ~= 0 then
       fail("producer source " .. label .. " saved progress differs: " .. row.name)
     end
   end

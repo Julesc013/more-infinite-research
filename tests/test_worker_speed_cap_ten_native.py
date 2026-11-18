@@ -84,10 +84,10 @@ class WorkerSpeedCapTenNativeFixtureTests(unittest.TestCase):
         return self.world["source_producer_flow"](str(SOURCE_PRODUCER15 / "control.lua"),
                                                        str(fixture_control), cold)
 
-    def producer_transition_result(self, mode: str = "successor", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
+    def producer_transition_result(self, mode: str = "successor", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua", saved_progress: float = .2):
         return self.world["producer_successor_flow"](
             str(SOURCE_PRODUCER15 / "control.lua"), str(PRODUCER_OLD15 / "control.lua"),
-            str(PRODUCER_SUCCESSOR17 / "control.lua"), str(fixture_control), mode, opponent)
+            str(PRODUCER_SUCCESSOR17 / "control.lua"), str(fixture_control), mode, opponent, saved_progress)
 
     def current_state_result(self, mode: str = "candidate", opponent: str = "", fixture_control: Path = FIXTURE / "fixture_control.lua"):
         return self.world["current_state_flow"](str(CURRENT_OLD_NEGATIVE / "control.lua"),
@@ -1022,14 +1022,15 @@ end
     def test_producer_saved_work_is_validated_at_each_transition_output(self):
         for prefix, expected_saves in (("saved-", 0), ("late-saved-", 0), ("cold-saved-", 1)):
             for role in ("player", "foreign", "earned"):
-                with self.subTest(stage=prefix, force=role):
-                    result = self.producer_transition_result(opponent=prefix + role)
-                    self.assertFalse(result["ok"], prefix + role)
-                    self.assertIn("saved progress", result["message"])
-                    self.assertEqual(expected_saves, result["saves"])
-                    if prefix == "saved-":
-                        self.assertEqual(0, result["labs"])
-                        self.assertTrue(result["rejected_fixture_state_unchanged"])
+                for saved_progress in (.2, 1e-9):
+                    with self.subTest(stage=prefix, force=role, saved_progress=saved_progress):
+                        result = self.producer_transition_result(opponent=prefix + role, saved_progress=saved_progress)
+                        self.assertFalse(result["ok"], prefix + role)
+                        self.assertIn("saved progress", result["message"])
+                        self.assertEqual(expected_saves, result["saves"])
+                        if prefix == "saved-":
+                            self.assertEqual(0, result["labs"])
+                            self.assertTrue(result["rejected_fixture_state_unchanged"])
 
     def test_producer_admission_state_guard_detects_a_forbidden_early_write(self):
         original = (FIXTURE / "fixture_control.lua").read_text(encoding="utf-8")
