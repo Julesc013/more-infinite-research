@@ -14,7 +14,17 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Static productivity credit contract integrated (2026-11-18; next-patch source)
+
+[PR2112](https://github.com/Julesc013/more-infinite-research/pull/2112) merged at `9fa022c3fbe1cc657dacf2ff8301cd914eed5b59` after independent review and all four required checks on exact head `9e8e7d631c17dde8a3fc09602b324b67025b8afa`. The existing private adoption payload now transports the actual emitted static carrier pairs and raw authored positive changes; the runtime validates their independent native scalar contract and every force's projected signed range before dependent writes. Optional absent pairs, positive raw values quantized to zero, fresh/reset baselines and original late carrier-emission order retain explicit controls. Collected multi-effect carriers keep their separate vector accounting; this is not proof of the original Cerys/Ryutavi configuration.
+
+The complete local host driver passes all209 controls with pinned Lupa2.6/Lua5.2 on unchanged reviewed head9e8e; its JSON42C8DDF8 and full logD7E89546 are retained under primary `build/qualification/mir5-audit-intake-20261118-r01`. The earlier incorrect full-pass report, positional-test failure and carrier-emission-order regression remain adverse records. The final merged player tree is `08bd039b58fec73a6fb1ca25a604ab94f15c6687`; the original review branch remains remotely reachable. Actual static paid research, science, upgrade and two-cold-load qualification remains open. Published5.0.17 bytes are unchanged.
+
 ## Localized-search native verifier adverse retained (2026-11-18)
+
+The [R04 native successor](../spec/evidence/library517-linux-localized-search-r04-adverse.json) passes the new public close-state observation, real Help/Research clicks, focused clear, German `Eisenzahnrad` input, one correctly localized gear result and second closure on unchanged public17. Root reviews all nine bound before-captures. Eight input steps complete; the ninth reopen request reaches XTEST, then observer0.1.1 rejects its result count on tick30366 and the server exits255 before phase09 or a final capture. The differing count and its cause were not recorded, so asynchronous rebuilding and product state loss are not distinguished by this attempt.
+
+All controls and owned archives restore, the protected83D seed stays unchanged and no owned session process remains. The server's early exit prevents clean child-lifecycle or complete-case acceptance. All252 original bodies/129537936raw bytes are retained in primary qualification custody, capsule97481FB7. The native lane is released; no unchanged automatic retry follows. Earlier R01–R03 adverse results retain their own identities and scope.
 
 The [R03 diagnostic](../spec/evidence/library517-linux-localized-search-r03-adverse.json) adds read-only post-request and missing-phase captures on the unchanged published17 player. Root viewed the Library present before the one Escape request and absent in both later images, but no passive close-phase file arrived. All children exit0, resources restore and the protected seed stays unchanged; all71 original bodies/21190665bytes are retained. The corrected Linux monitor now reports the actor's actual exit1, preserving the phase failure. No full input or post-input native-frame acceptance follows.
 
