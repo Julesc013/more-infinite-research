@@ -37,7 +37,6 @@ jobs:
           Set-StrictMode -Version Latest
 
           $policy = [pscustomobject][ordered]@{ minimum_free_ram_gib = 4 }
-          $workRoot = Join-Path $env:GITHUB_WORKSPACE 'build/tmp/mir5-linux-resource-readiness'
           $requests = @(
             [ordered]@{ role = 'frozen-k2so-batch-pre-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 64 },
             [ordered]@{ role = 'frozen-k2so-per-child-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 128 }
@@ -46,6 +45,7 @@ jobs:
           [IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
           $outputPath = Join-Path $outputDirectory 'linux-resource-readiness.json'
           $frozenGovernorCheckout = Join-Path $env:GITHUB_WORKSPACE 'build/tmp/mir5-frozen-governor-613'
+          $workRoot = Join-Path $frozenGovernorCheckout 'build/tmp/mir5-linux-resource-readiness'
           $frozenGovernorCommit613 = '61307A4813E3C6DF6443ADD66A9DFF5CE3F375F9'
           $frozenGovernorTree613 = '6DE3E707D7BE07BEE2B4DA69C052BCDA1E8BFA0D'
           $governorPath = 'tools/lib/validation/ResourceGovernor.ps1'
