@@ -124,6 +124,15 @@ function M.descriptors(groups)
   return out
 end
 
+-- The fixed carriers have no collected-family input.  Their presence in the
+-- private data-stage record proves that this exact package emitted the named
+-- pair with the reported raw authored scalar; it is not saved history.
+function M.fixed_descriptors()
+  local out = {}
+  for index = 1, #DESCRIPTORS do out[index] = copy_descriptor(DESCRIPTORS[index]) end
+  return out
+end
+
 local function named_current_rows(technologies, descriptors)
   if type(technologies) ~= "table" then
     error("MIR native credit definitions require an output technology array", 3)
@@ -168,6 +177,7 @@ local function carrier(name, recipe, change)
     hidden = true,
     enabled = false,
     visible_when_disabled = false,
+    ignore_tech_cost_multiplier = true,
     max_level = "infinite",
     order = ORDER_PREFIX .. name,
     effects = {{type = "change-recipe-productivity", recipe = recipe, change = change}},
@@ -179,9 +189,9 @@ end
 -- recipe are both present. It returns the newly owned rows; neither existing
 -- output rows nor data.raw are mutated.
 function M.append(technologies, raw, effective_values, target, groups)
-  if type(target) ~= "table" or target.recipe_productivity ~= true then return {} end
+  if type(target) ~= "table" or target.recipe_productivity ~= true then return {}, {} end
   local descriptors = M.descriptors(groups)
-  local present, staged = named_current_rows(technologies, descriptors), {}
+  local present, staged, fixed_scalars = named_current_rows(technologies, descriptors), {}, {}
   local has_main = false
   for index = 1, #descriptors do
     local row = descriptors[index]
@@ -191,7 +201,7 @@ function M.append(technologies, raw, effective_values, target, groups)
     end
     if main ~= nil then has_main = true end
   end
-  if not has_main then return staged end
+  if not has_main then return staged, fixed_scalars end
   if type(raw) ~= "table" or type(raw.recipe) ~= "table" then
     error("MIR native credit definitions require data.raw.recipe", 2)
   end
@@ -209,10 +219,11 @@ function M.append(technologies, raw, effective_values, target, groups)
       local change = row.collected and row.change or configured_change(effective_values, row.family)
       staged[#staged + 1] = carrier(row.positive_id, row.recipe, change)
       staged[#staged + 1] = carrier(row.negative_id, row.recipe, -change)
+      if not row.collected then fixed_scalars[row.recipe] = change end
     end
   end
   for index = 1, #staged do technologies[#technologies + 1] = staged[index] end
-  return staged
+  return staged, fixed_scalars
 end
 
 return M

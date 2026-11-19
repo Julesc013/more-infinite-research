@@ -1,0 +1,123 @@
+{
+  "kind": "MIRWorkerRecoveryCommandFailureHostV1",
+  "verdict": "host-qualified-public-command-failure-propagation-only",
+  "requirements": [
+    "ARCH-07",
+    "RUN-01",
+    "RUN-02",
+    "MIG-01",
+    "VER-02"
+  ],
+  "baseline_source": {
+    "commit": "c13bdfe85efa5ee3dbd515fd35b99b973ce97c6e",
+    "git_blob": "142864dec8a8c7df85e4e5ed94b0efec560cd018",
+    "path": "build/qualification/mir516-recovery-command-failure-r01/baseline-worker_robot_storage.lua",
+    "bytes": 106153,
+    "sha256": "3A0EC3C4E0F668AF460AC4CED69B233C5DD44418E1EDBFF6E89DA7080126C33A"
+  },
+  "candidate_source": {
+    "path": "source/runtime/worker_robot_storage.lua",
+    "bytes": 106926,
+    "sha256": "CFBA665A19FDBA24E5A6BF486A359804B7C0D87CE574995074A43D13AB6F8998"
+  },
+  "runtime": "existing pinned Lupa Lua 5.2 host runtime; native-fact doubles only",
+  "observations": [
+    {
+      "case": "prepare-after-first-write",
+      "baseline_command_returned": true,
+      "candidate_command_returned": false,
+      "writes": 1,
+      "native_frames_and_history_equal_between_arms": true
+    },
+    {
+      "case": "prepare-after-queue",
+      "baseline_command_returned": true,
+      "candidate_command_returned": false,
+      "writes": 10,
+      "native_frames_and_history_equal_between_arms": true
+    },
+    {
+      "case": "prepare-later-force",
+      "baseline_command_returned": true,
+      "candidate_command_returned": false,
+      "writes": 24,
+      "native_frames_and_history_equal_between_arms": true
+    },
+    {
+      "case": "resume-after-queue",
+      "baseline_command_returned": true,
+      "candidate_command_returned": false,
+      "writes": 1,
+      "native_frames_and_history_equal_between_arms": true
+    },
+    {
+      "case": "preflight-refusal",
+      "baseline_command_returned": true,
+      "candidate_command_returned": true,
+      "writes": 0,
+      "native_frames_and_history_equal_between_arms": true
+    },
+    {
+      "case": "ordinary-prepare",
+      "baseline_command_returned": true,
+      "candidate_command_returned": true,
+      "writes": 34,
+      "native_frames_and_history_equal_between_arms": true
+    }
+  ],
+  "regression_controls": {
+    "new_test_methods": 4,
+    "postwrite_prepare_cases": 4,
+    "postwrite_resume_cases": 1,
+    "positive_preflight_and_success_sequences": 2,
+    "exact_baseline_replay": "five post-write subcases fail; both preflight/success sequences pass",
+    "candidate": "all new controls pass; complete affected history module 146 tests passes",
+    "preservation": "Original cause and protected-original advice propagate. Durable prior route/absence stays uncommitted on failed preparation. Native partial frames are observed, not undone. Prepare retry refuses further writes; no resume retry-safety claim."
+  },
+  "raw_files": [
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/Probe-RecoveryCommand.py",
+      "bytes": 3784,
+      "sha256": "50961BEC96D99931E951D455CDC56BF63B253C30A270551BB2DB7D364A7F4E04"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/Run-NewControls.py",
+      "bytes": 1365,
+      "sha256": "53626C4CE49DCC3997F1F9802E6CDE40A8508E84616BF6893760A670587A2CA7"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/baseline-observations.json",
+      "bytes": 7750,
+      "sha256": "DCAA7AA05F26B6C3D69AF974FB4B8F7354D276F17D65AFF4CB91C397191000D4"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/candidate-observations.json",
+      "bytes": 8154,
+      "sha256": "E2B63025919C08D6722783CB4FF87413A8EC6140E2600F179CC378FF8A5A4594"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/baseline-final-controls-r02.txt",
+      "bytes": 9063,
+      "sha256": "6D610481F109974F39782F116F2957508E87452C60A036C6301AA12BC4099A29"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/candidate-controls-r02.txt",
+      "bytes": 917,
+      "sha256": "4E552E7E2C67D88B175AD32D67A8FAA7F9752FD6C8AC4F3B08A84E09DD0B128D"
+    },
+    {
+      "path": "build/qualification/mir516-recovery-command-failure-r01/affected-history-controls.txt",
+      "bytes": 251,
+      "sha256": "678F90FC9D7834D07EF88E7E28CEB25E90EA51207DE96E718707507F396FBFB8"
+    }
+  ],
+  "preserved_adverses": [
+    "baseline-controls.txt",
+    "baseline-final-controls.txt: harness used unavailable loadstring; no model case executed"
+  ],
+  "limits": [
+    "No Factorio process, actual save, save-corruption, rollback, post-fault continuation, or native containment qualification.",
+    "No package built, changed, published or requalified. Published 5.0.14/5.0.15 and frozen candidate102B remain unchanged.",
+    "Stable, GUI/client, reporter, physical-output and performance gates remain open."
+  ]
+}

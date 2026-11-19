@@ -10,7 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
-from test_k2_base_catalogue import _lua_value, _plain
+from lua_table_values import from_lua as _plain, to_lua as _lua_value
 from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, NATIVE_FAMILY_RECIPES, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
 from worker_storage_recovery_fixture import expected_private_worker_row
 
@@ -118,7 +118,14 @@ class BobAngelCatalogueTests(unittest.TestCase):
                          if row["name"].startswith("mir-native-credit-")}
         if len(reviewed) != 27 or len(public_review) != 7 or len(original_credits) != 20:
             raise AssertionError("Bob/Angel intent requires seven public dispositions and twenty exact dormant carriers")
-        if not catalogue._same(credit_review, original_credits):
+        # Historical r02 intent precedes the independently justified map-price
+        # correction. Prove that it is the only projected difference before
+        # comparing every retained historical field.
+        historical_credits = deepcopy(original_credits)
+        for row in historical_credits.values():
+            if row.pop("ignore_tech_cost_multiplier", None) is not True:
+                raise AssertionError("current native credit carrier lacks the reviewed map-price exemption")
+        if not catalogue._same(credit_review, historical_credits):
             raise AssertionError("Bob/Angel native comparison credit descriptors differ from independent published routes")
         for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
             if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
@@ -131,6 +138,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         cls.expected_complete_data["technology"].update(legacy_module_credit_rows(cls.inputs["raw"]["recipe"]))
         cls.expected_complete_data["technology"].update(legacy_cannon_credit_rows(cls.expected_data["technology"]))
         families = {}
+        fixed_credits = {}
         for family in NATIVE_FAMILY_RECIPES:
             main = cls.expected_data["technology"].get("recipe-prod-" + family + "-1")
             if main:
@@ -138,9 +146,17 @@ class BobAngelCatalogueTests(unittest.TestCase):
                     {"recipe": effect["recipe"], "change": effect["change"]}
                     for effect in main["effects"] if effect["type"] == "change-recipe-productivity"
                 ], key=lambda row: row["recipe"])
+        # This independent oracle already identifies the published fixed
+        # carrier rows and the raw recipe world.  The private construction
+        # map records precisely the rows data-final-fixes emits; it is not
+        # runtime credit history or a candidate-derived observation.
+        for _family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
+            if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
+                fixed_credits[recipe] = NATIVE_CREDIT_DEFAULT_SCALAR
         cls.expected_complete_data["mod-data"] = {"more-infinite-research-native-adoptions": {
             "type": "mod-data", "name": "more-infinite-research-native-adoptions",
-            "data": {"schema": 1, "owners": {}, "withheld": {}, "credits": families},
+            "data": {"schema": 1, "owners": {}, "withheld": {}, "credits": families,
+                     "fixed_credits": fixed_credits},
         }}
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
@@ -186,7 +202,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         return lua
 
     def assert_foreign_input_unchanged(self, lua, raw):
-        actual = _plain(lua.globals().data.raw)
+        actual = _plain(lua, lua.globals().data.raw)
         for kind, rows in raw.items():
             for name, row in rows.items():
                 row = deepcopy(row)
@@ -197,7 +213,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
 
     def test_complete_native_definitions_and_foreign_inputs(self):
         lua = self.stage()
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         complete = deepcopy(self.expected_complete_data)
         complete["technology"]["mir-worker-storage-preservation-4"] = expected_private_worker_row("automation-science-pack")
         self.assertTrue(catalogue._same(complete, emitted),
@@ -216,7 +232,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # source recipe/technology/item/lab tables used for this construction.
         self.assert_foreign_input_unchanged(lua, self.inputs["raw"])
         self.assertEqual(lua.globals().publications, 2)  # shortcut, one complete technology publication
-        declared = _plain(lua.execute('return require("research.catalogue").declared()'))
+        declared = _plain(lua, lua.execute('return require("research.catalogue").declared()'))
         self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
 
     def test_disabled_named_water_gate_refuses_enabled_routes_before_publication(self):
@@ -229,7 +245,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # admission check must add no later publication or Bob/Angel research.
         self.assertEqual(lua.globals().publications, lua.globals().data_publications)
         self.assertNotIn("recipe-prod-research_bullets-1",
-                         _plain(lua.globals().emitted).get("technology", {}))
+                         _plain(lua, lua.globals().emitted).get("technology", {}))
         self.assert_foreign_input_unchanged(lua, raw)
 
         # The published independent rows name exactly which forward streams
@@ -245,7 +261,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
             self.assertTrue(name.startswith("recipe-prod-") and name.endswith("-1"), name)
             startup["ips-enable-" + name[len("recipe-prod-"):-2]] = {"value": False}
         lua = self.stage(raw=raw, startup=startup)
-        emitted = _plain(lua.globals().emitted)
+        emitted = _plain(lua, lua.globals().emitted)
         self.assertEqual(lua.globals().publications, 2)
         for name in gated_rows:
             self.assertFalse(emitted["technology"][name]["enabled"], name)
@@ -253,7 +269,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
 
     def test_all_875_settings_match_published_fields_with_reviewed_growth_bound(self):
         lua = self.stage()
-        rows = _plain(lua.execute('return require("research.settings").prototypes()'))
+        rows = _plain(lua, lua.execute('return require("research.settings").prototypes()'))
         actual = {}
         for row in rows:
             actual.setdefault(row["type"], {})[row["name"]] = row

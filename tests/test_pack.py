@@ -61,6 +61,8 @@ class PackTests(unittest.TestCase):
         expected.update(path.relative_to(PLAYER).as_posix() for path in PLAYER.rglob("*.lua"))
         migrations = PLAYER / "migrations"
         expected.update(path.relative_to(PLAYER).as_posix() for path in migrations.glob("*.json"))
+        expected.remove("migrations/more-infinite-research_5.0.0.json")
+        expected.add(F110_PLUS_MIGRATION)
         expected.update(path.relative_to(PLAYER).as_posix() for path in (PLAYER / "locale").rglob("*.cfg"))
         graphics = PLAYER / "graphics"
         if graphics.is_dir():
@@ -111,6 +113,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/bob_angel_f200_combined_profile.lua",
                 "compatibility/bob_tech_profile.lua",
                 "compatibility/bob_core_profile.lua",
+                "compatibility/bob_core_selection.lua",
                 "compatibility/bob_plates_profile.lua",
                 "compatibility/bob_productivity.lua",
                 "compatibility/ironclad.lua",

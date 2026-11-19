@@ -22,6 +22,14 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
+          -- Test-owned expected identities. Keep this independent from
+          -- bootstrap's local selector declaration.
+          TEST_COMPETING_PROVIDER_IDS = {
+            "ExpandedProductivityResearch", "plates-n-circuit-productivity",
+            "Science_packs_productivity", "bioflux-productivity", "fish-productivity",
+            "crafting-efficiency-2", "ProductivityResearch"
+          }
+
           function install_modules(caps_enabled, repair_enabled, scripted_active, native_credit_active)
             CAP_ACTIVE = caps_enabled == true
             REPAIR_ACTIVE = repair_enabled == true
@@ -39,6 +47,25 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.native_credits"] = function()
               local module = {}
+              module.preflight_family_transition = function(event)
+                local plan = {family_snapshot = true}
+                credit_calls.family_event = event
+                credit_calls.family_plan = plan
+                return plan
+              end
+              for _, name in ipairs({"preflight_force_created", "preflight_force_reset",
+                  "preflight_forces_merged", "preflight_technology_effects_reset"}) do
+                local preflight = name
+                module[preflight] = function(event)
+                  local plan = {boundary_snapshot = preflight}
+                  credit_calls[preflight] = event
+                  credit_calls[preflight .. "_plan"] = plan
+                  return plan
+                end
+              end
+              module.needs_research_events = function() return false end
+              module.on_research_finished = function() return false end
+              module.on_research_cancelled = function() return false end
               module.preflight_legacy_preference_transition = function(event, provider_relevant)
                 credit_calls.preflight = (credit_calls.preflight or 0) + 1
                 credit_calls.last_preflight_event = event
@@ -49,10 +76,11 @@ class BootstrapTests(unittest.TestCase):
               for _, name in ipairs({"on_init", "on_configuration_changed", "on_load",
                   "on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
                 local callback = name
-                module[callback] = function(event)
+                module[callback] = function(event, plan)
                   credit_calls[callback] = (credit_calls[callback] or 0) + 1
                   credit_calls.last_event = event
                   if callback == "on_configuration_changed" then
+                    credit_calls.applied_family_plan = plan
                     table.insert(configuration_order, "native-credit-reconcile")
                   end
                 end
@@ -140,6 +168,11 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.lifecycle"] = function()
               return {
+                preflight = function(configuration_changed)
+                  local plan = {configuration_changed=configuration_changed}
+                  lifecycle_calls.cap_plan = plan
+                  return plan
+                end,
                 preflight_worker_storage_split_caps = function(plan)
                   lifecycle_calls.worker_cap_plan = plan
                   return nil
@@ -152,8 +185,12 @@ class BootstrapTests(unittest.TestCase):
                   return { ["recipe-prod-research_gears-1"] = 2 }
                 end,
                 caps_active = function() return CAP_ACTIVE end,
-                on_init = function() lifecycle_calls.init = (lifecycle_calls.init or 0) + 1 end,
-                on_configuration_changed = function(event)
+                on_init = function(plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==false)
+                  lifecycle_calls.init = (lifecycle_calls.init or 0) + 1
+                end,
+                on_configuration_changed = function(event,plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==true)
                   lifecycle_calls.configuration = event
                   table.insert(configuration_order, "lifecycle")
                 end,
@@ -347,6 +384,43 @@ class BootstrapTests(unittest.TestCase):
                     assert(table.concat(order,",")=="owner-preflight,legacy-preflight,cap-preflight,legacy-commit,gate-only-apply,cap-noop",table.concat(order,","))
                     assert(lifecycle_calls.configuration.marker=="gate-only"and library_calls.configuration.marker=="gate-only")
                   end
+                ''')
+
+    def test_cap_admission_preflight_failure_precedes_other_lifecycle_writers(self):
+        for callback in ("init", "configuration"):
+            with self.subTest(callback=callback):
+                self.setUp()
+                self.lua.globals().fault_callback = callback
+                self.lua.execute('''
+                  install_modules(true,true,true,true)
+                  install_runtime(nil,{["space-age"]="2.1.23"});load_control()
+                  local cause={boundary="cap-preflight"}
+                  require("runtime.lifecycle").preflight=function()error(cause)end
+                  local ok,reason=pcall(handlers[fault_callback],{})
+                  assert(not ok and reason==cause,"bootstrap lost the original cap admission failure")
+                  assert(lifecycle_calls.init==nil and lifecycle_calls.configuration==nil
+                    and credit_calls.on_init==nil and credit_calls.on_configuration_changed==nil
+                    and library_calls.init==nil and library_calls.configuration==nil
+                    and scripted_calls.init==nil and scripted_calls.configuration==nil
+                    and #configuration_order==0,
+                    "cap admission ran after another reconciler wrote")
+                ''')
+
+    def test_required_cap_preflight_export_fails_before_callback_registration(self):
+        for export in (None, False, "wrong"):
+            with self.subTest(export=export):
+                self.setUp()
+                self.lua.globals().bad_cap_preflight = export
+                self.lua.execute('''
+                  install_modules(false,false,false,false);install_runtime()
+                  local original=package.preload["runtime.lifecycle"]
+                  package.preload["runtime.lifecycle"]=function()
+                    local lifecycle=original();lifecycle.preflight=bad_cap_preflight;return lifecycle
+                  end
+                  local ok,reason=pcall(load_control)
+                  assert(not ok and tostring(reason):find("caps requires callable preflight",1,true))
+                  assert(handlers.init==nil and handlers.configuration==nil
+                    and next(handlers.events)==nil,"broken cap composition registered handlers")
                 ''')
 
     def test_gun_credit_preflight_runs_before_every_configuration_writer(self):
@@ -671,6 +745,106 @@ class BootstrapTests(unittest.TestCase):
             and cannon_credit_calls.preflight==nil)
         ''')
 
+    def test_native_credit_boundary_preflights_precede_each_lifecycle_writer(self):
+        cases = (
+            ("preflight_force_created", "on_force_created", 1, "{force=player.force}"),
+            ("preflight_force_reset", "on_force_reset", 2, "{force=player.force}"),
+            ("preflight_forces_merged", "on_forces_merged", 3,
+             "{source_index=17,destination=player.force}"),
+            ("preflight_technology_effects_reset", "on_technology_effects_reset", 20,
+             "{force=player.force}"),
+        )
+        for preflight, callback, event_id, event in cases:
+            with self.subTest(preflight=preflight):
+                self.setUp()
+                self.lua.globals().boundary_preflight = preflight
+                self.lua.globals().boundary_callback = callback
+                self.lua.globals().boundary_event_id = event_id
+                self.lua.execute(f'''
+                  install_modules(false,false,false,true);install_runtime();load_control()
+                  local module=require("runtime.native_credits")
+                  local cause={{boundary=boundary_preflight}}
+                  module[boundary_preflight]=function(actual)
+                    assert(actual.force==player.force or actual.destination==player.force)
+                    error(cause)
+                  end
+                  local ok,reason=pcall(handlers.events[boundary_event_id],{event})
+                  assert(not ok and reason==cause,"boundary preflight lost its original failure")
+                  assert(credit_calls[boundary_callback]==nil
+                    and lifecycle_calls.force_created==nil and lifecycle_calls.force_reset==nil
+                    and lifecycle_calls.forces_merged==nil and lifecycle_calls.effects_reset==nil
+                    and library_calls.force==nil,
+                    "native boundary preflight ran after a lifecycle writer")
+                ''')
+
+    def test_native_credit_required_exports_refuse_before_bootstrap_registration(self):
+        for target_id in ("f200", "f210"):
+            for export in ("preflight_family_transition", "preflight_force_created",
+                           "preflight_force_reset", "preflight_forces_merged",
+                           "preflight_technology_effects_reset", "needs_research_events",
+                           "on_research_finished", "on_research_cancelled"):
+                for opponent in ("missing", "false", "table"):
+                    with self.subTest(target=target_id, export=export, opponent=opponent):
+                        self.setUp()
+                        self.lua.globals().target_id = target_id
+                        self.lua.globals().export_name = export
+                        self.lua.globals().opponent = opponent
+                        self.lua.execute(r'''
+                          install_modules(false,false,false,true);install_runtime()
+                          local credit_factory=package.preload["runtime.native_credits"]
+                          local supplied=credit_factory()
+                          if opponent=="missing" then supplied[export_name]=nil
+                          elseif opponent=="false" then supplied[export_name]=false
+                          else supplied[export_name]={} end
+                          assert(type(supplied[export_name])~="function")
+                          package.preload["runtime.native_credits"]=function()return supplied end
+                          local target_factory=package.preload["platform.target"]
+                          package.preload["platform.target"]=function()
+                            local target=target_factory();target.id=target_id;return target
+                          end
+                          local ok,message=pcall(load_control)
+                          assert(not ok and tostring(message):find(
+                            "MIR runtime native credits requires callable "..export_name,1,true),
+                            "required credit export was treated as optional: "..export_name)
+                          assert(next(remote.interfaces)==nil and next(commands.registered)==nil
+                            and handlers.init==nil and handlers.configuration==nil and handlers.load==nil
+                            and next(handlers.events)==nil and next(handlers.nth)==nil,
+                            "invalid credit interface registered callbacks or commands")
+                          assert(next(lifecycle_calls)==nil and next(library_calls)==nil
+                            and next(credit_calls)==nil and next(module_credit_calls)==nil
+                            and next(cannon_credit_calls)==nil and next(gun_credit_calls)==nil,
+                            "invalid credit interface reached a lifecycle writer")
+                        ''')
+
+    def test_family_credit_plan_is_forwarded_without_recomputing_or_dropping_it(self):
+        self.lua.execute(r'''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          local event={mod_changes={}}
+          handlers.configuration(event)
+          assert(credit_calls.family_event==event and credit_calls.family_plan.family_snapshot)
+          assert(credit_calls.applied_family_plan==credit_calls.family_plan,
+            "configuration discarded the admitted family plan")
+        ''')
+
+    def test_inactive_native_credit_subsystem_does_not_require_or_load_its_interface(self):
+        for target_id in ("f200", "f210", "f018"):
+            with self.subTest(target=target_id):
+                self.setUp()
+                self.lua.globals().target_id = target_id
+                self.lua.execute(r'''
+                  install_modules(false,false,false,false);install_runtime()
+                  package.preload["runtime.native_credits"]=function()
+                    error("inactive credit module was imported")
+                  end
+                  local target_factory=package.preload["platform.target"]
+                  package.preload["platform.target"]=function()
+                    local target=target_factory();target.id=target_id;return target
+                  end
+                  load_control();handlers.init();handlers.configuration({mod_changes={}});handlers.load()
+                  assert(package.loaded["runtime.native_credits"]==nil and next(credit_calls)==nil)
+                  assert(lifecycle_calls.configuration~=nil and library_calls.configuration~=nil)
+                ''')
+
     def test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes(self):
         import test_native_family_paid_credits as paid_fixture
         paid_fixture.LuaRuntime = LuaRuntime
@@ -772,16 +946,68 @@ class BootstrapTests(unittest.TestCase):
             return {id="f200", recipe_productivity=true}
           end
           load_control()
-          handlers.configuration({mod_startup_settings_changed=true,
-            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
-              ['fish-productivity']={old_version='1.0.0'}}})
-          assert(credit_calls.last_preflight_provider_relevant == true,
-            "removed named provider did not retain legacy-preflight relevance")
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            handlers.configuration({mod_startup_settings_changed=true,
+              mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
+                [name]={old_version='1.0.0'}}})
+            assert(credit_calls.last_preflight_provider_relevant == true,
+              "removed named provider did not retain legacy-preflight relevance: " .. name)
+          end
           handlers.configuration({mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
               unrelated={old_version='1.0.0'}}})
           assert(credit_calls.last_preflight_provider_relevant == false,
             "unrelated removed mod was marked as competing-provider relevance")
+        ''')
+
+    def test_named_productivity_providers_activate_only_the_f200_adapter(self):
+        self.lua.execute('''
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            install_modules(false, false, false, true)
+            install_runtime(nil, {[name]="1.0.0"})
+            package.loaded["runtime.competing_productivity"] = nil
+            package.preload["platform.target"] = function()
+              return {id="f200", recipe_productivity=true}
+            end
+            local loads, configurations = 0, 0
+            package.preload["runtime.competing_productivity"] = function()
+              loads = loads + 1
+              return {
+                active = function() return false end,
+                on_configuration_changed = function() configurations = configurations + 1 end,
+                on_init = function() end,
+                on_load = function() end,
+                on_research_finished = function() end,
+                on_research_reversed = function() end,
+                on_technology_effects_reset = function() end,
+                on_research_started = function() end,
+                on_research_cancelled = function() end,
+                on_force_created = function() end,
+                on_force_reset = function() end,
+                on_forces_merged = function() end
+              }
+            end
+            load_control()
+            assert(loads == 1, "F200 did not activate the named provider adapter: " .. name)
+            handlers.configuration({mod_changes={}})
+            assert(credit_calls.last_preflight_provider_relevant == true and configurations == 1,
+              "F200 provider did not retain configuration relevance: " .. name)
+          end
+
+          install_modules(false, false, false, true)
+          install_runtime(nil, {unrelated="1.0.0"})
+          package.loaded["runtime.competing_productivity"] = nil
+          package.preload["platform.target"] = function()
+            return {id="f200", recipe_productivity=true}
+          end
+          package.preload["runtime.competing_productivity"] = function()
+            error("absent F200 provider loaded the competing-productivity adapter")
+          end
+          load_control()
+          handlers.configuration({mod_changes={}})
+          assert(credit_calls.last_preflight_provider_relevant == false
+              and package.loaded["runtime.competing_productivity"] == nil,
+            "unrelated F200 profile acquired a competing provider")
         ''')
 
     def test_native_credit_preflight_stops_configuration_before_lifecycle_writes(self):
@@ -841,26 +1067,30 @@ class BootstrapTests(unittest.TestCase):
 
     def test_f210_current_productivity_provider_preflights_without_a_mod_change(self):
         self.lua.execute('''
-          install_modules(false, false, false, true)
-          install_runtime(nil, {ProductivityResearch='2.1.0'})
-          package.preload["platform.target"] = function()
-            return {id="f210", recipe_productivity=true}
-          end
-          package.preload["runtime.competing_productivity"] = function()
-            error("F210 loaded the F200 competing-productivity adapter")
-          end
-          CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
-          load_control()
-
           local changed = {mod_startup_settings_changed=true,
             mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.21000'}}}
-          local ok, message = pcall(handlers.configuration, changed)
-          assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
-          assert(credit_calls.preflight == 1 and credit_calls.last_preflight_event == changed
-            and credit_calls.last_preflight_provider_relevant == true)
-          assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
-            and library_calls.configuration == nil,
-            "current F210 provider allowed configuration writes before preflight refusal")
+          for _, name in ipairs(TEST_COMPETING_PROVIDER_IDS) do
+            install_modules(false, false, false, true)
+            install_runtime(nil, {[name]='2.1.0'})
+            package.loaded["runtime.competing_productivity"] = nil
+            package.preload["platform.target"] = function()
+              return {id="f210", recipe_productivity=true}
+            end
+            package.preload["runtime.competing_productivity"] = function()
+              error("F210 loaded the F200 competing-productivity adapter")
+            end
+            CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
+            load_control()
+
+            local ok, message = pcall(handlers.configuration, changed)
+            assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
+            assert(credit_calls.preflight == 1 and credit_calls.last_preflight_event == changed
+              and credit_calls.last_preflight_provider_relevant == true,
+              "current F210 provider was not recognized: " .. name)
+            assert(lifecycle_calls.configuration == nil and credit_calls.on_configuration_changed == nil
+              and library_calls.configuration == nil and package.loaded["runtime.competing_productivity"] == nil,
+              "current F210 provider loaded the F200 adapter or allowed configuration writes: " .. name)
+          end
 
           CREDIT_PREFLIGHT_ERROR = nil
           install_modules(false, false, false, true)
@@ -1182,6 +1412,92 @@ class BootstrapTests(unittest.TestCase):
         self.assertNotIn("require(", source[source.index("function M.register"):])
         self.assertIn('require("runtime.bootstrap")', control)
         self.assertIn("remote.add_interface", control)
+
+    def test_required_catalogue_worker_exports_refuse_before_bootstrap_registration(self):
+        self.lua.execute(r'''
+          local actual_catalogue = require("runtime.catalogue")
+          local names = {
+            "worker_storage_route", "worker_default_split", "finite_research_speed_provider"
+          }
+          for _, target_id in ipairs({"f200", "f210"}) do
+            for _, name in ipairs(names) do
+              for _, kind in ipairs({"missing", "nonfunction"}) do
+              install_modules(false); install_runtime()
+              local supplied = {}
+              for key, value in pairs(actual_catalogue) do supplied[key] = value end
+              if kind == "nonfunction" then
+                supplied[name] = false
+                assert(rawget(supplied, name) == false and type(rawget(supplied, name)) == "boolean",
+                  "nonfunction catalogue opponent was not false: " .. name)
+              else
+                supplied[name] = nil
+                assert(rawget(supplied, name) == nil,
+                  "missing catalogue opponent unexpectedly retained a value: " .. name)
+              end
+              package.loaded["runtime.catalogue"] = nil
+              package.loaded["runtime.worker_robot_storage"] = nil
+              package.loaded["runtime.finite_research_speed"] = nil
+              package.preload["platform.target"] = function()
+                local target = dofile(player_root .. "/platform/target.lua")
+                target.id = target_id
+                return target
+              end
+              package.preload["runtime.catalogue"] = function() return supplied end
+              local ok, message = pcall(load_control)
+              assert(not ok and tostring(message):find("MIR runtime catalogue requires callable " .. name, 1, true),
+                target_id .. " " .. kind .. " required catalogue export was treated as an absent result: " .. name)
+              assert(next(remote.interfaces) == nil and next(commands.registered) == nil
+                and handlers.init == nil and handlers.configuration == nil and handlers.load == nil
+                and next(handlers.events) == nil and next(handlers.nth) == nil,
+                target_id .. " " .. kind .. " export registered a callback or command before refusal: " .. name)
+              assert(next(lifecycle_calls) == nil and next(library_calls) == nil
+                and package.loaded["runtime.worker_robot_storage"] == nil
+                and package.loaded["runtime.finite_research_speed"] == nil,
+                target_id .. " " .. kind .. " export reached worker, finite-speed, lifecycle or Library application: " .. name)
+              end
+            end
+          end
+        ''')
+
+    def test_historical_target_does_not_require_current_catalogue_worker_exports(self):
+        self.lua.execute(r'''
+          install_modules(false); install_runtime()
+          local actual_catalogue = require("runtime.catalogue")
+          local supplied = {}
+          for key, value in pairs(actual_catalogue) do supplied[key] = value end
+          supplied.worker_storage_route = nil
+          supplied.worker_default_split = false
+          supplied.finite_research_speed_provider = nil
+          package.loaded["runtime.catalogue"] = nil
+          package.preload["platform.target"] = function()
+            local target = dofile(player_root .. "/platform/target.lua")
+            target.id = "f018"
+            return target
+          end
+          package.preload["runtime.catalogue"] = function() return supplied end
+          local ok, message = pcall(load_control)
+          assert(ok, message)
+          assert(next(remote.interfaces) ~= nil and handlers.init ~= nil and handlers.configuration ~= nil,
+            "historical target lost the ordinary bootstrap route")
+        ''')
+
+    def test_callable_catalogue_worker_exports_keep_absent_results(self):
+        self.lua.execute(r'''
+          install_modules(false); install_runtime()
+          local catalogue = require("runtime.catalogue")
+          catalogue.worker_storage_route = function() return nil end
+          catalogue.worker_default_split = function() return false end
+          catalogue.finite_research_speed_provider = function() return nil end
+          local ok, message = pcall(load_control)
+          assert(ok, message)
+          ok, message = pcall(handlers.init)
+          assert(ok, message)
+          ok, message = pcall(handlers.configuration, {mod_changes = {}})
+          assert(ok, message)
+          assert(lifecycle_calls.init == 1 and lifecycle_calls.configuration ~= nil
+            and library_calls.init == 1 and library_calls.configuration ~= nil,
+            "callable absent worker results lost the ordinary lifecycle route")
+        ''')
 
     def test_k2_carrier_lifecycle_is_independent_of_caps_and_scripted_features(self):
         self.lua.execute('''

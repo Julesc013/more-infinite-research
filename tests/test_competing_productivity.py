@@ -477,6 +477,7 @@ class CompetingProductivityTests(unittest.TestCase):
           package.preload["platform.target"] = function() return {id="f200", factorio_version="2.0"} end
           package.preload["runtime.lifecycle"] = function()
             local module = {caps_active=function() return false end, cap_limits=function() return {} end,
+              preflight=function()return {}end,
               preflight_worker_storage_split_caps=function(plan) assert(plan==nil);return nil end,
               apply_worker_storage_split_caps=function(plan) assert(plan==nil)end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end}
@@ -505,7 +506,7 @@ class CompetingProductivityTests(unittest.TestCase):
               on_player_locale_changed=function() end, on_player_changed_force=function() end, on_player_joined_game=function() end,
               open=function() return nil end}
           end
-          package.preload["research.catalogue"] = function() return {declared=function() return {} end} end
+          package.preload["research.catalogue"] = function() return {prepare=function() end,declared=function() return {} end} end
           package.preload["api.v1.runtime"] = function() return {get_version=function() return {} end, get_capabilities=function() return {} end, get_research=function() return {} end} end
           package.preload["runtime.settings_profile"] = function() return {export_string=function() return "" end, validate_string=function() return {} end} end
           package.preload["runtime.settings_commands"] = function() return {export=function() end, validate=function() end} end
@@ -1272,8 +1273,11 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertIn('mods["crafting-efficiency-2"]', (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
         self.assertIn("mods.ProductivityResearch", (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
         bootstrap = (PLAYER / "runtime/bootstrap.lua").read_text(encoding="utf-8")
-        self.assertIn('active_mods["crafting-efficiency-2"]', bootstrap)
-        self.assertIn("active_mods.ProductivityResearch", bootstrap)
+        # Keep authored identities explicit without requiring inlined lookups.
+        # test_bootstrap.py independently exercises every provider's activation,
+        # current/removed relevance and F210 adapter-import boundary.
+        for provider in ("crafting-efficiency-2", "ProductivityResearch"):
+            self.assertIn(provider, bootstrap)
         self.assertNotIn("ProductivityResearchForEveryone", bootstrap)
         self.assertNotIn("ProductivityResearchForEveryoneFG", bootstrap)
         self.assertNotIn("require(", runtime[runtime.index("function M.on_init"):])

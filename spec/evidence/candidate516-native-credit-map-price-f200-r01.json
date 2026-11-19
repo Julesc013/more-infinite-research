@@ -1,0 +1,577 @@
+{
+  "kind": "MIR516NativeCreditMapPriceObservationV1",
+  "verdict": "accepted-exact-F200-four-carrier-native-cost-slice-only",
+  "source_commit": "83266f7bdffc65d85f5417215fbea0f9822e5437",
+  "player_tree": "e10b207fbd70819e058a2d82e3c3deb52142cb66",
+  "players": {
+    "old15": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.20015.zip",
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+      "version": "5.0.20015",
+      "info_member": "more-infinite-research_5.0.20015/info.json"
+    },
+    "new16": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir516-native-credit-price-r01\\more-infinite-research_5.0.20016.zip",
+      "bytes": 1043760,
+      "sha256": "0C3838C3C8CF5CE77DFB8B2C5F2143E28719229EE6E71E0D3A837CE9414CC8B4",
+      "version": "5.0.20016",
+      "info_member": "more-infinite-research_5.0.20016/info.json"
+    }
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "data": "D:\\Games\\Factorio\\2.0\\data"
+  },
+  "engine_facts": {
+    "technology_source": {
+      "path": "D:\\Games\\Factorio\\2.0\\data\\base\\prototypes\\technology.lua",
+      "bytes": 122922,
+      "sha256": "19E827C2B7D02A72EACA5BE284DD67BF76E0D4ECDD86722232D8F98805D4FE6F"
+    },
+    "runtime_api": {
+      "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+    }
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\packet.json",
+    "bytes": 9630,
+    "sha256": "6C0CFF485ADBE1C020798D521F49C5DDD5E13F8576321FDA918279F1D7C2B6B2"
+  },
+  "owner": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\Invoke-PriceObservation.ps1",
+    "bytes": 16376,
+    "sha256": "7AD6AB15E1A0839C49FF003CFF7E2FBFA22837653E1BCC60428B643AEF31B5ED"
+  },
+  "preparer": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\Prepare-PriceObservation.py",
+    "bytes": 11055,
+    "sha256": "D625C46C00D2F6E1136CC1D2A93F45D76C1B706929BA6C93FC036F21069DA38E"
+  },
+  "payload": {
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\payload.lua",
+      "bytes": 3039,
+      "sha256": "D32A11A086D9C1C42CB301BBD14ECA4D111AEF61AA3FD39388C1FD3AA0660708"
+    },
+    "wire": {
+      "bytes": 2936,
+      "sha256": "51FAAA078C99E0F13A7BC6647CE95F76AC058760AB42241324A8365130157416",
+      "line_join": "space"
+    }
+  },
+  "reader": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\Verify-PriceObservation.py",
+    "bytes": 7534,
+    "sha256": "C606A50E38E8778C31E8B2DDEB48C4C227EEE275D8554632F89A1B4E0F1C3FB7"
+  },
+  "composition": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\composition.json",
+    "bytes": 4365,
+    "sha256": "107CDB8F236B5BD33D56983E1C4FF947A9AC3923A5BB77490625BC40ABA5EFF3"
+  },
+  "terminal": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r06\\terminal.json",
+    "bytes": 18168,
+    "sha256": "54A857A7B40B0B762861D7876587422BB7472025D2D9D5A5384C52AA2B19F862"
+  },
+  "limits": {
+    "memory_mib": 4096,
+    "output_mib": 64,
+    "timeout_seconds": 180,
+    "new_processes": 3
+  },
+  "arms": [
+    {
+      "arm": "old15",
+      "mir": "5.0.20015",
+      "raw": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-cost-native-r01\\build\\tmp\\mir516-native-credit-price-r06-native\\old15\\evidence\\mir-credit-cost-observation.json",
+        "bytes": 8024,
+        "sha256": "FB794568F347AC6C7BD7A937D36E8174BF67F3465B9C42D27A31382D0FDF7E26"
+      },
+      "matrix": [
+        {
+          "multiplier": 0.5,
+          "public": {
+            "name": "automation-2",
+            "native_count": 20,
+            "prototype_count": 20,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 1,
+          "public": {
+            "name": "automation-2",
+            "native_count": 40,
+            "prototype_count": 40,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": false
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 2,
+          "public": {
+            "name": "automation-2",
+            "native_count": 80,
+            "prototype_count": 80,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 2,
+              "prototype_count": 2,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 2,
+              "prototype_count": 2,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 2,
+              "prototype_count": 2,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 2,
+              "prototype_count": 2,
+              "ignore": false
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 4,
+          "public": {
+            "name": "automation-2",
+            "native_count": 160,
+            "prototype_count": 160,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 4,
+              "prototype_count": 4,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 4,
+              "prototype_count": 4,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 4,
+              "prototype_count": 4,
+              "ignore": false
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 4,
+              "prototype_count": 4,
+              "ignore": false
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        }
+      ],
+      "three_fresh_force_snapshots_unchanged": true,
+      "map_price_restored": 1,
+      "readiness_probes": 2,
+      "cost_payload_commands": 1,
+      "actual_loaded_selection": [
+        "base@2.0.77",
+        "more-infinite-research@5.0.20015",
+        "quality@2.0.77"
+      ],
+      "processes": 1
+    },
+    {
+      "arm": "new16",
+      "mir": "5.0.20016",
+      "raw": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-cost-native-r01\\build\\tmp\\mir516-native-credit-price-r06-native\\new16\\evidence\\mir-credit-cost-observation.json",
+        "bytes": 8008,
+        "sha256": "8F66F8ACAD3ADC533513782FEBF21DD7D63811260A23D450FFCC2C22A0E8D828"
+      },
+      "matrix": [
+        {
+          "multiplier": 0.5,
+          "public": {
+            "name": "automation-2",
+            "native_count": 20,
+            "prototype_count": 20,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 1,
+          "public": {
+            "name": "automation-2",
+            "native_count": 40,
+            "prototype_count": 40,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 2,
+          "public": {
+            "name": "automation-2",
+            "native_count": 80,
+            "prototype_count": 80,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        },
+        {
+          "multiplier": 4,
+          "public": {
+            "name": "automation-2",
+            "native_count": 160,
+            "prototype_count": 160,
+            "ignore": false
+          },
+          "carriers": [
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_copper-copper-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-positive",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            },
+            {
+              "name": "mir-native-credit-research_iron-iron-plate-negative",
+              "native_count": 1,
+              "prototype_count": 1,
+              "ignore": true
+            }
+          ],
+          "public_exempt": {
+            "name": "automation",
+            "native_count": 10,
+            "prototype_count": 10,
+            "ignore": true
+          }
+        }
+      ],
+      "three_fresh_force_snapshots_unchanged": true,
+      "map_price_restored": 1,
+      "readiness_probes": 2,
+      "cost_payload_commands": 1,
+      "actual_loaded_selection": [
+        "base@2.0.77",
+        "more-infinite-research@5.0.20016",
+        "quality@2.0.77"
+      ],
+      "processes": 2
+    }
+  ],
+  "four_logical_successful_stages": "R05 natural old15 create adopted once, R06 old15 server, R06 candidate16 create/server",
+  "actual_campaign_processes": 5,
+  "adopted_create_pid": 102112,
+  "adverse_server_pid": 120156,
+  "new_r06_pids": [
+    120560,
+    125444,
+    120512
+  ],
+  "prior_r05_terminal": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r05\\terminal.json",
+    "bytes": 3199,
+    "sha256": "91F8A8E84B47AEA3A5D4F2A6EABBE3006E32A5CD03CBE38E8904E1C76CAC6776"
+  },
+  "prior_r05_status": "adverse-stopped-before-cost-payload-on-uninitialized-transport-audit-counter",
+  "source_adoption": {
+    "seed": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\r05-adverse-custody\\originals\\raw-native\\old15\\write-data\\saves\\headless-seed.zip",
+      "bytes": 835753,
+      "sha256": "CB5B1B0ED36040D46992996C5C74C7EA8978D02F02EE95CC7A426293BE02DE7A"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r05\\packet.json",
+      "bytes": 6852,
+      "sha256": "B44EB058169D1B36CAC5E84F5CA63E2800D71A9EF1883A215037426F3608E414"
+    },
+    "adverse_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\native-case-r05\\terminal.json",
+      "bytes": 3199,
+      "sha256": "91F8A8E84B47AEA3A5D4F2A6EABBE3006E32A5CD03CBE38E8904E1C76CAC6776"
+    },
+    "create_proof": {
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-cost-native-r01\\build\\tmp\\mir516-native-credit-price-r05-native\\process-1.resources.jsonl",
+        "bytes": 2618,
+        "sha256": "CA55029F08D4E6C4E67A426D658844CA019E911DF60BE9E9CCC064A6692255EE"
+      },
+      "stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-cost-native-r01\\build\\tmp\\mir516-native-credit-price-r05-native\\process-1.stdout.txt",
+        "bytes": 6757,
+        "sha256": "B8BD954635F85CE6912B788D92F7940C302D8F461573805BDD4D0B5E4873D9E2"
+      },
+      "stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-cost-native-r01\\build\\tmp\\mir516-native-credit-price-r05-native\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      }
+    },
+    "creator_pid": 102112,
+    "scope": "natural source create only; adverse server remains adverse"
+  },
+  "source_adoption_assessment": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\r05-adverse-custody\\seed-adoption-assessment.json",
+    "bytes": 1708,
+    "sha256": "EBB9B8E8BB45DF34EE95C1EEB11E0BAA2C6DF4D7766BE6AF25A8D66BDEFC3D1C"
+  },
+  "unadmitted_preparations": "R01-R04 had zero native processes; original files, reader/schema/empty-queue and closure-guard adverses remain retained. R05 remains adverse, not relabeled.",
+  "library_preservation": {
+    "before": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\before-native-library.json",
+      "bytes": 5110,
+      "sha256": "BD122603A1E66024AB7CCB9E3E6E7C66CD102889074513430625E203EBCA6261"
+    },
+    "after_adverse_r05": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\after-adverse-r05-library.json",
+      "bytes": 5200,
+      "sha256": "CF8937F244736A40582AEDD1C4243B2E782EFBEF64D946170515F879EE713DD4"
+    },
+    "after_observed_r06": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\after-observed-r06-library.json",
+      "bytes": 5201,
+      "sha256": "E2315C6C61352D1FCCE3FE92FBA6B2579BF16342E2C2A499DB06E99EBDA85471"
+    },
+    "exact_controls": 4,
+    "exact_mir_archives": 18,
+    "archive_path_set_unchanged": true,
+    "factorio_remaining": 0
+  },
+  "independent_result_review": {
+    "record_author": "/root",
+    "reviewer": "/root/review_515_prerequisites",
+    "source": "explicit read-only reviewer message; not a GitHub approval",
+    "verdict": "GO exact cost slice only"
+  },
+  "private_custody": {
+    "kind": "MIR516NativeCreditPriceRootIndependentReadbackV1",
+    "record_author": "/root",
+    "repository": "Julesc013/scratchpad",
+    "commit": "758b1a1f2d41a151f399bbf50be737f68711ec2e",
+    "blob": "d88b07eefde027349bda86b10518485f22b87d06",
+    "path": "projects/mir/runs/mir516-native-credit-price-r01/original-bodies.json.gz",
+    "packed_bytes": 3004395,
+    "packed_sha256": "1E9F6E59C00E4E32B0F02CCEBD0A8536BEC30195CBBA50421D76B5B89A7FC933",
+    "remote_files_byte_compared": 315,
+    "unique_bodies": 176,
+    "original_files_compared_to_retained_and_source": 311,
+    "original_bytes": 7003188,
+    "unique_generated_save_bodies": 2,
+    "external_reference_rows_rehashed": 4,
+    "engine_player_archive_bodies_absent": true,
+    "scope": "exact raw custody only; bounded native cost acceptance is a separate review",
+    "independent_readback_receipt": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-native-credit-price-r01\\root-independent-cost-readback.json",
+      "bytes": 805,
+      "sha256": "6622F636353FA7169684FEA7A303DBFF69EB92B9C41724832248DA77FD847997"
+    },
+    "branch": "evidence/mir516-native-credit-price-blackglass-r01",
+    "retained_capture_manifest_sha256": "071030596ED0136E6C2DFB730BBBBA267BAAAC8E965E3DD51486CD2A835D63E9"
+  },
+  "limits_on_claim": [
+    "Four named copper/iron signed carriers, four map prices and two public cost controls on exact Base+Quality/2.0.77 only.",
+    "Old half-price result 1 is an observation, not a general rounding rule.",
+    "Fresh zero-player force snapshots only; no earned-credit, ordinary research, migration/save-upgrade, physical-output or reporter qualification.",
+    "No F210, GUI/client/multiplayer, visual, performance or stable acceptance.",
+    "Published14/15 and prior frozen102B candidate remain unchanged. Current0C38 candidate is unpublished; this does not requalify any other package/scenario."
+  ]
+}

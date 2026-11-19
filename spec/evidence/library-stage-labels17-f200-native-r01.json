@@ -1,0 +1,313 @@
+{
+  "schema": 1,
+  "kind": "MIRSource17DefaultStageLabelsF200NativeEvidenceV1",
+  "date": "2026-11-17",
+  "status": "ACCEPTED-scoped-default-stage-caption-rendering-only",
+  "source_head": "075fdc0386d4e4f10c8b8956f5f65914d00670a1",
+  "player_tree": "33452f1139806acef9413d9822e092171e50344b",
+  "package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\library-stage-list-labels-source17-r02\\more-infinite-research_5.0.20017.zip",
+    "bytes": 1045641,
+    "sha256": "8827E47E1AE5AFB00579C2E4CA104FCA4C5F9A70BBC510A1FD49EF0859EA0271",
+    "version": "5.0.20017",
+    "published": false
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "edition": "Base only"
+  },
+  "fixture": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\inputs\\f200\\mir-fixture-library-render-capture_0.1.7.zip",
+    "bytes": 3321,
+    "sha256": "CAD0C1A57B2A54A6B82E15CA211EE396441B91D17DA69E4EE85B64686F3D8409",
+    "version": "0.1.7",
+    "source_commit": "0e1b3fd03fe6e3f2d577114bc31598fb0bbd1ee7"
+  },
+  "controller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\Invoke-RenderCapture-r02.ps1",
+    "bytes": 10787,
+    "sha256": "475EAFF112D3FD986C8C7C74B7B74C90D7293497F81BE5109C1B2E05CAA5D278"
+  },
+  "reader": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-render-source17-native-r01\\Validate-CaptureFiles.py",
+    "bytes": 2525,
+    "sha256": "3EFB63B6400A34CB95A45E0F7D7552C50DC645CCB48E7CC6D3387BC594D6274B"
+  },
+  "reviewed_implementation": {
+    "caption_pr": 2056,
+    "caption_head": "7b976cc40268928202bc5c4b52a9d3cf2dacbd7d",
+    "caption_merge": "52208ad5ea1cbc43d1937a06de445b5c50db20b0",
+    "bootstrap_pr": 2058,
+    "bootstrap_head": "5199845513a3eafd04299e910de8a2d26659ab38",
+    "bootstrap_merge": "daa81f29d7f2b79367256e40e264b8058ade4de4",
+    "checked_integrated_player_tree_matches_qualified_player": true,
+    "merge_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\bootstrap-required-exports-review-r01\\MERGE-READBACK-r01.json",
+      "bytes": 604,
+      "sha256": "945E963F89BF2F834FCDE702C883696D953166324CCF5F2DC4D83E96F30E1F66"
+    }
+  },
+  "resources": {
+    "serial_peak_mib": 4096,
+    "max_new_output_mib": 512,
+    "timeout_seconds": 240,
+    "reserves_unchanged": true,
+    "no_factory_budget_change": true
+  },
+  "sessions": [
+    {
+      "locale": "en",
+      "pid": 139524,
+      "start_utc": "2026-11-16T22:07:53.4930853Z",
+      "duration_seconds": 63.01406,
+      "termination": "completion-predicate supervised close, observed exit0; not natural exit or performance acceptance",
+      "actual_mod_tuple": "base@2.0.77|mir-fixture-library-render-capture@0.1.7|more-infinite-research@5.0.20017",
+      "native_actor_named_selected_force_comparison": true,
+      "declared_input_pins_rehashed_after_execution": 10,
+      "original_library_restored": true,
+      "protected_saves_unchanged": true,
+      "cleanup_errors": [],
+      "factorio_zero": true,
+      "viewport": {
+        "width": 3200,
+        "height": 1800,
+        "scale": 1.5
+      },
+      "images": [
+        {
+          "phase": "01-research",
+          "bytes": 4128875,
+          "sha256": "993CAADD33BDF06BB004E0FD0497E497A5DE7DC5445E51C0926D539BBFA2EDFC"
+        },
+        {
+          "phase": "02-queue",
+          "bytes": 3844350,
+          "sha256": "D7F356E9211F64457CF08ACFFC69E8FED131E36EB99AA2B5E6359DB49F4D3702"
+        },
+        {
+          "phase": "03-settings-research",
+          "bytes": 4049526,
+          "sha256": "22CBF21EA3CF0FEE3CB34BD57DB8E046339C6A79F775B351A05C19CF4CFC7884"
+        },
+        {
+          "phase": "04-settings-options",
+          "bytes": 4137580,
+          "sha256": "7ECFD3822BFE24A302198AD33BA047DF8A949D057AA954749575F85FA96EC4F1"
+        },
+        {
+          "phase": "05-help",
+          "bytes": 4113243,
+          "sha256": "9D8EA1F276C643F15531EAC1AF88009813156D90D9E5984AA788078296A63AF5"
+        },
+        {
+          "phase": "06-availability",
+          "bytes": 3993634,
+          "sha256": "60930E87926A0653754DF77F3638C0E289E4F45A9674F4DA122306C49E81062E"
+        },
+        {
+          "phase": "07-research-filtered",
+          "bytes": 4113405,
+          "sha256": "C8D91543EBF417366ECC248DFD8EAFE0686EC90572CA1F0F5449701F1D50164F"
+        }
+      ],
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\en-plan-r03.json",
+        "bytes": 7452,
+        "sha256": "69211803BEE24018F06ED17274FB91DBA158F2B2E2A2EE4B7E402FFD11418882"
+      },
+      "capture_summary": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-stage-labels17-f200-en-r03-native\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 1986,
+        "sha256": "F88C9F2A9DBF7C94F3A89A676BCED850C08FBC5C90D7E39BDE0D621A2FA29D77"
+      },
+      "integrity": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-stage-labels17-f200-en-r03-native\\render-file-validation.json",
+        "bytes": 1658,
+        "sha256": "D1B2A76CD077ABEAD21BF32429ED6C4F16EF2BEA095889FC0F5C015544503B5F"
+      }
+    },
+    {
+      "locale": "de",
+      "pid": 143032,
+      "start_utc": "2026-11-16T22:11:33.1035607Z",
+      "duration_seconds": 62.720784,
+      "termination": "completion-predicate supervised close, observed exit0; not natural exit or performance acceptance",
+      "actual_mod_tuple": "base@2.0.77|mir-fixture-library-render-capture@0.1.7|more-infinite-research@5.0.20017",
+      "native_actor_named_selected_force_comparison": true,
+      "declared_input_pins_rehashed_after_execution": 10,
+      "original_library_restored": true,
+      "protected_saves_unchanged": true,
+      "cleanup_errors": [],
+      "factorio_zero": true,
+      "viewport": {
+        "width": 3200,
+        "height": 1800,
+        "scale": 1.5
+      },
+      "images": [
+        {
+          "phase": "01-research",
+          "bytes": 4156168,
+          "sha256": "0DFCEF2DC9FB48200EA724CED0269572234B82BDF1995851FABFB8FDBA42406D"
+        },
+        {
+          "phase": "02-queue",
+          "bytes": 3855942,
+          "sha256": "392303ED60EEF7D6964CA1A84A8F7FB388F09E68850A497F46B7184E823A7BDA"
+        },
+        {
+          "phase": "03-settings-research",
+          "bytes": 4076566,
+          "sha256": "00181FD635C3438ECDDADD26DA784016A28D574CE294B171E55BBB7C94A5840A"
+        },
+        {
+          "phase": "04-settings-options",
+          "bytes": 4185715,
+          "sha256": "DB354806A45D3FAD71C07851D1058F8DCD90E86D2C3EB7E3295428DEC6005BD3"
+        },
+        {
+          "phase": "05-help",
+          "bytes": 4131987,
+          "sha256": "575780A0295D093F32F5A1EE56700D919CA370588BB539EFFDD49DBEE5A6DAF9"
+        },
+        {
+          "phase": "06-availability",
+          "bytes": 4001074,
+          "sha256": "5FAB6F8D35C38BEB0400610002969C53A746445C2B01975945CDEEC81648E9AA"
+        },
+        {
+          "phase": "07-research-filtered",
+          "bytes": 4130971,
+          "sha256": "F283BA4F5EA0B72CEA140BF45D57DE9F8E3513AAD6DA036383CFBCB45D701254"
+        }
+      ],
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\de-plan-r03.json",
+        "bytes": 7452,
+        "sha256": "F572A9DD2FC4A81348203C6B1CBE07D623EC3639B4DFA8450AD3BE40E8F4F33B"
+      },
+      "capture_summary": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-stage-labels17-f200-de-r03-native\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 1986,
+        "sha256": "ED1366A3610BA0672BD415F6E1ABF39ADB8780BDEB49D607023DF7CDF890021A"
+      },
+      "integrity": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\library-stage-labels17-f200-de-r03-native\\render-file-validation.json",
+        "bytes": 1658,
+        "sha256": "1BBB48C39C8DEFADA0EC02927C2E423FBB772235652AFBDEF4EFA4377F59791F"
+      }
+    }
+  ],
+  "root_pixel_scope": "All14 original PNGs displayed individually. Both complete default finite/continuation role, endpoint4 and native name fit EN/DE. One viewport/scale.",
+  "accepted_labels": {
+    "en": [
+      "Continuation from 4: Worker robot cargo size",
+      "Finite stage to 4: Worker robot cargo size"
+    ],
+    "de": [
+      "Fortsetzung ab 4: Arbeitsroboter-Transportmenge",
+      "Endliche Stufe bis 4: Arbeitsroboter-Transportmenge"
+    ]
+  },
+  "independent_admission": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\INDEPENDENT-ADMISSION-REVIEW-r03.json",
+    "bytes": 5301,
+    "sha256": "B26F76E3819300CA39FDE7636A0C0EBA801FB3516B64EB2EC9F1778ACBB19F6E"
+  },
+  "en_gate_before_de": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\INDEPENDENT-EN-RESULT-REVIEW-r03.json",
+    "bytes": 3421,
+    "sha256": "A6D38A4EEE377F8CF1980F6D1E44FEF9C6A33971A518449FF25A5AC78BBC6EDC"
+  },
+  "independent_result_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\INDEPENDENT-RESULT-REVIEW-r03.json",
+    "bytes": 4496,
+    "sha256": "69022EE3FFF283E3CF6537D7E690082C534D6E0894577092F151F67FAA063850"
+  },
+  "primary_facts": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\EXECUTION-FACTS-r03.json",
+    "bytes": 11361,
+    "sha256": "16F2C3AB352FD79CE5565B8E481C0227E84BAFB07A83C420FD3CAF3DF83B1187"
+  },
+  "primary_raw_manifest": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\RAW-BODY-MANIFEST-r03.json",
+    "bytes": 24269,
+    "sha256": "BFEA5C2575ADBABD07FC4397404B478D638DAA23873ECC89746B1C743FAFC7CD"
+  },
+  "retained_adverses": {
+    "first_composition": {
+      "native_executions": 0,
+      "reason": "Config copy was outside the governor-admitted scratch root; r02 corrected paths without changing any guard.",
+      "record": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\COMPOSITION-r01-ADVERSE.json",
+        "bytes": 589,
+        "sha256": "F7B737BCFED60ECE22F1FAD708ACC0A39FB303C1022C5C9E5D0FC3806BF1E3B9"
+      }
+    },
+    "candidate156": {
+      "package_sha256": "15609718CC0EB777FD23D7C94911631494D78968BC68BF6E1120317B695465BA",
+      "en_pid": 142888,
+      "native_executions": 1,
+      "result": "Supervised completion/restoration passed, visual closure NO-GO for clipped redundant limit suffix.",
+      "de_executions": 0,
+      "independent_review": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-list-labels-native-r01\\INDEPENDENT-EN-RESULT-REVIEW-r02.json",
+        "bytes": 3318,
+        "sha256": "5E9528313BE2A4D91F4E3D0A06BCC97EDDFA82D5C774490A56D1E1FFEE34CCD1"
+      },
+      "private_commit": "25291492555480a575c4123cce42a66c70dc3aca",
+      "root_fresh_readback": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-labels156-private-custody-r01\\ROOT-INDEPENDENT-READBACK-r03.json",
+        "bytes": 599,
+        "sha256": "A47FB9EB284D14962F1B87F613D0867F1A35C9C07AF7D32F802A77E0DBAC434D"
+      }
+    },
+    "comparator": "The first pairwise stage-order patch created a real comparator cycle; its exact original source/failure/review remain preserved. Final model comparator equals the original baseline."
+  },
+  "custody": {
+    "private_repository": "Julesc013/scratchpad",
+    "private_commit": "9f95889dc663e35790dc49af5eab48ba0b9858fc",
+    "private_tree": "64b830a2e1dd4b0954689cb75369ac7a2fa19697",
+    "index_path": "projects/mir/runs/library-stage-labels8827-r03/index.json",
+    "index_blob": "6b586da19b01a98680a196930bdce7b2eaa2e973",
+    "index_sha256": "A4341E4132200A422AD65EF9492D74BADF089A1E956D349CD4823DED9717A89B",
+    "originals": 84,
+    "native_originals": 50,
+    "body_rows_with_versioned_tools": 87,
+    "capsules": {
+      "en": {
+        "path": "projects/mir/runs/library-stage-labels8827-r03/en-original-bodies.json.gz",
+        "bytes": 29663822,
+        "sha256": "F57482B5EB25F4EC886FF6DEBEC54EAA2BDC6AEA892D7674518A9646004F6D05"
+      },
+      "de": {
+        "path": "projects/mir/runs/library-stage-labels8827-r03/de-original-bodies.json.gz",
+        "bytes": 29826661,
+        "sha256": "0F961CB6E07E203CC58D701FFECF168296F3EA6FEFB8639A92DA92AA9AAA63D6"
+      },
+      "common": {
+        "path": "projects/mir/runs/library-stage-labels8827-r03/common-original-bodies.json.gz",
+        "bytes": 1324391,
+        "sha256": "74C8AD3580114A55933868F6CFB43678508FE6C092BFD852C2AAE78176202CEE"
+      }
+    },
+    "root_fresh_remote_decoded_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-stage-labels8827-private-custody-r01\\ROOT-INDEPENDENT-READBACK-r01.json",
+      "bytes": 1674,
+      "sha256": "129AA89A4CC93089F367A40244A100E222713DAD969B3098B1C3560F5DD1A395"
+    },
+    "scope": "All84 input/output originals byte-compare to primary and retained copies exactly once; three additional producer-tool rows bind their two preserved exact versions.",
+    "retained_tooling_adverse": "First worker verifier used the later live producer tool at an earlier locale locator; its failed log and earlier producer snapshot remain. Root binds the preserved snapshots by hash; the84 originals have no exception."
+  },
+  "limits": [
+    "One Base-only Factorio2.0.77 viewport3200x1800/scale1.5 and default finite4/ordinarycontinuation4 labels.",
+    "A distinct lower finite cap2 is host-tested, not native-qualified by this case.",
+    "Actor named selected-force comparison only; no independent raw native-vector replay or all-force claim.",
+    "No genuine mouse/keyboard,13GUIexports, save/upgrade/client/multiplayer/lifecycle, other sizes/scales, F210/DLC, performance or stable acceptance.",
+    "Some inactive integration names use English fallback in German; ordinary long Other-options labels may ellipsize with full detail headings.",
+    "Published14/15/16 and previous private7A/156 packages remain fixed."
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "kind": "MIR515IndependentAnonymousPublicReadbackV1",
+  "status": "GO-scoped-GitHub-prerelease-public-delivery",
+  "reviewed_utc": "2026-11-15T16:43:51.7495500Z",
+  "release": {
+    "id": 446196178,
+    "author": "Julesc013",
+    "tag": "v5.0.15",
+    "title": "MIR 5.0.15",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false,
+    "published_at": "2026-11-15T16:36:11Z",
+    "target_commitish": "d64318546890f8dfc048ab60262436130dcec5e9",
+    "body_sha256": "0A5EC0D49E17AFE98DFBFCBBD8099AD656D386984BA47B98E179E6F56575ACA5",
+    "asset_count": 19,
+    "authorization_header": false,
+    "cookies": false
+  },
+  "tag": {
+    "ref_object": "9a1b8744231e3134f4aaa1e46495f5d05bd76c21",
+    "annotated": true,
+    "peeled_commit": "d64318546890f8dfc048ab60262436130dcec5e9",
+    "signature_verified": false,
+    "signature_reason": "unsigned",
+    "local_signing_authority": "Standing maintainer authorization for MIR5 canonical tags when enrolled key unavailable",
+    "credentials_changed": false
+  },
+  "latest_stable": {
+    "tag": "v4.7.3",
+    "id": 422732162
+  },
+  "anonymous_assets": [
+    {
+      "name": "more-infinite-research_5.0.00615.zip",
+      "label": "MIR 5.0.15 for Factorio 0.6.4 (zip)",
+      "asset_id": 751600599,
+      "bytes": 139477,
+      "sha256": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.00615.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.00715.zip",
+      "label": "MIR 5.0.15 for Factorio 0.7.5 (zip)",
+      "asset_id": 751600608,
+      "bytes": 139477,
+      "sha256": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.00715.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.00815.zip",
+      "label": "MIR 5.0.15 for Factorio 0.8.8 (zip)",
+      "asset_id": 751600613,
+      "bytes": 139475,
+      "sha256": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.00815.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.00915.zip",
+      "label": "MIR 5.0.15 for Factorio 0.9.8 (zip)",
+      "asset_id": 751600629,
+      "bytes": 139477,
+      "sha256": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.00915.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01015.zip",
+      "label": "MIR 5.0.15 for Factorio 0.10.12 (zip)",
+      "asset_id": 751600633,
+      "bytes": 139476,
+      "sha256": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01015.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01115.zip",
+      "label": "MIR 5.0.15 for Factorio 0.11.22 (zip)",
+      "asset_id": 751600632,
+      "bytes": 139477,
+      "sha256": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01115.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01215.zip",
+      "label": "MIR 5.0.15 for Factorio 0.12.35 (zip)",
+      "asset_id": 751600635,
+      "bytes": 139478,
+      "sha256": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01215.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01315.zip",
+      "label": "MIR 5.0.15 for Factorio 0.13.20 (zip)",
+      "asset_id": 751600396,
+      "bytes": 676637,
+      "sha256": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01315.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01415.zip",
+      "label": "MIR 5.0.15 for Factorio 0.14.23 (zip)",
+      "asset_id": 751600399,
+      "bytes": 676640,
+      "sha256": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01415.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01515.zip",
+      "label": "MIR 5.0.15 for Factorio 0.15.40 (zip)",
+      "asset_id": 751600407,
+      "bytes": 676637,
+      "sha256": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01515.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01615.zip",
+      "label": "MIR 5.0.15 for Factorio 0.16.51 (zip)",
+      "asset_id": 751600403,
+      "bytes": 676637,
+      "sha256": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01615.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01715.zip",
+      "label": "MIR 5.0.15 for Factorio 0.17.79 (zip)",
+      "asset_id": 751600402,
+      "bytes": 676639,
+      "sha256": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01715.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.01815.zip",
+      "label": "MIR 5.0.15 for Factorio 0.18.47 (zip)",
+      "asset_id": 751600513,
+      "bytes": 676640,
+      "sha256": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.01815.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.10015.zip",
+      "label": "MIR 5.0.15 for Factorio 1.0.0 (zip)",
+      "asset_id": 751600526,
+      "bytes": 676631,
+      "sha256": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.10015.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.11015.zip",
+      "label": "MIR 5.0.15 for Factorio 1.1.110 (zip)",
+      "asset_id": 751600527,
+      "bytes": 676941,
+      "sha256": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.11015.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.20015.zip",
+      "label": "MIR 5.0.15 for Factorio 2.0.77 (zip)",
+      "asset_id": 751600543,
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.20015.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "more-infinite-research_5.0.21015.zip",
+      "label": "MIR 5.0.15 for Factorio 2.1.23 (zip)",
+      "asset_id": 751600535,
+      "bytes": 1041986,
+      "sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/more-infinite-research_5.0.21015.zip",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "label": "SHA256 checksums (early editions)",
+      "asset_id": 751600669,
+      "bytes": 721,
+      "sha256": "4C8EF4AB7CC2A4147D52852BF1AE356D711FE66D4E622F4F2DA70643D8F5410E",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/SHA256SUMS-early.txt",
+      "authorization_header": false,
+      "cookies": false
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "label": "SHA256 checksums",
+      "asset_id": 751600666,
+      "bytes": 1030,
+      "sha256": "EF9EEEB8B3B35F0CD089988AFA88E37F4E1F37AFA545137E9FF8E1378904F9AE",
+      "download_url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.15/SHA256SUMS.txt",
+      "authorization_header": false,
+      "cookies": false
+    }
+  ],
+  "zip_metadata": [
+    {
+      "name": "more-infinite-research_5.0.00615.zip",
+      "root": "more-infinite-research_5.0.00615",
+      "version": "5.0.00615",
+      "factorio_version": "0.6",
+      "base_dependency": "base >= 0.6.4",
+      "bytes": 139477,
+      "sha256": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A"
+    },
+    {
+      "name": "more-infinite-research_5.0.11015.zip",
+      "root": "more-infinite-research_5.0.11015",
+      "version": "5.0.11015",
+      "factorio_version": "1.1",
+      "base_dependency": "base >= 1.1.110",
+      "bytes": 676941,
+      "sha256": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86"
+    },
+    {
+      "name": "more-infinite-research_5.0.10015.zip",
+      "root": "more-infinite-research_5.0.10015",
+      "version": "5.0.10015",
+      "factorio_version": "1.0",
+      "base_dependency": "base >= 1.0.0",
+      "bytes": 676631,
+      "sha256": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A"
+    },
+    {
+      "name": "more-infinite-research_5.0.01815.zip",
+      "root": "more-infinite-research_5.0.01815",
+      "version": "5.0.01815",
+      "factorio_version": "0.18",
+      "base_dependency": "base >= 0.18.47",
+      "bytes": 676640,
+      "sha256": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904"
+    },
+    {
+      "name": "more-infinite-research_5.0.01715.zip",
+      "root": "more-infinite-research_5.0.01715",
+      "version": "5.0.01715",
+      "factorio_version": "0.17",
+      "base_dependency": "base >= 0.17.79",
+      "bytes": 676639,
+      "sha256": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA"
+    },
+    {
+      "name": "more-infinite-research_5.0.01615.zip",
+      "root": "more-infinite-research_5.0.01615",
+      "version": "5.0.01615",
+      "factorio_version": "0.16",
+      "base_dependency": "base >= 0.16.51",
+      "bytes": 676637,
+      "sha256": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01515.zip",
+      "root": "more-infinite-research_5.0.01515",
+      "version": "5.0.01515",
+      "factorio_version": "0.15",
+      "base_dependency": "base >= 0.15.40",
+      "bytes": 676637,
+      "sha256": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A"
+    },
+    {
+      "name": "more-infinite-research_5.0.20015.zip",
+      "root": "more-infinite-research_5.0.20015",
+      "version": "5.0.20015",
+      "factorio_version": "2.0",
+      "base_dependency": "base >= 2.0.77",
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+    },
+    {
+      "name": "more-infinite-research_5.0.01415.zip",
+      "root": "more-infinite-research_5.0.01415",
+      "version": "5.0.01415",
+      "factorio_version": "0.14",
+      "base_dependency": "base >= 0.14.23",
+      "bytes": 676640,
+      "sha256": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB"
+    },
+    {
+      "name": "more-infinite-research_5.0.01215.zip",
+      "root": "more-infinite-research_5.0.01215",
+      "version": "5.0.01215",
+      "factorio_version": "0.12",
+      "base_dependency": "base >= 0.12.35",
+      "bytes": 139478,
+      "sha256": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77"
+    },
+    {
+      "name": "more-infinite-research_5.0.01115.zip",
+      "root": "more-infinite-research_5.0.01115",
+      "version": "5.0.01115",
+      "factorio_version": "0.11",
+      "base_dependency": "base >= 0.11.22",
+      "bytes": 139477,
+      "sha256": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67"
+    },
+    {
+      "name": "more-infinite-research_5.0.01015.zip",
+      "root": "more-infinite-research_5.0.01015",
+      "version": "5.0.01015",
+      "factorio_version": "0.10",
+      "base_dependency": "base >= 0.10.12",
+      "bytes": 139476,
+      "sha256": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D"
+    },
+    {
+      "name": "more-infinite-research_5.0.00915.zip",
+      "root": "more-infinite-research_5.0.00915",
+      "version": "5.0.00915",
+      "factorio_version": "0.9",
+      "base_dependency": "base >= 0.9.8",
+      "bytes": 139477,
+      "sha256": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6"
+    },
+    {
+      "name": "more-infinite-research_5.0.00815.zip",
+      "root": "more-infinite-research_5.0.00815",
+      "version": "5.0.00815",
+      "factorio_version": "0.8",
+      "base_dependency": "base >= 0.8.8",
+      "bytes": 139475,
+      "sha256": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A"
+    },
+    {
+      "name": "more-infinite-research_5.0.00715.zip",
+      "root": "more-infinite-research_5.0.00715",
+      "version": "5.0.00715",
+      "factorio_version": "0.7",
+      "base_dependency": "base >= 0.7.5",
+      "bytes": 139477,
+      "sha256": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0"
+    },
+    {
+      "name": "more-infinite-research_5.0.01315.zip",
+      "root": "more-infinite-research_5.0.01315",
+      "version": "5.0.01315",
+      "factorio_version": "0.13",
+      "base_dependency": "base >= 0.13.20",
+      "bytes": 676637,
+      "sha256": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5"
+    },
+    {
+      "name": "more-infinite-research_5.0.21015.zip",
+      "root": "more-infinite-research_5.0.21015",
+      "version": "5.0.21015",
+      "factorio_version": "2.1",
+      "base_dependency": "base >= 2.1.23",
+      "bytes": 1041986,
+      "sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207"
+    }
+  ],
+  "checksum_rows": {
+    "more-infinite-research_5.0.01315.zip": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5",
+    "more-infinite-research_5.0.01215.zip": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77",
+    "more-infinite-research_5.0.01415.zip": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB",
+    "more-infinite-research_5.0.10015.zip": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A",
+    "more-infinite-research_5.0.11015.zip": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86",
+    "more-infinite-research_5.0.00915.zip": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6",
+    "more-infinite-research_5.0.01715.zip": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA",
+    "more-infinite-research_5.0.01515.zip": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A",
+    "more-infinite-research_5.0.01815.zip": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904",
+    "more-infinite-research_5.0.00715.zip": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0",
+    "more-infinite-research_5.0.01115.zip": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67",
+    "more-infinite-research_5.0.00615.zip": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A",
+    "more-infinite-research_5.0.01015.zip": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D",
+    "more-infinite-research_5.0.20015.zip": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+    "more-infinite-research_5.0.21015.zip": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+    "more-infinite-research_5.0.01615.zip": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D",
+    "more-infinite-research_5.0.00815.zip": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A"
+  },
+  "primary_local_delivery": {
+    "directory": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15",
+    "file_count": 21,
+    "files": [
+      {
+        "name": "more-infinite-research_5.0.00615.zip",
+        "bytes": 139477,
+        "sha256": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.00615.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00715.zip",
+        "bytes": 139477,
+        "sha256": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.00715.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00815.zip",
+        "bytes": 139475,
+        "sha256": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.00815.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00915.zip",
+        "bytes": 139477,
+        "sha256": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.00915.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01015.zip",
+        "bytes": 139476,
+        "sha256": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01015.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01115.zip",
+        "bytes": 139477,
+        "sha256": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01115.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01215.zip",
+        "bytes": 139478,
+        "sha256": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01215.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01315.zip",
+        "bytes": 676637,
+        "sha256": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01315.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01415.zip",
+        "bytes": 676640,
+        "sha256": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01415.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01515.zip",
+        "bytes": 676637,
+        "sha256": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01515.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01615.zip",
+        "bytes": 676637,
+        "sha256": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01615.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01715.zip",
+        "bytes": 676639,
+        "sha256": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01715.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01815.zip",
+        "bytes": 676640,
+        "sha256": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.01815.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.10015.zip",
+        "bytes": 676631,
+        "sha256": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.10015.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.11015.zip",
+        "bytes": 676941,
+        "sha256": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.11015.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.20015.zip",
+        "bytes": 1041561,
+        "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.20015.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.21015.zip",
+        "bytes": 1041986,
+        "sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\more-infinite-research_5.0.21015.zip"
+      },
+      {
+        "name": "RELEASE_NOTES.md",
+        "bytes": 1007,
+        "sha256": "0A5EC0D49E17AFE98DFBFCBBD8099AD656D386984BA47B98E179E6F56575ACA5",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\RELEASE_NOTES.md"
+      },
+      {
+        "name": "SHA256SUMS-early.txt",
+        "bytes": 721,
+        "sha256": "4C8EF4AB7CC2A4147D52852BF1AE356D711FE66D4E622F4F2DA70643D8F5410E",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\SHA256SUMS-early.txt"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 1030,
+        "sha256": "EF9EEEB8B3B35F0CD089988AFA88E37F4E1F37AFA545137E9FF8E1378904F9AE",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\SHA256SUMS.txt"
+      },
+      {
+        "name": "UPLOAD.txt",
+        "bytes": 1125,
+        "sha256": "9B93BC0987567E751109F7E6F1E42B2AB09D861906BFE1E92ED2F4C3C164AE2D",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.15\\UPLOAD.txt"
+      }
+    ]
+  },
+  "frozen": {
+    "public_set_sha256": "0908ADDBAB118D5D8F07D385B4709632FD053C6FE6A515C1F49B60DD31112703",
+    "notes_sha256": "0A5EC0D49E17AFE98DFBFCBBD8099AD656D386984BA47B98E179E6F56575ACA5",
+    "upload_text_sha256": "9B93BC0987567E751109F7E6F1E42B2AB09D861906BFE1E92ED2F4C3C164AE2D",
+    "main": "d64318546890f8dfc048ab60262436130dcec5e9",
+    "tree": "f766575c934dddefbc7d2fa8d277c0ccb592e49f",
+    "player_source": "b3d7d083251f8473b77bdd7e9dd691646d460bac"
+  },
+  "limitations": [
+    "GitHub prerelease delivery only; not stable acceptance.",
+    "GUI Library/client/multiplayer, full reporter, physical-output and broader performance obligations remain open.",
+    "This review does not supersede separate prior-object preservation receipt or qualify a Mod Portal release."
+  ],
+  "stable_qualified": false,
+  "release_acceptance": false
+}

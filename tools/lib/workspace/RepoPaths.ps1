@@ -8,9 +8,10 @@ function Assert-MIRCheckoutHardLinkBoundary {
   # libraries are consumed directly; refusing a link must not trigger a copy.
   $checkout=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..')).TrimEnd('\','/')
   if(-not(Test-Path -LiteralPath (Join-Path $checkout '.git'))){throw '[mir-hardlink-checkout-missing]'}
+  $comparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   foreach($path in @($Source,$Destination)){
     $full=[IO.Path]::GetFullPath($path)
-    if(-not$full.StartsWith($checkout+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){
+    if(-not$full.StartsWith($checkout+[IO.Path]::DirectorySeparatorChar,$comparison)){
       throw "[mir-hardlink-outside-checkout] $full; use direct-library activation for external inputs."
     }
     # Also inspect existing ancestors of a not-yet-created destination. A

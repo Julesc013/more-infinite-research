@@ -19,6 +19,7 @@ local availability = require("presentation.availability")
 local target = require("platform.target")
 local translation_queue = require("runtime.library_translations")
 local library_production = require("runtime.library_production")
+local library_settings_detail = require("runtime.library_settings_detail")
 local support_exports
 if helpers and type(helpers.write_file) == "function" then
   support_exports = require("runtime.settings_commands")
@@ -64,6 +65,7 @@ local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 -- Closing a view drops that working cache and retains only issued native IDs.
 local translation_caches = {}
 local declaration_cache
+local stage_annotation_cache
 -- Credit carriers are genuine native technologies for migration/runtime
 -- accounting, but never Library research. The catalogue supplies this small
 -- exact identity map at control parse; it is not inferred from hidden flags
@@ -1106,6 +1108,58 @@ local function caption(row, player)
   return row.id or ""
 end
 
+-- Group complete authored declarations, not filtered live rows. A ready-only,
+-- completed-only or personal view must retain an individual finite or
+-- continuation label even when its declared sibling is not displayed.
+local function stage_annotations()
+  if stage_annotation_cache ~= nil then return stage_annotation_cache end
+  local families, groups, annotations = {}, {}, {}
+  for _, row in ipairs(authored_declarations()) do
+    if type(row) == "table" and type(row.family) == "string" and row.family ~= ""
+        and type(row.locale_key) == "string" and row.locale_key ~= ""
+        and whole_number(row.progression, 1) then
+      local locales = families[row.family]
+      if locales == nil then locales = {}; families[row.family] = locales end
+      local progressions = locales[row.locale_key]
+      if progressions == nil then progressions = {}; locales[row.locale_key] = progressions end
+      local group = progressions[row.progression]
+      if group == nil then
+        group = {}
+        progressions[row.progression] = group
+        groups[#groups + 1] = group
+      end
+      group[#group + 1] = row
+    end
+  end
+  for _, group in ipairs(groups) do
+    local bounded = false
+    for _, row in ipairs(group) do
+      if whole_number(row.fixed_maximum, 1) then bounded = true; break end
+    end
+    if bounded and #group > 1 then
+      for _, row in ipairs(group) do
+        annotations[row.id] = {fixed_maximum = row.fixed_maximum}
+      end
+    end
+  end
+  stage_annotation_cache = annotations
+  return stage_annotation_cache
+end
+
+local function list_caption(row, player, stage)
+  local text = caption(row, player)
+  if type(stage) ~= "table" then return text end
+  local cap = whole_number(row.cap, 1) and row.cap or nil
+  if whole_number(stage.fixed_maximum, 1) then
+    if cap and cap ~= stage.fixed_maximum then
+      return {"mir-browser.list-stage-finite-capped", text, stage.fixed_maximum, cap}
+    end
+    return {"mir-browser.list-stage-finite", text, stage.fixed_maximum}
+  end
+  if cap then return {"mir-browser.list-stage-capped", text, row.progression, cap} end
+  return {"mir-browser.list-stage-continuation", text, row.progression}
+end
+
 local function row_index(rows, selected)
   for index, row in ipairs(rows) do
     if row.id == selected then return index end
@@ -1555,9 +1609,10 @@ local function update_research_content(content, player, view, context, translati
   end
 
   local rows = rows_for(player, view, context, translations)
+  local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
-    local text = caption(row, player)
+    local text = list_caption(row, player, stages[row.id])
     item_labels[index] = known_technology(player, row.id)
       and {"", "[img=technology/" .. row.id .. "] ", text} or text
   end
@@ -1808,8 +1863,8 @@ end
 
 local function update_settings_content(content, view, preserve_query, translations, context)
   if not valid(content) then return end
-  local width = content.style and (content.style.maximal_width or content.style.width) or 592
-  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
+  local width = content.style and content.style.maximal_width or 592
+  local available_height = content.style and content.style.maximal_height or 220
   local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
   if not valid(content[PREFIX .. "settings_search_label"])
@@ -1918,54 +1973,12 @@ local function update_settings_content(content, view, preserve_query, translatio
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
   end
-  local function setting_label(spec, parent, width)
-    local label = add(parent or detail, spec)
-    if valid(label) and label.style then
-      label.style.single_line = false
-      label.style.maximal_width = math.max(1, width or panes.detail_width - 16)
-    end
-    return label
-  end
   local selected = visible[selected_index]
-  if selected == nil then
-    setting_label({type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
-    return
-  end
-  local title = setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
-  title.style.font = "default-large-bold"
-  setting_label({type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
-  if selected.externally_supplied then
-    setting_label({type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
-  end
-  library_section(detail, "settings_effective", "mir-browser.effective-values", panes.detail_width)
-  local fields = add(detail, {type = "table", name = PREFIX .. "settings_fields", column_count = 2})
-  fields.style.width = math.max(1, panes.detail_width - 16)
-  fields.style.horizontal_spacing, fields.style.vertical_spacing = 12, 10
-  local field_width = math.max(1, style_pixels((panes.detail_width - 40) * .55))
-  local value_width = math.max(1, panes.detail_width - 40 - field_width)
-  local source = "default"
-  for index, field in ipairs(selected.fields) do
-    local name = PREFIX .. "setting_" .. index
-    local label = setting_label({type = "label", name = name .. "_name", caption = field.caption,
-      tooltip = field.description}, fields, field_width)
-    label.style.font = "default-semibold"
-    local display = setting_display(field.name, field.effective)
-    if field.default ~= nil and field.effective ~= field.default then
-      display = {"mir-browser.setting-with-default", display, setting_display(field.name, field.default)}
-    end
-    setting_label({type = "label", name = name .. "_value", caption = display,
-      tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}}, fields, value_width)
-    if field.source == "mirset1" then
-      source = "mirset1"
-      setting_label({type = "label", name = name .. "_profile_marker", caption = {"mir-browser.profile-override"}}, fields, field_width)
-      setting_label({type = "label", name = name .. "_source", caption = {"mir-browser.source-mirset1"}}, fields, value_width)
-    elseif source ~= "mirset1" and field.source == "direct" then
-      source = "direct"
-    end
-  end
-  library_section(detail, "settings_source", "mir-browser.configuration-source", panes.detail_width)
-  setting_label({type = "label", name = PREFIX .. "settings_source_summary", caption = {"mir-browser.source-" .. source}})
+  library_settings_detail.render({
+    parent = detail, selected = selected, detail_width = panes.detail_width,
+    prefix = PREFIX, add = add, valid = valid, display = setting_display,
+    section = library_section, pixels = style_pixels,
+  })
 end
 
 local function queue_name(entry)
@@ -3207,6 +3220,7 @@ end
 function M.on_configuration_changed()
   reconnect_translation_caches()
   declaration_cache = nil
+  stage_annotation_cache = nil
   setting_groups_cache = nil
   setting_prototype_cache = nil
   local legacy = legacy_browser_state()

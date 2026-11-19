@@ -1,0 +1,838 @@
+{
+  "kind": "MIR515IndependentAffectedNativeVerdictV1",
+  "review_recorded_by": "execution lead from nonauthor read-only current artifact/result/package review",
+  "reviewer": "/root/review_515_prerequisites",
+  "recorded_at": "2026-11-15T15:15:27.134623+00:00",
+  "verdict": "GO-affected-native-and-package-scope-only",
+  "freeze_commit": "3aa4e2c67811665c7600d8dbacb29e0b06404a82",
+  "player_source": "b3d7d083251f8473b77bdd7e9dd691646d460bac",
+  "inventory": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir515-repair-freeze-r02\\MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 217847,
+    "sha256": "8784399E1CE2511C9387596C5FF98F0759F01783B324E2352DCA78A0B2FD9855"
+  },
+  "packages": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01315.zip",
+      "bytes": 676637,
+      "sha256": "0F2A506D5FE18B855F9FDE91135F96D4427FDD2906050A544C5A311EAAFD8DF5"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01415.zip",
+      "bytes": 676640,
+      "sha256": "6EC85628015035838430F544F9831E429EE2E218232D13F4384E16A708171CFB"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01515.zip",
+      "bytes": 676637,
+      "sha256": "B52E807BB95A9AD60CDB3FA5C2C05879DACE5F46C94F29CFBAE094514761348A"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01615.zip",
+      "bytes": 676637,
+      "sha256": "2D59ECD5894F8B7DE1EB0ED6354DA99340C3D46A256191D33D7AE68976259E5D"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01715.zip",
+      "bytes": 676639,
+      "sha256": "52B380CDE0DB393F1C30338E1EA5C78E0A26DB54890E6834FCCED6D308D59FDA"
+    },
+    {
+      "target": "f018",
+      "name": "more-infinite-research_5.0.01815.zip",
+      "bytes": 676640,
+      "sha256": "FF26F44479B778BD758A03559C1E9A9FD60956092D66935B4E43F00EDA6B7904"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10015.zip",
+      "bytes": 676631,
+      "sha256": "B65159B34629FACE65CFE1749F68AF82D820455A65EC0F7D529B9A78E56D684A"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11015.zip",
+      "bytes": 676941,
+      "sha256": "B8855B6DA6152BD10B3C3FCD7BDF9137E8E6B06C3A9347FE080FEDA18DCE3E86"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20015.zip",
+      "bytes": 1041561,
+      "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21015.zip",
+      "bytes": 1041986,
+      "sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207"
+    },
+    {
+      "target": "f006",
+      "name": "more-infinite-research_5.0.00615.zip",
+      "bytes": 139477,
+      "sha256": "EC6570A819AE7C341892DBE9546B1864717416AD23632071F81DFB7B18D7ED1A"
+    },
+    {
+      "target": "f007",
+      "name": "more-infinite-research_5.0.00715.zip",
+      "bytes": 139477,
+      "sha256": "2892254117D1C221CEFF53FB943774E419A4422059008DB9696D3F73BB5802D0"
+    },
+    {
+      "target": "f008",
+      "name": "more-infinite-research_5.0.00815.zip",
+      "bytes": 139475,
+      "sha256": "DA515FA87E9F50CCB2779F8527E7E03CDA78FC72A5BF569BA8CE21452EA14D9A"
+    },
+    {
+      "target": "f009",
+      "name": "more-infinite-research_5.0.00915.zip",
+      "bytes": 139477,
+      "sha256": "EE2A798FB13B4B5FD019B2A52EB37DE9B1C1A45803180A2A4EB6E919EB5876E6"
+    },
+    {
+      "target": "f010",
+      "name": "more-infinite-research_5.0.01015.zip",
+      "bytes": 139476,
+      "sha256": "094EC27151BAD6D93F28208C17EEBE91825D841956EEAF1EEB2413B1F911346D"
+    },
+    {
+      "target": "f011",
+      "name": "more-infinite-research_5.0.01115.zip",
+      "bytes": 139477,
+      "sha256": "52126D70F5186C05B45F8D0DD2DF75849DD620E51A0BBA4731F0BDBC959C1C67"
+    },
+    {
+      "target": "f012",
+      "name": "more-infinite-research_5.0.01215.zip",
+      "bytes": 139478,
+      "sha256": "C57661896BE0E329FECFCF9337B2FC100652491EB9C6E186E3D128EA40B7CA77"
+    }
+  ],
+  "prepared_default": [
+    {
+      "case": "f200-resume-r03",
+      "engine": "2.0.77",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\terminal.json",
+        "bytes": 26996,
+        "sha256": "342AC1559EF9A51A34939F2BFDFCA34BCBC720DEDD0B2F7A18D8724FDB78630B"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\packet.json",
+        "bytes": 13546,
+        "sha256": "C1EBD646575AEEF5A2D61FD9E45297930105132B6267F608767338AD1C0DA1C5"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\composition.json",
+        "bytes": 16696,
+        "sha256": "B6CADC609C52A6683761F122F1FF6C729F4C721ED2E7A7A8DA81396716E19EFB"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\Invoke-Prepared-r03.ps1",
+        "bytes": 16480,
+        "sha256": "968585644AC22515FC8279DDDA01317DBABD2C2CA46E5E707C9C2BD1808AF266"
+      },
+      "actor_commit": "5936ff0120436eb7fcea7efbfdcd1543b28817f2",
+      "actor_archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\mir-worker-storage-default-native_0.1.0.zip",
+        "bytes": 18633,
+        "sha256": "2E338167D820FC4714152C3D713C4DBE8EAB656982A926773A010A3EB68462C4"
+      },
+      "protected_prepared": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\protected\\prepared.zip",
+        "bytes": 174515,
+        "sha256": "188DD95FD66DC3C2862A97E7DB0823BB8C196FBDAE09586E2EFA5525052F4013"
+      },
+      "original_preparation_terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\terminal.json",
+        "bytes": 30953,
+        "sha256": "38EC0B7419C929D34A685342436CFEF6671AC9325093C8DDC2E53299A41C2025"
+      },
+      "original_preparation_packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\packet.json",
+        "bytes": 14583,
+        "sha256": "D82EA5A49B3E8D44E3DB16ECCF390E1910423AE4F19C66270E54A5D93B3C1BCD"
+      },
+      "protected_successor": {
+        "sha256": "D642E785E7E9A8FA5EFDFEAA9EC6035A2297EA36C3E79A21F5AB5311188DF42F",
+        "bytes": 176302,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\protected\\successor.zip"
+      },
+      "cold_inputs": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f200-resume-r03-native\\cold1\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 176302,
+          "sha256": "D642E785E7E9A8FA5EFDFEAA9EC6035A2297EA36C3E79A21F5AB5311188DF42F"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f200-resume-r03-native\\cold2\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 176302,
+          "sha256": "D642E785E7E9A8FA5EFDFEAA9EC6035A2297EA36C3E79A21F5AB5311188DF42F"
+        }
+      ],
+      "observations": [
+        {
+          "sha256": "0BFC41433D474E26A2EADDF64EDC97D3D3EFAB22F3FA19038274CB19E9675161",
+          "bytes": 22073,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\custody-execute\\successor.json"
+        },
+        {
+          "sha256": "6226476118F0BE341748AF97A15BB6B3A7AB9A417DD2B3C739E2D41459CCA3D2",
+          "bytes": 22062,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\custody-execute\\cold1.json"
+        },
+        {
+          "sha256": "6226476118F0BE341748AF97A15BB6B3A7AB9A417DD2B3C739E2D41459CCA3D2",
+          "bytes": 22062,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200-resume-r03\\custody-execute\\cold2.json"
+        }
+      ],
+      "owned_pids": [
+        92364,
+        97728,
+        97520
+      ],
+      "ordinary_completions": [
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "player",
+          "tick": 2124,
+          "by_script": false
+        },
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "mir-worker-default-unpaid",
+          "tick": 2551,
+          "by_script": false
+        }
+      ],
+      "science_inventory_item_depletion": {
+        "player": {
+          "automation-science-pack": 1982,
+          "logistic-science-pack": 1982,
+          "chemical-science-pack": 1982,
+          "production-science-pack": 1982,
+          "utility-science-pack": 1982
+        },
+        "mir-worker-default-unpaid": {
+          "automation-science-pack": 426,
+          "logistic-science-pack": 426,
+          "chemical-science-pack": 426,
+          "production-science-pack": 426,
+          "utility-science-pack": 426
+        }
+      },
+      "force_bonuses": {
+        "player": 8,
+        "mir-worker-default-queued": 6,
+        "mir-worker-default-detached": 5,
+        "mir-worker-default-unpaid": 4
+      },
+      "restored": true
+    },
+    {
+      "case": "f210-resume-r03",
+      "engine": "2.1.23",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\terminal.json",
+        "bytes": 27821,
+        "sha256": "F9542358BEEB5F26531A0DF8C77717E4D24F315C65622EBC25056B0546BD5BF8"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\packet.json",
+        "bytes": 13600,
+        "sha256": "5B2944E2B1CF9975D41236D021D3781E00914DBBA810B088C68B4F41C55AC544"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\composition.json",
+        "bytes": 17518,
+        "sha256": "728EA98614A67CA377CE13CB66941D618441DA2A68C6029FC9FCA0A510B9CB40"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\Invoke-Prepared-r03.ps1",
+        "bytes": 16480,
+        "sha256": "968585644AC22515FC8279DDDA01317DBABD2C2CA46E5E707C9C2BD1808AF266"
+      },
+      "actor_commit": "5936ff0120436eb7fcea7efbfdcd1543b28817f2",
+      "actor_archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\mir-worker-storage-default-native_0.1.0.zip",
+        "bytes": 18637,
+        "sha256": "4DF2E9DD56C8D440A73C7DDE08E70A7B84B8E3B019123D09C2B5BA078FEEA010"
+      },
+      "protected_prepared": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\protected\\prepared.zip",
+        "bytes": 180887,
+        "sha256": "21F496E558BE29210F7F91A51D72C9BF452DD489230D2E046878118AF93F841F"
+      },
+      "original_preparation_terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\terminal.json",
+        "bytes": 59050,
+        "sha256": "8981764B6282F3F27DB8052A9FAFB6DD7F9946DB2ABE2C80CEFD2514C281F1A9"
+      },
+      "original_preparation_packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\packet.json",
+        "bytes": 13996,
+        "sha256": "6A4B34EFCD66FCE068D84FCD926B4F6732583DE098922A86AA5DC206EBBA492C"
+      },
+      "protected_successor": {
+        "sha256": "83B917D0F4C597EAC87A9F9A367F95E62A694A040CF8EAA72A2E3A27DF78DB4A",
+        "bytes": 183240,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\protected\\successor.zip"
+      },
+      "cold_inputs": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f210-resume-r03-native\\cold1\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 183240,
+          "sha256": "83B917D0F4C597EAC87A9F9A367F95E62A694A040CF8EAA72A2E3A27DF78DB4A"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f210-resume-r03-native\\cold2\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 183240,
+          "sha256": "83B917D0F4C597EAC87A9F9A367F95E62A694A040CF8EAA72A2E3A27DF78DB4A"
+        }
+      ],
+      "observations": [
+        {
+          "sha256": "90FD7BC45F09BE6DA8894A56776F389D7D7ECE4C059E19591012B814A0A9C8AF",
+          "bytes": 22049,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\custody-execute\\successor.json"
+        },
+        {
+          "sha256": "95914AC19D9901FC30096640EABBA7F23381E3817EEB95F26A54DAF9B50F7194",
+          "bytes": 22038,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\custody-execute\\cold1.json"
+        },
+        {
+          "sha256": "95914AC19D9901FC30096640EABBA7F23381E3817EEB95F26A54DAF9B50F7194",
+          "bytes": 22038,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-resume-r03\\custody-execute\\cold2.json"
+        }
+      ],
+      "owned_pids": [
+        92664,
+        97348,
+        81456
+      ],
+      "ordinary_completions": [
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "player",
+          "tick": 2058,
+          "by_script": false
+        },
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "mir-worker-default-unpaid",
+          "tick": 2485,
+          "by_script": false
+        }
+      ],
+      "science_inventory_item_depletion": {
+        "player": {
+          "automation-science-pack": 1982,
+          "logistic-science-pack": 1982,
+          "chemical-science-pack": 1982,
+          "production-science-pack": 1982,
+          "utility-science-pack": 1982
+        },
+        "mir-worker-default-unpaid": {
+          "automation-science-pack": 426,
+          "logistic-science-pack": 426,
+          "chemical-science-pack": 426,
+          "production-science-pack": 426,
+          "utility-science-pack": 426
+        }
+      },
+      "force_bonuses": {
+        "player": 8,
+        "mir-worker-default-queued": 6,
+        "mir-worker-default-detached": 5,
+        "mir-worker-default-unpaid": 4
+      },
+      "restored": true
+    },
+    {
+      "case": "f210-patch24-r03",
+      "engine": "2.1.24",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\terminal.json",
+        "bytes": 27968,
+        "sha256": "F80EF56AD8F8DAF3E67BFA8D62284373B4AB7C6BE6F98629A8F9FEFCDD53AAE3"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\packet.json",
+        "bytes": 13696,
+        "sha256": "0662DBC3B9CC170688021D41A3D10017C2C204BCEA24B86385CEB4F8A7BC2CD6"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\composition.json",
+        "bytes": 17646,
+        "sha256": "EC44166DC886504FE7C0D97AD45709A1E73992688F4E8D4E9048AB7E353ED168"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\Invoke-Prepared-r03.ps1",
+        "bytes": 16480,
+        "sha256": "968585644AC22515FC8279DDDA01317DBABD2C2CA46E5E707C9C2BD1808AF266"
+      },
+      "actor_commit": "5936ff0120436eb7fcea7efbfdcd1543b28817f2",
+      "actor_archive": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\mir-worker-storage-default-native_0.1.0.zip",
+        "bytes": 18637,
+        "sha256": "4DF2E9DD56C8D440A73C7DDE08E70A7B84B8E3B019123D09C2B5BA078FEEA010"
+      },
+      "protected_prepared": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\protected\\prepared.zip",
+        "bytes": 180887,
+        "sha256": "21F496E558BE29210F7F91A51D72C9BF452DD489230D2E046878118AF93F841F"
+      },
+      "original_preparation_terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\terminal.json",
+        "bytes": 59050,
+        "sha256": "8981764B6282F3F27DB8052A9FAFB6DD7F9946DB2ABE2C80CEFD2514C281F1A9"
+      },
+      "original_preparation_packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-full-r02\\packet.json",
+        "bytes": 13996,
+        "sha256": "6A4B34EFCD66FCE068D84FCD926B4F6732583DE098922A86AA5DC206EBBA492C"
+      },
+      "protected_successor": {
+        "sha256": "FAF9EFC7C284808797BD8C5B3A709C15AFD3F2BE93B28A184B7BB0F753A972F2",
+        "bytes": 183247,
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\protected\\successor.zip"
+      },
+      "cold_inputs": [
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f210-patch24-r03-native\\cold1\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 183247,
+          "sha256": "FAF9EFC7C284808797BD8C5B3A709C15AFD3F2BE93B28A184B7BB0F753A972F2"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-prepared-f210-patch24-r03-native\\cold2\\write\\saves\\input.zip",
+          "exists": true,
+          "bytes": 183247,
+          "sha256": "FAF9EFC7C284808797BD8C5B3A709C15AFD3F2BE93B28A184B7BB0F753A972F2"
+        }
+      ],
+      "observations": [
+        {
+          "sha256": "147BCD68E0803A706FFDF70579FCA73C983FC22676E1D637B1F6C16DDBC5EFE6",
+          "bytes": 22049,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\custody-execute\\successor.json"
+        },
+        {
+          "sha256": "42452E76B97D61F00047C9C9AED9A99D54C0C445658777C79ECDF7AB8D948581",
+          "bytes": 22038,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\custody-execute\\cold1.json"
+        },
+        {
+          "sha256": "42452E76B97D61F00047C9C9AED9A99D54C0C445658777C79ECDF7AB8D948581",
+          "bytes": 22038,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f210-patch24-r03\\custody-execute\\cold2.json"
+        }
+      ],
+      "owned_pids": [
+        90400,
+        86624,
+        90800
+      ],
+      "ordinary_completions": [
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "player",
+          "tick": 2058,
+          "by_script": false
+        },
+        {
+          "name": "mir-worker-storage-default-4",
+          "force": "mir-worker-default-unpaid",
+          "tick": 2485,
+          "by_script": false
+        }
+      ],
+      "science_inventory_item_depletion": {
+        "player": {
+          "automation-science-pack": 1982,
+          "logistic-science-pack": 1982,
+          "chemical-science-pack": 1982,
+          "production-science-pack": 1982,
+          "utility-science-pack": 1982
+        },
+        "mir-worker-default-unpaid": {
+          "automation-science-pack": 426,
+          "logistic-science-pack": 426,
+          "chemical-science-pack": 426,
+          "production-science-pack": 426,
+          "utility-science-pack": 426
+        }
+      },
+      "force_bonuses": {
+        "player": 8,
+        "mir-worker-default-queued": 6,
+        "mir-worker-default-detached": 5,
+        "mir-worker-default-unpaid": 4
+      },
+      "restored": true
+    }
+  ],
+  "older_published_base_patch": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\terminal.json",
+      "bytes": 27915,
+      "sha256": "F0D5EC08C8E3250FAFED46CA1041D10D737510E223C0476501EA6B190E3D0457"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\packet.json",
+      "bytes": 19956,
+      "sha256": "E506400BC422C6881D4EC3E19F41A6E47A2ED7C867DA73F0D614FAA08320FF82"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\composition.json",
+      "bytes": 13513,
+      "sha256": "EB9655F14848BA18554DCC3443DF25E3413257A6D25876BCAD4C29CB0AA12FBA"
+    },
+    "controller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\Invoke-Positive.ps1",
+      "bytes": 28601,
+      "sha256": "E1645E4560ECB0961A47B6F39E24F91973A5E31B1CB13A75109F166BE4EB8843"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1.24\\Factorio_2.1.24\\bin\\x64\\factorio.exe",
+      "bytes": 49415632,
+      "sha256": "421DA29B40CE3EDD35C5C9516B46469F426218063464BFAC8FA49AA3C9CD39C0"
+    },
+    "source": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker473-f210-earned-pending-positive13-r01/source-old-earned-pending473.zip",
+      "bytes": 673305,
+      "sha256": "33304EADB46949673086A417F7E4260FA455E2EA98DFFDEFCB11EFEE2A058876"
+    },
+    "source_original": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker473-f210-earned-pending-source-r01/protected-results/old-earned-pending473.zip",
+      "bytes": 673305,
+      "sha256": "33304EADB46949673086A417F7E4260FA455E2EA98DFFDEFCB11EFEE2A058876"
+    },
+    "source_adoption": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker473-f210-earned-pending-source-r01/ROOT-ADOPTED-EARNED-PENDING-SOURCE.json",
+      "bytes": 1546,
+      "sha256": "AD9A118A35ACA78C07436D739E3B881EE108BD863238CDB23CD5AB6AEFC48F7F"
+    },
+    "protected_first": {
+      "crc": {
+        "entries": 55,
+        "crc_passed": true
+      },
+      "bytes": 674148,
+      "sha256": "D59C3F6A9F6FDB7E2C1CC1B750B8C604BF8901359D5A2DF581E34806387D9ACF",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\protected-results\\first-candidate473.zip"
+    },
+    "protected_final": {
+      "crc": {
+        "entries": 55,
+        "crc_passed": true
+      },
+      "bytes": 679327,
+      "sha256": "C099ACA441CDF76CEAC6F85FB4E428E1DBF9BDAF8B041A7885D5341179CFAE55",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r02\\protected-results\\config-candidate473.zip"
+    },
+    "observations": [
+      {
+        "phase": "first",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-473-patch24-r02-native\\first-observed.json",
+        "sha256": "2546BE8C52C50048472CCB66BA7517BEBD641C3C15189EBEECEBD172FF6BA578"
+      },
+      {
+        "phase": "config",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-473-patch24-r02-native\\config-observed.json",
+        "sha256": "D6A8C7334E4007BDD162A71EA1A6A13B2EAAEF0B4C0FF1BE16CC1EBD176CD0F4"
+      },
+      {
+        "phase": "cold1",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-473-patch24-r02-native\\cold1-observed.json",
+        "sha256": "9D2F2424F773CE4AE69AC18CC4A70DCF53753B9E3CC3FF140B9925F7BF048740"
+      },
+      {
+        "phase": "cold2",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\mir515-473-patch24-r02-native\\cold2-observed.json",
+        "sha256": "502FADA97315E271425B28EA3B380A261DEE0FC0668751CF4CCF67AF254C37B4"
+      }
+    ],
+    "owned_pids": [
+      94528,
+      86948,
+      96480,
+      97732
+    ],
+    "ordinary_completions": 1,
+    "scope": "Actual adopted published4.7.21003/Base2.1.23 to current15/Base2.1.24; original current/queued/partial and lab state, one new ordinary default6-to7 on existing lab13, save/two cold reads",
+    "restored": true
+  },
+  "productivity_vectors": [
+    {
+      "family": "f200",
+      "engine": "2.0.77",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\execution-Execute-r01\\terminal.json",
+        "bytes": 2934911,
+        "sha256": "0D3F7B9EDEBF9235E69BBCBF6FC074A83FFC45B6F2BE78189D5CA1E769B55DE4"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\packet.json",
+        "bytes": 31084,
+        "sha256": "0C7D56A3B571B8F8E2321CB67EA7F4A831A817EFA28E21581DD52D2111F3E1D4"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\composition.json",
+        "bytes": 70090,
+        "sha256": "B9F3CC6E5079AADE88BB31953E814E83C1AF222C0B7B915B90EE73076E8D8E1B"
+      },
+      "actor_sha256": "4FC83F7FDD498045BD3F5589838FAD9624962A6F79C0558F8F1297B5B9818673",
+      "fixture_commit": "0f7a82bbf3dd3d04058859fc98158be928996c25",
+      "owned_pids": [
+        89524,
+        79740,
+        78392,
+        91588,
+        66464,
+        96556,
+        97700,
+        94780
+      ],
+      "protected_saves": [
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\protected\\f0.zip",
+          "exists": true,
+          "bytes": 870608,
+          "sha256": "5FEB008A2FC983C1C492A0AEC66DAD505FC0A7A8BBDFA4FAD9173FFE1879193E"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\protected\\f1-negative.zip",
+          "exists": true,
+          "bytes": 875623,
+          "sha256": "9F9A5B5AD74DB400A048D31440453BF0D9A8607E7915081954C801181F2FD56E"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\protected\\f1-resume.zip",
+          "exists": true,
+          "bytes": 876007,
+          "sha256": "A605C785924E1CC9587DA4C291154C8A3CCB8ED0DDBA105D3BCCC39181E7D9F1"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f200-r03\\protected\\f2.zip",
+          "exists": true,
+          "bytes": 874815,
+          "sha256": "20AD17020349AB280F6CDADB05DE07D95AE31BE6DC89E38507DDA7AC45AC737C"
+        }
+      ],
+      "phases": [
+        {
+          "id": "f0",
+          "processes": 1,
+          "public_continuations": 0,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f200-f0-r01-native\\write-data\\saves\\native-vector-f0.zip",
+            "exists": true,
+            "bytes": 870608,
+            "sha256": "5FEB008A2FC983C1C492A0AEC66DAD505FC0A7A8BBDFA4FAD9173FFE1879193E"
+          }
+        },
+        {
+          "id": "f1-negative",
+          "processes": 3,
+          "public_continuations": 0,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f200-f1-negative-r01-native\\write-data\\saves\\native-vector-f1-negative.zip",
+            "exists": true,
+            "bytes": 875623,
+            "sha256": "9F9A5B5AD74DB400A048D31440453BF0D9A8607E7915081954C801181F2FD56E"
+          }
+        },
+        {
+          "id": "f1-resume",
+          "processes": 1,
+          "public_continuations": 1,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f200-f1-resume-r01-native\\write-data\\saves\\native-vector-f1-pending.zip",
+            "exists": true,
+            "bytes": 876007,
+            "sha256": "A605C785924E1CC9587DA4C291154C8A3CCB8ED0DDBA105D3BCCC39181E7D9F1"
+          }
+        },
+        {
+          "id": "f2",
+          "processes": 3,
+          "public_continuations": 1,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f200-f2-r01-native\\write-data\\saves\\native-vector-final.zip",
+            "exists": true,
+            "bytes": 874815,
+            "sha256": "20AD17020349AB280F6CDADB05DE07D95AE31BE6DC89E38507DDA7AC45AC737C"
+          }
+        }
+      ],
+      "scope": "Five explicit synthetic productivity families/11 routes, complete public-reference supersets and public-only negative, bounded upstream excerpt; ordinary lab/save/cold continuity, not a full reporter mod selection or physical production verdict",
+      "restored": true
+    },
+    {
+      "family": "f210",
+      "engine": "2.1.23",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\execution-Execute-r01\\terminal.json",
+        "bytes": 3125434,
+        "sha256": "0F55B5FD3A605E00FA74B9046844E52BC1753C730F32A7B9150445F0889CE4CB"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\packet.json",
+        "bytes": 31151,
+        "sha256": "E264873DB3BB0C3B667C0AB25690D91FA7BA0622309D807EB3A34EE67B10523D"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\composition.json",
+        "bytes": 78014,
+        "sha256": "02D9355204D3F555FD64C62E8A92173CD1F3F7C84AD9EC204C440D419E57ACC1"
+      },
+      "actor_sha256": "4FC83F7FDD498045BD3F5589838FAD9624962A6F79C0558F8F1297B5B9818673",
+      "fixture_commit": "0f7a82bbf3dd3d04058859fc98158be928996c25",
+      "owned_pids": [
+        84916,
+        78996,
+        94880,
+        90668,
+        96732,
+        93968,
+        95072,
+        92892
+      ],
+      "protected_saves": [
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\protected\\f0.zip",
+          "exists": true,
+          "bytes": 825705,
+          "sha256": "5D7282D31CD44567B70DCFDF90637732BA53E5C0EF6153286FEB65FB8E3F9E13"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\protected\\f1-negative.zip",
+          "exists": true,
+          "bytes": 830769,
+          "sha256": "9B4FBD38B4F319B33C80735CBB25900BDA53845E7C483DED110F6298B1AD4280"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\protected\\f1-resume.zip",
+          "exists": true,
+          "bytes": 831298,
+          "sha256": "617D289332BA6E999A61C2B3E721E119AD9BF9E35E663EF268BCA208D978EF28"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-native-vector-r01\\f210-r03\\protected\\f2.zip",
+          "exists": true,
+          "bytes": 829959,
+          "sha256": "81FDA7070324D27C7EB20ACA5684148593CB5A1E1E1680331956B5B07EF23F10"
+        }
+      ],
+      "phases": [
+        {
+          "id": "f0",
+          "processes": 1,
+          "public_continuations": 0,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f210-f0-r01-native\\write-data\\saves\\native-vector-f0.zip",
+            "exists": true,
+            "bytes": 825705,
+            "sha256": "5D7282D31CD44567B70DCFDF90637732BA53E5C0EF6153286FEB65FB8E3F9E13"
+          }
+        },
+        {
+          "id": "f1-negative",
+          "processes": 3,
+          "public_continuations": 0,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f210-f1-negative-r01-native\\write-data\\saves\\native-vector-f1-negative.zip",
+            "exists": true,
+            "bytes": 830769,
+            "sha256": "9B4FBD38B4F319B33C80735CBB25900BDA53845E7C483DED110F6298B1AD4280"
+          }
+        },
+        {
+          "id": "f1-resume",
+          "processes": 1,
+          "public_continuations": 1,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f210-f1-resume-r01-native\\write-data\\saves\\native-vector-f1-pending.zip",
+            "exists": true,
+            "bytes": 831298,
+            "sha256": "617D289332BA6E999A61C2B3E721E119AD9BF9E35E663EF268BCA208D978EF28"
+          }
+        },
+        {
+          "id": "f2",
+          "processes": 3,
+          "public_continuations": 1,
+          "closed_save": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir515-final-blackglass-r02\\build\\tmp\\native-vector-f210-f2-r01-native\\write-data\\saves\\native-vector-final.zip",
+            "exists": true,
+            "bytes": 829959,
+            "sha256": "81FDA7070324D27C7EB20ACA5684148593CB5A1E1E1680331956B5B07EF23F10"
+          }
+        }
+      ],
+      "scope": "Five explicit synthetic productivity families/11 routes, complete public-reference supersets and public-only negative, bounded upstream excerpt; ordinary lab/save/cold continuity, not a full reporter mod selection or physical production verdict",
+      "restored": true
+    }
+  ],
+  "accepted_current_native_processes": 29,
+  "remaining_factorio_processes": 0,
+  "private_original_custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir515-final-raw-blackglass-r01",
+    "commit": "fa4fc730fb63023fc25bd09425c190016e6fecd0",
+    "path": "projects/mir/runs/mir515-final-raw-custody-r01/original-bodies.json.gz",
+    "git_blob": "7dec1cf340c03e43d510154ddf201c5a354987e1",
+    "packed_sha256": "7C3F121BC0C604C54C9AB2AC9EF29F85E840425EC707942CA5FA457EF64DA1A5",
+    "original_files": 1609,
+    "original_bytes": 126632407,
+    "unique_bodies": 620,
+    "remote_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-final-raw-custody-r01\\remote-readback.json",
+      "bytes": 872,
+      "sha256": "D06EF4736D52F3E1433FE984F603BAC1100551EBCB3C95A45C3B18CAF8D7EF30"
+    }
+  },
+  "retained_adverses": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\terminal.json",
+      "reason": "Earlier fe15 actor incorrectly expected zero head-debit science; candidate attempt stopped before gameplay. Original actual published11 protected preparation reused; wrong mock/actor fixed against authored one-pack contract.",
+      "count_erratum": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\NATIVE-COUNT-ERRATUM-R01.json",
+        "bytes": 1960,
+        "sha256": "900DD5E462F414EB52000C151EB3051C86028D55106E7AF57563E7EF0E7D7237"
+      }
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-473-patch24-r01\\terminal.json",
+      "reason": "Earlier fe15 native paid-mask admission refused exact old4.7.21003/Base23 to Base24. PR1970 correction and current-package positive retain this original failure."
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-prepared-native-r01\\f200\\compose-readonly-interrupted-r01.json",
+      "reason": "Initial zero-native Compose interrupted before activation while unnecessarily hashing unselected archives; corrected controller preserves only its owned destinations."
+    }
+  ],
+  "limits": [
+    "Earlier fe15 native results remain exact earlier candidate observations, not current package qualifications.",
+    "Scripted historical earned levels/partials/prerequisites are labelled setup, not ordinary completions. Lab deltas are inventory item depletion, not an independent physical-cargo or product-output measurement.",
+    "No full Cerys/Ryutavi/factomacto selection, personal absent-history reconstruction, Gamer433 SE0.7.57 cap10/ore-miner output, Driku original pre-reset save, or changed K2SE productivity exclusion verdict.",
+    "No new GUI13-click, personal/client/multiplayer, full historical-edition or coherent whole-product performance/stable qualification. Existing13/14 results retain their exact identities and applicable scopes."
+  ],
+  "intended_maturity": "GitHub prerelease",
+  "release_acceptance": false,
+  "stable_qualified": false
+}

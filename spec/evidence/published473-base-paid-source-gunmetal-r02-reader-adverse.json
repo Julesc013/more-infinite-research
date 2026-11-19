@@ -1,0 +1,282 @@
+{
+  "kind": "MIRPublished473BasePaidSourceReaderAdverseV1",
+  "status": "NO-GO-r02-source-cold-acceptance",
+  "scope": "Exact published4.7.20003 plus Base2.0.77 source only. No candidate upgrade or original-reporter outcome.",
+  "runner_commit": "ddf8259fa6c978eaf77b75d93b10c98ebfbd92b5",
+  "player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+  "actor": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-paid-source-ddf8259f-r02/tests/fixtures/published-base-paid-source/control.lua",
+    "bytes": 23865,
+    "sha256": "ECE093EA3A3B854492B46AF2988CE041087F833DA586F59162A45B97B051AA57"
+  },
+  "source_packet": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/packet.json",
+    "bytes": 8698,
+    "sha256": "FE1BBB96312DD29578C11DE6F62EC26F1EF0D4E00898ECE88829D43100AD73B7"
+  },
+  "owner": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/Invoke-BasePaidSource.ps1",
+    "bytes": 19805,
+    "sha256": "7070DB069FBC6CC13146629FC08269B3EB22E04CD78EEF001E6C47749546A61D"
+  },
+  "frozen_reader": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/Verify-BasePaidSource.py",
+    "bytes": 14228,
+    "sha256": "7E54BC207A406FAB9333477DA499488603FEDE7D955C93E637AD8CC312475984"
+  },
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "published_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/testmods/2.0/more-infinite-research_4.7.20003.zip",
+    "bytes": 1449475,
+    "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+  },
+  "terminal": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/terminal.json",
+    "bytes": 78533,
+    "sha256": "21BCC76D6A2E1CBAF073F95F26E852A1B6EEA4F09AEEAD6C06B46B7627AE2B40"
+  },
+  "readback": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/EXECUTE-READBACK-r02.json",
+    "bytes": 10463,
+    "sha256": "22ECB59230E1D4099B7F6759FF942ED7AD940E14B5197AD020DEA90543818705"
+  },
+  "independent_adverse_review": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r02/INDEPENDENT-ADVERSE-REVIEW-r01.json",
+    "bytes": 5634,
+    "sha256": "0EE2976AE561908D38B103311DC9D63F631D5B60BBD1F9A3AA0515DABCB55FB8"
+  },
+  "native": {
+    "owned_pids": [
+      375834
+    ],
+    "native_attempts": 1,
+    "native_processes": 1,
+    "exit_code": 137,
+    "completion_predicate_observed": true,
+    "timed_out": false,
+    "duration_seconds": 25.024388,
+    "failure": "[base473-paid-source] Independent source reader refused",
+    "protected_source": null,
+    "cold_executed": false
+  },
+  "actual_source": {
+    "save": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/saves/mir473-base-paid-source.zip",
+      "bytes": 848333,
+      "sha256": "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413"
+    },
+    "zip_members": 8,
+    "zip_crc_and_duplicate_names": "passed",
+    "embedded_scenario_control_matches_exact_actor": true,
+    "observation": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/script-output/published-base-paid-source/source.json",
+      "bytes": 10695,
+      "sha256": "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98"
+    },
+    "preflight": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/script-output/published-base-paid-source/preflight.json",
+      "bytes": 3735,
+      "sha256": "7E562649DE22D4AAEA7F0F64BD1B36953EA8375C4C3621652B9FCA1DEF9EE86F"
+    },
+    "preflight_tick": 0,
+    "native_finite_rows": 23,
+    "tier_two_preflight_rows": {
+      "automation-2": {
+        "name": "automation-2",
+        "technology_level": 2,
+        "prototype_level": 2,
+        "prototype_max_level": 2,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "advanced-material-processing-2": {
+        "name": "advanced-material-processing-2",
+        "technology_level": 2,
+        "prototype_level": 2,
+        "prototype_max_level": 2,
+        "researched": false,
+        "saved_progress": 0
+      },
+      "logistics-2": {
+        "name": "logistics-2",
+        "technology_level": 2,
+        "prototype_level": 2,
+        "prototype_max_level": 2,
+        "researched": false,
+        "saved_progress": 0
+      }
+    },
+    "prehold_tick": 1250,
+    "saved_tick": 1252,
+    "ordinary_events": [
+      {
+        "name": "recipe-prod-research_low_density_structure-1",
+        "level": 2,
+        "by_script": false,
+        "tick": 249
+      },
+      {
+        "name": "recipe-prod-research_plastic-1",
+        "level": 2,
+        "by_script": false,
+        "tick": 499
+      },
+      {
+        "name": "recipe-prod-research_processing_unit-1",
+        "level": 2,
+        "by_script": false,
+        "tick": 749
+      },
+      {
+        "name": "recipe-prod-research_rocket_fuel-1",
+        "level": 2,
+        "by_script": false,
+        "tick": 999
+      },
+      {
+        "name": "recipe-prod-research_steel-1",
+        "level": 2,
+        "by_script": false,
+        "tick": 1249
+      }
+    ],
+    "science": {
+      "accepted": {
+        "automation-science-pack": 40168,
+        "logistic-science-pack": 40168,
+        "chemical-science-pack": 40168,
+        "production-science-pack": 40168
+      },
+      "consumed": {
+        "automation-science-pack": 40000,
+        "logistic-science-pack": 40000,
+        "chemical-science-pack": 40000,
+        "production-science-pack": 40000
+      },
+      "remaining": {
+        "automation-science-pack": 168,
+        "logistic-science-pack": 168,
+        "chemical-science-pack": 168,
+        "production-science-pack": 168
+      }
+    },
+    "observed_forces": {
+      "player": {
+        "name": "player",
+        "index": 1
+      },
+      "foreign": {
+        "name": "mir473-base-paid-foreign",
+        "index": 4
+      }
+    },
+    "full_force_registry": [
+      {
+        "name": "player",
+        "index": 1
+      },
+      {
+        "name": "enemy",
+        "index": 2
+      },
+      {
+        "name": "neutral",
+        "index": 3
+      },
+      {
+        "name": "mir473-base-paid-foreign",
+        "index": 4
+      }
+    ],
+    "player_recipe_bonuses": {
+      "low-density-structure": 0.10000000149011612,
+      "plastic-bar": 0.10000000149011612,
+      "processing-unit": 0.10000000149011612,
+      "rocket-fuel": 0.10000000149011612,
+      "steel-plate": 0.10000000149011612
+    },
+    "player_queue": {
+      "current": "recipe-prod-research_steel-1",
+      "names": [
+        "recipe-prod-research_steel-1",
+        "recipe-prod-research_steel-1"
+      ],
+      "progress": 0
+    },
+    "detached_plastic_saved_progress": 0.27,
+    "foreign_queue": {
+      "current": "braking-force-1",
+      "names": [
+        "braking-force-1",
+        "recipe-prod-research_gears-1",
+        "recipe-prod-research_gears-1"
+      ],
+      "progress": 0.42000000000000004
+    },
+    "lab": {
+      "name": "lab",
+      "unit_number": 19,
+      "disabled_by_script": true,
+      "input": {
+        "automation-science-pack": 168,
+        "logistic-science-pack": 168,
+        "chemical-science-pack": 168,
+        "production-science-pack": 168
+      },
+      "position": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "force_name": "player",
+      "force_index": 1,
+      "surface_index": 1,
+      "laboratory_speed_modifier": 0
+    }
+  },
+  "reader_failure": {
+    "message": "Source lab position/owner/surface differs",
+    "source": "Frozen reader line140 requires lab position(0,0), copying the requested create_entity coordinates. Actual native lab is(.5,.5), with the expected player owner and surface.",
+    "classification": "External reader/host-world placement assumption; no player-source defect established."
+  },
+  "conditional_adoption": {
+    "verdict": "Exact already-created source ZIP may be reused only through separately reviewed corrected offline reader and cold-only packet.",
+    "source_creation_must_not_repeat": true,
+    "r02_terminal_remains_adverse": true,
+    "cold_load_pending": true
+  },
+  "review_metadata_correction": {
+    "original_dispatched_review": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/REVIEW-EXECUTE.json",
+      "bytes": 2955,
+      "sha256": "C9F84C9C05D45480799AC4C9183985BCD99A954E1756A2C1CD16A240DFE967C7"
+    },
+    "worker_addendum": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/EXECUTE-REVIEW-BINDING-CORRECTION-r01.json",
+      "bytes": 1622,
+      "sha256": "2B341C124B7A1A84C0BAD6446FA96259F9D125CBDF86BEDBA4211796FA9DD285"
+    },
+    "root_independent_recheck": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/ROOT-EXECUTE-REVIEW-CHECK-r01.json",
+      "bytes": 4247,
+      "sha256": "AA4916EF4C8A472B4D109F5E064CA0679149B20108543DF18719571920736DC8"
+    },
+    "defect": "A supplementary Compose-readback SHA in the original review was unverified and wrong. Original review bytes remain unchanged. Both additive records bind the actual returned body; packet/owner/composition dispatch bindings and all nine composed files rehash correctly."
+  },
+  "custody": {
+    "readback_files": 20,
+    "all_readback_bytes_and_hashes_verified": true,
+    "remaining_factorio_processes": 0,
+    "restored": true,
+    "cleanup_errors": [],
+    "source_saved_but_not_promoted": true
+  },
+  "limits": [
+    "Five ordinary source levels and measured effects do not establish candidate preservation.",
+    "Cold loading did not run under r02.",
+    "No source recreation, published-byte replacement, release, client, performance, original-reporter or stable acceptance."
+  ]
+}

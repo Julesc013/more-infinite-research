@@ -3,6 +3,11 @@ description: Suggest an improvement and tell us how you would use it.
 title: "feat: "
 labels: ["enhancement", "triage"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us the outcome you want and why it helps. You do not need an implementation design.
+        We will record the decision and define and verify the acceptance criteria for accepted work.
   - type: textarea
     id: behavior
     attributes:

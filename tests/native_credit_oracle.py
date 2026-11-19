@@ -105,6 +105,7 @@ def native_credit_carrier_rows(public_rows, captured_recipes, family_recipes=Non
                 "hidden": True,
                 "enabled": False,
                 "visible_when_disabled": False,
+                "ignore_tech_cost_multiplier": True,
                 "max_level": "infinite",
                 "order": f"zz[mir-native-credit]-{name}",
                 "effects": [{

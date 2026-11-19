@@ -195,6 +195,33 @@ K2SO_INTENDED_MATERIAL_ROWS = {
 }
 
 
+def _intended_k2so_material_continuation(name, item, routes, science):
+    # New authored late-stage intent, separate from the retained finite capture.
+    row = _intended_k2so_material_row(name, item, routes, science, [])
+    row.update(level=4, max_level="infinite", show_levels_info=False, visible_when_disabled=True,
+               prerequisites=[name.removesuffix("-4") + "-1", "space-science-pack"],
+               order="p[research_material_" + item.removeprefix("kr-").replace("-", "_") + "__continuation]")
+    row["unit"]["count_formula"] = "1600+200*(L-4)"
+    return row
+
+
+K2SO_INTENDED_MATERIAL_ROWS.update({
+    "recipe-prod-research_material_rare_metals-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_rare_metals-4", "kr-rare-metals",
+        ["kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "space-science-pack"],
+    ),
+    "recipe-prod-research_material_silicon-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_silicon-4", "kr-silicon", ["kr-silicon"],
+        ["automation-science-pack", "logistic-science-pack", "space-science-pack"],
+    ),
+    "recipe-prod-research_material_glass-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_glass-4", "kr-glass", ["kr-glass"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "space-science-pack"],
+    ),
+})
+
+
 def lua_table(lua, value):
     if isinstance(value, dict):
         table = lua.table()
@@ -1354,6 +1381,9 @@ class GeneratorTests(unittest.TestCase):
             ["recipe-prod-research_material_rare_metals-1"] = true,
             ["recipe-prod-research_material_silicon-1"] = true,
             ["recipe-prod-research_material_glass-1"] = true,
+            ["recipe-prod-research_material_rare_metals-4"] = true,
+            ["recipe-prod-research_material_silicon-4"] = true,
+            ["recipe-prod-research_material_glass-4"] = true,
           }
           local seen = 0
           for _, row in ipairs(environment.emitted) do
@@ -1367,7 +1397,7 @@ class GeneratorTests(unittest.TestCase):
               seen = seen + 1
             end
           end
-          assert(seen == 3)
+          assert(seen == 6)
           package.loaded["research.settings"] = nil
           mods = nil
         ''')
@@ -1874,7 +1904,7 @@ class GeneratorTests(unittest.TestCase):
           assert(values.streams.research_material_imersite__continuation == values.streams.research_material_imersite)
           package.loaded["research.catalogue"] = nil
           local declared = require("research.catalogue").declared()
-          assert(#declared == 80)
+          assert(#declared == 83)
           local declared_ids, holder_ids = {}, { ["mir-k2-imersite-staged-state-1"] = true, ["mir-k2-imersite-continuation-state-4"] = true }
           for _, row in ipairs(declared) do
             assert(values.streams[row.family] ~= nil, "catalogue family has no resolved value: " .. row.family)
@@ -1888,6 +1918,9 @@ class GeneratorTests(unittest.TestCase):
             ["recipe-prod-research_material_rare_metals-1"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
             ["recipe-prod-research_material_silicon-1"] = {family="research_material_silicon", recipe="kr-silicon"},
             ["recipe-prod-research_material_glass-1"] = {family="research_material_glass", recipe="kr-glass"},
+            ["recipe-prod-research_material_rare_metals-4"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
+            ["recipe-prod-research_material_silicon-4"] = {family="research_material_silicon", recipe="kr-silicon"},
+            ["recipe-prod-research_material_glass-4"] = {family="research_material_glass", recipe="kr-glass"},
           }
           local material_count = 0
           for id, expected in pairs(expected_material_rows) do
@@ -1899,7 +1932,7 @@ class GeneratorTests(unittest.TestCase):
               and row.legacy_binding.source == "generated-stream" and row.legacy_binding.operation == "emit", id)
             material_count = material_count + 1
           end
-          assert(material_count == 3, "K2SO runtime catalogue material identity/count")
+          assert(material_count == 6, "K2SO runtime catalogue material identity/count")
           local rows = modern.technologies(selected, values)
           assert(#rows == 72+5,"K2SO native private main cardinality")
           local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
@@ -1932,13 +1965,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2+3)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5+4+1+2)
+          assert(final_count == 106+5+4+1+2+3)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -2647,6 +2680,49 @@ class GeneratorTests(unittest.TestCase):
           a.prerequisites = {"beta-1"}; b.prerequisites = {}
           local environment = world(); generator.install({a, b}, environment)
           assert(environment.writes == 1 and environment.emitted[1].name == "alpha-1")
+        ''')
+
+    def test_rejection_facts_distinguish_absent_references_from_malformed_definitions(self):
+        self.lua.execute('''
+          local function rejected(rows, environment, reason, message)
+            local facts = {}
+            local ok, actual = pcall(generator.install, rows, environment, facts)
+            assert(not ok and facts.reason == reason,
+              "wrong authored rejection category: " .. tostring(facts.reason))
+            assert(tostring(actual):find(message, 1, true), "original human reason was lost")
+            assert(environment.writes == 0, "preflight rejection published prototypes")
+          end
+          local a, b = build(), build()
+          rejected({a, b}, world(), "duplicate_identity", "within MIR emission")
+          local occupied = world(); occupied.raw.technology[a.name] = {}
+          rejected({a}, occupied, "duplicate_identity", "already exists")
+          a = build(); a.unit.ingredients[1][1] = "absent-science"
+          rejected({a}, world(), "missing_target", "research ingredient")
+          a = build(); a.unit.ingredients[1][2] = 0
+          rejected({a}, world(), "invalid_definition", "research ingredient")
+          a = build(); a.prerequisites = {"absent-prerequisite"}
+          rejected({a}, world(), "missing_target", "missing prerequisite")
+          a = build(); a.effects[1].recipe = "absent-recipe"
+          rejected({a}, world(), "missing_target", "missing recipe effect target")
+          a = build(); a.effects[1].recipe = false
+          rejected({a}, world(), "invalid_definition", "missing recipe effect target")
+          a = build(); a.name = "missing-word-in-a-valid-identity"; a.unit.count = 0
+          a.unit.count_formula = nil
+          rejected({a}, world(), "invalid_definition", "invalid research count")
+          rejected({[1]=build(), [3]=build()}, world(), "invalid_definition", "missing entry")
+          a, b = build(), build(); a.name = "cycle-a"; b.name = "cycle-b"
+          a.prerequisites = {b.name}; b.prerequisites = {a.name}
+          rejected({a, b}, world(), "invalid_definition", "cycle")
+
+          local environment, facts = world(), {}
+          environment.extend = function() error("unexpected native missing target", 0) end
+          local ok, message = pcall(generator.install, {build()}, environment, facts)
+          assert(not ok and message == "unexpected native missing target" and next(facts) == nil,
+            "a native exception acquired an invented preflight category")
+          environment, facts = world(), {}
+          generator.install({build()}, environment, facts)
+          assert(environment.writes == 1 and next(facts) == nil,
+            "successful publication retained a rejection or changed write count")
         ''')
 
     def test_all_family_failures_precede_first_write(self):

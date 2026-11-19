@@ -22,6 +22,8 @@ Read the actual published package, resolved prototype output and independently i
 
 Recover and reproduce actual default → profile-import → user/effective-setting precedence. Do not assume raw `settings.startup` alone reproduces the previous profile-import behavior. Parse an import string once using a restricted data codec; never `load`/execute it. Unknown, malformed and out-of-range values retain documented behavior or receive an explicit reviewed correction.
 
+MIRSET1 profiles may omit their `format` and `codec` headers for legacy raw-JSON compatibility. When either header is supplied, it must be the current exact identity (`format=1`, `codec=canonical-json-deflate-base64`); a supplied `false`, zero or other value is malformed rather than an omitted header. This header rule does not change valid setting values, including literal `false` and zero.
+
 Resolve effective values once per active definition/feature. No complete setting-registry copy in every technology constructor. Settings-stage code may share small identity declarations with data/runtime code but must not import prototype-world analysis. Extensions declare their settings in their own settings-stage files.
 
 ## Required continuity subjects

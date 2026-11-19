@@ -82,13 +82,23 @@ end
 local function copy_json_value(value, seen)
   local value_type = type(value)
   if value_type == "string" or value_type == "boolean" then return value end
-  if value_type == "number" then return finite(value) and value or nil end
-  if value_type ~= "table" or seen[value] then return nil end
+  if value_type == "number" then
+    if not finite(value) then return nil, "profile contains a non-finite number" end
+    return value
+  end
+  if value_type ~= "table" then return nil, "profile contains an unsupported value" end
+  if seen[value] then return nil, "profile contains a cycle" end
   seen[value] = true
+  local array = is_array(value)
   local out = {}
   for key, item in pairs(value) do
-    local copied = copy_json_value(item, seen)
-    if copied ~= nil and (type(key) == "string" or type(key) == "number") then out[key] = copied end
+    if not array and type(key) ~= "string" then
+      seen[value] = nil
+      return nil, "profile object key must be a string"
+    end
+    local copied, err = copy_json_value(item, seen)
+    if err then seen[value] = nil; return nil, err end
+    if copied ~= nil then out[key] = copied end
   end
   seen[value] = nil
   return out
@@ -96,20 +106,36 @@ end
 
 local function normalized_for_encode(profile)
   if type(profile) ~= "table" then return nil, "profile must be a table" end
-  local schema = profile.schema or M.schema
+  local schema = profile.schema
+  if schema == nil then schema = M.schema end
   if schema ~= M.schema then return nil, "unsupported profile schema " .. tostring(schema) end
-  local kind = profile.kind or M.kind
+  local kind = profile.kind
+  if kind == nil then kind = M.kind end
   if kind ~= M.kind then return nil, "unsupported profile kind " .. tostring(kind) end
   if profile.settings ~= nil and type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
   local settings = {}
   for name, value in pairs(profile.settings or {}) do
-    local copied = copy_json_value(value, {})
-    if copied ~= nil then settings[tostring(name)] = copied end
+    -- Registered setting identities are non-empty strings. Coercing arbitrary
+    -- caller keys with tostring can merge distinct keys and lose a value.
+    if type(name) ~= "string" or name == "" then
+      return nil, "profile setting name must be a non-empty string"
+    end
+    local copied, err = copy_json_value(value, {})
+    if err then return nil, err end
+    if copied ~= nil then settings[name] = copied end
+  end
+  if profile.metadata ~= nil and type(profile.metadata) ~= "table" then
+    return nil, "profile metadata must be a table"
+  end
+  local metadata, metadata_error = copy_json_value(profile.metadata or {}, {})
+  if metadata_error then return nil, metadata_error end
+  if profile.mod ~= nil and (type(profile.mod) ~= "string" or profile.mod == "") then
+    return nil, "profile mod must be a non-empty string"
   end
   return {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
     mod = profile.mod or "more-infinite-research",
-    metadata = copy_json_value(profile.metadata or {}, {}) or {}, settings = settings
+    metadata = metadata or {}, settings = settings
   }
 end
 
@@ -129,9 +155,15 @@ local function migrate_profile(profile)
   if profile.schema ~= M.schema then return nil, "unsupported profile schema " .. tostring(profile.schema) end
   if profile.kind ~= nil and profile.kind ~= M.kind then return nil, "unsupported profile kind " .. tostring(profile.kind) end
   if type(profile.settings) ~= "table" then return nil, "profile settings must be a table" end
+  local format = profile.format
+  if format == nil then format = M.format
+  elseif format ~= M.format then return nil, "unsupported profile format " .. tostring(format) end
+  local codec = profile.codec
+  if codec == nil then codec = M.codec
+  elseif codec ~= M.codec then return nil, "unsupported profile codec " .. tostring(codec) end
   return {
-    schema = M.schema, kind = M.kind, format = profile.format or M.format,
-    codec = profile.codec or M.codec, mod = profile.mod or "more-infinite-research",
+    schema = M.schema, kind = M.kind, format = format,
+    codec = codec, mod = profile.mod or "more-infinite-research",
     metadata = type(profile.metadata) == "table" and profile.metadata or {}, settings = profile.settings
   }
 end
@@ -157,9 +189,13 @@ end
 function M.current_profile(options)
   options = options or {}
   local compact = options.compact == true
+  -- Export annotations belong to this result, not to the caller's metadata.
+  -- Retain unknown metadata fields without rewriting the supplied table.
+  local metadata = {}
+  for key, value in pairs(options.metadata or {}) do metadata[key] = value end
   local profile = {
     schema = M.schema, kind = M.kind, format = M.format, codec = M.codec,
-    mod = "more-infinite-research", metadata = options.metadata or {}, settings = {}
+    mod = "more-infinite-research", metadata = metadata, settings = {}
   }
   profile.metadata.export_mode = compact and "compact" or "full"
   for _, name in ipairs(options.names or {}) do

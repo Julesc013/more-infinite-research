@@ -4,10 +4,14 @@ import hashlib
 import json
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+import zlib
+
+from mir_test_versions import current_alias, current_source_release
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("mir_native_package", ROOT / "tools/package.py")
@@ -32,9 +36,8 @@ F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 class PackageTests(unittest.TestCase):
     def test_source_header_is_a_heading_not_an_entry_mention(self):
-        source_distribution = json.loads(
-            (ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-        source_version = pack.source_changelog_version(source_distribution)
+        source_distribution = current_alias("f210").distribution_version
+        source_version = current_source_release()
         entry = ("-" * 99 + "\nVersion: " + source_version + "\n\n  Changes:\n"
                  "    - Example source label: Version: 5.0.0\n").encode("utf-8")
         files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
@@ -83,11 +86,28 @@ class PackageTests(unittest.TestCase):
         cls._git(repository, "commit", "-qm", "player and target record")
         return cls._git(repository, "rev-parse", "HEAD").decode().strip()
 
+    @classmethod
+    def _write_fixture_metadata_repository(cls, repository, alternate=None, name="metadata-fixture"):
+        repository.mkdir(parents=True, exist_ok=True)
+        cls._git(repository, "init", "-q")
+        cls._git(repository, "config", "user.name", "Package test")
+        cls._git(repository, "config", "user.email", "package-test@example.invalid")
+        cls._git(repository, "config", "core.autocrlf", "false")
+        source = repository / "tests" / "fixtures" / "fixture"
+        source.mkdir(parents=True)
+        canonical = {"name": name, "version": "0.1.0", "factorio_version": "2.1"}
+        if alternate is None:
+            alternate = {**canonical, "factorio_version": "2.0"}
+        (source / "info.json").write_text(json.dumps(canonical) + "\n", encoding="utf-8")
+        if alternate is not False:
+            (source / "info-f200.json").write_text(json.dumps(alternate) + "\n", encoding="utf-8")
+        (source / "data.lua").write_bytes(b"return 'committed fixture'\n")
+        cls._git(repository, "add", ".")
+        cls._git(repository, "commit", "-qm", "fixture metadata")
+        return source, cls._git(repository, "rev-parse", "HEAD").decode().strip()
+
     def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
         source = ROOT / "source"
-        canonical = json.loads((source / "info.json").read_text(encoding="utf-8"))["version"]
-        major, minor, encoded = canonical.split(".")
-        source_patch = int(encoded) % 100
         published = json.loads((ROOT / "spec/inventory/target-load-order-470.json").read_text())
         dependencies = {row["target"]: row["dependencies"] for row in published["records"]}
         sif_ordering = "? space-is-fake"
@@ -158,10 +178,7 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
-                self.assertEqual(
-                    info["version"],
-                    f"{major}.{minor}.{target[1:]}{source_patch:02d}",
-                )
+                self.assertEqual(info["version"], current_alias(target).distribution_version)
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
                 probability = "independent_probability" if target == "f210" else "probability"
@@ -213,6 +230,9 @@ class PackageTests(unittest.TestCase):
                 editions, _ = pack.read_editions(source)
                 unfiltered_info = json.loads(source_files["info.json"])
                 unfiltered = pack.select_edition(source_files, unfiltered_info, target, editions)
+                # Preserve the independently pinned published filename while
+                # the editable source uses its canonical source-release label.
+                unfiltered[F110_PLUS_MIGRATION] = unfiltered.pop("migrations/more-infinite-research_5.0.0.json")
                 unfiltered["info.json"] = (json.dumps(unfiltered_info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
                 excluded = set()
                 if target != "f210":
@@ -224,6 +244,52 @@ class PackageTests(unittest.TestCase):
                                  {path: value for path, value in unfiltered.items() if path not in excluded})
                 for name in files:
                     self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_canonical_migration_source_keeps_one_published_identity_and_unchanged_bytes(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        self.assertTrue((source / canonical).is_file())
+        self.assertFalse((source / F110_PLUS_MIGRATION).exists())
+        body = (source / canonical).read_bytes()
+        self.assertEqual(hashlib.sha256(body).hexdigest().upper(), F110_PLUS_MIGRATION_SHA256)
+        files = {"info.json": (source / "info.json").read_bytes(), canonical: body}
+        before = dict(files)
+        _, rows = pack.members(source, committed_files=files)
+        emitted = dict(rows)
+        self.assertEqual(files, before, "aliasing mutated caller-owned frozen inputs")
+        self.assertNotIn(canonical, emitted)
+        self.assertEqual(emitted[F110_PLUS_MIGRATION], body)
+        self.assertEqual([name for name in emitted if name.startswith("migrations/")], [F110_PLUS_MIGRATION])
+
+    def test_historical_migration_source_and_foreign_fixture_are_not_rewritten(self):
+        source = ROOT / "source"
+        canonical = "migrations/more-infinite-research_5.0.0.json"
+        body = (source / canonical).read_bytes()
+        legacy = {"info.json": (source / "info.json").read_bytes(), F110_PLUS_MIGRATION: body}
+        _, rows = pack.members(source, committed_files=legacy)
+        self.assertEqual(dict(rows)[F110_PLUS_MIGRATION], body)
+        self.assertNotIn(canonical, dict(rows))
+        foreign_info = json.loads(legacy["info.json"])
+        foreign_info["name"] = "independent-fixture"
+        foreign = {"info.json": json.dumps(foreign_info).encode(), canonical: body}
+        _, rows = pack.members(source, committed_files=foreign)
+        self.assertIn(canonical, dict(rows))
+        self.assertNotIn(F110_PLUS_MIGRATION, dict(rows))
+
+    def test_ambiguous_migration_aliases_refuse_before_creating_an_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            (source / "migrations").mkdir(parents=True)
+            metadata = (ROOT / "source/info.json").read_bytes()
+            (source / "info.json").write_bytes(metadata)
+            body = b'{"technology": [["laser-turret-speed-8", "laser-shooting-speed-8"]]}\n'
+            for name in ("more-infinite-research_5.0.0.json", "more-infinite-research_5.0.11000.json"):
+                (source / "migrations" / name).write_bytes(body)
+            output = root / ("more-infinite-research_" + json.loads(metadata)["version"] + ".zip")
+            with self.assertRaisesRegex(ValueError, "Ambiguous canonical and published migration"):
+                pack.build(source, output)
+            self.assertFalse(output.exists())
 
     def test_early_target_selection_excludes_all_normal_migration_members(self):
         source = ROOT / "source"
@@ -348,8 +414,9 @@ class PackageTests(unittest.TestCase):
     def test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            package_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-            package_root = "more-infinite-research_" + package_version
+            alias = current_alias("f210")
+            package_version = alias.distribution_version
+            package_root = alias.archive_root
             def git(*arguments):
                 return subprocess.check_output(["git", "-C", str(root), *arguments])
             git("init", "-q")
@@ -393,9 +460,6 @@ class PackageTests(unittest.TestCase):
     def test_staged_and_canonical_target_record_layouts_have_identical_selected_members(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
-            major, minor, encoded = source_version.split(".")
-            source_patch = int(encoded) % 100
             staged_repository = temporary / "staged"
             canonical_repository = temporary / "canonical"
             staged_repository.mkdir()
@@ -408,9 +472,10 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210"})
             for target_id, edition in editions.items():
                 with self.subTest(target=target_id):
-                    version = f"{major}.{minor}.{target_id[1:]}{source_patch:02d}"
-                    member_root = "more-infinite-research_" + version
-                    filename = member_root + ".zip"
+                    alias = current_alias(target_id)
+                    version = alias.distribution_version
+                    member_root = alias.archive_root
+                    filename = alias.archive_name
                     staged = pack.build(
                         staged_repository / "source/mir5", staged_repository / "out" / filename,
                         revision=staged_commit, target=target_id, target_record="targets/mir5/editions.json")
@@ -452,8 +517,7 @@ class PackageTests(unittest.TestCase):
 
     def test_every_edition_gets_the_complete_master_history_and_preserves_player_assets(self):
         source = ROOT / "source"
-        source_version = pack.source_changelog_version(
-            json.loads((source / "info.json").read_text(encoding="utf-8"))["version"])
+        source_version = current_source_release()
         recovered = json.loads((ROOT / "spec/inventory/package-presentation-472.json").read_bytes())
         self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
         self.assertEqual(len(recovered["records"]), 9)
@@ -531,6 +595,104 @@ class PackageTests(unittest.TestCase):
             self.assertTrue((source / "new.lua").is_file())
             with self.assertRaises(ValueError):
                 pack.build(repository, repository / "invalid/test-fixture_0.1.0.zip", revision=commit)
+
+    def test_f200_fixture_metadata_is_raw_git_pinned_with_exact_members_and_provenance(self):
+        source = ROOT / "tests/fixtures/profile-native-witness"
+        root = "mir-fixture-mir5-profile-native-witness_0.1.0"
+        selected_path = "tests/fixtures/profile-native-witness/info-f200.json"
+        revision = self._git(ROOT, "rev-parse", "HEAD").decode().strip()
+        selected_raw = self._git(ROOT, "show", revision + ":" + selected_path)
+        selected_blob = self._git(ROOT, "rev-parse", revision + ":" + selected_path).decode().strip()
+        canonical_raw = self._git(
+            ROOT, "show", revision + ":tests/fixtures/profile-native-witness/info.json")
+        expected_paths = ["control.lua", "data-final-fixes.lua", "info.json", "settings.lua", "witness.lua"]
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / (root + ".zip")
+            record = json.loads(subprocess.check_output([
+                sys.executable, str(ROOT / "tools/package.py"), "--source", str(source), "--revision",
+                revision, "--fixture-info", "info-f200.json", "--output", str(output),
+            ], text=True))
+            self.assertEqual(record["source_commit"], revision)
+            self.assertEqual(record["fixture_info"], {
+                "source_path": "info-f200.json", "source_blob": selected_blob,
+                "sha256": hashlib.sha256(selected_raw).hexdigest(), "bytes": len(selected_raw),
+                "output_path": "info.json",
+            })
+            self.assertEqual([member["path"] for member in record["members"]], expected_paths)
+            with zipfile.ZipFile(output) as archive:
+                self.assertEqual(archive.namelist(), [root + "/" + path for path in expected_paths])
+                self.assertEqual(archive.read(root + "/info.json"), selected_raw)
+                self.assertEqual(archive.getinfo(root + "/info.json").CRC,
+                                 zlib.crc32(selected_raw) & 0xffffffff)
+                for path in expected_paths:
+                    source_path = selected_path if path == "info.json" else (
+                        "tests/fixtures/profile-native-witness/" + path)
+                    self.assertEqual(archive.read(root + "/" + path), self._git(
+                        ROOT, "show", revision + ":" + source_path))
+            default_output = Path(temporary) / "default" / (root + ".zip")
+            default = pack.build(source, default_output, revision=revision)
+            self.assertNotIn("fixture_info", default)
+            with zipfile.ZipFile(default_output) as archive:
+                self.assertEqual(archive.read(root + "/info.json"), canonical_raw)
+
+    def test_f200_fixture_metadata_ignores_dirty_worktree_alternate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            source, commit = self._write_fixture_metadata_repository(repository)
+            committed = self._git(repository, "show", commit + ":tests/fixtures/fixture/info-f200.json")
+            (source / "info-f200.json").write_bytes(b'{"name":"dirty","version":"99.0.0"}\r\n')
+            output = repository / "out" / "metadata-fixture_0.1.0.zip"
+            record = pack.build(source, output, revision=commit, fixture_info="info-f200.json")
+            self.assertEqual(record["source_commit"], commit)
+            with zipfile.ZipFile(output) as archive:
+                self.assertEqual(archive.read("metadata-fixture_0.1.0/info.json"), committed)
+            self.assertEqual((source / "info-f200.json").read_bytes(), b'{"name":"dirty","version":"99.0.0"}\r\n')
+
+    def test_f200_fixture_metadata_refuses_untracked_mismatched_player_and_conflicting_inputs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            source, commit = self._write_fixture_metadata_repository(repository, alternate=False)
+            (source / "info-f200.json").write_text(
+                '{"name":"metadata-fixture","version":"0.1.0","factorio_version":"2.0"}\n', encoding="utf-8")
+            output = repository / "out" / "metadata-fixture_0.1.0.zip"
+            with self.assertRaisesRegex(ValueError, "not tracked"):
+                pack.build(source, output, revision=commit, fixture_info="info-f200.json")
+            self.assertFalse(output.exists())
+
+            source, commit = self._write_fixture_metadata_repository(
+                repository / "mismatched", alternate={
+                    "name": "other-fixture", "version": "0.1.0", "factorio_version": "2.0"})
+            with self.assertRaisesRegex(ValueError, "canonical fixture name and version"):
+                pack.build(source, repository / "mismatched/out/metadata-fixture_0.1.0.zip",
+                           revision=commit, fixture_info="info-f200.json")
+            source, commit = self._write_fixture_metadata_repository(
+                repository / "wrong-line", alternate={
+                    "name": "metadata-fixture", "version": "0.1.0", "factorio_version": "2.1"})
+            with self.assertRaisesRegex(ValueError, "canonical F210 and alternate F200"):
+                pack.build(source, repository / "wrong-line/out/metadata-fixture_0.1.0.zip",
+                           revision=commit, fixture_info="info-f200.json")
+            source, commit = self._write_fixture_metadata_repository(
+                repository / "player-name", name=pack.MIR_PLAYER_NAME)
+            with self.assertRaisesRegex(ValueError, "does not package MIR player source"):
+                pack.build(source, repository / "player-name/out/more-infinite-research_0.1.0.zip",
+                           revision=commit, fixture_info="info-f200.json")
+
+            source, commit = self._write_fixture_metadata_repository(repository / "conflicts")
+            with self.assertRaisesRegex(ValueError, "requires --revision"):
+                pack.build(source, repository / "requires/metadata-fixture_0.1.0.zip",
+                           fixture_info="info-f200.json")
+            with self.assertRaisesRegex(ValueError, "only info-f200.json"):
+                pack.build(source, repository / "traversal/metadata-fixture_0.1.0.zip", revision=commit,
+                           fixture_info="../info.json")
+            with self.assertRaisesRegex(ValueError, "does not permit --version"):
+                pack.build(source, repository / "version/metadata-fixture_0.1.0.zip", revision=commit,
+                           version="0.2.0", fixture_info="info-f200.json")
+            with self.assertRaisesRegex(ValueError, "does not permit --target"):
+                pack.build(source, repository / "target/metadata-fixture_0.1.0.zip", revision=commit,
+                           target="f200", fixture_info="info-f200.json")
+            with self.assertRaisesRegex(ValueError, "requires a direct tests/fixtures source"):
+                pack.build(ROOT / "source", repository / "player/more-infinite-research_5.0.20014.zip",
+                           revision=self._git(ROOT, "rev-parse", "HEAD").decode().strip(), fixture_info="info-f200.json")
 
     def test_reproducible_members_and_fixture_version(self):
         with tempfile.TemporaryDirectory() as temporary:

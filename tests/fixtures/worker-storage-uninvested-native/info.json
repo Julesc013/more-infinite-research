@@ -1,0 +1,8 @@
+{
+  "name": "mir-worker-storage-uninvested-native",
+  "version": "0.13.0",
+  "title": "MIR uninvested worker-storage native fixture",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research"]
+}

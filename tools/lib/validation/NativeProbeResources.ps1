@@ -84,7 +84,7 @@ function Get-MIRNativeProbeRemainingOutputBytes {
         $path=Join-Path $activation.library ($name+$suffix)
         if(Test-Path -LiteralPath $path){
           Assert-MIRLibraryPath $path
-          $controlBytes+=[int64](Get-Item -LiteralPath $path).Length
+          $controlBytes+=[int64](Get-Item -LiteralPath $path -Force).Length
         }
       }
     }
@@ -163,6 +163,8 @@ function Invoke-MIRNativeProbeProcess {
     $entry=[ordered]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$failure.Exception.Message}
     $consoleReceipt=$failure.Exception.Data['mir441_factorio_console_startup']
     if($consoleReceipt-is[Collections.IDictionary] -or $consoleReceipt-is[pscustomobject]){$entry.console_startup=$consoleReceipt}
+    $cleanupFacts=$failure.Exception.Data['mir441_process_cleanup_facts']
+    if($cleanupFacts-is[Collections.IEnumerable]-and$cleanupFacts-isnot[string]){$entry.cleanup_facts=@($cleanupFacts)}
     $terminal=$failure.Exception.Data['mir441_process_result']
     if($terminal-is[pscustomobject]-and
       @('status','exit_code','passed','timed_out','completion_predicate_observed'|Where-Object {$null-eq$terminal.PSObject.Properties[$_]}).Count-eq0-and
@@ -221,9 +223,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   # The same governed ProcessStartInfo already owns the process lifetime,
   # streamed stdout/stderr, process tree, timeout and cleanup. Start Factorio
-  # directly so its duration is native executable start-to-exit, rather than
-  # the historical PowerShell-wrapper tree duration. This clock-scope repair
-  # removes developer harness work; it is not product-speedup evidence.
+  # directly on Windows. Linux first establishes an owned POSIX session then
+  # execs the engine with the same PID; that launcher remains in its clock
+  # scope. Neither scope supplies a product-speedup claim on its own.
   $actorArguments=@{Context=$Context;FilePath=$FilePath;Arguments=$Arguments;TimeoutSeconds=$TimeoutSeconds;FactorioSteamIdentity=$true;CompletionPredicate=$CompletionPredicate}
   if($SampleMilliseconds -ne 0){$actorArguments.SampleMilliseconds=$SampleMilliseconds}
   if($null -ne $OwnedProcessSampleCallback){$actorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
@@ -235,9 +237,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
   }
   $run=Invoke-MIRNativeProbeProcess @actorArguments
   $run.result | Add-Member -NotePropertyName duration_measurement -NotePropertyValue ([ordered]@{
-    scope='direct-native-executable-start-to-exit'
+    scope=$(if($IsLinux){'linux-session-launch-and-native-exec-start-to-exit'}else{'direct-native-executable-start-to-exit'})
     historical_scope='governed-powershell-wrapper-tree-start-to-exit'
-    comparability='scope-changed; compare only fresh direct-native measurements; no product-speedup claim'
+    comparability=$(if($IsLinux){'functional Linux receipt includes session launcher; no scored timing or Windows comparison'}else{'scope-changed; compare only fresh direct-native measurements; no product-speedup claim'})
   }) -Force
   if($actorArguments.ContainsKey('PreStartAdmissionWait')){
     $run | Add-Member -NotePropertyName admission_wait -NotePropertyValue $actorArguments.PreStartAdmissionWait -Force

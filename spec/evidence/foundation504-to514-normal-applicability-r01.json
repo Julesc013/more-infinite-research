@@ -1,0 +1,56 @@
+{
+  "kind": "MIR514FoundationOriginalNormalTimingApplicabilityReviewV1",
+  "reviewer": "/root/review_1929_live",
+  "recorded_by": "integration lead from bounded independent source/input review",
+  "original": "spec/evidence/foundation504-normal-comparison-r01.json",
+  "candidate_player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "candidate_zip_sha256": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4",
+  "verdict": "current14-reuse-not-proven",
+  "original_scope": "NoMIR A35rows versus MIR504 B36rows,31upstream archives,Defaults,no observer,exact2.0.77/protected Foundation save;3AA calibration pairs plus6AB pairs,18physical processes,601updates each. Original -0.0233ms mean difference remains a5.0.4 result.",
+  "source_finding": "The added current worker-storage module has no unconditional on_tick/on_nth_tick handler. Config/init/load changes occur outside the mean-update endpoint and are not evidence of a measured regression. Possible in-window paths are conditional research callbacks when pending or default_head_pending, and force lifecycle callbacks.",
+  "specific_gap": "The old timing receipt and current19-key activity projection do not establish current B owner/pending state, registered event set or actual research/force callback firing during601updates. Activity equality alone does not establish timing equivalence.",
+  "next_step": "Prepare/review a fresh current14 normal controller for a current timing verdict, unless separate exact admissible evidence first proves new callback paths cannot fire and establishes event-registration equivalence. Retain all old observations under their original identities; no broad campaign restart.",
+  "review_correction": "The review initially treated bootstrap/configuration/member changes too broadly; follow-up narrowed the conclusion to the precise in-window callback proof gap and withdrew any implication of measured regression.",
+  "new_native_processes": 0,
+  "old_observations_relabelled": false,
+  "performance_acceptance": false,
+  "stable_acceptance": false,
+  "schema": 1,
+  "review_record": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\NORMAL-APPLICABILITY-REVIEW.json",
+    "bytes": 2067,
+    "sha256": "09DF7C0E9C6D1008DB3D772D1347232C2421E05CB7B0523ABF691A384C559AD4"
+  },
+  "original_normal_receipt": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\foundation504-normal-comparison-r01.json",
+    "bytes": 5019,
+    "sha256": "F3641EE65B0FE1DAA76D5970E95DA472FF845FC3203FA4D75D96C9BA6829C8B6"
+  },
+  "previous505_scoped_applicability": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\foundation-current505-activity-r01.json",
+    "bytes": 5919,
+    "sha256": "55AEACE875C546463047986C32B67E5E9E81C70F561AEEC90E436F9AA64B1F9A"
+  },
+  "actual14_activity": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\foundation514-current-unscored-activity-r01.json",
+    "bytes": 17036,
+    "sha256": "D17E2D644D0DFF88F36D873D3206C6B36DDCCE160DD034C60394F91B4B61F53A"
+  },
+  "old_player_archive": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.4\\more-infinite-research_5.0.20004.zip",
+    "bytes": 804866,
+    "sha256": "34F14D93A1262F32B45EBAB40B1C640B8B8FBE41B718492227024649E9E75268"
+  },
+  "current_player_archive": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.14\\more-infinite-research_5.0.20014.zip",
+    "bytes": 1039250,
+    "sha256": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4"
+  },
+  "worker_module_in_original504": false,
+  "current_worker_module": {
+    "member": "runtime/worker_robot_storage.lua",
+    "bytes": 102599,
+    "sha256": "21FA352A13180DB3B6B6F812997FFD948A3033439C1D41D8A379F8F3E2964821"
+  },
+  "conclusion_limit": "No measured regression or new callback cost is established. Lack of consumed-input proof prevents current14 reuse; only this observer-absent F200 normal-update scope needs a new reviewed controller if no exact callback/event-equivalence evidence closes the gap."
+}

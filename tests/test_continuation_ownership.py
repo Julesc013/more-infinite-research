@@ -1,5 +1,6 @@
 """Finite native-continuation ownership controls; not native qualification."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -57,6 +58,140 @@ FINITE_SPEED_INPUT = r'''
 
 
 class ContinuationOwnershipTests(unittest.TestCase):
+    def callback_world(self, target_id="f210"):
+        """Parse real modules first; callers explicitly close the import window."""
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = (ROOT / "source").as_posix()
+        target = json.loads((ROOT / "targets/editions.json").read_text(encoding="utf-8"))["targets"][target_id]
+        lua.globals().selected_target = lua.table_from(dict(target, id=target_id))
+        lua.execute('''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+          package.cpath = ""
+          package.loaded["platform.target"] = selected_target
+          script = {active_mods={base=selected_target.minimum_base}}
+          game = nil -- Factorio has no live game while control is parsed.
+          storage = setmetatable({}, {__newindex=function() error("unexpected storage write") end})
+          function close_imports()
+            require = function(name) error("callback attempted require: " .. name, 2) end
+            game = setmetatable({}, {__index=function() error("unexpected live game read") end})
+          end
+        ''')
+        return lua
+
+    def test_catalogue_exports_after_parsing_without_native_transport(self):
+        # Includes the native failure's no-mod-data path and reduced editions.
+        # Even a cached require is forbidden by the runtime contract here.
+        targets = json.loads((ROOT / "targets/editions.json").read_text(encoding="utf-8"))["targets"]
+        for target_id in targets:
+            for shape in ("absent", "empty"):
+                with self.subTest(target=target_id, transport=shape):
+                    lua = self.callback_world(target_id)
+                    lua.globals().transport_shape = shape
+                    lua.execute('''
+                      prototypes = transport_shape == "empty" and {mod_data={}} or nil
+                      local catalogue = require("runtime.catalogue")
+                      close_imports()
+                      assert(next(catalogue.native_credit_scalars()) == nil)
+                      assert(next(catalogue.native_credit_groups()) == nil)
+                      local ids = catalogue.internal_credit_ids()
+                      assert(ids["mir-worker-storage-preservation-4"] == true)
+                      ids["mir-worker-storage-preservation-4"] = nil
+                      assert(catalogue.internal_credit_ids()["mir-worker-storage-preservation-4"])
+                      local rows = catalogue.declared()
+                      assert(#rows > 0)
+                      rows[1].id = "caller mutation"
+                      assert(catalogue.declared()[1].id ~= "caller mutation")
+                      assert(#catalogue.restoration_only() == 0)
+                      assert(catalogue.worker_storage_route() == nil)
+                      assert(catalogue.finite_research_speed_provider() == nil)
+                      assert(not catalogue.worker_default_split() and not catalogue.galore_sulfur_retired())
+                      assert(not catalogue.externally_supplied_continuation("worker-robots-storage-4"))
+                    ''')
+
+    def test_catalogue_credit_exports_after_parsing_with_native_transport(self):
+        for target_id in ("f200", "f210"):
+            for populated in (False, True):
+                with self.subTest(target=target_id, populated=populated):
+                    lua = self.callback_world(target_id)
+                    lua.globals().populated = populated
+                    lua.execute('''
+                      local data = {schema=1, owners={}, credits={}, fixed_credits={}}
+                      script.active_mods["space-age"] = selected_target.minimum_base
+                      if populated then
+                        data.credits.research_processing_unit = {{recipe="processing-unit", change=.1}}
+                        data.fixed_credits["copper-plate"] = .1
+                        data.withheld = {["steel-plate-productivity"]={family="research_steel", generated=false}}
+                      end
+                      prototypes = {mod_data={["more-infinite-research-native-adoptions"]={data=data}}}
+                      local catalogue = require("runtime.catalogue")
+                      close_imports()
+                      local scalars, groups = catalogue.native_credit_scalars(), catalogue.native_credit_groups()
+                      if populated then
+                        assert(scalars["copper-plate"] == .1)
+                        assert(groups.research_processing_unit[1].recipe == "processing-unit")
+                        assert(groups.research_processing_unit[1].change == .1)
+                        local ids = catalogue.internal_credit_ids()
+                        assert(ids["mir-native-credit-research_processing_unit-processing-unit-positive"])
+                        assert(ids["mir-native-credit-research_processing_unit-processing-unit-negative"])
+                        scalars["copper-plate"], groups.research_processing_unit[1].change = 99, 99
+                        assert(catalogue.native_credit_scalars()["copper-plate"] == .1)
+                        assert(catalogue.native_credit_groups().research_processing_unit[1].change == .1)
+                        local withheld = catalogue.restoration_only()
+                        assert(#withheld == 1 and withheld[1].id == "steel-plate-productivity")
+                        assert(withheld[1].native_admission.effect_type == "change-recipe-productivity")
+                        assert(withheld[1].native_admission.recipes[1] == "steel-plate")
+                        withheld[1].id = "caller mutation"
+                        withheld[1].native_admission.effect_type = "caller mutation"
+                        withheld[1].native_admission.recipes[1] = "caller mutation"
+                        assert(catalogue.restoration_only()[1].id == "steel-plate-productivity")
+                        assert(catalogue.restoration_only()[1].native_admission.effect_type == "change-recipe-productivity")
+                        assert(catalogue.restoration_only()[1].native_admission.recipes[1] == "steel-plate")
+                      else
+                        assert(next(scalars) == nil and next(groups) == nil)
+                        assert(#catalogue.restoration_only() == 0)
+                      end
+                      assert(#catalogue.declared() > 0)
+                      catalogue.internal_credit_ids()
+                    ''')
+
+    def test_native_transport_helpers_keep_imports_out_of_callable_operations(self):
+        lua = self.callback_world()
+        lua.execute('''
+          local adoption = require("research.native_adoption")
+          close_imports()
+          local prototype = adoption.prototype()
+          local groups = {research_processing_unit={{recipe="processing-unit", change=.1}}}
+          local scalars = {["copper-plate"]=.1}
+          local route = {technology="worker-robots-storage-5", level=5, predecessor="worker-robots-storage-4",
+            owned=true, legacy_compatible=true, finite={{name="worker-robots-storage-4", max_level=4}}}
+          local plan = adoption.plan({["mod-data"]={[prototype.name]=prototype}}, {}, {}, groups, scalars, route, false)
+          adoption.apply(plan)
+          local facts = {}
+          local owners, withheld, decoded_groups, decoded_scalars = adoption.read(prototype.data, {}, facts)
+          assert(next(owners) == nil and next(withheld) == nil)
+          assert(decoded_groups.research_processing_unit[1].change == .1)
+          assert(decoded_scalars["copper-plate"] == .1)
+          assert(facts.worker_storage.technology == "worker-robots-storage-5")
+          assert(facts.worker_storage.finite[1].max_level == 4 and not facts.worker_default_split)
+          groups.research_processing_unit[1].change, scalars["copper-plate"], route.finite[1].max_level = 99, 99, 99
+          assert(decoded_groups.research_processing_unit[1].change == .1 and decoded_scalars["copper-plate"] == .1)
+          assert(facts.worker_storage.finite[1].max_level == 4)
+          decoded_groups.research_processing_unit[1].change, decoded_scalars["copper-plate"] = 88, 88
+          facts.worker_storage.finite[1].max_level = 88
+          assert(prototype.data.credits.research_processing_unit[1].change == .1)
+          assert(prototype.data.fixed_credits["copper-plate"] == .1)
+          assert(prototype.data.worker_storage.finite[1].max_level == 4)
+          for _, invalid in ipairs({{["copper-plate"]=0}, {["copper-plate"]=math.huge}, {["unknown-recipe"]=.1}}) do
+            local ok, message = pcall(adoption.fixed_credit_scalars, invalid)
+            assert(not ok and tostring(message):find("invalid fixed native credit", 1, true), tostring(message))
+          end
+          local ok, message = pcall(adoption.credit_groups, {unknown_family={{recipe="processing-unit", change=.1}}})
+          assert(not ok and tostring(message):find("family is not authored", 1, true), tostring(message))
+          prototype.data.worker_storage.level = 6
+          ok, message = pcall(adoption.read, prototype.data, {}, {})
+          assert(not ok and tostring(message):find("invalid continuation identity", 1, true), tostring(message))
+        ''')
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
