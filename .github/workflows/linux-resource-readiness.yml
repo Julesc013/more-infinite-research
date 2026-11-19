@@ -1,0 +1,197 @@
+name: Linux resource readiness
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/linux-resource-readiness.yml'
+      - 'tools/lib/validation/ResourceGovernor.ps1'
+      - 'tools/lib/validation/LinuxResourceObservation.py'
+      - 'tools/lib/validation/NativeProbeResources.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resource-readiness:
+    name: linux-resource-readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - id: probe
+        name: Observe real Linux admission without an engine
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+
+          $governorPath = 'tools/lib/validation/ResourceGovernor.ps1'
+          $observerPath = 'tools/lib/validation/LinuxResourceObservation.py'
+          $probeResourcesPath = 'tools/lib/validation/NativeProbeResources.ps1'
+          $workflowPath = '.github/workflows/linux-resource-readiness.yml'
+          $sourceCommit = (& git rev-parse HEAD).Trim().ToUpperInvariant()
+          $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+          if ($LASTEXITCODE -ne 0 -or $sourceCommit -notmatch '^[0-9A-F]{40}$' -or $sourceTree -notmatch '^[0-9A-F]{40}$') {
+            throw 'Unable to resolve the checked-out source identity.'
+          }
+
+          function Get-GitBlob([string]$Path) {
+            $blob = (& git rev-parse ('HEAD:{0}' -f $Path)).Trim().ToUpperInvariant()
+            if ($LASTEXITCODE -ne 0 -or $blob -notmatch '^[0-9A-F]{40}$') {
+              throw "Unable to resolve Git blob for $Path."
+            }
+            return $blob
+          }
+
+          $k2soGovernorBlob613 = '8B3B81B4681BE982ACBEC26263901083E49260ED'
+          $k2soObserverBlob613 = 'E0D92EF66638078DF19FE6CE0346F4714AE97865'
+          $k2soProbeResourcesBlob613 = 'AA01743DE388238C8BB074C5BE0925BC48B62966'
+          $governorBlob = Get-GitBlob $governorPath
+          $observerBlob = Get-GitBlob $observerPath
+          $probeResourcesBlob = Get-GitBlob $probeResourcesPath
+          $workflowBlob = Get-GitBlob $workflowPath
+          $governorHash = (Get-FileHash -LiteralPath $governorPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          $observerHash = (Get-FileHash -LiteralPath $observerPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          $probeResourcesHash = (Get-FileHash -LiteralPath $probeResourcesPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          $workflowHash = (Get-FileHash -LiteralPath $workflowPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          $kernel = ((& uname -srm) -join ' ').Trim()
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($kernel)) { throw 'Unable to read the Linux kernel identity.' }
+
+          . (Join-Path $PWD $governorPath)
+          $policy = [pscustomobject][ordered]@{ minimum_free_ram_gib = 4 }
+          $workRoot = Join-Path $env:GITHUB_WORKSPACE 'build/tmp/mir5-linux-resource-readiness'
+          $requests = @(
+            [ordered]@{ role = 'frozen-k2so-batch-pre-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 64 },
+            [ordered]@{ role = 'frozen-k2so-per-child-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 128 }
+          )
+          $results = [Collections.Generic.List[object]]::new()
+          foreach ($request in $requests) {
+            $expectedPeakBytes = [int64]$request.expected_peak_memory_mib * 1MB
+            $estimatedOutputBytes = [int64]$request.estimated_new_output_mib * 1MB
+            try {
+              $snapshot = Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $workRoot -EstimatedPeakBytes $estimatedOutputBytes -ExpectedPeakMemoryBytes $expectedPeakBytes
+              $limits = Get-MIR441ResourceLimits -Policy $policy -Snapshot $snapshot
+              $results.Add([ordered]@{
+                role = $request.role
+                state = 'admitted'
+                expected_peak_memory_mib = $request.expected_peak_memory_mib
+                estimated_new_output_mib = $request.estimated_new_output_mib
+                snapshot = $snapshot
+                limits = $limits
+              })
+            } catch {
+              $admission = $_.Exception.Data['mir441_resource_admission']
+              if ($null -ne $admission) {
+                $results.Add([ordered]@{
+                  role = $request.role
+                  state = 'refused'
+                  error = $_.Exception.Message
+                  expected_peak_memory_mib = $request.expected_peak_memory_mib
+                  estimated_new_output_mib = $request.estimated_new_output_mib
+                  snapshot = $admission.snapshot
+                  limits = $admission.limits
+                })
+              } else {
+                $results.Add([ordered]@{
+                  role = $request.role
+                  state = 'observation-error'
+                  error = $_.Exception.Message
+                  expected_peak_memory_mib = $request.expected_peak_memory_mib
+                  estimated_new_output_mib = $request.estimated_new_output_mib
+                })
+              }
+            }
+          }
+
+          $states = @($results | ForEach-Object { [string]$_.state })
+          $admissionStatus = if ($states.Count -eq $requests.Count -and (@($states | Where-Object { $_ -ceq 'admitted' }).Count -eq $requests.Count)) {
+            'admitted'
+          } elseif (@($states | Where-Object { $_ -ceq 'observation-error' }).Count -gt 0) {
+            'observation-error'
+          } else {
+            'refused'
+          }
+          $record = [ordered]@{
+            schema = 1
+            kind = 'MIRHostedLinuxResourceReadinessProbeV1'
+            status = $admissionStatus
+            scope = [ordered]@{
+              engine_started = $false
+              factorio_started = $false
+              native_assignment_created = $false
+              package_or_save_input = $false
+              private_input_uploaded = $false
+              library_activated = $false
+              host_configuration_changed = $false
+            }
+            source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
+            checked_files = [ordered]@{
+              resource_governor = [ordered]@{
+                path = $governorPath
+                git_blob = $governorBlob
+                sha256 = $governorHash
+                same_as_frozen_k2so_runner_613 = ($governorBlob -ceq $k2soGovernorBlob613)
+                frozen_k2so_runner_613_blob = $k2soGovernorBlob613
+              }
+              linux_observer = [ordered]@{
+                path = $observerPath
+                git_blob = $observerBlob
+                sha256 = $observerHash
+                same_as_frozen_k2so_runner_613 = ($observerBlob -ceq $k2soObserverBlob613)
+                frozen_k2so_runner_613_blob = $k2soObserverBlob613
+              }
+              probe_resources = [ordered]@{
+                path = $probeResourcesPath
+                git_blob = $probeResourcesBlob
+                sha256 = $probeResourcesHash
+                same_as_frozen_k2so_runner_613 = ($probeResourcesBlob -ceq $k2soProbeResourcesBlob613)
+                frozen_k2so_runner_613_blob = $k2soProbeResourcesBlob613
+              }
+              workflow = [ordered]@{ path = $workflowPath; git_blob = $workflowBlob; sha256 = $workflowHash }
+            }
+            runner = [ordered]@{
+              image_os = $env:ImageOS
+              image_version = $env:ImageVersion
+              kernel = $kernel
+              github_runner_os = $env:RUNNER_OS
+              github_runner_arch = $env:RUNNER_ARCH
+            }
+            policy = $policy
+            work_root = $workRoot
+            requests = $results
+            conclusion = 'This is a capacity-only observation. An admitted result does not launch Factorio and is not native, save, package, gameplay, performance, or release acceptance.'
+          }
+          $outputDirectory = Join-Path $PWD 'build/host-gate'
+          [IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
+          $outputPath = Join-Path $outputDirectory 'linux-resource-readiness.json'
+          [IO.File]::WriteAllText($outputPath, (($record | ConvertTo-Json -Depth 32) + "`n"), [Text.UTF8Encoding]::new($false))
+          $outputHash = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          "admission_status=$admissionStatus" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "receipt_sha256=$outputHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          (@(
+            '# Linux resource readiness',
+            '',
+            "Status: **$admissionStatus**",
+            ('Receipt SHA-256: `{0}`' -f $outputHash),
+            '',
+            'This job ran no engine and created no native assignment. Its result is capacity-only and does not qualify MIR behavior or release readiness.'
+          ) -join "`n") | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+      - name: Preserve the capacity receipt
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          include-hidden-files: true
+          name: linux-resource-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/host-gate/linux-resource-readiness.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Refuse unavailable hosted capacity
+        if: steps.probe.outputs.admission_status != 'admitted'
+        shell: pwsh
+        run: |
+          $status = '${{ steps.probe.outputs.admission_status }}'
+          throw "Hosted Linux resource admission was $status; inspect the preserved capacity receipt."
