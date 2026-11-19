@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Paid Base source native preflight adverse retained (2026-11-19)
+
+The [genuine two-mod source attempt](../spec/evidence/published473-base-paid-source-gunmetal-r01-adverse.json) starts one native headless2.0.77 process with exact published MIR4.7.20003. Its scenario stops in player preflight at `automation-2`: the fixture wrongly requires every finite prerequisite's native maximum/current level to be1. The host world and external reader repeat that assumption. No scenario prerequisite grants, ordinary source research, source save or cold load follows. This is a fixture/oracle defect; no player implementation is changed or newly qualified.
+
+The overall result remains `NO-GO`. Independent review rehashes all eleven retained bodies, confirms native exit1 without timeout, protected-source absence, restored library controls/archives, empty cleanup and zero remaining Factorio. Preserve the packet, actual failure and the checked #2139 fixture commits. The corrective source must emit the actual23-row native preflight scalars before construction, distinguish a single native stage from absolute level1, and retain opposing multi-level/infinite/earned/no-work checks in the actor, host world and external reader. Use a distinct reviewed packet; the earlier data-only43FF capture remains accepted only within its original scope. Candidate preservation, original reports, release and stable acceptance remain unfinished.
+
 ## Paid Base reader integrated; published predecessor data retained (2026-11-19)
 
 [PR #2136](https://github.com/Julesc013/more-infinite-research/pull/2136), merged as `60add71e`, reconciles the original #2084 commits with current source and admits the exact published4.7.3 Base recipe mask when every current extra mod is proved newly added. Updated, removed, unwitnessed or inconsistent providers, changed startup settings and private current mains retain their refusals. Root runs131 focused methods; independent review runs eight affected methods; all four exact-head CI checks pass. Player treee2df and the then-unconsumed CADD/9127 private18 packages are retained. The distinct MIR4 Base-addition admission still has no native paid-preservation verdict.
