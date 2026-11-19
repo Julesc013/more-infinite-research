@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## K2SO unlimited material report: source correction awaiting qualification (2026-11-19)
+
+The latest Driku thread reports that a zero productivity maximum still leaves silicon at level3, including after removing and readding MIR. Inspection reproduces the mechanism: the three K2SO material families emit only their finite stages, while their level-four identities remain inventory-only. The correction adds all three continuations through the existing shared material renderer and registers their existing settings with the cap catalogue. The finite native stages remain intact, and only MIR-owned cap disablements may be restored. The [architecture response](implementation/architecture-regression-response-2026-11-18.md#scope-and-evidence) records the explicit late-science/cost decision and required opposing cases. Existing request `K2-04` retains the full intake identity; no new request registry is created.
+
+Pinned host controls pass16 material methods,57 Generator methods and five existing finite-fixture methods. The complete frozen private F21018 ZIP fails the three new late-stage expectations, with no native execution; its bytes remain unchanged. Those comparisons establish a missing construction/cap boundary, not the reporter's actual saved settings or native upgrade. This correction still needs independent review, required CI, exact K2SO paid finite-to-late progression and cap/save/two-cold qualification before an affected release is accepted. Published5.0.17 remains unchanged; no18 publication or stable acceptance follows.
+
 ## Paid Base source adopted and same-selection cold accepted (2026-11-19)
 
 The [separate retained-source cold result](../spec/evidence/published473-base-paid-source-gunmetal-r03.json) accepts the exact already-created435425 published4.7.20003/Base2.0.77 source without repeating its five ordinary completions. The corrected external reader preserves the native lab position `(0.5,0.5)` and passes fifteen controls, including the actual old-reader refusal and corrected-reader success on the same retained bytes. A reviewed zero-native Compose restores the library, then one natural cold process exits0 and observes the unchanged saved endpoint at tick1253 after saved tick1252.
