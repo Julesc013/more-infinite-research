@@ -122,6 +122,7 @@ $controls = @(
   [ordered]@{path='tests/test_cryogenic_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/test_material_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_material_native_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_k2so_material_continuation_fixture.py';lua=$true},
   [ordered]@{path='tests/test_product_targets.py';lua=$true},
   [ordered]@{path='tests/test_product_target_extension.py';lua=$true},
   [ordered]@{path='tests/test_native_family_product_targets.py';lua=$true},

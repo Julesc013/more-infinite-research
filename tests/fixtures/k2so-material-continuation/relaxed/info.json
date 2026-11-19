@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-k2so-material-continuation",
+  "version": "0.4.0",
+  "title": "MIR K2SO material continuation relaxed fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable ordinary-cost material progression, cap and save witnesses. Not a player repair tool.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.24",
+    "space-age = 2.1.24",
+    "Krastorio2 = 2.1.4",
+    "Krastorio2-spaced-out = 2.0.19",
+    "xy-k2so-enhancements-nulls-fork = 0.8.3",
+    "more-infinite-research = 5.0.21018"
+  ]
+}
