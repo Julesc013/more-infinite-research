@@ -124,7 +124,7 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
                     "unit":{"count_formula":"1600+200*(L-4)","time":30,"ingredients":[["space-science-pack",1]]}}
         raw={"technology":technologies,"lab":{
             "lab":{"type":"lab","name":"lab","energy_source":{"type":"electric","usage_priority":"secondary-input"},
-                "researching_speed":1,"inputs":["automation-science-pack","logistic-science-pack","chemical-science-pack"]},
+                "researching_speed":1,"inputs":["automation-science-pack","logistic-science-pack","chemical-science-pack","space-science-pack"]},
             "k2so-white-lab":{"type":"lab","name":"k2so-white-lab","energy_source":{"type":"electric"},
                 "inputs":["space-science-pack"]}},
             "int-setting":{f"ips-max-level-research_material_{family}":{"type":"int-setting","default_value":0} for family in EARLY}}
@@ -152,13 +152,12 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
             return {key:K2SOMaterialContinuationFixtureTests.plain(member) for key,member in value.items()}
         return value
 
-    def test_data_adds_only_probe_then_private_lab_after_full_unchanged_material_validation(self):
+    def test_data_adds_only_probe_after_full_named_original_lab_validation(self):
         for role in ROLES:
             with self.subTest(role=role):
                 self.data_world(role)
                 original=self.plain(self.lua.eval("data.raw"))
                 self.lua.eval("fixture_data.prototypes")(role)
-                self.assertIsNone(self.lua.eval('data.raw.lab["mir-k2so-material-continuation-lab"]'))
                 self.lua.eval("fixture_data.validate")(role)
                 after=self.plain(self.lua.eval("data.raw"))
                 for name,row in original["technology"].items():
@@ -166,11 +165,7 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
                 for name,row in original["lab"].items():
                     self.assertEqual(after["lab"][name],row)
                 self.assertEqual(set(after["technology"])-set(original["technology"]),{PROBE})
-                self.assertEqual(set(after["lab"])-set(original["lab"]),{"mir-k2so-material-continuation-lab"})
-                private=after["lab"]["mir-k2so-material-continuation-lab"]
-                self.assertEqual(private["energy_source"],original["lab"]["lab"]["energy_source"])
-                self.assertEqual(private["researching_speed"],1800)
-                self.assertEqual(private["module_slots"],0)
+                self.assertEqual(after["lab"],original["lab"])
                 self.lua.eval("fixture_data.settings")(role)
                 for family in EARLY:
                     self.assertEqual(self.lua.eval(f'data.raw["int-setting"]["ips-max-level-research_material_{family}"].default_value'),3 if role=="finite" else 0)
@@ -192,16 +187,12 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
                 with self.assertRaisesRegex(Exception,reason):
                     self.lua.eval("fixture_data.validate")("upgrade")
                 self.assertEqual(self.plain(self.lua.eval("data.raw")),before)
-                self.assertIsNone(self.lua.eval('data.raw.lab["mir-k2so-material-continuation-lab"]'))
+                self.assertEqual(self.plain(self.lua.eval("data.raw.lab")),before["lab"])
 
-    def test_private_lab_cannot_authenticate_missing_original_white_science_support(self):
+    def test_named_original_lab_cannot_be_replaced_by_an_alternative_white_lab(self):
         self.data_world("upgrade")
-        self.lua.execute('data.raw.lab["k2so-white-lab"].inputs={"chemical-science-pack"}')
-        with self.assertRaisesRegex(Exception,"no original K2SO lab accepts"):
-            self.lua.eval("fixture_data.validate")("upgrade")
-        self.assertIsNone(self.lua.eval('data.raw.lab["mir-k2so-material-continuation-lab"]'))
-        self.lua.execute('data.raw.lab["mir-k2so-material-continuation-lab"]={inputs={"space-science-pack"}}')
-        with self.assertRaisesRegex(Exception,"private lab appeared before final science validation"):
+        self.lua.execute('data.raw.lab["lab"].inputs={"chemical-science-pack"}')
+        with self.assertRaisesRegex(Exception,"named original lab does not accept"):
             self.lua.eval("fixture_data.validate")("upgrade")
 
     def test_published_source_data_refuses_any_unexpected_continuation(self):
@@ -211,7 +202,96 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
                 self.lua.execute(f'data.raw.technology["recipe-prod-research_material_{family}-4"]={{name="unexpected"}}')
                 with self.assertRaisesRegex(Exception,"published source unexpectedly has a material continuation"):
                     self.lua.eval("fixture_data.validate")("source")
-                self.assertIsNone(self.lua.eval('data.raw.lab["mir-k2so-material-continuation-lab"]'))
+
+    def test_named_original_lab_and_temporary_speed_restore_an_observed_nonzero_baseline(self):
+        self.world.execute("game.forces.player.laboratory_speed_modifier=.25")
+        self.world.load("source")
+        self.call("init")
+        self.tick(3)
+        self.assertEqual(self.lua.eval(f"storage.{KEY}.lab_speed_baseline"), .25)
+        self.assertEqual(self.lua.eval("game.forces.player.laboratory_speed_modifier"), 115199.25)
+        self.until("#saves==1")
+        self.assertEqual(self.lua.eval("game.forces.player.laboratory_speed_modifier"), .25)
+        self.assertEqual(self.lua.eval(f"storage.{KEY}.player.laboratory_speed_modifier"), .25)
+        self.world.load("source")
+        self.call("load")
+        self.tick()
+        self.assertEqual(self.lua.eval("game.forces.player.laboratory_speed_modifier"), .25)
+
+    def test_nonzero_productivity_or_nonfinite_speed_baseline_refuses_before_fixture_writes(self):
+        opponents=(
+            ("game.forces.player.laboratory_speed_modifier=.25; game.forces.player.laboratory_productivity_bonus=.1",
+             "laboratory baseline is invalid", .25, .1),
+            ("game.forces.player.laboratory_speed_modifier=math.huge",
+             "laboratory baseline is invalid", float("inf"), 0),
+        )
+        for setup, reason, speed, productivity in opponents:
+            with self.subTest(setup=setup):
+                world=FixtureWorld(self.runtime_type)
+                world.execute(setup)
+                world.load("source")
+                ok,message=world.evaluate("world_call")("init",None)
+                self.assertTrue(ok,message)
+                with self.assertRaisesRegex(Exception,reason):
+                    world.evaluate("world_tick")(2,False)
+                self.assertEqual(world.evaluate("game.forces.player.laboratory_speed_modifier"),speed)
+                self.assertEqual(world.evaluate("game.forces.player.laboratory_productivity_bonus"),productivity)
+                self.assertFalse(world.evaluate('game.forces.player.technologies["automation-science-pack"].researched'))
+                self.assertIsNone(world.evaluate(f'game.forces["{FOREIGN}"]'))
+                self.assertEqual(world.evaluate("#world_labs"),0)
+                self.assertEqual(world.evaluate("#saves"),0)
+                self.assertEqual(world.evaluate("#game.forces.player.research_queue"),0)
+
+    def test_private_lab_substitution_or_missed_speed_restoration_refuses_before_save(self):
+        text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
+        private=text.replace('local LAB = "lab"','local LAB = "mir-k2so-material-continuation-lab"')
+        self.world.load("source",actor_source=private)
+        self.call("init")
+        self.tick()
+        with self.assertRaisesRegex(Exception,"fixture must use the named original lab"):
+            self.tick()
+        self.assertEqual(self.lua.eval("#saves"),0)
+
+        restored=text.replace("set_running(state, false)\n    restore_lab_speed(state)\n    state.job_finished", "set_running(state, false)\n    state.job_finished", 1)
+        self.world=FixtureWorld(self.runtime_type)
+        self.lua=self.world.lua
+        self.world.execute("game.forces.player.laboratory_speed_modifier=.25")
+        self.world.load("source",actor_source=restored)
+        self.call("init")
+        with self.assertRaisesRegex(Exception,"laboratory baseline changed"):
+            self.until("#saves==1")
+        self.assertEqual(self.lua.eval("#saves"),0)
+
+    def test_lab_entity_boundary_refuses_readonly_and_unknown_actor_access_before_science_or_save(self):
+        self.world.execute('''
+          local lab=game.surfaces[1].create_entity{name="lab",position={0,0},force=game.forces.player}
+          lab.energy=100;lab.disabled_by_script=true;lab.destructible=false;lab.minable=false;lab.operable=false
+          assert(lab.energy==100 and lab.disabled_by_script and not lab.destructible and not lab.minable and not lab.operable)
+        ''')
+        for statement in ('return world_labs[1].unknown_fixture_member', 'world_labs[1].unknown_fixture_member=true', 'world_labs[1].name="lab"'):
+            with self.subTest(statement=statement):
+                with self.assertRaisesRegex(Exception,"LuaEntity field"):
+                    self.world.execute(statement)
+
+        text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
+        anchor='state.lab=game.surfaces[1].create_entity{name=LAB,position={0,0},force=force}\n      set_running(state,false)'
+        self.assertEqual(text.count(anchor),1)
+        opponents=(
+            ('state.lab.name=LAB', 'LuaEntity field: name'),
+            ('local ignored=state.lab.unknown_fixture_member or false', 'LuaEntity field: unknown_fixture_member'),
+        )
+        for mutation,reason in opponents:
+            with self.subTest(mutation=mutation):
+                self.world=FixtureWorld(self.runtime_type)
+                self.lua=self.world.lua
+                actor=text.replace(anchor, 'state.lab=game.surfaces[1].create_entity{name=LAB,position={0,0},force=force}\n      '+mutation+'\n      set_running(state,false)')
+                self.world.load("source",actor_source=actor)
+                self.call("init")
+                with self.assertRaisesRegex(Exception,reason):
+                    self.tick(2)
+                self.assertEqual(self.lua.eval("#saves"),0)
+                self.assertEqual(self.lua.eval("#game.forces.player.research_queue"),0)
+                self.assertTrue(self.lua.eval("world_labs[1].get_inventory(1).is_empty()"))
 
     def test_wrong_difficulty_api_field_is_a_live_rejected_opponent(self):
         text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
@@ -233,9 +313,9 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
                 with self.assertRaisesRegex(Exception,"LuaForce field"):
                     self.world.execute(statement)
         text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
-        anchor="local force = game.forces.player\n      for _, name in ipairs(PREREQUISITES)"
+        anchor='assert_lab_baseline(state,"source setup")\n      for _, name in ipairs(PREREQUISITES)'
         self.assertEqual(text.count(anchor),1)
-        opponent=text.replace(anchor,"local force = game.forces.player\n      force.research_queue_enabled=true\n      for _, name in ipairs(PREREQUISITES)")
+        opponent=text.replace(anchor,'assert_lab_baseline(state,"source setup")\n      force.research_queue_enabled=true\n      for _, name in ipairs(PREREQUISITES)')
         self.world.load("source",actor_source=opponent)
         self.call("init")
         with self.assertRaisesRegex(Exception,"LuaForce field: research_queue_enabled"):
@@ -360,13 +440,23 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
         self.assertEqual(self.lua.eval(f"storage.{KEY}.finished"),0)
 
     def test_foreign_change_during_research_cannot_become_the_saved_baseline(self):
-        self.world.load("source")
-        self.call("init")
-        self.tick(2)
-        self.world.execute(f'game.forces["{FOREIGN}"].recipes["kr-glass"].productivity_bonus=.02')
-        with self.assertRaisesRegex(Exception,"foreign.*paid recipe changed|foreign.*bonus"):
-            self.until("#saves==1")
-        self.assertEqual(self.lua.eval("#saves"),0)
+        opponents=(
+            (f'game.forces["{FOREIGN}"].recipes["kr-glass"].productivity_bonus=.02',
+             "foreign.*paid recipe changed|foreign.*bonus"),
+            (f'game.forces["{FOREIGN}"].laboratory_productivity_bonus=.1',
+             "foreign.*laboratory modifiers changed"),
+        )
+        for mutation,reason in opponents:
+            with self.subTest(mutation=mutation):
+                self.world=FixtureWorld(self.runtime_type)
+                self.lua=self.world.lua
+                self.world.load("source")
+                self.call("init")
+                self.tick(2)
+                self.world.execute(mutation)
+                with self.assertRaisesRegex(Exception,reason):
+                    self.until("#saves==1")
+                self.assertEqual(self.lua.eval("#saves"),0)
 
     def test_save_requires_two_elapsed_ticks_and_rechecks_the_complete_snapshot(self):
         self.world.load("source")
