@@ -212,14 +212,12 @@ local function history_context(event, route, state, current, rejected)
   return " [" .. table.concat(parts, " ") .. "]"
 end
 
-local function recover_error(reason, route, event, state, current, rejected)
+local function recover_error(reason, route, event, state, current, rejected, advice)
   if event ~= nil or state ~= nil or current ~= nil then
     reason = reason .. history_context(event, route, state, current, rejected)
   end
-  refuse(reason .. "; keep the protected original COPY. Load a separate copy with the previous mod selection"
-    .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
-    .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
-    .. " verified history; this command cannot infer it", route)
+  if advice ~= nil then reason = reason .. advice end
+  refuse(reason .. "; keep the protected original COPY", route)
 end
 
 local function legacy_preflight(event, route)
@@ -739,8 +737,8 @@ end
 -- These older Base transitions have separate, narrower native predicates.
 -- MIR501 with a new selection remains empty-only; unchanged-selection MIR501
 -- uses the common default contract. Observer additions never stand for old mods.
-local function default_origin_error(reason, event, state, current, rejected)
-  recover_error(reason, nil, event, state, current, rejected)
+local function default_origin_error(reason, event, state, current, rejected, advice)
+  recover_error(reason, nil, event, state, current, rejected, advice)
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current)
@@ -925,7 +923,10 @@ local function default_origin(event, initializing, state, current)
       local active_version = active[name]
       if not plain or old == nil or old ~= new or new ~= active_version then
         default_origin_error("default transfer requires the unchanged mod selection", event, state, current,
-          {name=name, row=item, active_version=active_version})
+          {name=name, row=item, active_version=active_version},
+          "; this unrecorded changed selection cannot be repaired by /mir-worker-storage-recovery prepare."
+          .. " On a separate copy under its prior mod selection and matching MIR settings, a supported upgrade may"
+          .. " establish MIR-owned default infinite worker4 automatically; save and exit before changing selection")
       end
     end
   end

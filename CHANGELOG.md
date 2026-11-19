@@ -15,6 +15,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Factorio 2.0/2.1: Reject changed internal recipe-productivity amounts before altering saved bonuses.
 - Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
 - Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
+- Factorio 2.0/2.1: Give worker-cargo recovery advice only for an identified unrecorded default selection instead of suggesting preparation for unrelated saved histories.
 
 ## [5.0.17] - 2026-11-17
 
