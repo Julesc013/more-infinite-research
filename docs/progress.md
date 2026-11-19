@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Paid Base source saved; native lab-position reader adverse retained (2026-11-19)
+
+The [second two-mod source attempt](../spec/evidence/published473-base-paid-source-gunmetal-r02-reader-adverse.json) completes five ordinary first research levels with published MIR4.7.20003 and Base2.0.77. Actual non-scripted events expose next level2; the lab consumes40000 of each of four science packs and retains168 each. The scenario observes23 native finite prerequisites before construction, including three tier-two rows, then retains completed rows on both observed forces, five paid player recipe effects, detached27% plastic work, repeated player/foreign queues and the foreign42% current work. After two elapsed hold ticks it writes the848333-byte435425 source save.
+
+The overall r02 result remains `NO-GO`. The unchanged external reader rejects the actual Base lab at `(0.5,0.5)` because it expects the requested creation coordinates `(0,0)`. One governed process stops on its closed-save predicate without timeout; no protected-source promotion or cold process follows. Independent review rehashes all twenty readback bodies, CRC-checks all eight ZIP entries, confirms exact embedded actor bytes and restored library/empty cleanup/zero remaining Factorio, and permits conditional adoption of this exact already-created source only. A distinct corrected offline reader and separately reviewed cold-only packet must finish that boundary without recreating the five source completions.
+
+The original execution review also contains a wrong unverified supplementary Compose-readback hash. Its original bytes remain unchanged; separate reviewer and root addenda record the correct hash and independently rehash all nine actual composition files. The packet, owner and top-level composition dispatch bindings match. Preserve this review defect and both native adverses; neither correction establishes candidate preservation, reporter closure, release or stable acceptance. Player source and published packages are unchanged.
+
 ## Paid Base source native preflight adverse retained (2026-11-19)
 
 The [genuine two-mod source attempt](../spec/evidence/published473-base-paid-source-gunmetal-r01-adverse.json) starts one native headless2.0.77 process with exact published MIR4.7.20003. Its scenario stops in player preflight at `automation-2`: the fixture wrongly requires every finite prerequisite's native maximum/current level to be1. The host world and external reader repeat that assumption. No scenario prerequisite grants, ordinary source research, source save or cold load follows. This is a fixture/oracle defect; no player implementation is changed or newly qualified.
