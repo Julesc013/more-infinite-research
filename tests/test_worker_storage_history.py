@@ -90,6 +90,8 @@ class WorkerStorageHistoryTests(unittest.TestCase):
           for _,old in ipairs({"5.0.21008","4.7.21003","4.7.20003"}) do
             local ok,message=pcall(history.preflight,upgrade(old),route(4))
             assert(not ok and tostring(message):find("previous continuation ownership is unknown",1,true))
+            assert(tostring(message):find("keep the protected original COPY",1,true))
+            assert(not tostring(message):find("/mir-worker-storage-recovery prepare",1,true))
             assert(tostring(message):find("previous_mir="..old,1,true))
             assert(tostring(message):find("new_mir=5.0.21009",1,true))
             assert(tostring(message):find("saved_route=absent",1,true) and tostring(message):find("current_route=finite",1,true))
@@ -413,6 +415,8 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(message:find("technology=worker-robots-storage-9",1,true))
           assert(message:find("previous_mir=unchanged",1,true) and message:find("saved_route=default",1,true))
           assert(message:find("current_route=finite",1,true) and message:find("startup_changed=true",1,true))
+          assert(message:find("keep the protected original COPY",1,true))
+          assert(not message:find("/mir-worker-storage-recovery prepare",1,true))
         ''')
 
     def test_unknown_history_context_stays_bounded_printable_and_does_not_gain_authority(self):
@@ -2556,6 +2560,10 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                       local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
                       assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
                       assert(not tostring(message):find("rejecting row metamethod invoked",1,true))
+                      assert(message:find("cannot be repaired by /mir-worker-storage-recovery prepare",1,true))
+                      assert(message:find("a supported upgrade may establish native ownership automatically",1,true))
+                      assert(message:find("restore the previous mod selection and original save",1,true))
+                      assert(not message:find("Only if that copy has MIR-owned default infinite worker4",1,true))
                       assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
                       assert(message:find("previous_mir="..event.mod_changes["more-infinite-research"].old_version,1,true))
                       assert(message:find("new_mir="..script.active_mods["more-infinite-research"],1,true))
@@ -2660,6 +2668,8 @@ class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
                   assert(canonical_reads==1)
                   assert(message:find("recorded default source has an inconsistent producer event",1,true))
                   assert(message:find("current_route=default",1,true))
+                  assert(message:find("keep the protected original COPY",1,true))
+                  assert(not message:find("/mir-worker-storage-recovery prepare",1,true))
                 ''')
 
     def test_recorded_default_preserves_paid_and_pending_work_across_consistent_mod_changes(self):
