@@ -31,8 +31,8 @@ permissions:
 
 jobs:
   verification-plan:
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     name: verification-plan
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     outputs:
       plan_artifact: ${{ steps.artifact.outputs.plan_artifact }}
@@ -194,9 +194,9 @@ jobs:
           if-no-files-found: error
 
   host-controls:
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     name: host-controls
     needs: verification-plan
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -365,8 +365,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   native-tooling-controls:
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     name: native-tooling-controls
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
