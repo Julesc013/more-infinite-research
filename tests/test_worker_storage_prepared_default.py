@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_bootstrap as bootstrap_fixture
+from bootstrap_control_world import build_bootstrap_control_world
 from test_worker_storage_inherited_origin import published_modules
 from worker_storage_default_world import (
     build_default_native_owner_world,
@@ -220,12 +220,11 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_actual_bootstrap_consumes_prepared_default_without_issuing_a_legacy_quota(self):
         # Callback routing is an actual bootstrap control. The authentic old11
         # native-frame host controls above separately exercise the transfer.
-        bootstrap_fixture.LuaRuntime = LuaRuntime
         for invalid_caps in (False, True):
             with self.subTest(invalid_caps=invalid_caps):
-                fixture = bootstrap_fixture.BootstrapTests();fixture.setUp()
-                fixture.lua.globals().invalid_caps = invalid_caps
-                fixture.lua.execute(r'''
+                lua = build_bootstrap_control_world(LuaRuntime, source_root=ROOT / "source")
+                lua.globals().invalid_caps = invalid_caps
+                lua.execute(r'''
                   install_modules(false);install_runtime()
                   local catalogue=require("runtime.catalogue")
                   catalogue.worker_default_split=function()return true end
@@ -263,6 +262,27 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
                     assert(lifecycle_calls.configuration~=nil)
                   end
                 ''')
+
+    def test_prepared_default_bootstrap_uses_explicit_world_not_bootstrap_testcase(self):
+        import test_bootstrap as bootstrap_fixture
+
+        missing_runtime = object()
+        original_runtime = getattr(bootstrap_fixture, "LuaRuntime", missing_runtime)
+        original_setup = bootstrap_fixture.BootstrapTests.setUp
+
+        def forbidden_setup(_case):
+            raise AssertionError("prepared-default bootstrap selected borrowed BootstrapTests.setUp")
+
+        bootstrap_fixture.BootstrapTests.setUp = forbidden_setup
+        try:
+            self.test_actual_bootstrap_consumes_prepared_default_without_issuing_a_legacy_quota()
+        finally:
+            bootstrap_fixture.BootstrapTests.setUp = original_setup
+            if original_runtime is missing_runtime:
+                if hasattr(bootstrap_fixture, "LuaRuntime"):
+                    delattr(bootstrap_fixture, "LuaRuntime")
+            else:
+                bootstrap_fixture.LuaRuntime = original_runtime
 
 
 if __name__ == "__main__":
