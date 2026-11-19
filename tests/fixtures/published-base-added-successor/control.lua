@@ -6,9 +6,12 @@ local PREFIX = "[MIR_PUBLISHED_BASE_ADDED_SUCCESSOR] "
 local SAVE = "mir473-base-added-successor"
 local SOURCE = require("expected-source")
 local SOURCE_SHA = "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98"
+local SOURCE_SAVE_SHA = "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413"
 local SOURCE_MIR = "4.7.20003"
 local TARGET = {["5.0.20016"] = true, ["5.0.20018"] = true}
 local HOLD = 2
+local SPEED_ACCELERATION = 115199
+local STEEL_LEVEL_THREE_COUNT = 32000
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
 local PLAYER, FOREIGN = "player", "mir473-base-paid-foreign"
 local MAINS = {
@@ -44,7 +47,12 @@ local function equal(actual, expected, path)
     for key, item in pairs(expected) do equal(actual[key], item, path .. "." .. tostring(key)) end
     for key in pairs(actual) do if expected[key] == nil then fail(path .. " has unexpected field " .. tostring(key)) end end
   elseif type(actual) == "number" then
-    if not close(actual, expected) then fail(path .. " differs") end
+    local floating_native = path:find("saved_progress", 1, true) or path:find("progress", 1, true) or path:find("recipe_bonuses", 1, true)
+    if expected == 0 then
+      if actual ~= 0 then fail(path .. " differs") end
+    elseif floating_native then
+      if not close(actual, expected) then fail(path .. " differs") end
+    elseif actual ~= expected then fail(path .. " differs") end
   elseif actual ~= expected then fail(path .. " differs") end
 end
 local function active() return TARGET[script.active_mods["more-infinite-research"]] == true end
@@ -137,13 +145,12 @@ local function source_projection(expected)
   require_ok(player and foreign and player.valid ~= false and foreign.valid ~= false, "observed source forces differ")
   local lab = lab_frame(expected.lab)
   return {force_registry=force_registry(),observed_force_count=2,observed_forces={player={name=player.name,index=player.index},foreign={name=foreign.name,index=foreign.index}},
-    player=force_frame(player, expected.player), foreign=force_frame(foreign, expected.foreign),
-    science=copy(expected.science), lab=lab}
+    player=force_frame(player, expected.player), foreign=force_frame(foreign, expected.foreign), lab=lab}
 end
 local function assert_aliases_zero()
   for _, force_name in ipairs({PLAYER, FOREIGN}) do
     local force = game.forces[force_name]
-    for _, row in ipairs(MAINS) do require_ok(close(recipe(force, row.alias).productivity_bonus, 0), "new alias inherited old paid bonus") end
+    for _, row in ipairs(MAINS) do require_ok(recipe(force, row.alias).productivity_bonus == 0, "new alias inherited old paid bonus") end
   end
 end
 local function assert_initial()
@@ -155,7 +162,6 @@ local function assert_initial()
   equal(actual.observed_forces, expected.observed_forces, "frozen public source observed forces")
   equal(actual.player, expected.player, "frozen public source player")
   equal(actual.foreign, expected.foreign, "frozen public source foreign")
-  equal(actual.science, expected.science, "frozen public source science")
   equal(actual.lab, expected.lab, "frozen public source lab")
   assert_aliases_zero()
   return expected, actual
@@ -201,8 +207,8 @@ local function begin_work(state)
   local steel = technology(state.player, STEEL.name)
   require_ok(state.player.current_research == steel and close(state.player.research_progress, 0), "source steel queue differs before ordinary work")
   state.lab.energy = state.lab.electric_buffer_size
-  state.player.laboratory_speed_modifier = state.source_lab.laboratory_speed_modifier + 64
-  require_ok(close(state.player.laboratory_speed_modifier, state.source_lab.laboratory_speed_modifier + 64), "temporary laboratory speed differs")
+  state.player.laboratory_speed_modifier = state.source_lab.laboratory_speed_modifier + SPEED_ACCELERATION
+  require_ok(state.player.laboratory_speed_modifier == state.source_lab.laboratory_speed_modifier + SPEED_ACCELERATION, "temporary laboratory speed differs")
   replenish(state); state.lab.disabled_by_script = false; state.phase = "working"
 end
 local function assert_settled(state)
@@ -214,20 +220,23 @@ local function assert_settled(state)
   local player_mains, foreign_mains = mains_frame(player, expected.player.mains), mains_frame(foreign, expected.foreign.mains)
   for _, row in ipairs(MAINS) do
     if row.name == STEEL.name then
-      require_ok(player_mains[row.name].state.level == 3 and player_mains[row.name].state.researched == false and player_mains[row.name].state.saved_progress == 0, "completed steel state differs")
+      local settled = copy(expected.player.mains[row.name])
+      settled.state.level, settled.state.researched, settled.state.saved_progress = 3, false, 0
+      settled.unit.count = STEEL_LEVEL_THREE_COUNT
+      equal(player_mains[row.name], settled, "completed steel state")
     else equal(player_mains[row.name], expected.player.mains[row.name], "player main " .. row.name) end
     equal(foreign_mains[row.name], expected.foreign.mains[row.name], "foreign main " .. row.name)
   end
-  local player_queue = queue(player); require_ok(player_queue.current == STEEL.name and #player_queue.names == 1 and player_queue.names[1] == STEEL.name and close(player_queue.progress, 0), "settled steel queue differs")
+  local player_queue = queue(player); require_ok(player_queue.current == STEEL.name and #player_queue.names == 1 and player_queue.names[1] == STEEL.name and player_queue.progress == 0, "settled steel queue differs")
   equal(queue(foreign), expected.foreign.queue, "foreign queue")
   for _, row in ipairs(MAINS) do
     local player_bonus, foreign_bonus = recipe(player, row.recipe).productivity_bonus, recipe(foreign, row.recipe).productivity_bonus
-    require_ok(close(foreign_bonus, 0) and close(recipe(foreign, row.alias).productivity_bonus, 0), "foreign productivity differs")
+    require_ok(foreign_bonus == 0 and recipe(foreign, row.alias).productivity_bonus == 0, "foreign productivity differs")
     if row.name == STEEL.name then require_ok(close(player_bonus, .2) and close(recipe(player,row.alias).productivity_bonus,.1), "steel paid/new alias bonuses differ")
-    else require_ok(close(player_bonus,.1) and close(recipe(player,row.alias).productivity_bonus,0), "uncompleted paid/new alias bonuses differ") end
+    else require_ok(close(player_bonus,.1) and recipe(player,row.alias).productivity_bonus == 0, "uncompleted paid/new alias bonuses differ") end
   end
   local lab = lab_frame(expected.lab)
-  require_ok(lab.disabled_by_script and close(lab.laboratory_speed_modifier, expected.lab.laboratory_speed_modifier), "settled lab control differs")
+  require_ok(lab.disabled_by_script and lab.laboratory_speed_modifier == expected.lab.laboratory_speed_modifier, "settled lab control differs")
   for _, pack in ipairs(PACKS) do
     local spent = state.initial_input[pack] + state.science.accepted[pack] - lab.input[pack]
     require_ok(spent == 16000 and lab.input[pack] > 0, "ordinary science accounting differs")
@@ -236,20 +245,30 @@ local function assert_settled(state)
 end
 local function plain_endpoint(state)
   local lab = assert_settled(state)
+  local consumed = {}
+  for _, pack in ipairs(PACKS) do
+    consumed[pack] = state.initial_input[pack] + state.science.accepted[pack] - lab.input[pack]
+  end
   return {force_registry=force_registry(),observed_forces={player=force_frame(state.player,state.expected.player),foreign=force_frame(state.foreign,state.expected.foreign)},
-    lab=lab,science={accepted=copy(state.science.accepted),remaining=copy(lab.input),consumed={}},
+    lab=lab,science={accepted=copy(state.science.accepted),remaining=copy(lab.input),consumed=consumed},
     ordinary=copy(state.ordinary),topups=copy(state.topups),callback=copy(state.callback),scripted_carriers=copy(state.scripted_carriers)}
 end
-local function marker(state, phase, filename)
+local function exact_equal(actual, expected, path)
+  if type(actual) ~= type(expected) then fail(path .. " type differs") end
+  if type(actual) == "table" then
+    for key, item in pairs(expected) do exact_equal(actual[key], item, path .. "." .. tostring(key)) end
+    for key in pairs(actual) do if expected[key] == nil then fail(path .. " has unexpected field " .. tostring(key)) end end
+  elseif actual ~= expected then fail(path .. " differs") end
+end
+local function marker(state, phase, filename, closed)
   local endpoint
   if phase == "added-pre-work" then
     endpoint = copy(state.before)
   else
-    endpoint = plain_endpoint(state)
-    for _, pack in ipairs(PACKS) do endpoint.science.consumed[pack] = state.initial_input[pack] + state.science.accepted[pack] - endpoint.science.remaining[pack] end
+    endpoint = closed or plain_endpoint(state)
   end
   local body = {kind="MIRPublished473BaseAddedSuccessorV1",schema=1,role="added-successor",phase=phase,tick=game.tick,
-    source_sha256=SOURCE_SHA,source_tick=state.source.tick,source_saved_tick=state.source.saved_tick,before=copy(state.before),endpoint=endpoint,
+    source_observation_sha256=SOURCE_SHA,source_save_sha256=SOURCE_SAVE_SHA,source_tick=state.source.tick,source_saved_tick=state.source.saved_tick,before=copy(state.before),source_history=copy(state.expected.science),endpoint=endpoint,
     callback=copy(state.callback),elapsed_ticks=state.hold_start and game.tick-state.hold_start or 0}
   local text = helpers.table_to_json(body)
   helpers.write_file("published-base-added-successor/" .. filename, text, false)
@@ -277,12 +296,14 @@ script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]; if type(state) ~= "table" then return end
   local research = event and event.research
   if event and event.by_script == true then
-    require_ok(research and carriers[research.name] == true, "unexpected scripted research event")
-    state.scripted_carriers[#state.scripted_carriers + 1] = {name=research.name,tick=game.tick,by_script=true}; return
+    local force = research and research.force
+    require_ok(research and force and (force == state.player or force == state.foreign) and carriers[research.name] == true and technology(force, research.name) == research, "unexpected scripted research event")
+    state.scripted_carriers[#state.scripted_carriers + 1] = {name=research.name,force_name=force.name,force_index=force.index,tick=game.tick,by_script=true}; return
   end
-  require_ok(state.phase == "working" and research and research == technology(state.player, STEEL.name) and event.by_script == false, "ordinary research event differs")
+  require_ok(state.phase == "working" and research and research.force == state.player and research == technology(state.player, STEEL.name) and event.by_script == false, "ordinary research event differs")
   require_ok(research.level == 3 and research.researched == false, "ordinary event was not post-increment steel level three")
   state.ordinary.completed = state.ordinary.completed + 1; require_ok(state.ordinary.completed == 1, "ordinary completion count differs")
+  state.ordinary.event = {name=research.name,level=research.level,force_name=research.force.name,force_index=research.force.index,tick=game.tick,by_script=event.by_script}
   state.lab.disabled_by_script = true
   state.player.laboratory_speed_modifier = state.source_lab.laboratory_speed_modifier
   state.phase, state.hold_start = "holding", game.tick
@@ -292,15 +313,15 @@ script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]; if type(state) ~= "table" then return end
   if cold_pending then
     require_ok(state.phase == "saved" and game.tick == state.saved_tick + 1, "cold tick differs")
-    plain_endpoint(state); marker(state, "added-cold", "added-cold.json"); cold_pending = false; return
+    local endpoint = plain_endpoint(state); exact_equal(endpoint, state.saved_endpoint, "cold saved endpoint"); marker(state, "added-cold", "added-cold.json", endpoint); cold_pending = false; return
   end
   if state.phase == "pre-work" then begin_work(state)
-  elseif state.phase == "working" then replenish(state)
+  elseif state.phase == "working" then state.lab.energy = state.lab.electric_buffer_size; replenish(state)
   elseif state.phase == "holding" then
     assert_settled(state)
     if game.tick - state.hold_start >= HOLD then
-      state.saved_tick, state.phase = game.tick, "saved"; marker(state, "added-saved", "added-saved.json"); game.server_save(SAVE)
+      state.saved_endpoint = plain_endpoint(state); state.saved_tick, state.phase = game.tick, "saved"; marker(state, "added-saved", "added-saved.json", state.saved_endpoint); game.server_save(SAVE)
     end
-  elseif state.phase == "saved" then assert_settled(state)
+  elseif state.phase == "saved" then exact_equal(plain_endpoint(state), state.saved_endpoint, "saved endpoint")
   elseif state.phase ~= "initialized" then fail("unknown fixture phase") end
 end)

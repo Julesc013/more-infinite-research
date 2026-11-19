@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import unittest
@@ -56,6 +57,7 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         self.assertEqual(self.source["tick"], 1252)
         self.assertEqual(self.source["endpoint"]["lab"]["position"], {"x": 0.5, "y": 0.5})
         self.assertIn("BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98", EXPECTED.read_text(encoding="utf-8"))
+        self.assertEqual(hashlib.sha256(self.source_text.encode("utf-8")).hexdigest().upper(), "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98")
         data = DATA.read_text(encoding="utf-8")
         for _, _, recipe, alias in MAINS:
             self.assertIn(f'{{"{recipe}", "{alias}"}}', data)
@@ -70,11 +72,16 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         self.assertGreaterEqual(self.call("storage.mir_published_base_added_successor.saved_tick-storage.mir_published_base_added_successor.hold_start"), 2)
         self.assertEqual(self.call("markers[1].phase"), "added-pre-work")
         self.assertEqual(self.call("markers[2].phase"), "added-saved")
+        self.assertEqual(self.call("markers[2].source_observation_sha256"), "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98")
+        self.assertEqual(self.call("markers[2].source_save_sha256"), "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413")
         self.assertFalse(self.call("markers[1].callback.startup_changed"))
         self.assertEqual(self.call('markers[1].callback.startup["mir-max-level-worker-robots-storage"]'), 0)
         self.assertEqual(self.call("markers[2].endpoint.ordinary.name"), "recipe-prod-research_steel-1")
         self.assertEqual(self.call("markers[2].endpoint.ordinary.completed"), 1)
         self.assertFalse(self.call("markers[2].endpoint.ordinary.by_script"))
+        self.assertEqual(self.call("markers[2].endpoint.ordinary.event.level"), 3)
+        self.assertEqual(self.call("markers[2].endpoint.ordinary.event.force_name"), "player")
+        self.assertFalse(self.call("markers[2].endpoint.ordinary.event.by_script"))
         self.assertEqual(self.call('markers[2].endpoint.observed_forces.player.mains["recipe-prod-research_steel-1"].state.level'), 3)
         self.assertEqual(self.call('game.forces.player.recipes["steel-plate"].productivity_bonus'), 0.2)
         self.assertEqual(self.call('game.forces.player.recipes["mir-fixture-added-steel-plate"].productivity_bonus'), 0.1)
@@ -87,6 +94,10 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         for pack in ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"):
             self.assertEqual(self.call(f'markers[2].endpoint.science.consumed["{pack}"]'), 16000)
             self.assertGreater(self.call(f'markers[2].endpoint.science.remaining["{pack}"]'), 0)
+        topups = self.call("#markers[2].endpoint.topups")
+        ok, message = self.call("added_tick(1,false)")
+        self.assertTrue(ok, message)
+        self.assertEqual(self.call("#storage.mir_published_base_added_successor.topups"), topups)
 
     def test_old_and_malformed_configuration_events_refuse_without_repairing_source(self) -> None:
         ok, message = self.call('added_init_config("5.0.20015",nil)')
@@ -104,6 +115,9 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
     def test_scripted_carrier_is_logged_but_scripted_main_and_stale_event_refuse(self) -> None:
         self.config()
         ok, message = self.call('added_call(2,{research={name="mir-native-credit-research_steel-steel-plate-positive"},by_script=true})')
+        self.assertFalse(ok)
+        self.assertIn("unexpected scripted research event", message)
+        ok, message = self.call('added_scripted("mir-native-credit-research_steel-steel-plate-positive")')
         self.assertTrue(ok, message)
         self.assertEqual(self.call("#storage.mir_published_base_added_successor.scripted_carriers"), 1)
         ok, message = self.call('added_scripted("recipe-prod-research_steel-1")')
@@ -135,7 +149,7 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         self.assertEqual(lua.eval("markers[3].phase"), "added-cold")
 
     def test_wrong_bonus_and_early_elapsed_hold_refuse_or_do_not_save(self) -> None:
-        self.lua.execute('game.forces.player.recipes["steel-plate"].productivity_bonus=.3')
+        self.lua.execute("added_seed_bonus(.3)")
         ok, message = self.call('added_init_config("5.0.20018",nil)')
         self.assertFalse(ok)
         self.assertIn("frozen public source player.recipe_bonuses.steel-plate differs", message)
@@ -152,6 +166,55 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         ok, message = lua.eval("added_tick(1,false)")
         self.assertTrue(ok, message)
         self.assertEqual(lua.eval("#saves"), 1)
+
+    def test_actual_throughput_energy_and_public_write_guards_are_independent(self) -> None:
+        self.assertEqual(self.call("added_ticks_needed(115199)"), 500)
+        self.assertGreater(self.call("added_ticks_needed(64)"), 60 * 300)
+        self.config()
+        ok, message = self.call("added_tick(1,false)")
+        self.assertTrue(ok, message)
+        self.call("added_starve_energy()")
+        ok, message = self.call("added_tick(1,false)")
+        self.assertFalse(ok)
+        self.assertIn("energy exhausted", message)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        install(lua, self.source, self.source_text)
+        writes = lua.eval("added_observer_writes_refuse()")
+        for field in (
+            "level", "researched", "saved", "enabled", "current", "queue", "progress", "bonus",
+            "bracket_level", "bracket_researched", "bracket_saved", "bracket_enabled",
+            "bracket_current", "bracket_queue", "bracket_progress", "bracket_bonus",
+        ):
+            with self.subTest(field=field):
+                self.assertFalse(writes[field])
+
+    def test_exact_zero_and_complete_saved_endpoint_refuse_tiny_or_coordinated_drift(self) -> None:
+        self.lua.execute("added_seed_alias_bonus(1e-12)")
+        ok, message = self.call('added_init_config("5.0.20018",nil)')
+        self.assertFalse(ok)
+        self.assertIn("new alias inherited old paid bonus", message)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        install(lua, self.source, self.source_text)
+        ok, message = lua.eval('added_init_config("5.0.20018",nil)')
+        self.assertTrue(ok, message)
+        ok, message = lua.eval("added_until_saved()")
+        self.assertTrue(ok, message)
+        lua.execute("added_drift_settled()")
+        ok, message = lua.eval("added_tick(1,false)")
+        self.assertFalse(ok)
+        self.assertIn("completed steel state", message)
+        cold_lua = LuaRuntime(unpack_returned_tuples=True)
+        install(cold_lua, self.source, self.source_text)
+        ok, message = cold_lua.eval('added_init_config("5.0.20018",nil)')
+        self.assertTrue(ok, message)
+        ok, message = cold_lua.eval("added_until_saved()")
+        self.assertTrue(ok, message)
+        cold_lua.execute("added_corrupt_saved_endpoint()")
+        ok, message = cold_lua.eval("added_load_throwing()")
+        self.assertTrue(ok, message)
+        ok, message = cold_lua.eval("added_tick(1,false)")
+        self.assertFalse(ok)
+        self.assertIn("cold saved endpoint", message)
 
     def test_observer_never_gets_research_queue_or_progress_write_authority(self) -> None:
         text = CONTROL.read_text(encoding="utf-8")
