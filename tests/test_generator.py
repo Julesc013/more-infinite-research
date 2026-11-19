@@ -195,6 +195,33 @@ K2SO_INTENDED_MATERIAL_ROWS = {
 }
 
 
+def _intended_k2so_material_continuation(name, item, routes, science):
+    # New authored late-stage intent, separate from the retained finite capture.
+    row = _intended_k2so_material_row(name, item, routes, science, [])
+    row.update(level=4, max_level="infinite", show_levels_info=False, visible_when_disabled=True,
+               prerequisites=[name.removesuffix("-4") + "-1", "space-science-pack"],
+               order="p[research_material_" + item.removeprefix("kr-").replace("-", "_") + "__continuation]")
+    row["unit"]["count_formula"] = "1600+200*(L-4)"
+    return row
+
+
+K2SO_INTENDED_MATERIAL_ROWS.update({
+    "recipe-prod-research_material_rare_metals-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_rare_metals-4", "kr-rare-metals",
+        ["kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "space-science-pack"],
+    ),
+    "recipe-prod-research_material_silicon-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_silicon-4", "kr-silicon", ["kr-silicon"],
+        ["automation-science-pack", "logistic-science-pack", "space-science-pack"],
+    ),
+    "recipe-prod-research_material_glass-4": _intended_k2so_material_continuation(
+        "recipe-prod-research_material_glass-4", "kr-glass", ["kr-glass"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "space-science-pack"],
+    ),
+})
+
+
 def lua_table(lua, value):
     if isinstance(value, dict):
         table = lua.table()
@@ -1354,6 +1381,9 @@ class GeneratorTests(unittest.TestCase):
             ["recipe-prod-research_material_rare_metals-1"] = true,
             ["recipe-prod-research_material_silicon-1"] = true,
             ["recipe-prod-research_material_glass-1"] = true,
+            ["recipe-prod-research_material_rare_metals-4"] = true,
+            ["recipe-prod-research_material_silicon-4"] = true,
+            ["recipe-prod-research_material_glass-4"] = true,
           }
           local seen = 0
           for _, row in ipairs(environment.emitted) do
@@ -1367,7 +1397,7 @@ class GeneratorTests(unittest.TestCase):
               seen = seen + 1
             end
           end
-          assert(seen == 3)
+          assert(seen == 6)
           package.loaded["research.settings"] = nil
           mods = nil
         ''')
@@ -1874,7 +1904,7 @@ class GeneratorTests(unittest.TestCase):
           assert(values.streams.research_material_imersite__continuation == values.streams.research_material_imersite)
           package.loaded["research.catalogue"] = nil
           local declared = require("research.catalogue").declared()
-          assert(#declared == 80)
+          assert(#declared == 83)
           local declared_ids, holder_ids = {}, { ["mir-k2-imersite-staged-state-1"] = true, ["mir-k2-imersite-continuation-state-4"] = true }
           for _, row in ipairs(declared) do
             assert(values.streams[row.family] ~= nil, "catalogue family has no resolved value: " .. row.family)
@@ -1888,6 +1918,9 @@ class GeneratorTests(unittest.TestCase):
             ["recipe-prod-research_material_rare_metals-1"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
             ["recipe-prod-research_material_silicon-1"] = {family="research_material_silicon", recipe="kr-silicon"},
             ["recipe-prod-research_material_glass-1"] = {family="research_material_glass", recipe="kr-glass"},
+            ["recipe-prod-research_material_rare_metals-4"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
+            ["recipe-prod-research_material_silicon-4"] = {family="research_material_silicon", recipe="kr-silicon"},
+            ["recipe-prod-research_material_glass-4"] = {family="research_material_glass", recipe="kr-glass"},
           }
           local material_count = 0
           for id, expected in pairs(expected_material_rows) do
@@ -1899,7 +1932,7 @@ class GeneratorTests(unittest.TestCase):
               and row.legacy_binding.source == "generated-stream" and row.legacy_binding.operation == "emit", id)
             material_count = material_count + 1
           end
-          assert(material_count == 3, "K2SO runtime catalogue material identity/count")
+          assert(material_count == 6, "K2SO runtime catalogue material identity/count")
           local rows = modern.technologies(selected, values)
           assert(#rows == 72+5,"K2SO native private main cardinality")
           local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
@@ -1932,13 +1965,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2+3)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5+4+1+2)
+          assert(final_count == 106+5+4+1+2+3)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]

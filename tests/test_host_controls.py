@@ -259,6 +259,16 @@ class HostControlsTests(unittest.TestCase):
         plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
         validate_host_control_plan(plan, ROOT)
 
+    def test_plan_registers_published_base_paid_source_control_with_lua_runtime(self):
+        plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
+        plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
+        self.assertIn({"path": "tests/test_published_base_paid_source.py", "lua": True}, plan["controls"])
+
+    def test_plan_registers_published_base_added_successor_control_with_lua_runtime(self):
+        plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
+        plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
+        self.assertIn({"path": "tests/test_published_base_added_successor.py", "lua": True}, plan["controls"])
+
     def test_plan_properties_reject_missing_duplicate_wrong_mode_and_escaped_controls(self):
         with tempfile.TemporaryDirectory(prefix="mir-host-plan-contract-") as directory:
             root = Path(directory)

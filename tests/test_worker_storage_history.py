@@ -2059,6 +2059,68 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                 lua=self.older_world("f210")
                 lua.execute('local event=older_event("4.7.21003",true);'+opponent+';refuse_older(event)')
 
+    def test_first_owner_refusals_report_the_actual_473_event_base_and_current_route(self):
+        cases=(
+            ("f210", "4.7.21003", "2.1.24", "2.1.23", "2.1.24", True,
+             "unrecorded default source requires unchanged startup settings"),
+            ("f200", "4.7.20003", "2.0.76", "2.0.77", "2.0.76", False,
+             "older default source requires its qualified Base engine and unchanged settings"),
+        )
+        for target, old, active_base, old_base, new_base, startup, reason in cases:
+            with self.subTest(target=target, reason=reason):
+                lua=self.older_world(target)
+                lua.globals().old=old;lua.globals().active_base=active_base
+                lua.globals().old_base=old_base;lua.globals().new_base=new_base
+                lua.globals().startup=startup
+                lua.globals().reason=reason
+                lua.execute(r'''
+                  local event=older_event(old,false);script.active_mods.base=active_base
+                  event.mod_startup_settings_changed=startup
+                  event.mod_changes.base={old_version=old_base,new_version=new_base}
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                  message=tostring(message);assert(message:find(reason,1,true))
+                  assert(message:find("previous_mir="..old,1,true))
+                  assert(message:find("new_mir=5.0."..(package_family=="f210"and"21012"or"20012"),1,true))
+                  assert(message:find("startup_changed="..tostring(startup),1,true))
+                  assert(message:find("saved_route=absent",1,true)and message:find("current_route=default",1,true))
+                  assert(message:find("active_base="..active_base,1,true))
+                  assert(message:find("qualified_minimum_base="..(package_family=="f210"and"2.1.23"or"2.0.77"),1,true))
+                  assert(message:find("base_event=base="..old_base.."->"..new_base,1,true))
+                ''')
+
+    def test_first_owner_refusal_escapes_the_available_base_event_without_writes(self):
+        lua=self.older_world("f210")
+        lua.execute(r'''
+          local event=older_event("4.7.21003",false);event.mod_startup_settings_changed=false
+          event.mod_changes.base={old_version="2.1.23\0\nold",new_version="2.1.24"}
+          script.active_mods.base="2.1.24";local before=all_frames();writes=0
+          local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+          assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+          message=tostring(message)
+          assert(message:find("older default source requires its qualified Base engine and unchanged settings",1,true))
+          assert(message:find("base_event=base=2.1.23\\x00\\x0Aold->2.1.24",1,true))
+          assert(message:find("current_route=default",1,true)and not message:find("\0",1,true))
+        ''')
+
+    def test_unrecorded_default_first_owner_refusal_keeps_event_state_and_current_context(self):
+        lua=self.world("f210")
+        lua.execute(r'''
+          local event=owner_event("5.0.21042");script.active_mods.base="2.1.24"
+          event.mod_changes.base={old_version="2.1.23",new_version="2.1.24"}
+          local before=all_frames();writes=0
+          local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+          assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+          message=tostring(message)
+          assert(message:find("unrecorded default source has no qualified MIR5 producer",1,true))
+          assert(message:find("previous_mir=5.0.21042",1,true)and message:find("new_mir=5.0.21012",1,true))
+          assert(message:find("startup_changed=false",1,true))
+          assert(message:find("saved_route=absent",1,true)and message:find("current_route=default",1,true))
+          assert(message:find("active_base=2.1.24",1,true)and message:find("qualified_minimum_base=2.1.23",1,true))
+          assert(message:find("base_event=base=2.1.23->2.1.24",1,true))
+        ''')
+
     def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
         for target,old,hop in (("f200","4.7.20003",False),
                                ("f210","4.7.21003",False),
@@ -2645,6 +2707,51 @@ class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
 
     def world(self, target="f210"):
         return WorkerDefaultNativeOwnerTransferTests.world(self, target)
+
+    def test_recorded_default_refusals_do_not_invent_a_rejected_mod(self):
+        for target in ("f200", "f210"):
+            for bad_entry in (True, {"old_version": "1.2.2", "new_version": "1.2.4"}):
+                with self.subTest(target=target, bad_entry=bad_entry):
+                    lua = self.world(target)
+                    lua.globals().bad_entry = lua.table_from(bad_entry) if isinstance(bad_entry, dict) else bad_entry
+                    lua.execute(r'''
+                      seed_owner()
+                      storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                      script.active_mods.qol="1.2.3"
+                      local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                      event.mod_changes.qol=bad_entry
+                      local before=all_frames();writes=0
+                      local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                      assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                      message=tostring(message)
+                      assert(message:find("current_route=default",1,true))
+                      assert(not message:find("rejecting_mod_name=",1,true))
+                    ''')
+
+    def test_default_origin_reuses_the_already_observed_native_route(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  seed_owner()
+                  storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                  local observed=prototypes.get_history;local canonical_reads=0
+                  prototypes.get_history=function(kind,name)
+                    if name==CANONICAL then
+                      canonical_reads=canonical_reads+1
+                      assert(canonical_reads==1,"diagnostic repeated the native route lookup")
+                    end
+                    return observed(kind,name)
+                  end
+                  local event=owner_event(package_family=="f200"and"5.0.20042"or"5.0.21042")
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.plan_default_owner_transfer,event,nil,false)
+                  assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                  message=tostring(message)
+                  assert(canonical_reads==1)
+                  assert(message:find("recorded default source has an inconsistent producer event",1,true))
+                  assert(message:find("current_route=default",1,true))
+                ''')
 
     def test_recorded_default_preserves_paid_and_pending_work_across_consistent_mod_changes(self):
         for target in ("f200", "f210"):

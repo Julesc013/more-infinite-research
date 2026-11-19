@@ -1,0 +1,890 @@
+{
+  "kind": "MIRStaticPaidRetainedPartialNativeV1",
+  "date": "2026-11-19",
+  "status": "accepted_bounded_native_sequence",
+  "scope": "Controlled Factorio2.0.77/Space Age public17 fixed-credit scope exclusion followed by exact current18 retained-partial continuation, ordinary completion, save and two independent cold copies. One player force and two named breeding recipe bonuses; no original reporter-save or stable verdict.",
+  "source": {
+    "commit": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+    "target": "f200",
+    "version": "5.0.20018",
+    "archive_sha256": "CADD59F762C729AA4D8C599C7D8307990D0872786969D6CBE1CBF74A81584A14",
+    "archive_bytes": 1053010
+  },
+  "engine": {
+    "path": "/home/jules/Programs/Factorio/2.0/bin/x64/factorio",
+    "sha256": "09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3",
+    "base_version": "2.0.77",
+    "distribution": "full-linux64"
+  },
+  "selection": {
+    "base": "2.0.77",
+    "elevated-rails": "2.0.77",
+    "quality": "2.0.77",
+    "space-age": "2.0.77",
+    "more-infinite-research": "5.0.20018",
+    "mir-fixture-mir5-static-paid-f04": "1.1.0"
+  },
+  "controller": {
+    "commit": "c123ea18ae50f91b41a10136674a4fbe7d6aac7f",
+    "tree": "a44d60878c3e44e54d103f1e7c3c4ff27dded1f5",
+    "owner_sha256": "47181B6CEE530DB8D208D5904487F5C57AC6D90B6AA5971C336715DD0D7F6F5D",
+    "caller_sha256": "4ADC74DE9C968996ED133A2994149CB3EAB3A1CC934251E7634E58F1B8B44314",
+    "gate_sha256": "DDFDF4E2AA31FD4D34E8B9C8A7531D92D55D9C8A3E40D8988F5BDC2167934C28",
+    "adapter_sha256": "2E79BEEF7F65E1BDDF89A49BEF1C5DD8233AB38F519489915C6C59EF3EF71AF9"
+  },
+  "fixtures": {
+    "source_a": {
+      "version": "0.8.0",
+      "sha256": "643A6E34CC5BACD283581E7B65364CC97003660C59CBC49CC99B2B331D96696D"
+    },
+    "source_b": {
+      "version": "0.9.0",
+      "sha256": "3BE00955E0253FD2E7C896FCEE30BEE0B44A5E99CEFEAC57ABDD942D3E51A670"
+    },
+    "candidate": {
+      "version": "1.1.0",
+      "sha256": "FD444D7899CD62F6E8EB549CFD400D1810B9B275860F65691BCDC30DCD36597C"
+    }
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/stage-root-r07/packet-root-r07.json",
+      "bytes": 5370,
+      "sha256": "E3F11E1A1AA17A02B51E1DBEE61AE3100AE10BB937131A59218B468AF5C216E1"
+    },
+    "plan": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/stage-root-r07/owner-plan-root-r07.json",
+      "bytes": 8458,
+      "sha256": "67B00E3B6A836DA68F37B1522E30CA2438DA955026363A2DF04344EF7C2ED0B1"
+    },
+    "compose": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/compose-root-r07-readback.json",
+      "bytes": 1402,
+      "sha256": "9BFB013B61E4E03E1A9065A9B39AC6EA8F7C989B72C82A3F03CAC065F2CA97C6"
+    },
+    "execute_authorization": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/composition-execute-independent-review-r07.json",
+      "bytes": 5727,
+      "sha256": "895800FB3C8BCA4FA2AF1E5B8168A38F1E33C8447D5686A4CDD881D0C84493E9"
+    },
+    "native_readback": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r07-readback.json",
+      "bytes": 30559,
+      "sha256": "95C8FA66958246B616DA23224D4D67E4C6C6B37B833585EC139D025E649CA741"
+    },
+    "caller_record": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r07-originals/execute/result.json",
+      "bytes": 137767,
+      "sha256": "FED6320640FB014091FDF5A1FDB19DF6075B8858A4DCE876DDA319AFA4DAE381"
+    },
+    "post_result_gate": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r07-originals/execute/post-result-gate.json",
+      "bytes": 36313,
+      "sha256": "77A164E023C64DD6A21ED7CBF9004AC4F9CFBD251D27EEA413C798804E878770"
+    },
+    "r06_adverse_and_predecessor_adoption": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r06-independent-adverse-review.json",
+      "bytes": 6296,
+      "sha256": "23448348D54CBD7570D24E93B934C551CCC222A2684C53C40F6E9EC0DDA31DE1"
+    },
+    "direct_remote_endpoint_identities": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r07-endpoint-identity-readback-r01.json",
+      "bytes": 3089,
+      "sha256": "72BF2A166E39D0D05A337B7CAC71268510F8A8DBEF1F0D64AAAB8B2B949E289E"
+    }
+  },
+  "adopted_predecessor": {
+    "record_path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r06/execute/result.json",
+    "record_sha256": "E53249CB82B2C17DB05A07C730D972F2CBD062799F1507D1D31DA3C90B2372BB",
+    "packet_sha256": "AE851F29C99787B1E6F66B69237D5550FEA4414F50373B2C318ECEC498256534",
+    "native_processes_replayed": 0,
+    "scope": "Original public17 source-A/B observations are adopted unchanged, not new executions. Only candidate and two cold copies are executed here."
+  },
+  "processes": {
+    "new_native_count": 3,
+    "replayed_source_count": 0,
+    "named_stages": [
+      {
+        "name": "source-a-ordinary-save",
+        "tick": 128,
+        "exit_code": 137,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "timed_out": false
+      },
+      {
+        "name": "source-b-public17-partial-save",
+        "tick": 161,
+        "exit_code": 137,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "timed_out": false
+      },
+      {
+        "name": "candidate18-retained-partial-save",
+        "tick": 258,
+        "exit_code": 137,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "timed_out": false
+      },
+      {
+        "name": "candidate18-cold-1",
+        "tick": 259,
+        "exit_code": 137,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "timed_out": false
+      },
+      {
+        "name": "candidate18-cold-2",
+        "tick": 259,
+        "exit_code": 137,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "timed_out": false
+      }
+    ],
+    "termination_scope": "Named servers are governed stops after their completion predicates, not natural exit-zero claims. The create/source-A/source-B observations are retained from original R06; its separate failed candidate attempt remains adverse."
+  },
+  "raw_dossier": {
+    "source_proof": {
+      "zip_sha256": "B0BFA7418CFF77F249262C98864A386FA022C73E59B29EC30D028AE279A6AB27",
+      "native_adoption_sha256": "47E5CB2D2985145A28D238DF515922B00D1EDF77D84C328A278C87296AB88827",
+      "native_credit_definitions_sha256": "0450734D422261929CD091FB952EE5423989C577DC53CCC427BA17F93C4F88BB",
+      "historical_settings_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7",
+      "fixed_credits_transport": false,
+      "fish_positive_change": 0.1,
+      "fish_negative_change": -0.1,
+      "fish_main_change": 0.1,
+      "pentapod_main_change": 0.1,
+      "map_price": 2
+    },
+    "candidate_fixed_credits": {
+      "copper-plate": 0.1,
+      "iron-plate": 0.1,
+      "fish-breeding": 0.1,
+      "advanced-oil-processing": 0.1,
+      "basic-oil-processing": 0.1,
+      "coal-liquefaction": 0.1,
+      "firearm-magazine": 0.1,
+      "grenade": 0.1,
+      "lubricant": 0.1,
+      "pentapod-egg": 0.1,
+      "stone-brick": 0.1,
+      "sulfuric-acid": 0.1
+    },
+    "science": {
+      "base_count": 64,
+      "multiplier": 2,
+      "runtime_count": 128,
+      "lab_drain_percent": 100,
+      "source_a_consumed": {
+        "automation-science-pack": 128,
+        "logistic-science-pack": 128,
+        "chemical-science-pack": 128,
+        "production-science-pack": 128
+      },
+      "stage_b_partial_consumed": {
+        "automation-science-pack": 32,
+        "logistic-science-pack": 32,
+        "chemical-science-pack": 32,
+        "production-science-pack": 32
+      },
+      "stage_b_retained": {
+        "automation-science-pack": 96,
+        "logistic-science-pack": 96,
+        "chemical-science-pack": 96,
+        "production-science-pack": 96
+      },
+      "candidate_consumed": {
+        "automation-science-pack": 96,
+        "logistic-science-pack": 96,
+        "chemical-science-pack": 96,
+        "production-science-pack": 96
+      },
+      "total_second_level": {
+        "automation-science-pack": 128,
+        "logistic-science-pack": 128,
+        "chemical-science-pack": 128,
+        "production-science-pack": 128
+      }
+    },
+    "stage_a": {
+      "visible_level": 2,
+      "main_completed": 1,
+      "included": true,
+      "positive_completed": 0,
+      "negative_completed": 0,
+      "fish_bonus": 0.10000000149011612,
+      "pentapod_bonus": 0.10000000149011612,
+      "queue": {
+        "current": false,
+        "names": {},
+        "progress": 0
+      },
+      "packs": {
+        "automation-science-pack": 0,
+        "logistic-science-pack": 0,
+        "chemical-science-pack": 0,
+        "production-science-pack": 0
+      },
+      "science": {
+        "automation-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "logistic-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "chemical-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "production-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        }
+      },
+      "lab": {
+        "unit_number": 10,
+        "name": "mir-static-paid-f04-lab",
+        "disabled_by_script": true
+      }
+    },
+    "stage_b": {
+      "visible_level": 2,
+      "main_completed": 1,
+      "included": false,
+      "positive_completed": 1,
+      "negative_completed": 0,
+      "fish_bonus": 0.10000000149011612,
+      "pentapod_bonus": 0.10000000149011612,
+      "queue": {
+        "current": "recipe-prod-research_breeding-1",
+        "names": [
+          "recipe-prod-research_breeding-1"
+        ],
+        "progress": 0.25
+      },
+      "packs": {
+        "automation-science-pack": 96,
+        "logistic-science-pack": 96,
+        "chemical-science-pack": 96,
+        "production-science-pack": 96
+      },
+      "science": {
+        "automation-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 1,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "logistic-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 2,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "chemical-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 3,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "production-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 4,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        }
+      },
+      "lab": {
+        "unit_number": 10,
+        "name": "mir-static-paid-f04-lab",
+        "disabled_by_script": true
+      }
+    },
+    "candidate_configuration": {
+      "visible_level": 2,
+      "main_completed": 1,
+      "included": false,
+      "positive_completed": 1,
+      "negative_completed": 0,
+      "fish_bonus": 0.10000000149011612,
+      "pentapod_bonus": 0.10000000149011612,
+      "queue": {
+        "current": "recipe-prod-research_breeding-1",
+        "names": [
+          "recipe-prod-research_breeding-1"
+        ],
+        "progress": 0.25
+      },
+      "packs": {
+        "automation-science-pack": 96,
+        "logistic-science-pack": 96,
+        "chemical-science-pack": 96,
+        "production-science-pack": 96
+      },
+      "science": {
+        "automation-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 1,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "logistic-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 2,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "chemical-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 3,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        },
+        "production-science-pack": {
+          "count": 96,
+          "maximum": 1,
+          "units": 96,
+          "slots": [
+            {
+              "slot": 4,
+              "count": 96,
+              "quality": "normal",
+              "durability": 1
+            }
+          ]
+        }
+      },
+      "lab": {
+        "unit_number": 10,
+        "name": "mir-static-paid-f04-lab",
+        "disabled_by_script": true
+      }
+    },
+    "candidate_endpoint": {
+      "visible_level": 3,
+      "main_completed": 2,
+      "included": false,
+      "positive_completed": 1,
+      "negative_completed": 0,
+      "fish_bonus": 0.10000000149011612,
+      "pentapod_bonus": 0.20000000298023224,
+      "queue": {
+        "current": false,
+        "names": {},
+        "progress": 0
+      },
+      "packs": {
+        "automation-science-pack": 0,
+        "logistic-science-pack": 0,
+        "chemical-science-pack": 0,
+        "production-science-pack": 0
+      },
+      "science": {
+        "automation-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "logistic-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "chemical-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        },
+        "production-science-pack": {
+          "count": 0,
+          "maximum": 1,
+          "units": 0,
+          "slots": {}
+        }
+      },
+      "lab": {
+        "unit_number": 10,
+        "name": "mir-static-paid-f04-lab",
+        "disabled_by_script": true
+      }
+    },
+    "ordinary_events": [
+      {
+        "stage": "source-a",
+        "research": "recipe-prod-research_breeding-1",
+        "by_script": false
+      },
+      {
+        "stage": "candidate",
+        "research": "recipe-prod-research_breeding-1",
+        "by_script": false
+      }
+    ],
+    "cold_loads": [
+      {
+        "frame": {
+          "visible_level": 3,
+          "main_completed": 2,
+          "included": false,
+          "positive_completed": 1,
+          "negative_completed": 0,
+          "fish_bonus": 0.10000000149011612,
+          "pentapod_bonus": 0.20000000298023224,
+          "queue": {
+            "current": false,
+            "names": {},
+            "progress": 0
+          },
+          "packs": {
+            "automation-science-pack": 0,
+            "logistic-science-pack": 0,
+            "chemical-science-pack": 0,
+            "production-science-pack": 0
+          },
+          "science": {
+            "automation-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "logistic-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "chemical-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "production-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            }
+          },
+          "lab": {
+            "unit_number": 10,
+            "name": "mir-static-paid-f04-lab",
+            "disabled_by_script": true
+          }
+        }
+      },
+      {
+        "frame": {
+          "visible_level": 3,
+          "main_completed": 2,
+          "included": false,
+          "positive_completed": 1,
+          "negative_completed": 0,
+          "fish_bonus": 0.10000000149011612,
+          "pentapod_bonus": 0.20000000298023224,
+          "queue": {
+            "current": false,
+            "names": {},
+            "progress": 0
+          },
+          "packs": {
+            "automation-science-pack": 0,
+            "logistic-science-pack": 0,
+            "chemical-science-pack": 0,
+            "production-science-pack": 0
+          },
+          "science": {
+            "automation-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "logistic-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "chemical-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            },
+            "production-science-pack": {
+              "count": 0,
+              "maximum": 1,
+              "units": 0,
+              "slots": {}
+            }
+          },
+          "lab": {
+            "unit_number": 10,
+            "name": "mir-static-paid-f04-lab",
+            "disabled_by_script": true
+          }
+        }
+      }
+    ],
+    "map_prices": {
+      "source_a": 2,
+      "source_b": 2,
+      "candidate_configuration": 2,
+      "candidate_endpoint": 2,
+      "cold_1": 2,
+      "cold_2": 2
+    }
+  },
+  "normalization_observations": [
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "stage_a.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "stage_a.pentapod_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "stage_a.queue.names",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "idle-zero-progress"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "stage_a.science.automation-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "stage_a.science.logistic-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "stage_a.science.chemical-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "stage_a.science.production-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "stage_b.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "stage_b.pentapod_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "candidate_configuration.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "candidate_configuration.pentapod_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "candidate_endpoint.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "candidate_endpoint.pentapod_bonus",
+      "raw": 0.20000000298023224,
+      "canonical": 0.2,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "candidate_endpoint.queue.names",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "idle-zero-progress"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "candidate_endpoint.science.automation-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "candidate_endpoint.science.logistic-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "candidate_endpoint.science.chemical-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "candidate_endpoint.science.production-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "cold_loads[1].frame.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "cold_loads[1].frame.pentapod_bonus",
+      "raw": 0.20000000298023224,
+      "canonical": 0.2,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[1].frame.queue.names",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "idle-zero-progress"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[1].frame.science.automation-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[1].frame.science.logistic-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[1].frame.science.chemical-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[1].frame.science.production-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "cold_loads[2].frame.fish_bonus",
+      "raw": 0.10000000149011612,
+      "canonical": 0.1,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "binary32-recipe-bonus",
+      "path": "cold_loads[2].frame.pentapod_bonus",
+      "raw": 0.20000000298023224,
+      "canonical": 0.2,
+      "epsilon": 1e-08
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[2].frame.queue.names",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "idle-zero-progress"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[2].frame.science.automation-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[2].frame.science.logistic-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[2].frame.science.chemical-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    },
+    {
+      "kind": "empty-lua-array",
+      "path": "cold_loads[2].frame.science.production-science-pack.slots",
+      "raw_type": "object",
+      "canonical_type": "array",
+      "reason": "zero-count-zero-units"
+    }
+  ],
+  "protected_and_cold_crc": [
+    {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r06/execute/write-data/saves/mir5-static-paid-f04-stage-a.zip",
+      "sha256": "EB0591EF021EF872F8392FF5DEC9931C8FCF40A26AE5851272F028C7ED3440FB",
+      "members": 56
+    },
+    {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r06/execute/write-data/saves/mir5-static-paid-f04-stage-b.zip",
+      "sha256": "B7B164ABE2A4B3C4559AF755774DD7103AE296337AC09F16C7F85DE4352FAF71",
+      "members": 56
+    },
+    {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r07/execute/write-data/saves/mir5-static-paid-f04-candidate.zip",
+      "sha256": "0E36AFD3BD3118CFECEA722DBB4AE1A7CE7F6D5C4DF5E91AA00E3796B26475B7",
+      "members": 56
+    },
+    {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r07/execute/write-data/saves/candidate18-cold-1-working.zip",
+      "sha256": "0E36AFD3BD3118CFECEA722DBB4AE1A7CE7F6D5C4DF5E91AA00E3796B26475B7",
+      "members": 56
+    },
+    {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-controller-aero-r01/build/tmp/static-paid-f04-r03/owned-r07/execute/write-data/saves/candidate18-cold-2-working.zip",
+      "sha256": "0E36AFD3BD3118CFECEA722DBB4AE1A7CE7F6D5C4DF5E91AA00E3796B26475B7",
+      "members": 56
+    }
+  ],
+  "cleanup": {
+    "library_restored": true,
+    "errors": [],
+    "controls": {
+      "mod-list.json": null,
+      "mod-settings.dat": null,
+      ".mir-active-profile.json": null
+    },
+    "factorio_pids": []
+  },
+  "independent_result_review": {
+    "path": "build/qualification/mir5-audit-intake-20261118-r01/static-paid-native-preparation-r03/native-root-r07-independent-review-r01.json",
+    "bytes": 10966,
+    "sha256": "ED50334159E33090550759410E9051FDC809C9F2A0F835943F81BA894FEE782F"
+  },
+  "retained_adverses": [
+    "R01 named-only ingredient reader",
+    "R04 invalid named research ingredient output",
+    "R05 exact-decimal initial guard",
+    "R06 candidate lab-pause ordering",
+    "R11 malformed placeholder profile and diagnostic storage writes",
+    "Wrong PSObject reader probes and missing-import caller-control invocation are preserved; corrected controls do not relabel them."
+  ],
+  "limits": [
+    "Controlled cost64 and time1, map-price2, four nonspoiling packs, void-energy ordinary lab speed60 and100percent drain; not default-duration play or performance.",
+    "Exact CADD package and public17 source only; no unqualified F210, MIR4 Base-addition, original modpack or reporter-save acceptance is inferred.",
+    "Native bonuses and empty Lua array transport retain raw observations; detached projection changes no science quantity, level, queue progress or provenance.",
+    "Cold fixture nonmutation is separately source/host-reviewed; no native write counter is invented.",
+    "No release, multiplayer/client, full-library or stable verdict."
+  ]
+}

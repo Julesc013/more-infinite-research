@@ -189,6 +189,71 @@ class ProductTargetTests(unittest.TestCase):
           assert(not ok)
         ''')
 
+    def test_k2se_advanced_science_cards_are_research_inputs_not_productivity_effects(self):
+        # Host-only source-bound control for issue #1961. These are synthetic
+        # final-recipe opponents, not Raptor355's actual unprovided profile.
+        self.lua.execute(r'''
+          local k2se = require("compatibility.modern_catalogue.k2_space_exploration")
+          local family = "research_science_pack_productivity"
+          local science
+          for _, rule in ipairs(k2se.exact_product_bindings) do
+            if rule.family == family then
+              assert(science == nil, "K2SE science must have one exact recipe group")
+              science = rule
+            end
+          end
+          assert(science and science.reject_explicit_productivity_denial == true)
+          assert(science.weight == 1)
+          local named, effects, consumed = {}, {}, {}
+          for _, name in ipairs(science.recipes) do named[name] = true end
+          for _, row in ipairs(k2se.definition_overrides[family].effects) do
+            effects[row.recipe] = true
+          end
+          for _, name in ipairs(k2se.science.science_se_k2_research_science_pack_productivity) do
+            consumed[name] = true
+          end
+          assert(named["kr-matter-tech-card"] and effects["kr-matter-tech-card"])
+          for _, name in ipairs({
+            "kr-advanced-tech-card", "kr-singularity-tech-card",
+            "se-kr-advanced-science-pack-2"
+          }) do
+            assert(not named[name] and not effects[name],
+              "excluded advanced card must not acquire a production effect")
+          end
+          assert(consumed["kr-advanced-tech-card"] and consumed["kr-singularity-tech-card"],
+            "research cost ingredients are not productivity effect permissions")
+          local candidates = {
+            ["kr-matter-tech-card"] = recipe({}, {product("item","kr-matter-tech-card")},
+              {allow_productivity=true}),
+            ["kr-advanced-tech-card"] = recipe({}, {product("item","kr-advanced-tech-card")},
+              {allow_productivity=false}),
+            ["kr-singularity-tech-card"] = recipe({}, {product("item","kr-singularity-tech-card")},
+              {allow_productivity=false}),
+            ["se-kr-advanced-science-pack-2"] = recipe({},
+              {product("item","se-kr-advanced-science-pack-2")},
+              {allow_productivity=false}),
+          }
+          local actual = targets.collect(candidates, targets.prepare({science}))
+          local expected = family .. ":kr-matter-tech-card:item:kr-matter-tech-card:1"
+          assert(target_names(actual.by_family[family]) == expected)
+          -- An explicitly widened *synthetic* binding must still reject each
+          -- denied final recipe. Removing the denial guard admits all four.
+          local names = {
+            "kr-matter-tech-card", "kr-advanced-tech-card",
+            "kr-singularity-tech-card", "se-kr-advanced-science-pack-2"
+          }
+          local strict = binding(family, 1, {}, {
+            recipes=names, reject_explicit_productivity_denial=true
+          })
+          local guarded = targets.collect(candidates, targets.prepare({strict}))
+          assert(target_names(guarded.by_family[family]) == expected)
+          local relaxed = targets.collect(candidates, targets.prepare({
+            binding(family, 1, {}, {recipes=names})
+          }))
+          assert(#relaxed.by_family[family] == 4,
+            "the negative opponent must distinguish rejection from missing input")
+        ''')
+
     def test_collection_is_linear_in_recipe_products_and_never_mutates_raw_rows(self):
         self.lua.execute(r'''
           local recipes = {
