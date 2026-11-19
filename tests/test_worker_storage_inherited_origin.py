@@ -12,7 +12,10 @@ import subprocess
 import sys
 import unittest
 
-import test_worker_storage_history as history_fixture
+from worker_storage_default_world import (
+    build_default_native_owner_world,
+    install_published_default_reader,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,48 +52,23 @@ def published_source(path, digest):
     return raw.decode("utf-8")
 
 
+def published_modules():
+    return {
+        name: published_source(path, digest)
+        for name, (path, digest) in PUBLISHED_MEMBERS.items()
+    }
+
+
 class WorkerInheritedOriginTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.published = {
-            name: published_source(path, digest)
-            for name, (path, digest) in PUBLISHED_MEMBERS.items()
-        }
+        cls.published = published_modules()
 
     def world(self, target):
-        history_fixture.LuaRuntime = LuaRuntime
-        lua = history_fixture.WorkerDefaultNativeOwnerTransferTests.world(self, target)
-        lua.globals().published_modules = lua.table_from(self.published)
-        lua.execute(r'''
-          candidate_history=history
-          candidate_modules={}
-          for name in pairs(published_modules)do candidate_modules[name]=package.loaded[name]end
-          local target=require("platform.target")
-          candidate_version=target.distribution_version
-          published_version=package_family=="f200"and"5.0.20011"or"5.0.21011"
-          function published_reader()
-            target.distribution_version=published_version
-            script.active_mods["more-infinite-research"]=published_version
-            package.loaded["runtime.caps"]=assert(load(published_modules["runtime.caps"]))()
-            package.loaded["research.worker_storage_recovery"]=assert(load(published_modules["research.worker_storage_recovery"]))()
-            return assert(load(published_modules["runtime.worker_robot_storage"]))()
-          end
-          function inherited_configuration(old)
-            local reader=published_reader()
-            reader.on_load()
-            local event={mod_startup_settings_changed=false,mod_changes={
-              ["more-infinite-research"]={old_version=old,new_version=published_version}}}
-            reader.apply(reader.preflight(event,nil))
-            return reader
-          end
-          function candidate_reader()
-            target.distribution_version=candidate_version
-            script.active_mods["more-infinite-research"]=candidate_version
-            for name,module in pairs(candidate_modules)do package.loaded[name]=module end
-            history=candidate_history
-          end
-        ''')
-        return lua
+        lua = build_default_native_owner_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
+        return install_published_default_reader(lua, historical_sources=self.published)
 
     def test_fresh_init_records_default_but_inherited_configuration_does_not(self):
         for target in ("f200", "f210"):
