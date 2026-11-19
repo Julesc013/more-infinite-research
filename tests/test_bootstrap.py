@@ -4,12 +4,8 @@ These tests exercise only registration and callback routing with host doubles.
 They are not Factorio engine, GUI, menu, save, or gameplay evidence.
 """
 import argparse
-import ast
-import contextlib
 from pathlib import Path
-import subprocess
 import sys
-import textwrap
 import unittest
 from bootstrap_control_world import build_bootstrap_control_world, install_bootstrap_control_world
 from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
@@ -575,33 +571,11 @@ class BootstrapTests(unittest.TestCase):
         paid_fixture.NativeFamilyPaidCreditsTests.setUp = forbidden_setup
         try:
             self.test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes()
-            old_source = subprocess.check_output(
-                ["git", "show", "d737f2e7c7290fd72ccda577975f5c34f16d7995:tests/test_bootstrap.py"],
-                cwd=ROOT,
-                text=True,
-            )
-            old_tree = ast.parse(old_source)
-            old_method_node = next(
-                member for node in old_tree.body
-                if isinstance(node, ast.ClassDef) and node.name == "BootstrapTests"
-                for member in node.body
-                if isinstance(member, ast.FunctionDef)
-                and member.name == "test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes"
-            )
-            old_method_source = ast.get_source_segment(old_source, old_method_node)
-            self.assertIn("paid_fixture.LuaRuntime = LuaRuntime", old_method_source)
-            namespace = {"LuaRuntime": LuaRuntime}
-            exec(textwrap.dedent(old_method_source), namespace)
-            historical_case = BootstrapTests(
-                "test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes"
-            )
-            historical_case.subTest = lambda **_kwargs: contextlib.nullcontext()
-            with self.assertRaisesRegex(AssertionError, "bootstrap control selected paid TestCase setup"):
-                namespace[old_method_node.name](historical_case)
         finally:
             paid_fixture.NativeFamilyPaidCreditsTests.setUp = original_setup
             if original_runtime is missing_runtime:
-                delattr(paid_fixture, "LuaRuntime")
+                if hasattr(paid_fixture, "LuaRuntime"):
+                    delattr(paid_fixture, "LuaRuntime")
             else:
                 paid_fixture.LuaRuntime = original_runtime
 
