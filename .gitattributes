@@ -172,3 +172,15 @@ fixtures/assert-f210-current-bob-angel-tin-route-observer/data-final-fixes.lua -
 # Native finite-continuation profiles bind exact committed fixture bytes.
 tests/fixtures/native-research-speed-finite/** -text -eol whitespace=cr-at-eol
 tests/fixtures/worker-storage-default-native/** text eol=lf
+
+# The finite-four native adapter verifies these actor and helper files by raw
+# SHA-256.  Keep their checkout bytes LF under every core.autocrlf mode.
+tests/fixtures/worker-storage-native-observer/control.lua text eol=lf
+tests/fixtures/worker-storage-native-observer/info.json text eol=lf
+tests/fixtures/worker-storage-native-observer/data.lua text eol=lf
+tests/fixtures/worker-storage-finite-provider/info.json text eol=lf
+tests/fixtures/worker-storage-finite-provider/data-updates.lua text eol=lf
+tools/lib/validation/ImmutableInputStaging.ps1 text eol=lf
+tools/lib/compatibility/LibraryActivation.ps1 text eol=lf
+tools/lib/validation/NativeProbeResources.ps1 text eol=lf
+tools/lib/validation/ResourceGovernor.ps1 text eol=lf

@@ -1,6 +1,7 @@
 """Real file identities and filesystem boundaries; no engine or library inputs."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -170,6 +171,106 @@ class InputFilesystemBoundaries(unittest.TestCase):
             "} finally {$lock.Dispose()}"
         )
         self.assertEqual(1024**2 - 64 * 1024 - 3, result["remaining"])
+
+    def test_finite_four_hash_pins_survive_isolated_autocrlf_checkouts(self):
+        packet = json.loads(
+            (ROOT / "tests/fixtures/worker-storage-finite-four-native.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        descriptors = (
+            packet["inputs"]["actor_members"] + packet["helper_pins"]
+        )
+        expected = {row["path"]: row["sha256"].lower() for row in descriptors}
+        self.assertEqual(9, len(expected), expected)
+        self.assertEqual(9, len(descriptors), descriptors)
+        actor = "tests/fixtures/worker-storage-native-observer/control.lua"
+        self.assertIn(actor, expected)
+
+        attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+        rules = [f"{path} text eol=lf" for path in expected]
+        for rule in rules:
+            self.assertIn(rule, attributes)
+
+        def git(directory: Path, *arguments: str, text: bool = False):
+            result = subprocess.run(
+                ["git", "-C", str(directory), *arguments],
+                capture_output=True,
+                text=text,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return result.stdout
+
+        def source_blobs():
+            blobs = {}
+            for path, pin in expected.items():
+                result = subprocess.run(
+                    ["git", "-C", str(ROOT), "show", f"HEAD:{path}"],
+                    capture_output=True,
+                    timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr.decode())
+                self.assertEqual(hashlib.sha256(result.stdout).hexdigest(), pin, path)
+                blobs[path] = result.stdout
+            return blobs
+
+        def initialize(directory: Path, attribute_text: str, blobs: dict[str, bytes]):
+            directory.mkdir()
+            (directory / ".gitattributes").write_text(
+                attribute_text, encoding="utf-8", newline="\n"
+            )
+            for path, payload in blobs.items():
+                destination = directory / path
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(payload)
+            git(directory, "init", "-q")
+            git(directory, "config", "user.name", "Finite-four transport control")
+            git(directory, "config", "user.email", "finite-four@example.invalid")
+            git(directory, "add", ".")
+            git(directory, "commit", "-qm", "finite-four transport source")
+            expected_tree = {".gitattributes", *expected}
+            tree = set(git(directory, "ls-tree", "-r", "--name-only", "HEAD", text=True).splitlines())
+            self.assertEqual(expected_tree, tree)
+
+        def checkout(source: Path, name: str, autocrlf: str) -> Path:
+            destination = self.directory / name
+            result = subprocess.run(
+                ["git", "clone", "--quiet", "--depth=1", "-c",
+                 f"core.autocrlf={autocrlf}", source.as_uri(), str(destination)],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(git(destination, "config", "--local", "--get", "core.autocrlf", text=True).strip(), autocrlf)
+            return destination
+
+        blobs = source_blobs()
+        governed = self.directory / "governed-source"
+        initialize(governed, attributes, blobs)
+        for mode in ("true", "false"):
+            checked_out = checkout(governed, f"governed-{mode}", mode)
+            for path, pin in expected.items():
+                self.assertEqual(
+                    hashlib.sha256((checked_out / path).read_bytes()).hexdigest(),
+                    pin,
+                    (mode, path),
+                )
+
+        # This is the pre-fix counterpart: the same nine raw Git blobs, but
+        # no finite-four eol rules.  A true-autocrlf checkout must alter at
+        # least the known observer-control hash, so the production assertion
+        # cannot be replaced by a text-only attribute check.
+        ungoverned_attributes = "\n".join(
+            line for line in attributes.splitlines() if line not in rules
+        ) + "\n"
+        ungoverned = self.directory / "ungoverned-source"
+        initialize(ungoverned, ungoverned_attributes, blobs)
+        ungoverned_checkout = checkout(ungoverned, "ungoverned-true", "true")
+        actual = (ungoverned_checkout / actor).read_bytes()
+        self.assertNotEqual(hashlib.sha256(actual).hexdigest(), expected[actor])
+        self.assertIn(b"\r\n", actual)
 
 
 if __name__ == "__main__":
