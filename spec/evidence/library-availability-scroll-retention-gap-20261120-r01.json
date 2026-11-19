@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryAvailabilityScrollStateParityExpectationV1",
+  "reviewed_on": "2026-11-20",
+  "baseline": {
+    "repository": "Julesc013/more-infinite-research",
+    "dev_commit": "411ff1dd844d728f314ac2101989cdc75c39bfe1",
+    "latest_verified_published_mir5": "v5.0.17",
+    "published_class": "prerelease",
+    "source": [
+      {
+        "path": "source/runtime/library.lua",
+        "git_blob": "dd1009ae00d561c179608ba405a937e292757a57",
+        "anchors": [
+          "2038-2072 Availability builder",
+          "2277-2297 outer tabs/Research page",
+          "2439-2446 render branch",
+          "2580-2607 text/tab events"
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/runtime/research_browser.lua",
+        "ref": "v4.7.3",
+        "git_blob": "4c375e78aa53ae11a7c464f4ade8e1f370437da5",
+        "anchors": [
+          "1067-1079 omission list-box selected index",
+          "1527-1534 omission selection event",
+          "1250-1271 retained tabs"
+        ]
+      },
+      {
+        "path": "tests/test_library.py",
+        "git_blob": "e0c8427b4de814a1fdf2d548b63a693308cfecf4",
+        "scope": "Host Lua GUI double; not native pointer, mouse-wheel, focus, scroll offset or rendering proof"
+      }
+    ]
+  },
+  "observed_source_mechanism": {
+    "severity": "Independent source-design parity gap requiring real GUI qualification; no native failure observed by this fixture",
+    "mir5": "The Availability builder clears the Research content unconditionally and constructs a new named inner scroll-pane. It does not record its vertical offset or a visible-row anchor, and has no restoration call.",
+    "navigation": "The selected-tab-changed event updates view.tab and rerenders. Returning to Research with visibility=3 enters the clearing Availability builder even when the query and authored rows are unchanged.",
+    "adjacent_research": "Normal Research has explicit view.scroll/list.scroll_to_item recovery; it does not apply to the Availability inner scroll-pane.",
+    "mir4": "Published MIR4 v4.7.3 represents omissions as a list-box selected_index from v.omission_selection and updates that index on selection. This is a different interaction model: it establishes remembered selection, not a guarantee of identical scroll pixels or MIR5 Availability semantics.",
+    "tab_geometry": "The tabbed pane is constructed above the Research content. Rebuilding Availability does not itself show a displaced tab strip. Stable geometry still requires native pixels at changed viewport/locale.",
+    "structural_checks": {
+      "modern_unconditional_clear": true,
+      "modern_nested_scroll": true,
+      "modern_no_restore": true,
+      "tab_change_renders": true,
+      "open_availability_projection": true,
+      "old_index_persisted": true,
+      "old_list_box": true,
+      "prior_host_scroll_coverage": true
+    }
+  },
+  "finite_acceptance": [
+    {
+      "id": "AV-STATE-01",
+      "action": "With an authored Availability projection that genuinely overflows its inner viewport, scroll to a distinguishable lower row, switch Research -> Settings -> Research without changing the query, filter, locale, resolution or scale",
+      "required": "Determine and satisfy the approved interaction policy: retain the visible-row anchor or meaningful prior scroll position, not silently replace it with the first row; retain the query and stable outer tabs",
+      "current_evidence": "Source rebuilds the viewport and lacks explicit scroll recovery; actual scroll reset remains UNVERIFIED until native input and screenshots or scroll coordinate readback"
+    },
+    {
+      "id": "AV-STATE-02",
+      "action": "From the same lower row, invoke an ordinary non-query-changing refresh/reopen on the existing Library root",
+      "required": "Keep the source-backed query and approved viewport state; no regenerated frame/tab navigation displacement or stale independent Settings search",
+      "current_evidence": "Availability builds a new inner viewport on render; no actual same-root pointer/scroll test has been run here"
+    },
+    {
+      "id": "AV-STATE-03",
+      "action": "Change Availability search so the previous row disappears, then clear the search",
+      "required": "Apply a documented reset/nearest-valid-anchor policy rather than restoring a nonexistent row; keep input focus, decoded text and outer tabs stable",
+      "current_evidence": "Search event explicitly resets view.scroll to 1 but Availability does not consume that field; native cursor/focus outcome unknown"
+    },
+    {
+      "id": "AV-STATE-04",
+      "action": "Repeat on narrow and normal approved viewports with English and German long captions, then resize or close/reopen",
+      "required": "Check bottom reachability, nested-wheel routing, tab strip stable location/size, readable explanations and the chosen view-state policy",
+      "current_evidence": "Earlier 24-entry host GUI-double tests and existing native still captures establish only their specific layouts; they are not scroll-retention input passes"
+    }
+  ],
+  "input_and_oracle_constraints": {
+    "source_fixture": "Reuse existing authored 24-entry/three-width Availability host projection only for simulated overflow structure; do not infer native click/scroll pass from that host fixture.",
+    "native": "For real scroll/input qualification use an existing owner-reviewed graphical controller and exact approved engine/mod closure, or prepare a distinct bounded non-dispatched input. Record original query, viewport dimensions, first/last visible row or native scroll offset before/after, tab geometry, locale, accepted screenshots and independent readback.",
+    "alternative_profile": "Do not assume the currently supplied Base-only or Bob/Angel mods produce enough Availability rows to overflow; confirm actual row count or use an explicitly documented test fixture.",
+    "expected_vs_observed": "Proposed retention behavior requires the product/MIR4 parity owner to approve it. An unexecuted code trace is not a demonstrated gameplay/UI regression or a stable gate pass.",
+    "coexisting_obligations": [
+      "PR #1948 omitted-research/Library parity",
+      "PR #1951 German Availability search expectations",
+      "original MIR4 design and selected omission semantics",
+      "stable tab geometry and locale/input/export/client lifecycle",
+      "native earned-work migration/ordinary completion/save/two cold loads",
+      "whole-product UI and performance"
+    ]
+  },
+  "review_and_ownership": {
+    "status": "prepared-unexecuted-parity-fixture",
+    "source_files_modified": 0,
+    "native_processes": 0,
+    "protected_saves_touched": 0,
+    "release_assets_modified": 0,
+    "implementation_owner": "Unassigned downstream Library owner; existing integration/native assignments unchanged",
+    "recommended_next": "Choose the interaction policy, implement conditional anchor/scroll recovery without reconstructing native research catalogue, then run narrow real GUI input and original MIR4 comparator; preserve independent search/client lifecycle and exact evidence custody"
+  }
+}
