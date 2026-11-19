@@ -37,6 +37,7 @@ local cold_pending = false
 local function require_ok(value, message) if not value then error("[mir-published473-paid-source] " .. message, 0) end end
 local function copy(value) if type(value) ~= "table" then return value end local out = {}; for k, v in pairs(value) do out[k] = copy(v) end; return out end
 local function near(left, right) return type(left) == "number" and type(right) == "number" and math.abs(left - right) <= 0.000001 end
+local function integer(value) return type(value) == "number" and value == math.floor(value) end
 local function same(left, right)
   if type(left) ~= type(right) then return false end
   if type(left) ~= "table" then return left == right end
@@ -107,9 +108,16 @@ local function assert_main(technology, main, label)
 end
 local function assert_finite(technology, name, parents, label)
   require_ok(technology and technology.valid ~= false and technology.name == name, label .. " finite technology is absent: " .. name)
-  require_ok(technology.prototype and technology.prototype.max_level == 1, label .. " finite technology does not have one native level: " .. name)
-  require_ok(technology.level == 1 and technology.researched == false and technology.saved_progress == 0, label .. " finite technology is not a fresh level one: " .. name)
+  local prototype = technology.prototype; require_ok(prototype, label .. " finite technology prototype is absent: " .. name)
+  local level, prototype_level, maximum = technology.level, prototype.level, prototype.max_level
+  local single_native_stage = integer(level) and level >= 1 and integer(prototype_level) and integer(maximum) and maximum == level and maximum < UINT32_MAX and
+    ((prototype_level == level) or (prototype_level == 0 and level == 1 and maximum == 1))
+  require_ok(single_native_stage,
+    label .. " finite technology is not a single finite native ordinal: " .. name)
+  require_ok(technology.researched == false and technology.saved_progress == 0, label .. " finite technology is not fresh: " .. name)
   exact_set(technology.prerequisites, parents, label .. " direct parents: " .. name)
+  return { name = name, technology_level = level, prototype_level = prototype_level, prototype_max_level = maximum,
+    researched = technology.researched, saved_progress = technology.saved_progress }
 end
 local function assert_preflight(force, label)
   require_ok(force and force.valid ~= false, label .. " force is invalid")
@@ -118,9 +126,11 @@ local function assert_preflight(force, label)
     local technology = force.technologies[main.name]; assert_main(technology, main, label)
     require_ok(technology.level == 1 and technology.researched == false and technology.saved_progress == 0, label .. " main is not a fresh level one: " .. main.name .. " [" .. facts .. "]")
   end
-  for _, row in ipairs(PREREQUISITES) do assert_finite(force.technologies[row[1]], row[1], row[2], label) end
+  local finite = {}
+  for _, row in ipairs(PREREQUISITES) do finite[row[1]] = assert_finite(force.technologies[row[1]], row[1], row[2], label) end
   assert_finite(force.technologies[BRAKING], BRAKING, { "railway", "chemical-science-pack" }, label)
   assert_main(force.technologies[GEAR], { name = GEAR, recipe = "iron-gear-wheel" }, label .. " gear")
+  return finite
 end
 local function grant_finite(force, label)
   for _, row in ipairs(PREREQUISITES) do
@@ -208,6 +218,11 @@ local function marker(state, phase, write_name)
   local encoded = helpers.table_to_json(body); log(PREFIX .. encoded)
   if write_name then helpers.write_file(OUTPUT_DIRECTORY .. "/" .. write_name, encoded, false) end
 end
+local function preflight_marker(player, finite)
+  local body = { kind = "MIRPublished473BasePaidSourcePreflightV1", schema = 1, role = "source", phase = "source-preflight", tick = game.tick,
+    mods = copy(script.active_mods), force_registry = force_registry(), player = { name = player.name, index = player.index }, finite = finite }
+  local encoded = helpers.table_to_json(body); log(PREFIX .. encoded); helpers.write_file(OUTPUT_DIRECTORY .. "/preflight.json", encoded, false)
+end
 local function set_queue(force, rows, progress, label)
   force.research_queue = rows
   local queue = queue_frame(force); require_ok(queue.current == rows[1].name and #queue.names == #rows, label .. " queue setter differs")
@@ -249,7 +264,8 @@ script.on_init(function()
   require_ok(storage[KEY] == nil, "source scenario storage already exists")
   local player = game.forces.player; require_ok(player and player.valid ~= false, "player force is absent")
   require_ok(game.forces[FOREIGN] == nil, "named foreign force already exists")
-  assert_preflight(player, "player")
+  local player_finite = assert_preflight(player, "player")
+  preflight_marker(player, player_finite)
   local foreign = game.create_force(FOREIGN); assert_preflight(foreign, "foreign")
   grant_finite(player, "player"); grant_finite(foreign, "foreign")
   local surface = game.surfaces[1]; require_ok(surface and type(surface.create_entity) == "function", "source surface is absent")

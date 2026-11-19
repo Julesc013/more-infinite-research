@@ -44,20 +44,21 @@ local FOREIGN="mir473-base-paid-foreign"
 local SCIENCE={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
 local MAINS={{"recipe-prod-research_low_density_structure-1","low-density-structure"},{"recipe-prod-research_plastic-1","plastic-bar"},{"recipe-prod-research_processing_unit-1","processing-unit"},{"recipe-prod-research_rocket_fuel-1","rocket-fuel"},{"recipe-prod-research_steel-1","steel-plate"}}
 local GEAR,BRAKING="recipe-prod-research_gears-1","braking-force-1"
+local TIER_TWO={ ["automation-2"]=true,["advanced-material-processing-2"]=true,["logistics-2"]=true }
 local function copy(value)if type(value)~="table"then return value end local out={}for k,v in pairs(value)do out[k]=copy(v)end return out end
-local function tech(name,maximum,effects)
-  local row={name=name,valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-    prototype={max_level=maximum or 1,effects=effects or{}},prerequisites={},research_unit_energy=3600,
+local function tech(name,maximum,effects,current_level,prototype_level)
+  local row={name=name,valid=true,level=current_level or 1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+    prototype={level=prototype_level == nil and 0 or prototype_level,max_level=maximum or 1,effects=effects or{}},prerequisites={},research_unit_energy=3600,
     research_unit_ingredients={{name=SCIENCE[1],amount=1},{name=SCIENCE[2],amount=1},{name=SCIENCE[3],amount=1},{name=SCIENCE[4],amount=1}}}
   setmetatable(row,{__index=function(_,key)if key=="research_unit_count"then return row.prototype.max_level==4294967295 and 8000*2^(row.level-1)or 1 end end})
   return row
 end
 local function make_force(name,index,rows)
   local technologies,recipes={},{}
-  for row_name in pairs(rows)do technologies[row_name]=tech(row_name,1,{})end
-  for _,main in ipairs(MAINS)do technologies[main[1]]=tech(main[1],4294967295,{{type="change-recipe-productivity",recipe=main[2],change=.1}});recipes[main[2]]={productivity_bonus=0}end
-  technologies[GEAR]=tech(GEAR,4294967295,{{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}})
-  technologies[BRAKING]=tech(BRAKING,1,{{type="train-braking-force-bonus",modifier=.1}})
+  for row_name in pairs(rows)do local level=TIER_TWO[row_name]and 2 or 1;local first=TIER_TWO[row_name]and 2 or 0;technologies[row_name]=tech(row_name,level,{},level,first)end
+  for _,main in ipairs(MAINS)do technologies[main[1]]=tech(main[1],4294967295,{{type="change-recipe-productivity",recipe=main[2],change=.1}},1,0);recipes[main[2]]={productivity_bonus=0}end
+  technologies[GEAR]=tech(GEAR,4294967295,{{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}},1,0)
+  technologies[BRAKING]=tech(BRAKING,1,{{type="train-braking-force-bonus",modifier=.1}},1,0)
   for row_name,parents in pairs(rows)do for _,parent in ipairs(parents)do technologies[row_name].prerequisites[parent]=technologies[parent]end end
   for _,main in ipairs(MAINS)do for _,parent in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do technologies[main[1]].prerequisites[parent]=technologies[parent]end end
   for _,parent in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do technologies[GEAR].prerequisites[parent]=technologies[parent]end
