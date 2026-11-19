@@ -397,15 +397,40 @@ jobs:
           }
           & .\tests\tooling\Test-MIRPlayerReport.ps1
 
+  finite-four-controller-control:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check the actual controller without an engine
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & pwsh -NoProfile -File tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1 -OutputRoot (Join-Path $PWD 'build/tmp/worker-storage-finite-four-controller-controls')
+          if ($LASTEXITCODE -ne 0) { throw 'Finite-four controller controls failed.' }
+      - name: Retain the controller-control output
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-storage-finite-four-controls-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-finite-four-controller-controls
+          if-no-files-found: error
+          retention-days: 14
+
   finite-four-public-inputs:
     if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
+    needs: finite-four-controller-control
     uses: ./.github/workflows/worker-storage-public-inputs.yml
 
   finite-four-native:
     if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
-    needs: finite-four-public-inputs
+    needs: [finite-four-controller-control, finite-four-public-inputs]
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 40
     env:
       MIR_NATIVE_MODE: ${{ inputs.native_mode }}
     steps:
