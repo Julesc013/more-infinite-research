@@ -17,7 +17,56 @@ permissions:
   contents: read
 
 jobs:
+  exact-packages:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.14.7'
+          architecture: x64
+          check-latest: false
+      - name: Reproduce the frozen package producer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          . ./tools/lib/validation/NativeProbeResources.ps1
+          $out = Join-Path $PWD 'build/tmp/worker-storage-exact-packages'
+          $context = New-MIRNativeProbeResourceContext -RepoRoot $PWD -OutputRoot $out -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 64 -UseExactOutputRoot
+          [IO.Directory]::CreateDirectory($context.root) | Out-Null
+          python -c "import sys,zlib; assert sys.version_info[:3]==(3,14,7); assert zlib.ZLIB_VERSION==zlib.ZLIB_RUNTIME_VERSION=='1.3.1.zlib-ng'"
+          if ($LASTEXITCODE -ne 0) { throw 'Frozen package producer differs.' }
+          $revision = '22f34725d00befd4c80160105b98b556824b57ed'
+          python -B tools/package.py --source source --revision $revision --target f210 --output "$out/more-infinite-research_5.0.21018.zip" --record "$out/candidate.json"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate reconstruction failed.' }
+          python -B tools/package.py --source tests/fixtures/worker-storage-native-observer --revision $revision --output "$out/mir-worker-storage-native-observer_0.1.2.zip" --record "$out/observer.json"
+          if ($LASTEXITCODE -ne 0) { throw 'Observer reconstruction failed.' }
+          python -B tools/package.py --source tests/fixtures/worker-storage-finite-provider --revision $revision --output "$out/mir-worker-storage-finite-fixture_0.1.0.zip" --record "$out/provider.json"
+          if ($LASTEXITCODE -ne 0) { throw 'Provider reconstruction failed.' }
+          $pins = @(
+            @('more-infinite-research_5.0.21018.zip', 'C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D', 1053618),
+            @('mir-worker-storage-native-observer_0.1.2.zip', 'DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C', 3086),
+            @('mir-worker-storage-finite-fixture_0.1.0.zip', '6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1', 1064)
+          )
+          foreach ($pin in $pins) {
+            $path = Join-Path $out $pin[0]
+            if ((Get-FileHash -LiteralPath $path).Hash -cne $pin[1] -or (Get-Item -LiteralPath $path).Length -ne $pin[2]) { throw "Frozen package differs: $($pin[0])" }
+          }
+          Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIRWorkerStorageExactPublicPackagesV1';controller_commit=(& git rev-parse HEAD).Trim();player_commit=$revision;python='3.14.7';zlib='1.3.1.zlib-ng';native_processes=0;private_inputs=$false})
+      - name: Transfer only reconstructed public-source packages to Linux
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-storage-exact-packages-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-exact-packages/*
+          if-no-files-found: error
+          retention-days: 14
   public-inputs:
+    needs: exact-packages
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -44,15 +93,11 @@ jobs:
             pending_assignment_created = $false
           }
           Write-MIRNativeProbeResult -Context $context -Record $record
-      - name: Reconstruct the exact candidate and own fixture ZIPs
-        shell: bash
-        run: |
-          set -euo pipefail
-          out=build/tmp/worker-storage-public-inputs
-          revision=22f34725d00befd4c80160105b98b556824b57ed
-          python -B tools/package.py --source source --revision "$revision" --target f210 --output "$out/more-infinite-research_5.0.21018.zip" --record "$out/candidate.json"
-          python -B tools/package.py --source tests/fixtures/worker-storage-native-observer --revision "$revision" --output "$out/mir-worker-storage-native-observer_0.1.2.zip" --record "$out/observer.json"
-          python -B tools/package.py --source tests/fixtures/worker-storage-finite-provider --revision "$revision" --output "$out/mir-worker-storage-finite-fixture_0.1.0.zip" --record "$out/provider.json"
+      - name: Receive byte-identical packages from the frozen producer
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: worker-storage-exact-packages-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-public-inputs/packages
       - name: Retrieve only the exact public predecessor and official engine
         shell: bash
         run: |
@@ -80,7 +125,10 @@ jobs:
           }
           files = []
           for name, (sha, size) in pins.items():
-              path = root / name
+              path = (root / 'packages' / name) if name in (
+                  'more-infinite-research_5.0.21018.zip',
+                  'mir-worker-storage-native-observer_0.1.2.zip',
+                  'mir-worker-storage-finite-fixture_0.1.0.zip') else root / name
               if digest(path) != sha or (size is not None and path.stat().st_size != size):
                   raise ValueError('Exact input differs: ' + name)
               files.append({'name': name, 'sha256': sha, 'bytes': path.stat().st_size})
