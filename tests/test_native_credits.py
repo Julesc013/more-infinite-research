@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_world import build_native_credit_runtime_world
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
@@ -11,142 +13,9 @@ PLAYER = ROOT / "source"
 
 class NativeCreditRuntimeTests(unittest.TestCase):
     def setUp(self):
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
-        self.lua.globals().player_root = PLAYER.as_posix()
-        self.lua.execute(r'''
-          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
-          package.cpath = ""
-          storage, game = {}, {forces={}}
-          native_credit_definitions = require("research.native_credit_definitions")
-           local catalogue = require("runtime.catalogue")
-           fixed_credit_scalars = {}
-           for _, descriptor in ipairs(native_credit_definitions.fixed_descriptors()) do
-             if descriptor.recipe ~= "vgal-coal-crushing" then fixed_credit_scalars[descriptor.recipe] = .1 end
-           end
-           catalogue.native_credit_scalars = function()
-             local out = {}
-             for recipe, change in pairs(fixed_credit_scalars) do out[recipe] = change end
-             return out
-           end
-          native_credits = require("runtime.native_credits")
-          descriptors = native_credit_definitions.descriptors()
-          -- These default worlds contain the original twelve recipes, not
-          -- Galore's optional recipe. Its explicit controls opt in below.
-          for i=#descriptors,1,-1 do
-            if descriptors[i].recipe=="vgal-coal-crushing" then table.remove(descriptors,i) end
-          end
-          UINT32_MAX = 4294967295
-
-          function make_technology(name, prototype, level, researched, enabled)
-            local state = {
-              name=name, valid=true, prototype=prototype, level=level or 1,
-              researched=researched == true, enabled=enabled == true,
-              visible_when_disabled=false, writes={level=0, enabled=0},
-            }
-            local object = {}
-            setmetatable(object, {
-              __index=state,
-              __newindex=function(_, key, value)
-                state[key] = value
-                if key == "level" then
-                  state.writes.level = state.writes.level + 1
-                  -- F200 level writes represent research through the preceding level.
-                  state.researched = false
-                  -- Native F200 setter behavior: setting a carrier level enables it.
-                  state.enabled = true
-                elseif key == "enabled" then
-                  state.writes.enabled = state.writes.enabled + 1
-                end
-              end,
-            })
-            return object, state
-          end
-
-          function descriptor_for(recipe)
-            for _, descriptor in ipairs(descriptors) do
-              if descriptor.recipe == recipe then return descriptor end
-            end
-            error("unknown descriptor " .. tostring(recipe))
-          end
-
-          local function main_level(levels, main_id)
-            local specified = levels and levels[main_id]
-            if type(specified) == "table" then
-              return specified.level or 1, specified.researched == true
-            end
-            return specified or 1, false
-          end
-
-          local function rebuild_effects(force, main_id)
-            local effects = {}
-            for _, descriptor in ipairs(descriptors) do
-              if descriptor.main_id == main_id and force._included[descriptor.recipe] ~= false then
-                effects[#effects + 1] = {
-                  type="change-recipe-productivity", recipe=descriptor.recipe, change=force._scalar[descriptor.recipe]
-                }
-              end
-            end
-            force.technologies[main_id].prototype.effects = effects
-          end
-
-          function make_force(index, included, levels, offsets, scalar)
-            local technologies = setmetatable({}, {
-              __pairs=function() error("native credits scanned force technologies") end,
-            })
-            local force = {
-              index=index, valid=true, technologies=technologies, _included=included or {}, _scalar={}, _states={},
-              external_bonus=17.25, reset_calls=0,
-              reset_technology_effects=function() error("native credits reset force effects") end,
-              recipes=setmetatable({}, {__index=function() error("native credits read aggregate recipe bonus") end}),
-            }
-            local main_seen = {}
-            for _, descriptor in ipairs(descriptors) do
-              local change = scalar and scalar[descriptor.recipe] or .1
-              force._scalar[descriptor.recipe] = change
-              if not main_seen[descriptor.main_id] then
-                local level, researched = main_level(levels, descriptor.main_id)
-                local technology, state = make_technology(descriptor.main_id, {
-                  name=descriptor.main_id, level=1, max_level=UINT32_MAX, effects={}
-                }, level, researched, true)
-                technologies[descriptor.main_id], force._states[descriptor.main_id] = technology, state
-                main_seen[descriptor.main_id] = true
-              end
-              local offset = offsets and offsets[descriptor.recipe] or 0
-              local positive_level = 1 + (offset > 0 and offset or 0)
-              local negative_level = 1 + (offset < 0 and -offset or 0)
-              local positive, positive_state = make_technology(descriptor.positive_id, {
-                name=descriptor.positive_id, level=1, max_level=UINT32_MAX, hidden=true, enabled=false,
-                visible_when_disabled=false,
-                effects={{type="change-recipe-productivity", recipe=descriptor.recipe, change=change}},
-              }, positive_level, false, false)
-              local negative, negative_state = make_technology(descriptor.negative_id, {
-                name=descriptor.negative_id, level=1, max_level=UINT32_MAX, hidden=true, enabled=false,
-                visible_when_disabled=false,
-                effects={{type="change-recipe-productivity", recipe=descriptor.recipe, change=-change}},
-              }, negative_level, false, false)
-              technologies[descriptor.positive_id], technologies[descriptor.negative_id] = positive, negative
-              force._states[descriptor.positive_id], force._states[descriptor.negative_id] = positive_state, negative_state
-            end
-            for main_id in pairs(main_seen) do rebuild_effects(force, main_id) end
-            return force
-          end
-
-          function set_included(force, recipe, value)
-            local descriptor = descriptor_for(recipe)
-            force._included[recipe] = value
-            rebuild_effects(force, descriptor.main_id)
-          end
-
-          function ledger(force, recipe)
-            local current = storage.mir_native_credits
-            return current and current.forces[force.index] and current.forces[force.index][recipe] or nil
-          end
-
-          function holder(force, recipe, direction)
-            local descriptor = descriptor_for(recipe)
-            return force.technologies[direction == "positive" and descriptor.positive_id or descriptor.negative_id]
-          end
-        ''')
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=PLAYER
+        )
 
     def galore_force(self, included=False, retired=True):
         self.lua.globals().galore_included = included

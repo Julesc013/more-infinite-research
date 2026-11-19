@@ -4,8 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_native_family_paid_credits as family_fixture
 import test_generator as generator_fixture
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,10 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NativeCreditVectorTests(unittest.TestCase):
     def setUp(self):
-        family_fixture.LuaRuntime = LuaRuntime
-        case = family_fixture.NativeFamilyPaidCreditsTests()
-        case.setUp()
-        self.lua = case.lua
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=ROOT / "source"
+        )
+        install_native_family_paid_world(self.lua, target="f210")
         self.lua.execute(r'''
           function vector_world(size, included, target, change, level, family, recipe, public_id)
             family=family or "research_low_density_structure";recipe=recipe or "scrap-recycling"
@@ -83,6 +83,56 @@ class NativeCreditVectorTests(unittest.TestCase):
             VF,VD,VR=f,d,reference
             return f,d,reference
           end
+        ''')
+
+    def test_explicit_credit_world_construction_ignores_foreign_testcase_and_runtime_globals(self):
+        import test_native_credits as credit_fixture
+        import test_native_family_paid_credits as paid_fixture
+
+        absent = object()
+        original_credit_runtime = getattr(credit_fixture, "LuaRuntime", absent)
+        original_paid_runtime = getattr(paid_fixture, "LuaRuntime", absent)
+        original_paid_case = paid_fixture.NativeFamilyPaidCreditsTests
+        factory_calls = []
+
+        def forbidden_factory(**_):
+            raise AssertionError("borrowed test-module LuaRuntime was used")
+
+        class ForbiddenPaidCase:
+            def __init__(self):
+                raise AssertionError("borrowed paid-family TestCase was constructed")
+
+        def supplied_factory(*, unpack_returned_tuples):
+            factory_calls.append(unpack_returned_tuples)
+            return LuaRuntime(unpack_returned_tuples=unpack_returned_tuples)
+
+        credit_fixture.LuaRuntime = forbidden_factory
+        paid_fixture.LuaRuntime = forbidden_factory
+        paid_fixture.NativeFamilyPaidCreditsTests = ForbiddenPaidCase
+        try:
+            self.setUp()
+            self.lua.execute("assert(type(vector_world)=='function')")
+            lua = build_native_credit_runtime_world(
+                supplied_factory, target="f200", source_root=ROOT / "source"
+            )
+            install_native_family_paid_world(lua, target="f200")
+        finally:
+            if original_credit_runtime is absent:
+                delattr(credit_fixture, "LuaRuntime")
+            else:
+                credit_fixture.LuaRuntime = original_credit_runtime
+            if original_paid_runtime is absent:
+                delattr(paid_fixture, "LuaRuntime")
+            else:
+                paid_fixture.LuaRuntime = original_paid_runtime
+            paid_fixture.NativeFamilyPaidCreditsTests = original_paid_case
+
+        self.assertEqual([True], factory_calls)
+        lua.execute(r'''
+          assert(require("platform.target").id=="f200")
+          local force=make_collected_force(1,1,{},false)
+          native_credits.on_init()
+          assert(record(force,"research_steel","steel-plate").included==false)
         ''')
 
     def test_real_collection_then_cerys_loop_admits_complete_carriers_with_broader_public_owner(self):
