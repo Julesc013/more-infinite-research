@@ -11,105 +11,20 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_native_credits as fixture
 import test_bootstrap as bootstrap_fixture
 import test_generator as generator_fixture
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFamilyPaidCreditsTests(unittest.TestCase):
     def setUp(self):
-        fixture.LuaRuntime = LuaRuntime
-        case = fixture.NativeCreditRuntimeTests()
-        case.setUp()
-        self.lua = case.lua
-        self.lua.globals().fixture_float32 = lambda value: struct.unpack("<f", struct.pack("<f", value))[0]
-        self.lua.execute(r'''
-          GROUPS={research_steel={
-            {recipe="alternate-steel",change=.17},{recipe="multi-native",change=.17},
-            {recipe="steel-plate",change=.17},{recipe="casting-steel",change=.17}},
-            research_low_density_structure={{recipe="multi-native",change=.1}}}
-          local function copy(value)
-            if type(value)~="table" then return value end
-            local out={};for k,v in pairs(value) do out[k]=copy(v) end;return out
-          end
-          -- Ordinary fixture defaults are authored exact quanta. Precision
-          -- cases below replace these fields from independent observed units.
-          function fixture_effect(value)
-            return require("platform.target").id=="f200" and fixture_float32(value) or value
-          end
-          function reload_credits(active,target_id,fixed)
-            script={active_mods=active or {base="2.1.23",["space-age"]="2.1.23",["more-infinite-research"]="5.0.21003"}}
-            require("platform.target").id=target_id or "f210"
-            prototypes={technology={},mod_data={
-              ["more-infinite-research-native-adoptions"]={data={schema=1,owners={},withheld={},credits=copy(GROUPS),
-                fixed_credits=copy(fixed or {})}}},
-              get_history=function(_,name) return {created=foreign_creation==name and "foreign" or "more-infinite-research"} end}
-            package.loaded["research.catalogue"]=nil
-            package.loaded["runtime.catalogue"]=nil
-            package.loaded["runtime.native_credits"]=nil
-            native_credits=require("runtime.native_credits")
-          end
-          function make_collected_force(index,level,mask,private)
-            local force={index=index,valid=true,technologies=setmetatable({}, {
-              __pairs=function()error("whole technology traversal")end}),_states={},
-              foreign_bonus=17.25,recipes=setmetatable({}, {__index=function()error("aggregate recipe read")end}),
-              reset_technology_effects=function()error("force reset")end,research_progress=.42}
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              if not force.technologies[d.main_id] then
-                local t,s=make_technology(d.main_id,{name=d.main_id,level=1,max_level=UINT32_MAX,
-                  hidden=private==true,effects={}},level or 1,false,true)
-                t.force=force;force.technologies[d.main_id]=t;force._states[d.main_id]=s
-              end
-              for _,direction in ipairs({"positive","negative"}) do
-                local name=direction=="positive" and d.positive_id or d.negative_id
-                local t,s=make_technology(name,{name=name,level=1,max_level=UINT32_MAX,hidden=true,
-                  enabled=false,visible_when_disabled=false,effects={{type="change-recipe-productivity",
-                    recipe=d.recipe,change=direction=="positive" and fixture_effect(d.change)
-                      or -fixture_effect(d.change)}}},1,false,false)
-                t.force=force;force.technologies[name]=t;force._states[name]=s
-              end
-            end
-            local t,s=make_technology("foreign",{name="foreign",level=1,max_level=UINT32_MAX,effects={}},3,false,false)
-            t.force=force;force.technologies.foreign=t;force._states.foreign=s
-            game.forces[index]=force;set_mask(force,mask or {},private)
-            return force
-          end
-          function set_mask(force,mask,private)
-            local seen={}
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              local proto=force.technologies[d.main_id].prototype
-              if not seen[d.main_id] then proto.effects={};proto.hidden=private==true;seen[d.main_id]=true end
-              if mask[d.family.."\0"..d.recipe] then
-                proto.effects[#proto.effects+1]={type="change-recipe-productivity",recipe=d.recipe,change=fixture_effect(d.change)}
-              end
-            end
-          end
-          function key(family,recipe)return family.."\0"..recipe end
-          function record(force,family,recipe)
-            return storage.mir_native_credits and storage.mir_native_credits.forces[force.index]
-              and storage.mir_native_credits.forces[force.index][key(family,recipe)]
-          end
-          function own_contribution(force,family,recipe)
-            local wanted
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              if d.family==family and d.recipe==recipe then wanted=d end
-            end
-            local function completed(t)return t.level-1+(t.researched and 1 or 0)end
-            local main=force.technologies[wanted.main_id];local included=false
-            for _,e in ipairs(main.prototype.effects) do if e.recipe==recipe then included=true end end
-            return wanted.change*((included and completed(main) or 0)
-              +completed(force.technologies[wanted.positive_id])-completed(force.technologies[wanted.negative_id]))
-          end
-          function close(a,b)assert(math.abs(a-b)<1e-8,tostring(a).." differs "..tostring(b))end
-          function no_foreign_write(force)
-            assert(force.foreign_bonus==17.25 and not force.technologies.foreign.enabled)
-            assert(force._states.foreign.writes.enabled==0 and force._states.foreign.writes.level==0)
-          end
-          function advance(force,id,level,researched)
-            force._states[id].level=level;force._states[id].researched=researched
-          end
-          reload_credits()
-        ''')
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=ROOT / "source"
+        )
+        install_native_family_paid_world(self.lua, target="f210")
 
     FAMILIES = ("research_low_density_structure", "research_plastic",
                 "research_processing_unit", "research_rocket_fuel", "research_steel")
@@ -375,7 +290,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     @staticmethod
     def observed_oracle(target):
-        path = fixture.ROOT / "tests/fixtures" / ("native-effect-conversion-" + target + ".json")
+        path = ROOT / "tests/fixtures" / ("native-effect-conversion-" + target + ".json")
         oracle = json.loads(path.read_text())
         assert oracle["target"] == target
         assert len(oracle["cases"]) == (20 if target == "f200" else 36)
