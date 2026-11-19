@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-20
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,16 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Current 5.0.18 preparation and remaining native gate (2026-11-20)
+
+Reviewed [PR #2164](https://github.com/Julesc013/more-infinite-research/pull/2164), merged as `962de39aed3b71c02ccb02d825e1079db57b04bd`, removes inapplicable preparation-command advice from the shared worker-history rejection formatter. The unrecorded changed-selection branch now explains the conditional separate-copy upgrade route after the recorded/prepared admissions have been checked. The correction changes guidance only: admission, accounting, commands, native reads and writes are unchanged. Focused opponents retain the rejected state and demonstrate the old misleading advice. This is not a functional repair claim for an original reporter save.
+
+Reviewed [PR #2165](https://github.com/Julesc013/more-infinite-research/pull/2165), merged as `22f34725d00befd4c80160105b98b556824b57ed`, replaces direct native-credit, paid-family and vector TestCase construction/global-runtime coupling with explicit world builders. Existing assertions and historical identities remain; a deliberate borrowed-TestCase opponent rejects the actual former vector setup. The combined merged-head controls pass314 methods across worker history, bootstrap, native credits, paid credits, vectors and their fixture. All four required checks passed on both final PR heads. The deferred bootstrap/paid-family cycle and other generator/known-base/vector-fixture bridges remain separate work; these host results supply no new Factorio acceptance.
+
+The offline asset freeze at source commit `22f34725d00befd4c80160105b98b556824b57ed`, player tree `a504d92fe798d570df58514f9f839c4954af14f3`, contains17 player ZIPs. The release tool rebuild verifies exact bytes; separate root and peer inspections reconcile every archive/member, metadata, version codec, checksums and support scope. Its F210 candidate is1053618bytes, SHA256 `C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D`. Local custody is `build/qualification/mir518-a504-source-freeze-aero-r01` and `../mir5-freeze/mir518-a504-source-freeze-aero-r01`. The raw inventory-file SHA256 `97C9EA38D97277D5C4C8E4DB612EA4F852CE9C284A8D8E300C3CE5577441F7BB` is distinct from its logical self-digest `8e3a11a31930bb89bf369d10ab4577e0887a6de7eae0bbd47fd97d8053c253f2`. This is private package preparation, with no tag, release draft, publication or delivery verdict.
+
+The earlier K2SO613/717 runner and2941 candidate tuple remain preserved under their original identities. The single pending thirteen-process batch is being rebound to the new sealed player artifact, recording runner/controller and player-source provenance separately. No native process or execution reservation is active. Gunmetal's system filesystem remains90112bytes below the unchanged20GiB reserve; separate home capacity does not clear that check. Administrator maintenance remains an unanswered choice, not approval, and no cleanup, reserve reduction or repeated failed dispatch has occurred. The retained Library cold-only endpoint and older worker-source successor remain distinct obligations; completed source/input work must not be recreated. K2SO native progression/caps/save/two-cold acceptance, fresh and reporter-settings cases, original worker/carrier/mining reports, Library/client/export, performance and stable acceptance remain open. Latest public release remains5.0.17.
 
 ## Paid Base addition successor accepted (2026-11-19)
 
