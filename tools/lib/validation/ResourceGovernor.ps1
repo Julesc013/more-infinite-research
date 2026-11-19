@@ -627,9 +627,9 @@ function Update-MIR441FactorioConsoleStartupOutput {
       if(-not$State.ready_marker_seen-and$tail.IndexOf($State.ready_marker,[StringComparison]::Ordinal)-ge0){$State.ready_marker_seen=$true}
       $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
       if($State.receipt.send_count-ge1){
-        # The first command establishes a per-stream byte boundary after its
-        # successful write.  Output already present at that boundary may have
-        # been emitted before the command even when the bounded reader has not
+        # The first command commits the per-stream byte boundary captured
+        # immediately before its successful write. Output at or before that
+        # boundary predates the command even when the bounded reader has not
         # reached it yet, so it cannot request a replay.
         $confirmationStart=[int64]$stream.confirmation_start_offset
         $confirmationOffset=[Math]::Max(0L,$confirmationStart-$readOffset)
@@ -649,6 +649,25 @@ function Update-MIR441FactorioConsoleStartupOutput {
 function Send-MIR441FactorioConsoleStartupLine {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
   if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
+  # Capture each stream before WriteLine/Flush. A Factorio response can be
+  # appended synchronously by Flush, so a post-flush measurement is too late
+  # to distinguish that response from unread pre-command output.
+  $preWriteBoundaries=[Collections.Generic.List[object]]::new()
+  foreach($stream in $State.streams){
+    try {
+      $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+      $preWriteBoundaries.Add([ordered]@{kind=$stream.kind;path=$stream.path;bytes=$bytes})
+    } catch {throw '[mir441-factorio-console-baseline]'}
+  }
+  $priorSend=if($Kind-ceq'confirmation-replay'){$State.receipt.sends[$State.receipt.sends.Count-1]}else{$null}
+  if($Kind-ceq'confirmation-replay'){
+    # Reject a regressed stream before repeating the one allowed command.
+    # This leaves the receipt truthful: no second command was delivered.
+    foreach($boundary in $preWriteBoundaries){
+      $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$boundary.kind-and$_.path-ceq$boundary.path})
+      if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or[int64]$boundary.bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
+    }
+  }
   try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
   $State.receipt.send_count++
   $send=[ordered]@{
@@ -660,7 +679,14 @@ function Send-MIR441FactorioConsoleStartupLine {
   # A post-send observation failure must not turn an already-delivered command
   # into a receipt that claims no command was sent.
   $State.receipt.sends.Add($send)
-  $priorSend=if($Kind-ceq'confirmation-replay'){$State.receipt.sends[$State.receipt.sends.Count-2]}else{$null}
+  if($Kind-ceq'command'){
+    for($index=0;$index-lt$State.streams.Count;$index++){
+      # Commit pre-write snapshots only after WriteLine and Flush succeeded.
+      # The post-flush boundaries below remain separate observational facts.
+      $State.streams[$index].confirmation_start_offset=[int64]$preWriteBoundaries[$index].bytes
+      $State.streams[$index].confirmation_tail=''
+    }
+  }
   foreach($stream in $State.streams){
     try {
       $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
@@ -670,13 +696,6 @@ function Send-MIR441FactorioConsoleStartupLine {
       if($Kind-ceq'confirmation-replay'){
         $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$stream.kind-and$_.path-ceq$stream.path})
         if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or$bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
-      }
-      if($Kind-ceq'command'){
-        # Preserve the first-send confirmation boundary used by the existing
-        # confirmation reader.  Replays get their own receipt floor above but
-        # do not widen that original causal boundary.
-        $stream.confirmation_start_offset=$bytes
-        $stream.confirmation_tail=''
       }
     } catch {throw '[mir441-factorio-console-baseline]'}
   }
