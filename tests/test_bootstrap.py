@@ -4,8 +4,12 @@ These tests exercise only registration and callback routing with host doubles.
 They are not Factorio engine, GUI, menu, save, or gameplay evidence.
 """
 import argparse
+import ast
+import contextlib
 from pathlib import Path
+import subprocess
 import sys
+import textwrap
 import unittest
 from bootstrap_control_world import build_bootstrap_control_world, install_bootstrap_control_world
 from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
@@ -534,40 +538,68 @@ class BootstrapTests(unittest.TestCase):
 
     def test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes(self):
         import test_native_family_paid_credits as paid_fixture
+        for opponent in ("mir-fixture-observer", "ExpandedProductivityResearch", "space-age"):
+            with self.subTest(opponent=opponent):
+                case = paid_fixture.NativeFamilyPaidCreditsTests()
+                case.lua = build_native_credit_runtime_world(
+                    LuaRuntime, target="f210", source_root=ROOT / "source"
+                )
+                install_native_family_paid_world(case.lua, target="f210")
+                case._same_engine_unknown_paid_mask(opponent)
+                self.setUp(case.lua)
+                self.lua.execute('''
+                  local real_credits=native_credits
+                  install_modules(true,false,true,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
+                  package.preload["runtime.native_credits"]=function()return real_credits end
+                  load_control()
+                  local registrations=0
+                  script.on_event=function()registrations=registrations+1 end
+                  script.on_nth_tick=function()registrations=registrations+1 end
+                  assert_unknown_mask_refuses(handlers.configuration)
+                  assert(lifecycle_calls.configuration==nil and library_calls.configuration==nil
+                    and module_credit_calls.preflight==nil and cannon_credit_calls.preflight==nil
+                    and scripted_calls.configuration==nil and registrations==0,
+                    "bootstrap wrote cap/force/control state before real credit refusal")
+                ''')
+
+    def test_paid_mask_bootstrap_does_not_select_paid_testcase_setup(self):
+        import test_native_family_paid_credits as paid_fixture
+
         missing_runtime = object()
         original_runtime = getattr(paid_fixture, "LuaRuntime", missing_runtime)
+        original_setup = paid_fixture.NativeFamilyPaidCreditsTests.setUp
 
-        def forbidden_runtime(*args, **kwargs):
-            raise AssertionError("bootstrap control selected paid TestCase module-global runtime")
+        def forbidden_setup(_case):
+            raise AssertionError("bootstrap control selected paid TestCase setup")
 
-        paid_fixture.LuaRuntime = forbidden_runtime
+        paid_fixture.NativeFamilyPaidCreditsTests.setUp = forbidden_setup
         try:
-            with self.assertRaisesRegex(AssertionError, "bootstrap control selected paid TestCase module-global runtime"):
-                paid_fixture.NativeFamilyPaidCreditsTests().setUp()
-            for opponent in ("mir-fixture-observer", "ExpandedProductivityResearch", "space-age"):
-                with self.subTest(opponent=opponent):
-                    case = paid_fixture.NativeFamilyPaidCreditsTests()
-                    case.lua = build_native_credit_runtime_world(
-                        LuaRuntime, target="f210", source_root=ROOT / "source"
-                    )
-                    install_native_family_paid_world(case.lua, target="f210")
-                    case._same_engine_unknown_paid_mask(opponent)
-                    self.setUp(case.lua)
-                    self.lua.execute('''
-                      local real_credits=native_credits
-                      install_modules(true,false,true,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
-                      package.preload["runtime.native_credits"]=function()return real_credits end
-                      load_control()
-                      local registrations=0
-                      script.on_event=function()registrations=registrations+1 end
-                      script.on_nth_tick=function()registrations=registrations+1 end
-                      assert_unknown_mask_refuses(handlers.configuration)
-                      assert(lifecycle_calls.configuration==nil and library_calls.configuration==nil
-                        and module_credit_calls.preflight==nil and cannon_credit_calls.preflight==nil
-                        and scripted_calls.configuration==nil and registrations==0,
-                        "bootstrap wrote cap/force/control state before real credit refusal")
-                    ''')
+            self.test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes()
+            old_source = subprocess.check_output(
+                ["git", "show", "d737f2e7c7290fd72ccda577975f5c34f16d7995:tests/test_bootstrap.py"],
+                cwd=ROOT,
+                text=True,
+            )
+            old_tree = ast.parse(old_source)
+            old_method_node = next(
+                member for node in old_tree.body
+                if isinstance(node, ast.ClassDef) and node.name == "BootstrapTests"
+                for member in node.body
+                if isinstance(member, ast.FunctionDef)
+                and member.name == "test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes"
+            )
+            old_method_source = ast.get_source_segment(old_source, old_method_node)
+            self.assertIn("paid_fixture.LuaRuntime = LuaRuntime", old_method_source)
+            namespace = {"LuaRuntime": LuaRuntime}
+            exec(textwrap.dedent(old_method_source), namespace)
+            historical_case = BootstrapTests(
+                "test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes"
+            )
+            historical_case.subTest = lambda **_kwargs: contextlib.nullcontext()
+            with self.assertRaisesRegex(AssertionError, "bootstrap control selected paid TestCase setup"):
+                namespace[old_method_node.name](historical_case)
         finally:
+            paid_fixture.NativeFamilyPaidCreditsTests.setUp = original_setup
             if original_runtime is missing_runtime:
                 delattr(paid_fixture, "LuaRuntime")
             else:
