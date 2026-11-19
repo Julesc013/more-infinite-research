@@ -168,12 +168,18 @@ end
 local function assert_lab_baseline(state, label)
   local force=game.forces.player
   if type(state.lab_speed_baseline)~="number" or state.lab_speed_baseline~=state.lab_speed_baseline
-      or type(state.lab_productivity_baseline)~="number" or state.lab_productivity_baseline~=state.lab_productivity_baseline then
+      or state.lab_speed_baseline==math.huge or state.lab_speed_baseline==-math.huge
+      or type(state.lab_productivity_baseline)~="number" or state.lab_productivity_baseline~=0 then
     fail("laboratory baseline is invalid")
   end
   if force.laboratory_speed_modifier~=state.lab_speed_baseline
-      or force.laboratory_productivity_bonus~=state.lab_productivity_baseline then
+      or force.laboratory_productivity_bonus~=0 then
     fail(label .. " laboratory baseline changed")
+  end
+end
+local function assert_zero_productivity(force, label)
+  if type(force.laboratory_productivity_bonus)~="number" or force.laboratory_productivity_bonus~=0 then
+    fail(label .. " laboratory productivity baseline differs")
   end
 end
 local function accelerate_lab(state)
@@ -320,6 +326,7 @@ function M.apply(stage)
     local state = storage[KEY]
     if not state or state.stage ~= expected.prior or state.phase ~= "complete" then fail("protected predecessor stage differs") end
     assert_lab_baseline(state,"configuration")
+    assert_zero_productivity(game.forces[state.foreign_index],"configuration foreign")
     local player, foreign = frame(game.forces.player), frame(game.forces[state.foreign_index])
     if stage == "upgrade" then
       paid(player, state.player, "upgrade player")
@@ -401,6 +408,7 @@ function M.apply(stage)
         for _, recipe in ipairs(material.recipes) do if not near(force.recipes[recipe].productivity_bonus,0) then fail("source has unearned material bonus") end end
       end
       local foreign=game.create_force(FOREIGN)
+      assert_zero_productivity(foreign,"foreign setup")
       state.foreign_index=foreign.index
       for _, material in ipairs(MATERIALS) do
         local value=tech(foreign,id(material,1)); value.enabled,value.visible_when_disabled=false,false

@@ -218,6 +218,30 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
         self.tick()
         self.assertEqual(self.lua.eval("game.forces.player.laboratory_speed_modifier"), .25)
 
+    def test_nonzero_productivity_or_nonfinite_speed_baseline_refuses_before_fixture_writes(self):
+        opponents=(
+            ("game.forces.player.laboratory_speed_modifier=.25; game.forces.player.laboratory_productivity_bonus=.1",
+             "laboratory baseline is invalid", .25, .1),
+            ("game.forces.player.laboratory_speed_modifier=math.huge",
+             "laboratory baseline is invalid", float("inf"), 0),
+        )
+        for setup, reason, speed, productivity in opponents:
+            with self.subTest(setup=setup):
+                world=FixtureWorld(self.runtime_type)
+                world.execute(setup)
+                world.load("source")
+                ok,message=world.evaluate("world_call")("init",None)
+                self.assertTrue(ok,message)
+                with self.assertRaisesRegex(Exception,reason):
+                    world.evaluate("world_tick")(2,False)
+                self.assertEqual(world.evaluate("game.forces.player.laboratory_speed_modifier"),speed)
+                self.assertEqual(world.evaluate("game.forces.player.laboratory_productivity_bonus"),productivity)
+                self.assertFalse(world.evaluate('game.forces.player.technologies["automation-science-pack"].researched'))
+                self.assertIsNone(world.evaluate(f'game.forces["{FOREIGN}"]'))
+                self.assertEqual(world.evaluate("#world_labs"),0)
+                self.assertEqual(world.evaluate("#saves"),0)
+                self.assertEqual(world.evaluate("#game.forces.player.research_queue"),0)
+
     def test_private_lab_substitution_or_missed_speed_restoration_refuses_before_save(self):
         text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
         private=text.replace('local LAB = "lab"','local LAB = "mir-k2so-material-continuation-lab"')
@@ -385,13 +409,23 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
         self.assertEqual(self.lua.eval(f"storage.{KEY}.finished"),0)
 
     def test_foreign_change_during_research_cannot_become_the_saved_baseline(self):
-        self.world.load("source")
-        self.call("init")
-        self.tick(2)
-        self.world.execute(f'game.forces["{FOREIGN}"].recipes["kr-glass"].productivity_bonus=.02')
-        with self.assertRaisesRegex(Exception,"foreign.*paid recipe changed|foreign.*bonus"):
-            self.until("#saves==1")
-        self.assertEqual(self.lua.eval("#saves"),0)
+        opponents=(
+            (f'game.forces["{FOREIGN}"].recipes["kr-glass"].productivity_bonus=.02',
+             "foreign.*paid recipe changed|foreign.*bonus"),
+            (f'game.forces["{FOREIGN}"].laboratory_productivity_bonus=.1',
+             "foreign.*laboratory modifiers changed"),
+        )
+        for mutation,reason in opponents:
+            with self.subTest(mutation=mutation):
+                self.world=FixtureWorld(self.runtime_type)
+                self.lua=self.world.lua
+                self.world.load("source")
+                self.call("init")
+                self.tick(2)
+                self.world.execute(mutation)
+                with self.assertRaisesRegex(Exception,reason):
+                    self.until("#saves==1")
+                self.assertEqual(self.lua.eval("#saves"),0)
 
     def test_save_requires_two_elapsed_ticks_and_rechecks_the_complete_snapshot(self):
         self.world.load("source")
