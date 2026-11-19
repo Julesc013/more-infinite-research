@@ -159,6 +159,7 @@ function world_new()
   local surface={index=1}
   world_labs={}
   surface.create_entity=function(arguments)
+    assert(arguments.name=="lab","fixture must use the named original lab")
     local inv=inventory()
     local lab_values={name=arguments.name,valid=true,unit_number=#world_labs+1,
       force=type(arguments.force)=="string" and force_registry[arguments.force] or arguments.force or player,
@@ -227,10 +228,18 @@ function world_engine_unit(scripted)
   assert(lab.energy>0,"bounded host lab energy exhausted before next work unit")
   local inv=lab.get_inventory(1)
   for _,ingredient in ipairs(row.research_unit_ingredients)do if inv.get_item_count(ingredient.name)<ingredient.amount then return false end end
-  for _,ingredient in ipairs(row.research_unit_ingredients)do inv.debit(ingredient.name,ingredient.amount)end
-  lab.energy=0
+  local speed=lab.prototype.get_researching_speed(lab.quality and lab.quality.name or "normal")
+  local modifier=force.laboratory_speed_modifier
+  assert(type(speed)=="number" and speed>0 and type(modifier)=="number" and modifier>=0,"invalid host lab speed")
   local count=row.research_unit_count
-  local completed=math.floor(force.research_progress*count+.5)+1
+  local completed=math.floor(force.research_progress*count+.5)
+  local units=math.max(1,math.floor(speed*(1+modifier)/row.prototype.research_unit_energy))
+  units=math.min(units,count-completed)
+  for _,ingredient in ipairs(row.research_unit_ingredients)do units=math.min(units,math.floor(inv.get_item_count(ingredient.name)/ingredient.amount))end
+  if units<=0 then return false end
+  for _,ingredient in ipairs(row.research_unit_ingredients)do inv.debit(ingredient.name,ingredient.amount*units)end
+  lab.energy=0
+  completed=completed+units
   force_values[force].progress=completed/count
   technology_values[row].saved_progress=completed/count
   if completed==count then

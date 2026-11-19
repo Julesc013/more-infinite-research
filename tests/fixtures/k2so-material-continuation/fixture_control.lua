@@ -1,13 +1,14 @@
--- Disposable paid K2SO progression. Only this fixture's lab, queue setup,
+-- Disposable paid K2SO progression. Only this fixture's lab entity, queue setup,
 -- native prerequisites and its own storage are written; MIR owns migration.
 local M = {}
 local KEY = "mir5_k2so_material_continuation"
 local FIXTURE = "mir-fixture-k2so-material-continuation"
-local LAB = "mir-k2so-material-continuation-lab"
+local LAB = "lab"
 local PROBE = "mir-k2so-material-continuation-probe"
 local FOREIGN = "mir-k2so-material-continuation-foreign"
 local CASE = "k2so-material-continuation"
 local UINT32_MAX = 4294967295
+local LAB_SPEED_ACCELERATION = 115199
 local WHITE = "space-science-pack"
 local PACKS = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", WHITE}
 local MATERIALS = {
@@ -43,7 +44,9 @@ local function equal_queue(a, b, label)
 end
 local function frame(force)
   local out = {technologies={}, bonuses={}, current=force.current_research and force.current_research.name or false,
-    queue=queue_names(force), progress=force.research_progress}
+    queue=queue_names(force), progress=force.research_progress,
+    laboratory_speed_modifier=force.laboratory_speed_modifier,
+    laboratory_productivity_bonus=force.laboratory_productivity_bonus}
   local function add(name)
     local value = tech(force, name)
     out.technologies[name] = {level=value.level, researched=value.researched, enabled=value.enabled,
@@ -83,6 +86,10 @@ function M.assert_snapshot(actual, expected, label)
   end
   if actual.current ~= expected.current or not near(actual.progress, expected.progress) then
     fail(label .. " current research changed")
+  end
+  if actual.laboratory_speed_modifier ~= expected.laboratory_speed_modifier
+      or actual.laboratory_productivity_bonus ~= expected.laboratory_productivity_bonus then
+    fail(label .. " laboratory modifiers changed")
   end
   equal_queue(actual.queue, expected.queue, label)
 end
@@ -144,9 +151,6 @@ local function closure(stage)
 end
 
 local function check_materials(force, stage, levels, bonus, foreign)
-  if not near(force.laboratory_productivity_bonus, 0) or not near(force.laboratory_speed_modifier, 0) then
-    fail("fixture force has a laboratory modifier")
-  end
   for _, material in ipairs(MATERIALS) do
     local early = tech(force, id(material, 1))
     if early.level ~= (foreign and 1 or 3) or early.researched ~= not foreign
@@ -161,8 +165,32 @@ local function check_materials(force, stage, levels, bonus, foreign)
     end
   end
 end
+local function assert_lab_baseline(state, label)
+  local force=game.forces.player
+  if type(state.lab_speed_baseline)~="number" or state.lab_speed_baseline~=state.lab_speed_baseline
+      or type(state.lab_productivity_baseline)~="number" or state.lab_productivity_baseline~=state.lab_productivity_baseline then
+    fail("laboratory baseline is invalid")
+  end
+  if force.laboratory_speed_modifier~=state.lab_speed_baseline
+      or force.laboratory_productivity_bonus~=state.lab_productivity_baseline then
+    fail(label .. " laboratory baseline changed")
+  end
+end
+local function accelerate_lab(state)
+  local force=game.forces.player
+  assert_lab_baseline(state,"before ordinary work")
+  force.laboratory_speed_modifier=state.lab_speed_baseline+LAB_SPEED_ACCELERATION
+  if force.laboratory_speed_modifier~=state.lab_speed_baseline+LAB_SPEED_ACCELERATION then
+    fail("temporary laboratory speed differs")
+  end
+end
+local function restore_lab_speed(state)
+  local force=game.forces.player
+  force.laboratory_speed_modifier=state.lab_speed_baseline
+  assert_lab_baseline(state,"restored")
+end
 local function set_running(state, running)
-  if not state.lab or state.lab.valid == false then fail("owned lab is absent") end
+  if not state.lab or state.lab.valid == false or state.lab.name~=LAB then fail("named original lab is absent") end
   state.lab.disabled_by_script = not running
   if running then
     local capacity = state.lab.electric_buffer_size
@@ -238,9 +266,7 @@ local function start_job(state)
   local job = work_plan(state.stage)[state.work_index]
   if not job then return false end
   local force, value = game.forces.player, tech(game.forces.player, job.name)
-  if not near(force.laboratory_productivity_bonus,0) or not near(force.laboratory_speed_modifier,0) then
-    fail("ordinary work has a laboratory modifier")
-  end
+  assert_lab_baseline(state,"ordinary work")
   if value.level ~= job.level or value.research_unit_count ~= job.count or not value.enabled then
     fail("ordinary next research cursor/count/enablement differs")
   end
@@ -248,12 +274,14 @@ local function start_job(state)
   if not force.current_research or force.current_research.name ~= job.name or not near(force.research_progress, job.progress) then
     fail("ordinary research did not retain its own starting work")
   end
+  accelerate_lab(state)
   state.phase, state.job_finished = "work", false
   begin_budget(state, job.budget, job.science)
   return true
 end
 local function settle(state)
   set_running(state, false)
+  restore_lab_speed(state)
   if state.foreign_guard then M.assert_snapshot(frame(game.forces[state.foreign_index]),state.foreign_guard,"working foreign") end
   state.phase, state.settle_tick = "settle", game.tick
   state.player, state.foreign = frame(game.forces.player), frame(game.forces[state.foreign_index])
@@ -270,7 +298,8 @@ local function marker(kind, state)
     case=CASE, stage=kind, status="passed", role=state.stage,
     witnesses={actual_lab_completions=state.finished, source_finite_completions=9,
       science_consumed=state.consumed, material_count_time_effect_unchanged=true,
-      fixture_accelerates_lab_speed_only=true, ordinary_elapsed_timing_qualified=false,
+      fixture_accelerates_force_speed_only=true, laboratory_speed_baseline=state.lab_speed_baseline,
+      laboratory_speed_acceleration=LAB_SPEED_ACCELERATION, ordinary_elapsed_timing_qualified=false,
       physical_manufacturing_observed=false, player=state.player, foreign=state.foreign,
       on_load_read_only=kind=="reload"}})
 end
@@ -290,6 +319,7 @@ function M.apply(stage)
     closure(stage)
     local state = storage[KEY]
     if not state or state.stage ~= expected.prior or state.phase ~= "complete" then fail("protected predecessor stage differs") end
+    assert_lab_baseline(state,"configuration")
     local player, foreign = frame(game.forces.player), frame(game.forces[state.foreign_index])
     if stage == "upgrade" then
       paid(player, state.player, "upgrade player")
@@ -337,6 +367,7 @@ function M.apply(stage)
       fail("unexpected ordinary completion")
     end
     set_running(state, false)
+    restore_lab_speed(state)
     state.job_finished, state.finished = true, state.finished+1
   end)
   script.on_event(defines.events.on_tick, function()
@@ -356,6 +387,9 @@ function M.apply(stage)
     if state.phase == "setup" then
       if game.tick-state.started<2 then return end
       local force = game.forces.player
+      state.lab_speed_baseline=force.laboratory_speed_modifier
+      state.lab_productivity_baseline=force.laboratory_productivity_bonus
+      assert_lab_baseline(state,"source setup")
       for _, name in ipairs(PREREQUISITES) do
         setup_grant=tech(force,name)
         if not setup_grant.researched then setup_grant.researched=true end
@@ -401,6 +435,7 @@ function M.apply(stage)
         if not force.add_research(SILICON) or not force.add_research(SILICON) or not force.add_research(PROBE) then fail("partial queue was refused") end
         equal_queue(queue_names(force),{SILICON,SILICON,PROBE},"partial start")
         if tech(force,SILICON).research_unit_count~=1800 or not near(force.research_progress,0) then fail("partial native price differs") end
+        accelerate_lab(state)
         state.phase="partial"; begin_budget(state,360,{WHITE})
       else
         local force=game.forces.player
@@ -418,7 +453,7 @@ function M.apply(stage)
     if state.phase=="partial" then
       set_running(state,true); refill(state)
       if not budget_complete(state) then return end
-      set_running(state,false); finish_budget(state)
+      set_running(state,false); restore_lab_speed(state); finish_budget(state)
       local force=game.forces.player
       if not force.current_research or force.current_research.name~=SILICON or not near(force.research_progress,.2) then fail("genuine twenty-percent material work was not observed") end
       equal_queue(queue_names(force),{SILICON,SILICON,PROBE},"partial completion")
