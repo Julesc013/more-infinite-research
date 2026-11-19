@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_native_family_paid_credits as family_fixture
+from native_credit_world import build_native_family_credit_world
 import test_generator as generator_fixture
 
 
@@ -13,10 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NativeCreditVectorTests(unittest.TestCase):
     def setUp(self):
-        family_fixture.LuaRuntime = LuaRuntime
-        case = family_fixture.NativeFamilyPaidCreditsTests()
-        case.setUp()
-        self.lua = case.lua
+        self.lua = build_native_family_credit_world(LuaRuntime, ROOT / "source")
         self.lua.execute(r'''
           function vector_world(size, included, target, change, level, family, recipe, public_id)
             family=family or "research_low_density_structure";recipe=recipe or "scrap-recycling"

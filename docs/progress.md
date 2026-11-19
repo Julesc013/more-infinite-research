@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-20
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,12 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Native-credit test worlds separated (2026-11-20)
+
+The [native-credit world builders](../tests/native_credit_world.py) replace three chains of borrowed `TestCase` setup and imported `LuaRuntime` mutation with ordinary base/family construction functions receiving the runtime factory and source root. Four runtime-credit controls use these functions directly. Scenario targets, active-mod tuples, historical producer inputs and independent assertions remain with their tests; the data-definition and Generator/Bootstrap harnesses retain separate ownership.
+
+All 111 existing test methods retain their assertions and scenario strings. The base Lua setup (6,851 bytes), family setup (5,563 bytes) and vector-fixture story (4,503 bytes) are unchanged. Five focused controls pass 120 tests, including the new world isolation control. Independent replay confirms that this control rejects deliberately cached worlds, ignored source roots and ignored runtime factories at their intended assertions. These are improvements to host test construction and verification; player source, published packages and native qualification are unchanged. Evidence remains in primary `build/qualification/mir5-credit-world-builder-r01` and the preserved secondary unit's `build/qualification/native-credit-world-builders-r01`.
 
 ## Paid Base addition successor accepted (2026-11-19)
 
