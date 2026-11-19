@@ -116,6 +116,7 @@ function Assert-FiniteFourNativePacket {
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['factorio_binary_sha256'].ToUpperInvariant() '062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF' 'engine binary SHA-256'
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['platform'] 'Linux headless' 'engine distribution'
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['headless'] $true 'engine headless capability'
+    Assert-FiniteFourNativeEqual $Packet['protocol']['confirmation_marker'] 'Using Lua console commands will disable achievements. Please repeat the command to proceed.' 'console confirmation marker'
     Require-FiniteFourNative ($Packet['inputs']['fixtures'] -is [System.Collections.IList] -and $Packet['inputs']['fixtures'].Count -eq 2) 'fixture archive selection differs'
     foreach($canonical in $script:CanonicalFixtureArchives){
         $fixture=@($Packet['inputs']['fixtures']|Where-Object { $_['role'] -eq $canonical.role })
@@ -354,6 +355,103 @@ function Complete-FiniteFourNativeCleanup {
     throw ('finite-four cleanup failed: '+($cleanupErrors -join '; '))
 }
 
+function Get-FiniteFourNativeException {
+    param([Parameter(Mandatory)]$ErrorRecord)
+    if ($ErrorRecord -is [Management.Automation.ErrorRecord]) { return $ErrorRecord.Exception }
+    if ($ErrorRecord -is [Exception]) { return $ErrorRecord }
+    throw 'finite-four primary failure type differs'
+}
+
+function Get-FiniteFourNativeRunList {
+    param($Context)
+    if ($null -eq $Context) { return @() }
+    $runsProperty=$Context.PSObject.Properties['runs']
+    if ($null -eq $runsProperty -or $null -eq $runsProperty.Value) { return @() }
+    return @($runsProperty.Value | ForEach-Object { $_ })
+}
+
+function Get-FiniteFourNativeStartedProcessState {
+    param($Context)
+    $invocationCount=0
+    if($null-ne$Context){
+        $indexProperty=$Context.PSObject.Properties['process_index']
+        if($null-ne$indexProperty-and$indexProperty.Value-is[ValueType]-and$indexProperty.Value-isnot[bool]-and[int64]$indexProperty.Value-ge0){$invocationCount=[int]$indexProperty.Value}
+    }
+    $processIds=[Collections.Generic.List[int64]]::new();$ledgerErrors=[Collections.Generic.List[string]]::new()
+    foreach($run in Get-FiniteFourNativeRunList $Context){
+        $ledgerProperty=$run.PSObject.Properties['ledger']
+        if($null-eq$ledgerProperty-or[string]::IsNullOrWhiteSpace([string]$ledgerProperty.Value)-or-not(Test-Path -LiteralPath ([string]$ledgerProperty.Value) -PathType Leaf)){continue}
+        try {
+            foreach($line in Get-Content -LiteralPath ([string]$ledgerProperty.Value)){
+                if([string]::IsNullOrWhiteSpace($line)){continue}
+                $sample=$line|ConvertFrom-Json -AsHashtable -Depth 64
+                if($sample-isnot[Collections.IDictionary]-or$sample['process']-isnot[Collections.IDictionary]){continue}
+                $process=$sample['process']
+                if(-not$process.Contains('id')-or-not$process.Contains('phase')-or$process['phase']-cne'running'-or-not$process.Contains('start_identity')-or$null-eq$process['start_identity']){continue}
+                $id=$process['id']
+                if($id-is[ValueType]-and$id-isnot[bool]-and[int64]$id-gt0-and-not$processIds.Contains([int64]$id)){[void]$processIds.Add([int64]$id)}
+            }
+        } catch {
+            [void]$ledgerErrors.Add((([string]$ledgerProperty.Value)+': '+$_.Exception.Message))
+        }
+    }
+    return [ordered]@{invocation_count=$invocationCount;actual_started_process_ids=@($processIds);ledger_read_errors=@($ledgerErrors)}
+}
+
+function New-FiniteFourNativeFailedExecutionRecord {
+    param(
+        [Parameter(Mandatory)]$PrimaryError,
+        $Context,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$ExecutionState,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$CleanupOutcome
+    )
+    $exception=Get-FiniteFourNativeException $PrimaryError
+    $started=Get-FiniteFourNativeStartedProcessState $Context
+    $consoleFacts=$exception.Data['mir441_factorio_console_startup']
+    $processCleanupFacts=$exception.Data['mir441_process_cleanup_facts']
+    $restoration=[Collections.Generic.List[object]]::new()
+    if($ExecutionState.Contains('restoration')-and$null-ne$ExecutionState['restoration']){foreach($item in $ExecutionState['restoration']){[void]$restoration.Add($item)}}
+    $cleanupFacts=[Collections.Generic.List[object]]::new()
+    if($processCleanupFacts-is[Collections.IEnumerable]-and$processCleanupFacts-isnot[string]){foreach($item in $processCleanupFacts){[void]$cleanupFacts.Add($item)}}
+    $resourceRuns=[Collections.Generic.List[object]]::new()
+    foreach($run in Get-FiniteFourNativeRunList $Context){[void]$resourceRuns.Add($run)}
+    return [ordered]@{
+        schema=1
+        kind='MIRWorkerStorageFiniteFourA504NativeExecutionResultV1'
+        status='failed-retained-adverse'
+        primary_cause=[ordered]@{message=$exception.Message;type=$exception.GetType().FullName}
+        resource_admission=$exception.Data['mir441_resource_admission']
+        attempted_invocations=$started.invocation_count
+        actual_started_process_ids=$started.actual_started_process_ids
+        started_process_ledger_read_errors=$started.ledger_read_errors
+        resource_runs=$resourceRuns
+        console_startup=$consoleFacts
+        process_cleanup_facts=$cleanupFacts
+        restoration=$restoration
+        cleanup=$CleanupOutcome
+    }
+}
+
+function Write-FiniteFourNativeFailedExecutionResult {
+    param(
+        [Parameter(Mandatory)]$PrimaryError,
+        [Parameter(Mandatory)]$Context,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$ExecutionState,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$CleanupOutcome
+    )
+    try {
+        $record=New-FiniteFourNativeFailedExecutionRecord -PrimaryError $PrimaryError -Context $Context -ExecutionState $ExecutionState -CleanupOutcome $CleanupOutcome
+        Write-MIRNativeProbeResult -Context $Context -Record $record
+        return $true
+    } catch {
+        $exception=Get-FiniteFourNativeException $PrimaryError
+        $exception.Data['finite_four_failure_ledger_write_attempted']=$true
+        $exception.Data['finite_four_failure_ledger_write_succeeded']=$false
+        $exception.Data['finite_four_failure_ledger_write_error']=$_.Exception.Message
+        return $false
+    }
+}
+
 function Invoke-FiniteFourNativeExecution {
     param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
     # Dot-source in this caller scope. Importing through a helper function
@@ -362,7 +460,7 @@ function Invoke-FiniteFourNativeExecution {
     . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
     . (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1')
     . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
-    $runtime=$Packet['runtime_bindings'];$inputs=$Packet['inputs'];$bounds=$Packet['bounds'];$executionState=[ordered]@{activation=$null;restoration=[Collections.Generic.List[object]]::new()};$context=$null;$primary=$null
+    $runtime=$Packet['runtime_bindings'];$inputs=$Packet['inputs'];$bounds=$Packet['bounds'];$executionState=[ordered]@{activation=$null;restoration=[Collections.Generic.List[object]]::new()};$context=$null;$primary=$null;$validated=$null;$cleanupOutcome=[ordered]@{attempted=$false;succeeded=$true;errors=@();library_restoration=[ordered]@{applicable=$false;attempted=$false;succeeded=$null;records=@()}}
     try {
         $context=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot ([string]$runtime['output_root']) -ExpectedPeakMemoryMiB ([int]$bounds['expected_peak_memory_mib']) -MaxNewOutputMiB ([int]$bounds['max_new_output_mib']) -UseExactOutputRoot
         [IO.Directory]::CreateDirectory($context.root)|Out-Null
@@ -418,17 +516,42 @@ function Invoke-FiniteFourNativeExecution {
             $chain["cold$i"]=[ordered]@{name="cold-$i";run=$coldRun.result;working_input=$coldWork;marker=(Join-Path $coldWrite 'script-output/worker-storage/reload.json');stdout=$coldRun.stdout}
         }
         $validated=Read-FiniteFourNativeCompleteChain -Chain $chain
-        $record=[ordered]@{schema=1;kind='MIRWorkerStorageFiniteFourA504NativeExecutionResultV1';status='completed-await-independent-review';chain=$validated;resource_runs=@($context.runs);restoration=@($executionState.restoration)}
-        Write-MIRNativeProbeResult -Context $context -Record $record
-        return $record
-    } catch { $primary=$_;throw } finally {
-        Complete-FiniteFourNativeCleanup -PrimaryError $primary -CleanupAction {
-            if($null-ne$executionState.activation-and-not$executionState.activation.closed){
-                $executionState.restoration.Add((Complete-MIRLibraryActivation -Activation $executionState.activation))
-                $executionState.activation=$null
+    } catch { $primary=$_ } finally {
+        $cleanupOutcome.attempted=$true
+        try {
+            Complete-FiniteFourNativeCleanup -PrimaryError $primary -CleanupAction {
+                if($null-ne$executionState.activation-and-not$executionState.activation.closed){
+                    $cleanupOutcome.library_restoration.applicable=$true
+                    $cleanupOutcome.library_restoration.attempted=$true
+                    try {
+                        $restoration=Complete-MIRLibraryActivation -Activation $executionState.activation
+                        $executionState.restoration.Add($restoration)
+                        $cleanupOutcome.library_restoration.records=@($executionState.restoration|ForEach-Object {$_})
+                        $cleanupOutcome.library_restoration.succeeded=$true
+                        $executionState.activation=$null
+                    } catch {
+                        $cleanupOutcome.library_restoration.succeeded=$false
+                        throw
+                    }
+                }
             }
+        } catch {
+            $cleanupOutcome.succeeded=$false
+            $cleanupErrors=$_.Exception.Data['finite_four_cleanup_errors']
+            $cleanupOutcome.errors=if($cleanupErrors-is[Collections.IEnumerable]-and$cleanupErrors-isnot[string]){@($cleanupErrors|ForEach-Object {[string]$_})}else{@($_.Exception.Message)}
+            if($null-eq$primary){$primary=$_}
         }
     }
+    if($null-ne$primary){
+        if($null-ne$context){
+            $null=Write-FiniteFourNativeFailedExecutionResult -PrimaryError $primary -Context $context -ExecutionState $executionState -CleanupOutcome $cleanupOutcome
+        }
+        throw $primary
+    }
+    if($null-eq$validated){throw 'finite-four execution produced no terminal record'}
+    $completedRecord=[ordered]@{schema=1;kind='MIRWorkerStorageFiniteFourA504NativeExecutionResultV1';status='completed-await-independent-review';chain=$validated;resource_runs=$context.runs;restoration=$executionState.restoration;cleanup=$cleanupOutcome}
+    Write-MIRNativeProbeResult -Context $context -Record $completedRecord
+    return $completedRecord
 }
 
 function Write-FiniteFourNativeReceipt {
