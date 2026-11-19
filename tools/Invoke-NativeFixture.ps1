@@ -722,7 +722,8 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
     $arguments+=@(Get-MIRNativeAudioArguments -Headless:$Headless)
   }
   $arguments+=$StageArguments
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  # Historical process modes keep their separately qualified log protocol.
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection:(-not $historicalProcess) -ActiveModsObserver $activeModsObserverName
   # Completed host parsing/interop allocations need not occupy commit while a
   # later native stage waits for admission. Keep every governor limit intact.
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()

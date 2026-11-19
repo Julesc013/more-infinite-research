@@ -205,7 +205,7 @@ try {
 
   $arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)
   $record.arguments = $arguments
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver
   $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
   Assert-MIR5PrototypeCapture ([bool]$native.result.passed -and -not [bool]$native.result.timed_out -and [int]$native.result.exit_code -eq 0) 'Factorio dump process must exit naturally with code zero'

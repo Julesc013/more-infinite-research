@@ -8,6 +8,7 @@ import base64
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -557,6 +558,108 @@ try {{
     return json.loads(result.stdout)
 
 
+def loaded_selection_launch_cases(*, remove_coverage: bool = False) -> dict:
+    """Exercise the actual launch guard over real ZIPs; the endpoint is a counter."""
+    scratch = ROOT / "build/tmp"
+    scratch.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="mir-observation-launch-", dir=scratch) as directory:
+        root = Path(directory).resolve()
+        assert root.is_relative_to(scratch.resolve())
+        library = root / "library"
+        library.mkdir()
+        engine = root / "engine"
+        executable = engine / "bin/x64/factorio.exe"
+        executable.parent.mkdir(parents=True)
+        executable.write_bytes(b"host test; never executed")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text('{"name":"base","version":"2.1.24"}', encoding="utf-8")
+        (base / "data.lua").write_text("-- native loading entry\n", encoding="utf-8")
+        write_data = root / "write-data"
+        write_data.mkdir()
+        config = root / "config.ini"
+        config.write_text(
+            f"[path]\nread-data={engine / 'data'}\nwrite-data={write_data}\n"
+            "[other]\nenable-new-mods=false\n", encoding="utf-8"
+        )
+
+        def archive(name: str, scripts: tuple[str, ...], *, prefix: str | None = None) -> dict:
+            path = library / f"{name}_1.0.0.zip"
+            prefix = prefix or f"{name}_1.0.0"
+            with zipfile.ZipFile(path, "w") as z:
+                z.writestr(f"{prefix}/info.json", json.dumps({"name": name, "version": "1.0.0"}))
+                for script in scripts:
+                    z.writestr(f"{prefix}/{script}", "-- host fixture\n")
+            return {"name": name, "version": "1.0.0", "path": str(path), "builtin": False,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest().upper()}
+
+        base_row = {"name": "base", "version": "2.1.24", "path": str(base / "info.json"),
+                    "builtin": True, "sha256": "A" * 64}
+        ordinary = archive("ordinary", ("data.lua",), prefix="arbitrary-valid-root")
+        settings = archive("settings-only", ("settings-updates.lua",))
+        assets = archive("assets", ())
+        control = archive("control-only", ("control.lua",))
+        wrong_case = archive("wrong-case", ("Data.lua",))
+        observer = archive("observer", ("data-final-fixes.lua",))
+        control_observer = archive("control-observer", ("control.lua",))
+        broken = archive("unreadable", ("data.lua",))
+        Path(broken["path"]).unlink()
+        cases = []
+
+        def case(name: str, rows: list[dict], observer_name: str = "", *,
+                 script: str = "data-final-fixes.lua", require: bool = True) -> None:
+            cases.append({"name": name, "selected": [base_row, *rows], "observer": observer_name,
+                          "script": script, "require": require})
+
+        case("ordinary", [ordinary])
+        case("settings", [settings])
+        case("assets", [assets])
+        case("control-only", [control])
+        case("wrong-case", [wrong_case])
+        case("valid-observer", [assets, observer], "observer")
+        case("missing-observer", [assets], "observer")
+        case("disabled-observer", [assets], "observer")  # Present on disk, absent from active selection.
+        case("builtin-observer", [assets], "base")
+        case("unbound-observer", [assets, {**observer, "sha256": ""}], "observer")
+        case("wrong-script", [assets, control_observer], "control-observer")
+        case("control-observer", [assets, control_observer], "control-observer", script="control.lua")
+        case("duplicate-observer", [assets, observer, observer], "observer")
+        case("read-failure", [broken])
+        case("no-complete-selection-claim", [assets], require=False)
+        definition = root / "cases.json"
+        definition.write_text(json.dumps(cases), encoding="utf-8")
+        script = r"""
+          Set-StrictMode -Version Latest; $ErrorActionPreference='Stop'
+          . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
+          # The unit is launch admission, not activation/custody already covered elsewhere.
+          function Assert-MIRLibraryActivation { param($Activation,$OwnedProcesses) }
+          if($env:MIR_TEST_REMOVE_COVERAGE-ceq'1') {
+            function Assert-MIRLibraryObservationCoverage { param($Activation,$ActiveModsObserver,$ActiveModsObserverScript) }
+          }
+          $root=$env:MIR_TEST_CASE
+          $rows=Get-Content -Raw -LiteralPath (Join-Path $root 'cases.json')|ConvertFrom-Json
+          $observations=@(foreach($case in $rows) {
+            $activation=[pscustomobject]@{library=(Join-Path $root 'library');engine_data=(Join-Path $root 'engine/data');selected=@($case.selected)}
+            $launches=0; $errorText=$null; $errorType=$null
+            try {
+              Assert-MIRLibraryLaunch -Activation $activation -FactorioBin (Join-Path $root 'engine/bin/x64/factorio.exe') -Arguments @('--config',(Join-Path $root 'config.ini'),'--mod-directory',$activation.library,'--dump-data') -RequireLoadedSelection:$case.require -ActiveModsObserver $case.observer -ActiveModsObserverScript $case.script
+              $launches++  # Stubbed child endpoint. No executable is invoked.
+            } catch {
+              $errorText=$_.Exception.Message
+              $errorType=$_.Exception.GetType().FullName
+              if($_.Exception.InnerException){$errorType+=' / '+$_.Exception.InnerException.GetType().FullName}
+            }
+            [ordered]@{name=$case.name;launches=$launches;error=$errorText;error_type=$errorType}
+          })
+          ConvertTo-Json -InputObject $observations -Depth 10 -Compress
+        """
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                env={**os.environ, "MIR_TEST_REPO": str(ROOT), "MIR_TEST_CASE": str(root),
+                                     "MIR_TEST_REMOVE_COVERAGE": "1" if remove_coverage else "0"},
+                                capture_output=True, text=True, check=True)
+        return {row["name"]: row for row in json.loads(result.stdout)}
+
+
 class CaptureControlTests(unittest.TestCase):
     def test_broad_native_receipts_preserve_failures_and_data_only_scope(self):
         payload = (ROOT / "spec/evidence/broad-ecosystem-f210-b2-native-receipts.json.gz").read_bytes()
@@ -623,6 +726,83 @@ class CaptureControlTests(unittest.TestCase):
             sorted(path.name for path in FIXTURE.iterdir()),
             ["data-final-fixes.lua", "info-f200.json", "info.json"],
         )
+
+    def test_complete_selection_rejects_unobservable_mods_before_child_launch(self):
+        cases = loaded_selection_launch_cases()
+        for name in ("assets", "control-only", "wrong-case"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 0)
+                self.assertIn("[mir-library-loaded-observer-required]", cases[name]["error"])
+        for name in ("missing-observer", "disabled-observer", "builtin-observer",
+                     "unbound-observer", "wrong-script", "duplicate-observer"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 0)
+                self.assertIn("[mir-library-loaded-observer", cases[name]["error"])
+        self.assertEqual(cases["read-failure"]["launches"], 0)
+        self.assertIn("FileNotFoundException", cases["read-failure"]["error_type"])
+        self.assertNotIn("loaded-observer-required", cases["read-failure"]["error"])
+
+    def test_complete_selection_allows_real_loading_entries_and_bound_observers(self):
+        cases = loaded_selection_launch_cases()
+        for name in ("ordinary", "settings", "valid-observer", "control-observer", "no-complete-selection-claim"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 1, cases[name])
+                self.assertIsNone(cases[name]["error"])
+
+    def test_launch_opponent_demonstrates_missing_coverage_would_start_asset_case(self):
+        cases = loaded_selection_launch_cases(remove_coverage=True)
+        self.assertEqual(cases["assets"]["launches"], 1)
+        self.assertIsNone(cases["assets"]["error"])
+
+    def test_full_selection_callers_admit_the_same_observer_before_process_start(self):
+        script = r"""
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Observer-Argument($Command) {
+            for($i=0;$i-lt$Command.CommandElements.Count-1;$i++) {
+              $e=$Command.CommandElements[$i]
+              if($e-is[Management.Automation.Language.CommandParameterAst]-and$e.ParameterName-ceq'ActiveModsObserver') {
+                return $Command.CommandElements[$i+1].Extent.Text
+              }
+            }
+            return ''
+          }
+          function Check-Wiring([string]$Text) {
+            $t=$null;$e=$null;$ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$t,[ref]$e)
+            if($e.Count){return $false}
+            $commands=@($ast.FindAll({param($n) $n-is[Management.Automation.Language.CommandAst]},$true))
+            $launches=@($commands|Where-Object {$_.GetCommandName()-ceq'Assert-MIRLibraryLaunch'})
+            $proofs=@($commands|Where-Object {$_.GetCommandName()-ceq'Assert-MIRLibraryLoadedSelection'})
+            $processes=@($commands|Where-Object {$_.GetCommandName()-in@('Invoke-MIRNativeProbeFactorioProcess','Invoke-MIRNativeProbeProcess')})
+            if($launches.Count-ne1-or$proofs.Count-ne1-or$processes.Count-ne1){return $false}
+            $required=@($launches[0].CommandElements|Where-Object {$_-is[Management.Automation.Language.CommandParameterAst]-and$_.ParameterName-ceq'RequireLoadedSelection'})
+            $observer=Observer-Argument $launches[0]
+            return $required.Count-eq1-and$observer-ne''-and$observer-ceq(Observer-Argument $proofs[0])-and$launches[0].Extent.StartOffset-lt$processes[0].Extent.StartOffset-and$processes[0].Extent.StartOffset-lt$proofs[0].Extent.StartOffset
+          }
+          $rows=@(foreach($path in @('tools/Invoke-PrototypeCapture.ps1','tools/Invoke-NativeFixture.ps1','tools/lib/validation/DirectLibraryStartupMeasurement.ps1')) {
+            $text=[IO.File]::ReadAllText((Join-Path $env:MIR_TEST_REPO $path))
+            $t=$null;$e=$null;$ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$t,[ref]$e)
+            $launch=@($ast.FindAll({param($n) $n-is[Management.Automation.Language.CommandAst]-and$n.GetCommandName()-ceq'Assert-MIRLibraryLaunch'},$true))[0]
+            $flag=@($launch.CommandElements|Where-Object {$_-is[Management.Automation.Language.CommandParameterAst]-and$_.ParameterName-ceq'RequireLoadedSelection'})[0]
+            $withoutFlag=$text.Substring(0,$flag.Extent.StartOffset)+$text.Substring($flag.Extent.EndOffset)
+            $argument=Observer-Argument $launch
+            $wrongCall=$launch.Extent.Text.Replace('-ActiveModsObserver '+$argument,"-ActiveModsObserver 'wrong-observer'")
+            $wrongObserver=$text.Substring(0,$launch.Extent.StartOffset)+$wrongCall+$text.Substring($launch.Extent.EndOffset)
+            $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseInput($withoutFlag,[ref]$t,[ref]$e);$flagParses=$e.Count-eq0
+            $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseInput($wrongObserver,[ref]$t,[ref]$e)
+            [ordered]@{path=$path;admitted=Check-Wiring $text;missing_flag=Check-Wiring $withoutFlag;different_observer=Check-Wiring $wrongObserver;missing_flag_parses=$flagParses;different_observer_parses=($e.Count-eq0)}
+          })
+          ConvertTo-Json -InputObject $rows -Depth 6 -Compress
+        """
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                env={**os.environ, "MIR_TEST_REPO": str(ROOT)},
+                                capture_output=True, text=True, check=True)
+        for row in json.loads(result.stdout):
+            with self.subTest(path=row["path"]):
+                self.assertTrue(row["admitted"])
+                self.assertFalse(row["missing_flag"])
+                self.assertFalse(row["different_observer"])
+                self.assertTrue(row["missing_flag_parses"])
+                self.assertTrue(row["different_observer_parses"])
 
     def test_fixture_reports_the_actual_mod_table_in_sorted_order_once(self):
         mods = self.lua.table_from({
