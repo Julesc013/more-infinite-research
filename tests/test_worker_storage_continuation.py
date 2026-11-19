@@ -30,10 +30,11 @@ def finite_chain(last=4):
 
 class WorkerStorageContinuationTests(unittest.TestCase):
     def stage(self, rows=None, target_id="f210", changes=None, extra_mods=None):
-        scaffold.LuaRuntime = LuaRuntime
-        harness = scaffold.GeneratorTests()
-        harness.setUp()
-        lua = harness.lua
+        lua = scaffold.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=scaffold.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=scaffold.K2SO_MATERIAL_NATIVE,
+        )
         lua.globals().selected_target = scaffold.lua_table(lua, {**EDITIONS[target_id], "id": target_id})
         lua.globals().foreign_rows = scaffold.lua_table(lua, rows or {})
         lua.globals().selected_changes = scaffold.lua_table(lua, changes or {})

@@ -47,10 +47,11 @@ class SecretasContinuationTests(unittest.TestCase):
         cls.original_oracle = original.split("local function queue(", 1)[0] + "\nreturn technologies"
 
     def stage(self, target_id="f210", inputs=None, changes=None, provider=True):
-        scaffold.LuaRuntime = LuaRuntime
-        harness = scaffold.GeneratorTests()
-        harness.setUp()
-        lua = harness.lua
+        lua = scaffold.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=scaffold.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=scaffold.K2SO_MATERIAL_NATIVE,
+        )
         major, minor, encoded_patch = SOURCE_VERSION.split(".")
         version = f"{major}.{minor}.{int(target_id[1:]) * 100 + int(encoded_patch) % 100:05d}"
         lua.globals().selected_target = scaffold.lua_table(lua, {
