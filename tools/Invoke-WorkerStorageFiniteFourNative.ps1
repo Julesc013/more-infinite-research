@@ -20,7 +20,7 @@ $script:CanonicalHelperPins = @(
     [ordered]@{path='tools/lib/validation/ImmutableInputStaging.ps1';sha256='25523C83C26501444A01729226E504199A3294F02E5330DEB1BB4D305832FBEE';bytes=27295},
     [ordered]@{path='tools/lib/compatibility/LibraryActivation.ps1';sha256='A98570967D35048ECFEAEC7124BB1D9A4501B208E9EAB8CC6E647A638CA2DF7D';bytes=41094},
     [ordered]@{path='tools/lib/validation/NativeProbeResources.ps1';sha256='1504B4BE12920BE4354CA74204D9B0621481215D08A5F4D231C8C75BCB8D7CB3';bytes=15778},
-    [ordered]@{path='tools/lib/validation/ResourceGovernor.ps1';sha256='6E0457AB8D2A3FD64AD1226D482C1DAEA4D68E5AA62DCB527354951E2A70179C';bytes=62227}
+    [ordered]@{path='tools/lib/validation/ResourceGovernor.ps1';sha256='D7CEFFD1DC7D9E1A2B0D0CB19FE78D6AF31157B9CB40A0E4548F5397D6D43195';bytes=63682}
 )
 $script:CanonicalFixtureArchives = @(
     [ordered]@{role='finite provider archive';filename='mir-worker-storage-finite-fixture_0.1.0.zip';sha256='6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1';bytes=1064},
