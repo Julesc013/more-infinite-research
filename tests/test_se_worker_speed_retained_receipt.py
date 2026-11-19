@@ -1,7 +1,7 @@
 """Frozen documentary checks for the accepted SE worker-speed native receipt.
 
 This checks the public *summary's* internal contracts, not the private native
-bodies, actual source ZIP hashes, gameplay or release qualification. Do not
+bodies, independent rehashing of actual ZIP bytes, gameplay or release qualification. Do not
 convert this host check into a replacement for the independently reviewed native
 sequence or the remaining worker-cargo/reporter migration gates.
 """
@@ -29,6 +29,10 @@ def check_receipt(r: dict) -> None:
             and r["selection"]["selected_mods"] == 20, "frozen source closure")
     require(r["player_archive"]["version"] == "5.0.20018"
             and r["player_archive"]["private_only"] is True, "private candidate identity")
+
+    require(r["player_archive"]["sha256"] == "7046DDBD02ECF99BEA4853DBB8C0C4AD58E2457B8917808F4AD3114B6560E87A"
+            and r["player_archive"]["bytes"] == 1052778,
+            "private candidate archive custody")
 
     actual = r["actual"]
     exits = actual["stage_exits"]
@@ -65,7 +69,11 @@ def check_receipt(r: dict) -> None:
             "closed unrelated and paid-work preservation claims")
 
     protected = r["protected"]
-    require(protected["source"]["sha256"] != protected["candidate"]["sha256"]
+    require(protected["source"]["sha256"] == "7FAD213E47A0AB6B2660FE67C4047213B5048063A5F571C82321EBF148D243C7"
+            and protected["source"]["bytes"] == 833284
+            and protected["candidate"]["sha256"] == "C34EEFC45055D467E6FE3F68C5C60070D61A775F5AFB3C10CBF027E449155825"
+            and protected["candidate"]["bytes"] == 854638
+            and protected["source"]["sha256"] != protected["candidate"]["sha256"]
             and protected["source"]["crc_entries"] == 55
             and protected["candidate"]["crc_entries"] == 55, "source/successor ZIP custody")
     require(actual["cold_processes"] == 2
@@ -109,6 +117,29 @@ class SERetainedNativeReceiptTests(unittest.TestCase):
         early["actual"]["closed_tick"] = early["actual"]["ordinary_event"]["tick"]
         with self.assertRaisesRegex(AssertionError, "post-completion hold"):
             check_receipt(early)
+
+    def test_mutants_refuse_replaced_archive_digests_and_sizes(self) -> None:
+        # Mutate to another syntactically valid 64-hex digest: inequality alone
+        # must never pass as an immutable-archive identity guard.
+        for group, label in (
+            ("source", "source/successor ZIP custody"),
+            ("candidate", "source/successor ZIP custody"),
+            ("player_archive", "private candidate archive custody"),
+        ):
+            bad_digest = deepcopy(self.receipt)
+            target = (bad_digest["player_archive"] if group == "player_archive"
+                      else bad_digest["protected"][group])
+            original_digest = target["sha256"]
+            target["sha256"] = ("0" if original_digest[0] != "0" else "1") + original_digest[1:]
+            with self.subTest(group=group, mutation="sha256"), self.assertRaisesRegex(AssertionError, label):
+                check_receipt(bad_digest)
+
+            bad_size = deepcopy(self.receipt)
+            target = (bad_size["player_archive"] if group == "player_archive"
+                      else bad_size["protected"][group])
+            target["bytes"] += 1
+            with self.subTest(group=group, mutation="bytes"), self.assertRaisesRegex(AssertionError, label):
+                check_receipt(bad_size)
 
     def test_mutants_refuse_single_cold_and_stable_promotion(self) -> None:
         mutations = (
