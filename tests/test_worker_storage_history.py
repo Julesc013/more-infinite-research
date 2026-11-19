@@ -2561,7 +2561,7 @@ class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
                       assert(not ok and tostring(message):find("default transfer requires the unchanged mod selection",1,true))
                       assert(not tostring(message):find("rejecting row metamethod invoked",1,true))
                       assert(message:find("cannot be repaired by /mir-worker-storage-recovery prepare",1,true))
-                      assert(message:find("a supported upgrade may establish MIR-owned default infinite worker4 automatically",1,true))
+                      assert(message:find("a supported upgrade may establish native ownership automatically",1,true))
                       assert(message:find("restore the previous mod selection and original save",1,true))
                       assert(not message:find("Only if that copy has MIR-owned default infinite worker4",1,true))
                       assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)

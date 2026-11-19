@@ -18,8 +18,7 @@ Date: 2026-11-19
     - Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration
       paths.
     - Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
-    - Factorio 2.0/2.1: Give worker-cargo recovery advice only for an identified unrecorded default selection instead of suggesting
-      preparation for unrelated saved histories.
+    - Factorio 2.0/2.1: Remove inapplicable worker-cargo preparation instructions and explain the supported upgrade sequence.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.17

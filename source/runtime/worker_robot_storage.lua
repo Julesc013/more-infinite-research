@@ -926,7 +926,7 @@ local function default_origin(event, initializing, state, current)
           {name=name, row=item, active_version=active_version},
           "; this unrecorded changed selection cannot be repaired by /mir-worker-storage-recovery prepare."
           .. " On a separate copy under its prior mod selection and matching MIR settings, a supported upgrade may"
-          .. " establish MIR-owned default infinite worker4 automatically; save and exit before changing selection")
+          .. " establish native ownership automatically; save and exit before changing selection")
       end
     end
   end
