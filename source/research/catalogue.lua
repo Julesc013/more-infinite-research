@@ -276,8 +276,12 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
   if selected.k2_imersite then
     for _, row in ipairs(imersite_rows()) do rows[#rows +1] = row end
     for _, definition in ipairs(require("research.k2_materials")) do
-      rows[#rows + 1] = generated_row(definition.name, definition.key, definition.order,
-        "description.productivity-bonus", definition.routes[1].recipe)
+      for _, stage in ipairs({definition.early, definition.continuation}) do
+        local row = generated_row(stage.id, definition.key, stage.order,
+          "description.productivity-bonus", definition.routes[1].recipe)
+        row.progression = stage.first_level or 1
+        rows[#rows + 1] = row
+      end
     end
   end
   if selected.bob_angel then
