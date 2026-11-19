@@ -180,6 +180,35 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
           ok=pcall(actor.on_tick);assert(not ok and #saves==0 and state.phase=="head-finished")
         ''')
 
+    def test_map_price_witness_refuses_foreign_progress_and_queue_drift(self):
+        # Independent negative opponents for the 2x/4x first-completion witness:
+        # foreign earned work and research queue must remain byte-for-byte
+        # equal to the baseline captured before the attempted completion.
+        self._install_map_price_world()
+        self.lua.execute(r'''
+          for _,multiplier in ipairs({2,4}) do
+            for _,change in ipairs({
+              function(ids)
+                game.forces["mir-worker-default-queued"].technologies[ids.queued].saved_progress=.27
+              end,
+              function(ids)
+                local foreign=game.forces["mir-worker-default-detached"]
+                foreign.research_queue={foreign.technologies[ids.queued]}
+              end,
+            }) do
+              local state,ids=map_price_world(multiplier,675*multiplier,1,nil,"head-finished")
+              state.lab.disabled_by_script=true
+              local retained=deep(state.baseline)
+              change(ids)
+              local ok,err=pcall(actor.on_tick)
+              assert(not ok and type(err)=="string" and err:find("$/foreign/",1,true),
+                "foreign work drift must be refused by exact frame comparison")
+              assert(#saves==0 and state.phase=="head-finished")
+              actor.same(retained,state.baseline)
+            end
+          end
+        ''')
+
     def test_existing_one_x_first_and_old_routes_remain_separate_from_map_price_witness(self):
         text = (FIXTURE / "control.lua").read_text()
         self.assertIn('save("first-saved", frames)', text)
