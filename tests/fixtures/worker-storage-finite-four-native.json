@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "kind": "MIRWorkerStorageFiniteFourA504NativeExecutorPacketV1",
+  "case_id": "worker-storage-finite-four-published473-to-current-a504",
+  "authority": "PREPARED_PUBLIC_ADAPTER_ONLY; EXECUTE_REQUIRES_SEPARATE_ADMISSION_AND_REVIEW",
+  "prepared_from": {
+    "executor_revision": "Portable public adapter of the reviewed private r02 scope correction; r01 and r02 custody are retained in primary qualification records.",
+    "private_executor_checkout": {
+      "commit": "33da01ffa43b2d9ea9534b25ca6ca52f5885de35",
+      "tree": "4839de77744910c60a99cacd1cc88314f0235263"
+    },
+    "public_adapter_checkout": {
+      "commit": "535af7e919f23b794992b5cbecbe51c1d9e4889",
+      "tree": "167b163445bbf725534379bf079a5d151f806b1c"
+    },
+    "private_scope_correction": {
+      "controller_sha256": "F1AD4B980E3CAF778F972B6D5F581A286C3B4B9C75DC1143FD53D8A628F8AB4B",
+      "control_sha256": "4B2AB741E909678983A9D79FCD8CFA92BB6B26980BAFBBD1D5260C4223B27C22",
+      "review_sha256": "57A65BBCAC02A3A2E7082F1ED4860CA15C37926C8A8C9D86E24E1FE0FFC23F6D",
+      "limit": "The preserved r01 clean-scope adverse exited 17; the reviewed r02 direct caller-scope import passed in a clean PowerShell subprocess."
+    },
+    "eligibility_receipt": {
+      "path": "build/qualification/mir5-audit-intake-20261118-r01/base-only-worker-cap-native-eligibility-a504-r01.json",
+      "sha256": "E2DCD8811B08F525073C7CEC46864DDB48D6B8D61A39F532940B782919D8CAED"
+    },
+    "executor_difference_from_r02": "r02 describes a future loopback-RCON packet. This executor uses the existing governed Factorio ConsoleStartup primitive: one stdin /c command after the historical 2.1.24 hosting marker, no RCON listener or secret. Confirmation replay stays disabled unless a separately pinned engine warning is observed and reviewed."
+  },
+  "inputs": {
+    "engine": {
+      "version": "2.1.24",
+      "platform": "Linux headless",
+      "headless": true,
+      "archive_sha256": "C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F",
+      "factorio_binary_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF",
+      "binary_path": null,
+      "engine_data_path": null
+    },
+    "source_mir": {
+      "filename": "more-infinite-research_4.7.21003.zip",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "bytes": 1463293,
+      "path": null,
+      "release": "v4.7.3 asset 672267722"
+    },
+    "candidate_mir": {
+      "filename": "more-infinite-research_5.0.21018.zip",
+      "sha256": "C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D",
+      "bytes": 1053618,
+      "path": null,
+      "source_commit": "22f34725d00befd4c80160105b98b556824b57ed",
+      "player_tree": "a504d92fe798d570df58514f9f839c4954af14f3"
+    },
+    "fixtures": [
+      {
+        "role": "finite provider archive",
+        "filename": "mir-worker-storage-finite-fixture_0.1.0.zip",
+        "path": null,
+        "sha256": "6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1",
+        "bytes": 1064
+      },
+      {
+        "role": "native observer archive",
+        "filename": "mir-worker-storage-native-observer_0.1.2.zip",
+        "path": null,
+        "sha256": "DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C",
+        "bytes": 3086
+      }
+    ],
+    "actor_members": [
+      {"role":"observer control","path":"tests/fixtures/worker-storage-native-observer/control.lua","sha256":"6C8FB257FEB3BE0614F32A4F8AADA558946F5C43EEC5378804F3FAF20630F276","bytes":6530},
+      {"role":"observer info","path":"tests/fixtures/worker-storage-native-observer/info.json","sha256":"CECDAE11F13FE2D4ED92FFD78AB0D153809703F3CA29DB8269118F0159C1A519","bytes":294},
+      {"role":"observer data","path":"tests/fixtures/worker-storage-native-observer/data.lua","sha256":"6492E27219B136ED865FEE3F2125EC27D98DB716A6E19A4F2113454D5153BE9D","bytes":231},
+      {"role":"provider info","path":"tests/fixtures/worker-storage-finite-provider/info.json","sha256":"DB8D808D99BF1ED151745672BE9BCB6266DECACF308E265D2BD2DDADBE88D733","bytes":363},
+      {"role":"provider data","path":"tests/fixtures/worker-storage-finite-provider/data-updates.lua","sha256":"69BA675379EDB935267F59700BEC031033FB6D4354D0D7D02945EC5912EBD6E6","bytes":799}
+    ]
+  },
+  "helper_pins": [
+    {"path":"tools/lib/validation/ImmutableInputStaging.ps1","sha256":"25523C83C26501444A01729226E504199A3294F02E5330DEB1BB4D305832FBEE","bytes":27295},
+    {"path":"tools/lib/compatibility/LibraryActivation.ps1","sha256":"A98570967D35048ECFEAEC7124BB1D9A4501B208E9EAB8CC6E647A638CA2DF7D","bytes":41094},
+    {"path":"tools/lib/validation/NativeProbeResources.ps1","sha256":"1504B4BE12920BE4354CA74204D9B0621481215D08A5F4D231C8C75BCB8D7CB3","bytes":15778},
+    {"path":"tools/lib/validation/ResourceGovernor.ps1","sha256":"95950BCBE360523092CE1CD18B96737C9645E4300BCDD4B927B04D0D02EE201B","bytes":62064}
+  ],
+  "runtime_bindings": {
+    "library_directory": null,
+    "output_root": null,
+    "source_profile": null,
+    "candidate_profile": null,
+    "server_port": 0,
+    "server_settings_template": null,
+    "source_seed_map_gen_settings": null,
+    "input_disposition": "all null fields are deliberate missing bindings; Validate and Compose must defer rather than create a context"
+  },
+  "protocol": {
+    "console_ready_marker": "Hosting game at IP ADDR:",
+    "confirmation_marker": "",
+    "source_console_command": "/c remote.call(\"mir-worker-storage-native-observer\", \"begin\", \"source\")",
+    "successor_console_command": "/c game.forces.player.laboratory_speed_modifier=1000; remote.call(\"mir-worker-storage-native-observer\", \"begin\", \"successor\")",
+    "confirmation_replay": "No replay is planned. The existing ConsoleStartup helper may replay only if a nonempty separately reviewed engine warning marker is supplied and observed.",
+    "stages": ["create-source-seed", "source-server", "successor-server", "cold-reload-1", "cold-reload-2"],
+    "marker_order": ["source-earned", "source-finished", "configuration", "before-successor-lab", "successor-earned", "successor-finished", "reload cold-1", "reload cold-2"],
+    "successor_ordering": "The configuration callback is observed before the ConsoleStartup request; before-successor-lab is emitted by the first successor tick after that request and must precede successor-earned. Cross-process tick values are save-relative, not one global timeline.",
+    "sentinel_limit": "42% main current work and 27% unrelated saved work are scripted continuity sentinels, not earned-science evidence."
+  },
+  "bounds": {
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512,
+    "create_timeout_seconds": 240,
+    "server_timeout_seconds": 240,
+    "cold_timeout_seconds": 120,
+    "cold_test_ticks": 10
+  }
+}
