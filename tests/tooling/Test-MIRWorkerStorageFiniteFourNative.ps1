@@ -141,6 +141,119 @@ function Copy-ControlChain {
     New-SyntheticCompleteChain -Root $destination
 }
 
+function Invoke-ConsoleStartupControl {
+    param(
+        [Parameter(Mandatory)][System.Collections.IDictionary]$Protocol,
+        [Parameter(Mandatory)][string]$Root,
+        [ValidateSet('observed','wrong','absent','unrelated')][string]$Confirmation
+    )
+    . (Join-Path (Find-FiniteFourNativeRepoRoot -StartPath $PSScriptRoot) 'tools/lib/validation/ResourceGovernor.ps1')
+    [IO.Directory]::CreateDirectory($Root) | Out-Null
+    $stdout=Join-Path $Root 'source.stdout.txt'
+    [IO.File]::WriteAllText($stdout,($Protocol['console_ready_marker']+"`n"),[Text.UTF8Encoding]::new($false))
+    $state=New-MIR441FactorioConsoleStartup -Definition ([ordered]@{
+        command=[string]$Protocol['source_console_command']
+        ready_marker=[string]$Protocol['console_ready_marker']
+        confirmation_marker=[string]$Protocol['confirmation_marker']
+    })
+    Add-MIR441FactorioConsoleStartupOutput -State $state -Kind stdout -Path $stdout
+    $stream=[IO.MemoryStream]::new();$writer=[IO.StreamWriter]::new($stream,[Text.UTF8Encoding]::new($false),1024,$true);$timer=[Diagnostics.Stopwatch]::StartNew()
+    try {
+        $step={
+            if(Update-MIR441FactorioConsoleStartupOutput -State $state){
+                if(-not$state.receipt.ready_marker_observed-and$state.ready_marker_seen){
+                    $state.receipt.ready_marker_observed=$true
+                    $state.receipt.ready_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
+                    Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command
+                }
+                if($state.receipt.send_count-eq1-and$state.confirmation_marker.Length-gt0-and$state.confirmation_marker_seen){
+                    $state.receipt.confirmation_marker_observed=$true
+                    $state.receipt.confirmation_elapsed_monotonic_milliseconds=[Math]::Round([double]$timer.Elapsed.TotalMilliseconds,3)
+                    Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind confirmation-replay
+                }
+            }
+        }
+        & $step
+        $line=switch($Confirmation){
+            'observed' { '2026-11-19 21:06:57 [WARNING] '+$Protocol['confirmation_marker'] }
+            'wrong' { '2026-11-19 21:06:57 [WARNING] Using Lua console commands will disable achievements. Please repeat a different command to proceed.' }
+            'unrelated' { '2026-11-19 21:06:57 [WARNING] unrelated server warning' }
+            'absent' { $null }
+        }
+        if($null-ne$line){[IO.File]::AppendAllText($stdout,($line+"`n"),[Text.UTF8Encoding]::new($false))}
+        & $step
+        $writer.Flush()
+        return [ordered]@{receipt=$state.receipt;stdin=[Text.UTF8Encoding]::new($false).GetString($stream.ToArray())}
+    } finally {
+        $timer.Stop();$writer.Dispose();$stream.Dispose()
+    }
+}
+
+function New-SyntheticInterruptedContext {
+    param([Parameter(Mandatory)][string]$Root)
+    [IO.Directory]::CreateDirectory($Root) | Out-Null
+    $startedLedger=Join-Path $Root 'process-1.resources.jsonl'
+    $preAdmissionLedger=Join-Path $Root 'process-2.resources.jsonl'
+    $running=[ordered]@{process=[ordered]@{id=4123;phase='running';start_identity=[ordered]@{pid=4123;start_ticks=77;session_id=4123;kind='MIR441LinuxNativeLaunchV1'}}}
+    $terminal=[ordered]@{phase='interrupted';error='[mir441-resource-admission-memory]'}
+    [IO.File]::WriteAllText($startedLedger,(($running|ConvertTo-Json -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($preAdmissionLedger,(($terminal|ConvertTo-Json -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
+    $runs=[Collections.Generic.List[object]]::new()
+    $runs.Add([pscustomobject]@{index=1;status='passed';ledger=$startedLedger;stdout=(Join-Path $Root 'process-1.stdout.txt');stderr=(Join-Path $Root 'process-1.stderr.txt')})
+    $runs.Add([pscustomobject]@{index=2;status='interrupted';ledger=$preAdmissionLedger;stdout=(Join-Path $Root 'process-2.stdout.txt');stderr=(Join-Path $Root 'process-2.stderr.txt');error='[mir441-resource-admission-memory]'})
+    return [pscustomobject]@{root=$Root;process_index=2;runs=$runs}
+}
+
+function New-SyntheticExecutionFailureHelperRoot {
+    param([Parameter(Mandatory)][string]$Root)
+    foreach($path in @(
+        (Join-Path $Root 'tools/lib/validation'),
+        (Join-Path $Root 'tools/lib/compatibility')
+    )) {[IO.Directory]::CreateDirectory($path)|Out-Null}
+    [IO.File]::WriteAllText((Join-Path $Root 'tools/lib/validation/ImmutableInputStaging.ps1'),'',[Text.UTF8Encoding]::new($false))
+    $library=@'
+function Start-MIRLibraryActivation {
+  param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode)
+  $activation=[pscustomobject]@{closed=$false;synthetic=$true}
+  $global:FiniteFourFailurePathState.activation=$activation
+  $global:FiniteFourFailurePathState.activation_started++
+  return $activation
+}
+function Add-MIRNativeProbeLibraryActivation {param($Context,$Activation)}
+function Complete-MIRLibraryActivation {
+  param($Activation)
+  $Activation.closed=$true
+  $global:FiniteFourFailurePathState.cleanup_count++
+  return [ordered]@{state='synthetic-restored';library_lock_released=$true}
+}
+function Assert-MIRLibraryLaunch {param($Activation,$FactorioBin,$Arguments)}
+'@
+    [IO.File]::WriteAllText((Join-Path $Root 'tools/lib/compatibility/LibraryActivation.ps1'),$library,[Text.UTF8Encoding]::new($false))
+    $native=@'
+function New-MIRNativeProbeResourceContext {
+  param($RepoRoot,$OutputRoot,$ExpectedPeakMemoryMiB,$MaxNewOutputMiB,[switch]$UseExactOutputRoot)
+  return [pscustomobject]@{root=$OutputRoot;process_index=0;runs=[Collections.Generic.List[object]]::new()}
+}
+function Get-MIRNativeAudioArguments {param([switch]$Headless);if(-not$Headless){throw 'synthetic headless capability differs'};return @()}
+function Invoke-MIRNativeProbeFactorioProcess {
+  param($Context,$FilePath,$Arguments,$TimeoutSeconds,$CompletionPredicate,$ConsoleStartup)
+  $Context.process_index++
+  $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='interrupted';ledger=(Join-Path $Context.root ('process-'+$Context.process_index+'.resources.jsonl'));error='[mir441-process-timeout]'})
+  $global:FiniteFourFailurePathState.native_call_count++
+  $failure=[TimeoutException]::new('[mir441-process-timeout]')
+  $failure.Data['mir441_factorio_console_startup']=[ordered]@{send_count=1;ready_marker_observed=$true;confirmation_marker_observed=$false}
+  throw $failure
+}
+function Write-MIRNativeProbeResult {
+  param($Context,$Record)
+  if($global:FiniteFourFailurePathState.cleanup_count-ne1-or$null-eq$global:FiniteFourFailurePathState.activation-or-not$global:FiniteFourFailurePathState.activation.closed){throw 'synthetic result write preceded cleanup'}
+  $global:FiniteFourFailurePathState.result_write_count++
+  $global:FiniteFourFailurePathState.result=$Record
+}
+'@
+    [IO.File]::WriteAllText((Join-Path $Root 'tools/lib/validation/NativeProbeResources.ps1'),$native,[Text.UTF8Encoding]::new($false))
+}
+
 $checks=[Collections.Generic.List[object]]::new()
 function Add-Check { param([string]$Name,[scriptblock]$Action) & $Action;$checks.Add([ordered]@{name=$Name;passed=$true}) }
 
@@ -183,6 +296,28 @@ Add-Check 'headless create, server, and cold argument construction omits the GUI
     foreach($set in $argumentSets){
         $arguments=@($set.value)
         if($arguments-notcontains'--config'-or$arguments-notcontains'--mod-directory'-or$arguments-contains'--disable-audio'){throw 'headless Factorio argument shape differs'}
+    }
+}
+
+Add-Check 'the observed 2.1.24 console confirmation replays the identical source command once after its first send' {
+    . (Join-Path (Find-FiniteFourNativeRepoRoot -StartPath $PSScriptRoot) 'tools/lib/validation/ResourceGovernor.ps1')
+    $packet=Read-FiniteFourNativeJson $PacketPath
+    $protocol=$packet['protocol']
+    $expected='Using Lua console commands will disable achievements. Please repeat the command to proceed.'
+    if($protocol['confirmation_marker']-cne$expected-or(Get-MIR441TextSha256 $expected).ToUpperInvariant()-cne'F5F37A7206390ADD9B1DB0C2F108794CC75C58DC69F55EEFEDC0D06352DEF588'){throw 'packet does not bind the observed console confirmation marker'}
+    $result=Invoke-ConsoleStartupControl -Protocol $protocol -Root (Join-Path $OutputRoot 'console-confirmation-observed') -Confirmation observed
+    if($result.receipt.send_count-ne2-or-not$result.receipt.ready_marker_observed-or-not$result.receipt.confirmation_marker_observed-or$result.receipt.sends[0].kind-cne'command'-or$result.receipt.sends[1].kind-cne'confirmation-replay'){throw 'observed confirmation did not produce the one bounded replay'}
+    $lines=@($result.stdin -split "`r?`n" | Where-Object {$_-ne''})
+    if($lines.Count-ne2-or$lines[0]-cne$protocol['source_console_command']-or$lines[1]-cne$protocol['source_console_command']){throw 'confirmation replay changed or duplicated the source command'}
+}
+
+Add-Check 'wrong, absent, and unrelated output cannot request a console confirmation replay' {
+    $protocol=(Read-FiniteFourNativeJson $PacketPath)['protocol']
+    foreach($case in @('wrong','absent','unrelated')){
+        $result=Invoke-ConsoleStartupControl -Protocol $protocol -Root (Join-Path $OutputRoot ('console-confirmation-'+$case)) -Confirmation $case
+        if($result.receipt.send_count-ne1-or$result.receipt.confirmation_marker_observed-or$result.receipt.sends[0].kind-cne'command'){throw "console confirmation '$case' was accepted"}
+        $lines=@($result.stdin -split "`r?`n" | Where-Object {$_-ne''})
+        if($lines.Count-ne1-or$lines[0]-cne$protocol['source_console_command']){throw "console confirmation '$case' changed the authorized command boundary"}
     }
 }
 
@@ -247,6 +382,60 @@ Add-Check 'complete reader rejects a protected successor reused as a cold workin
     Assert-Refuses -Contains 'reuses protected pathname' -Action { Read-FiniteFourNativeCompleteChain -Chain $chain | Out-Null }
 }
 
+Add-Check 'failed execution custody separates attempted invocations from ledger-proved started PIDs and retains cleanup facts' {
+    $context=New-SyntheticInterruptedContext -Root (Join-Path $OutputRoot 'failed-execution-custody')
+    $primary=[TimeoutException]::new('[mir441-process-timeout]')
+    $primary.Data['mir441_factorio_console_startup']=[ordered]@{send_count=1;ready_marker_observed=$true;confirmation_marker_observed=$false}
+    $primary.Data['mir441_process_cleanup_facts']=@([ordered]@{step='process-stop-finally';succeeded=$true})
+    $restoration=[Collections.Generic.List[object]]::new();$restoration.Add([ordered]@{state='restored-direct-library-controls';library_lock_released=$true})
+    $record=New-FiniteFourNativeFailedExecutionRecord -PrimaryError $primary -Context $context -ExecutionState ([ordered]@{restoration=$restoration}) -CleanupOutcome ([ordered]@{attempted=$true;succeeded=$false;errors=@('library restoration failed');library_restoration=[ordered]@{applicable=$true;attempted=$true;succeeded=$false;records=@()}})
+    if($record.status-cne'failed-retained-adverse'-or$record.primary_cause.message-cne'[mir441-process-timeout]' -or$record.attempted_invocations-ne2-or$record.actual_started_process_ids.Count-ne1-or$record.actual_started_process_ids[0]-ne4123){throw 'failure custody changed attempted-versus-started process facts'}
+    if($record.resource_runs.Count-ne2-or$record.console_startup.send_count-ne1-or$record.process_cleanup_facts.Count-ne1-or$record.restoration.Count-ne1-or$record.cleanup.succeeded-or$record.cleanup.errors[0]-cne'library restoration failed'-or-not$record.cleanup.library_restoration.applicable-or-not$record.cleanup.library_restoration.attempted-or$record.cleanup.library_restoration.succeeded){throw 'failure custody omitted console, restoration, or cleanup facts'}
+}
+
+Add-Check 'failure result write refusal cannot replace the original timeout or fabricate a written terminal result' {
+    . (Join-Path (Find-FiniteFourNativeRepoRoot -StartPath $PSScriptRoot) 'tools/lib/validation/NativeProbeResources.ps1')
+    $context=New-SyntheticInterruptedContext -Root (Join-Path $OutputRoot 'failure-result-write-refusal')
+    $primary=[TimeoutException]::new('[mir441-process-timeout]')
+    $priorWriter=(Get-Command Write-MIRNativeProbeResult -CommandType Function -ErrorAction Stop).ScriptBlock
+    try {
+        Set-Item -Path Function:Write-MIRNativeProbeResult -Value {param($Context,$Record) throw 'controlled result write refusal'}
+        $written=Write-FiniteFourNativeFailedExecutionResult -PrimaryError $primary -Context $context -ExecutionState ([ordered]@{restoration=@()}) -CleanupOutcome ([ordered]@{attempted=$true;succeeded=$true;errors=@()})
+        if($written-or$primary.Message-cne'[mir441-process-timeout]' -or-not$primary.Data['finite_four_failure_ledger_write_attempted']-or$primary.Data['finite_four_failure_ledger_write_succeeded']-or$primary.Data['finite_four_failure_ledger_write_error']-notmatch'controlled result write refusal'){throw 'failure result writer masked the primary timeout'}
+    } finally {
+        Set-Item -Path Function:Write-MIRNativeProbeResult -Value $priorWriter
+    }
+}
+
+Add-Check 'Execution writes one failed context result only after synthetic cleanup and rethrows its controlled native timeout' {
+    $stubRoot=Join-Path $OutputRoot 'execution-failure-helper-root';New-SyntheticExecutionFailureHelperRoot -Root $stubRoot
+    $global:FiniteFourFailurePathState=[ordered]@{activation=$null;activation_started=0;cleanup_count=0;native_call_count=0;result_write_count=0;result=$null}
+    $executionRoot=Join-Path $OutputRoot 'execution-failure-context'
+    $packet=[ordered]@{
+        runtime_bindings=[ordered]@{output_root=$executionRoot;library_directory='synthetic-library';source_profile='synthetic-source-profile';candidate_profile='synthetic-candidate-profile';source_seed_map_gen_settings='synthetic-map-settings';server_settings_template='synthetic-server-settings';server_port=34197}
+        inputs=[ordered]@{engine=[ordered]@{binary_path='synthetic-factorio';engine_data_path='synthetic-data'};source_mir=[ordered]@{filename='source.zip';sha256='source'};candidate_mir=[ordered]@{filename='candidate.zip';sha256='candidate'};fixtures=@()}
+        bounds=[ordered]@{expected_peak_memory_mib=4096;max_new_output_mib=512;create_timeout_seconds=240;server_timeout_seconds=240;cold_timeout_seconds=120;cold_test_ticks=10}
+        protocol=[ordered]@{source_console_command='/c remote.call("mir-worker-storage-native-observer", "begin", "source")';successor_console_command='/c remote.call("mir-worker-storage-native-observer", "begin", "successor")';console_ready_marker='Hosting game at IP ADDR:';confirmation_marker='Using Lua console commands will disable achievements. Please repeat the command to proceed.'}
+    }
+    $seen=$null
+    try { Invoke-FiniteFourNativeExecution -Packet $packet -RepoRoot $stubRoot|Out-Null } catch {$seen=$_}
+    try {
+        if($null-eq$seen-or$seen.Exception.Message-cne'[mir441-process-timeout]'){throw "Execution did not preserve the controlled native timeout: $($seen.Exception.Message)"}
+        $state=$global:FiniteFourFailurePathState
+        if($state.native_call_count-ne1-or$state.activation_started-ne1-or$state.cleanup_count-ne1-or$state.result_write_count-ne1-or$null-eq$state.result){throw 'Execution did not run the one-call cleanup-before-result boundary'}
+        if($state.result.status-cne'failed-retained-adverse'-or$state.result.primary_cause.message-cne'[mir441-process-timeout]' -or$state.result.attempted_invocations-ne1-or$state.result.actual_started_process_ids.Count-ne0-or-not$state.result.cleanup.library_restoration.applicable-or-not$state.result.cleanup.library_restoration.attempted-or-not$state.result.cleanup.library_restoration.succeeded){throw 'Execution failed result differs from the controlled timeout boundary'}
+    } finally {
+        Remove-Variable -Name FiniteFourFailurePathState -Scope Global -ErrorAction SilentlyContinue
+    }
+}
+
+Add-Check 'the executor contains an explicit post-cleanup failed-context writer instead of a success-only result path' {
+    $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($ControllerPath,[ref]$tokens,[ref]$errors)
+    if($errors.Count-ne0){throw 'controller parse failed'}
+    $execution=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-FiniteFourNativeExecution'},$true))
+    if($execution.Count-ne1-or$execution[0].Extent.Text-notmatch'Write-FiniteFourNativeFailedExecutionResult'-or$execution[0].Extent.Text-notmatch'library_restoration'){throw 'executor retains the prior success-only failure path'}
+}
+
 Add-Check 'cleanup retains the primary chain failure and records the restoration failure' {
     $primary=$null;try{throw 'primary chain rejection'}catch{$primary=$_}
     $seen=$null
@@ -267,7 +456,7 @@ $receipt=[ordered]@{
     packet=[ordered]@{path=$PacketPath;sha256=$packetHash;bytes=(Get-Item -LiteralPath $PacketPath).Length}
     control_script=[ordered]@{path=$PSCommandPath;sha256=$testHash;bytes=(Get-Item -LiteralPath $PSCommandPath).Length}
     controls=$checks;count=$checks.Count
-    result='PASS: host-only parser/chain/cleanup controls. No context, direct library activation, Factorio process, save creation by an engine, RCON listener, or gameplay result was created.'
+    result='PASS: host-only parser/chain/cleanup controls. No actual ResourceGovernor context, direct library activation, Factorio process, save creation by an engine, RCON listener, or gameplay result was created.'
     limits='Synthetic save ZIPs and marker files validate the controller reader only. Exact native inputs remain missing or deferred, and no current result is native evidence.'
 }
 Write-ControlJson -Path (Join-Path $OutputRoot 'result.json') -Value $receipt

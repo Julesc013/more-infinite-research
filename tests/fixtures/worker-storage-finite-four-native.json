@@ -23,7 +23,7 @@
       "path": "build/qualification/mir5-audit-intake-20261118-r01/base-only-worker-cap-native-eligibility-a504-r01.json",
       "sha256": "E2DCD8811B08F525073C7CEC46864DDB48D6B8D61A39F532940B782919D8CAED"
     },
-    "executor_difference_from_r02": "r02 describes a future loopback-RCON packet. This executor uses the existing governed Factorio ConsoleStartup primitive: one stdin /c command after the historical 2.1.24 hosting marker, no RCON listener or secret. Confirmation replay stays disabled unless a separately pinned engine warning is observed and reviewed."
+    "executor_difference_from_r02": "r02 describes a future loopback-RCON packet. This executor uses the existing governed Factorio ConsoleStartup primitive: one stdin /c command after the historical 2.1.24 hosting marker, no RCON listener or secret. The exact observed 2.1.24 confirmation warning authorizes only its one identical bounded replay."
   },
   "inputs": {
     "engine": {
@@ -92,10 +92,10 @@
   },
   "protocol": {
     "console_ready_marker": "Hosting game at IP ADDR:",
-    "confirmation_marker": "",
+    "confirmation_marker": "Using Lua console commands will disable achievements. Please repeat the command to proceed.",
     "source_console_command": "/c remote.call(\"mir-worker-storage-native-observer\", \"begin\", \"source\")",
     "successor_console_command": "/c game.forces.player.laboratory_speed_modifier=1000; remote.call(\"mir-worker-storage-native-observer\", \"begin\", \"successor\")",
-    "confirmation_replay": "No replay is planned. The existing ConsoleStartup helper may replay only if a nonempty separately reviewed engine warning marker is supplied and observed.",
+    "confirmation_replay": "The existing ConsoleStartup helper replays the identical source command exactly once only after its first send and this exact observed 2.1.24 console confirmation warning. It does not begin any successor stage or change a timeout.",
     "stages": ["create-source-seed", "source-server", "successor-server", "cold-reload-1", "cold-reload-2"],
     "marker_order": ["source-earned", "source-finished", "configuration", "before-successor-lab", "successor-earned", "successor-finished", "reload cold-1", "reload cold-2"],
     "successor_ordering": "The configuration callback is observed before the ConsoleStartup request; before-successor-lab is emitted by the first successor tick after that request and must precede successor-earned. Cross-process tick values are save-relative, not one global timeline.",
