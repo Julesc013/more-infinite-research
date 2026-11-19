@@ -260,10 +260,12 @@ class PrerequisiteRepairTests(unittest.TestCase):
 
     def test_data_final_imports_the_repair_only_for_an_active_supported_named_input(self):
         import test_generator
-        test_generator.LuaRuntime = LuaRuntime
-        host = test_generator.GeneratorTests("runTest")
-        host.setUp()
-        host.lua.execute('''
+        host = test_generator.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=test_generator.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=test_generator.K2SO_MATERIAL_NATIVE,
+        )
+        host.execute('''
           local environment = full_world({})
           local modules = {enabled=true,prerequisites={"automation", "angels-silver-smelting-1"}}
           local astroponics = {prerequisites={"landfill", "space-science-pack"}}
@@ -286,9 +288,12 @@ class PrerequisiteRepairTests(unittest.TestCase):
             .. "muluna-astroponics-space-science-cycle: removed astroponics -> space-science-pack.")
         ''')
 
-        inactive = test_generator.GeneratorTests("runTest")
-        inactive.setUp()
-        inactive.lua.execute('''
+        inactive = test_generator.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=test_generator.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=test_generator.K2SO_MATERIAL_NATIVE,
+        )
+        inactive.execute('''
           settings, mods, data, helpers, log = {startup=defaults()}, {base="2.1.23"}, full_world({}), nil, function() end
           package.loaded["overrides.prerequisite_repairs"] = nil
           package.preload["overrides.prerequisite_repairs"] = function() error("inactive repair import") end
