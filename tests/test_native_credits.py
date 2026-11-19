@@ -2,9 +2,10 @@
 import argparse
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
-from native_credit_world import build_native_credit_runtime_world
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +17,52 @@ class NativeCreditRuntimeTests(unittest.TestCase):
         self.lua = build_native_credit_runtime_world(
             LuaRuntime, target="f210", source_root=PLAYER
         )
+
+    def test_explicit_credit_world_consumes_source_root_and_isolates_world_state(self):
+        calls = []
+
+        def supplied_runtime(**kwargs):
+            calls.append(kwargs)
+            return LuaRuntime(**kwargs)
+
+        with tempfile.TemporaryDirectory(prefix="mir-native-credit-world-") as directory:
+            root = Path(directory)
+            for relative in ("platform", "research", "runtime"):
+                (root / relative).mkdir()
+            (root / "platform/target.lua").write_text('return {id="f210"}\n', encoding="utf-8")
+            (root / "research/native_credit_definitions.lua").write_text(
+                """local rows={
+                  {recipe="builder-probe",main_id="probe-main",positive_id="probe-positive",negative_id="probe-negative"},
+                  {recipe="vgal-coal-crushing",main_id="galore-main",positive_id="galore-positive",negative_id="galore-negative"}}
+                return {fixed_descriptors=function()return rows end,descriptors=function()return rows end}
+                """, encoding="utf-8")
+            (root / "runtime/catalogue.lua").write_text("return {}\n", encoding="utf-8")
+            (root / "runtime/native_credits.lua").write_text(
+                'return {identity="native-credits-"..require("platform.target").id}\n', encoding="utf-8")
+
+            first = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            second = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            self.assertEqual([{"unpack_returned_tuples": True}] * 2, calls)
+            self.assertIsNot(first, second)
+            self.assertEqual("builder-probe", first.eval("descriptors[1].recipe"))
+            self.assertEqual("builder-probe", second.eval("descriptors[1].recipe"))
+            first.execute('storage.marker="first";package.loaded["runtime.native_credits"]={identity="first"}')
+            self.assertEqual("first", first.eval("storage.marker"))
+            self.assertIsNone(second.eval("storage.marker"))
+            self.assertEqual("first", first.eval('package.loaded["runtime.native_credits"].identity'))
+            self.assertEqual("native-credits-f200", second.eval('package.loaded["runtime.native_credits"].identity'))
+
+            first = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            second = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            install_native_family_paid_world(first, target="f200")
+            install_native_family_paid_world(second, target="f200")
+            first.execute('foreign_creation="first";reload_credits();first_history=prototypes.get_history("technology","first").created')
+            second.execute('foreign_creation="second";reload_credits();second_history=prototypes.get_history("technology","second").created')
+            self.assertEqual([{"unpack_returned_tuples": True}] * 4, calls)
+            self.assertEqual("foreign", first.eval("first_history"))
+            self.assertEqual("foreign", second.eval("second_history"))
+            self.assertEqual("more-infinite-research", first.eval('prototypes.get_history("technology","second").created'))
+            self.assertEqual("more-infinite-research", second.eval('prototypes.get_history("technology","first").created'))
 
     def galore_force(self, included=False, retired=True):
         self.lua.globals().galore_included = included
