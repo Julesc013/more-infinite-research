@@ -75,7 +75,7 @@ local function inventory(initial)
   return result
 end
 function added_world(expected)
-  handlers,markers,logs,files,saves,storage={},{},{},{},{},{}
+  handlers,markers,logs,files,saves,storage={},{},{},{},{},{};world_energy_starved=false
   local player,pv=make_force("player",1);local foreign,fv=make_force("mir473-base-paid-foreign",4)
   local enemy={name="enemy",index=2,valid=true};local neutral={name="neutral",index=3,valid=true}
   local input=inventory({["automation-science-pack"]=168,["logistic-science-pack"]=168,["chemical-science-pack"]=168,["production-science-pack"]=168})
@@ -106,6 +106,10 @@ function added_call(which,event)local ok,msg=pcall(handlers[which],event);return
 function added_init_config(version,extra)
   scenario_env.script.active_mods["more-infinite-research"]=version or "5.0.20018"
   local ok,msg=added_call("init");if not ok then return ok,msg end
+  return added_config_only(version,extra)
+end
+function added_config_only(version,extra)
+  scenario_env.script.active_mods["more-infinite-research"]=version or "5.0.20018"
   local changes={["more-infinite-research"]={old_version="4.7.20003",new_version=version or "5.0.20018"},["mir-fixture-published-base-added-successor"]={old_version=nil,new_version="0.1.0"}}
   if extra then changes[extra]={old_version=nil,new_version="0.1.0"} end
   return added_call("config",{mod_startup_settings_changed=false,mod_changes=changes})
@@ -152,6 +156,9 @@ function added_observer_writes_refuse()
     bracket_progress=pcall(function()player["research_progress"]=1 end),bracket_bonus=pcall(function()recipe["productivity_bonus"]=.9 end)}
 end
 function added_scripted(name)return added_call(2,{research=game.forces.player.technologies[name],by_script=true})end
+function added_scripted_foreign(name)return added_call(2,{research=game.forces["mir473-base-paid-foreign"].technologies[name],by_script=true})end
+function added_scripted_forged_force(name)return added_call(2,{research={name=name,force={name="player",index=1,valid=true}},by_script=true})end
+function added_scripted_forged_object(name)return added_call(2,{research={name=name,force=game.forces.player,valid=true},by_script=true})end
 function added_drift_foreign()world_values.foreign.progress=.5 end
 function added_load_throwing()
   local old_game,old_storage=scenario_env.game,scenario_env.storage;scenario_env.game=setmetatable({},{__index=function()error("game read")end});scenario_env.storage=setmetatable({},{__index=function()error("storage read")end})

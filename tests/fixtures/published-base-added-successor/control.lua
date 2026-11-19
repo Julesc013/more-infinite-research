@@ -297,7 +297,9 @@ script.on_event(defines.events.on_research_finished, function(event)
   local research = event and event.research
   if event and event.by_script == true then
     local force = research and research.force
-    require_ok(research and force and (force == state.player or force == state.foreign) and carriers[research.name] == true and technology(force, research.name) == research, "unexpected scripted research event")
+    local player, foreign = state.player or game.forces[PLAYER], state.foreign or game.forces[FOREIGN]
+    require_ok(state.phase == "initialized" or state.phase == "pre-work" or state.phase == "working", "scripted carrier phase differs")
+    require_ok(research and force and (force == player or force == foreign) and carriers[research.name] == true and technology(force, research.name) == research, "unexpected scripted research event")
     state.scripted_carriers[#state.scripted_carriers + 1] = {name=research.name,force_name=force.name,force_index=force.index,tick=game.tick,by_script=true}; return
   end
   require_ok(state.phase == "working" and research and research.force == state.player and research == technology(state.player, STEEL.name) and event.by_script == false, "ordinary research event differs")
