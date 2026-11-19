@@ -1,0 +1,362 @@
+{
+  "kind": "MIRPublishedBaseDataCaptureV1",
+  "date": "2026-11-19",
+  "verdict": "retained-data-stage-observation-accepted-by-independent-offline-reader-addendum",
+  "scope": "Exact published MIR4.7.20003 + Base2.0.77 data only. No world, save, on_init, paid-preservation, reporter, release or stable qualification.",
+  "source_repair": {
+    "pr": "https://github.com/Julesc013/more-infinite-research/pull/2136",
+    "original_pr": "https://github.com/Julesc013/more-infinite-research/pull/2084",
+    "original_commit": "4c471fe5a1a19476789a95bb9c2e224da2b1bf12",
+    "reviewed_head": "c9f0bfe8ec0b4d5d01a94339e140f933f6f353bd",
+    "merge": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+    "status": "source-integrated-independent-review-and-four-exact-head-checks-passed-native-paid-preservation-not-run",
+    "review": {
+      "path": "build/qualification/paid-base-added-inputs-current-r01/INDEPENDENT-SOURCE-REVIEW-r01.json",
+      "bytes": 4177,
+      "sha256": "E03B994897451D9AB9941373661FD438CC22E33891B1F917D5B08D20F6EC75A4"
+    }
+  },
+  "capture_inputs": {
+    "runner_commit": "c9f0bfe8ec0b4d5d01a94339e140f933f6f353bd",
+    "engine": {
+      "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+      "bytes": 244051696,
+      "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+    },
+    "engine_data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data",
+    "base_info": {
+      "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data/base/info.json",
+      "bytes": 193,
+      "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    "base_data": {
+      "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data/base/data.lua",
+      "bytes": 5074,
+      "sha256": "76FF34870C89CBC9AED82CB76E21D7F2B20F4F3F58CFFC5EB43305FDB9759CF8"
+    },
+    "published_archive": {
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-base-data-c9f0bfe8-r01/build/qualification/published473-base-prerequisites-capture-gunmetal-r02/inputs/more-infinite-research_4.7.20003.zip",
+      "bytes": 1449475,
+      "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+    },
+    "direct_library_archive": {
+      "path": "/home/agents/Projects/Factorio/MIR/testmods/2.0/more-infinite-research_4.7.20003.zip",
+      "bytes": 1449475,
+      "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+    },
+    "archive_policy": "existing-library-read-only",
+    "mods": {
+      "base": "2.0.77",
+      "more-infinite-research": "4.7.20003"
+    },
+    "limits": {
+      "memory_mib": 8192,
+      "output_mib": 1024,
+      "timeout_seconds": 300,
+      "processes": 1
+    }
+  },
+  "pins": {
+    "packet": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/packet.json",
+      "bytes": 6919,
+      "sha256": "D460302875665AC93089EF11FC50DF6E046A7ADFEF49553C1FB1F705AA51864D"
+    },
+    "owner": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/Invoke-Published473PrerequisiteCapture.ps1",
+      "bytes": 19395,
+      "sha256": "3B85B2757EA3CDC173910F73927BECF2C9C48C110F91B70E8BB565209AB96FA7"
+    },
+    "frozen_reader": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/Verify-Published473BasePrerequisites.py",
+      "bytes": 10292,
+      "sha256": "7FF8A4EEDCA97A6EC186DB58254E28606AE9D0A1D3304E8B283240200F08FFEB"
+    },
+    "composition": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/composition.json",
+      "bytes": 43340,
+      "sha256": "4D46AA49DB6FFCF3C7B21A329FFF9FBB5CF7ACF91225AF5853E2C20E463D3C68"
+    },
+    "compose_review": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/REVIEW-COMPOSE.json",
+      "bytes": 1066,
+      "sha256": "1C57015C60F764B6B4BF810167CE733609F265995F836BF78D7871982578C14C"
+    },
+    "execute_review": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/REVIEW-EXECUTE.json",
+      "bytes": 847,
+      "sha256": "ADE5B1EDEFDB7D6A2927CAAA90223DE647A10A0E16BD940F0A104186A8F94747"
+    },
+    "terminal_adverse": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/terminal.json",
+      "bytes": 117785,
+      "sha256": "A785BE2D9045DA5A0B95FBB157F05128E130E0FEBB8F3288A28620C8595D6DC7"
+    },
+    "execute_readback": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/EXECUTE-READBACK-r01.json",
+      "bytes": 6875,
+      "sha256": "1E160804284416534CBBD05EB661D935D45074DD4DAE2B2B9B83A09C1A701C4F"
+    },
+    "capture": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r02/execute-custody/capture/result.json",
+      "bytes": 63747,
+      "sha256": "98C4151728E47FECAEFD40D41D30C8BDA0F9325F600947B74A5F03487747F627"
+    },
+    "corrected_offline_reader": {
+      "path": "build/qualification/published473-base-prerequisites-reader-r03/Verify-Published473BasePrerequisites.py",
+      "bytes": 10561,
+      "sha256": "EB227C23B4F84758B4846B949180DC4A801F904A05A6683243AB5D3CE0217C87"
+    },
+    "reader_controls": {
+      "path": "build/qualification/published473-base-prerequisites-reader-r03/Test-Reader.py",
+      "bytes": 8792,
+      "sha256": "8610E5C51CDE361D066A6C0C379BE6E11407E096C8523AA11A9A2A378C74EF03"
+    },
+    "reader_observation": {
+      "path": "build/qualification/published473-base-prerequisites-reader-r03/observation.json",
+      "bytes": 1433,
+      "sha256": "B6504B1421A9AC749C6539D1845AF65C5FB58227E2D0EF4D6493649DDFC009D3"
+    },
+    "independent_result_review": {
+      "path": "build/qualification/published473-base-prerequisites-reader-r03/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 6204,
+      "sha256": "66B0A6F5BD439E3E4284BAB83198B5ECACD144B88B1AF1A7A941A25BF1DCA424"
+    },
+    "offline_source_facts": {
+      "path": "build/qualification/published473-base-prerequisites-reader-r03/offline-source-facts.json",
+      "bytes": 30026,
+      "sha256": "43DA5E4375A15BFF99CB0B1B79E50FA95B3871AE80BCD963C7BCD65DC36D756F"
+    }
+  },
+  "execution": {
+    "unit": "mir-published473-base-prerequisites-execute-r02",
+    "invocation": "2e4df8cf2dd345aba80db41022259c90",
+    "native_processes": 1,
+    "owned_pid": 360523,
+    "native_exit_code": 0,
+    "timed_out": false,
+    "endpoint": "data-stage dump only",
+    "actual_argv": [
+      "--config",
+      "/home/agents/Projects/Factorio/MIR/.task-builds/published473-base-data-c9f0bfe8-r01/build/tmp/published473-base-prerequisites-capture-gunmetal-r02-native/capture/config.ini",
+      "--mod-directory",
+      "/home/agents/Projects/Factorio/MIR/testmods/2.0",
+      "--no-log-rotation",
+      "--dump-data"
+    ],
+    "loaded_tuple": [
+      "base@2.0.77",
+      "more-infinite-research@4.7.20003"
+    ],
+    "restored": true,
+    "cleanup_errors": [],
+    "factorio_processes": 0,
+    "output_accounting": {
+      "case_bytes": 14561766,
+      "max_new_output_bytes": 1073741824,
+      "terminal_reserve_bytes": 1048576,
+      "copied_custody_bytes": 14561766
+    },
+    "rehash_readback_bodies": 13
+  },
+  "adverse_disposition": {
+    "r01_compose": "Preserved zero-native failure in borrowed archive helper and singleton custody handling; independent read-only recovery verified original library bytes/name set unchanged.",
+    "r01_recovery": {
+      "path": "build/qualification/published473-base-prerequisites-capture-gunmetal-r01/RESTORATION-READBACK-ADDENDUM-r02.json",
+      "bytes": 1313,
+      "sha256": "CD9E29D3A00A47D3D69329EAFC8CE0E8A50796DEA11DC6A28192A9F0D22795E5"
+    },
+    "r02_terminal": "Preserved adverse; the frozen reader compared the complete archive row to an incomplete four-field synthetic row.",
+    "authentic_harness_fields": [
+      "path",
+      "sha256",
+      "name",
+      "version",
+      "factorio_version",
+      "root"
+    ],
+    "offline_correction": "Required identity fields plus exact direct-library path and ZIP root; original capture/terminal remain unchanged. Eleven controls include original refusal/new acceptance against actual captured bytes and wrong path/root/hash opponents.",
+    "native_reruns": 0
+  },
+  "captured_facts": {
+    "data_raw": {
+      "bytes": 13358004,
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\published473-base-prerequisites-capture-gunmetal-r02\\execute-custody\\capture\\write-data\\script-output\\data-raw-dump.json",
+      "sha256": "43FF6868BCE10E7290A5E656F6E7A55A67F16B575C3BB54B8E0A05C057B37097",
+      "technology_count": 250,
+      "technology_names_sha256": "326A3E770FAF40927B0EA95A15E4875D7FAA05D705569DCAE11056B1490F1EA5"
+    },
+    "finite_prerequisites": 23,
+    "five_public_mains": [
+      {
+        "name": "recipe-prod-research_low_density_structure-1",
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "low-density-structure",
+            "change": 0.1
+          }
+        ]
+      },
+      {
+        "name": "recipe-prod-research_plastic-1",
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "plastic-bar",
+            "change": 0.1
+          }
+        ]
+      },
+      {
+        "name": "recipe-prod-research_processing_unit-1",
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "processing-unit",
+            "change": 0.1
+          }
+        ]
+      },
+      {
+        "name": "recipe-prod-research_rocket_fuel-1",
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "rocket-fuel",
+            "change": 0.1
+          }
+        ]
+      },
+      {
+        "name": "recipe-prod-research_steel-1",
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "count_formula": "8000*2^(L-1)",
+          "time": 60
+        },
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "steel-plate",
+            "change": 0.1
+          }
+        ]
+      }
+    ],
+    "independent_mask_reference": "spec/inventory/modern-f200-470.json profile base-f200",
+    "status": "Offline source-scenario facts only; no paid science has been consumed in this capture."
+  },
+  "remaining": [
+    "Genuine two-mod published source with ordinary paid research and partial/current/repeated queues.",
+    "Affected authentic-old refusal/corrected candidate, effects, ordinary completion, save and two cold reloads.",
+    "Other editions, original reporter configurations, GUI/client/performance, delivery and stable acceptance."
+  ],
+  "published_bytes_changed": false
+}

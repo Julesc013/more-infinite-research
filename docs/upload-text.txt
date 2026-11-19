@@ -1,18 +1,16 @@
-MIR 5.0.16
+MIR 5.0.17
 Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Improves settings-profile fidelity, compatibility checks and research-preservation diagnostics.
+Repairs a worker-cargo upgrade refusal for inherited MIR 5.0.11 saves and improves Research Library details and internal error handling.
 
-- Preserve settings-profile values and reject malformed supplied headers.
-- Improve Bob/Angel material compatibility and Library availability explanations.
-- Correct internal productivity-preservation costs on maps with custom research prices.
-- Stop worker recovery after an unexpected application failure and explain when to reload the protected original.
-- Name the rejecting mod and its old, new and active versions when a worker-cargo upgrade cannot authenticate its history.
-- Report incomplete research setup immediately at startup.
-- Recognize Space Exploration's infinite worker-speed research beginning at level 10 for configured limits.
+- Allow inherited MIR 5.0.11 saves previously using only Base and MIR to upgrade after startup settings change or mods are added, when no worker-cargo continuation research has been earned, started or queued on any force.
+- Apply the configured worker robot speed limit to Space Exploration's infinite research beginning at level 10.
+- Avoid invalid GUI style reads when refreshing the Library's Settings tab.
+- Distinguish finite and continuing research with the same localized name, including their effective limits.
+- Reject incomplete internal preservation interfaces before changing research, and retain unexpected integration errors instead of misreporting them as missing research or history.
 
-Update a copy first. Keep a protected original save with its matching mods and startup settings. The additional worker-history details do not reconstruct missing ownership or earned research; some unprepared older saves can still be refused. Use the conditional recovery instructions in the support guide for a qualifying original default-worker save.
+Update a copy first and keep the protected original with its matching mods and startup settings. This worker-cargo repair covers a verified empty inherited 5.0.11 history; it does not reconstruct unknown earned research or every earlier mod selection. Other unprepared older saves can still be refused. Removing MIR, saving and re-adding it can discard research and preservation data; use an original backup or a supported recovery route instead.
 
-This is a GitHub beta. Space Exploration cap reset/continuation checks, actual Library input/client checks and broader performance testing remain unfinished. No blanket save or modpack qualification is claimed.
+This is a GitHub beta. Remaining Library input/export checks, broader performance testing and unresolved historical save cases remain open for stable MIR 5. No blanket save or modpack qualification is claimed.
 
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.16/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.17/docs/support.md).

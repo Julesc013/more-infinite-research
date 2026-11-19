@@ -1,0 +1,158 @@
+{
+  "kind": "MIRSEProviderElapsedHoldAdverseV1",
+  "date": "2026-11-19",
+  "status": "adverse_elapsed_tick_oracle_after_configuration_save",
+  "scope": "The exact predecessor configuration and observed frames survive, but the declared two-elapsed-tick hold is not met. Overall NO-GO; no cold or candidate acceptance.",
+  "actor_commit": "c98303ed6f22174bde6bc7112c025b8414181ded",
+  "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-c98303ed-r03",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "mir-fixture-se-worker-speed-provider-admitted": "0.2.0"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 2,
+    "admission_wait_seconds": 30
+  },
+  "source": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-c98303ed-r03/build/tmp/se-provider-admission-r03-native/source/write/saves/source.zip",
+    "bytes": 849928,
+    "sha256": "FAD88AE24184CCFD09F29930E0D31E58D0C4340F26487D24F407D95E988DB3CB"
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-admission-native-r04/packet.json",
+      "bytes": 22621,
+      "sha256": "EE840888F80B5A44C221E48AE2CCDFCC0DFFDF5A92F2A3E4F1C83B4230E230B4"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-admission-native-r04/Invoke-RetainedProviderAdmission.ps1",
+      "bytes": 20099,
+      "sha256": "E82786248EF7B6CA1F0A444FE1937463533196049355CBE3BF8A6BDC25B3A171"
+    },
+    "reader": {
+      "path": "build/qualification/se-provider-admission-native-r04/Verify-ProviderAdmission.py",
+      "bytes": 6942,
+      "sha256": "A6B09B736E4F2999E0BE25AE900321E263635F65C5426D0D68FE8136CF697668"
+    },
+    "compose": {
+      "path": "build/qualification/se-provider-admission-native-r04/composition.json",
+      "bytes": 130262,
+      "sha256": "9247FDC81EEC768083ADE1056B97B177799CF3DA3F77F3C6BCE097BC660180FC"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-admission-native-r04/REVIEW-EXECUTE.json",
+      "bytes": 4910,
+      "sha256": "7EBB86CFBCA6A09C6D9861D60C8F656B5F854BE257948E41AF73DBB0623D9942"
+    },
+    "actual_review_preflight": {
+      "path": "build/qualification/se-provider-admission-native-r04/ACTUAL-REVIEW-PREFLIGHT-r02.json",
+      "bytes": 548,
+      "sha256": "7AF6A28EEC90BFB7C479177B6AECD5CF3A1131AD88DC35C9FB99C66D5089F282"
+    },
+    "dispatch": {
+      "path": "build/qualification/se-provider-admission-native-r04/EXECUTE-DISPATCH-r04-r02.json",
+      "bytes": 1774,
+      "sha256": "A86C1A2E087FED29E620FE2DCC670030419943CE17F8986F0057607E46731B50"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-admission-native-r04/terminal.json",
+      "bytes": 133175,
+      "sha256": "DCE31687DBF04E3AF5B20DF3AB1126EF0BC769EE074B82BA3C7BA16AE036C564"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-admission-native-r04/EXECUTE-READBACK-r02.json",
+      "bytes": 39028,
+      "sha256": "A514CFB250583110F0519C1A1B0D9473131F032CD147C226C799CAC2CA446F18"
+    },
+    "result_review": {
+      "path": "build/qualification/se-provider-admission-native-r04/INDEPENDENT-RESULT-REVIEW-r04.json",
+      "bytes": 3496,
+      "sha256": "3F4BB09243C48ECE1FD0ED245E13CA7F09DBC03F56D775419B4CEEE44FC77920"
+    },
+    "before": {
+      "path": "build/qualification/se-provider-admission-native-r04/execute-custody/custody/admission-pre-hold.json",
+      "bytes": 141288,
+      "sha256": "476A665126A174BA5E38361A345B28F4F94E10DDC80A41462A1B5D58754D5292"
+    },
+    "after": {
+      "path": "build/qualification/se-provider-admission-native-r04/execute-custody/custody/admission-saved.json",
+      "bytes": 211131,
+      "sha256": "AA5F4D6E9F0626E4BE11345DE1FCA5C1AFAA798218BB28E3AC8BA89AC96B9553"
+    }
+  },
+  "zero_native_refusals": {
+    "missing_review_field": {
+      "path": "build/qualification/se-provider-admission-native-r04/REVIEW-SCHEMA-REFUSAL-r01.json",
+      "bytes": 577,
+      "sha256": "2DC14903C548828AD9765DDCD79A50319983E3C3B2FD4B87B29845C194D5228C"
+    },
+    "review_rows_shape": {
+      "path": "build/qualification/se-provider-admission-native-r04/REVIEW-ROWS-REFUSAL-r02.json",
+      "bytes": 763,
+      "sha256": "5845F202666E9548EC3978E533231F54011DBD9BA4C4EC0899826E7F87D4E00A"
+    }
+  },
+  "actual": {
+    "native_processes": 1,
+    "owned_pids": [
+      307506
+    ],
+    "governed_saved_completion": true,
+    "before_tick": 0,
+    "saved_tick": 1,
+    "elapsed_ticks": 1,
+    "fixture_callback_counter": 2,
+    "three_force_frames_and_196_rows_each_unchanged": true,
+    "readback_bodies": 73,
+    "protected_source_unchanged": true,
+    "cold_loads": 0,
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "unaccepted_saved_artifact": {
+    "path": "build/qualification/se-provider-admission-native-r04/execute-custody/admission/write/saves/se-worker-speed-provider-admission.zip",
+    "bytes": 833113,
+    "sha256": "3D075F8277AC64251FE67BCCC267F81F7DB044441C73F71A63CD1945F387E0EB"
+  },
+  "failure": "[se-provider-retained-admission] Independent actual observation reader",
+  "disposition": "Retain the correct >=2 elapsed-tick reader requirement. Correct the test actor to record a starting game tick and save only once the actual elapsed interval reaches2; a same-tick first callback must not count as an elapsed tick. Preserve existing source FAD and every prior failure; do not recreate the world or count this packet as passed.",
+  "not_established": [
+    "complete admission packet",
+    "cold load",
+    "old cap opponent",
+    "candidate upgrade",
+    "ordinary completion",
+    "cargo/mining reporter outcome",
+    "release or stable acceptance"
+  ],
+  "published_assets_changed": false
+}

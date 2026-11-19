@@ -97,7 +97,7 @@ function Open-MIRLoopbackRconSession {
   }
 }
 function Send-MIRLoopbackRconCommand {
-  param([Parameter(Mandatory)]$Session,[Parameter(Mandatory)][string]$Command,[int]$RequestId)
+  param([Parameter(Mandatory)]$Session,[Parameter(Mandatory)][string]$Command,[int]$RequestId,[scriptblock]$AfterWrite)
   Assert-MIRLoopbackRcon (-not$Session.closed) 'session is closed'
   Assert-MIRLoopbackRcon ($Session.commands.Count-lt2) 'command bound exceeded'
   [byte[]]$commandBytes=Get-MIRLoopbackRconUtf8Bytes -Value $Command -Label 'command' -MaximumBytes 16384 -OneLine
@@ -107,6 +107,14 @@ function Send-MIRLoopbackRconCommand {
   [void]$Session.commands.Add($row)
   Write-MIRLoopbackRconPacket -Stream $Session.stream -Id $RequestId -Type 2 -Payload $Command -Label 'command' -OneLine
   $row.write_monotonic_milliseconds=Get-MIRLoopbackRconElapsedMilliseconds $Session.timer
+  if($PSBoundParameters.ContainsKey('AfterWrite')){
+    $metadata=[pscustomobject][ordered]@{request_id=$row.request_id;command_sha256=$row.command_sha256;command_bytes=$row.command_bytes;write_monotonic_milliseconds=$row.write_monotonic_milliseconds}
+    $hookOutput=@(& $AfterWrite $metadata)
+    Assert-MIRLoopbackRcon ($hookOutput.Count-eq1) 'after-write observation output is invalid'
+    $observation=$hookOutput[0]
+    Assert-MIRLoopbackRcon ($null-ne$observation-and$observation-is[Collections.IDictionary]) 'after-write observation is invalid'
+    $row|Add-Member -NotePropertyName write_observation -NotePropertyValue $observation
+  }
   $response=Read-MIRLoopbackRconPacket $Session.stream
   $row.response_monotonic_milliseconds=Get-MIRLoopbackRconElapsedMilliseconds $Session.timer
   $row.response=[ordered]@{id=$response.id;type=$response.type;payload_base64=$response.payload_base64;payload_byte_length=$response.payload_byte_length;payload_text=$response.payload_text;payload_sha256=$response.payload_sha256}
@@ -140,7 +148,8 @@ function Invoke-MIRLoopbackRconCommands {
     [int]$AuthenticationRequestId=43101,
     [int]$FirstCommandRequestId=43102,
     [ValidateRange(1,30000)][int]$ConnectTimeoutMilliseconds=5000,
-    [ValidateRange(1,30000)][int]$IoTimeoutMilliseconds=5000
+    [ValidateRange(1,30000)][int]$IoTimeoutMilliseconds=5000,
+    [scriptblock]$AfterWrite
   )
   Assert-MIRLoopbackRcon ($Commands.Count-ge1-and$Commands.Count-le2) 'command count is invalid'
   Assert-MIRLoopbackRcon ($FirstCommandRequestId-ge1-and([int64]$FirstCommandRequestId+$Commands.Count-1)-le[int]::MaxValue) 'command request id is invalid'
@@ -150,7 +159,11 @@ function Invoke-MIRLoopbackRconCommands {
     $opened=@(Open-MIRLoopbackRconSession -Port $Port -Password $Password -AuthenticationRequestId $AuthenticationRequestId -ConnectTimeoutMilliseconds $ConnectTimeoutMilliseconds -IoTimeoutMilliseconds $IoTimeoutMilliseconds)
     Assert-MIRLoopbackRcon ($opened.Count-eq1) 'open emitted an invalid session shape'
     $session=$opened[0]
-    for($index=0;$index-lt$Commands.Count;$index++){$null=Send-MIRLoopbackRconCommand -Session $session -Command $Commands[$index] -RequestId ($FirstCommandRequestId+$index)}
+    for($index=0;$index-lt$Commands.Count;$index++){
+      $send=[ordered]@{Session=$session;Command=$Commands[$index];RequestId=($FirstCommandRequestId+$index)}
+      if($PSBoundParameters.ContainsKey('AfterWrite')){$send.AfterWrite=$AfterWrite}
+      $null=Send-MIRLoopbackRconCommand @send
+    }
     $result=Get-MIRLoopbackRconReceipt -Session $session -Port $Port -AuthenticationRequestId $AuthenticationRequestId
   } catch {$primaryFailure=$_}
   $inheritedCleanupFacts=@()

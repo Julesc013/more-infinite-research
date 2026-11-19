@@ -888,26 +888,23 @@ local function default_origin(event, initializing, state, current)
       default_origin_error("prepared default engine hop remains unqualified", event, state, current)
     end
     if prepared and (not change or change.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[target.id]) then
-      default_origin_error("prepared default requires its published11 producer package event", event, state, current,
-        {kind="default"})
+      default_origin_error("prepared default requires its published11 producer package event", event, state, current)
     end
     -- This saved fact authenticates the old MIR default. The caller also
     -- checks the surviving full native contract and every force's work.
     -- Other mods may change without invalidating those independent facts.
     for name, item in pairs(event.mod_changes) do
       if type(name) ~= "string" or name == "" or type(item) ~= "table" or getmetatable(item) ~= nil then
-        default_origin_error("recorded default has an invalid mod-change entry", event, state, current, {kind="default"})
+        default_origin_error("recorded default has an invalid mod-change entry", event, state, current)
       end
       local old, new = item.old_version, item.new_version
       if old ~= nil and (type(old) ~= "string" or old == "")
           or new ~= nil and (type(new) ~= "string" or new == "")
           or old == nil and new == nil or new ~= active[name] then
-        default_origin_error("recorded default mod-change entry disagrees with active mods", event, state, current,
-          {kind="default"})
+        default_origin_error("recorded default mod-change entry disagrees with active mods", event, state, current)
       end
       if base_hop and name ~= MIR and name ~= "base" and old ~= new then
-        default_origin_error("recorded default engine hop requires the unchanged Base-only selection", event, state,
-          current, {kind="default"})
+        default_origin_error("recorded default engine hop requires the unchanged Base-only selection", event, state, current)
       end
     end
     if change and type(change.old_version) ~= "string" then
@@ -1011,7 +1008,8 @@ local function default_contract(prepared)
     recover_error("ordinary default identity is unavailable")
   end
   local source, owner = native_prototype(recovery.canonical), native_prototype(id)
-  if not same_fact(fact(nil), {kind="default"}) or creator(id) ~= MIR
+  local current = fact(nil)
+  if not same_fact(current, {kind="default"}) or creator(id) ~= MIR
       or not recovery.matches_default_owner(source, owner) or owner.hidden ~= false
       or type(owner.enabled) ~= "boolean" or type(owner.visible_when_disabled) ~= "boolean" then
     recover_error("canonical4/full default4 contract or custody differs")
@@ -1031,7 +1029,7 @@ local function default_contract(prepared)
       end
     end
   else empty_private() end
-  return source, owner, contract
+  return source, owner, contract, current
 end
 
 -- A full-owner finish never transfers work. Its native queue/current may
@@ -1092,8 +1090,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   local prepared = not owned and state and state.schema == 2 and state.kind == "prepared"
     and state.phase == "default" and state.current.kind == "default" or false
   if prepared and initializing then recover_error("initial default owner cannot consume prepared history") end
-  local source_prototype, prototype, contract = default_contract(prepared and state or nil)
-  local current = fact(nil)
+  local source_prototype, prototype, contract, current = default_contract(prepared and state or nil)
   local producer = owned and owned.producer or default_origin(event, initializing, state, current)
   if state and not prepared and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
     recover_error("legacy prepared/finite conversion is not implemented")
@@ -1340,7 +1337,14 @@ local function provider_addition(event, route, owned)
       route, details, checked_state(), fact(route))
   end
   local mir = event.mod_changes[MIR]
-  if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
+  local previous = type(mir) == "table" and mir.old_version
+  -- The producer is immutable origin evidence, including across the admitted
+  -- engine hop. The event names the immediately preceding installed package.
+  -- Current native ownership survives intervening updates; the event must still
+  -- stay in this edition and cannot predate its origin or downgrade a later patch.
+  if mir ~= nil and (producer_edition(previous) ~= target.id
+      or tonumber(previous:sub(-2)) < tonumber(owned.producer.new_version:sub(-2))
+      or tonumber(previous:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or mir.new_version ~= script.active_mods[MIR]) then
     recover_error("full default handover package event is inconsistent", route)
   end

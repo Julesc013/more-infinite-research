@@ -1228,6 +1228,264 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             "superseded worker tail gained restoration rights")
         ''')
 
+    def test_all_force_legacy_decode_precedes_marker_and_ownership_commit(self):
+        for target_id in ("f200", "f210"):
+            for policy_version in (1, 3):
+                for fault in ("none", "collection", "lookup", "enabled", "visibility", "admission"):
+                    with self.subTest(target=target_id, policy=policy_version, fault=fault):
+                        self.setUp()
+                        for key, value in {"target_id": target_id, "policy_version": policy_version,
+                                           "fault": fault}.items():
+                            self.lua.globals()[key] = value
+                        self.lua.execute(r'''
+                          local forces, owners, queues, old = {}, {}, {}, nil
+                          local decode_force, eligible_imports, fault_reads, observing = nil, 0, 0, true
+                          local copper_name = "recipe-prod-research_copper-1"
+                          for index=1,3 do
+                            local i = index
+                            local owner, queued = technology(gear_name), technology("unrelated-queue")
+                            queued.enabled, owner.saved_progress = true, .27
+                            local enabled, visible = false, true
+                            owner.enabled, owner.visible_when_disabled = nil, nil
+                            setmetatable(owner, {__index=function(_,key)
+                              if key=="enabled" then
+                                if decode_force==i and fault=="enabled" then fault_reads=fault_reads+1;error("legacy enabled sentinel") end
+                                return enabled
+                              elseif key=="visible_when_disabled" then
+                                if decode_force==i and fault=="visibility" then fault_reads=fault_reads+1;error("legacy visibility sentinel") end
+                                return visible
+                              end
+                            end,__newindex=function(t,key,value)
+                              if key=="enabled" then enabled=value
+                              elseif key=="visible_when_disabled" then visible=value
+                              else rawset(t,key,value) end
+                            end})
+                            owner.prototype = setmetatable({}, {__index=function(_,key)
+                              if key=="enabled" then
+                                -- Admission now runs for all forces before the
+                                -- decoder starts; fail one later force there.
+                                if observing and fault=="admission" and i==2 then
+                                  fault_reads=fault_reads+1;error("legacy admission sentinel")
+                                end
+                                return true
+                              end
+                            end})
+                            local technologies = {[queued.name]=queued}
+                            if i==3 then technologies[copper_name]=technology(copper_name) end
+                            setmetatable(technologies,{__index=function(_,name)
+                              if name==gear_name then
+                                if decode_force==i and fault=="lookup" then fault_reads=fault_reads+1;error("legacy lookup sentinel") end
+                                return owner
+                              end
+                            end})
+                            local f = modern_queued_force(i,technologies,{queued},queued,.42,false)
+                            owner.force,queued.force,f.worker_robots_storage_bonus=f,f,.17
+                            f.technologies=nil
+                            local mt,read=getmetatable(f),getmetatable(f).__index
+                            mt.__index=function(t,key)
+                              if key=="technologies" then
+                                if decode_force==i and fault=="collection" then fault_reads=fault_reads+1;error("legacy collection sentinel") end
+                                return technologies
+                              end
+                              return read(t,key)
+                            end
+                            forces[i],owners[i],queues[i]=f,owner,queued
+                            local bucket
+                            if policy_version==1 then
+                              bucket=schema1(i,{{name=gear_name,setting="ips-max-level-research_gears",source="generated-stream",
+                                operation=target_id=="f200" and "runtime-settings-transport" or "emit",visibility=false}})
+                            elseif target_id=="f200" then bucket=f200_gear_legacy(i,2)
+                            else bucket=legacy({gear_name},{i}) end
+                            if old==nil then old=bucket else
+                              old.disabled_by_cap[i],old.visibility_by_cap[i]=bucket.disabled_by_cap[i],bucket.visibility_by_cap[i]
+                            end
+                          end
+                          local stale, copper_right = {disabled=true}, {disabled=true,visible_when_disabled=false}
+                          local first_map, third_map = {stale=stale}, {[gear_name]=false,[copper_name]=copper_right}
+                          local owned = {[1]=first_map,[3]=third_map}
+                          local current = {schema=1,owned_disabled=owned,preserved={keep=true}}
+                          boot(forces,old,current,{target_id=target_id})
+                          local decoder = require("runtime.legacy_caps")
+                          local method=policy_version==1 and "import_boolean_for_force" or "import_for_force"
+                          local original, late_marker, early_mutation, import_calls = decoder[method],false,false,0
+                          decoder[method]=function(bucket,force,candidates,current_owned,allowed)
+                            import_calls=import_calls+1
+                            late_marker=late_marker or current.legacy_caps_checked==true
+                            early_mutation=early_mutation or current.owned_disabled~=owned or owned[1]~=first_map
+                              or first_map.stale~=stale or owned[3]~=third_map or third_map[copper_name]~=copper_right
+                            if current_owned==nil or current_owned[gear_name]==nil then
+                              eligible_imports=eligible_imports+1
+                              if eligible_imports==2 and observing then decode_force=force.index end
+                            end
+                            local ok,rows,facts=pcall(original,bucket,force,candidates,current_owned,allowed)
+                            decode_force=nil
+                            if not ok then error(rows,0) end
+                            return rows,facts
+                          end
+                          local ok,message=pcall(lifecycle.on_configuration_changed)
+                          observing,decode_force=false,nil
+                          if fault~="none" then
+                            assert(fault_reads>0, "fault was not reached")
+                            assert(not ok and current.legacy_caps_checked==nil and not early_mutation
+                              and storage.mir_caps==current and current.owned_disabled==owned
+                              and owned[1]==first_map and first_map.stale==stale and owned[2]==nil
+                              and owned[3]==third_map and third_map[gear_name]==false and third_map[copper_name]==copper_right,
+                              "failed legacy read consumed the marker or mutated prior ownership")
+                            assert(tostring(message):find("legacy "..fault.." sentinel",1,true), "native failure cause was hidden")
+                            for i=1,3 do
+                              assert(not owners[i].enabled and owners[i].visible_when_disabled
+                                and forces[i].queue_writes==0, "later-force failure applied an earlier native restoration")
+                            end
+                            fault="none"
+                            lifecycle.on_configuration_changed()
+                          else
+                            assert(ok,message)
+                            assert(not late_marker and not early_mutation, "legacy import committed before every force was decoded")
+                          end
+                          assert(current.legacy_caps_checked and current.preserved.keep
+                            and storage.mir.maximum_level_control==old and old.unique.keep,
+                            "successful import lost its one-time marker or old bucket")
+                          assert(owners[1].enabled and owners[2].enabled and not owners[3].enabled
+                            and not owners[1].visible_when_disabled and not owners[2].visible_when_disabled
+                            and forces[3].technologies[copper_name].enabled,
+                            "retry lost a proven right or replaced existing MIR5/foreign authority")
+                          for i=1,3 do
+                            assert(owners[i].level==3 and owners[i].saved_progress==.27 and forces[i].current_research==queues[i]
+                              and forces[i].research_progress==.42 and #forces[i].research_queue==1
+                              and forces[i].research_queue[1]==queues[i] and forces[i].queue_writes==0
+                              and forces[i].worker_robots_storage_bonus==.17, "legacy import changed unrelated work")
+                          end
+                          local completed_calls=import_calls
+                          lifecycle.on_configuration_changed()
+                          assert(import_calls==completed_calls, "one-time import was repeated after commit")
+                        ''')
+
+    def test_pending_legacy_import_observes_completed_worker_cap_transfer(self):
+        for target_id in ("f200", "f210"):
+            for transfer_kind in ("split", "handover"):
+                for positive in (False, True):
+                    with self.subTest(target=target_id, transfer=transfer_kind, positive=positive):
+                        self.setUp()
+                        for key, value in {"target_id": target_id, "transfer_kind": transfer_kind,
+                                           "positive": positive}.items():
+                            self.lua.globals()[key] = value
+                        self.lua.execute(r'''
+                          local public_name,tail_name="worker-robots-storage-4","mir-worker-storage-default-4"
+                          local public,tail,gear,queued=technology(public_name),technology(tail_name),
+                            technology(gear_name),technology("unrelated-queue")
+                          public.level,tail.level,queued.enabled=10,4,true
+                          public.prototype.visible_when_disabled=false
+                          tail.visible_when_disabled,gear.saved_progress=false,.27
+                          local f=modern_queued_force(1,{[public_name]=public,[tail_name]=tail,
+                            [gear_name]=gear,[queued.name]=queued},{queued,queued},queued,.42,false)
+                          public.force,tail.force,gear.force,queued.force=f,f,f,f
+                          f.worker_robots_storage_bonus=.17
+                          local right={disabled=positive,visible_when_disabled=false}
+                          local owned={[public_name]=right}
+                          local state={schema=1,owned_disabled={[1]=owned}}
+                          local old=target_id=="f200" and f200_gear_legacy(1,2) or legacy({gear_name},{1})
+                          boot({[1]=f},old,state,{target_id=target_id})
+                          local catalogue,original=require("runtime.catalogue"),require("runtime.catalogue").declared
+                          if transfer_kind=="split" then
+                            catalogue.declared=function()
+                              local rows=original()
+                              for _,row in ipairs(rows) do if row.id==public_name then
+                                local later={};for key,value in pairs(row) do later[key]=value end
+                                row.fixed_maximum,later.id,later.progression=4,tail_name,4
+                                rows[#rows+1]=later;break
+                              end end
+                              return rows
+                            end
+                          end
+                          package.loaded["runtime.lifecycle"]=nil
+                          lifecycle=require("runtime.lifecycle")
+                          local prototype_reads=0
+                          gear.prototype=setmetatable({}, {__index=function(_,key)
+                            if key=="enabled" then prototype_reads=prototype_reads+1;return true end
+                          end})
+                          local admissions=lifecycle.preflight(true)
+                          local reads_before_transfer=prototype_reads
+                          local native_plan={kind=transfer_kind=="split" and "default-native-owner-transfer"
+                            or "default-native-provider-handover",items={{force=f,phase="owned",moved=true}}}
+                          local rights=lifecycle.preflight_worker_storage_split_caps(native_plan)
+                          -- Supply only the native worker setter result; the
+                          -- actual cap-right transfer and importer run below.
+                          if transfer_kind=="split" then
+                            tail.level,tail.enabled,tail.visible_when_disabled=public.level,public.enabled,public.visible_when_disabled
+                            public.level=5
+                          end
+                          lifecycle.apply_worker_storage_split_caps(rights)
+                          local settled_owned=state.owned_disabled[1]
+                          local decoder,decode_calls=require("runtime.legacy_caps"),0
+                          local decode=decoder.import_for_force
+                          decoder.import_for_force=function(...)
+                            decode_calls=decode_calls+1
+                            assert(state.legacy_caps_checked==nil and state.owned_disabled[1]==settled_owned,
+                              "decoder used a replaced map or consumed marker")
+                            assert(owned[public_name]==nil,"decoder preceded worker cap retirement")
+                            if transfer_kind=="split" then
+                              assert(owned[tail_name]==right and not tail.enabled and tail.visible_when_disabled,
+                                "decoder did not see the transferred restoration right")
+                            else
+                              assert(owned[tail_name]==nil and public.enabled==positive and not public.visible_when_disabled,
+                                "decoder observed pre-handover ownership or flags")
+                            end
+                            return decode(...)
+                          end
+                          lifecycle.on_configuration_changed(nil,admissions)
+                          assert(decode_calls==1 and prototype_reads==reads_before_transfer,
+                            "application repeated immutable admission or legacy decoding")
+                          assert(storage.mir_caps==state and state.legacy_caps_checked
+                            and storage.mir.maximum_level_control==old and old.unique.keep
+                            and gear.enabled and not gear.visible_when_disabled,
+                            "pending legacy import lost its independent proven right")
+                          if transfer_kind=="split" then
+                            assert(tail.enabled==positive and not tail.visible_when_disabled
+                              and not public.enabled and owned[public_name]~=right,
+                              "pre-transfer cap map was reinstalled or retired public head restored")
+                          else
+                            assert(public.enabled==positive and not public.visible_when_disabled and not tail.enabled
+                              and (state.owned_disabled[1] or {})[public_name]==nil
+                              and (state.owned_disabled[1] or {})[tail_name]==nil,
+                              "legacy import reinstalled a retired provider-handover right")
+                          end
+                          assert(f.queue_writes==0 and f.current_research==queued and f.research_progress==.42
+                            and #f.research_queue==2 and f.research_queue[1]==queued and f.research_queue[2]==queued
+                            and gear.saved_progress==.27 and f.worker_robots_storage_bonus==.17,
+                            "composed import changed unrelated work")
+                        ''')
+
+    def test_first_legacy_import_read_failure_does_not_allocate_a_consumed_marker(self):
+        for target_id in ("f200", "f210"):
+          for structured in (False, True):
+            with self.subTest(target=target_id, structured=structured):
+                self.setUp()
+                self.lua.globals().target_id = target_id
+                self.lua.globals().structured_cause = structured
+                self.lua.execute(r'''
+                  local item = technology(gear_name)
+                  local f = force(1,{[gear_name]=item})
+                  local old = target_id=="f200" and f200_gear_legacy(1,2) or legacy({gear_name},{1})
+                  boot({[1]=f},old,nil,{target_id=target_id})
+                  local cause = structured_cause and setmetatable({}, {__tostring=function()
+                    error("structured cause must not be stringified") end}) or "first legacy visibility sentinel"
+                  item.visible_when_disabled=nil
+                  setmetatable(item,{__index=function(_,key)
+                    if key=="visible_when_disabled" then error(cause) end
+                  end})
+                  local ok,message=pcall(lifecycle.on_configuration_changed)
+                  assert(not ok and storage.mir_caps==nil and storage.mir.maximum_level_control==old
+                    and not item.enabled and item.level==3 and f.research_progress==.42,
+                    "first import read failure consumed an unrecorded legacy right")
+                  if structured_cause then assert(message==cause, "original native cause was replaced")
+                  else assert(tostring(message):find(gear_name,1,true)
+                    and tostring(message):find("first legacy visibility sentinel",1,true)) end
+                  setmetatable(item,nil);item.visible_when_disabled=true
+                  lifecycle.on_configuration_changed()
+                  assert(item.enabled and not item.visible_when_disabled and storage.mir_caps.legacy_caps_checked,
+                    "recovered first import did not restore its proven legacy right")
+                ''')
+
     def test_worker_owner_preflight_failure_preserves_legacy_import_marker_and_queue(self):
         self.lua.execute('''
           local function run(fault)

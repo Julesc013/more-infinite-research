@@ -1,0 +1,177 @@
+{
+  "kind": "MIR517FreshLinuxExportInputNativeV1",
+  "verdict": "ACCEPTED_SCOPED_SIX_EXPORT_INPUT_AND_ROLE_LOCAL_EXPORTS",
+  "source": {
+    "player_producer": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "release_snapshot": "0e4c5bb89e7c05260e50fadbab5e2166e4cec217",
+    "published_main": "7cd3ae1ff4910699eb9ceeb70681f02659f0deec",
+    "tag": "v5.0.17",
+    "player_archive": "more-infinite-research_5.0.21017.zip",
+    "player_archive_bytes": 1047107,
+    "player_archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "controller_commit": "9269b49ab16a19bc9cbb0f02aa294025cb7ab987",
+    "controller_tree": "f1ecbced6413a73768003fd9ece19e5839cdf79a",
+    "packet_sha256": "24EF9D1DA21C056ED30CF591B863D5D57D06AF7EAAE7804B494FB8554BD611BC",
+    "composition_sha256": "63AA8A5D7DE3A3C0EB544279AA6DF16CB025AE62D4D7126CE657E982601B5666",
+    "owner_sha256": "87AF536E1FA861D20FC29EBE4B62173FC667E5AFFC7670408FE51887E638D812",
+    "actor": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-source517-controller-aero-r01/build/tmp/library517-fresh-export-r09/Run-FreshExportInput-r05.py",
+      "bytes": 41276,
+      "sha256": "B816E609DBCE395EFFB99AF3840811FCD5DC1E8147272263DEC8219672142FE3"
+    },
+    "validator": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-source517-controller-aero-r01/build/tmp/library517-fresh-export-r07/Validate-FreshExportFiles.py",
+      "bytes": 19688,
+      "sha256": "9008B442111E6867E25F8AE929277FFA960D72082ED61E64036B34DC0378771F"
+    },
+    "selected_archives": [
+      {
+        "bytes": 4433,
+        "sha256": "FE2D85F883168D36037FA992D19969BCD683B17D1D542D7944D1C977F64A026B",
+        "name": "mir-fixture-library-fresh-export-input_0.1.0.zip"
+      },
+      {
+        "bytes": 835,
+        "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+      },
+      {
+        "bytes": 2776,
+        "sha256": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+        "name": "mir-fixture-mir5-api-alpha_0.1.0.zip"
+      },
+      {
+        "bytes": 2815,
+        "sha256": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+        "name": "mir-fixture-mir5-api-beta_0.1.0.zip"
+      },
+      {
+        "bytes": 1047107,
+        "sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+        "name": "more-infinite-research_5.0.21017.zip"
+      }
+    ]
+  },
+  "engine": {
+    "factorio": "2.1.24",
+    "build": 87808,
+    "selection": "Base only, Linux graphical full build",
+    "bytes": 260829368,
+    "sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "private_geometry": [
+      1280,
+      720
+    ],
+    "private_displays": [
+      ":193",
+      ":194"
+    ],
+    "performance_acceptance": false
+  },
+  "input": {
+    "protected_seed_bytes": 1064930,
+    "protected_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "origin": "Retained fresh multiplayer R09 final save; not the protected imported31-row source.",
+    "executed_copy_initial_verified": true,
+    "original_unchanged": true,
+    "working_copy_after": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-source517-controller-aero-r01/build/p/library517-fresh-export-r09/case/input-save.zip",
+      "bytes": 1989682,
+      "sha256": "511BD2D930AA39930FEAEF13B5639CB47467AE2D3AC94122DF3C000604083F3C"
+    },
+    "copy_semantics": "The original seed is immutable. The separately verified working save is ordinary server output and may change on orderly quit."
+  },
+  "observed": {
+    "roles": [
+      "server",
+      "client-en",
+      "client-de"
+    ],
+    "governed_root_processes": 2,
+    "governed_process_meaning": "One zero-native composition and one native actor. The actor owns three Factorio roles and two display-owner children; private X children retain their own identity/cleanup records.",
+    "literal_steps": 12,
+    "real_clicks": 10,
+    "already_open_skips": 2,
+    "xtest_motion_button_requests": 30,
+    "export_actions": [
+      "en-full",
+      "en-compact",
+      "en-diagnostics",
+      "de-full",
+      "de-compact",
+      "de-diagnostics"
+    ],
+    "full_settings_per_role": 888,
+    "compact_deviations_per_role": 0,
+    "observer_phase_receipts": 7,
+    "phase_contract": "Actual next-tick click identity/order, localized client roles and unchanged native fresh frame; external validator checks current physical role-local files against that phase preview and preserved prior snapshot.",
+    "server_export_contract": "The exact pre-client startup diagnostic stays unchanged; no role export leaks to server or the other client.",
+    "loaded_six_mod_closure_before_and_after": true,
+    "all_five_direct_children_exit_zero": true,
+    "both_private_displays_restored": true,
+    "no_remaining_owned_process": true,
+    "controls_and_temporary_archives_restored": true,
+    "restoration_errors": [],
+    "resource_runs": [
+      {
+        "status": "passed",
+        "duration_seconds": 1.277977,
+        "exit_code": 0,
+        "clock_scope": "linux-launcher-session-inclusive"
+      },
+      {
+        "status": "passed",
+        "duration_seconds": 751.866072,
+        "exit_code": 0,
+        "clock_scope": "linux-launcher-session-inclusive"
+      }
+    ],
+    "resource_bounds": {
+      "memory_mib": 7168,
+      "output_mib": 512,
+      "session_timeout_seconds": 840,
+      "display_deadline_seconds": 900,
+      "literal_steps": 12,
+      "future_export_phases": 6
+    },
+    "timing_scope": "Elapsed supervision only; not an accepted performance observation."
+  },
+  "visual": {
+    "owner_viewed_original_before_pngs": 12,
+    "independent_reviewer_viewed_original_after_pngs": 12,
+    "root_point_review_sha256": "407D5F0945010C9D68CFDD3824FC67D301BCD58A9F5A80D164BEB0C34B2E2BB7",
+    "observed": "English and German Research, Settings/full/compact, Help and Diagnostics states match the bound role and step. Each point was selected only after viewing its original capture.",
+    "limits": "One1280x720 geometry. Existing English fallbacks in inactive integration labels are not closed; this does not establish all-scale or MIR4 design parity."
+  },
+  "custody": {
+    "primary_root": "build/qualification/library-fresh-export-input-preparation-r01",
+    "capsule": "fresh-export-r09-originals-r01.json.gz",
+    "capsule_bytes": 65404308,
+    "capsule_sha256": "C6EE8EF4E778B80D50C38378E2529CBEA3AA3A8A9EDAD54F6A71E66414728E5D",
+    "decoded_members": 291,
+    "decoded_bytes": 122000737,
+    "readback_sha256": "692C5A59C6D644F3158DBD911CE0E617879D7497727A3BF678E96FA1C466D87D",
+    "owner_result_sha256": "47435C030FFCE16D67EFDC94AC4D58B3EA15DB6151E669AE4BBE9F964E59C77D",
+    "actor_result_sha256": "AF22D7B1F25159B16F9B2029B956FF88844B8E8F64BD30DAD03AEBA93E228144",
+    "independent_review_sha256": "821630EB314E91DD237A7960591D1C5598A942F04EB569AEA75D6BC45BCAB56C",
+    "independent_scope": "All291 bodies replay exactly; all12 after PNGs viewed. This tracked record summarizes primary local custody and does not imply a remote raw-capsule publication."
+  },
+  "retained_adverse": {
+    "case": "R08",
+    "capsule_sha256": "3C0DE460212C8F8290294C3C064A95923A85A610B9A303E7B777D116985A7AC5",
+    "members": 54,
+    "raw_bytes": 4992045,
+    "exports": 0,
+    "cause": "The private actor passed DEVNULL to server stdin, producing a native EOF Error. The unchanged fatal check refused before capture/input/export.",
+    "repair": "The new actor holds an unwritten private stdin pipe open and closes it after owned exit; no log exception/whitelist was added.",
+    "host_controls": "Old actor fails2 of12; corrected actor passes12. The separate LF/CRLF candidate-generation refusal is retained and is not a pass.",
+    "repair_review_sha256": "221D9724C4EA2E12B8CC22A66FBE277F9B9BDF8E878078A6D14236D37629A012"
+  },
+  "not_qualified": [
+    "Actual query typing, clearing, scrolling, resizing or Unicode input.",
+    "Protected imported31-row/13-action lifecycle, Windows input/capture, codec import or save/reload for this current export case.",
+    "All-scale layout, complete localization, whole-product performance, stable acceptance or individual reporter-case closure.",
+    "Player changes on later dev revisions; the public C311 bytes retain their original identity."
+  ]
+}
