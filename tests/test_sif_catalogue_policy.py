@@ -39,10 +39,12 @@ def target_fields(lua, target):
 
 class SIFCataloguePolicyTests(unittest.TestCase):
     def inputs(self, target="f210", variant="ordinary", source="retired", sif=True):
-        fixture.LuaRuntime = LuaRuntime
-        harness = fixture.GeneratorTests()
-        harness.setUp()
-        target_fields(harness.lua, target)
+        lua = fixture.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=fixture.K2SO_MATERIAL_NATIVE,
+        )
+        target_fields(lua, target)
         engine = "2.0.77" if target == "f200" else "2.1.23"
         mods = {"base": engine, "space-age": engine}
         if sif:
@@ -52,7 +54,7 @@ class SIFCataloguePolicyTests(unittest.TestCase):
         # Reuse the existing complete Generator world for unrelated authored
         # references. Each execution below starts a fresh Lua runtime and uses
         # only the selected player source, including for released-baseline runs.
-        raw = fixture.plain_lua(harness.lua.globals().full_world(fixture.lua_table(harness.lua, mods), True)["raw"])
+        raw = fixture.plain_lua(lua.globals().full_world(fixture.lua_table(lua, mods), True)["raw"])
         if target == "f200" and sif:
             for paid in PAID:
                 raw["item"][paid["product"]] = {"type": "item", "name": paid["product"]}

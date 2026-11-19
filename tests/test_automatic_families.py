@@ -53,10 +53,11 @@ def _load_generator_harness():
         raise AssertionError("cannot load the MIR5 Generator host harness")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    module.LuaRuntime = LuaRuntime
-    harness = module.GeneratorTests()
-    harness.setUp()
-    return harness
+    return module.build_generator_world(
+        LuaRuntime, source_root=ROOT / "source",
+        science_sources=module.SCIENCE_SOURCE_ORACLE["profiles"],
+        material_native=module.K2SO_MATERIAL_NATIVE,
+    )
 
 
 class AutomaticFamilyNonEmissionTests(unittest.TestCase):
@@ -188,9 +189,7 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
             self._verify_published_settings(json.loads(settings_path.read_text(encoding="utf-8")), self.facts)
 
     def test_full_f200_data_final_pipeline_keeps_opt_in_but_does_not_emit_automatic_ids(self):
-        harness = _load_generator_harness()
-        self.addCleanup(lambda: setattr(harness, "lua", None))
-        lua = harness.lua
+        lua = _load_generator_harness()
         lua.globals().automatic_facts = _lua_value(lua, self.facts)
         lua.execute(r'''
           local target = require("platform.target")

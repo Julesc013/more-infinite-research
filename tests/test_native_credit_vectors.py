@@ -5,6 +5,7 @@ import sys
 import unittest
 
 import test_generator as generator_fixture
+from generator_world import build_generator_world
 from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
@@ -139,10 +140,12 @@ class NativeCreditVectorTests(unittest.TestCase):
         # The extra producer is explicitly synthetic. The collector, carrier
         # constructor and unchanged Cerys loop are real source. This is a host
         # reproduction of their composition, not either reporter's modpack.
-        generator_fixture.LuaRuntime = LuaRuntime
-        stage = generator_fixture.GeneratorTests()
-        stage.setUp()
-        stage.lua.execute(r'''
+        stage = build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator_fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator_fixture.K2SO_MATERIAL_NATIVE,
+        )
+        stage.execute(r'''
           mods={base="2.1.23",["space-age"]="2.1.23"}
           package.loaded["research.settings"]=nil
           local config=require("research.settings");local startup={}
@@ -170,16 +173,16 @@ class NativeCreditVectorTests(unittest.TestCase):
           assert(#emitted_groups.research_processing_unit==3,"collector omitted a productive recipe")
           assert(#data.raw.technology[owner].effects==3,"public owner lost a collected recipe")
         ''')
-        stage.lua.execute((ROOT / "tests/fixtures/native-credit-vectors/cerys-technology-first45.lua").read_text())
-        stage.lua.execute(r'''
+        stage.execute((ROOT / "tests/fixtures/native-credit-vectors/cerys-technology-first45.lua").read_text())
+        stage.execute(r'''
           local prefix="mir-native-credit-research_processing_unit-"
           assert(#data.raw.technology[prefix.."processing-unit-positive"].effects==2)
           assert(#data.raw.technology[prefix.."processing-unit-negative"].effects==2)
           assert(#data.raw.technology[prefix.."mir-vector-independent-processing-positive"].effects==1)
           assert(#data.raw.technology["processing-unit-productivity"].effects==3)
         ''')
-        groups = generator_fixture.plain_lua(stage.lua.globals().emitted_groups)
-        emitted = generator_fixture.plain_lua(stage.lua.globals().data.raw.technology)
+        groups = generator_fixture.plain_lua(stage.globals().emitted_groups)
+        emitted = generator_fixture.plain_lua(stage.globals().data.raw.technology)
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.setUp()

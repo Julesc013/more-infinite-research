@@ -13,6 +13,7 @@ import unittest
 
 import test_bootstrap as bootstrap_fixture
 import test_generator as generator_fixture
+from generator_world import build_generator_world
 from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
@@ -31,11 +32,13 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     def minimum_pipeline(self, target):
         """Run real settings/data stages; only the native scalar is an oracle."""
-        generator_fixture.LuaRuntime = LuaRuntime
-        stage = generator_fixture.GeneratorTests()
-        stage.setUp()
-        stage.lua.globals().case_target = target
-        stage.lua.execute(r'''
+        stage = build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator_fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator_fixture.K2SO_MATERIAL_NATIVE,
+        )
+        stage.globals().case_target = target
+        stage.execute(r'''
           local t=require("platform.target");t.id=case_target
           local base=case_target=="f200" and "2.0.77" or "2.1.23"
           t.factorio_version=case_target=="f200" and "2.0" or "2.1";t.minimum_base=base
@@ -65,7 +68,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
             local row=emitted_groups[family][1];assert(row.change==.0001)
           end
         ''')
-        g = stage.lua.globals()
+        g = stage.globals()
         return (generator_fixture.plain_lua(g.emitted_groups),
                 generator_fixture.plain_lua(g.emitted_prototypes))
 

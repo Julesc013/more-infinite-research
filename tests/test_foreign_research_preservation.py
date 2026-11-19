@@ -437,10 +437,12 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         # the actual data-final entrypoint and default values, not a stubbed
         # research publisher. Full output equality has its separate oracle.
         import test_generator
-        test_generator.LuaRuntime = LuaRuntime
-        host = test_generator.GeneratorTests("runTest")
-        host.setUp()
-        host.lua.execute('''
+        host = test_generator.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=test_generator.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=test_generator.K2SO_MATERIAL_NATIVE,
+        )
+        host.execute('''
           local environment = full_world({})
           local foreign_effect = {type="laboratory-speed",modifier=.061}
           local foreign = {type="technology",name="Space-Lab-Research-61",max_level=61,
@@ -477,7 +479,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         ''')
         actual = {
             row["name"]: test_generator.plain_lua(row)
-            for row in host.lua.globals().foreign_output.values()
+            for row in host.globals().foreign_output.values()
         }
         self.assertEqual(actual.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
         canonical = expected_private_worker_row()
@@ -488,7 +490,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             self.assertEqual(actual.pop(name), expected)
         public = verified_public_rows(
             actual,
-            {str(name) for name in host.lua.globals().foreign_recipes.keys()},
+            {str(name) for name in host.globals().foreign_recipes.keys()},
         )
         self.assertEqual(len(public), 54)
 
