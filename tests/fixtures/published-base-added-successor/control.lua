@@ -122,6 +122,14 @@ local function force_frame(force, expected)
     gear={level=gear.level,researched=gear.researched,enabled=gear.enabled,visible=gear.visible_when_disabled,saved_progress=gear.saved_progress},
     queue=queue(force), recipe_bonuses=bonuses}
 end
+local function alias_bonus_frame(force)
+  local out = {}
+  for _, row in ipairs(MAINS) do out[row.alias] = recipe(force, row.alias).productivity_bonus end
+  return out
+end
+local function aliases_frame(player, foreign)
+  return {player=alias_bonus_frame(player),foreign=alias_bonus_frame(foreign)}
+end
 local function lab_frame(expected)
   local surface = game.surfaces[expected.surface_index]
   require_ok(surface and surface.valid ~= false and type(surface.find_entity) == "function", "source lab surface differs")
@@ -145,12 +153,12 @@ local function source_projection(expected)
   require_ok(player and foreign and player.valid ~= false and foreign.valid ~= false, "observed source forces differ")
   local lab = lab_frame(expected.lab)
   return {force_registry=force_registry(),observed_force_count=2,observed_forces={player={name=player.name,index=player.index},foreign={name=foreign.name,index=foreign.index}},
-    player=force_frame(player, expected.player), foreign=force_frame(foreign, expected.foreign), lab=lab}
+    player=force_frame(player, expected.player), foreign=force_frame(foreign, expected.foreign), aliases=aliases_frame(player, foreign), lab=lab}
 end
-local function assert_aliases_zero()
-  for _, force_name in ipairs({PLAYER, FOREIGN}) do
-    local force = game.forces[force_name]
-    for _, row in ipairs(MAINS) do require_ok(recipe(force, row.alias).productivity_bonus == 0, "new alias inherited old paid bonus") end
+local function assert_aliases_zero(aliases)
+  require_ok(type(aliases) == "table" and type(aliases.player) == "table" and type(aliases.foreign) == "table", "new alias observation differs")
+  for _, role in ipairs({"player", "foreign"}) do
+    for _, row in ipairs(MAINS) do require_ok(aliases[role][row.alias] == 0, "new alias inherited old paid bonus") end
   end
 end
 local function assert_initial()
@@ -163,7 +171,7 @@ local function assert_initial()
   equal(actual.player, expected.player, "frozen public source player")
   equal(actual.foreign, expected.foreign, "frozen public source foreign")
   equal(actual.lab, expected.lab, "frozen public source lab")
-  assert_aliases_zero()
+  assert_aliases_zero(actual.aliases)
   return expected, actual
 end
 local function exact_mods()
@@ -229,11 +237,12 @@ local function assert_settled(state)
   end
   local player_queue = queue(player); require_ok(player_queue.current == STEEL.name and #player_queue.names == 1 and player_queue.names[1] == STEEL.name and player_queue.progress == 0, "settled steel queue differs")
   equal(queue(foreign), expected.foreign.queue, "foreign queue")
+  local aliases = aliases_frame(player, foreign)
   for _, row in ipairs(MAINS) do
     local player_bonus, foreign_bonus = recipe(player, row.recipe).productivity_bonus, recipe(foreign, row.recipe).productivity_bonus
-    require_ok(foreign_bonus == 0 and recipe(foreign, row.alias).productivity_bonus == 0, "foreign productivity differs")
-    if row.name == STEEL.name then require_ok(close(player_bonus, .2) and close(recipe(player,row.alias).productivity_bonus,.1), "steel paid/new alias bonuses differ")
-    else require_ok(close(player_bonus,.1) and recipe(player,row.alias).productivity_bonus == 0, "uncompleted paid/new alias bonuses differ") end
+    require_ok(foreign_bonus == 0 and aliases.foreign[row.alias] == 0, "foreign productivity differs")
+    if row.name == STEEL.name then require_ok(close(player_bonus, .2) and close(aliases.player[row.alias],.1), "steel paid/new alias bonuses differ")
+    else require_ok(close(player_bonus,.1) and aliases.player[row.alias] == 0, "uncompleted paid/new alias bonuses differ") end
   end
   local lab = lab_frame(expected.lab)
   require_ok(lab.disabled_by_script and lab.laboratory_speed_modifier == expected.lab.laboratory_speed_modifier, "settled lab control differs")
@@ -241,15 +250,15 @@ local function assert_settled(state)
     local spent = state.initial_input[pack] + state.science.accepted[pack] - lab.input[pack]
     require_ok(spent == 16000 and lab.input[pack] > 0, "ordinary science accounting differs")
   end
-  return lab
+  return lab, aliases
 end
 local function plain_endpoint(state)
-  local lab = assert_settled(state)
+  local lab, aliases = assert_settled(state)
   local consumed = {}
   for _, pack in ipairs(PACKS) do
     consumed[pack] = state.initial_input[pack] + state.science.accepted[pack] - lab.input[pack]
   end
-  return {force_registry=force_registry(),observed_forces={player=force_frame(state.player,state.expected.player),foreign=force_frame(state.foreign,state.expected.foreign)},
+  return {force_registry=force_registry(),observed_forces={player=force_frame(state.player,state.expected.player),foreign=force_frame(state.foreign,state.expected.foreign)},aliases=aliases,
     lab=lab,science={accepted=copy(state.science.accepted),remaining=copy(lab.input),consumed=consumed},
     ordinary=copy(state.ordinary),topups=copy(state.topups),callback=copy(state.callback),scripted_carriers=copy(state.scripted_carriers)}
 end

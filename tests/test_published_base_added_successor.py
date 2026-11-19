@@ -76,6 +76,9 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         self.assertEqual(self.call("markers[2].source_save_sha256"), "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413")
         self.assertFalse(self.call("markers[1].callback.startup_changed"))
         self.assertEqual(self.call('markers[1].callback.startup["mir-max-level-worker-robots-storage"]'), 0)
+        for _, _, _, alias in MAINS:
+            self.assertEqual(self.call(f'markers[1].before.aliases.player["{alias}"]'), 0)
+            self.assertEqual(self.call(f'markers[1].before.aliases.foreign["{alias}"]'), 0)
         self.assertEqual(self.call("markers[2].endpoint.ordinary.name"), "recipe-prod-research_steel-1")
         self.assertEqual(self.call("markers[2].endpoint.ordinary.completed"), 1)
         self.assertFalse(self.call("markers[2].endpoint.ordinary.by_script"))
@@ -88,6 +91,10 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         for _, name, recipe, alias in MAINS[:-1]:
             self.assertEqual(self.call(f'game.forces.player.recipes["{recipe}"].productivity_bonus'), 0.1)
             self.assertEqual(self.call(f'game.forces.player.recipes["{alias}"].productivity_bonus'), 0)
+            self.assertEqual(self.call(f'markers[2].endpoint.aliases.player["{alias}"]'), 0)
+        self.assertEqual(self.call('markers[2].endpoint.aliases.player["mir-fixture-added-steel-plate"]'), 0.1)
+        for _, _, _, alias in MAINS:
+            self.assertEqual(self.call(f'markers[2].endpoint.aliases.foreign["{alias}"]'), 0)
         self.assertEqual(self.call(f'game.forces["{FOREIGN}"].research_progress'), 0.42)
         self.assertEqual(self.call(f'game.forces["{FOREIGN}"].recipes["steel-plate"].productivity_bonus'), 0)
         self.assertEqual(self.call("#markers[2].endpoint.force_registry"), 4)
@@ -172,6 +179,11 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         ok, message = lua.eval("added_tick(1,false)")
         self.assertTrue(ok, message)
         self.assertEqual(lua.eval("markers[3].phase"), "added-cold")
+        self.assertEqual(lua.eval('markers[3].endpoint.aliases.player["mir-fixture-added-steel-plate"]'), 0.1)
+        for _, _, _, alias in MAINS[:-1]:
+            self.assertEqual(lua.eval(f'markers[3].endpoint.aliases.player["{alias}"]'), 0)
+        for _, _, _, alias in MAINS:
+            self.assertEqual(lua.eval(f'markers[3].endpoint.aliases.foreign["{alias}"]'), 0)
 
     def test_wrong_bonus_and_early_elapsed_hold_refuse_or_do_not_save(self) -> None:
         self.lua.execute("added_seed_bonus(.3)")
@@ -228,6 +240,18 @@ class PublishedBaseAddedSuccessorTests(unittest.TestCase):
         ok, message = lua.eval("added_tick(1,false)")
         self.assertFalse(ok)
         self.assertIn("completed steel state", message)
+        alias_lua = LuaRuntime(unpack_returned_tuples=True)
+        install(alias_lua, self.source, self.source_text)
+        ok, message = alias_lua.eval('added_init_config("5.0.20018",nil)')
+        self.assertTrue(ok, message)
+        ok, message = alias_lua.eval("added_until_saved()")
+        self.assertTrue(ok, message)
+        alias_lua.execute("added_drift_alias()")
+        ok, message = alias_lua.eval("added_load_throwing()")
+        self.assertTrue(ok, message)
+        ok, message = alias_lua.eval("added_tick(1,false)")
+        self.assertFalse(ok)
+        self.assertIn("steel paid/new alias bonuses", message)
         cold_lua = LuaRuntime(unpack_returned_tuples=True)
         install(cold_lua, self.source, self.source_text)
         ok, message = cold_lua.eval('added_init_config("5.0.20018",nil)')

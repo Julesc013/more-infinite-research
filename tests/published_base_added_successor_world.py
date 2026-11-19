@@ -143,6 +143,7 @@ function added_ticks_needed(modifier)return math.ceil(16000/(world_lab.prototype
 function added_starve_energy()world_energy_starved=true;world_lab.energy=0 end
 function added_seed_bonus(value)recipe_values[game.forces.player.recipes["steel-plate"]].productivity_bonus=value end
 function added_seed_alias_bonus(value)recipe_values[game.forces.player.recipes["mir-fixture-added-steel-plate"]].productivity_bonus=value end
+function added_drift_alias()recipe_values[game.forces.player.recipes["mir-fixture-added-steel-plate"]].productivity_bonus=.2 end
 function added_drift_settled()set_technology(game.forces.player.technologies["recipe-prod-research_steel-1"],"enabled",false);game.forces.player.technologies["recipe-prod-research_steel-1"].prototype.research_unit_energy=7200;world_input.consume("automation-science-pack",1)end
 function added_corrupt_saved_endpoint()storage.mir_published_base_added_successor.saved_endpoint.lab.unit_number=20 end
 function added_observer_writes_refuse()
