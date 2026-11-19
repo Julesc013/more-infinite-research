@@ -4,12 +4,14 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_bootstrap as bootstrap_fixture
+from bootstrap_control_world import build_bootstrap_control_world
 from worker_storage_default_world import (
     DEFAULT_WORKER_RUNTIME_CONFIGURATION,
     build_default_native_owner_world,
 )
 from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS, RECOVERY_WORLD as RECOVERY_WORLD_FIXTURE
+
+ROOT = Path(__file__).resolve().parents[1]
 
 # Explicit parse-time runtime configuration for these native-fact doubles.
 # Real bootstrap controls use the actual resolver; older-origin controls below
@@ -183,10 +185,8 @@ class WorkerStorageHistoryTests(unittest.TestCase):
         ''')
 
     def test_bootstrap_refuses_before_lifecycle_or_other_credit_writes(self):
-        bootstrap_fixture.LuaRuntime = LuaRuntime
-        fixture = bootstrap_fixture.BootstrapTests()
-        fixture.setUp()
-        fixture.lua.execute(r'''
+        lua = build_bootstrap_control_world(LuaRuntime, source_root=ROOT / "source")
+        lua.execute(r'''
           install_modules(true,false,false,true)
           install_runtime(nil,{base="2.1.24",["more-infinite-research"]="5.0.21009"})
           local catalogue=require("runtime.catalogue")
@@ -201,6 +201,27 @@ class WorkerStorageHistoryTests(unittest.TestCase):
           assert(#configuration_order==0 and lifecycle_calls.configuration==nil)
           assert(storage.mir_worker_storage_route==nil)
         ''')
+
+    def test_bootstrap_refusal_uses_explicit_world_not_bootstrap_testcase(self):
+        import test_bootstrap as bootstrap_fixture
+
+        missing_runtime = object()
+        original_runtime = getattr(bootstrap_fixture, "LuaRuntime", missing_runtime)
+        original_setup = bootstrap_fixture.BootstrapTests.setUp
+
+        def forbidden_setup(_case):
+            raise AssertionError("worker-history bootstrap selected borrowed BootstrapTests.setUp")
+
+        bootstrap_fixture.BootstrapTests.setUp = forbidden_setup
+        try:
+            self.test_bootstrap_refuses_before_lifecycle_or_other_credit_writes()
+        finally:
+            bootstrap_fixture.BootstrapTests.setUp = original_setup
+            if original_runtime is missing_runtime:
+                if hasattr(bootstrap_fixture, "LuaRuntime"):
+                    delattr(bootstrap_fixture, "LuaRuntime")
+            else:
+                bootstrap_fixture.LuaRuntime = original_runtime
 
 
 class WorkerStorageRecoveryTests(unittest.TestCase):
