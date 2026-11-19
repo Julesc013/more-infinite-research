@@ -191,7 +191,14 @@ function Write-MIRNativeProbeResult {
   $bytes=[Text.UTF8Encoding]::new($false).GetBytes($json)
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context -IncludeResultReserve
   if($bytes.Length -ge $remaining) { throw '[mir441-resource-output-budget]' }
-  [IO.File]::WriteAllBytes((Join-Path $Context.root 'result.json'),$bytes)
+  $stream=$null
+  try {
+    $stream=[IO.File]::Open((Join-Path $Context.root 'result.json'),[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $stream.Write($bytes,0,$bytes.Length)
+    $stream.Flush($true)
+  } finally {
+    if($null-ne$stream){$stream.Dispose()}
+  }
 }
 
 function Invoke-MIRNativeProbeFactorioProcess {

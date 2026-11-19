@@ -10,6 +10,7 @@ $root=Join-Path $repo ('build/tmp/mir5-native-probe-controls-'+[guid]::NewGuid()
 $checks=0
 function Assert-Probe([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-native-probe-$Code]"};$script:checks++}
 function Refuses-Probe([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Probe ($actual.Contains($Expected)) "refusal-$Expected"}
+function Refuses-AnyProbe([scriptblock]$Action,[string]$Code){$refused=$false;try{&$Action|Out-Null}catch{$refused=$true};Assert-Probe $refused $Code}
 function Assert-LinuxDistinctSystemDiskAccounting {
   param([Parameter(Mandatory)][string]$AdmissionRoot)
   if(-not$IsLinux){return}
@@ -626,8 +627,19 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
     Assert-Probe ($null-eq$factorioRecord.result.PSObject.Properties['console_startup']) 'factorio-console-default-no-input'
     Assert-FactorioConsoleStartup -Context $context -Child $child
     Refuses-Probe {Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('x'*20000)} '[mir-native-probe-argument-budget]'
-    Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIR5NativeProbeControlV1';status='passed'})
-    Assert-Probe (Test-Path -LiteralPath (Join-Path $context.root 'result.json')) 'result'
+    $resultRecord=[ordered]@{kind='MIR5NativeProbeControlV1';status='passed'}
+    $resultPath=Join-Path $context.root 'result.json'
+    Write-MIRNativeProbeResult -Context $context -Record $resultRecord
+    $resultBytes=[IO.File]::ReadAllBytes($resultPath)
+    Assert-Probe ((Test-Path -LiteralPath $resultPath)-and($resultBytes.Length-gt0)) 'result-fresh-exclusive-create'
+    Refuses-AnyProbe {Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIR5NativeProbeControlV1';status='second-write-must-refuse'})} 'result-second-write-refused'
+    Assert-Probe ([Convert]::ToHexString([IO.File]::ReadAllBytes($resultPath))-ceq[Convert]::ToHexString($resultBytes)) 'result-second-write-preserves-first-record'
+    $sentinelContext=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'result-sentinel') -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8 -UseExactOutputRoot
+    [IO.Directory]::CreateDirectory($sentinelContext.root)|Out-Null
+    $sentinelPath=Join-Path $sentinelContext.root 'result.json';$sentinelBytes=[Text.UTF8Encoding]::new($false).GetBytes('original terminal receipt sentinel')
+    [IO.File]::WriteAllBytes($sentinelPath,$sentinelBytes)
+    Refuses-AnyProbe {Write-MIRNativeProbeResult -Context $sentinelContext -Record $resultRecord} 'result-preexisting-sentinel-refused'
+    Assert-Probe ([Convert]::ToHexString([IO.File]::ReadAllBytes($sentinelPath))-ceq[Convert]::ToHexString($sentinelBytes)) 'result-preexisting-sentinel-preserved'
     $terminal=Complete-MIRImmutableInputLease -Lease $lease
     Assert-Probe ([bool]$terminal.inputs_sha256_match-and$terminal.outcome-ceq'passed') 'lease-terminal'
   } finally {if($null-ne$lease-and-not$lease.closed){Complete-MIRImmutableInputLease -Lease $lease -Outcome failed|Out-Null}}
