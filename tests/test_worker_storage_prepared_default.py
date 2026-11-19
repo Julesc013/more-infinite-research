@@ -4,8 +4,12 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_worker_storage_inherited_origin as origin
 import test_bootstrap as bootstrap_fixture
+from test_worker_storage_inherited_origin import published_modules
+from worker_storage_default_world import (
+    build_default_native_owner_world,
+    install_published_default_reader,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,12 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 class WorkerPreparedDefaultTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        origin.WorkerInheritedOriginTests.setUpClass.__func__(cls)
+        cls.published = published_modules()
 
-    world = origin.WorkerInheritedOriginTests.world
+    def world(self, target):
+        lua = build_default_native_owner_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
+        return install_published_default_reader(lua, historical_sources=self.published)
 
     def prepared(self, target):
-        origin.LuaRuntime = LuaRuntime
         lua = self.world(target)
         lua.execute(r'''
           seed_owner();local old=inherited_configuration(package_family=="f200"and"4.7.20002"or"4.7.21002")
@@ -29,7 +36,6 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_published_preparation_transfers_the_complete_work_once(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
-                origin.LuaRuntime = LuaRuntime
                 lua = self.world(target)
                 lua.execute(r'''
                   seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
@@ -186,7 +192,6 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_prepared_above_cap_earnings_and_cap_restoration_right_follow_the_owner(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
-                origin.LuaRuntime = LuaRuntime
                 lua = self.world(target)
                 lua.execute(r'''
                   seed_owner();uninvested.technologies[CANONICAL].level=11
