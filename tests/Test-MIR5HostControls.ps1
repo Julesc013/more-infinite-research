@@ -141,6 +141,7 @@ $controls = @(
     [ordered]@{path='tests/test_f200_foreign_cap_baseline_fixture.py';lua=$true},
   [ordered]@{path='tests/test_native_owner_cap_order_fixture.py';lua=$true},
   [ordered]@{path='tests/test_worker_speed_cap_ten_native.py';lua=$true},
+  [ordered]@{path='tests/test_se_worker_speed_retained_receipt.py';lua=$false},
   [ordered]@{path='tests/test_se_worker_speed_provider_source.py';lua=$true},
   [ordered]@{path='tests/test_published_base_paid_source.py';lua=$true},
   [ordered]@{path='tests/test_f200_legacy_worker_fixture.py';lua=$true},
