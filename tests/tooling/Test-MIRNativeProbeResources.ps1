@@ -312,8 +312,8 @@ function Assert-FactorioConsoleSynchronousConfirmationBoundary {
   $newMemory=[IO.MemoryStream]::new();$newWriter=New-FactorioConsoleFastReplyWriter -Destination $newMemory -ReplyPath $stdout -Reply $confirmation
   try {Send-MIR441FactorioConsoleStartupLine -State $newState -Writer $newWriter -Timer $timer -Kind command} finally {$newWriter.Dispose();$timer.Stop()}
   $newPayload=[Text.UTF8Encoding]::new($false).GetString($newMemory.ToArray());$newMemory.Dispose()
-  $newBoundary=@($newState.receipt.sends[0].output_boundaries)
-  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $newState)-and$newState.receipt.send_count-eq1-and$newState.streams[0].confirmation_start_offset-eq0-and$newState.confirmation_marker_seen-and$newBoundary.Count-eq2-and$newBoundary[0].bytes-eq(Get-Item -LiteralPath $stdout).Length-and$newBoundary[1].bytes-eq0-and$newPayload.Contains($startup.command)) 'console-fast-reply-prewrite-floor-accepts-observed-marker'
+  $newPreWriteBoundary=@($newState.receipt.sends[0].pre_write_output_boundaries);$newBoundary=@($newState.receipt.sends[0].output_boundaries);$markerStart=0L;$markerEnd=[int64][Text.UTF8Encoding]::new($false).GetByteCount($confirmation)
+  Assert-Probe ((Update-MIR441FactorioConsoleStartupOutput -State $newState)-and$newState.receipt.send_count-eq1-and$newState.streams[0].confirmation_start_offset-eq0-and$newState.confirmation_marker_seen-and$newPreWriteBoundary.Count-eq2-and$newPreWriteBoundary[0].kind-ceq'stdout'-and$newPreWriteBoundary[0].bytes-le$markerStart-and$newPreWriteBoundary[1].kind-ceq'stderr'-and$newPreWriteBoundary[1].bytes-eq0-and$newBoundary.Count-eq2-and$newBoundary[0].bytes-ge$markerEnd-and$newBoundary[0].bytes-eq(Get-Item -LiteralPath $stdout).Length-and$newBoundary[1].bytes-eq0-and$newPayload.Contains($startup.command)) 'console-fast-reply-prewrite-floor-accepts-observed-marker'
 }
 function Assert-FactorioConsolePreWriteBoundaryFailure {
   $consoleRoot=Join-Path $root 'factorio-console-prewrite-boundary-failure';[IO.Directory]::CreateDirectory($consoleRoot)|Out-Null

@@ -628,8 +628,8 @@ function Update-MIR441FactorioConsoleStartupOutput {
       $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
       if($State.receipt.send_count-ge1){
         # The first command commits the per-stream byte boundary captured
-        # immediately before its successful write. Output at or before that
-        # boundary predates the command even when the bounded reader has not
+        # immediately before its successful write. Bytes before that boundary
+        # predate the command even when the bounded reader has not
         # reached it yet, so it cannot request a replay.
         $confirmationStart=[int64]$stream.confirmation_start_offset
         $confirmationOffset=[Math]::Max(0L,$confirmationStart-$readOffset)
@@ -673,12 +673,16 @@ function Send-MIR441FactorioConsoleStartupLine {
   $send=[ordered]@{
     order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command
     elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)
+    pre_write_output_boundaries=[Collections.Generic.List[object]]::new()
     output_boundaries=[Collections.Generic.List[object]]::new();output_boundaries_complete=$false
   }
   # Record that WriteLine and Flush succeeded before observing output files.
   # A post-send observation failure must not turn an already-delivered command
   # into a receipt that claims no command was sent.
   $State.receipt.sends.Add($send)
+  foreach($boundary in $preWriteBoundaries){
+    $send.pre_write_output_boundaries.Add([ordered]@{kind=$boundary.kind;path=$boundary.path;bytes=[int64]$boundary.bytes})
+  }
   if($Kind-ceq'command'){
     for($index=0;$index-lt$State.streams.Count;$index++){
       # Commit pre-write snapshots only after WriteLine and Flush succeeded.
