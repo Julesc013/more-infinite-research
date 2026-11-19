@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-published-base-added-successor",
+  "version": "0.1.0",
+  "title": "MIR published Base added-recipe successor fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable observer for an exact published Base and MIR source. It is test apparatus, not player content or a qualification result.",
+  "factorio_version": "2.0",
+  "dependencies": ["more-infinite-research >= 5.0.20016"]
+}
