@@ -12,6 +12,7 @@ on:
       - 'tools/lib/validation/ImmutableInputStaging.ps1'
       - 'tools/lib/validation/LinuxResourceObservation.py'
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
