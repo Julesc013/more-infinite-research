@@ -356,7 +356,6 @@ function M.apply(stage)
     if state.phase == "setup" then
       if game.tick-state.started<2 then return end
       local force = game.forces.player
-      force.research_queue_enabled=true
       for _, name in ipairs(PREREQUISITES) do
         setup_grant=tech(force,name)
         if not setup_grant.researched then setup_grant.researched=true end

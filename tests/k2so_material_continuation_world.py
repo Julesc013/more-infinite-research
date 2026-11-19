@@ -76,14 +76,17 @@ local function set_queue(force, submitted)
 end
 local function make_force(name, index)
   local values={name=name,index=index,valid=true,technologies={},recipes={},queue={},
-    current=nil,progress=0,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,
-    research_queue_enabled=true}
+    current=nil,progress=0,laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
+  local readable={name=true,index=true,valid=true,technologies=true,recipes=true,
+    laboratory_speed_modifier=true,laboratory_productivity_bonus=true,add_research=true}
+  local writable={laboratory_speed_modifier=true,laboratory_productivity_bonus=true}
   local force={}
   setmetatable(force, {
     __index=function(_, key)
       if key == "research_queue" then return values.queue end
       if key == "current_research" then return values.current end
       if key == "research_progress" then return values.progress end
+      if not readable[key] then error("unknown LuaForce field: "..tostring(key))end
       return values[key]
     end,
     __newindex=function(_, key, value)
@@ -93,6 +96,7 @@ local function make_force(name, index)
         assert(values.current, "No research in progress")
         values.progress=value;technology_values[values.current].saved_progress=value;return
       end
+      if not writable[key] then error("unknown or read-only LuaForce field: "..tostring(key))end
       values[key]=value
     end,
   })
@@ -121,10 +125,6 @@ local function make_force(name, index)
     local queue={};for _, item in ipairs(values.queue)do queue[#queue+1]=item end
     queue[#queue+1]=row;set_queue(force,queue);return true
   end
-  values.get_saved_technology_progress=function(id)
-    return values.technologies[id].saved_progress
-  end
-  values.reset_technology_effects=function() end
   return force
 end
 local function inventory()

@@ -223,6 +223,26 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
         self.assertIn("unknown DifficultySettings field: research_price_multiplier",message)
         self.assertIsNone(self.lua.eval(f"storage.{KEY}"))
 
+    def test_force_boundary_rejects_removed_and_unknown_native_api_members(self):
+        for statement in (
+            "return game.forces.player.research_queue_enabled",
+            "game.forces.player.unavailable_fixture_property=true",
+            "return game.forces.player.unavailable_fixture_property",
+        ):
+            with self.subTest(statement=statement):
+                with self.assertRaisesRegex(Exception,"LuaForce field"):
+                    self.world.execute(statement)
+        text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
+        anchor="local force = game.forces.player\n      for _, name in ipairs(PREREQUISITES)"
+        self.assertEqual(text.count(anchor),1)
+        opponent=text.replace(anchor,"local force = game.forces.player\n      force.research_queue_enabled=true\n      for _, name in ipairs(PREREQUISITES)")
+        self.world.load("source",actor_source=opponent)
+        self.call("init")
+        with self.assertRaisesRegex(Exception,"LuaForce field: research_queue_enabled"):
+            self.tick(2)
+        self.assertEqual(self.lua.eval("#saves"),0)
+        self.assertEqual(self.lua.eval(f"storage.{KEY}.finished"),0)
+
     def test_missing_per_tick_power_refill_cannot_hide_behind_unlimited_mock_energy(self):
         text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
         original="if not state.job_finished then set_running(state,true); refill(state); return end"
