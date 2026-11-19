@@ -262,6 +262,37 @@ class K2SOMaterialContinuationFixtureTests(unittest.TestCase):
             self.until("#saves==1")
         self.assertEqual(self.lua.eval("#saves"),0)
 
+    def test_lab_entity_boundary_refuses_readonly_and_unknown_actor_access_before_science_or_save(self):
+        self.world.execute('''
+          local lab=game.surfaces[1].create_entity{name="lab",position={0,0},force=game.forces.player}
+          lab.energy=100;lab.disabled_by_script=true;lab.destructible=false;lab.minable=false;lab.operable=false
+          assert(lab.energy==100 and lab.disabled_by_script and not lab.destructible and not lab.minable and not lab.operable)
+        ''')
+        for statement in ('return world_labs[1].unknown_fixture_member', 'world_labs[1].unknown_fixture_member=true', 'world_labs[1].name="lab"'):
+            with self.subTest(statement=statement):
+                with self.assertRaisesRegex(Exception,"LuaEntity field"):
+                    self.world.execute(statement)
+
+        text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
+        anchor='state.lab=game.surfaces[1].create_entity{name=LAB,position={0,0},force=force}\n      set_running(state,false)'
+        self.assertEqual(text.count(anchor),1)
+        opponents=(
+            ('state.lab.name=LAB', 'LuaEntity field: name'),
+            ('local ignored=state.lab.unknown_fixture_member or false', 'LuaEntity field: unknown_fixture_member'),
+        )
+        for mutation,reason in opponents:
+            with self.subTest(mutation=mutation):
+                self.world=FixtureWorld(self.runtime_type)
+                self.lua=self.world.lua
+                actor=text.replace(anchor, 'state.lab=game.surfaces[1].create_entity{name=LAB,position={0,0},force=force}\n      '+mutation+'\n      set_running(state,false)')
+                self.world.load("source",actor_source=actor)
+                self.call("init")
+                with self.assertRaisesRegex(Exception,reason):
+                    self.tick(2)
+                self.assertEqual(self.lua.eval("#saves"),0)
+                self.assertEqual(self.lua.eval("#game.forces.player.research_queue"),0)
+                self.assertTrue(self.lua.eval("world_labs[1].get_inventory(1).is_empty()"))
+
     def test_wrong_difficulty_api_field_is_a_live_rejected_opponent(self):
         text=(FIXTURE/"fixture_control.lua").read_text(encoding="utf-8")
         self.assertEqual(text.count("game.difficulty_settings.technology_price_multiplier"),1)

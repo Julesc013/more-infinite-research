@@ -167,9 +167,17 @@ function world_new()
       disabled_by_script=false,destructible=true,minable=true,operable=true,
       get_inventory=function(which)assert(which==1);return inv end,
       prototype={get_researching_speed=function()return 1 end},quality={name="normal"}}
+    local readable={name=true,valid=true,unit_number=true,force=true,surface=true,position=true,energy=true,
+      electric_buffer_size=true,disabled_by_script=true,destructible=true,minable=true,operable=true,
+      get_inventory=true,prototype=true,quality=true}
+    local writable={energy=true,disabled_by_script=true,destructible=true,minable=true,operable=true}
     local lab=setmetatable({}, {
-      __index=function(_,key)return lab_values[key]end,
+      __index=function(_,key)
+        if readable[key] then return lab_values[key] end
+        error("LuaEntity field: "..tostring(key))
+      end,
       __newindex=function(_,key,value)
+        if not writable[key] then error("LuaEntity field: "..tostring(key)) end
         if observation_locked then error("observer lab write: "..key) end
         if key=="energy"then value=math.min(value,lab_values.electric_buffer_size)end
         lab_values[key]=value
