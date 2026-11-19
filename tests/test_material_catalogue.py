@@ -78,6 +78,7 @@ class MaterialCatalogueTests(unittest.TestCase):
             "automation-science-pack": {},
             "logistic-science-pack": {},
             "chemical-science-pack": {},
+            "space-science-pack": {},
             "kr-rare-metals": {"icon": "__Krastorio2Assets__/icons/items/rare-metals.png"},
             "kr-silicon": {"icon": "__Krastorio2Assets__/icons/items/silicon.png"},
             "kr-glass": {"icon": "__Krastorio2Assets__/icons/items/glass.png"},
@@ -95,7 +96,7 @@ class MaterialCatalogueTests(unittest.TestCase):
             "kr-stone-processing": self.owner("kr-crusher", "kr-glass"),
         }
         for name in (
-            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "space-science-pack",
             "kr-rare-metal-mining", "kr-advanced-chemistry", "kr-fluids-chemistry",
             "automation-2", "kr-crusher",
         ):
@@ -137,11 +138,13 @@ class MaterialCatalogueTests(unittest.TestCase):
                 before = _plain(raw)
                 rows = _plain(self.rows(raw=raw, active_mods=lua_table(self.lua, case["mods"]),
                                         upstream_startup=lua_table(self.lua, case["startup"])))
-                self.assertEqual(3, len(rows))
+                self.assertEqual(6, len(rows))
                 glass = next(row for row in rows if row["name"] == "recipe-prod-research_material_glass-1")
                 recipes = ["kr-glass", "glass"] if case["k2"] and case["glass"] else ["kr-glass"]
                 self.assertEqual([{"type": "change-recipe-productivity", "recipe": recipe, "change": .02}
                                   for recipe in recipes], glass["effects"])
+                tail = next(row for row in rows if row["name"] == "recipe-prod-research_material_glass-4")
+                self.assertEqual(glass["effects"], tail["effects"])
                 self.assertEqual(["automation-science-pack", "logistic-science-pack", "chemical-science-pack",
                                   "kr-stone-processing"], glass["prerequisites"])
                 self.assertEqual((1, 3, "200*2^(L-1)", 30),
@@ -231,7 +234,7 @@ class MaterialCatalogueTests(unittest.TestCase):
                 "order": "p[research_material_glass]",
             },
         }
-        self.assertEqual(3, len(rows))
+        self.assertEqual(6, len(rows))
         for index in range(1, 4):
             row = rows[index]
             facts = expected[row["name"]]
@@ -280,7 +283,7 @@ class MaterialCatalogueTests(unittest.TestCase):
         ''')
         self.generator["install"](rows, stage)
         self.assertEqual(1, stage["writes"])
-        self.assertEqual(3, len(stage["batch"]))
+        self.assertEqual(6, len(stage["batch"]))
 
     def test_resolved_settings_control_cost_effect_time_cap_and_disabled_identity(self):
         values = self.values()
@@ -299,6 +302,9 @@ class MaterialCatalogueTests(unittest.TestCase):
         self.assertEqual("(250+3*(L-1))*2^(L-1)", rare_row["unit"]["count_formula"])
         self.assertEqual(45, rare_row["unit"]["time"])
         self.assertEqual(3, rare_row["max_level"])
+        self.assertEqual("2072+250*(L-4)", rows[4]["unit"]["count_formula"])
+        self.assertEqual(45, rows[4]["unit"]["time"])
+        self.assertTrue(all(rows[4]["effects"][i]["change"] == .03 for i in (1, 2)))
         self.assertTrue(all(rare_row["effects"][i]["change"] == 0.03 for i in (1, 2)))
         self.assertEqual("recipe-prod-research_material_silicon-1", silicon_row["name"])
         self.assertFalse(silicon_row["enabled"])
@@ -336,20 +342,20 @@ class MaterialCatalogueTests(unittest.TestCase):
         )
         raw["recipe"] = poison_pairs(raw["recipe"])
         raw["technology"] = poison_pairs(raw["technology"])
-        self.assertEqual(3, len(self.rows(raw=raw)))
+        self.assertEqual(6, len(self.rows(raw=raw)))
 
         cosmetic = self.raw_fixture()
         cosmetic["item"]["kr-silicon"]["icon"] = "__another-mod__/silicon.png"
         cosmetic["technology"]["kr-silicon-processing"]["prerequisites"] = lua_table(
             self.lua, ["another-prerequisite", "automation-2", "kr-fluids-chemistry"]
         )
-        self.assertEqual(3, len(self.rows(raw=cosmetic)))
+        self.assertEqual(6, len(self.rows(raw=cosmetic)))
 
         full_probability = self.raw_fixture()
         full_probability["recipe"]["kr-silicon"]["results"][1]["shared_probability"] = lua_table(
             self.lua, {"min": 0, "max": 1}
         )
-        self.assertEqual(3, len(self.rows(raw=full_probability)))
+        self.assertEqual(6, len(self.rows(raw=full_probability)))
 
         wrong_type = self.raw_fixture()
         wrong_type["recipe"]["kr-glass"]["results"][1]["type"] = "fluid"
@@ -434,12 +440,12 @@ class MaterialCatalogueTests(unittest.TestCase):
             if row.family == 'research_material_rare_metals' or row.family == 'research_material_silicon'
               or row.family == 'research_material_glass' then count = count + 1 end
           end
-          assert(count == 3)
+          assert(count == 6)
           assert(package.loaded['compatibility.material_catalogue'] == nil)
           assert(package.loaded['research.generator'] == nil)
         ''')
 
-    def test_unsupported_late_identities_remain_inventory_only(self):
+    def test_declared_late_identities_are_emitted_with_absolute_level_four(self):
         inventory = json.loads(CONTINUATIONS.read_text(encoding="utf-8"))
         continuations = inventory["continuations"]
         self.assertEqual(
@@ -452,6 +458,99 @@ class MaterialCatalogueTests(unittest.TestCase):
         )
         self.assertTrue(all(row["carrier_ids"] == [] for row in continuations))
         self.assertTrue(all(self.rows()[index]["name"].endswith("-1") for index in range(1, 4)))
+        rows = _plain(self.rows())
+        tails = rows[3:]
+        self.assertEqual([row["technology"] for row in continuations], [row["name"] for row in tails])
+        for row, historical in zip(tails, continuations):
+            self.assertEqual(4, row["level"])
+            self.assertEqual("infinite", row["max_level"])
+            self.assertEqual("1600+200*(L-4)", row["unit"]["count_formula"])
+            self.assertEqual(30, row["unit"]["time"])
+            self.assertEqual([historical["predecessor"], "space-science-pack"], row["prerequisites"])
+            self.assertEqual(historical["effect_recipes"], [effect["recipe"] for effect in row["effects"]])
+            self.assertTrue(all(effect["change"] == .02 for effect in row["effects"]))
+            self.assertNotEqual(False, row.get("enabled"))
+
+    def test_continuations_preserve_early_science_and_require_space_science(self):
+        rows = _plain(self.rows())
+        self.assertEqual(6, len(rows), "finite stages must have their three continuing counterparts")
+        for early, tail in zip(rows[:3], rows[3:]):
+            self.assertEqual(early["unit"]["ingredients"] + [["space-science-pack", 1]], tail["unit"]["ingredients"])
+            self.assertEqual(early["effects"], tail["effects"])
+            self.assertTrue(tail["visible_when_disabled"])
+            self.assertFalse(tail["show_levels_info"])
+        rows = self.rows()
+        rows[4]["effects"][1]["change"] = 99
+        rows[4]["unit"]["ingredients"][1][1] = "foreign"
+        self.assertEqual(.02, rows[1]["effects"][1]["change"])
+        self.assertEqual("automation-science-pack", rows[1]["unit"]["ingredients"][1][1])
+        self.assertEqual(.02, self.rows()[4]["effects"][1]["change"])
+
+    def test_caps_do_not_truncate_stages_and_disablement_covers_both_stages(self):
+        for limit in (0, 2, 3, 4, 10):
+            values = self.values()
+            for key in ("research_material_rare_metals", "research_material_silicon", "research_material_glass"):
+                values["streams"][key]["max_level"] = limit
+            rows = _plain(self.rows(values=values))
+            self.assertEqual([3, 3, 3, "infinite", "infinite", "infinite"], [row["max_level"] for row in rows])
+        values = self.values()
+        values["streams"]["research_material_silicon"]["enabled"] = False
+        rows = _plain(self.rows(values=values))
+        self.assertFalse(rows[1]["enabled"])
+        self.assertFalse(rows[4]["enabled"])
+        for invalid in (-1, 1.5, float("nan"), float("inf"), "0", False):
+            values = self.values()
+            values["streams"]["research_material_silicon"]["max_level"] = invalid
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(Exception, "research_material_silicon resolved settings are invalid"):
+                self.rows(values=values)
+
+    def test_declared_stage_caps_restore_only_mir_disablements_without_changing_paid_work(self):
+        self.lua.execute('''
+          script = {active_mods={['space-age']='2.1.23',Krastorio2='2.1.4',
+            ['Krastorio2-spaced-out']='2.0.19',Krastorio2Assets='2.1.0',['k2so-assets']='1.0.7'}}
+          local declared = require('research.catalogue').declared()
+          local caps, names = require('runtime.caps'), {}
+          for _, row in ipairs(declared) do
+            if row.family == 'research_material_rare_metals' or row.family == 'research_material_silicon'
+              or row.family == 'research_material_glass' then
+              assert(row.cap_setting == 'ips-max-level-' .. row.family)
+              assert(row.progression == (row.id:sub(-2) == '-4' and 4 or 1))
+              names[#names + 1] = row.id
+            end
+          end
+          assert(#names == 6, 'all material stages must participate in runtime limits')
+          for _, limit in ipairs({3,10}) do
+            local foreign = {name='foreign',level=7,enabled=true}
+            local queue = {foreign,foreign}
+            local force = {index=1,technologies={},research_queue=queue,
+              current_research=foreign,research_progress=.27,productivity_bonus=.42}
+            local limits, owned = {}, {}
+            for _, name in ipairs(names) do
+              force.technologies[name] = {name=name,level=name:sub(-2)=='-4' and limit+1 or 3,
+                researched=name:sub(-2)=='-1',enabled=true,visible_when_disabled=false}
+              limits[name] = limit
+            end
+            -- A foreign disablement must not become MIR's restoration right.
+            local denied = 'recipe-prod-research_material_glass-4'
+            force.technologies[denied].enabled = false
+            caps.reconcile(force, limits, owned)
+            for _, name in ipairs(names) do
+              assert(force.technologies[name].enabled == (name:sub(-2)=='-1'))
+              limits[name] = 0
+            end
+            caps.reconcile(force, limits, owned)
+            for _, name in ipairs(names) do
+              local technology = force.technologies[name]
+              assert(technology.enabled == (name ~= denied))
+              assert(technology.level == (name:sub(-2)=='-4' and limit+1 or 3))
+              assert(technology.researched == (name:sub(-2)=='-1'))
+              assert(technology.visible_when_disabled == false)
+            end
+            assert(force.current_research == foreign and force.research_progress == .27)
+            assert(force.research_queue == queue and #queue == 2 and queue[1] == foreign and queue[2] == foreign)
+            assert(force.productivity_bonus == .42)
+          end
+        ''')
 
 
 if __name__ == "__main__":

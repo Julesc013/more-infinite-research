@@ -22,6 +22,7 @@ REPLAY_CAPTURE = ROOT / "tools/Invoke-ReplayCapture.ps1"
 MENU_COMPARISON = ROOT / "tools/Invoke-MenuComparison.ps1"
 NATIVE_FIXTURE = ROOT / "tools/Invoke-NativeFixture.ps1"
 LIBRARY_ACTIVATION = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
+NATIVE_COMMON = ROOT / "tools/lib/validation/NativeProbeCommon.ps1"
 
 
 def assert_powershell_parses(path: Path) -> None:
@@ -76,6 +77,87 @@ def prototype_capture_output_budget_binder_cases() -> dict:
         }
 
     return {"eight_gib": invoke(8192), "over_limit": invoke(8193)}
+
+
+def audio_argument_builder_source() -> str:
+    """Load the real shared pure helper without executing a native entry point."""
+    path = str(NATIVE_COMMON).replace("'", "''")
+    return r"""
+$audioTokens=$null;$audioErrors=$null
+$audioAst=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$audioTokens,[ref]$audioErrors)
+if($audioErrors.Count){throw 'Native common source does not parse'}
+$audioFunctions=@($audioAst.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Get-MIRNativeAudioArguments'},$true))
+if($audioFunctions.Count -ne 1){throw 'One real audio argv helper required'}
+Invoke-Expression $audioFunctions[0].Extent.Text
+""".replace("__SOURCE__", path)
+
+
+def prototype_capture_argument_cases() -> dict:
+    """Execute the actual argv builder without starting capture or an engine."""
+    source = str(PROTOTYPE_CAPTURE).replace("'", "''")
+    script = audio_argument_builder_source() + r"""
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'Capture source does not parse'}
+$functions=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Get-MIR5PrototypeCaptureArguments'},$true))
+if($functions.Count -ne 1){throw 'One real capture argv builder required'}
+Invoke-Expression $functions[0].Extent.Text
+$common=@{ConfigPath='C:/capture/space dir/config.ini';LibraryDirectory='C:/MIR/test mods'}
+@{
+  default_gui=@(Get-MIR5PrototypeCaptureArguments @common)
+  explicit_gui=@(Get-MIR5PrototypeCaptureArguments @common -Headless:$false)
+  headless=@(Get-MIR5PrototypeCaptureArguments @common -Headless)
+}|ConvertTo-Json -Depth 5 -Compress
+""".replace("__SOURCE__", source)
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", script],
+        cwd=ROOT, text=True, capture_output=True, check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def native_fixture_argument_cases() -> dict:
+    """Stop the actual stage at launch validation; no process can be started."""
+    source = str(NATIVE_FIXTURE).replace("'", "''")
+    with tempfile.TemporaryDirectory(prefix="mir-headless-stage-") as directory:
+        scratch = directory.replace("'", "''")
+        script = audio_argument_builder_source() + r"""
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'Native fixture source does not parse'}
+$functions=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Invoke-FixtureStage'},$true))
+if($functions.Count -ne 1){throw 'One actual native stage required'}
+Invoke-Expression $functions[0].Extent.Text
+function Assert-MIRLibraryLaunch {
+  param($Activation,$FactorioBin,$Arguments)
+  $script:observed=@($Arguments)
+  throw 'HOST_ARGV_BOUNDARY'
+}
+$writeData='__SCRATCH__';$config='C:/capture/space dir/config.ini'
+$activation=[pscustomobject]@{library='C:/MIR/test mods'};$engine='must-never-run'
+$results=@{}
+foreach($case in @(
+  @{name='modern_gui';headless=$false;process=$false;historical=$false;version='2.0'},
+  @{name='modern_headless';headless=$true;process=$false;historical=$false;version='2.0'},
+  @{name='legacy013_gui';headless=$false;process=$true;historical=$true;version='0.13'},
+  @{name='legacy014_gui';headless=$false;process=$true;historical=$true;version='0.14'},
+  @{name='legacy110_gui';headless=$false;process=$true;historical=$true;version='1.1'},
+  @{name='f110_process_gui';headless=$false;process=$true;historical=$false;version='0.13'},
+  @{name='legacy110_headless';headless=$true;process=$true;historical=$true;version='1.1'}
+)){
+  $Headless=$case.headless;$historicalProcess=$case.process;$historical=$case.historical
+  $historicalFixture=[pscustomobject]@{factorio_version=$case.version}
+  $script:observed=$null
+  try{Invoke-FixtureStage -Name 'host-only' -StageArguments @('--benchmark','owned-input.zip')}
+  catch{if($_.Exception.Message -cne 'HOST_ARGV_BOUNDARY'){throw}}
+  if($null -eq $script:observed){throw 'Stage failed before actual launch arguments'}
+  $results[$case.name]=$script:observed
+}
+$results|ConvertTo-Json -Depth 5 -Compress
+""".replace("__SOURCE__", source).replace("__SCRATCH__", scratch)
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                text=True, capture_output=True, check=True)
+        return json.loads(result.stdout)
 
 
 def prototype_capture_archive_guard_cases() -> dict:
@@ -640,6 +722,30 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("MaxNewOutputMiB", cases["over_limit"]["output"])
         self.assertIn("maximum allowed range", cases["over_limit"]["output"])
         self.assertNotIn("missing-factorio.exe", cases["over_limit"]["output"])
+
+    def test_prototype_capture_selects_explicit_headless_argv_and_preserves_gui_default(self):
+        cases = prototype_capture_argument_cases()
+        common = ["--config", "C:/capture/space dir/config.ini", "--mod-directory", "C:/MIR/test mods", "--no-log-rotation"]
+        self.assertEqual([*common, "--disable-audio", "--dump-data"], cases["default_gui"])
+        self.assertEqual(cases["default_gui"], cases["explicit_gui"])
+        # The real headless 2.0.77 CLI rejects --disable-audio. This expected
+        # vector also opposes accidentally appending the GUI option universally.
+        self.assertEqual([*common, "--dump-data"], cases["headless"])
+        source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+        self.assertIn("$arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)", source)
+        self.assertIn("headless_requested=[bool]$Headless", source)
+        self.assertIn("$record.arguments = $arguments", source)
+
+    def test_native_fixture_shares_headless_selection_and_preserves_legacy_cli_exclusions(self):
+        cases = native_fixture_argument_cases()
+        common = ["--config", "C:/capture/space dir/config.ini", "--mod-directory", "C:/MIR/test mods", "--no-log-rotation"]
+        for name in ("modern_gui", "legacy110_gui", "f110_process_gui"):
+            with self.subTest(case=name):
+                self.assertEqual([*common, "--disable-audio", "--benchmark", "owned-input.zip"], cases[name])
+        for name in ("modern_headless", "legacy013_gui", "legacy014_gui", "legacy110_headless"):
+            with self.subTest(case=name):
+                self.assertEqual([*common, "--benchmark", "owned-input.zip"], cases[name])
+        self.assertIn("headless_requested=[bool]$Headless", NATIVE_FIXTURE.read_text(encoding="utf-8"))
 
     def test_prototype_capture_refuses_declared_selected_inputs_before_output_or_admission(self):
         cases = prototype_capture_declared_input_guard_cases()

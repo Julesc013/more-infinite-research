@@ -44,6 +44,7 @@ param(
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(16,128)][int]$MaxNewOutputMiB=128,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
+  [switch]$Headless,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -714,11 +715,11 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
   $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation')
   if(-not $historicalProcess){
-    $arguments+='--disable-audio'
+    $arguments+=@(Get-MIRNativeAudioArguments -Headless:$Headless)
   }elseif(-not $historical -or $historicalFixture.factorio_version -notin @('0.13','0.14')){
     # Keep the older-engine exception tied to the historical fixture metadata;
     # the F110 published source leg is an explicit 1.1 process-mode caller.
-    $arguments+='--disable-audio'
+    $arguments+=@(Get-MIRNativeAudioArguments -Headless:$Headless)
   }
   $arguments+=$StageArguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
@@ -887,7 +888,7 @@ Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdenti
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -Mode Hook -MaxWorktrees 2 -MaxBranches 4 -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
 $record=[ordered]@{
-  kind='MIR5NativeFixtureV1';status='prepared';case=$CaseName
+  kind='MIR5NativeFixtureV1';status='prepared';case=$CaseName;headless_requested=[bool]$Headless
   source_head=[string](& git -C $repo rev-parse HEAD)
   source_dirty=(@(& git -C $repo status --porcelain=v1).Count -gt 0)
   harness_sha256=Get-FixtureSha $PSCommandPath

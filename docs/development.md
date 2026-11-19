@@ -193,6 +193,8 @@ The library archive must already match the profile's selected archive SHA256; a 
 
 The F200 profile-native witness is the narrowly admitted alternate-metadata case: use `--fixture-info info-f200.json` together with `--revision <full-commit>` when packaging its direct `tests/fixtures/<fixture>` source. The packager reads that alternate as a raw Git blob from the selected commit and emits it only as archive `info.json`, recording its source path, blob, hash and byte count; shared fixture members remain raw Git members from that same commit. This selector rejects player source, untracked or path-like metadata names, and `--target` or `--version`, so it cannot materialize a player edition or rewrite the exact fixture metadata.
 
+For a pinned headless engine, pass `-Headless` to `tools/Invoke-PrototypeCapture.ps1` or `tools/Invoke-NativeFixture.ps1`. Both use the shared CLI selector to omit the graphical audio option and record the declared selection; prototype captures also record the full argument vector. The default graphical arguments and existing historical0.13/0.14 audio exclusions remain unchanged. Select the actual distribution explicitly alongside its exact engine/profile hashes; the operating system and executable filename do not establish CLI capabilities.
+
 ## Recover an exact published catalogue
 
 `tools/recover_modern_catalogue.py recover` accepts `--published-version` for an exact same-target MIR4.7 numeric distribution, such as `4.7.21003` or `4.7.20003`. Omitting it retains the original `4.7.21000`/`4.7.20000` recovery contract. Every supplied published arm, including optional K2SO, must match that version; engine, archive, capture-hash and paired-input checks still apply. MIR5 is never admitted as the published oracle.

@@ -53,6 +53,16 @@ class BootstrapTests(unittest.TestCase):
                 credit_calls.family_plan = plan
                 return plan
               end
+              for _, name in ipairs({"preflight_force_created", "preflight_force_reset",
+                  "preflight_forces_merged", "preflight_technology_effects_reset"}) do
+                local preflight = name
+                module[preflight] = function(event)
+                  local plan = {boundary_snapshot = preflight}
+                  credit_calls[preflight] = event
+                  credit_calls[preflight .. "_plan"] = plan
+                  return plan
+                end
+              end
               module.needs_research_events = function() return false end
               module.on_research_finished = function() return false end
               module.on_research_cancelled = function() return false end
@@ -158,6 +168,11 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.lifecycle"] = function()
               return {
+                preflight = function(configuration_changed)
+                  local plan = {configuration_changed=configuration_changed}
+                  lifecycle_calls.cap_plan = plan
+                  return plan
+                end,
                 preflight_worker_storage_split_caps = function(plan)
                   lifecycle_calls.worker_cap_plan = plan
                   return nil
@@ -170,8 +185,12 @@ class BootstrapTests(unittest.TestCase):
                   return { ["recipe-prod-research_gears-1"] = 2 }
                 end,
                 caps_active = function() return CAP_ACTIVE end,
-                on_init = function() lifecycle_calls.init = (lifecycle_calls.init or 0) + 1 end,
-                on_configuration_changed = function(event)
+                on_init = function(plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==false)
+                  lifecycle_calls.init = (lifecycle_calls.init or 0) + 1
+                end,
+                on_configuration_changed = function(event,plan)
+                  assert(plan==lifecycle_calls.cap_plan and plan.configuration_changed==true)
                   lifecycle_calls.configuration = event
                   table.insert(configuration_order, "lifecycle")
                 end,
@@ -365,6 +384,43 @@ class BootstrapTests(unittest.TestCase):
                     assert(table.concat(order,",")=="owner-preflight,legacy-preflight,cap-preflight,legacy-commit,gate-only-apply,cap-noop",table.concat(order,","))
                     assert(lifecycle_calls.configuration.marker=="gate-only"and library_calls.configuration.marker=="gate-only")
                   end
+                ''')
+
+    def test_cap_admission_preflight_failure_precedes_other_lifecycle_writers(self):
+        for callback in ("init", "configuration"):
+            with self.subTest(callback=callback):
+                self.setUp()
+                self.lua.globals().fault_callback = callback
+                self.lua.execute('''
+                  install_modules(true,true,true,true)
+                  install_runtime(nil,{["space-age"]="2.1.23"});load_control()
+                  local cause={boundary="cap-preflight"}
+                  require("runtime.lifecycle").preflight=function()error(cause)end
+                  local ok,reason=pcall(handlers[fault_callback],{})
+                  assert(not ok and reason==cause,"bootstrap lost the original cap admission failure")
+                  assert(lifecycle_calls.init==nil and lifecycle_calls.configuration==nil
+                    and credit_calls.on_init==nil and credit_calls.on_configuration_changed==nil
+                    and library_calls.init==nil and library_calls.configuration==nil
+                    and scripted_calls.init==nil and scripted_calls.configuration==nil
+                    and #configuration_order==0,
+                    "cap admission ran after another reconciler wrote")
+                ''')
+
+    def test_required_cap_preflight_export_fails_before_callback_registration(self):
+        for export in (None, False, "wrong"):
+            with self.subTest(export=export):
+                self.setUp()
+                self.lua.globals().bad_cap_preflight = export
+                self.lua.execute('''
+                  install_modules(false,false,false,false);install_runtime()
+                  local original=package.preload["runtime.lifecycle"]
+                  package.preload["runtime.lifecycle"]=function()
+                    local lifecycle=original();lifecycle.preflight=bad_cap_preflight;return lifecycle
+                  end
+                  local ok,reason=pcall(load_control)
+                  assert(not ok and tostring(reason):find("caps requires callable preflight",1,true))
+                  assert(handlers.init==nil and handlers.configuration==nil
+                    and next(handlers.events)==nil,"broken cap composition registered handlers")
                 ''')
 
     def test_gun_credit_preflight_runs_before_every_configuration_writer(self):
@@ -689,9 +745,43 @@ class BootstrapTests(unittest.TestCase):
             and cannon_credit_calls.preflight==nil)
         ''')
 
+    def test_native_credit_boundary_preflights_precede_each_lifecycle_writer(self):
+        cases = (
+            ("preflight_force_created", "on_force_created", 1, "{force=player.force}"),
+            ("preflight_force_reset", "on_force_reset", 2, "{force=player.force}"),
+            ("preflight_forces_merged", "on_forces_merged", 3,
+             "{source_index=17,destination=player.force}"),
+            ("preflight_technology_effects_reset", "on_technology_effects_reset", 20,
+             "{force=player.force}"),
+        )
+        for preflight, callback, event_id, event in cases:
+            with self.subTest(preflight=preflight):
+                self.setUp()
+                self.lua.globals().boundary_preflight = preflight
+                self.lua.globals().boundary_callback = callback
+                self.lua.globals().boundary_event_id = event_id
+                self.lua.execute(f'''
+                  install_modules(false,false,false,true);install_runtime();load_control()
+                  local module=require("runtime.native_credits")
+                  local cause={{boundary=boundary_preflight}}
+                  module[boundary_preflight]=function(actual)
+                    assert(actual.force==player.force or actual.destination==player.force)
+                    error(cause)
+                  end
+                  local ok,reason=pcall(handlers.events[boundary_event_id],{event})
+                  assert(not ok and reason==cause,"boundary preflight lost its original failure")
+                  assert(credit_calls[boundary_callback]==nil
+                    and lifecycle_calls.force_created==nil and lifecycle_calls.force_reset==nil
+                    and lifecycle_calls.forces_merged==nil and lifecycle_calls.effects_reset==nil
+                    and library_calls.force==nil,
+                    "native boundary preflight ran after a lifecycle writer")
+                ''')
+
     def test_native_credit_required_exports_refuse_before_bootstrap_registration(self):
         for target_id in ("f200", "f210"):
-            for export in ("preflight_family_transition", "needs_research_events",
+            for export in ("preflight_family_transition", "preflight_force_created",
+                           "preflight_force_reset", "preflight_forces_merged",
+                           "preflight_technology_effects_reset", "needs_research_events",
                            "on_research_finished", "on_research_cancelled"):
                 for opponent in ("missing", "false", "table"):
                     with self.subTest(target=target_id, export=export, opponent=opponent):

@@ -2313,7 +2313,19 @@
       "remaining_obligations": [
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
-      ]
+      ],
+      "latest_player_report": {
+        "intake_date": "2026-11-19",
+        "reporter": "Driku",
+        "reported_symptom": "Setting productivity maximum to 0 still leaves silicon at level 3; removing, saving and reinstalling did not change it.",
+        "source": {
+          "path": "build/qualification/k2so-material-unlimited-report-r01/original-report.txt",
+          "bytes": 32774,
+          "sha256": "214B022A40023521F75B230E8E96ACB0DDF8D34654832A400C836294FBE56AD0"
+        },
+        "finding": "Confirmed in pre-correction source: only the three finite levels are emitted; no level-4 counterpart exists. Exact reporter save and effective settings are not reproduced by this source finding.",
+        "next_patch_gate": "Exact K2SO candidate upgrade preserving finite paid work, real level-4 completion and effect, cap tightening/zero relaxation, save and two cold reloads; no original-reporter closure from host controls."
+      }
     },
     {
       "id": "K2-05",

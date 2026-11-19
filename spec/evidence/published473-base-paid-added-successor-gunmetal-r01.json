@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473BasePaidAdditionNativeChainV1",
+  "status": "passed-bounded-independent-native-review",
+  "scope": "Exact published4.7.20003 Base-only paid source plus one new five-alias provider on Factorio2.0.77; authentic16 refusal, CADD18 successor, one ordinary completion, save and two independent cold loads.",
+  "engine": {
+    "version": "2.0.77",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "actor": {
+    "commit": "f48f97cd032e3d061b7f7924497ce3735dc0ea9a",
+    "fixture_archive": {
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-base-added-f48f97cd-r01/build/qualification/published473-base-added-successor-gunmetal-r01/inputs/mir-fixture-published-base-added-successor_0.1.0.zip",
+      "bytes": 8320,
+      "sha256": "D2C8C8F03F732C459B3ACF1FF87B334608CD84B74A3BDAB7E9552F05655F94A7"
+    },
+    "source_review": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/INDEPENDENT-SOURCE-REVIEW-r02.json",
+      "bytes": 6369,
+      "sha256": "DD955B60223EFEE8205163FA05650266C743E9053FF111CB01BF65EC43313151"
+    }
+  },
+  "player": {
+    "old": {
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-base-added-f48f97cd-r01/build/qualification/published473-base-added-successor-gunmetal-r01/inputs/more-infinite-research_5.0.20016.zip",
+      "bytes": 1043850,
+      "sha256": "EC76E089FC3A66280A3B3E1F149B55217480489E1FF55B009A3B9A50E7890A2C"
+    },
+    "candidate": {
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-base-added-f48f97cd-r01/build/qualification/published473-base-added-successor-gunmetal-r01/inputs/more-infinite-research_5.0.20018.zip",
+      "bytes": 1053010,
+      "sha256": "CADD59F762C729AA4D8C599C7D8307990D0872786969D6CBE1CBF74A81584A14"
+    },
+    "consumed_player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+    "later_source_applicability": "Not adopted by this receipt; do not relabel these consumed bytes as the new K2SO continuation candidate."
+  },
+  "published_source_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/testmods/2.0/more-infinite-research_4.7.20003.zip",
+    "bytes": 1449475,
+    "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+  },
+  "source": {
+    "save": {
+      "bytes": 848333,
+      "sha256": "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413",
+      "observation_sha256": "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98"
+    },
+    "accepted_source_record": {
+      "path": "spec/evidence/published473-base-paid-source-gunmetal-r03.json",
+      "bytes": 8382,
+      "sha256": "00D0508D613707989668C9422A84207D6424538A91EDCB3FB723394C9A5F8831"
+    },
+    "source_creation_repeated": false,
+    "ordinary_source_completions_newly_run": 0,
+    "previously_observed_source_completions": 5,
+    "count_source_work_once": true
+  },
+  "successor_save": {
+    "bytes": 872988,
+    "sha256": "3ECEA8522E74902E10E4C0EFC3D954CDD4A433D2FADB288773FCEF056173F494"
+  },
+  "native_runs": [
+    {
+      "stage": "old",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_seconds": 1.247016,
+      "completion_predicate_observed": false,
+      "loaded_selection": [
+        "base@2.0.77",
+        "mir-fixture-published-base-added-successor@0.1.0",
+        "more-infinite-research@5.0.20016"
+      ],
+      "reader_output": [
+        "{\"native_qualification\": false, \"status\": \"passed-expected-old-refusal\"}"
+      ]
+    },
+    {
+      "stage": "candidate",
+      "exit_code": 137,
+      "timed_out": false,
+      "duration_seconds": 9.802871,
+      "completion_predicate_observed": true,
+      "loaded_selection": [
+        "base@2.0.77",
+        "mir-fixture-published-base-added-successor@0.1.0",
+        "more-infinite-research@5.0.20018"
+      ],
+      "reader_output": [
+        "{\"new_aliases_observed_per_force\": 5, \"observed_forces\": 2, \"ordinary_candidate_completions\": 1, \"reporter_acceptance\": false, \"science_consumed_each_pack\": 16000, \"source_save_sha256\": \"4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413\", \"stable_acceptance\": false, \"stage\": \"candidate\", \"status\": \"passed\"}"
+      ]
+    },
+    {
+      "stage": "cold1",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 1.209487,
+      "completion_predicate_observed": false,
+      "loaded_selection": [
+        "base@2.0.77",
+        "mir-fixture-published-base-added-successor@0.1.0",
+        "more-infinite-research@5.0.20018"
+      ],
+      "reader_output": [
+        "{\"new_aliases_observed_per_force\": 5, \"observed_forces\": 2, \"ordinary_candidate_completions\": 1, \"reporter_acceptance\": false, \"science_consumed_each_pack\": 16000, \"source_save_sha256\": \"4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413\", \"stable_acceptance\": false, \"stage\": \"cold1\", \"status\": \"passed\"}"
+      ]
+    },
+    {
+      "stage": "cold2",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 1.190231,
+      "completion_predicate_observed": false,
+      "loaded_selection": [
+        "base@2.0.77",
+        "mir-fixture-published-base-added-successor@0.1.0",
+        "more-infinite-research@5.0.20018"
+      ],
+      "reader_output": [
+        "{\"new_aliases_observed_per_force\": 5, \"observed_forces\": 2, \"ordinary_candidate_completions\": 1, \"reporter_acceptance\": false, \"science_consumed_each_pack\": 16000, \"source_save_sha256\": \"4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413\", \"stable_acceptance\": false, \"stage\": \"cold2\", \"status\": \"passed\"}"
+      ]
+    }
+  ],
+  "native_processes": 4,
+  "owned_pids": [
+    406646,
+    408685,
+    411000,
+    413041
+  ],
+  "callback": {
+    "startup_changed": false,
+    "observed_startup_values": 875,
+    "mod_changes": {
+      "more-infinite-research": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.20018"
+      },
+      "mir-fixture-published-base-added-successor": {
+        "new_version": "0.1.0"
+      }
+    },
+    "active_mods": {
+      "base": "2.0.77",
+      "more-infinite-research": "5.0.20018",
+      "mir-fixture-published-base-added-successor": "0.1.0"
+    }
+  },
+  "observations": {
+    "ordinary_candidate_completions": 1,
+    "ordinary_candidate_by_script": false,
+    "science_consumed_each_of_four_packs": 16000,
+    "closing_inventory_each_pack": 104,
+    "state_summary_from_independent_review": {
+      "source_history": {
+        "ordinary_source_completions": 5,
+        "counted_once": true,
+        "source_work_was_retained_input": true
+      },
+      "force_registry": [
+        "player#1",
+        "enemy#2",
+        "neutral#3",
+        "mir473-base-paid-foreign#4"
+      ],
+      "pre_work": {
+        "player_original_five_recipe_bonuses": 0.1,
+        "player_new_alias_bonuses": 0,
+        "foreign_original_and_new_alias_bonuses": 0,
+        "player_steel_queue": [
+          "recipe-prod-research_steel-1",
+          "recipe-prod-research_steel-1"
+        ],
+        "player_plastic_saved_progress": 0.27,
+        "foreign_queue": [
+          "braking-force-1",
+          "recipe-prod-research_gears-1",
+          "recipe-prod-research_gears-1"
+        ],
+        "foreign_progress": 0.42
+      },
+      "closed_candidate_and_colds": {
+        "player_steel_level": 3,
+        "player_steel_original_bonus": 0.2,
+        "player_steel_new_alias_bonus": 0.1,
+        "other_four_player_new_alias_bonuses": 0,
+        "foreign_original_and_new_alias_bonuses": 0,
+        "player_steel_queue": [
+          "recipe-prod-research_steel-1"
+        ],
+        "player_steel_progress": 0,
+        "player_plastic_saved_progress": 0.27,
+        "foreign_progress": 0.42,
+        "finite_rows_per_observed_force": 23,
+        "lab": {
+          "name": "lab",
+          "unit_number": 19,
+          "position": [
+            0.5,
+            0.5
+          ],
+          "force": "player#1",
+          "surface_index": 1,
+          "disabled_by_script": true,
+          "laboratory_speed_modifier": 0,
+          "input_remaining_each": 104
+        },
+        "scripted_carrier_notifications": 5,
+        "scripted_carriers_not_counted_as_ordinary": true
+      }
+    },
+    "numeric_note": "Review summaries use readable decimals; retained raw frames preserve the actual floating values.",
+    "raw_frames": {
+      "candidate/added-pre-work": {
+        "artifact": {
+          "path": "build/qualification/published473-base-added-successor-gunmetal-r01/execute-custody/candidate/write/script-output/published-base-added-successor/added-pre-work.json",
+          "bytes": 62882,
+          "sha256": "B0F4995499085492F8E5B6B852049E1FE51A9F02EFC02AFD4AAB185FABFA9170"
+        },
+        "tick": 1253,
+        "phase": "added-pre-work"
+      },
+      "candidate/added-saved": {
+        "artifact": {
+          "path": "build/qualification/published473-base-added-successor-gunmetal-r01/execute-custody/candidate/write/script-output/published-base-added-successor/added-saved.json",
+          "bytes": 126140,
+          "sha256": "482C57F19FFACE440C6792917938B914CF656759A6277EF163930760641525BA"
+        },
+        "tick": 1754,
+        "phase": "added-saved"
+      },
+      "cold1/added-cold": {
+        "artifact": {
+          "path": "build/qualification/published473-base-added-successor-gunmetal-r01/execute-custody/cold1/write/script-output/published-base-added-successor/added-cold.json",
+          "bytes": 126139,
+          "sha256": "D3B599CC6E4DECCD2B6308D3F2679D50E7C7254F8A89E36DC448357EA8EC1B6A"
+        },
+        "tick": 1755,
+        "phase": "added-cold"
+      },
+      "cold2/added-cold": {
+        "artifact": {
+          "path": "build/qualification/published473-base-added-successor-gunmetal-r01/execute-custody/cold2/write/script-output/published-base-added-successor/added-cold.json",
+          "bytes": 126139,
+          "sha256": "D3B599CC6E4DECCD2B6308D3F2679D50E7C7254F8A89E36DC448357EA8EC1B6A"
+        },
+        "tick": 1755,
+        "phase": "added-cold"
+      }
+    }
+  },
+  "restoration": {
+    "controls_restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio_processes": 0,
+    "output_accounting": {
+      "copied_custody_bytes": 9022466,
+      "max_new_output_bytes": 1073741824,
+      "terminal_reserve_bytes": 1048576,
+      "case_bytes": 9022466
+    }
+  },
+  "evidence": {
+    "packet": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/packet.json",
+      "bytes": 13770,
+      "sha256": "BBC28F0A7259F65332E988D29CD9EB7169C9196B2EE22753A0323D5E0EA7B1C1"
+    },
+    "owner": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/Invoke-AddedSuccessor.ps1",
+      "bytes": 22817,
+      "sha256": "956E7CE92ABC36007C0942A36E9F74113C6B03E77BF04A9F3036951CE0891438"
+    },
+    "reader": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/Verify-AddedSuccessor.py",
+      "bytes": 11938,
+      "sha256": "33296CDEA212F286B8C364233912F2ABA44E4C1F3384FEBC66F3E481982C6426"
+    },
+    "composition": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/composition.json",
+      "bytes": 30339,
+      "sha256": "9977B515E7528DC207B7B5B5CC6C4243FC7D81230F8E2DC455FEBBC128F3210F"
+    },
+    "composition_review": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/REVIEW-COMPOSE.json",
+      "bytes": 3704,
+      "sha256": "01FBE6CEB857AE784E3FFE8C12D95610BC8E96DCD531B9B0C64B5CCB93013336"
+    },
+    "execute_review": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/REVIEW-EXECUTE.json",
+      "bytes": 3272,
+      "sha256": "1649BE26CF953018F2EDCF4BD82441ECA01951B7F3F11AFCBEC048B688BB75BA"
+    },
+    "terminal": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/terminal.json",
+      "bytes": 160910,
+      "sha256": "3541A3B5B49BE1E9E8D6D7F7A88D1EEFF670996971AB23AEF2F32FA52E175A6A"
+    },
+    "readback": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/EXECUTE-READBACK-r01.json",
+      "bytes": 30790,
+      "sha256": "5F33424CA9CDC4249F56D04D3361E186B302E18ABA22A76DE5B4BA80308B2840"
+    },
+    "root_result_check": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/ROOT-RESULT-CHECK-r01.json",
+      "bytes": 4482,
+      "sha256": "67BA580AE1A567828BFFA21D91B618FCAB08E978E5E9AB377F31DA4461C715DB"
+    },
+    "independent_result_review": {
+      "path": "build/qualification/published473-base-added-successor-gunmetal-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 6629,
+      "sha256": "1530E1D3DA1CD7D9EAF222CEE2310DC26EBF56CD0DF7591A61BDD75CF6BCD8D5"
+    }
+  },
+  "claims": {
+    "bounded_native_upgrade": true,
+    "earned_original_and_unearned_added_recipe_effects": true,
+    "ordinary_science_work": true,
+    "save_and_two_independent_cold_loads": true,
+    "k2so_material_continuations": false,
+    "factorio_2_1": false,
+    "original_reporter_saves": false,
+    "multiplayer": false,
+    "gui": false,
+    "performance": false,
+    "release": false,
+    "stable_acceptance": false
+  },
+  "limits": [
+    "Two forces have full paid/partial/queue/effect observations; the complete four-force registry is preserved.",
+    "The player steel queue advances by one ordinary completion; unrelated partial work and foreign repeated queues remain preserved.",
+    "Five scripted carrier notifications are retained separately and are not ordinary research completions.",
+    "The candidate closes by the governed saved-completion predicate, not a timeout; both colds naturally exit0.",
+    "Earlier source-producer and reader adverse records remain adverse; no source campaign was repeated.",
+    "This is the exact Base2.0.77/CADD case, not K2SO, the complete reporter selections, other engine editions or stable qualification."
+  ]
+}

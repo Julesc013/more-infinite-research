@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryLocalizedSearchNativeAdverseV1",
+  "status": "closed-before-input-adverse",
+  "source": {
+    "player_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "player_tree": "fdaf8dbadbb926be1f43ccbfd8c39c4cd0a34542",
+    "published_tag": "v5.0.17",
+    "player_archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "player_archive_bytes": 1047107,
+    "controller_commit": "6cbed74f2d9d51ae979c2db22dc521f7b6f63486",
+    "controller_tree": "d3bdbf447cda4d5aa32dad6fc2e5883e28e624b6",
+    "actor_sha256": "060214B725E4BA32CB6D34B03BB987579D0A7CDD284D0571B2C3331F8CE92116",
+    "owner_sha256": "88FD820B64E8BE303510456DBB19E98E701FB37D46EEB7C0818CDC6B2EBFA6D8",
+    "fixture_sha256": "C59C40732D43CC3BB906A082E0406BF215E4451C6C1093D8B06A72DC8E1A160C"
+  },
+  "inputs": {
+    "engine_version": "2.1.24",
+    "engine_variant": "Linux x64 graphical full build, Base selection",
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "protected_fresh_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "protected_fresh_seed_bytes": 1064930,
+    "packet_sha256": "F1C017E08F87EFB0A00883444A5EDCF7A80AF8EA801D2322F19C7F32DB618909",
+    "composition_sha256": "5E051A38CEA41EEEAC3406248D61EE38722F9C353A025D47142DBD473D4A993E",
+    "execution_review_sha256": "24DA11CAA47ED7AA9EABA37E660289DDA5A6409B9C3C916F36F4818FEA9C590F",
+    "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.0|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21017"
+  },
+  "observed": {
+    "owner_service": "mir-library517-localized-search-r01.service",
+    "invocation_id": "5fbe0263b8dd4bb78d8b037d822afcc0",
+    "service_terminal_exit": 1,
+    "governed_roots": ["zero-native composition passed", "native actor returned failure"],
+    "actor_error": "loaded six-mod closure differs",
+    "accepted_passive_phase": "00-initial",
+    "phase_sha256": "3E30C0B4CCEAB00423FC81349A0669CBE7BFD9E18F85CF4966D90B3D3D2A8AFA",
+    "completed_input_actions": 0,
+    "captures": 0,
+    "server_marker_producers": [
+      "__mir-fixture-mir5-active-mods-observer__/data-final-fixes.lua:14",
+      "__mir-fixture-library-localized-search-native__/control.lua:447"
+    ],
+    "client_marker_producers": ["__mir-fixture-mir5-active-mods-observer__/data-final-fixes.lua:14"],
+    "all_marker_payloads_equal_expected": true,
+    "diagnosis": "The actor expected exactly one generic marker per role. The newly added passive fixture initializes on the server and adds a second correct marker there; the joining client has only the data-stage marker. This is a verifier cardinality defect, not a mismatched actual mod selection or an established player defect."
+  },
+  "cleanup": {
+    "direct_child_exit_codes": {"server": 0, "client-de": 0, "display-de": 0},
+    "forced_children": 0,
+    "remaining_owned_session_processes": 0,
+    "private_display_restored": true,
+    "actor_cleanup_verified": true,
+    "owner_restored": true,
+    "restoration_errors": [],
+    "temporary_owned_archives_removed": 5,
+    "direct_library_controls_restored": true,
+    "dependency_library_bytes_copied": 0,
+    "protected_seed_unchanged": true,
+    "initial_executed_copy_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "retained_mutable_working_copy_sha256": "955C74A2F02D04BB00475478DA35EEB3DFC4DE7063285ABD79CD6305B01C0E32",
+    "retained_mutable_working_copy_bytes": 1060656,
+    "supervision_limit": "The jules account had Linger=no; an owned SSH observer was held through this case. No final-logout durability result is claimed."
+  },
+  "custody": {
+    "primary_directory": "build/qualification/library-localized-search-input-preparation-r01",
+    "capsule": "localized-search-r01-originals-r01.json.gz",
+    "capsule_sha256": "7110C1A83EB91D27C5F187484BDB59E84C4D20DC1E03218EC4E4ADC6E42C7924",
+    "capsule_bytes": 2774547,
+    "decoded_bodies": 48,
+    "decoded_bytes": 4635924,
+    "all_decoded_bodies_rehashed": true,
+    "adverse_review_sha256": "937657A03CA6B3645F2E7AC64DCDE7B31387730A9A5EAADF05E4C9F300CCB9AA"
+  },
+  "prospective_correction": {
+    "actor_sha256": "3105CFC5180CECFE801E030FBB10A18F021C083DAF1529084BE341083015B69A",
+    "control_sha256": "579FD9B3DD6CA74DDDFA8A9AA9CFD8505876F85428B61CD323F9C958BCA27835",
+    "source_review_sha256": "890AA234147FE0E71616A2A0B7779946138710C784836C579420D3F307717017",
+    "rule": "Require exactly the known role-specific producers, in order, and the complete exact mod payload for every marker. Reject missing, duplicate, conflicting, malformed or unknown markers. Preserve fatal/desync checks.",
+    "host_controls": "Three actual-log/opponent methods pass; thirteen prior actor methods pass. The old actor fails the actual positive log pair and ten opposing assertions.",
+    "native_status": "No corrected native attempt is adopted by this record. A fresh packet/context, composition review and exclusive host assignment remain necessary."
+  },
+  "scope_limits": [
+    "No actual input, localized query, clear, reopen, pixel/layout, export, Unicode, scrolling or resize acceptance.",
+    "Not a reporter save or imported historical-world reproduction.",
+    "Not Windows, performance, new-development-source crash qualification or stable acceptance.",
+    "Published artifacts and the original adverse outcomes remain unchanged."
+  ]
+}
