@@ -10,6 +10,21 @@ on:
       - dev
       - main
   workflow_dispatch:
+    inputs:
+      native_case:
+        description: Optional reviewed native case; ordinary host checks remain the default
+        type: choice
+        default: none
+        options:
+          - none
+          - worker-storage-finite-four
+      native_mode:
+        description: Compose never starts Factorio; Execute requires the reviewed native assignment
+        type: choice
+        default: Compose
+        options:
+          - Compose
+          - Execute
 
 permissions:
   contents: read
@@ -17,6 +32,7 @@ permissions:
 jobs:
   verification-plan:
     name: verification-plan
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     outputs:
       plan_artifact: ${{ steps.artifact.outputs.plan_artifact }}
@@ -180,6 +196,7 @@ jobs:
   host-controls:
     name: host-controls
     needs: verification-plan
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -349,6 +366,7 @@ jobs:
 
   native-tooling-controls:
     name: native-tooling-controls
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -364,6 +382,7 @@ jobs:
             'tests/tooling/Test-MIRDevelopmentHealth.ps1',
             'tests/tooling/Test-MIRArtifactStorageOptimization.ps1',
             'tests/tooling/Test-MIRPlayerReport.ps1'
+            'tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1'
           )
           foreach ($control in $controls) {
             & pwsh -NoLogo -NoProfile -File $control
@@ -377,3 +396,209 @@ jobs:
             throw 'The Windows convenience launcher requires a PowerShell 5.1 control.'
           }
           & .\tests\tooling\Test-MIRPlayerReport.ps1
+
+  finite-four-controller-control:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check the actual controller without an engine
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & pwsh -NoProfile -File tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1 -OutputRoot (Join-Path $PWD 'build/tmp/worker-storage-finite-four-controller-controls')
+          if ($LASTEXITCODE -ne 0) { throw 'Finite-four controller controls failed.' }
+      - name: Retain the controller-control output
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-storage-finite-four-controls-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-finite-four-controller-controls
+          if-no-files-found: error
+          retention-days: 14
+
+  finite-four-public-inputs:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
+    needs: finite-four-controller-control
+    uses: ./.github/workflows/worker-storage-public-inputs.yml
+
+  finite-four-native:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-finite-four'
+    needs: [finite-four-controller-control, finite-four-public-inputs]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      MIR_NATIVE_MODE: ${{ inputs.native_mode }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit preparation without starting the native assignment
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          if ($env:MIR_NATIVE_MODE -notin @('Compose', 'Execute')) { throw 'Unknown native mode.' }
+          . ./tools/lib/validation/NativeProbeResources.ps1
+          $root = Join-Path $PWD 'build/tmp/worker-storage-finite-four'
+          $context = New-MIRNativeProbeResourceContext -RepoRoot $PWD -OutputRoot $root -ExpectedPeakMemoryMiB 4096 -MaxNewOutputMiB 2048 -UseExactOutputRoot
+          [IO.Directory]::CreateDirectory($context.root) | Out-Null
+          Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIRWorkerStorageFiniteFourPreparationAdmissionV1';mode=$env:MIR_NATIVE_MODE;native_processes=0;admission=(Assert-MIR441ResourceAdmission -Policy $context.policy -WorkRoot $context.root -EstimatedPeakBytes $context.max_new_output_bytes -ExpectedPeakMemoryBytes $context.peak_memory_bytes)})
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: worker-storage-exact-packages-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-finite-four/packages
+      - name: Retrieve the exact public engine and predecessor
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=build/tmp/worker-storage-finite-four
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1463293 --output "$out/more-infinite-research_4.7.21003.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.21003.zip
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 300 --max-filesize 61211876 --output "$out/factorio-headless-2.1.24.tar.xz" https://factorio.com/get-download/2.1.24/headless/linux64
+      - name: Bind the finite public runtime inputs
+        shell: python
+        run: |
+          from pathlib import Path, PurePosixPath
+          import hashlib, json, os, shutil, subprocess, tarfile
+
+          repo = Path.cwd()
+          root = repo / 'build/tmp/worker-storage-finite-four'
+          def digest(path):
+              with path.open('rb') as stream:
+                  return hashlib.file_digest(stream, 'sha256').hexdigest().upper()
+          def write_json(path, value):
+              with path.open('x', encoding='utf-8') as stream:
+                  json.dump(value, stream, indent=2)
+                  stream.write('\n')
+          packet = json.loads((repo / 'tests/fixtures/worker-storage-finite-four-native.json').read_text())
+          source = root / 'more-infinite-research_4.7.21003.zip'
+          candidate = root / 'packages/more-infinite-research_5.0.21018.zip'
+          archive = root / 'factorio-headless-2.1.24.tar.xz'
+          if digest(source) != 'B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852' or source.stat().st_size != 1463293:
+              raise ValueError('Published predecessor differs')
+          if digest(candidate) != 'C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D' or candidate.stat().st_size != 1053618:
+              raise ValueError('Frozen candidate differs')
+          if digest(archive) != 'C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F' or archive.stat().st_size != 61211876:
+              raise ValueError('Official engine archive differs')
+          engine_root = root / 'engine'
+          engine_root.mkdir()
+          with tarfile.open(archive, 'r:xz') as stream:
+              members = stream.getmembers()
+              if len({member.name for member in members}) != len(members):
+                  raise ValueError('Duplicate engine member')
+              if sum(member.size for member in members if member.isfile()) > 1024 * 1024 * 1024:
+                  raise ValueError('Engine extraction exceeds the admitted input allowance')
+              for member in members:
+                  path = PurePosixPath(member.name)
+                  if path.is_absolute() or '..' in path.parts or not path.parts or path.parts[0] != 'factorio':
+                      raise ValueError('Engine member escapes the selected root')
+              stream.extractall(engine_root, filter='data')
+          engine = engine_root / 'factorio/bin/x64/factorio'
+          data = engine_root / 'factorio/data'
+          if digest(engine) != '062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF' or engine.stat().st_size != 260556936:
+              raise ValueError('Extracted executable differs')
+          if json.loads((data / 'base/info.json').read_text())['version'] != '2.1.24':
+              raise ValueError('Bundled Base differs')
+          library = Path(os.environ['RUNNER_TEMP']) / ('mir-worker-finite-four-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
+          library.mkdir()
+          selected = [source, candidate]
+          for descriptor in packet['inputs']['fixtures']:
+              path = root / 'packages' / descriptor['filename']
+              if digest(path) != descriptor['sha256'] or path.stat().st_size != descriptor['bytes']:
+                  raise ValueError('Own fixture container differs')
+              descriptor['path'] = str(path)
+              selected.append(path)
+          for path in selected:
+              with path.open('rb') as incoming, (library / path.name).open('xb') as outgoing:
+                  shutil.copyfileobj(incoming, outgoing)
+              if digest(library / path.name) != digest(path):
+                  raise ValueError('Own input copy differs')
+          profiles = {}
+          for role, version in (('source', '4.7.21003'), ('candidate', '5.0.21018')):
+              profile = root / (role + '-profile.json')
+              write_json(profile, {'schema': 1, 'kind': 'worker-storage-finite-four-selection', 'target': 'f210', 'factorio_line': '2.1', 'engine': {'version': '2.1.24', 'sha256': digest(engine)}, 'settings_mode': 'Defaults', 'mods': [{'name': 'base', 'version': '2.1.24', 'enabled': True}, {'name': 'more-infinite-research', 'version': version, 'enabled': True}, {'name': 'mir-worker-storage-finite-fixture', 'version': '0.1.0', 'enabled': True}, {'name': 'mir-worker-storage-native-observer', 'version': '0.1.2', 'enabled': True}]})
+              profiles[role] = str(profile)
+          map_settings = json.loads((data / 'map-gen-settings.example.json').read_text())
+          map_settings.update(seed=424242, width=128, height=128, water=0)
+          map_path = root / 'map-gen-settings.json'
+          write_json(map_path, map_settings)
+          projections = root / 'fixture-projections'
+          projections.mkdir()
+          for descriptor in packet['inputs']['actor_members']:
+              relative = descriptor['path']
+              contents = subprocess.check_output(['git', 'show', '22f34725d00befd4c80160105b98b556824b57ed:' + relative])
+              if hashlib.sha256(contents).hexdigest().upper() != descriptor['sha256'] or len(contents) != descriptor['bytes']:
+                  raise ValueError('Own fixture Git member differs')
+              role = 'observer' if '/worker-storage-native-observer/' in relative else 'provider'
+              destination = projections / role
+              destination.mkdir(exist_ok=True)
+              with (destination / Path(relative).name).open('xb') as stream:
+                  stream.write(contents)
+          output = root / 'execution'
+          output.mkdir()
+          packet['inputs']['engine']['binary_path'] = str(engine)
+          packet['inputs']['engine']['engine_data_path'] = str(data)
+          packet['inputs']['source_mir']['path'] = str(source)
+          packet['inputs']['candidate_mir']['path'] = str(candidate)
+          packet['runtime_bindings'].update(library_directory=str(library), output_root=str(output), source_profile=profiles['source'], candidate_profile=profiles['candidate'], server_port=34197, server_settings_template=str(data / 'server-settings.example.json'), source_seed_map_gen_settings=str(map_path), input_disposition='Fresh exact public inputs and checkout-owned fixture containers only; no protected player input.')
+          write_json(root / 'runtime-packet.json', packet)
+      - name: Verify actual library composition and restore it before the case
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          . ./tools/lib/validation/ImmutableInputStaging.ps1
+          . ./tools/lib/compatibility/LibraryActivation.ps1
+          $root = Join-Path $PWD 'build/tmp/worker-storage-finite-four'
+          $packet = Get-Content -LiteralPath (Join-Path $root 'runtime-packet.json') -Raw | ConvertFrom-Json -AsHashtable
+          $runtime = $packet.runtime_bindings
+          $hashes = @{}
+          foreach ($row in $packet.inputs.fixtures) { $hashes[$row.filename] = $row.sha256 }
+          $provider = @($packet.inputs.fixtures | Where-Object role -eq 'finite provider archive')
+          $observer = @($packet.inputs.fixtures | Where-Object role -eq 'native observer archive')
+          if ($provider.Count -ne 1 -or $observer.Count -ne 1) { throw 'Own fixture roles differ.' }
+          Assert-MIRLibraryFixtureArchive -Archive $provider[0].path -SourceDirectory (Join-Path $root 'fixture-projections/provider')
+          Assert-MIRLibraryFixtureArchive -Archive $observer[0].path -SourceDirectory (Join-Path $root 'fixture-projections/observer')
+          $receipts = @()
+          foreach ($role in @('source', 'candidate')) {
+            $mir = $packet.inputs[($role + '_mir')]
+            $selected = $hashes.Clone()
+            $selected[$mir.filename] = $mir.sha256
+            $activation = $null
+            try {
+              $activation = Start-MIRLibraryActivation -LibraryDirectory $runtime.library_directory -EngineDataDirectory $packet.inputs.engine.engine_data_path -ProfilePath $runtime[($role + '_profile')] -ArchiveHashes $selected -SettingsMode Defaults
+              if ($activation.selected.Count -ne 4) { throw 'Selected closure is not the finite four-mod case.' }
+              Assert-MIRLibraryActivation -Activation $activation
+            } finally {
+              if ($null -ne $activation) { $receipts += Complete-MIRLibraryActivation -Activation $activation }
+            }
+          }
+          if (Test-Path -LiteralPath (Join-Path $runtime.library_directory '.mir-active-profile.json')) { throw 'Composition lease was not released.' }
+          [IO.File]::WriteAllText((Join-Path $root 'library-compose.json'), (($receipts | ConvertTo-Json -Depth 30) + "`n"), [Text.UTF8Encoding]::new($false))
+          & pwsh -NoProfile -File tools/Invoke-WorkerStorageFiniteFourNative.ps1 -Mode Compose -PacketPath (Join-Path $root 'runtime-packet.json') -OutputPath (Join-Path $root 'driver-compose.json')
+          if ($LASTEXITCODE -ne 0) { throw 'Bound driver Compose failed.' }
+      - name: Run only the explicitly selected mode in a fresh process
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = Join-Path $PWD 'build/tmp/worker-storage-finite-four'
+          if ($env:MIR_NATIVE_MODE -eq 'Execute') {
+            & pwsh -NoProfile -File tools/Invoke-WorkerStorageFiniteFourNative.ps1 -Mode Execute -PacketPath (Join-Path $root 'runtime-packet.json') -OutputPath (Join-Path $root 'driver-execute.json')
+            if ($LASTEXITCODE -ne 0) { throw 'Finite-four native execution failed; retain the adverse output.' }
+          } elseif ($env:MIR_NATIVE_MODE -ne 'Compose') { throw 'Unknown native mode.' }
+      - name: Retain the exact packet and all case output
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-storage-finite-four-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/tmp/worker-storage-finite-four/*.json
+            build/tmp/worker-storage-finite-four/execution
+            build/tmp/worker-storage-finite-four/fixture-projections
+          if-no-files-found: error
+          retention-days: 14
