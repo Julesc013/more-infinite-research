@@ -17,6 +17,7 @@ Date: 2026-11-19
     - Factorio 2.0/2.1: Reject changed internal recipe-productivity amounts before altering saved bonuses.
     - Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration
       paths.
+    - Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.17
