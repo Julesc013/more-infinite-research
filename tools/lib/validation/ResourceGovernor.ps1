@@ -379,6 +379,7 @@ function Get-MIR441OwnedProcessTree {
       working_set_bytes=[int64]$tree.working_set_bytes;private_bytes=[int64]$tree.private_bytes;children=$children
       root_exited=[bool]$tree.root_exited;root_identity=$tree.root_identity
       private_measure=[string]$tree.private_measure;private_resident_bytes=[int64]$tree.private_resident_bytes;private_swap_bytes=[int64]$tree.private_swap_bytes
+      released_address_space_members=@($tree.released_address_space_members)
     }
   }
   # Query only direct children of processes we have already established as
@@ -827,7 +828,7 @@ function Invoke-MIR441MonitoredProcess {
       # Preserve the triggering process observation before enforcing its budget.
       # Private bytes can exceed working set during graphical resource loading.
       $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
-      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
+      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.released_address_space_members=@($tree.released_address_space_members);$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}

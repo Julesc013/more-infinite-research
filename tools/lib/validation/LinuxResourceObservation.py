@@ -17,7 +17,18 @@ import posixpath
 import re
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
+
+
+# Linux task flags, include/linux/sched.h. This alone never waives a memory read.
+PF_EXITING = 0x00000004
+
+
+class ReleasedAddressSpace(NamedTuple):
+    """A successful status snapshot without an address space, not measured RSS."""
+
+    pid: int
+    state: str
 
 
 class ObservationFailure(Exception):
@@ -319,6 +330,7 @@ def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[
         "state": fields[0],
         "ppid": parse_uint(fields[1], "mir441-linux-process-stat"),
         "session_id": parse_uint(fields[3], "mir441-linux-process-stat"),
+        "flags": parse_uint(fields[6], "mir441-linux-process-stat"),
         "start_ticks": parse_uint(fields[19], "mir441-linux-process-stat"),
     }
 
@@ -341,16 +353,28 @@ def iter_proc_stats(proc_root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def read_status_rss(proc_root: Path, pid: int) -> int:
+def read_status_rss(proc_root: Path, pid: int) -> int | ReleasedAddressSpace:
+    """Read RSS or retain a validated R-state/no-address-space observation."""
     value: int | None = None
-    for line in read_text(proc_root / str(pid) / "status", "mir441-linux-process-status").splitlines():
+    lines = read_text(proc_root / str(pid) / "status", "mir441-linux-process-status").splitlines()
+    for line in lines:
         match = re.fullmatch(r"VmRSS:\s*([0-9]+)\s+kB\s*", line)
-        if match is not None:
-            if value is not None:
+        if line.lstrip().lower().startswith("vmrss"):
+            if match is None or value is not None:
                 fail("mir441-linux-process-status")
             value = parse_uint(match.group(1), "mir441-linux-process-status") * 1024
     if value is None:
-        fail("mir441-linux-process-status")
+        # proc_pid_status omits memory fields when get_task_mm returns no mm.
+        # A malformed/present memory field is not that supported observation.
+        if any(line.lstrip().lower().startswith(("vm", "rss", "hugetlb")) for line in lines):
+            fail("mir441-linux-process-status")
+        states = [re.fullmatch(r"State:\s*([A-Za-z])\s+\([^\n()]+\)\s*", line) for line in lines if line.startswith("State:")]
+        pids = [re.fullmatch(r"Pid:\s*([0-9]+)\s*", line) for line in lines if line.startswith("Pid:")]
+        if (len(states) != 1 or states[0] is None or states[0].group(1) != "R"
+                or len(pids) != 1 or pids[0] is None
+                or parse_uint(pids[0].group(1), "mir441-linux-process-status") != pid):
+            fail("mir441-linux-process-status")
+        return ReleasedAddressSpace(pid=pid, state="R")
     return value
 
 
@@ -445,6 +469,7 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
             "private_bytes": 0,
             "private_measure": "smaps_rollup_private_resident_plus_swap",
             "children": [],
+            "released_address_space_members": [],
         }
     else:
         queue = [root]
@@ -469,6 +494,7 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
     private_resident = 0
     private_swap = 0
     children: list[dict[str, int]] = []
+    released_address_space_members: list[dict[str, int | str]] = []
     for pid in sorted(owned):
         row = owned[pid]
         current = read_proc_stat(proc_root, pid, missing_is_exit=True)
@@ -485,10 +511,18 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
         # Continue accounting for every live member of the owned session.
         if current.get("state") in {"Z", "X", "x"}:
             continue
+        memory_failure: ObservationFailure | None = None
         try:
             rss = read_status_rss(proc_root, pid)
-            resident, swap = read_private_memory(proc_root, pid)
-        except ObservationFailure as memory_failure:
+            if isinstance(rss, ReleasedAddressSpace):
+                # The status alone does not prove which owned lifecycle this
+                # belongs to. Confirm it through the common boundary below.
+                memory_failure = ObservationFailure("mir441-linux-process-status")
+            else:
+                resident, swap = read_private_memory(proc_root, pid)
+        except ObservationFailure as failure:
+            memory_failure = failure
+        if memory_failure is not None:
             # Exit can occur between identity and either memory read. Only a
             # re-observed exit of that exact identity makes this sample absent;
             # a live malformed/unreadable process still retains the refusal.
@@ -503,7 +537,39 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
                 if pid == root_pid:
                     root = after
                 continue
-            raise
+            # Linux releases mm before exit_notify marks the task Z. A fresh
+            # successful no-mm status bracketed by matching R/PF_EXITING stat
+            # identities proves that lifecycle transition after either memory
+            # read. Neither a read error nor PF_EXITING alone is such proof.
+            if after["state"] == "R" and after["flags"] & PF_EXITING:
+                try:
+                    released = read_status_rss(proc_root, pid)
+                    confirmed = (read_proc_stat(proc_root, pid, missing_is_exit=True)
+                                 if isinstance(released, ReleasedAddressSpace) else after)
+                except ObservationFailure:
+                    raise memory_failure
+                if confirmed is not None and (confirmed["start_ticks"] != row["start_ticks"]
+                        or session_id is not None and confirmed["session_id"] != session_id):
+                    fail("mir441-owned-child-identity")
+                if confirmed is None or confirmed.get("state") in {"Z", "X", "x"}:
+                    if pid == root_pid:
+                        root = confirmed
+                    continue
+                if (isinstance(released, ReleasedAddressSpace) and released.pid == pid
+                        and released.state == "R" and confirmed["state"] == "R"
+                        and confirmed["flags"] & PF_EXITING):
+                    released_address_space_members.append({
+                        "pid": pid, "start_ticks": row["start_ticks"],
+                        "session_id": row["session_id"], "state": "R",
+                        "flags": confirmed["flags"], "reason": "exiting-address-space-released",
+                    })
+                    # No RSS/smaps value was measured for this member. Retain
+                    # its explicit outcome and continue accounting for peers.
+                    # A still-R root is not an observed process exit.
+                    if pid == root_pid:
+                        root = confirmed
+                    continue
+            raise memory_failure
         # Commit one complete sample, never an RSS fragment whose private
         # accounting became unavailable during a confirmed process exit.
         working += rss
@@ -520,6 +586,7 @@ def process_tree(proc_root: Path, root_pid: int, root_start_ticks: int, session_
         "private_bytes": private_resident + private_swap,
         "private_measure": "smaps_rollup_private_resident_plus_swap",
         "children": children,
+        "released_address_space_members": released_address_space_members,
     }
 
 

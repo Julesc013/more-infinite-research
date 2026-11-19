@@ -50,9 +50,10 @@ def cgroup_files(path: Path, *, current: int, maximum: str, high: str) -> None:
     )
 
 
-def proc_stat(pid: int, ppid: int, start: int, session: int = 1) -> str:
+def proc_stat(pid: int, ppid: int, start: int, session: int = 1, *, state: str = "S", flags: int = 0) -> str:
     # Fields after the final ')' start at procfs field 3.  starttime is field 22.
     fields = ["S", str(ppid), "0", str(session)] + ["0"] * 15 + [str(start)]
+    fields[0], fields[6] = state, str(flags)  # procfs state field3 and flags field9.
     return f"{pid} (owned worker {pid}) {' '.join(fields)}\n"
 
 
@@ -508,6 +509,157 @@ try {{
         self.assertEqual(4 * 5 * 1024, value["private_swap_bytes"])
         self.assertEqual(4 * 10 * 1024, value["private_bytes"])
         self.assertEqual("smaps_rollup_private_resident_plus_swap", value["private_measure"])
+
+    def test_released_r_state_member_keeps_peer_memory_and_root_lifetime_separate(self) -> None:
+        for released in (100, 101):
+            with self.subTest(released=released), tempfile.TemporaryDirectory(prefix="mir-linux-released-mm-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
+                process_files(proc, 101, 100, 1001, {101: ""}, session=100)
+                parent, start = (1, 1000) if released == 100 else (100, 1001)
+                write(proc / str(released) / "stat", proc_stat(released, parent, start, 100, state="R", flags=4))
+                write(proc / str(released) / "status", f"Name:\towned\nState:\tR (running)\nPid:\t{released}\n")
+                (proc / str(released) / "smaps_rollup").unlink()
+                original_private = OBSERVATION.read_private_memory
+                with mock.patch.object(OBSERVATION, "read_private_memory", wraps=original_private) as private:
+                    value = OBSERVATION.process_tree(proc, 100, 1000, 100)
+                self.assertEqual([(proc, 101 if released == 100 else 100)], [call.args for call in private.call_args_list])
+                self.assertFalse(value["root_exited"])
+                self.assertEqual(12 * 1024, value["working_set_bytes"])
+                self.assertEqual(10 * 1024, value["private_bytes"])
+                self.assertEqual([{
+                    "pid": released, "start_ticks": start, "session_id": 100,
+                    "state": "R", "flags": 4, "reason": "exiting-address-space-released",
+                }], value["released_address_space_members"])
+                self.assertNotIn("working_set_bytes", value["released_address_space_members"][0])
+                self.assertEqual([101] if released == 100 else [], [row["id"] for row in value["children"]])
+
+    def test_exit_between_rss_and_private_reads_needs_fresh_release_proof_and_discards_fragment(self) -> None:
+        for released in (100, 101):
+            with self.subTest(released=released), tempfile.TemporaryDirectory(prefix="mir-linux-mm-between-reads-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
+                process_files(proc, 101, 100, 1001, {101: ""}, session=100)
+                parent, start = (1, 1000) if released == 100 else (100, 1001)
+                original = OBSERVATION.read_private_memory
+                cause = OBSERVATION.ObservationFailure("mir441-linux-process-smaps")
+                def exit_after_rss(root, pid):
+                    if pid == released:
+                        write(proc / str(pid) / "stat", proc_stat(pid, parent, start, 100, state="R", flags=4))
+                        write(proc / str(pid) / "status", f"Name:\towned\nState:\tR (running)\nPid:\t{pid}\n")
+                        raise cause
+                    return original(root, pid)
+                with mock.patch.object(OBSERVATION, "read_private_memory", side_effect=exit_after_rss):
+                    value = OBSERVATION.process_tree(proc, 100, 1000, 100)
+                self.assertFalse(value["root_exited"])
+                self.assertEqual(12 * 1024, value["working_set_bytes"])
+                self.assertEqual(10 * 1024, value["private_bytes"])
+                self.assertEqual([released], [row["pid"] for row in value["released_address_space_members"]])
+
+    def test_final_release_confirmation_cannot_hide_identity_replacement_or_unreadability(self) -> None:
+        for opponent, code in (("pid-reused", "mir441-owned-child-identity"), ("unreadable-stat", "mir441-linux-process-status")):
+            with self.subTest(opponent=opponent), tempfile.TemporaryDirectory(prefix="mir-linux-mm-confirmation-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: ""}, session=100)
+                write(proc / "100/stat", proc_stat(100, 1, 1000, 100, state="R", flags=4))
+                write(proc / "100/status", "Name:\towned\nState:\tR (running)\nPid:\t100\n")
+                original = OBSERVATION.read_status_rss
+                calls = 0
+                def confirm(root, pid):
+                    nonlocal calls
+                    value = original(root, pid)
+                    calls += 1
+                    if calls == 2:
+                        if opponent == "pid-reused":
+                            write(proc / "100/stat", proc_stat(100, 1, 9999, 100, state="R", flags=4))
+                        else:
+                            write(proc / "100/stat", "not a proc stat record\n")
+                    return value
+                with mock.patch.object(OBSERVATION, "read_status_rss", side_effect=confirm):
+                    with self.assertRaises(OBSERVATION.ObservationFailure) as raised:
+                        OBSERVATION.process_tree(proc, 100, 1000, 100)
+                self.assertEqual(code, raised.exception.code)
+
+    def test_pf_exiting_with_memory_still_requires_and_counts_the_complete_sample(self) -> None:
+        for missing_private in (False, True):
+            with self.subTest(missing_private=missing_private), tempfile.TemporaryDirectory(prefix="mir-linux-exiting-live-mm-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: ""}, session=100)
+                write(proc / "100/stat", proc_stat(100, 1, 1000, 100, state="R", flags=4))
+                if missing_private:
+                    (proc / "100/smaps_rollup").unlink()
+                    with self.assertRaises(OBSERVATION.ObservationFailure) as raised:
+                        OBSERVATION.process_tree(proc, 100, 1000, 100)
+                    self.assertEqual("mir441-linux-process-smaps", raised.exception.code)
+                else:
+                    value = OBSERVATION.process_tree(proc, 100, 1000, 100)
+                    self.assertFalse(value["root_exited"])
+                    self.assertEqual(12 * 1024, value["working_set_bytes"])
+                    self.assertEqual(10 * 1024, value["private_bytes"])
+                    self.assertEqual([], value["released_address_space_members"])
+
+    def test_missing_rss_needs_readable_unambiguous_pid_state_and_exit_flags(self) -> None:
+        base = "Name:\towned\nState:\tR (running)\nPid:\t100\n"
+        opponents = {
+            "live-unflagged": (base, "R", 0),
+            "sleeping-stat": (base, "S", 4),
+            "sleeping-status": (base.replace("R (running)", "S (sleeping)"), "R", 4),
+            "missing-state": ("Name:\towned\nPid:\t100\n", "R", 4),
+            "malformed-state": (base.replace("R (running)", "running"), "R", 4),
+            "duplicate-state": (base + "State:\tR (running)\n", "R", 4),
+            "missing-pid": ("Name:\towned\nState:\tR (running)\n", "R", 4),
+            "foreign-pid": (base.replace("Pid:\t100", "Pid:\t999"), "R", 4),
+            "duplicate-pid": (base + "Pid:\t100\n", "R", 4),
+            "malformed-rss": (base + "VmRSS:\tbroken kB\n", "R", 4),
+            "duplicate-rss": (base + "VmRSS:\t12 kB\nVmRSS:\t13 kB\n", "R", 4),
+            "malformed-second-rss": (base + "VmRSS:\t12 kB\nVmRSS:\tbroken kB\n", "R", 4),
+            "other-memory-still-present": (base + "VmSize:\t12 kB\n", "R", 4),
+            "unreadable-status": (None, "R", 4),
+        }
+        for name, (status, state, flags) in opponents.items():
+            with self.subTest(opponent=name), tempfile.TemporaryDirectory(prefix="mir-linux-no-mm-opponent-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: ""}, session=100)
+                write(proc / "100/stat", proc_stat(100, 1, 1000, 100, state=state, flags=flags))
+                if status is None:
+                    (proc / "100/status").unlink()
+                else:
+                    write(proc / "100/status", status)
+                with self.assertRaises(OBSERVATION.ObservationFailure) as raised:
+                    OBSERVATION.process_tree(proc, 100, 1000, 100)
+                self.assertEqual("mir441-linux-process-status", raised.exception.code)
+
+    def test_released_address_space_reread_preserves_identity_and_flag_refusals(self) -> None:
+        for name, start, session, flags, code in (
+            ("reused-pid", 9999, 100, 4, "mir441-owned-child-identity"),
+            ("foreign-session", 1000, 999, 4, "mir441-owned-child-identity"),
+            ("exit-flag-disappeared", 1000, 100, 0, "mir441-linux-process-status"),
+        ):
+            with self.subTest(opponent=name), tempfile.TemporaryDirectory(prefix="mir-linux-no-mm-reread-") as directory:
+                proc = Path(directory)
+                process_files(proc, 100, 1, 1000, {100: ""}, session=100)
+                write(proc / "100/stat", proc_stat(100, 1, 1000, 100, state="R", flags=4))
+                write(proc / "100/status", "Name:\towned\nState:\tR (running)\nPid:\t100\n")
+                original = OBSERVATION.read_status_rss
+                def transition(root, pid):
+                    value = original(root, pid)
+                    write(proc / "100/stat", proc_stat(100, 1, start, session, state="R", flags=flags))
+                    return value
+                with mock.patch.object(OBSERVATION, "read_status_rss", side_effect=transition):
+                    with self.assertRaises(OBSERVATION.ObservationFailure) as raised:
+                        OBSERVATION.process_tree(proc, 100, 1000, 100)
+                self.assertEqual(code, raised.exception.code)
+
+    def test_unexpected_status_reader_failure_is_never_a_released_address_space(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="mir-linux-no-mm-unexpected-") as directory:
+            proc = Path(directory)
+            process_files(proc, 100, 1, 1000, {100: ""}, session=100)
+            write(proc / "100/stat", proc_stat(100, 1, 1000, 100, state="R", flags=4))
+            failure = RuntimeError("unexpected status reader failure")
+            with mock.patch.object(OBSERVATION, "read_status_rss", side_effect=failure):
+                with self.assertRaises(RuntimeError) as raised:
+                    OBSERVATION.process_tree(proc, 100, 1000, 100)
+            self.assertIs(failure, raised.exception)
 
     def test_zombie_leader_has_no_address_space_but_live_session_child_is_still_counted(self) -> None:
         with tempfile.TemporaryDirectory(prefix="mir-linux-zombie-accounting-") as directory:
