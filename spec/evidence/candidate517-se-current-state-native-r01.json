@@ -1,0 +1,370 @@
+{
+  "kind": "MIR517SECurrentStateNativeQualificationV1",
+  "verdict": "passed-reduced-current-state-cap-reset-ordinary-save-two-cold",
+  "source": {
+    "commit": "cd02652282d277b63664fed91977ae4d5e92de7a",
+    "player_tree": "f08bee5ab5a9152fe406aed8cc4739023f8e62e3",
+    "source_version": "5.0.17",
+    "distribution_version": "5.0.20017",
+    "package": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir517-se-current-candidate-r01\\more-infinite-research_5.0.20017.zip",
+      "bytes": 1044815,
+      "sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5"
+    },
+    "published_at_observation": false
+  },
+  "fixture": {
+    "actor_commit": "9a3cb7d73514a1fd598ae612e7ed11535c2d4915",
+    "version": "0.12.0",
+    "archive": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir517-se-current-qualification-r03\\mir-fixture-mir5-worker-speed-cap-ten_0.12.0.zip",
+      "bytes": 16581,
+      "sha256": "196FD8D8C75B9E15421CD7F84221B169A5AC620A94E11B06E3678403262047BB"
+    },
+    "merge_pr": 2043,
+    "merge_commit": "3e2c822d16d499562fdd8047beb28255363ca80b"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "data": "D:\\Games\\Factorio\\2.0\\data"
+  },
+  "mods": {
+    "base": "2.0.77",
+    "more-infinite-research": "5.0.20017",
+    "mir-fixture-mir5-worker-speed-cap-ten": "0.12.0",
+    "space-exploration": "0.7.57",
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "jetpack": "0.4.17",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "informatron": "0.4.0",
+    "aai-signal-transmission": "0.5.3"
+  },
+  "dependency_archive_count": 17,
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "admission_wait_seconds": 30,
+    "processes": 3
+  },
+  "current_state": {
+    "native_resets": 3,
+    "native_reset_events": 3,
+    "player_level_ten_queue_occurrences_before_after": [
+      2,
+      1
+    ],
+    "player_partial_progress_preserved": 0.27,
+    "foreign_automation_progress_preserved": 0.42,
+    "earned_level_preserved": 13
+  },
+  "native": {
+    "fresh_process_count": 3,
+    "pids": [
+      136028,
+      142144,
+      21856
+    ],
+    "cap": {
+      "pid": 136028,
+      "completion_predicate_observed": true,
+      "exit_code": -1,
+      "timed_out": false,
+      "observation_sha256": "3D5226BD17C44AB07CDD3015348A5239F077E70C3C93EB98C5D17495A9BB40B3",
+      "completed_save": {
+        "bytes": 824618,
+        "sha256": "B4A47480A1E84FE26DE05EDFCD6A00F96DC2B97641DBFEF4C0A4260DB730BA30"
+      }
+    },
+    "cold1": {
+      "pid": 142144,
+      "exit_code": 0,
+      "timed_out": false,
+      "observation_sha256": "B0716350B3E157FF6146492BE6F79FB29DB379C80BF1E7F59BC3AE879C87392C"
+    },
+    "cold2": {
+      "pid": 21856,
+      "exit_code": 0,
+      "timed_out": false,
+      "observation_sha256": "B0716350B3E157FF6146492BE6F79FB29DB379C80BF1E7F59BC3AE879C87392C"
+    },
+    "ordinary_completion": {
+      "count": 1,
+      "technology": "worker-robots-speed-10",
+      "by_script": false,
+      "completed_level": 10,
+      "event_post_increment_level": 11,
+      "level_eleven_start_count": 0,
+      "level_eleven_queue_attempt_accepted": false,
+      "post_completion_hold_ticks": 2
+    }
+  },
+  "paid_lab": {
+    "named_packs": [
+      "automation-science-pack",
+      "chemical-science-pack",
+      "logistic-science-pack",
+      "se-deep-space-science-pack-1",
+      "se-energy-science-pack-4",
+      "se-rocket-science-pack",
+      "space-science-pack",
+      "utility-science-pack"
+    ],
+    "scripted_feed_per_pack": 2536,
+    "remaining_per_pack": 200,
+    "observed_native_debit_per_pack": 2336,
+    "post_completion_hold_ticks": 2,
+    "role": "Synthetic pre-existing 27% work and bounded fixture lab; no full physical science-production claim"
+  },
+  "reader_replay": {
+    "cap": "passed-exact-current-state-observations",
+    "cold1": "passed-exact-current-state-observations",
+    "cold2_with_first_cold": "passed-exact-current-state-observations",
+    "cold_observations_equal_after_only_phase_and_on_load_label_are_removed": true,
+    "queue_attempt_present_and_equal_in_cap_cold1_cold2": true
+  },
+  "restoration": {
+    "raw_member_count": 83,
+    "raw_custody_and_live_native_root_rehash": "passed",
+    "frozen_packet_input_rows_rehashed": 102,
+    "frozen_packet_unique_paths_rehashed": 98,
+    "library_controls_rechecked": 4,
+    "library_archives_rechecked": 37,
+    "library_top_level_path_count_before_after": 884,
+    "restored": true,
+    "restore_error": null,
+    "factorio_processes_after_review": 0,
+    "adopted_old15_adverse_pid": 110816,
+    "adopted_old15_remains_adverse": true
+  },
+  "proofs": {
+    "packet": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/packet.json",
+      "bytes": 33193,
+      "sha256": "C29691722F974A92998D7435A6BA91E32AB1D8CE77F08E175EDB9433EFD76547"
+    },
+    "plan": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/plan.json",
+      "bytes": 1322,
+      "sha256": "F05A69776799412BFF2561670A5861D5E184D713121D15785D83C47F553E53BA"
+    },
+    "composition": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/composition.json",
+      "bytes": 136390,
+      "sha256": "D68BBBB68F05877529A1D29546ED66096BBDE4DB5233277ED9390D5AFDCB3791"
+    },
+    "terminal": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/terminal.json",
+      "bytes": 197258,
+      "sha256": "B108F18782BF450A4C124BBB4D56B1D3A51B683ED940E53D7A35B2467A21CE07"
+    },
+    "guard_execute": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/guard-execute.json",
+      "bytes": 302,
+      "sha256": "66F40F119A494AC92A894CDDE8CE855E073FD2B30D5E8911857F5A7676C006A2"
+    },
+    "reader": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/Verify-CurrentCap.py",
+      "bytes": 20417,
+      "sha256": "43EAFFD023AE6A312D37516E3AB149BCC5620AA94A41C6B7088C6143FF0DF68D"
+    },
+    "fixture_raw_git_members": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/fixture-raw-git-members.json",
+      "bytes": 2125,
+      "sha256": "FDC04BD68C2D2A0AB7B031B0476475F78B0ADAD0A37E6ACEC207C1CD8E3D84EC"
+    },
+    "independent_fixture_review": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/INDEPENDENT-FIXTURE-REVIEW.json",
+      "bytes": 1878,
+      "sha256": "F50D5FD6D38F0C3733BCF81464C5B00CB7F49DF990BC4898F277516CF1F8F1F4"
+    },
+    "independent_result_review": {
+      "path": "build/qualification/mir517-se-current-qualification-review-r01/INDEPENDENT-RESULT-REVIEW-r03.json",
+      "bytes": 4408,
+      "sha256": "8377C7AFA1225C5564A31E93224C460DABC2F7685FAC44C171EBCD9818B89069"
+    },
+    "owner_acceptance": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/OWNER-ACCEPTANCE.json",
+      "bytes": 2362,
+      "sha256": "8E10B73C8559838E2F0A99A359661D1BDEFA3F9DEF67AFD75CB7ACABD4C19B79"
+    },
+    "conditional_execute_review": {
+      "path": "build/qualification/mir517-se-current-qualification-review-r01/REVIEW-EXECUTE-r03.json",
+      "bytes": 1640,
+      "sha256": "B32BD8CF6C25FB920434F0640FD66C663B03296597FF0A6D6140CA3623051FAD"
+    },
+    "root_independent_remote_readback": {
+      "path": "build/qualification/mir517-se-current-qualification-review-r01/ROOT-REMOTE-BODY-READBACK-r03.json",
+      "bytes": 1348,
+      "sha256": "FAA98C105DE90F6B9D81FF0C39AA6B0293541C00CB5B8547FC0A0DA4D56F05DD"
+    }
+  },
+  "quality_controls": {
+    "fixture_methods": 13,
+    "fixture_receipt": {
+      "path": "build/qualification/mir517-se-current-qualification-r03/host-fixture-tests.log",
+      "bytes": 2850,
+      "sha256": "3522CCA6D9B9BF948A41679DE37459A99FCFD6B26AB113E7225FB69756253CA0"
+    },
+    "pure_controller_reader_controls": 67,
+    "actor_checks": [
+      {
+        "name": "branch-policy",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "9a3cb7d73514a1fd598ae612e7ed11535c2d4915"
+      },
+      {
+        "name": "verification-plan",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "9a3cb7d73514a1fd598ae612e7ed11535c2d4915"
+      },
+      {
+        "name": "native-tooling-controls",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "9a3cb7d73514a1fd598ae612e7ed11535c2d4915"
+      },
+      {
+        "name": "host-controls",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "9a3cb7d73514a1fd598ae612e7ed11535c2d4915"
+      }
+    ],
+    "changes": "Reverse research before assigning desired infinite levels; use one current completion/cold snapshot constructor; require the literal full schema and equality for both cold observations, including an omission opponent."
+  },
+  "prior_adverses": [
+    {
+      "case": "mir517-se-admin-observation-r07",
+      "player_input": "private Source16, not published16",
+      "fresh_processes": 1,
+      "outcome": "expected trace emitted but process timed out; adverse, no native qualification"
+    },
+    {
+      "case": "mir517-se-current-qualification-r01",
+      "fixture": "0.10.0",
+      "fresh_processes": 1,
+      "outcome": "natural exit1 before reset; foreign/earned desired levels lost by level-first/researched-second setup"
+    },
+    {
+      "case": "mir517-se-current-qualification-r02",
+      "fixture": "0.11.0",
+      "fresh_processes": 2,
+      "outcome": "cap and save observed; cold exited0 but omitted required queue-attempt evidence; reader refused, cold2 not run"
+    }
+  ],
+  "custody_limit": {
+    "lost_superseded_narrative_sha256": "B9D321438E802F08FFB8984483AA72CDEEEECC10536A87E5324E31C373C0BA26",
+    "original_bound_admission_intact": true,
+    "original_admission_sha256": "D9A4BD89F389B7801594CD3C0BEFAEB6CC9362C7543498F1787C8BA1AF4B1E16",
+    "disposition": {
+      "path": "build/qualification/mir517-se-current-qualification-review-r01/REVIEW-COMPOSE-r03-SUPERSEDED-B9D321-DISPOSITION.json",
+      "bytes": 1303,
+      "sha256": "2B62A12C4CF9B2B5BC7C73F9E9DFC8ABAAF774A68CA20DF65EFB8C61099DA633"
+    },
+    "scope": "Intermediate post-Compose narrative bytes unavailable; no substitute body or claim of byte-preservation success. Actual Compose and native evidence remain intact."
+  },
+  "private_custody": [
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "3c2868199439c01168253f493dbe6a1774469e7a",
+      "git_blob": "4d79ad140a9448ba7cb3d4be8d543083c96617ee",
+      "path": "projects/mir/runs/mir517-se-adverses-r01/original-bodies.json.gz",
+      "packed_bytes": 3113018,
+      "packed_sha256": "C641F8D793BD75B5BE87FB2556F3468C5425714904770A9A7AFF61330C7DA2A6",
+      "original_rows": 422,
+      "original_bytes": 7108276,
+      "scope": "Closed observation r01-r07 and current-qualification r01 plus two selected current-r02 reviews; not the raw r02 case.",
+      "remote_readback": {
+        "path": "build/qualification/mir517-se-adverse-private-custody-r01/remote-verification.json",
+        "bytes": 642,
+        "sha256": "4FB09E1311D75AAA8180F025D85107EF9A8C928AF8EBCFF3D44870666B80B57B"
+      },
+      "scope_correction": {
+        "path": "build/qualification/mir517-se-adverse-private-custody-r01/SCOPE-CORRECTION-r01.json",
+        "bytes": 879,
+        "sha256": "13897717011E24A4A1DC9C4F6BD0658608219B481CFD552946C8C40000D6DFB0"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "5cae706b027f5e6ffc84f5f07310a9efec34e36c",
+      "git_blob": "0633456820dead82e272c401d532cda0f9268823",
+      "path": "projects/mir/runs/mir517-se-current-r02-adverse-r01/original-bodies.json.gz",
+      "packed_bytes": 2542963,
+      "packed_sha256": "7A607F5BC2EA8952379888FFF678D93A96B51ED8E13FC1636AA93D5803935B9F",
+      "original_rows": 246,
+      "original_bytes": 7555673,
+      "scope": "Closed r02 cap/save/first-cold adverse, raw case and saved output; no qualified cold result.",
+      "remote_readback": {
+        "path": "build/qualification/mir517-se-adverse-private-custody-r01/current-r02-supplement-remote-verification.json",
+        "bytes": 2261,
+        "sha256": "F5CBC8AFB13A7A41E19A2DC93F7751E72449F45C5E4332A46B9EF7F2DA770CAD"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "215ad78f237be71c6a3cd0c5ce57b714d0ee6de9",
+      "git_blob": "34d323576260c7bcebb3dc03d4c430b4ed898c1e",
+      "path": "projects/mir/runs/mir517-se-current-r03-native-r01/original-bodies.json.gz",
+      "packed_bytes": 2617668,
+      "packed_sha256": "EB5473BADBC3EA08BADF137D461689A8353D015444D4C92B747F3751E695BD44",
+      "original_rows": 275,
+      "unique_bodies": 161,
+      "original_bytes": 8180031,
+      "scope": "Accepted reduced current-state r03 native case, actual output save, exact fixture/player archives, reviews and explicit unavailable-B9 disposition.",
+      "remote_readback": {
+        "path": "build/qualification/mir517-se-current-r03-native-private-custody-r01/remote-verification.json",
+        "bytes": 2336,
+        "sha256": "AB0E6DB0D66309148B4A9D0421E52132D06CAE8FCB79651665B9BEAC7137F743"
+      },
+      "root_independent_remote_readback": {
+        "kind": "MIR517SECurrentRootIndependentRemoteBodyReadbackV1",
+        "commit": "215ad78f237be71c6a3cd0c5ce57b714d0ee6de9",
+        "git_blob": "34d323576260c7bcebb3dc03d4c430b4ed898c1e",
+        "packed_sha256": "EB5473BADBC3EA08BADF137D461689A8353D015444D4C92B747F3751E695BD44",
+        "rows": 275,
+        "unique_bodies": 161,
+        "original_bytes": 8180031,
+        "all_remote_decoded_rows_equal_closed_originals": true,
+        "mandatory_body_hashes_present": [
+          "2B62A12C4CF9B2B5BC7C73F9E9DFC8ABAAF774A68CA20DF65EFB8C61099DA633",
+          "3D5226BD17C44AB07CDD3015348A5239F077E70C3C93EB98C5D17495A9BB40B3",
+          "8377C7AFA1225C5564A31E93224C460DABC2F7685FAC44C171EBCD9818B89069",
+          "8E10B73C8559838E2F0A99A359661D1BDEFA3F9DEF67AFD75CB7ACABD4C19B79",
+          "B0716350B3E157FF6146492BE6F79FB29DB379C80BF1E7F59BC3AE879C87392C",
+          "B108F18782BF450A4C124BBB4D56B1D3A51B683ED940E53D7A35B2467A21CE07",
+          "B4A47480A1E84FE26DE05EDFCD6A00F96DC2B97641DBFEF4C0A4260DB730BA30",
+          "D9A4BD89F389B7801594CD3C0BEFAEB6CC9362C7543498F1787C8BA1AF4B1E16"
+        ],
+        "b9_unavailable_body_explicit": true,
+        "initial_metadata_assumption_refusal": "First readback reached all275 body comparisons, then expected the full B9 SHA in shorthand top-level metadata. The referenced exact disposition was inspected and its full missing SHA checked; capsule bytes were not changed.",
+        "native_execution": false
+      }
+    }
+  ],
+  "limitations": [
+    "Only the exact declared synthetic current-state cap/reset, one ordinary completion/save and two unchanged-input cold reads are qualified.",
+    "The cap process was stopped by its reviewed completion/save predicate; only the two cold processes are natural-exit0 results.",
+    "Untouched-save upgrades/configuration preservation, reporter histories, full physical science/output, GUI/client/visual, performance and stable acceptance remain separate.",
+    "Published5.0.14/15/16 bytes, tags and releases are preserved."
+  ],
+  "stable_acceptance": false,
+  "whole_goal_complete": false
+}

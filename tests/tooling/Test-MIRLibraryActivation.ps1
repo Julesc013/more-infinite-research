@@ -9,6 +9,15 @@ $root=Join-Path $repo ('build/tmp/mir5-library-activation-controls-'+[guid]::New
 $checks=0
 function Assert-Library([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-library-$Code]"};$script:checks++}
 function Refuses-Library([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Library ($actual.Contains($Expected)) "refusal-$Expected"}
+function Open-LibraryExclusiveLease([string]$Library){
+  return [IO.File]::Open((Join-Path $Library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+}
+function Test-LibrarySecondOpenBlocked([string]$Library){
+  $probe=$null
+  try{$probe=[IO.File]::Open((Join-Path $Library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::ReadWrite);return $false}
+  catch [IO.IOException]{return $true}
+  finally{if($null-ne$probe){$probe.Dispose()}}
+}
 function New-TestArchive([string]$Library,[string]$Name,[string]$Version,[string]$FactorioVersion='2.1',[string]$SourceDirectory='',[string]$Payload=''){
   $path=Join-Path $Library ($Name+'_'+$Version+'.zip')
   $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
@@ -66,6 +75,57 @@ try {
   [IO.File]::WriteAllText((Join-Path $library 'mod-list.json'),$originalList,[Text.UTF8Encoding]::new($false));[IO.File]::WriteAllBytes((Join-Path $library 'mod-settings.dat'),$originalSettings)
   [IO.File]::WriteAllText($profile,(@{mods=@(@{name='base';version='2.1.23';enabled=$true},@{name='controlled';version='1.0.0';enabled=$true})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $hashes=@{([IO.Path]::GetFileName($archive))=(Get-MIRImmutableInputSha256 $archive)}
+  # A caller-held lock covers owned archive admission, activation, completion,
+  # and the caller's archive restoration. The actual second file-open and
+  # activation attempts prove this is not merely an ownership flag.
+  $wrongLease=[IO.File]::Open((Join-Path $root 'wrong-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+  try{Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $wrongLease} '[mir-library-borrowed-lock-path]'}finally{$wrongLease.Dispose()}
+  $readOnlyLease=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::Read,[IO.FileShare]::None)
+  try{Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $readOnlyLease} '[mir-library-borrowed-lock-access]'}finally{$readOnlyLease.Dispose()}
+  $sharedLease=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::ReadWrite)
+  try{Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $sharedLease} '[mir-library-borrowed-lock-exclusive]'}finally{$sharedLease.Dispose()}
+  $disposedLease=Open-LibraryExclusiveLease $library;$disposedLease.Dispose()
+  Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $disposedLease} '[mir-library-borrowed-lock-closed]'
+  $borrowedLease=Open-LibraryExclusiveLease $library;$borrowed=$null
+  try{
+    $borrowed=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $borrowedLease
+    Assert-Library (-not$borrowed.owns_library_lock-and-not$borrowed.closed-and(Test-LibrarySecondOpenBlocked $library)) 'borrowed-lock-is-physically-exclusive-during-active-selection'
+    Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes} '[mir-library-busy]'
+    $borrowedCompletion=Complete-MIRLibraryActivation -Activation $borrowed;$borrowed=$null
+    Assert-Library ($borrowedCompletion.status-ceq'restored-direct-library-controls'-and-not$borrowedCompletion.library_lock_released-and$borrowedLease.CanRead-and$borrowedLease.CanWrite) 'borrowed-lock-survives-normal-completion'
+    Assert-Library ((Test-LibrarySecondOpenBlocked $library)-and(Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList) 'borrowed-lock-covers-post-completion-archive-restore-window'
+    Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes} '[mir-library-busy]'
+  }finally{
+    if($null-ne$borrowed-and-not$borrowed.closed){$null=Complete-MIRLibraryActivation -Activation $borrowed}
+    $borrowedLease.Dispose()
+  }
+  Assert-Library (-not(Test-LibrarySecondOpenBlocked $library)) 'borrowed-lock-releases-only-when-caller-disposes'
+  $ownedLease=$null
+  try{
+    $ownedLease=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
+    Assert-Library ($ownedLease.owns_library_lock-and(Test-LibrarySecondOpenBlocked $library)) 'default-activation-owns-exclusive-lock'
+    $ownedCompletion=Complete-MIRLibraryActivation -Activation $ownedLease;$ownedLease=$null
+    Assert-Library ($ownedCompletion.library_lock_released-and-not(Test-LibrarySecondOpenBlocked $library)) 'default-activation-releases-owned-lock'
+  }finally{if($null-ne$ownedLease-and-not$ownedLease.closed){$null=Complete-MIRLibraryActivation -Activation $ownedLease}}
+  # Force a failure after the journal and controls are live. The activation
+  # unwinds its own handles and controls, but the caller's exclusive lease
+  # must still prevent another activation until the caller disposes it.
+  $postJournalLease=Open-LibraryExclusiveLease $library;$controlWriter=${function:Write-MIRLibraryControl};$script:borrowedLeasePostJournalFailure=$true
+  function Write-MIRLibraryControl {
+    param([string]$Path,[byte[]]$Bytes,[switch]$Absent)
+    if($script:borrowedLeasePostJournalFailure-and$Absent-and(Split-Path -Leaf $Path)-ceq'mod-settings.dat'){$script:borrowedLeasePostJournalFailure=$false;throw '[controlled-borrowed-lock-post-journal-failure]'}
+    & $controlWriter @PSBoundParameters
+  }
+  try{
+    Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes -LibraryLock $postJournalLease} '[controlled-borrowed-lock-post-journal-failure]'
+    Assert-Library ($postJournalLease.CanRead-and$postJournalLease.CanWrite-and(Test-LibrarySecondOpenBlocked $library)) 'borrowed-lock-survives-failed-start-unwind'
+    Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'borrowed-lock-failed-start-restores-controls'
+    Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes} '[mir-library-busy]'
+  }finally{
+    Set-Item Function:Write-MIRLibraryControl $controlWriter
+    $postJournalLease.Dispose()
+  }
+  Assert-Library (-not(Test-LibrarySecondOpenBlocked $library)) 'borrowed-lock-failed-start-releases-only-after-caller-disposes'
   Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes @{([IO.Path]::GetFileName($archive))=('0'*64)}} '[mir-library-hash-mismatch]'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList) 'failed-activation-restores-list'
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
@@ -166,7 +226,11 @@ try {
   $recoveryJournal=$abandoned.journal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
   foreach($handle in $abandoned.handles){$handle.Dispose()};$abandoned.lock.Dispose();$abandoned.closed=$true
   $recoveryJournal.owner_pid=[int]::MaxValue;$recoveryJournal.owner_started_utc='2000-01-01T00:00:00Z'
-  [IO.File]::WriteAllText((Join-Path $library '.mir-active-profile.json'),($recoveryJournal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+  $recoveryJournalPath=Join-Path $library '.mir-active-profile.json'
+  [IO.File]::WriteAllText($recoveryJournalPath,($recoveryJournal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+  $recoveryJournalItem=Get-Item -LiteralPath $recoveryJournalPath -Force
+  Assert-Library ($recoveryJournalItem.Length-gt0-and$recoveryJournalItem.Name-ceq'.mir-active-profile.json') 'stale-journal-is-present-before-recovery'
+  if($IsLinux){Assert-Library ([bool]($recoveryJournalItem.Attributes-band[IO.FileAttributes]::Hidden)) 'stale-journal-is-hidden-on-linux'}
   [IO.File]::WriteAllText($legacyJson,'{"interrupted-engine":true}',[Text.UTF8Encoding]::new($false))
   $recovered=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
   try{Assert-Library ($recovered.journal.controls['mod-settings.json'].sha256-ceq$jsonOriginalHash-and-not(Test-Path -LiteralPath $legacyJson)) 'legacy-json-recovery-restores-original-before-next-defaults'}

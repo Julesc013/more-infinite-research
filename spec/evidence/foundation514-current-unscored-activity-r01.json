@@ -1,0 +1,308 @@
+{
+  "schema": 1,
+  "kind": "MIR514FoundationCurrentUnscoredActivityV1",
+  "date": "2026-11-13",
+  "status": "ACCEPTED-exact-unscored-activity-projection-prerequisite-only",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "published_tag": "v5.0.14",
+  "player": {
+    "name": "more-infinite-research",
+    "version": "5.0.20014",
+    "archive": "more-infinite-research_5.0.20014.zip",
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.20014.zip",
+    "bytes": 1039250,
+    "sha256": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "factorio_line": "2.0"
+  },
+  "observer": {
+    "name": "mir-fixture-mir5-large-factory-activity",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+    "path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation504-activity-r02-prepared\\mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+    "bytes": 5904,
+    "sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\profiles\\unscored-profile-B.json",
+    "bytes": 7969,
+    "sha256": "B0F04533946D6308AC2D4D43DE204ABBC5E8F68A3DC9B88EED12E2E14C9883E1"
+  },
+  "selected_mods": 37,
+  "selected_archives": 33,
+  "protected_save": {
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-inputs-r01\\protected-saves\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+    },
+    "previous_owned_copy": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\retained\\mir-native-worker-foundation-settings-r03\\build\\foundation-settings-r03-frozen-helper-inputs\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+    },
+    "owned_copy": {
+      "path": "D:\\Projects\\Factorio\\mir-native-worker-foundation-inventory-r04\\build\\foundation-input-inventory-r04-prepared-inputs\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+    }
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\packet.json",
+    "bytes": 55683,
+    "sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57"
+  },
+  "caller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\Invoke-Foundation514Activity.ps1",
+    "bytes": 21147,
+    "sha256": "642E314EFD831D6F92A511379B15DFFEEBEF555C0AB05C021CAF6239A9ECE7D5"
+  },
+  "reader": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\Prepare-Foundation514Activity.py",
+    "bytes": 24016,
+    "sha256": "EE0F4BAA2948F53816DACC30E182A24C2CC5D3B7B3150187C46775E7AB220D58"
+  },
+  "original_preparation": "spec/evidence/foundation514-current-public-preparation-r01.json",
+  "compose": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\compose-record\\terminal.json",
+      "bytes": 22267,
+      "sha256": "BA699D59A7DF624834EE55AA16D881173D75D826DBB576F095B4DA6139CAFAFE"
+    },
+    "admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\native-owner-compose-r01.json",
+      "bytes": 1397,
+      "sha256": "B5492C2A2A56EDDE4A11F32EEE2495E1649F32079218E8EDA41BB57839050CCC"
+    },
+    "status": "composition-boundary-suppressed",
+    "suppressed_boundaries": 1,
+    "actual_native_processes": 0,
+    "restored": true
+  },
+  "execute": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\terminal.json",
+      "bytes": 31022,
+      "sha256": "68110DFFB9CA984B3672E059D3B44A74120140F92AFE485FCDB56A95BDE9EC03"
+    },
+    "admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\native-owner-execute-r01.json",
+      "bytes": 1486,
+      "sha256": "6A1A7B5807CD07847AB8FD1318AB0C4D2CF1054EBC6689799BD38F3B8208FCF3"
+    },
+    "actual_native_processes": 1,
+    "process_id": 14936,
+    "physical_exit": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\physical-exit.json",
+      "bytes": 522,
+      "sha256": "5DE264333B791AF839954860670F6837C8F26D59B1BE65ACF65F5F110AD818EB"
+    },
+    "natural_exit_code": 0,
+    "timeout": false,
+    "restored": true,
+    "admission_status": "admitted-without-wait",
+    "resources": {
+      "expected_peak_memory_mib": 8192,
+      "maximum_new_output_mib": 1024,
+      "timeout_seconds": 300,
+      "admission_wait_seconds": 30
+    },
+    "diagnostic_direct_process_seconds": 47.324025,
+    "duration_scope": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "diagnostic_peak_working_set_bytes": 4892250112,
+    "diagnostic_peak_sampled_private_bytes": 4996964352
+  },
+  "useful_work": {
+    "first_tick": 169628853,
+    "final_tick": 169629453,
+    "observed_ticks": 600,
+    "surface_count_after": 57,
+    "sampled_machines": 1918,
+    "sampled_machines_with_progress": 275,
+    "sampled_products_finished_delta": 4006,
+    "positive_normal_item_input_delta": 5899,
+    "invalidated_sampled_machines": 0,
+    "invalidated_surfaces": 0,
+    "normal_item_counter_decreases": 0,
+    "sampled_product_counter_decreases": 0
+  },
+  "complete_projection": {
+    "expected": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation504-activity-r01\\expected-NoMIR-projection.json",
+      "bytes": 84956,
+      "sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11"
+    },
+    "actual_sha256": [
+      "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+      "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11"
+    ],
+    "exact_bytes_equal": true,
+    "keys": [
+      "activity_observed",
+      "final",
+      "final_tick",
+      "first_tick",
+      "initial",
+      "invalidated_sampled_machines",
+      "invalidated_surfaces",
+      "item_available",
+      "item_columns",
+      "normal_item_counter_decreases",
+      "observed_ticks",
+      "positive_normal_item_input_delta",
+      "sampled_machines",
+      "sampled_machines_with_progress",
+      "sampled_per_surface",
+      "sampled_product_counter_decreases",
+      "sampled_products_finished_delta",
+      "surface_count_after",
+      "type_columns"
+    ],
+    "comparator": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation504-activity-r02\\run-owned-r02.py",
+      "bytes": 2988,
+      "sha256": "C81550B04A69B97D3098B591EBD228131CC7E080EA12AEE10E18C7A29449A8C4"
+    },
+    "method": "Project the original 19 expected keys; json.dumps(sort_keys=True, separators=(comma,colon), ensure_ascii=False) plus one newline, encoded UTF-8; compare original bytes and SHA256 independently for native result and strict-parser output."
+  },
+  "actual_raw": {
+    "result": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\native-custody\\result.json",
+      "bytes": 292066,
+      "sha256": "C929A0586C8A2725E91B8C4380AEE60202D7C5B73922346D32B0444B64E5F148"
+    },
+    "parser": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\parser-stdout.txt",
+      "bytes": 268077,
+      "sha256": "1283CADB44054BCD04C409C3BE037AA6AC90B83D4DC7D3FD1BFF141BC1BCAA67"
+    },
+    "log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\native-custody\\write-data\\factorio-current.log",
+      "bytes": 145054,
+      "sha256": "C978A32BA4B5C8AC25191B00D255E66D4BDD22C8D97D30A8DF08D394B8CDAA1F"
+    },
+    "stdout": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\native-custody\\process-1.stdout.txt",
+      "bytes": 8510,
+      "sha256": "1235A54037CBAE9B3AF2ED55EF255581AB1689D1084936BC00BC0FCF5D609AEE"
+    },
+    "stderr": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\native-custody\\process-1.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "resource_ledger": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\execute-record\\native-custody\\process-1.resources.jsonl",
+      "bytes": 96742,
+      "sha256": "3EE1C851BDF17F5F543B9D5BABB8B9D573A988212163C98C0EB95A69AC0B0514"
+    }
+  },
+  "independent_review": {
+    "record": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\INDEPENDENT-RESULT-REVIEW.json",
+      "bytes": 1461,
+      "sha256": "3C3EB066EEF43EEFB5B8316A1FCFCC8BF9B623651D40A4F5DB134186C2CE501A"
+    },
+    "findings": {
+      "kind": "MIR514FoundationUnscoredActivityIndependentReviewV1",
+      "recorded_by": "integration lead from non-author read-only result review",
+      "reviewer": "/root/review_factory_result",
+      "verdict": "GO-predeclared-18-run-timing-prerequisite-only",
+      "packet_sha256": "38634DD5EF463EB23A4ED8A4E44CB6638BE549BEF82084683AC88E60B6162A57",
+      "actual_full_projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+      "expected_full_projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+      "method": "Independent replay of the original 19-key canonical projection algorithm against both immutable native-custody/result.json and strict-reader parser-stdout.txt; both equal the frozen comparator without differing keys.",
+      "scope": "Exactly one natural-exit diagnostic, 601 updates and 600 elapsed ticks on 57 stable surfaces; 1918 sampled machines, 275 progressed, 4006 sampled products finished and 5899 positive named-item input delta. Zero invalidated samples or counter decreases. Frozen engine/player/save/controller pins match and original library controls restore byte-for-byte. Protected save staging is a distinct copy with matching pre/post hashes.",
+      "scored_timings_executed": 0,
+      "large_factory_qualified": false,
+      "performance_acceptance": false,
+      "gameplay_acceptance": false,
+      "save_preservation_acceptance": false,
+      "stable_acceptance": false,
+      "release_qualification": false
+    }
+  },
+  "original_remote_custody": {
+    "kind": "MIR514FoundationActualOriginalRemoteReadbackV1",
+    "repository": "Julesc013/scratchpad",
+    "commit": "467b21dde5636932de9b48bc16a9c86bdf117b30",
+    "path": "projects/mir/runs/mir514-foundation-activity-r01/original-bodies.json.gz",
+    "git_blob": "184eea26e76de96b212390a4667ceca8ae3c316a",
+    "packed_sha256": "F64D4FCF4FC8E4929D6E1A8CB96EF5266512F58BDD9A3FE500D1EDEA46152904",
+    "actual_originals_verified": 55,
+    "actual_original_bytes": 1602876,
+    "unchanged_fixed_save_copies_verified": 4,
+    "scope": "One exact public 5.0.20014/2.0.77 unscored Foundation diagnostic after zero-native composition; controls and protected saves restored. All new run logs, ledgers, observations, controllers and admissions retained. Only unchanged fixed protected-save ZIP bodies are excluded and separately hash-bound. No scored timing or stable acceptance."
+  },
+  "prior_resource_refusals_preserved": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-r01.json",
+      "bytes": 1186,
+      "sha256": "C6703D1852E7306C14B5B918A07A5EA265915E7B0C16E6C8325B3982E6BDF448"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-r02.json",
+      "bytes": 1186,
+      "sha256": "DCB7F345A21796B30A06ABB836477BF9A71B8868BACB3FFC8D4FCCF9DF15B424"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-wait-r03.json",
+      "bytes": 2157,
+      "sha256": "812A1D28F9E540680950B5C5BCFAFA2D50DC1C2BFC3454CE7EE6657C7D46378C"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\resource-admission-wait-r04.json",
+      "bytes": 2157,
+      "sha256": "F0906096B53BE6AF5C8D5CFFA4C42E9D0F895EBDB959F8EC8DD5D7A871CF4F2F"
+    }
+  ],
+  "limitations": [
+    "One diagnostic 600-tick window per init/config/load activation; exclude from acceptance timing.",
+    "Entity counts cover the player force on selected initial surfaces; they do not prove activity.",
+    "Machine samples are bounded native-order subsets, not random samples or a whole-factory estimate.",
+    "Production counters cover the 15 named normal-quality items; other activity may be unobserved.",
+    "Counter decreases are reported, not reinterpreted as completed work. No native state preservation verdict.",
+    "This diagnostic is excluded from scored timing. No new 18-run timing comparison or reuse verdict is established here.",
+    "The complete projection prerequisite is satisfied; exact current-input eligibility and the original timing scope remain separately reviewable.",
+    "Existing 504/505/13 observations retain their original identities. No old result is relabelled as a fresh14 execution.",
+    "GUI/client/import-roundtrip and whole-product performance remain incomplete. All published bytes remain fixed."
+  ],
+  "scored_timing_observations_in_this_run": 0,
+  "native_activity_observed": true,
+  "large_factory_qualified": false,
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "stable_acceptance": false,
+  "release_qualification": false,
+  "timing_gate_clarification": {
+    "record": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-foundation-current14-r01\\TIMING-GATE-CLARIFICATION.json",
+      "bytes": 1367,
+      "sha256": "022F82952499D9E8CD12616E7DCCA31694377E86D85866F60A4F62E05379AAC6"
+    },
+    "findings": {
+      "kind": "MIR514FoundationTimingGateIndependentClarificationV1",
+      "reviewer": "/root/review_factory_result",
+      "recorded_by": "integration lead from non-author bounded review",
+      "activity_projection_verdict": "GO-complete-projection-prerequisite-only",
+      "timing_dispatch_verdict": "NO-GO-from-current-activity-packet",
+      "original_collection": "spec/evidence/foundation504-normal-comparison-r01.json",
+      "original_scope": "18 original5.0.4/F200 physical processes:3AA plus6AB pairs,601updates,observer absent.",
+      "finding": "Current13/14 activity packets inherit the original18 count verbatim and contain one unscored observer-enabled diagnostic. They contain no new18-process normal-run schedule/controller or scored analysis. Prior505 applicability covers only its named delta, not13/14.",
+      "next_safe_step": "Independent consumed-input/source applicability review from the original504 F200 normal roles to exact current14 F200 normal roles, including intervening runtime/configuration changes, engine/save/default settings, observer-absent closures, schedule and endpoint. Reuse remains an explicit inference under original504 execution identities; if unproven, prepare and review a separate current normal-comparison controller.",
+      "scored_runs_started_on_resume": 0,
+      "normal504_current14_applicability_accepted": false,
+      "stable_acceptance": false
+    }
+  }
+}

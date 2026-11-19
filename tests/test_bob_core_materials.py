@@ -338,10 +338,18 @@ class BobCoreMaterialTests(unittest.TestCase):
         explicit_default["recipe"]["bob-nitinol-alloy"]["maximum_productivity"] = 3
         self.assertEqual(_plain(self.rows()), _plain(self.rows(raw=explicit_default)))
 
-        wrong_icon = self.raw_fixture()
-        wrong_icon["item"]["bob-lead-plate"]["icon"] = "wrong"
-        with self.assertRaisesRegex(Exception, "bob-lead-plate presentation changed"):
-            self.rows(raw=wrong_icon)
+        baseline = _plain(self.rows())
+        reskinned = self.raw_fixture()
+        reskinned_item = reskinned["item"]["bob-lead-plate"]
+        reskinned_item["icon"] = "__reskin__/graphics/icons/bob-lead-plate.png"
+        reskinned_item["icon_size"] = 128
+        reskinned_before = _plain(reskinned)
+        self.assertEqual(baseline, _plain(self.rows(raw=reskinned)))
+        self.assertEqual(reskinned_before, _plain(reskinned))
+        missing_item = self.raw_fixture()
+        missing_item["item"]["bob-lead-plate"] = None
+        with self.assertRaisesRegex(Exception, "bob-lead-plate is unavailable"):
+            self.rows(raw=missing_item)
         disabled = self.raw_fixture()
         disabled["recipe"]["bob-lead-plate"]["enabled"] = False
         with self.assertRaisesRegex(Exception, "bob-lead-plate changed"):
@@ -402,6 +410,8 @@ class BobCoreMaterialTests(unittest.TestCase):
 
     def test_profile_is_no_angel_only_and_outputs_are_detached(self):
         baseline = _plain(self.rows())
+        self.lua.execute('target.minimum_base = "2.1.24"')
+        self.assertEqual(baseline, _plain(self.rows()))
         changed = dict(self.facts["required_mods"])
         changed["bobtech"] = "newer"
         self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, changed))))

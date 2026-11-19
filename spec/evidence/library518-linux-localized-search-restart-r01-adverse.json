@@ -1,0 +1,131 @@
+{
+  "kind": "MIRLibraryLocalizedSearchRestartAdverseEvidenceV1",
+  "status": "adverse-controller-producer-line-before-input; no-adoption",
+  "scope": "Exact current18 Base-only Linux German two-session preparation. Initial candidate/server/client load is observed; a controller identity check stops before any reviewed input. No search, restart, saved-successor, cold, report, release or stable acceptance follows.",
+  "player": {
+    "source_commit": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+    "version": "5.0.21018",
+    "archive_bytes": 1053436,
+    "archive_sha256": "9127C343F1A2311F06287FCB97094059B6F6F802E7A3198B71B5E6CACC2EC14D"
+  },
+  "engine": {
+    "version": "2.1.24",
+    "platform": "Linux full graphical build; Base-only selected",
+    "executable_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF"
+  },
+  "controller": {
+    "source_head": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "source_tree": "6d5502d078560f6e61b1d4a606d090a5ab90f236",
+    "actor": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/Run-LocalizedSearchCandidate18Restart-r01.py",
+      "bytes": 33658,
+      "sha256": "0C88432275993C096E0E50C2858E8935B2C820C6B0C808B38727033A5CB4E74A"
+    },
+    "owner": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/Invoke-LocalizedSearchCandidate18RestartOwner-r01.ps1",
+      "bytes": 15828,
+      "sha256": "2258DD99022E40039AB76D5AC02D26EC4D7B2428B8C3C54F6F405259E8D3B9A3"
+    },
+    "packet": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/offline-stage-r01/owner-packet-candidate18-restart.json",
+      "bytes": 10346,
+      "sha256": "00C7514C45BD4EC136473991A1DA2E4B26D253BA876E1D36A350F2DFCAB65DBC"
+    },
+    "composition_sha256": "84652A543B371DEE76B3389DCDFC1D71D3D5A7C900255CD88445CADDEC2C0B64",
+    "compose_review_sha256": "1EC25163FFD66AD02E609CC7D274DDB5152623DC064DC389707211B36E8D03B1"
+  },
+  "fixture": {
+    "version": "0.1.3",
+    "archive_sha256": "3C844CDFE6C858376EC5FD38D9AA437D974FF63D4849D98F0D98B6ACF14CF10B",
+    "control_sha256": "E836031E1994AA5FA59BDB83365C6F0A7BA3E937747CE8431AE14461F784E164"
+  },
+  "native_observations": {
+    "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.3|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21018",
+    "initial_phase": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/native-originals-r01/case/first-session/client-de/write-data/script-output/mir-library-localized-search-candidate18-restart/00-initial.json",
+      "bytes": 1883,
+      "sha256": "0F3C33B7DEF8D47C44F16872120E45A1A9E33F6C275B4E6BF589843942E6EE19"
+    },
+    "initial_phase_name": "initial",
+    "initial_phase_tick": 11543,
+    "reviewed_inputs": 0,
+    "restart_factorio_processes": 0,
+    "actor_result_reported_steps": 0,
+    "actor_result_reported_phases": 0,
+    "counter_limit": "The closed raw phase00 exists before the failing closure check. Actor counters are assigned only after route success; their zero values do not erase that observation or qualify it as gameplay.",
+    "primary_error": "role-specific candidate loaded closure differs",
+    "expected_producer": "__mir-fixture-library-localized-search-native__/control.lua:526",
+    "actual_exact_producer": "__mir-fixture-library-localized-search-native__/control.lua:525",
+    "payload_matches_exact_six_mod_tuple": true
+  },
+  "shutdown": {
+    "server": {
+      "pid": 384254,
+      "exit_code": 255
+    },
+    "client_de": {
+      "pid": 384394,
+      "exit_code": 0,
+      "controlled_sigterm_elapsed_seconds": 23.527
+    },
+    "display_child": {
+      "pid": 384389,
+      "exit_code": 0
+    },
+    "secondary_error": "The fixture player-unavailable exception at server elapsed24.446 follows the client shutdown after the controller refusal. It is not evidence of a MIR player-code cause.",
+    "unopened_restart_cleanup_limit": "The unopened restart cleanup observes the first session process group before first-session shutdown and reports it as remaining; retain that false scope claim in the original actor result.",
+    "actual_service_terminal": {
+      "unit": "mir-library518-localized-restart-r01.service",
+      "invocation_id": "8a40eb31bfd44541b97547cac86baa58",
+      "owner_pid_at_start": 380867,
+      "terminal_main_pid": 0,
+      "result": "exit-code",
+      "exit_code": 1
+    },
+    "later_unit_readback": "After the last SSH observer exits, jules has no linger. LoadState=not-found and its default success/0 properties are not the historical run result.",
+    "original_observer_log": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/launch-owner-r01-stdout.log",
+      "bytes": 1854,
+      "sha256": "DB40E8F6B3A85A347D3C6453F75BDD2A3358CB2FF9D4E7C6C507EF2906932836"
+    }
+  },
+  "custody": {
+    "originals_root": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/native-originals-r01",
+    "file_count": 40,
+    "bytes_total": 3196136,
+    "all_originals_rehashed_against_remote": true,
+    "terminal_physical_readback": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/native-terminal-physical-readback-r01.json",
+      "bytes": 19712,
+      "sha256": "A1F222FCFF8BABF9EDED9D1180D19EF099156F8146B67E33BC88AB2725EA9728"
+    },
+    "independent_actual_review": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-restart-successor-r04/c18-r01-native-adverse-independent-review-r01.json",
+      "bytes": 6855,
+      "sha256": "649963E6C5A5ABF95D7C9B314DDB1BCB2E7367BF9A28EAE40A5BECDF42B96D26"
+    },
+    "verdict": "ADVERSE_CONFIRMED_NO_ADOPTION"
+  },
+  "restoration": {
+    "owner_restored": true,
+    "restoration_errors": [],
+    "temporary_archives_removed": 5,
+    "library_controls_restored": true,
+    "original_mir15_sha256": "1CAE13846512F7E2F0F01C90F1DC968BE630919F21356B2A257E375B66C45207",
+    "protected_seed_sha256": "83D27E8A58BE2681FC89C8061AEA1CF66DA80855B5160852F575D67F141967D3",
+    "protected_seed_bytes": 1064930,
+    "protected_seed_crc_bad_member": null,
+    "protected_seed_zip_entries": 56,
+    "exclusive_library_lock_available": true,
+    "factorio_pids": []
+  },
+  "next_action": "Correct and independently test the private actor producer-line, cleanup scope and failure-observation accounting using the retained real logs. Preserve R01 unchanged; require a distinct packet/context and fresh actual composition review before any corrected successor. Do not replay the source producer or infer an original-report repair.",
+  "limits": [
+    "Zero reviewed inputs and no restart/save/cold outcome.",
+    "No positive adoption of the initial phase as gameplay acceptance.",
+    "No player-source or published-package mutation.",
+    "Protected83D and accepted public17 R05 evidence retain their original identity.",
+    "Original worker, ore-output and carrier reports remain individually unqualified; this apparatus refusal is not a report resolution."
+  ]
+}

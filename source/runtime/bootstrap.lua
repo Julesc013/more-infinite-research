@@ -14,6 +14,22 @@ local diagnostics = helpers and type(helpers.write_file) == "function" and requi
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
+local function required_runtime_export(module, component, name)
+  local value = module[name]
+  if type(value) ~= "function" then
+    error("MIR runtime " .. component .. " requires callable " .. name, 2)
+  end
+  return value
+end
+required_runtime_export(lifecycle, "caps", "preflight")
+local worker_storage_route_export
+local worker_default_split_export
+local finite_research_speed_provider_export
+if target.id == "f200" or target.id == "f210" then
+  worker_storage_route_export = required_runtime_export(catalogue, "catalogue", "worker_storage_route")
+  worker_default_split_export = required_runtime_export(catalogue, "catalogue", "worker_default_split")
+  finite_research_speed_provider_export = required_runtime_export(catalogue, "catalogue", "finite_research_speed_provider")
+end
 local finite_research_speed = (target.id == "f200" or target.id == "f210")
   and require("runtime.finite_research_speed")
 local worker_robot_storage = (target.id == "f200" or target.id == "f210")
@@ -23,21 +39,29 @@ if worker_robot_storage then
   worker_robot_storage.configure(worker_values and worker_values.max_level, worker_values and worker_values.enabled)
 end
 local function worker_storage_route()
-  return type(catalogue.worker_storage_route) == "function" and catalogue.worker_storage_route() or nil
+  if worker_storage_route_export == nil then return nil end
+  return worker_storage_route_export()
 end
-local WORKER_DEFAULT_SPLIT = worker_robot_storage and type(catalogue.worker_default_split) == "function"
-  and catalogue.worker_default_split() or false
+local WORKER_DEFAULT_SPLIT = worker_robot_storage and worker_default_split_export() or false
 local function worker_storage_mutating(event)
   return worker_robot_storage and worker_robot_storage.default_owner_mutating(event) or false
 end
 local function finite_research_speed_provider()
-  return type(catalogue.finite_research_speed_provider) == "function"
-    and catalogue.finite_research_speed_provider() or nil
+  if finite_research_speed_provider_export == nil then return nil end
+  return finite_research_speed_provider_export()
 end
 local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local native_credits, legacy_module_credits, legacy_cannon_credits
 if target.recipe_productivity == true then
   native_credits = require("runtime.native_credits")
+  -- Absence of this optional subsystem is decided above. Its history and
+  -- paid-work callbacks are mandatory once it is active; a broken interface
+  -- must not skip admission or silently drop continuation events.
+  for _, name in ipairs({"preflight_family_transition", "preflight_force_created",
+      "preflight_force_reset", "preflight_forces_merged", "preflight_technology_effects_reset",
+      "needs_research_events", "on_research_finished", "on_research_cancelled"}) do
+    required_runtime_export(native_credits, "native credits", name)
+  end
   legacy_module_credits = require("runtime.legacy_module_credits")
   legacy_cannon_credits = require("runtime.legacy_cannon_credits")
 end
@@ -50,45 +74,42 @@ if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
   if target.recipe_productivity == true then native_gun_credits = require("runtime.native_gun_credits") end
 end
--- A bounded foreign-owner adapter is needed only while its named provider is
--- present. It owns no module discovery and is imported before callbacks.
-local competing_productivity
-if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~= nil
-    or active_mods["plates-n-circuit-productivity"] ~= nil
-    or active_mods.Science_packs_productivity ~= nil
-    or active_mods["bioflux-productivity"] ~= nil
-    or active_mods["fish-productivity"] ~= nil
-    or active_mods["crafting-efficiency-2"] ~= nil
-    or active_mods.ProductivityResearch ~= nil)
-    and target.id == "f200" then
-  competing_productivity = require("runtime.competing_productivity")
-end
-
 -- A removed provider is absent from script.active_mods by the time the
 -- configuration callback runs. Keep this finite list aligned with the exact
 -- F200 runtime adapters; it also recognizes a current F210 provider without
 -- importing the F200 adapter.
 local COMPETING_PROVIDER_IDS = {
-  ExpandedProductivityResearch = true,
-  ["plates-n-circuit-productivity"] = true,
-  Science_packs_productivity = true,
-  ["bioflux-productivity"] = true,
-  ["fish-productivity"] = true,
-  ["crafting-efficiency-2"] = true,
-  ProductivityResearch = true,
+  "ExpandedProductivityResearch",
+  "plates-n-circuit-productivity",
+  "Science_packs_productivity",
+  "bioflux-productivity",
+  "fish-productivity",
+  "crafting-efficiency-2",
+  "ProductivityResearch",
 }
+
+local function has_competing_provider(values)
+  if type(values) ~= "table" then return false end
+  for index = 1, #COMPETING_PROVIDER_IDS do
+    if values[COMPETING_PROVIDER_IDS[index]] ~= nil then return true end
+  end
+  return false
+end
+
+-- A bounded foreign-owner adapter is needed only while its named provider is
+-- present. It owns no module discovery and is imported before callbacks.
+local competing_productivity
+if target.id == "f200" and has_competing_provider(active_mods) then
+  competing_productivity = require("runtime.competing_productivity")
+end
 
 local function relevant_competing_provider_transition(event)
   if competing_productivity ~= nil then return true end
-  if type(active_mods) == "table" then
-    for name in pairs(COMPETING_PROVIDER_IDS) do
-      if active_mods[name] ~= nil then return true end
-    end
-  end
+  if has_competing_provider(active_mods) then return true end
   local changes = event and event.mod_changes
   if type(changes) ~= "table" then return false end
-  for name in pairs(COMPETING_PROVIDER_IDS) do
-    local change = changes[name]
+  for index = 1, #COMPETING_PROVIDER_IDS do
+    local change = changes[COMPETING_PROVIDER_IDS[index]]
     if type(change) == "table" and type(change.old_version) == "string" then return true end
   end
   return false
@@ -336,14 +357,16 @@ local function add_command()
 end
 
 local function on_init()
+  local native_credit_plan = native_credits and native_credits.preflight_family_transition(nil, true)
+  local cap_plan = lifecycle.preflight(false)
   if worker_robot_storage then
     worker_robot_storage.on_init(worker_storage_route())
     worker_robot_storage.default_owner_on_init(worker_storage_route(), WORKER_DEFAULT_SPLIT)
   end
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
-  lifecycle.on_init()
-  if native_credits then native_credits.on_init() end
+  lifecycle.on_init(cap_plan)
+  if native_credits then native_credits.on_init(native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_init() end
   if competing_productivity then competing_productivity.on_init() end
   if scripted_effects then scripted_effects.on_init() end
@@ -368,6 +391,7 @@ local function discard_absent_competing_productivity_state()
 end
 
 local function on_configuration_changed(event)
+  local cap_plan = lifecycle.preflight(true)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
   local mir = type(changes) == "table" and changes["more-infinite-research"]
@@ -376,13 +400,16 @@ local function on_configuration_changed(event)
     and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
-  local worker_storage_plan = worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
+  local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
+  -- The default-owner plan authenticates and consumes this complete prepared
+  -- witness. Do not issue a second legacy plan that could reinstall its quota.
+  local worker_storage_plan = not worker_prepared_default and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
     worker_provider_handover and worker_default_plan or nil)
   local worker_default_caps = lifecycle.preflight_worker_storage_split_caps(worker_default_plan)
   if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
       and ((secretas.old_version ~= nil) ~= (secretas.new_version ~= nil))
       and (mir == nil or mir.old_version ~= nil)
-      and not (worker_robot_storage and worker_robot_storage.plan_prepared(worker_storage_plan)) then
+      and not worker_prepared_default and not (worker_robot_storage and worker_robot_storage.plan_prepared(worker_storage_plan)) then
     -- Foreign finite4..8 and MIR's infinite4/9 represent different paid
     -- identities. Do not guess their former levels after prototype migration.
     error("MIR cannot safely add or remove Secretas on this unprepared save; keep the protected original COPY and prepare its MIR-default infinite worker4 before adding the provider using /mir-worker-storage-recovery prepare", 2)
@@ -403,15 +430,15 @@ local function on_configuration_changed(event)
     and finite_research_speed.preflight(event, finite_research_speed_provider())
   if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
-    if native_credits.preflight_family_transition then
-      family_credit_plan = native_credits.preflight_family_transition(event)
-    end
+    family_credit_plan = native_credits.preflight_family_transition(event)
   end
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
   if worker_robot_storage then
-    if worker_provider_handover then
+    if worker_prepared_default then
+      worker_robot_storage.default_owner_apply(worker_default_plan)
+    elseif worker_provider_handover then
       -- Native setters can raise scripted callbacks. Keep the old route until
       -- its work is completely on the private holder, then install its quota.
       worker_robot_storage.default_owner_apply(worker_default_plan)
@@ -424,7 +451,7 @@ local function on_configuration_changed(event)
   end
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
-  lifecycle.on_configuration_changed(event)
+  lifecycle.on_configuration_changed(event, cap_plan)
   if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
   if competing_productivity then
     competing_productivity.on_configuration_changed(event)
@@ -565,8 +592,7 @@ local function on_research_finished(event)
     worker_default_changed = worker_robot_storage.default_owner_on_research_finished(event)
     if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
   end
-  if native_credits and native_credits.on_research_finished
-      and native_credits.on_research_finished(event) then reconcile_library_events() end
+  if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
@@ -590,8 +616,9 @@ local function on_research_reversed(event)
 end
 
 local function on_technology_effects_reset(event)
+  local native_credit_plan = native_credits and native_credits.preflight_technology_effects_reset(event)
   if not worker_storage_mutating(event) then lifecycle.on_technology_effects_reset(event) end
-  if native_credits then native_credits.on_technology_effects_reset(event) end
+  if native_credits then native_credits.on_technology_effects_reset(event, native_credit_plan) end
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
   if legacy_module_credits then legacy_module_credits.on_technology_effects_reset(event) end
@@ -610,8 +637,7 @@ end
 
 local function on_research_cancelled(event)
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
-  if native_credits and native_credits.on_research_cancelled
-      and native_credits.on_research_cancelled(event) then reconcile_library_events() end
+  if native_credits and native_credits.on_research_cancelled(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
@@ -623,12 +649,13 @@ local function on_tower_planted_seed(event)
 end
 
 local function on_force_created(event)
+  local native_credit_plan = native_credits and native_credits.preflight_force_created(event)
   if worker_robot_storage then
     worker_robot_storage.on_force_created(event)
     worker_robot_storage.default_owner_on_force_created(event)
   end
   if event and event.force then initialize_imersite(event.force) end
-  if native_credits then native_credits.on_force_created(event) end
+  if native_credits then native_credits.on_force_created(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_force_created(event) end
   -- Authored prototype disablement may retain restoration rights even when
   -- all caps are unlimited. Clear those rights at existing force boundaries.
@@ -640,12 +667,13 @@ local function on_force_created(event)
 end
 
 local function on_force_reset(event)
+  local native_credit_plan = native_credits and native_credits.preflight_force_reset(event)
   if worker_robot_storage then
     worker_robot_storage.on_force_reset(event)
     worker_robot_storage.default_owner_on_force_reset(event)
   end
   if event and event.force then initialize_imersite(event.force) end
-  if native_credits then native_credits.on_force_reset(event) end
+  if native_credits then native_credits.on_force_reset(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_force_reset(event) end
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
@@ -655,16 +683,17 @@ local function on_force_reset(event)
 end
 
 local function on_forces_merged(event)
+  local native_credit_plan = native_credits and native_credits.preflight_forces_merged(event)
   local worker_merge_unqualified = false
   if worker_robot_storage then
     worker_robot_storage.on_forces_merged(event)
     local _, disposition = worker_robot_storage.default_owner_on_forces_merged(event)
     worker_merge_unqualified = disposition == "unqualified-native-merge-frame"
     if worker_merge_unqualified then
-      log("MIR worker storage: mixed native merge work retained without cap reconciliation; this draft case is unqualified")
+      log("MIR worker storage: mixed native merge work retained without worker-cargo cap reconciliation; this draft case is unqualified")
     end
   end
-  if native_credits then native_credits.on_forces_merged(event) end
+  if native_credits then native_credits.on_forces_merged(event, native_credit_plan) end
   if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if imersite and event and event.destination then
     local state = imersite_state()
@@ -675,7 +704,7 @@ local function on_forces_merged(event)
     initialize_imersite(event.destination)
     reconcile_imersite(event.destination)
   end
-  if not worker_merge_unqualified then lifecycle.on_forces_merged(event) end
+  lifecycle.on_forces_merged(event, worker_merge_unqualified and "worker-robots-storage" or nil)
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
   if legacy_module_credits and event and event.destination then
@@ -705,8 +734,7 @@ local function on_discovery_setting_changed(event)
 end
 
 local function bind_runtime_events(library_open)
-  local credit_pending = native_credits and native_credits.needs_research_events
-    and native_credits.needs_research_events() or false
+  local credit_pending = native_credits and native_credits.needs_research_events() or false
   credit_pending = credit_pending or (native_gun_credits and native_gun_credits.needs_research_events() or false)
   local worker_pending = worker_robot_storage and worker_robot_storage.needs_research_events() or false
   credit_pending = credit_pending or worker_pending

@@ -1,0 +1,369 @@
+{
+  "kind": "MIR516SECapQualificationBoundaryV1",
+  "status": "diagnostic-boundary-reviewed-candidate-unqualified",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "selection": {
+    "mods": 20,
+    "space_exploration": "0.7.57",
+    "postprocess": "0.7.5",
+    "original_reporter_inputs": false
+  },
+  "player_packages": {
+    "published15": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+    "unpublished16": "102B786DEC25E1A5520A8F463B0E482AF4F56510CEF8D07384B4322EDE982F4B",
+    "candidate_source": "eefed99e9d4689706011f59e85996b42d93a6bb9",
+    "candidate_player_tree": "38dfd952a6820396f501b5f69d21a903b5642eaa",
+    "candidate_native_processes": 0
+  },
+  "native_processes": 7,
+  "observations": [
+    {
+      "case": "mir515-se-speed-cap-ten-r01",
+      "pid": 99060,
+      "processes": 1,
+      "phase": "wrong finite-tail data-stage adverse",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir515-se-speed-cap-ten-r01/terminal.json",
+        "bytes": 624,
+        "sha256": "F50CD7AEE9643F326F450BCB6593134D12312C869B8A4975E165BD4388064A47"
+      }
+    },
+    {
+      "case": "mir515-se-worker-row-diagnostic-r01",
+      "pid": 98744,
+      "processes": 1,
+      "phase": "read-only final-data diagnostic",
+      "original_terminal_status": "observed-read-only-late-data-snapshot",
+      "receipt": {
+        "path": "build/qualification/mir515-se-worker-row-diagnostic-r01/terminal-r03.json",
+        "bytes": 46804,
+        "sha256": "F4EDA69314A2D5A8FF34AEB47867FFED99C38292C23C52087C8B293DE5282F47"
+      }
+    },
+    {
+      "case": "mir516-se-speed-cap-ten-r02",
+      "pid": 107020,
+      "processes": 1,
+      "phase": "fixture broad-enabling interference",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir516-se-speed-cap-ten-r02/terminal.json",
+        "bytes": 2094,
+        "sha256": "BA5A43A250C90A8F0EDD6E6CCF90DFB8E4871270E05ED130EDE2E6CCB74043E4"
+      }
+    },
+    {
+      "case": "mir516-se-speed-cap-ten-r03",
+      "pid": 107356,
+      "processes": 1,
+      "phase": "fixture missing automation prerequisite",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir516-se-speed-cap-ten-r03/terminal.json",
+        "bytes": 2094,
+        "sha256": "C9027466210242057AAC74921EC69E62B9A08737A6534F416617304C742105CE"
+      }
+    },
+    {
+      "case": "mir516-se-speed-cap-ten-r04",
+      "pid": 102120,
+      "processes": 1,
+      "phase": "completed source create followed by host-observer stop",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir516-se-speed-cap-ten-r04/terminal.json",
+        "bytes": 2559,
+        "sha256": "D3921E716D359123722BC284826F14108CD6D293D622D4917B4B3ED58991849A"
+      }
+    },
+    {
+      "case": "mir516-se-speed-cap-ten-r05",
+      "pid": 102668,
+      "processes": 1,
+      "phase": "old configuration prerequisite assertion",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir516-se-speed-cap-ten-r05/terminal.json",
+        "bytes": 3760,
+        "sha256": "80C651832E009567838587ECC310B89F1EE277A332B1311E6C88745EA8E46433"
+      }
+    },
+    {
+      "case": "mir516-se-cap-preconditions-r01",
+      "pid": 104568,
+      "processes": 1,
+      "phase": "read-only preconditions followed by host-observer stop",
+      "original_terminal_status": "adverse-stopped-first-failure",
+      "receipt": {
+        "path": "build/qualification/mir516-se-cap-preconditions-r01/terminal.json",
+        "bytes": 4006,
+        "sha256": "276A76A8B366C0460ECBA629C0FFDABC31885533C0AB353FD377675137656380"
+      }
+    }
+  ],
+  "adopted_source": {
+    "pid": 102120,
+    "save_sha256": "A0E0C6216C0AEC2317AC1A88B80BBDC7BC7A1F581A787D7FA82F3DEF3F0F8DFC",
+    "observation_sha256": "B9F726CB4CCADFBC3EC27B6F8C718B1B9B3A2139A54BD5B254F470D89965EFED",
+    "source_create_exit_code": 0,
+    "crc_members": 55,
+    "scope": "Three original source frames only; no prerequisite-survival or configuration-preservation verdict"
+  },
+  "preconditions": {
+    "pid": 104568,
+    "observation": {
+      "path": "build/qualification/mir516-se-cap-preconditions-r01/custody-execute/raw/preconditions/write/script-output/worker-speed-cap-ten/preconditions.json",
+      "bytes": 3039,
+      "sha256": "644CE236FBEBEFF24F74D72F2F770FAE2D107FF1529371C1E081EC5980E7B758"
+    },
+    "worker_frames": {
+      "player": {
+        "level": 10,
+        "researched": false,
+        "enabled": true,
+        "visible": false,
+        "saved_progress": 0,
+        "bonus": 0,
+        "per_level_speed_effect": 0.65,
+        "research_unit_count": 3200,
+        "research_unit_energy": 3600,
+        "queue": {
+          "current": false,
+          "queue": {},
+          "progress": 0
+        }
+      },
+      "foreign": {
+        "level": 11,
+        "researched": false,
+        "enabled": false,
+        "visible": false,
+        "saved_progress": 0,
+        "bonus": 0.65,
+        "per_level_speed_effect": 0.65,
+        "research_unit_count": 6400,
+        "research_unit_energy": 3600,
+        "queue": {
+          "current": "automation",
+          "queue": [
+            "automation"
+          ],
+          "progress": 0.42000000000000004
+        }
+      },
+      "earned_above_cap": {
+        "level": 13,
+        "researched": false,
+        "enabled": true,
+        "visible": false,
+        "saved_progress": 0,
+        "bonus": 1.9500000000000002,
+        "per_level_speed_effect": 0.65,
+        "research_unit_count": 25600,
+        "research_unit_energy": 3600,
+        "queue": {
+          "current": false,
+          "queue": {},
+          "progress": 0
+        }
+      }
+    },
+    "prerequisite_flags": {
+      "player": {
+        "worker-robots-speed-9": {
+          "researched": false,
+          "enabled": true,
+          "level": 9,
+          "valid": true
+        },
+        "se-deep-space-science-pack-1": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation-science-pack": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "electricity": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        }
+      },
+      "foreign": {
+        "worker-robots-speed-9": {
+          "researched": false,
+          "enabled": true,
+          "level": 9,
+          "valid": true
+        },
+        "se-deep-space-science-pack-1": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation-science-pack": {
+          "researched": true,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "electricity": {
+          "researched": true,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        }
+      },
+      "earned_above_cap": {
+        "worker-robots-speed-9": {
+          "researched": false,
+          "enabled": true,
+          "level": 9,
+          "valid": true
+        },
+        "se-deep-space-science-pack-1": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation-science-pack": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "electricity": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        },
+        "automation": {
+          "researched": false,
+          "enabled": true,
+          "level": 1,
+          "valid": true
+        }
+      }
+    },
+    "independent_adoption": {
+      "path": "build/qualification/mir516-se-cap-preconditions-r01/INDEPENDENT-OBSERVATION-ADOPTION.json",
+      "bytes": 4799,
+      "sha256": "3C62B68125F185A22CD5EB8449235B930309F9D2FCB23D05241073F651FCB7A4"
+    }
+  },
+  "private_custody": [
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "45bfc1faa622a4087726d0c51058e0f48b97fb08",
+      "git_blob": "98cb2a913784315130a1122058eef83adbfc68f8",
+      "path": "projects/mir/runs/mir516-se-cap-adverse-diagnostic-r01/original-bodies.json.gz",
+      "packed_bytes": 272017,
+      "packed_sha256": "E0541D359523589C2909ECCFA062E67A348F99EAB3845BF90AFCBB2693010CB9",
+      "original_rows": 140,
+      "original_bytes": 1226932,
+      "remote_decoded_original_comparison": {
+        "path": "build/qualification/mir516-se-cap-adverse-private-custody-r01/remote-readback.json",
+        "bytes": 1035,
+        "sha256": "3E782A2DFE0CD0581DB22D8B59C3477316FDDD5A7930A79AAB0ED37A0EA97260"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "1b859bca18ecfea344c772e5403a75a1a8182374",
+      "git_blob": "4302985cbfa78a2173f5ad40fb14483df44ed411",
+      "path": "projects/mir/runs/mir516-se-cap-interference-r01/original-bodies.json.gz",
+      "packed_bytes": 220869,
+      "packed_sha256": "1E4A547678451B752CD6B7FF7571145FCFA072DF38272D9D43B4FB568BE94B97",
+      "original_rows": 76,
+      "original_bytes": 841292,
+      "remote_decoded_original_comparison": {
+        "path": "build/qualification/mir516-se-cap-interference-private-custody-r01/remote-readback.json",
+        "bytes": 597,
+        "sha256": "34E1948615DDDE7332753232B5D1F0DEFD01418D678BBD2D72DAEC44BB9EFFA1"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "c62b5cf36ff2ce6b9af8e17982c7d6cfefaf6541",
+      "git_blob": "2b9df626e2022ca0b58eadb68320f158f031851a",
+      "path": "projects/mir/runs/mir516-se-cap-source-r01/original-bodies.json.gz",
+      "packed_bytes": 1273764,
+      "packed_sha256": "EA3DE36878D75BC3A497EB2CDE3C5C07196B162532B5C5B3E44ED5E53D846EF1",
+      "original_rows": 176,
+      "original_bytes": 3399109,
+      "remote_decoded_original_comparison": {
+        "path": "build/qualification/mir516-se-cap-source-private-custody-r01/remote-readback.json",
+        "bytes": 1239,
+        "sha256": "5837082D39231FFC85910FF5D7CD650C6A1968A1ED330E13A0F2F9E18113D7F6"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "20c92b7d956aec3e118a8305589a6d07a89c02c9",
+      "git_blob": "667fbee79ee79b33d52d3793d036e6bb1c797a15",
+      "path": "projects/mir/runs/mir516-se-cap-config-adverse-r01/original-bodies.json.gz",
+      "packed_bytes": 1106685,
+      "packed_sha256": "021E971FE6C28E29ACB58CB7D758BB77E0AD2D8A15B1E47C2C6E3D3D4389D130",
+      "original_rows": 104,
+      "original_bytes": 3351107,
+      "remote_decoded_original_comparison": {
+        "path": "build/qualification/mir516-se-cap-config-adverse-private-custody-r01/remote-readback.json",
+        "bytes": 1091,
+        "sha256": "9EF7DE3612D783ACBDF5C086310F29FEF776A930714C5AB17CC906F4DD410D2D"
+      }
+    },
+    {
+      "repository": "Julesc013/scratchpad",
+      "commit": "392df655fb842c462530da29cb1d44fbb91aed98",
+      "git_blob": "09eaa783a5d7d99d5ed4bddac4eba8cd7f40005f",
+      "path": "projects/mir/runs/mir516-se-preconditions-r01/original-bodies.json.gz",
+      "packed_bytes": 974311,
+      "packed_sha256": "8E7D75EF34FAD1E142245C1FCD593E5EFE3E7EF4E855D814AFFBA01774381056",
+      "original_rows": 95,
+      "original_bytes": 2915718,
+      "remote_decoded_original_comparison": {
+        "path": "build/qualification/mir516-se-preconditions-private-custody-r01/remote-readback.json",
+        "bytes": 970,
+        "sha256": "A8D385BE09F762A5A5BB2A6ED2464A6CE2C85313B171BEF68E986FE6E3A4DDC9"
+      }
+    }
+  ],
+  "interpretation": [
+    "After configuration, the named prerequisite flags are false and captured target work/bonuses differ from the source frames. Prerequisite flags were not recorded at source save time, so their survival and the causative callback are not established. The original source facts are not valid continuation preconditions.",
+    "The result does not identify an MIR production defect or justify blindly restoring prerequisites.",
+    "The host observer initially omitted asset-only mods, then rejected the shared log callsite; authentic runtime tuples and raw observations were adopted independently without reruns. All adverse terminals remain unchanged.",
+    "The separately reviewed next contract administratively constructs an explicit post-provider current state and uses real reset_technology_effects event delivery. It cannot qualify save-upgrade/configuration preservation or exclusive internal-writer attribution."
+  ],
+  "limitations": [
+    "The source repair is checked/merged; candidate ordinary cap/completion/cold behavior has not run.",
+    "Full science cost, physical output, original reporter saves/selections, externally disabled native ownership, GUI/client, multiplayer, coherent performance and stable acceptance remain open.",
+    "Published14/15 bytes and tags remain untouched. Future final16 packages must assess the metadata-only changelog correction relative to the frozen candidate rather than relabeling its exact package."
+  ],
+  "stable_acceptance": false,
+  "whole_goal_complete": false
+}

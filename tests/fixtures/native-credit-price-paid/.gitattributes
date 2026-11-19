@@ -1,0 +1,5 @@
+# Preserve byte-checked borrowed upstream material on every checkout platform.
+data.lua -text
+data-final-fixes.lua -text
+cerys-technology-first45.lua -text
+Cerys-LICENSE.txt -text

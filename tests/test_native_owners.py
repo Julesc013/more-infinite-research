@@ -71,10 +71,98 @@ class NativeOwnersTests(unittest.TestCase):
           local calls = {}
           local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6")
           local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5")
+          local ten = data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+            prerequisites = {"worker-robots-speed-9", "se-deep-space-science-pack-1"}
+          })
           assert(owners.data_worker_robot_speed_owner(lookup({
-            [seven.name] = seven, [six.name] = six
+            [seven.name] = seven, [six.name] = six, [ten.name] = ten
           }, calls)) == seven.name)
           assert(#calls == 1 and calls[1] == seven.name)
+        ''')
+
+    def test_known_se_tail_ten_follows_only_finite_six_and_seven(self):
+        self.lua.execute('''
+          local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7, prerequisites = {"worker-robots-speed-6"}
+          })
+          local ten = data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+            prerequisites = {"worker-robots-speed-9", "se-deep-space-science-pack-1"}
+          })
+          local data_calls = {}
+          assert(owners.data_worker_robot_speed_owner(lookup({
+            [six.name] = six, [seven.name] = seven, [ten.name] = ten
+          }, data_calls)) == ten.name)
+          assert(#data_calls == 3 and data_calls[1] == seven.name
+            and data_calls[2] == six.name and data_calls[3] == ten.name)
+
+          local runtime_six = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local runtime_seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7
+          })
+          local runtime_ten = runtime_technology("worker-robots-speed-10", "worker-robots-speed-9")
+          local runtime_calls = {}
+          assert(owners.runtime_worker_robot_speed_owner(lookup({
+            [runtime_six.name] = runtime_six, [runtime_seven.name] = runtime_seven,
+            [runtime_ten.name] = runtime_ten
+          }, runtime_calls)) == runtime_ten.name)
+          assert(#runtime_calls == 3 and runtime_calls[1] == runtime_seven.name
+            and runtime_calls[2] == runtime_six.name and runtime_calls[3] == runtime_ten.name)
+        ''')
+
+    def test_tail_ten_keeps_exact_effect_predecessor_and_infinite_admission(self):
+        self.lua.execute('''
+          local six = data_technology("worker-robots-speed-6", "worker-robots-speed-5", {
+            max_level = 6
+          })
+          local seven = data_technology("worker-robots-speed-7", "worker-robots-speed-6", {
+            max_level = 7, prerequisites = {"worker-robots-speed-6"}
+          })
+          local function reject(data_tail, runtime_tail)
+            local data_calls, runtime_calls = {}, {}
+            assert(owners.data_worker_robot_speed_owner(lookup({
+              [six.name] = six, [seven.name] = seven, [data_tail.name] = data_tail
+            }, data_calls)) == nil)
+            assert(owners.runtime_worker_robot_speed_owner(lookup({
+              ["worker-robots-speed-6"] = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5", {max_level = 6}),
+              ["worker-robots-speed-7"] = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6", {max_level = 7}),
+              [runtime_tail.name] = runtime_tail
+            }, runtime_calls)) == nil)
+            assert(#data_calls == 3 and data_calls[3] == "worker-robots-speed-10")
+            assert(#runtime_calls == 3 and runtime_calls[3] == "worker-robots-speed-10")
+          end
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-8", {
+              prerequisites = {"worker-robots-speed-8"}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-8")
+          )
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              prerequisites = {"worker-robots-speed-9"},
+              effects = {{type = "worker-robot-speed", modifier = .64}}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              effects = {{type = "worker-robot-speed", modifier = .64}}
+            })
+          )
+          reject(
+            data_technology("worker-robots-speed-10", "worker-robots-speed-9", {
+              max_level = 10, prerequisites = {"worker-robots-speed-9"}
+            }),
+            runtime_technology("worker-robots-speed-10", "worker-robots-speed-9", {max_level = 10})
+          )
+          local unknown = data_technology("worker-robots-speed-11", "worker-robots-speed-10", {
+            prerequisites = {"worker-robots-speed-10"}
+          })
+          local calls = {}
+          assert(owners.data_worker_robot_speed_owner(lookup({[unknown.name] = unknown}, calls)) == nil)
+          assert(#calls == 3 and calls[1] == "worker-robots-speed-7"
+            and calls[2] == "worker-robots-speed-6" and calls[3] == "worker-robots-speed-10")
         ''')
 
     def test_runtime_uses_numeric_max_and_prerequisite_object_map(self):
@@ -145,11 +233,58 @@ class NativeOwnersTests(unittest.TestCase):
           end) == nil)
         ''')
 
-    def test_missing_owner_and_lookup_failure_are_not_admitted(self):
+    def test_missing_owner_and_non_callable_lookup_are_not_admitted(self):
         self.lua.execute('''
           assert(owners.data_worker_robot_speed_owner(function() return nil end) == nil)
-          assert(owners.runtime_worker_robot_speed_owner(function() error("foreign lookup failure") end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return nil end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return false end) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(function() return {} end) == nil)
           assert(owners.data_worker_robot_speed_owner(nil) == nil)
+        ''')
+
+    def test_unexpected_lookup_or_admission_error_does_not_select_later_owner(self):
+        self.lua.execute('''
+          local six = runtime_technology("worker-robots-speed-6", "worker-robots-speed-5")
+
+          local lookup_calls = {}
+          local lookup_ok, lookup_owner = pcall(function()
+            return owners.runtime_worker_robot_speed_owner(function(name)
+              lookup_calls[#lookup_calls + 1] = name
+              if name == "worker-robots-speed-7" then error("foreign lookup failure") end
+              if name == six.name then return six end
+              return nil
+            end)
+          end)
+          assert(lookup_ok == false,
+            "earlier lookup failure selected later owner " .. tostring(lookup_owner))
+          assert(#lookup_calls == 1 and lookup_calls[1] == "worker-robots-speed-7")
+          local lookup_message = tostring(lookup_owner)
+          assert(lookup_message:find("lookup failed for worker%-robots%-speed%-7")
+              and lookup_message:find("foreign lookup failure", 1, true),
+            "lookup rejection discarded its candidate or original cause: " .. lookup_message)
+
+          local seven = runtime_technology("worker-robots-speed-7", "worker-robots-speed-6")
+          seven.prototype.max_level = nil
+          setmetatable(seven.prototype, {__index = function(_, key)
+            if key == "max_level" then error("foreign property read failure") end
+            return nil
+          end})
+          local admission_calls = {}
+          local admission_ok, admission_owner = pcall(function()
+            return owners.runtime_worker_robot_speed_owner(function(name)
+              admission_calls[#admission_calls + 1] = name
+              if name == seven.name then return seven end
+              if name == six.name then return six end
+              return nil
+            end)
+          end)
+          assert(admission_ok == false,
+            "earlier admission failure selected later owner " .. tostring(admission_owner))
+          assert(#admission_calls == 1 and admission_calls[1] == "worker-robots-speed-7")
+          local admission_message = tostring(admission_owner)
+          assert(admission_message:find("admission failed for worker%-robots%-speed%-7")
+              and admission_message:find("foreign property read failure", 1, true),
+            "admission rejection discarded its candidate or original cause: " .. admission_message)
         ''')
 
     def test_unrelated_growth_is_never_examined_or_mutated(self):

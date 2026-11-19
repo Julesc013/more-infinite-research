@@ -194,6 +194,21 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         self.assertEqual({}, _plain(lua.execute("return bob_plates.product_definitions({base='2.1.23'})")))
 
     def test_named_direct_route_drift_refuses_before_returning_rows(self):
+        _, baseline = self.technologies("q097")
+        reskinned = self.raw_from_context("q097")
+        reskinned["item"]["bob-aluminium-plate"].update(
+            icon="__reskin__/graphics/icons/bob-aluminium-plate.png", icon_size=128,
+        )
+        reskinned_before = deepcopy(reskinned)
+        _, actual = self.technologies("q097", raw=reskinned)
+        self.assertEqual(baseline, actual)
+        self.assertEqual(reskinned_before, reskinned)
+
+        missing_item = self.raw_from_context("q097")
+        missing_item["item"].pop("bob-aluminium-plate")
+        with self.assertRaisesRegex(Exception, "bob-aluminium-plate is unavailable"):
+            self.technologies("q097", raw=missing_item)
+
         raw = self.raw_from_context("q097")
         raw["recipe"].pop("bob-aluminium-plate")
         lua = self.lua()

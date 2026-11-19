@@ -10,6 +10,34 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_refresh_handles_unavailable_readable_style_bounds(self):
+        self.lua.execute('''
+          for _, missing in ipairs{{maximal_width=true}, {maximal_height=true},
+              {maximal_width=true, maximal_height=true}} do
+            boot()
+            local root = library.open(player, {tab="settings", settings_scope="research"})
+            local page = root.mir_library_tabs.mir_library_settings_content
+            local query = page.mir_library_settings_query
+            local style = page.style
+            local native_read = getmetatable(style).__index
+            getmetatable(style).__index = function(target, key)
+              if missing[key] then return nil end
+              return native_read(target, key)
+            end
+            local before_level, before_enabled = gear.level, gear.enabled
+            local before_progress = player.force.research_progress
+            query.text = "gear"
+            library.on_gui_text_changed({player_index=player.index, element=query})
+            assert(storage.mir_library.players[player.index].settings_query == "gear")
+            assert(page.mir_library_settings_query.text == "gear")
+            assert(page.mir_library_settings_toolbar.valid
+              and page.mir_library_settings_dynamic.valid)
+            assert(gear.level == before_level and gear.enabled == before_enabled
+              and player.force.research_progress == before_progress,
+              "Settings presentation changed native research")
+          end
+        ''')
+
     def test_retained_title_restyles_through_the_shared_native_element_setter(self):
         self.lua.execute(r'''
           boot()
@@ -259,6 +287,125 @@ class LibraryTests(unittest.TestCase):
           assert(detail.mir_library_settings_source_summary.caption[1]=="mir-browser.source-direct")
           assert(settings.startup["ips-cost-growth-research_gears"].value==1.25)
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_stateless_settings_detail_renderer_keeps_the_pre_extraction_tree_and_unavailable_path(self):
+        self.lua.execute(r'''
+          local renderer = require("runtime.library_settings_detail")
+          local original, calls, supplied = renderer.render, 0, nil
+          renderer.render = function(options)
+            calls, supplied = calls + 1, options
+            assert(options.parent and options.detail_width > 0)
+            assert(type(options.prefix) == "string" and type(options.add) == "function"
+              and type(options.valid) == "function" and type(options.display) == "function"
+              and type(options.section) == "function" and type(options.pixels) == "function")
+            assert(options.state == nil and options.cache == nil and options.player == nil,
+              "the stateless detail renderer received Library lifecycle state")
+            return original(options)
+          end
+          boot()
+          helpers = {encode_string=function(value) return value end,
+            decode_string=function(value) return value end,
+            json_to_table=function(value)
+              if value == "settings-detail-profile" then return {
+                schema=1, kind="mir-settings-profile", settings={
+                  ["ips-cost-base-research_gears"]=777
+                }}
+              end
+            end}
+          settings.startup = {
+            ["ips-enable-research_gears"]={value=false},
+            ["ips-cost-base-research_gears"]={value=4242},
+            ["ips-max-level-research_gears"]={value=0},
+            ["mir-settings-profile-import"]={value="MIRSET1:settings-detail-profile"}
+          }
+          local root = library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
+          local detail = root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
+            .mir_library_settings_detail
+          assert(calls == 1 and supplied.parent == detail and supplied.selected.fields[1]
+            and supplied.detail_width == detail.style.maximal_width)
+          local expected = {"mir_library_settings_title", "mir_library_settings_scope",
+            "mir_library_settings_effective_divider", "mir_library_settings_effective",
+            "mir_library_settings_fields", "mir_library_settings_source_divider",
+            "mir_library_settings_source", "mir_library_settings_source_summary"}
+          for index, name in ipairs(expected) do
+            assert(detail._children[index] == detail[name], "Settings detail tree changed at " .. name)
+          end
+          assert(#detail._children == #expected, "Settings detail gained an unexpected child")
+          local fields = detail.mir_library_settings_fields
+          assert(fields.mir_library_setting_1_value.caption[2][1] == "mir-browser.setting-off"
+            and fields.mir_library_setting_1_value.tooltip[3][1] == "mir-browser.setting-on",
+            "false/default display changed during extraction")
+          assert(fields.mir_library_setting_2_value.caption[2] == "777"
+            and fields.mir_library_setting_2_value.tooltip[2] == "4242"
+            and fields.mir_library_setting_2_profile_marker
+            and fields.mir_library_setting_2_source,
+            "profile override/default provenance tree changed during extraction")
+          assert(fields.mir_library_setting_5_value.caption[1] == "mir-browser.setting-unlimited",
+            "zero unlimited-cap display changed during extraction")
+          assert(detail.mir_library_settings_source_summary.caption[1] == "mir-browser.source-mirset1")
+          assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
+
+          -- This is the exact pre-extraction tree contract for values whose
+          -- display rules differ. It uses the same Library-provided format,
+          -- section and pixel policies rather than duplicating either here.
+          local long = string.rep("ä", 80)
+          local parent = gui_container(nil)
+          renderer.render({parent=parent, detail_width=256, prefix="mir_library_",
+            add=supplied.add, valid=supplied.valid, display=supplied.display,
+            section=supplied.section, pixels=supplied.pixels, selected={
+              title="Synthetic settings", externally_supplied=true, fields={
+                {name="fixture-enabled",caption="Enabled",effective=false,direct=false,default=true,source="direct"},
+                {name="fixture-max-level-stream",caption="Cap",effective=0,direct=0,default=0,source="default"},
+                {name="fixture-number",caption="Number",effective=1.23456789,direct=1.23456789,default=1,source="mirset1"},
+                {name="fixture-text",caption="Text",effective=long,direct=long,default=long,source="direct"},
+              }}})
+          local expected_tree = {"mir_library_settings_title", "mir_library_settings_scope", "mir_library_settings_external",
+            "mir_library_settings_effective_divider", "mir_library_settings_effective", "mir_library_settings_fields",
+            "mir_library_settings_source_divider", "mir_library_settings_source", "mir_library_settings_source_summary"}
+          for index, name in ipairs(expected_tree) do
+            assert(parent._children[index] == parent[name], "pre-extraction synthetic tree changed at " .. name)
+          end
+          assert(#parent._children == #expected_tree)
+          local synthetic = parent.mir_library_settings_fields
+          local expected_fields = {"mir_library_setting_1_name", "mir_library_setting_1_value",
+            "mir_library_setting_2_name", "mir_library_setting_2_value", "mir_library_setting_3_name",
+            "mir_library_setting_3_value", "mir_library_setting_3_profile_marker", "mir_library_setting_3_source",
+            "mir_library_setting_4_name", "mir_library_setting_4_value"}
+          for index, name in ipairs(expected_fields) do
+            assert(synthetic._children[index] == synthetic[name], "pre-extraction field tree changed at " .. name)
+          end
+          assert(synthetic.mir_library_setting_1_value.caption[2][1] == "mir-browser.setting-off"
+            and synthetic.mir_library_setting_1_value.caption[3][1] == "mir-browser.setting-on")
+          assert(synthetic.mir_library_setting_2_value.caption[1] == "mir-browser.setting-unlimited")
+          assert(synthetic.mir_library_setting_3_value.caption[2] == "≈ 1.23457"
+            and synthetic.mir_library_setting_3_value.caption[3] == "1"
+            and synthetic.mir_library_setting_3_profile_marker and synthetic.mir_library_setting_3_source)
+          assert(synthetic.mir_library_setting_4_value.caption == string.rep("ä", 58) .. "...",
+            "the extracted renderer split or expanded the bounded UTF-8 preview")
+          assert(parent.mir_library_settings_external and parent.mir_library_settings_source_summary.caption[1]
+            == "mir-browser.source-mirset1")
+          local empty = gui_container(nil)
+          renderer.render({parent=empty, selected=nil, detail_width=256, prefix="mir_library_",
+            add=supplied.add, valid=supplied.valid, display=supplied.display,
+            section=supplied.section, pixels=supplied.pixels})
+          assert(#empty._children == 1 and empty.mir_library_settings_empty
+            and empty.mir_library_settings_empty.style.single_line == false
+            and empty.mir_library_settings_empty.style.maximal_width == 240,
+            "nil selection changed the retained empty-detail shape")
+
+          library.close(player)
+          local catalogue = require("research.settings")
+          catalogue.registered_names = function() error("deliberate settings catalogue refusal") end
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          root = library.open(player, {tab="settings"})
+          local dynamic = root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
+          assert(dynamic.mir_library_settings_unavailable
+            and dynamic.mir_library_settings_unavailable.caption[1] == "mir-browser.detail-unavailable"
+            and calls == 3,
+            "catalogue refusal bypassed the existing unavailable path or invoked the detail renderer")
+          assert(gear.level == 3 and gear.enabled == false and player.force.research_progress == .5)
         ''')
 
     def test_unchanged_details_retain_widgets_snapshot_translation_tab_and_cold_load(self):
@@ -867,6 +1014,7 @@ class LibraryTests(unittest.TestCase):
             return {
               gear_id = function() return "recipe-prod-research_gears-1" end,
               internal_credit_ids = function() return library_private_credit_ids or {} end,
+              prepare = function() end,
               declared = function()
                 return library_declarations or {
                   {id = "recipe-prod-research_gears-1", name = "Iron gear wheel productivity",
@@ -1001,6 +1149,7 @@ class LibraryTests(unittest.TestCase):
             return setmetatable({}, {
               __index = function(_, key)
                 if key=="name" then return style_name or "default" end
+                if key=="width" or key=="height" then error("LuaStyle." .. key .. " is write only") end
                 return values[key]
               end,
               __newindex = function(_, key, value)
@@ -1174,6 +1323,7 @@ class LibraryTests(unittest.TestCase):
             package.loaded["runtime.lifecycle"] = nil
             package.preload["runtime.lifecycle"] = function()
               return {caps_active=function() return caps_active end,cap_limits=function() return {} end,
+                preflight=function()return {}end,
                 on_init=function() end,on_configuration_changed=function() end,on_load=function() end,
                 on_research_finished=function() native_cap_completions=native_cap_completions+1 end,
                 on_technology_effects_reset=function(event) native_policy_reset_force=event.force end,
@@ -1672,6 +1822,84 @@ class LibraryTests(unittest.TestCase):
           assert(player.opened == foreign, "translation refresh took focus from another GUI")
           assert(library.open(player) == root and player.opened == root,
             "an explicit reopen must select the existing owned frame")
+        ''')
+
+    def test_tab_navigation_after_resizes_preserves_shared_chrome_and_independent_search(self):
+        # Host-only composition control. This combines layout-size transitions
+        # with tab switching; it is not a native screenshot or input verdict.
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution={width=1600,height=900}
+          local root=library.open(player,{tab="research",query="gear",selected=gear.name})
+          root.location={x=37,y=19}
+          library.on_gui_location_changed({player_index=1,element=root})
+          root=library.open(player,{tab="settings",settings_scope="options",settings_search="repair"})
+          local view=storage.mir_library.players[1]
+          local setting=view.setting_selected
+          assert(view.query=="gear" and view.settings_query=="repair"
+            and view.settings_scope=="options")
+          local before_level,before_progress=gear.level,player.force.research_progress
+
+          local function cycle()
+            local frame=player.gui.screen.mir_research_browser
+            local tabs=frame.mir_library_tabs
+            local title=frame.mir_library_title
+            local original_width,original_height=frame.style.minimal_width,frame.style.minimal_height
+            local x,y=frame.location.x,frame.location.y
+            local query=research_filters(frame).mir_library_query
+            local settings_page=tabs.mir_library_settings_content
+            local settings_query=settings_page.mir_library_settings_query
+            local toolbar_columns=settings_page.mir_library_settings_toolbar.column_count
+            local page_height=research_page(frame).style.minimal_height
+            for _,index in ipairs({1,3,2,4,3,1,3,1}) do
+              tabs.selected_tab_index=index
+              library.on_gui_selected_tab_changed({player_index=1,element=tabs})
+              assert(player.gui.screen.mir_research_browser==frame
+                and frame.mir_library_tabs==tabs and frame.mir_library_title==title,
+                "tab navigation must never rebuild or displace owned chrome")
+              assert(frame.style.minimal_width==original_width
+                and frame.style.minimal_height==original_height
+                and frame.location.x==x and frame.location.y==y,
+                "tab content must not resize or move the outer window")
+              local live={}
+              for _,child in ipairs(frame._children) do
+                if child.valid then live[#live+1]=child end
+              end
+              assert(#live==2 and live[1]==title and live[2]==tabs,
+                "tab-specific controls must remain beneath navigation")
+              for _,name in ipairs({"research_page","queue_content","settings_content","help_content"}) do
+                assert(tabs["mir_library_"..name].style.minimal_height==page_height,
+                  "all tabs retain the same bounded page height")
+              end
+              assert(research_filters(frame).mir_library_query==query and query.text=="gear")
+              local current_query=settings_page.mir_library_settings_query
+              if current_query~=settings_query then
+                -- Responsive toolbar column changes legitimately rebuild this
+                -- field. Reject gratuitous replacement on ordinary tab changes.
+                local new_columns=settings_page.mir_library_settings_toolbar.column_count
+                assert(index==3 and new_columns~=toolbar_columns and not settings_query.valid,
+                  "only a Settings toolbar breakpoint may replace its search field")
+                settings_query,toolbar_columns=current_query,new_columns
+              end
+              assert(settings_query.valid and settings_query.text=="repair"
+                and view.settings_query=="repair" and view.query=="gear",
+                "switching tabs must preserve distinct Settings and Research searches")
+            end
+            assert(view.query=="gear" and view.settings_query=="repair"
+              and view.settings_scope=="options" and view.setting_selected==setting
+              and view.selected==gear.name)
+            assert(gear.level==before_level and player.force.research_progress==before_progress)
+          end
+          cycle()
+          for _,action in ipairs({"layout_smaller","layout_smaller","layout_larger","layout_larger"}) do
+            root=player.gui.screen.mir_research_browser
+            library.on_gui_click({player_index=1,element=root.mir_library_title["mir_library_"..action]})
+            cycle()
+          end
+          player.display_resolution={width=640,height=480}
+          root=library.open(player,{tab="settings"})
+          assert(root==player.gui.screen.mir_research_browser)
+          cycle()
         ''')
 
     def test_tab_navigation_stays_above_tab_specific_controls_and_preserves_personal_view(self):
@@ -3981,10 +4209,13 @@ class LibraryTests(unittest.TestCase):
           }
           boot()
 
+          -- Native public stages deliberately share their localized technology
+          -- caption.  The Library must present the separate authored stages
+          -- without substituting either literal technology identity.
           local retired = {valid=true, name=retired_id, level=4, researched=true, enabled=false,
-            visible_when_disabled=true, localised_name="Retired worker storage head", prototype=retired_prototype}
+            visible_when_disabled=true, localised_name="Worker robot storage", prototype=retired_prototype}
           local tail = {valid=true, name=tail_id, level=7, researched=false, enabled=true,
-            visible_when_disabled=true, localised_name="Current worker storage tail", prototype=tail_prototype,
+            visible_when_disabled=true, localised_name="Worker robot storage", prototype=tail_prototype,
             research_unit_count=9100, research_unit_energy=60,
             research_unit_ingredients={{name="automation-science-pack", amount=1}}}
           local queue = {tail, tail}
@@ -4001,6 +4232,15 @@ class LibraryTests(unittest.TestCase):
           assert(declared[retired_id].fixed_maximum == 4 and declared[tail_id].fixed_maximum == nil,
             "the retired finite head and ordinary tail lost their separate contracts")
 
+          local ordinary = library.open(player, {selected=gear.name})
+          local ordinary_rows = research_content(ordinary).mir_library_list_pane.mir_library_results
+          assert(ordinary_rows.items[1][3] == gear.localised_name,
+            "an unrelated ordinary research should keep its native list caption")
+          library.set_cap_provider(function(force)
+            assert(force == player.force)
+            return {[retired_id] = 4, [tail_id] = 8}
+          end)
+
           local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
           local head_level, tail_level = retired.level, tail.level
           local head_enabled, tail_enabled = retired.enabled, tail.enabled
@@ -4012,13 +4252,33 @@ class LibraryTests(unittest.TestCase):
           -- After parse, callbacks must consume those retained rows and never
           -- re-import a model or reconstruct a substituted ownership route.
           require = function(name) error("Library callback imported " .. tostring(name)) end
-          local root = library.open(player, {family="worker-robots-storage", selected=tail_id})
+          local root = library.open(player, {family="worker-robots-storage", selected=tail_id, sort="name-asc"})
           local state = storage.mir_library.players[1]
           local content = research_content(root)
           local detail = content["mir_library_detail"]
           assert(state.selected == tail_id and detail["mir_library_research_facts"]
             ["mir_library_detail_heading"]["mir_library_detail_title"].caption == tail.localised_name,
             "Library selection or detail relabeled the ordinary default worker tail")
+
+          local labels = {}
+          for _, item in ipairs(content["mir_library_list_pane"]["mir_library_results"].items) do
+            if item[2] == "[img=technology/" .. retired_id .. "] " then labels[retired_id] = item[3] end
+            if item[2] == "[img=technology/" .. tail_id .. "] " then labels[tail_id] = item[3] end
+          end
+          local items = content["mir_library_list_pane"]["mir_library_results"].items
+          assert(items[1][2] == "[img=technology/" .. tail_id .. "] "
+            and items[2][2] == "[img=technology/" .. retired_id .. "] ",
+            "same-caption stage labels must not override the established name sort")
+          assert(labels[retired_id] and labels[tail_id] and labels[retired_id] ~= labels[tail_id],
+            "same-caption public worker stages need distinct list choices")
+          assert(labels[retired_id][1] == "mir-browser.list-stage-finite"
+            and labels[retired_id][2] == "Worker robot storage"
+            and labels[retired_id][3] == 4,
+            "the finite public stage lost its authored endpoint")
+          assert(labels[tail_id][1] == "mir-browser.list-stage-capped"
+            and labels[tail_id][2] == "Worker robot storage"
+            and labels[tail_id][3] == 4 and labels[tail_id][4] == 8,
+            "the continuation must show its effective limit without exposing its internal ID")
 
           local actions = content["mir_library_list_pane"]["mir_library_actions"]
           library.on_gui_click({player_index=1, element=actions["mir_library_open_native"]})
@@ -4035,6 +4295,44 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress == progress
             and queue[1] == tail and queue[2] == tail,
             "Library navigation changed literal worker objects, levels, bonus or native queue state")
+
+          -- Repeat the native finite endpoint only when the effective limit
+          -- actually differs; an identical limit needlessly clips the label.
+          library.set_cap_provider(function() return {[retired_id] = 2, [tail_id] = 8} end)
+          local lower_cap_root = library.open(player, {family="worker-robots-storage", selected=retired_id})
+          local lower_cap_items = research_content(lower_cap_root).mir_library_list_pane.mir_library_results.items
+          local lower_cap_label
+          for _, item in ipairs(lower_cap_items) do
+            if item[2] == "[img=technology/" .. retired_id .. "] " then lower_cap_label = item[3] end
+          end
+          assert(lower_cap_label and lower_cap_label[1] == "mir-browser.list-stage-finite-capped"
+            and lower_cap_label[3] == 4 and lower_cap_label[4] == 2,
+            "a distinct effective finite limit must remain visible in the list label")
+          library.set_cap_provider(function() return {[retired_id] = 4, [tail_id] = 8} end)
+
+          -- The stage relationship belongs to the complete prepared
+          -- declarations, not the current filtered list. Each lone visible
+          -- native row retains its intrinsic finite/continuation distinction.
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {}, nil, 0
+          local ready_root = library.open(player, {
+            family = "worker-robots-storage", status = 2, selected = tail_id, sort = "name-asc"
+          })
+          local ready_items = research_content(ready_root)["mir_library_list_pane"]["mir_library_results"].items
+          assert(#ready_items == 1 and ready_items[1][2] == "[img=technology/" .. tail_id .. "] "
+            and ready_items[1][3][1] == "mir-browser.list-stage-capped"
+            and ready_items[1][3][2] == "Worker robot storage"
+            and ready_items[1][3][3] == 4 and ready_items[1][3][4] == 8,
+            "a ready-only continuation lost its same-caption stage distinction")
+
+          local complete_root = library.open(player, {
+            family = "worker-robots-storage", status = 1, hidden = {tail_id}, selected = retired_id, sort = "name-asc"
+          })
+          local complete_items = research_content(complete_root)["mir_library_list_pane"]["mir_library_results"].items
+          assert(retired.researched == true and #complete_items == 1
+            and complete_items[1][2] == "[img=technology/" .. retired_id .. "] "
+            and complete_items[1][3][1] == "mir-browser.list-stage-finite"
+            and complete_items[1][3][2] == "Worker robot storage" and complete_items[1][3][3] == 4,
+            "a completed-only finite stage lost its same-caption distinction")
         ''')
 
     def _assert_real_selected_catalogue_opens_without_runtime_imports(self, profile_name, target_id, expected_id):
@@ -4224,7 +4522,7 @@ class LibraryTests(unittest.TestCase):
     def test_real_model_host_preserves_hidden_visibility_and_full_family_callbacks(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = function()
-            return {internal_credit_ids = function() return {} end, declared = function()
+            return {internal_credit_ids = function() return {} end, prepare = function() end, declared = function()
               return {
                 {id = "recipe-prod-research_gears-1", family = "research_gears", progression = 1,
                   native_order = "p[research_gears]"},

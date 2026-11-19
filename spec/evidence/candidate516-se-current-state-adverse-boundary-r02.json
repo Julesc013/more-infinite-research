@@ -1,0 +1,212 @@
+{
+  "kind": "MIR516SECurrentStateAdverseBoundaryV1",
+  "source_commit": "eefed99e9d4689706011f59e85996b42d93a6bb9",
+  "player_tree": "38dfd952a6820396f501b5f69d21a903b5642eaa",
+  "exact_inputs": {
+    "engine_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "public15_sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9",
+    "candidate16_sha256": "102B786DEC25E1A5520A8F463B0E482AF4F56510CEF8D07384B4322EDE982F4B",
+    "se_version": "0.7.57",
+    "dependency_archives": 17,
+    "active_mods": 20,
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "per_process_timeout_seconds": 300,
+    "reserves_unchanged": true
+  },
+  "previous_boundary_record": "candidate516-se-current-state-boundary-r01.json",
+  "additional_unique_native_processes": 4,
+  "actual_additional_pids": [
+    100960,
+    110816,
+    113552,
+    116440
+  ],
+  "cases": [
+    {
+      "case": "r01",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r01\\packet.json",
+        "bytes": 26486,
+        "sha256": "2896385551520348D08B7FB112482DC501D1EA73E1193D24938A1ABEEC5D73BC"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r01\\composition.json",
+        "bytes": 1882,
+        "sha256": "46548FF6C34602345FDB819B767B5BA7A62BE70BF5AA9C99A4232FBC39F53F2E"
+      },
+      "native_processes": 0,
+      "owned_pids": [],
+      "status": "adverse-stopped-first-failure",
+      "restored": false,
+      "failure": "The variable '$library' cannot be retrieved because it has not been set."
+    },
+    {
+      "case": "r02",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r02\\packet.json",
+        "bytes": 26740,
+        "sha256": "F63C6C92E6704CC76B87EA73092A427C5270FB4BF1D42F63F8510EEC9989DC0D"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r02\\terminal.json",
+        "bytes": 3957,
+        "sha256": "BF1D779EDE3956F241812FB9A5E4D0F37C3332E3240BECB294FBFDE5F9E69D17"
+      },
+      "native_processes": 1,
+      "owned_pids": [
+        100960
+      ],
+      "status": "adverse-stopped-first-failure",
+      "restored": true,
+      "failure": "[mir516-current-cap] Exact expected old-package assertion in actual stdout"
+    },
+    {
+      "case": "r03",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r03\\packet.json",
+        "bytes": 26738,
+        "sha256": "61D7766B98B92C29AB195D06477BC7850D5898B91220779912A99525E844B2AC"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r03\\terminal.json",
+        "bytes": 4666,
+        "sha256": "053D1AD8AED59F486D04401ED50BE885030658F78D747B61D5A00395057C9907"
+      },
+      "native_processes": 1,
+      "owned_pids": [
+        110816
+      ],
+      "status": "adverse-stopped-first-failure",
+      "restored": true,
+      "failure": "[mir516-current-cap] Packet-bound current-state old observation guards"
+    },
+    {
+      "case": "r04",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r04\\packet.json",
+        "bytes": 30281,
+        "sha256": "9D10A4C972412B098D4EC0F2642B3AE81EBC8E0351565027DE6F2C549C88C749"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r04\\ADMISSION-NOGO-AND-CUSTODY-RECOVERY.json",
+        "bytes": 1180,
+        "sha256": "1E975FAE48B530617EC19AC6768633199441BA1F0AF4A35F965426AD7B45C7AE"
+      },
+      "native_processes": 0,
+      "status": "independent-admission-no-go-before-activation",
+      "original_owner_restored": true
+    },
+    {
+      "case": "r05",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r05\\packet.json",
+        "bytes": 30281,
+        "sha256": "FCC7E10AE74AFCD97EBA0CB0A82028C76F18A88CEAAAD7C1E8FF939B14A41307"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r05\\terminal.json",
+        "bytes": 7629,
+        "sha256": "3F4E2C7AC291C2FFA44E7648E541FC0496C2E99FFA7D13CDC359A6512442F034"
+      },
+      "native_processes": 1,
+      "owned_pids": [
+        116440
+      ],
+      "status": "adverse-stopped-first-failure",
+      "restored": true,
+      "failure": "Exception calling \"ReadAllText\" with \"1\" argument(s): \"The process cannot access the file 'D:\\Projects\\Factorio\\.task-builds\\mir516-candidate-metadata-r01\\build\\tmp\\mir516-se-current-cap-r05-native\\cap\\write\\factorio-current.log' because it is being used by another process.\""
+    },
+    {
+      "case": "r06",
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r06\\packet.json",
+        "bytes": 30782,
+        "sha256": "1E934FB99315B1AA657BB0A666893FD59A7323B84F51A8CBAFB1E753B7FF2B40"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-r06\\terminal.json",
+        "bytes": 8048,
+        "sha256": "2C361990DFFE99448AC9A1277F8E7C9FBBA478F5E25C51253A65C1A57E5ED4E9"
+      },
+      "native_processes": 1,
+      "owned_pids": [
+        113552
+      ],
+      "status": "adverse-stopped-first-failure",
+      "restored": true,
+      "failure": "[mir441-process-exit] 1"
+    }
+  ],
+  "old_negative_adoption": {
+    "original_case": "r03",
+    "pid": 110816,
+    "original_terminal_remains_adverse": true,
+    "corrected_reader_sha256": "C40E6754E9A4417887EF883E9C7D8DE552FF55B97E68A89BBB79C12B5E782EF3",
+    "role": "Exact synthetic published15 reset-event negative only; no candidate qualification",
+    "reason": "Only the two declared partial-intent fields required existing finite 1e-7 numeric precision across runtime serialization; all other checks remain exact."
+  },
+  "candidate_admin_observation": {
+    "case": "r06",
+    "pid": 113552,
+    "phase": "after-declared-admin-before-baseline-validation",
+    "differences_from_actual_old_pre_reset": [
+      {
+        "field": "foreign.worker.enabled",
+        "old": true,
+        "candidate": false
+      },
+      {
+        "field": "foreign.worker.visible",
+        "old": false,
+        "candidate": true
+      },
+      {
+        "field": "earned_above_cap.worker.enabled",
+        "old": true,
+        "candidate": false
+      },
+      {
+        "field": "earned_above_cap.worker.visible",
+        "old": false,
+        "candidate": true
+      }
+    ],
+    "all_other_wrapped_force_fields_equal": true,
+    "explicit_reset_reached": false,
+    "ordinary_completion_reached": false,
+    "completion_save_created": false,
+    "cold_processes": 0,
+    "callback_attribution": "Not established by these observations"
+  },
+  "disposition": "Stop this reset contract at its identical-baseline gate. Preserve all adverse receipts; no reseeding, handler suppression, weaker baseline or cold run against an absent cap save.",
+  "qualification": {
+    "candidate_reset": "unqualified",
+    "candidate_ordinary_completion": "unqualified",
+    "candidate_cold_reload": "unqualified",
+    "original_reporter": "unqualified",
+    "upgrade_preservation": "unqualified",
+    "full_science_cost": "unqualified",
+    "physical_output": "unqualified",
+    "stable_acceptance": false
+  },
+  "private_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "c837f8ddf53fcdccd11e43eaa8a6e1c5ca77f37c",
+    "git_blob": "fface1391a7530cc653cab7a339911a809c4532b",
+    "path": "projects/mir/runs/mir516-se-cap-current-r01/original-bodies.json.gz",
+    "packed_bytes": 2317327,
+    "packed_sha256": "DEDC90002D5E20A8F4C59B1C5E403EA2A8C99AD3FA8FBDAA5F7E7D68893D8323",
+    "original_files": 730,
+    "original_bytes": 17065283,
+    "unique_bodies": 363,
+    "root_non_author_remote_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir516-se-current-cap-private-custody-r01\\root-independent-readback.json",
+      "bytes": 655,
+      "sha256": "6EB946576AC3C91B81F978694B5AFE6884A8C18F359B8A7AB077614E8907C1E2"
+    },
+    "player_and_dependency_archive_bodies_absent": true
+  },
+  "remaining": "Actual exported profile bytes through startup import/effective native output, current-source applicability, GUI/client and performance/stable gates remain separate."
+}

@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-profile-native-witness",
+  "version": "0.1.0",
+  "title": "MIR private profile native-output witness",
+  "author": "MIR maintainers",
+  "description": "Read-only observations for exact numeric and legacy-alias startup imports in disposable worlds.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "quality = 2.0.77",
+    "more-infinite-research = 5.0.20014"
+  ]
+}

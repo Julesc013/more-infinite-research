@@ -22,6 +22,7 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
             ["mir-worker-storage-default-native"]="0.1.0"},on_init=function(f)handlers.init=f end,
             on_load=function(f)handlers.load=f end,on_configuration_changed=function(f)handlers.configuration=f end,
             on_event=function(id,f)handlers[id]=f end}
+          settings={startup={['worker-default-native-scenario']={value='legacy'}}}
           defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1,lab_modules=2}}
           remote={add_interface=function()end};actor=assert(load(actor_source))()
           provider=assert(load(provider_source))()

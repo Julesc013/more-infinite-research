@@ -1,0 +1,378 @@
+{
+  "schema": 1,
+  "kind": "MIR514ActualPublicServerExportSubsetV1",
+  "date": "2026-11-13",
+  "status": "ACCEPTED-scoped-two-engine-public-server-export-subset",
+  "player_source": "e35961ca94c68300d0843b3a3a5270db81d3241a",
+  "frozen_runner": "d4e6a802dbdcfae683069cca26d10ef58a6edb6a",
+  "public_commands": [
+    "/mir-settings-export",
+    "/mir-settings-export --compact mir-headless-compact",
+    "/mir-diagnostics-export"
+  ],
+  "expectations": "Actual engine baseline values and independent target declaration names; complete typed map, false distinct from zero, full/compact wire and metadata, exact diagnostic output and all native state snapshots. No GUI fixture or direct handler invocation.",
+  "cases": [
+    {
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77",
+        "data": "D:\\Games\\Factorio\\2.0\\data"
+      },
+      "player": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.20014.zip",
+        "bytes": 1039250,
+        "sha256": "10EB57D9D2228EAD4D818D8DBCCBA035B7BC110AF83BB2DADB9BA665DD9A05C4",
+        "version": "5.0.20014"
+      },
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-native-r02/f200/packet.json",
+        "bytes": 13040,
+        "sha256": "ADB933DEAD94424D9BA6D94338A8A05AA8C4DE1ED7FAE006644684EB9C756619"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-server-export-native-r02\\Invoke-Continuation.ps1",
+        "bytes": 16154,
+        "sha256": "51866F91E25806B8075513FC55287FE7FE6238F896FE58F260A1042723CEE562"
+      },
+      "reader": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-server-export-native-r02\\check_evidence.py",
+        "bytes": 5762,
+        "sha256": "0625CC1253B1168544DE3B1E3E916E8D257C622C6F0182BDCF2F50D99F608941"
+      },
+      "terminal": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-native-r02/f200/terminal.json",
+        "bytes": 11070,
+        "sha256": "27F8B705441761395AB8D614477231583551DD44C625275DDCB7D813F5A6D13F"
+      },
+      "composition": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-native-r02/f200/composition.json",
+        "bytes": 8830,
+        "sha256": "0F79250324DE80184454EB78B1949FFEF2F825E9C9EFDC74025B7416AC396342"
+      },
+      "independent_review": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-native-r02/INDEPENDENT-RESULT-REVIEW.json",
+        "bytes": 1279,
+        "sha256": "D9B34BAE0A1ED8CCC840EB7188DE429CAB53060B62300E3768EFDE288D5F6707"
+      },
+      "review_record": {
+        "kind": "MIR514F200ActualHeadlessExportResultReviewV1",
+        "recorded_by": "execution lead from non-author read-only reviewer findings",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO-scoped-F200-public-server-exports",
+        "packet_sha256": "ADB933DEAD94424D9BA6D94338A8A05AA8C4DE1ED7FAE006644684EB9C756619",
+        "engine": "2.0.77",
+        "mir": "5.0.20014",
+        "actual_new_servers": 1,
+        "server_end": "supervised completion, exit -1; not a natural-exit claim",
+        "players": 0,
+        "settings": 874,
+        "full_bytes": 6361,
+        "compact_bytes": 269,
+        "diagnostic_bytes": 6943,
+        "scope": "Reader independently rerun; all four snapshots byte-identical across3forces/861technologies; false-versus-zero preserved; real helper function and both command registrations; exact3successful profile-write log lines and public acknowledgements; full and diagnostics-full byte-identical. Initial report absent until actual explicit diagnostics produced a bounded report. All3seed copies, package and clean runner hashes match. Actual library readback matches5controls and18MIR archives; restored=true, no errors and zero live Factorio.",
+        "original_r01_adverse_preserved": true,
+        "original_create_adopted_not_repeated": true,
+        "f210_gui_client_gameplay_stable_qualified": false
+      },
+      "observed": {
+        "status": "observed-server-exports-independent-review-required",
+        "zero_players": true,
+        "actual_startup_settings": 874,
+        "full_bytes": 6361,
+        "compact_bytes": 269,
+        "diagnostics_bytes": 6943,
+        "false_and_zero_type_checked": true,
+        "startup_report_present": false,
+        "write_file_type": "function",
+        "native_acceptance": false
+      },
+      "new_native_processes": 1,
+      "process_ends": "natural create where applicable; supervised server completion, not natural server exit",
+      "forces": 3,
+      "technologies": 861,
+      "four_byte_identical_snapshots": [
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/state-before.json",
+          "bytes": 141157,
+          "sha256": "3DDC0722DAE69B245B6119A698C8FD99E2D725650DAFE221C3C6130056264F42"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/state-after-full.json",
+          "bytes": 141157,
+          "sha256": "3DDC0722DAE69B245B6119A698C8FD99E2D725650DAFE221C3C6130056264F42"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/state-after-compact.json",
+          "bytes": 141157,
+          "sha256": "3DDC0722DAE69B245B6119A698C8FD99E2D725650DAFE221C3C6130056264F42"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/state-after-diagnostics.json",
+          "bytes": 141157,
+          "sha256": "3DDC0722DAE69B245B6119A698C8FD99E2D725650DAFE221C3C6130056264F42"
+        }
+      ],
+      "actual_files": {
+        "profile-full.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/profile-full.txt",
+          "bytes": 6361,
+          "sha256": "117BE0D4FDE965A4C3B0886E9CCF28243F95A32F154A50F98ED72C6286F56E7B"
+        },
+        "profile-compact.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/profile-compact.txt",
+          "bytes": 269,
+          "sha256": "DCDACDE6E8571052A45671243E9BB09C2DA84EEBE4CE17C67C77AB9DB31B0713"
+        },
+        "profile-after-diagnostics.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/profile-after-diagnostics.txt",
+          "bytes": 6361,
+          "sha256": "117BE0D4FDE965A4C3B0886E9CCF28243F95A32F154A50F98ED72C6286F56E7B"
+        },
+        "decoded-full.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/decoded-full.json",
+          "bytes": 42383,
+          "sha256": "F4B539B282749CB493CB8D8CB2F19AC8416E0954CA121227A33D158386FC1C96"
+        },
+        "decoded-compact.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/decoded-compact.json",
+          "bytes": 299,
+          "sha256": "C8B179023CC555D4E66A698D17CE095E344B8C14DA1516EF39A01DB2E1E11EA8"
+        },
+        "decoded-after-diagnostics.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/decoded-after-diagnostics.json",
+          "bytes": 42383,
+          "sha256": "F4B539B282749CB493CB8D8CB2F19AC8416E0954CA121227A33D158386FC1C96"
+        },
+        "diagnostic-explicit.log": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/diagnostic-explicit.log",
+          "bytes": 6943,
+          "sha256": "AE2BC4FAB44589410AC309BB9E985E230162C0C780E4BF9DFF528ADAF263D991"
+        },
+        "public-command-acks.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/public-command-acks.json",
+          "bytes": 449,
+          "sha256": "D5978B026BFABADC7A168AF5C85472254159F1B4E52DC9278853F907EA7A6867"
+        },
+        "server.log": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-r02-f200-native/evidence/server.log",
+          "bytes": 9586,
+          "sha256": "AEBB787F9C24042D985AFC8417C35A9F3F898E6DA342AAFA3F7C7F89D573E855"
+        }
+      },
+      "restored": true,
+      "live_factorio": 0,
+      "private_original_readback": {
+        "kind": "ActualF200ServerExportOriginalRemoteReadbackV1",
+        "repository": "Julesc013/scratchpad",
+        "commit": "feb80acd715bf126f9d8c15517017b29d41bf2bb",
+        "path": "projects/mir/runs/mir514-f200-actual-server-exports-r02/original-bodies.json.gz",
+        "git_blob": "756a7392544b45c378f845e3010c2d208554d4af",
+        "packed_sha256": "007946C8C60DC4334C91D77CE82973FC26561E2016E3789CE57AF14796F4D88F",
+        "actual_originals_verified": 106,
+        "actual_original_bytes": 2252201,
+        "scope": "Accepted F200 public-server full/compact/diagnostics export subset on exact public5.0.20014 and engine2.0.77. One new supervised server using the original natural seed; complete actual snapshots/files/logs/controllers/inputs/host controls and non-author reviews retained. R01 pre-command adverse stays separate. No GUI/client/gameplay/performance/stable result."
+      }
+    },
+    {
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "version": "2.1.23",
+        "data": "D:\\Games\\Factorio\\2.1\\data"
+      },
+      "player": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir514-d4e6a8-final-r01\\more-infinite-research_5.0.21014.zip",
+        "bytes": 1039673,
+        "sha256": "021E222A5495398ECEED272DE340BD1731816CCA483DA446B6F641BF5FE2DD3B",
+        "version": "5.0.21014"
+      },
+      "packet": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-f210-native-r01/f210/packet.json",
+        "bytes": 9358,
+        "sha256": "4EB99059760D185F92D5DA3DA5D33902C329EFEEABE21216C05CC70038148133"
+      },
+      "controller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-server-export-f210-native-r01\\Invoke-F210.ps1",
+        "bytes": 15794,
+        "sha256": "859DDB6E830EC0857766A91CB4F8013E50590950D919ACD53B92756801541719"
+      },
+      "reader": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir514-server-export-f210-native-r01\\check_evidence.py",
+        "bytes": 5717,
+        "sha256": "24C9B0A412D8906066002213000F805D5A763DC277F8D93D617E130CE42999EB"
+      },
+      "terminal": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-f210-native-r01/f210/terminal.json",
+        "bytes": 14310,
+        "sha256": "30DEAC87F2D99ABD4D6521324FD8EB28574E3118A449E69C67A25F8DB1F21004"
+      },
+      "composition": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-f210-native-r01/f210/composition.json",
+        "bytes": 10147,
+        "sha256": "9D0C408131F127DE8F0ECE5DC094EC630BCDF06268D3E3CF19E2F96B128254DE"
+      },
+      "independent_review": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-f210-native-r01/INDEPENDENT-RESULT-REVIEW.json",
+        "bytes": 1460,
+        "sha256": "4C74EE21254C1DE0B765C26093826AED96D0D72A134F42052C5B1BFFADF70B81"
+      },
+      "review_record": {
+        "kind": "MIR514F210ActualHeadlessExportResultReviewV1",
+        "recorded_by": "execution lead from non-author read-only reviewer findings",
+        "reviewer": "/root/stable_ui_packet_review512",
+        "verdict": "GO-scoped-F210-public-server-exports",
+        "packet_sha256": "4EB99059760D185F92D5DA3DA5D33902C329EFEEABE21216C05CC70038148133",
+        "terminal_sha256": "30DEAC87F2D99ABD4D6521324FD8EB28574E3118A449E69C67A25F8DB1F21004",
+        "engine": "2.1.23",
+        "mir": "5.0.21014",
+        "actual_create_processes": 1,
+        "actual_servers": 1,
+        "process_ends": "create natural exit0; server supervised completion exit-1",
+        "players": 0,
+        "settings": 888,
+        "full_bytes": 6501,
+        "compact_bytes": 269,
+        "diagnostic_bytes": 7083,
+        "scope": "Rehashed all18inputs and actual evidence. Exact independent888-name set,10false/245numeric-zero values preserved. Four141973B snapshots byte-identical across3forces/861technologies; no players, actual helper=function and both registrations. All file mirrors match script-output originals; full and diagnostics-full identical, compact legitimately empty. Initial report absent through full/compact, actual explicit diagnostics creates required bounded report. Natural171150B seed preserved. Base+MIR-only logs, exact package/engine/source, all5controls and19priorMIR archives restore, candidate removed, zero errors/live Factorio.",
+        "f200_r01_adverse_preserved_separately": true,
+        "gui_client_gameplay_performance_stable_qualified": false
+      },
+      "observed": {
+        "status": "observed-server-exports-independent-review-required",
+        "zero_players": true,
+        "actual_startup_settings": 888,
+        "full_bytes": 6501,
+        "compact_bytes": 269,
+        "diagnostics_bytes": 7083,
+        "false_and_zero_type_checked": true,
+        "startup_report_present": false,
+        "write_file_type": "function",
+        "native_acceptance": false
+      },
+      "new_native_processes": 2,
+      "process_ends": "natural create where applicable; supervised server completion, not natural server exit",
+      "forces": 3,
+      "technologies": 861,
+      "four_byte_identical_snapshots": [
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/state-before.json",
+          "bytes": 141973,
+          "sha256": "4597F917B17FDB391DE408EAAF69D6495E8E1B70027DD0466838E19C4FB0C0B2"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/state-after-full.json",
+          "bytes": 141973,
+          "sha256": "4597F917B17FDB391DE408EAAF69D6495E8E1B70027DD0466838E19C4FB0C0B2"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/state-after-compact.json",
+          "bytes": 141973,
+          "sha256": "4597F917B17FDB391DE408EAAF69D6495E8E1B70027DD0466838E19C4FB0C0B2"
+        },
+        {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/state-after-diagnostics.json",
+          "bytes": 141973,
+          "sha256": "4597F917B17FDB391DE408EAAF69D6495E8E1B70027DD0466838E19C4FB0C0B2"
+        }
+      ],
+      "actual_files": {
+        "profile-full.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/profile-full.txt",
+          "bytes": 6501,
+          "sha256": "1BEEC9013CD957EB4852D938EE5384950E10DDABF97330775A626E549EC70E6D"
+        },
+        "profile-compact.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/profile-compact.txt",
+          "bytes": 269,
+          "sha256": "08A163E60884CA412639E5E3F9A1F7B3204BC87566D2BC2402426F9BB4A26E61"
+        },
+        "profile-after-diagnostics.txt": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/profile-after-diagnostics.txt",
+          "bytes": 6501,
+          "sha256": "1BEEC9013CD957EB4852D938EE5384950E10DDABF97330775A626E549EC70E6D"
+        },
+        "decoded-full.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/decoded-full.json",
+          "bytes": 43199,
+          "sha256": "0A21BC93DF65BF7C51CCC509831DF4E4E18A9DE3A168B54B4E9E6A7A99AA9844"
+        },
+        "decoded-compact.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/decoded-compact.json",
+          "bytes": 299,
+          "sha256": "C0EFDB9ED1EC291717CCFD391D00D3ACDA1ADC8F0510DE73D07FB10D244677A6"
+        },
+        "decoded-after-diagnostics.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/decoded-after-diagnostics.json",
+          "bytes": 43199,
+          "sha256": "0A21BC93DF65BF7C51CCC509831DF4E4E18A9DE3A168B54B4E9E6A7A99AA9844"
+        },
+        "diagnostic-explicit.log": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/diagnostic-explicit.log",
+          "bytes": 7083,
+          "sha256": "482C243818F3ECA851D4280287F2F93E5F313CC7064440CBAEE5F7F47886A7FB"
+        },
+        "public-command-acks.json": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/public-command-acks.json",
+          "bytes": 449,
+          "sha256": "25EE577B759FB5043192962796B68E2D5600D506D20B46BD5BD1E157634122C4"
+        },
+        "server.log": {
+          "path": "D:/Projects/Factorio/.task-builds/mir514-worker-recorded-default-blackglass-r01/build/tmp/mir514-headless-exports-f210-fresh-r01-f210-native/evidence/server.log",
+          "bytes": 32406,
+          "sha256": "507FCC599F428B07FAD08D8D93C43A537E68A6324A5D031B83B5F7632D81A330"
+        }
+      },
+      "restored": true,
+      "live_factorio": 0,
+      "private_original_readback": {
+        "kind": "ActualF210ServerExportOriginalRemoteReadbackV1",
+        "repository": "Julesc013/scratchpad",
+        "commit": "458f5d072e42e6899990f8145318a225918028b6",
+        "path": "projects/mir/runs/mir514-f210-actual-server-exports-r01/original-bodies.json.gz",
+        "git_blob": "647b738cee643282a648b195e78ba20578792769",
+        "packed_sha256": "A92B23415E65DEB146F452455F73939CA711F182813505844BB9960CDA68D9DF",
+        "actual_originals_verified": 105,
+        "actual_original_bytes": 2237656,
+        "scope": "Accepted F210 fresh public-server full/compact/diagnostics export subset on exact public5.0.21014 and engine2.1.23. Natural create plus one supervised server; actual snapshots/files/logs/controllers/inputs/focused controls and non-author reviews. No GUI/client/gameplay/performance/stable result."
+      }
+    }
+  ],
+  "retained_original_adverse": {
+    "terminal": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/mir514-server-export-native-r01/f200/terminal.json",
+      "bytes": 12459,
+      "sha256": "47FA752ABE48492A039ACC3DD89481810667FAD77AC59E58926D74241344EA7B"
+    },
+    "failure": "[mir514-headless-export] Expected fresh file D:\\Projects\\Factorio\\.task-builds\\mir514-worker-recorded-default-blackglass-r01\\build\\tmp\\mir514-headless-exports-f200-native\\write-data\\script-output\\more-infinite-research\\mir.log",
+    "native_processes": 2,
+    "restored": true,
+    "public_commands_executed": 0,
+    "valid_natural_create_adopted_once": true,
+    "controller_corrections": "Optional initial report for create-to-server lifecycle; target-specific874/888 name sets. Mandatory real explicit diagnostic report retained; source unchanged.",
+    "private_original_readback": {
+      "kind": "ActualHeadlessExportAdverseOriginalRemoteReadbackV1",
+      "repository": "Julesc013/scratchpad",
+      "commit": "c3149b7fc77b4f96d96f7ad6e5371b7b223bc538",
+      "path": "projects/mir/runs/mir514-server-export-r01-adverse-originals/original-bodies.json.gz",
+      "git_blob": "517562a40ce4d4cf74ea6d396ebcdd098f6d9300",
+      "packed_sha256": "038AD97F23474D17D1BFDF1036D3A75B339136B75BE83A41900C7FDF96420CE9",
+      "actual_originals_verified": 92,
+      "actual_original_bytes": 1132617,
+      "scope": "Actual F200 r01 natural seed creation and stopped server attempt, original controller/reader/packet revisions, logs and observed baseline. Startup-report precondition stopped execution before all public export commands. Both process outcomes and zero-live/restored terminal retained; no export acceptance, GUI, client, timing or stable claim."
+    }
+  },
+  "totals": {
+    "actual_native_process_invocations": 5,
+    "retained_adverse_servers": 1,
+    "accepted_server_cases": 2,
+    "original_create_not_counted_twice": true
+  },
+  "limits": [
+    "No13GUIclicks, Library input, import round-trip or peer/client/personal-state acceptance.",
+    "Fresh zero-player Base+MIR worlds only; no gameplay, broad compatibility, performance, historical or stable verdict.",
+    "Published14 bytes unchanged; original13/older results keep their identities."
+  ]
+}

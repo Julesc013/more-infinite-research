@@ -4,6 +4,7 @@
 -- not catalogue rows, do not create technologies, and deliberately do not
 -- reproduce the historical compiler's broad skip ledger.
 local M = {}
+local bob_core_selection = require("compatibility.bob_core_selection")
 
 local SPACE_AGE = "space-age"
 local NATIVE_RESEARCH_PRODUCTIVITY = "research-productivity"
@@ -24,17 +25,6 @@ local F210_BOBTECH_ANGEL_REQUIRED = {
   "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
   "angelsrefining", "angelsrefininggraphics", "angelspetrochem", "angelspetrochemgraphics",
   "angelssmelting", "angelssmeltinggraphics",
-}
-
-local F210_BOB_CORE_REQUIRED = {
-  "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
-}
-
-local F210_BOB_CORE_EXCLUDED = {
-  "angelsbioprocessing", "angelsbioprocessinggraphics", "angelsrefining", "angelsrefininggraphics",
-  "angelspetrochem", "angelspetrochemgraphics", "angelssmelting", "angelssmeltinggraphics",
-  "Krastorio2", "Krastorio2-spaced-out",
-  "pycoalprocessing", "pyalienlife", "pyhightech",
 }
 
 local function withheld_material(family, reason)
@@ -137,21 +127,14 @@ end
 
 local function is_f210_bobtech_angel(active_mods, target)
   if type(target) ~= "table" or target.id ~= "f210" or target.factorio_version ~= "2.1"
-      or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOBTECH_ANGEL_REQUIRED) then
+      or not has_every(active_mods, F210_BOBTECH_ANGEL_REQUIRED) then
     return false
   end
   return active_mods.Krastorio2 == nil and active_mods["Krastorio2-spaced-out"] == nil
 end
 
 local function is_f210_bob_core(active_mods, target)
-  if type(target) ~= "table" or target.id ~= "f210" or target.factorio_version ~= "2.1"
-      or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOB_CORE_REQUIRED) then
-    return false
-  end
-  for _, name in ipairs(F210_BOB_CORE_EXCLUDED) do
-    if active_mods[name] ~= nil then return false end
-  end
-  return true
+  return bob_core_selection.status(active_mods, target) == "selected"
 end
 
 -- Only a direct lookup by the exact authored early-stage identity is allowed.
@@ -251,9 +234,20 @@ function M.rows(active_mods, target, force, query, effective_streams)
   if not supports_recipe_productivity(target) then return rows end
   if not has_space_age(active_mods) then
     for _, row in ipairs(BASE_WITHOUT_SPACE_AGE) do
-      if matches(row, query) then rows[#rows + 1] = copy(row) end
+      -- A disabled stream or present named technology is not an omission.
+      -- A failed native read is not proof of absence; do not scan the catalogue.
+      if not is_explicitly_disabled(row, effective_streams)
+          and emitted_technology_state(force, "recipe-prod-" .. row.family .. "-1") == false
+          and matches(row, query) then
+        rows[#rows + 1] = copy(row)
+      end
     end
-  elseif has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+  elseif not is_explicitly_disabled(NATIVE_LAB_PRODUCTIVITY, effective_streams)
+      and emitted_technology_state(force,
+        "recipe-prod-" .. NATIVE_LAB_PRODUCTIVITY.family .. "-1") == false
+      and has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+    -- The named native owner is insufficient to claim omission if MIR's exact
+    -- historical technology identity is also present in the force.
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
   end
   if is_f200_bob_angel(active_mods, target) then

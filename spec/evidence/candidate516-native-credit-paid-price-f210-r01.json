@@ -1,0 +1,230 @@
+{
+  "kind": "MIR516F210PaidPriceContinuationEvidenceV1",
+  "verdict": "accepted-scoped-native-evidence",
+  "reviewed_source_commit": "47f9cb78455cb4764666a76969ae51c53ea7fd8a",
+  "reviewed_player_tree": "b886299c70d259d8a76a9d7d63583283ed8a0708",
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir516-credit-price-paid-current-r01\\more-infinite-research_5.0.21016.zip",
+    "bytes": 1044239,
+    "sha256": "D1A0D32D1ECCDA925D6E4C52E74CFFA92FF365C31A118629EAA0F1206875AF48",
+    "version": "5.0.21016"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "closure": {
+    "base": "2.1.23",
+    "elevated-rails": "2.1.23",
+    "quality": "2.1.23",
+    "recycler": "2.1.23",
+    "space-age": "2.1.23",
+    "more-infinite-research": "5.0.21016",
+    "mir-fixture-native-credit-vectors": "0.4.0"
+  },
+  "fixture": {
+    "scenario_commit": "93cd6dcbd6752ca9e3649a1dba515279708e0969",
+    "scenario_actor": {
+      "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/materialized/actor/control.lua",
+      "bytes": 10843,
+      "sha256": "F7475D37C7A2BA1D48A5D15C5371B1B34E3863025C208AE0C73AD8C1962BE68E"
+    },
+    "fixture_zip": {
+      "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/materialized/fixture/mir-fixture-native-credit-vectors_0.4.0.zip",
+      "bytes": 12545,
+      "sha256": "0E1A89D1C885A77B3189C6CE7F073FF1A0B1D9EC17FD5CA5658AE3378CB1DC5A"
+    },
+    "fixture_pr_merge_commit": "662f53203e2fe9914fbfd9fc3323d8899fe8cd65",
+    "original_pr_head": "afa9dd148fa4df2d9efd153e296c329dc56bb6d0",
+    "portability_correction_scope": "The test/attribute-only descendants retain identical actor, contract and fixture-body blobs; native materialization retains the original 93cd fixture identity."
+  },
+  "source_boundary": {
+    "protected_original": {
+      "path": "build/qualification/mir515-native-vector-r01/f210-r03/protected/f1-negative.zip",
+      "bytes": 830769,
+      "sha256": "9B4FBD38B4F319B33C80735CBB25900BDA53845E7C483DED110F6298B1AD4280"
+    },
+    "source_record": {
+      "path": "build/qualification/mir515-native-vector-r01/f210-r03/Execute-r01-f1-negative/result.json",
+      "bytes": 1039431,
+      "sha256": "85B4C8FB3FDC23E716092BE19353A499426D1DF6ADEA6FC7ADB374357F690D46",
+      "saved_phase": "f1-negative-saved",
+      "saved_frame_sha256": "E751E4537B42AB1D8F1C6E08245B3CF7293CA6E1F2D260ACB280B0CB8E2A49EB",
+      "rejected_entry_frame_sha256": "D0EF61C55D018D9113A017E7868DA7A76643E8D37F54C612D28AD7237E2D040A",
+      "entry_to_saved_difference_count": 106
+    },
+    "controlled_derivative": {
+      "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/materialized/source/paid-price-f1-observer.zip",
+      "bytes": 787070,
+      "sha256": "9A462A97ED46D8DB93BB0941C6434D12C6610C5B281AB1D0ACB4DDDC391C8FFE",
+      "meaning": "Only the embedded observer control is replaced; the original protected source archive remains untouched."
+    },
+    "full_live_source_barrier": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-price-paid-r01\\build\\tmp\\mir516-credit-price-paid-r01-native\\continuation\\source-before-command.log",
+      "bytes": 78898,
+      "sha256": "B72773FBF79B06EA699DE9DAEA9BCC6D429ED43DB6C9CCACA8BDAAEAA46CE583",
+      "reader_mode": "source",
+      "result": "passed before the two read-only readiness probes and the one continuation command",
+      "native_sections": [
+        "mains",
+        "queue",
+        "unchanged",
+        "inventory",
+        "units",
+        "bonuses",
+        "technologies",
+        "prototypes"
+      ],
+      "observed_bonus_rows": 109,
+      "observed_technology_statuses": 34,
+      "source_lds_signed_carrier_completed_counts": [0, 0, 0, 0, 0, 2],
+      "source_ordinary_lds_completions": 2,
+      "source_total_ordinary_by_main": 6
+    }
+  },
+  "packet": {
+    "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/packet.json",
+    "bytes": 18181,
+    "sha256": "ABDE3679E677760859B0D8F96D2507FE752AF11A999353ADDBCAFEF96772DECE"
+  },
+  "controller": {
+    "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/Invoke-PaidPrice.ps1",
+    "bytes": 19655,
+    "sha256": "7EF6ED76DB87CEA501B0AA4AFB0A8049CBBDC15257F5A6F1738694BEE89B17B7"
+  },
+  "reader": {
+    "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/Verify-PaidPrice.py",
+    "bytes": 10004,
+    "sha256": "092D301DBDDA4037D455C6E5F0FA542DA6A21EB9EE8C3AE7D83CA42D0264C98D"
+  },
+  "limits": {
+    "memory_mib": 4096,
+    "output_mib": 64,
+    "timeout_seconds": 180,
+    "new_native_processes": 3
+  },
+  "actual_execution": {
+    "terminal": {
+      "path": "build/qualification/mir516-credit-price-paid-r01/prepared-case-r01/terminal.json",
+      "bytes": 17904,
+      "sha256": "8B5054DA2592BAB6C0CAB9FBC7F08DC04668F54AFF032F6CCA5D342295DB4DD2",
+      "status": "observed-paid-price2-save-two-colds-independent-review-required",
+      "native_attempts": 3,
+      "owned_pids": [133272, 114840, 133952],
+      "restored": true,
+      "factorio_processes_remaining": 0,
+      "failure": null
+    },
+    "continuation": {
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-price-paid-r01\\build\\tmp\\mir516-credit-price-paid-r01-native\\continuation\\completed.log",
+        "bytes": 204565,
+        "sha256": "417F2E279F24AA3D465F87C620F662F03840B3EDF798E5C7F123D96CBC79FCBB"
+      },
+      "markers": ["source", "pre-lab", "save"],
+      "map_price": 2,
+      "ordinary_completion": {
+        "name": "recipe-prod-research_low_density_structure-1",
+        "by_script": false,
+        "count": 1
+      },
+      "science_per_pack": {
+        "source": 168,
+        "inserted": 63832,
+        "remaining": 0,
+        "consumed": 64000
+      },
+      "post_completion": {
+        "main_level": 4,
+        "next_public_count": 128000,
+        "all_six_private_rows": {
+          "ignore_tech_cost_multiplier": true,
+          "native_count": 1,
+          "prototype_count": 1
+        },
+        "low_density_and_casting_bonus": 0.3,
+        "scrap_and_alias_bonus": 0.1,
+        "lab": "mir-vector-lab / disabled_by_script=true"
+      }
+    },
+    "protected_completed_price2_save": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir516-credit-price-paid-r01\\build\\tmp\\mir516-credit-price-paid-r01-native\\protected\\completed-price2.zip",
+      "bytes": 836201,
+      "sha256": "F6E6C0990EF4D38D8D725B6625F4741975E7D3A749C53537FBC9B9B7E855023C"
+    },
+    "colds": [
+      {
+        "role": "cold1",
+        "log_sha256": "ECD46EF628F2DD3DF3C92371EFBBF55D1904EEE9038721AF6B9BB914196DFF9E",
+        "input_sha256": "F6E6C0990EF4D38D8D725B6625F4741975E7D3A749C53537FBC9B9B7E855023C",
+        "ticks_after_saved_marker": 1,
+        "reader": "passed"
+      },
+      {
+        "role": "cold2",
+        "log_sha256": "5D2AB15F91847D594E0D7AF8AC2D921723EB32D5D5B09C73EA7D6F3583E1A1DA",
+        "input_sha256": "F6E6C0990EF4D38D8D725B6625F4741975E7D3A749C53537FBC9B9B7E855023C",
+        "ticks_after_saved_marker": 1,
+        "reader": "passed"
+      }
+    ],
+    "library_restoration": {
+      "witness_sha256": "02D4F80F1563C1F2642D08996EA528AE1292120539E58850749CA7DD6C8FE306",
+      "equal": true,
+      "control_rows": 4,
+      "mir_archive_rows": 19,
+      "owned_player_and_fixture_rows": 2
+    }
+  },
+  "independent_native_review": {
+    "path": "build/qualification/mir516-credit-price-paid-r01/independent-native-review-r01/INDEPENDENT-NATIVE-REVIEW.json",
+    "bytes": 5752,
+    "sha256": "295CF0134843A5F38847ACA46E92B2E7CF512BC08429276D14AEED131FC2E5E5",
+    "verdict": "GO-for-scoped-native-evidence-recording"
+  },
+  "private_custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir516-credit-price-paid-blackglass-r01",
+    "commit": "6c891c95bee8afca7825d6f73fb1d4d92d62832c",
+    "tree": "a31ae41b6295cc0f95ea0d54b9c92499280b3905",
+    "blob": "dedda558b16488ade5cd635e47994ef3b6bb57f6",
+    "path": "projects/mir/runs/mir516-credit-price-paid-r01/original-bodies.json.gz",
+    "packed_bytes": 2883997,
+    "packed_sha256": "2690073B246D14756647215456889DEBC66C468DE57F777A439FC37EF3C1EA30",
+    "captured_actual_originals": {
+      "files": 101,
+      "bytes": 10602129
+    },
+    "capsule": {
+      "rows": 107,
+      "unique_bodies": 87,
+      "bytes": 10651144,
+      "static_custody_files": 6
+    },
+    "external_body_references": {
+      "external_hash_reference_rows": 16,
+      "bodies_excluded": true,
+      "rehash_required": true
+    },
+    "root_packed_remote_equals_local": true,
+    "independent_remote_review": {
+      "path": "build/qualification/mir516-credit-price-paid-private-custody-r01/independent-remote-review-r01/INDEPENDENT-REMOTE-REVIEW.json",
+      "bytes": 2382,
+      "sha256": "E58085153962B0404ED6BADA9E798956654B3D40EEAC09CE949060B409EC620F",
+      "verdict": "GO",
+      "all_101_original_rows_equal_actual_closed_and_retained_copies": true,
+      "all_6_static_rows_equal_local_sources": true,
+      "all_16_external_references_rehashed": true,
+      "external_body_hashes_absent_from_body_map": true
+    },
+    "scope": "Raw custody only; it neither substitutes for nor expands this native result."
+  },
+  "limits_on_claim": [
+    "This is one controlled observer-derivative continuation from the retained paid F1-negative world, not direct loading of an untouched source archive or a general paid-save upgrade result.",
+    "No physical output, reporter reproduction, GUI/client, multiplayer, visual, performance, broad native-family or stable-acceptance claim follows.",
+    "The historical source counters remain facts of the saved witness: scalar LDS ordinary completions are 2 while the five-main ordinary-by-main total is 6.",
+    "The published 5.0.15 packages, earlier cost slices, original protected source archive and all prior adverse/refusal receipts remain separately identified and unchanged."
+  ]
+}

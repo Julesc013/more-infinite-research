@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-worker-speed-cap-ten",
+  "version": "0.9.0",
+  "title": "MIR F200 SE worker-speed tail-ten callback observation fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 SE public callback-boundary observation fixture; not a reporter save.",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "space-exploration = 0.7.57", "more-infinite-research = 5.0.20016"]
+}

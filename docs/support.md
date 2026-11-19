@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -73,6 +73,8 @@ source_of_truth_for:
 - These routes do not automatically cover different expansion, provider, startup-setting or mod combinations. Older histories and best-effort editions retain their stated limits. A successful load is not proof that every earned effect or queued research state was preserved.
 
 ### Productivity providers and preferences
+
+- On Factorio 2.0.77 with the Base-game profile, a 0.01% recipe-productivity reward resolves to zero native bonus. The setting loads successfully; new levels add no productivity at that reward.
 
 - Use this additional caution only for a Factorio 2.0 save from MIR 4.7 with overlapping productivity from a known provider when you plan to change that provider, MIR's preference or relevant startup settings, especially as part of a move from Factorio 2.0 to 2.1:
 
@@ -161,6 +163,10 @@ source_of_truth_for:
 ## Safe diagnosis
 
 - Use the [bug report form](https://github.com/Julesc013/more-infinite-research/issues/new?template=bug.yml) for crashes, loading failures and mod compatibility problems. Describe what happened and what you expected. You do not need a complete diagnosis or a repeatable case to report it.
+
+- The [support collector](../SUPPORT.md#collect-the-available-files-in-one-zip) gathers available engine logs, the mod list, installed MIR identities and existing MIR exports into one local ZIP. It works when startup fails before MIR can export anything. Exact mod settings and a selected original save can be included explicitly in the same collection; review those private inputs before sharing.
+
+- We retain supplied evidence with the case and own reproduction, reduction and verification. Keep the original save and matching selection; you do not need to remove mods one by one or test speculative releases to complete a report. A reduced test or diagnostic change does not close an unresolved original configuration.
 
 - Add Factorio/MIR versions and relevant mods if known; “not sure” is fine.
 - Give reproduction steps if you have them. Preserve the original save and matching mods/settings, and use a copy for further testing.

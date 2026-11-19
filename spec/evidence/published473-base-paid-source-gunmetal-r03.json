@@ -1,0 +1,191 @@
+{
+  "kind": "MIRPublished473BasePaidRetainedSourceColdVerdictV1",
+  "verdict": "accepted-bounded-retained-source-and-same-selection-cold",
+  "scope": "Exact synthetic published4.7.20003 plus Base2.0.77 paid source, adopted without recreation, and one same-selection cold only. No MIR5 upgrade is executed here.",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "published_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/testmods/2.0/more-infinite-research_4.7.20003.zip",
+    "bytes": 1449475,
+    "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+  },
+  "runner_commit": "ddf8259fa6c978eaf77b75d93b10c98ebfbd92b5",
+  "player_tree_at_controller_commit": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+  "packet": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/packet.json",
+    "bytes": 4791,
+    "sha256": "B1BA7ACA2A8B12081A91C3440F1209A756BD5D6CFBA2DBF782A0F6B103EA16B9"
+  },
+  "owner": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/Invoke-RetainedCold.ps1",
+    "bytes": 17734,
+    "sha256": "BC092695DA86E5FDEBA612DF80AB817AE784749D9C4ACF2E1209A9B27330B98B"
+  },
+  "corrected_reader": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/Verify-BasePaidSource.py",
+    "bytes": 14396,
+    "sha256": "AC919CB8772331F910AFB83731017751AAD1F41CB8E9B04749ACE6964C3E4078"
+  },
+  "controller_review": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/INDEPENDENT-CONTROLLER-REVIEW-r01.json",
+    "bytes": 4425,
+    "sha256": "D38EE3F7F30B44481138C048FD5F84DC9662ACF04CCF8F3E1E1538C863537A97"
+  },
+  "composition": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/composition.json",
+    "bytes": 44548,
+    "sha256": "F09DFF575DC69957CB017161EF29755AE4688060DFC32F8B893AFECE1B81401B"
+  },
+  "execute_review": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/REVIEW-EXECUTE.json",
+    "bytes": 2514,
+    "sha256": "46503C2DB0235D307F52217EDEC67B2A7511540CFFF177D699F74D642DE0F739"
+  },
+  "terminal": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/terminal.json",
+    "bytes": 79566,
+    "sha256": "499CD943EF653DD8F16EA203FE68D0535DFA6FF0956351C4E151CC8E07F85C39"
+  },
+  "independent_result_review": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/INDEPENDENT-RESULT-REVIEW-r01.json",
+    "bytes": 4116,
+    "sha256": "328918D93BD200A699B1F2F6F8CA9FC7A99C1C3EF0F98D78502CA64DD1104324"
+  },
+  "root_result_check": {
+    "path": "build/qualification/published473-paid-source-gunmetal-r03/ROOT-RESULT-CHECK-r01.json",
+    "bytes": 1625,
+    "sha256": "BA88719584C341316BB035049A7B267AAFAEE07ADC0E78FA1FFB1C4500E17946"
+  },
+  "source": {
+    "original_saved_archive": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/saves/mir473-base-paid-source.zip",
+      "bytes": 848333,
+      "sha256": "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413"
+    },
+    "protected_archive": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r03/execute-custody/protected/source.zip",
+      "bytes": 848333,
+      "sha256": "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413"
+    },
+    "cold_input": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r03/execute-custody/cold/write/saves/input.zip",
+      "bytes": 848333,
+      "sha256": "4354251431E4A495DACF6DA44207A5ECAE2F1D5A29FFD2A990415ACC98CD2413"
+    },
+    "zip_members": 8,
+    "crc_and_duplicate_names": "passed for original/protected/working input",
+    "source_observation": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/script-output/published-base-paid-source/source.json",
+      "bytes": 10695,
+      "sha256": "BCDED2247121D9F0268D1F4F0DF16EB5C89E6BECD4DE66E04EBDB23ECFE2FD98"
+    },
+    "preflight_observation": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r02/execute-custody/source/write/script-output/published-base-paid-source/preflight.json",
+      "bytes": 3735,
+      "sha256": "7E562649DE22D4AAEA7F0F64BD1B36953EA8375C4C3621652B9FCA1DEF9EE86F"
+    },
+    "original_adverse_remains_unchanged": true,
+    "source_creation_repeated": false,
+    "ordinary_completions_counted_once": 5,
+    "science_consumed_each_of_four_packs": 40000,
+    "remaining_each_pack": 168,
+    "administrative_setup": "23 named finite prerequisites granted on each of two observed forces; partial-work fixtures are deliberately seeded, not measured paid partial research.",
+    "acceleration": "Temporary source lab speed modifier115199, restored to original0 before the saved endpoint. No performance claim.",
+    "player_paid_recipes": {
+      "low-density-structure": 0.10000000149011612,
+      "plastic-bar": 0.10000000149011612,
+      "processing-unit": 0.10000000149011612,
+      "rocket-fuel": 0.10000000149011612,
+      "steel-plate": 0.10000000149011612
+    },
+    "player_queue": {
+      "current": "recipe-prod-research_steel-1",
+      "names": [
+        "recipe-prod-research_steel-1",
+        "recipe-prod-research_steel-1"
+      ],
+      "progress": 0
+    },
+    "foreign_queue": {
+      "current": "braking-force-1",
+      "names": [
+        "braking-force-1",
+        "recipe-prod-research_gears-1",
+        "recipe-prod-research_gears-1"
+      ],
+      "progress": 0.42000000000000004
+    },
+    "detached_plastic_saved_progress": 0.27,
+    "lab": {
+      "name": "lab",
+      "unit_number": 19,
+      "disabled_by_script": true,
+      "input": {
+        "automation-science-pack": 168,
+        "logistic-science-pack": 168,
+        "chemical-science-pack": 168,
+        "production-science-pack": 168
+      },
+      "position": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "force_name": "player",
+      "force_index": 1,
+      "surface_index": 1,
+      "laboratory_speed_modifier": 0
+    },
+    "saved_tick": 1252
+  },
+  "cold": {
+    "native_processes": 1,
+    "owned_pids": [
+      383045
+    ],
+    "exit_code": 0,
+    "duration_seconds": 1.963072,
+    "timed_out": false,
+    "completion_predicate_observed": false,
+    "observation": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r03/execute-custody/cold/write/script-output/published-base-paid-source/cold.json",
+      "bytes": 10694,
+      "sha256": "263CFEBA8D9CCCA2BD86BDF1EA6B476928E40C1CF0B1E19AECDE5B4F32DD6204"
+    },
+    "tick": 1253,
+    "saved_tick": 1252,
+    "same_full_observed_endpoint": true,
+    "source_and_cold_reader_replays": "passed using corrected reader and preserved actual source/preflight/log bodies"
+  },
+  "custody": {
+    "readback": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r03/EXECUTE-READBACK-r03.json",
+      "bytes": 6457,
+      "sha256": "E4B034E1D4B943948F7F2AE94CB84DC61BB35E24D182A7342E7A616C97EB40A0"
+    },
+    "files_rehashed": 13,
+    "original_source_readback_files_rehashed": 20,
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio_processes": 0,
+    "source_and_cold_total_native_processes": 2
+  },
+  "preserved_adverses": [
+    {
+      "path": "spec/evidence/published473-base-paid-source-gunmetal-r01-adverse.json",
+      "disposition": "Original absolute-level-one fixture failure remains adverse."
+    },
+    {
+      "path": "spec/evidence/published473-base-paid-source-gunmetal-r02-reader-adverse.json",
+      "disposition": "Original source/save reader-position failure and wrong supplemental review hash remain adverse; this separately reviewed adoption does not rewrite them."
+    }
+  ],
+  "next_required_boundary": "Separate authentic published16 opponent and current18 combined upgrade/new-provider admission, ordinary next research/save/two independent cold loads from exact435425 source.",
+  "limits": [
+    "Same-selection source cold only; no MIR5 candidate package executes.",
+    "The source has two observed force frames plus complete four-force registry, not an arbitrary modpack/history.",
+    "This is no old16 comparison, native paid-mask admission, reporter repair, GUI/client/performance, release or stable verdict."
+  ]
+}

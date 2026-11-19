@@ -1,0 +1,71 @@
+{
+  "kind": "MIR515PublicationContinuationPrivateCustodyV1",
+  "status": "remote-original-byte-readback-passed",
+  "release": {
+    "id": 446196178,
+    "tag": "v5.0.15",
+    "main": "d64318546890f8dfc048ab60262436130dcec5e9",
+    "player_tree": "b3d7d083251f8473b77bdd7e9dd691646d460bac",
+    "prerelease": true
+  },
+  "private_repository": "Julesc013/scratchpad",
+  "private_branch": "evidence/mir515-publication-raw-blackglass-r01",
+  "commit": "81efc318c3964c223c70b8a75e12ce3cf2ebf8bb",
+  "git_blob": "7a34f293816ccc178e9da7010d1121d0ef4ae7f7",
+  "path": "projects/mir/runs/mir515-publication-raw-custody-r01/original-bodies.json.gz",
+  "packed_sha256": "6743BCF826C5B8197D5B8BE07119AB8254C3820DDB668EE260A59CAF8C52F3E3",
+  "packed_bytes": 568264,
+  "original_bodies": 64,
+  "unique_bodies": 55,
+  "original_bytes": 4489959,
+  "actual_remote_decoded_bytes_equal_primary": true,
+  "external_public_downloads_rehashed": 51,
+  "distinct_public_packages": 17,
+  "public_zip_bodies_in_capsule": false,
+  "scope": "Closed publication, independent anonymous delivery and exact historical F200 checked-merge originals. Custody only; no new native, GUI, performance or stable verdict. Public ZIP bodies excluded.",
+  "roots": [
+    "build/qualification/mir515-publication-r01",
+    "build/qualification/mir515-independent-public-readback-r01",
+    "build/qualification/mir514-f200-profile-checked-merge-r01"
+  ],
+  "preserved_native_custody_commit": "fa4fc730fb63023fc25bd09425c190016e6fecd0",
+  "preserved_dirty_private_worktree": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\library511-native-evidence-private-r01",
+    "head": "339bbae1fc569102f2c4491556ade2f824ea13c5",
+    "disposition": "untouched; new bodies committed only in isolated sparse worktree"
+  },
+  "proof": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-private-custody-r01\\custody-created.json",
+      "bytes": 522,
+      "sha256": "6381ECC548B20FD321EBC799343254EC7CE4D83EECE72745B1BE9A96750F9DAD"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-private-custody-r01\\remote-readback.json",
+      "bytes": 741,
+      "sha256": "265E7068D1164423AC20C1A9E278C315E50CDFA8D2602C7E64BD2FC78843E3C3"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-private-custody-r01\\external-download-reference-readback.json",
+      "bytes": 371,
+      "sha256": "C955BAF0B3923380DB6FC9508A978E7204B52B226D867D3CDCC287A27358296D"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-private-custody-r01\\Capture-Publication.py",
+      "bytes": 3429,
+      "sha256": "C24CE671FA30B94CFA2E90C07B7785E593849CD998BAE0DDA85FF00FB597EA75"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir515-publication-private-custody-r01\\Verify-Publication.py",
+      "bytes": 1794,
+      "sha256": "00CB49881DCAC7D54CF7BD1F96D4D0D9602037D30C48B67779D5F48A66F26FDF"
+    }
+  ],
+  "limitations": [
+    "Custody adds no native, graphical, client, performance or stable verdict.",
+    "The earlier two-download-set assertion stopped before any capsule write; corrected capture explicitly retains three 17-ZIP sets as external references.",
+    "The sparse path add initially refused the new path; explicit add --sparse committed only the named capsule. No sparse definitions or prior private index were changed."
+  ],
+  "stable_acceptance": false,
+  "whole_goal_complete": false
+}

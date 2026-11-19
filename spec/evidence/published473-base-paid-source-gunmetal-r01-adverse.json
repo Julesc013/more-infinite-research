@@ -1,0 +1,141 @@
+{
+  "kind": "MIRPublishedBasePaidSourceNativeAdverseV1",
+  "date": "2026-11-19",
+  "verdict": "NO-GO",
+  "scope": "Source-scenario preflight on exact published4.7.20003/Base2.0.77; not a player-source failure or an accepted source save.",
+  "actor": {
+    "head": "3028b00f32b027889883c78e3feb13c99674fa6b",
+    "source_review": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/INDEPENDENT-SOURCE-REVIEW-r01.json",
+      "bytes": 2210,
+      "sha256": "654B1198C8C75A67130643719DB92C628482618B04F016B123E543830CAF3CA7"
+    },
+    "files": [
+      {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-paid-source-3028b00f-r01/tests/fixtures/published-base-paid-source/control.lua",
+        "bytes": 22561,
+        "sha256": "42DA2BDEAEACC92692B560F36F42907114609818A2659FD88CAB8795BF14319F"
+      },
+      {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-paid-source-3028b00f-r01/tests/fixtures/published-base-paid-source/description.json",
+        "bytes": 261,
+        "sha256": "A6FB9243D2DDF245C07B038AC15AE39374A21667A519CB1F60DA24FAC399E10C"
+      }
+    ],
+    "facts": {
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/published473-paid-source-3028b00f-r01/tests/fixtures/published-base-paid-source/captured-facts.json",
+      "bytes": 3273,
+      "sha256": "82F10B718EC426640D9F7C790AC0A30F1241D50B61422B460E817DCC421A9ED0"
+    },
+    "checked_integration": "https://github.com/Julesc013/more-infinite-research/pull/2139",
+    "merge": "3fe0ffc8f4d2ef859f1811f39b2544ae480cf8bb"
+  },
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "base_info": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data/base/info.json",
+    "bytes": 193,
+    "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+  },
+  "base_data": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data/base/data.lua",
+    "bytes": 5074,
+    "sha256": "76FF34870C89CBC9AED82CB76E21D7F2B20F4F3F58CFFC5EB43305FDB9759CF8"
+  },
+  "published_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/testmods/2.0/more-infinite-research_4.7.20003.zip",
+    "bytes": 1449475,
+    "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+  },
+  "mods": {
+    "base": "2.0.77",
+    "more-infinite-research": "4.7.20003"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 2
+  },
+  "pins": {
+    "packet": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/packet.json",
+      "bytes": 8353,
+      "sha256": "83699D89DAB9E5920943DA6D5E92189C442B42F2DB10D26422C9F7150ECF9FBA"
+    },
+    "owner": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/Invoke-BasePaidSource.ps1",
+      "bytes": 19410,
+      "sha256": "E54A3BFFE65DC9566458C205D2071D4670DA41E8119E3A2764B5955CAC2D28EC"
+    },
+    "reader": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/Verify-BasePaidSource.py",
+      "bytes": 11663,
+      "sha256": "DF8C7A2EF1E9DEDD53A6553CC109D317A18C1044464A7DA84700DD0BC99EC284"
+    },
+    "zero_native_composition": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/composition.json",
+      "bytes": 44997,
+      "sha256": "A035D06E16EE58C1BA070BF57A311F69B0FB82DEAA67449FEF54EC67B8CE53A1"
+    },
+    "compose_readback": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/COMPOSE-READBACK-r02.json",
+      "bytes": 4567,
+      "sha256": "B4754173BFC8BB9951762EB84DAEFFF56EEC662EE2FD604679BFF9839B8AB8A8"
+    },
+    "execute_review": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/REVIEW-EXECUTE.json",
+      "bytes": 2095,
+      "sha256": "B926F7D77C5D873D207A57466F116AAE0445824D8196E89303D1713662CB1718"
+    },
+    "terminal": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/terminal.json",
+      "bytes": 42807,
+      "sha256": "AEBBDE730B045ED61DA6508C89ABE89DB920A47B87FA07FBC1B9D417D9B1C000"
+    },
+    "execute_readback": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/EXECUTE-READBACK-r02.json",
+      "bytes": 5574,
+      "sha256": "460FA6837823F9F771323E267CB5132A7C9DFE6A92F90E17E0891FEF1662D31F"
+    },
+    "independent_adverse_review": {
+      "path": "build/qualification/published473-paid-source-gunmetal-r01/INDEPENDENT-ADVERSE-REVIEW-r01.json",
+      "bytes": 3453,
+      "sha256": "F8F8AC42768A6B7D8F695EB204B8FA374B602C0E47FF3FEC0C4D12884EAA1102"
+    }
+  },
+  "execution": {
+    "unit": "mir-published473-paid-source-execute-r01",
+    "invocation": "fcdf54713a5b4b35ad18c685ee7ac1f1",
+    "native_processes": 1,
+    "owned_pid": 368653,
+    "exit_code": 1,
+    "timed_out": false,
+    "failure": "[mir-published473-paid-source] player finite technology does not have one native level: automation-2",
+    "phase": "level::on_init -> assert_preflight -> assert_finite before scenario finite grants or foreign-force construction",
+    "retained_bodies_rehashed": 11,
+    "source_save_created": false,
+    "cold_ran": false,
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "finding": {
+    "actor": "Finite prerequisite preflight wrongly required every prototype max/current level to equal1.",
+    "host_model": "All finite rows were modeled at1, so agreement concealed the native absolute-level error.",
+    "external_reader": "Its completed-finite oracle repeated the same all-level-one assumption.",
+    "required_correction": "Bind a pre-write native scalar observation for the23 named finite rows; distinguish one native stage from absolute level1; preserve fresh/no-work/edge and finite-range refusals across actor, host model and external reader."
+  },
+  "readback_correction": "The first downloader expected an absent lane file inherited from the data-only controller. Its two already-copied bodies were verified unchanged; the corrected downloader completed the real custody members. No controller/native rerun or terminal rewrite.",
+  "remaining": [
+    "New independently reviewed source fixture/controller and exact successful CI.",
+    "Distinct zero-native Compose and conditional source/save/cold; no accepted source is available from this run.",
+    "Candidate paid preservation, original reporter configurations, delivery and stable gates."
+  ],
+  "player_source_changed": false,
+  "published_bytes_changed": false,
+  "stable_acceptance": false
+}

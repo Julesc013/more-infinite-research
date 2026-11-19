@@ -2,6 +2,53 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.18] - 2026-11-19
+
+### Bugfixes
+
+- Factorio 2.1: Add missing K2: Spaced Out silicon, glass and rare-metals productivity continuations so a zero research limit permits research beyond level 3.
+- Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged startup settings.
+- Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
+- Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.
+- Factorio 2.0/2.1: Keep earned research-limit restoration rights when a technology cannot be read instead of treating the failure as missing research.
+- Factorio 2.0/2.1: Reconcile unrelated research limits after a force merge even when worker cargo history cannot be adopted.
+- Factorio 2.0/2.1: Reject changed internal recipe-productivity amounts before altering saved bonuses.
+- Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
+- Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
+
+## [5.0.17] - 2026-11-17
+
+### Bugfixes
+
+- Allow inherited MIR 5.0.11 Base-only saves with no invested worker cargo research to upgrade after startup settings change or mods are added, preserving other research.
+- Apply the worker robot speed limit to Space Exploration's infinite research beginning at level 10.
+- Avoid invalid GUI style reads when refreshing the Research Library's Settings tab.
+- Reject incomplete internal preservation interfaces before changing research.
+- Distinguish finite and continuing research stages with the same localized name in the Research Library, including effective limits.
+- Keep original integration errors intact and report missing research or unknown history only for those verified conditions.
+
+## [5.0.16] - 2026-11-16
+
+### Bugfixes
+
+- Keep settings profile exports detached from caller metadata and reject values that cannot be exported without loss.
+- Show accurate Research Library availability when research is disabled by its effective settings or already exists.
+- Stop worker cargo recovery after an unexpected failure while applying changes and require reloading the protected original save.
+- Keep hidden productivity credit technologies at their fixed bookkeeping cost on maps with a research price multiplier.
+- Refuse startup when the internal research catalogue is incomplete instead of silently skipping its required preparation.
+- Reject malformed settings-profile format or codec headers while preserving headerless profiles and valid false or zero setting values.
+- Identify the mod and version change that caused an unrecorded worker-cargo upgrade to be refused.
+- Accept compatible Bob material definitions with changed item icons or a higher supported engine minimum.
+
+## [5.0.15] - 2026-11-16
+
+### Bugfixes
+
+- Preserve prepared default worker cargo research from MIR 5.0.11, including earned levels and unfinished research.
+- Keep authenticated older default worker upgrades valid on supported newer engine patches.
+- Accept complete productivity preservation effects when their public research also covers other recipes.
+- Include the rejected productivity component and public reference in startup errors.
+
 ## [5.0.14] - 2026-11-13
 
 ### Bugfixes

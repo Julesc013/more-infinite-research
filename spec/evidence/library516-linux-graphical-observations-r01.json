@@ -1,0 +1,100 @@
+{
+  "kind": "MIRLinuxLibraryGraphicalObservationsV1",
+  "status": "scoped-native-observations-stable-incomplete",
+  "source": {
+    "commit": "56df1207493ff8be42e498a2dd96827378baaec9",
+    "player_tree": "95189aaecad482f153686f025e5b1d05f072de31",
+    "package": "more-infinite-research_5.0.21016.zip",
+    "bytes": 1042825,
+    "sha256": "A8453A11E81CE1CF5EEB993F7FB2089F1364A5F0778327CE629271D6808C7484",
+    "scope": "Unpublished local test input, frozen before later compatibility and Settings-detail changes. It is not a selected release asset or an assertion about current dev. Published15 bytes remain unchanged."
+  },
+  "environment": {
+    "platform": "Linux graphical client, private X display, llvmpipe",
+    "engine": "2.1.24",
+    "engine_bytes": 260829368,
+    "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "runner_commit": "9c3234e4fff3ce8531f7f260585b994ded2d93c1",
+    "selection": "Base plus MIR and one exact render observer; Space Age is not enabled",
+    "resolution": [2560, 1440],
+    "display_scale": 1.25,
+    "input_events": 0,
+    "performance_measurement": false
+  },
+  "fresh_seed": {
+    "verdict": "accepted-as-fresh-render-input-only",
+    "bytes": 837365,
+    "sha256": "0E55566E6B3DDFE8C0A195AE33BF843F3DC1231DC8B028BE1FC5DACEBF44EE49",
+    "factorio_processes": 1,
+    "save_crc": "passed",
+    "controls_restored": true,
+    "independent_review_sha256": "4E16786CE93A1231584E8F7C1EA5A1F523D5FE82116EDCC85452F90A0AE279B4",
+    "limits": "This is a distinct fresh world. It does not replace the missing protected8B32 historical GUI predecessor or the accepted A612 genuine old-F200 source, and it proves no earned-research upgrade."
+  },
+  "english": {
+    "actor_verdict": "FAILED",
+    "owner_verdict": "FAILED",
+    "packet_sha256": "9C84D0D6923C933110A4A1530F323603BE2A8DF3F356A6F00F9915C5BDDB8B4D",
+    "observer_version": "0.1.5",
+    "observer_sha256": "FAEFF75C5520D18CF7EA27C15A2701CBA31B8AB03AF4D90124048E718A3E3408",
+    "actor_sha256": "8E46D364138D7822BE9CACCD9873DF1113F6A854A510CCE2AE249D6EEE81D4B0",
+    "controller_sha256": "D80F63315960097D1341656A0F57A116E152A77A37BE4B2E6924D0D67C1E8230",
+    "factorio_processes": 1,
+    "failure": "The control-only observer has no data/settings Loading-mod line. The old exact-selection reader refused after capture because it could not observe that fixture version through Loading-mod lines.",
+    "accepted_subverdict": "Seven exact PNG/state pairs retained as narrow graphical observations, independently bound by the native Help diagnostic's complete actual script.active_mods rows and the exact package/profile tuple. The failed transaction is not relabelled.",
+    "capture_pairs": 7,
+    "native_snapshot_unchanged": true,
+    "input_save_unchanged": true,
+    "controls_restored": true,
+    "independent_partial_adoption_sha256": "9DF4A3DDFCA8B0A489EB7E22AD6C3B85B53358C0493C196BA042014B4644D3FA"
+  },
+  "german": {
+    "verdict": "PASS_NARROW_RENDER_FILE_PROTOCOL",
+    "packet_sha256": "C1F0F33456E17122312095E3485B6FDEE6CD3C1F23CE9F65F904C5122825F3F5",
+    "observer_version": "0.1.6",
+    "observer_source": "4fce6721b553351e1d17088abd08dc52c01da463",
+    "observer_sha256": "92675ECCB379984EA825AC262BD8AE8B14B493A34835F26C4F27DA97E6164006",
+    "actor_sha256": "E11DD99B6E6FE2327EDCB7172E499531DA1E9EAEE74FC2986046CC8778CEDE48",
+    "controller_sha256": "97940696C622F15752791DD3100E6644CE4455454AEC2F11DBB95A290411BEAF",
+    "native_active_mods": ["base@2.1.24", "mir-fixture-library-render-capture@0.1.6", "more-infinite-research@5.0.21016"],
+    "factorio_processes": 1,
+    "capture_pairs": 7,
+    "native_snapshot_unchanged": true,
+    "input_save_unchanged": true,
+    "controls_restored": true,
+    "factorio_requested_stop_exit": 0,
+    "forced_termination": false,
+    "service_exit": 0,
+    "remaining_owned_processes": 0,
+    "independent_review_sha256": "01039699471B4391CFE763C44755F7E81C8209576AAC8C2C9AF74FB1AF6EC3EC"
+  },
+  "views": ["Research", "Queue", "Settings research", "Settings options", "Help", "Availability", "Research filtered"],
+  "geometry": {
+    "all_fourteen_programmatic_views": "Same recorded root location640/120, minimal/maximal width1024, maximal height864, resolution2560x1440 and scale1.25.",
+    "visual_review": "The actual English/German images are retained and were inspected for legible panels and structured research/settings facts. Some German setting names/descriptions and diagnostic payloads remain English; pointer-hover tooltips obscure a portion of Settings/Help in these captures. This is not a complete translation or MIR4 design-parity verdict.",
+    "first_tab_click": "Not tested by this render-only actor. Real Help-to-Research clicks, search input, focus/caret, scrolling, resizing and personal-state retention remain separate."
+  },
+  "preserved_preparation_adverses": [
+    "Original system-disk admission refusal before any library/game action; distinct-filesystem output accounting repaired without reducing memory or disk reserves.",
+    "English first Compose selected the seed-only profile while supplying an unused observer hash; strict refusal restored controls before any native action.",
+    "Original English actor/owner selection refusal and all original outputs remain failed. The corrected reader still refuses that old log; its synthetic host-positive table is never counted as native evidence."
+  ],
+  "private_original_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "3281d7b3237ebda562a7a059f7c7f820ee8dba38",
+    "tree": "31e05e773b23a617b2d9925dbd523c3a6b798175",
+    "path": "projects/mir/evidence/mir515-additional-raw-review-aero-r01/post515-library-native-r01",
+    "original_files": 74,
+    "original_bytes": 89106907,
+    "capsules": [
+      {"name": "seed-and-english-original-bodies.json.gz", "git_blob": "06d75f3cb6045cba4030323167e71ff2aff9a04a", "sha256": "3C1ECF38C124CBD497DBE00BEDEEA7257E77F0E62BBF4D82BD1EF511034200EE"},
+      {"name": "german-original-bodies.json.gz", "git_blob": "0a4587d3b6ddd82881188ef568bdebc25a1d6a4a", "sha256": "8FB5C06271021D297175A1DEC64B4F96595A73990D5DB6B69BF16EE5A8FA7388"}
+    ],
+    "fresh_filtered_remote_body_readback": true,
+    "all_decoded_originals_equal_primary": true,
+    "readback_receipt_sha256": "B5091D5D0EE4F890DB022DB86F210F6BA43932CF040601458880D9FA6C3BE2D8",
+    "primary_original_roots": ["build/qualification/gunmetal-library16-fresh-seed-r02-originals", "build/qualification/gunmetal-library16-render-en-r02-adverse-originals", "build/qualification/gunmetal-library16-render-de-r01-originals"],
+    "primary_preparation": "build/qualification/linux-library-current-render-preparation-r01"
+  },
+  "not_qualified": ["Current development/release package", "MIR4 design parity", "Actual mouse/keyboard/first-tab input", "Startup settings menu", "GUI exports and profile import", "Protected predecessor upgrade/save/reload", "Two clients and reconnect/restart", "Windows behavior", "Whole-product performance/stress", "Stable MIR5"]
+}

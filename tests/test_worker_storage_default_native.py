@@ -15,7 +15,7 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().actor_source = (FIXTURE / "control.lua").read_text()
         self.lua.execute(r'''
-          handlers={};interfaces={};script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012",
+          handlers={};interfaces={};settings={startup={['worker-default-native-scenario']={value='legacy'}}};script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012",
             ["mir-worker-storage-default-native"]="0.1.0"},
             on_init=function(fn)handlers.init=fn end,on_load=function(fn)handlers.load=fn end,
             on_configuration_changed=function(fn)handlers.configuration=fn end,
@@ -35,7 +35,7 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
             local ids=actor.ids;local out={}
             for i,n in ipairs({8,7,6,4})do
               local name=({"player","mir-worker-default-queued","mir-worker-default-detached","mir-worker-default-unpaid"})[i]
-              out[i]={name=name,bonus=3+n-4,current=i==1 or i==4 and ids.main or ids.current,
+              out[i]={name=name,index=({11,22,33,44})[i],bonus=3+n-4,current=i==1 or i==4 and ids.main or ids.current,
                 progress=({.42,.125,.19,.37})[i],queue=i==1 and {ids.main,ids.queued}
                   or i==2 and {ids.current,ids.main,ids.queued}or i==3 and {ids.current}or {ids.main},
                 rows={[ids.main]=r(ids.main,n,math.floor(675*1.5^(n-4)),true,i==2 and .27 or i==3 and .23 or 0),
@@ -52,7 +52,10 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
         self.assertEqual("0.1.0", info["version"])
         self.assertEqual("2.1", info["factorio_version"])
         self.assertEqual(["base >= 2.1.23", "more-infinite-research"], info["dependencies"])
-        self.assertFalse((FIXTURE / "settings.lua").exists())
+        settings_source = (FIXTURE / "settings.lua").read_text()
+        self.assertIn('name="worker-default-native-scenario"', settings_source)
+        self.assertIn('default_value="legacy"', settings_source)
+        self.assertIn('allowed_values={"legacy","prepared-default"}', settings_source)
 
     def test_data_is_four_detached_owned_prototypes_without_foreign_changes(self):
         self.lua.globals().data_source = (FIXTURE / "data.lua").read_text()
