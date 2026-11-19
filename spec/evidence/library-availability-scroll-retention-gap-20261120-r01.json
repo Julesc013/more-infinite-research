@@ -50,7 +50,7 @@
       "open_availability_projection": true,
       "old_index_persisted": true,
       "old_list_box": true,
-      "prior_host_scroll_coverage": true
+      "host_gui_double_references_availability_viewport": true
     }
   },
   "finite_acceptance": [
