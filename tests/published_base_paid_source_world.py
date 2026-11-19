@@ -91,14 +91,17 @@ local function inventory()
 end
 local function lab(force,surface,position)
   local input=inventory()
-  return {valid=true,name="lab",unit_number=77,disabled_by_script=false,energy=0,electric_buffer_size=1000000,force=force,surface=surface,position={x=position.x or position[1],y=position.y or position[2]},
+  -- Exact C9/FBBA source PID375834 observes the native Base lab's default
+  -- grid snapping: this actor's requested (0,0) becomes actual (.5,.5).
+  assert((position.x or position[1])==0 and (position.y or position[2])==0,"world only models the source lab placement")
+  return {valid=true,name="lab",unit_number=77,disabled_by_script=false,energy=0,electric_buffer_size=1000000,force=force,surface=surface,position={x=.5,y=.5},
     get_inventory=function(kind)assert(kind==1);return input end,_input=input}
 end
 function paid_source_world(rows)
   handlers,markers,logs,files,saves,storage={},{},{},{},{},{}
   local player=make_force("player",1,rows);local enemy={name="enemy",index=2,valid=true};local neutral={name="neutral",index=3,valid=true};local next_index=4
   local surface={index=1}
-  surface.create_entity=function(spec)assert(spec.name=="lab"and spec.force==player);game.lab=lab(spec.force,surface,spec.position);return game.lab end
+  surface.create_entity=function(spec)assert(spec.name=="lab"and spec.force==player and spec.snap_to_grid~=false);game.lab=lab(spec.force,surface,spec.position);return game.lab end
   game={tick=0,forces={player=player,enemy=enemy,neutral=neutral,[1]=player,[2]=enemy,[3]=neutral},surfaces={[1]=surface},
     create_force=function(name)assert(game.forces[name]==nil);local value=make_force(name,next_index,rows);next_index=next_index+1;game.forces[name]=value;game.forces[value.index]=value;return value end,
     server_save=function(name)saves[#saves+1]={name=name,tick=game.tick}end}

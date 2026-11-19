@@ -95,6 +95,8 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
         self.assertEqual(self.lua_value("markers[3].endpoint.lab.force_name"), "player")
         self.assertEqual(self.lua_value("markers[3].endpoint.lab.force_index"), 1)
         self.assertEqual(self.lua_value("markers[3].endpoint.lab.surface_index"), 1)
+        self.assertEqual(self.lua_value("markers[3].endpoint.lab.position.x"), 0.5)
+        self.assertEqual(self.lua_value("markers[3].endpoint.lab.position.y"), 0.5)
         for name, recipe in MAINS:
             self.assertEqual(self.lua_value(f'game.forces.player.technologies["{name}"].level'), 2)
             self.assertEqual(self.lua_value(f'game.forces.player.recipes["{recipe}"].productivity_bonus'), 0.1)
