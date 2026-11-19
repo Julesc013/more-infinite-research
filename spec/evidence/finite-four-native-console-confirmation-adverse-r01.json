@@ -15,7 +15,7 @@
       "factorio_binary_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF"
     },
     "packet": {
-      "path": "execution/runtime-packet.json",
+      "path": "runtime-packet.json",
       "sha256": "4ABC7D7CFED09E8514FA76FAB99BC804D08C97CD3E7843E4F2193F4277505A62",
       "confirmation_marker": ""
     }
@@ -31,10 +31,9 @@
   },
   "repair_boundary": {
     "controller": "The finite-four packet fixes the confirmation marker to this exact literal and requires it before execution.",
-    "existing_helper": "ConsoleStartup sends the identical source command at most once more, only after the first send and an observed matching confirmation marker.",
+    "existing_helper": "ConsoleStartup sends either stage's already-authorized identical command at most once more, only after that stage's first send and an observed matching confirmation marker.",
     "excluded": [
       "new command text",
-      "successor command replay",
       "timeout change",
       "actor or gameplay-oracle change",
       "native retry or acceptance"
