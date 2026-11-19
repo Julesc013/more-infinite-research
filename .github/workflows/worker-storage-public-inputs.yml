@@ -1,0 +1,130 @@
+name: Worker storage public input readiness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-inputs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit bounded preparation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          . ./tools/lib/validation/NativeProbeResources.ps1
+          $root = Join-Path $PWD 'build/tmp/worker-storage-public-inputs'
+          $context = New-MIRNativeProbeResourceContext -RepoRoot $PWD -OutputRoot $root -ExpectedPeakMemoryMiB 4096 -MaxNewOutputMiB 2048 -UseExactOutputRoot
+          [IO.Directory]::CreateDirectory($context.root) | Out-Null
+          $record = [ordered]@{
+            kind = 'MIRWorkerStoragePublicInputPreparationAdmissionV1'
+            controller_commit = (& git rev-parse HEAD).Trim()
+            admitted_at_utc = [DateTime]::UtcNow.ToString('o')
+            admission = Assert-MIR441ResourceAdmission -Policy $context.policy -WorkRoot $context.root -EstimatedPeakBytes $context.max_new_output_bytes -ExpectedPeakMemoryBytes $context.peak_memory_bytes
+            native_processes = 0
+            library_activation = $false
+            pending_assignment_created = $false
+          }
+          Write-MIRNativeProbeResult -Context $context -Record $record
+      - name: Reconstruct the exact candidate and own fixture ZIPs
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=build/tmp/worker-storage-public-inputs
+          revision=22f34725d00befd4c80160105b98b556824b57ed
+          python -B tools/package.py --source source --revision "$revision" --target f210 --output "$out/more-infinite-research_5.0.21018.zip" --record "$out/candidate.json"
+          python -B tools/package.py --source tests/fixtures/worker-storage-native-observer --revision "$revision" --output "$out/mir-worker-storage-native-observer_0.1.2.zip" --record "$out/observer.json"
+          python -B tools/package.py --source tests/fixtures/worker-storage-finite-provider --revision "$revision" --output "$out/mir-worker-storage-finite-fixture_0.1.0.zip" --record "$out/provider.json"
+      - name: Retrieve only the exact public predecessor and official engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=build/tmp/worker-storage-public-inputs
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1463293 --output "$out/more-infinite-research_4.7.21003.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.21003.zip
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 300 --max-filesize 536870912 --output "$out/factorio-headless-2.1.24.tar.xz" https://factorio.com/get-download/2.1.24/headless/linux64
+      - name: Verify bytes and inspect the engine without launching it
+        shell: python
+        run: |
+          from pathlib import Path, PurePosixPath
+          import hashlib, json, subprocess, tarfile, zipfile
+
+          root = Path('build/tmp/worker-storage-public-inputs')
+          def digest(path):
+              with path.open('rb') as stream:
+                  return hashlib.file_digest(stream, 'sha256').hexdigest().upper()
+
+          pins = {
+              'more-infinite-research_5.0.21018.zip': ('C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D', 1053618),
+              'more-infinite-research_4.7.21003.zip': ('B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852', 1463293),
+              'mir-worker-storage-native-observer_0.1.2.zip': ('DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C', 3086),
+              'mir-worker-storage-finite-fixture_0.1.0.zip': ('6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1', 1064),
+              'factorio-headless-2.1.24.tar.xz': ('C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F', None),
+          }
+          files = []
+          for name, (sha, size) in pins.items():
+              path = root / name
+              if digest(path) != sha or (size is not None and path.stat().st_size != size):
+                  raise ValueError('Exact input differs: ' + name)
+              files.append({'name': name, 'sha256': sha, 'bytes': path.stat().st_size})
+              if name.endswith('.zip'):
+                  with zipfile.ZipFile(path) as archive:
+                      if archive.testzip() is not None:
+                          raise ValueError('ZIP CRC failed: ' + name)
+
+          # Inspect the hash-verified official archive. No executable is started,
+          # no installation or input library is created, and no data is extracted.
+          with tarfile.open(root / 'factorio-headless-2.1.24.tar.xz', 'r:xz') as archive:
+              members = archive.getmembers()
+              names = [member.name for member in members]
+              if len(names) != len(set(names)):
+                  raise ValueError('Duplicate engine member')
+              for member in members:
+                  path = PurePosixPath(member.name)
+                  if path.is_absolute() or '..' in path.parts or path.parts[0] != 'factorio':
+                      raise ValueError('Unexpected engine member path')
+              binary = archive.getmember('factorio/bin/x64/factorio')
+              if not binary.isfile() or binary.size != 260556936:
+                  raise ValueError('Engine binary shape differs')
+              with archive.extractfile(binary) as stream:
+                  binary_sha = hashlib.file_digest(stream, 'sha256').hexdigest().upper()
+              if binary_sha != '062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF':
+                  raise ValueError('Engine binary hash differs')
+              with archive.extractfile('factorio/data/base/info.json') as stream:
+                  base = json.load(stream)
+              if base['name'] != 'base' or base['version'] != '2.1.24':
+                  raise ValueError('Bundled Base differs')
+
+          result = {
+              'kind': 'MIRWorkerStoragePublicInputReadinessV1',
+              'controller_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'player_commit': '22f34725d00befd4c80160105b98b556824b57ed',
+              'player_tree': 'a504d92fe798d570df58514f9f839c4954af14f3',
+              'inputs': files,
+              'engine_binary_sha256': binary_sha,
+              'engine_binary_bytes': binary.size,
+              'bundled_base_version': base['version'],
+              'status': 'public_inputs_reconstructed_and_verified_only',
+              'native_processes': 0,
+              'library_activated': False,
+              'native_assignment_created': False,
+              'gameplay_acceptance': False,
+          }
+          with (root / 'input-readiness.json').open('x', encoding='utf-8') as stream:
+              json.dump(result, stream, indent=2)
+              stream.write('\n')
+      - name: Preserve readiness receipts only
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: worker-storage-public-input-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/tmp/worker-storage-public-inputs/*.json
+          if-no-files-found: error
+          retention-days: 14
