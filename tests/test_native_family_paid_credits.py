@@ -11,8 +11,8 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_bootstrap as bootstrap_fixture
 import test_generator as generator_fixture
+from bootstrap_control_world import install_bootstrap_control_world
 from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
@@ -1092,7 +1092,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base("f200", "f200")
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1229,7 +1229,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base("f200", "f200")
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1394,7 +1394,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1440,7 +1440,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
