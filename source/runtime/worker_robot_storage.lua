@@ -1076,6 +1076,29 @@ local function full_pair(source, owner, gate)
     and gate_paid(gate) == paid
 end
 
+-- A configuration callback can represent either an explicit startup-setting
+-- choice or an ordinary package update.  The former may validate the new
+-- configured pair; the latter cannot replace a recorded paid-work contract.
+-- Read every force before changing storage or a native frame so a later force
+-- with zero visible reward still keeps its earned/current/queued work safe.
+local function default_owner_frame_has_invested_work(frame, id)
+  return frame.next_level > 4
+    or frame.saved_progress > 0
+    or frame.current == id
+    or frame.occurrences > 0
+end
+
+local function automatic_owner_contract_has_invested_work()
+  local id = recovery.ordinary_default_id
+  for _, force in ipairs(forces()) do
+    local frame = snapshot(force, id)
+    if default_owner_frame_has_invested_work(frame, id) then
+      return true
+    end
+  end
+  return false
+end
+
 local function native_bonus(force)
   local value = force.worker_robots_storage_bonus
   if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
@@ -1096,10 +1119,16 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   if state and not prepared and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
     recover_error("legacy prepared/finite conversion is not implemented")
   end
-  if owned and owned.contract ~= contract and not context.configuration then recover_error("default native-owner contract changed") end
   if context.configuration and (type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
       or type(event.mod_changes) ~= "table" or script.active_mods[MIR] ~= target.distribution_version) then
     recover_error("current default configuration event is unavailable")
+  end
+  if owned and owned.contract ~= contract then
+    if not context.configuration then
+      recover_error("default native-owner contract changed")
+    elseif event.mod_startup_settings_changed == false and automatic_owner_contract_has_invested_work() then
+      recover_error("default native-owner automatic contract change has invested work; keep the protected original COPY")
+    end
   end
   if context.configuration and owned and producer_edition(owned.producer.new_version) == "f200" and target.id == "f210"
       and event.mod_changes.base ~= nil then
