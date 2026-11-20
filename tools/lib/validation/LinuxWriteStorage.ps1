@@ -16,7 +16,8 @@ function Resolve-MIRLinuxWritePath {
       if($item.Attributes -band [IO.FileAttributes]::ReparsePoint){throw '[mir-linux-storage-reparse]'}
       if($current -ceq $full -and $item -isnot [IO.DirectoryInfo]){throw '[mir-linux-storage-directory]'}
     }
-    $current=Split-Path -Parent $current
+    $parent=[IO.Directory]::GetParent($current)
+    $current=if($null -ne $parent){$parent.FullName}else{$null}
   }
   return $full
 }

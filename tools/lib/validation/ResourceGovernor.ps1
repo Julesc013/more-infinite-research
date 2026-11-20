@@ -135,7 +135,8 @@ function Resolve-MIR441RecoveryScratchPath {
   $current=$full
   while($current){
     if(Test-Path -LiteralPath $current){if((Get-Item -LiteralPath $current -Force).Attributes-band[IO.FileAttributes]::ReparsePoint){throw '[mir441-resource-output-reparse]'}}
-    $current=Split-Path -Parent $current
+    $parent=[IO.Directory]::GetParent($current)
+    $current=if($null-ne$parent){$parent.FullName}else{$null}
   }
   return $full
 }
