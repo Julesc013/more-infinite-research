@@ -1,7 +1,7 @@
 """Strict Lua52-style world for the SE worker-storage cargo fixture.
 
 The world represents only documented members consumed by the fixture. Engine
-completion and the published C4â†’private recovery transfer are host operations;
+completion and the published C4→private recovery transfer are host operations;
 the fixture cannot write technology levels or research progress.
 """
 
