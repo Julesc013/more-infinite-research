@@ -20,6 +20,7 @@ PREDECESSOR = "worker-robots-storage-3"
 TAIL = "mir-fixture-worker-storage-se-cap-ten-tail"
 LAB = "se-space-science-lab"
 POWER = "mir-fixture-worker-storage-se-cap-ten-power"
+POLE = "substation"
 SCIENCE = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
     "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack",
@@ -64,7 +65,7 @@ def rows() -> dict[str, list[str]]:
 WORLD = r'''
 local SOURCE,CANDIDATE,HEAD="worker-robots-storage-4","mir-worker-storage-default-4","mir-worker-storage-head-4"
 local PREDECESSOR,TAIL="worker-robots-storage-3","mir-fixture-worker-storage-se-cap-ten-tail"
-local LAB,POWER="se-space-science-lab","mir-fixture-worker-storage-se-cap-ten-power"
+local LAB,POWER,POLE="se-space-science-lab","mir-fixture-worker-storage-se-cap-ten-power","substation"
 local SCIENCE={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","se-rocket-science-pack","se-material-science-pack-1","space-science-pack"}
 local function copy(v) if type(v)~="table" then return v end local o={} for k,x in pairs(v) do o[k]=copy(x) end return o end
 local function strict(values,reads,writes,label)
@@ -163,13 +164,20 @@ end
 function cargo_world(declaration)
   callbacks,logs,interfaces,storage={}, {}, {}, {}
   local player,backing,values=new_force(declaration)
-  local lab,power,input,counts,spend_science,set_partial_science;local flags={missing_power=false,blocked_feed=false,bad_durability=false};local saves={}
+  local lab,power,pole,input,counts,spend_science,set_partial_science;local flags={missing_power=false,missing_pole=false,disconnected_network=false,wrong_network=false,blocked_feed=false,bad_durability=false};local saves={};local entity_specs={}
   local foreign_values={valid=true,index=2,worker_robots_storage_bonus=0}
   local foreign=strict(foreign_values,{valid=true,index=true,worker_robots_storage_bonus=true},{worker_robots_storage_bonus=true},"LuaForce")
+  local positions={[POWER]={0,0},[LAB]={8,0},[POLE]={0,6}}
+  local function network_entity(name,x,y,network)
+    local values={valid=true,name=name,force=player,position={x=x,y=y},electric_network_id=network}
+    values.is_connected_to_electric_network=function()return not flags.disconnected_network end
+    return strict(values,{valid=true,name=true,force=true,position=true,electric_network_id=true,is_connected_to_electric_network=true},{},"LuaEntity")
+  end
   local surface={valid=true,create_entity=function(spec)
-    assert(spec.force==player)
-    if spec.name==POWER then if flags.missing_power then return nil end;power={valid=true,name=POWER,force=player};return power end
-    assert(spec.name==LAB);input,counts,spend_science,set_partial_science=new_inventory();lab={valid=true,name=LAB,unit_number=91,force=player,energy=0,electric_buffer_size=1000000,active=true,prototype={get_researching_speed=function()return flags.lab_speed or 10 end},get_inventory=function(i)assert(i==1);return input end};return lab end}
+    assert(spec.force==player);local expected=positions[spec.name];assert(expected,"unexpected fixture entity "..tostring(spec.name));local position=spec.position or {};local x,y=position.x or position[1],position.y or position[2];assert(x==expected[1] and y==expected[2],"fixture entity position differs");entity_specs[#entity_specs+1]={name=spec.name,x=x,y=y}
+    if spec.name==POWER then if flags.missing_power then return nil end;power=network_entity(POWER,x,y,1);return power end
+    if spec.name==POLE then if flags.missing_pole then return nil end;pole=network_entity(POLE,x,y,flags.wrong_network and 2 or 1);return pole end
+    input,counts,spend_science,set_partial_science=new_inventory();local values={valid=true,name=LAB,unit_number=91,force=player,position={x=x,y=y},electric_network_id=1,energy=0,electric_buffer_size=1000000,disabled_by_script=false,prototype={get_researching_speed=function()return flags.lab_speed or 10 end}};values.is_connected_to_electric_network=function()return not flags.disconnected_network end;values.get_inventory=function(i)assert(i==1);return input end;lab=strict(values,{valid=true,name=true,unit_number=true,force=true,position=true,electric_network_id=true,energy=true,electric_buffer_size=true,disabled_by_script=true,prototype=true,is_connected_to_electric_network=true,get_inventory=true},{disabled_by_script=true},"LuaEntity");return lab end}
   local active=copy(CARGO_CLOSURE);active["more-infinite-research"]="4.7.20002";active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0"
   local startup={};for n,v in pairs(CARGO_SETTINGS) do startup[n]={valid=true,value=v,default_value=0} end
   game={tick=0,difficulty_settings={technology_price_multiplier=1},forces={player=player,[1]=player,foreign=foreign,[2]=foreign},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
@@ -181,7 +189,7 @@ function cargo_world(declaration)
     assert(name=="__mir-fixture-mir5-worker-storage-se-cap-ten-native__/prerequisites",name);local rs,by_name={},{}
     for _,entry in ipairs(CARGO_DECLARATION_ORDER) do local row={name=entry[1],parents=entry[2]};rs[#rs+1]=row;by_name[row.name]=row end
     return {rows=rs,by_name=by_name} end
-  CARGO_ENV=env;CARGO_CALLBACKS=callbacks;CARGO_LOGS=logs;CARGO_INTERFACES=interfaces;CARGO_FORCE_VALUES=values;CARGO_TECHNOLOGIES=values.technologies;CARGO_TECH_BACKING=backing;CARGO_FLAGS=flags;CARGO_SAVES=saves;CARGO_LAB_COUNTS=function()return copy(counts or {})end;CARGO_FOREIGN_VALUES=foreign_values
+  CARGO_ENV=env;CARGO_CALLBACKS=callbacks;CARGO_LOGS=logs;CARGO_INTERFACES=interfaces;CARGO_FORCE_VALUES=values;CARGO_TECHNOLOGIES=values.technologies;CARGO_TECH_BACKING=backing;CARGO_FLAGS=flags;CARGO_SAVES=saves;CARGO_LAB_COUNTS=function()return copy(counts or {})end;CARGO_ENTITIES=function()return copy(entity_specs)end;CARGO_FOREIGN_VALUES=foreign_values
   CARGO_TRANSFER=function()transfer(player,backing,values)end;CARGO_CONSUME=function()assert(spend_science);spend_science()end;CARGO_PARTIAL=function(progress)assert(set_partial_science);set_partial_science(progress)end
   return env
 end
@@ -200,7 +208,7 @@ function cargo_on_load()CARGO_CALLBACKS.load()end
 function cargo_cold()CARGO_CALLBACKS.load();game.tick=game.tick+1;CARGO_CALLBACKS[1]()end
 function cargo_logs()return CARGO_LOGS end;function cargo_counts()return CARGO_LAB_COUNTS()end;function cargo_saves()return CARGO_SAVES end;function cargo_phase()return storage["mir5_worker_storage_se_cap_ten_native"].phase end
 function cargo_set_phase(phase)storage["mir5_worker_storage_se_cap_ten_native"].phase=phase end
-function cargo_unsupported_force_write()game.forces.player.unapproved=true end;function cargo_missing_power()CARGO_FLAGS.missing_power=true end;function cargo_block_feed()CARGO_FLAGS.blocked_feed=true end;function cargo_setting(n,v)settings.startup[n].value=v end
+function cargo_unsupported_force_write()game.forces.player.unapproved=true end;function cargo_missing_power()CARGO_FLAGS.missing_power=true end;function cargo_missing_pole()CARGO_FLAGS.missing_pole=true end;function cargo_disconnected_electric_network()CARGO_FLAGS.disconnected_network=true end;function cargo_wrong_electric_network()CARGO_FLAGS.wrong_network=true end;function cargo_block_feed()CARGO_FLAGS.blocked_feed=true end;function cargo_setting(n,v)settings.startup[n].value=v end
 function cargo_science(names)
   for _,worker in ipairs({SOURCE,CANDIDATE}) do
     local v=CARGO_TECH_BACKING[worker];v.research_unit_ingredients={};for i,n in ipairs(names) do v.research_unit_ingredients[i]={name=n,amount=1} end
@@ -210,7 +218,7 @@ function cargo_lab_speed(v)CARGO_FLAGS.lab_speed=v end;function cargo_drop_queue
 function cargo_wrong_gate()CARGO_TECH_BACKING[HEAD].enabled=true end;function cargo_add_late_force()CARGO_FOREIGN_VALUES.worker_robots_storage_bonus=5 end
 function cargo_reenable_cap()CARGO_TECH_BACKING[CANDIDATE].enabled=true end
 function cargo_reenable_cap_and_queue()CARGO_TECH_BACKING[CANDIDATE].enabled=true;return CARGO_FORCE_VALUES.add_research(CARGO_TECHNOLOGIES[CANDIDATE]) end
-function cargo_queue_names()local o={};for i,row in ipairs(CARGO_FORCE_VALUES._queue) do o[i]=row.name end;return o end;function cargo_current_name()return CARGO_FORCE_VALUES._current and CARGO_FORCE_VALUES._current.name or false end
+function cargo_queue_names()local o={};for i,row in ipairs(CARGO_FORCE_VALUES._queue) do o[i]=row.name end;return o end;function cargo_current_name()return CARGO_FORCE_VALUES._current and CARGO_FORCE_VALUES._current.name or false end;function cargo_entities()return CARGO_ENTITIES()end
 '''
 
 

@@ -70,6 +70,26 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             lua.globals().cargo_load(path.as_posix())
         return lua
 
+    def historical_buffer_refill_actor(self):
+        """Load the exact pre-grid feed write against the strict entity proxy."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  end
+end
+local function create_lab_and_power(force)'''
+        new = '''  end
+  state.lab.energy = state.lab.electric_buffer_size
+end
+local function create_lab_and_power(force)'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "historical-buffer-refill-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
     def unconditional_cold_pending_actor(self):
         """Load the AFA actor behavior that treated every saved phase as cold."""
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -469,6 +489,33 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             self.lua.globals().cargo_begin()
         self.assertEqual("idle", self.lua.globals().cargo_phase())
 
+    def test_fixture_requires_owned_connected_substation_grid_before_research(self):
+        for mutator, expected in (
+            ("cargo_missing_pole", "fixture substation differs"),
+            ("cargo_disconnected_electric_network", "fixture electric network differs"),
+            ("cargo_wrong_electric_network", "fixture electric network differs"),
+        ):
+            with self.subTest(mutator=mutator):
+                lua = self.fresh_actor()
+                getattr(lua.globals(), mutator)()
+                with self.assertRaisesRegex(LuaError, expected):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+
+    def test_fixture_constructs_the_three_owned_nonoverlapping_grid_entities(self):
+        self.lua.globals().cargo_begin()
+        entities = list(self.lua.globals().cargo_entities().values())
+        self.assertEqual(
+            [(world.POWER, 0, 0), (world.LAB, 8, 0), (world.POLE, 0, 6)],
+            [(entity["name"], entity["x"], entity["y"]) for entity in entities],
+        )
+
+    def test_strict_world_rejects_the_historical_direct_lab_buffer_refill(self):
+        lua = self.historical_buffer_refill_actor()
+        with self.assertRaisesRegex(LuaError, "LuaEntity unsupported write energy"):
+            lua.globals().cargo_begin()
+        self.assertEqual("source-working", lua.globals().cargo_phase())
+
     def test_missing_science_feed_refuses_without_completion(self):
         self.lua.globals().cargo_block_feed()
         with self.assertRaisesRegex(LuaError, "native science feed differs"):
@@ -535,7 +582,11 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn('data.raw["electric-energy-interface"]["electric-energy-interface"]', data)
         self.assertIn("mir-fixture-worker-storage-se-cap-ten-power", data)
+        self.assertIn('local POLE = "substation"', control)
         self.assertIn("se-space-science-lab", control)
+        self.assertIn("electric_network_id", control)
+        self.assertIn("is_connected_to_electric_network", control)
+        self.assertNotRegex(control, r"state\.lab\.energy\s*=(?!=)")
         self.assertNotIn("table.deepcopy(data.raw.lab", data)
         self.assertNotIn("researching_speed =", data)
 
