@@ -229,6 +229,17 @@ local function create_lab_and_power(force)'''
             with self.subTest(name=name):
                 self.assertEqual(parents, declared[name])
 
+    def test_scripted_finite_setup_callbacks_do_not_become_worker_completions(self):
+        self.lua.globals().cargo_begin()
+        self.assertEqual(98, self.lua.globals().CARGO_SCRIPTED_RESEARCH_CALLBACKS)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        self.assertIn("ordinary=0", self.logs()[-1])
+        self.assertEqual(0, len(self.lua.globals().cargo_saves()))
+
+    def test_scripted_worker_completion_before_begin_still_refuses(self):
+        with self.assertRaisesRegex(LuaError, "scripted worker completion differs"):
+            self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['worker-robots-storage-4'],by_script=true}")
+
     def test_omitted_native_parent_refuses_before_source_setup(self):
         for name, parent in (("rocket-silo", "se-heat-shielding"), ("speed-module", "se-fuel-refining")):
             with self.subTest(name=name):

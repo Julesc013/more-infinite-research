@@ -261,7 +261,8 @@ assert_lab = function(lab, power, pole, force)
   check(positioned(lab, 8, 0), "native SE lab position differs")
   local network = lab.electric_network_id
   check(network ~= nil and power.electric_network_id == network and pole.electric_network_id == network,
-    "fixture electric network differs")
+    "fixture electric network differs: lab=" .. tostring(network) .. " power=" .. tostring(power.electric_network_id)
+      .. " pole=" .. tostring(pole.electric_network_id))
   check(type(lab.is_connected_to_electric_network) == "function"
     and type(power.is_connected_to_electric_network) == "function"
     and lab.is_connected_to_electric_network()
@@ -424,12 +425,15 @@ end)
 script.on_event(defines.events.on_research_finished, function(event)
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
-  local target = technology(state.player, state.worker)
+  check(event and event.research and type(event.research.name) == "string", "research completion event differs")
+  if event.research.name ~= SOURCE and event.research.name ~= CANDIDATE then return end
   if event and event.by_script == true then fail("scripted worker completion differs") end
+  local target = technology(state.player, state.worker)
   check(event and event.research == target and event.by_script == false and event.research.force == state.player, "worker completion differs")
   check(event.research.level == target.level, "worker event cursor differs")
   if state.phase == "source-working" then
-    check(target.level == state.ordinary + 5 and target.level <= 9, "source ordinary completion level differs")
+    check(target.level == state.ordinary + 5 and target.level <= 9,
+      "source ordinary completion level differs: observed=" .. tostring(target.level) .. " expected=" .. tostring(state.ordinary + 5))
     state.ordinary = state.ordinary + 1
     assert_earned_bonuses(state, state.ordinary, 0, "source ordinary")
     if target.level == 9 then
