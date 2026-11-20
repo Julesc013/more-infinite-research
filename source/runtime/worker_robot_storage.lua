@@ -785,11 +785,12 @@ local function owner_record()
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
   local published_default = value.producer.kind == "published473-default"
+  local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
   local published11_empty = value.producer.kind == "published511-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default and not published11_empty)
+      and not older_empty and not older_idle and not published_default and not published472_se and not published11_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -806,6 +807,7 @@ local function owner_record()
       or older_idle and value.producer.old_version ~= "4.7.20003"
       or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
+      or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
@@ -925,6 +927,69 @@ local function published11_empty_origin(event, change, active)
   return {kind="published511-empty-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
+local function published472_se_origin(event, change, active, state, current)
+  -- F394/151772B0 native data captured this SE-seven contract under the seven
+  -- typed 149E settings. It is not the Base-five contract of published517.
+  if getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
+    default_origin_error("published472 SE source requires a plain package event", event, state, current)
+  end
+  if target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
+      or active["space-exploration"] ~= "0.7.57" or active.Krastorio2 ~= nil
+      or active["Krastorio2-spaced-out"] ~= nil then
+    default_origin_error("published472 SE source requires its observed engine and provider", event, state, current)
+  end
+  for _, name in ipairs{"space-age", "quality", "elevated-rails", "recycler"} do
+    if active[name] ~= nil then
+      default_origin_error("published472 SE source has an unqualified official-mod selection", event, state, current)
+    end
+  end
+  for name, row in pairs(event.mod_changes) do
+    if type(name) ~= "string" or type(row) ~= "table" or getmetatable(row) ~= nil
+        or type(row.new_version) ~= "string" or row.new_version ~= active[name]
+        or name ~= MIR and row.old_version ~= row.new_version then
+      default_origin_error("published472 SE source requires the unchanged mod selection", event, state, current)
+    end
+  end
+  if not same_worker_configuration(relevant_worker_configuration(), {
+      enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
+      max_level=10, research_time=60, effect_percent=1,
+    }) or selected_cap ~= 10 or selected_enabled ~= true then
+    default_origin_error("published472 SE source requires its observed worker settings", event, state, current)
+  end
+  local prototype = native_prototype(recovery.canonical)
+  local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
+  if prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
+      or prototype.ignore_tech_cost_multiplier ~= false
+      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 or effect.hidden == true then
+    default_origin_error("published472 SE source work contract differs", event, state, current)
+  end
+  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
+    ["production-science-pack"]=1, ["se-rocket-science-pack"]=1, ["se-material-science-pack-1"]=1,
+    ["space-science-pack"]=1}
+  local ingredients = prototype.research_unit_ingredients
+  if type(ingredients) ~= "table" or #ingredients ~= 7 then
+    default_origin_error("published472 SE source science differs", event, state, current)
+  end
+  for _, ingredient in ipairs(ingredients) do
+    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
+      default_origin_error("published472 SE source science differs", event, state, current)
+    end
+    packs[ingredient.name] = nil
+  end
+  if next(packs) ~= nil then default_origin_error("published472 SE source science differs", event, state, current) end
+  local prerequisites = 0
+  for key, prerequisite in pairs(prototype.prerequisites or {}) do
+    local name = type(key) == "string" and key or prerequisite and prerequisite.name
+    if name ~= "worker-robots-storage-3" then
+      default_origin_error("published472 SE source prerequisite differs", event, state, current)
+    end
+    prerequisites = prerequisites + 1
+  end
+  if prerequisites ~= 1 then default_origin_error("published472 SE source prerequisite differs", event, state, current) end
+  return {kind="published472-se-default", old_version=change.old_version, new_version=active[MIR]}
+end
+
 local function default_origin(event, initializing, state, current)
   local active = script and script.active_mods or {}
   if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
@@ -960,6 +1025,9 @@ local function default_origin(event, initializing, state, current)
   if state == nil and event.mod_startup_settings_changed ~= false
       and not (base_hop and change.old_version == "4.7.20003") then
     default_origin_error("unrecorded default source requires unchanged startup settings", event, state, current)
+  end
+  if state == nil and change and change.old_version == "4.7.20002" then
+    return published472_se_origin(event, change, active, state, current)
   end
   if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
       or change.old_version == "5.0.20001" and new_selection) then

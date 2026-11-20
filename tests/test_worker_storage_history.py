@@ -2784,6 +2784,96 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
+    def published472_se_world(self):
+        # Exact F394 data observation: 151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104.
+        # These are native-frame doubles, not an earned source save.
+        lua=self.older_world("f200")
+        lua.execute(r'''
+          current_se_contract();script.active_mods["space-exploration"]="0.7.57"
+          require("runtime.configuration").streams["worker-robots-storage"].max_level=10
+          history.configure(10,true)
+          for _,force in pairs(game.forces)do
+            for _,id in ipairs{CANONICAL,ORDINARY}do
+              force.technologies[id].prerequisites={["worker-robots-storage-3"]={researched=true}}
+            end
+          end
+        ''')
+        return lua
+
+    def test_472_se_observed_contract_transfers_full_native_work_once(self):
+        lua=self.published472_se_world()
+        lua.execute(r'''
+          seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
+          foreign_bonus[detached.index]=73
+          local event=older_event("4.7.20002",false);local before=all_frames();writes=0
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(type(plan)=="table" and plan.kind=="default-native-owner-transfer"
+            and plan.record.producer.kind=="published472-se-default"
+            and writes==0 and same(before,all_frames()))
+          assert(history.default_owner_apply(plan))
+          for _,force in pairs(game.forces)do
+            local a,b=frame(force),before[force.index]
+            local current=b.current==CANONICAL and ORDINARY or b.current
+            local queue={}for i,id in ipairs(b.queue)do queue[i]=id==CANONICAL and ORDINARY or id end
+            assert(a.owner.level==b.source.level and not a.owner.researched and a.owner.saved==b.source.saved)
+            assert(a.owner.count==b.source.count and a.owner.enabled==b.source.enabled
+              and a.owner.visible==b.source.visible)
+            assert(a.current==current and a.progress==b.progress and same(a.queue,queue))
+            assert(a.other_saved==b.other_saved and same(a.private,b.private) and a.bonus==b.bonus)
+          end
+          assert(player.research_queue[1].name==ORDINARY and player.research_queue[2].name==ORDINARY)
+          local settled=all_frames();writes=0;history.default_owner_on_load()
+          local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
+          assert(not history.default_owner_apply(again) and writes==0 and same(settled,all_frames()))
+          assert(storage[OWNER_KEY].producer.old_version=="4.7.20002")
+          local producer=storage[OWNER_KEY].producer
+          for _,invalid in ipairs{"4.7.20001","4.7.20003","4.7.21002"}do
+            producer.old_version=invalid
+            assert(not pcall(history.default_owner_on_load) and writes==0 and same(settled,all_frames()))
+          end
+          producer.old_version="4.7.20002";history.default_owner_on_load()
+          -- After authentication, a later explicit cap change is governed by
+          -- the ordinary owned-state path, not this first-upgrade admission.
+          require("runtime.configuration").streams["worker-robots-storage"].max_level=0
+          history.configure(0,true)
+          local retune=history.default_owner_preflight({mod_startup_settings_changed=true,mod_changes={}},nil,true)
+          history.default_owner_apply(retune)
+          assert(writes==0 and same(settled,all_frames()) and storage[OWNER_KEY].settings.max_level==0)
+        ''')
+
+    def test_472_se_admission_rejects_other_events_settings_and_native_contracts_without_writes(self):
+        opponents=(
+            'event.mod_startup_settings_changed=true',
+            'event.mod_changes["more-infinite-research"].old_version="4.7.20001"',
+            'script.active_mods["space-exploration"]="0.7.58"',
+            'script.active_mods.base="2.0.78"',
+            'script.active_mods.Krastorio2="1.0.0"',
+            'script.active_mods["space-age"]="2.0.77"',
+            'script.active_mods["new-mod"]="1";event.mod_changes["new-mod"]={new_version="1"}',
+            'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
+            'event.mod_changes["removed-mod"]={old_version="1"}',
+            'setmetatable(event.mod_changes,{})',
+            'setmetatable(event.mod_changes["more-infinite-research"],{})',
+            'require("runtime.configuration").streams["worker-robots-storage"].base_cost=201',
+            'require("runtime.configuration").streams["worker-robots-storage"].max_level=9;history.configure(9,true)',
+            'for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_count_formula="676*1.5^(L-4)"end',
+            'for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_ingredients[7].name="automation-science-pack"end',
+            'for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].prerequisites={foundation={name="foundation"}}end',
+            'uninvested.technologies[ORDINARY].level=5',
+            'uninvested.technologies[ORDINARY].saved_progress=.1',
+            'uninvested.research_queue={ORDINARY}',
+        )
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                lua=self.published472_se_world();lua.globals().opponent=opponent
+                lua.execute(r'''
+                  seed_owner();local event=older_event("4.7.20002",false)
+                  assert(load(opponent,"independent472opponent","t",setmetatable({event=event},{__index=_G})))()
+                  local before=all_frames();writes=0
+                  local ok=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
+
     def test_501_empty_all_forces_admits_new_observer_without_zero_aggregate_inference(self):
         lua=self.older_world();lua.execute(r'''
           player.research_queue={OTHER};player.research_progress=.42
