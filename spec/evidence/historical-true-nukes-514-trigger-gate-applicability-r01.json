@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalTrueNukesTriggerGateCurrent514ApplicabilityReviewV1",
+  "reviewed_on": "2026-11-13",
+  "purpose": "Finite VER-07/COMP-TRUE-NUKES-01 source-intent reconciliation against the exact publicly published 5.0.14 beta and current dev; preserve original reporter scope.",
+  "scope": "Read-only original-versus-current source and request-ledger inspection with static text/identity predicates. No Factorio host execution, installed True Nukes closure, native save, player-source modification or support verdict.",
+  "request": {
+    "id": "COMP-TRUE-NUKES-01",
+    "source_id": "P-TRUE-NUKES-2026-10-25",
+    "decision": "retain-open-for-mir5-regression-and-community-continuity",
+    "existing_status": "requested-not-qualified",
+    "existing_disposition": "reported-inputs-incomplete-not-reporter-qualified",
+    "observation": "Reporter attributes a crash to enabling True Nukes and its nuclear-test research; no precise signature or configuration was supplied.",
+    "reporter_inputs_missing": [
+      "Original error/stack",
+      "Exact engine and both mod archive hashes/versions",
+      "Complete dependency/settings closure",
+      "Reproducer or affected save"
+    ],
+    "ledger_path": "spec/programmes/community-requests.json",
+    "ledger_git_blob": "9e8f71be4fe629862cc6780216bbb588e03b8366"
+  },
+  "revision_identity": {
+    "original_tag": "v4.7.3",
+    "original_test_path": "tests/compiler/approved_pack_bindings.lua",
+    "original_test_blob": "e947985dfa73acbda052b151ef962399eaa097ed",
+    "original_test_source_note": "The original approved-pack control names True Nukes Continued 0.3.36 and typed craft-item triggers; it is source testimony, not independently downloaded current upstream archive proof.",
+    "selected_public_tag": "v5.0.14",
+    "public_tag_commit": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+    "selected_dev_commit": "6848661578137b989924d532901779cafe15a9b5",
+    "current_test": {
+      "path": "tests/test_science.py",
+      "blob": "cdaa3ddf357c4a20933821596285d0833b3e18c0",
+      "method": "test_nuclear_craft_triggers_are_foreign_gates_not_lab_science"
+    },
+    "current_science": {
+      "path": "source/research/science.lua",
+      "blob": "d98442982a3499c1051f010b1123c5d62d0d6123"
+    },
+    "current_generator": {
+      "path": "source/research/generator.lua",
+      "blob": "1f838ff42a5092dcd86d43bf9b3e3a8ee74b99a8"
+    },
+    "current_request_ledger": {
+      "path": "spec/programmes/community-requests.json",
+      "blob": "9e8f71be4fe629862cc6780216bbb588e03b8366"
+    },
+    "published_current_test_and_science_and_generator_and_ledger_blobs_identical": true
+  },
+  "accepted_source_intent": {
+    "foreign_trigger_gates": [
+      "atomic-bomb",
+      "full-fission-atomics"
+    ],
+    "craft_item_triggers": [
+      "test-pack-atomic-20t-1",
+      "test-pack-atomic-500t-1"
+    ],
+    "historical_contract": [
+      "A craft-item trigger is a distinct foreign research condition, not automatically a MIR approved laboratory science pack.",
+      "Foreign technology identity, research_trigger, inherited unit and prerequisites must be preserved rather than silently replaced.",
+      "A nuclear test tool absent from lab inputs must not become approved science solely because it is a tool.",
+      "The original control deliberately removes a trigger and expects no-accepting-lab; this is an original historical opponent, not an assertion that the newer host method separately runs it."
+    ],
+    "current_published_host_method_expected_observations": [
+      "On an authored synthetic F210 base-lab world, ordinary MIR science retains 2 automation and 1 logistic packs.",
+      "Both foreign gate technology objects remain reference-identical with trigger type/item/count, unit and empty own prerequisites unchanged.",
+      "The MIR Generator installs one new authored technology row, not an overwrite of either foreign gate.",
+      "A synthetic extra unbound nuclear-test tool placed in lab inputs is not silently accepted as fully bound; existing ordinary research remains enabled."
+    ],
+    "current_method_target": "f210",
+    "qualification_limit": "These are assertions written in an existing pure-Lua host method, not a real True Nukes 0.3.36 modpack or Factorio-native execution. The method does not establish f200, client lifecycle, changed-mod migrations or any exact reporter save."
+  },
+  "static_review": {
+    "checks": {
+      "historical_named_version_and_trigger": true,
+      "historical_atomic_gate": true,
+      "historical_missing_trigger_opponent": true,
+      "current_exact_test_method": true,
+      "current_same_gate_ids": true,
+      "current_synthetic_unbound_unit": true,
+      "current_no_foreign_mir_write": true,
+      "current_nonlab_tools_not_science": true,
+      "current_lab_input_opponent": true,
+      "current_target_scoped_f210": true,
+      "ledger_is_unqualified": true,
+      "ledger_source_id_retained": true,
+      "tag_and_dev_test_blob_equal": true,
+      "tag_and_dev_science_blob_equal": true,
+      "tag_and_dev_generator_blob_equal": true,
+      "tag_and_dev_ledger_blob_equal": true
+    },
+    "passed": 16,
+    "failed": 0,
+    "mechanism": "Direct UTF-8 source/ledger text predicates and exact Git blob identity comparison, not Lua/Factorio execution.",
+    "host_tests_executed_this_review": 0,
+    "native_processes_executed_this_review": 0
+  },
+  "finite_remaining_cases": [
+    {
+      "id": "TNC-R1",
+      "stage": "original input acquisition; unverified",
+      "independent_input": "Reporter-matching original stack, exact engine/MIR/True Nukes archive identities, dependency-valid mod/settings closure and relevant save if a migration is alleged.",
+      "oracle": "Classify the real error owner and final native trigger/unit/prototype; do not attribute a generic startup crash to this source-path fixture.",
+      "owner": "Existing historical compatibility/native worklist; native execution owner Black Glass if an exact run becomes actionable."
+    },
+    {
+      "id": "TNC-R2",
+      "stage": "candidate-specific startup and useful-work qualification; unrun",
+      "independent_input": "Exact selected candidate package + engine + resolved upstream closure from TNC-R1, compared to a control without the affected upstream mod.",
+      "oracle": "Native startup, correct foreign craft-trigger technology ownership and ordinary MIR lab science/useful research; preserve independent foreign effects and identities, reject genuine conflicts.",
+      "owner": "Sole existing native execution lane"
+    },
+    {
+      "id": "TNC-R3",
+      "stage": "conditional migration, only if the actual report implicates a saved predecessor; unrun",
+      "independent_input": "Authenticated prior earned/current partial work, repeated research queue and bonuses, protected original save plus selected candidate; no synthetic repair of earned data.",
+      "oracle": "Observe first migrated state, one new ordinary lab completion with correct physical science/effect, save, then two immutable cold loads with exact preserved state; rejected ambiguous cases must produce no partial writes.",
+      "owner": "Sole existing native execution lane"
+    }
+  ],
+  "disposition": {
+    "original_request_record_modified": false,
+    "host_test_modified": false,
+    "player_or_release_modified": false,
+    "current_source_level_boundary": "mapped to original and current authored host controls on unchanged public14 source",
+    "exact_reporter_reproduction": false,
+    "native_acceptance": false,
+    "beta_to_stable_qualification": false,
+    "supported_predecessor_or_modpack_claim": false,
+    "result": "Retain COMP-TRUE-NUKES-01 open; reuse this source-intent mapping without relabeling the existing synthetic control or requesting reporter logs a second time if already available."
+  },
+  "source_links": [
+    "https://github.com/Julesc013/more-infinite-research/blob/v4.7.3/tests/compiler/approved_pack_bindings.lua",
+    "https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/tests/test_science.py",
+    "https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/source/research/science.lua",
+    "https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/source/research/generator.lua",
+    "https://github.com/Julesc013/more-infinite-research/blob/v5.0.14/spec/programmes/community-requests.json"
+  ]
+}
