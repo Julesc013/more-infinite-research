@@ -450,17 +450,19 @@ function M.is_k2_base(active_mods)
   return false
 end
 
-function M.is_space_exploration(active_mods)
-  return target.id == "f210" and type(active_mods) == "table"
+local function active_space_exploration(active_mods)
+  return type(active_mods) == "table"
     and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
     and active_mods["Krastorio2-spaced-out"] == nil
 end
 
+function M.is_space_exploration(active_mods)
+  return target.id == "f210" and active_space_exploration(active_mods)
+end
+
 local function is_space_exploration_without_k2(active_mods)
-  return (target.id == "f200" or target.id == "f210") and type(active_mods) == "table"
-    and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
+  return (target.id == "f200" or target.id == "f210") and active_space_exploration(active_mods)
     and active_mods.Krastorio2 == nil and active_mods.Krastorio2Assets == nil
-    and active_mods["Krastorio2-spaced-out"] == nil
 end
 
 -- Bob Logistics authors these named infinite native tails in its data stage.
@@ -996,7 +998,7 @@ function M.select(active_mods, raw, withheld)
     if k2se then
       apply(k2se)
     elseif se_mining then
-      local mining = (se or require("compatibility.modern_catalogue.space_exploration")).mining_drill_manufacturing
+      local mining = require("compatibility.modern_catalogue.space_exploration_mining")
       if type(mining) ~= "table" then error("MIR SE mining-drill declaration is invalid", 2) end
       apply(mining)
     end

@@ -18,39 +18,7 @@ local function exact_binding(family, weight, recipes)
     allow_shared_input_output=true, reject_explicit_productivity_denial=true}
 end
 
--- Published MIR 4.7.20002 with Space Exploration named this four-recipe
--- manufacturing vector without K2.  Keep it apart from the F210 SE capture:
--- F200 selects only this exact delta, while F210 composes it after its existing
--- SE declaration.  K2:SE retains its separately captured five-recipe body.
-local MINING_DRILL_MANUFACTURING = {
-  definition_overrides = {
-    research_mining_drill = {
-      effects = {
-        effect("burner-mining-drill"),
-        effect("electric-mining-drill", 0.5),
-        effect("area-mining-drill", 0.25),
-        effect("se-core-miner-drill", 0.25),
-      },
-    },
-  },
-  exact_product_bindings = {
-    exact_binding("research_mining_drill", 1, {"burner-mining-drill"}),
-    exact_binding("research_mining_drill", 0.5, {"electric-mining-drill"}),
-    exact_binding("research_mining_drill", 0.25, {"area-mining-drill", "se-core-miner-drill"}),
-  },
-  exact_product_target_families = {research_mining_drill = true},
-  required_product_targets = {
-    research_mining_drill = {
-      "area-mining-drill",
-      "burner-mining-drill",
-      "electric-mining-drill",
-      "se-core-miner-drill",
-    },
-  },
-}
-
 return {
-  mining_drill_manufacturing = MINING_DRILL_MANUFACTURING,
   science = {
     science_se_braking_force = {
       "automation-science-pack",

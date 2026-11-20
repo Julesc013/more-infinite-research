@@ -282,6 +282,30 @@ class ModernTargetTests(unittest.TestCase):
           assert(not ok and tostring(message):find("MIR product targets changed required family research_mining_drill", 1, true))
         ''')
 
+    def test_f200_mining_only_imports_its_small_se_declaration_when_selected(self):
+        self.lua.execute('''
+          f200()
+          local full = "compatibility.modern_catalogue.space_exploration"
+          local mining = "compatibility.modern_catalogue.space_exploration_mining"
+          package.loaded[full], package.loaded[mining] = nil, nil
+          package.preload[full] = function()
+            error("F200 mining must not construct the F210 SE catalogue")
+          end
+          local mining_imports = 0
+          package.preload[mining] = function()
+            mining_imports = mining_imports + 1
+            return dofile(player_root .. "/compatibility/modern_catalogue/space_exploration_mining.lua")
+          end
+          catalogue.select({base="2.0.77"})
+          catalogue.select({base="2.0.77", ["space-exploration"]="0.7.57",
+            Krastorio2="1.0", Krastorio2Assets="1.0"})
+          assert(mining_imports == 0, "An absent mining integration must not construct its declaration")
+          local selected = catalogue.select({base="2.0.77", ["space-exploration"]="0.7.57"})
+          assert(mining_imports == 1)
+          assert(effect_vector(names(selected.definitions).research_mining_drill) ==
+            "burner-mining-drill:1,electric-mining-drill:0.5,area-mining-drill:0.25,se-core-miner-drill:0.25")
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
