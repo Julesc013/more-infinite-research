@@ -39,12 +39,29 @@
       "sha256": "FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0",
       "bytes": 9275,
       "path": null,
-      "source_commit": "00d6b2dca3dca5da8584577178e9d4cb12ac589b"
+      "source_commit": "00d6b2dca3dca5da8584577178e9d4cb12ac589b",
+      "expected_data_stage_construction": {
+        "name": "worker-robots-storage-4",
+        "prerequisite": "worker-robots-storage-3",
+        "formula": "675*1.5^(L-4)",
+        "time": "60",
+        "ingredients": "automation-science-pack:1,chemical-science-pack:1,logistic-science-pack:1,production-science-pack:1,se-material-science-pack-1:1,se-rocket-science-pack:1,space-science-pack:1",
+        "effects": "worker-robot-storage:1"
+      }
     },
     "settings": {
       "sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7",
       "bytes": 511,
       "typed_value_count": 7,
+      "expected_data_stage_values": {
+        "mir-enable-worker-robots-storage": "boolean:true",
+        "mir-max-level-worker-robots-storage": "number:10",
+        "mir-cost-base-worker-robots-storage": "number:200",
+        "mir-cost-linear-increment-worker-robots-storage": "number:0",
+        "mir-cost-growth-worker-robots-storage": "number:1.5",
+        "mir-research-time-worker-robots-storage": "number:60",
+        "mir-effect-per-level-worker-robots-storage": "number:1"
+      },
       "path": null
     },
     "source_profile": {"sha256": "763454DAC5447C12918296DFB0CA11678B2B794A8309E4846D0524FB17F3A2D7", "bytes": 5388, "path": null},
