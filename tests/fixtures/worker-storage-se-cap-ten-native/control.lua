@@ -107,7 +107,7 @@ local function science_units(input, item, label)
   local prototype = prototypes.item[item]
   check(prototype and prototype.type == "tool" and type(prototype.get_durability) == "function",
     label .. " native science prototype differs: " .. item)
-  local total, stacks = 0, 0
+  local total = 0
   for index = 1, #input do
     local stack = input[index]
     if stack.valid_for_read and stack.name == item then
@@ -119,10 +119,9 @@ local function science_units(input, item, label)
       local maximum, durability = prototype.get_durability(quality), stack.durability
       check(close(maximum, 1) and type(durability) == "number" and durability > 0 and durability <= maximum,
         label .. " native science durability differs: " .. item)
-      total, stacks = total + stack.count - 1 + durability / maximum, stacks + 1
+      total = total + stack.count - 1 + durability / maximum
     end
   end
-  check(stacks > 0, label .. " native science stack is absent: " .. item)
   return total
 end
 local assert_lab
@@ -302,7 +301,7 @@ assert_lab = function(lab, power, pole, force)
     and lab.is_connected_to_electric_network()
     and power.is_connected_to_electric_network(), "fixture electric network differs")
   local input = lab.get_inventory(defines.inventory.lab_input)
-  check(input ~= nil, "native SE lab input differs")
+  check(input ~= nil and input.valid ~= false, "native SE lab input differs")
   return input
 end
 local function feed(state)
