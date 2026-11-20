@@ -1,0 +1,132 @@
+{
+  "kind": "MIRCap10PairedDataAcceptanceV1",
+  "observed_at_utc": "2026-11-20T02:49:19.736959+00:00",
+  "verdict": "ACCEPTED_CONTROLLED_DATA_OBSERVATIONS",
+  "manifest_sha256": "530037EF9BD596E1677158248FB752E3089F0B12B28063E27FA2A823736D31FC",
+  "rehash_files": 18,
+  "rehash_bytes": 72490998,
+  "observations": {
+    "source": {
+      "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "result_sha256": "68BC93281BAFBBC376F50989A13FBB027FC032AAE45BD14A402EB12A58433745",
+      "data_sha256": "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104",
+      "actual_typed_settings": {
+        "mir-enable-worker-robots-storage": true,
+        "mir-max-level-worker-robots-storage": 10.0,
+        "mir-cost-base-worker-robots-storage": 200.0,
+        "mir-cost-linear-increment-worker-robots-storage": 0.0,
+        "mir-cost-growth-worker-robots-storage": 1.5,
+        "mir-research-time-worker-robots-storage": 60.0,
+        "mir-effect-per-level-worker-robots-storage": 1.0
+      },
+      "loaded_mod_count": 20,
+      "ordinary_completions": 0,
+      "process_count": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 4.872392,
+      "controls_restored": true,
+      "library_lock_released": true,
+      "cargo_science": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "se-rocket-science-pack",
+        "se-material-science-pack-1",
+        "space-science-pack"
+      ],
+      "cargo_formula": "675*1.5^(L-4)",
+      "cargo_time": 60,
+      "cargo_effect": 1,
+      "cargo_max_level": "infinite",
+      "cargo_prerequisites": [
+        "worker-robots-storage-3"
+      ],
+      "mining_drill_recipe_effects": {
+        "burner-mining-drill": 0.2,
+        "electric-mining-drill": 0.1,
+        "area-mining-drill": 0.05,
+        "se-core-miner-drill": 0.05
+      }
+    },
+    "candidate": {
+      "archive_sha256": "3C82F7F9E3D879243B64423A96D00301BBF5A406CCD77BC0F6F06FE23FAF299D",
+      "result_sha256": "C12DDFA2288B7639B155D5E37C861437C25F9A45231BC3AF45333B2092ED0532",
+      "data_sha256": "38F0A31206D960B5F279EB10E5658EBCF68DB3B758FD8552C356112E1459DFFF",
+      "actual_typed_settings": {
+        "mir-enable-worker-robots-storage": true,
+        "mir-max-level-worker-robots-storage": 10.0,
+        "mir-cost-base-worker-robots-storage": 200.0,
+        "mir-cost-linear-increment-worker-robots-storage": 0.0,
+        "mir-cost-growth-worker-robots-storage": 1.5,
+        "mir-research-time-worker-robots-storage": 60.0,
+        "mir-effect-per-level-worker-robots-storage": 1.0
+      },
+      "loaded_mod_count": 20,
+      "ordinary_completions": 0,
+      "process_count": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 3.653165,
+      "controls_restored": true,
+      "library_lock_released": true,
+      "cargo_science": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack"
+      ],
+      "cargo_formula": "675*1.5^(L-4)",
+      "cargo_time": 60,
+      "cargo_effect": 1,
+      "cargo_max_level": "infinite",
+      "cargo_prerequisites": [
+        "utility-science-pack",
+        "worker-robots-storage-3"
+      ],
+      "mining_drill_recipe_effects": {
+        "burner-mining-drill": 0.2,
+        "electric-mining-drill": 0.1,
+        "area-mining-drill": 0.05,
+        "se-core-miner-drill": 0.05
+      }
+    }
+  },
+  "findings": {
+    "confirmed_cargo_construction_gap": "The same7actualFile values are loaded on exactsame20-mod selection exceptMIR. F394C4 has7SEpacks; current2397C4/default/preservation use5Basepacksinclutility and replace the prerequisite. Formula,time,reward and nativeinfinite contract remain same. This is a demonstrated data construction mismatch; ownership/earned-work upgrade still needs an actual source world.",
+    "mining_production_gap_refuted": "Both final native data dumps already emit the same4manufacturing effects. The earlier selector-only audit142FAA and proposedPR2190 omitted the shared collector from the observed boundary. Withdraw the unnecessary production change; preserve branches and add final-pipeline regression coverage. This does not establish ore extraction behavior."
+  },
+  "limits": [
+    "Exactly2data-stage processes,0ordinary completions,0worlds/saves/colds; no gameplay/cap/preservation qualification.",
+    "Current observations bind only source59c/player2397/F2003C82, not any future science repair or new source package.",
+    "No comparison of performance is accepted.",
+    "Actual source/current reporter save and ore-yield outcomes remain unresolved."
+  ],
+  "schema": 1,
+  "original_independent_review": {
+    "primary_path": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-cap10-paired-data-preparation-r01/native-r04/root-independent-data-review-r01.json",
+    "sha256": "42B8CB81929F0AC43EDB36598DA9367B9788744B9903FA251819FC9CD570017C"
+  },
+  "native_inputs": {
+    "controller_commit": "7415d8bdee596bb0810b075616b1a7fddf10e895",
+    "controller_tree": "ebe38fc05fb2c16b01c9fa362d95421d3c1b9694",
+    "controller_sha256": "1737F5A019EB4510C9B37C15B969248A1B89F55EB739C47FA55B05A3DB438A2F",
+    "engine": {
+      "version": "2.0.77",
+      "distribution": "Linux x64 headless",
+      "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+    },
+    "space_exploration": "0.7.57",
+    "startup_settings": {
+      "mode": "File",
+      "bytes": 511,
+      "sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7"
+    },
+    "source_profile_sha256": "EB9E47B055B0648CB1A3396F2320AAC8A6D0245F01EC30095A7173CBB9832C42",
+    "current_profile_sha256": "AB2404D725EEE38B0356F42B59A2744DE7C21C6551E08262FC396C6159357F40",
+    "current_player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+    "observer_sha256": "D0C083EB7A60870129830A7F3F5B2870524823ACEC0E9AEF84747C640AE2B47E"
+  }
+}
