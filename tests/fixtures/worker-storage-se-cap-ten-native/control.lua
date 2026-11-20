@@ -427,24 +427,37 @@ script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]; if type(state) ~= "table" then return end
   check(event and event.research and type(event.research.name) == "string", "research completion event differs")
   if event.research.name ~= SOURCE and event.research.name ~= CANDIDATE then return end
+  local player = state.player or game.forces.player
+  check(player and event.research.force, "research completion force differs")
+  if event.research.force ~= player then return end
+  -- MIR's configuration handoff can emit scripted notifications before this
+  -- observer's configuration callback validates the complete transferred frame.
+  if state.phase == "source-partial" and event.by_script == true then return end
+  if state.worker and event.research.name ~= state.worker then
+    if event.by_script == true then return end
+    fail("ordinary worker role differs")
+  end
   if event and event.by_script == true then fail("scripted worker completion differs") end
+  check(state.phase == "source-working" or state.phase == "candidate-working", "worker completion phase differs")
   local target = technology(state.player, state.worker)
   check(event and event.research == target and event.by_script == false and event.research.force == state.player, "worker completion differs")
   check(event.research.level == target.level, "worker event cursor differs")
+  local next_level = target.level + (target.researched and 1 or 0)
   if state.phase == "source-working" then
-    check(target.level == state.ordinary + 5 and target.level <= 9,
-      "source ordinary completion level differs: observed=" .. tostring(target.level) .. " expected=" .. tostring(state.ordinary + 5))
+    check(next_level == state.ordinary + 5 and next_level <= 9,
+      "source ordinary completion level differs: level=" .. tostring(target.level) .. " researched=" .. tostring(target.researched)
+        .. " next=" .. tostring(next_level) .. " expected=" .. tostring(state.ordinary + 5))
     state.ordinary = state.ordinary + 1
     assert_earned_bonuses(state, state.ordinary, 0, "source ordinary")
-    if target.level == 9 then
+    if next_level == 9 then
       state.lab.disabled_by_script = true
       state.phase = "source-await-queue"
     else feed(state) end
   elseif state.phase == "candidate-working" then
-    check(target.level == state.candidate_events + 10 and target.level <= 11, "candidate ordinary completion level differs")
+    check(next_level == state.candidate_events + 10 and next_level <= 11, "candidate ordinary completion level differs")
     state.candidate_events = state.candidate_events + 1
     assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate ordinary")
-    if target.level == 11 then
+    if next_level == 11 then
       state.lab.disabled_by_script = true
       state.phase = "candidate-await-cap"
     else feed(state) end

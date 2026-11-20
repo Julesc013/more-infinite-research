@@ -217,9 +217,9 @@ function cargo_load(path)local fn,msg=loadfile(path,"t",CARGO_ENV);assert(fn,msg
 function cargo_begin()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
 function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_CALLBACKS[1]()end end
 function cargo_partial(p)CARGO_FORCE_VALUES._progress=p;CARGO_PARTIAL(p) end
-function cargo_complete(by_script,cursor,reward)
+function cargo_complete(by_script,cursor,reward,completed_cursor)
   local target=CARGO_FORCE_VALUES._current;assert(target,"completion without current");local values=CARGO_TECH_BACKING[target.name];local level=values.level+1;values.level=level;CARGO_FORCE_VALUES.worker_robots_storage_bonus=reward==nil and level-4 or reward;if target.name==CANDIDATE and level==11 then values.enabled=false end;CARGO_CONSUME();table.remove(CARGO_FORCE_VALUES._queue,1);CARGO_FORCE_VALUES._current=CARGO_FORCE_VALUES._queue[1];CARGO_FORCE_VALUES._progress=0
-  local event={research=target,by_script=by_script,tick=game.tick};if cursor~=nil then values.level=cursor end;CARGO_CALLBACKS[2](event);if cursor~=nil then values.level=level end end
+  local event={research=target,by_script=by_script,tick=game.tick};if cursor~=nil then values.level=cursor end;if completed_cursor then values.researched=true end;CARGO_CALLBACKS[2](event);if cursor~=nil then values.level=level end;if completed_cursor then values.researched=false end end
 function cargo_candidate(mir,mutate,startup_changed)
   script.active_mods["more-infinite-research"]=mir or "5.0.20018";CARGO_TRANSFER();if mutate then mutate(CARGO_TECHNOLOGIES[CANDIDATE],CARGO_TECHNOLOGIES[SOURCE],CARGO_TECHNOLOGIES[HEAD],CARGO_FORCE_VALUES) end
   local changed=false;if startup_changed~=nil then changed=startup_changed end
