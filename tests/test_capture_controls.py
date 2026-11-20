@@ -332,6 +332,189 @@ def prototype_capture_declared_input_guard_cases() -> dict:
         }
 
 
+def prototype_capture_file_settings_guard_cases() -> dict:
+    """Exercise the real capture preflight through File-settings admission only."""
+    source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+    boundary = "$buildTmp = Join-Path $repo 'build/tmp'"
+    offset = source.index(boundary)
+    settings_call = (
+        "$captureSettings = Get-MIR5PrototypeCaptureSettingsArguments "
+        "-ProfileDefinition $profileDefinition -Path $SettingsPath "
+        "-ExpectedSha256 $ExpectedSettingsSha256"
+    )
+    if source.count(settings_call) != 1:
+        raise AssertionError("prototype capture File-settings admission is missing or ambiguous")
+
+    with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-file-settings-") as temp:
+        root = Path(temp)
+        runner = root / "Invoke-PrototypeCapture-file-settings-preflight.ps1"
+        old_runner = root / "Invoke-PrototypeCapture-file-settings-preflight-old.ps1"
+        runner.write_text(source[:offset] + "\nreturn\n", encoding="utf-8", newline="\n")
+        old_runner.write_text(
+            source[:offset].replace(settings_call, "", 1) + "\nreturn\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        engine = root / "engine"
+        factorio = engine / "bin/x64/factorio.exe"
+        factorio.parent.mkdir(parents=True)
+        factorio.write_bytes(b"fake F200 capture engine identity for host-only settings admission")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text(
+            json.dumps({"name": "base", "version": "2.0.77", "dependencies": []}),
+            encoding="utf-8",
+        )
+        library = root / "library"
+        library.mkdir()
+        archive = library / "controlled_1.0.0.zip"
+        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as value:
+            value.writestr(
+                "controlled_1.0.0/info.json",
+                json.dumps(
+                    {
+                        "name": "controlled",
+                        "version": "1.0.0",
+                        "factorio_version": "2.0",
+                        "dependencies": ["base"],
+                    }
+                ),
+            )
+        settings = root / "cap10-settings.dat"
+        settings.write_bytes(bytes.fromhex("020001001400000000050000000000"))
+        settings_hash = hashlib.sha256(settings.read_bytes()).hexdigest().upper()
+        archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest().upper()
+        engine_hash = hashlib.sha256(factorio.read_bytes()).hexdigest().upper()
+        profile = root / "profile.json"
+        output = root / "output"
+
+        def invoke(
+            name: str,
+            *,
+            settings_path: Path | None,
+            expected_hash: str | None,
+            mode: str = "File",
+            profile_hash: str | None = None,
+            include_profile_hash: bool = True,
+            runner_path: Path = runner,
+        ) -> dict:
+            value = {
+                "target": "f200",
+                "factorio_line": "2.0",
+                "settings_mode": mode,
+                "engine": {"version": "2.0.77", "sha256": engine_hash},
+                "archive_sha256": {archive.name: archive_hash},
+                "mods": [
+                    {"name": "base", "version": "2.0.77", "enabled": True},
+                    {"name": "controlled", "version": "1.0.0", "enabled": True},
+                ],
+            }
+            if include_profile_hash:
+                value["settings_sha256"] = settings_hash if profile_hash is None else profile_hash
+            profile.write_text(json.dumps(value), encoding="utf-8", newline="\n")
+            command = [
+                "pwsh", "-NoProfile", "-File", str(runner_path),
+                "-ArchiveLibrary", str(library),
+                "-FactorioBin", str(factorio),
+                "-ProfilePath", str(profile),
+                "-OutputRoot", str(output),
+                "-RepoRoot", str(ROOT),
+            ]
+            if settings_path is not None:
+                command.extend(["-SettingsPath", str(settings_path)])
+            if expected_hash is not None:
+                command.extend(["-ExpectedSettingsSha256", expected_hash])
+            result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
+            return {
+                "returncode": result.returncode,
+                "output": result.stdout + result.stderr,
+                "output_exists": output.exists(),
+                "controls_exist": any(
+                    (library / control).exists()
+                    for control in ("mod-list.json", "mod-settings.dat", ".mir-active-profile.json")
+                ),
+            }
+
+        valid = invoke("valid", settings_path=settings, expected_hash=settings_hash)
+        defaults = invoke(
+            "defaults", settings_path=None, expected_hash=None,
+            mode="Defaults", include_profile_hash=False,
+        )
+        file_without_inputs = invoke("file-without-inputs", settings_path=None, expected_hash=None)
+        path_without_hash = invoke("path-without-hash", settings_path=settings, expected_hash=None)
+        hash_without_path = invoke("hash-without-path", settings_path=None, expected_hash=settings_hash)
+        malformed_hash = invoke("malformed-hash", settings_path=settings, expected_hash="not-a-sha",
+                                profile_hash="not-a-sha")
+        default_profile = invoke("default-profile", settings_path=settings, expected_hash=settings_hash,
+                                 mode="Defaults", include_profile_hash=False)
+        profile_hash_mismatch = invoke("profile-hash-mismatch", settings_path=settings,
+                                       expected_hash=settings_hash, profile_hash="A" * 64)
+        missing_profile_hash = invoke("missing-profile-hash", settings_path=settings,
+                                      expected_hash=settings_hash, include_profile_hash=False)
+        missing_file = invoke("missing-file", settings_path=root / "missing.dat", expected_hash=settings_hash)
+        settings.write_bytes(b"mutated after hash")
+        changed_file = invoke("changed-file", settings_path=settings, expected_hash=settings_hash)
+        old_file_without_inputs = invoke(
+            "old-file-without-inputs", settings_path=None, expected_hash=None, runner_path=old_runner,
+        )
+        return {
+            "valid": valid,
+            "defaults": defaults,
+            "file_without_inputs": file_without_inputs,
+            "path_without_hash": path_without_hash,
+            "hash_without_path": hash_without_path,
+            "malformed_hash": malformed_hash,
+            "default_profile": default_profile,
+            "profile_hash_mismatch": profile_hash_mismatch,
+            "missing_profile_hash": missing_profile_hash,
+            "missing_file": missing_file,
+            "changed_file": changed_file,
+            "old_file_without_inputs": old_file_without_inputs,
+        }
+
+
+def prototype_capture_linked_settings_case() -> dict:
+    """The real shared reparse guard must reject a linked File-mode input."""
+    capture = str(PROTOTYPE_CAPTURE).replace("'", "''")
+    activation = str(LIBRARY_ACTIVATION).replace("'", "''")
+    script = rf'''
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$captureAst=[Management.Automation.Language.Parser]::ParseFile('{capture}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw 'capture parse failed'}}
+$activationAst=[Management.Automation.Language.Parser]::ParseFile('{activation}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw 'activation parse failed'}}
+foreach($name in @('Assert-MIR5PrototypeCapture','Get-MIR5PrototypeCaptureSha256','Get-MIR5PrototypeCaptureSettingsArguments')){{
+  $node=@($captureAst.FindAll({{param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name}},$true))
+  if($node.Count-ne1){{throw ('capture settings function differs: '+$name)}}
+  Invoke-Expression $node[0].Extent.Text
+}}
+$pathNode=@($activationAst.FindAll({{param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MIRLibraryPath'}},$true))
+if($pathNode.Count-ne1){{throw 'library path guard differs'}}
+Invoke-Expression $pathNode[0].Extent.Text
+$root=Join-Path ([IO.Path]::GetTempPath()) ('mir5-capture-linked-settings-'+[guid]::NewGuid().ToString('N'))
+[IO.Directory]::CreateDirectory($root)|Out-Null
+try{{
+  $target=Join-Path $root 'target.dat'
+  [IO.File]::WriteAllBytes($target,[Convert]::FromHexString('020001001400000000050000000000'))
+  $link=Join-Path $root 'linked.dat'
+  [IO.File]::CreateSymbolicLink($link,$target)|Out-Null
+  $hash=Get-MIR5PrototypeCaptureSha256 $target
+  $accepted=$true;$message=''
+  try{{Get-MIR5PrototypeCaptureSettingsArguments @{{settings_mode='File';settings_sha256=$hash}} $link $hash|Out-Null}}catch{{$accepted=$false;$message=$_.Exception.Message}}
+  [ordered]@{{accepted=$accepted;message=$message;link_attributes=[string](Get-Item -LiteralPath $link -Force).Attributes}}|ConvertTo-Json -Compress
+}} finally {{[IO.Directory]::Delete($root,$true)}}
+'''
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-NonInteractive", "-Command", script],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
 def native_fixture_observer_guard_cases() -> dict:
     """Execute the wrapper's isolated observer-binding helper, never its runner."""
     escaped = str(NATIVE_FIXTURE).replace("'", "''")
@@ -953,6 +1136,58 @@ class CaptureControlTests(unittest.TestCase):
         self.assertEqual(cases["call_removed"]["returncode"], 0, cases["call_removed"]["output"])
         self.assertFalse(cases["call_removed"]["output_exists"])
         self.assertFalse(cases["call_removed"]["controls_exist"])
+
+    def test_prototype_capture_binds_only_hash_declared_file_settings_before_admission(self):
+        cases = prototype_capture_file_settings_guard_cases()
+
+        for name in ("valid", "defaults"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["returncode"], 0, cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        expected = {
+            "file_without_inputs": "File settings profile requires explicit SettingsPath and ExpectedSettingsSha256",
+            "path_without_hash": "SettingsPath and ExpectedSettingsSha256 must be supplied together",
+            "hash_without_path": "SettingsPath and ExpectedSettingsSha256 must be supplied together",
+            "malformed_hash": "ExpectedSettingsSha256 requires a 64-character SHA-256",
+            "default_profile": "File settings require profile settings_mode File",
+            "profile_hash_mismatch": "File settings profile SHA-256 differs from expected input",
+            "missing_profile_hash": "File settings profile requires a 64-character settings_sha256",
+            "missing_file": "SettingsPath must name an existing regular file",
+            "changed_file": "SettingsPath SHA-256 differs from expected input",
+        }
+        for name, message in expected.items():
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn(f"[mir5-prototype-capture] {message}", cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        # The original Defaults-only entry point accepted this File profile
+        # without a supplied file. Its acceptance is the counterfactual that
+        # the real preflight above must reject.
+        self.assertEqual(cases["old_file_without_inputs"]["returncode"], 0,
+                         cases["old_file_without_inputs"]["output"])
+        self.assertFalse(cases["old_file_without_inputs"]["output_exists"])
+        self.assertFalse(cases["old_file_without_inputs"]["controls_exist"])
+
+        linked = prototype_capture_linked_settings_case()
+        self.assertFalse(linked["accepted"], linked)
+        self.assertIn("[mir-library-reparse]", linked["message"])
+
+        source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+        self.assertIn(
+            "$captureSettings = Get-MIR5PrototypeCaptureSettingsArguments "
+            "-ProfileDefinition $profileDefinition -Path $SettingsPath "
+            "-ExpectedSha256 $ExpectedSettingsSha256",
+            source,
+        )
+        self.assertIn("SettingsMode=$captureSettings.SettingsMode", source)
+        self.assertIn("$activationArguments.SettingsPath = $captureSettings.SettingsPath", source)
+        self.assertIn("$activationArguments.SettingsSha256 = $captureSettings.SettingsSha256", source)
+        self.assertIn("$activation = Start-MIRLibraryActivation @activationArguments", source)
+        self.assertIn("settings=[ordered]@{mode=$captureSettings.SettingsMode", source)
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")
