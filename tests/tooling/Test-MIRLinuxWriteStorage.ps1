@@ -95,9 +95,18 @@ try{
       $plan.execution_account='not-the-execution-owner'
       Refuses-Storage {Read-StorageControlPlan} '[mir-linux-storage-execution-account]'
       $plan.execution_account=[Environment]::UserName
+      # This opponent changes only data placement. Keep its mount pins true
+      # to that path so a separate data filesystem does not reject the stale
+      # mount/path pair before the intended checkout-containment predicate.
+      $dataRow=$plan.roots[1]
+      $plan.roots[1]=[ordered]@{}
+      foreach($key in $dataRow.Keys){$plan.roots[1][$key]=$dataRow[$key]}
       $plan.roots[1].path=$controlRoot
+      foreach($key in @('mount_id','device','mount_point','filesystem_type')){
+        $plan.roots[1][$key]=$plan.roots[0][$key]
+      }
       Refuses-Storage {Read-StorageControlPlan} '[mir-linux-storage-data-external]'
-      $plan.roots[1].path=$external
+      $plan.roots[1]=$dataRow
       $link=Join-Path $scratch 'linked-data'
       New-Item -ItemType SymbolicLink -Path $link -Target $external | Out-Null
       Refuses-Storage {Resolve-MIRLinuxWritePath -Path $link} '[mir-linux-storage-reparse]'
