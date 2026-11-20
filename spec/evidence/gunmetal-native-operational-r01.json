@@ -1,0 +1,193 @@
+{
+  "kind": "MIRNativeOperationalEvidenceV1",
+  "scope": "Retained Base and Space Exploration native supervision; no current-candidate gameplay qualification.",
+  "execution_account": "jules",
+  "runner_commit": "b42755d28115e2078fea444a126a9f4157f09e41",
+  "factorio_version": "2.0.77",
+  "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+  "mir_version": "5.0.20017",
+  "mir_archive_sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "8363b28b15a3358689ebb6ff3449ed3573271ea4",
+    "path": "projects/mir/run-records/gunmetal-native-operational-20261120-r01",
+    "primary_path": "build/qualification/gunmetal-native-operational-20261120-r01",
+    "capsules": [
+      {
+        "path": "native-base517-custody-r01.tar.gz",
+        "sha256": "378C7D856B04F34ECD172EADB69DF3A112CCFE427998019AF66611424851534E",
+        "manifest": "native-base517-custody-manifest-r01.json",
+        "manifest_sha256": "1889C60CBF0DB536F1998F4EC744484834398BA9215D31179074B423D15E179A",
+        "bodies": 11,
+        "uncompressed_bytes": 804270
+      },
+      {
+        "path": "native-base517-supplement-r01.tar.gz",
+        "sha256": "11975338C6A01C74B13FD38376F6B02B74505B12249080282085F8B166E412A3",
+        "manifest": "native-base517-supplement-manifest-r01.json",
+        "manifest_sha256": "DED22F13D37883C358445011E459395CE975FB7C5D9354487DFE4119E472ACCE",
+        "bodies": 8,
+        "uncompressed_bytes": 51206
+      },
+      {
+        "path": "native-se517-custody-r01.tar.gz",
+        "sha256": "C11E5DA56BA641E3F86E27D32C04F55E3BF85623E0F1D4B5769AF366B60E774A",
+        "manifest": "native-se517-custody-manifest-r01.json",
+        "manifest_sha256": "577C47F4747B2AACFE733B263BF2A7292ACABE00CFFDB1DF14046C707CB0B8D9",
+        "bodies": 11,
+        "uncompressed_bytes": 1733326
+      },
+      {
+        "path": "native-se517-supplement-r01.tar.gz",
+        "sha256": "D5D1E3FF33EA3E81A903F3C4E203302BE2AEE1B7A02BE27DB3FC84494A209D31",
+        "manifest": "native-se517-supplement-manifest-r01.json",
+        "manifest_sha256": "597B986DAD429DF5395903C422C184ED05EB9907AD6423C87925C955E20E6856",
+        "bodies": 7,
+        "uncompressed_bytes": 77777
+      }
+    ],
+    "verified_bodies": 37,
+    "verified_uncompressed_bytes": 2666579,
+    "independent_review": "independent-custody-review-r01.json",
+    "independent_review_sha256": "949BDFCB774C6DB6E818443AC01FD59CF529606E0EC9B16C8544E311493EC56E"
+  },
+  "profiles": [
+    {
+      "profile": "base",
+      "started_utc": "2026-11-20T12:23:25.7148029Z",
+      "finished_utc": "2026-11-20T12:24:45.8201410Z",
+      "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+      "archive_sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+      "profile_sha256": "04E70DA64C1B4ECBFF4783DC5F0DC935D84557C2CB5952057A6E255C4098CB75",
+      "seed": {
+        "sha256": "2EEDFF2D8E87407C6BD2FDB32827F55BF84E3E2B345AE81766FEEE5C4C6C7A5C",
+        "bytes": 643454,
+        "path": "/mnt/files/Temporary/MIR/gunmetal-native-base517-r01/base517-seed.zip"
+      },
+      "stages": [
+        {
+          "name": "create",
+          "pid": 8999,
+          "start_ticks": 991749,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 4,
+          "sampled_working_set_peak_bytes": 297488384
+        },
+        {
+          "name": "cold1",
+          "pid": 10658,
+          "start_ticks": 993454,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 2,
+          "sampled_working_set_peak_bytes": 34582528
+        },
+        {
+          "name": "cold2",
+          "pid": 11692,
+          "start_ticks": 994911,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 2,
+          "sampled_working_set_peak_bytes": 33980416
+        }
+      ],
+      "cold_checksum": "2735966025",
+      "library_controls_unchanged": true
+    },
+    {
+      "profile": "se",
+      "started_utc": "2026-11-20T12:34:38.6110033Z",
+      "finished_utc": "2026-11-20T12:35:51.8607436Z",
+      "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+      "archive_sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+      "profile_sha256": "E2FDFA32CBEA17460B58F2A1DDD8C78294CD08D6CAD1A9805372DE6BCB9042EB",
+      "seed": {
+        "bytes": 1474801,
+        "path": "/mnt/files/Temporary/MIR/gunmetal-native-se517-r01/se517-seed.zip",
+        "sha256": "CCC6EB4ADBA7AABDA492B1777BA10FFA1DCCAE13C3DC463E2BBC4FCDAC45901A"
+      },
+      "stages": [
+        {
+          "name": "create",
+          "pid": 14878,
+          "start_ticks": 1057246,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 9,
+          "sampled_working_set_peak_bytes": 557944832
+        },
+        {
+          "name": "cold1",
+          "pid": 22771,
+          "start_ticks": 1059758,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 3,
+          "sampled_working_set_peak_bytes": 467750912
+        },
+        {
+          "name": "cold2",
+          "pid": 24054,
+          "start_ticks": 1061365,
+          "exit_code": 0,
+          "timed_out": false,
+          "live_samples": 3,
+          "sampled_working_set_peak_bytes": 527986688
+        }
+      ],
+      "cold_checksum": "823101519",
+      "library_controls_unchanged": true
+    }
+  ],
+  "observed_library_restoration": {
+    "eight_control_files_match": true,
+    "library_lock_released": true,
+    "dependency_bytes_copied": 0,
+    "dependency_links_created": 0,
+    "dependency_extractions": 0,
+    "basis": "Original hash-bound scripts compare the eight controls before activation and after restoration; their original passed result records are retained. Raw baseline control vectors are not separately embedded."
+  },
+  "supervision": {
+    "base_invocation": "bdb25edeff134115a1cf50bc21d488f7",
+    "se_invocation": "0e69b87041a04467a7864658f261aded",
+    "dispatch_returned_while_service_running": true,
+    "native_return_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "cold_process_updates": 1200,
+    "base_terminal_service_result": "success",
+    "base_terminal_service_exit_code": 0,
+    "completed_units_unloaded": true,
+    "installed_mir_unit_files": [],
+    "remaining_mir_units_at_cleanup": [],
+    "owned_control_roots_removed": [
+      "/home/shared/Projects/Factorio/MIR/.task-builds/linux-write-storage-gunmetal-r01/build/tmp/gunmetal-native-base517-r01",
+      "/home/shared/Projects/Factorio/MIR/.task-builds/linux-write-storage-gunmetal-r01/build/tmp/gunmetal-native-se517-r01"
+    ],
+    "source_clean_at_cleanup": true
+  },
+  "ordinary_research_acceptance": false,
+  "current_candidate_acceptance": false,
+  "reporter_reproduction": false,
+  "performance_acceptance": false,
+  "interruption_or_reboot_recovery_acceptance": false,
+  "continuous_queue_acceptance": false,
+  "release_acceptance": false,
+  "limits": [
+    "No native rerun; result and restoration records are hash-verified remote observations.",
+    "No ordinary research, current candidate, reporter, performance or stable qualification.",
+    "Detached dispatch returned while service was running; native interruption/reboot recovery is not established.",
+    "Short-process sampled memory can miss peaks; values are not performance measurements.",
+    "Initial missing cleanup-helper failure remains preserved; later cleanup is a separate record.",
+    "The six native processes use the published predecessor. These are create/cold benchmark operations, not a successor save or earned-work transition.",
+    "Cleanup observations describe the completed pilot only; they do not assert the state of later jobs.",
+    "Initial units retained exited status; future jobs use one collected transient unit. No persistent scheduler or restart-on-boot service was established."
+  ]
+}

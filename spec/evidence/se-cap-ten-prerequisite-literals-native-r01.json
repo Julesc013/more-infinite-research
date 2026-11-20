@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIRSECapTenPrerequisiteLiteralCorrectionV1",
+  "scope": "Fixture setup correction only; no earned source work, worker repair, reporter reproduction or release acceptance.",
+  "native_source": {
+    "factorio_version": "2.0.77",
+    "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "mir_version": "4.7.20002",
+    "mir_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "space_exploration_version": "0.7.57",
+    "settings_sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7",
+    "prior_data_evidence": "spec/evidence/gamer433-cap10-paired-data-native-r01.json",
+    "prior_data_sha256": "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104"
+  },
+  "observed_adverse_world": {
+    "invocation_id": "c7a5f16134cc4c118df51a6517ca46bf",
+    "fixture_sha256": "228791861B63A1C9B4FE6083594C20DE66C877F685652DD981B76491C598D52E",
+    "source_create_pid": 30526,
+    "source_create_exit_code": 0,
+    "source_server_pid": 38690,
+    "begin_error": "setup parents rocket-silo count differs",
+    "ordinary_worker_completions": 0,
+    "diagnostic_loads": 0,
+    "terminal_cause": "Finite source-server timeout after the rejected one-shot begin command; controller restored archives and controls.",
+    "interruption_attempt": "Existing owned-process identity helper refused because the engine had already exited; no signal was sent.",
+    "private_custody": "Julesc013/scratchpad PR150, projects/mir/tasks/gunmetal-worker-cap10-diagnostic-r01"
+  },
+  "native_data_parent_rows": {
+    "rocket-silo": ["electric-engine", "rocket-control-unit", "rocket-fuel", "solar-energy", "electric-energy-accumulators", "low-density-structure", "se-heat-shielding", "radar"],
+    "speed-module": ["modules", "se-fuel-refining"]
+  },
+  "bounded_comparison": {
+    "original_declaration_sha256": "E5CE84A0AA88310D51D780E1C583FCB01C02C71A69AE9ED58471D26186188E5B",
+    "literal_rows_compared": 98,
+    "differing_rows": ["rocket-silo", "speed-module"],
+    "missing_parent_nodes": [],
+    "limit": "Rocket parent mismatch was observed in the current runtime begin; the speed-module correction is grounded in the prior exact native source data, not a later current runtime observation."
+  },
+  "host_regression": {
+    "native_parent_expectations": "Two independent native prototype rows in the strict host world; the fixture declaration remains a separate input.",
+    "original_declaration": "53 methods: 11 failures and 32 errors with the independent native rows; original positive controls encounter the same rocket parent mismatch.",
+    "corrected_declaration": "53 methods pass with pinned Lua5.2, including missing-parent opponents that refuse before entities or saves exist.",
+    "native_qualification": "Corrected actor source research and copied-save diagnostic load remain unexecuted."
+  }
+}

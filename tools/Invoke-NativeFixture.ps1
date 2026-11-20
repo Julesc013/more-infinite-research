@@ -9,6 +9,8 @@ param(
   [string]$ActiveModsObserver='',
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$LinuxStoragePlanPath='',
+  [string]$LinuxStoragePlanSha256='',
   [string[]]$ConsumerMarkers=@(),
   [ValidateSet('load','configuration')][string]$ProductionConsumerStage='load',
   # Empty retains the F200/F210 runner byte path.  A selected reduced target
@@ -723,7 +725,7 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   }
   $arguments+=$StageArguments
   # Historical process modes keep their separately qualified log protocol.
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection:(-not $historicalProcess) -ActiveModsObserver $activeModsObserverName
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection:(-not $historicalProcess) -ActiveModsObserver $activeModsObserverName -WriteStoragePolicy $resources.policy
   # Completed host parsing/interop allocations need not occupy commit while a
   # later native stage waits for admission. Keep every governor limit intact.
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
@@ -914,8 +916,17 @@ try{
   # Linux admission uses its proc/cgroup observer, with no Windows Add-Type.
   if($IsWindows){$null=Get-MIR441PhysicalMemorySnapshot}
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
-  $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
+  $storageArguments=@{}
+  if($LinuxStoragePlanPath -or $LinuxStoragePlanSha256){
+    $storageArguments=@{LinuxStoragePlanPath=$LinuxStoragePlanPath;LinuxStoragePlanSha256=$LinuxStoragePlanSha256;LibraryRoot=$library}
+  }else{
+    $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
+  }
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot @storageArguments
+  if($storageArguments.Count){
+    $record.linux_write_storage=$resources.policy.linux_write_storage
+    $record.linux_write_storage_helper_sha256=Get-FixtureSha (Join-Path $repo 'tools/lib/validation/LinuxWriteStorage.ps1')
+  }
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
   $workingInputSave=$null

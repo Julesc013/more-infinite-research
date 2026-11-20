@@ -86,7 +86,8 @@ function Find-FiniteFourNativeRepoRoot {
 function Test-FiniteFourNativeFile {
     param(
         [Parameter(Mandatory)][System.Collections.IDictionary]$Descriptor,
-        [Parameter(Mandatory)][string]$Label
+        [Parameter(Mandatory)][string]$Label,
+        [switch]$ObserveMismatch
     )
     $path = if ($Descriptor.Contains('path')) { [string]$Descriptor['path'] } elseif ($Descriptor.Contains('local_path')) { [string]$Descriptor['local_path'] } else { '' }
     $sha = [string]$Descriptor['sha256']
@@ -95,14 +96,17 @@ function Test-FiniteFourNativeFile {
         return [ordered]@{label=$Label;state='missing_local_input';path=$path;sha256=$sha;bytes=$bytes}
     }
     $item=Get-Item -LiteralPath $path -Force
-    if ($null -ne $bytes -and $item.Length -ne $bytes) { throw "$Label bytes differ" }
+    if ($null -ne $bytes -and $item.Length -ne $bytes -and -not $ObserveMismatch) { throw "$Label bytes differ" }
     $actual=Get-FiniteFourNativeSha256 $path
-    if ($actual -ne $sha.ToUpperInvariant()) { throw "$Label SHA-256 differs" }
+    if (($null -ne $bytes -and $item.Length -ne $bytes) -or $actual -ne $sha.ToUpperInvariant()) {
+        if(-not $ObserveMismatch){throw "$Label SHA-256 differs"}
+        return [ordered]@{label=$Label;state='mismatched_local_input';path=$path;sha256=$sha;bytes=$bytes;observed_sha256=$actual;observed_bytes=$item.Length}
+    }
     [ordered]@{label=$Label;state='verified_local_input';path=$path;sha256=$actual;bytes=$item.Length}
 }
 
 function Assert-FiniteFourNativePacket {
-    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot,[switch]$DeferLocalHelperObservation)
     Assert-FiniteFourNativeEqual $Packet['schema'] 1 'packet schema'
     Assert-FiniteFourNativeEqual $Packet['kind'] 'MIRWorkerStorageFiniteFourA504NativeExecutorPacketV1' 'packet kind'
     Assert-FiniteFourNativeEqual $Packet['case_id'] 'worker-storage-finite-four-published473-to-current-a504' 'packet case'
@@ -144,8 +148,10 @@ function Assert-FiniteFourNativePacket {
         Assert-FiniteFourNativeEqual ([int64]$pin[0]['bytes']) ([int64]$canonical.bytes) "helper bytes $($canonical.path)"
         $helperPath=Get-FiniteFourNativePath $RepoRoot ([string]$pin[0]['path'])
         $pin[0]['path']=$helperPath
-        $state=Test-FiniteFourNativeFile -Descriptor $pin[0] -Label "helper $([IO.Path]::GetFileName($helperPath))"
-        Require-FiniteFourNative ($state.state -eq 'verified_local_input') 'required helper source is unavailable'
+        if(-not $DeferLocalHelperObservation){
+            $state=Test-FiniteFourNativeFile -Descriptor $pin[0] -Label "helper $([IO.Path]::GetFileName($helperPath))"
+            Require-FiniteFourNative ($state.state -eq 'verified_local_input') 'required helper source is unavailable'
+        }
     }
     $controlPath=Get-FiniteFourNativePath $RepoRoot 'tests/fixtures/worker-storage-native-observer/control.lua'
     $controlText=Get-Content -LiteralPath $controlPath -Raw
@@ -162,6 +168,7 @@ function Get-FiniteFourNativeInputStates {
     $engine=[ordered]@{path=$Packet['inputs']['engine']['binary_path'];sha256=$Packet['inputs']['engine']['factorio_binary_sha256'];bytes=$null}
     $state += Test-FiniteFourNativeFile -Descriptor $engine -Label 'official Factorio 2.1.24 binary'
     foreach($fixture in $Packet['inputs']['fixtures']) { $state += Test-FiniteFourNativeFile -Descriptor $fixture -Label ([string]$fixture['role']) }
+    foreach($helper in $Packet['helper_pins']) { $state += Test-FiniteFourNativeFile -Descriptor $helper -Label "helper $([IO.Path]::GetFileName($helper['path']))" -ObserveMismatch }
     foreach($name in @('library_directory','output_root','source_profile','candidate_profile','server_settings_template','source_seed_map_gen_settings')) {
         $path=[string]$Packet['runtime_bindings'][$name]
         if([string]::IsNullOrWhiteSpace($path) -or -not (Test-Path -LiteralPath $path)) { $state += [ordered]@{label=$name;state='missing_local_binding';path=$path} }
@@ -563,11 +570,18 @@ function Write-FiniteFourNativeReceipt {
 
 function Invoke-FiniteFourNativeExecutor {
     param([Parameter(Mandatory)][ValidateSet('Validate','Compose','Execute')][string]$RequestedMode,[Parameter(Mandatory)][string]$RequestedPacketPath,[Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RequestedOutputPath)
-    $packet=Read-FiniteFourNativeJson $RequestedPacketPath;Assert-FiniteFourNativePacket -Packet $packet -RepoRoot $RepoRoot;$inputs=Get-FiniteFourNativeInputStates $packet;$missing=@($inputs|Where-Object {$_.state -match '^missing'})
+    $packet=Read-FiniteFourNativeJson $RequestedPacketPath
+    # Validate/Compose describe unavailable historical inputs without loading
+    # them. Execute still requires the exact frozen helper bytes before any
+    # imports, resource context, library activation or native process.
+    Assert-FiniteFourNativePacket -Packet $packet -RepoRoot $RepoRoot -DeferLocalHelperObservation:($RequestedMode -ne 'Execute')
+    $inputs=Get-FiniteFourNativeInputStates $packet;$missing=@($inputs|Where-Object {$_.state -match '^missing'})
+    $mismatched=@($inputs|Where-Object {$_.state -eq 'mismatched_local_input'})
     $record=[ordered]@{schema=1;kind='MIRWorkerStorageFiniteFourA504NativeExecutorReceiptV1';mode=$RequestedMode;packet_sha256=(Get-FiniteFourNativeSha256 $RequestedPacketPath);input_states=$inputs;deferred_missing_bindings=@($missing|ForEach-Object label);native_processes_started=0;library_activation=$false;resource_context_allocated=$false;execution_plan=(New-FiniteFourNativeComposePlan $packet);limit='No current result is gameplay evidence.'}
-    if($RequestedMode -eq 'Validate'){$record.status=if($missing.Count){'DEFERRED_MISSING_LOCAL_BINDINGS'}else{'VALIDATED_NOT_ADMITTED'}}
-    elseif($RequestedMode -eq 'Compose'){$record.status=if($missing.Count){'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'}else{'COMPOSED_NOT_ADMITTED'}}
-    else {if($missing.Count){throw 'Execute refuses missing local bindings'};$record=Invoke-FiniteFourNativeExecution -Packet $packet -RepoRoot $RepoRoot}
+    $record.unavailable_helper_bindings=@($inputs|Where-Object {$_.label -like 'helper *' -and $_.state -ne 'verified_local_input'}|ForEach-Object label)
+    if($RequestedMode -eq 'Validate'){$record.status=if($mismatched.Count){'DEFERRED_LOCAL_HELPER_MISMATCH'}elseif($missing.Count){'DEFERRED_MISSING_LOCAL_BINDINGS'}else{'VALIDATED_NOT_ADMITTED'}}
+    elseif($RequestedMode -eq 'Compose'){$record.status=if($mismatched.Count){'COMPOSED_DEFERRED_LOCAL_HELPER_MISMATCH'}elseif($missing.Count){'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'}else{'COMPOSED_NOT_ADMITTED'}}
+    else {if($mismatched.Count){throw 'Execute refuses mismatched local helpers'};if($missing.Count){throw 'Execute refuses missing local bindings'};$record=Invoke-FiniteFourNativeExecution -Packet $packet -RepoRoot $RepoRoot}
     Write-FiniteFourNativeReceipt -Path $RequestedOutputPath -Record $record
     [pscustomobject]$record
 }

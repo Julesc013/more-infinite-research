@@ -374,6 +374,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Fetch exact frozen SE cargo actor source
+        shell: pwsh
+        run: |
+          git fetch --no-tags --depth=1 origin 7cfad2708e790b024e2493d00ed5892ac0c2601a
+          if ($LASTEXITCODE -ne 0) { throw 'Exact frozen SE cargo actor-source fetch failed.' }
       - name: Run current native tooling guards without an engine
         shell: pwsh
         run: |
@@ -387,6 +392,7 @@ jobs:
             'tests/tooling/Test-MIRArtifactStorageOptimization.ps1',
             'tests/tooling/Test-MIRPlayerReport.ps1'
             'tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1'
+            'tests/tooling/Test-MIRWorkerStorageSECargoCapTenNative.ps1'
           )
           foreach ($control in $controls) {
             & pwsh -NoLogo -NoProfile -File $control

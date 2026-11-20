@@ -223,6 +223,29 @@ local function create_lab_and_power(force)'''
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
 
+    def test_setup_declaration_matches_independent_native_parent_rows(self):
+        declared = world.rows()
+        for name, parents in world.NATIVE_SETUP_PARENTS.items():
+            with self.subTest(name=name):
+                self.assertEqual(parents, declared[name])
+
+    def test_omitted_native_parent_refuses_before_source_setup(self):
+        for name, parent in (("rocket-silo", "se-heat-shielding"), ("speed-module", "se-fuel-refining")):
+            with self.subTest(name=name):
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                world.install(lua)
+                lua.execute("for _, row in ipairs(CARGO_DECLARATION_ORDER) do "
+                            f"if row[1] == {json.dumps(name)} then "
+                            "for index, value in ipairs(row[2]) do "
+                            f"if value == {json.dumps(parent)} then table.remove(row[2], index); break end "
+                            "end end end")
+                world.load(lua)
+                with self.assertRaisesRegex(LuaError, f"setup parents {name} count differs"):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+                self.assertEqual(0, len(lua.globals().cargo_entities()))
+                self.assertEqual(0, len(lua.globals().cargo_saves()))
+
     def test_afa_cold_pending_mutant_refuses_both_source_load_orders(self):
         old = self.unconditional_cold_pending_actor()
         old.globals().cargo_on_load()

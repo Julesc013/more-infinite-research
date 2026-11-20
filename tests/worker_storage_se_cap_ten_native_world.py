@@ -44,6 +44,15 @@ CLOSURE = {
     "space-exploration-postprocess": "0.7.5", "informatron": "0.4.0", "aai-signal-transmission": "0.5.3",
 }
 
+# Independent native F394/2.0.77/SE0.7.57 data, SHA256
+# 151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104.
+# These two prototype rows must not inherit the actor's erroneous declaration.
+NATIVE_SETUP_PARENTS = {
+    "rocket-silo": ["electric-engine", "rocket-control-unit", "rocket-fuel", "solar-energy",
+                   "electric-energy-accumulators", "low-density-structure", "se-heat-shielding", "radar"],
+    "speed-module": ["modules", "se-fuel-refining"],
+}
+
 
 def rows() -> dict[str, list[str]]:
     """Read the literal prerequisite declaration without evaluating Lua."""
@@ -224,9 +233,10 @@ function cargo_queue_names()local o={};for i,row in ipairs(CARGO_FORCE_VALUES._q
 
 def install(lua) -> None:
     declaration = rows()
+    native_rows = {**declaration, **NATIVE_SETUP_PARENTS}
     mapping = "{" + ",".join(
         f'[{name!r}]={{{",".join(repr(parent) for parent in parents)}}}'
-        for name, parents in declaration.items()
+        for name, parents in native_rows.items()
     ) + "}"
     ordered = "{" + ",".join(
         "{%r,{%s}}" % (name, ",".join(repr(parent) for parent in parents))
