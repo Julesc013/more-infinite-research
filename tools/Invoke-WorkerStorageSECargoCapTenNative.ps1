@@ -1,0 +1,292 @@
+[CmdletBinding()]
+param(
+    [ValidateSet('Validate', 'Compose', 'Execute')]
+    [string]$Mode = 'Validate',
+    [string]$PacketPath = (Join-Path $PSScriptRoot '../tests/fixtures/worker-storage-se-cap-ten-native.json'),
+    [string]$OutputPath
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+# This is deliberately a case-specific owner.  Invoke-NativeFixture remains
+# F210/default-settings-only for its existing finite-speed protocol.
+$script:CargoActorRoot = 'tests/fixtures/worker-storage-se-cap-ten-native'
+$script:CargoActorMembers = @(
+    [ordered]@{path='control.lua';sha256='0013ED9DABFCB4DA35B65434026046175F1D944932EB4343DE9121DAF3F347E2';bytes=16493},
+    [ordered]@{path='data-final-fixes.lua';sha256='E860A534CE99E25D300988E9684B1D03F2DC3CA6CAEF8BB0851E5066270B1926';bytes=3493},
+    [ordered]@{path='data.lua';sha256='6C30FB3F21238E3D3AC46D09C7F23A2510FA215E26F312850276E2579C690CEF';bytes=1053},
+    [ordered]@{path='info-f200.json';sha256='280292F01A17994DCEB5D7731FA60029928A7F9E9F28890EBB0872A099D01398';bytes=452},
+    [ordered]@{path='prerequisites.lua';sha256='E5CE84A0AA88310D51D780E1C583FCB01C02C71A69AE9ED58471D26186188E5B';bytes=5699}
+)
+$script:CargoHelperPins = @(
+    [ordered]@{path='tools/lib/validation/ImmutableInputStaging.ps1';sha256='25523C83C26501444A01729226E504199A3294F02E5330DEB1BB4D305832FBEE';bytes=27295},
+    [ordered]@{path='tools/lib/compatibility/LibraryActivation.ps1';sha256='A98570967D35048ECFEAEC7124BB1D9A4501B208E9EAB8CC6E647A638CA2DF7D';bytes=41094},
+    [ordered]@{path='tools/lib/validation/NativeProbeResources.ps1';sha256='1504B4BE12920BE4354CA74204D9B0621481215D08A5F4D231C8C75BCB8D7CB3';bytes=15778},
+    [ordered]@{path='tools/lib/validation/ResourceGovernor.ps1';sha256='D7CEFFD1DC7D9E1A2B0D0CB19FE78D6AF31157B9CB40A0E4548F5397D6D43195';bytes=63682}
+)
+$script:CargoSEMods = @(
+    @('base','2.0.77'),@('aai-containers','0.3.2'),@('aai-industry','0.6.16'),@('aai-signal-transmission','0.5.3'),
+    @('alien-biomes','0.7.4'),@('alien-biomes-graphics','0.7.1'),@('informatron','0.4.0'),@('jetpack','0.4.17'),
+    @('robot_attrition','0.6.6'),@('shield-projector','0.2.2'),@('space-exploration','0.7.57'),@('space-exploration-graphics','0.7.5'),
+    @('space-exploration-graphics-2','0.7.2'),@('space-exploration-graphics-3','0.7.2'),@('space-exploration-graphics-4','0.7.2'),
+    @('space-exploration-graphics-5','0.7.3'),@('space-exploration-menu-simulations','0.7.4'),@('space-exploration-postprocess','0.7.5'),
+    @('mir-fixture-mir5-worker-storage-se-cap-ten-native','0.1.0')
+)
+
+function Get-CargoCapTenSha256 { param([Parameter(Mandatory)][string]$Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
+function Require-CargoCapTen { param([bool]$Condition,[string]$Message) if(-not $Condition){throw $Message} }
+function Assert-CargoCapTenEqual { param($Actual,$Expected,[string]$Name) if($Actual -ne $Expected){throw "$Name differs; expected '$Expected', got '$Actual'"} }
+function Assert-CargoCapTenNumber { param($Value,[string]$Name) if($Value -is [bool] -or $Value -isnot [ValueType] -or $Value -is [char]){throw "$Name is not numeric"}; [double]$Value }
+function Assert-CargoCapTenNear { param($Actual,[double]$Expected,[string]$Name) if([math]::Abs((Assert-CargoCapTenNumber $Actual $Name)-$Expected)-gt 1e-7){throw "$Name differs"} }
+
+function Find-CargoCapTenRepoRoot {
+    param([Parameter(Mandatory)][string]$StartPath)
+    $current=(Resolve-Path -LiteralPath $StartPath).Path
+    while($true){
+        if((Test-Path -LiteralPath (Join-Path $current 'tools')) -and (Test-Path -LiteralPath (Join-Path $current 'tests')) -and (Test-Path -LiteralPath (Join-Path $current 'source'))){return $current}
+        $parent=Split-Path -Parent $current;if([string]::IsNullOrWhiteSpace($parent)-or$parent-eq$current){break};$current=$parent
+    }
+    throw 'MIR repository root is unavailable from executor location'
+}
+function Read-CargoCapTenJson { param([Parameter(Mandatory)][string]$Path) if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "JSON input is missing: $Path"};Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -AsHashtable -Depth 100 }
+function Resolve-CargoCapTenPath { param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path) if([IO.Path]::IsPathRooted($Path)){return [IO.Path]::GetFullPath($Path)};[IO.Path]::GetFullPath((Join-Path $RepoRoot $Path)) }
+
+function Test-CargoCapTenFile {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Descriptor,[Parameter(Mandatory)][string]$Label)
+    $path=if($Descriptor.Contains('path') -and $null-ne$Descriptor['path']){[string]$Descriptor['path']}else{''}
+    $expected=[string]$Descriptor['sha256'];$bytes=if($Descriptor.Contains('bytes') -and $null-ne$Descriptor['bytes']){[int64]$Descriptor['bytes']}else{$null}
+    if([string]::IsNullOrWhiteSpace($path)-or-not(Test-Path -LiteralPath $path -PathType Leaf)){return [ordered]@{label=$Label;state='missing_local_input';path=$path;sha256=$expected;bytes=$bytes}}
+    $item=Get-Item -LiteralPath $path -Force
+    if($null-ne$bytes-and$item.Length-ne$bytes){throw "$Label bytes differ"}
+    $actual=Get-CargoCapTenSha256 $path;if($actual-cne$expected.ToUpperInvariant()){throw "$Label SHA-256 differs"}
+    [ordered]@{label=$Label;state='verified_local_input';path=$item.FullName;sha256=$actual;bytes=$item.Length}
+}
+
+function Assert-CargoCapTenPacket {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
+    Assert-CargoCapTenEqual $Packet['schema'] 1 'packet schema'
+    Assert-CargoCapTenEqual $Packet['kind'] 'MIRWorkerStorageSECargoCapTenF200NativeExecutorPacketV1' 'packet kind'
+    Assert-CargoCapTenEqual $Packet['case_id'] 'gamer433-se0757-worker-storage-cap-ten-f394-to-e334' 'packet case'
+    Assert-CargoCapTenEqual $Packet['inputs']['engine']['version'] '2.0.77' 'engine version'
+    Assert-CargoCapTenEqual $Packet['inputs']['engine']['factorio_binary_sha256'].ToUpperInvariant() 'C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198' 'engine SHA-256'
+    Assert-CargoCapTenEqual $Packet['inputs']['source_mir']['sha256'].ToUpperInvariant() 'F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7' 'source MIR SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['source_mir']['bytes']) 1449338 'source MIR bytes'
+    Assert-CargoCapTenEqual $Packet['inputs']['candidate_mir']['sha256'].ToUpperInvariant() 'E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD' 'candidate MIR SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['candidate_mir']['bytes']) 1054386 'candidate MIR bytes'
+    Assert-CargoCapTenEqual $Packet['inputs']['candidate_mir']['source_commit'] '862dee34c4716cb17dfb48deb12a99e6bc8f1dfc' 'candidate source commit'
+    Assert-CargoCapTenEqual $Packet['inputs']['candidate_mir']['player_tree'] 'ec9abdc840aefdd25e66a5787d89e5ad045837c9' 'candidate player tree'
+    Assert-CargoCapTenEqual $Packet['inputs']['fixture']['sha256'].ToUpperInvariant() 'FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0' 'fixture SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['fixture']['bytes']) 9275 'fixture bytes'
+    Assert-CargoCapTenEqual $Packet['inputs']['settings']['sha256'].ToUpperInvariant() '149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7' 'File settings SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['settings']['bytes']) 511 'File settings bytes'
+    Assert-CargoCapTenEqual ([int]$Packet['inputs']['settings']['typed_value_count']) 7 'File settings typed values'
+    Assert-CargoCapTenEqual $Packet['inputs']['source_profile']['sha256'].ToUpperInvariant() '763454DAC5447C12918296DFB0CA11678B2B794A8309E4846D0524FB17F3A2D7' 'source profile SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['source_profile']['bytes']) 5388 'source profile bytes'
+    Assert-CargoCapTenEqual $Packet['inputs']['candidate_profile']['sha256'].ToUpperInvariant() 'C82C3BC3DD7A4CA3F6E38F54B37F09A1E40B94D7259BA6294C3F26941B247052' 'candidate profile SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['candidate_profile']['bytes']) 5462 'candidate profile bytes'
+    Assert-CargoCapTenEqual $Packet['protocol']['fixture_interface'] 'mir-fixture-mir5-worker-storage-se-cap-ten-native' 'fixture interface'
+    Assert-CargoCapTenEqual $Packet['protocol']['begin_method'] 'begin' 'fixture begin method'
+    Assert-CargoCapTenEqual $Packet['protocol']['confirmation_marker'] 'Using Lua console commands will disable achievements. Please repeat the command to proceed.' 'console confirmation marker'
+    Require-CargoCapTen (-not $Packet['protocol'].Contains('candidate_console_command')) 'candidate stage must not send a second actor begin command'
+    Assert-CargoCapTenEqual $Packet['protocol']['candidate']['configuration_callback_begins_work'] $true 'candidate configuration actor ownership'
+    Assert-CargoCapTenEqual $Packet['protocol']['candidate']['no_console_command'] $true 'candidate command scope'
+    Assert-CargoCapTenEqual ([int]$Packet['bounds']['expected_peak_memory_mib']) 8192 'memory budget'
+    Assert-CargoCapTenEqual ([int]$Packet['bounds']['max_new_output_mib']) 1024 'output budget'
+    Require-CargoCapTen ($Packet['inputs']['actor_members'] -is [Collections.IList] -and $Packet['inputs']['actor_members'].Count -eq $script:CargoActorMembers.Count) 'actor member count differs'
+    foreach($canonical in $script:CargoActorMembers){
+        $member=@($Packet['inputs']['actor_members']|Where-Object {[string]$_['path']-ceq$canonical.path})
+        Require-CargoCapTen ($member.Count-eq1) "actor member selection differs: $($canonical.path)"
+        Assert-CargoCapTenEqual $member[0]['sha256'].ToUpperInvariant() $canonical.sha256 "actor member SHA-256 $($canonical.path)"
+        Assert-CargoCapTenEqual ([int64]$member[0]['bytes']) ([int64]$canonical.bytes) "actor member bytes $($canonical.path)"
+        $path=Join-Path $RepoRoot (Join-Path $script:CargoActorRoot $canonical.path)
+        $state=Test-CargoCapTenFile -Descriptor ([ordered]@{path=$path;sha256=$canonical.sha256;bytes=$canonical.bytes}) -Label "actor $($canonical.path)"
+        Require-CargoCapTen ($state.state-ceq'verified_local_input') "actor source is unavailable: $($canonical.path)"
+    }
+    Require-CargoCapTen ($Packet['helper_pins'] -is [Collections.IList] -and $Packet['helper_pins'].Count -eq $script:CargoHelperPins.Count) 'helper pin count differs'
+    foreach($canonical in $script:CargoHelperPins){
+        $pin=@($Packet['helper_pins']|Where-Object {[string]$_['path']-ceq$canonical.path})
+        Require-CargoCapTen ($pin.Count-eq1) "helper selection differs: $($canonical.path)"
+        Assert-CargoCapTenEqual $pin[0]['sha256'].ToUpperInvariant() $canonical.sha256 "helper SHA-256 $($canonical.path)"
+        Assert-CargoCapTenEqual ([int64]$pin[0]['bytes']) ([int64]$canonical.bytes) "helper bytes $($canonical.path)"
+        $path=Resolve-CargoCapTenPath $RepoRoot $canonical.path
+        $state=Test-CargoCapTenFile -Descriptor ([ordered]@{path=$path;sha256=$canonical.sha256;bytes=$canonical.bytes}) -Label "helper $($canonical.path)"
+        Require-CargoCapTen ($state.state-ceq'verified_local_input') "helper source is unavailable: $($canonical.path)"
+    }
+    $control=Get-Content -LiteralPath (Join-Path $RepoRoot (Join-Path $script:CargoActorRoot 'control.lua')) -Raw
+    foreach($fragment in @('remote.add_interface(FIXTURE, {begin = begin_source})','check(event and event.research == target and event.by_script == false','state.source_frame, state.phase = frame(state), "source-partial"','check(same(frame(state), state.source_frame), "candidate changed source frame before observation")','marker("candidate-closed", state, {cap_attempt = "refused"','marker("cold-read", state, {cold_writes = 0}')){
+        Require-CargoCapTen $control.Contains($fragment) "actor contract source fragment is absent: $fragment"
+    }
+}
+
+function Get-CargoCapTenInputStates {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet)
+    $states=@()
+    foreach($name in @('source_mir','candidate_mir','fixture','settings')){$states+=Test-CargoCapTenFile -Descriptor $Packet['inputs'][$name] -Label $name}
+    $engine=[ordered]@{path=$Packet['inputs']['engine']['binary_path'];sha256=$Packet['inputs']['engine']['factorio_binary_sha256'];bytes=$null};$states+=Test-CargoCapTenFile -Descriptor $engine -Label 'Factorio 2.0.77 binary'
+    $engineData=[string]$Packet['inputs']['engine']['engine_data_path']
+    if([string]::IsNullOrWhiteSpace($engineData)-or-not(Test-Path -LiteralPath $engineData -PathType Container)){$states+=[ordered]@{label='engine_data_path';state='missing_local_binding';path=$engineData}}
+    else {
+        $baseInfo=Join-Path $engineData 'base/info.json'
+        if(-not(Test-Path -LiteralPath $baseInfo -PathType Leaf)){throw 'engine data has no base info'}
+        $base=Read-CargoCapTenJson $baseInfo;Assert-CargoCapTenEqual $base['version'] '2.0.77' 'engine base version'
+        $states+=[ordered]@{label='engine_data_path';state='bound_local_input';path=(Resolve-Path -LiteralPath $engineData).Path}
+    }
+    foreach($name in @('source_profile','candidate_profile')){
+        $profile=[ordered]@{path=$Packet['runtime_bindings'][$name];sha256=$Packet['inputs'][$name]['sha256'];bytes=$Packet['inputs'][$name]['bytes']}
+        $states+=Test-CargoCapTenFile -Descriptor $profile -Label $name
+    }
+    foreach($name in @('library_directory','output_root','server_settings_template')){
+        $path=[string]$Packet['runtime_bindings'][$name]
+        if([string]::IsNullOrWhiteSpace($path)-or-not(Test-Path -LiteralPath $path)){$states+=[ordered]@{label=$name;state='missing_local_binding';path=$path}}
+        else{$states+=[ordered]@{label=$name;state='bound_local_input';path=$path}}
+    }
+    $port=$Packet['runtime_bindings']['server_port']
+    if($port-is[bool]-or$port-isnot[ValueType]-or[int64]$port-lt1024-or[int64]$port-gt65535){$states+=[ordered]@{label='server_port';state='missing_local_binding';path=[string]$port}}
+    else{$states+=[ordered]@{label='server_port';state='bound_local_input';path=[string]$port}}
+    return $states
+}
+
+function Get-CargoCapTenFingerprint { param([Parameter(Mandatory)][string]$Path) if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "file is missing: $Path"};$item=Get-Item -LiteralPath $Path -Force;[ordered]@{path=$item.FullName;bytes=[int64]$item.Length;sha256=(Get-CargoCapTenSha256 $item.FullName)} }
+function Assert-CargoCapTenFingerprint { param($Before,[Parameter(Mandatory)][string]$Path,[string]$Name) $after=Get-CargoCapTenFingerprint $Path;Assert-CargoCapTenEqual $after.bytes $Before.bytes "$Name bytes";Assert-CargoCapTenEqual $after.sha256 $Before.sha256 "$Name SHA-256";$after }
+function Assert-CargoCapTenDistinctCopy { param([Parameter(Mandatory)][string]$ProtectedPath,[Parameter(Mandatory)][string]$WorkingPath,[string]$Name) Assert-CargoCapTenEqual (Get-CargoCapTenSha256 $WorkingPath) (Get-CargoCapTenSha256 $ProtectedPath) "$Name copy SHA-256";if(([IO.Path]::GetFullPath($ProtectedPath))-eq([IO.Path]::GetFullPath($WorkingPath))){throw "$Name reuses protected pathname"};if(Get-Command Get-MIRImmutableInputFileIdentity -ErrorAction SilentlyContinue){if((Get-MIRImmutableInputFileIdentity -Path $ProtectedPath)-eq(Get-MIRImmutableInputFileIdentity -Path $WorkingPath)){throw "$Name aliases protected input"}} }
+
+function Assert-CargoCapTenProfile {
+    param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$ExpectedSha,[Parameter(Mandatory)][string]$MirFilename,[Parameter(Mandatory)][string]$MirSha,[Parameter(Mandatory)][int64]$MirBytes)
+    $actual=Get-CargoCapTenSha256 $Path;Assert-CargoCapTenEqual $actual $ExpectedSha.ToUpperInvariant() 'profile SHA-256'
+    $profile=Read-CargoCapTenJson $Path
+    Assert-CargoCapTenEqual $profile['kind'] 'MIRGamer433SE0757WorkerCargoCap10NativeProfileV1' 'profile kind';Assert-CargoCapTenEqual $profile['target'] 'f200' 'profile target';Assert-CargoCapTenEqual $profile['factorio_line'] '2.0' 'profile line'
+    Assert-CargoCapTenEqual $profile['engine']['version'] '2.0.77' 'profile engine';Assert-CargoCapTenEqual $profile['engine']['sha256'].ToUpperInvariant() 'C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198' 'profile engine SHA-256'
+    Assert-CargoCapTenEqual $profile['settings_mode'] 'File' 'profile settings mode';Assert-CargoCapTenEqual $profile['settings_input']['sha256'].ToUpperInvariant() '149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7' 'profile settings SHA-256';Assert-CargoCapTenEqual ([int]$profile['settings_input']['typed_value_count']) 7 'profile settings value count'
+    Assert-CargoCapTenEqual $profile['mir_archive']['filename'] $MirFilename 'profile MIR filename';Assert-CargoCapTenEqual $profile['mir_archive']['sha256'].ToUpperInvariant() $MirSha 'profile MIR SHA-256';Assert-CargoCapTenEqual ([int64]$profile['mir_archive']['bytes']) $MirBytes 'profile MIR bytes'
+    Require-CargoCapTen ($profile['mods'] -is [Collections.IList] -and $profile['mods'].Count-eq19) 'profile declared 19-mod closure differs'
+    foreach($pair in $script:CargoSEMods){$row=@($profile['mods']|Where-Object {[string]$_['name']-ceq$pair[0]});Require-CargoCapTen ($row.Count-eq1) "profile mod differs: $($pair[0])";Assert-CargoCapTenEqual $row[0]['version'] $pair[1] "profile mod version $($pair[0])";Assert-CargoCapTenEqual $row[0]['enabled'] $true "profile mod enabled $($pair[0])"}
+    Require-CargoCapTen (-not @($profile['mods']|Where-Object {[string]$_['name']-ceq'more-infinite-research'}).Count) 'prepared profile must remain the 19-row pre-MIR input'
+    return $profile
+}
+
+function New-CargoCapTenRuntimeProfile {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Profile,[Parameter(Mandatory)][string]$MirFilename,[Parameter(Mandatory)][string]$MirVersion,[Parameter(Mandatory)][string]$MirSha,[Parameter(Mandatory)][string]$Path)
+    $mods=[Collections.Generic.List[object]]::new();foreach($row in $Profile['mods']){[void]$mods.Add([ordered]@{name=[string]$row['name'];version=[string]$row['version'];enabled=[bool]$row['enabled']})};[void]$mods.Add([ordered]@{name='more-infinite-research';version=$MirVersion;enabled=$true})
+    $hashes=[ordered]@{};foreach($name in @($Profile['archive_sha256'].Keys|Sort-Object)){$hashes[$name]=[string]$Profile['archive_sha256'][$name]};$hashes[$MirFilename]=$MirSha
+    Require-CargoCapTen ($mods.Count-eq20) 'runtime profile must select exactly twenty mods'
+    Require-CargoCapTen ($hashes.Count-eq19) 'runtime profile must bind nineteen non-base archives'
+    $runtime=[ordered]@{schema=1;kind='MIRWorkerStorageSECargoCapTenRuntimeSelectionV1';mods=@($mods);archive_sha256=$hashes}
+    $bytes=[Text.UTF8Encoding]::new($false).GetBytes((($runtime|ConvertTo-Json -Depth 32)+"`n"));$stream=$null;try{$stream=[IO.File]::Open($Path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None);$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{if($null-ne$stream){$stream.Dispose()}}
+    return $hashes
+}
+
+function New-CargoCapTenConfig { param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$EngineData,[Parameter(Mandatory)][string]$WriteData) [IO.File]::WriteAllText($Path,"[path]`nread-data=$EngineData`nwrite-data=$WriteData`n`n[other]`nenable-new-mods=false`n",[Text.UTF8Encoding]::new($false)) }
+function New-CargoCapTenEngineArguments { param([Parameter(Mandatory)][string]$ConfigPath,[Parameter(Mandatory)][string]$LibraryDirectory) @('--config',$ConfigPath,'--mod-directory',$LibraryDirectory,'--no-log-rotation')+@(Get-MIRNativeAudioArguments -Headless) }
+function New-CargoCapTenServerSettings { param([Parameter(Mandatory)][string]$Template,[Parameter(Mandatory)][string]$Path) $settings=Get-Content -LiteralPath $Template -Raw|ConvertFrom-Json -AsHashtable;$settings.name='MIR isolated SE cargo cap-ten check';$settings.description='';$settings.visibility=[ordered]@{public=$false;lan=$false};$settings.username='';$settings.password='';$settings.token='';$settings.game_password='';$settings.require_user_verification=$false;$settings.auto_pause=$false;$settings.autosave_interval=0;$settings.max_players=1;[IO.File]::WriteAllText($Path,(($settings|ConvertTo-Json -Depth 32)+"`n"),[Text.UTF8Encoding]::new($false)) }
+function Complete-CargoCapTenActivation {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Execution,[Parameter(Mandatory)][AllowEmptyCollection()][Collections.Generic.List[object]]$Restoration)
+    $activation=$Execution['activation']
+    if($null-eq$activation-or$activation.closed){return}
+    $Restoration.Add((Complete-MIRLibraryActivation -Activation $activation))
+    $Execution['activation']=$null
+}
+
+function Get-CargoCapTenMarkers {
+    param([Parameter(Mandatory)][string]$LogPath)
+    if(-not(Test-Path -LiteralPath $LogPath -PathType Leaf)){throw "Factorio log is missing: $LogPath"}
+    $rows=[Collections.Generic.List[object]]::new()
+    foreach($line in Get-Content -LiteralPath $LogPath){
+        $match=[regex]::Match($line,'\[MIR_SE_CARGO_NATIVE\]\|(?<fields>.+)$');if(-not$match.Success){continue}
+        $marker=[ordered]@{};foreach($field in $match.Groups['fields'].Value.Split('|')){$parts=$field.Split('=',2);if($parts.Count-eq2){if($parts[0]-in @('tick','progress')){[double]$numeric=0;if(-not[double]::TryParse($parts[1],[Globalization.NumberStyles]::Float,[Globalization.CultureInfo]::InvariantCulture,[ref]$numeric)){throw "marker numeric field differs: $($parts[0])"};$marker[$parts[0]]=$numeric}else{$marker[$parts[0]]=$parts[1]}}}
+        [void]$rows.Add($marker)
+    }
+    return @($rows)
+}
+function Get-CargoCapTenOneMarker { param([Parameter(Mandatory)][object[]]$Markers,[Parameter(Mandatory)][string]$Phase) $row=@($Markers|Where-Object {[string]$_['phase']-ceq$Phase});Require-CargoCapTen ($row.Count-eq1) "marker phase differs: $Phase";return $row[0] }
+function Assert-CargoCapTenMarkerCommon { param([Parameter(Mandatory)][System.Collections.IDictionary]$Marker,[Parameter(Mandatory)][string]$Phase) Assert-CargoCapTenEqual $Marker['phase'] $Phase 'marker phase';Assert-CargoCapTenEqual $Marker['settings_file_values'] 'true' 'marker File settings';$tick=Assert-CargoCapTenNumber $Marker['tick'] 'marker tick';Require-CargoCapTen ($tick-ge0-and[math]::Floor($tick)-eq$tick) 'marker tick differs' }
+function Assert-CargoCapTenMarkerOrder { param([Parameter(Mandatory)][System.Collections.IDictionary]$Earlier,[Parameter(Mandatory)][System.Collections.IDictionary]$Later) if((Assert-CargoCapTenNumber $Later['tick'] 'later marker tick')-le(Assert-CargoCapTenNumber $Earlier['tick'] 'earlier marker tick')){throw 'local marker tick order differs'} }
+
+function Test-CargoCapTenSaveZip {
+    param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Name)
+    if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){throw "$Name save is missing"};$python=Get-Command python3 -ErrorAction SilentlyContinue;if($null-eq$python){$python=Get-Command python -ErrorAction SilentlyContinue};if($null-eq$python){throw "$Name save CRC reader is unavailable"}
+    $program='import sys,zipfile; z=zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None; assert any(e.filename.endswith(("level.dat","level.dat0")) for e in z.infolist())';$output=@(& $python.Source -I -c $program $Path 2>&1);if($LASTEXITCODE-ne0){throw "$Name save CRC or level data differs: $($output -join ' ')"}
+}
+function Assert-CargoCapTenEarnedRun { param([Parameter(Mandatory)]$Run,[Parameter(Mandatory)][string]$Name) Assert-CargoCapTenEqual $Run.passed $true "$Name passed";Assert-CargoCapTenEqual $Run.timed_out $false "$Name timeout";Assert-CargoCapTenEqual $Run.completion_predicate_observed $true "$Name completion predicate";if($Run.exit_code-ne0-and$Run.exit_code-ne137){throw "$Name exit code differs"} }
+function Assert-CargoCapTenColdRun { param([Parameter(Mandatory)]$Run,[Parameter(Mandatory)][string]$Name) Assert-CargoCapTenEqual $Run.passed $true "$Name passed";Assert-CargoCapTenEqual $Run.timed_out $false "$Name timeout";Assert-CargoCapTenEqual $Run.exit_code 0 "$Name natural exit" }
+
+function Read-CargoCapTenCompleteChain {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Chain)
+    foreach($name in @('source','candidate','cold1','cold2')){Require-CargoCapTen ($Chain.Contains($name)-and$Chain[$name]-is[Collections.IDictionary]) "chain lacks $name"}
+    $source=$Chain['source'];$candidate=$Chain['candidate'];$cold1=$Chain['cold1'];$cold2=$Chain['cold2']
+    Assert-CargoCapTenEarnedRun $source['run'] 'source';$sourceMarkers=Get-CargoCapTenMarkers $source['log'];$sourceBegin=Get-CargoCapTenOneMarker $sourceMarkers 'source-begin';$sourcePartial=Get-CargoCapTenOneMarker $sourceMarkers 'source-partial';Assert-CargoCapTenMarkerCommon $sourceBegin 'source-begin';Assert-CargoCapTenMarkerCommon $sourcePartial 'source-partial';Assert-CargoCapTenMarkerOrder $sourceBegin $sourcePartial
+    Assert-CargoCapTenEqual $sourcePartial['level'] '9' 'source partial level';Assert-CargoCapTenEqual $sourcePartial['ordinary'] '5' 'source ordinary completion count';Assert-CargoCapTenEqual $sourcePartial['current'] 'worker-robots-storage-4' 'source partial current';Assert-CargoCapTenEqual $sourcePartial['queue'] 'worker-robots-storage-4,worker-robots-storage-4,mir-fixture-worker-storage-se-cap-ten-tail' 'source partial queue';$sourceProgress=Assert-CargoCapTenNumber $sourcePartial['progress'] 'source partial progress';Require-CargoCapTen ($sourceProgress-gt0-and$sourceProgress-lt1) 'source partial is not earned work'
+    Test-CargoCapTenSaveZip $source['protected_save'] 'source';$sourceBefore=Get-CargoCapTenFingerprint $source['protected_save'];Assert-CargoCapTenDistinctCopy $source['protected_save'] $candidate['working_input'] 'candidate'
+    Assert-CargoCapTenEarnedRun $candidate['run'] 'candidate';$candidateMarkers=Get-CargoCapTenMarkers $candidate['log'];$pre=Get-CargoCapTenOneMarker $candidateMarkers 'candidate-pre-work';$closed=Get-CargoCapTenOneMarker $candidateMarkers 'candidate-closed';Assert-CargoCapTenMarkerCommon $pre 'candidate-pre-work';Assert-CargoCapTenMarkerCommon $closed 'candidate-closed';Assert-CargoCapTenMarkerOrder $pre $closed
+    Assert-CargoCapTenEqual $pre['level'] '9' 'candidate pre-work level';Assert-CargoCapTenEqual $pre['current'] 'worker-robots-storage-4' 'candidate pre-work current';Assert-CargoCapTenNear $pre['progress'] $sourceProgress 'candidate pre-work partial';Assert-CargoCapTenEqual $pre['queue'] $sourcePartial['queue'] 'candidate pre-work queue';Assert-CargoCapTenEqual $closed['level'] '11' 'candidate closed level';Assert-CargoCapTenEqual $closed['candidate_events'] '2' 'candidate event count';Assert-CargoCapTenEqual $closed['cap_attempt'] 'refused' 'candidate cap refusal';Assert-CargoCapTenEqual $closed['current'] 'false' 'candidate closed current';Assert-CargoCapTenEqual $closed['queue'] '' 'candidate closed queue'
+    Assert-CargoCapTenFingerprint $sourceBefore $source['protected_save'] 'protected source'|Out-Null;Test-CargoCapTenSaveZip $candidate['protected_save'] 'candidate';$candidateBefore=Get-CargoCapTenFingerprint $candidate['protected_save']
+    foreach($cold in @($cold1,$cold2)){
+        Assert-CargoCapTenDistinctCopy $candidate['protected_save'] $cold['working_input'] ([string]$cold['name']);Assert-CargoCapTenColdRun $cold['run'] ([string]$cold['name']);$marker=Get-CargoCapTenOneMarker (Get-CargoCapTenMarkers $cold['log']) 'cold-read';Assert-CargoCapTenMarkerCommon $marker 'cold-read';Assert-CargoCapTenEqual $marker['cold_writes'] '0' 'cold no writes';Assert-CargoCapTenEqual $marker['level'] '11' 'cold level';Assert-CargoCapTenEqual $marker['current'] 'false' 'cold current';Assert-CargoCapTenEqual $marker['queue'] '' 'cold queue';Assert-CargoCapTenFingerprint $candidateBefore $candidate['protected_save'] 'protected candidate'|Out-Null
+    }
+    [ordered]@{source=Get-CargoCapTenFingerprint $source['protected_save'];candidate=Get-CargoCapTenFingerprint $candidate['protected_save'];cold_working_inputs=@($cold1['working_input'],$cold2['working_input']);native_partial='source actor observed 0 < progress < 1 after five ordinary events';ordinary_events=[ordered]@{source=5;candidate=2;cap_start_refused=$true}}
+}
+
+function New-CargoCapTenComposePlan {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet)
+    [ordered]@{status='COMPOSED_EXECUTOR_PLAN_NOT_ADMITTED';stages=@(
+        [ordered]@{name='create-source-seed';arguments=@('--create','<source-seed.zip>');natural_exit_required=$true},
+        [ordered]@{name='source-server';console_command=$Packet['protocol']['source_console_command'];requires=@('five ordinary source completion events','source-partial saved state','protected source copy')},
+        [ordered]@{name='candidate-server';configuration_callback_begins_work=$true;no_candidate_console_command=$true;requires=@('candidate-pre-work','two ordinary candidate completion events','cap 11 next-start refusal','protected candidate copy')},
+        [ordered]@{name='cold-1';arguments=@('--test-save','<distinct candidate copy>','--test-arg','reload')},
+        [ordered]@{name='cold-2';arguments=@('--test-save','<distinct candidate copy>','--test-arg','reload')}
+    );no_native_claim='Compose validates only packet shape and local bindings. It creates no context, direct-library activation, process, console write, save, or gameplay result.'}
+}
+
+function Write-CargoCapTenReceipt { param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Record) $parent=Split-Path -Parent $Path;if(-not(Test-Path -LiteralPath $parent -PathType Container)){throw "output parent is missing: $parent"};$bytes=[Text.UTF8Encoding]::new($false).GetBytes((($Record|ConvertTo-Json -Depth 100)+"`n"));$stream=$null;try{$stream=[IO.File]::Open($Path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None);$stream.Write($bytes,0,$bytes.Length);$stream.Flush($true)}finally{if($null-ne$stream){$stream.Dispose()}} }
+
+function Invoke-CargoCapTenExecution {
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
+    . (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1');. (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1');. (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+    $runtime=$Packet['runtime_bindings'];$inputs=$Packet['inputs'];$bounds=$Packet['bounds'];$context=$null;$execution=[ordered]@{activation=$null};$restoration=[Collections.Generic.List[object]]::new();$primary=$null;$chain=$null
+    function Close-CargoCapTenActivation { Complete-CargoCapTenActivation -Execution $execution -Restoration $restoration }
+    try {
+        $context=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot ([string]$runtime['output_root']) -ExpectedPeakMemoryMiB ([int]$bounds['expected_peak_memory_mib']) -MaxNewOutputMiB ([int]$bounds['max_new_output_mib']) -UseExactOutputRoot
+        [IO.Directory]::CreateDirectory($context.root)|Out-Null
+        $engine=[string]$inputs['engine']['binary_path'];$engineData=[string]$inputs['engine']['engine_data_path'];$library=[string]$runtime['library_directory'];$settings=[string]$inputs['settings']['path']
+        $sourceDefinition=Assert-CargoCapTenProfile -Path ([string]$runtime['source_profile']) -ExpectedSha ([string]$inputs['source_profile']['sha256']) -MirFilename ([string]$inputs['source_mir']['filename']) -MirSha ([string]$inputs['source_mir']['sha256']) -MirBytes ([int64]$inputs['source_mir']['bytes'])
+        $candidateDefinition=Assert-CargoCapTenProfile -Path ([string]$runtime['candidate_profile']) -ExpectedSha ([string]$inputs['candidate_profile']['sha256']) -MirFilename ([string]$inputs['candidate_mir']['filename']) -MirSha ([string]$inputs['candidate_mir']['sha256']) -MirBytes ([int64]$inputs['candidate_mir']['bytes'])
+        $sourceRoot=Join-Path $context.root 'source';$candidateRoot=Join-Path $context.root 'candidate';[IO.Directory]::CreateDirectory($sourceRoot)|Out-Null;[IO.Directory]::CreateDirectory($candidateRoot)|Out-Null
+        function Open-CargoCapTenActivation([string]$Profile,[hashtable]$Archives){$execution['activation']=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $Profile -ArchiveHashes $Archives -SettingsMode File -SettingsPath $settings -SettingsSha256 ([string]$inputs['settings']['sha256']);Add-MIRNativeProbeLibraryActivation -Context $context -Activation $execution['activation']}
+        $sourceRuntimeProfile=Join-Path $sourceRoot 'profile.json';$sourceArchives=New-CargoCapTenRuntimeProfile -Profile $sourceDefinition -MirFilename ([string]$inputs['source_mir']['filename']) -MirVersion '4.7.20002' -MirSha ([string]$inputs['source_mir']['sha256']) -Path $sourceRuntimeProfile
+        Open-CargoCapTenActivation $sourceRuntimeProfile $sourceArchives
+        $sourceWrite=Join-Path $sourceRoot 'write-data';$sourceSaves=Join-Path $sourceWrite 'saves';[IO.Directory]::CreateDirectory($sourceSaves)|Out-Null;$sourceConfig=Join-Path $sourceRoot 'config.ini';New-CargoCapTenConfig $sourceConfig $engineData $sourceWrite
+        $seed=Join-Path $sourceRoot 'seed.zip';$createArgs=(New-CargoCapTenEngineArguments $sourceConfig $library)+@('--create',$seed);Assert-MIRLibraryLaunch -Activation $execution['activation'] -FactorioBin $engine -Arguments $createArgs;$create=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $engine -Arguments $createArgs -TimeoutSeconds ([int]$bounds['create_timeout_seconds']);Assert-CargoCapTenEqual $create.result.exit_code 0 'source create exit'
+        $sourceWorking=Join-Path $sourceRoot 'source-working.zip';[IO.File]::Copy($seed,$sourceWorking,$false);Assert-CargoCapTenDistinctCopy $seed $sourceWorking 'source'
+        $sourceServerSettings=Join-Path $sourceRoot 'server-settings.json';New-CargoCapTenServerSettings ([string]$runtime['server_settings_template']) $sourceServerSettings;$sourceSave=Join-Path $sourceSaves 'mir5-se-worker-storage-cap10-source.zip';$sourceLog=Join-Path $sourceWrite 'factorio-current.log';$sourcePredicate={(Test-Path -LiteralPath $sourceSave -PathType Leaf)-and(Test-Path -LiteralPath $sourceLog -PathType Leaf)-and([IO.File]::ReadAllText($sourceLog).Contains('phase=source-partial'))}.GetNewClosure();$sourceArgs=(New-CargoCapTenEngineArguments $sourceConfig $library)+@('--start-server',$sourceWorking,'--server-settings',$sourceServerSettings,'--bind','127.0.0.1','--port',[string]$runtime['server_port']);Assert-MIRLibraryLaunch -Activation $execution['activation'] -FactorioBin $engine -Arguments $sourceArgs;$sourceRun=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $engine -Arguments $sourceArgs -TimeoutSeconds ([int]$bounds['server_timeout_seconds']) -CompletionPredicate $sourcePredicate -ConsoleStartup ([ordered]@{command=$Packet['protocol']['source_console_command'];ready_marker=$Packet['protocol']['console_ready_marker'];confirmation_marker=$Packet['protocol']['confirmation_marker']});Close-CargoCapTenActivation
+        $protectedSource=Join-Path $context.root 'protected-source.zip';[IO.File]::Copy($sourceSave,$protectedSource,$false);$sourceInitial=Get-CargoCapTenFingerprint $protectedSource
+        $candidateWorking=Join-Path $candidateRoot 'candidate-working.zip';[IO.File]::Copy($protectedSource,$candidateWorking,$false);Assert-CargoCapTenDistinctCopy $protectedSource $candidateWorking 'candidate'
+        $candidateRuntimeProfile=Join-Path $candidateRoot 'profile.json';$candidateArchives=New-CargoCapTenRuntimeProfile -Profile $candidateDefinition -MirFilename ([string]$inputs['candidate_mir']['filename']) -MirVersion '5.0.20018' -MirSha ([string]$inputs['candidate_mir']['sha256']) -Path $candidateRuntimeProfile
+        $candidateWrite=Join-Path $candidateRoot 'write-data';$candidateSaves=Join-Path $candidateWrite 'saves';[IO.Directory]::CreateDirectory($candidateSaves)|Out-Null;$candidateConfig=Join-Path $candidateRoot 'config.ini';New-CargoCapTenConfig $candidateConfig $engineData $candidateWrite;$candidateServerSettings=Join-Path $candidateRoot 'server-settings.json';New-CargoCapTenServerSettings ([string]$runtime['server_settings_template']) $candidateServerSettings;$candidateSave=Join-Path $candidateSaves 'mir5-se-worker-storage-cap10-candidate.zip';$candidateLog=Join-Path $candidateWrite 'factorio-current.log';$candidatePredicate={(Test-Path -LiteralPath $candidateSave -PathType Leaf)-and(Test-Path -LiteralPath $candidateLog -PathType Leaf)-and([IO.File]::ReadAllText($candidateLog).Contains('phase=candidate-closed'))}.GetNewClosure()
+        Open-CargoCapTenActivation $candidateRuntimeProfile $candidateArchives;$candidateArgs=(New-CargoCapTenEngineArguments $candidateConfig $library)+@('--start-server',$candidateWorking,'--server-settings',$candidateServerSettings,'--bind','127.0.0.1','--port',[string]$runtime['server_port']);Assert-MIRLibraryLaunch -Activation $execution['activation'] -FactorioBin $engine -Arguments $candidateArgs;$candidateRun=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $engine -Arguments $candidateArgs -TimeoutSeconds ([int]$bounds['server_timeout_seconds']) -CompletionPredicate $candidatePredicate;Close-CargoCapTenActivation
+        Assert-CargoCapTenFingerprint $sourceInitial $protectedSource 'protected source'|Out-Null;$protectedCandidate=Join-Path $context.root 'protected-candidate.zip';[IO.File]::Copy($candidateSave,$protectedCandidate,$false);$candidateInitial=Get-CargoCapTenFingerprint $protectedCandidate
+        $chain=[ordered]@{source=[ordered]@{run=$sourceRun.result;log=$sourceLog;protected_save=$protectedSource};candidate=[ordered]@{run=$candidateRun.result;log=$candidateLog;working_input=$candidateWorking;protected_save=$protectedCandidate}}
+        for($i=1;$i-le2;$i++){$coldRoot=Join-Path $context.root ("cold-$i");$coldWrite=Join-Path $coldRoot 'write-data';[IO.Directory]::CreateDirectory($coldWrite)|Out-Null;$coldConfig=Join-Path $coldRoot 'config.ini';New-CargoCapTenConfig $coldConfig $engineData $coldWrite;$coldWorking=Join-Path $coldRoot 'cold-input.zip';[IO.File]::Copy($protectedCandidate,$coldWorking,$false);Assert-CargoCapTenDistinctCopy $protectedCandidate $coldWorking "cold-$i";Open-CargoCapTenActivation $candidateRuntimeProfile $candidateArchives;$coldArgs=(New-CargoCapTenEngineArguments $coldConfig $library)+@('--test-save',$coldWorking,'--test-arg','reload','--test-ticks',[string]$bounds['cold_test_ticks']);Assert-MIRLibraryLaunch -Activation $execution['activation'] -FactorioBin $engine -Arguments $coldArgs;$coldRun=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $engine -Arguments $coldArgs -TimeoutSeconds ([int]$bounds['cold_timeout_seconds']);Close-CargoCapTenActivation;$chain["cold$i"]=[ordered]@{name="cold-$i";run=$coldRun.result;working_input=$coldWorking;log=(Join-Path $coldWrite 'factorio-current.log')}}
+        $verified=Read-CargoCapTenCompleteChain $chain
+    } catch {$primary=$_} finally {
+        if($null-ne$execution['activation']-and-not$execution['activation'].closed){try{Complete-CargoCapTenActivation -Execution $execution -Restoration $restoration}catch{if($null-eq$primary){$primary=$_}else{$primary.Exception.Data['cargo_cap_ten_restoration_error']=$_.Exception.Message}}}
+    }
+    if($null-ne$primary){
+        if($null-ne$context){$failure=[ordered]@{schema=1;kind='MIRWorkerStorageSECargoCapTenF200NativeExecutionResultV1';status='failed-retained-adverse';primary_cause=[ordered]@{message=$primary.Exception.Message;type=$primary.Exception.GetType().FullName};resource_runs=@($context.runs);restoration=@($restoration);native_completion_count=0};try{Write-MIRNativeProbeResult -Context $context -Record $failure}catch{$primary.Exception.Data['cargo_cap_ten_failure_result_error']=$_.Exception.Message}}
+        throw $primary
+    }
+    $record=[ordered]@{schema=1;kind='MIRWorkerStorageSECargoCapTenF200NativeExecutionResultV1';status='completed-await-independent-review';chain=$verified;resource_runs=@($context.runs);restoration=@($restoration);native_completion_count=5;candidate_completion_count=2;cold_count=2}
+    Write-MIRNativeProbeResult -Context $context -Record $record;return $record
+}
+
+function Invoke-CargoCapTenExecutor {
+    param([Parameter(Mandatory)][ValidateSet('Validate','Compose','Execute')][string]$RequestedMode,[Parameter(Mandatory)][string]$RequestedPacketPath,[Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RequestedOutputPath)
+    $packet=Read-CargoCapTenJson $RequestedPacketPath;Assert-CargoCapTenPacket $packet $RepoRoot;$states=Get-CargoCapTenInputStates $packet;$missing=@($states|Where-Object {$_.state -match '^missing'})
+    $record=[ordered]@{schema=1;kind='MIRWorkerStorageSECargoCapTenF200NativeExecutorReceiptV1';mode=$RequestedMode;packet_sha256=(Get-CargoCapTenSha256 $RequestedPacketPath);input_states=$states;deferred_missing_bindings=@($missing|ForEach-Object label);native_processes_started=0;library_activation=$false;resource_context_allocated=$false;execution_plan=(New-CargoCapTenComposePlan $packet);limit='No current result is gameplay evidence.'}
+    if($RequestedMode-eq'Validate'){$record.status=if($missing.Count){'DEFERRED_MISSING_LOCAL_BINDINGS'}else{'VALIDATED_NOT_ADMITTED'}}elseif($RequestedMode-eq'Compose'){$record.status=if($missing.Count){'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'}else{'COMPOSED_NOT_ADMITTED'}}else{if($missing.Count){throw 'Execute refuses missing local bindings'};$record=Invoke-CargoCapTenExecution $packet $RepoRoot}
+    Write-CargoCapTenReceipt $RequestedOutputPath $record;[pscustomobject]$record
+}
+
+if($MyInvocation.InvocationName-ne'.'){
+    if([string]::IsNullOrWhiteSpace($OutputPath)){throw 'OutputPath is required; choose a new explicit custody path.'}
+    Invoke-CargoCapTenExecutor -RequestedMode $Mode -RequestedPacketPath $PacketPath -RepoRoot (Find-CargoCapTenRepoRoot $PSScriptRoot) -RequestedOutputPath $OutputPath
+}
