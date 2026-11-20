@@ -240,12 +240,20 @@ end
 -- The detached owner starts at the same native level and retains the entire
 -- work contract. Public names and force flags confer no historical authority.
 function M.matches_default_owner(source, owner)
-  local ok, matches = pcall(function()
-    assert(source and source.name == M.canonical and source.level == 4)
-    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX)
-    return M.fingerprint(source) == M.fingerprint(owner)
+  local source_ok, expected = pcall(function()
+    assert(source and source.name == M.canonical and source.level == 4,
+      "MIR worker canonical identity is invalid")
+    return M.fingerprint(source)
   end)
-  return ok and matches
+  if not source_ok then return false, "canonical-fingerprint", expected end
+  local owner_ok, actual = pcall(function()
+    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX,
+      "MIR worker ordinary owner identity is invalid")
+    return M.fingerprint(owner)
+  end)
+  if not owner_ok then return false, "owner-fingerprint", actual end
+  if actual ~= expected then return false, "unequal-fingerprint" end
+  return true
 end
 
 function M.debit(authored)

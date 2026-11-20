@@ -1003,6 +1003,65 @@ local function set_gate_paid(gate, paid)
   gate.enabled, gate.visible_when_disabled = false, false
 end
 
+-- Failure-only observation of this pair, never an admission rule or saved
+-- fingerprint replacement. Every native read retains unavailable separately
+-- from absent, and the fixed projections keep startup diagnostics bounded.
+local function default_contract_failure(predicate, source, owner, current, owner_creator, comparison, cause)
+  local details = {"predicate=" .. predicate,
+    "route=" .. configuration_context.rejected_value(current and current.kind or "unclassified"),
+    "owner_creator=" .. (predicate == "public-route" and "unobserved" or configuration_context.rejected_value(owner_creator))}
+  if comparison then details[#details + 1] = "comparison=" .. comparison end
+  if cause ~= nil then details[#details + 1] = "cause=" .. configuration_context.rejected_value(cause) end
+  local function observed(read)
+    local ok, value = pcall(read)
+    if not ok then return "unavailable:" .. configuration_context.rejected_value(value) end
+    return configuration_context.rejected_value(value)
+  end
+  local function pair(label, read, always)
+    local left = observed(function() return read(source) end)
+    local right = observed(function() return read(owner) end)
+    if always or left ~= right then
+      details[#details + 1] = label .. ".canonical=" .. left
+      details[#details + 1] = label .. ".owner=" .. right
+    end
+  end
+  for _, field in ipairs({"name", "level", "max_level", "hidden", "enabled", "visible_when_disabled",
+      "ignore_tech_cost_multiplier", "research_unit_count_formula", "research_unit_count", "research_unit_energy"}) do
+    pair(field, function(row) return row and row[field] end,
+      field == "name" or field == "level" or field == "max_level" or predicate == "owner-flags")
+  end
+  pair("effects.count", function(row) return row and row.effects and #row.effects end)
+  for _, field in ipairs({"type", "modifier", "hidden"}) do
+    pair("effect." .. field, function(row) return row and row.effects and row.effects[1] and row.effects[1][field] end)
+  end
+  pair("science.count", function(row) return row and row.research_unit_ingredients and #row.research_unit_ingredients end)
+  -- At most four differing ingredient rows; the fingerprint independently
+  -- retains the complete equality/validation rule for up to 32 ingredients.
+  local differences = 0
+  for index = 1, 32 do
+    local before = #details
+    for _, field in ipairs({"name", "amount"}) do
+      pair("science[" .. index .. "]." .. field, function(row)
+        local items = row and row.research_unit_ingredients
+        return items and items[index] and items[index][field]
+      end)
+    end
+    if #details > before then differences = differences + 1 end
+    if differences == 4 then details[#details + 1] = "science_differences=first-four"; break end
+  end
+  local function prerequisites(row)
+    local names = {}
+    for key, item in pairs(row and row.prerequisites or {}) do
+      if #names == 32 then return "over-limit" end
+      names[#names + 1] = configuration_context.rejected_value(type(key) == "string" and key or item and item.name)
+    end
+    table.sort(names)
+    return table.concat(names, ",")
+  end
+  pair("prerequisites", prerequisites)
+  recover_error("canonical4/full default4 contract or custody differs [" .. table.concat(details, " ") .. "]")
+end
+
 local function default_contract(prepared)
   local id = recovery.ordinary_default_id
   if id ~= "mir-worker-storage-default-4" or id == recovery.canonical or id == recovery.id then
@@ -1010,10 +1069,23 @@ local function default_contract(prepared)
   end
   local source, owner = native_prototype(recovery.canonical), native_prototype(id)
   local current = fact(nil)
-  if not same_fact(current, {kind="default"}) or creator(id) ~= MIR
-      or not recovery.matches_default_owner(source, owner) or owner.hidden ~= false
-      or type(owner.enabled) ~= "boolean" or type(owner.visible_when_disabled) ~= "boolean" then
-    recover_error("canonical4/full default4 contract or custody differs")
+  if not same_fact(current, {kind="default"}) then
+    default_contract_failure("public-route", source, owner, current)
+  end
+  local owner_creator = creator(id)
+  if owner_creator ~= MIR then
+    default_contract_failure("owner-creator", source, owner, current, owner_creator)
+  end
+  local matches, comparison, cause = recovery.matches_default_owner(source, owner)
+  if not matches then
+    default_contract_failure("work-contract", source, owner, current, owner_creator, comparison, cause)
+  end
+  local flags_read, valid_flags = pcall(function()
+    return owner.hidden == false and type(owner.enabled) == "boolean" and type(owner.visible_when_disabled) == "boolean"
+  end)
+  if not flags_read or not valid_flags then
+    default_contract_failure("owner-flags", source, owner, current, owner_creator,
+      not flags_read and "unavailable-flags" or nil, not flags_read and valid_flags or nil)
   end
   local contract = recovery.fingerprint(source)
   head_gate_contract(source)
