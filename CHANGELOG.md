@@ -7,6 +7,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Bugfixes
 
 - Factorio 2.1: Add missing K2: Spaced Out silicon, glass and rare-metals productivity continuations so a zero research limit permits research beyond level 3.
+- Preserve research availability when raising or removing a limit after MIR cancels over-limit queued research.
 - Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged startup settings.
 - Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
 - Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.

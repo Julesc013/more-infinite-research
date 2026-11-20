@@ -333,9 +333,26 @@ function M.apply_worker_storage_split_caps(plan)
   end
 end
 
+local reconciliation_depth = 0
+
 local function discard_empty_state(value)
-  if next(value.owned_disabled) == nil and value.legacy_caps_checked ~= true then
+  if reconciliation_depth == 0 and next(value.owned_disabled) == nil and value.legacy_caps_checked ~= true then
     storage[STORAGE_KEY] = nil
+  end
+end
+
+-- Native queue writes can synchronously start another research callback.
+-- Keep the shared state attached until every active reconciler has finished
+-- writing its rights. An inner callback cannot retire an outer writer's empty
+-- table. This is transient call state, never another saved ownership record.
+local function reconcile_with_state(callback, ...)
+  reconciliation_depth = reconciliation_depth + 1
+  local ok, reason = pcall(callback, ...)
+  reconciliation_depth = reconciliation_depth - 1
+  if not ok then error(reason, 0) end
+  if reconciliation_depth == 0 then
+    local current = existing_state()
+    if current then discard_empty_state(current) end
   end
 end
 
@@ -772,7 +789,7 @@ local function stale_force_indices(forces)
   return stale
 end
 
-local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled, discovery_observed, admissions, stale, observed_forces)
+local function reconcile_all_body(clean_stale_forces, selected_owners, imported_reenabled, discovery_observed, admissions, stale, observed_forces)
   local forces = observed_forces or force_snapshot()
   if forces == nil then return end
   admissions = admissions or preflight_cap_admissions(forces)
@@ -807,6 +824,10 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
     end
   end
   if current then discard_empty_state(current) end
+end
+
+local function reconcile_all(...)
+  reconcile_with_state(reconcile_all_body, ...)
 end
 
 local function direct_f200_to_f210_transition(event)
@@ -1027,7 +1048,7 @@ local function clear_force(index, excluded_family)
   discard_empty_state(current)
 end
 
-local function reconcile_event(event, research_only, discovery_observed, clear_index, excluded_family)
+local function reconcile_event_body(event, research_only, discovery_observed, clear_index, excluded_family)
   -- One upstream discovery event can change every technology on its force.
   -- Reconcile only MIR's bounded admitted rows, rather than just the finished ID.
   if DISCOVERY_TREE and discovery_observed then research_only = false end
@@ -1053,6 +1074,10 @@ local function reconcile_event(event, research_only, discovery_observed, clear_i
   if not current then return end
   reconcile_force(force, current.owned_disabled, nil, false, name, nil, discovery_observed, observed, excluded_family)
   discard_empty_state(current)
+end
+
+local function reconcile_event(...)
+  reconcile_with_state(reconcile_event_body, ...)
 end
 
 -- Prototype admission is immutable during a runtime callback. Bootstrap can

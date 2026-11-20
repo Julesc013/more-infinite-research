@@ -145,6 +145,82 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_nested_queue_start_keeps_cap_rights_attached_through_relaxation(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local gear, probe = technology(name, 6, true), technology("unrelated-probe", 1, true)
+          local f = force(1, {[name]=gear, [probe.name]=probe}, {gear, probe}, gear, .42)
+          gear.force, probe.force = f, f
+          boot({[1]=f}, 3, "")
+          local meta, nested, before, after = getmetatable(f), 0
+          local write = meta.__newindex
+          meta.__newindex = function(object, key, value)
+            local current = object.current_research
+            write(object, key, value)
+            if key == "research_queue" and current ~= object.current_research and object.current_research then
+              nested = nested + 1
+              before = storage.mir_caps
+              handlers.events[defines.events.on_research_started]({research=object.current_research})
+              after = storage.mir_caps
+            end
+          end
+          require("runtime.lifecycle").on_init()
+          local state = storage.mir_caps
+          assert(nested == 1 and before ~= nil and after == before,
+            "nested queue callback detached the outer cap writer's state")
+          assert(state == before and state.owned_disabled[1][name].disabled == true,
+            "native disablement lost its durable restoration right")
+          assert(not gear.enabled and gear.visible_when_disabled and gear.level == 6 and not gear.researched)
+          assert(f.current_research == probe and #f.research_queue == 1 and f.research_queue[1] == probe)
+
+          -- A later independent force starts disabled by another owner. Its
+          -- visibility write is ours; its enablement is never ours to restore.
+          local foreign = technology(name, 6, false)
+          local other = force(2, {[name]=foreign})
+          foreign.force = other
+          game.forces[2] = other
+          require("runtime.lifecycle").on_force_created({force=other})
+          assert(state.owned_disabled[2][name].disabled == false)
+          local saved, queue = storage, f.research_queue
+          boot({[1]=f, [2]=other}, 0, "", saved)
+          require("runtime.lifecycle").on_configuration_changed({})
+          assert(gear.enabled and not gear.visible_when_disabled,
+            "relaxation did not restore the outer writer's actual flags")
+          assert(not foreign.enabled and not foreign.visible_when_disabled,
+            "relaxation changed the foreign enablement baseline")
+          assert(gear.level == 6 and not gear.researched and foreign.level == 6 and not foreign.researched)
+          assert(f.research_queue == queue and f.current_research == probe)
+          assert(storage.mir_caps == nil, "completed outermost relaxation retained empty cap state")
+        ''')
+
+    def test_nested_queue_failure_unwinds_state_lifetime_without_replacing_error(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local gear, probe = technology(name, 6, true), technology("unrelated-probe", 1, true)
+          local f = force(1, {[name]=gear, [probe.name]=probe}, {gear, probe}, gear, .42)
+          gear.force, probe.force = f, f
+          boot({[1]=f}, 3, "")
+          local meta, sentinel = getmetatable(f), {}
+          local write = meta.__newindex
+          meta.__newindex = function(object, key, value)
+            local current = object.current_research
+            write(object, key, value)
+            if key == "research_queue" and current ~= object.current_research then
+              handlers.events[defines.events.on_research_started]({research=object.current_research})
+              error(sentinel, 0)
+            end
+          end
+          local ok, reason = pcall(require("runtime.lifecycle").on_init)
+          assert(not ok and reason == sentinel, "reconciliation replaced the original structured error")
+          meta.__newindex = write
+          -- A later ordinary callback must be able to finish empty-state
+          -- cleanup. An unbalanced transient depth would pin it indefinitely.
+          handlers.events[defines.events.on_research_started]({research=probe})
+          assert(storage.mir_caps == nil, "failed reconciliation left its state lifetime active")
+          assert(gear.enabled and gear.level == 6 and not gear.researched)
+          assert(f.current_research == probe and #f.research_queue == 1)
+        ''')
+
     def test_required_restoration_catalogue_export_cannot_silently_drop_rights(self):
         for active in ({}, {"space-age": "2.1.23"}):
             for missing in (None, False, "wrong", 12):
