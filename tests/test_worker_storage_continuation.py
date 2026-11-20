@@ -60,6 +60,12 @@ class WorkerStorageContinuationTests(unittest.TestCase):
           for _,spec in ipairs(config.prototypes())do settings.startup[spec.name]={value=spec.default_value}end
           for key,value in pairs(selected_changes)do settings.startup[key].value=value end
           data,helpers,log=full_world(mods,true),nil,function()end
+          -- This is an existing native predecessor, not an emitted MIR row.
+          -- The exact published517 holder retains it in its historical
+          -- prerequisite contract even though current F200 SE worker4 does
+          -- not.  The host world must therefore materialize the actual name
+          -- before data-final validates that hidden holder.
+          data.raw.technology["worker-robots-storage-2"]={type="technology",name="worker-robots-storage-2"}
           data.raw.technology["worker-robots-storage-3"]={type="technology",name="worker-robots-storage-3",
             upgrade=true,prerequisites={"worker-robots-storage-2"},
             effects={{type="worker-robot-storage",modifier=1}},
@@ -180,6 +186,15 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         ):
             with self.subTest(holder=name):
                 self.assert_f200_se_worker_contract(scaffold.plain_lua(technologies[name]))
+
+    def test_f200_se_scaffold_materializes_the_published_holder_predecessor_without_mutating_it(self):
+        lua = self.f200_se_stage()
+        predecessor = scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-2"])
+        self.assertEqual({"type": "technology", "name": "worker-robots-storage-2"}, predecessor)
+        self.pipeline(lua)
+        self.assertEqual(predecessor, scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-2"]))
+        holder = scaffold.plain_lua(lua.globals().data.raw.technology["mir-worker-storage-published517-4"])
+        self.assertIn("worker-robots-storage-2", holder["prerequisites"])
 
     def test_f200_se_final_emission_resolves_worker_science_without_loading_the_f210_catalogue(self):
         lua = self.f200_se_stage()

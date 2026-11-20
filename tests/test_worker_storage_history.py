@@ -1430,6 +1430,226 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(player.worker_robots_storage_bonus==before_bonus+1 and player.current_research.name==OTHER)
         ''')
 
+    def test_published517_engine_owned_completion_defers_then_settles_without_repricing(self):
+        """The progress-one callback is Factorio-owned, not a settled paid-work frame."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          local callback=all_frames();local bonus=player.worker_robots_storage_bonus;writes=0
+          -- The old settled-frame reader rejected this exact callback shape.
+          local changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101}
+          assert(changed and not settled)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="legacy-completion-pending")
+          assert(storage[OWNER_KEY].forces[player.index].completion_tick==101)
+          assert(history.default_owner_completion_pending_tick()==102 and writes==0 and same(callback,all_frames()))
+          -- Mimic the engine's later released representation; MIR must not
+          -- synchronously reset an engine-owned completed row above.
+          player.research_progress=0;player.research_queue={OTHER}
+          legacy.researched=false;legacy.level=6;legacy.saved_progress=0;writes=0
+          local changed,settled=history.default_owner_on_completion_tick{tick=102}
+          assert(changed and #settled==1 and settled[1]==player)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned")
+          assert(history.default_owner_completion_pending_tick()==nil and writes>0)
+          assert(player.technologies[ORDINARY].level==6 and player.technologies[ORDINARY].saved_progress==0)
+          assert(legacy.level==4 and not legacy.enabled and player.current_research.name==OTHER)
+          assert(player.worker_robots_storage_bonus==bonus)
+        ''')
+
+    def test_published517_nil_current_completion_rehydrates_once_across_load(self):
+        """A queue remainder with no current research also gets exactly one later observation."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={OTHER};player.research_progress=0;legacy.researched=true;gaps[player.index]=true
+          writes=0
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=201})
+          local pending=storage[OWNER_KEY]
+          assert(pending.forces[player.index].phase=="legacy-completion-pending"
+            and history.default_owner_completion_pending_tick()==202 and writes==0)
+          local native_game,native_prototypes=game,prototypes
+          game=nil;prototypes=nil;history.default_owner_on_load()
+          assert(storage[OWNER_KEY]==pending and history.default_owner_completion_pending_tick()==202 and writes==0)
+          game,prototypes=native_game,native_prototypes
+          package.loaded["runtime.worker_robot_storage"]=nil;history=require("runtime.worker_robot_storage")
+          history.default_owner_on_load();assert(history.default_owner_completion_pending_tick()==202 and writes==0)
+          gaps[player.index]=false;legacy.researched=false;legacy.level=6;legacy.saved_progress=0
+          player.research_queue={OTHER};player.research_progress=0;writes=0
+          assert(history.default_owner_on_completion_tick{tick=202})
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned" and writes>0)
+          assert(player.technologies[ORDINARY].level==6 and player.current_research.name==OTHER)
+        ''')
+
+    def test_published517_completion_preserves_foreign_holder_enablement_and_visibility(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=251})
+          local rights=copy(storage[OWNER_KEY].forces[player.index].retired_flags)
+          player.research_progress=0;player.research_queue={OTHER}
+          legacy.researched=false;legacy.level=6;legacy.saved_progress=0
+          -- An external data/runtime owner changed the retiring holder after
+          -- the callback. The successor must retain that visible disablement,
+          -- not silently enable a new current-contract progression.
+          legacy.enabled=false;legacy.visible_when_disabled=true;writes=0
+          assert(history.default_owner_on_completion_tick{tick=252})
+          local current=player.technologies[ORDINARY]
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned")
+          assert(current.level==6 and not current.enabled and current.visible_when_disabled)
+          assert(legacy.level==4 and not legacy.enabled and not legacy.visible_when_disabled)
+          assert(same(storage[OWNER_KEY].forces[player.index].retired_flags,rights))
+        ''')
+
+    def test_published517_completion_keeps_the_current_cap_when_old_work_reaches_its_boundary(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          -- The original published contract permits the final paid level at
+          -- its cap. Its completion must retain the earned bonus but leave
+          -- future seven-pack work disabled at the current cap.
+          player.technologies[ORDINARY].level=10;player.technologies[ORDINARY].saved_progress=0
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          assert(legacy.level==10 and legacy.enabled)
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=271})
+          player.research_progress=0;player.research_queue={OTHER}
+          legacy.researched=false;legacy.level=11;legacy.saved_progress=0;writes=0
+          assert(history.default_owner_on_completion_tick{tick=272})
+          local current=player.technologies[ORDINARY]
+          assert(current.level==11 and not current.enabled and legacy.level==4 and not legacy.enabled)
+          assert(player.current_research.name==OTHER and storage[OWNER_KEY].forces[player.index].phase=="owned")
+        ''')
+
+    def test_published517_pending_completion_admits_ordinary_repeats_without_duplicate_authority(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=301})
+          local pending=storage[OWNER_KEY];local rights=copy(pending.forces[player.index].retired_flags);writes=0
+          -- A same-tick old-holder completion can follow before the one later
+          -- observation. It is admitted as a no-op: it cannot create another
+          -- authority or settle the historical contract twice.
+          local changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=301}
+          assert(not changed and not settled and writes==0 and storage[OWNER_KEY]==pending)
+          local ok,message=pcall(history.default_owner_on_research_finished,{research=legacy,by_script=true,tick=301})
+          assert(not ok and tostring(message):find("ordinary native research",1,true) and writes==0 and storage[OWNER_KEY]==pending)
+          local before=all_frames()
+          ok,message=pcall(history.default_owner_on_forces_merging,{source=player,destination=suspended})
+          assert(not ok and tostring(message):find("unsettled historical work",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==pending)
+          ok,message=pcall(history.default_owner_on_force_reset,{force=player})
+          assert(not ok and tostring(message):find("awaiting its bounded native observation",1,true)
+            and writes==0 and storage[OWNER_KEY]==pending)
+          -- A changed callback row is stale evidence, not permission to apply
+          -- the saved plan.  It remains pending and performs no native writes.
+          player.technologies[CANONICAL].enabled=true;writes=0
+          ok,message=pcall(history.default_owner_on_completion_tick,{tick=302})
+          assert(not ok and writes==0 and storage[OWNER_KEY]==pending)
+          player.technologies[CANONICAL].enabled=false
+          -- A second ordinary level completes before the marker tick. It
+          -- remains old-cost debt and retains the original marker rather than
+          -- becoming a second settlement plan.
+          player.research_progress=0;player.research_queue={LEGACY517,LEGACY517,OTHER}
+          legacy.researched=false;legacy.level=6;legacy.saved_progress=0
+          player.research_progress=1;legacy.researched=true;writes=0
+          changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=301}
+          assert(not changed and not settled and writes==0 and storage[OWNER_KEY]==pending)
+          player.research_progress=0;player.research_queue={LEGACY517,LEGACY517,OTHER}
+          legacy.researched=false;legacy.level=7;legacy.saved_progress=0
+          player.technologies[OTHER].saved_progress=.19;player.research_progress=.2;writes=0
+          assert(history.default_owner_on_completion_tick{tick=302})
+          local record=storage[OWNER_KEY].forces[player.index]
+          assert(record.phase=="legacy" and record.completion_tick==nil and same(record.retired_flags,rights))
+          assert(writes==0 and player.current_research.name==LEGACY517 and player.research_progress==.2)
+          assert(player.research_queue[2].name==LEGACY517 and player.research_queue[3].name==OTHER)
+          assert(player.technologies[OTHER].saved_progress==.19 and history.default_owner_completion_pending_tick()==nil)
+        ''')
+
+    def test_published517_pending_resume_is_revalidated_after_another_force_settles(self):
+        """A nested later completion must not clear a stale second force marker."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          for _,force in ipairs({player,suspended})do
+            finish_frame(force,"advanced",{ORDINARY},false)
+            assert(history.default_owner_on_research_finished(finish_event(force)))
+            force.technologies[ORDINARY].saved_progress=.42
+            force.research_queue={ORDINARY,OTHER};force.research_progress=.42
+          end
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local first,second=player.technologies[LEGACY517],suspended.technologies[LEGACY517]
+          for _,item in ipairs({{force=player,legacy=first},{force=suspended,legacy=second}})do
+            item.force.research_queue={LEGACY517,OTHER};item.force.research_progress=1;item.legacy.researched=true
+            assert(history.default_owner_on_research_finished{research=item.legacy,by_script=false,tick=401})
+          end
+          -- Player is ready to settle; suspended has real old queue work and
+          -- is initially only ready to resume its legacy phase.
+          player.research_progress=0;player.research_queue={OTHER}
+          first.researched=false;first.level=6;first.saved_progress=0
+          suspended.research_progress=0;suspended.research_queue={LEGACY517,OTHER}
+          second.researched=false;second.level=6;second.saved_progress=0;suspended.research_progress=.2
+          local mt=getmetatable(first);local write=mt.__newindex;local fired=false
+          mt.__newindex=function(object,key,value)
+            if key=="level" and value==4 and not fired then
+              fired=true
+              -- A genuine second ordinary completion arrives during the first
+              -- force's native writer. It retains the marker but invalidates
+              -- the pre-read resume frame for suspended.
+              suspended.research_progress=1;second.researched=true
+              local changed,settled=history.default_owner_on_research_finished{
+                research=second,by_script=false,tick=402}
+              assert(not changed and not settled)
+            end
+            return write(object,key,value)
+          end
+          local pending=storage[OWNER_KEY];writes=0
+          local ok,message=pcall(history.default_owner_on_completion_tick,{tick=402})
+          assert(not ok and fired)
+          -- The first setter already happened; do not claim rollback. The
+          -- durable owner record retains both markers rather than silently
+          -- disposing suspended's newly completed historical work.
+          assert(writes>0 and storage[OWNER_KEY]==pending)
+          assert(pending.forces[player.index].phase=="legacy-completion-pending"
+            and pending.forces[suspended.index].phase=="legacy-completion-pending")
+          assert(player.technologies[ORDINARY].level==6 and second.researched and suspended.research_progress==1)
+        ''')
+
     def test_published517_exact_settings_admit_the_paid_bridge_when_an_unrelated_setting_changed(self):
         lua=self.world("f200")
         lua.execute(r'''
@@ -1826,6 +2046,25 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(plan.record.schema==3 and plan.record.legacy==nil and plan.record.kind=="provider-retired")
           assert(history.default_owner_apply(plan));history.apply(legacy)
           assert(storage[OWNER_KEY].schema==3 and storage[OWNER_KEY].kind=="provider-retired")
+        ''')
+
+    def test_published517_pending_completion_refuses_provider_handover_before_any_native_write(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=351})
+          finite_entry(1);local before,state=all_frames(),storage[OWNER_KEY];writes=0
+          local ok,message=pcall(delegate,provider_event(),provider_route(5))
+          assert(not ok and tostring(message):find("paid work must settle",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
         ''')
 
     def test_four_force_handover_reuses_private_quota_and_conserves_each_scalar_basis(self):

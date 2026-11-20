@@ -13,6 +13,10 @@ local function integer(value)
   return type(value) == "number" and value > 0 and value < 4294967295 and value == math.floor(value)
 end
 
+local function tick(value)
+  return type(value) == "number" and value >= 0 and value < 4294967295 and value == math.floor(value)
+end
+
 local function provider(value)
   return type(value) == "string" and value ~= "" and value ~= MIR
 end
@@ -713,10 +717,16 @@ local function equal_plain(left, right)
 end
 
 local function checked_default_force(record, retired, legacy)
-  fields(record, {phase=true, retired_flags=true})
+  fields(record, {phase=true, retired_flags=true, completion_tick=true})
   local valid_phase = retired and record.phase == "retired"
-    or not retired and (record.phase == "owned" or legacy and record.phase == "legacy")
+    or not retired and (record.phase == "owned" or legacy and (record.phase == "legacy"
+      or record.phase == "legacy-completion-pending"))
   if not valid_phase then recover_error("invalid full default owner phase") end
+  if record.phase == "legacy-completion-pending" then
+    if not legacy or not tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
+  elseif record.completion_tick ~= nil then
+    recover_error("settled default owner has an unexpected completion tick")
+  end
   fields(record.retired_flags, {enabled=true, visible=true, disabled_by_mir=true, visibility_hidden_by_mir=true})
   local flags = record.retired_flags
   if type(flags.enabled) ~= "boolean" or type(flags.visible) ~= "boolean"
@@ -1493,10 +1503,16 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   for _, force in ipairs(forces()) do
     seen[force.index] = true
     local finished = context.finished_force == force.index
+    local prior = owned and owned.forces[force.index]
+    if legacy_active and prior and prior.phase == "legacy-completion-pending" then
+      -- The callback row may not be a settled native frame yet. Its durable
+      -- marker alone establishes historical debt for configuration/reset.
+      recover_error("published517 SE paid-worker completion is awaiting its bounded native observation")
+    end
     local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
     local public = prepared and default_frame(force, recovery.canonical, finished) or source
     local destination = default_frame(force, id, finished)
-    local gate, prior = gate_frame(force, owned ~= nil and context.configuration == true), owned and owned.forces[force.index]
+    local gate = gate_frame(force, owned ~= nil and context.configuration == true)
     local refresh = context.created_force == force.index or context.reset_force == force.index
     if context.created_force == force.index and prior then recover_error("new default force already has history") end
     local action, next_force = "validate", prior and clone(prior) or nil
@@ -2098,61 +2114,198 @@ function M.default_owner_mutating(event)
   return default_mutating_force ~= nil and force ~= nil and force.index == default_mutating_force
 end
 
-local function settle_published517_se_paid_completion(state, force, event)
-  local prior = state.forces[force.index]
-  if not prior then recover_error("published517 SE paid completion has unknown force history") end
-  if prior.phase ~= "legacy" then recover_error("published517 SE paid completion has no pending old contract") end
-  if event.by_script ~= false then recover_error("published517 SE paid completion must be ordinary native research") end
-  local source = default_frame(force, recovery.canonical)
-  local owner = default_frame(force, recovery.ordinary_default_id)
-  local legacy = default_frame(force, recovery.published517_se_id, true)
+local function published517_completion_frame(force, finished)
+  local source = default_frame(force, recovery.canonical, finished)
+  local owner = default_frame(force, recovery.ordinary_default_id, finished)
+  local legacy = default_frame(force, recovery.published517_se_id, finished)
   local gate = gate_frame(force)
   if not legacy_paid_pair(source, owner, gate, legacy) then
     recover_error("published517 SE paid completion frame differs")
   end
-  -- More old-contract work is still native current/queued/saved work. Leave
-  -- it wholly on the historical holder; its later ordinary completion will
-  -- re-enter this same checked boundary.
-  if default_owner_frame_has_unsettled_work(legacy, recovery.published517_se_id) then return false end
-  local before_bonus = native_bonus(force)
-  local next_state = clone(state)
-  next_state.forces[force.index].phase = "owned"
-  local previous = default_mutating_force
-  default_mutating_force = force.index
-  local ok, message = pcall(function()
-    local current, old = owner.technology, legacy.technology
-    if current.level ~= legacy.next_level or current.researched then current.level = legacy.next_level end
-    current.saved_progress = 0
-    current.enabled = selected_enabled and (selected_cap == 0 or legacy.next_level <= selected_cap)
-    current.visible_when_disabled = legacy.visible
-    if old.level ~= 4 or old.researched then old.level = 4 end
-    old.saved_progress, old.enabled, old.visible_when_disabled = 0, false, false
-  end)
-  default_mutating_force = previous
-  if not ok then error(message, 0) end
-  local actual_source = default_frame(force, recovery.canonical)
-  local actual_owner = default_frame(force, recovery.ordinary_default_id)
-  local actual_legacy = default_frame(force, recovery.published517_se_id)
-  local actual_gate = gate_frame(force)
-  if not full_pair(actual_source, actual_owner, actual_gate)
-      or not pristine_default_frame(actual_legacy, recovery.published517_se_id) or actual_legacy.visible
-      or native_bonus(force) ~= before_bonus then
-    recover_error("published517 SE paid completion did not preserve native work")
+  return {force=force, source=source, owner=owner, legacy=legacy, gate=gate, bonus=native_bonus(force)}
+end
+
+local function engine_owned_published517_completion(frame)
+  local legacy, id = frame.legacy, recovery.published517_se_id
+  return legacy.researched and ((legacy.current == id and legacy.current_progress == 1 and legacy.queue[1] == id)
+    or (legacy.current == nil and legacy.current_progress == 0 and legacy.queue[1] ~= nil))
+end
+
+local function same_published517_completion_frame(expected, actual)
+  return expected.bonus == actual.bonus
+    and equal_plain(frame_values(expected.source), frame_values(actual.source))
+    and equal_plain(frame_values(expected.owner), frame_values(actual.owner))
+    and equal_plain(frame_values(expected.legacy), frame_values(actual.legacy))
+    and equal_plain(frame_values(expected.gate), frame_values(actual.gate))
+end
+
+local function revalidate_published517_completion_item(state, item)
+  if storage[OWNER_KEY] ~= state then recover_error("published517 SE paid completion ownership changed before native mutation") end
+  local record = state.forces[item.force.index]
+  if not record or record.phase ~= item.prior_phase then recover_error("published517 SE paid completion plan changed") end
+  local actual = published517_completion_frame(item.force, false)
+  if not same_published517_completion_frame(item, actual) then
+    recover_error("published517 SE paid completion native frame changed before mutation")
   end
-  if storage[OWNER_KEY] ~= state then recover_error("published517 SE paid completion ownership changed") end
+end
+
+-- The only writer for schema-4 completion phase changes. A deferred marker
+-- records that Factorio has reported completion but still owns its row; it
+-- deliberately carries no copied native level, progress, queue, or cost.
+local function apply_published517_completion_transition(state, items)
+  local next_state = clone(state)
+  for _, item in ipairs(items) do
+    local prior, next_force = state.forces[item.force.index], next_state.forces[item.force.index]
+    if not prior or not next_force or prior.phase ~= item.prior_phase then
+      recover_error("published517 SE paid completion plan changed")
+    end
+    if item.action == "defer" then
+      next_force.phase, next_force.completion_tick = "legacy-completion-pending", item.completion_tick
+    elseif item.action == "resume-legacy" then
+      next_force.phase, next_force.completion_tick = "legacy", nil
+    elseif item.action == "settle" then
+      next_force.phase, next_force.completion_tick = "owned", nil
+    else
+      recover_error("published517 SE paid completion action is invalid")
+    end
+  end
+  if storage[OWNER_KEY] ~= state then recover_error("published517 SE paid completion ownership changed before application") end
+  for _, item in ipairs(items) do
+    if item.action == "settle" then
+      -- A previous force's setter can synchronously invoke another callback.
+      -- Re-read this exact force immediately before its first dependent write;
+      -- the one preflight pass below never authorizes a stale later frame.
+      revalidate_published517_completion_item(state, item)
+      local previous = default_mutating_force
+      default_mutating_force = item.force.index
+      local ok, message = pcall(function()
+        local current, old, legacy = item.owner.technology, item.legacy.technology, item.legacy
+        if current.level ~= legacy.next_level or current.researched then current.level = legacy.next_level end
+        current.saved_progress = 0
+        -- The historical holder is the only live evidence of a foreign
+        -- enablement override made after the completion callback.  Carry that
+        -- flag to its successor; configuration changes are separately refused
+        -- while this bounded historical debt is pending.
+        current.enabled = legacy.enabled and selected_enabled
+          and (selected_cap == 0 or legacy.next_level <= selected_cap)
+        current.visible_when_disabled = legacy.visible
+        if old.level ~= 4 or old.researched then old.level = 4 end
+        old.saved_progress, old.enabled, old.visible_when_disabled = 0, false, false
+      end)
+      default_mutating_force = previous
+      if not ok then error(message, 0) end
+    end
+  end
+  for _, item in ipairs(items) do
+    if item.action == "resume-legacy" then
+      -- This disposition has no native setter of its own, but another ready
+      -- force can synchronously finish while a preceding settlement writes.
+      -- Never clear its sole durable marker from the stale pre-write frame.
+      revalidate_published517_completion_item(state, item)
+    end
+  end
+  for _, item in ipairs(items) do
+    if item.action == "settle" then
+      local actual_source = default_frame(item.force, recovery.canonical)
+      local actual_owner = default_frame(item.force, recovery.ordinary_default_id)
+      local actual_legacy = default_frame(item.force, recovery.published517_se_id)
+      local actual_gate = gate_frame(item.force)
+      if not full_pair(actual_source, actual_owner, actual_gate)
+          or not pristine_default_frame(actual_legacy, recovery.published517_se_id) or actual_legacy.visible
+          or native_bonus(item.force) ~= item.bonus then
+        recover_error("published517 SE paid completion did not preserve native work")
+      end
+    end
+  end
+  if storage[OWNER_KEY] ~= state then recover_error("published517 SE paid completion ownership changed during application") end
   storage[OWNER_KEY] = next_state
   reconnect_default(next_state)
   return true
 end
 
+local function settle_published517_se_paid_completion(state, force, event)
+  local prior = state.forces[force.index]
+  if not prior then recover_error("published517 SE paid completion has unknown force history") end
+  if event.by_script ~= false then recover_error("published517 SE paid completion must be ordinary native research") end
+  local item = published517_completion_frame(force, true)
+  if prior.phase == "legacy-completion-pending" then
+    -- Several authentic old-holder completions can occur before the first
+    -- later observation, including in the same tick.  They grant no second
+    -- writer: retain the original marker and validate each event-shaped row.
+    if not engine_owned_published517_completion(item) or not tick(event.tick)
+        or event.tick < prior.completion_tick then
+      recover_error("published517 SE pending completion does not retain an ordinary native completion frame")
+    end
+    return false, false
+  end
+  if prior.phase ~= "legacy" then recover_error("published517 SE paid completion has no pending old contract") end
+  item.prior_phase = "legacy"
+  if engine_owned_published517_completion(item) then
+    if not tick(event.tick) then recover_error("published517 SE paid completion has no native event tick") end
+    item.action, item.completion_tick = "defer", event.tick
+    return apply_published517_completion_transition(state, {item}), false
+  end
+  -- More old-contract work is still native current/queued/saved work. Leave
+  -- it wholly on the historical holder; its later ordinary completion will
+  -- re-enter this same checked boundary.
+  if default_owner_frame_has_unsettled_work(item.legacy, recovery.published517_se_id) then return false, false end
+  item.action = "settle"
+  return apply_published517_completion_transition(state, {item}), true
+end
+
+function M.default_owner_completion_pending_tick()
+  local state = owner_record()
+  if not state or state.schema ~= 4 then return nil end
+  local earliest
+  for _, record in pairs(state.forces) do
+    if record.phase == "legacy-completion-pending" then
+      local due = record.completion_tick + 1
+      if earliest == nil or due < earliest then earliest = due end
+    end
+  end
+  return earliest
+end
+
+function M.default_owner_on_completion_tick(event)
+  local state = owner_record()
+  if not state or state.schema ~= 4 then return false end
+  if not event or not tick(event.tick) then recover_error("published517 SE pending completion has no native tick") end
+  local pending, force_by_index = {}, {}
+  for _, force in ipairs(forces()) do force_by_index[force.index] = force end
+  for index, record in pairs(state.forces) do
+    if record.phase == "legacy-completion-pending" and event.tick >= record.completion_tick + 1 then
+      local force = force_by_index[index]
+      if not force then recover_error("published517 SE pending completion force is unavailable") end
+      pending[#pending + 1] = {force=force, prior_phase="legacy-completion-pending"}
+    end
+  end
+  table.sort(pending, function(left, right) return left.force.index < right.force.index end)
+  if #pending == 0 then return false, nil end
+  -- Read every ready force before changing a technology. A normal post-event
+  -- legacy frame with remaining old work clears only its marker; a completed
+  -- row with no remaining old work can now transfer without touching a row
+  -- still owned by Factorio's completion representation.
+  for _, item in ipairs(pending) do
+    local frame = published517_completion_frame(item.force, false)
+    for key, value in pairs(frame) do item[key] = value end
+    item.action = default_owner_frame_has_unsettled_work(item.legacy, recovery.published517_se_id)
+      and "resume-legacy" or "settle"
+  end
+  local settled = {}
+  for _, item in ipairs(pending) do
+    if item.action == "settle" then settled[#settled + 1] = item.force end
+  end
+  return apply_published517_completion_transition(state, pending), settled
+end
+
 function M.default_owner_on_research_finished(event)
   local force, research = event and event.research and event.research.force, event and event.research
-  if not default_head_pending or not force or M.default_owner_mutating(event) then return false end
+  if not default_head_pending or not force or M.default_owner_mutating(event) then return false, false end
   local state = owner_record()
   if state and state.schema == 4 and research.name == recovery.published517_se_id then
     return settle_published517_se_paid_completion(state, force, event)
   end
-  if research.name ~= recovery.ordinary_default_id then return false end
+  if research.name ~= recovery.ordinary_default_id then return false, false end
   if not state or not state.forces[force.index] then recover_error("default completion has unknown force history") end
   if event.by_script ~= false then recover_error("full default completion must be ordinary native research") end
   local owner = force.technologies[recovery.ordinary_default_id]
@@ -2161,7 +2314,8 @@ function M.default_owner_on_research_finished(event)
     recover_error("full default completion has no native earned first level")
   end
   local plan = M.plan_default_owner_transfer(nil, nil, false, {finished_force=force.index})
-  return M.apply_default_owner_transfer(plan)
+  local changed = M.apply_default_owner_transfer(plan)
+  return changed, changed
 end
 
 function M.default_owner_on_force_created(event)
@@ -2210,13 +2364,15 @@ function M.default_owner_on_forces_merging(event)
   if not source or not destination or not integer(source.index) or not integer(destination.index)
       or source.index == destination.index then recover_error("default native pre-merge has invalid force identity") end
   if default_owner_merge_plans[source.index] ~= nil then recover_error("default native pre-merge is already pending") end
-  -- A schema-4 legacy row is a debt to its historical contract, including a
-  -- just-completed level whose research-finished callback has not settled it
-  -- yet. Factorio invalidates the source force after this event and provides
-  -- no authenticated destination mapping for that debt. Refuse while both
-  -- the exact native frame and its saved ownership remain available.
-  if state.forces[source.index].phase == "legacy" then
-    default_owner_merge_frame(state, source)
+  -- A schema-4 legacy or bounded-pending row is a debt to its historical
+  -- contract. Factorio invalidates the source force after this event and
+  -- provides no authenticated destination mapping for that debt. A pending
+  -- frame may still be engine-owned, so refuse it before attempting a normal
+  -- snapshot rather than treating an unreadable settled frame as absence.
+  local source_record = state.forces[source.index]
+  if not source_record then recover_error("default native pre-merge has unknown source history") end
+  if source_record.phase ~= "owned" then
+    if source_record.phase == "legacy" then default_owner_merge_frame(state, source) end
     recover_error("published517 SE paid source has unsettled historical work before force merge")
   end
   local source_frame = default_owner_merge_frame(state, source)

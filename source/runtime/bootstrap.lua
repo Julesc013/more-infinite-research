@@ -173,6 +173,7 @@ local reconcile_library_events
 local library_events_scheduled
 local credit_events_scheduled
 local worker_events_scheduled
+local worker_completion_tick_scheduled
 local library_refresh_scheduled
 local browser_families = {all = true, external = true, mir = true}
 for _, declaration in ipairs(catalogue.declared()) do
@@ -587,16 +588,16 @@ end
 
 local function on_research_finished(event)
   if not (event and event.research) or event.research.valid == false then return end
-  local worker_default_changed = false
+  local worker_default_changed, worker_default_settled = false, false
   if worker_robot_storage then
-    worker_default_changed = worker_robot_storage.default_owner_on_research_finished(event)
+    worker_default_changed, worker_default_settled = worker_robot_storage.default_owner_on_research_finished(event)
     if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
   end
   if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
-    if worker_default_changed then
+    if worker_default_settled then
       -- Its first native completion also fulfils the public prerequisite.
       -- Reconcile only that changed head's presentation, never the work queue.
       lifecycle.on_research_finished({research=event.research.force.technologies["worker-robots-storage-4"]})
@@ -642,6 +643,20 @@ local function on_research_cancelled(event)
   if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
   request_library_refresh(event)
+end
+
+local function on_worker_completion_tick(event)
+  local changed, settled = false, nil
+  if worker_robot_storage then changed, settled = worker_robot_storage.default_owner_on_completion_tick(event) end
+  if lifecycle.caps_active() and changed and type(settled) == "table" then
+    for _, force in ipairs(settled) do
+      lifecycle.on_research_finished({research=force.technologies["worker-robots-storage-4"]})
+    end
+  end
+  -- The handler is installed only for durable schema-4 completion markers.
+  -- Reconcile immediately so a settled or resumed marker removes this exact
+  -- one-shot observation instead of becoming ordinary periodic work.
+  reconcile_library_events()
 end
 
 local function on_tower_planted_seed(event)
@@ -741,12 +756,16 @@ local function bind_runtime_events(library_open)
   local credit_pending = native_credits and native_credits.needs_research_events() or false
   credit_pending = credit_pending or (native_gun_credits and native_gun_credits.needs_research_events() or false)
   local worker_pending = worker_robot_storage and worker_robot_storage.needs_research_events() or false
+  local worker_completion_tick = worker_robot_storage
+    and type(worker_robot_storage.default_owner_completion_pending_tick) == "function"
+    and worker_robot_storage.default_owner_completion_pending_tick() or nil
   credit_pending = credit_pending or worker_pending
   if library_events_scheduled == library_open and credit_events_scheduled == credit_pending
-      and worker_events_scheduled == worker_pending then return end
+      and worker_events_scheduled == worker_pending and worker_completion_tick_scheduled == worker_completion_tick then return end
   library_events_scheduled = library_open
   credit_events_scheduled = credit_pending
   worker_events_scheduled = worker_pending
+  worker_completion_tick_scheduled = worker_completion_tick
   local events = defines and defines.events or {}
   local competing_active = competing_productivity and competing_productivity.active()
   local force_lifecycle_active = lifecycle.caps_active()
@@ -802,6 +821,7 @@ local function bind_runtime_events(library_open)
       (lifecycle.caps_active() or competing_active or library_open) and on_discovery_setting_changed or nil)
   end
   if events.on_research_moved then script.on_event(events.on_research_moved, library_open and request_library_refresh or nil) end
+  if events.on_tick then script.on_event(events.on_tick, worker_completion_tick and on_worker_completion_tick or nil) end
 end
 
 local function on_library_native_refresh(event)
@@ -847,6 +867,7 @@ function M.register()
   library_events_scheduled = nil
   credit_events_scheduled = nil
   worker_events_scheduled = nil
+  worker_completion_tick_scheduled = nil
   bind_runtime_events(false)
   script.on_nth_tick(library.native_refresh_ticks, nil)
   library_refresh_scheduled = false

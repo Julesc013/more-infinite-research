@@ -1121,10 +1121,54 @@ class BootstrapTests(unittest.TestCase):
     def test_bootstrap_has_no_late_module_loading_or_unconditional_tick_dispatch(self):
         source = (ROOT / "source/runtime/bootstrap.lua").read_text(encoding="utf-8")
         control = (ROOT / "source/control.lua").read_text(encoding="utf-8")
-        self.assertNotIn("on_tick", source)
+        self.assertIn("worker_completion_tick and on_worker_completion_tick or nil", source)
+        self.assertNotIn("script.on_event(events.on_tick, on_worker_completion_tick)", source)
         self.assertNotIn("require(", source[source.index("function M.register"):])
         self.assertIn('require("runtime.bootstrap")', control)
         self.assertIn("remote.add_interface", control)
+
+    def test_worker_completion_tick_is_bound_only_for_a_durable_marker(self):
+        self.lua.execute(r'''
+          install_modules(false);install_runtime();load_control()
+          local worker=require("runtime.worker_robot_storage")
+          local due,calls=101,{}
+          worker.default_owner_completion_pending_tick=function()return due end
+          worker.default_owner_on_completion_tick=function(event)
+            calls[#calls+1]=event.tick;due=nil;return true
+          end
+          handlers.init()
+          assert(type(handlers.events[defines.events.on_tick])=="function")
+          handlers.events[defines.events.on_tick]({tick=101})
+          assert(#calls==1 and calls[1]==101)
+          assert(handlers.events[defines.events.on_tick]==nil,
+            "completion observation remained scheduled after its marker cleared")
+        ''')
+
+    def test_worker_completion_marker_does_not_publish_until_the_later_settlement(self):
+        self.lua.execute(r'''
+          install_modules(true);install_runtime();load_control()
+          local worker=require("runtime.worker_robot_storage")
+          local lifecycle=require("runtime.lifecycle")
+          local due,calls=nil,{}
+          lifecycle.on_research_finished=function(event)calls[#calls+1]=event end
+          worker.default_owner_completion_pending_tick=function()return due end
+          worker.default_owner_on_research_finished=function(event)
+            due=401;return true,false
+          end
+          worker.default_owner_on_completion_tick=function(event)
+            assert(event.tick==401);due=nil;return true,{player.force}
+          end
+          player.force.technologies["worker-robots-storage-4"]={name="worker-robots-storage-4"}
+          handlers.init()
+          local event={research={valid=true,name="mir-worker-storage-published517-4",force=player.force}}
+          handlers.events[defines.events.on_research_finished](event)
+          assert(#calls==1 and calls[1]==event,
+            "deferred completion published the canonical public research early")
+          assert(type(handlers.events[defines.events.on_tick])=="function")
+          handlers.events[defines.events.on_tick]({tick=401})
+          assert(#calls==2 and calls[2].research==player.force.technologies["worker-robots-storage-4"])
+          assert(handlers.events[defines.events.on_tick]==nil)
+        ''')
 
     def test_required_catalogue_worker_exports_refuse_before_bootstrap_registration(self):
         self.lua.execute(r'''
