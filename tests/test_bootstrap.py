@@ -21,6 +21,56 @@ class BootstrapTests(unittest.TestCase):
             else build_bootstrap_control_world(LuaRuntime, source_root=ROOT / "source")
         )
 
+    def test_se_scripted_policy_preflights_first_and_applies_after_existing_reconciliation(self):
+        for mode in ("success", "policy-refusal", "other-preflight-refusal"):
+            with self.subTest(mode=mode):
+                self.setUp()
+                self.lua.globals().policy_mode = mode
+                self.lua.execute('''
+                  install_modules(false,false,false,true)
+                  package.preload["platform.target"]=function()return {id="f200",recipe_productivity=true}end
+                  install_runtime(nil,{["space-exploration"]="0.7.57"})
+                  local cap=require("runtime.lifecycle");local original=cap.preflight
+                  cap.preflight=function(...)
+                    assert(policy_preflight_seen==1)
+                    if policy_mode=="other-preflight-refusal"then error("other preflight refused")end
+                    return original(...)
+                  end
+                  package.preload["runtime.lifecycle"]=function()return cap end
+                  package.preload["runtime.space_exploration_system_force"]=function()return {
+                    preflight=function(event)
+                      assert(event.marker=="SE-policy"and library_calls.configuration==nil)
+                      policy_preflight_seen=(policy_preflight_seen or 0)+1
+                      if policy_mode=="policy-refusal"then error("SE policy refused")end
+                      return "SE-plan"
+                    end,
+                    apply=function(plan)
+                      assert(plan=="SE-plan"and library_calls.configuration.marker=="SE-policy")
+                      policy_apply_seen=(policy_apply_seen or 0)+1
+                    end}end
+                  load_control()
+                  local ok,message=pcall(handlers.configuration,{marker="SE-policy",mod_changes={}})
+                  assert(policy_preflight_seen==1)
+                  if policy_mode=="success"then assert(ok,message);assert(policy_apply_seen==1)
+                  else assert(not ok and tostring(message):find("refused",1,true))
+                    assert(policy_apply_seen==nil and library_calls.configuration==nil)end
+                ''')
+
+    def test_se_scripted_policy_body_is_not_imported_for_an_inactive_target_or_provider(self):
+        for target_id, provider in (("f210", "0.7.57"), ("f200", "0.7.58"), ("f200", None)):
+            with self.subTest(target_id=target_id, provider=provider):
+                self.setUp()
+                self.lua.globals().selected_target = target_id
+                self.lua.globals().selected_provider = provider
+                self.lua.execute('''
+                  install_modules(false)
+                  package.preload["platform.target"]=function()return {id=selected_target,recipe_productivity=false}end
+                  local active={};active["space-exploration"]=selected_provider
+                  install_runtime(nil,active)
+                  package.preload["runtime.space_exploration_system_force"]=function()error("inactive body import")end
+                  load_control();handlers.configuration({mod_changes={}})
+                ''')
+
     def test_actual_bootstrap_keeps_gate_only_configuration_after_legacy_commit(self):
         # Routing only: the complete worker/history controls own native-frame
         # validation. This independent order must not delegate a flag-only plan.
