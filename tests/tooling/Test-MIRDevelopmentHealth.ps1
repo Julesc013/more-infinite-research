@@ -82,6 +82,8 @@ try {
   New-Item -ItemType Directory -Path (Split-Path -Parent $distPath) -Force | Out-Null
   [IO.File]::WriteAllText($distPath,'preview',[Text.UTF8Encoding]::new($false))
   Invoke-HealthFixtureGit -Arguments @('worktree','add','--quiet','-b','health-linked',$linked,'health-old')
+  $linkedCreatedUtc = (Get-Item -LiteralPath (Join-Path $linked '.git') -Force).CreationTimeUtc
+  $freshWorktreeNow = $linkedCreatedUtc.AddHours(1)
   [IO.File]::WriteAllText((Join-Path $linked 'linked-uncommitted.txt'),'preserve me',[Text.UTF8Encoding]::new($false))
   $fixtureToolRoot = Join-Path $fixture 'tools/commands/workspace'
   New-Item -ItemType Directory -Path $fixtureToolRoot -Force | Out-Null
@@ -106,7 +108,7 @@ try {
 
   $trackedBefore = [IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt'))
   $linkedBefore = [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt'))
-  $report = (& $checker -RepoRoot $fixture -AsJson -MaxEntriesPerRoot 2 -MaxScanSeconds 10 -MaxWorktrees 4 -MaxBranches 8 -OldWorktreeDays 7 -OldBranchDays 7 -BuildBudgetMiB 0 -NowUtc ([datetime]'2026-09-27T00:00:00Z') | ConvertFrom-Json -Depth 16)
+  $report = (& $checker -RepoRoot $fixture -AsJson -MaxEntriesPerRoot 2 -MaxScanSeconds 10 -MaxWorktrees 4 -MaxBranches 8 -OldWorktreeDays 7 -OldBranchDays 7 -BuildBudgetMiB 0 -NowUtc $freshWorktreeNow | ConvertFrom-Json -Depth 16)
   if ([string]$report.kind -cne 'MIRDevelopmentWorkspaceHealthV1' -or [string]$report.side_effects -cne 'none-report-only' -or -not [bool]$report.checkpoint_required -or @($report.checkpoint_reasons | Where-Object { $_ -match '^dirty:' }).Count -ne 1) { throw '[mir-development-health-report-shape]' }
   if ($report.git.dirty.count -lt 1) { throw '[mir-development-health-dirty-current]' }
   if ([bool]$report.disk.build.complete -or -not [bool]$report.disk.build.bytes_is_lower_bound -or [string]$report.disk.build.limit -cne 'entry-budget' -or [string]$report.disk.build_budget_observation -cne 'over-budget-lower-bound') { throw '[mir-development-health-bounded-build]' }
@@ -117,7 +119,7 @@ try {
   $oldBranch = @($report.git.branches.rows | Where-Object name -ceq 'health-old')
   if ($oldBranch.Count -ne 1 -or -not [bool]$oldBranch[0].review_needed -or [string]$oldBranch[0].preservation -cne 'preserve-unique-commits') { throw '[mir-development-health-old-branch]' }
   if (@($report.checkpoint_reasons | Where-Object { $_ -match '^branches:review-' }).Count -ne 1) { throw '[mir-development-health-old-branch-checkpoint]' }
-  $futureWorktree = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -OldWorktreeDays 7 -NowUtc ([datetime]'2026-11-27T00:00:00Z') | ConvertFrom-Json -Depth 16)
+  $futureWorktree = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -OldWorktreeDays 7 -NowUtc $linkedCreatedUtc.AddDays(8) | ConvertFrom-Json -Depth 16)
   if (@($futureWorktree.git.worktrees.rows | Where-Object { -not $_.current -and $_.review_needed }).Count -ne 1 -or @($futureWorktree.checkpoint_reasons | Where-Object { $_ -match '^worktrees:review-' }).Count -ne 1) { throw '[mir-development-health-old-worktree-checkpoint]' }
   if (@($report.actions | Where-Object { $_.command -match 'Remove-Item|git clean|worktree remove|branch -D' }).Count -ne 0) { throw '[mir-development-health-unsafe-action]' }
   $auditAction = @($report.actions | Where-Object kind -ceq 'safe-storage-audit')
@@ -126,7 +128,7 @@ try {
   if ($cleanAction.Count -ne 1 -or [string]$cleanAction[0].command -cne '.\\tools\\commands\\workspace\\Remove-MIRStaleArtifacts.ps1 -RepoRoot . -AllWorktrees -OlderThanDays 7 -Apply' -or [bool]$cleanAction[0].automatic) { throw '[mir-development-health-explicit-cleanup]' }
   if ([IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt')) -cne $trackedBefore -or [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt')) -cne $linkedBefore) { throw '[mir-development-health-report-mutated-worktree]' }
 
-  $hookReport = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -MaxScanSeconds 60 -MaxEntriesPerRoot 100000 -MaxWorktrees 128 -MaxBranches 512 -NowUtc ([datetime]'2026-09-27T00:00:00Z') | ConvertFrom-Json -Depth 16)
+  $hookReport = (& $checker -RepoRoot $fixture -Mode Hook -AsJson -MaxScanSeconds 60 -MaxEntriesPerRoot 100000 -MaxWorktrees 128 -MaxBranches 512 -NowUtc $freshWorktreeNow | ConvertFrom-Json -Depth 16)
   if ($hookReport.scan_limits.max_scan_seconds -gt 4 -or $hookReport.scan_limits.max_entries_per_root -gt 512 -or $hookReport.scan_limits.max_worktrees -gt 8 -or $hookReport.scan_limits.max_branches -gt 64) { throw '[mir-development-health-hook-budget]' }
   if ($hookReport.hook_message.Length -gt 900 -or [string]$hookReport.side_effects -cne 'none-report-only') { throw '[mir-development-health-hook-message]' }
   if (@($hookReport.git.branches.rows | Where-Object { $null -ne $_.unique_commit_count }).Count -ne 0) { throw '[mir-development-health-hook-avoids-branch-graph-walk]' }
