@@ -506,7 +506,10 @@ class LifecycleTests(unittest.TestCase):
           assert(table.concat(trace, ",") == "split-finished,legacy-finished,caps-finished",
             "native split guard suppressed another force's cap callback")
           trace = {}
-          worker.default_owner_on_research_finished = function() note("split-finished");return true end
+          -- A changed, genuinely settled default holder fulfils its public
+          -- prerequisite. The worker boundary now reports that separately
+          -- from a durable deferred completion marker.
+          worker.default_owner_on_research_finished = function() note("split-finished");return true,true end
           local tail = technology("mir-worker-storage-default-4", 5)
           row.force.technologies[tail.name] = tail
           tail.force = row.force
@@ -514,6 +517,11 @@ class LifecycleTests(unittest.TestCase):
           handlers.events[defines.events.on_research_finished]({research=tail, by_script=false})
           assert(table.concat(trace, ",") == "split-finished,legacy-finished,mir-worker-storage-default-4,worker-robots-storage-4",
             "completion invoked an extra cap callback for a different technology")
+          trace = {}
+          worker.default_owner_on_research_finished = function() note("split-finished");return true,false end
+          handlers.events[defines.events.on_research_finished]({research=tail, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished,mir-worker-storage-default-4",
+            "deferred native completion published the public worker cap callback")
         ''')
 
     def test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration(self):
