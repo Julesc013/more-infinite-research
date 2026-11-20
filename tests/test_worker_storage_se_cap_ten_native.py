@@ -120,6 +120,7 @@ local function create_lab_and_power(force)'''
     if not source_reload_observed and cold_phase == "source-partial"
       and script.active_mods["more-infinite-research"] == SOURCE_MIR and state.phase == "source-partial" then
       source_reload_observed = true
+      observe_force_contributions("source-reload")
       frame_diagnostics(state.source_frame, frame(state), "source-reload")
     end
 '''
@@ -193,6 +194,9 @@ local function assert_candidate_transfer(state)'''
 
     def frame_diffs(self):
         return [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_FRAME_DIFF]")]
+
+    def force_contributions(self):
+        return [line for line in self.logs() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
 
     def data_stage(self, values=None, ingredients=None):
         """Execute the data-only marker through strict, actual-value proxies."""
@@ -396,6 +400,111 @@ local function assert_candidate_transfer(state)'''
             "summary path=frame origin=source-reload count=0 truncated=false",
             self.frame_diffs()[-1],
         )
+        self.assertIn(
+            "summary phase=source-reload forces=7 truncated=false unavailable=false",
+            self.force_contributions()[-1],
+        )
+
+    def test_force_contributor_snapshot_is_read_only_and_exposes_complete_conquest_vector(self):
+        before_phase = self.lua.globals().cargo_phase()
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        before_saves = list(self.lua.globals().cargo_saves().values())
+        before_queue = list(self.lua.globals().cargo_queue_names().values())
+        before_current = self.lua.globals().cargo_current_name()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-entry"))
+        rows = self.force_contributions()
+        conquest = next(row for row in rows if "kind=force" in row and 'force_name="conquest"' in row)
+        self.assertIn("force_index=4", conquest)
+        self.assertIn("worker_robots_storage_bonus=3", conquest)
+        self.assertIn("worker_robots_speed_modifier=5.6500000000000004", conquest)
+        self.assertIn("artillery_range_modifier=1.8", conquest)
+        self.assertIn("artillery_shell_gun_speed_modifier=6", conquest)
+        self.assertIn("laser_gun_speed_modifier=2.2000000000000002", conquest)
+        self.assertIn("laser_ammo_damage_modifier=5.0999999999999996", conquest)
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=present", source)
+        self.assertIn('effect_1_type="worker-robot-storage"', source)
+        self.assertIn("effect_1_modifier=1", source)
+        legacy = next(row for row in rows if "kind=technology" in row and 'technology="mir-worker-storage-published517-4"' in row)
+        self.assertIn("state=absent", legacy)
+        self.assertIn("summary phase=mir-config-entry forces=7 truncated=false unavailable=false", rows[-1])
+        self.assertEqual(before_phase, self.lua.globals().cargo_phase())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before_saves, list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before_queue, list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(before_current, self.lua.globals().cargo_current_name())
+
+    def test_force_contributor_snapshot_labels_absent_row_without_treating_it_as_unavailable(self):
+        self.lua.globals().cargo_remove_contributor_technology(world.SOURCE)
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        row = next(row for row in self.force_contributions()
+                   if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=absent", row)
+        self.assertNotIn("state=unavailable", row)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
+
+    def test_force_contributor_snapshot_refuses_unrecognized_phase_without_observation(self):
+        before_logs = list(self.logs())
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        with self.assertRaisesRegex(LuaError, "contribution observation phase differs"):
+            self.lua.globals().cargo_observe_force_contributions("ordinary-fixture-play")
+        self.assertEqual(before_logs, self.logs())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+
+    def test_force_contributor_snapshot_truncates_oversize_force_registry_without_arbitrary_rows(self):
+        self.lua.globals().cargo_add_contributor_forces(10)
+        before = len(self.logs())
+        self.assertFalse(self.lua.globals().cargo_observe_force_contributions("mir-config-exit"))
+        rows = self.logs()[before:]
+        self.assertEqual(["[MIR_SE_FORCE_CONTRIBUTIONS] summary phase=mir-config-exit forces=0 truncated=true unavailable=false"], rows)
+
+    def test_force_contributor_summary_marks_throwing_or_nonfinite_vector_observations_unavailable(self):
+        self.lua.globals().cargo_contributor_bad_vector()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-entry"))
+        player = next(row for row in self.force_contributions()
+                      if "kind=force" in row and 'force_name="player"' in row)
+        self.assertIn("worker_robots_storage_bonus=unavailable", player)
+        self.assertIn("artillery_shell_gun_speed_modifier=unavailable", player)
+        self.assertIn("summary phase=mir-config-entry forces=7 truncated=false unavailable=true", self.force_contributions()[-1])
+
+    def test_force_contributor_summary_marks_technology_and_effect_observation_unavailable(self):
+        self.lua.globals().cargo_contributor_effects_unavailable()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        source = next(row for row in self.force_contributions()
+                      if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=present", source)
+        self.assertIn("effects=unavailable", source)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=true", self.force_contributions()[-1])
+
+        lua = self.fresh_actor()
+        lua.globals().cargo_contributor_technology_unavailable()
+        self.assertTrue(lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        rows = [line for line in lua.globals().cargo_logs().values() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=unavailable", source)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=true", rows[-1])
+
+    def test_force_contributor_summary_marks_effect_and_name_bounds_truncated(self):
+        self.lua.globals().cargo_contributor_effects_overflow()
+        self.lua.globals().cargo_add_long_name_contributor()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-exit"))
+        rows = self.force_contributions()
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("effects=truncated", source)
+        long_force = next(row for row in rows if "kind=force" in row and "name_truncated=true" in row)
+        self.assertIn("force_index=8", long_force)
+        self.assertIn("summary phase=mir-config-exit forces=8 truncated=true unavailable=false", rows[-1])
+
+    def test_force_contributor_accepts_custom_force_table_but_reports_iteration_failure(self):
+        self.lua.globals().cargo_custom_force_registry()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("candidate-transfer"))
+        self.assertIn("summary phase=candidate-transfer forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
+
+        lua = self.fresh_actor()
+        lua.globals().cargo_throwing_force_registry()
+        self.assertFalse(lua.globals().cargo_observe_force_contributions("candidate-transfer"))
+        rows = [line for line in lua.globals().cargo_logs().values() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
+        self.assertEqual(["[MIR_SE_FORCE_CONTRIBUTIONS] summary phase=candidate-transfer forces=0 truncated=false unavailable=true"], rows)
 
     def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
         lua = self.unsupported_queue_flag_actor()

@@ -337,6 +337,167 @@ end
 -- neither traverses Factorio objects nor changes state, research, or queues.
 local FRAME_DIFF_MAX, FRAME_DIFF_DEPTH, FRAME_DIFF_VISITS, FRAME_DIFF_KEYS = 24, 6, 128, 64
 local source_reload_observed = false
+-- This is intentionally a finite, read-only contributor snapshot.  The
+-- packet-side temporary diagnostic calls it at selected callback boundaries;
+-- ordinary fixture play never calls it and it has no research authority.
+local CONTRIBUTION_PREFIX = "[MIR_SE_FORCE_CONTRIBUTIONS]"
+local CONTRIBUTION_FORCE_LIMIT, CONTRIBUTION_REGISTRY_KEY_LIMIT = 16, 64
+local CONTRIBUTION_EFFECT_LIMIT, CONTRIBUTION_NAME_LIMIT = 16, 160
+local CONTRIBUTION_PHASES = {
+  ["source-reload"] = true,
+  ["mir-config-entry"] = true,
+  ["mir-worker-applied"] = true,
+  ["mir-config-exit"] = true,
+  ["candidate-transfer"] = true
+}
+local CONTRIBUTION_TECHNOLOGIES = {
+  "worker-robots-storage-1", "worker-robots-storage-2", "worker-robots-storage-3", "worker-robots-storage-4",
+  "mir-worker-storage-default-4", "mir-worker-storage-head-4", "mir-worker-storage-published517-4"
+}
+local function contribution_finite(value)
+  return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
+end
+local function contribution_number(value)
+  return contribution_finite(value) and string.format("%.17g", value) or "unavailable"
+end
+local function contribution_boolean(value)
+  return type(value) == "boolean" and tostring(value) or "unavailable"
+end
+local function contribution_name(value)
+  if type(value) ~= "string" then return "<unavailable>", true end
+  if #value > CONTRIBUTION_NAME_LIMIT then return value:sub(1, CONTRIBUTION_NAME_LIMIT) .. "...", true end
+  return value, false
+end
+local function contribution_read(object, field)
+  local ok, value = pcall(function() return object[field] end)
+  if not ok then return nil, false end
+  return value, true
+end
+local function contribution_effects(row)
+  local prototype, available = contribution_read(row, "prototype")
+  if not available or prototype == nil then return "effects=unavailable", false, true end
+  local effects, effects_available = contribution_read(prototype, "effects")
+  if not effects_available or type(effects) ~= "table" then return "effects=unavailable", false, true end
+  local count_available, count = pcall(function() return #effects end)
+  if not count_available or type(count) ~= "number" or count < 0 or count % 1 ~= 0 then return "effects=unavailable", false, true end
+  if count > CONTRIBUTION_EFFECT_LIMIT then return "effects=truncated", true, false end
+  local fields = {"type", "modifier", "recipe", "change"}
+  local rows, truncated, unavailable = {"effects_count=" .. string.format("%.17g", count)}, false, false
+  for index = 1, count do
+    local effect, effect_available = contribution_read(effects, index)
+    if not effect_available or type(effect) ~= "table" then return "effects=unavailable", false, true end
+    for _, field in ipairs(fields) do
+      local value, value_available = contribution_read(effect, field)
+      local encoded
+      if not value_available then encoded = "unavailable"; unavailable = true
+      elseif value == nil then encoded = "missing"
+      elseif type(value) == "string" then
+        local name, value_truncated = contribution_name(value)
+        encoded = string.format("%q", name); truncated = truncated or value_truncated
+      elseif type(value) == "number" then
+        encoded = contribution_number(value); unavailable = unavailable or not contribution_finite(value)
+      elseif type(value) == "boolean" then encoded = tostring(value)
+      else encoded = "unavailable"; unavailable = true end
+      rows[#rows + 1] = "effect_" .. tostring(index) .. "_" .. field .. "=" .. encoded
+    end
+  end
+  return table.concat(rows, " "), truncated, unavailable
+end
+local function contribution_technology(force, phase, force_index, force_name)
+  local truncated, unavailable = false, false
+  for _, name in ipairs(CONTRIBUTION_TECHNOLOGIES) do
+    local technologies, technologies_available = contribution_read(force, "technologies")
+    local row, row_available = nil, technologies_available
+    if row_available then row, row_available = contribution_read(technologies, name) end
+    local prefix = CONTRIBUTION_PREFIX .. " phase=" .. phase .. " force_index=" .. contribution_number(force_index)
+      .. " force_name=" .. string.format("%q", force_name) .. " kind=technology technology=" .. string.format("%q", name)
+    if not row_available then
+      log(prefix .. " state=unavailable"); unavailable = true
+    elseif row == nil then
+      log(prefix .. " state=absent")
+    else
+      local valid, valid_available = contribution_read(row, "valid")
+      local level, level_available = contribution_read(row, "level")
+      local researched, researched_available = contribution_read(row, "researched")
+      local enabled, enabled_available = contribution_read(row, "enabled")
+      local visible, visible_available = contribution_read(row, "visible_when_disabled")
+      if not valid_available or valid ~= true or not level_available or not researched_available or not enabled_available or not visible_available then
+        log(prefix .. " state=unavailable"); unavailable = true
+      else
+        local effects, effects_truncated, effects_unavailable = contribution_effects(row)
+        log(prefix .. " state=present level=" .. contribution_number(level)
+          .. " researched=" .. contribution_boolean(researched) .. " enabled=" .. contribution_boolean(enabled)
+          .. " visible=" .. contribution_boolean(visible) .. " " .. effects)
+        unavailable = unavailable or not contribution_finite(level) or type(researched) ~= "boolean"
+          or type(enabled) ~= "boolean" or type(visible) ~= "boolean" or effects_unavailable
+        truncated = truncated or effects_truncated
+      end
+    end
+  end
+  return truncated, unavailable
+end
+local function contribution_force_rows()
+  local registry, registry_available = contribution_read(game, "forces")
+  if not registry_available or registry == nil then return nil, false, true end
+  local rows, seen, keys = {}, {}, 0
+  local iterated, complete, truncated, unavailable = pcall(function()
+    for _, force in pairs(registry) do
+      keys = keys + 1
+      if keys > CONTRIBUTION_REGISTRY_KEY_LIMIT then return false, true, false end
+      local index, index_available = contribution_read(force, "index")
+      if not index_available or not contribution_finite(index) then return false, false, true end
+      if not seen[index] then
+        seen[index] = true
+        local name, name_available = contribution_read(force, "name")
+        local valid, valid_available = contribution_read(force, "valid")
+        if not name_available or type(name) ~= "string" or not valid_available or valid ~= true then return false, false, true end
+        rows[#rows + 1] = {force = force, index = index, name = name}
+        if #rows > CONTRIBUTION_FORCE_LIMIT then return false, true, false end
+      end
+    end
+    return true, false, false
+  end)
+  if not iterated then return nil, false, true end
+  if not complete then return nil, truncated, unavailable end
+  table.sort(rows, function(left, right)
+    if left.index ~= right.index then return left.index < right.index end
+    return left.name < right.name
+  end)
+  return rows, false, false
+end
+local function observe_force_contributions(phase)
+  check(type(phase) == "string" and CONTRIBUTION_PHASES[phase] == true, "contribution observation phase differs")
+  local rows, truncated, unavailable = contribution_force_rows()
+  if rows then
+    for _, row in ipairs(rows) do
+      local force_name, name_truncated = contribution_name(row.name)
+      truncated = truncated or name_truncated
+      local values = {}
+      local fields = {
+        {"worker_robots_storage_bonus", function() return row.force.worker_robots_storage_bonus end},
+        {"worker_robots_speed_modifier", function() return row.force.worker_robots_speed_modifier end},
+        {"artillery_range_modifier", function() return row.force.artillery_range_modifier end},
+        {"artillery_shell_gun_speed_modifier", function() return row.force.get_gun_speed_modifier("artillery-shell") end},
+        {"laser_gun_speed_modifier", function() return row.force.get_gun_speed_modifier("laser") end},
+        {"laser_ammo_damage_modifier", function() return row.force.get_ammo_damage_modifier("laser") end}
+      }
+      for _, field in ipairs(fields) do
+        local ok, value = pcall(field[2])
+        values[#values + 1] = field[1] .. "=" .. (ok and contribution_number(value) or "unavailable")
+        unavailable = unavailable or not ok or not contribution_finite(value)
+      end
+      log(CONTRIBUTION_PREFIX .. " phase=" .. phase .. " force_index=" .. contribution_number(row.index)
+        .. " force_name=" .. string.format("%q", force_name) .. " kind=force name_truncated=" .. tostring(name_truncated)
+        .. " " .. table.concat(values, " "))
+      local technology_truncated, technology_unavailable = contribution_technology(row.force, phase, row.index, force_name)
+      truncated = truncated or technology_truncated
+      unavailable = unavailable or technology_unavailable
+    end
+  end
+  log(CONTRIBUTION_PREFIX .. " summary phase=" .. phase .. " forces=" .. tostring(rows and #rows or 0)
+    .. " truncated=" .. tostring(truncated) .. " unavailable=" .. tostring(unavailable))
+  return rows ~= nil
+end
 local function frame_key(key)
   if type(key) == "number" then return string.format("#%.17g", key) end
   if type(key) == "string" then return "$" .. key end
@@ -431,6 +592,7 @@ end
 local function assert_candidate_transfer(state)
   local expected = expected_candidate_frame(state.source_frame)
   local observed = frame(state)
+  observe_force_contributions("candidate-transfer")
   if not same(observed, expected) then frame_diagnostics(expected, observed, "candidate-transfer") end
   check(same(observed, expected), "candidate changed source frame before observation")
   local canonical, gate = technology(state.player, SOURCE), technology(state.player, HEAD)
@@ -509,6 +671,7 @@ local function configuration(event)
   if not source_reload_observed and script.active_mods["more-infinite-research"] == SOURCE_MIR
     and type(state) == "table" and state.phase == "source-partial" then
     source_reload_observed = true
+    observe_force_contributions("source-reload")
     frame_diagnostics(state.source_frame, frame(state), "source-reload")
   end
   local change = event.mod_changes["more-infinite-research"]
@@ -555,7 +718,7 @@ script.on_load(function()
   local state = storage[KEY]
   cold_phase = type(state) == "table" and state.phase or nil
 end)
-remote.add_interface(FIXTURE, {begin = begin_source})
+remote.add_interface(FIXTURE, {begin = begin_source, observe_force_contributions = observe_force_contributions})
 script.on_configuration_changed(function(event)
   if active() then configuration(event) end
 end)
@@ -617,6 +780,7 @@ script.on_event(defines.events.on_tick, function(event)
     if not source_reload_observed and cold_phase == "source-partial"
       and script.active_mods["more-infinite-research"] == SOURCE_MIR and state.phase == "source-partial" then
       source_reload_observed = true
+      observe_force_contributions("source-reload")
       frame_diagnostics(state.source_frame, frame(state), "source-reload")
     end
     if cold_phase == "closed" then

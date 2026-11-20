@@ -144,7 +144,7 @@ local function new_force(declaration)
   for _,name in ipairs({SOURCE,CANDIDATE,HEAD,TAIL}) do all[name],backing[name]=new_tech(name) end
   for name,parents in pairs(declaration) do for _,parent in ipairs(parents) do backing[name].prerequisites[parent]=all[parent] end end
   worker_contract(backing[SOURCE],all);worker_contract(backing[CANDIDATE],all);backing[SOURCE].level=4
-  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,_queue_enabled=true,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,worker_robots_storage_bonus=0}
+  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,_queue_enabled=true,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,worker_robots_storage_bonus=0,worker_robots_speed_modifier=0,artillery_range_modifier=0}
   local force
   values.add_research=function(row)
     if type(row)=="string" then row=all[row] end
@@ -156,7 +156,9 @@ local function new_force(declaration)
     end
     values._queue={row};values._current=row;values._progress=0;return true
   end
-  local readable={name=true,index=true,valid=true,technologies=true,laboratory_speed_modifier=true,laboratory_productivity_bonus=true,worker_robots_storage_bonus=true}
+  values.get_gun_speed_modifier=function(category)assert(category=="artillery-shell" or category=="laser");return 0 end
+  values.get_ammo_damage_modifier=function(category)assert(category=="laser");return 0 end
+  local readable={name=true,index=true,valid=true,technologies=true,laboratory_speed_modifier=true,laboratory_productivity_bonus=true,worker_robots_storage_bonus=true,worker_robots_speed_modifier=true,artillery_range_modifier=true,get_gun_speed_modifier=true,get_ammo_damage_modifier=true}
   force=setmetatable({}, {__index=function(_,key)
     if key=="research_queue" then return values._queue end
     if key=="current_research" then return values._current end
@@ -172,6 +174,15 @@ local function new_force(declaration)
   for _,row in pairs(all) do backing[row.name].force=force end
   return force,backing,values
 end
+local function observed_force(name,index,vector)
+  local values={name=name,index=index,valid=true,technologies={},worker_robots_storage_bonus=vector.worker_robots_storage_bonus or 0,worker_robots_speed_modifier=vector.worker_robots_speed_modifier or 0,artillery_range_modifier=vector.artillery_range_modifier or 0}
+  values.get_gun_speed_modifier=function(category)
+    assert(category=="artillery-shell" or category=="laser")
+    return category=="artillery-shell" and (vector.artillery_shell_gun_speed_modifier or 0) or (vector.laser_gun_speed_modifier or 0)
+  end
+  values.get_ammo_damage_modifier=function(category)assert(category=="laser");return vector.laser_ammo_damage_modifier or 0 end
+  return strict(values,{name=true,index=true,valid=true,technologies=true,worker_robots_storage_bonus=true,worker_robots_speed_modifier=true,artillery_range_modifier=true,get_gun_speed_modifier=true,get_ammo_damage_modifier=true},{worker_robots_storage_bonus=true},"LuaForce"),values
+end
 local function transfer(force,backing,values)
   local source,private,head=backing[SOURCE],backing[CANDIDATE],backing[HEAD]
   private.level=source.level;private.researched=source.researched;private.enabled=source.enabled;private.visible_when_disabled=source.visible_when_disabled;private.saved_progress=source.saved_progress
@@ -185,8 +196,12 @@ function cargo_world(declaration)
   CARGO_SCRIPTED_RESEARCH_CALLBACKS=0
   local player,backing,values=new_force(declaration)
   local lab,power,pole,input,counts,spend_science,set_partial_science;local flags={missing_power=false,missing_pole=false,disconnected_network=false,wrong_network=false,blocked_feed=false,bad_durability=false};local saves={};local entity_specs={}
-  local foreign_values={valid=true,index=2,worker_robots_storage_bonus=0}
-  local foreign=strict(foreign_values,{valid=true,index=true,worker_robots_storage_bonus=true},{worker_robots_storage_bonus=true},"LuaForce")
+  local foreign,foreign_values=observed_force("enemy",2,{})
+  local neutral=observed_force("neutral",3,{})
+  local conquest=observed_force("conquest",4,{worker_robots_storage_bonus=3,worker_robots_speed_modifier=5.65,artillery_range_modifier=1.8,artillery_shell_gun_speed_modifier=6,laser_gun_speed_modifier=2.2,laser_ammo_damage_modifier=5.1})
+  local ignore=observed_force("ignore",5,{})
+  local capture=observed_force("capture",6,{})
+  local friendly=observed_force("friendly",7,{})
   -- Independent native footprint: the seven-tile SE lab has half-tile centers;
   -- both two-tile electricity entities have integer centers. Integer tie
   -- placement below is a host representative, not r05's unlogged coordinate.
@@ -217,7 +232,7 @@ function cargo_world(declaration)
     input,counts,spend_science,set_partial_science=new_inventory();local values={valid=true,name=LAB,unit_number=91,force=player,position={x=x,y=y},electric_network_id=1,energy=0,electric_buffer_size=1000000,disabled_by_script=false,prototype=native_entity_prototype(LAB)};register_network(values,1);values.is_connected_to_electric_network=function()return values.electric_network_id~=nil and not flags.disconnected_network end;values.get_inventory=function(i)assert(i==1);return input end;lab=strict(values,{valid=true,name=true,unit_number=true,force=true,position=true,electric_network_id=true,energy=true,electric_buffer_size=true,disabled_by_script=true,prototype=true,is_connected_to_electric_network=true,get_inventory=true},{disabled_by_script=true},"LuaEntity");return lab end}
   local active=copy(CARGO_CLOSURE);active["more-infinite-research"]="4.7.20002";active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0"
   local startup={};for n,v in pairs(CARGO_SETTINGS) do startup[n]={valid=true,value=v,default_value=0} end
-  game={tick=0,difficulty_settings={technology_price_multiplier=1},forces={player=player,[1]=player,foreign=foreign,[2]=foreign},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
+  game={tick=0,difficulty_settings={technology_price_multiplier=1},forces={player=player,[1]=player,foreign=foreign,enemy=foreign,[2]=foreign,neutral=neutral,[3]=neutral,conquest=conquest,[4]=conquest,ignore=ignore,[5]=ignore,capture=capture,[6]=capture,friendly=friendly,[7]=friendly},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
   script={active_mods=active,on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,on_configuration_changed=function(fn)callbacks.configuration=fn end,on_event=function(id,fn)callbacks[id]=fn end}
   remote={add_interface=function(n,v)interfaces[n]=v end};settings={startup=startup};defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}
   local item_prototypes={};for _,name in ipairs(SCIENCE) do item_prototypes[name]={type="tool",get_durability=function(quality)assert(quality and quality.name=="normal");return 1 end} end
@@ -233,6 +248,7 @@ function cargo_world(declaration)
 end
 function cargo_load(path)local fn,msg=loadfile(path,"t",CARGO_ENV);assert(fn,msg);fn();assert(CARGO_CALLBACKS.init);CARGO_CALLBACKS.init()end
 function cargo_begin_only()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
+function cargo_observe_force_contributions(phase)return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].observe_force_contributions(phase)end
 function cargo_begin()cargo_begin_only();cargo_tick(1)end
 function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_PUBLISH_NETWORK();CARGO_CALLBACKS[1]({tick=game.tick})end end
 function cargo_partial(p)CARGO_FORCE_VALUES._progress=p;CARGO_PARTIAL(p) end
@@ -260,6 +276,29 @@ function cargo_lab_speed(v)CARGO_FLAGS.lab_speed=v end;function cargo_drop_queue
 function cargo_wrong_gate()CARGO_TECH_BACKING[HEAD].enabled=true end;function cargo_add_late_force()CARGO_FOREIGN_VALUES.worker_robots_storage_bonus=5 end
 function cargo_reenable_cap()CARGO_TECH_BACKING[CANDIDATE].enabled=true end
 function cargo_reenable_cap_and_queue()CARGO_TECH_BACKING[CANDIDATE].enabled=true;return CARGO_FORCE_VALUES.add_research(CARGO_TECHNOLOGIES[CANDIDATE]) end
+function cargo_remove_contributor_technology(name)CARGO_FORCE_VALUES.technologies[name]=nil end
+function cargo_add_contributor_forces(count)
+  for index=1,count do local force=observed_force("diagnostic-"..tostring(index),100+index,{});game.forces["diagnostic-"..tostring(index)]=force;game.forces[100+index]=force end
+end
+function cargo_contributor_bad_vector()
+  CARGO_FORCE_VALUES.worker_robots_storage_bonus=0/0
+  CARGO_FORCE_VALUES.get_gun_speed_modifier=function()error("diagnostic gun-speed getter differs")end
+end
+function cargo_contributor_effects_unavailable()CARGO_TECH_BACKING[SOURCE].prototype.effects=nil end
+function cargo_contributor_effects_overflow()
+  local effects={};for index=1,17 do effects[index]={type="worker-robot-storage",modifier=1} end;CARGO_TECH_BACKING[SOURCE].prototype.effects=effects
+end
+function cargo_contributor_technology_unavailable()
+  local original=CARGO_FORCE_VALUES.technologies
+  CARGO_FORCE_VALUES.technologies=setmetatable({}, {__index=function(_,name)if name==SOURCE then error("diagnostic technology lookup differs")end;return original[name] end})
+end
+function cargo_add_long_name_contributor()
+  local name=string.rep("x",161);local force=observed_force(name,8,{});game.forces[name]=force;game.forces[8]=force
+end
+function cargo_custom_force_registry()
+  local original=game.forces;game.forces=setmetatable({}, {__pairs=function()return next,original,nil end})
+end
+function cargo_throwing_force_registry()game.forces=setmetatable({}, {__pairs=function()error("diagnostic force registry iteration differs")end})end
 function cargo_queue_names()local o={};for i,row in ipairs(CARGO_FORCE_VALUES._queue) do o[i]=row.name end;return o end;function cargo_current_name()return CARGO_FORCE_VALUES._current and CARGO_FORCE_VALUES._current.name or false end;function cargo_entities()return CARGO_ENTITIES()end
 '''
 
