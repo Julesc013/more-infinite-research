@@ -124,24 +124,25 @@ local function new_force(declaration)
   for _,name in ipairs({SOURCE,CANDIDATE,HEAD,TAIL}) do all[name],backing[name]=new_tech(name) end
   for name,parents in pairs(declaration) do for _,parent in ipairs(parents) do backing[name].prerequisites[parent]=all[parent] end end
   worker_contract(backing[SOURCE],all);worker_contract(backing[CANDIDATE],all);backing[SOURCE].level=4
-  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,research_queue_enabled=true,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,worker_robots_storage_bonus=0}
+  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,_queue_enabled=true,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,worker_robots_storage_bonus=0}
   local force
   values.add_research=function(row)
     if type(row)=="string" then row=all[row] end
     if row~=all[SOURCE] and row~=all[CANDIDATE] then return false end
     if backing[row.name].enabled~=true then return false end
     if values._current~=nil then
-      if values.research_queue_enabled~=true then return false end
+      if values._queue_enabled~=true then return false end
       values._queue[#values._queue+1]=row;return true
     end
     values._queue={row};values._current=row;values._progress=0;return true
   end
+  local readable={name=true,index=true,valid=true,technologies=true,laboratory_speed_modifier=true,laboratory_productivity_bonus=true,worker_robots_storage_bonus=true}
   force=setmetatable({}, {__index=function(_,key)
     if key=="research_queue" then return values._queue end
     if key=="current_research" then return values._current end
     if key=="research_progress" then return values._progress end
     if key=="add_research" then return values.add_research end
-    if values[key]~=nil then return values[key] end
+    if readable[key] then return values[key] end
     error("LuaForce unsupported read "..tostring(key)) end,
     __newindex=function(_,key,value)
       if key=="research_queue" then local q={};for i,row in ipairs(value or {}) do q[i]=row end;values._queue=q;values._current=q[1];values._progress=0;return end

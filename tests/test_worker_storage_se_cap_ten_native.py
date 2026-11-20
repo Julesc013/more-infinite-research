@@ -51,6 +51,21 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             lua.globals().cargo_load(path.as_posix())
         return lua
 
+    def unsupported_queue_flag_actor(self):
+        """Load an in-memory actor mutant that reads a removed LuaForce member."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = "local player = game.forces.player\n  check(player and player.valid ~= false, \"player force differs\")"
+        new = "local player = game.forces.player\n  local removed_queue_flag = player.research_queue_enabled\n  check(player and player.valid ~= false, \"player force differs\")"
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "removed-queue-flag-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
     def source_to_partial(self):
         self.lua.globals().cargo_begin()
         for _ in range(5):
@@ -130,6 +145,11 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.lua.globals().cargo_begin()
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
+
+    def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
+        lua = self.unsupported_queue_flag_actor()
+        with self.assertRaisesRegex(LuaError, "LuaForce unsupported read research_queue_enabled"):
+            lua.globals().cargo_begin()
 
     def test_source_records_five_native_ordinary_completions_then_real_partial(self):
         self.source_to_partial()
