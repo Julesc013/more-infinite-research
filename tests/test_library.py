@@ -201,6 +201,105 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress==progress)
         ''')
 
+    def test_queue_observation_failures_are_unavailable_and_recover_without_native_writes(self):
+        for failure in ("read", "iteration", "entry", "invalid-name", "missing", "invalid-force"):
+            with self.subTest(failure=failure):
+                self.lua.globals().queue_failure = failure
+                self.lua.execute(r'''
+                  boot()
+                  local force = player.force
+                  local native_queue, current, progress = force.research_queue, force.current_research, force.research_progress
+                  local level, enabled = gear.level, gear.enabled
+                  if queue_failure == "read" then
+                    force.research_queue = nil
+                    setmetatable(force, {__index=function(_, key)
+                      if key == "research_queue" then error("queue observation unavailable") end
+                    end})
+                  elseif queue_failure == "iteration" then
+                    force.research_queue = setmetatable({}, {__ipairs=function()
+                      local index = 0
+                      return function()
+                        index = index + 1
+                        if index == 1 then return index, gear end
+                        error("queue iteration interrupted")
+                      end
+                    end})
+                  elseif queue_failure == "entry" then
+                    force.research_queue = {gear, setmetatable({}, {__index=function()
+                      error("queued technology observation unavailable")
+                    end})}
+                  elseif queue_failure == "invalid-name" then
+                    force.research_queue = {gear, {name=""}}
+                  elseif queue_failure == "missing" then
+                    force.research_queue = nil
+                  else
+                    force.valid = false
+                  end
+                  local observed_queue = rawget(force, "research_queue")
+                  local root = library.open(player, {tab="queue"})
+                  local page = root.mir_library_tabs.mir_library_queue_content
+                  local list = page.mir_library_queue_list
+                  assert(page.mir_library_queue_empty.visible == false,
+                    "a failed queue observation claimed the queue was empty")
+                  local unavailable = assert(page.mir_library_queue_unavailable,
+                    "a failed queue observation needs an unavailable message")
+                  assert(unavailable.visible and unavailable.caption[1] == "mir-browser.detail-unavailable"
+                    and unavailable.caption[2][1] == "mir-browser.queue")
+                  assert(list.visible == false and #list.items == 0,
+                    "an incomplete queue must not expose a partial projection")
+                  assert(rawget(force, "research_queue") == observed_queue
+                    and force.current_research == current and force.research_progress == progress
+                    and gear.level == level and gear.enabled == enabled,
+                    "an unavailable queue view changed native research")
+                  -- A later successful observation must restore the same retained controls.
+                  setmetatable(force, nil)
+                  force.valid, force.research_queue = true, native_queue
+                  assert(library.open(player, {tab="queue"}) == root)
+                  assert(page.mir_library_queue_list == list and list.visible and #list.items == 1
+                    and not unavailable.visible and not page.mir_library_queue_empty.visible)
+                  local empty = {}
+                  force.research_queue = empty
+                  library.open(player, {tab="queue"})
+                  assert(not unavailable.visible and page.mir_library_queue_empty.visible
+                    and not list.visible and #list.items == 0)
+                  assert(force.research_queue == empty and force.current_research == current
+                    and force.research_progress == progress and gear.level == level and gear.enabled == enabled)
+                ''')
+
+    def test_queue_selection_refuses_an_unavailable_entry_without_changing_personal_view(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {tab="queue"})
+          local list = root.mir_library_tabs.mir_library_queue_content.mir_library_queue_list
+          local view = storage.mir_library.players[player.index]
+          local selected, current, progress = view.selected, player.force.current_research, player.force.research_progress
+          local queue = {gear, setmetatable({}, {__index=function()
+            error("queued technology no longer readable")
+          end})}
+          player.force.research_queue = queue
+          list.selected_index = 1
+          local ok, reason = pcall(library.on_gui_selection_state_changed,
+            {player_index=player.index, element=list})
+          assert(ok, "unavailable queue selection escaped its UI boundary: " .. tostring(reason))
+          assert(view.tab == "queue" and view.selected == selected,
+            "a partial queue observation navigated to a different research view")
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress and gear.level == 3 and gear.enabled == false)
+        ''')
+
+    def test_queue_unavailable_message_is_added_to_a_retained_older_view(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {tab="queue"})
+          local page = root.mir_library_tabs.mir_library_queue_content
+          local list = page.mir_library_queue_list
+          if page.mir_library_queue_unavailable then page.mir_library_queue_unavailable.destroy() end
+          library.open(player, {tab="queue"})
+          assert(player.gui.screen.mir_research_browser == root and page.mir_library_queue_list == list,
+            "adding queue observation status rebuilt the retained view")
+          assert(page.mir_library_queue_unavailable and not page.mir_library_queue_unavailable.visible)
+        ''')
+
     def test_debug_restores_original_sections_and_two_panes_without_an_export_on_open(self):
         self.lua.execute('''
           helpers={write_file=function() error("opening Debug exported a file") end}
