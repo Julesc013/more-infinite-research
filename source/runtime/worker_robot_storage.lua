@@ -1081,11 +1081,18 @@ end
 -- configured pair; the latter cannot replace a recorded paid-work contract.
 -- Read every force before changing storage or a native frame so a later force
 -- with zero visible reward still keeps its earned/current/queued work safe.
+local function default_owner_frame_has_invested_work(frame, id)
+  return frame.next_level > 4
+    or frame.saved_progress > 0
+    or frame.current == id
+    or frame.occurrences > 0
+end
+
 local function automatic_owner_contract_has_invested_work()
   local id = recovery.ordinary_default_id
   for _, force in ipairs(forces()) do
     local frame = snapshot(force, id)
-    if frame.next_level > 4 or frame.saved_progress > 0 or frame.current == id or frame.occurrences > 0 then
+    if default_owner_frame_has_invested_work(frame, id) then
       return true
     end
   end

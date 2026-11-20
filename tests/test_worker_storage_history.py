@@ -2,6 +2,7 @@
 import argparse
 import ast
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -1190,16 +1191,22 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
               assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5 and not player.technologies[HEAD].researched)
             ''')
 
-    def test_automatic_owner_contract_drift_refuses_invested_later_zero_reward_work(self):
+    def test_exact_411_raw_runtime_characterizes_false_setting_drift(self):
         source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
         guard='''    elseif event.mod_startup_settings_changed == false and automatic_owner_contract_has_invested_work() then
       recover_error("default native-owner automatic contract change has invested work; keep the protected original COPY")
 '''
         self.assertEqual(source.count(guard),1)
+        revision="411b74c364bee277b7f8bedc80679aa602935682"
+        path="source/runtime/worker_robot_storage.lua"
+        blob=subprocess.run(["git","rev-parse",f"{revision}:{path}"],cwd=ROOT,check=True,capture_output=True,text=True).stdout.strip()
+        self.assertEqual(blob,"d564a866651adaa938f6df059d89392241b0bd9d")
+        legacy=subprocess.run(["git","show",f"{revision}:{path}"],cwd=ROOT,check=True,capture_output=True,text=True).stdout
+        self.assertNotIn("automatic_owner_contract_has_invested_work",legacy)
         for target in ("f200","f210"):
             for drift in ("science","prerequisite","time"):
                 with self.subTest(target=target,drift=drift):
-                    lua=self.world(target);lua.globals().drift=drift;lua.globals().legacy=source.replace(guard,"")
+                    lua=self.world(target);lua.globals().drift=drift;lua.globals().legacy=legacy
                     lua.execute(r'''
                       set_reward(0);init_default()
                       local later=make_force("later",5);install_force(later);game.forces.later=later
@@ -1223,13 +1230,73 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                       local ok,message=pcall(history.default_owner_preflight,event,nil,true)
                       assert(not ok and tostring(message):find("automatic contract change has invested work",1,true))
                       assert(writes==0 and same(before,all_frames())and same(state,storage[OWNER_KEY]))
-                      -- Deleting only the new guard restores the exact 411
-                      -- behavior: it accepts the false-setting drift and
-                      -- replaces recorded provenance without native writes.
+                      -- The exact raw 411 runtime accepts the false-setting
+                      -- drift and replaces recorded provenance without native
+                      -- writes in this same established world.
                       history=assert(load(legacy))()
                       local plan=history.default_owner_preflight(event,nil,true)
                       assert(plan.already_owned and history.default_owner_apply(plan))
                       assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY].contract~=state.contract)
+                    ''')
+
+    def test_automatic_owner_contract_drift_refuses_each_investment_signal(self):
+        for target in ("f200","f210"):
+            for signal in ("earned","completed","partial","current","queued"):
+                with self.subTest(target=target,signal=signal):
+                    lua=self.world(target);lua.globals().signal=signal
+                    lua.execute(r'''
+                      set_reward(0);init_default()
+                      local later=make_force("later",5);install_force(later);game.forces.later=later
+                      history.on_force_created{force=later};assert(history.default_owner_on_force_created{force=later})
+                      if signal=="earned"then
+                        finish_frame(later,"advanced",{},false)
+                        assert(history.default_owner_on_research_finished(finish_event(later)))
+                        assert(later.technologies[ORDINARY].level==5 and later.worker_robots_storage_bonus==20)
+                      elseif signal=="completed"then
+                        later.technologies[ORDINARY].researched=true
+                        assert(later.technologies[ORDINARY].level==4 and later.technologies[ORDINARY].researched)
+                      elseif signal=="partial"then
+                        later.technologies[ORDINARY].saved_progress=.42
+                      elseif signal=="current"then
+                        later.research_queue={ORDINARY};later.research_progress=.42
+                      else
+                        later.research_queue={OTHER,ORDINARY};later.research_progress=.42
+                      end
+                      for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_energy=3600 end
+                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                      local before,state=all_frames(),copy(storage[OWNER_KEY]);writes=0;queue_writes={};progress_writes={}
+                      local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                      assert(not ok and tostring(message):find("automatic contract change has invested work",1,true))
+                      assert(writes==0 and same(before,all_frames())and same(state,storage[OWNER_KEY]))
+                    ''')
+
+    def test_automatic_owner_contract_investment_disjuncts_are_independent(self):
+        source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
+        marker="\nlocal function automatic_owner_contract_has_invested_work()"
+        self.assertEqual(source.count(marker),1)
+        exposed=source.replace(marker,"\nM._test_default_owner_frame_has_invested_work=default_owner_frame_has_invested_work"+marker)
+        disjuncts={
+            "earned":("  return frame.next_level > 4\n","  return false\n"),
+            "partial":("    or frame.saved_progress > 0\n","    or false\n"),
+            "current":("    or frame.current == id\n","    or false\n"),
+            "queued":("    or frame.occurrences > 0\n","    or false\n"),
+        }
+        for target in ("f200","f210"):
+            for signal,(disjunct,replacement) in disjuncts.items():
+                with self.subTest(target=target,signal=signal):
+                    self.assertEqual(exposed.count(disjunct),1)
+                    lua=self.world(target);lua.globals().signal=signal;lua.globals().probe_source=exposed
+                    lua.globals().broken_source=exposed.replace(disjunct,replacement,1)
+                    lua.execute(r'''
+                      local frame={next_level=4,saved_progress=0,current="other",occurrences=0}
+                      if signal=="earned"then frame.next_level=5
+                      elseif signal=="partial"then frame.saved_progress=.42
+                      elseif signal=="current"then frame.current=ORDINARY
+                      else frame.occurrences=1 end
+                      local current=assert(load(probe_source))()
+                      local deleted=assert(load(broken_source))()
+                      assert(current._test_default_owner_frame_has_invested_work(frame,ORDINARY))
+                      assert(not deleted._test_default_owner_frame_has_invested_work(frame,ORDINARY))
                     ''')
 
     def test_automatic_owner_contract_drift_updates_only_uninvested_existing_owners(self):
