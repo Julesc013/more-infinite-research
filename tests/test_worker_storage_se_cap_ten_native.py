@@ -786,6 +786,10 @@ local function assert_candidate_transfer(state)'''
         for setup, expected in (
             ("cargo_missing_science_input", "native SE lab input differs"),
             ("cargo_invalid_science_input", "native SE lab input differs"),
+            ("cargo_missing_science_input_valid", "native SE lab input differs"),
+            ("cargo_nonboolean_science_input_valid", "native SE lab input differs"),
+            ("cargo_missing_science_stack_flag", "native science read flag differs: automation-science-pack"),
+            ("cargo_nonboolean_science_stack_flag", "native science read flag differs: automation-science-pack"),
             ("cargo_missing_science_prototype", "native science prototype differs: automation-science-pack"),
             ("cargo_science_stack_read_error", "LuaInventory science stack read unavailable"),
             ("cargo_malformed_science_stack", "native science count differs: automation-science-pack"),

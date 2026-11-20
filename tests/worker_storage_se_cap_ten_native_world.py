@@ -135,11 +135,18 @@ local function new_inventory()
       raw.valid_for_read=true;raw.count=0;raw.durability=1;counts[name]=0
     end
   end
+  CARGO_SCIENCE_READ_FLAG=function(value)
+    for _,raw in pairs(by_name) do raw.valid_for_read=value end
+  end
   local values={get_item_count=function(name)return counts[name] or 0 end,insert=function(spec)
     assert(type(spec)=="table" and type(spec.name)=="string" and type(spec.count)=="number")
     if CARGO_FLAGS.blocked_feed then return 0 end;add(spec.name,spec.count);return spec.count end}
   local inventory=setmetatable({}, {__index=function(_,key)
-    if key=="valid" then return not CARGO_FLAGS.invalid_science_input end
+    if key=="valid" then
+      if CARGO_FLAGS.missing_science_input_valid then return nil end
+      if CARGO_FLAGS.nonboolean_science_input_valid then return "unavailable" end
+      return not CARGO_FLAGS.invalid_science_input
+    end
     if type(key)=="number" then
       if CARGO_FLAGS.science_stack_read_error then error("LuaInventory science stack read unavailable") end
       return slots[key]
@@ -291,6 +298,10 @@ function cargo_science(names)
   end
 end
 function cargo_lab_speed(v)CARGO_FLAGS.lab_speed=v end;function cargo_drop_queue()CARGO_FORCE_VALUES._queue={};CARGO_FORCE_VALUES._current=nil end;function cargo_mutate_closed()CARGO_FORCE_VALUES.worker_robots_storage_bonus=999 end;function cargo_mutate_bonus(v)CARGO_FORCE_VALUES.worker_robots_storage_bonus=v end;function cargo_bad_science_durability()CARGO_FLAGS.bad_durability=true end;function cargo_exhaust_science()CARGO_EXHAUST_SCIENCE()end;function cargo_malformed_science_stack()CARGO_MALFORM_SCIENCE()end;function cargo_missing_science_input()CARGO_FLAGS.missing_science_input=true end;function cargo_invalid_science_input()CARGO_FLAGS.invalid_science_input=true end;function cargo_science_stack_read_error()CARGO_FLAGS.science_stack_read_error=true end;function cargo_missing_science_prototype()CARGO_ENV.prototypes.item[SCIENCE[1]]=nil end
+function cargo_missing_science_input_valid()CARGO_FLAGS.missing_science_input_valid=true end
+function cargo_nonboolean_science_input_valid()CARGO_FLAGS.nonboolean_science_input_valid=true end
+function cargo_missing_science_stack_flag()CARGO_SCIENCE_READ_FLAG(nil)end
+function cargo_nonboolean_science_stack_flag()CARGO_SCIENCE_READ_FLAG("unavailable")end
 function cargo_wrong_gate()CARGO_TECH_BACKING[HEAD].enabled=true end;function cargo_add_late_force()CARGO_FOREIGN_VALUES.worker_robots_storage_bonus=5 end
 function cargo_reenable_cap()CARGO_TECH_BACKING[CANDIDATE].enabled=true end
 function cargo_reenable_cap_and_queue()CARGO_TECH_BACKING[CANDIDATE].enabled=true;return CARGO_FORCE_VALUES.add_research(CARGO_TECHNOLOGIES[CANDIDATE]) end

@@ -110,7 +110,9 @@ local function science_units(input, item, label)
   local total = 0
   for index = 1, #input do
     local stack = input[index]
-    if stack.valid_for_read and stack.name == item then
+    local readable = stack.valid_for_read
+    check(type(readable) == "boolean", label .. " native science read flag differs: " .. item)
+    if readable and stack.name == item then
       local quality = stack.quality
       check(quality and quality.name == "normal", label .. " native science quality differs: " .. item)
       check(stack.type == "tool" and stack.is_tool == true, label .. " native science stack type differs: " .. item)
@@ -301,7 +303,7 @@ assert_lab = function(lab, power, pole, force)
     and lab.is_connected_to_electric_network()
     and power.is_connected_to_electric_network(), "fixture electric network differs")
   local input = lab.get_inventory(defines.inventory.lab_input)
-  check(input ~= nil and input.valid ~= false, "native SE lab input differs")
+  check(input ~= nil and input.valid == true, "native SE lab input differs")
   return input
 end
 local function feed(state)
