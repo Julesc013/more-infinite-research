@@ -121,11 +121,12 @@ try{
   $script:storageTestMount.device='8:2';$script:storageTestMount.filesystem_type='ext4'
   Refuses-Storage {Resolve-MIR441ProcessOutputPath -Policy $policy -Path $log} '[mir-linux-storage-mount-changed]'
 
-  # Six named library controls only; archives are inputs, never output copies.
+  # Eight named library controls only; archives are inputs, never output copies.
   [IO.File]::WriteAllBytes((Join-Path $libraryRoot 'dependency.zip'),[byte[]]::new(4096))
   [IO.File]::WriteAllBytes((Join-Path $libraryRoot 'mod-list.json'),[byte[]]::new(11))
+  [IO.File]::WriteAllBytes((Join-Path $libraryRoot 'mod-settings.json.mir-new'),[byte[]]::new(7))
   [IO.File]::WriteAllBytes((Join-Path $libraryRoot '.mir-active-profile.json.mir-new'),[byte[]]::new(19))
-  Assert-Storage ((Get-MIRLinuxLibraryControlBytes -Path $libraryRoot) -eq 30) 'library-control-only-accounting'
+  Assert-Storage ((Get-MIRLinuxLibraryControlBytes -Path $libraryRoot) -eq 37) 'library-control-only-accounting'
 
   $script:storageTestObservation=[pscustomobject]@{roots=@(
     [pscustomobject]@{role='control';used_new_bytes=10L;peak_new_bytes=100L},

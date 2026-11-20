@@ -23,7 +23,7 @@ function Get-MIRLinuxLibraryControlBytes {
   param([Parameter(Mandatory)][string]$Path)
   [int64]$bytes=0
   # Do not enumerate or charge the dependency archive collection.
-  foreach($name in @('mod-list.json','mod-settings.dat','.mir-active-profile.json')){
+  foreach($name in @('mod-list.json','mod-settings.dat','mod-settings.json','.mir-active-profile.json')){
     foreach($suffix in @('','.mir-new')){
       $file=Join-Path $Path ($name+$suffix)
       if(Test-Path -LiteralPath $file){
@@ -44,11 +44,14 @@ function Read-MIRLinuxWriteStorage {
   )
   if(-not $IsLinux){throw '[mir-linux-storage-linux-required]'}
   $item=Get-Item -LiteralPath $Path -Force -ErrorAction Stop
-  if($item -isnot [IO.FileInfo] -or $item.Length -gt 16KB -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
-      $Sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash -cne $Sha256.ToUpperInvariant()){
+  if($item -isnot [IO.FileInfo] -or $item.Length -gt 16KB -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)){
     throw '[mir-linux-storage-plan-identity]'
   }
-  $plan=Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -ErrorAction Stop
+  $bytes=[IO.File]::ReadAllBytes($item.FullName)
+  if($bytes.Length -gt 16KB -or $Sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) -cne $Sha256.ToUpperInvariant()){
+    throw '[mir-linux-storage-plan-identity]'
+  }
+  $plan=[Text.UTF8Encoding]::new($false,$true).GetString($bytes).TrimStart([char]0xFEFF) | ConvertFrom-Json -ErrorAction Stop
   if($plan.schema -ne 1 -or $plan.execution_account -isnot [string] -or $plan.execution_account -cne [Environment]::UserName){throw '[mir-linux-storage-execution-account]'}
   if(@($plan.roots).Count -ne 3){throw '[mir-linux-storage-roles]'}
   $roots=[Collections.Generic.List[object]]::new();[int64]$total=0
