@@ -264,10 +264,8 @@ assert_lab = function(lab, power, pole, force)
     "fixture electric network differs")
   check(type(lab.is_connected_to_electric_network) == "function"
     and type(power.is_connected_to_electric_network) == "function"
-    and type(pole.is_connected_to_electric_network) == "function"
     and lab.is_connected_to_electric_network()
-    and power.is_connected_to_electric_network()
-    and pole.is_connected_to_electric_network(), "fixture electric network differs")
+    and power.is_connected_to_electric_network(), "fixture electric network differs")
   local input = lab.get_inventory(defines.inventory.lab_input)
   check(input ~= nil, "native SE lab input differs")
   return input

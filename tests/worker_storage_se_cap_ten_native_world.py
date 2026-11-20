@@ -170,7 +170,7 @@ function cargo_world(declaration)
   local positions={[POWER]={0,0},[LAB]={8,0},[POLE]={0,6}}
   local function network_entity(name,x,y,network)
     local values={valid=true,name=name,force=player,position={x=x,y=y},electric_network_id=network}
-    values.is_connected_to_electric_network=function()return not flags.disconnected_network end
+    values.is_connected_to_electric_network=function()return name ~= POLE and not flags.disconnected_network end
     return strict(values,{valid=true,name=true,force=true,position=true,electric_network_id=true,is_connected_to_electric_network=true},{},"LuaEntity")
   end
   local surface={valid=true,create_entity=function(spec)

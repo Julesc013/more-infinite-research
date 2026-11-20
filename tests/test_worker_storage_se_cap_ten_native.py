@@ -90,6 +90,29 @@ local function create_lab_and_power(force)'''
             lua.globals().cargo_load(path.as_posix())
         return lua
 
+    def all_three_connection_predicate_actor(self):
+        """Load the rejected all-entity predicate against a real distributor row."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network(), "fixture electric network differs")'''
+        new = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and type(pole.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network()
+    and pole.is_connected_to_electric_network(), "fixture electric network differs")'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "all-three-connection-predicate-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
     def unconditional_cold_pending_actor(self):
         """Load the AFA actor behavior that treated every saved phase as cold."""
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -516,6 +539,13 @@ local function create_lab_and_power(force)'''
             lua.globals().cargo_begin()
         self.assertEqual("source-working", lua.globals().cargo_phase())
 
+    def test_substation_network_identity_does_not_require_a_producer_consumer_predicate(self):
+        self.lua.globals().cargo_begin()
+        lua = self.all_three_connection_predicate_actor()
+        with self.assertRaisesRegex(LuaError, "fixture electric network differs"):
+            lua.globals().cargo_begin()
+        self.assertEqual("idle", lua.globals().cargo_phase())
+
     def test_missing_science_feed_refuses_without_completion(self):
         self.lua.globals().cargo_block_feed()
         with self.assertRaisesRegex(LuaError, "native science feed differs"):
@@ -587,6 +617,7 @@ local function create_lab_and_power(force)'''
         self.assertIn("electric_network_id", control)
         self.assertIn("is_connected_to_electric_network", control)
         self.assertNotRegex(control, r"state\.lab\.energy\s*=(?!=)")
+        self.assertNotIn("and pole.is_connected_to_electric_network()", control)
         self.assertNotIn("table.deepcopy(data.raw.lab", data)
         self.assertNotIn("researching_speed =", data)
 
