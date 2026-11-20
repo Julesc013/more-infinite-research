@@ -192,3 +192,4 @@ tools/lib/validation/ImmutableInputStaging.ps1 text eol=lf
 tools/lib/compatibility/LibraryActivation.ps1 text eol=lf
 tools/lib/validation/NativeProbeResources.ps1 text eol=lf
 tools/lib/validation/ResourceGovernor.ps1 text eol=lf
+tools/lib/validation/LinuxWriteStorage.ps1 text eol=lf
