@@ -196,8 +196,10 @@ function cargo_candidate(mir,mutate,startup_changed)
   script.active_mods["more-infinite-research"]=mir or "5.0.20018";CARGO_TRANSFER();if mutate then mutate(CARGO_TECHNOLOGIES[CANDIDATE],CARGO_TECHNOLOGIES[SOURCE],CARGO_TECHNOLOGIES[HEAD],CARGO_FORCE_VALUES) end
   local changed=false;if startup_changed~=nil then changed=startup_changed end
   CARGO_CALLBACKS.configuration({mod_startup_settings_changed=changed,mod_changes={["more-infinite-research"]={old_version="4.7.20002",new_version=script.active_mods["more-infinite-research"]}}}) end
+function cargo_on_load()CARGO_CALLBACKS.load()end
 function cargo_cold()CARGO_CALLBACKS.load();game.tick=game.tick+1;CARGO_CALLBACKS[1]()end
 function cargo_logs()return CARGO_LOGS end;function cargo_counts()return CARGO_LAB_COUNTS()end;function cargo_saves()return CARGO_SAVES end;function cargo_phase()return storage["mir5_worker_storage_se_cap_ten_native"].phase end
+function cargo_set_phase(phase)storage["mir5_worker_storage_se_cap_ten_native"].phase=phase end
 function cargo_unsupported_force_write()game.forces.player.unapproved=true end;function cargo_missing_power()CARGO_FLAGS.missing_power=true end;function cargo_block_feed()CARGO_FLAGS.blocked_feed=true end;function cargo_setting(n,v)settings.startup[n].value=v end
 function cargo_science(names)
   for _,worker in ipairs({SOURCE,CANDIDATE}) do

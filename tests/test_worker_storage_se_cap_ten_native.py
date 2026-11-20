@@ -66,6 +66,31 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             lua.globals().cargo_load(path.as_posix())
         return lua
 
+    def unconditional_cold_pending_actor(self):
+        """Load the AFA actor behavior that treated every saved phase as cold."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        fixed = '''  if cold_pending then
+    if state.phase == "closed" then
+      check(same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    end
+    check(state.phase == "idle" or state.phase == "candidate-working", "cold load phase differs")
+    cold_pending = false
+  end'''
+        original = '''  if cold_pending then
+    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+  end'''
+        self.assertIn(fixed, source)
+        source = source.replace(fixed, original, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unconditional-cold-pending-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
     def source_to_partial(self):
         self.lua.globals().cargo_begin()
         for _ in range(5):
@@ -145,6 +170,46 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.lua.globals().cargo_begin()
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
+
+    def test_documented_on_load_before_source_begin_keeps_idle_admissible(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.logs())
+        self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+    def test_documented_on_load_configuration_then_candidate_tick_remains_working(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_begin()
+        for _ in range(5):
+            old.globals().cargo_complete(False)
+            old.globals().cargo_tick(1)
+        old.globals().cargo_partial(0.42)
+        old.globals().cargo_tick(1)
+        old.globals().cargo_on_load()
+        old.globals().cargo_candidate("5.0.20018", None, True)
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        self.source_to_partial()
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_candidate("5.0.20018", None, True)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertIn("phase=candidate-pre-work", self.logs()[-1])
+        self.assertNotIn("phase=cold-read", self.logs()[-1])
+
+    def test_on_load_refuses_unrecognized_persisted_phase(self):
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_set_phase("unknown-persisted-phase")
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
 
     def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
         lua = self.unsupported_queue_flag_actor()

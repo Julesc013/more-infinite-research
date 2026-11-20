@@ -433,8 +433,12 @@ script.on_event(defines.events.on_tick, function()
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
   if cold_pending then
-    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
-    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    if state.phase == "closed" then
+      check(same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    end
+    check(state.phase == "idle" or state.phase == "candidate-working", "cold load phase differs")
+    cold_pending = false
   end
   if state.phase == "source-working" or state.phase == "candidate-working" then feed(state)
   elseif state.phase == "source-await-queue" then stage_source_partial_queue(state)
