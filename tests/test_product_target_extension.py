@@ -217,6 +217,83 @@ class ProductTargetExtensionTests(unittest.TestCase):
           end
         ''')
 
+    def test_non_k2_se_final_drill_effects_include_collected_area_core_and_alias_outputs(self):
+        # Native F394/2397 captures on 2.0.77+SE0.7.57 agree on four final
+        # effects. The bare catalogue has only two; final emission also runs
+        # this collector. COMP-02 retains other admitted producers of a drill.
+        self.lua.execute(r'''
+          local target = require("platform.target")
+          local catalogue = require("compatibility.modern_catalogue")
+          local modern = require("research.modern")
+          for _, edition in ipairs({{"f200","2.0","2.0.77"},{"f210","2.1","2.1.23"}}) do
+            target.id, target.factorio_version, target.minimum_base = edition[1],edition[2],edition[3]
+            mods = {base=edition[3], ["space-exploration"]="0.7.57"}
+            package.loaded["research.settings"] = nil
+            local resolved = require("research.settings").resolve({})
+            local selected = catalogue.select(mods)
+            local definition
+            for _, row in ipairs(selected.definitions) do
+              if row.key == "research_mining_drill" then definition = row end
+            end
+            assert(definition, "selected SE mining family is missing")
+            local function exercise(with_alias)
+              local expected = {
+                ["burner-mining-drill"]=.20, ["electric-mining-drill"]=.10,
+                ["area-mining-drill"]=.05, ["se-core-miner-drill"]=.05,
+              }
+              local recipes, items = {}, {}
+              for name in pairs(expected) do
+                recipes[name] = recipe({{"iron-plate",1}}, {product("item",name)})
+                items[name] = {place_result=name}
+              end
+              if with_alias then
+                recipes["extra-core-manufacturer"] = recipe({{"steel-plate",1}},
+                  {product("item","se-core-miner-drill")})
+                expected["extra-core-manufacturer"] = .05
+              end
+              recipes["ore-extraction"] = recipe({}, {product("item","iron-ore")})
+              local raw = raw_with_recipes(recipes)
+              raw.item = items
+              local before = frozen_copy(recipes) .. frozen_copy(items)
+              local technology = modern.technology(definition, resolved)
+              -- This bounded pipeline contains only the mining family. Keep
+              -- its actual selected contract, without inventing fixtures for
+              -- every unrelated required SE family.
+              local required = {}
+              if selected.required_product_targets and selected.required_product_targets.research_mining_drill then
+                required.research_mining_drill = selected.required_product_targets.research_mining_drill
+              end
+              extension.extend({technology}, resolved, {raw=raw, mods=mods,
+                exact_product_bindings=selected.exact_product_bindings,
+                exact_product_target_families=selected.exact_product_target_families,
+                additional_product_bindings=selected.additional_product_bindings,
+                required_product_targets=required,
+                replacement_product_target_families=selected.replacement_product_target_families,
+                excluded_product_target_recipes=selected.excluded_product_target_recipes})
+              local seen = {}
+              for _, effect in ipairs(technology.effects) do
+                assert(effect.type == "change-recipe-productivity")
+                assert(not seen[effect.recipe] and expected[effect.recipe] == effect.change,
+                  "unexpected or duplicate SE drill manufacturing effect")
+                seen[effect.recipe] = true
+              end
+              for name in pairs(expected) do
+                assert(seen[name], "missing SE drill manufacturing effect: " .. name)
+              end
+              assert(technology.unit.count_formula == "8000*2^(L-1)" and technology.unit.time == 60)
+              assert(frozen_copy(recipes) .. frozen_copy(items) == before)
+            end
+            exercise(false)
+            exercise(true)
+            local original_extend = extension.extend
+            extension.extend = function() return {} end
+            local ok, message = pcall(exercise, true)
+            extension.extend = original_extend
+            assert(not ok and tostring(message):find("missing SE drill manufacturing effect",1,true),
+              "the final-output oracle accepted a missing collector")
+          end
+        ''')
+
     def test_exclusions_typed_homonyms_and_unsupported_literal_routes_do_not_widen_productivity(self):
         self.lua.execute(r'''
           local gear = generated("research_gears", {productivity("iron-gear-wheel", .10)})
