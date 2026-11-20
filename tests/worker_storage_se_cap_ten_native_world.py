@@ -284,6 +284,7 @@ function cargo_candidate(mir,mutate,startup_changed)
   script.active_mods["more-infinite-research"]=mir or "5.0.20018";CARGO_TRANSFER();if mutate then mutate(CARGO_TECHNOLOGIES[CANDIDATE],CARGO_TECHNOLOGIES[SOURCE],CARGO_TECHNOLOGIES[HEAD],CARGO_FORCE_VALUES) end
   local changed=false;if startup_changed~=nil then changed=startup_changed end
   CARGO_CALLBACKS.configuration({mod_startup_settings_changed=changed,mod_changes={["more-infinite-research"]={old_version="4.7.20002",new_version=script.active_mods["more-infinite-research"]}}}) end
+function cargo_configuration(event)return CARGO_CALLBACKS.configuration(event)end
 function cargo_on_load()CARGO_CALLBACKS.load()end
 function cargo_cold()CARGO_CALLBACKS.load();cargo_tick(1)end
 function cargo_logs()return CARGO_LOGS end;function cargo_counts()return CARGO_LAB_COUNTS()end;function cargo_saves()return CARGO_SAVES end;function cargo_phase()return storage["mir5_worker_storage_se_cap_ten_native"].phase end
@@ -316,6 +317,11 @@ end
 function cargo_contributor_effects_unavailable()CARGO_TECH_BACKING[SOURCE].prototype.effects=nil end
 function cargo_contributor_effects_overflow()
   local effects={};for index=1,17 do effects[index]={type="worker-robot-storage",modifier=1} end;CARGO_TECH_BACKING[SOURCE].prototype.effects=effects
+end
+function cargo_incompatible_candidate_contract()
+  local values=CARGO_TECH_BACKING[CANDIDATE]
+  values.prototype.max_level=12;values.prototype.effects={{type="worker-robot-storage",modifier=2}}
+  values.research_unit_count_formula="999+L"
 end
 function cargo_contributor_technology_unavailable()
   local original=CARGO_FORCE_VALUES.technologies
