@@ -1,5 +1,6 @@
 """Worker continuation identity guards; host doubles are not native save proof."""
 import argparse
+import ast
 from pathlib import Path
 import sys
 import unittest
@@ -8,6 +9,8 @@ from bootstrap_control_world import build_bootstrap_control_world
 from worker_storage_default_world import (
     DEFAULT_WORKER_RUNTIME_CONFIGURATION,
     build_default_native_owner_world,
+    build_full_default_provider_handover_world,
+    build_older_default_admission_world,
 )
 from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS, RECOVERY_WORLD as RECOVERY_WORLD_FIXTURE
 
@@ -1190,7 +1193,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
 class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
     def world(self,target="f210"):
-        return WorkerDefaultNativeOwnerTransferTests.world(self,target)
+        return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_init_noop_unsupported_provider_and_manual_prepare_are_explicit(self):
         lua=self.world();lua.execute(r'''
@@ -1339,56 +1342,10 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
         ''')
 
 class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
-    def world(self,target="f210"):
-        lua=WorkerDefaultNativeOwnerTransferTests.world(self,target)
-        lua.execute(r'''
-          prototypes.technology[ID].visible_when_disabled=false
-          function full_source(a,unpaid_pending)
-            history.on_init(nil);set_reward(a);seed_owner()
-            if unpaid_pending then uninvested.technologies[CANONICAL].enabled=true;uninvested.research_queue={CANONICAL};uninvested.research_progress=.37 end
-            transfer();writes=0;queue_writes={};progress_writes={}
-          end
-          function provider_event()
-            return {mod_startup_settings_changed=false,mod_changes={provider={new_version="1.0"}}}
-          end
-          function finite_entry(b)
-            script.active_mods.provider="1.0";add_provider(5)
-            creators["worker-robots-storage-6"]="more-infinite-research"
-            local public=prototypes.technology[CANONICAL]
-            public.effects[1].modifier=b;public.research_unit_count_formula=nil;public.research_unit_count=1000
-            public.research_unit_energy=3600;public.research_unit_ingredients={{name="automation-science-pack",amount=1},{name="space-science-pack",amount=1}}
-            prototypes.technology[HEAD].effects[1].modifier=b==0 and 0 or -b
-            for _,f in pairs(game.forces)do
-              local c=f.technologies[CANONICAL];local paid=f.technologies[HEAD].level==5;local enabled,visible=c.enabled,c.visible_when_disabled
-              -- Explicit host representation of already-loaded finite4, not a claim of new engine observation.
-              c.level=4;c.researched=paid;c.enabled=enabled;c.visible_when_disabled=visible
-              local mt=getmetatable(c);local read=mt.__index
-              mt.__index=function(object,key)if key=="research_unit_count"then return 1000 end;return read(object,key)end
-            end
-            writes=0;queue_writes={};progress_writes={}
-          end
-          function delegate(event,route)
-            event,route=event or provider_event(),route or provider_route(5)
-            local plan=history.default_owner_preflight(event,route,true)
-            assert(history.default_owner_delegated(plan))
-            local legacy=history.preflight(event,route,plan)
-            return plan,legacy
-          end
-          function handover(event,route)
-            local plan,legacy=delegate(event,route)
-            assert(history.default_owner_apply(plan));history.apply(legacy)
-            return plan,legacy
-          end
-          function foreign_frames()
-            local out={}
-            for _,f in pairs(game.forces)do local rows={}
-              for n=5,6 do local t=f.technologies['worker-robots-storage-'..n];rows[n]={level=t.level,researched=t.researched,enabled=t.enabled,saved=t.saved_progress}end
-              out[f.index]=rows
-            end
-            return out
-          end
-        ''')
-        return lua
+    def world(self, target="f210"):
+        return build_full_default_provider_handover_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
 
     def test_four_force_handover_reuses_private_quota_and_conserves_each_scalar_basis(self):
         for target in ("f200","f210"):
@@ -1773,7 +1730,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
 
 class WorkerInfiniteHeadDebitTests(unittest.TestCase):
     def world(self,target="f210"):
-        return WorkerFullDefaultProviderHandoverTests.world(self,target)
+        return build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_zero_two_scalar_native_debit_count_is_one_or_zero_across_handover(self):
         for target in ("f200","f210"):
@@ -1850,49 +1807,15 @@ class WorkerInfiniteHeadDebitTests(unittest.TestCase):
 class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     """Known473 default work, old idle records and501-empty restrictions."""
 
-    world = WorkerDefaultNativeOwnerTransferTests.world
+    def world(self, target="f210"):
+        return build_default_native_owner_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
 
     def older_world(self, target="f200"):
-        lua = self.world(target)
-        lua.execute(r'''
-          for _,id in ipairs({CANONICAL,ORDINARY,ID})do
-            prototypes.technology[id].research_unit_count_formula="675*1.5^(L-4)"
-            prototypes.technology[id].research_unit_energy=3600
-            prototypes.technology[id].research_unit_ingredients={
-              {name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},
-              {name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1},
-              {name="utility-science-pack",amount=1}}
-            for _,force in pairs(game.forces)do
-              local t=force.technologies[id];local mt=getmetatable(t);local read=mt.__index
-              mt.__index=function(object,key)
-                if key=="research_unit_count"then return math.floor(675*1.5^(read(object,"level")-4))end
-                return read(object,key)
-              end
-            end
-          end
-          function older_event(old,addition)
-            local event=owner_event(old)
-            if addition then script.active_mods["test-observer"]="0.1.0"
-              event.mod_changes["test-observer"]={new_version="0.1.0"}end
-            return event
-          end
-          function paid_idle()
-            player.technologies[CANONICAL].level=5;uninvested.technologies[CANONICAL].level=5
-            suspended.technologies[CANONICAL].level=6
-            player.research_queue={OTHER};player.research_progress=.42
-            suspended.research_queue={OTHER};suspended.research_progress=.125
-            detached.technologies[OTHER].saved_progress=.27
-            uninvested.technologies[CANONICAL].enabled=false
-            writes=0;queue_writes={};progress_writes={}
-          end
-          function older_plan(event)return history.plan_default_owner_transfer(event,nil,false)end
-          function refuse_older(event,route)
-            local before=all_frames();writes=0
-            assert(not pcall(history.plan_default_owner_transfer,event,route,false))
-            assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
-          end
-        ''')
-        return lua
+        return build_older_default_admission_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
 
     def test_501_empty_all_forces_admits_new_observer_without_zero_aggregate_inference(self):
         lua=self.older_world();lua.execute(r'''
@@ -2319,7 +2242,7 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
     """Model the observed config-only re-enable of a paid native infinite H5."""
 
     def world(self, target="f210"):
-        lua = WorkerFullDefaultProviderHandoverTests.world(self, target)
+        lua = build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
         lua.execute(r'''
           function reenable_paid_heads()
             local count=0
@@ -2485,7 +2408,7 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
 
 class WorkerUnchangedSelectionDefaultOriginTests(unittest.TestCase):
     def world(self, target="f210"):
-        return WorkerDefaultNativeOwnerTransferTests.world(self,target)
+        return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_known_nil_history_versions_preserve_paid_and_pending_work_with_unchanged_qol(self):
         for target in ("f200","f210"):
@@ -2644,7 +2567,7 @@ class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
     """A saved MIR route plus surviving native work is not a whole-modpack lock."""
 
     def world(self, target="f210"):
-        return WorkerDefaultNativeOwnerTransferTests.world(self, target)
+        return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_recorded_default_refusals_do_not_invent_a_rejected_mod(self):
         for target in ("f200", "f210"):
@@ -2791,12 +2714,12 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
     """Exact existing Base hop and stable historical producer facts, host only."""
 
     def world(self, target="f210"):
-        return WorkerFullDefaultProviderHandoverTests.world(self, target)
+        return build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_exact_473_and_recorded_modern_base_hop_preserve_all_native_work(self):
         for old in ("4.7.20003","5.0.20009","5.0.20010","5.0.20011"):
             for changed in (False,True):
-                lua=WorkerOlderDefaultAdmissionTests().older_world("f210") if old.startswith("4.7")else self.world()
+                lua=build_older_default_admission_world(LuaRuntime, target="f210", source_root=ROOT / "source") if old.startswith("4.7")else self.world()
                 lua.globals().old=old;lua.globals().changed=changed
                 lua.execute(r'''
                   if old=="4.7.20003"then paid_idle()
@@ -2914,7 +2837,7 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
         opponents=("old-base","new-base","missing-base","old-package","new-mod","unchanged-qol","space-age","private-work","foreign-source","unrecorded")
         for old in ("4.7.20003","5.0.20011"):
             for opponent in opponents:
-                lua=WorkerOlderDefaultAdmissionTests().older_world("f210") if old.startswith("4.7")else self.world()
+                lua=build_older_default_admission_world(LuaRuntime, target="f210", source_root=ROOT / "source") if old.startswith("4.7")else self.world()
                 lua.globals().old=old;lua.globals().opponent=opponent
                 lua.execute(r'''
                   if old=="4.7.20003"then paid_idle()else seed_owner();storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}end
@@ -3000,7 +2923,7 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
 
 class WorkerPrivateQueueEventContextTests(unittest.TestCase):
     def world(self,target="f210"):
-        lua=WorkerFullDefaultProviderHandoverTests.world(self,target)
+        lua=build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
         lua.execute('defines={events={on_research_queued=25,on_research_started=26}}')
         return lua
 
@@ -3089,7 +3012,7 @@ class WorkerPrivateQueueEventContextTests(unittest.TestCase):
 
 class WorkerSameFamilyEnginePatchTests(unittest.TestCase):
     def world(self,target="f210"):
-        return WorkerDefaultNativeOwnerTransferTests.world(self,target)
+        return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_known_unrecorded_defaults_accept_supported_current_and_synchronized_official_patch(self):
         for target in ("f200","f210"):
@@ -3192,7 +3115,7 @@ class WorkerPublished08DefaultCompatibilityTests(unittest.TestCase):
     """Published08/09 share the exact worker contract; native qualification is separate."""
 
     def world(self, target="f210"):
-        return WorkerFullDefaultProviderHandoverTests.world(self, target)
+        return build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_08_earned_current_repeated_queue_and_detached_work_move_exactly(self):
         for target in ("f200", "f210"):
@@ -3281,10 +3204,10 @@ class WorkerPublished08DefaultCompatibilityTests(unittest.TestCase):
 
 
 class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
-    'Public00Ã¢â‚¬â€œ11 default native stream and complete schema3 handover authority.'
+    'Public00ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“11 default native stream and complete schema3 handover authority.'
 
     def world(self, target="f210"):
-        return WorkerFullDefaultProviderHandoverTests.world(self, target)
+        return build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
     def test_all_public_default_versions_keep_native_paid_or_empty_work_both_families(self):
         for target in ("f200", "f210"):
@@ -3424,6 +3347,72 @@ class WorkerPublishedDefaultContractContinuityTests(unittest.TestCase):
               assert(not pcall(history.default_owner_preflight,event,nil,true))
               assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
             ''')
+
+def borrowed_test_worlds(source):
+    """Find world construction delegated to another test case."""
+    tree = ast.parse(source)
+    test_classes = {node.name for node in tree.body if isinstance(node, ast.ClassDef)}
+    borrowed = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Attribute) or node.attr not in ("world", "older_world"):
+            continue
+        owner = node.value.func if isinstance(node.value, ast.Call) else node.value
+        if isinstance(owner, ast.Name) and owner.id in test_classes:
+            borrowed.append((node.lineno, ast.get_source_segment(source, node)))
+    return borrowed
+
+
+class WorkerWorldConstructionTests(unittest.TestCase):
+    def test_worker_worlds_do_not_borrow_test_case_construction(self):
+        self.assertEqual(borrowed_test_worlds(Path(__file__).read_text(encoding="utf-8")), [])
+
+    def test_borrow_guard_rejects_calls_aliases_and_constructed_cases(self):
+        for expression in (
+            "WorkerDefaultNativeOwnerTransferTests.world",
+            "WorkerDefaultNativeOwnerTransferTests.world(self, target)",
+            "WorkerFullDefaultProviderHandoverTests.world(self, target)",
+            "WorkerOlderDefaultAdmissionTests().older_world('f210')",
+        ):
+            with self.subTest(expression=expression):
+                source = (
+                    "class WorkerDefaultNativeOwnerTransferTests: pass\n"
+                    "class WorkerFullDefaultProviderHandoverTests: pass\n"
+                    "class WorkerOlderDefaultAdmissionTests: pass\n"
+                    "class Consumer:\n    world = " + expression + "\n"
+                )
+                self.assertEqual(len(borrowed_test_worlds(source)), 1)
+
+    def test_builders_use_explicit_inputs_and_return_independent_worlds(self):
+        builders = (
+            build_default_native_owner_world,
+            build_full_default_provider_handover_world,
+            build_older_default_admission_world,
+        )
+        source_root = ROOT / "source" / "runtime" / ".."
+        missing_root = ROOT / "tests" / ".missing-worker-world-source"
+        self.assertFalse(missing_root.exists())
+        for builder in builders:
+            for target, base in (("f200", "2.0.77"), ("f210", "2.1.23")):
+                with self.subTest(builder=builder.__name__, target=target):
+                    calls = []
+
+                    def factory(**options):
+                        calls.append(options)
+                        return LuaRuntime(**options)
+
+                    first = builder(factory, target=target, source_root=source_root)
+                    first.execute("storage.fixture_probe=71; package.loaded['platform.target'].minimum_base='changed'")
+                    second = builder(factory, target=target, source_root=source_root)
+                    self.assertIsNot(first, second)
+                    self.assertEqual(calls, [{"unpack_returned_tuples": True}] * 2)
+                    self.assertEqual(second.eval("player_root"), source_root.as_posix())
+                    self.assertEqual(second.eval("package_family"), target)
+                    self.assertEqual(second.eval("require('platform.target').minimum_base"), base)
+                    self.assertIsNone(second.eval("storage.fixture_probe"))
+            with self.subTest(builder=builder.__name__, missing_source=True):
+                with self.assertRaisesRegex(Exception, r"module 'runtime\.worker_robot_storage' not found"):
+                    builder(LuaRuntime, target="f210", source_root=missing_root)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
