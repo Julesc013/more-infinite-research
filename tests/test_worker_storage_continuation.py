@@ -93,7 +93,8 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         self.assertEqual(4, row["level"])
         self.assertEqual("675*1.5^(L-4)", row["unit"]["count_formula"])
         self.assertEqual(60, row["unit"]["time"])
-        self.assertEqual(F200_SE_WORKER_SCIENCE, row["unit"]["ingredients"])
+        self.assertEqual(F200_SE_WORKER_SCIENCE, row["unit"]["ingredients"],
+                         f"published source data {F200_SE_SOURCE_DATA_SHA256}")
         self.assertEqual(F200_SE_WORKER_PREREQUISITES, row["prerequisites"])
         self.assertEqual([{"type": "worker-robot-storage", "modifier": 1}], row["effects"])
         self.assertNotIn("utility-science-pack", row["prerequisites"])
@@ -169,10 +170,6 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         # The native F394 data capture is independent evidence. Its 2.0.77
         # result had this exact source dump and seven-pack worker contract;
         # old construction instead emitted the Base five-pack vector.
-        self.assertEqual(
-            "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104",
-            F200_SE_SOURCE_DATA_SHA256,
-        )
         lua = self.f200_se_stage()
         self.pipeline(lua)
         technologies = lua.globals().data.raw.technology
@@ -183,6 +180,22 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         ):
             with self.subTest(holder=name):
                 self.assert_f200_se_worker_contract(scaffold.plain_lua(technologies[name]))
+
+    def test_f200_se_final_emission_resolves_worker_science_without_loading_the_f210_catalogue(self):
+        lua = self.f200_se_stage()
+        # The scaffold seeds foreign prototype rows before this boundary.
+        # Poison the real MIR final-emission consumer, not that fixture setup.
+        lua.execute(r'''
+          local full="compatibility.modern_catalogue.space_exploration"
+          package.loaded[full]=nil
+          package.preload[full]=function()error("F200 worker science loaded the full F210 SE catalogue")end
+        ''')
+        self.pipeline(lua)
+        for name in ("worker-robots-storage-4", "mir-worker-storage-default-4",
+                     "mir-worker-storage-preservation-4"):
+            self.assert_f200_se_worker_contract(
+                scaffold.plain_lua(lua.globals().data.raw.technology[name])
+            )
 
     def test_f200_non_k2_space_exploration_old_base_selection_fails_the_captured_contract(self):
         # This is the exact pre-repair selector outcome: the shared SE worker

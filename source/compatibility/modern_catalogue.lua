@@ -752,7 +752,9 @@ end
 function M.science_names(key)
   local vector = SCIENCE[key]
   if vector == nil and type(key) == "string" then
-    if key:match("^science_se_k2_") then
+    if key == "science_se_worker_robots_storage" then
+      vector = require("compatibility.modern_catalogue.space_exploration_worker_storage").science
+    elseif key:match("^science_se_k2_") then
       vector = require("compatibility.modern_catalogue.k2_space_exploration").science[key]
     elseif key:match("^science_se_") then
       vector = require("compatibility.modern_catalogue.space_exploration").science[key]
