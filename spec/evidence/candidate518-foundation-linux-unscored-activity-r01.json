@@ -1,0 +1,477 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate518FoundationLinuxUnscoredActivityV1",
+  "status": "independently-accepted-current18-unscored-activity-diagnostic-only",
+  "source_version": "5.0.18",
+  "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+  "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+  "source_integration": "8d7ad78dd859ae96a8505773bd7a3e90880eeb63",
+  "candidate_archive": {
+    "archive": "more-infinite-research_5.0.20018.zip",
+    "bytes": 1053483,
+    "name": "more-infinite-research",
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/more-infinite-research_5.0.20018.zip",
+    "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+    "sha256": "3C82F7F9E3D879243B64423A96D00301BBF5A406CCD77BC0F6F06FE23FAF299D",
+    "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+    "version": "5.0.20018"
+  },
+  "native_owner": {
+    "host": "Gunmetal-Debian",
+    "user": "agents",
+    "uid": 1001,
+    "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01",
+    "runner_commit": "873b8cdfc1bd8811c3efcb2bdd2b7102ed51c1ce",
+    "runner_player_tree": "a504d92fe798d570df58514f9f839c4954af14f3",
+    "engine": {
+      "bytes": 244051696,
+      "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+      "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+      "version": "2.0.77"
+    },
+    "engine_data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data",
+    "helper_rows": 58,
+    "helper_scope": "53 frozen runner helpers plus five actual 2.0.77 engine-data rows; binary separately pinned"
+  },
+  "selection": {
+    "profile": {
+      "bytes": 6455,
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-2397-r03/profile-r02.json",
+      "sha256": "3D34FFE06480616A54D841EB64347E2457B75464758CEF2F4F3B5B2B7A70369C"
+    },
+    "official_version": "2.0.77",
+    "official_mods": [
+      "base",
+      "elevated-rails",
+      "quality",
+      "space-age"
+    ],
+    "third_party_archive_count": 31,
+    "selected_mod_count": 37,
+    "actual_metadata": {
+      "base_version": "2.0.77",
+      "force_index": 1,
+      "force_name": "player",
+      "mir_version": "5.0.20018",
+      "mods": [
+        {
+          "name": "Bottleneck",
+          "version": "0.12.1"
+        },
+        {
+          "name": "Brighter-Lamps",
+          "version": "2.0.0"
+        },
+        {
+          "name": "EditorExtensions",
+          "version": "2.5.2"
+        },
+        {
+          "name": "FactorySearch",
+          "version": "1.14.3"
+        },
+        {
+          "name": "GUI_Unifyer",
+          "version": "2.0.1"
+        },
+        {
+          "name": "Honk",
+          "version": "5.1.1"
+        },
+        {
+          "name": "Kux-CoreLib",
+          "version": "3.17.8"
+        },
+        {
+          "name": "Kux-ZoomRunning",
+          "version": "3.3.2"
+        },
+        {
+          "name": "MaxRateCalculator",
+          "version": "200.0.53"
+        },
+        {
+          "name": "Milestones",
+          "version": "1.4.7"
+        },
+        {
+          "name": "ModuleInserterEx",
+          "version": "7.4.1"
+        },
+        {
+          "name": "OilOutpostPlanner",
+          "version": "1.6.10"
+        },
+        {
+          "name": "RateCalculator",
+          "version": "3.3.8"
+        },
+        {
+          "name": "Shortcuts-ick",
+          "version": "2.0.7"
+        },
+        {
+          "name": "VehicleSnap",
+          "version": "2.0.3"
+        },
+        {
+          "name": "YARM",
+          "version": "1.0.5"
+        },
+        {
+          "name": "base",
+          "version": "2.0.77"
+        },
+        {
+          "name": "bullet-trails",
+          "version": "0.7.1"
+        },
+        {
+          "name": "car-finder",
+          "version": "2.0.0"
+        },
+        {
+          "name": "electric_pole_free_light",
+          "version": "0.0.3"
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.0.77"
+        },
+        {
+          "name": "even-distribution",
+          "version": "2.0.2"
+        },
+        {
+          "name": "factoryplanner",
+          "version": "2.0.50"
+        },
+        {
+          "name": "far-reach",
+          "version": "2.0.2"
+        },
+        {
+          "name": "flib",
+          "version": "0.16.5"
+        },
+        {
+          "name": "fluid_permutations_fixed",
+          "version": "0.6.0"
+        },
+        {
+          "name": "inventory-repair",
+          "version": "20.0.3"
+        },
+        {
+          "name": "light-overhaul",
+          "version": "0.2.2"
+        },
+        {
+          "name": "lightorio",
+          "version": "2.0.1"
+        },
+        {
+          "name": "mining-patch-planner",
+          "version": "1.7.19"
+        },
+        {
+          "name": "mir-fixture-mir5-large-factory-activity",
+          "version": "0.1.0"
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.20018"
+        },
+        {
+          "name": "quality",
+          "version": "2.0.77"
+        },
+        {
+          "name": "space-age",
+          "version": "2.0.77"
+        },
+        {
+          "name": "squeak-through-2",
+          "version": "0.1.5"
+        },
+        {
+          "name": "stdlib2",
+          "version": "2.0.1"
+        },
+        {
+          "name": "tree_collision",
+          "version": "2.0.0"
+        }
+      ]
+    },
+    "observer": {
+      "archive": "mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "bytes": 5904,
+      "identity": {
+        "bytes": 5904,
+        "kind": "MIRFoundation518StagedInputIdentityV1",
+        "remote_path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+        "sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4",
+        "source_before": {
+          "bytes": 5904,
+          "device": 3781016413010784355,
+          "inode": 42784196460446300,
+          "mtime_ns": 1793840656848631500
+        }
+      },
+      "local_custody_path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation504-activity-r02-prepared\\mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "name": "mir-fixture-mir5-large-factory-activity",
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "provenance": {
+        "input_before_record": {
+          "bytes": 2493,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\INPUTS-BEFORE-r01.json",
+          "sha256": "35F3475AF52B37AD4BCC2D493D074C922CD8F2F6522B3178762E53B6180FF5CD"
+        },
+        "kind": "MIRFoundation518StagedInputProvenanceV1",
+        "local_custody_path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation504-activity-r02-prepared\\mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+        "remote_staging_record": {
+          "bytes": 1766,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\STAGED-INPUTS-r01.json",
+          "sha256": "2347DE5280A2E4AC56DC44FAD973F2C2EE29E37A75034AFDFB30E95E3B6C8083"
+        }
+      },
+      "remote_staged": true,
+      "script": "control.lua",
+      "sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4",
+      "version": "0.1.0"
+    },
+    "actual_complete_selection_source": "native START.metadata.mods; the unchanged observer does not emit the SDK pipe marker",
+    "requested_settings_mode": "Defaults",
+    "actual_settings_capture": "Strict SETTINGS marker in the complete native log; no original-saved or per-player settings equivalence claim"
+  },
+  "protected_input": {
+    "world": {
+      "bytes": 108548262,
+      "identity": {
+        "bytes": 108548262,
+        "kind": "MIRFoundation518StagedInputIdentityV1",
+        "remote_path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/foundation-iii-original.zip",
+        "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+        "source_before": {
+          "bytes": 108548262,
+          "device": 3781016413010784355,
+          "inode": 24769797951429241,
+          "mtime_ns": 1793277693647144000
+        }
+      },
+      "immutable": true,
+      "local_custody_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-inputs-r01\\protected-saves\\foundation-iii-original.zip",
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/foundation-iii-original.zip",
+      "provenance": {
+        "input_before_record": {
+          "bytes": 2493,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\INPUTS-BEFORE-r01.json",
+          "sha256": "35F3475AF52B37AD4BCC2D493D074C922CD8F2F6522B3178762E53B6180FF5CD"
+        },
+        "kind": "MIRFoundation518StagedInputProvenanceV1",
+        "local_custody_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-inputs-r01\\protected-saves\\foundation-iii-original.zip",
+        "remote_staging_record": {
+          "bytes": 1766,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\STAGED-INPUTS-r01.json",
+          "sha256": "2347DE5280A2E4AC56DC44FAD973F2C2EE29E37A75034AFDFB30E95E3B6C8083"
+        }
+      },
+      "remote_staged": true,
+      "role": "protected-whole-foundation-world",
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+    },
+    "staging_mode": "ForceCopy",
+    "source_and_staged_pre_post_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "immutable_lease": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/mir-immutable-input-lease.json",
+      "bytes": 3493,
+      "sha256": "8C378EADD9F2BB2FA249022D0F124A831B110B1D5519A6D7D566C60BDDDE8635"
+    }
+  },
+  "execution": {
+    "packet": {
+      "path": "build/qualification/foundation518-gunmetal-2397-r03/packet.json",
+      "bytes": 38859,
+      "sha256": "6C4B5FF91C35F38B4AD1FF49E6CAEA64023C534512E108895D4DB3DD30AC17C9"
+    },
+    "owner": {
+      "path": "build/qualification/foundation518-gunmetal-2397-r03/Invoke-Foundation518Activity-r04.ps1",
+      "bytes": 21150,
+      "sha256": "95DCD2BA1AA9CC2CF2566E900C9EC30754D7D16775FD7E822081651AD5064BDD"
+    },
+    "compose": {
+      "path": "build/qualification/foundation518-gunmetal-2397-r03/composition.json",
+      "bytes": 934,
+      "sha256": "14E16AE0D97BD2F96F188690B7C433F66F7881B0544A583E6D26FBE9305EB4EC"
+    },
+    "execute_review": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/REVIEW-EXECUTE-r01.json",
+      "bytes": 1137,
+      "sha256": "34AB87439E9ABB2B3E4A8C65A74DCC08BEBFF8E9408FDEDD8F2AB870CC1A473E"
+    },
+    "terminal": {
+      "path": "build/qualification/foundation518-gunmetal-2397-r03/terminal.json",
+      "bytes": 345174,
+      "sha256": "D4B47B77E1405D37E9B822D1D843797714EA670C23AE3B904C3BC490126D79E4"
+    },
+    "service_invocation_id": "70cae532df9b4251a97c971dd6edda7d",
+    "native_processes": 1,
+    "process_id": 612194,
+    "start_identity": {
+      "pid": 612194,
+      "start_ticks": 51115099,
+      "session_id": 612194,
+      "kind": "MIR441LinuxNativeLaunchV1"
+    },
+    "natural_exit_code": 0,
+    "timeout": false,
+    "completion_predicate": false,
+    "observed_engine_updates": 601,
+    "elapsed_observation_ticks": 600,
+    "sample_milliseconds": 250,
+    "sample_rows": 97,
+    "physical_exit": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/physical-exit.json",
+      "bytes": 454,
+      "sha256": "30F8D39D3E247F11CE39258DE0A420A767C15AA94EACFC3AB85C8714E36610F3"
+    },
+    "strict_context": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/process-context.json",
+      "bytes": 111,
+      "sha256": "C3FCF9D51BF998EC342DF9ED742FDE48179EE907C1D9D3024EC2B5CE32B5189C"
+    },
+    "library_restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "activity": {
+    "observed": true,
+    "projection_keys": 19,
+    "projection_bytes": 84956,
+    "projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+    "exact_frozen_projection_bytes_equal": true,
+    "source_comparator": {
+      "bytes": 84956,
+      "identity": {
+        "bytes": 84956,
+        "kind": "MIRFoundation518StagedInputIdentityV1",
+        "remote_path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/expected-NoMIR-projection.json",
+        "sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+        "source_before": {
+          "bytes": 84956,
+          "device": 3781016413010784355,
+          "inode": 23362423067410957,
+          "mtime_ns": 1793839576412539300
+        }
+      },
+      "local_custody_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation504-activity-r01\\expected-NoMIR-projection.json",
+      "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/foundation518-gunmetal-inputs-2397-r01/expected-NoMIR-projection.json",
+      "provenance": {
+        "input_before_record": {
+          "bytes": 2493,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\INPUTS-BEFORE-r01.json",
+          "sha256": "35F3475AF52B37AD4BCC2D493D074C922CD8F2F6522B3178762E53B6180FF5CD"
+        },
+        "kind": "MIRFoundation518StagedInputProvenanceV1",
+        "local_custody_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation504-activity-r01\\expected-NoMIR-projection.json",
+        "remote_staging_record": {
+          "bytes": 1766,
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation518-gunmetal-inputs-2397-r01\\STAGED-INPUTS-r01.json",
+          "sha256": "2347DE5280A2E4AC56DC44FAD973F2C2EE29E37A75034AFDFB30E95E3B6C8083"
+        }
+      },
+      "remote_staged": true,
+      "sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11"
+    },
+    "surfaces": 57,
+    "sampled_machines": 1918,
+    "sampled_machines_with_progress": 275,
+    "sampled_products_finished_delta": 4006,
+    "positive_normal_item_input_delta": 5899
+  },
+  "resources": {
+    "declared": {
+      "admission_wait_seconds": 30,
+      "expected_peak_memory_mib": 8192,
+      "maximum_new_output_mib": 1024,
+      "maximum_stage_output_mib": 128,
+      "minimum_physical_free_bytes": 15400000000,
+      "sample_milliseconds": 250,
+      "timeout_seconds": 300
+    },
+    "expected_peak_memory_bytes": 8589934592,
+    "enforcement": "sampled watchdog, not a hard process-memory cap",
+    "peak_working_set_bytes": 4651479040,
+    "peak_sampled_private_bytes": 4649136128,
+    "initial_available_memory_bytes": 32077156352,
+    "initial_system_free_bytes": 21565329408,
+    "initial_work_free_bytes": 28617068544,
+    "initial_minimum_physical_free_bytes": 15400000000,
+    "system_reserve_bytes": 21474836480,
+    "leaf_local_adverse_events": false,
+    "shared_ancestor_history": "Retained as observed; historical shared counters are not attributed to this process or reset to zero.",
+    "resource_ledger": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/process-1.resources.jsonl",
+      "bytes": 703508,
+      "sha256": "03ED787FBD4B5E3BD14686405F04319375D1651C5A1F406355A91C9EB493F775"
+    },
+    "scored_timing": false,
+    "windows_or_historical_timing_comparison": false
+  },
+  "custody": {
+    "returned_files": 16,
+    "returned_bytes": 110488940,
+    "full_readback": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/EXECUTE-READBACK-r01.json",
+      "bytes": 8802,
+      "sha256": "DA32A37FA88F89839CB67721F37E3E9E51B3D6DBA148061E90BD777160E42EFD"
+    },
+    "native_log": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/write-data/factorio-current.log",
+      "bytes": 144060,
+      "sha256": "3208E6828BDACB4D5D424557C0611BCFB3D204B102D6F44DAF57B331AAAEC030"
+    },
+    "native_stdout": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/process-1.stdout.txt",
+      "bytes": 8255,
+      "sha256": "307542E0EF720D381F53457B044DF30CE9D0130695A81EEBBEED2AC922122C83"
+    },
+    "raw_observation": {
+      "path": "build/qualification/foundation518-gunmetal-inputs-2397-r03/execute-readback-r01/raw/foundation-observation.json",
+      "bytes": 179745,
+      "sha256": "2729C19C5F30EAE631611594F045FE7EA90BE22474F9D03F221FC25D776A9EBD"
+    }
+  },
+  "independent_review": {
+    "path": "build/qualification/foundation518-gunmetal-review-2397-r01/RESULT-REVIEW-r01.json",
+    "bytes": 7923,
+    "sha256": "5EE16C3C6460F903ABB83D5D889E634D1B8E16D8AF4ABDB13E030929A7C3A165"
+  },
+  "api_wiring_review": {
+    "path": "build/qualification/foundation518-gunmetal-api-review-2397-r01/API-REVIEW-r01.json",
+    "bytes": 5922,
+    "sha256": "7350FFE245BF3A5EAC3CC222ED5117F0D17A02027429D0014F61989F5D1896AD"
+  },
+  "retained_adverses": {
+    "r01": "Zero-native Compose retained under its old exact owner; no transfer to later packets.",
+    "r02": "250ms callback contract refusal before engine creation; actual terminal count remains null/unknown, never a passing sample. Full raw readback retained.",
+    "r03_local_dispatch": "Missing staging receipt refused locally before SSH or any remote mode; first actual Validate occurred after staging completed.",
+    "preparation_reviews": "Original NO-GO, stale/unadopted GO and subsequent exact corrected reviews remain in foundation518-gunmetal-review-2397-r01.",
+    "source_history": "Old 5.0.14 Foundation and private e239 timing remain separate original results, not rerun or relabelled."
+  },
+  "limits": [
+    "One actual current18 Linux activity diagnostic, not a normal observer-free timing comparison or memory non-regression result.",
+    "No original reporter, earned-state preservation, ordinary research completion, successor save/two-cold-load, physical manufacturing-productivity, GUI/client, visual or scheduler qualification.",
+    "Deterministic services completed without an agent driving engine ticks; this is not a multi-day stress campaign.",
+    "Input-byte preservation is distinct from saved entitlement or migration acceptance.",
+    "Existing scientific activity expectations and all admission budgets/reserves were preserved."
+  ],
+  "large_factory_qualified": false,
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "release_qualification": false,
+  "stable_acceptance": false,
+  "public_release_published": false
+}

@@ -33,9 +33,13 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
-        world.install(self.lua)
-        world.load(self.lua)
+        self.lua = self.fresh_actor()
+
+    def fresh_actor(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        world.load(lua)
+        return lua
 
     def static_role_actor(self):
         """Load the former static-C4 expectation as an in-memory actor mutant."""
@@ -62,6 +66,79 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         world.install(lua)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "removed-queue-flag-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def historical_buffer_refill_actor(self):
+        """Load the exact pre-grid feed write against the strict entity proxy."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  end
+end
+local function create_lab_and_power(force)'''
+        new = '''  end
+  state.lab.energy = state.lab.electric_buffer_size
+end
+local function create_lab_and_power(force)'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "historical-buffer-refill-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def all_three_connection_predicate_actor(self):
+        """Load the rejected all-entity predicate against a real distributor row."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network(), "fixture electric network differs")'''
+        new = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and type(pole.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network()
+    and pole.is_connected_to_electric_network(), "fixture electric network differs")'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "all-three-connection-predicate-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def unconditional_cold_pending_actor(self):
+        """Load the AFA actor behavior that treated every saved phase as cold."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        fixed = '''  if cold_pending then
+    if cold_phase == "closed" then
+      check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
+    elseif cold_phase == "idle" then
+      check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
+    elseif cold_phase == "source-partial" then
+      check(state.phase == "candidate-working", "cold load phase differs")
+    else
+      fail("cold load phase differs")
+    end
+    cold_pending, cold_phase = false, nil
+  end'''
+        original = '''  if cold_pending then
+    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+  end'''
+        self.assertIn(fixed, source)
+        source = source.replace(fixed, original, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unconditional-cold-pending-control.lua"
             path.write_text(source, encoding="utf-8", newline="\n")
             lua.globals().cargo_load(path.as_posix())
         return lua
@@ -145,6 +222,65 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.lua.globals().cargo_begin()
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
+
+    def test_afa_cold_pending_mutant_refuses_both_source_load_orders(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        old_after_begin = self.unconditional_cold_pending_actor()
+        old_after_begin.globals().cargo_on_load()
+        old_after_begin.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old_after_begin.globals().cargo_tick(1)
+
+    def test_documented_on_load_source_idle_admits_both_first_tick_orders(self):
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.logs())
+        self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+        after_begin = self.fresh_actor()
+        after_begin.globals().cargo_on_load()
+        after_begin.globals().cargo_begin()
+        after_begin.globals().cargo_tick(1)
+        self.assertEqual("source-working", after_begin.globals().cargo_phase())
+
+    def test_documented_on_load_configuration_then_candidate_tick_remains_working(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_begin()
+        for _ in range(5):
+            old.globals().cargo_complete(False)
+            old.globals().cargo_tick(1)
+        old.globals().cargo_partial(0.42)
+        old.globals().cargo_tick(1)
+        old.globals().cargo_on_load()
+        old.globals().cargo_candidate("5.0.20018", None, True)
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        self.source_to_partial()
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_candidate("5.0.20018", None, True)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertIn("phase=candidate-pre-work", self.logs()[-1])
+        self.assertNotIn("phase=cold-read", self.logs()[-1])
+
+    def test_on_load_refuses_unrecognized_persisted_phase(self):
+        self.lua.globals().cargo_set_phase("unknown-persisted-phase")
+        self.lua.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_on_load_source_partial_requires_configuration_before_first_tick(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
 
     def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
         lua = self.unsupported_queue_flag_actor()
@@ -376,6 +512,40 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             self.lua.globals().cargo_begin()
         self.assertEqual("idle", self.lua.globals().cargo_phase())
 
+    def test_fixture_requires_owned_connected_substation_grid_before_research(self):
+        for mutator, expected in (
+            ("cargo_missing_pole", "fixture substation differs"),
+            ("cargo_disconnected_electric_network", "fixture electric network differs"),
+            ("cargo_wrong_electric_network", "fixture electric network differs"),
+        ):
+            with self.subTest(mutator=mutator):
+                lua = self.fresh_actor()
+                getattr(lua.globals(), mutator)()
+                with self.assertRaisesRegex(LuaError, expected):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+
+    def test_fixture_constructs_the_three_owned_nonoverlapping_grid_entities(self):
+        self.lua.globals().cargo_begin()
+        entities = list(self.lua.globals().cargo_entities().values())
+        self.assertEqual(
+            [(world.POWER, 0, 0), (world.LAB, 8, 0), (world.POLE, 0, 6)],
+            [(entity["name"], entity["x"], entity["y"]) for entity in entities],
+        )
+
+    def test_strict_world_rejects_the_historical_direct_lab_buffer_refill(self):
+        lua = self.historical_buffer_refill_actor()
+        with self.assertRaisesRegex(LuaError, "LuaEntity unsupported write energy"):
+            lua.globals().cargo_begin()
+        self.assertEqual("source-working", lua.globals().cargo_phase())
+
+    def test_substation_network_identity_does_not_require_a_producer_consumer_predicate(self):
+        self.lua.globals().cargo_begin()
+        lua = self.all_three_connection_predicate_actor()
+        with self.assertRaisesRegex(LuaError, "fixture electric network differs"):
+            lua.globals().cargo_begin()
+        self.assertEqual("idle", lua.globals().cargo_phase())
+
     def test_missing_science_feed_refuses_without_completion(self):
         self.lua.globals().cargo_block_feed()
         with self.assertRaisesRegex(LuaError, "native science feed differs"):
@@ -442,7 +612,12 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn('data.raw["electric-energy-interface"]["electric-energy-interface"]', data)
         self.assertIn("mir-fixture-worker-storage-se-cap-ten-power", data)
+        self.assertIn('local POLE = "substation"', control)
         self.assertIn("se-space-science-lab", control)
+        self.assertIn("electric_network_id", control)
+        self.assertIn("is_connected_to_electric_network", control)
+        self.assertNotRegex(control, r"state\.lab\.energy\s*=(?!=)")
+        self.assertNotIn("and pole.is_connected_to_electric_network()", control)
         self.assertNotIn("table.deepcopy(data.raw.lab", data)
         self.assertNotIn("researching_speed =", data)
 
