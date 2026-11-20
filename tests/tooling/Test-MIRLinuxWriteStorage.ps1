@@ -185,7 +185,7 @@ print(json.dumps({"cwd": os.getcwd(), "temp": os.environ["TMPDIR"], "pid": os.ge
           Assert-Storage ((Test-MIR441PathContained -Root $external -Path $capture) -and (Test-Path -LiteralPath $capture -PathType Leaf)) 'governed-child-data-capture-file'
         }
         $monitor=@(Get-Content -LiteralPath $run.ledger | Where-Object {$_} | ForEach-Object {$_ | ConvertFrom-Json})
-        Assert-Storage ($monitor.Count -ge 2 -and @($monitor | Where-Object phase -CEQ 'completed').Count -eq 1 -and $monitor[-1].phase -ceq 'completed' -and $monitor[-1].exit_code -eq 0) 'governed-child-monitor-completion'
+        Assert-Storage ($monitor.Count -ge 2 -and @($monitor | Where-Object {$null -ne $_.PSObject.Properties['phase'] -and $_.phase -ceq 'completed'}).Count -eq 1 -and $monitor[-1].phase -ceq 'completed' -and $monitor[-1].exit_code -eq 0) 'governed-child-monitor-completion'
         Assert-Storage (@($monitor | Where-Object {$null -ne $_.PSObject.Properties['process'] -and $_.process.phase -ceq 'running'}).Count -ge 1) 'governed-child-monitor-live-sample'
         Assert-Storage (@(Get-ChildItem -LiteralPath $controlRoot -Force).Count -eq 0) 'governed-child-control-residue'
         $payloadBytes=[IO.File]::ReadAllBytes($payload)
