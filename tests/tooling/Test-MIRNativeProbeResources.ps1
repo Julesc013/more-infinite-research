@@ -410,8 +410,21 @@ function Assert-FactorioConsoleDeliveryFailureReceipt {
     $expectedFaultType=if($faultPhase-ceq'write'){'System.IO.IOException'}else{'System.InvalidOperationException'}
     $expectedFaultHResult=if($faultPhase-ceq'write'){-2146232800L}else{-2146233079L}
     Assert-Probe ($actual.Contains('[mir441-factorio-console-write]')-and$state.receipt.send_count-eq0-and$state.receipt.sends.Count-eq0-and$state.receipt.send_attempt_count-eq1-and$state.receipt.delivery_unknown-and$attempts.Count-eq1-and$attempt.order-eq1-and$attempt.kind-ceq'command'-and$attempt.phase-ceq$faultPhase-and$attempt.delivery-ceq'unknown'-and$members.Count-ge1-and@($members|Where-Object {[string]::IsNullOrWhiteSpace([string]$_.type)-or($_.hresult -isnot [long])}).Count-eq0-and@($members|Where-Object {$_.type-ceq$expectedFaultType-and[long]$_.hresult-eq$expectedFaultHResult}).Count-eq1-and-not$receiptJson.Contains($startup.command)) "console-$faultPhase-failure-records-sanitized-unknown-delivery"
+    Assert-Probe (-not$receiptJson.Contains("MIR441 controlled console $faultPhase failure")-and-not$receiptJson.Contains("MIR441 controlled console $faultPhase inner")) "console-$faultPhase-failure-omits-outer-and-inner-exception-messages"
     Refuses-Probe {Send-MIR441FactorioConsoleStartupLine -State $state -Writer $writer -Timer $timer -Kind command} '[mir441-factorio-console-delivery-unknown]'
     Assert-Probe ($state.receipt.send_attempt_count-eq1-and$state.receipt.send_attempts.Count-eq1-and$state.receipt.send_count-eq0-and$state.receipt.sends.Count-eq0) "console-$faultPhase-failure-never-replays-unknown-delivery"
+    $memory.Dispose()
+  }
+  foreach($faultPhase in @('write','flush')){
+    $replayState=New-MIR441FactorioConsoleStartup -Definition $startup
+    $memory=[IO.MemoryStream]::new();$firstWriter=[IO.StreamWriter]::new($memory,[Text.UTF8Encoding]::new($false),1024,$true);$timer=[Diagnostics.Stopwatch]::StartNew()
+    try {Send-MIR441FactorioConsoleStartupLine -State $replayState -Writer $firstWriter -Timer $timer -Kind command} finally {$firstWriter.Dispose()}
+    $writer=New-FactorioConsoleFaultingWriter -Destination $memory -FaultPhase $faultPhase;$actual=''
+    try {Send-MIR441FactorioConsoleStartupLine -State $replayState -Writer $writer -Timer $timer -Kind confirmation-replay}catch{$actual=$_.Exception.Message}finally{$writer.Dispose();$timer.Stop()}
+    $attempts=@($replayState.receipt.send_attempts)
+    Assert-Probe ($actual.Contains('[mir441-factorio-console-write]')-and$replayState.receipt.delivery_unknown-and$replayState.receipt.send_count-eq1-and$replayState.receipt.sends.Count-eq1-and$replayState.receipt.send_attempt_count-eq2-and$attempts.Count-eq2-and$attempts[0].delivery-ceq'writer-flushed'-and$attempts[1].kind-ceq'confirmation-replay'-and$attempts[1].phase-ceq$faultPhase-and$attempts[1].delivery-ceq'unknown') "console-confirmation-$faultPhase-failure-retains-first-send"
+    Refuses-Probe {Send-MIR441FactorioConsoleStartupLine -State $replayState -Writer $writer -Timer $timer -Kind confirmation-replay} '[mir441-factorio-console-delivery-unknown]'
+    Assert-Probe ($replayState.receipt.send_attempt_count-eq2-and$replayState.receipt.send_attempts.Count-eq2-and$replayState.receipt.send_count-eq1-and$replayState.receipt.sends.Count-eq1) "console-confirmation-$faultPhase-failure-never-retries"
     $memory.Dispose()
   }
   $successState=New-MIR441FactorioConsoleStartup -Definition $startup
