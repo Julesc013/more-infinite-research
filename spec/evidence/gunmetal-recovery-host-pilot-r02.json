@@ -1,0 +1,61 @@
+{
+  "kind": "MIRRecoveryHostPilotEvidenceV1",
+  "source_commit": "0bb697f512c85ebd8d40fc93b3e6d0ed979a49f5",
+  "observed_utc": "2026-11-20T10:12:19.620663+00:00",
+  "host_context": "Gunmetal jules fresh post-reboot shared-group session",
+  "scope": "repository-check-supervision-only",
+  "controller_connection_closed_before_readback": true,
+  "command": [
+    "/usr/bin/python3",
+    "-B",
+    "tools/check_repository.py"
+  ],
+  "repository_check": "pass",
+  "unit_properties": {
+    "RuntimeMaxUSec": "5min",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainCode": "1",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "41750528",
+    "MemoryMax": "536870912",
+    "TasksMax": "64",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "a667ab3eb3684a2dbd0cfaeacffc64ff"
+  },
+  "owned_service_stopped": true,
+  "completed_clean_task_worktree_removed": true,
+  "original_shared_checkout_preserved": true,
+  "old_manifest_membership": "2346 archive names and sizes match; no new full-catalogue hash pass",
+  "selected_headless_engines": [
+    {
+      "version": "2.0.77",
+      "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+    },
+    {
+      "version": "2.1.24",
+      "sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF"
+    }
+  ],
+  "lifetime_setting_change": "jules Linger enabled for the pilot; reported to primary coordinator for sole execution-owner disposition; no persistent queue installed",
+  "receipts": {
+    "path": "gunmetal-recovery-host-pilot-r02-receipts.json.gz",
+    "sha256": "A71E33917BBCAD25F2C5E48B501B9E330DF16A079402EC203779C3BE9624FAF9",
+    "records": 15,
+    "raw_bytes": 31478
+  },
+  "native_gameplay_acceptance": false,
+  "library_activation_or_restoration_acceptance": false,
+  "logout_boot_interruption_recovery_acceptance": false,
+  "continuous_queue_acceptance": false,
+  "release_acceptance": false,
+  "limits": [
+    "r01 repository output passed, but transient unit metadata unloaded before readback; original limitation retained.",
+    "r02 retained status established applied budget and normal completion; no Factorio world was launched.",
+    "Linger configuration is not proof of successful reboot/logout recovery.",
+    "Historical engines and original reporter configurations retain their separate qualification limits."
+  ]
+}
