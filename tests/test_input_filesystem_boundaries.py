@@ -172,7 +172,7 @@ class InputFilesystemBoundaries(unittest.TestCase):
         )
         self.assertEqual(1024**2 - 64 * 1024 - 3, result["remaining"])
 
-    def test_finite_four_hash_pins_survive_isolated_autocrlf_checkouts(self):
+    def test_finite_four_inputs_and_current_helpers_survive_isolated_autocrlf_checkouts(self):
         packet = json.loads(
             (ROOT / "tests/fixtures/worker-storage-finite-four-native.json").read_text(
                 encoding="utf-8"
@@ -186,9 +186,10 @@ class InputFilesystemBoundaries(unittest.TestCase):
         self.assertEqual(9, len(descriptors), descriptors)
         actor = "tests/fixtures/worker-storage-native-observer/control.lua"
         self.assertIn(actor, expected)
+        current_helpers = ("tools/lib/validation/LinuxWriteStorage.ps1",)
 
         attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
-        rules = [f"{path} text eol=lf" for path in expected]
+        rules = [f"{path} text eol=lf" for path in (*expected, *current_helpers)]
         for rule in rules:
             self.assertIn(rule, attributes)
 
@@ -204,14 +205,19 @@ class InputFilesystemBoundaries(unittest.TestCase):
 
         def source_blobs():
             blobs = {}
-            for path, pin in expected.items():
+            for path in (*expected, *current_helpers):
                 result = subprocess.run(
                     ["git", "-C", str(ROOT), "show", f"HEAD:{path}"],
                     capture_output=True,
                     timeout=30,
                 )
                 self.assertEqual(result.returncode, 0, result.stderr.decode())
-                self.assertEqual(hashlib.sha256(result.stdout).hexdigest(), pin, path)
+                # Actor members remain the original frozen inputs. Shared
+                # helpers may advance: their current Git blob is the byte
+                # authority for this transport test, not permission to change
+                # an old execution packet's pin.
+                if path.startswith("tests/fixtures/"):
+                    self.assertEqual(hashlib.sha256(result.stdout).hexdigest(), expected[path], path)
                 blobs[path] = result.stdout
             return blobs
 
@@ -229,7 +235,7 @@ class InputFilesystemBoundaries(unittest.TestCase):
             git(directory, "config", "user.email", "finite-four@example.invalid")
             git(directory, "add", ".")
             git(directory, "commit", "-qm", "finite-four transport source")
-            expected_tree = {".gitattributes", *expected}
+            expected_tree = {".gitattributes", *blobs}
             tree = set(git(directory, "ls-tree", "-r", "--name-only", "HEAD", text=True).splitlines())
             self.assertEqual(expected_tree, tree)
 
@@ -247,18 +253,22 @@ class InputFilesystemBoundaries(unittest.TestCase):
             return destination
 
         blobs = source_blobs()
+        transport_hashes = {
+            path: hashlib.sha256(payload).hexdigest()
+            for path, payload in blobs.items()
+        }
         governed = self.directory / "governed-source"
         initialize(governed, attributes, blobs)
         for mode in ("true", "false"):
             checked_out = checkout(governed, f"governed-{mode}", mode)
-            for path, pin in expected.items():
+            for path, pin in transport_hashes.items():
                 self.assertEqual(
                     hashlib.sha256((checked_out / path).read_bytes()).hexdigest(),
                     pin,
                     (mode, path),
                 )
 
-        # This is the pre-fix counterpart: the same nine raw Git blobs, but
+        # This is the pre-fix counterpart: the same raw Git blobs, but
         # no finite-four eol rules.  A true-autocrlf checkout must alter at
         # least the known observer-control hash, so the production assertion
         # cannot be replaced by a text-only attribute check.

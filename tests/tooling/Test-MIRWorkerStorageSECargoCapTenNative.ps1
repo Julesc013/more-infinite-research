@@ -62,14 +62,32 @@ $packet=Read-CargoCapTenJson $PacketPath
 $windowsPacket=Read-CargoCapTenJson $WindowsPacketPath
 
 Add-Check 'packets pin the full F200 source/candidate/File-settings/actor closure and distinct exact engines' {
-    Assert-CargoCapTenPacket -Packet $packet -RepoRoot $repo
-    Assert-CargoCapTenPacket -Packet $windowsPacket -RepoRoot $repo
+    Assert-CargoCapTenPacket -Packet $packet -RepoRoot $repo -DeferLocalHelperObservation
+    Assert-CargoCapTenPacket -Packet $windowsPacket -RepoRoot $repo -DeferLocalHelperObservation
 }
 Add-Check 'Compose defers missing local bindings without context or direct-library activation' {
     $out=Join-Path $OutputRoot 'compose.json';$receipt=Invoke-CargoCapTenExecutor -RequestedMode Compose -RequestedPacketPath $PacketPath -RepoRoot $repo -RequestedOutputPath $out
-    Assert-CargoCapTenEqual $receipt.status 'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS' 'Compose status';Assert-CargoCapTenEqual $receipt.native_processes_started 0 'Compose native processes';Assert-CargoCapTenEqual $receipt.library_activation $false 'Compose activation';Assert-CargoCapTenEqual $receipt.resource_context_allocated $false 'Compose context'
+    Require-CargoCapTen ($receipt.status -cin @('COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS','COMPOSED_DEFERRED_LOCAL_HELPER_MISMATCH')) 'Compose status differs';Assert-CargoCapTenEqual $receipt.native_processes_started 0 'Compose native processes';Assert-CargoCapTenEqual $receipt.library_activation $false 'Compose activation';Assert-CargoCapTenEqual $receipt.resource_context_allocated $false 'Compose context'
     $windowsOut=Join-Path $OutputRoot 'compose-windows.json';$windowsReceipt=Invoke-CargoCapTenExecutor -RequestedMode Compose -RequestedPacketPath $WindowsPacketPath -RepoRoot $repo -RequestedOutputPath $windowsOut
-    Assert-CargoCapTenEqual $windowsReceipt.status 'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS' 'Windows Compose status';Assert-CargoCapTenEqual $windowsReceipt.native_processes_started 0 'Windows Compose native processes';Assert-CargoCapTenEqual $windowsReceipt.library_activation $false 'Windows Compose activation';Assert-CargoCapTenEqual $windowsReceipt.resource_context_allocated $false 'Windows Compose context'
+    Require-CargoCapTen ($windowsReceipt.status -cin @('COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS','COMPOSED_DEFERRED_LOCAL_HELPER_MISMATCH')) 'Windows Compose status differs';Assert-CargoCapTenEqual $windowsReceipt.native_processes_started 0 'Windows Compose native processes';Assert-CargoCapTenEqual $windowsReceipt.library_activation $false 'Windows Compose activation';Assert-CargoCapTenEqual $windowsReceipt.resource_context_allocated $false 'Windows Compose context'
+}
+Add-Check 'helper observation preserves same-size drift while strict admission rejects it' {
+    $path=Join-Path $OutputRoot 'helper-identity.txt';Write-Text $path 'ABCD'
+    $descriptor=[ordered]@{path=$path;bytes=4;sha256='E12E115ACF4552B2568B55E93CBD39394C4EF81C82447FAFC997882A02D23677'}
+    Assert-CargoCapTenEqual (Test-CargoCapTenFile $descriptor 'helper control' -ObserveMismatch).state 'verified_local_input' 'exact helper'
+    Write-Text $path 'WXYZ';$changed=Test-CargoCapTenFile $descriptor 'helper control' -ObserveMismatch
+    Require-CargoCapTen ($changed.state -ceq 'mismatched_local_input' -and $changed.sha256 -ceq $descriptor.sha256 -and $changed.observed_sha256 -ceq '21E32F5321CAD49AB4CF78BA5ED231E0F36D0C78D34108FDA1BE939F33FBA149') 'helper mismatch observation differs'
+    Assert-Refuses -Contains 'helper control SHA-256 differs' -Action {Test-CargoCapTenFile $descriptor 'helper control'}
+}
+Add-Check 'planning cannot change frozen helper pins and Execute refuses unavailable helpers before its actor' {
+    $bad=Copy-HashTable $packet;$bad.helper_pins[2].sha256='0'*64
+    Assert-Refuses -Contains 'helper SHA-256' -Action {Assert-CargoCapTenPacket $bad $repo -DeferLocalHelperObservation}
+    $prior=(Get-Command Invoke-CargoCapTenExecution -CommandType Function).ScriptBlock;$script:cargoUnexpectedExecution=$false
+    try{
+        Set-Item -Path Function:Invoke-CargoCapTenExecution -Value {param($Packet,$RepoRoot) $script:cargoUnexpectedExecution=$true;throw 'unexpected execution boundary'}
+        $errorText='';try{Invoke-CargoCapTenExecutor -RequestedMode Execute -RequestedPacketPath $WindowsPacketPath -RepoRoot $repo -RequestedOutputPath (Join-Path $OutputRoot 'must-not-execute.json')|Out-Null}catch{$errorText=$_.Exception.Message}
+        Require-CargoCapTen (-not $script:cargoUnexpectedExecution -and $errorText -match 'helper .+ (bytes differ|SHA-256 differs)|Execute refuses missing local bindings' -and -not(Test-Path -LiteralPath (Join-Path $OutputRoot 'must-not-execute.json'))) "unavailable helpers crossed execution: $errorText"
+    }finally{Set-Item -Path Function:Invoke-CargoCapTenExecution -Value $prior}
 }
 Add-Check 'wrong File settings, actor, engine, and archive identities refuse before an owner can execute' {
     $mutations=@(
@@ -162,8 +180,11 @@ Add-Check 'source and candidate completion predicates require a complete save ZI
     $invalid=Join-Path $OutputRoot 'predicate-invalid.zip';Write-Text $invalid 'not-a-zip';if(Test-CargoCapTenCompleteSave $invalid 'predicate invalid'){throw 'invalid completed save was admitted'}
     $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($ControllerPath,[ref]$tokens,[ref]$errors);if($errors.Count-ne0){throw 'controller parse failed'};$execution=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-CargoCapTenExecution'},$true));if($execution.Count-ne1 -or $execution[0].Extent.Text-notmatch'Test-CargoCapTenCompleteSave \$sourceSave' -or $execution[0].Extent.Text-notmatch'Test-CargoCapTenCompleteSave \$candidateSave'){throw 'execution predicate does not require completed ZIPs'}
 }
-Add-Check 'Execute refuses before context when bindings are absent and preserves the requested output path' {
-    $compatiblePacket=if((Get-CargoCapTenHostPlatform)-ceq'Windows'){$WindowsPacketPath}else{$PacketPath};$out=Join-Path $OutputRoot 'execute-with-missing-bindings.json';Assert-Refuses -Contains 'Execute refuses missing local bindings' -Action {Invoke-CargoCapTenExecutor -RequestedMode Execute -RequestedPacketPath $compatiblePacket -RepoRoot $repo -RequestedOutputPath $out|Out-Null};if(Test-Path -LiteralPath $out){throw 'missing-binding Execute wrote an output receipt'}
+Add-Check 'Execute refuses before context when frozen helpers or bindings are unavailable and preserves the output path' {
+    $compatiblePacket=if((Get-CargoCapTenHostPlatform)-ceq'Windows'){$WindowsPacketPath}else{$PacketPath};$out=Join-Path $OutputRoot 'execute-with-missing-bindings.json'
+    $errorText='';try{Invoke-CargoCapTenExecutor -RequestedMode Execute -RequestedPacketPath $compatiblePacket -RepoRoot $repo -RequestedOutputPath $out|Out-Null}catch{$errorText=$_.Exception.Message}
+    Require-CargoCapTen ($errorText -match 'helper .+ (bytes differ|SHA-256 differs)|Execute refuses missing local bindings') "unavailable input refusal differs: $errorText"
+    if(Test-Path -LiteralPath $out){throw 'unavailable-input Execute wrote an output receipt'}
 }
 Add-Check 'post-activation cleanup closes one owned activation and surfaces restoration failure' {
     function script:Complete-MIRLibraryActivation {param($Activation) if($Activation.fail){throw 'synthetic restoration failure'};$Activation.closed=$true;[ordered]@{status='restored'}}

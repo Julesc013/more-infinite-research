@@ -1,4 +1,5 @@
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'LinuxWriteStorage.ps1')
 
 function Get-MIR441PhysicalMemorySnapshot {
   if (-not $IsWindows) { throw '[mir441-resource-monitor-windows-required]' }
@@ -134,7 +135,8 @@ function Resolve-MIR441RecoveryScratchPath {
   $current=$full
   while($current){
     if(Test-Path -LiteralPath $current){if((Get-Item -LiteralPath $current -Force).Attributes-band[IO.FileAttributes]::ReparsePoint){throw '[mir441-resource-output-reparse]'}}
-    $current=Split-Path -Parent $current
+    $parent=[IO.Directory]::GetParent($current)
+    $current=if($null-ne$parent){$parent.FullName}else{$null}
   }
   return $full
 }
@@ -229,11 +231,20 @@ function Assert-MIR441ResourceAdmission {
   $null=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot
   if($EstimatedPeakBytes-lt0-or$EstimatedPeakBytes-gt8GB-or$ExpectedPeakMemoryBytes-lt0){throw '[mir441-resource-staging-budget]'}
   $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot;$limits=Get-MIR441ResourceLimits -Policy $Policy -Snapshot $snapshot
+  $storageProperty=$Policy.PSObject.Properties['linux_write_storage']
+  if($null -ne $storageProperty){
+    if(-not $IsLinux){throw '[mir-linux-storage-linux-required]'}
+    $control=@($storageProperty.Value.roots | Where-Object role -CEQ 'control')[0]
+    if([IO.Path]::GetFullPath($WorkRoot) -cne $control.path){throw '[mir-linux-storage-control-root]'}
+    $storageObservation=Get-MIRLinuxWriteStorageObservation -Storage $storageProperty.Value
+    $snapshot | Add-Member -NotePropertyName write_storage -NotePropertyValue $storageObservation
+    $limits.system_bytes=$null;$limits.work_bytes=$null
+  }
   $failure=''
   if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
   elseif($IsLinux-and$null-ne$snapshot.memory.cgroup_v2.effective_headroom_bytes-and[int64]$snapshot.memory.cgroup_v2.effective_headroom_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-cgroup]'}
   elseif(-not$IsLinux-and[int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
-  else{
+  elseif($null -eq $storageProperty){
     [int64]$systemOutputAllowance=2*$EstimatedPeakBytes
     if($IsLinux){
       $systemDevice=Get-MIR441LinuxVolumeDevice -Volume $snapshot.system_volume
@@ -733,11 +744,12 @@ function Invoke-MIR441MonitoredProcess {
     $consoleStartup=New-MIR441FactorioConsoleStartup -Definition $FactorioConsoleStartup
     if([string]::IsNullOrWhiteSpace($StdoutPath)-and[string]::IsNullOrWhiteSpace($StderrPath)){throw '[mir441-factorio-console-output-required]'}
   }
-  $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
+  $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $LedgerPath
+  $splitStorage=$null -ne $Policy.PSObject.Properties['linux_write_storage']
   $pathComparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
-    $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
-    if(-not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,$pathComparison)){throw '[mir441-resource-output-work-root]'}
+    $resolved=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $path
+    if(-not $splitStorage -and -not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,$pathComparison)){throw '[mir441-resource-output-work-root]'}
   }
   if($EstimatedPeakBytes-le0-or$ExpectedPeakMemoryBytes-le0){throw '[mir441-resource-peak-budget-required]'}
   if($null -ne $PreStartAdmissionWait){Assert-MIR441PreStartAdmissionWaitState -State $PreStartAdmissionWait}
@@ -746,7 +758,8 @@ function Invoke-MIR441MonitoredProcess {
   }else{
     $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
   }
-  $before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}
+  $before=$null
+  if(-not $splitStorage){$before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}}
   $lockPath=Join-Path ([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))) 'build/tmp/mir-heavy.lock'
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
@@ -853,11 +866,14 @@ function Invoke-MIR441MonitoredProcess {
       $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
       if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.released_address_space_members=@($tree.released_address_space_members);$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
+      $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}
       if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
-      $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
-      if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
+      if(-not $splitStorage){
+        $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
+        if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
+      }
       if($process.HasExited){
         Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
         break
@@ -890,6 +906,7 @@ function Invoke-MIR441MonitoredProcess {
     $passed=$completionObserved-or$process.ExitCode-eq0
     $completedLedger=[ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}
     if($IsLinux){$completedLedger.clock_scope='linux-launcher-session-inclusive'}
+    $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
     Write-MIR441Json -Value $completedLedger -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
     $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
@@ -916,6 +933,7 @@ function Invoke-MIR441MonitoredProcess {
     }
     if(-not$isNaturalExitFailure){
       & $recordCleanup 'interrupted-ledger-write' $true {
+        $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
         Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
       }
     }
