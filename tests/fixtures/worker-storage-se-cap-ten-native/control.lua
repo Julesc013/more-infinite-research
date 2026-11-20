@@ -692,15 +692,33 @@ local function cap12_mir_change_values(event)
   local new_version, new_valid = value("new_version")
   return "present", old_version, new_version, old_valid and new_valid
 end
+local function cap12_contract_value(value)
+  local kind, text = frame_value(value, true)
+  return kind .. ":" .. text
+end
+local function cap12_contract_scalar(row, field)
+  local available, value = pcall(function() return row[field] end)
+  if not available then return "unavailable", false, nil end
+  return cap12_contract_value(value), true, value
+end
 local function observe_cap12_configuration(event, state)
   check(script.active_mods["more-infinite-research"] == CURRENT_MIR, "cap12 MIR identity differs")
   check(state.phase == "closed" and state.worker == CANDIDATE and type(state.closed) == "table"
     and state.closed.worker == CANDIDATE, "cap12 configuration state differs")
   check(state.ordinary == 5 and state.candidate_events == 2, "cap12 saved completion count differs")
   check(state.configuration_startup_settings_changed == false, "cap12 saved configuration flag differs")
-  assert_active_tuple(); assert_cap12_settings(); assert_worker_contract(state.player, CANDIDATE)
+  assert_active_tuple(); assert_cap12_settings()
   local change_state, old_version, new_version, change_valid = cap12_mir_change_values(event)
   local observed = frame(state)
+  local target = technology(state.player, CANDIDATE)
+  local prototype_available, prototype = pcall(function() return target.prototype end)
+  local maximum_text, maximum_available, maximum = "unavailable", false, nil
+  if prototype_available then
+    maximum_text, maximum_available, maximum = cap12_contract_scalar(prototype, "max_level")
+  end
+  local count_text, count_available, count = cap12_contract_scalar(target, "research_unit_count")
+  local time_text, time_available, time = cap12_contract_scalar(target, "research_unit_energy")
+  local formula_text, formula_available, formula = cap12_contract_scalar(target, "research_unit_count_formula")
   log(table.concat({
     "[MIR_SE_CARGO_CAP12_CONFIGURATION]", "event_startup_settings_changed=" .. tostring(event.mod_startup_settings_changed),
     "saved_configuration_startup_settings_changed=" .. tostring(state.configuration_startup_settings_changed),
@@ -708,9 +726,15 @@ local function observe_cap12_configuration(event, state)
     "level=" .. tostring(observed.target.level), "enabled=" .. tostring(observed.target.enabled),
     "current=" .. tostring(observed.current), "progress=" .. tostring(observed.progress),
     "queue=" .. table.concat(observed.queue, ","), "science_issued=" .. science_values(observed.science.issued),
-    "science_remaining=" .. science_values(observed.science.remaining), "science_debit=" .. science_values(observed.science.debit)
+    "science_remaining=" .. science_values(observed.science.remaining), "science_debit=" .. science_values(observed.science.debit),
+    "bonus=" .. cap12_contract_value(observed.bonus), "maximum=" .. maximum_text,
+    "unit_count=" .. count_text, "unit_time=" .. time_text, "unit_formula=" .. formula_text
   }, "|"))
   check(change_valid, "cap12 MIR change differs")
+  check(prototype_available and maximum_available and count_available and time_available and formula_available,
+    "cap12 current contract unavailable")
+  check(type(maximum) == "number" and type(count) == "number" and type(time) == "number" and type(formula) == "string",
+    "cap12 current contract differs")
   observe_force_contributions("cap12-configuration")
   frame_diagnostics(state.closed, observed, "cap12-configuration")
 end

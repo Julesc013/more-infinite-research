@@ -812,6 +812,11 @@ local function assert_candidate_transfer(state)'''
         self.assertIn("science_issued=automation-science-pack:", snapshot)
         self.assertIn("science_remaining=automation-science-pack:", snapshot)
         self.assertIn("science_debit=automation-science-pack:", snapshot)
+        self.assertIn("bonus=number:7", snapshot)
+        self.assertIn("maximum=number:4294967295", snapshot)
+        self.assertIn("unit_count=number:675", snapshot)
+        self.assertIn("unit_time=number:3600", snapshot)
+        self.assertIn('unit_formula=string:"675*1.5^(L-4)"', snapshot)
         self.assertIn(
             "summary path=frame origin=cap12-configuration count=0 truncated=false",
             self.frame_diffs()[-1],
@@ -829,6 +834,38 @@ local function assert_candidate_transfer(state)'''
         self.assertIn("mir_change=present", snapshot)
         self.assertIn('mir_old="5.0.20018"', snapshot)
         self.assertIn('mir_new="5.0.20018"', snapshot)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_cap12_configuration_observes_incompatible_current_contract_before_old_closed_refusal(self):
+        self.candidate_to_closed()
+        self.lua.globals().cargo_incompatible_candidate_contract()
+        before = {
+            "phase": self.lua.globals().cargo_phase(),
+            "saves": list(self.lua.globals().cargo_saves().values()),
+            "science": dict(self.lua.globals().cargo_counts().items()),
+            "bonus": self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+            "current": self.lua.globals().cargo_current_name(),
+            "queue": list(self.lua.globals().cargo_queue_names().values()),
+        }
+        self.closed_cap12_configuration()
+        self.assertEqual(before["phase"], self.lua.globals().cargo_phase())
+        self.assertEqual(before["saves"], list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before["science"], dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before["bonus"], self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+        self.assertEqual(before["current"], self.lua.globals().cargo_current_name())
+        self.assertEqual(before["queue"], list(self.lua.globals().cargo_queue_names().values()))
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("maximum=number:12", snapshot)
+        self.assertIn('unit_formula=string:"999+L"', snapshot)
+        self.assertIn("unit_count=number:675", snapshot)
+        self.assertIn("unit_time=number:3600", snapshot)
+        contributor = next(line for line in self.force_contributions()
+                           if 'phase=cap12-configuration force_index=1 force_name="player" kind=technology ' in line
+                           and 'technology="mir-worker-storage-default-4"' in line)
+        self.assertIn('effect_1_type="worker-robot-storage"', contributor)
+        self.assertIn("effect_1_modifier=2", contributor)
         self.lua.globals().cargo_reenable_cap()
         with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
             self.lua.globals().cargo_tick(1)

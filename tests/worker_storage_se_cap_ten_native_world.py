@@ -318,6 +318,11 @@ function cargo_contributor_effects_unavailable()CARGO_TECH_BACKING[SOURCE].proto
 function cargo_contributor_effects_overflow()
   local effects={};for index=1,17 do effects[index]={type="worker-robot-storage",modifier=1} end;CARGO_TECH_BACKING[SOURCE].prototype.effects=effects
 end
+function cargo_incompatible_candidate_contract()
+  local values=CARGO_TECH_BACKING[CANDIDATE]
+  values.prototype.max_level=12;values.prototype.effects={{type="worker-robot-storage",modifier=2}}
+  values.research_unit_count_formula="999+L"
+end
 function cargo_contributor_technology_unavailable()
   local original=CARGO_FORCE_VALUES.technologies
   CARGO_FORCE_VALUES.technologies=setmetatable({}, {__index=function(_,name)if name==SOURCE then error("diagnostic technology lookup differs")end;return original[name] end})
