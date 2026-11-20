@@ -21,6 +21,35 @@ class BootstrapTests(unittest.TestCase):
             else build_bootstrap_control_world(LuaRuntime, source_root=ROOT / "source")
         )
 
+    def test_temporary_force_observer_brackets_configuration_writers(self):
+        self.lua.execute('''
+          local fixture="mir-fixture-mir5-worker-storage-se-cap-ten-native"
+          install_modules(false);install_runtime({[fixture]={observe_force_contributions=true}}, {[fixture]="0.1.0"})
+          local phases={};local event={mod_changes={}}
+          remote.call=function(name,method,phase)
+            assert(name==fixture and method=="observe_force_contributions")
+            phases[#phases+1]=phase
+            if phase=="mir-config-entry" then
+              assert(lifecycle_calls.cap_plan==nil and lifecycle_calls.configuration==nil)
+            elseif phase=="mir-worker-applied" then
+              assert(lifecycle_calls.cap_plan and lifecycle_calls.configuration==nil)
+            elseif phase=="mir-config-exit" then
+              assert(lifecycle_calls.configuration==event and library_calls.configuration==event)
+            else error("unexpected observer phase") end
+          end
+          load_control();handlers.configuration(event)
+          assert(table.concat(phases,",")=="mir-config-entry,mir-worker-applied,mir-config-exit")
+        ''')
+
+    def test_temporary_force_observer_unavailable_refuses_before_preflight(self):
+        self.lua.execute('''
+          local fixture="mir-fixture-mir5-worker-storage-se-cap-ten-native"
+          install_modules(false);install_runtime({}, {[fixture]="0.1.0"});load_control()
+          local ok,why=pcall(handlers.configuration,{mod_changes={}})
+          assert(not ok and tostring(why):find("MIR diagnostic worker-force observer is unavailable",1,true))
+          assert(lifecycle_calls.cap_plan==nil and lifecycle_calls.configuration==nil and library_calls.configuration==nil)
+        ''')
+
     def test_actual_bootstrap_keeps_gate_only_configuration_after_legacy_commit(self):
         # Routing only: the complete worker/history controls own native-frame
         # validation. This independent order must not delegate a flag-only plan.

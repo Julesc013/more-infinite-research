@@ -391,7 +391,20 @@ local function discard_absent_competing_productivity_state()
   storage.mir_competing_productivity = nil
 end
 
+-- Temporary diagnostic branch only: the observer lives in the separately
+-- pinned test fixture. These calls add no production repair or authority.
+local function observe_diagnostic_worker_forces(phase)
+  local observer = "mir-fixture-mir5-worker-storage-se-cap-ten-native"
+  if not (script and script.active_mods and script.active_mods[observer] == "0.1.0") then return end
+  local interface = remote and remote.interfaces and remote.interfaces[observer]
+  if not (interface and interface.observe_force_contributions) then
+    error("MIR diagnostic worker-force observer is unavailable", 2)
+  end
+  remote.call(observer, "observe_force_contributions", phase)
+end
+
 local function on_configuration_changed(event)
+  observe_diagnostic_worker_forces("mir-config-entry")
   local cap_plan = lifecycle.preflight(true)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
@@ -450,6 +463,7 @@ local function on_configuration_changed(event)
     end
     lifecycle.apply_worker_storage_split_caps(worker_default_caps)
   end
+  observe_diagnostic_worker_forces("mir-worker-applied")
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
   lifecycle.on_configuration_changed(event, cap_plan)
@@ -482,6 +496,7 @@ local function on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
   if diagnostics then diagnostics.startup("MIR configuration change") end
+  observe_diagnostic_worker_forces("mir-config-exit")
 end
 
 local function on_load()
