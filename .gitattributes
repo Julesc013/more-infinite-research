@@ -180,6 +180,14 @@ tests/fixtures/worker-storage-native-observer/info.json text eol=lf
 tests/fixtures/worker-storage-native-observer/data.lua text eol=lf
 tests/fixtures/worker-storage-finite-provider/info.json text eol=lf
 tests/fixtures/worker-storage-finite-provider/data-updates.lua text eol=lf
+# The SE cargo-cap native owner binds this entire fixture body by exact raw
+# member hashes.  Keep each staged member equal to its committed LF blob on
+# Windows runners as well as Linux native hosts.
+tests/fixtures/worker-storage-se-cap-ten-native/control.lua text eol=lf
+tests/fixtures/worker-storage-se-cap-ten-native/data-final-fixes.lua text eol=lf
+tests/fixtures/worker-storage-se-cap-ten-native/data.lua text eol=lf
+tests/fixtures/worker-storage-se-cap-ten-native/info-f200.json text eol=lf
+tests/fixtures/worker-storage-se-cap-ten-native/prerequisites.lua text eol=lf
 tools/lib/validation/ImmutableInputStaging.ps1 text eol=lf
 tools/lib/compatibility/LibraryActivation.ps1 text eol=lf
 tools/lib/validation/NativeProbeResources.ps1 text eol=lf
