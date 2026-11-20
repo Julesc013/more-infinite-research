@@ -391,7 +391,49 @@ local function discard_absent_competing_productivity_state()
   storage.mir_competing_productivity = nil
 end
 
+-- BEGIN MIR force4 diagnostic-only observation
+local function trace_force4_configuration(stage)
+  if target.id ~= "f200" or not script or not script.active_mods
+      or script.active_mods["space-exploration"] ~= "0.7.57" or type(log) ~= "function" then return end
+  local force = game and game.forces and game.forces[4]
+  if not force then return end
+  local function observed(read)
+    local ok, value = pcall(read)
+    if not ok then return "unavailable" end
+    if type(value) == "number" then return "number:" .. string.format("%.17g", value) end
+    return type(value) .. ":" .. tostring(value):gsub("[%c|]", " "):sub(1, 96)
+  end
+  local fields = {"[MIR_FORCE4_STAGE]", "stage=" .. stage,
+    "index=" .. observed(function() return force.index end), "name=" .. observed(function() return force.name end),
+    "cargo=" .. observed(function() return force.worker_robots_storage_bonus end),
+    "speed=" .. observed(function() return force.worker_robots_speed_modifier end),
+    "artillery_range=" .. observed(function() return force.artillery_range_modifier end),
+    "artillery_speed=" .. observed(function() return force.get_gun_speed_modifier("artillery-shell") end),
+    "laser_speed=" .. observed(function() return force.get_gun_speed_modifier("laser") end),
+    "laser_damage=" .. observed(function() return force.get_ammo_damage_modifier("laser") end)}
+  log(table.concat(fields, "|"))
+  for _, id in ipairs{"worker-robots-storage-1", "worker-robots-storage-2", "worker-robots-storage-3",
+      "worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-head-4",
+      "mir-worker-storage-preservation-4", "mir-worker-storage-published517-4"} do
+    local row = force.technologies[id]
+    local values = {"[MIR_FORCE4_ROW]", "stage=" .. stage, "technology=" .. id, "status=" .. (row and "present" or "absent")}
+    if row then
+      for _, key in ipairs{"level", "researched", "enabled", "visible_when_disabled", "saved_progress",
+          "research_unit_count", "research_unit_energy"} do
+        values[#values + 1] = key .. "=" .. observed(function() return row[key] end)
+      end
+      values[#values + 1] = "effect=" .. observed(function()
+        local effect = row.prototype.effects[1]
+        return effect and (effect.type .. ":" .. tostring(effect.modifier))
+      end)
+    end
+    log(table.concat(values, "|"))
+  end
+end
+-- END MIR force4 diagnostic-only observation
+
 local function on_configuration_changed(event)
+  trace_force4_configuration("entry")
   local cap_plan = lifecycle.preflight(true)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
@@ -436,6 +478,7 @@ local function on_configuration_changed(event)
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
+  trace_force4_configuration("after-preflight")
   if worker_robot_storage then
     if worker_prepared_default then
       worker_robot_storage.default_owner_apply(worker_default_plan)
@@ -451,14 +494,19 @@ local function on_configuration_changed(event)
     lifecycle.apply_worker_storage_split_caps(worker_default_caps)
   end
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
+  trace_force4_configuration("after-worker-and-finite-speed")
   reconcile_imersite()
+  trace_force4_configuration("after-imersite")
   lifecycle.on_configuration_changed(event, cap_plan)
+  trace_force4_configuration("after-lifecycle")
   if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
+  trace_force4_configuration("after-native-credits")
   if competing_productivity then
     competing_productivity.on_configuration_changed(event)
   else
     discard_absent_competing_productivity_state()
   end
+  trace_force4_configuration("after-competing-productivity")
   if scripted_effects then
     scripted_effects.on_configuration_changed(event)
   else
@@ -475,13 +523,18 @@ local function on_configuration_changed(event)
       end
     end
   end
+  trace_force4_configuration("after-scripted-effects")
   if legacy_module_credits then legacy_module_credits.apply(module_credit_plan) end
   if legacy_cannon_credits then legacy_cannon_credits.apply(cannon_credit_plan) end
   if native_gun_credits then native_gun_credits.on_configuration_changed(event, gun_credit_plan) end
+  trace_force4_configuration("after-legacy-and-gun-credits")
   library.on_configuration_changed(event)
+  trace_force4_configuration("after-library")
   reconcile_repair()
   reconcile_translations()
+  trace_force4_configuration("after-repair-and-translations")
   if diagnostics then diagnostics.startup("MIR configuration change") end
+  trace_force4_configuration("after-diagnostics")
 end
 
 local function on_load()
