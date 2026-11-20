@@ -17,7 +17,7 @@ local SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
   "utility-science-pack"
 }
-local RUNTIME_PREREQUISITES = {"utility-science-pack", "worker-robots-storage-2", PREDECESSOR}
+local RUNTIME_PREREQUISITES = {"utility-science-pack", PREDECESSOR}
 local SETTINGS = {
   {name = "mir-enable-worker-robots-storage", value = true},
   {name = "mir-max-level-worker-robots-storage", value = 10},
@@ -115,7 +115,8 @@ local function observe_runtime_prerequisites(force)
   if prerequisites == nil then
     log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
       .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
-      .. "|observed=unavailable|authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+      .. "|observed=unavailable|runtime_expected=utility-science-pack,worker-robots-storage-3"
+      .. "|authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
     fail("ordinary worker runtime prerequisite is unavailable")
   end
   local names, seen, count = {}, {}, 0
@@ -130,7 +131,8 @@ local function observe_runtime_prerequisites(force)
   log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
     .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
     .. "|observed_count=" .. tostring(#names) .. "|observed=" .. table.concat(names, ",")
-    .. "|authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+    .. "|runtime_expected=utility-science-pack,worker-robots-storage-3"
+    .. "|authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
 end
 local function assert_worker_contract(force)
   local row = technology(force, TARGET)

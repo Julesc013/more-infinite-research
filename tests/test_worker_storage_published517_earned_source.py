@@ -156,13 +156,15 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.assertEqual([], self.logs())
 
     def test_runtime_logs_the_actual_prerequisite_map_before_any_finite_setup_grant_refusal(self):
-        self.lua.execute("P517_OMIT_TARGET_PREREQUISITE='worker-robots-storage-2'")
+        self.lua.execute("P517_EXTRA_TARGET_PREREQUISITE='worker-robots-storage-2'")
         with self.assertRaisesRegex(LuaError, "ordinary worker direct prerequisite count differs"):
             self.lua.globals().p517_begin()
         self.assertEqual("idle", self.lua.globals().p517_phase())
         diagnostic = next(row for row in self.logs() if "stage=runtime-pregrant" in row)
-        self.assertIn("observed_count=2", diagnostic)
-        self.assertIn("observed=utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertIn("observed_count=3", diagnostic)
+        self.assertIn("observed=utility-science-pack,worker-robots-storage-2,worker-robots-storage-3", diagnostic)
+        self.assertIn("runtime_expected=utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertIn("authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
         self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
 
     def test_configuration_change_refuses_instead_of_entering_a_candidate_route(self):
