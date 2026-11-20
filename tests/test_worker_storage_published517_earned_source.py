@@ -41,7 +41,7 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.lua.globals().p517_tick(1)
         self.assertEqual("source-partial", self.lua.globals().p517_phase())
 
-    def data_stage(self, *, ingredients=None, settings_values=None):
+    def data_stage(self, *, ingredients=None, prerequisites=None, settings_values=None):
         lua = LuaRuntime(unpack_returned_tuples=True)
         values = dict(world.SETTINGS if settings_values is None else settings_values)
         startup = lua.table()
@@ -52,7 +52,11 @@ class Published517EarnedSourceTests(unittest.TestCase):
             unit_rows[index] = lua.table_from({1: name, 2: 1}, recursive=True)
         target = lua.table_from({
             "max_level": "infinite", "level": 4, "enabled": True, "hidden": False,
-            "prerequisites": lua.table_from({1: "worker-robots-storage-2", 2: "utility-science-pack", 3: world.PREDECESSOR}),
+            "prerequisites": lua.table_from({
+                index: name for index, name in enumerate(
+                    prerequisites or ("worker-robots-storage-2", "utility-science-pack", world.PREDECESSOR), 1
+                )
+            }),
             "unit": lua.table_from({"count_formula": "675*1.5^(L-4)", "time": 60, "ingredients": unit_rows}),
             "effects": lua.table_from({1: lua.table_from({"type": "worker-robot-storage", "modifier": 1})}),
         }, recursive=True)
@@ -86,7 +90,7 @@ class Published517EarnedSourceTests(unittest.TestCase):
         result, logs = self.data_stage()
         self.assertTrue(result)
         self.assertEqual(20, next(row for row in logs if row.startswith("[MIR_ACTIVE_MODS]")).count("@"))
-        marker = next(row for row in logs if row.startswith("[MIR_PUBLISHED517_EARNED_SOURCE]"))
+        marker = next(row for row in logs if row.startswith("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data target="))
         self.assertIn("science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,utility-science-pack", marker)
         self.assertIn("formula=675*1.5^(L-4)", marker)
         self.assertIn("prerequisites=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", marker)
@@ -96,6 +100,15 @@ class Published517EarnedSourceTests(unittest.TestCase):
         result, _ = self.data_stage(ingredients=world.SCIENCE[:-1])
         self.assertFalse(result[0])
         self.assertIn("published ordinary worker science count differs", result[1])
+
+    def test_data_stage_logs_the_actual_prerequisite_map_before_refusing_an_extra_or_missing_contract(self):
+        result, logs = self.data_stage(prerequisites=("utility-science-pack", world.PREDECESSOR))
+        self.assertFalse(result[0])
+        self.assertIn("published ordinary worker prerequisite count differs", result[1])
+        diagnostic = next(row for row in logs if "stage=data-prerequisites" in row)
+        self.assertIn("observed_count=2", diagnostic)
+        self.assertIn("observed=utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertIn("authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
 
     def test_dedicated_force_natively_earns_four_through_eight_then_partial_nine(self):
         self.source_to_partial()
@@ -141,6 +154,16 @@ class Published517EarnedSourceTests(unittest.TestCase):
             self.lua.globals().p517_begin()
         self.assertEqual("idle", self.lua.globals().p517_phase())
         self.assertEqual([], self.logs())
+
+    def test_runtime_logs_the_actual_prerequisite_map_before_any_finite_setup_grant_refusal(self):
+        self.lua.execute("P517_OMIT_TARGET_PREREQUISITE='worker-robots-storage-2'")
+        with self.assertRaisesRegex(LuaError, "ordinary worker direct prerequisite count differs"):
+            self.lua.globals().p517_begin()
+        self.assertEqual("idle", self.lua.globals().p517_phase())
+        diagnostic = next(row for row in self.logs() if "stage=runtime-pregrant" in row)
+        self.assertIn("observed_count=2", diagnostic)
+        self.assertIn("observed=utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
 
     def test_configuration_change_refuses_instead_of_entering_a_candidate_route(self):
         self.source_to_partial()

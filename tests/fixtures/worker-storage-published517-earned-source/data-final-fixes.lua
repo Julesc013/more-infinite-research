@@ -35,6 +35,23 @@ local function exact_names(rows, expected, label)
   if type(rows) ~= "table" or #rows ~= #expected then fail(label .. " count differs") end
   for index, name in ipairs(expected) do if rows[index] ~= name then fail(label .. " differs: " .. tostring(index)) end end
 end
+local function bounded_prerequisite_names(rows, label)
+  if type(rows) ~= "table" then
+    log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data-prerequisites target=" .. TARGET
+      .. "|observed=unavailable|authored_expected=" .. table.concat(PREREQUISITES, ","))
+    fail(label .. " is unavailable")
+  end
+  local names, seen, count = {}, {}, 0
+  for key, value in pairs(rows) do
+    local name = type(key) == "number" and value or key
+    if type(name) ~= "string" or name == "" or seen[name] then fail(label .. " is invalid") end
+    count = count + 1
+    if count > 32 then fail(label .. " exceeds bounded observation") end
+    seen[name], names[#names + 1] = true, name
+  end
+  table.sort(names)
+  return names
+end
 
 if type(mods) ~= "table" then fail("data-stage mods dictionary is required") end
 local identities = {}
@@ -68,6 +85,10 @@ if technology.unit == nil or technology.unit.count_formula ~= "675*1.5^(L-4)" or
   fail("published ordinary worker unit differs")
 end
 exact_rows(technology.unit.ingredients, SCIENCE, "published ordinary worker science")
+local observed_prerequisites = bounded_prerequisite_names(technology.prerequisites, "published ordinary worker prerequisite")
+log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data-prerequisites target=" .. TARGET
+  .. "|observed_count=" .. tostring(#observed_prerequisites) .. "|observed=" .. table.concat(observed_prerequisites, ",")
+  .. "|authored_expected=" .. table.concat(PREREQUISITES, ","))
 exact_names(technology.prerequisites, PREREQUISITES, "published ordinary worker prerequisite")
 if type(technology.effects) ~= "table" or #technology.effects ~= 1
     or technology.effects[1].type ~= "worker-robot-storage" or technology.effects[1].modifier ~= 1 then

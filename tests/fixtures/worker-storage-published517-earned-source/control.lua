@@ -109,6 +109,29 @@ local function parent_names(row)
   for key, value in pairs(row.prerequisites or {}) do out[#out + 1] = type(key) == "string" and key or value.name end
   table.sort(out); return out
 end
+local function observe_runtime_prerequisites(force)
+  local row = technology(force, TARGET)
+  local prerequisites = row.prerequisites
+  if prerequisites == nil then
+    log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
+      .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
+      .. "|observed=unavailable|authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+    fail("ordinary worker runtime prerequisite is unavailable")
+  end
+  local names, seen, count = {}, {}, 0
+  for key, value in pairs(prerequisites) do
+    local name = type(key) == "string" and key or value and value.name
+    check(type(name) == "string" and name ~= "" and not seen[name], "ordinary worker runtime prerequisite is invalid")
+    count = count + 1
+    check(count <= 32, "ordinary worker runtime prerequisite exceeds bounded observation")
+    seen[name], names[#names + 1] = true, name
+  end
+  table.sort(names)
+  log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
+    .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
+    .. "|observed_count=" .. tostring(#names) .. "|observed=" .. table.concat(names, ",")
+    .. "|authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+end
 local function assert_worker_contract(force)
   local row = technology(force, TARGET)
   check(row.prototype and row.prototype.max_level == UINT32_MAX, "ordinary worker maximum differs")
@@ -365,6 +388,7 @@ local function begin_source()
   local force = game.create_force(RESEARCH_FORCE)
   check(force and force.valid ~= false and force.name == RESEARCH_FORCE and finite(force.index), "dedicated research force differs")
   state.research_force, state.research_force_name, state.research_force_index = force, force.name, force.index
+  observe_runtime_prerequisites(force)
   assert_setup_declaration(force); assert_worker_contract(force)
   for _, declared in ipairs(fixture.rows) do technology(force, declared.name).researched = true end
   assert_foreign_vectors(state, force_vectors(), "source setup")
