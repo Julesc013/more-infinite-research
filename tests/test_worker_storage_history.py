@@ -17,6 +17,16 @@ from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS, RECOVERY_WORLD
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# Literal persisted contract in native SE seed CCC6EB4A (archive7A30), retained
+# by capsule C11E5DA5. This is independent native input, not a production
+# projection or an assertion that private7A30 was the published B0BF package.
+NATIVE_517_SE_CONTRACT = (
+    "worker-storage-1|20:worker-robot-storage|1:1|false|false|formula|13:675*1.5^(L-4)"
+    "|4:3600|1:5|23:automation-science-pack|1:1|21:logistic-science-pack|1:1"
+    "|21:chemical-science-pack|1:1|23:production-science-pack|1:1|20:utility-science-pack|1:1"
+    "|1:2|20:utility-science-pack|23:worker-robots-storage-3"
+)
+
 # Explicit parse-time runtime configuration for these native-fact doubles.
 # Real bootstrap controls use the actual resolver; older-origin controls below
 # also exercise an imported profile through that resolver.
@@ -1364,6 +1374,45 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                       assert(plan.already_owned and history.default_owner_apply(plan))
                       assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY].contract~=contract)
                     ''')
+
+    def test_published517_bridge_matches_the_literal_retained_native_contract(self):
+        lua = self.world("f200")
+        lua.globals().native_contract = NATIVE_517_SE_CONTRACT
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          assert(storage[OWNER_KEY].contract==native_contract)
+          finish_frame(player,"advanced",{ORDINARY,OTHER},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+          local plan=history.default_owner_preflight(published517_se_bridge_event(),nil,true)
+          assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+          assert(history.default_owner_apply(plan))
+          assert(storage[OWNER_KEY].legacy.contract==native_contract
+            and storage[OWNER_KEY].forces[player.index].phase=="legacy"
+            and player.current_research.name==LEGACY517 and player.research_progress==.42
+            and player.technologies[LEGACY517].level==5
+            and player.technologies[LEGACY517].saved_progress==before[player.index].owner.saved)
+        ''')
+
+    def test_published517_bridge_rejects_an_extra_holder_prerequisite_before_writes(self):
+        lua = self.world("f200")
+        lua.globals().native_contract = NATIVE_517_SE_CONTRACT
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          assert(storage[OWNER_KEY].contract==native_contract)
+          finish_frame(player,"advanced",{ORDINARY,OTHER},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          prototypes.technology[LEGACY517].prerequisites["worker-robots-storage-2"]={name="worker-robots-storage-2"}
+          local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+          local ok,message=pcall(history.default_owner_preflight,published517_se_bridge_event(),nil,true)
+          assert(not ok and tostring(message):find("holder or current contract differs",1,true),tostring(message))
+          assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+        ''')
 
     def test_published517_se_paid_contract_moves_only_known_old_work_to_the_old_holder(self):
         """A published F200 SE Base-five partial must not become current SE-seven work."""

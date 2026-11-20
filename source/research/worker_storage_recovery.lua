@@ -14,7 +14,9 @@ local PUBLISHED517_SE_SCIENCE = {
   "production-science-pack", "utility-science-pack",
 }
 local PUBLISHED517_SE_PREREQUISITES = {
-  "worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3",
+  -- Preserve the native direct prerequisite set, not the authored row's
+  -- redundant earlier level. The retained native saved contract names two.
+  "utility-science-pack", "worker-robots-storage-3",
 }
 local PUBLISHED517_SE_TERMS = {
   formula="675*1.5^(L-4)", seconds=60, modifier=1, ignore_map_price=false,
