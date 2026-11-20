@@ -12,9 +12,10 @@
   },
   "inputs": {
     "engine": {
+      "binding_id": "linux-c9-headless-2.0.77",
       "version": "2.0.77",
-      "platform": "Linux headless",
-      "headless": true,
+      "host_platform": "Linux",
+      "headless_build": true,
       "factorio_binary_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
       "binary_path": null,
       "engine_data_path": null

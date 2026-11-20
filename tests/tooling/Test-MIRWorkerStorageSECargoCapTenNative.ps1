@@ -2,6 +2,7 @@
 param(
     [string]$ControllerPath,
     [string]$PacketPath,
+    [string]$WindowsPacketPath,
     [string]$OutputRoot
 )
 
@@ -11,12 +12,15 @@ $ErrorActionPreference = 'Stop'
 $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 if([string]::IsNullOrWhiteSpace($ControllerPath)){$ControllerPath=Join-Path $repo 'tools/Invoke-WorkerStorageSECargoCapTenNative.ps1'}
 if([string]::IsNullOrWhiteSpace($PacketPath)){$PacketPath=Join-Path $repo 'tests/fixtures/worker-storage-se-cap-ten-native.json'}
+if([string]::IsNullOrWhiteSpace($WindowsPacketPath)){$WindowsPacketPath=Join-Path $repo 'tests/fixtures/worker-storage-se-cap-ten-native-windows.json'}
 if([string]::IsNullOrWhiteSpace($OutputRoot)){$OutputRoot=Join-Path $repo ('build/tmp/worker-storage-se-cap-ten-native-controls-'+[guid]::NewGuid().ToString('N'))}
 if(-not(Test-Path -LiteralPath $ControllerPath -PathType Leaf)){throw "controller is missing: $ControllerPath"}
 if(-not(Test-Path -LiteralPath $PacketPath -PathType Leaf)){throw "packet is missing: $PacketPath"}
+if(-not(Test-Path -LiteralPath $WindowsPacketPath -PathType Leaf)){throw "Windows packet is missing: $WindowsPacketPath"}
 if(Test-Path -LiteralPath $OutputRoot){throw "refusing to overwrite control output: $OutputRoot"}
 [IO.Directory]::CreateDirectory($OutputRoot)|Out-Null
 . $ControllerPath
+. (Join-Path $repo 'tools/lib/validation/NativeProbeCommon.ps1')
 
 $script:checks=[Collections.Generic.List[object]]::new()
 function Add-Check { param([Parameter(Mandatory)][string]$Name,[Parameter(Mandatory)][scriptblock]$Action) try{&$Action;[void]$script:checks.Add([ordered]@{name=$Name;passed=$true})}catch{[void]$script:checks.Add([ordered]@{name=$Name;passed=$false;error=$_.Exception.Message});throw} }
@@ -55,22 +59,42 @@ function New-SyntheticCargoChain {
 }
 
 $packet=Read-CargoCapTenJson $PacketPath
+$windowsPacket=Read-CargoCapTenJson $WindowsPacketPath
 
-Add-Check 'packet pins the full F200 source/candidate/File-settings/actor closure' {
+Add-Check 'packets pin the full F200 source/candidate/File-settings/actor closure and distinct exact engines' {
     Assert-CargoCapTenPacket -Packet $packet -RepoRoot $repo
+    Assert-CargoCapTenPacket -Packet $windowsPacket -RepoRoot $repo
 }
 Add-Check 'Compose defers missing local bindings without context or direct-library activation' {
     $out=Join-Path $OutputRoot 'compose.json';$receipt=Invoke-CargoCapTenExecutor -RequestedMode Compose -RequestedPacketPath $PacketPath -RepoRoot $repo -RequestedOutputPath $out
     Assert-CargoCapTenEqual $receipt.status 'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS' 'Compose status';Assert-CargoCapTenEqual $receipt.native_processes_started 0 'Compose native processes';Assert-CargoCapTenEqual $receipt.library_activation $false 'Compose activation';Assert-CargoCapTenEqual $receipt.resource_context_allocated $false 'Compose context'
+    $windowsOut=Join-Path $OutputRoot 'compose-windows.json';$windowsReceipt=Invoke-CargoCapTenExecutor -RequestedMode Compose -RequestedPacketPath $WindowsPacketPath -RepoRoot $repo -RequestedOutputPath $windowsOut
+    Assert-CargoCapTenEqual $windowsReceipt.status 'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS' 'Windows Compose status';Assert-CargoCapTenEqual $windowsReceipt.native_processes_started 0 'Windows Compose native processes';Assert-CargoCapTenEqual $windowsReceipt.library_activation $false 'Windows Compose activation';Assert-CargoCapTenEqual $windowsReceipt.resource_context_allocated $false 'Windows Compose context'
 }
 Add-Check 'wrong File settings, actor, engine, and archive identities refuse before an owner can execute' {
     $mutations=@(
         @('settings SHA-256',{param($p)$p.inputs.settings.sha256='0'*64},'File settings SHA-256'),
         @('actor control SHA-256',{param($p)$p.inputs.actor_members[0].sha256='0'*64},'actor member SHA-256'),
-        @('engine SHA-256',{param($p)$p.inputs.engine.factorio_binary_sha256='0'*64},'engine SHA-256'),
+        @('engine SHA-256',{param($p)$p.inputs.engine.factorio_binary_sha256='0'*64},'engine factorio_binary_sha256'),
         @('candidate archive SHA-256',{param($p)$p.inputs.candidate_mir.sha256='0'*64},'candidate MIR SHA-256')
     )
     foreach($row in $mutations){$mutated=Copy-HashTable $packet;&$row[1] $mutated;Assert-Refuses -Contains $row[2] -Action {Assert-CargoCapTenPacket -Packet $mutated -RepoRoot $repo}}
+}
+Add-Check 'two engine bindings reject wrong platform, mode, hash, and Windows byte identity before context' {
+    $windowsBinding=Get-CargoCapTenEngineBinding $windowsPacket.inputs.engine;$linuxBinding=Get-CargoCapTenEngineBinding $packet.inputs.engine
+    Assert-CargoCapTenEqual $windowsBinding.host_platform 'Windows' 'Windows binding platform';Assert-CargoCapTenEqual $windowsBinding.headless_build $false 'Windows binding mode';Assert-CargoCapTenEqual $linuxBinding.host_platform 'Linux' 'Linux binding platform';Assert-CargoCapTenEqual $linuxBinding.headless_build $true 'Linux binding mode'
+    Assert-Refuses -Contains 'engine host platform' -Action {Assert-CargoCapTenHostEngineBinding -Packet $windowsPacket -HostPlatform Linux|Out-Null}
+    foreach($mutation in @(
+        @{name='headless mode';apply={param($p)$p.inputs.engine.headless_build=$true};error='engine headless mode'},
+        @{name='binary hash';apply={param($p)$p.inputs.engine.factorio_binary_sha256='0'*64};error='engine factorio_binary_sha256'},
+        @{name='binary bytes';apply={param($p)$p.inputs.engine.factorio_binary_bytes=1};error='engine binary bytes'},
+        @{name='unknown binding';apply={param($p)$p.inputs.engine.binding_id='windows-any'};error='engine binding differs'}
+    )){$bad=Copy-HashTable $windowsPacket;&$mutation.apply $bad;Assert-Refuses -Contains $mutation.error -Action {Assert-CargoCapTenPacket -Packet $bad -RepoRoot $repo}}
+}
+Add-Check 'engine arguments preserve Linux headless and require Windows full --disable-audio' {
+    $linux=Get-CargoCapTenEngineBinding $packet.inputs.engine;$windows=Get-CargoCapTenEngineBinding $windowsPacket.inputs.engine
+    $linuxArgs=@(New-CargoCapTenEngineArguments 'linux-config.ini' 'linux-mods' $linux);Require-CargoCapTen (-not($linuxArgs-contains'--disable-audio')) 'Linux headless arguments include audio disable'
+    $windowsArgs=@(New-CargoCapTenEngineArguments 'windows-config.ini' 'windows-mods' $windows);Require-CargoCapTen (@($windowsArgs|Where-Object {$_-ceq'--disable-audio'}).Count-eq1) 'Windows full arguments omit audio disable'
 }
 Add-Check 'only the source stage sends the fixture begin command' {
     $plan=New-CargoCapTenComposePlan $packet;$source=@($plan.stages|Where-Object name -eq 'source-server')[0];$candidate=@($plan.stages|Where-Object name -eq 'candidate-server')[0]
@@ -118,7 +142,7 @@ Add-Check 'source and candidate completion predicates require a complete save ZI
     $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($ControllerPath,[ref]$tokens,[ref]$errors);if($errors.Count-ne0){throw 'controller parse failed'};$execution=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-CargoCapTenExecution'},$true));if($execution.Count-ne1 -or $execution[0].Extent.Text-notmatch'Test-CargoCapTenCompleteSave \$sourceSave' -or $execution[0].Extent.Text-notmatch'Test-CargoCapTenCompleteSave \$candidateSave'){throw 'execution predicate does not require completed ZIPs'}
 }
 Add-Check 'Execute refuses before context when bindings are absent and preserves the requested output path' {
-    $out=Join-Path $OutputRoot 'execute-with-missing-bindings.json';Assert-Refuses -Contains 'Execute refuses missing local bindings' -Action {Invoke-CargoCapTenExecutor -RequestedMode Execute -RequestedPacketPath $PacketPath -RepoRoot $repo -RequestedOutputPath $out|Out-Null};if(Test-Path -LiteralPath $out){throw 'missing-binding Execute wrote an output receipt'}
+    $compatiblePacket=if((Get-CargoCapTenHostPlatform)-ceq'Windows'){$WindowsPacketPath}else{$PacketPath};$out=Join-Path $OutputRoot 'execute-with-missing-bindings.json';Assert-Refuses -Contains 'Execute refuses missing local bindings' -Action {Invoke-CargoCapTenExecutor -RequestedMode Execute -RequestedPacketPath $compatiblePacket -RepoRoot $repo -RequestedOutputPath $out|Out-Null};if(Test-Path -LiteralPath $out){throw 'missing-binding Execute wrote an output receipt'}
 }
 Add-Check 'post-activation cleanup closes one owned activation and surfaces restoration failure' {
     function script:Complete-MIRLibraryActivation {param($Activation) if($Activation.fail){throw 'synthetic restoration failure'};$Activation.closed=$true;[ordered]@{status='restored'}}
