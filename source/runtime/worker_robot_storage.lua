@@ -220,6 +220,60 @@ local function recover_error(reason, route, event, state, current, rejected, adv
   refuse(reason .. "; keep the protected original COPY", route)
 end
 
+-- The configuration event tells us only that some startup setting changed.
+-- Persist this narrow resolved vector with new native-owner records so a
+-- later contract difference can distinguish an actual worker choice from an
+-- unrelated startup change. It is evidence of the observed current work
+-- contract, not a reconstruction of an older setting table.
+local WORKER_CONFIGURATION_FIELDS = {
+  "enabled", "base_cost", "linear_increment", "growth_factor", "max_level", "research_time", "effect_percent",
+}
+
+local function relevant_worker_configuration()
+  local stream = effective_values.streams and effective_values.streams["worker-robots-storage"]
+  if type(stream) ~= "table" then recover_error("current worker startup configuration is unavailable") end
+  local result = {}
+  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
+    local value = stream[key]
+    if key == "enabled" then
+      if type(value) ~= "boolean" then recover_error("current worker enable configuration is invalid") end
+    elseif type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
+      recover_error("current worker startup configuration is invalid")
+    end
+    result[key] = value
+  end
+  return result
+end
+
+local function checked_worker_configuration(value)
+  if type(value) ~= "table" or getmetatable(value) ~= nil then
+    recover_error("saved worker startup configuration is invalid")
+  end
+  local seen = {}
+  for key, item in pairs(value) do
+    if type(key) ~= "string" then recover_error("saved worker startup configuration has an invalid key") end
+    seen[key] = true
+    if key == "enabled" then
+      if type(item) ~= "boolean" then recover_error("saved worker enable configuration is invalid") end
+    elseif (key ~= "base_cost" and key ~= "linear_increment" and key ~= "growth_factor"
+        and key ~= "max_level" and key ~= "research_time" and key ~= "effect_percent")
+        or type(item) ~= "number" or item ~= item or item == math.huge or item == -math.huge then
+      recover_error("saved worker startup configuration is invalid")
+    end
+  end
+  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
+    if not seen[key] then recover_error("saved worker startup configuration is incomplete") end
+  end
+  return value
+end
+
+local function same_worker_configuration(left, right)
+  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
+    if left[key] ~= right[key] then return false end
+  end
+  return true
+end
+
 local function legacy_preflight(event, route)
   local prior = checked(storage[KEY])
   if prior ~= nil then
@@ -680,7 +734,7 @@ local function owner_record()
   local value = storage[OWNER_KEY]
   if value == nil then return nil end
   fields(value, {schema=true, kind=true, owner=true, source=true, gate=true, contract=true, producer=true, forces=true, current=true,
-    legacy=true})
+    legacy=true, settings=true})
   local retired = value.kind == "provider-retired"
   local legacy = value.schema == 4
   if value.schema ~= 3 and value.schema ~= 4 or value.kind ~= "full-default" and not retired or value.owner ~= recovery.ordinary_default_id
@@ -698,6 +752,7 @@ local function owner_record()
       recover_error("invalid published517 SE paid-worker record")
     end
   elseif value.legacy ~= nil then recover_error("ordinary default owner has unexpected legacy work") end
+  if value.settings ~= nil then checked_worker_configuration(value.settings) end
   if retired then
     checked_fact(value.current)
     if value.current.kind ~= "finite" then recover_error("retired default owner has no admitted finite route") end
@@ -1137,12 +1192,20 @@ local function published517_se_contract(source)
   return owner, recovery.published517_se_contract(source)
 end
 
+local function published517_se_configuration()
+  return same_worker_configuration(relevant_worker_configuration(), {
+    enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
+    max_level=10, research_time=60, effect_percent=1,
+  })
+end
+
 local function published517_se_event(event, owned)
   local active = script and script.active_mods or {}
-  if type(event) ~= "table" or event.mod_startup_settings_changed ~= false
+  if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
       or type(event.mod_changes) ~= "table" or active[MIR] ~= target.distribution_version
       or owned.schema ~= 3 or owned.kind ~= "full-default" or owned.producer.kind ~= "initial-empty"
-      or owned.producer.old_version ~= nil or owned.producer.new_version ~= "5.0.20017" then return false end
+      or owned.producer.old_version ~= nil or owned.producer.new_version ~= "5.0.20017"
+      or not published517_se_configuration() then return false end
   local mir = event.mod_changes[MIR]
   if type(mir) ~= "table" or mir.old_version ~= "5.0.20017" or mir.new_version ~= active[MIR] then return false end
   for name, row in pairs(event.mod_changes) do
@@ -1276,6 +1339,7 @@ local function plan_published517_se_paid_bridge(event, state, owned, source_prot
   else
     record.contract = current_contract
   end
+  record.settings = relevant_worker_configuration()
   return {kind="published517-se-paid-bridge", event=clone(event), context=clone(context), prior_state=state,
     prior_owner=owned, contract=current_contract, legacy_contract=legacy_contract, cap=selected_cap, enabled=selected_enabled,
     items=items, moved=moved, record=record}
@@ -1384,11 +1448,18 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       or type(event.mod_changes) ~= "table" or script.active_mods[MIR] ~= target.distribution_version) then
     recover_error("current default configuration event is unavailable")
   end
+  local current_settings = relevant_worker_configuration()
   if owned and owned.contract ~= contract then
     if not context.configuration then
       recover_error("default native-owner contract changed")
-    elseif event.mod_startup_settings_changed == false and automatic_owner_contract_has_invested_work() then
-      recover_error("default native-owner automatic contract change has invested work; keep the protected original COPY")
+    elseif automatic_owner_contract_has_invested_work() then
+      if owned.settings == nil then
+        recover_error("default native-owner has paid work but no recorded relevant startup settings")
+      elseif same_worker_configuration(owned.settings, current_settings) then
+        recover_error("unrelated startup setting change cannot authorize changing paid worker research")
+      elseif event.mod_startup_settings_changed ~= true then
+        recover_error("paid worker startup settings differ without a configuration-change authority")
+      end
     end
   end
   if context.configuration and owned and producer_edition(owned.producer.new_version) == "f200" and target.id == "f210"
@@ -1409,7 +1480,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   end
   local record = owned and clone(owned) or {schema=3, kind="full-default", owner=id, source=recovery.canonical,
     gate=recovery.head_id, contract=contract, producer=producer, forces={}}
-  record.contract = contract
+  record.contract, record.settings = contract, current_settings
   local legacy_active, legacy_contract = owned and owned.schema == 4, nil
   if legacy_active then
     _, legacy_contract = published517_se_contract(source_prototype)
@@ -1676,6 +1747,31 @@ local function provider_addition(event, route, owned)
   end
 end
 
+-- A finite provider cannot take over a holder which still carries the exact
+-- published Base-five obligation: the provider/private holder has the current
+-- contract, not that historical price. Once every force has completed or
+-- deliberately cleared that old work, validate the still-emitted historical
+-- row is pristine and retire only the legacy record schema before handover.
+local function settled_published517_se_legacy(owned)
+  if owned.schema ~= 4 then return end
+  local holder = native_prototype(recovery.published517_se_id)
+  if not holder or creator(recovery.published517_se_id) ~= MIR or holder.name ~= recovery.published517_se_id
+      or holder.hidden ~= true or holder.enabled ~= false or holder.visible_when_disabled ~= false
+      or recovery.fingerprint(holder) ~= owned.legacy.contract then
+    recover_error("published517 SE historical holder changed before provider handover")
+  end
+  for _, force in ipairs(forces()) do
+    local prior = owned.forces[force.index]
+    if not prior or prior.phase ~= "owned" then
+      recover_error("published517 SE paid work must settle before provider handover")
+    end
+    local frame = snapshot(force, recovery.published517_se_id)
+    if not pristine_default_frame(frame, recovery.published517_se_id) or frame.visible then
+      recover_error("published517 SE historical holder has outstanding work before provider handover")
+    end
+  end
+end
+
 local function plan_provider_handover(event, route)
   local owned, state = owner_record(), checked_state()
   if not owned or owned.kind ~= "full-default" or state ~= nil and (state.schema ~= 2 or state.kind ~= "route"
@@ -1684,7 +1780,9 @@ local function plan_provider_handover(event, route)
   if contract ~= owned.contract then recover_error("native full default contract changed before provider handover", route) end
   provider_addition(event, route, owned)
   empty_private()
+  settled_published517_se_legacy(owned)
   local record = clone(owned)
+  if record.schema == 4 then record.schema, record.legacy = 3, nil end
   record.kind, record.current = "provider-retired", clone(current)
   local prepared = {schema=2, kind="prepared", phase="provider", current=clone(current), contract=contract,
     cap=selected_cap, family_enabled=selected_enabled, forces={}}

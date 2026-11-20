@@ -1222,6 +1222,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             lua.execute(r'''
               seed_owner();transfer();set_reward(scalar)
               prototypes.technology[CANONICAL].research_unit_energy=3600;prototypes.technology[ORDINARY].research_unit_energy=3600
+              require("runtime.configuration").streams["worker-robots-storage"].base_cost=201
               local before=all_frames();local contract=storage[OWNER_KEY].contract;writes=0
               local plan=history.default_owner_preflight({mod_startup_settings_changed=true,mod_changes={}},nil,true)
               assert(history.default_owner_apply(plan)and writes==0 and same(before,all_frames()))
@@ -1231,9 +1232,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
     def test_exact_411_raw_runtime_characterizes_false_setting_drift(self):
         source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
-        guard='''    elseif event.mod_startup_settings_changed == false and automatic_owner_contract_has_invested_work() then
-      recover_error("default native-owner automatic contract change has invested work; keep the protected original COPY")
-'''
+        guard='''        recover_error("unrelated startup setting change cannot authorize changing paid worker research")'''
         self.assertEqual(source.count(guard),1)
         revision="411b74c364bee277b7f8bedc80679aa602935682"
         path="source/runtime/worker_robot_storage.lua"
@@ -1263,14 +1262,15 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                       else
                         for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_energy=3600 end
                       end
-                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017");event.mod_startup_settings_changed=true
                       local before,state=all_frames(),copy(storage[OWNER_KEY]);writes=0;queue_writes={};progress_writes={}
                       local ok,message=pcall(history.default_owner_preflight,event,nil,true)
-                      assert(not ok and tostring(message):find("automatic contract change has invested work",1,true))
+                      assert(not ok and tostring(message):find("unrelated startup setting change cannot authorize",1,true))
                       assert(writes==0 and same(before,all_frames())and same(state,storage[OWNER_KEY]))
-                      -- The exact raw 411 runtime accepts the false-setting
+                      -- The exact raw 411 runtime accepts an unrelated-setting
                       -- drift and replaces recorded provenance without native
                       -- writes in this same established world.
+                      storage[OWNER_KEY].settings=nil;state.settings=nil
                       history=assert(load(legacy))()
                       local plan=history.default_owner_preflight(event,nil,true)
                       assert(plan.already_owned and history.default_owner_apply(plan))
@@ -1301,10 +1301,10 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                         later.research_queue={OTHER,ORDINARY};later.research_progress=.42
                       end
                       for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_energy=3600 end
-                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017");event.mod_startup_settings_changed=true
                       local before,state=all_frames(),copy(storage[OWNER_KEY]);writes=0;queue_writes={};progress_writes={}
                       local ok,message=pcall(history.default_owner_preflight,event,nil,true)
-                      assert(not ok and tostring(message):find("automatic contract change has invested work",1,true))
+                      assert(not ok and tostring(message):find("unrelated startup setting change cannot authorize",1,true))
                       assert(writes==0 and same(before,all_frames())and same(state,storage[OWNER_KEY]))
                     ''')
 
@@ -1425,6 +1425,21 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             and not player.technologies[LEGACY517].enabled)
           assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5)
           assert(player.worker_robots_storage_bonus==before_bonus+1 and player.current_research.name==OTHER)
+        ''')
+
+    def test_published517_exact_settings_admit_the_paid_bridge_when_an_unrelated_setting_changed(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          local event=published517_se_bridge_event();event.mod_startup_settings_changed=true
+          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(plan.kind=="published517-se-paid-bridge" and writes==0 and same(before,all_frames()))
+          assert(history.default_owner_apply(plan))
+          assert(storage[OWNER_KEY].schema==4 and storage[OWNER_KEY].settings.max_level==10)
         ''')
 
     def test_published517_se_paid_bridge_reloads_and_reenters_without_rewriting_old_work(self):
@@ -1620,6 +1635,38 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
         return build_full_default_provider_handover_world(
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
+
+    def test_published517_provider_handover_waits_for_old_work_then_retires_the_legacy_schema(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)),"bridge")
+          assert(storage[OWNER_KEY].schema==4 and storage[OWNER_KEY].forces[player.index].phase=="legacy","legacy phase")
+          player.technologies[LEGACY517].level=6
+          player.research_queue={OTHER};player.research_progress=0
+          player.technologies[LEGACY517].saved_progress=0
+          local changed=history.default_owner_on_research_finished{research=player.technologies[LEGACY517],by_script=false,tick=101}
+          assert(changed)
+          for _,force in pairs(game.forces)do
+            local t=force.technologies[ID];local mt=getmetatable(t);local read=mt.__index
+            mt.__index=function(object,key)
+              if key=="research_unit_count"then return math.floor(675*1.5^(read(object,"level")-4))end
+              return read(object,key)
+            end
+          end
+          finite_entry(1);local event=provider_event()
+          local recovery=require("research.worker_storage_recovery")
+          assert(recovery.fingerprint(prototypes.technology[ID])==recovery.fingerprint(prototypes.technology[ORDINARY]),"private contract")
+          local ok,plan,legacy=pcall(delegate,event,provider_route(5));assert(ok,plan)
+          assert(plan.record.schema==3 and plan.record.legacy==nil and plan.record.kind=="provider-retired")
+          assert(history.default_owner_apply(plan));history.apply(legacy)
+          assert(storage[OWNER_KEY].schema==3 and storage[OWNER_KEY].kind=="provider-retired")
+        ''')
 
     def test_four_force_handover_reuses_private_quota_and_conserves_each_scalar_basis(self):
         for target in ("f200","f210"):

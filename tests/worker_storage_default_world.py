@@ -131,6 +131,8 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
       function published517_source_contract()
         target.distribution_version="5.0.20017";script.active_mods["more-infinite-research"]=target.distribution_version
         script.active_mods["space-exploration"]="0.7.57"
+        local values=require("runtime.configuration").streams["worker-robots-storage"]
+        values.max_level=10;history.configure(10,true)
         local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
           "production-science-pack","utility-science-pack"}
         local prerequisites={"worker-robots-storage-2","utility-science-pack","worker-robots-storage-3"}
@@ -154,8 +156,9 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         target.distribution_version="5.0.20018";script.active_mods["more-infinite-research"]=target.distribution_version
         local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
           "production-science-pack","se-rocket-science-pack","se-material-science-pack-1","space-science-pack"}
-        for _,id in ipairs{CANONICAL,ORDINARY}do
+        for _,id in ipairs{CANONICAL,ORDINARY,ID}do
           local p=prototypes.technology[id];p.research_unit_ingredients={};p.prerequisites={}
+          if id==ID then p.research_unit_count_formula="675*1.5^(L-4)";p.research_unit_count=nil;p.research_unit_energy=3600 end
           for _,name in ipairs(packs)do p.research_unit_ingredients[#p.research_unit_ingredients+1]={name=name,amount=1}end
           p.prerequisites["worker-robots-storage-3"]={name="worker-robots-storage-3"}
         end
