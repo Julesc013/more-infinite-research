@@ -14,7 +14,20 @@ local function integer(value)
 end
 
 local function tick(value)
-  return type(value) == "number" and value >= 0 and value < 4294967295 and value == math.floor(value)
+  -- MapTick is uint64 in the exact pinned 2.0.77 runtime API. Lua can only
+  -- preserve its own finite integral number domain; do not import the
+  -- technology-level uint32 bound into an event timestamp.
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+    and value >= 0 and value == math.floor(value)
+end
+
+local function completion_tick(value)
+  if not tick(value) then return false end
+  local following = value + 1
+  -- A saved completion marker schedules exactly one later observation. Do
+  -- not accept a representable MapTick whose unit successor rounds back to
+  -- the same Lua number or overflows to infinity.
+  return following > value and following < math.huge and following == math.floor(following)
 end
 
 local function provider(value)
@@ -723,7 +736,7 @@ local function checked_default_force(record, retired, legacy)
       or record.phase == "legacy-completion-pending"))
   if not valid_phase then recover_error("invalid full default owner phase") end
   if record.phase == "legacy-completion-pending" then
-    if not legacy or not tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
+    if not legacy or not completion_tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
   elseif record.completion_tick ~= nil then
     recover_error("settled default owner has an unexpected completion tick")
   end
@@ -1504,80 +1517,86 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     seen[force.index] = true
     local finished = context.finished_force == force.index
     local prior = owned and owned.forces[force.index]
-    if legacy_active and prior and prior.phase == "legacy-completion-pending" then
-      -- The callback row may not be a settled native frame yet. Its durable
-      -- marker alone establishes historical debt for configuration/reset.
-      recover_error("published517 SE paid-worker completion is awaiting its bounded native observation")
-    end
-    local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
-    local public = prepared and default_frame(force, recovery.canonical, finished) or source
-    local destination = default_frame(force, id, finished)
-    local gate = gate_frame(force, owned ~= nil and context.configuration == true)
     local refresh = context.created_force == force.index or context.reset_force == force.index
-    if context.created_force == force.index and prior then recover_error("new default force already has history") end
-    local action, next_force = "validate", prior and clone(prior) or nil
-    local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
-    if legacy_active and prior and prior.phase == "legacy" then
-      if refresh then
-        -- A force reset intentionally discards that force's native progress.
-        -- It may therefore resume ordinary current-contract ownership only
-        -- after the old holder itself proves empty.  Do not call an observed
-        -- reset permission to erase historical paid work that survived it.
-        if not pristine_default_frame(legacy, recovery.published517_se_id) or legacy.visible then
-          recover_error("published517 SE paid-worker reset retained historical work")
-        end
-      elseif not legacy_paid_pair(source, destination, gate, legacy) then
-        recover_error("published517 SE paid-worker active frame differs")
-      else
-        action = "legacy-validate"
+    if legacy_active and prior and prior.phase == "legacy-completion-pending" then
+      -- A callback row may still be owned by Factorio. It remains historical
+      -- debt at every affected boundary, but a different force's creation,
+      -- reset, or completion must neither inspect it as a settled frame nor
+      -- turn that unrelated operation into a global refusal.
+      if context.configuration or refresh or finished then
+        recover_error("published517 SE paid-worker completion is awaiting its bounded native observation")
       end
+      record.forces[force.index] = clone(prior)
+    else
+      local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
+      local public = prepared and default_frame(force, recovery.canonical, finished) or source
+      local destination = default_frame(force, id, finished)
+      local gate = gate_frame(force, owned ~= nil and context.configuration == true)
+      if context.created_force == force.index and prior then recover_error("new default force already has history") end
+      local action, next_force = "validate", prior and clone(prior) or nil
+      local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
+      if legacy_active and prior and prior.phase == "legacy" then
+        if refresh then
+          -- A force reset intentionally discards that force's native progress.
+          -- It may therefore resume ordinary current-contract ownership only
+          -- after the old holder itself proves empty.  Do not call an observed
+          -- reset permission to erase historical paid work that survived it.
+          if not pristine_default_frame(legacy, recovery.published517_se_id) or legacy.visible then
+            recover_error("published517 SE paid-worker reset retained historical work")
+          end
+        elseif not legacy_paid_pair(source, destination, gate, legacy) then
+          recover_error("published517 SE paid-worker active frame differs")
+        else
+          action = "legacy-validate"
+        end
+      end
+      if action == "legacy-validate" then
+        -- The historical holder, rather than the current full pair, carries
+        -- this force's authenticated paid work until its ordinary completion.
+      elseif not prior or refresh then
+        if owned and not refresh then recover_error("default force history is missing") end
+        if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
+            or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
+            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
+          recover_error("full default owner/debit is not pristine")
+        end
+        if (initializing or refresh) and (source.next_level ~= 4 or source.researched
+            or source.saved_progress ~= 0 or source.occurrences ~= 0) then
+          recover_error("first initialization/new force cannot adopt existing default work")
+        end
+        if not owned and producer.kind == "published511-empty-default"
+            and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
+              or source.occurrences ~= 0 or source.current == recovery.canonical) then
+          recover_error("published11 empty default source has invested or queued worker work")
+        end
+        if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
+          if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
+            recover_error("older default source has unfinished native worker work")
+          end
+          if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
+            recover_error("older MIR501 source requires every native worker4 to be empty")
+          end
+        end
+        if source.occurrences > 0 then requeueable(force, source, true, true) end
+        if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
+        action, moved = "transfer", true
+        next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
+          disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
+      elseif not full_pair(source, destination, gate) then
+        if finished and source.next_level == 4 and not source.researched and not source.enabled
+            and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
+            and destination.next_level >= 5 then
+          action = "first-credit"
+        else recover_error("full default native owner/first-level debit changed") end
+      end
+      if action == "validate" and gate.enabled then action = "settle-gate" end
+      record.forces[force.index] = next_force
+      items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
+        gate_enabled=gate.enabled,
+        bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
+        moved=action == "transfer", action=action,
+        target_enabled=public.enabled, target_visible=public.visible}
     end
-    if action == "legacy-validate" then
-      -- The historical holder, rather than the current full pair, carries
-      -- this force's authenticated paid work until its ordinary completion.
-    elseif not prior or refresh then
-      if owned and not refresh then recover_error("default force history is missing") end
-      if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
-          or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
-          or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
-        recover_error("full default owner/debit is not pristine")
-      end
-      if (initializing or refresh) and (source.next_level ~= 4 or source.researched
-          or source.saved_progress ~= 0 or source.occurrences ~= 0) then
-        recover_error("first initialization/new force cannot adopt existing default work")
-      end
-      if not owned and producer.kind == "published511-empty-default"
-          and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
-            or source.occurrences ~= 0 or source.current == recovery.canonical) then
-        recover_error("published11 empty default source has invested or queued worker work")
-      end
-      if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
-        if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
-          recover_error("older default source has unfinished native worker work")
-        end
-        if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
-          recover_error("older MIR501 source requires every native worker4 to be empty")
-        end
-      end
-      if source.occurrences > 0 then requeueable(force, source, true, true) end
-      if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
-      action, moved = "transfer", true
-      next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
-        disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
-    elseif not full_pair(source, destination, gate) then
-      if finished and source.next_level == 4 and not source.researched and not source.enabled
-          and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
-          and destination.next_level >= 5 then
-        action = "first-credit"
-      else recover_error("full default native owner/first-level debit changed") end
-    end
-    if action == "validate" and gate.enabled then action = "settle-gate" end
-    record.forces[force.index] = next_force
-    items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
-      gate_enabled=gate.enabled,
-      bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
-      moved=action == "transfer", action=action,
-      target_enabled=public.enabled, target_visible=public.visible}
   end
   if #items == 0 then recover_error("default transfer requires native force frames") end
   if owned then
@@ -2241,7 +2260,7 @@ local function settle_published517_se_paid_completion(state, force, event)
   if prior.phase ~= "legacy" then recover_error("published517 SE paid completion has no pending old contract") end
   item.prior_phase = "legacy"
   if engine_owned_published517_completion(item) then
-    if not tick(event.tick) then recover_error("published517 SE paid completion has no native event tick") end
+    if not completion_tick(event.tick) then recover_error("published517 SE paid completion has no native event tick") end
     item.action, item.completion_tick = "defer", event.tick
     return apply_published517_completion_transition(state, {item}), false
   end

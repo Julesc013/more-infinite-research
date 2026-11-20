@@ -1600,6 +1600,140 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(player.technologies[OTHER].saved_progress==.19 and history.default_owner_completion_pending_tick()==nil)
         ''')
 
+    def test_published517_pending_completion_preserves_unrelated_force_creation_and_reset(self):
+        """A pending callback row is debt on its force, not a global lifecycle lock."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101})
+          local pending_frame,pending_record=frame(player),copy(storage[OWNER_KEY].forces[player.index])
+          local fresh=make_force("late",5);install_force(fresh);game.forces.late=fresh
+          history.on_force_created{force=fresh};writes=0
+          assert(history.default_owner_on_force_created{force=fresh})
+          assert(writes==10 and storage[OWNER_KEY].forces[fresh.index].phase=="owned")
+          assert(same(pending_frame,frame(player)) and same(pending_record,storage[OWNER_KEY].forces[player.index]))
+          -- A different ordinary current-contract completion is similarly
+          -- local: it may settle that force but cannot consume or invent a
+          -- released frame for the pending old-contract player row.
+          finish_frame(fresh,"advanced",{OTHER},false)
+          assert(history.default_owner_on_research_finished(finish_event(fresh)))
+          assert(fresh.technologies[ORDINARY].level==5 and same(pending_frame,frame(player))
+            and same(pending_record,storage[OWNER_KEY].forces[player.index]))
+          local function cleared_reset_frame(force)
+            force.research_queue={OTHER};force.research_progress=0
+            for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517,HEAD}do
+              local tech=force.technologies[id]
+              tech.level=4;tech.researched=false;tech.saved_progress=0
+              local prototype=prototypes.technology[id]
+              tech.enabled=type(prototype.enabled)=="boolean" and prototype.enabled or false
+              tech.visible_when_disabled=type(prototype.visible_when_disabled)=="boolean"
+                and prototype.visible_when_disabled or false
+              assert(type(tech.level)=="number" and type(tech.researched)=="boolean"
+                and type(tech.enabled)=="boolean" and type(tech.visible_when_disabled)=="boolean"
+                and type(tech.saved_progress)=="number", "incomplete unrelated reset frame: "..id)
+            end
+            history.on_force_reset{force=force}
+          end
+          cleared_reset_frame(suspended);writes=0
+          assert(history.default_owner_on_force_reset{force=suspended})
+          assert(storage[OWNER_KEY].forces[suspended.index].phase=="owned" and writes>0)
+          assert(same(pending_frame,frame(player)) and same(pending_record,storage[OWNER_KEY].forces[player.index]))
+          local before,state=all_frames(),storage[OWNER_KEY];writes=0
+          local ok,message=pcall(history.default_owner_on_force_reset,{force=player})
+          assert(not ok and tostring(message):find("awaiting its bounded native observation",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
+        ''')
+
+    def test_published517_pending_completion_is_local_to_an_unrelated_owned_merge(self):
+        """A third-force marker survives an owned merge; either merge endpoint debt still refuses."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=151})
+          local pending_frame,pending_record=frame(player),copy(storage[OWNER_KEY].forces[player.index])
+          local function own_after_reset(force)
+            force.research_queue={OTHER};force.research_progress=0
+            for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517,HEAD}do
+              local tech=force.technologies[id]
+              tech.level=4;tech.researched=false;tech.saved_progress=0
+              local prototype=prototypes.technology[id]
+              tech.enabled=type(prototype.enabled)=="boolean" and prototype.enabled or false
+              tech.visible_when_disabled=type(prototype.visible_when_disabled)=="boolean"
+                and prototype.visible_when_disabled or false
+              assert(type(tech.level)=="number" and type(tech.researched)=="boolean"
+                and type(tech.enabled)=="boolean" and type(tech.visible_when_disabled)=="boolean"
+                and type(tech.saved_progress)=="number", "incomplete unrelated reset frame: "..id)
+            end
+            history.on_force_reset{force=force};assert(history.default_owner_on_force_reset{force=force})
+            assert(storage[OWNER_KEY].forces[force.index].phase=="owned")
+          end
+          own_after_reset(uninvested);own_after_reset(suspended)
+          local before,state=all_frames(),storage[OWNER_KEY];writes=0
+          local ok,message=pcall(history.default_owner_on_forces_merging,{source=uninvested,destination=player})
+          assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
+          ok,message=pcall(history.default_owner_on_forces_merging,{source=player,destination=uninvested})
+          assert(not ok and tostring(message):find("source has unsettled historical work",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
+          assert(history.default_owner_on_forces_merging{source=suspended,destination=uninvested})
+          assert(writes==0 and storage[OWNER_KEY]==state and same(pending_frame,frame(player))
+            and same(pending_record,state.forces[player.index]))
+          game.forces.suspended=nil
+          local source_index=suspended.index
+          assert(history.default_owner_on_forces_merged{source_index=source_index,destination=uninvested})
+          assert(writes==0 and storage[OWNER_KEY].forces[source_index]==nil
+            and same(pending_frame,frame(player)) and same(pending_record,storage[OWNER_KEY].forces[player.index]))
+        ''')
+
+    def test_published517_pending_completion_accepts_the_finite_maptick_domain(self):
+        """MapTick is not a technology-level uint32 field; this remains host API-domain evidence."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          -- 2^53 cannot advance by one in the Lua number domain, even though
+          -- it is a finite integral value. It cannot be a durable marker
+          -- because its required later observation would be ambiguous.
+          local indistinct=9007199254740992
+          local before=all_frames();writes=0
+          local ok=pcall(history.default_owner_on_research_finished,
+            {research=legacy,by_script=false,tick=indistinct})
+          assert(not ok and writes==0 and same(before,all_frames())
+            and storage[OWNER_KEY].forces[player.index].phase=="legacy")
+          local boundary=4294967295
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=boundary})
+          local pending=storage[OWNER_KEY]
+          assert(pending.forces[player.index].completion_tick==boundary
+            and history.default_owner_completion_pending_tick()==boundary+1)
+          before=all_frames();writes=0
+          ok=pcall(history.default_owner_on_completion_tick,{tick=math.huge})
+          assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==pending)
+          ok=pcall(history.default_owner_on_research_finished,{research=legacy,by_script=false,tick=boundary+.5})
+          assert(not ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==pending)
+        ''')
+
     def test_published517_pending_resume_is_revalidated_after_another_force_settles(self):
         """A nested later completion must not clear a stale second force marker."""
         lua=self.world("f200")
