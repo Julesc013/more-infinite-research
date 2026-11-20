@@ -433,7 +433,9 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
             row.effects[1].modifier=1;row.unit.ingredients={}
             for i,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
               "production-science-pack","utility-science-pack"})do row.unit.ingredients[i]={name,1}end
-            row.prerequisites={"worker-robots-storage-2","utility-science-pack","worker-robots-storage-3"}
+            -- Literal post-SE-postprocess/native parent set; the earlier
+            -- authored redundant level2 is not part of this exact contract.
+            row.prerequisites={"utility-science-pack","worker-robots-storage-3"}
             return row
           end
         ''')

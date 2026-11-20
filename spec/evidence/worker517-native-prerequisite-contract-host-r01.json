@@ -22,6 +22,16 @@
     "independent_data_dump_sha256": "488CBDB6BFF7902350E725A65943BE2F399D7A4B3630C983C4916B2677E115D5",
     "limits": "Retained private7A30 native evidence, not a B0BF native result. Extracting a literal from original saved bytes does not qualify a new candidate or upgrade."
   },
+  "postprocess_cause": {
+    "archive": "space-exploration-postprocess_0.7.5.zip",
+    "archive_sha256": "D25FBC6AA73E65C1C2F80DFF21970C0ACBD9D8AFB4E5FAAAA71B942EDC150677",
+    "member": "prototypes/phase-4/tech-tree-prune.lua",
+    "member_sha256": "089A3CDDC921421D77B217451CED7CB16E6E115D6C2ACD26740D2CE6E630A1FD",
+    "original_native_load_order": ["MIR data-final-fixes", "SE-postprocess data-final-fixes", "fixture data-final-fixes"],
+    "exact_B0BF_constructor_and_science_before_postprocess": ["worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"],
+    "unmodified_postprocess_replay_output": ["utility-science-pack", "worker-robots-storage-3"],
+    "limits": "Exact archived source/host replay against the disposable retained7A30 graph, not a new B0BF native process. No upstream pruner or graph traversal is imported into player MIR."
+  },
   "correction": {
     "source": "source/research/worker_storage_recovery.lua",
     "direct_prerequisites": ["utility-science-pack", "worker-robots-storage-3"],
@@ -45,6 +55,8 @@
     ],
     "worker_history": {"tests": 198, "passed": true},
     "worker_construction": {"tests": 24, "passed": true},
+    "worker_native_owner_data": {"tests": 25, "passed": true},
+    "initial_required_ci": "Exact34475268 run44838860031 caught six subcase errors in the remaining data-control historical_expected three-parent oracle. Its original failed log remains in primary custody; the final oracle uses the same independent two-parent native expectation.",
     "native_execution": false
   },
   "primary_custody": {
@@ -54,6 +66,9 @@
     "opponent_script": "replay_original_prerequisite_opponent.py",
     "history_log": "native-prerequisite-history-r01.log",
     "construction_log": "native-prerequisite-construction-r01.log",
+    "owner_data_log": "native-prerequisite-owner-data-r01.log",
+    "postprocess_trace": "b0bf-default-owner-data-boundary-r02.json",
+    "postprocess_trace_script": "inspect_data_boundary.py",
     "earlier_new_control_setup_failures": "The initial new controls had incomplete paid-owner and current-versus-saved-progress assumptions; their r01-r03 logs remain. The final corrected control still rejects exact original8c independently."
   },
   "remaining": [
