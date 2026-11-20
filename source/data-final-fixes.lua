@@ -257,6 +257,9 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   -- default4, independently of a currently selected foreign finite route.
   local recovery = require("research.worker_storage_recovery")
   local baseline_mods = mods["space-age"] and {["space-age"]=mods["space-age"]} or {}
+  if modern_catalogue.is_f200_non_k2_space_exploration(mods) then
+    baseline_mods["space-exploration"] = mods["space-exploration"]
+  end
   local definition
   for _, row in ipairs(modern_catalogue.continuations(baseline_mods, nil)) do
     if row.id == recovery.canonical then definition = row; break end

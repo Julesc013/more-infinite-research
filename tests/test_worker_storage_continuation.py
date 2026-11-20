@@ -15,6 +15,17 @@ TRANSPORT = "more-infinite-research-native-adoptions"
 SCIENCE = [["automation-science-pack", 2], ["logistic-science-pack", 3], ["utility-science-pack", 4]]
 SCIENCE_GATES = ["automation-science-pack", "logistic-science-pack", "utility-science-pack"]
 PUBLISHED_WORKER = json.loads((ROOT / "tests/fixtures/worker-storage-published-473.json").read_text())
+F200_SE_SOURCE_DATA_SHA256 = "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104"
+F200_SE_WORKER_SCIENCE = [
+    ["automation-science-pack", 1],
+    ["logistic-science-pack", 1],
+    ["chemical-science-pack", 1],
+    ["production-science-pack", 1],
+    ["se-rocket-science-pack", 1],
+    ["se-material-science-pack-1", 1],
+    ["space-science-pack", 1],
+]
+F200_SE_WORKER_PREREQUISITES = ["worker-robots-storage-3"]
 
 
 def finite_chain(last=4):
@@ -70,6 +81,24 @@ class WorkerStorageContinuationTests(unittest.TestCase):
 
     def pipeline(self, lua):
         lua.execute("dofile(data_final_path)")
+
+    def f200_se_stage(self, rows=None, changes=None, extra_mods=None):
+        mods = {"space-exploration": "0.7.57"}
+        mods.update(extra_mods or {})
+        return self.stage(rows, "f200", changes, mods)
+
+    def assert_f200_se_worker_contract(self, row):
+        self.assertEqual("technology", row["type"])
+        self.assertEqual("infinite", row["max_level"])
+        self.assertEqual(4, row["level"])
+        self.assertEqual("675*1.5^(L-4)", row["unit"]["count_formula"])
+        self.assertEqual(60, row["unit"]["time"])
+        self.assertEqual(F200_SE_WORKER_SCIENCE, row["unit"]["ingredients"],
+                         f"published source data {F200_SE_SOURCE_DATA_SHA256}")
+        self.assertEqual(F200_SE_WORKER_PREREQUISITES, row["prerequisites"])
+        self.assertEqual([{"type": "worker-robot-storage", "modifier": 1}], row["effects"])
+        self.assertNotIn("utility-science-pack", row["prerequisites"])
+        self.assertNotIn("utility-science-pack", [name for name, _ in row["unit"]["ingredients"]])
 
     def runtime(self, lua):
         lua.execute('''
@@ -136,6 +165,120 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         published = PUBLISHED_WORKER["published_technology"]
         self.assertEqual(published["prerequisites"], row["prerequisites"])
         self.assertEqual(published["unit"], row["unit"])
+
+    def test_f200_non_k2_space_exploration_constructs_the_captured_worker_contract_for_all_owned_holders(self):
+        # The native F394 data capture is independent evidence. Its 2.0.77
+        # result had this exact source dump and seven-pack worker contract;
+        # old construction instead emitted the Base five-pack vector.
+        lua = self.f200_se_stage()
+        self.pipeline(lua)
+        technologies = lua.globals().data.raw.technology
+        for name in (
+            "worker-robots-storage-4",
+            "mir-worker-storage-preservation-4",
+            "mir-worker-storage-default-4",
+        ):
+            with self.subTest(holder=name):
+                self.assert_f200_se_worker_contract(scaffold.plain_lua(technologies[name]))
+
+    def test_f200_se_final_emission_resolves_worker_science_without_loading_the_f210_catalogue(self):
+        lua = self.f200_se_stage()
+        # The scaffold seeds foreign prototype rows before this boundary.
+        # Poison the real MIR final-emission consumer, not that fixture setup.
+        lua.execute(r'''
+          local full="compatibility.modern_catalogue.space_exploration"
+          package.loaded[full]=nil
+          package.preload[full]=function()error("F200 worker science loaded the full F210 SE catalogue")end
+        ''')
+        self.pipeline(lua)
+        for name in ("worker-robots-storage-4", "mir-worker-storage-default-4",
+                     "mir-worker-storage-preservation-4"):
+            self.assert_f200_se_worker_contract(
+                scaffold.plain_lua(lua.globals().data.raw.technology[name])
+            )
+
+    def test_f200_non_k2_space_exploration_old_base_selection_fails_the_captured_contract(self):
+        # This is the exact pre-repair selector outcome: the shared SE worker
+        # override is absent, so normal Base construction inserts utility and
+        # omits the three captured SE packs. It must remain a failing mutant.
+        lua = self.f200_se_stage()
+        lua.execute(r'''
+          require("compatibility.modern_catalogue").is_f200_non_k2_space_exploration=function()return false end
+          data.raw.technology["worker-robots-storage-2"]={type="technology",name="worker-robots-storage-2"}
+        ''')
+        self.pipeline(lua)
+        row = scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-4"])
+        self.assertNotEqual(F200_SE_WORKER_SCIENCE, row["unit"]["ingredients"])
+        self.assertEqual(
+            [["automation-science-pack", 1], ["logistic-science-pack", 1],
+             ["chemical-science-pack", 1], ["production-science-pack", 1],
+             ["utility-science-pack", 1]],
+            row["unit"]["ingredients"],
+        )
+        self.assertIn("utility-science-pack", row["prerequisites"])
+
+    def test_f200_non_k2_space_exploration_keeps_base_k2_and_external_worker_contracts_distinct(self):
+        base = self.stage(target_id="f200")
+        self.pipeline(base)
+        base_row = scaffold.plain_lua(base.globals().data.raw.technology["worker-robots-storage-4"])
+        self.assertEqual(
+            [["automation-science-pack", 1], ["logistic-science-pack", 1],
+             ["chemical-science-pack", 1], ["production-science-pack", 1],
+             ["utility-science-pack", 1]],
+            base_row["unit"]["ingredients"],
+        )
+        self.assertIn("utility-science-pack", base_row["prerequisites"])
+
+        asset_only = self.f200_se_stage(extra_mods={"Krastorio2Assets": "1.0"})
+        self.pipeline(asset_only)
+        self.assert_f200_se_worker_contract(
+            scaffold.plain_lua(asset_only.globals().data.raw.technology["worker-robots-storage-4"])
+        )
+
+        lua = self.f200_se_stage(extra_mods={"Krastorio2": "1.0", "Krastorio2Assets": "1.0"})
+        lua.execute(r'''
+          local catalogue=require("compatibility.modern_catalogue")
+          local selected
+          for _,row in ipairs(catalogue.continuations(mods,nil))do
+            if row.id=="worker-robots-storage-4"then selected=row;break end
+          end
+          assert(selected and selected.science=="science_automation_logistic_chemical_production_utility")
+          assert(selected.prerequisites[2]=="utility-science-pack")
+        ''')
+
+        provider = finite_chain()
+        provider["worker-robots-storage-4"]["max_level"] = "infinite"
+        provider["worker-robots-storage-4"]["unit"]["ingredients"] = deepcopy(SCIENCE)
+        foreign = self.f200_se_stage(provider)
+        self.pipeline(foreign)
+        self.assertEqual(
+            provider["worker-robots-storage-4"],
+            scaffold.plain_lua(foreign.globals().data.raw.technology["worker-robots-storage-4"]),
+        )
+        self.assertIsNone(foreign.globals().data.raw.technology["worker-robots-storage-5"])
+
+    def test_f200_non_k2_space_exploration_settings_change_only_the_existing_worker_controls(self):
+        disabled = self.f200_se_stage(changes={"mir-enable-worker-robots-storage": False})
+        self.pipeline(disabled)
+        disabled_row = scaffold.plain_lua(disabled.globals().data.raw.technology["worker-robots-storage-4"])
+        self.assert_f200_se_worker_contract(disabled_row)
+        self.assertFalse(disabled_row["enabled"])
+
+        tuned = self.f200_se_stage(changes={
+            "mir-cost-base-worker-robots-storage": 900,
+            "mir-cost-linear-increment-worker-robots-storage": 0,
+            "mir-cost-growth-worker-robots-storage": 2,
+            "mir-effect-per-level-worker-robots-storage": 3,
+        })
+        self.pipeline(tuned)
+        tuned_row = scaffold.plain_lua(tuned.globals().data.raw.technology["worker-robots-storage-4"])
+        self.assertEqual(F200_SE_WORKER_SCIENCE, tuned_row["unit"]["ingredients"])
+        self.assertEqual(F200_SE_WORKER_PREREQUISITES, tuned_row["prerequisites"])
+        self.assertEqual("7200*2^(L-4)", tuned_row["unit"]["count_formula"])
+        self.assertEqual([{"type": "worker-robot-storage", "modifier": 3}], tuned_row["effects"])
+        # Map-price behavior stays in the independent runtime owner contract;
+        # construction must not mark the ordinary SE work as price-exempt.
+        self.assertNotIn("ignore_tech_cost_multiplier", tuned_row)
 
     def test_finite_route_missing_default_input_keeps_only_an_uninvested_holder(self):
         inputs = finite_chain(5)
