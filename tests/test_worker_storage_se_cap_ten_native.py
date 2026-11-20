@@ -607,9 +607,36 @@ local function create_lab_and_power(force)'''
         self.lua.globals().cargo_begin()
         entities = list(self.lua.globals().cargo_entities().values())
         self.assertEqual(
-            [(world.POWER, 0, 0), (world.LAB, 8, 0), (world.POLE, 0, 6)],
+            [(world.POWER, 0, 0), (world.LAB, 8.5, 0.5), (world.POLE, 0, 6)],
             [(entity["name"], entity["x"], entity["y"]) for entity in entities],
         )
+
+    def test_old_integer_lab_anchor_fails_against_odd_native_grid(self):
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn("positioned(lab, 8.5, 0.5)", source)
+        self.assertIn("position = {8.5, 0.5}", source)
+        source = source.replace("positioned(lab, 8.5, 0.5)", "positioned(lab, 8, 0)", 1)
+        source = source.replace("position = {8.5, 0.5}", "position = {8, 0}", 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "integer-lab-anchor.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        with self.assertRaisesRegex(LuaError, "native SE lab position differs"):
+            lua.globals().cargo_begin()
+        self.assertEqual("idle", lua.globals().cargo_phase())
+        self.assertFalse(list(lua.globals().cargo_saves().values()))
+
+    def test_aligned_but_displaced_lab_still_refuses_with_observed_position(self):
+        for x, y in ((1, 0), (0, -1)):
+            with self.subTest(offset=(x, y)):
+                lua = self.fresh_actor()
+                lua.globals().cargo_offset_lab(x, y)
+                with self.assertRaisesRegex(LuaError, r"native SE lab position differs: expected=8.5,0.5 observed="):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+                self.assertFalse(list(lua.globals().cargo_saves().values()))
 
     def test_strict_world_rejects_the_historical_direct_lab_buffer_refill(self):
         lua = self.historical_buffer_refill_actor()

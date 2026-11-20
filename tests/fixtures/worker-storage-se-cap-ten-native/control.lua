@@ -258,7 +258,8 @@ assert_lab = function(lab, power, pole, force)
     "fixture external power differs")
   check(pole and pole.valid ~= false and pole.name == POLE and pole.force == force and positioned(pole, 0, 6),
     "fixture substation differs")
-  check(positioned(lab, 8, 0), "native SE lab position differs")
+  check(positioned(lab, 8.5, 0.5), "native SE lab position differs: expected=8.5,0.5 observed="
+    .. tostring(lab.position and lab.position.x) .. "," .. tostring(lab.position and lab.position.y))
   local network = lab.electric_network_id
   check(network ~= nil and power.electric_network_id == network and pole.electric_network_id == network,
     "fixture electric network differs: lab=" .. tostring(network) .. " power=" .. tostring(power.electric_network_id)
@@ -286,7 +287,8 @@ local function create_lab_and_power(force)
   local surface = game.surfaces[1]
   check(surface and surface.valid ~= false and type(surface.create_entity) == "function", "source surface differs")
   local power = surface.create_entity{name = POWER, position = {0, 0}, force = force}
-  local lab = surface.create_entity{name = LAB, position = {8, 0}, force = force}
+  -- The native seven-tile lab uses a tile-center anchor with normal snapping.
+  local lab = surface.create_entity{name = LAB, position = {8.5, 0.5}, force = force}
   local pole = surface.create_entity{name = POLE, position = {0, 6}, force = force}
   return lab, power, pole
 end

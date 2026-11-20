@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "MIRSECapTenLabGridCorrectionV1",
+  "scope": "Fixture placement repair; corrected ordinary source research and diagnostic load require a separately identified native run.",
+  "native_adverse": {
+    "invocation_id": "ae8df53090f841a9b9432c8c7cb82f05",
+    "controller_pid": 57557,
+    "fixture_sha256": "F7B9449A0195F61CCE628338AC28BA659484899E778097441223AD0E7F2B14A2",
+    "factorio_version": "2.0.77",
+    "mir_version": "4.7.20002",
+    "space_exploration_version": "0.7.57",
+    "source_create": {"pid": 59527, "start_ticks": 2183252, "exit_code": 0},
+    "source_server": {"pid": 67454, "start_ticks": 2185941, "session_id": 67454},
+    "error": "native SE lab position differs, control.lua261, before feeding or ordinary worker research",
+    "actual_post_snap_coordinates": "Not logged by the original actor; no exact observed coordinate is claimed.",
+    "stop": "The exact stdout error predicate automatically ends only its owned child137; the controller's explicit source refusal prevents treating the stop predicate as research acceptance.",
+    "result_sha256": "E34D889EED88CFDE4C669514BC08625F590941363B3956945A557539C05C646A",
+    "ordinary_worker_completions": 0,
+    "diagnostic_loads": 0,
+    "restoration": "Both original archives independently rehashed; all library controls unchanged and active journal absent; collected unit/no Factorio. Only owned ext4 control scratch removed after independently verified custody. Native originals remain.",
+    "private_custody": "Julesc013/scratchpad PR150 at ff381bf, projects/mir/tasks/gunmetal-worker-cap10-diagnostic-r01/r05",
+    "native_capsule_sha256": "29641347323182FBCA2BA22BA85ECDAA17A638CD00B8ECB9A54ADB9EACBC37FD",
+    "native_capsule_files": 66,
+    "native_capsule_raw_bytes": 4203411,
+    "control_capsule_sha256": "55F7B6505A4E03E22F0E767C1C7C1D3CA8207BA2ECC8C23D4DA924B36F0AA655"
+  },
+  "independent_geometry": {
+    "trusted_f394_native_data_sha256": "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104",
+    "lab": {"name": "se-space-science-lab", "collision_box": [[-3.2, -3.2], [3.2, 3.2]], "selection_box": [[-3.5, -3.5], [3.5, 3.5]], "researching_speed": 10},
+    "api": "https://lua-api.factorio.com/latest/classes/LuaSurface.html#create_entity",
+    "api_limit": "Latest official documentation supports ordinary grid snapping and the optional bypass; the exact2.0.77 documentation endpoint was unavailable. Existing native geometry and the retained actual position refusal provide the affected-engine evidence.",
+    "inference": "The seven-tile lab uses half-tile centers. Request and strictly require8.5,0.5 with normal snapping; keep the two-tile power and substation at0,0 and0,6. Do not disable snapping or accept arbitrary observed positions."
+  },
+  "host_controls": {
+    "original_actor_sha256": "4BC5F4DC6B1CD73AE900DC9BCE32861CA380A725BBE3210B3E6F16CC0D190333",
+    "opponent": "Exact original actor fails at its lab position check against an independent odd-grid host representative after98 finite callbacks, with idle phase and no save. The representative does not claim r05's unlogged tie-breaking coordinate.",
+    "candidate": "60 selected methods pass with pinned Lua5.2; include aligned placement, original integer-anchor opponent and displaced-but-grid-aligned refusals with expected/observed coordinates.",
+    "unchanged_obligations": "Complete science, effects, costs, earned work, callbacks, queues, saves, network identity and ordinary native completion requirements remain unchanged. No lab or research prototype is altered."
+  }
+}
