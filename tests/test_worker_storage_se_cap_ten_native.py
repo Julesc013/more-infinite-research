@@ -33,9 +33,13 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
-        world.install(self.lua)
-        world.load(self.lua)
+        self.lua = self.fresh_actor()
+
+    def fresh_actor(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        world.load(lua)
+        return lua
 
     def static_role_actor(self):
         """Load the former static-C4 expectation as an in-memory actor mutant."""
@@ -70,12 +74,17 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         """Load the AFA actor behavior that treated every saved phase as cold."""
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         fixed = '''  if cold_pending then
-    if state.phase == "closed" then
-      check(same(frame(state), state.closed), "cold process changed candidate endpoint")
-      marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    if cold_phase == "closed" then
+      check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
+    elseif cold_phase == "idle" then
+      check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
+    elseif cold_phase == "source-partial" then
+      check(state.phase == "candidate-working", "cold load phase differs")
+    else
+      fail("cold load phase differs")
     end
-    check(state.phase == "idle" or state.phase == "candidate-working", "cold load phase differs")
-    cold_pending = false
+    cold_pending, cold_phase = false, nil
   end'''
         original = '''  if cold_pending then
     check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
@@ -171,18 +180,31 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
 
-    def test_documented_on_load_before_source_begin_keeps_idle_admissible(self):
+    def test_afa_cold_pending_mutant_refuses_both_source_load_orders(self):
         old = self.unconditional_cold_pending_actor()
         old.globals().cargo_on_load()
         with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
             old.globals().cargo_tick(1)
 
+        old_after_begin = self.unconditional_cold_pending_actor()
+        old_after_begin.globals().cargo_on_load()
+        old_after_begin.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old_after_begin.globals().cargo_tick(1)
+
+    def test_documented_on_load_source_idle_admits_both_first_tick_orders(self):
         self.lua.globals().cargo_on_load()
         self.lua.globals().cargo_tick(1)
         self.assertEqual("idle", self.lua.globals().cargo_phase())
         self.assertEqual([], self.logs())
         self.lua.globals().cargo_begin()
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+        after_begin = self.fresh_actor()
+        after_begin.globals().cargo_on_load()
+        after_begin.globals().cargo_begin()
+        after_begin.globals().cargo_tick(1)
+        self.assertEqual("source-working", after_begin.globals().cargo_phase())
 
     def test_documented_on_load_configuration_then_candidate_tick_remains_working(self):
         old = self.unconditional_cold_pending_actor()
@@ -206,8 +228,14 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.assertNotIn("phase=cold-read", self.logs()[-1])
 
     def test_on_load_refuses_unrecognized_persisted_phase(self):
-        self.lua.globals().cargo_on_load()
         self.lua.globals().cargo_set_phase("unknown-persisted-phase")
+        self.lua.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_on_load_source_partial_requires_configuration_before_first_tick(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_on_load()
         with self.assertRaisesRegex(LuaError, "cold load phase differs"):
             self.lua.globals().cargo_tick(1)
 

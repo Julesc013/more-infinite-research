@@ -41,7 +41,7 @@ local CLOSURE = {
   ["space-exploration-graphics-5"] = "0.7.3", ["space-exploration-menu-simulations"] = "0.7.4",
   ["space-exploration-postprocess"] = "0.7.5", informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3"
 }
-local cold_pending = false
+local cold_pending, cold_phase = false, nil
 
 local function fail(message) error("[mir5-worker-storage-se-cap-ten-native] " .. message) end
 local function check(value, message) if not value then fail(message) end end
@@ -399,7 +399,11 @@ end
 script.on_init(function()
   if active() then storage[KEY] = {phase = "idle"} end
 end)
-script.on_load(function() cold_pending = true end)
+script.on_load(function()
+  cold_pending = true
+  local state = storage[KEY]
+  cold_phase = type(state) == "table" and state.phase or nil
+end)
 remote.add_interface(FIXTURE, {begin = begin_source})
 script.on_configuration_changed(function(event)
   if active() then configuration(event) end
@@ -433,12 +437,17 @@ script.on_event(defines.events.on_tick, function()
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
   if cold_pending then
-    if state.phase == "closed" then
-      check(same(frame(state), state.closed), "cold process changed candidate endpoint")
-      marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    if cold_phase == "closed" then
+      check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
+    elseif cold_phase == "idle" then
+      check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
+    elseif cold_phase == "source-partial" then
+      check(state.phase == "candidate-working", "cold load phase differs")
+    else
+      fail("cold load phase differs")
     end
-    check(state.phase == "idle" or state.phase == "candidate-working", "cold load phase differs")
-    cold_pending = false
+    cold_pending, cold_phase = false, nil
   end
   if state.phase == "source-working" or state.phase == "candidate-working" then feed(state)
   elseif state.phase == "source-await-queue" then stage_source_partial_queue(state)
