@@ -456,6 +456,13 @@ function M.is_space_exploration(active_mods)
     and active_mods["Krastorio2-spaced-out"] == nil
 end
 
+local function is_space_exploration_without_k2(active_mods)
+  return (target.id == "f200" or target.id == "f210") and type(active_mods) == "table"
+    and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
+    and active_mods.Krastorio2 == nil and active_mods.Krastorio2Assets == nil
+    and active_mods["Krastorio2-spaced-out"] == nil
+end
+
 -- Bob Logistics authors these named infinite native tails in its data stage.
 -- Its ownership does not depend on the rest of the Bob/Angel selection.
 function M.retains_bob_native_continuations(active_mods)
@@ -969,7 +976,8 @@ function M.select(active_mods, raw, withheld)
     profile = "bob-angel-" .. bob_angel_f210 .. "-f210"
   end
   local se, k2se = space_exploration_deltas(active_mods)
-  if se then
+  local se_mining = is_space_exploration_without_k2(active_mods)
+  if se or se_mining then
     exact_product_bindings, required_product_targets = {}, {}
     local function apply(delta)
       apply_authored_definitions(definitions, delta)
@@ -984,9 +992,16 @@ function M.select(active_mods, raw, withheld)
       copy_true_fields(replacement_product_target_families, delta.replacement_product_target_families or {})
       copy_true_fields(excluded_product_target_recipes, delta.excluded_product_target_recipes or {})
     end
-    apply(se)
-    if k2se then apply(k2se) end
-    profile = k2se and "k2-space-exploration-f210" or "space-exploration-f210"
+    if se then apply(se) end
+    if k2se then
+      apply(k2se)
+    elseif se_mining then
+      local mining = (se or require("compatibility.modern_catalogue.space_exploration")).mining_drill_manufacturing
+      if type(mining) ~= "table" then error("MIR SE mining-drill declaration is invalid", 2) end
+      apply(mining)
+    end
+    profile = se and (k2se and "k2-space-exploration-f210" or "space-exploration-f210")
+      or "space-exploration-f200"
   end
   -- The independently captured AAI Base/Space Age intersection changes only
   -- these two authored presentations. Keep it separate from SE/K2 semantics.

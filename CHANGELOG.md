@@ -6,6 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Factorio 2.0/2.1: Restore Space Exploration's named mining-drill manufacturing productivity for supported non-K2 selections; this does not change ore extraction.
 - Factorio 2.1: Add missing K2: Spaced Out silicon, glass and rare-metals productivity continuations so a zero research limit permits research beyond level 3.
 - Preserve research availability when raising or removing a limit after MIR cancels over-limit queued research.
 - Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged startup settings.

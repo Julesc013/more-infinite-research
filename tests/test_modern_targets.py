@@ -23,10 +23,40 @@ class ModernTargetTests(unittest.TestCase):
             target.recipe_probability, target.receiver_limits = "probability", false
             target.productivity_ignores_stats = true
           end
+          function f210()
+            target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+            target.distribution_version, target.cargo_research = "5.0.21018", true
+            target.recipe_probability, target.receiver_limits = "independent_probability", true
+            target.productivity_ignores_stats = true
+          end
           function names(rows)
             local out = {}
             for _, row in ipairs(rows) do out[row.key] = row end
             return out
+          end
+          function effect_vector(definition)
+            local out = {}
+            for _, effect in ipairs(definition.effects or {}) do
+              out[#out + 1] = effect.recipe .. ":" .. tostring(effect.scale or effect.change)
+            end
+            return table.concat(out, ",")
+          end
+          function recipe_map(recipes)
+            local raw = {recipe = {}}
+            for _, name in ipairs(recipes) do
+              raw.recipe[name] = {type="recipe", name=name, ingredients={},
+                results={{type="item", name=name, amount=1}}}
+            end
+            return raw
+          end
+          function recipe_shape(raw)
+            local out = {}
+            for name, recipe in pairs(raw.recipe or {}) do
+              out[#out + 1] = name .. ":" .. tostring(recipe.allow_productivity)
+                .. ":" .. tostring(recipe.results and recipe.results[1] and recipe.results[1].name)
+            end
+            table.sort(out)
+            return table.concat(out, ",")
           end
         ''')
 
@@ -165,6 +195,91 @@ class ModernTargetTests(unittest.TestCase):
             assert(not ok and tostring(message):find("MIR_API:invalid_definition",1,true), tostring(message))
           end
           assert(writes == 0)
+        ''')
+
+    def test_se_without_k2_restores_only_the_four_published_drill_manufacturing_effects(self):
+        """F394 data contract: four named manufacturing recipes, never an ore-yield route."""
+        self.lua.execute('''
+          local expected = "burner-mining-drill:1,electric-mining-drill:0.5,area-mining-drill:0.25,se-core-miner-drill:0.25"
+          local source_mods = {base="2.0.77", ["space-exploration"]="0.7.57"}
+          local recipe_names = {"burner-mining-drill", "electric-mining-drill", "area-mining-drill", "se-core-miner-drill"}
+          local function mining(selection)
+            return assert(names(selection.definitions).research_mining_drill)
+          end
+          local function continuation_ids(selection)
+            local out = {}
+            for _, row in ipairs(selection.continuations) do out[#out + 1] = row.id end
+            table.sort(out)
+            return table.concat(out, ",")
+          end
+
+          f200()
+          local base = catalogue.select({base="2.0.77"})
+          local selected = catalogue.select(source_mods)
+          assert(selected.profile == "space-exploration-f200")
+          assert(effect_vector(mining(base)) == "burner-mining-drill:1,electric-mining-drill:0.5")
+          assert(effect_vector(mining(selected)) == expected)
+          assert(#selected.native_owners == #base.native_owners and #selected.native_paid == #base.native_paid)
+          assert(continuation_ids(selected) == continuation_ids(base), "SE manufacturing cannot add a carrier")
+          assert(selected.exact_product_target_families.research_mining_drill == true)
+          assert(selected.required_product_targets.research_mining_drill[1] == "area-mining-drill"
+            and selected.required_product_targets.research_mining_drill[4] == "se-core-miner-drill")
+
+          local k2 = catalogue.select({base="2.0.77", ["space-exploration"]="0.7.57",
+            Krastorio2="1.0", Krastorio2Assets="1.0"})
+          assert(k2.profile == "k2-base-f200")
+          assert(effect_vector(mining(k2)) == "burner-mining-drill:1,electric-mining-drill:0.5")
+          assert(not k2.exact_product_target_families.research_mining_drill)
+
+          f210()
+          local se210 = catalogue.select({base="2.1.23", ["space-exploration"]="0.7.57"})
+          assert(se210.profile == "space-exploration-f210" and effect_vector(mining(se210)) == expected)
+          local k2se = catalogue.select({base="2.1.23", ["space-exploration"]="0.7.57",
+            Krastorio2="1.0", Krastorio2Assets="1.0"})
+          assert(k2se.profile == "k2-space-exploration-f210")
+          assert(effect_vector(mining(k2se)) ==
+            "burner-mining-drill:1,electric-mining-drill:0.5,area-mining-drill:0.25,kr-quarry-drill:0.25,se-core-miner-drill:0.25")
+
+          f200()
+          mods = source_mods
+          package.loaded["research.settings"] = nil
+          local settings = require("research.settings")
+          local values = settings.resolve({})
+          local modern = require("research.modern")
+          local extension = require("research.product_target_extension")
+          local technology = modern.technology(mining(selected), values)
+          assert(effect_vector(technology) == "burner-mining-drill:0.2,electric-mining-drill:0.1,area-mining-drill:0.05,se-core-miner-drill:0.05")
+          local raw = recipe_map(recipe_names)
+          raw.recipe["synthetic-ore-extraction"] = {type="recipe", name="synthetic-ore-extraction", ingredients={},
+            results={{type="item", name="iron-ore", amount=1}}}
+          local before_raw, before_effects = recipe_shape(raw), effect_vector(technology)
+          local report = extension.extend({technology}, values, {
+            mods=source_mods, raw=raw, exact_product_bindings=selected.exact_product_bindings,
+            exact_product_target_families=selected.exact_product_target_families,
+            required_product_targets=selected.required_product_targets,
+          })
+          assert(report.extended_effects == 0 and effect_vector(technology) == before_effects)
+          assert(recipe_shape(raw) == before_raw, "product collection must not mutate foreign recipes")
+
+          local incomplete = recipe_map({"burner-mining-drill", "electric-mining-drill", "area-mining-drill"})
+          local failed = modern.technology(mining(selected), values)
+          local before_incomplete, before_failed = recipe_shape(incomplete), effect_vector(failed)
+          local ok, message = pcall(extension.extend, {failed}, values, {
+            mods=source_mods, raw=incomplete, exact_product_bindings=selected.exact_product_bindings,
+            exact_product_target_families=selected.exact_product_target_families,
+            required_product_targets=selected.required_product_targets,
+          })
+          assert(not ok and tostring(message):find("MIR product targets changed required family research_mining_drill", 1, true))
+          assert(recipe_shape(incomplete) == before_incomplete and effect_vector(failed) == before_failed)
+
+          local denied = recipe_map(recipe_names)
+          denied.recipe["se-core-miner-drill"].allow_productivity = false
+          ok, message = pcall(extension.extend, {modern.technology(mining(selected), values)}, values, {
+            mods=source_mods, raw=denied, exact_product_bindings=selected.exact_product_bindings,
+            exact_product_target_families=selected.exact_product_target_families,
+            required_product_targets=selected.required_product_targets,
+          })
+          assert(not ok and tostring(message):find("MIR product targets changed required family research_mining_drill", 1, true))
         ''')
 
 
