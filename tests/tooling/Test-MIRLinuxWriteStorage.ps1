@@ -1,13 +1,18 @@
-# No Factorio or governed child is launched. Expectations are byte-exact.
+# No Factorio is launched. The opt-in Linux child exercises the real governor;
+# default controls remain observation/composition only. Expectations are exact.
 [CmdletBinding()]
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$LinuxDataTestParent='',
-  [string]$LinuxLibraryRoot=''
+  [string]$LinuxLibraryRoot='',
+  [switch]$GovernedSplitChild
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+if($GovernedSplitChild -and (-not $IsLinux -or -not $LinuxDataTestParent -or -not $LinuxLibraryRoot)){
+  throw 'Governed split-path control requires actual Linux data/library test roots.'
+}
 $checks=0
 function Assert-Storage([bool]$Condition,[string]$Name){if(-not $Condition){throw "[storage-control-$Name]"};$script:checks++}
 function Refuses-Storage([scriptblock]$Action,[string]$Expected){
@@ -111,6 +116,29 @@ try{
       New-Item -ItemType SymbolicLink -Path $link -Target $external | Out-Null
       Refuses-Storage {Resolve-MIRLinuxWritePath -Path $link} '[mir-linux-storage-reparse]'
       Remove-Item -LiteralPath $link
+      if($GovernedSplitChild){
+        # Exercise the existing actor, not its later mock: real POSIX session,
+        # control working directory/TEMP, external data captures and cleanup.
+        $plan | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $planPath
+        $context=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $controlRoot -ExpectedPeakMemoryMiB 128 -MaxNewOutputMiB 4 -UseExactOutputRoot -LinuxStoragePlanPath $planPath -LinuxStoragePlanSha256 (Get-FileHash -LiteralPath $planPath).Hash -LibraryRoot $LinuxLibraryRoot
+        $payload=Join-Path $context.root 'split-child.bin'
+        $actor=@'
+import json, os, sys
+with open(sys.argv[1], "xb") as output:
+    output.write(b"Z" * 65536)
+print(json.dumps({"cwd": os.getcwd(), "temp": os.environ["TMPDIR"], "pid": os.getpid(), "session": os.getsid(0)}))
+'@
+        $run=Invoke-MIRNativeProbeProcess -Context $context -FilePath (Get-Command python3 -ErrorAction Stop).Source -Arguments @('-I','-B','-c',$actor,$payload) -TimeoutSeconds 30
+        $witness=Get-Content -LiteralPath $run.stdout -Raw | ConvertFrom-Json
+        Assert-Storage ($run.result.passed -and $run.result.exit_code -eq 0 -and $witness.cwd -ceq $controlRoot) 'governed-child-control-cwd'
+        Assert-Storage ((Test-MIR441PathContained -Root $controlRoot -Path $witness.temp) -and -not (Test-Path -LiteralPath $witness.temp)) 'governed-child-owned-temp-cleanup'
+        Assert-Storage ($witness.pid -eq $witness.session) 'governed-child-owned-session'
+        Assert-Storage ((Test-MIR441PathContained -Root $external -Path $run.stdout) -and (Test-MIR441PathContained -Root $external -Path $run.ledger)) 'governed-child-data-captures'
+        $payloadBytes=[IO.File]::ReadAllBytes($payload)
+        Assert-Storage ($payloadBytes.Length -eq 65536 -and @($payloadBytes|Where-Object {$_ -ne 90}).Count -eq 0) 'governed-child-external-file'
+        Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIRLinuxGovernedSplitChildControlV1';passed=$true;factorio_started=$false;child=$witness;data_root=$context.root;payload_sha256=(Get-FileHash -LiteralPath $payload).Hash})
+        Assert-Storage (Test-Path -LiteralPath (Join-Path $external 'result.json') -PathType Leaf) 'governed-child-result-custody'
+      }
     }finally{
       # Recheck the actual mount before removing the single fresh child; never
       # delete the supplied parent, archive library or an unmounted fallback.
