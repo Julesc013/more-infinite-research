@@ -200,25 +200,39 @@ local function assert_candidate_transfer(state)'''
             lua.globals().cargo_load(path.as_posix())
         return lua
 
-    def source_to_partial(self):
-        self.lua.globals().cargo_begin()
+    def source_to_partial(self, lua=None):
+        actor = lua or self.lua
+        actor.globals().cargo_begin()
         for _ in range(5):
-            self.lua.globals().cargo_complete(False)
-            self.lua.globals().cargo_tick(1)
-        self.assertEqual("source-await-partial", self.lua.globals().cargo_phase())
-        self.lua.globals().cargo_partial(0.42)
-        self.lua.globals().cargo_tick(1)
-        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+            actor.globals().cargo_complete(False)
+            actor.globals().cargo_tick(1)
+        self.assertEqual("source-await-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_partial(0.42)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("source-partial", actor.globals().cargo_phase())
 
-    def candidate_to_closed(self):
-        self.source_to_partial()
-        self.lua.globals().cargo_candidate("5.0.20018", None)
-        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
-        self.lua.globals().cargo_complete(False)
-        self.lua.globals().cargo_tick(1)
-        self.lua.globals().cargo_complete(False)
-        self.lua.globals().cargo_tick(1)
-        self.assertEqual("closed", self.lua.globals().cargo_phase())
+    def candidate_to_closed(self, lua=None):
+        actor = lua or self.lua
+        self.source_to_partial(actor)
+        actor.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("candidate-working", actor.globals().cargo_phase())
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("closed", actor.globals().cargo_phase())
+
+    def closed_cap12_configuration(self, lua=None, *, startup_changed=True, mir_change=None):
+        actor = lua or self.lua
+        actor.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+        changes = actor.table()
+        if mir_change is not None:
+            changes["more-infinite-research"] = actor.table_from(mir_change, recursive=True)
+        event = actor.table_from({
+            "mod_startup_settings_changed": startup_changed,
+            "mod_changes": changes,
+        }, recursive=True)
+        actor.globals().cargo_configuration(event)
 
     def candidate_to_await_close(self, lua=None):
         actor = lua or self.lua
@@ -761,6 +775,95 @@ local function assert_candidate_transfer(state)'''
         self.assertIn("science_debit=automation-science-pack:7.42", log)
         self.assertEqual(["mir5-se-worker-storage-cap10-source", "mir5-se-worker-storage-cap10-candidate"], list(self.lua.globals().cargo_saves().values()))
         self.assert_complete_policy_observation("candidate-closed")
+
+    def test_cap12_configuration_probe_observes_closed_state_without_actor_mutation(self):
+        self.candidate_to_closed()
+        before = {
+            "phase": self.lua.globals().cargo_phase(),
+            "saves": list(self.lua.globals().cargo_saves().values()),
+            "science": dict(self.lua.globals().cargo_counts().items()),
+            "bonus": self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+            "current": self.lua.globals().cargo_current_name(),
+            "queue": list(self.lua.globals().cargo_queue_names().values()),
+            "saved_flag": self.lua.eval("storage['mir5_worker_storage_se_cap_ten_native'].configuration_startup_settings_changed"),
+        }
+        self.closed_cap12_configuration()
+        self.assertEqual(before["phase"], self.lua.globals().cargo_phase())
+        self.assertEqual(before["saves"], list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before["science"], dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before["bonus"], self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+        self.assertEqual(before["current"], self.lua.globals().cargo_current_name())
+        self.assertEqual(before["queue"], list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(False, before["saved_flag"])
+        self.assertEqual(before["saved_flag"], self.lua.eval("storage['mir5_worker_storage_se_cap_ten_native'].configuration_startup_settings_changed"))
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("event_startup_settings_changed=true", snapshot)
+        self.assertIn("saved_configuration_startup_settings_changed=false", snapshot)
+        self.assertIn("configured_cap=12", snapshot)
+        self.assertIn("mir_change=missing", snapshot)
+        self.assertIn("mir_old=missing", snapshot)
+        self.assertIn("mir_new=missing", snapshot)
+        self.assertIn(f"worker={world.CANDIDATE}", snapshot)
+        self.assertIn("level=11", snapshot)
+        self.assertIn("enabled=false", snapshot)
+        self.assertIn(f"current={world.TAIL}", snapshot)
+        self.assertIn(f"queue={world.TAIL}", snapshot)
+        self.assertIn("progress=0", snapshot)
+        self.assertIn("science_issued=automation-science-pack:", snapshot)
+        self.assertIn("science_remaining=automation-science-pack:", snapshot)
+        self.assertIn("science_debit=automation-science-pack:", snapshot)
+        self.assertIn(
+            "summary path=frame origin=cap12-configuration count=0 truncated=false",
+            self.frame_diffs()[-1],
+        )
+        self.assert_complete_policy_observation("cap12-configuration")
+
+    def test_cap12_configuration_observes_event_values_without_authorizing_changed_cap_state(self):
+        self.candidate_to_closed()
+        self.closed_cap12_configuration(
+            startup_changed=False,
+            mir_change={"old_version": "5.0.20018", "new_version": "5.0.20018"},
+        )
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("event_startup_settings_changed=false", snapshot)
+        self.assertIn("mir_change=present", snapshot)
+        self.assertIn('mir_old="5.0.20018"', snapshot)
+        self.assertIn('mir_new="5.0.20018"', snapshot)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_cap12_configuration_marks_an_unavailable_mir_change_before_refusing_it(self):
+        self.candidate_to_closed()
+        self.lua.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+        changes = self.lua.table_from({"more-infinite-research": "unavailable"}, recursive=True)
+        event = self.lua.table_from({"mod_startup_settings_changed": True, "mod_changes": changes}, recursive=True)
+        with self.assertRaisesRegex(LuaError, "cap12 MIR change differs"):
+            self.lua.globals().cargo_configuration(event)
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("mir_change=unavailable", snapshot)
+        self.assertIn("mir_old=unavailable", snapshot)
+        self.assertIn("mir_new=unavailable", snapshot)
+
+    def test_cap12_configuration_rejects_wrong_source_cap_cost_phase_and_unavailable_inputs(self):
+        cases = (
+            ("source", "script.active_mods['more-infinite-research']='4.7.20002'", "cap12 MIR identity differs"),
+            ("cap", "settings.startup['mir-max-level-worker-robots-storage'].value=10", "cap12 startup setting value differs: mir-max-level-worker-robots-storage"),
+            ("cost", "settings.startup['mir-cost-base-worker-robots-storage'].value=201", "cap12 startup setting value differs: mir-cost-base-worker-robots-storage"),
+            ("phase", "storage['mir5_worker_storage_se_cap_ten_native'].phase='candidate-working'", "cap12 configuration state differs"),
+            ("unavailable", "settings.startup['mir-max-level-worker-robots-storage']=nil", "cap12 startup setting differs: mir-max-level-worker-robots-storage"),
+        )
+        for label, mutate, expected in cases:
+            with self.subTest(label=label):
+                actor = self.fresh_actor()
+                self.candidate_to_closed(actor)
+                actor.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+                actor.execute(mutate)
+                event = actor.table_from({"mod_startup_settings_changed": True, "mod_changes": actor.table()}, recursive=True)
+                with self.assertRaisesRegex(LuaError, expected):
+                    actor.globals().cargo_configuration(event)
+                self.assertEqual([], [line for line in actor.globals().cargo_logs().values()
+                                      if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]")])
 
     def test_exhausted_valid_native_lab_science_closes_candidate_with_zero_remaining(self):
         self.candidate_to_await_close()

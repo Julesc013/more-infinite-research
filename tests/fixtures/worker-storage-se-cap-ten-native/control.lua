@@ -11,7 +11,7 @@ local POLE = "substation"
 local TAIL = "mir-fixture-worker-storage-se-cap-ten-tail"
 local SOURCE, CANDIDATE, HEAD = "worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-head-4"
 local PREDECESSOR, LAB = "worker-robots-storage-3", "se-space-science-lab"
-local SOURCE_MIR, UINT32_MAX = "4.7.20002", 4294967295
+local SOURCE_MIR, CURRENT_MIR, UINT32_MAX = "4.7.20002", "5.0.20018", 4294967295
 local SPEED_STIMULUS, FEED_REQUEST = 115199, 200
 -- Five native rows cover ordinary levels 4 through 8.  After the fifth
 -- completion has selected no successor, the next tick (while the lab is
@@ -209,6 +209,15 @@ local function assert_settings()
     check(row.value == expected.value, "startup setting value differs: " .. expected.name)
   end
 end
+local function assert_cap12_settings()
+  for _, expected in ipairs(SETTINGS) do
+    local value = expected.name == "mir-max-level-worker-robots-storage" and 12 or expected.value
+    local row = settings.startup and settings.startup[expected.name]
+    check(type(row) == "table" and row.valid ~= false and type(row.value) == type(value),
+      "cap12 startup setting differs: " .. expected.name)
+    check(row.value == value, "cap12 startup setting value differs: " .. expected.name)
+  end
+end
 local function parent_names(row)
   local out = {}
   for key, value in pairs(row.prerequisites or {}) do out[#out + 1] = type(key) == "string" and key or value.name end
@@ -350,6 +359,7 @@ local CONTRIBUTION_PHASES = {
   ["mir-worker-applied"] = true,
   ["mir-config-exit"] = true,
   ["candidate-transfer"] = true,
+  ["cap12-configuration"] = true,
   ["candidate-closed"] = true,
   ["cold-read"] = true
 }
@@ -668,6 +678,42 @@ local function stage_source_partial_queue(state)
   feed(state)
   marker("source-queue-staged", state, {queue_rows = 3})
 end
+local function cap12_mir_change_values(event)
+  local change = event.mod_changes["more-infinite-research"]
+  if change == nil then return "missing", "missing", "missing", true end
+  if type(change) ~= "table" then return "unavailable", "unavailable", "unavailable", false end
+  local function value(field)
+    local row = change[field]
+    if row == nil then return "missing", true end
+    if type(row) ~= "string" or #row > 160 then return "unavailable", false end
+    return string.format("%q", row), true
+  end
+  local old_version, old_valid = value("old_version")
+  local new_version, new_valid = value("new_version")
+  return "present", old_version, new_version, old_valid and new_valid
+end
+local function observe_cap12_configuration(event, state)
+  check(script.active_mods["more-infinite-research"] == CURRENT_MIR, "cap12 MIR identity differs")
+  check(state.phase == "closed" and state.worker == CANDIDATE and type(state.closed) == "table"
+    and state.closed.worker == CANDIDATE, "cap12 configuration state differs")
+  check(state.ordinary == 5 and state.candidate_events == 2, "cap12 saved completion count differs")
+  check(state.configuration_startup_settings_changed == false, "cap12 saved configuration flag differs")
+  assert_active_tuple(); assert_cap12_settings(); assert_worker_contract(state.player, CANDIDATE)
+  local change_state, old_version, new_version, change_valid = cap12_mir_change_values(event)
+  local observed = frame(state)
+  log(table.concat({
+    "[MIR_SE_CARGO_CAP12_CONFIGURATION]", "event_startup_settings_changed=" .. tostring(event.mod_startup_settings_changed),
+    "saved_configuration_startup_settings_changed=" .. tostring(state.configuration_startup_settings_changed),
+    "configured_cap=12", "mir_change=" .. change_state, "mir_old=" .. old_version, "mir_new=" .. new_version, "worker=" .. observed.worker,
+    "level=" .. tostring(observed.target.level), "enabled=" .. tostring(observed.target.enabled),
+    "current=" .. tostring(observed.current), "progress=" .. tostring(observed.progress),
+    "queue=" .. table.concat(observed.queue, ","), "science_issued=" .. science_values(observed.science.issued),
+    "science_remaining=" .. science_values(observed.science.remaining), "science_debit=" .. science_values(observed.science.debit)
+  }, "|"))
+  check(change_valid, "cap12 MIR change differs")
+  observe_force_contributions("cap12-configuration")
+  frame_diagnostics(state.closed, observed, "cap12-configuration")
+end
 local function configuration(event)
   check(event and type(event.mod_startup_settings_changed) == "boolean" and type(event.mod_changes) == "table", "configuration event differs")
   local state = storage[KEY]
@@ -676,6 +722,10 @@ local function configuration(event)
     source_reload_observed = true
     observe_force_contributions("source-reload")
     frame_diagnostics(state.source_frame, frame(state), "source-reload")
+  end
+  if type(state) == "table" and state.worker == CANDIDATE then
+    observe_cap12_configuration(event, state)
+    return
   end
   local change = event.mod_changes["more-infinite-research"]
   check(change and change.old_version == SOURCE_MIR and type(change.new_version) == "string" and change.new_version ~= SOURCE_MIR, "source-to-candidate identity differs")
