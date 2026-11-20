@@ -1,0 +1,141 @@
+{
+  "kind": "MIR510AeroSifFinalOutputReviewV1",
+  "status": "delivered-expectation-proposal-baseline-regressions-remain-unfixed",
+  "issue": "https://github.com/Julesc013/more-infinite-research/issues/1807",
+  "host": "AERO-15X-WIN10",
+  "base_commit": "2786326a5bd2d45ea6a7865f755ec37493656163",
+  "unchanged_player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+  "branch": "test/mir510-aero-sif-final-output-r01",
+  "ownership": {
+    "author": "Aero",
+    "production_source": "Black Glass; no production edits or assignment consumed",
+    "integration_native_publication": "Black Glass only"
+  },
+  "runtime": {
+    "lupa": "2.6",
+    "lua": "5.2",
+    "python": "3.14",
+    "module": "lua52.cp314-win_amd64.pyd",
+    "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+  },
+  "controller": {
+    "path": "tests/test_sif_final_output.py",
+    "sha256": "82527FC50BB51DABAF415619156B9EA579D93FE8CD9CF56F8EE16A7E84679033",
+    "default_host_plan_registered": false,
+    "reason": "Expectation proposal intentionally red on baseline; integrator must accept source correction before promoting into the required host plan."
+  },
+  "requirement": {
+    "source": "Current maintainer shared packet GOAL/INCIDENTS and issue1807, updated2026-11-08T12:19:28Z",
+    "expected": "Where white science is retired, intended final MIR public research remains present and obtainable without that pack or retired gate, including shifted tails and later required-science processing. Preserve unaffected costs/effects/ingredients, private holders and independently supported usable white routes.",
+    "superseded_oracle": "tests/test_science.py named-required SIF expectation around lines539-550 explicitly reappends white after exclusion; exact-name-only scope also predates the current incident instruction."
+  },
+  "input_facts": {
+    "worker": {
+      "repository": "StargateurFactorioMod/WorkerRobotCargoSizeResearch",
+      "commit": "61c361b719a5230da0067eb5ffd8ce810bef9da1",
+      "version": "1.0.0",
+      "factorio_version": "2.1",
+      "data_git_blob": "ec2cd18754032e4229c27d6b7a895c352356871d"
+    },
+    "sif_f210": {
+      "filename": "space-is-fake_1.0.78.zip",
+      "sha256": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13",
+      "data_updates_sha256": "6676A22AD0A16A18B3CB8F94D72C195DFCCA663690FAF1AA2FD40499C2057DD3",
+      "technology_lua_sha256": "F07B8B992B67022967E5C2DD6D65C6C07FA19665A53940DBF74E20A617002C3C",
+      "executed_scope": "Unchanged data-updates.lua and bounded exact replace_prerequisite function plus original white-gate call, read in memory from the direct archive. Not the whole upstream mod pipeline."
+    },
+    "sif_f200": {
+      "filename": "space-is-fake_1.0.60.zip",
+      "sha256": "860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC",
+      "scope": "Read-only source inspection and target-faithful minimal host inputs; actual archive not executed in the optional combined-source control."
+    }
+  },
+  "observations": {
+    "existing_science_controls": {
+      "tests": 38,
+      "result": "pass",
+      "log": "build/qualification/mir510-aero-existing-science-r01.log"
+    },
+    "existing_ownership_controls": {
+      "tests": 20,
+      "result": "pass",
+      "log": "build/qualification/mir510-aero-existing-ownership-r01.log"
+    },
+    "new_final_output_controls": {
+      "methods": 9,
+      "failed_subcases": 51,
+      "result": "expected-baseline-failure; no corrected-source pass claimed",
+      "failure_reasons": {
+        "MIR did not follow the actual finite provider tail": 4,
+        "MIR overlaps the provider's infinite tail": 4,
+        "braking-force-8: final white-science ingredient differs": 8,
+        "intended public research disappeared, became disabled or became hidden": 24,
+        "laser-shooting-speed-8: final white-science ingredient differs": 8,
+        "research-speed-7: final white-science ingredient differs": 2,
+        "weapon-shooting-speed-9: final white-science ingredient differs": 1
+      },
+      "log": "build/qualification/mir510-aero-sif-final-output-baseline-r06.log"
+    },
+    "actual_combined_upstream_source": {
+      "worker_maxima": [
+        4,
+        5,
+        7,
+        10
+      ],
+      "infinite": [
+        false,
+        true
+      ],
+      "pre_mir_result": "All8 upstream worker selections preserve +1 effects, contain five remaining science ingredients, and have white prerequisites replaced by utility/production before MIR.",
+      "mir_result": "All4 finite selections choose wrong MIR storage4 instead of max+1; all4 infinite selections retain an overlapping MIR storage4."
+    },
+    "repository_static": "tools/check_repository.py passed; static/document validation only.",
+    "host_plan_controls": {
+      "tests": 3,
+      "result": "pass",
+      "command": "python -B tests/test_host_controls.py"
+    }
+  },
+  "commands": [
+    "pwsh -NoProfile -File tests/Test-MIR5HostControls.ps1 -Plan",
+    "python -B tests/test_science.py --lua-runtime-dir <existing-pinned-lupa-directory>",
+    "python -B tests/test_continuation_ownership.py --lua-runtime-dir <existing-pinned-lupa-directory>",
+    "python -B tests/test_sif_final_output.py --lua-runtime-dir <existing-pinned-lupa-directory> --worker-data-source <shared-packet>/reference/worker/source-reference/worker-data.lua --sif-archive <direct-F210-library>/space-is-fake_1.0.78.zip",
+    "python -B tools/check_repository.py"
+  ],
+  "preservation": {
+    "primary": "C:/Projects/Factorio/more-infinite-research",
+    "packet": "C:/Projects/Factorio/.task-builds/mir510-shared-packet-aero-20261108/MIR510_Shared_Hotfix",
+    "adverse_logs": "Original r01-r06 retained under primary build/qualification. R01 included missing host finite anchors, corrected inr02 before interpreting failures; later records extend/correct the test scope. No earlier result erased.",
+    "existing_work": "All pre-existing dirty worktrees and unique commits explicitly preserved in place; no cleanup, reset, rebase or force push."
+  },
+  "limits": [
+    "No production correction is included. No BG source delegation was received before this record.",
+    "These are minimal normal-construction/science/Generator controls, not full data-final-fixes composition or native evidence.",
+    "Shifted weapon9 is a synthetic family-identity opponent, not a qualified provider capture.",
+    "Positive hidden-white case deliberately restores an independently admitted source relationship; it is not the unmodified SIF archive output.",
+    "Combined external-source execution is F210 only; no relabeled WorkerRobotCargoSizeResearch F200 input.",
+    "Runtime/caps/Library identities, earned-state saves/two cold reloads, required release CI, independent production review and GitHub delivery remain Black Glass work.",
+    "No native launches, merges, tags, release drafts or publication by Aero.",
+    "Separate historical paid-mask issue1806 remains outside these fixes."
+  ],
+  "claims": {
+    "native_execution": false,
+    "save_qualification": false,
+    "production_fix": false,
+    "release_qualification": false,
+    "published": false
+  },
+  "review": {
+    "independent_agent_role": "mir_luna_xhigh",
+    "configured_model": "gpt-5.6-luna",
+    "reasoning_effort": "xhigh",
+    "source_edits_by_reviewer": false,
+    "native_execution_by_reviewer": false,
+    "first_review": "Flagged mismatch with prior exact-name/hard-required oracles and F210 item shape. The current maintainer requirement was supplied explicitly; item shape was corrected and restored-source scenario clarified. Original review remains preserved in the session.",
+    "second_review": "No remaining blocking harness error. Intentional51 baseline subcase failures are consistent with the superseding1807 expectations.",
+    "followup": "Review ingredient amount/order limitations addressed with exact filtered-vector prefix checks for six native tails and rocket productivity. R06 still detects51 baseline failures.",
+    "not_a_verdict": "This reviews the expectation proposal and source extraction only, not an unimplemented production fix or native/release acceptance."
+  }
+}
