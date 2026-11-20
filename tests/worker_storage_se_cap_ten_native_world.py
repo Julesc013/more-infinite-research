@@ -84,7 +84,17 @@ end
 local function new_tech(name)
   local v={name=name,valid=true,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prerequisites={},prototype={max_level=1,effects={}},research_unit_count=1,research_unit_energy=60,research_unit_ingredients={}}
   local r={name=true,valid=true,level=true,researched=true,enabled=true,visible_when_disabled=true,saved_progress=true,prerequisites=true,prototype=true,research_unit_count=true,research_unit_count_formula=true,research_unit_energy=true,research_unit_ingredients=true,force=true}
-  return strict(v,r,{researched=true,enabled=true,visible_when_disabled=true,saved_progress=true},"LuaTechnology"),v
+  local object=strict(v,r,{researched=true,enabled=true,visible_when_disabled=true,saved_progress=true},"LuaTechnology")
+  local meta=getmetatable(object);local write=meta.__newindex
+  meta.__newindex=function(row,key,value)
+    local before=v[key];write(row,key,value)
+    -- Observed synchronously during the actual 2.0.77 source begin setter.
+    if key=="researched" and value==true and before~=true and CARGO_CALLBACKS and CARGO_CALLBACKS[2] then
+      CARGO_SCRIPTED_RESEARCH_CALLBACKS=CARGO_SCRIPTED_RESEARCH_CALLBACKS+1
+      CARGO_CALLBACKS[2]{research=object,by_script=true}
+    end
+  end
+  return object,v
 end
 local function new_inventory()
   local counts,slots,by_name={},{},{}
@@ -172,6 +182,7 @@ local function transfer(force,backing,values)
 end
 function cargo_world(declaration)
   callbacks,logs,interfaces,storage={}, {}, {}, {}
+  CARGO_SCRIPTED_RESEARCH_CALLBACKS=0
   local player,backing,values=new_force(declaration)
   local lab,power,pole,input,counts,spend_science,set_partial_science;local flags={missing_power=false,missing_pole=false,disconnected_network=false,wrong_network=false,blocked_feed=false,bad_durability=false};local saves={};local entity_specs={}
   local foreign_values={valid=true,index=2,worker_robots_storage_bonus=0}
@@ -206,9 +217,9 @@ function cargo_load(path)local fn,msg=loadfile(path,"t",CARGO_ENV);assert(fn,msg
 function cargo_begin()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
 function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_CALLBACKS[1]()end end
 function cargo_partial(p)CARGO_FORCE_VALUES._progress=p;CARGO_PARTIAL(p) end
-function cargo_complete(by_script,cursor,reward)
+function cargo_complete(by_script,cursor,reward,completed_cursor)
   local target=CARGO_FORCE_VALUES._current;assert(target,"completion without current");local values=CARGO_TECH_BACKING[target.name];local level=values.level+1;values.level=level;CARGO_FORCE_VALUES.worker_robots_storage_bonus=reward==nil and level-4 or reward;if target.name==CANDIDATE and level==11 then values.enabled=false end;CARGO_CONSUME();table.remove(CARGO_FORCE_VALUES._queue,1);CARGO_FORCE_VALUES._current=CARGO_FORCE_VALUES._queue[1];CARGO_FORCE_VALUES._progress=0
-  local event={research=target,by_script=by_script,tick=game.tick};if cursor~=nil then values.level=cursor end;CARGO_CALLBACKS[2](event);if cursor~=nil then values.level=level end end
+  local event={research=target,by_script=by_script,tick=game.tick};if cursor~=nil then values.level=cursor end;if completed_cursor then values.researched=true end;CARGO_CALLBACKS[2](event);if cursor~=nil then values.level=level end;if completed_cursor then values.researched=false end end
 function cargo_candidate(mir,mutate,startup_changed)
   script.active_mods["more-infinite-research"]=mir or "5.0.20018";CARGO_TRANSFER();if mutate then mutate(CARGO_TECHNOLOGIES[CANDIDATE],CARGO_TECHNOLOGIES[SOURCE],CARGO_TECHNOLOGIES[HEAD],CARGO_FORCE_VALUES) end
   local changed=false;if startup_changed~=nil then changed=startup_changed end
