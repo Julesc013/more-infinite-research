@@ -169,3 +169,100 @@ def install_published_default_reader(lua, *, historical_sources):
       end
     ''')
     return lua
+
+
+def build_full_default_provider_handover_world(runtime_factory, *, target, source_root):
+    """Construct the caller-owned provider handover world."""
+    lua = build_default_native_owner_world(runtime_factory, target=target, source_root=source_root)
+    lua.execute(r'''
+          prototypes.technology[ID].visible_when_disabled=false
+          function full_source(a,unpaid_pending)
+            history.on_init(nil);set_reward(a);seed_owner()
+            if unpaid_pending then uninvested.technologies[CANONICAL].enabled=true;uninvested.research_queue={CANONICAL};uninvested.research_progress=.37 end
+            transfer();writes=0;queue_writes={};progress_writes={}
+          end
+          function provider_event()
+            return {mod_startup_settings_changed=false,mod_changes={provider={new_version="1.0"}}}
+          end
+          function finite_entry(b)
+            script.active_mods.provider="1.0";add_provider(5)
+            creators["worker-robots-storage-6"]="more-infinite-research"
+            local public=prototypes.technology[CANONICAL]
+            public.effects[1].modifier=b;public.research_unit_count_formula=nil;public.research_unit_count=1000
+            public.research_unit_energy=3600;public.research_unit_ingredients={{name="automation-science-pack",amount=1},{name="space-science-pack",amount=1}}
+            prototypes.technology[HEAD].effects[1].modifier=b==0 and 0 or -b
+            for _,f in pairs(game.forces)do
+              local c=f.technologies[CANONICAL];local paid=f.technologies[HEAD].level==5;local enabled,visible=c.enabled,c.visible_when_disabled
+              -- Explicit host representation of already-loaded finite4, not a claim of new engine observation.
+              c.level=4;c.researched=paid;c.enabled=enabled;c.visible_when_disabled=visible
+              local mt=getmetatable(c);local read=mt.__index
+              mt.__index=function(object,key)if key=="research_unit_count"then return 1000 end;return read(object,key)end
+            end
+            writes=0;queue_writes={};progress_writes={}
+          end
+          function delegate(event,route)
+            event,route=event or provider_event(),route or provider_route(5)
+            local plan=history.default_owner_preflight(event,route,true)
+            assert(history.default_owner_delegated(plan))
+            local legacy=history.preflight(event,route,plan)
+            return plan,legacy
+          end
+          function handover(event,route)
+            local plan,legacy=delegate(event,route)
+            assert(history.default_owner_apply(plan));history.apply(legacy)
+            return plan,legacy
+          end
+          function foreign_frames()
+            local out={}
+            for _,f in pairs(game.forces)do local rows={}
+              for n=5,6 do local t=f.technologies['worker-robots-storage-'..n];rows[n]={level=t.level,researched=t.researched,enabled=t.enabled,saved=t.saved_progress}end
+              out[f.index]=rows
+            end
+            return out
+          end
+        ''')
+    return lua
+
+
+def build_older_default_admission_world(runtime_factory, *, target, source_root):
+    """Construct the caller-owned older default admission world."""
+    lua = build_default_native_owner_world(runtime_factory, target=target, source_root=source_root)
+    lua.execute(r'''
+          for _,id in ipairs({CANONICAL,ORDINARY,ID})do
+            prototypes.technology[id].research_unit_count_formula="675*1.5^(L-4)"
+            prototypes.technology[id].research_unit_energy=3600
+            prototypes.technology[id].research_unit_ingredients={
+              {name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},
+              {name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1},
+              {name="utility-science-pack",amount=1}}
+            for _,force in pairs(game.forces)do
+              local t=force.technologies[id];local mt=getmetatable(t);local read=mt.__index
+              mt.__index=function(object,key)
+                if key=="research_unit_count"then return math.floor(675*1.5^(read(object,"level")-4))end
+                return read(object,key)
+              end
+            end
+          end
+          function older_event(old,addition)
+            local event=owner_event(old)
+            if addition then script.active_mods["test-observer"]="0.1.0"
+              event.mod_changes["test-observer"]={new_version="0.1.0"}end
+            return event
+          end
+          function paid_idle()
+            player.technologies[CANONICAL].level=5;uninvested.technologies[CANONICAL].level=5
+            suspended.technologies[CANONICAL].level=6
+            player.research_queue={OTHER};player.research_progress=.42
+            suspended.research_queue={OTHER};suspended.research_progress=.125
+            detached.technologies[OTHER].saved_progress=.27
+            uninvested.technologies[CANONICAL].enabled=false
+            writes=0;queue_writes={};progress_writes={}
+          end
+          function older_plan(event)return history.plan_default_owner_transfer(event,nil,false)end
+          function refuse_older(event,route)
+            local before=all_frames();writes=0
+            assert(not pcall(history.plan_default_owner_transfer,event,route,false))
+            assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+          end
+        ''')
+    return lua
