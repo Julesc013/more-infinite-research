@@ -9,8 +9,16 @@
     "factorio_version": "2.0.77",
     "mir_version": "4.7.20002",
     "space_exploration_version": "0.7.57",
-    "source_create": {"pid": 59527, "start_ticks": 2183252, "exit_code": 0},
-    "source_server": {"pid": 67454, "start_ticks": 2185941, "session_id": 67454},
+    "source_create": {
+      "pid": 59527,
+      "start_ticks": 2183252,
+      "exit_code": 0
+    },
+    "source_server": {
+      "pid": 67454,
+      "start_ticks": 2185941,
+      "session_id": 67454
+    },
     "error": "native SE lab position differs, control.lua261, before feeding or ordinary worker research",
     "actual_post_snap_coordinates": "Not logged by the original actor; no exact observed coordinate is claimed.",
     "stop": "The exact stdout error predicate automatically ends only its owned child137; the controller's explicit source refusal prevents treating the stop predicate as research acceptance.",
@@ -26,15 +34,93 @@
   },
   "independent_geometry": {
     "trusted_f394_native_data_sha256": "151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104",
-    "lab": {"name": "se-space-science-lab", "collision_box": [[-3.2, -3.2], [3.2, 3.2]], "selection_box": [[-3.5, -3.5], [3.5, 3.5]], "researching_speed": 10},
-    "api": "https://lua-api.factorio.com/latest/classes/LuaSurface.html#create_entity",
-    "api_limit": "Latest official documentation supports ordinary grid snapping and the optional bypass; the exact2.0.77 documentation endpoint was unavailable. Existing native geometry and the retained actual position refusal provide the affected-engine evidence.",
-    "inference": "The seven-tile lab uses half-tile centers. Request and strictly require8.5,0.5 with normal snapping; keep the two-tile power and substation at0,0 and0,6. Do not disable snapping or accept arbitrary observed positions."
+    "lab": {
+      "name": "se-space-science-lab",
+      "collision_box": [
+        [
+          -3.2,
+          -3.2
+        ],
+        [
+          3.2,
+          3.2
+        ]
+      ],
+      "selection_box": [
+        [
+          -3.5,
+          -3.5
+        ],
+        [
+          3.5,
+          3.5
+        ]
+      ],
+      "researching_speed": 10
+    },
+    "api": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+    "api_limit": "Exact official2.0.77 JSON retrieved and matches the original pinned audit. It specifies normal snapping, odd/even tile anchors, BoundingBox, optional electric_network_id, connection predicate semantics and on_tick.tick; it does not guarantee immediate electrical publication.",
+    "inference": "The seven-tile lab uses half-tile centers. Request and strictly require8.5,0.5 with normal snapping; keep the two-tile power and substation at0,0 and0,6. Do not disable snapping or accept arbitrary observed positions.",
+    "power": {
+      "source": "Fixture clones Base electric-energy-interface; unchanged shape",
+      "collision_box": [
+        [
+          -0.9,
+          -0.9
+        ],
+        [
+          0.9,
+          0.9
+        ]
+      ],
+      "selection_box": [
+        [
+          -1,
+          -1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    "pole": {
+      "name": "substation",
+      "collision_box": [
+        [
+          -0.7,
+          -0.7
+        ],
+        [
+          0.7,
+          0.7
+        ]
+      ],
+      "selection_box": [
+        [
+          -1,
+          -1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "supply_area_distance": 9
+    },
+    "api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
   },
   "host_controls": {
     "original_actor_sha256": "4BC5F4DC6B1CD73AE900DC9BCE32861CA380A725BBE3210B3E6F16CC0D190333",
     "opponent": "Exact original actor fails at its lab position check against an independent odd-grid host representative after98 finite callbacks, with idle phase and no save. The representative does not claim r05's unlogged tie-breaking coordinate.",
-    "candidate": "60 selected methods pass with pinned Lua5.2; include aligned placement, original integer-anchor opponent and displaced-but-grid-aligned refusals with expected/observed coordinates.",
-    "unchanged_obligations": "Complete science, effects, costs, earned work, callbacks, queues, saves, network identity and ordinary native completion requirements remain unchanged. No lab or research prototype is altered."
+    "candidate": "Later grouped65 methods pass with pinned Lua5.2: snapshots of all3entities before physical assertion, no work before the one-update boundary, delayed publication, permanent missing network, skipped update, duplicate begin, absent entity and prior placement/callback/science obligations.",
+    "unchanged_obligations": "Complete science, effects, costs, earned work, callbacks, queues, saves, network identity and ordinary native completion requirements remain unchanged. No lab or research prototype is altered.",
+    "placement_checkpoint": "Original placement-only84fb checkpoint:60 selected methods pass; remains host-only and unused0FDB/r06 preparation is retained.",
+    "readiness_opponent": "Exact84fb immediate-readiness actor refuses the independent delayed-network world while idle/no current research. This is a host opponent, not a claim r05 native publication was delayed."
+  },
+  "correction_readiness": {
+    "observations": "One grouped creation snapshot and one grouped next-update snapshot; all3requested/actualpositions, valid/absent state, native tile dimensions, collision/selection boxes, network IDs and connection predicates. Unavailable reads remain explicit and non-authoritative.",
+    "stage": "Local pending tuple, reentry guard before setup writes, exactly next event.tick==created_tick+1 and game.tick==event.tick; consume pending before checking/starting research. No retry, speed stimulus, queue, feed or worker authority before strict physical readiness.",
+    "limits": "No API guarantee that one update suffices; unready state still refuses and retains both observations. This transient pre-research setup is not durable save progress; no accepted fixture save is written here."
   }
 }

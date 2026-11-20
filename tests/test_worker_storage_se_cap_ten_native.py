@@ -638,6 +638,74 @@ local function create_lab_and_power(force)'''
                 self.assertEqual("idle", lua.globals().cargo_phase())
                 self.assertFalse(list(lua.globals().cargo_saves().values()))
 
+    def test_setup_defers_all_work_until_one_native_update_and_rejects_reentry(self):
+        self.lua.globals().cargo_begin_only()
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.assertEqual({}, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(0, self.lua.globals().CARGO_FORCE_VALUES.laboratory_speed_modifier)
+        with self.assertRaisesRegex(LuaError, "source setup already scheduled"):
+            self.lua.globals().cargo_begin_only()
+        self.assertEqual(98, self.lua.globals().CARGO_SCRIPTED_RESEARCH_CALLBACKS)
+        self.assertEqual(3, len(list(self.lua.globals().cargo_entities().values())))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        snapshots = [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]
+        self.assertEqual(2, len(snapshots))
+        self.assertIn("stage=created tick=0", snapshots[0])
+        self.assertIn("stage=next-update tick=1", snapshots[1])
+        for line in snapshots:
+            self.assertIn("power requested=0,0 actual=0,0 valid=true grid=2,2", line)
+            self.assertIn("lab requested=8.5,0.5 actual=8.5,0.5 valid=true grid=7,7", line)
+            self.assertIn("pole requested=0,6 actual=0,6 valid=true grid=2,2", line)
+            self.assertEqual(3, line.count("collision="))
+            self.assertEqual(3, line.count("selection="))
+            self.assertEqual(3, line.count("network="))
+            self.assertEqual(3, line.count("connected="))
+
+    def test_delayed_network_publication_passes_only_on_next_native_update(self):
+        self.lua.globals().cargo_delay_network()
+        self.lua.globals().cargo_begin_only()
+        self.assertEqual(3, self.logs()[-1].count("network=nil"))
+        self.lua.execute("CARGO_CALLBACKS[1]({tick=game.tick})")
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        snapshot = next(line for line in self.logs() if "stage=next-update" in line)
+        self.assertEqual(3, snapshot.count("network=1"))
+
+    def test_permanently_missing_network_refuses_once_before_work(self):
+        self.lua.globals().cargo_missing_network()
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "fixture electric network differs"):
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.assertEqual({}, dict(self.lua.globals().cargo_counts().items()))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual(2, len([line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]))
+
+    def test_skipped_setup_update_refuses_and_does_not_retry(self):
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "source setup update boundary differs"):
+            self.lua.execute("game.tick=2; CARGO_CALLBACKS[1]({tick=game.tick})")
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual(2, len([line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]))
+
+    def test_missing_entity_snapshot_retains_the_other_two_before_refusal(self):
+        self.lua.globals().cargo_missing_power()
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "fixture external power differs"):
+            self.lua.globals().cargo_tick(1)
+        snapshots = [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]
+        self.assertEqual(2, len(snapshots))
+        for line in snapshots:
+            self.assertIn("power requested=0,0 status=absent actual=unavailable", line)
+            self.assertIn("lab requested=8.5,0.5 actual=8.5,0.5", line)
+            self.assertIn("pole requested=0,6 actual=0,6", line)
+
     def test_strict_world_rejects_the_historical_direct_lab_buffer_refill(self):
         lua = self.historical_buffer_refill_actor()
         with self.assertRaisesRegex(LuaError, "LuaEntity unsupported write energy"):

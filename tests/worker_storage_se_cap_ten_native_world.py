@@ -1,7 +1,7 @@
 """Strict Lua52-style world for the SE worker-storage cargo fixture.
 
 The world represents only documented members consumed by the fixture. Engine
-completion and the published C4→private recovery transfer are host operations;
+completion and the published C4â†’private recovery transfer are host operations;
 the fixture cannot write technology levels or research progress.
 """
 
@@ -191,10 +191,22 @@ function cargo_world(declaration)
   -- both two-tile electricity entities have integer centers. Integer tie
   -- placement below is a host representative, not r05's unlogged coordinate.
   local odd_grid={[POWER]=false,[LAB]=true,[POLE]=false}
+  local network_backing={}
+  local function bbox(half)return {left_top={x=-half,y=-half},right_bottom={x=half,y=half}}end
+  local function native_entity_prototype(name)
+    local width=name==LAB and 7 or 2
+    local collision=name==LAB and 3.2 or name==POWER and 0.9 or 0.7
+    return {tile_width=width,tile_height=width,collision_box=bbox(collision),selection_box=bbox(width/2),get_researching_speed=function()return flags.lab_speed or 10 end}
+  end
+  local function register_network(values,network)
+    network_backing[#network_backing+1]={values=values,network=network}
+    if flags.delayed_network or flags.missing_network then values.electric_network_id=nil else values.electric_network_id=network end
+  end
   local function network_entity(name,x,y,network)
-    local values={valid=true,name=name,force=player,position={x=x,y=y},electric_network_id=network}
-    values.is_connected_to_electric_network=function()return name ~= POLE and not flags.disconnected_network end
-    return strict(values,{valid=true,name=true,force=true,position=true,electric_network_id=true,is_connected_to_electric_network=true},{},"LuaEntity")
+    local values={valid=true,name=name,force=player,position={x=x,y=y},prototype=native_entity_prototype(name)}
+    register_network(values,network)
+    values.is_connected_to_electric_network=function()return name ~= POLE and values.electric_network_id~=nil and not flags.disconnected_network end
+    return strict(values,{valid=true,name=true,force=true,position=true,prototype=true,electric_network_id=true,is_connected_to_electric_network=true},{},"LuaEntity")
   end
   local surface={valid=true,create_entity=function(spec)
     assert(spec.force==player);assert(odd_grid[spec.name]~=nil,"unexpected fixture entity "..tostring(spec.name));local position=spec.position or {};local x,y=position.x or position[1],position.y or position[2];entity_specs[#entity_specs+1]={name=spec.name,x=x,y=y}
@@ -202,7 +214,7 @@ function cargo_world(declaration)
     if spec.name==LAB and flags.lab_offset then x=x+flags.lab_offset[1];y=y+flags.lab_offset[2] end
     if spec.name==POWER then if flags.missing_power then return nil end;power=network_entity(POWER,x,y,1);return power end
     if spec.name==POLE then if flags.missing_pole then return nil end;pole=network_entity(POLE,x,y,flags.wrong_network and 2 or 1);return pole end
-    input,counts,spend_science,set_partial_science=new_inventory();local values={valid=true,name=LAB,unit_number=91,force=player,position={x=x,y=y},electric_network_id=1,energy=0,electric_buffer_size=1000000,disabled_by_script=false,prototype={get_researching_speed=function()return flags.lab_speed or 10 end}};values.is_connected_to_electric_network=function()return not flags.disconnected_network end;values.get_inventory=function(i)assert(i==1);return input end;lab=strict(values,{valid=true,name=true,unit_number=true,force=true,position=true,electric_network_id=true,energy=true,electric_buffer_size=true,disabled_by_script=true,prototype=true,is_connected_to_electric_network=true,get_inventory=true},{disabled_by_script=true},"LuaEntity");return lab end}
+    input,counts,spend_science,set_partial_science=new_inventory();local values={valid=true,name=LAB,unit_number=91,force=player,position={x=x,y=y},electric_network_id=1,energy=0,electric_buffer_size=1000000,disabled_by_script=false,prototype=native_entity_prototype(LAB)};register_network(values,1);values.is_connected_to_electric_network=function()return values.electric_network_id~=nil and not flags.disconnected_network end;values.get_inventory=function(i)assert(i==1);return input end;lab=strict(values,{valid=true,name=true,unit_number=true,force=true,position=true,electric_network_id=true,energy=true,electric_buffer_size=true,disabled_by_script=true,prototype=true,is_connected_to_electric_network=true,get_inventory=true},{disabled_by_script=true},"LuaEntity");return lab end}
   local active=copy(CARGO_CLOSURE);active["more-infinite-research"]="4.7.20002";active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0"
   local startup={};for n,v in pairs(CARGO_SETTINGS) do startup[n]={valid=true,value=v,default_value=0} end
   game={tick=0,difficulty_settings={technology_price_multiplier=1},forces={player=player,[1]=player,foreign=foreign,[2]=foreign},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
@@ -215,12 +227,14 @@ function cargo_world(declaration)
     for _,entry in ipairs(CARGO_DECLARATION_ORDER) do local row={name=entry[1],parents=entry[2]};rs[#rs+1]=row;by_name[row.name]=row end
     return {rows=rs,by_name=by_name} end
   CARGO_ENV=env;CARGO_CALLBACKS=callbacks;CARGO_LOGS=logs;CARGO_INTERFACES=interfaces;CARGO_FORCE_VALUES=values;CARGO_TECHNOLOGIES=values.technologies;CARGO_TECH_BACKING=backing;CARGO_FLAGS=flags;CARGO_SAVES=saves;CARGO_LAB_COUNTS=function()return copy(counts or {})end;CARGO_ENTITIES=function()return copy(entity_specs)end;CARGO_FOREIGN_VALUES=foreign_values
+  CARGO_PUBLISH_NETWORK=function()flags.delayed_network=false;for _,row in ipairs(network_backing)do if not flags.missing_network then row.values.electric_network_id=row.network end end end
   CARGO_TRANSFER=function()transfer(player,backing,values)end;CARGO_CONSUME=function()assert(spend_science);spend_science()end;CARGO_PARTIAL=function(progress)assert(set_partial_science);set_partial_science(progress)end
   return env
 end
 function cargo_load(path)local fn,msg=loadfile(path,"t",CARGO_ENV);assert(fn,msg);fn();assert(CARGO_CALLBACKS.init);CARGO_CALLBACKS.init()end
-function cargo_begin()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
-function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_CALLBACKS[1]()end end
+function cargo_begin_only()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
+function cargo_begin()cargo_begin_only();cargo_tick(1)end
+function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_PUBLISH_NETWORK();CARGO_CALLBACKS[1]({tick=game.tick})end end
 function cargo_partial(p)CARGO_FORCE_VALUES._progress=p;CARGO_PARTIAL(p) end
 function cargo_complete(by_script,cursor,reward,completed_cursor)
   local target=CARGO_FORCE_VALUES._current;assert(target,"completion without current");local values=CARGO_TECH_BACKING[target.name];local level=values.level+1;values.level=level;CARGO_FORCE_VALUES.worker_robots_storage_bonus=reward==nil and level-4 or reward;if target.name==CANDIDATE and level==11 then values.enabled=false end;CARGO_CONSUME();table.remove(CARGO_FORCE_VALUES._queue,1);CARGO_FORCE_VALUES._current=CARGO_FORCE_VALUES._queue[1];CARGO_FORCE_VALUES._progress=0
@@ -230,11 +244,13 @@ function cargo_candidate(mir,mutate,startup_changed)
   local changed=false;if startup_changed~=nil then changed=startup_changed end
   CARGO_CALLBACKS.configuration({mod_startup_settings_changed=changed,mod_changes={["more-infinite-research"]={old_version="4.7.20002",new_version=script.active_mods["more-infinite-research"]}}}) end
 function cargo_on_load()CARGO_CALLBACKS.load()end
-function cargo_cold()CARGO_CALLBACKS.load();game.tick=game.tick+1;CARGO_CALLBACKS[1]()end
+function cargo_cold()CARGO_CALLBACKS.load();cargo_tick(1)end
 function cargo_logs()return CARGO_LOGS end;function cargo_counts()return CARGO_LAB_COUNTS()end;function cargo_saves()return CARGO_SAVES end;function cargo_phase()return storage["mir5_worker_storage_se_cap_ten_native"].phase end
 function cargo_set_phase(phase)storage["mir5_worker_storage_se_cap_ten_native"].phase=phase end
 function cargo_unsupported_force_write()game.forces.player.unapproved=true end;function cargo_missing_power()CARGO_FLAGS.missing_power=true end;function cargo_missing_pole()CARGO_FLAGS.missing_pole=true end;function cargo_disconnected_electric_network()CARGO_FLAGS.disconnected_network=true end;function cargo_wrong_electric_network()CARGO_FLAGS.wrong_network=true end;function cargo_block_feed()CARGO_FLAGS.blocked_feed=true end;function cargo_setting(n,v)settings.startup[n].value=v end
 function cargo_offset_lab(x,y)CARGO_FLAGS.lab_offset={x,y}end
+function cargo_delay_network()CARGO_FLAGS.delayed_network=true end
+function cargo_missing_network()CARGO_FLAGS.missing_network=true end
 function cargo_science(names)
   for _,worker in ipairs({SOURCE,CANDIDATE}) do
     local v=CARGO_TECH_BACKING[worker];v.research_unit_ingredients={};for i,n in ipairs(names) do v.research_unit_ingredients[i]={name=n,amount=1} end

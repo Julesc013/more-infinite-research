@@ -43,6 +43,7 @@ local CLOSURE = {
   ["space-exploration-postprocess"] = "0.7.5", informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3"
 }
 local cold_pending, cold_phase = false, nil
+local pending_setup
 
 local function fail(message) error("[mir5-worker-storage-se-cap-ten-native] " .. message) end
 local function check(value, message) if not value then fail(message) end end
@@ -251,6 +252,35 @@ local function positioned(entity, x, y)
   local position = entity and entity.position
   return position and position.x == x and position.y == y
 end
+local function setup_value(read)
+  local ok, value = pcall(read)
+  if not ok then return "unavailable:" .. tostring(value):gsub("[\r\n]", " "):sub(1, 96) end
+  return value == nil and "nil" or tostring(value)
+end
+local function setup_box(box)
+  local left, right = box.left_top or box[1], box.right_bottom or box[2]
+  return table.concat({left.x or left[1], left.y or left[2], right.x or right[1], right.y or right[2]}, ",")
+end
+local function observe_setup(stage, lab, power, pole)
+  local rows = {}
+  for _, row in ipairs({{role="power", entity=power, x=0, y=0}, {role="lab", entity=lab, x=8.5, y=0.5},
+      {role="pole", entity=pole, x=0, y=6}}) do
+    local entity = row.entity
+    if entity == nil or entity.valid == false then
+      rows[#rows + 1] = row.role .. " requested=" .. row.x .. "," .. row.y
+        .. " status=" .. (entity == nil and "absent" or "invalid")
+        .. " actual=unavailable grid=unavailable collision=unavailable selection=unavailable network=unavailable connected=unavailable"
+    else rows[#rows + 1] = table.concat({row.role, "requested=" .. row.x .. "," .. row.y,
+      "actual=" .. setup_value(function() return entity.position.x .. "," .. entity.position.y end),
+      "valid=" .. setup_value(function() return entity.valid end),
+      "grid=" .. setup_value(function() return entity.prototype.tile_width .. "," .. entity.prototype.tile_height end),
+      "collision=" .. setup_value(function() return setup_box(entity.prototype.collision_box) end),
+      "selection=" .. setup_value(function() return setup_box(entity.prototype.selection_box) end),
+      "network=" .. setup_value(function() return entity.electric_network_id end),
+      "connected=" .. setup_value(function() return entity.is_connected_to_electric_network() end)}, " ") end
+  end
+  log("[MIR_SE_CARGO_SETUP] stage=" .. stage .. " tick=" .. game.tick .. " " .. table.concat(rows, " | "))
+end
 assert_lab = function(lab, power, pole, force)
   check(lab and lab.valid ~= false and lab.name == LAB and lab.force == force, "native SE lab differs")
   check(lab.prototype and lab.prototype.get_researching_speed and lab.prototype.get_researching_speed() == 10, "native SE lab speed differs")
@@ -260,6 +290,9 @@ assert_lab = function(lab, power, pole, force)
     "fixture substation differs")
   check(positioned(lab, 8.5, 0.5), "native SE lab position differs: expected=8.5,0.5 observed="
     .. tostring(lab.position and lab.position.x) .. "," .. tostring(lab.position and lab.position.y))
+  check(lab.prototype.tile_width == 7 and lab.prototype.tile_height == 7
+    and power.prototype.tile_width == 2 and power.prototype.tile_height == 2
+    and pole.prototype.tile_width == 2 and pole.prototype.tile_height == 2, "fixture native tile grid differs")
   local network = lab.electric_network_id
   check(network ~= nil and power.electric_network_id == network and pole.electric_network_id == network,
     "fixture electric network differs: lab=" .. tostring(network) .. " power=" .. tostring(power.electric_network_id)
@@ -320,18 +353,7 @@ local function assert_tail_current(state, label)
   check(state.player.current_research and state.player.current_research.name == TAIL, label .. " tail current differs")
   exact_names(queue_names(state.player), {TAIL}, label .. " tail queue")
 end
-local function begin_source()
-  check(script.active_mods["more-infinite-research"] == SOURCE_MIR, "source MIR identity differs")
-  local state = storage[KEY]
-  check(type(state) == "table" and state.phase == "idle", "source begin phase differs")
-  local player = game.forces.player
-  check(player and player.valid ~= false, "player force differs")
-  assert_active_tuple(); assert_settings(); assert_setup_declaration(player); assert_worker_contract(player, SOURCE)
-  for _, declared in ipairs(fixture.rows) do
-    local row = technology(player, declared.name)
-    row.researched = true
-  end
-  local lab, power, pole = create_lab_and_power(player)
+local function start_source_research(state, player, lab, power, pole)
   state.player, state.lab, state.power, state.pole, state.input = player, lab, power, pole, assert_lab(lab, power, pole, player)
   state.speed_before, state.accepted, state.ordinary, state.worker = player.laboratory_speed_modifier, {}, 0, SOURCE
   state.force_bonus_baseline = force_bonuses()
@@ -347,6 +369,24 @@ local function begin_source()
   for index = 1, SOURCE_QUEUE_ROWS do queue[index] = target end
   player.research_queue = queue
   state.phase = "source-working"; feed(state); marker("source-begin", state, {setup_rows = #fixture.rows, lab_speed = 10, queue_rows = SOURCE_QUEUE_ROWS})
+end
+local function begin_source()
+  check(script.active_mods["more-infinite-research"] == SOURCE_MIR, "source MIR identity differs")
+  local state = storage[KEY]
+  check(type(state) == "table" and state.phase == "idle", "source begin phase differs")
+  check(pending_setup == nil, "source setup already scheduled")
+  local player = game.forces.player
+  check(player and player.valid ~= false, "player force differs")
+  assert_active_tuple(); assert_settings(); assert_setup_declaration(player); assert_worker_contract(player, SOURCE)
+  for _, declared in ipairs(fixture.rows) do
+    local row = technology(player, declared.name)
+    row.researched = true
+  end
+  local lab, power, pole = create_lab_and_power(player)
+  observe_setup("created", lab, power, pole)
+  -- Hand the completed creation batch back to one native update before
+  -- judging electrical publication. No queue, feed or speed stimulus yet.
+  pending_setup = {tick=game.tick, player=player, lab=lab, power=power, pole=pole}
 end
 local function source_partial(state)
   local target = technology(state.player, SOURCE)
@@ -465,9 +505,19 @@ script.on_event(defines.events.on_research_finished, function(event)
     else feed(state) end
   else fail("worker completion phase differs") end
 end)
-script.on_event(defines.events.on_tick, function()
+script.on_event(defines.events.on_tick, function(event)
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
+  if pending_setup then
+    if game.tick == pending_setup.tick then return end
+    local setup = pending_setup
+    pending_setup = nil
+    observe_setup("next-update", setup.lab, setup.power, setup.pole)
+    check(event and event.tick == setup.tick + 1 and game.tick == event.tick and state.phase == "idle",
+      "source setup update boundary differs")
+    start_source_research(state, setup.player, setup.lab, setup.power, setup.pole)
+    return
+  end
   if cold_pending then
     if cold_phase == "closed" then
       check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
