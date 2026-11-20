@@ -108,7 +108,8 @@
       516441790,
       516441790
     ],
-    "after_controller_disconnection": "Launch SSH exited0; separate later SSH observed the same running transient invocation; all native children started after launch SSH exit."
+    "after_controller_disconnection": "Launch SSH exited0; separate later SSH observed the same running transient invocation; all native children started after launch SSH exit.",
+    "bounded_unattended_slice": "Completed after launch SSH disconnection; results retained, controls restored and owned data/control cleaned. No continuous queue, logout/reboot/interruption or all-resource utilization claim."
   },
   "observations": {
     "source_frame_preserved": true,
@@ -176,7 +177,9 @@
     "verified_bodies": 81,
     "independent_verdict": "independent-native-verdict-r01.json",
     "protected_successor": "protected-successor.zip",
-    "original_failed_r03": "Retained independently at original invocation69a13563d0fc4b788d757ad320ea9c6e and raw9CC02D; no failure erased or relabelled."
+    "original_failed_r03": "Retained independently at original invocation69a13563d0fc4b788d757ad320ea9c6e and raw9CC02D; no failure erased or relabelled.",
+    "cleanup_commit": "5daba703add84ad098ec76db46fa5d10ccff13cc",
+    "cleanup_primary_readback": "cleanup-readback-r01.json"
   },
   "restoration": {
     "library_controls_unchanged": true,
@@ -184,7 +187,7 @@
     "original_mir_sha256": "E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD",
     "original_fixture_sha256": "FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0",
     "collected_unit_and_absent_controller": "Separate independent terminal readback at2026-11-20T21:18:15Z; default Result=success is not the completed job result.",
-    "raw_cleanup": "Awaiting independently adopted guarded cleanup receipt; retain source and successor."
+    "raw_cleanup": "Execution-owner guarded cleanup receipt independently rehashed at private5daba703add84ad098ec76db46fa5d10ccff13cc; removes only owned R04 data/control trees after sealed81-body custody. Original862 source and a separately verified staged AA1F successor remain. This adopts the original operator result, not a new root SSH execution."
   },
   "remaining": [
     "Same-candidate cap/settings and provider operations",
