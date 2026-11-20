@@ -27,7 +27,25 @@
     "observer_scope": "Validate the event's research identity, ignore names outside the source/candidate worker roles, reject scripted worker events before reading an uninitialized frame, retain exact force/object/ordinary-event checks.",
     "host_world": "Finite false-to-true researched setter delivers a synchronous scripted callback; old observer fails with the same nil-name stack. New source setup receives98 callbacks without counting them as ordinary worker completions.",
     "original_observer": "55 methods:9 failures and33 errors with the native-shaped setter.",
-    "corrected_observer": "55 methods pass with pinned Lua5.2, including scripted worker rejection before begin."
+    "corrected_observer": "55 methods pass with pinned Lua5.2, including scripted worker rejection before begin.",
+    "host_checkpoints": [
+      {
+        "candidate_revision": "6b112f0c607fce0c833322bf4de39e5469d6c704",
+        "actor_blob": "39576f749d35b4ba683ae294a49439df53925530",
+        "world_blob": "1a43b29399fef7414c69731b73aff8d5aa64e85a",
+        "original_observer_revision": "0506c1b9b04a14134de88c52b4d1d573e90ce328",
+        "result": "Original55-method checkpoint retained above: old observer fails9 assertions and33 errors in the corrected host world; candidate55 methods pass.",
+        "native_research": false
+      },
+      {
+        "candidate_revision": "5db2dc2764a99ed89c3091b9cd18a07aef37f03a",
+        "actor_blob": "e78fdadef223ecae045b7171c7fa791da8612ff2",
+        "world_blob": "076f9c967f8a420f85457264a25c5c8b24a0c6eb",
+        "unchanged_after_merge_revision": "de54b467dd0101ed8cc0c936a4c20f418628cc36",
+        "result": "Later58-method checkpoint passes with the additional phase/force/supporting-role boundaries and completed/settled cursor controls. It does not supersede the original55 observation.",
+        "native_research": false
+      }
+    ]
   },
   "separate_output_channel_finding": {
     "source_stdout": "process-2.stdout.txt contains the exact console-interface begin error.",
