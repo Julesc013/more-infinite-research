@@ -1,0 +1,195 @@
+{
+  "kind": "MIRCap59cRootIndependentPackageReadbackV1",
+  "observed_at_utc": "2026-11-20T01:15:59.596816+00:00",
+  "scope": "private package identity/source-member/metadata readback only; no native or release qualification",
+  "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+  "adopted_dev_commit": "8d7ad78dd859ae96a8505773bd7a3e90880eeb63",
+  "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+  "same_player_tree": true,
+  "assets": [
+    {
+      "target": "f013",
+      "zip_bytes": 677850,
+      "sha256": "C3F397DFAF8BBABD85A536BCE8FEB74EA6213C2AFBFD12E2BAEAEBD7E84CD7E0",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f014",
+      "zip_bytes": 677852,
+      "sha256": "AA80DABDBBFD5C17A790106CB7F8F7FF93C642A43E5A36E4226B099BC91696BE",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f015",
+      "zip_bytes": 677850,
+      "sha256": "391E8D97CE0A078BAD6D8EC0A09ECE37F37A59CEAB94BE6D4265660E8B17C4C7",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f016",
+      "zip_bytes": 677851,
+      "sha256": "B14DFD37C91932C282DB7AFFD965A5916225371CB480A6CC8D353273ECFF2636",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f017",
+      "zip_bytes": 677852,
+      "sha256": "AEF4A2FAC215D2729CB29DF9FEC9DD3B5EFE2C1FB1404B7E3A01D9470D3F8E51",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f018",
+      "zip_bytes": 677851,
+      "sha256": "264773619649B5B1933E466CDC7A9E2C59AE6DB95629BBBC3FC78BA6C0C7EE7B",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f100",
+      "zip_bytes": 677844,
+      "sha256": "7D5F48FB971428E5D3550F3DE0536B28AFEB2AFB27D9A8A9A8978BF728E90C10",
+      "members": 127,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f110",
+      "zip_bytes": 678154,
+      "sha256": "4BB8A42BC06DDCBE2E0239B3322D6494AFC205DD75E13C0B43587D967E4CBD14",
+      "members": 128,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f200",
+      "zip_bytes": 1053483,
+      "sha256": "3C82F7F9E3D879243B64423A96D00301BBF5A406CCD77BC0F6F06FE23FAF299D",
+      "members": 248,
+      "old_to_new_changed_members": [
+        "changelog.txt",
+        "runtime/lifecycle.lua"
+      ],
+      "lifecycle_present": true
+    },
+    {
+      "target": "f210",
+      "zip_bytes": 1053909,
+      "sha256": "001189ACF5D2030FADD91A369E2B2E0FB7B2A3CDE0FF7285934823C064650A2E",
+      "members": 249,
+      "old_to_new_changed_members": [
+        "changelog.txt",
+        "runtime/lifecycle.lua"
+      ],
+      "lifecycle_present": true
+    },
+    {
+      "target": "f006",
+      "zip_bytes": 140593,
+      "sha256": "4338637529B1B279053097C0B470C2F06DA66259F05F77CD37AD868BEA5CA38B",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f007",
+      "zip_bytes": 140593,
+      "sha256": "AC310F4F6C7002E967F1D44E42B1D2D31E95AD03D459D52DF61676D43234E1AA",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f008",
+      "zip_bytes": 140591,
+      "sha256": "953E87F3594B053905D008004F3D30952BE9528380CF05D7D82DF2D54C601DE5",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f009",
+      "zip_bytes": 140593,
+      "sha256": "BD93995E20E1FF53388AE067511202F9738B77A98A9A70C1BB882CF008DFBF4E",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f010",
+      "zip_bytes": 140592,
+      "sha256": "46FF50E231B50EFA88E698289CF60A9E4C0E0AD1F68650E7B154F54CBFAE9F88",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f011",
+      "zip_bytes": 140593,
+      "sha256": "475740F629C38B8D019982CD6E3602256DA241B9243ADBD5CC853C8A89DBB055",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    },
+    {
+      "target": "f012",
+      "zip_bytes": 140595,
+      "sha256": "2C7D7D6947B583A815D51AB6E54A45AA0DD9B7A02A98907687040349B850704D",
+      "members": 10,
+      "old_to_new_changed_members": [
+        "changelog.txt"
+      ],
+      "lifecycle_present": false
+    }
+  ],
+  "total_assets": 17,
+  "raw_git_member_comparisons": 1511,
+  "declared_virtual_metadata_entrypoint_members": 73,
+  "all_zip_crc_and_inventory_members_match": true,
+  "checksum_files_match": true,
+  "changed_lifecycle_targets": [
+    "f200",
+    "f210"
+  ],
+  "historical_scope": "Reduced editions use adapters/reduced/control.lua, no shared cap-event maintenance. F018 retains0.18.47 and experimental support; earlycohort best-effort notnativequalified.",
+  "root_verifier_preparation_adverse": "First readback wrongly required inventory.info summary to equal the complete info.json; inventory deliberately omits author/description. Corrected to exact subset equality plus authored extra-field checks. Early/reduced entrypoint transformations explicitly checked. A second verifier pass exposed the intentional published11000 migration filename alias; checked against exact canonical5.0.0 source body and F110/F200/F210 target contract. A third pass correctly interprets the standard SHA256SUMS binary-marker asterisk before each filename. Package bytes unchanged.",
+  "limits": "No gameplay/native/upgrade/reporter/performance/delivery pass. Producer outer exit unretained; producer --verify exit0, independently checked finalbytes."
+}
