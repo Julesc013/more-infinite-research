@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-worker-storage-published517-earned-source",
+  "version": "0.1.0",
+  "title": "MIR published 5.0.20017 worker-storage earned-source fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable published-5.0.20017 source-only worker-storage observer. It is test apparatus, not player content or a qualification result.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.77", "space-exploration >= 0.7.57", "more-infinite-research = 5.0.20017"]
+}
