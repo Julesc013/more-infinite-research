@@ -7,6 +7,7 @@ local fixture = require("__mir-fixture-mir5-worker-storage-se-cap-ten-native__/p
 local KEY = "mir5_worker_storage_se_cap_ten_native"
 local FIXTURE = "mir-fixture-mir5-worker-storage-se-cap-ten-native"
 local POWER = "mir-fixture-worker-storage-se-cap-ten-power"
+local POLE = "substation"
 local TAIL = "mir-fixture-worker-storage-se-cap-ten-tail"
 local SOURCE, CANDIDATE, HEAD = "worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-head-4"
 local PREDECESSOR, LAB = "worker-robots-storage-3", "se-space-science-lab"
@@ -41,7 +42,7 @@ local CLOSURE = {
   ["space-exploration-graphics-5"] = "0.7.3", ["space-exploration-menu-simulations"] = "0.7.4",
   ["space-exploration-postprocess"] = "0.7.5", informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3"
 }
-local cold_pending = false
+local cold_pending, cold_phase = false, nil
 
 local function fail(message) error("[mir5-worker-storage-se-cap-ten-native] " .. message) end
 local function check(value, message) if not value then fail(message) end end
@@ -125,7 +126,7 @@ local function science_units(input, item, label)
 end
 local assert_lab
 local function science_accounting(state)
-  local input, remaining, debit = assert_lab(state.lab, state.power, state.player), {}, {}
+  local input, remaining, debit = assert_lab(state.lab, state.power, state.pole, state.player), {}, {}
   for _, pack in ipairs(SCIENCE) do
     local issued = state.accepted[pack]
     remaining[pack] = science_units(input, pack, "native lab")
@@ -246,16 +247,31 @@ local function assert_setup_declaration(force)
   end
   check(#fixture.rows == 98 and seen[PREDECESSOR], "setup declaration count differs")
 end
-assert_lab = function(lab, power, force)
+local function positioned(entity, x, y)
+  local position = entity and entity.position
+  return position and position.x == x and position.y == y
+end
+assert_lab = function(lab, power, pole, force)
   check(lab and lab.valid ~= false and lab.name == LAB and lab.force == force, "native SE lab differs")
   check(lab.prototype and lab.prototype.get_researching_speed and lab.prototype.get_researching_speed() == 10, "native SE lab speed differs")
-  check(power and power.valid ~= false and power.name == POWER and power.force == force, "fixture external power differs")
+  check(power and power.valid ~= false and power.name == POWER and power.force == force and positioned(power, 0, 0),
+    "fixture external power differs")
+  check(pole and pole.valid ~= false and pole.name == POLE and pole.force == force and positioned(pole, 0, 6),
+    "fixture substation differs")
+  check(positioned(lab, 8, 0), "native SE lab position differs")
+  local network = lab.electric_network_id
+  check(network ~= nil and power.electric_network_id == network and pole.electric_network_id == network,
+    "fixture electric network differs")
+  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network(), "fixture electric network differs")
   local input = lab.get_inventory(defines.inventory.lab_input)
   check(input ~= nil, "native SE lab input differs")
   return input
 end
 local function feed(state)
-  local input = assert_lab(state.lab, state.power, state.player)
+  local input = assert_lab(state.lab, state.power, state.pole, state.player)
   for _, pack in ipairs(SCIENCE) do
     local present = input.get_item_count(pack)
     if present < 32 then
@@ -264,17 +280,14 @@ local function feed(state)
       state.accepted[pack] = state.accepted[pack] + requested
     end
   end
-  -- This documented entity buffer write complements the fixture-owned external
-  -- producer; it does not alter the lab prototype or its researching speed.
-  state.lab.energy = state.lab.electric_buffer_size
-  check(state.lab.energy > 0 and state.lab.active ~= false, "native SE lab energy differs")
 end
 local function create_lab_and_power(force)
   local surface = game.surfaces[1]
   check(surface and surface.valid ~= false and type(surface.create_entity) == "function", "source surface differs")
   local power = surface.create_entity{name = POWER, position = {0, 0}, force = force}
-  local lab = surface.create_entity{name = LAB, position = {3, 0}, force = force}
-  return lab, power
+  local lab = surface.create_entity{name = LAB, position = {8, 0}, force = force}
+  local pole = surface.create_entity{name = POLE, position = {0, 6}, force = force}
+  return lab, power, pole
 end
 local function same(left, right)
   if type(left) ~= type(right) then return false end
@@ -315,8 +328,8 @@ local function begin_source()
     local row = technology(player, declared.name)
     row.researched = true
   end
-  local lab, power = create_lab_and_power(player)
-  state.player, state.lab, state.power, state.input = player, lab, power, assert_lab(lab, power, player)
+  local lab, power, pole = create_lab_and_power(player)
+  state.player, state.lab, state.power, state.pole, state.input = player, lab, power, pole, assert_lab(lab, power, pole, player)
   state.speed_before, state.accepted, state.ordinary, state.worker = player.laboratory_speed_modifier, {}, 0, SOURCE
   state.force_bonus_baseline = force_bonuses()
   for _, pack in ipairs(SCIENCE) do state.accepted[pack] = 0 end
@@ -399,7 +412,11 @@ end
 script.on_init(function()
   if active() then storage[KEY] = {phase = "idle"} end
 end)
-script.on_load(function() cold_pending = true end)
+script.on_load(function()
+  cold_pending = true
+  local state = storage[KEY]
+  cold_phase = type(state) == "table" and state.phase or nil
+end)
 remote.add_interface(FIXTURE, {begin = begin_source})
 script.on_configuration_changed(function(event)
   if active() then configuration(event) end
@@ -433,8 +450,17 @@ script.on_event(defines.events.on_tick, function()
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
   if cold_pending then
-    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
-    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    if cold_phase == "closed" then
+      check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
+    elseif cold_phase == "idle" then
+      check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
+    elseif cold_phase == "source-partial" then
+      check(state.phase == "candidate-working", "cold load phase differs")
+    else
+      fail("cold load phase differs")
+    end
+    cold_pending, cold_phase = false, nil
   end
   if state.phase == "source-working" or state.phase == "candidate-working" then feed(state)
   elseif state.phase == "source-await-queue" then stage_source_partial_queue(state)
