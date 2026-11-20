@@ -77,11 +77,40 @@ local function new_tech(name)
   return strict(v,r,{researched=true,enabled=true,visible_when_disabled=true,saved_progress=true},"LuaTechnology"),v
 end
 local function new_inventory()
-  local counts={}
-  local v={valid=true,get_item_count=function(n)return counts[n] or 0 end,insert=function(s)
-    assert(type(s)=="table" and type(s.name)=="string" and type(s.count)=="number")
-    if CARGO_FLAGS.blocked_feed then return 0 end;counts[s.name]=(counts[s.name] or 0)+s.count;return s.count end}
-  return strict(v,{valid=true,get_item_count=true,insert=true},{},"LuaInventory"),counts
+  local counts,slots,by_name={},{},{}
+  local function add(name,count)
+    local raw=by_name[name]
+    if raw==nil then
+      raw={valid_for_read=true,name=name,quality={name="normal"},type="tool",is_tool=true,count=0,durability=1}
+      by_name[name]=raw
+      slots[#slots+1]=strict(raw,{valid_for_read=true,name=true,quality=true,type=true,is_tool=true,count=true,durability=true},{},"LuaItemStack")
+    end
+    raw.count=raw.count+count;raw.durability=CARGO_FLAGS.bad_durability and 2 or raw.durability;counts[name]=raw.count
+  end
+  local function spend_one()
+    for _,name in ipairs(SCIENCE) do
+      local raw=by_name[name]
+      assert(raw and raw.count>0,"native lab science missing "..name)
+      raw.count=raw.count-1;counts[name]=raw.count
+    end
+  end
+  local function set_partial(progress)
+    for _,name in ipairs(SCIENCE) do
+      local raw=by_name[name]
+      assert(raw and raw.count>0,"native lab science missing "..name)
+      raw.durability=1-progress
+    end
+  end
+  local values={valid=true,get_item_count=function(name)return counts[name] or 0 end,insert=function(spec)
+    assert(type(spec)=="table" and type(spec.name)=="string" and type(spec.count)=="number")
+    if CARGO_FLAGS.blocked_feed then return 0 end;add(spec.name,spec.count);return spec.count end}
+  local inventory=setmetatable({}, {__index=function(_,key)
+    if type(key)=="number" then return slots[key] end
+    if values[key]~=nil then return values[key] end
+    error("LuaInventory unsupported read "..tostring(key)) end,
+    __newindex=function(_,key)error("LuaInventory unsupported write "..tostring(key)) end,
+    __len=function()return #slots end})
+  return inventory,counts,spend_one,set_partial
 end
 local function worker_contract(v,all)
   v.prototype.max_level=4294967295;v.prototype.effects={{type="worker-robot-storage",modifier=1}}
@@ -95,13 +124,16 @@ local function new_force(declaration)
   for _,name in ipairs({SOURCE,CANDIDATE,HEAD,TAIL}) do all[name],backing[name]=new_tech(name) end
   for name,parents in pairs(declaration) do for _,parent in ipairs(parents) do backing[name].prerequisites[parent]=all[parent] end end
   worker_contract(backing[SOURCE],all);worker_contract(backing[CANDIDATE],all);backing[SOURCE].level=4
-  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,laboratory_speed_modifier=0,worker_robots_storage_bonus=0}
+  local values={name="player",index=1,valid=true,technologies=all,_queue={},_current=nil,_progress=0,research_queue_enabled=true,laboratory_speed_modifier=0,laboratory_productivity_bonus=0,worker_robots_storage_bonus=0}
   local force
   values.add_research=function(row)
     if type(row)=="string" then row=all[row] end
-    if values._current~=nil then return false end
-    if row==all[SOURCE] then values._queue={row};values._current=row;values._progress=0;return true end
-    if row~=all[CANDIDATE] or backing[CANDIDATE].level>=11 then return false end
+    if row~=all[SOURCE] and row~=all[CANDIDATE] then return false end
+    if backing[row.name].enabled~=true then return false end
+    if values._current~=nil then
+      if values.research_queue_enabled~=true then return false end
+      values._queue[#values._queue+1]=row;return true
+    end
     values._queue={row};values._current=row;values._progress=0;return true
   end
   force=setmetatable({}, {__index=function(_,key)
@@ -114,12 +146,11 @@ local function new_force(declaration)
     __newindex=function(_,key,value)
       if key=="research_queue" then local q={};for i,row in ipairs(value or {}) do q[i]=row end;values._queue=q;values._current=q[1];values._progress=0;return end
       if key=="research_progress" then assert(values._current~=nil,"progress without current");values._progress=value;return end
-      if key=="laboratory_speed_modifier" then values[key]=value;return end
+      if key=="laboratory_speed_modifier" or key=="laboratory_productivity_bonus" then values[key]=value;return end
       error("LuaForce unsupported write "..tostring(key)) end})
   for _,row in pairs(all) do backing[row.name].force=force end
   return force,backing,values
 end
-local function consume(counts) for _,n in ipairs(SCIENCE) do assert((counts[n] or 0)>0,"native lab science missing "..n);counts[n]=counts[n]-1 end end
 local function transfer(force,backing,values)
   local source,private,head=backing[SOURCE],backing[CANDIDATE],backing[HEAD]
   private.level=source.level;private.researched=source.researched;private.enabled=source.enabled;private.visible_when_disabled=source.visible_when_disabled;private.saved_progress=source.saved_progress
@@ -131,33 +162,34 @@ end
 function cargo_world(declaration)
   callbacks,logs,interfaces,storage={}, {}, {}, {}
   local player,backing,values=new_force(declaration)
-  local lab,power,input,counts;local flags={missing_power=false,blocked_feed=false};local saves={}
+  local lab,power,input,counts,spend_science,set_partial_science;local flags={missing_power=false,blocked_feed=false,bad_durability=false};local saves={}
   local foreign_values={valid=true,index=2,worker_robots_storage_bonus=0}
   local foreign=strict(foreign_values,{valid=true,index=true,worker_robots_storage_bonus=true},{worker_robots_storage_bonus=true},"LuaForce")
   local surface={valid=true,create_entity=function(spec)
     assert(spec.force==player)
     if spec.name==POWER then if flags.missing_power then return nil end;power={valid=true,name=POWER,force=player};return power end
-    assert(spec.name==LAB);input,counts=new_inventory();lab={valid=true,name=LAB,unit_number=91,force=player,energy=0,electric_buffer_size=1000000,active=true,prototype={get_researching_speed=function()return flags.lab_speed or 10 end},get_inventory=function(i)assert(i==1);return input end};return lab end}
+    assert(spec.name==LAB);input,counts,spend_science,set_partial_science=new_inventory();lab={valid=true,name=LAB,unit_number=91,force=player,energy=0,electric_buffer_size=1000000,active=true,prototype={get_researching_speed=function()return flags.lab_speed or 10 end},get_inventory=function(i)assert(i==1);return input end};return lab end}
   local active=copy(CARGO_CLOSURE);active["more-infinite-research"]="4.7.20002";active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0"
   local startup={};for n,v in pairs(CARGO_SETTINGS) do startup[n]={valid=true,value=v,default_value=0} end
-  game={tick=0,forces={player=player,[1]=player,foreign=foreign,[2]=foreign},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
+  game={tick=0,difficulty_settings={technology_price_multiplier=1},forces={player=player,[1]=player,foreign=foreign,[2]=foreign},surfaces={[1]=surface},server_save=function(n)saves[#saves+1]=n end}
   script={active_mods=active,on_init=function(fn)callbacks.init=fn end,on_load=function(fn)callbacks.load=fn end,on_configuration_changed=function(fn)callbacks.configuration=fn end,on_event=function(id,fn)callbacks[id]=fn end}
   remote={add_interface=function(n,v)interfaces[n]=v end};settings={startup=startup};defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}
-  local env={game=game,script=script,remote=remote,settings=settings,defines=defines,storage=storage,log=function(t)logs[#logs+1]=t end};env._G=env;setmetatable(env,{__index=function(_,k)return _G[k]end})
+  local item_prototypes={};for _,name in ipairs(SCIENCE) do item_prototypes[name]={type="tool",get_durability=function(quality)assert(quality and quality.name=="normal");return 1 end} end
+  local env={game=game,script=script,remote=remote,settings=settings,defines=defines,storage=storage,prototypes={item=item_prototypes},log=function(t)logs[#logs+1]=t end};env._G=env;setmetatable(env,{__index=function(_,k)return _G[k]end})
   env.require=function(name)
     assert(name=="__mir-fixture-mir5-worker-storage-se-cap-ten-native__/prerequisites",name);local rs,by_name={},{}
     for _,entry in ipairs(CARGO_DECLARATION_ORDER) do local row={name=entry[1],parents=entry[2]};rs[#rs+1]=row;by_name[row.name]=row end
     return {rows=rs,by_name=by_name} end
   CARGO_ENV=env;CARGO_CALLBACKS=callbacks;CARGO_LOGS=logs;CARGO_INTERFACES=interfaces;CARGO_FORCE_VALUES=values;CARGO_TECHNOLOGIES=values.technologies;CARGO_TECH_BACKING=backing;CARGO_FLAGS=flags;CARGO_SAVES=saves;CARGO_LAB_COUNTS=function()return copy(counts or {})end;CARGO_FOREIGN_VALUES=foreign_values
-  CARGO_TRANSFER=function()transfer(player,backing,values)end;CARGO_CONSUME=function()consume(counts)end
+  CARGO_TRANSFER=function()transfer(player,backing,values)end;CARGO_CONSUME=function()assert(spend_science);spend_science()end;CARGO_PARTIAL=function(progress)assert(set_partial_science);set_partial_science(progress)end
   return env
 end
 function cargo_load(path)local fn,msg=loadfile(path,"t",CARGO_ENV);assert(fn,msg);fn();assert(CARGO_CALLBACKS.init);CARGO_CALLBACKS.init()end
 function cargo_begin()return CARGO_INTERFACES["mir-fixture-mir5-worker-storage-se-cap-ten-native"].begin()end
 function cargo_tick(n)for _=1,n do game.tick=game.tick+1;CARGO_CALLBACKS[1]()end end
-function cargo_partial(p)CARGO_FORCE_VALUES._progress=p end
-function cargo_complete(by_script,cursor)
-  local target=CARGO_FORCE_VALUES._current;assert(target,"completion without current");local values=CARGO_TECH_BACKING[target.name];local level=values.level+1;values.level=level;CARGO_FORCE_VALUES.worker_robots_storage_bonus=level-4;CARGO_CONSUME();table.remove(CARGO_FORCE_VALUES._queue,1);CARGO_FORCE_VALUES._current=CARGO_FORCE_VALUES._queue[1];CARGO_FORCE_VALUES._progress=0
+function cargo_partial(p)CARGO_FORCE_VALUES._progress=p;CARGO_PARTIAL(p) end
+function cargo_complete(by_script,cursor,reward)
+  local target=CARGO_FORCE_VALUES._current;assert(target,"completion without current");local values=CARGO_TECH_BACKING[target.name];local level=values.level+1;values.level=level;CARGO_FORCE_VALUES.worker_robots_storage_bonus=reward==nil and level-4 or reward;if target.name==CANDIDATE and level==11 then values.enabled=false end;CARGO_CONSUME();table.remove(CARGO_FORCE_VALUES._queue,1);CARGO_FORCE_VALUES._current=CARGO_FORCE_VALUES._queue[1];CARGO_FORCE_VALUES._progress=0
   local event={research=target,by_script=by_script,tick=game.tick};if cursor~=nil then values.level=cursor end;CARGO_CALLBACKS[2](event);if cursor~=nil then values.level=level end end
 function cargo_candidate(mir,mutate,startup_changed)
   script.active_mods["more-infinite-research"]=mir or "5.0.20018";CARGO_TRANSFER();if mutate then mutate(CARGO_TECHNOLOGIES[CANDIDATE],CARGO_TECHNOLOGIES[SOURCE],CARGO_TECHNOLOGIES[HEAD],CARGO_FORCE_VALUES) end
@@ -171,8 +203,10 @@ function cargo_science(names)
     local v=CARGO_TECH_BACKING[worker];v.research_unit_ingredients={};for i,n in ipairs(names) do v.research_unit_ingredients[i]={name=n,amount=1} end
   end
 end
-function cargo_lab_speed(v)CARGO_FLAGS.lab_speed=v end;function cargo_drop_queue()CARGO_FORCE_VALUES._queue={};CARGO_FORCE_VALUES._current=nil end;function cargo_mutate_closed()CARGO_FORCE_VALUES.worker_robots_storage_bonus=999 end
+function cargo_lab_speed(v)CARGO_FLAGS.lab_speed=v end;function cargo_drop_queue()CARGO_FORCE_VALUES._queue={};CARGO_FORCE_VALUES._current=nil end;function cargo_mutate_closed()CARGO_FORCE_VALUES.worker_robots_storage_bonus=999 end;function cargo_mutate_bonus(v)CARGO_FORCE_VALUES.worker_robots_storage_bonus=v end;function cargo_bad_science_durability()CARGO_FLAGS.bad_durability=true end
 function cargo_wrong_gate()CARGO_TECH_BACKING[HEAD].enabled=true end;function cargo_add_late_force()CARGO_FOREIGN_VALUES.worker_robots_storage_bonus=5 end
+function cargo_reenable_cap()CARGO_TECH_BACKING[CANDIDATE].enabled=true end
+function cargo_reenable_cap_and_queue()CARGO_TECH_BACKING[CANDIDATE].enabled=true;return CARGO_FORCE_VALUES.add_research(CARGO_TECHNOLOGIES[CANDIDATE]) end
 function cargo_queue_names()local o={};for i,row in ipairs(CARGO_FORCE_VALUES._queue) do o[i]=row.name end;return o end;function cargo_current_name()return CARGO_FORCE_VALUES._current and CARGO_FORCE_VALUES._current.name or false end
 '''
 

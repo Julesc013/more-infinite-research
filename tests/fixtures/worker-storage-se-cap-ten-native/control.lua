@@ -86,14 +86,49 @@ local function force_bonuses()
   check(next(out) ~= nil, "force worker bonus set differs")
   return out
 end
-local function input_counts(input)
-  local out = {}; for _, pack in ipairs(SCIENCE) do out[pack] = input.get_item_count(pack) end; return out
+local function assert_earned_bonuses(state, source_events, candidate_events, label)
+  local baseline, observed = state.force_bonus_baseline, force_bonuses()
+  check(type(baseline) == "table" and type(state.player.index) == "number", label .. " worker bonus baseline differs")
+  for index, expected in pairs(baseline) do
+    local actual = observed[index]
+    check(actual ~= nil, label .. " worker bonus force differs")
+    if index == state.player.index then
+      check(close(actual, expected + source_events + candidate_events), label .. " earned worker bonus differs")
+    else
+      check(close(actual, expected), label .. " foreign worker bonus differs")
+    end
+  end
+  for index in pairs(observed) do check(baseline[index] ~= nil, label .. " worker bonus membership differs") end
+  return observed
+end
+local function science_units(input, item, label)
+  local prototype = prototypes.item[item]
+  check(prototype and prototype.type == "tool" and type(prototype.get_durability) == "function",
+    label .. " native science prototype differs: " .. item)
+  local total, stacks = 0, 0
+  for index = 1, #input do
+    local stack = input[index]
+    if stack.valid_for_read and stack.name == item then
+      local quality = stack.quality
+      check(quality and quality.name == "normal", label .. " native science quality differs: " .. item)
+      check(stack.type == "tool" and stack.is_tool == true, label .. " native science stack type differs: " .. item)
+      check(type(stack.count) == "number" and stack.count >= 1 and stack.count % 1 == 0,
+        label .. " native science count differs: " .. item)
+      local maximum, durability = prototype.get_durability(quality), stack.durability
+      check(close(maximum, 1) and type(durability) == "number" and durability > 0 and durability <= maximum,
+        label .. " native science durability differs: " .. item)
+      total, stacks = total + stack.count - 1 + durability / maximum, stacks + 1
+    end
+  end
+  check(stacks > 0, label .. " native science stack is absent: " .. item)
+  return total
 end
 local assert_lab
 local function science_accounting(state)
-  local remaining, debit = input_counts(assert_lab(state.lab, state.power, state.player)), {}
+  local input, remaining, debit = assert_lab(state.lab, state.power, state.player), {}, {}
   for _, pack in ipairs(SCIENCE) do
     local issued = state.accepted[pack]
+    remaining[pack] = science_units(input, pack, "native lab")
     check(type(issued) == "number" and issued >= remaining[pack], "science accounting differs: " .. pack)
     debit[pack] = issued - remaining[pack]
   end
@@ -101,6 +136,15 @@ local function science_accounting(state)
 end
 local function frame(state)
   local target = technology(state.player, state.worker)
+  local difficulty = game.difficulty_settings
+  check(difficulty and type(difficulty.technology_price_multiplier) == "number"
+    and difficulty.technology_price_multiplier == difficulty.technology_price_multiplier
+    and difficulty.technology_price_multiplier ~= math.huge and difficulty.technology_price_multiplier ~= -math.huge,
+    "technology price context differs")
+  check(type(state.player.laboratory_productivity_bonus) == "number"
+    and state.player.laboratory_productivity_bonus == state.player.laboratory_productivity_bonus
+    and state.player.laboratory_productivity_bonus ~= math.huge and state.player.laboratory_productivity_bonus ~= -math.huge,
+    "laboratory productivity context differs")
   return {
     worker = state.worker,
     target = {name = target.name, level = target.level, researched = target.researched,
@@ -110,7 +154,9 @@ local function frame(state)
     bonus = state.player.worker_robots_storage_bonus, force_bonuses = force_bonuses(),
     science = science_accounting(state),
     lab = {name = state.lab.name, unit_number = state.lab.unit_number, disabled_by_script = state.lab.disabled_by_script == true,
-      energy = state.lab.energy, laboratory_speed_modifier = state.player.laboratory_speed_modifier}
+      energy = state.lab.energy, laboratory_speed_modifier = state.player.laboratory_speed_modifier,
+      laboratory_productivity_bonus = state.player.laboratory_productivity_bonus,
+      technology_price_multiplier = difficulty.technology_price_multiplier}
   }
 end
 local function marker(phase, state, extra)
@@ -121,6 +167,8 @@ local function marker(phase, state, extra)
     "progress=" .. tostring(observed.progress), "queue=" .. table.concat(observed.queue, ","),
     "ordinary=" .. tostring(state.ordinary), "bonus=" .. tostring(observed.bonus),
     "force_bonuses=" .. ordered_numbers(observed.force_bonuses),
+    "laboratory_productivity_bonus=" .. tostring(observed.lab.laboratory_productivity_bonus),
+    "technology_price_multiplier=" .. tostring(observed.lab.technology_price_multiplier),
     "science_issued=" .. science_values(observed.science.issued),
     "science_remaining=" .. science_values(observed.science.remaining),
     "science_debit=" .. science_values(observed.science.debit),
@@ -128,6 +176,10 @@ local function marker(phase, state, extra)
     "unit_time=" .. tostring(technology(state.player, state.worker).research_unit_energy),
     "settings_file_values=true"
   }
+  if state.force_bonus_baseline then
+    fields[#fields + 1] = "expected_worker_bonus=" .. tostring(
+      state.force_bonus_baseline[state.player.index] + state.ordinary + (state.candidate_events or 0))
+  end
   if state.configuration_startup_settings_changed ~= nil then
     fields[#fields + 1] = "configuration_startup_settings_changed=" .. tostring(state.configuration_startup_settings_changed)
   end
@@ -266,6 +318,7 @@ local function begin_source()
   local lab, power = create_lab_and_power(player)
   state.player, state.lab, state.power, state.input = player, lab, power, assert_lab(lab, power, player)
   state.speed_before, state.accepted, state.ordinary, state.worker = player.laboratory_speed_modifier, {}, 0, SOURCE
+  state.force_bonus_baseline = force_bonuses()
   for _, pack in ipairs(SCIENCE) do state.accepted[pack] = 0 end
   player.laboratory_speed_modifier = state.speed_before + SPEED_STIMULUS
   check(player.laboratory_speed_modifier == state.speed_before + SPEED_STIMULUS, "laboratory speed stimulus differs")
@@ -290,6 +343,7 @@ local function source_partial(state)
     {level = target.level, researched = target.researched, enabled = target.enabled, visible = target.visible_when_disabled},
     role_value(target), "source-partial"
   for _, pack in ipairs(SCIENCE) do check(state.source_frame.science.debit[pack] > 0, "source native science debit differs: " .. pack) end
+  assert_earned_bonuses(state, state.ordinary, 0, "source partial")
   game.server_save(SOURCE_SAVE)
   marker("source-partial", state, {partial = state.source_frame.progress, save = SOURCE_SAVE, source_role = state.source_role})
 end
@@ -312,6 +366,7 @@ local function configuration(event)
   assert_active_tuple(); assert_settings(); state.worker = CANDIDATE; assert_worker_contract(state.player, CANDIDATE)
   -- This comparison intentionally occurs before candidate feeding or queueing.
   assert_candidate_transfer(state)
+  assert_earned_bonuses(state, state.ordinary, 0, "candidate transfer")
   state.configuration_startup_settings_changed = event.mod_startup_settings_changed
   state.phase = "candidate-working"; state.candidate_events = 0
   state.lab.disabled_by_script = false
@@ -327,6 +382,8 @@ end
 local function close_candidate(state)
   local before = science_accounting(state)
   local target = technology(state.player, CANDIDATE)
+  check(target.level == 11 and target.enabled == false, "candidate cap disabled state differs")
+  assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate cap")
   assert_tail_current(state, "candidate cap")
   check(state.player.add_research(target) == false, "cap level eleven unexpectedly queued")
   local after = science_accounting(state)
@@ -357,6 +414,7 @@ script.on_event(defines.events.on_research_finished, function(event)
   if state.phase == "source-working" then
     check(target.level == state.ordinary + 5 and target.level <= 9, "source ordinary completion level differs")
     state.ordinary = state.ordinary + 1
+    assert_earned_bonuses(state, state.ordinary, 0, "source ordinary")
     if target.level == 9 then
       state.lab.disabled_by_script = true
       state.phase = "source-await-queue"
@@ -364,6 +422,7 @@ script.on_event(defines.events.on_research_finished, function(event)
   elseif state.phase == "candidate-working" then
     check(target.level == state.candidate_events + 10 and target.level <= 11, "candidate ordinary completion level differs")
     state.candidate_events = state.candidate_events + 1
+    assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate ordinary")
     if target.level == 11 then
       state.lab.disabled_by_script = true
       state.phase = "candidate-await-cap"

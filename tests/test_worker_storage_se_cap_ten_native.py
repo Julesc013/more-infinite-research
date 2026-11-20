@@ -141,6 +141,29 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.assertIn("queue=worker-robots-storage-4,worker-robots-storage-4,mir-fixture-worker-storage-se-cap-ten-tail", log)
         self.assertEqual(["mir5-se-worker-storage-cap10-source"], list(self.lua.globals().cargo_saves().values()))
 
+    def test_synthetic_partial_exercises_the_f200_normal_tool_durability_reader(self):
+        self.source_to_partial()
+        log = self.logs()[-1]
+        self.assertIn("science_remaining=automation-science-pack:194.58", log)
+        self.assertIn("science_debit=automation-science-pack:5.42", log)
+
+    def test_f200_tool_science_reader_rejects_invalid_durability_before_research(self):
+        self.lua.globals().cargo_bad_science_durability()
+        with self.assertRaisesRegex(LuaError, "native science durability differs"):
+            self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+    def test_source_requires_the_native_plus_one_worker_bonus_for_each_completion(self):
+        self.lua.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "source ordinary earned worker bonus differs"):
+            self.lua.globals().cargo_complete(False, None, -100)
+
+    def test_source_requires_existing_foreign_force_bonus_to_stay_unchanged(self):
+        self.lua.globals().cargo_begin()
+        self.lua.globals().cargo_add_late_force()
+        with self.assertRaisesRegex(LuaError, "source ordinary foreign worker bonus differs"):
+            self.lua.globals().cargo_complete(False)
+
     def test_native_completions_consume_the_five_row_queue_before_staging_partial_and_tail(self):
         self.lua.globals().cargo_begin()
         self.assertEqual([world.SOURCE] * 5, list(self.lua.globals().cargo_queue_names().values()))
@@ -196,6 +219,19 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         with self.assertRaisesRegex(LuaError, "candidate changed source frame"):
             self.lua.globals().cargo_candidate("5.0.20018", None)
 
+    def test_candidate_requires_the_native_plus_one_bonus(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        with self.assertRaisesRegex(LuaError, "candidate ordinary earned worker bonus differs"):
+            self.lua.globals().cargo_complete(False, None, -100)
+
+    def test_candidate_requires_existing_foreign_force_bonus_to_stay_unchanged(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_add_late_force()
+        with self.assertRaisesRegex(LuaError, "candidate ordinary foreign worker bonus differs"):
+            self.lua.globals().cargo_complete(False)
+
     def test_scripted_completion_is_rejected(self):
         self.lua.globals().cargo_begin()
         with self.assertRaisesRegex(LuaError, "scripted worker completion"):
@@ -236,6 +272,10 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.assertIn("level=11", log)
         self.assertIn(f"current={world.TAIL}", log)
         self.assertIn(f"queue={world.TAIL}", log)
+        self.assertIn("expected_worker_bonus=7", log)
+        self.assertIn("laboratory_productivity_bonus=0", log)
+        self.assertIn("technology_price_multiplier=1", log)
+        self.assertIn("science_debit=automation-science-pack:7.42", log)
         self.assertEqual(["mir5-se-worker-storage-cap10-source", "mir5-se-worker-storage-cap10-candidate"], list(self.lua.globals().cargo_saves().values()))
 
     def test_cap_refusal_preserves_unrelated_tail_as_current_queue_and_science(self):
@@ -251,6 +291,37 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.assertEqual("closed", self.lua.globals().cargo_phase())
         self.assertEqual(before, dict(self.lua.globals().cargo_counts().items()))
         self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_cap_refusal_requires_native_disabled_endpoint_before_trying_to_queue_again(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "candidate cap disabled state differs"):
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual(world.TAIL, self.lua.globals().cargo_current_name())
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_queue_enabled_model_appends_an_explicitly_reenabled_cap_technology_after_the_tail(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.assertTrue(self.lua.globals().cargo_reenable_cap_and_queue())
+        self.assertEqual([world.TAIL, world.CANDIDATE], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_candidate_close_rejects_post_completion_wrong_earned_bonus(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_mutate_bonus(-100)
+        with self.assertRaisesRegex(LuaError, "candidate cap earned worker bonus differs"):
+            self.lua.globals().cargo_tick(1)
 
     def test_tail_loss_after_native_candidate_completion_is_rejected(self):
         self.source_to_partial()
