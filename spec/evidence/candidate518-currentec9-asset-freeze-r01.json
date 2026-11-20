@@ -1,0 +1,300 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidateCurrentEC9AssetFreezeV1",
+  "status": "accepted-private-package-integrity",
+  "source_version": "5.0.18",
+  "source_commit": "d48c3c791657d86a055c59c63ee7fca6988735d0",
+  "source_tree": "067eb8ddb68832a6ef5753cf1380481e83a2ea7e",
+  "player_tree": "ec9abdc840aefdd25e66a5787d89e5ad045837c9",
+  "source_integration": {
+    "commit": "411b74c364bee277b7f8bedc80679aa602935682",
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/2192"
+  },
+  "player_zip_count": 17,
+  "manifest_member_count": 1586,
+  "stable_target_definitions": 9,
+  "experimental_f018_definitions": 1,
+  "best_effort_early_definitions": 7,
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01318.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01318.zip",
+      "bytes": 677912,
+      "sha256": "73031F1CF8AB379832EEB0C95FDB733D9EFEFFE68841EF21690236AEA2EC0E1A",
+      "members": 127,
+      "minimum_base": "0.13.20",
+      "label": "MIR 5.0.18 for Factorio 0.13.20 (zip)"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01418.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01418.zip",
+      "bytes": 677914,
+      "sha256": "A9CB8A4D0DCF325089270DE8B6F3CEA32A02455CEAC8400C7981DF49AE295FC8",
+      "members": 127,
+      "minimum_base": "0.14.23",
+      "label": "MIR 5.0.18 for Factorio 0.14.23 (zip)"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01518.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01518.zip",
+      "bytes": 677912,
+      "sha256": "6656C8A33EB83C0AACEAA260A50E1A6B4A50E93B67A24B57A40221F5523B562C",
+      "members": 127,
+      "minimum_base": "0.15.40",
+      "label": "MIR 5.0.18 for Factorio 0.15.40 (zip)"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01618.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01618.zip",
+      "bytes": 677913,
+      "sha256": "11C0B7411ED24D308B5BC0DE518EC797C6ECD054ACD1058D05C81DF3F5E39E69",
+      "members": 127,
+      "minimum_base": "0.16.51",
+      "label": "MIR 5.0.18 for Factorio 0.16.51 (zip)"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01718.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01718.zip",
+      "bytes": 677914,
+      "sha256": "6CC697961AB98363B25F655196E456484D50A10E62BC43FD429D11114EB3A0CF",
+      "members": 127,
+      "minimum_base": "0.17.79",
+      "label": "MIR 5.0.18 for Factorio 0.17.79 (zip)"
+    },
+    {
+      "target": "f018",
+      "name": "more-infinite-research_5.0.01818.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01818.zip",
+      "bytes": 677913,
+      "sha256": "07E9CB9136E653FA78BAD0427E612D3E920E1CCC8AB7595EB4AF5D03AC14D9EB",
+      "members": 127,
+      "minimum_base": "0.18.47",
+      "label": "MIR 5.0.18 for Factorio 0.18.47 (zip)",
+      "support": "experimental-best-effort-github-only"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10018.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.10018.zip",
+      "bytes": 677906,
+      "sha256": "D142E590867D4B06B897CFC6CED0C4DB22F5E63E329BB473636B6FA475A857DC",
+      "members": 127,
+      "minimum_base": "1.0.0",
+      "label": "MIR 5.0.18 for Factorio 1.0.0 (zip)"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11018.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.11018.zip",
+      "bytes": 678216,
+      "sha256": "24E8296D2273197EB97578DD93A08EAFAA24205C39B433410C5C071C8CEBBBD1",
+      "members": 128,
+      "minimum_base": "1.1.110",
+      "label": "MIR 5.0.18 for Factorio 1.1.110 (zip)"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20018.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.20018.zip",
+      "bytes": 1054386,
+      "sha256": "E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD",
+      "members": 249,
+      "minimum_base": "2.0.77",
+      "label": "MIR 5.0.18 for Factorio 2.0.77 (zip)"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21018.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.21018.zip",
+      "bytes": 1054812,
+      "sha256": "6F8054C9A051456E4C63783566E38F9947E058B8A2908B8E1870812B75C498B4",
+      "members": 250,
+      "minimum_base": "2.1.23",
+      "label": "MIR 5.0.18 for Factorio 2.1.23 (zip)"
+    },
+    {
+      "target": "f006",
+      "name": "more-infinite-research_5.0.00618.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.00618.zip",
+      "bytes": 140655,
+      "sha256": "6CC055758DDB5B265433785355563B8532103488BD8252F3C9A674911C90BA65",
+      "members": 10,
+      "minimum_base": "0.6.4",
+      "label": "MIR 5.0.18 for Factorio 0.6.4 (zip)",
+      "delivery": "extract-to-folder"
+    },
+    {
+      "target": "f007",
+      "name": "more-infinite-research_5.0.00718.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.00718.zip",
+      "bytes": 140655,
+      "sha256": "C149F1856700145D33CA8A36DE69B3D36ADFE4DFAD099A0B5458BCEF5EF98B80",
+      "members": 10,
+      "minimum_base": "0.7.5",
+      "label": "MIR 5.0.18 for Factorio 0.7.5 (zip)",
+      "delivery": "extract-to-folder"
+    },
+    {
+      "target": "f008",
+      "name": "more-infinite-research_5.0.00818.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.00818.zip",
+      "bytes": 140653,
+      "sha256": "E8971B48F9F3C27D1A295EBF32510543D3F8511C3A201DF99728B23344CD153E",
+      "members": 10,
+      "minimum_base": "0.8.8",
+      "label": "MIR 5.0.18 for Factorio 0.8.8 (zip)",
+      "delivery": "extract-to-folder"
+    },
+    {
+      "target": "f009",
+      "name": "more-infinite-research_5.0.00918.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.00918.zip",
+      "bytes": 140655,
+      "sha256": "B7FA93DBB91C16775613A7C8B34791E16C7326A7ECE50389DDAB949BA55E447A",
+      "members": 10,
+      "minimum_base": "0.9.8",
+      "label": "MIR 5.0.18 for Factorio 0.9.8 (zip)",
+      "delivery": "zip"
+    },
+    {
+      "target": "f010",
+      "name": "more-infinite-research_5.0.01018.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01018.zip",
+      "bytes": 140654,
+      "sha256": "5AD0AB65F75300EBD176FC78138319A1C356CA6F08A754EDF2EEB8769C004237",
+      "members": 10,
+      "minimum_base": "0.10.12",
+      "label": "MIR 5.0.18 for Factorio 0.10.12 (zip)",
+      "delivery": "zip"
+    },
+    {
+      "target": "f011",
+      "name": "more-infinite-research_5.0.01118.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01118.zip",
+      "bytes": 140655,
+      "sha256": "A79785FA5AA48F960CC73216F6DBF6B44DF3C3227BFEDED70ACF212757F6E305",
+      "members": 10,
+      "minimum_base": "0.11.22",
+      "label": "MIR 5.0.18 for Factorio 0.11.22 (zip)",
+      "delivery": "zip"
+    },
+    {
+      "target": "f012",
+      "name": "more-infinite-research_5.0.01218.zip",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/more-infinite-research_5.0.01218.zip",
+      "bytes": 140657,
+      "sha256": "E3FEECD93AAF0E4904200485662E7B0F89C3F114C2EABDEC209AF0339F8C1136",
+      "members": 10,
+      "minimum_base": "0.12.35",
+      "label": "MIR 5.0.18 for Factorio 0.12.35 (zip)",
+      "delivery": "zip"
+    }
+  ],
+  "integrity_files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 219275,
+      "sha256": "2AABB46FF0AB490F9405FFBF8CBBDFA36E5EE7A3E0BB6E1D5719630214653EA7"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "D6CBD7DB22E25E6DC60AB5EB678E63D0037EE37D89AD7449A5A8A4EA33A47EA4"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "path": "build/packages/mir518-ec9-complete-aero-r01/SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "25C76B4B474DD4A9145BC7A8C5E16CC4297FE31F268BA0DE89AEF4EEE25A623B"
+    }
+  ],
+  "independent_review": {
+    "path": "build/qualification/mir5-audit-intake-20261118-r01/ec9-assets-freeze-aero-r01/ec9-assets-freeze-independent-review-r01.json",
+    "bytes": 7051,
+    "sha256": "02216DA90E3CF0DD9B05D529CCEC7B67C69D5DF5251573B9A6AD3EFFA8CEB74A",
+    "verdict": "GO_PRIVATE_FREEZE_INTEGRITY_ONLY"
+  },
+  "primary_custody": "build/packages/mir518-ec9-complete-aero-r01",
+  "primary_readback": {
+    "path": "build/qualification/mir5-audit-intake-20261118-r01/ec9-assets-freeze-aero-r01/primary-custody-readback-r01.json",
+    "sha256": "5DF05F7FDF8EF61A7ED61387FD64C419264DF2BD4A1659FF1D788A63FDBA97BF",
+    "files": 20
+  },
+  "frozen_controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "06704ed64b5fdfaa764e133ac6a5312a79e27c5537e464b8e5d57f62f89d7262"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "e1e1af6a542bb3631c26e0ba31a87e075441f59fa989cfa188017938c2c6a2ec"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "build_and_verification": {
+    "command": "python -B tools/release.py --source source --revision d48c3c791657d86a055c59c63ee7fca6988735d0 --output C:/Projects/Factorio/mir5-freeze/mir518-ec9-complete-aero-r01 --early-target-record targets/early-editions.json",
+    "exit_code": 0,
+    "existing_adapter_rebuild_verification": true,
+    "new_native_processes": 0,
+    "log": "build/qualification/mir5-audit-intake-20261118-r01/ec9-assets-freeze-aero-r01/freeze-r01.log"
+  },
+  "comparison_to_preserved_2397": {
+    "evidence": "spec/evidence/candidate518-current2397-asset-freeze-r01.json",
+    "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+    "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+    "all_17_original_assets_preserved": true,
+    "fifteen_reduced_editions": "Only changelog.txt changes; all other member paths and bytes are unchanged.",
+    "two_modern_editions": {
+      "added": [
+        "compatibility/modern_catalogue/space_exploration_worker_storage.lua"
+      ],
+      "changed": [
+        "changelog.txt",
+        "compatibility/modern_catalogue.lua",
+        "compatibility/modern_catalogue/space_exploration.lua",
+        "data-final-fixes.lua"
+      ],
+      "removed": []
+    }
+  },
+  "scope": [
+    "The F200 ZIP is byte-identical to the existing reviewed E334 science-fix package. Its original862 source identity remains preserved; this freeze binds the identical player bytes to committed sourced48.",
+    "The nine stable-edition definitions, experimental F018 and seven best-effort early artifacts classify packaging only. Existing support and extraction limits remain unchanged.",
+    "All earlier native results retain their exact original package/controller/settings/save identities. This freeze does not transfer2397 or private e2df results to EC9.",
+    "Affected current SE cargo science/history/caps/paid work and all applicable remaining native/client/GUI/performance/report and delivery gates remain open."
+  ],
+  "native_qualification": false,
+  "release_published": false,
+  "stable_acceptance": false,
+  "published_objects_changed": false
+}
