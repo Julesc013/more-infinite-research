@@ -1620,6 +1620,114 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
           assert(not ok and why=="unqualified-native-merge-frame"and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==state)
         ''')
 
+    def test_published517_merge_captures_the_live_source_before_engine_invalidates_it(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          assert(storage[OWNER_KEY].schema==4 and storage[OWNER_KEY].forces[player.index].phase=="legacy")
+          local state=storage[OWNER_KEY];local source_index=player.index;local destination_before=frame(suspended);writes=0
+          assert(history.default_owner_on_forces_merging{source=player,destination=suspended})
+          assert(writes==0 and storage[OWNER_KEY]==state)
+          game.forces.player=nil
+          local ok,why=history.default_owner_on_forces_merged{source_index=source_index,destination=suspended}
+          assert(ok and why=="native-merge-metadata-only" and storage[OWNER_KEY]~=state)
+          assert(storage[OWNER_KEY].forces[source_index]==nil and same(destination_before,frame(suspended)))
+        ''')
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local state=storage[OWNER_KEY];local source_index=player.index;game.forces.player=nil;writes=0
+          local ok,why=history.default_owner_on_forces_merged{source_index=source_index,destination=suspended}
+          assert(not ok and why=="unqualified-native-merge-frame" and writes==0 and storage[OWNER_KEY]==state)
+        ''')
+
+    def test_published517_reset_requires_the_old_holder_to_be_empty_before_resuming_current_ownership(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local before,state=all_frames(),storage[OWNER_KEY];writes=0
+          local ok,message=pcall(history.default_owner_on_force_reset,{force=player})
+          assert(not ok and tostring(message):find("reset retained historical work",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
+        ''')
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          -- Host representation of Factorio's reset boundary: the reset has
+          -- already cleared every owned and historical worker row.  This does
+          -- not substitute for the exact-engine reset observation required by
+          -- native qualification.
+          player.research_queue={OTHER};player.research_progress=0
+          for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517,HEAD}do
+            local tech=player.technologies[id]
+            tech.level=4;tech.researched=false;tech.saved_progress=0
+            tech.enabled=prototypes.technology[id].enabled
+            -- The authored public prototype leaves its default visibility
+            -- implicit; Factorio exposes the resulting force property as
+            -- false, rather than a missing observation.
+            if id==CANONICAL then tech.visible_when_disabled=false
+            else tech.visible_when_disabled=prototypes.technology[id].visible_when_disabled end
+          end
+          writes=0;queue_writes={};progress_writes={}
+          for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517,HEAD}do
+            local tech=player.technologies[id]
+            assert(type(tech.level)=="number" and type(tech.researched)=="boolean"
+              and type(tech.enabled)=="boolean" and type(tech.visible_when_disabled)=="boolean"
+              and type(tech.saved_progress)=="number", "incomplete reset frame: "..id
+                .." level="..type(tech.level).." researched="..type(tech.researched)
+                .." enabled="..type(tech.enabled).." visible="..type(tech.visible_when_disabled)
+                .." saved="..type(tech.saved_progress))
+          end
+          local legacy=player.technologies[LEGACY517]
+          assert(legacy.level==4 and not legacy.researched and legacy.saved_progress==0
+            and not legacy.enabled and not legacy.visible_when_disabled,
+            "reset did not clear legacy holder: level="..legacy.level.." researched="..tostring(legacy.researched)
+              .." saved="..legacy.saved_progress.." enabled="..tostring(legacy.enabled)
+              .." visible="..tostring(legacy.visible_when_disabled))
+          assert(history.default_owner_on_force_reset{force=player})
+          local record=storage[OWNER_KEY]
+          assert(record.schema==4 and record.forces[player.index].phase=="owned")
+          assert(player.technologies[ORDINARY].level==4 and not player.technologies[CANONICAL].enabled
+            and player.technologies[LEGACY517].level==4 and not player.technologies[LEGACY517].enabled
+            and player.technologies[HEAD].level==4 and not player.technologies[HEAD].enabled)
+          assert(player.worker_robots_storage_bonus==20 and player.current_research.name==OTHER)
+        ''')
+
+    def test_published517_late_force_starts_only_on_the_current_contract(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local fresh=make_force("late",5);install_force(fresh);game.forces.late=fresh
+          history.on_force_created{force=fresh};writes=0
+          assert(history.default_owner_on_force_created{force=fresh})
+          local record=storage[OWNER_KEY];local legacy=fresh.technologies[LEGACY517]
+          assert(record.schema==4 and record.forces[fresh.index].phase=="owned")
+          assert(fresh.technologies[ORDINARY].level==4 and not fresh.technologies[CANONICAL].enabled
+            and legacy.level==4 and not legacy.enabled and not legacy.visible_when_disabled
+            and fresh.technologies[HEAD].level==4 and not fresh.technologies[HEAD].enabled)
+          assert(fresh.worker_robots_storage_bonus==20)
+        ''')
+
     def test_cap_four_moves_unpaid_duplicates_before_policy_and_caps_actual_owner(self):
         lua=self.world();lua.execute(r'''
           history.on_init(nil);player.research_queue={CANONICAL,CANONICAL,OTHER};player.research_progress=.37;history.configure(4,true)

@@ -135,6 +135,7 @@ local configuration_context = require("runtime.configuration_change_context")
 local pending = false
 local default_head_pending = false
 local default_mutating_force
+local default_owner_merge_plans = {}
 local owned_queue_force
 local OWNER_KEY = "mir_worker_storage_native_owner"
 local delegated_provider_preflight, delegated_provider_apply
@@ -1501,10 +1502,23 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     local action, next_force = "validate", prior and clone(prior) or nil
     local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
     if legacy_active and prior and prior.phase == "legacy" then
-      if refresh or not legacy_paid_pair(source, destination, gate, legacy) then
+      if refresh then
+        -- A force reset intentionally discards that force's native progress.
+        -- It may therefore resume ordinary current-contract ownership only
+        -- after the old holder itself proves empty.  Do not call an observed
+        -- reset permission to erase historical paid work that survived it.
+        if not pristine_default_frame(legacy, recovery.published517_se_id) or legacy.visible then
+          recover_error("published517 SE paid-worker reset retained historical work")
+        end
+      elseif not legacy_paid_pair(source, destination, gate, legacy) then
         recover_error("published517 SE paid-worker active frame differs")
+      else
+        action = "legacy-validate"
       end
-      action = "legacy-validate"
+    end
+    if action == "legacy-validate" then
+      -- The historical holder, rather than the current full pair, carries
+      -- this force's authenticated paid work until its ordinary completion.
     elseif not prior or refresh then
       if owned and not refresh then recover_error("default force history is missing") end
       if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
@@ -2164,6 +2178,44 @@ function M.default_owner_on_force_reset(event)
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {reset_force=event.force.index}))
 end
 
+local function default_owner_merge_frame(state, force)
+  local prior = state.forces[force.index]
+  if not prior then recover_error("default native merge has unknown force identity") end
+  local source, owner, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force)
+  if state.schema == 4 and prior.phase == "legacy" then
+    local legacy = snapshot(force, recovery.published517_se_id)
+    if not legacy_paid_pair(source, owner, gate, legacy) then
+      recover_error("published517 SE paid merge frame differs")
+    end
+    return {phase="legacy", source=frame_values(source), owner=frame_values(owner), legacy=frame_values(legacy),
+      gate_paid=gate_paid(gate), bonus=native_bonus(force)}
+  end
+  if prior.phase ~= "owned" or not full_pair(source, owner, gate) then
+    recover_error("default native merge frame differs")
+  end
+  return {phase="owned", source=frame_values(source), owner=frame_values(owner),
+    gate_paid=gate_paid(gate), bonus=native_bonus(force)}
+end
+
+-- Factorio exposes the source force before merge and invalidates it before
+-- on_forces_merged. Capture only this single in-flight schema-4 pair; it is
+-- neither a persistent history mirror nor an attempt to invent summed-force
+-- research. The post event independently checks the engine's destination
+-- contract before deleting the now-invalid source metadata.
+function M.default_owner_on_forces_merging(event)
+  local state = owner_record()
+  if not state or state.kind == "provider-retired" or state.schema ~= 4 then return false end
+  local source, destination = event and event.source, event and event.destination
+  if not source or not destination or not integer(source.index) or not integer(destination.index)
+      or source.index == destination.index then recover_error("default native pre-merge has invalid force identity") end
+  if default_owner_merge_plans[source.index] ~= nil then recover_error("default native pre-merge is already pending") end
+  local source_frame = default_owner_merge_frame(state, source)
+  local destination_frame = default_owner_merge_frame(state, destination)
+  default_owner_merge_plans[source.index] = {state=state, source_index=source.index, destination_index=destination.index,
+    source=source_frame, destination=destination_frame}
+  return true
+end
+
 function M.default_owner_on_forces_merged(event)
   local retired = owner_record()
   if retired and retired.kind == "provider-retired" then return false end
@@ -2172,6 +2224,25 @@ function M.default_owner_on_forces_merged(event)
   local destination, source_index = event.destination, event.source_index
   if not integer(source_index) or source_index == destination.index or not state.forces[source_index]
       or not state.forces[destination.index] then recover_error("default native merge has unknown force identity") end
+  if state.schema == 4 then
+    local plan = default_owner_merge_plans[source_index]
+    if plan == nil then return false, "unqualified-native-merge-frame" end
+    default_owner_merge_plans[source_index] = nil
+    if plan.state ~= state or plan.source_index ~= source_index or plan.destination_index ~= destination.index then
+      recover_error("default native merge preflight changed")
+    end
+    -- Factorio's native merge retains destination technologies/bonuses rather
+    -- than adding the source. Check that observed behavior explicitly instead
+    -- of manufacturing an aggregate level or fractional historical price.
+    local actual = default_owner_merge_frame(state, destination)
+    if not equal_plain(plan.destination, actual) then recover_error("default native merge changed destination work") end
+    local next_state = clone(state)
+    next_state.forces[source_index] = nil
+    if storage[OWNER_KEY] ~= state then recover_error("default native merge ownership changed") end
+    storage[OWNER_KEY] = next_state
+    reconnect_default(next_state)
+    return true, "native-merge-metadata-only"
+  end
   local _, _, contract = default_contract()
   if contract ~= state.contract then recover_error("default merge contract changed") end
   local next_state, seen = clone(state), {}

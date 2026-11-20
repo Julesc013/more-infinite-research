@@ -178,6 +178,9 @@ class BootstrapTests(unittest.TestCase):
 
           for id = 1, 6 do assert(type(handlers.events[id]) == "function") end
           assert(type(handlers.events[19]) == "function" and type(handlers.events[20]) == "function")
+          assert(type(handlers.events[defines.events.on_forces_merging]) == "function",
+            "worker pre-merge capture was not bound alongside the post-merge lifecycle")
+          handlers.events[defines.events.on_forces_merging]({})
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           assert(type(handlers.events[21]) == "function")

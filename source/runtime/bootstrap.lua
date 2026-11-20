@@ -682,6 +682,10 @@ local function on_force_reset(event)
   request_library_refresh(event)
 end
 
+local function on_forces_merging(event)
+  if worker_robot_storage then worker_robot_storage.default_owner_on_forces_merging(event) end
+end
+
 local function on_forces_merged(event)
   local native_credit_plan = native_credits and native_credits.preflight_forces_merged(event)
   local worker_merge_unqualified = false
@@ -756,12 +760,14 @@ local function bind_runtime_events(library_open)
   if force_lifecycle_active then
     if events.on_force_created then script.on_event(events.on_force_created, on_force_created) end
     if events.on_force_reset then script.on_event(events.on_force_reset, on_force_reset) end
+    if events.on_forces_merging then script.on_event(events.on_forces_merging, on_forces_merging) end
     if events.on_forces_merged then script.on_event(events.on_forces_merged, on_forces_merged) end
   else
     -- Remove previous closures when no runtime owner or open Library needs
     -- these force boundaries after a configuration/view transition.
     if events.on_force_created then script.on_event(events.on_force_created, nil) end
     if events.on_force_reset then script.on_event(events.on_force_reset, nil) end
+    if events.on_forces_merging then script.on_event(events.on_forces_merging, nil) end
     if events.on_forces_merged then script.on_event(events.on_forces_merged, nil) end
   end
   -- The Library observes native changes only while a connected owned view is
