@@ -1108,6 +1108,44 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                   assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
                 ''')
 
+    def test_default_contract_refusals_identify_failed_predicate_without_writes(self):
+        opponents = (
+            ('creators[CANONICAL]="foreign"', ('predicate=public-route', 'route=external')),
+            ('creators[ORDINARY]="foreign"', ('predicate=owner-creator', 'owner_creator=foreign')),
+            ('prototypes.technology[ORDINARY].research_unit_energy=3600',
+             ('predicate=work-contract', 'comparison=unequal-fingerprint', 'research_unit_energy.canonical=1800',
+              'research_unit_energy.owner=3600')),
+            ('prototypes.technology[CANONICAL].research_unit_ingredients[1].amount="invalid"',
+             ('predicate=work-contract', 'comparison=canonical-fingerprint', 'science[1].amount.canonical=invalid')),
+            ('prototypes.technology[CANONICAL].research_unit_ingredients[1]=setmetatable({amount=1},'
+             '{__index=function() error("science-observation-failed") end})',
+             ('predicate=work-contract', 'comparison=canonical-fingerprint', 'science[1].name.canonical=unavailable:',
+              'science-observation-failed')),
+            ('prototypes.technology[ORDINARY].research_unit_ingredients[1].amount=2',
+             ('predicate=work-contract', 'comparison=unequal-fingerprint', 'science[1].amount.owner=2')),
+            ('prototypes.technology[ORDINARY].research_unit_ingredients[1].amount="invalid"',
+             ('predicate=work-contract', 'comparison=owner-fingerprint', 'science[1].amount.owner=invalid')),
+            ('prototypes.technology[ORDINARY].hidden=true',
+             ('predicate=owner-flags', 'hidden.owner=true')),
+            ('prototypes.technology[ORDINARY].hidden=nil;setmetatable(prototypes.technology[ORDINARY],'
+             '{__index=function(_,key) if key=="hidden" then error("owner-hidden-unavailable") end end})',
+             ('predicate=owner-flags', 'comparison=unavailable-flags', 'hidden.owner=unavailable:',
+              'owner-hidden-unavailable')),
+        )
+        for target in ("f200", "f210"):
+            for mutation, expected in opponents:
+                with self.subTest(target=target, mutation=mutation):
+                    lua = self.world(target)
+                    lua.execute('seed_owner();' + mutation + r'''
+                      local before=all_frames(); writes=0
+                      contract_ok,contract_error=pcall(history.plan_default_owner_transfer,
+                        owner_event(package_family=="f200" and "5.0.20011" or "5.0.21011"),nil,false)
+                      assert(not contract_ok and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                    ''')
+                    message = str(lua.globals().contract_error)
+                    for token in expected:
+                        self.assertIn(token, message)
+
     def test_stale_plan_detects_last_force_work_bonus_and_debit_changes(self):
         for change in ('detached.technologies[CANONICAL].saved_progress=.29','foreign_bonus[4]=21','detached.technologies[HEAD].researched=true'):
             lua=self.world();lua.execute(r'''
