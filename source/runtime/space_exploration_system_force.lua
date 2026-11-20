@@ -82,9 +82,10 @@ function M.preflight(event)
   local active = script and script.active_mods or {}
   if target.id ~= "f200" or active["space-exploration"] ~= "0.7.57" then return nil end
   local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[MIR]
-  if type(change) ~= "table" or change.old_version ~= "4.7.20002"
-      or type(active[MIR]) ~= "string" or not active[MIR]:match("^5%.")
-      or change.new_version ~= active[MIR] then return nil end
+  if type(change) ~= "table" or change.old_version ~= "4.7.20002" then return nil end
+  require_policy(type(target.distribution_version) == "string" and target.distribution_version ~= ""
+    and active[MIR] == target.distribution_version and change.new_version == target.distribution_version,
+    "target/package version differs")
   require_policy(event.mod_startup_settings_changed == false, "startup settings changed or are unavailable")
   origin(event, active)
   local force = game.forces.conquest

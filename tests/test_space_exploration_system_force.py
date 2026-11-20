@@ -16,7 +16,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         self.lua.globals().player_root = (ROOT / "source").as_posix()
         self.lua.execute('''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
-          target={id="f200"};package.loaded["platform.target"]=target
+          target={id="f200",distribution_version="5.0.20018"};package.loaded["platform.target"]=target
           -- Independently transcribed from the retained native profile, not
           -- generated from the production admission table.
           active={base="2.0.77",["aai-containers"]="0.3.2",["aai-industry"]="0.6.16",
@@ -78,8 +78,8 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         if after_preflight:
             self.lua.execute("plan=policy.preflight(event)")
         self.lua.execute(mutation)
-        ok, message = self.lua.eval("pcall(function() policy.apply(plan) end)" if after_preflight
-                                    else "pcall(function() policy.preflight(event) end)")
+        ok, message = self.lua.eval("pcall(function() policy.apply(plan);return nil end)" if after_preflight
+                                    else "pcall(function() policy.preflight(event);return nil end)")
         self.assertFalse(ok, mutation)
         self.assertTrue(message, mutation)
         self.assertEqual(self.lua.eval("#native_writes"), 0, mutation)
@@ -109,8 +109,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
     def test_inactive_or_unrelated_events_do_not_access_the_world(self):
         for mutation in ('target.id="f210"', 'active["space-exploration"]=nil',
                          'active["space-exploration"]="0.7.58"', 'event=nil', 'event.mod_changes={}',
-                         'event.mod_changes["more-infinite-research"].old_version="4.7.20003"',
-                         'event.mod_changes["more-infinite-research"].new_version="5.0.20019"'):
+                         'event.mod_changes["more-infinite-research"].old_version="4.7.20003"'):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute(mutation + ';game=setmetatable({}, {__index=function()error("world access")end})')
@@ -118,6 +117,10 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
 
     def test_profile_and_configuration_opponents_refuse_before_writes(self):
         mutations = ['event.mod_startup_settings_changed=true', 'event.mod_startup_settings_changed=nil',
+                     'target.distribution_version=nil', 'target.distribution_version=""',
+                     'target.distribution_version="5.0.21018"',
+                     'event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
+                     'active["more-infinite-research"]="5.0.20019";event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active.base="2.0.78"', 'active.Krastorio2="1.0.0"', 'active["space-age"]="2.0.77"',
                      'event.mod_changes.foreign={old_version="1.0.0"}',
                      'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
@@ -126,7 +129,9 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         for mutation in mutations:
             with self.subTest(mutation=mutation):
                 self.setUp()
+                self.lua.execute('world_reads=0;game=setmetatable({}, {__index=function()world_reads=world_reads+1;error("unexpected world access")end})')
                 self.rejected(mutation)
+                self.assertEqual(self.lua.eval("world_reads"), 0, mutation)
 
     def test_mixed_nonfinite_or_unavailable_scripted_values_are_not_absence(self):
         for mutation in ('fields.worker_robots_speed_modifier=5.65', 'fields.worker_robots_storage_bonus=3',
