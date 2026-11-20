@@ -1324,6 +1324,91 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                       assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY].contract~=contract)
                     ''')
 
+    def test_published517_se_paid_contract_moves_only_known_old_work_to_the_old_holder(self):
+        """A published F200 SE Base-five partial must not become current SE-seven work."""
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY,OTHER},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          suspended.technologies[ORDINARY].saved_progress=.27
+          suspended.research_queue={OTHER,ORDINARY};suspended.research_progress=.19
+          detached.technologies[ORDINARY].saved_progress=.31
+          local before=all_frames();local owner=copy(storage[OWNER_KEY]);writes=0;queue_writes={};progress_writes={}
+          current_se_contract()
+          local plan=history.default_owner_preflight(published517_se_bridge_event(),nil,true)
+          assert(plan.kind=="published517-se-paid-bridge")
+          assert(writes==0 and same(before,all_frames())and same(owner,storage[OWNER_KEY]))
+          assert(history.default_owner_apply(plan))
+          local record=storage[OWNER_KEY]
+          assert(record.schema==4 and record.kind=="full-default" and record.legacy.kind=="published517-se-paid")
+          for _,force in pairs(game.forces)do
+            local prior=before[force.index];local old=force.technologies[LEGACY517]
+            local current=force.technologies[ORDINARY]
+            if record.forces[force.index].phase=="legacy"then
+              assert(old.level==prior.owner.level and old.saved_progress==prior.owner.saved)
+              assert(old.enabled==prior.owner.enabled and old.visible_when_disabled==prior.owner.visible)
+              assert(current.level==4 and current.saved_progress==0 and not current.enabled)
+            else
+              assert(old.level==4 and old.saved_progress==0 and not old.enabled)
+              assert(current.level==prior.owner.level and current.saved_progress==prior.owner.saved)
+            end
+            assert(force.worker_robots_storage_bonus==prior.bonus)
+          end
+          assert(player.current_research.name==LEGACY517 and player.research_queue[1].name==LEGACY517
+            and player.research_queue[2].name==OTHER and player.research_progress==.42)
+          assert(suspended.research_queue[1].name==OTHER and suspended.research_queue[2].name==LEGACY517
+            and suspended.research_progress==.19)
+        ''')
+
+    def test_published517_se_paid_completion_settles_to_current_contract_without_changing_bonus(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local before_bonus=player.worker_robots_storage_bonus
+          player.technologies[LEGACY517].level=6
+          player.research_queue={OTHER};player.research_progress=0
+          player.technologies[LEGACY517].saved_progress=0
+          local changed=history.default_owner_on_research_finished{
+            research=player.technologies[LEGACY517],by_script=false,tick=101}
+          assert(changed)
+          local record=storage[OWNER_KEY]
+          assert(record.schema==4 and record.forces[player.index].phase=="owned")
+          assert(player.technologies[ORDINARY].level==6 and player.technologies[ORDINARY].saved_progress==0)
+          assert(player.technologies[ORDINARY].enabled and player.technologies[LEGACY517].level==4
+            and not player.technologies[LEGACY517].enabled)
+          assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5)
+          assert(player.worker_robots_storage_bonus==before_bonus+1 and player.current_research.name==OTHER)
+        ''')
+
+    def test_published517_se_paid_bridge_reloads_and_reenters_without_rewriting_old_work(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local record,before=storage[OWNER_KEY],all_frames();writes=0
+          local native_game,native_prototypes=game,prototypes
+          game=nil;prototypes=nil;history.default_owner_on_load()
+          game,prototypes=native_game,native_prototypes
+          local event={mod_startup_settings_changed=false,mod_changes={}}
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(plan.already_owned and not history.default_owner_apply(plan))
+          assert(storage[OWNER_KEY]==record and same(before,all_frames())and writes==0)
+        ''')
+
     def test_unchanged_automatic_configuration_keeps_invested_zero_reward_work(self):
         for target in ("f200","f210"):
             with self.subTest(target=target):

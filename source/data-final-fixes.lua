@@ -318,6 +318,12 @@ if worker_default_available then
   science.apply_family({worker_default_authored}, {[recovery.canonical]=
     require("compatibility.science_bindings").conditions_for("worker-robots-storage")},
     science_environment, science_context)
+  if modern_catalogue.is_f200_non_k2_space_exploration(mods) then
+    -- A hidden Base-five holder is the one explicit historical F200 SE work
+    -- contract. Runtime admission still requires the exact published517
+    -- record and frame; emitting this row does not migrate any save by itself.
+    technologies[#technologies + 1] = recovery.published517_se_owner(worker_default_authored)
+  end
   local owner = recovery.default_owner(worker_default_authored)
   if not worker_default_is_head then
     -- Current finite profiles retain the old contract without offering a
