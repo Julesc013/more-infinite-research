@@ -1620,15 +1620,71 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
           assert(not ok and why=="unqualified-native-merge-frame"and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==state)
         ''')
 
-    def test_published517_merge_captures_the_live_source_before_engine_invalidates_it(self):
+    def test_published517_premerge_refuses_each_unsettled_historical_source_without_writes(self):
         lua=self.world("f200")
         lua.execute(r'''
           published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          suspended.technologies[ORDINARY].saved_progress=.27
+          suspended.research_queue={OTHER,ORDINARY};suspended.research_progress=.19
+          detached.technologies[ORDINARY].saved_progress=.31
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          assert(player.current_research.name==LEGACY517 and player.research_queue[1].name==LEGACY517,
+            "current historical worker obligation was not prepared")
+          assert(suspended.research_queue[2].name==LEGACY517
+            and detached.technologies[LEGACY517].saved_progress==.31,
+            "queued/detached historical worker obligations were not prepared")
+          -- The old pre-capture accepted every one of these rows, then its
+          -- post event dropped the invalid source metadata. Each signal is an
+          -- independently observed historical obligation: current/queued,
+          -- queued behind foreign research, and detached saved work.
+          for _,source in ipairs{player,suspended,detached}do
+            local before,state=all_frames(),storage[OWNER_KEY];writes=0
+            local ok,message=pcall(history.default_owner_on_forces_merging,{source=source,destination=uninvested})
+            assert(not ok and tostring(message):find("source has unsettled historical work",1,true)
+              and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state
+              and game.forces[source.name]==source)
+          end
+        ''')
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
           player.technologies[ORDINARY].saved_progress=.42
           player.research_queue={ORDINARY};player.research_progress=.42
           current_se_contract()
           assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
-          assert(storage[OWNER_KEY].schema==4 and storage[OWNER_KEY].forces[player.index].phase=="legacy")
+          -- Native completion can precede the research-finished callback.
+          -- It is still historical debt until that callback settles the
+          -- authenticated old contract onto current ownership.
+          player.research_queue={OTHER};player.research_progress=0
+          player.technologies[LEGACY517].level=6
+          player.technologies[LEGACY517].saved_progress=0
+          local before,state=all_frames(),storage[OWNER_KEY];writes=0
+          local ok,message=pcall(history.default_owner_on_forces_merging,{source=player,destination=uninvested})
+          assert(not ok and tostring(message):find("source has unsettled historical work",1,true)
+            and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state,
+            "completed historical pre-merge result: "..tostring(message))
+        ''')
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          player.research_queue={OTHER};player.research_progress=0
+          player.technologies[LEGACY517].level=6
+          player.technologies[LEGACY517].saved_progress=0
+          assert(history.default_owner_on_research_finished{research=player.technologies[LEGACY517],by_script=false,tick=101})
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned")
           local state=storage[OWNER_KEY];local source_index=player.index;local destination_before=frame(suspended);writes=0
           assert(history.default_owner_on_forces_merging{source=player,destination=suspended})
           assert(writes==0 and storage[OWNER_KEY]==state)
@@ -1636,17 +1692,6 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
           local ok,why=history.default_owner_on_forces_merged{source_index=source_index,destination=suspended}
           assert(ok and why=="native-merge-metadata-only" and storage[OWNER_KEY]~=state)
           assert(storage[OWNER_KEY].forces[source_index]==nil and same(destination_before,frame(suspended)))
-        ''')
-        lua=self.world("f200")
-        lua.execute(r'''
-          published517_source_contract();init_default()
-          player.technologies[ORDINARY].saved_progress=.42
-          player.research_queue={ORDINARY};player.research_progress=.42
-          current_se_contract()
-          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
-          local state=storage[OWNER_KEY];local source_index=player.index;game.forces.player=nil;writes=0
-          local ok,why=history.default_owner_on_forces_merged{source_index=source_index,destination=suspended}
-          assert(not ok and why=="unqualified-native-merge-frame" and writes==0 and storage[OWNER_KEY]==state)
         ''')
 
     def test_published517_reset_requires_the_old_holder_to_be_empty_before_resuming_current_ownership(self):

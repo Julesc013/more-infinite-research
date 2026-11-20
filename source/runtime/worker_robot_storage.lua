@@ -2198,10 +2198,11 @@ local function default_owner_merge_frame(state, force)
 end
 
 -- Factorio exposes the source force before merge and invalidates it before
--- on_forces_merged. Capture only this single in-flight schema-4 pair; it is
--- neither a persistent history mirror nor an attempt to invent summed-force
--- research. The post event independently checks the engine's destination
--- contract before deleting the now-invalid source metadata.
+-- on_forces_merged. Capture only a source with no remaining historical debt
+-- and this single in-flight schema-4 pair; it is neither a persistent history
+-- mirror nor an attempt to invent summed-force research. The post event
+-- independently checks the engine's destination contract before deleting the
+-- now-invalid source metadata.
 function M.default_owner_on_forces_merging(event)
   local state = owner_record()
   if not state or state.kind == "provider-retired" or state.schema ~= 4 then return false end
@@ -2209,6 +2210,15 @@ function M.default_owner_on_forces_merging(event)
   if not source or not destination or not integer(source.index) or not integer(destination.index)
       or source.index == destination.index then recover_error("default native pre-merge has invalid force identity") end
   if default_owner_merge_plans[source.index] ~= nil then recover_error("default native pre-merge is already pending") end
+  -- A schema-4 legacy row is a debt to its historical contract, including a
+  -- just-completed level whose research-finished callback has not settled it
+  -- yet. Factorio invalidates the source force after this event and provides
+  -- no authenticated destination mapping for that debt. Refuse while both
+  -- the exact native frame and its saved ownership remain available.
+  if state.forces[source.index].phase == "legacy" then
+    default_owner_merge_frame(state, source)
+    recover_error("published517 SE paid source has unsettled historical work before force merge")
+  end
   local source_frame = default_owner_merge_frame(state, source)
   local destination_frame = default_owner_merge_frame(state, destination)
   default_owner_merge_plans[source.index] = {state=state, source_index=source.index, destination_index=destination.index,
