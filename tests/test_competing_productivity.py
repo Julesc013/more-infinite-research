@@ -471,6 +471,79 @@ class CompetingProductivityTests(unittest.TestCase):
           assert(reads == 0)
         ''')
 
+    def test_configuration_cleanup_uses_observed_live_forces_before_restoring_rights(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local contract = binding.select(exact_active(), f200_target())
+          local force = force_from_contract(contract)
+          storage = {}
+          install_competing(true, force).on_init()
+          local runtime = install_competing(false, force)
+          local indexed_reads = 0
+          game.forces = setmetatable({player=force}, {__index=function(_, index)
+            indexed_reads = indexed_reads + 1
+            error("unexpected indexed force observation " .. tostring(index), 0)
+          end})
+          runtime.on_configuration_changed()
+          assert(indexed_reads == 0, "cleanup queried a force instead of observing live membership")
+          for _, item in ipairs(contract.bindings) do
+            assert(force.technologies[item.id].enabled == true,
+              "cleanup discarded the live force's restoration right: " .. item.id)
+            assert(force.technologies[item.id].visible_when_disabled == false)
+          end
+          assert(storage.mir_competing_productivity == nil)
+        ''')
+
+    def test_failed_force_enumeration_retains_all_rights_before_cleanup(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local contract = binding.select(exact_active(), f200_target())
+          local force = force_from_contract(contract)
+          storage = {}
+          local runtime = install_competing(true, force)
+          runtime.on_init()
+          local current = storage.mir_competing_productivity
+          local live_rights = current.owned_disabled[force.index]
+          local stale_rights = {[contract.bindings[1].id]={disabled=true}}
+          current.owned_disabled[99] = stale_rights
+          game.forces = setmetatable({[force.index]=force}, {__pairs=function()
+            local yielded = false
+            return function()
+              if not yielded then yielded=true; return "player", force end
+              error("synthetic live-force enumeration failure", 0)
+            end
+          end})
+          local ok, message = pcall(runtime.on_configuration_changed)
+          assert(not ok and tostring(message):find("synthetic live-force enumeration failure", 1, true))
+          assert(storage.mir_competing_productivity == current
+            and current.owned_disabled[force.index] == live_rights
+            and current.owned_disabled[99] == stale_rights,
+            "failed force observation discarded restoration rights")
+          for _, item in ipairs(contract.bindings) do
+            assert(force.technologies[item.id].enabled == false)
+          end
+        ''')
+
+    def test_successful_force_observation_still_discards_absent_force_rights(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local contract = binding.select(exact_active(), f200_target())
+          local force = force_from_contract(contract)
+          storage = {}
+          local runtime = install_competing(true, force)
+          runtime.on_init()
+          local current = storage.mir_competing_productivity
+          local live_rights = current.owned_disabled[force.index]
+          current.owned_disabled[99] = {[contract.bindings[1].id]={disabled=true}}
+          game.forces = {[force.index]=force, player=force}
+          runtime.on_configuration_changed()
+          assert(current.owned_disabled[99] == nil, "absent force retained a stale right")
+          assert(current.owned_disabled[force.index] == live_rights)
+          for _, item in ipairs(contract.bindings) do
+            assert(force.technologies[item.id].enabled == false)
+          end
+        ''')
+
     def test_bootstrap_registers_the_single_named_event_composition(self):
         self.lua.execute(r'''
           local calls, cleanup_calls, handlers = {}, {}, {events={}}

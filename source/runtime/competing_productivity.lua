@@ -217,14 +217,9 @@ local function reconcile_force(force, target_name, discovery_observed)
   discard_empty_state(current)
 end
 
-local function force_for_index(index)
-  local ok, force = pcall(function() return game.forces[index] end)
-  return ok and force or nil
-end
-
-local function discard_unselected_rights(current)
+local function discard_unselected_rights(current, live_forces)
   for index, owned in pairs(current.owned_disabled) do
-    if not valid_force(force_for_index(index)) then
+    if not live_forces[index] then
       current.owned_disabled[index] = nil
     elseif type(owned) == "table" then
       for name in pairs(owned) do
@@ -244,8 +239,17 @@ local function reconcile_all(clean_stale, discovery_observed)
     return
   end
   if not game or not game.forces then return end
-  if clean_stale and current then discard_unselected_rights(current) end
-  for _, force in pairs(game.forces) do reconcile_force(force, nil, discovery_observed) end
+  -- Finish observing live membership before discarding any restoration right.
+  -- Reuse those force objects for reconciliation after the observation succeeds.
+  local observed, live_forces = {}, {}
+  for _, force in pairs(game.forces) do
+    if valid_force(force) then
+      observed[#observed + 1] = force
+      live_forces[force.index] = true
+    end
+  end
+  if clean_stale and current then discard_unselected_rights(current, live_forces) end
+  for _, force in ipairs(observed) do reconcile_force(force, nil, discovery_observed) end
   discard_empty_state(existing_state())
 end
 
