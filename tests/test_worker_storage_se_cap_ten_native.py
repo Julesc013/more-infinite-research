@@ -223,6 +223,84 @@ local function create_lab_and_power(force)'''
         self.assertEqual("source-working", self.lua.globals().cargo_phase())
         self.assertIn("phase=source-begin", self.logs()[-1])
 
+    def test_setup_declaration_matches_independent_native_parent_rows(self):
+        declared = world.rows()
+        for name, parents in world.NATIVE_SETUP_PARENTS.items():
+            with self.subTest(name=name):
+                self.assertEqual(parents, declared[name])
+
+    def test_scripted_finite_setup_callbacks_do_not_become_worker_completions(self):
+        self.lua.globals().cargo_begin()
+        self.assertEqual(98, self.lua.globals().CARGO_SCRIPTED_RESEARCH_CALLBACKS)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        self.assertIn("ordinary=0", self.logs()[-1])
+        self.assertEqual(0, len(self.lua.globals().cargo_saves()))
+
+    def test_scripted_worker_completion_before_begin_still_refuses(self):
+        with self.assertRaisesRegex(LuaError, "scripted worker completion differs"):
+            self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['worker-robots-storage-4'],by_script=true}")
+
+    def test_scripted_configuration_handoff_notifications_wait_for_full_frame_check(self):
+        self.source_to_partial()
+        logs, saves = len(self.logs()), len(self.lua.globals().cargo_saves())
+        self.lua.execute("CARGO_TRANSFER(); "
+                         "for _, name in ipairs({'worker-robots-storage-4','mir-worker-storage-default-4'}) do "
+                         "CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES[name],by_script=true} end")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        self.assertEqual(logs, len(self.logs()))
+        self.assertEqual(saves, len(self.lua.globals().cargo_saves()))
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20018'; "
+                         "CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                         "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        before = len(self.logs())
+        self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['worker-robots-storage-4'],by_script=true}; "
+                         "CARGO_CALLBACKS[2]{research={name='mir-worker-storage-default-4',force=game.forces.foreign},by_script=false}")
+        self.assertEqual(before, len(self.logs()))
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        with self.assertRaisesRegex(LuaError, "scripted worker completion differs"):
+            self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['mir-worker-storage-default-4'],by_script=true}")
+
+    def test_completed_and_settled_native_cursor_pairs_mean_the_same_earned_levels(self):
+        self.lua.globals().cargo_begin()
+        for level in range(4, 9):
+            self.lua.globals().cargo_complete(False, level, None, True)
+            self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_partial(0.42)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        for level in (9, 10):
+            self.lua.globals().cargo_complete(False, level, None, True)
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+
+    def test_handoff_notification_cannot_bless_changed_partial_work(self):
+        self.source_to_partial()
+        self.lua.execute("CARGO_TRANSFER(); CARGO_FORCE_VALUES._progress=0.25; "
+                         "CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['mir-worker-storage-default-4'],by_script=true}; "
+                         "script.active_mods['more-infinite-research']='5.0.20018'")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.execute("CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                             "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+
+    def test_omitted_native_parent_refuses_before_source_setup(self):
+        for name, parent in (("rocket-silo", "se-heat-shielding"), ("speed-module", "se-fuel-refining")):
+            with self.subTest(name=name):
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                world.install(lua)
+                lua.execute("for _, row in ipairs(CARGO_DECLARATION_ORDER) do "
+                            f"if row[1] == {json.dumps(name)} then "
+                            "for index, value in ipairs(row[2]) do "
+                            f"if value == {json.dumps(parent)} then table.remove(row[2], index); break end "
+                            "end end end")
+                world.load(lua)
+                with self.assertRaisesRegex(LuaError, f"setup parents {name} count differs"):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+                self.assertEqual(0, len(lua.globals().cargo_entities()))
+                self.assertEqual(0, len(lua.globals().cargo_saves()))
+
     def test_afa_cold_pending_mutant_refuses_both_source_load_orders(self):
         old = self.unconditional_cold_pending_actor()
         old.globals().cargo_on_load()

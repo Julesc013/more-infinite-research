@@ -61,6 +61,34 @@ function New-SyntheticCargoChain {
 $packet=Read-CargoCapTenJson $PacketPath
 $windowsPacket=Read-CargoCapTenJson $WindowsPacketPath
 
+# This controller tests the immutable 2287 case, not the current actor source.
+# Project its five exact historical members into disposable host input custody;
+# current helpers remain current so their strict historical-pin refusal is real.
+$currentRepo=$repo
+$frozenRepo=Join-Path $OutputRoot 'frozen-source'
+$python=Get-Command python -ErrorAction Stop
+$projection=@'
+from pathlib import Path
+import hashlib,json,subprocess,sys
+repo,out=Path(sys.argv[1]),Path(sys.argv[2])
+pins=json.loads(sys.argv[3]);revision='7cfad2708e790b024e2493d00ed5892ac0c2601a'
+prefix='tests/fixtures/worker-storage-se-cap-ten-native/'
+assert {r['path'] for r in pins['actors']}=={'control.lua','data-final-fixes.lua','data.lua','info-f200.json','prerequisites.lua'}
+for row in pins['actors']:
+ raw=subprocess.check_output(['git','-C',str(repo),'show',revision+':'+prefix+row['path']])
+ assert len(raw)==row['bytes'] and hashlib.sha256(raw).hexdigest().upper()==row['sha256'],row['path']
+ destination=out/prefix/row['path'];destination.parent.mkdir(parents=True,exist_ok=True)
+ with destination.open('xb') as stream:stream.write(raw)
+for row in pins['helpers']:
+ relative=Path(row['path']);assert not relative.is_absolute() and '..' not in relative.parts and relative.parts[0]=='tools'
+ destination=out/relative;destination.parent.mkdir(parents=True,exist_ok=True)
+ with destination.open('xb') as stream:stream.write((repo/relative).read_bytes())
+'@
+$projectionPins=[ordered]@{actors=$script:CargoActorMembers;helpers=$script:CargoHelperPins}|ConvertTo-Json -Depth 8 -Compress
+& $python.Source -I -c $projection $currentRepo $frozenRepo $projectionPins
+if($LASTEXITCODE-ne0){throw 'Exact historical Cargo host-input projection failed; fetch7cfad2708e790b024e2493d00ed5892ac0c2601a as documented in CI.'}
+$repo=$frozenRepo
+
 Add-Check 'packets pin the full F200 source/candidate/File-settings/actor closure and distinct exact engines' {
     Assert-CargoCapTenPacket -Packet $packet -RepoRoot $repo -DeferLocalHelperObservation
     Assert-CargoCapTenPacket -Packet $windowsPacket -RepoRoot $repo -DeferLocalHelperObservation

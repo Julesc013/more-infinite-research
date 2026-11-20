@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "kind": "MIRSECapTenScriptedSetupCallbackCorrectionV1",
+  "scope": "Fixture callback correction only; corrected ordinary source research and current diagnostic load remain unexecuted.",
+  "native_inputs": {
+    "factorio_version": "2.0.77",
+    "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "mir_version": "4.7.20002",
+    "mir_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "space_exploration_version": "0.7.57",
+    "fixture_sha256": "0D5729627024746F4DA39A1A9C0766ECD8A5376A4CA6EA92020089B0B1B82667",
+    "settings_sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7"
+  },
+  "adverse_observation": {
+    "invocation_id": "76d6dfc2bccd4892848916458f575b69",
+    "controller_pid": 43004,
+    "source_server_identity": {"pid": 52777, "start_ticks": 1815172, "session_id": 52777},
+    "call": "Labelled finite prerequisite row.researched=true synchronously invokes fixture on_research_finished before the source player/worker frame is installed.",
+    "error": "attempt to concatenate local 'name' (a nil value), technology control.lua57 / handler427 / setter329",
+    "by_script_flag": "Not logged by the failing handler; the host setter uses the pinned API's scripted-event expectation. Direct setter-to-event reentry is observed in the native stack.",
+    "ordinary_worker_completions": 0,
+    "diagnostic_loads": 0,
+    "intervention": "Existing guarded owned-engine stop matched PID/start/session and ended only this engine; the controller remained alive for restoration. The nonzero exit is an explicit intervention, not a spontaneous native crash.",
+    "private_custody": "Julesc013/scratchpad PR150, projects/mir/tasks/gunmetal-worker-cap10-diagnostic-r01/r04"
+  },
+  "correction": {
+    "observer_scope": "Validate the event's research identity, ignore names outside the source/candidate worker roles, reject scripted worker events before reading an uninitialized frame, retain exact force/object/ordinary-event checks.",
+    "host_world": "Finite false-to-true researched setter delivers a synchronous scripted callback; old observer fails with the same nil-name stack. New source setup receives98 callbacks without counting them as ordinary worker completions.",
+    "original_observer": "55 methods:9 failures and33 errors with the native-shaped setter.",
+    "corrected_observer": "55 methods pass with pinned Lua5.2, including scripted worker rejection before begin.",
+    "host_checkpoints": [
+      {
+        "candidate_revision": "6b112f0c607fce0c833322bf4de39e5469d6c704",
+        "actor_blob": "39576f749d35b4ba683ae294a49439df53925530",
+        "world_blob": "1a43b29399fef7414c69731b73aff8d5aa64e85a",
+        "original_observer_revision": "0506c1b9b04a14134de88c52b4d1d573e90ce328",
+        "result": "Original55-method checkpoint retained above: old observer fails9 assertions and33 errors in the corrected host world; candidate55 methods pass.",
+        "native_research": false
+      },
+      {
+        "candidate_revision": "5db2dc2764a99ed89c3091b9cd18a07aef37f03a",
+        "actor_blob": "e78fdadef223ecae045b7171c7fa791da8612ff2",
+        "world_blob": "076f9c967f8a420f85457264a25c5c8b24a0c6eb",
+        "unchanged_after_merge_revision": "de54b467dd0101ed8cc0c936a4c20f418628cc36",
+        "result": "Later58-method checkpoint passes with the additional phase/force/supporting-role boundaries and completed/settled cursor controls. It does not supersede the original55 observation.",
+        "native_research": false
+      }
+    ]
+  },
+  "separate_output_channel_finding": {
+    "source_stdout": "process-2.stdout.txt contains the exact console-interface begin error.",
+    "native_file_log": "source/write-data/factorio-current.log omits that console error and contains output from both create and server invocations.",
+    "execution_owner_obligation": "Read the governed per-process source stdout for failure/marker observation; do not infer absence of console errors from the native file log. This receipt does not claim that a future controller correction ran."
+  }
+}
