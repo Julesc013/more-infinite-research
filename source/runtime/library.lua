@@ -1982,23 +1982,32 @@ local function update_settings_content(content, view, preserve_query, translatio
 end
 
 local function queue_name(entry)
-  if type(entry) == "string" then return technology_id(entry) end
+  if type(entry) == "string" then
+    local id = technology_id(entry)
+    return id, id ~= nil
+  end
   local ok, name = pcall(function() return entry and entry.name end)
-  return ok and technology_id(name) or nil
+  if not ok then return nil, false end
+  local id = technology_id(name)
+  return id, id ~= nil
 end
 
 local function queue_entries(force)
-  local ok, queue = pcall(function() return force and force.research_queue end)
-  if not ok or queue == nil then return {} end
+  if force == nil then return nil, false end
+  local observed, queue = pcall(function() return force.research_queue end)
+  if not observed then return nil, false end
+  if queue == nil then return {}, true end
   local result = {}
   local complete = pcall(function()
     for index, entry in ipairs(queue) do
       if index > MAX_PAGE then error("MIR Library queue limit") end
-      local id = queue_name(entry)
+      local id, named = queue_name(entry)
+      if not named then error("MIR Library queue entry unavailable") end
       if id and not private_credit_id(id) then result[#result + 1] = id end
     end
   end)
-  return complete and result or {}
+  if not complete then return nil, false end
+  return result, true
 end
 
 local function update_queue_content(content, player, view)
@@ -2012,27 +2021,36 @@ local function update_queue_content(content, player, view)
     list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = {}})
     add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
   end
+  local unavailable = content[PREFIX .. "queue_unavailable"]
+  if not valid(unavailable) then
+    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
+      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
+  end
   local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local available_width = math.max(1, width - 64)
   list.style.width = available_width
   list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
   local guidance = content[PREFIX .. "queue_guidance"]
   guidance.style.single_line, guidance.style.maximal_width = false, available_width
-  local ids, items = queue_entries(player.force), {}
-  local context = DISCOVERY_TREE and context_for(player.force) or nil
-  for index, id in ipairs(ids) do
-    local technology = known_technology(player, id)
-    local name
-    if DISCOVERY_TREE and not library_model.technology_visible(technology, id, context) then
-      name = {"mir-browser.undiscovered-research"}
-    else name = technology and technology.localised_name or id end
-    items[index] = {"", tostring(index) .. ". ", name}
-  end
+  local ids, available = queue_entries(player.force)
+  local items = {}
   local selected_index = 0
-  for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
+  if available then
+    local context = DISCOVERY_TREE and context_for(player.force) or nil
+    for index, id in ipairs(ids) do
+      local technology = known_technology(player, id)
+      local name
+      if DISCOVERY_TREE and not library_model.technology_visible(technology, id, context) then
+        name = {"mir-browser.undiscovered-research"}
+      else name = technology and technology.localised_name or id end
+      items[index] = {"", tostring(index) .. ". ", name}
+    end
+    for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
+  end
   update_list_items(list, items, selected_index)
-  list.visible = #items > 0
-  content[PREFIX .. "queue_empty"].visible = #items == 0
+  list.visible = available and #items > 0
+  content[PREFIX .. "queue_empty"].visible = available and #items == 0
+  unavailable.visible = not available
 end
 
 local function update_availability_content(content, player, view, context)
@@ -2724,7 +2742,9 @@ function M.on_gui_selection_state_changed(event)
     if not owns_element(player, element, {
       PREFIX .. "queue_list", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT
     }) then return end
-    local id = queue_entries(player.force)[element.selected_index]
+    local ids, available = queue_entries(player.force)
+    if not available then return end
+    local id = ids[element.selected_index]
     if id == nil or known_technology(player, id) == nil then return end
     local view = view_for(player.index)
     view.selected, view.tab, view.page, view.scroll = id, "research", 1, 1

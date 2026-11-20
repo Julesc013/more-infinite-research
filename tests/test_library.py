@@ -201,6 +201,118 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress==progress)
         ''')
 
+    def test_queue_read_failure_is_unavailable_and_blocks_stale_selection(self):
+        self.lua.execute('''
+          boot()
+          local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+          local root=library.open(player,{tab="queue"})
+          local page=root.mir_library_tabs.mir_library_queue_content
+          local list=page.mir_library_queue_list
+          local foreign=page.add{type="label",name="foreign_queue_marker",caption="foreign"}
+          assert(list.visible and #list.items==1 and list.selected_index==0)
+          rawset(player.force,"research_queue",nil)
+          setmetatable(player.force,{__index=function(_,key)
+            if key=="research_queue" then error("native queue property unavailable") end
+          end})
+          assert(library.open(player,{tab="queue"})==root)
+          assert(page.mir_library_queue_unavailable.visible==true
+            and page.mir_library_queue_empty.visible==false
+            and list.visible==false and #list.items==0 and list.selected_index==0,
+            "an unreadable queue must be unavailable, never an empty projection")
+          assert(page.foreign_queue_marker==foreign and foreign.valid,
+            "an unavailable queue refresh must retain the existing queue frame and foreign children")
+          list.selected_index=1
+          library.on_gui_selection_state_changed({player_index=player.index,element=list})
+          assert(storage.mir_library.players[player.index].tab=="queue"
+            and storage.mir_library.players[player.index].selected==nil,
+            "a stale queue selection must not navigate when observation is unavailable")
+          assert(player.force.current_research==current and player.force.research_progress==progress)
+          library.on_gui_click({player_index=player.index,element=page.mir_library_queue_open_native})
+          assert(not root.valid and player.opened_technology==nil,
+            "the native Research handoff remains usable when MIR cannot read the queue")
+          assert(queue[1]==gear)
+        ''')
+
+    def test_queue_iteration_and_name_failures_are_unavailable(self):
+        self.lua.execute('''
+          boot()
+          local current,progress=player.force.current_research,player.force.research_progress
+          local queue,original_ipairs={},ipairs
+          player.force.research_queue=queue
+          ipairs=function(value)
+            if value==queue then error("native queue iteration unavailable") end
+            return original_ipairs(value)
+          end
+          local root=library.open(player,{tab="queue"})
+          ipairs=original_ipairs
+          local page=root.mir_library_tabs.mir_library_queue_content
+          local list=page.mir_library_queue_list
+          assert(page.mir_library_queue_unavailable.visible==true
+            and page.mir_library_queue_empty.visible==false
+            and list.visible==false and #list.items==0 and list.selected_index==0,
+            "an iteration failure must not become an empty queue")
+          assert(player.force.current_research==current and player.force.research_progress==progress)
+
+          boot()
+          current,progress=player.force.current_research,player.force.research_progress
+          player.force.research_queue={setmetatable({}, {__index=function(_,key)
+            if key=="name" then error("native queue entry name unavailable") end
+          end})}
+          root=library.open(player,{tab="queue"})
+          page=root.mir_library_tabs.mir_library_queue_content
+          list=page.mir_library_queue_list
+          assert(page.mir_library_queue_unavailable.visible==true
+            and page.mir_library_queue_empty.visible==false
+            and list.visible==false and #list.items==0 and list.selected_index==0,
+            "an entry-name failure must not become a partial queue")
+          assert(player.force.current_research==current and player.force.research_progress==progress)
+        ''')
+
+    def test_queue_limit_is_unavailable(self):
+        self.lua.execute('''
+          boot()
+          local queue={}
+          for index=1,30001 do queue[index]=gear end
+          local current,progress=player.force.current_research,player.force.research_progress
+          player.force.research_queue=queue
+          local root=library.open(player,{tab="queue"})
+          local page=root.mir_library_tabs.mir_library_queue_content
+          local list=page.mir_library_queue_list
+          assert(page.mir_library_queue_unavailable.visible==true
+            and page.mir_library_queue_empty.visible==false
+            and list.visible==false and #list.items==0 and list.selected_index==0,
+            "a queue beyond the bounded observation limit must be unavailable")
+          assert(player.force.research_queue==queue and player.force.current_research==current
+            and player.force.research_progress==progress)
+        ''')
+
+    def test_queue_empty_and_repeated_entries_keep_native_meaning(self):
+        self.lua.execute('''
+          boot()
+          local current,progress=player.force.current_research,player.force.research_progress
+          player.force.research_queue=nil
+          local root=library.open(player,{tab="queue"})
+          local page=root.mir_library_tabs.mir_library_queue_content
+          local list=page.mir_library_queue_list
+          assert(page.mir_library_queue_empty.visible==true
+            and list.visible==false and #list.items==0,
+            "a successfully observed nil queue has the native empty meaning")
+          local empty={};player.force.research_queue=empty
+          library.open(player,{tab="queue"})
+          assert(page.mir_library_queue_empty.visible==true
+            and list.visible==false and #list.items==0,
+            "a successfully observed empty queue remains empty")
+          local repeated={gear,gear};player.force.research_queue=repeated
+          library.open(player,{tab="queue"})
+          assert(page.mir_library_queue_empty.visible==false
+            and list.visible==true and #list.items==2
+            and list.items[1][2]=="1. " and list.items[2][2]=="2. "
+            and list.items[1][3]==gear.localised_name and list.items[2][3]==gear.localised_name,
+            "a successfully observed repeated native entry must stay repeated")
+          assert(player.force.research_queue==repeated and player.force.current_research==current
+            and player.force.research_progress==progress)
+        ''')
+
     def test_debug_restores_original_sections_and_two_panes_without_an_export_on_open(self):
         self.lua.execute('''
           helpers={write_file=function() error("opening Debug exported a file") end}
