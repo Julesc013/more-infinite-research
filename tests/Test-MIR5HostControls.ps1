@@ -222,6 +222,7 @@ $controls = @(
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
   [ordered]@{path='tests/test_input_filesystem_boundaries.py';lua=$false},
   [ordered]@{path='tests/test_linux_resource_platform.py';lua=$false},
+  [ordered]@{path='tests/test_linux_write_storage.py';lua=$false},
   [ordered]@{path='tools/check_repository.py';lua=$false}
 )
 
