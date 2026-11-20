@@ -14,7 +14,20 @@ local function integer(value)
 end
 
 local function tick(value)
-  return type(value) == "number" and value >= 0 and value < 4294967295 and value == math.floor(value)
+  -- MapTick is uint64 in the exact pinned 2.0.77 runtime API. Lua can only
+  -- preserve its own finite integral number domain; do not import the
+  -- technology-level uint32 bound into an event timestamp.
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+    and value >= 0 and value == math.floor(value)
+end
+
+local function completion_tick(value)
+  if not tick(value) then return false end
+  local following = value + 1
+  -- A saved completion marker schedules exactly one later observation. Do
+  -- not accept a representable MapTick whose unit successor rounds back to
+  -- the same Lua number or overflows to infinity.
+  return following > value and following < math.huge and following - value == 1
 end
 
 local function provider(value)
@@ -723,7 +736,7 @@ local function checked_default_force(record, retired, legacy)
       or record.phase == "legacy-completion-pending"))
   if not valid_phase then recover_error("invalid full default owner phase") end
   if record.phase == "legacy-completion-pending" then
-    if not legacy or not tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
+    if not legacy or not completion_tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
   elseif record.completion_tick ~= nil then
     recover_error("settled default owner has an unexpected completion tick")
   end
@@ -1500,8 +1513,15 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     end
   end
   local items, seen, moved = {}, {}, false
-  local local_force = not context.configuration and not initializing
-    and (context.created_force or context.reset_force or context.finished_force)
+  local local_force
+  if not context.configuration and not initializing then
+    for _, key in ipairs{"created_force", "reset_force", "finished_force"} do
+      if context[key] ~= nil then
+        if local_force or not integer(context[key]) then recover_error("default local event context is invalid") end
+        local_force = context[key]
+      end
+    end
+  end
   for _, force in ipairs(forces()) do
     seen[force.index] = true
     local finished = context.finished_force == force.index
@@ -2262,7 +2282,7 @@ local function settle_published517_se_paid_completion(state, force, event)
   if prior.phase ~= "legacy" then recover_error("published517 SE paid completion has no pending old contract") end
   item.prior_phase = "legacy"
   if engine_owned_published517_completion(item) then
-    if not tick(event.tick) then recover_error("published517 SE paid completion has no native event tick") end
+    if not completion_tick(event.tick) then recover_error("published517 SE paid completion has no native event tick") end
     item.action, item.completion_tick = "defer", event.tick
     return apply_published517_completion_transition(state, {item}), false
   end
