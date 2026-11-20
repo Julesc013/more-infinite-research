@@ -1190,6 +1190,90 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
               assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5 and not player.technologies[HEAD].researched)
             ''')
 
+    def test_automatic_owner_contract_drift_refuses_invested_later_zero_reward_work(self):
+        source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
+        guard='''    elseif event.mod_startup_settings_changed == false and automatic_owner_contract_has_invested_work() then
+      recover_error("default native-owner automatic contract change has invested work; keep the protected original COPY")
+'''
+        self.assertEqual(source.count(guard),1)
+        for target in ("f200","f210"):
+            for drift in ("science","prerequisite","time"):
+                with self.subTest(target=target,drift=drift):
+                    lua=self.world(target);lua.globals().drift=drift;lua.globals().legacy=source.replace(guard,"")
+                    lua.execute(r'''
+                      set_reward(0);init_default()
+                      local later=make_force("later",5);install_force(later);game.forces.later=later
+                      history.on_force_created{force=later};assert(history.default_owner_on_force_created{force=later})
+                      finish_frame(later,"advanced",{ORDINARY},false)
+                      assert(history.default_owner_on_research_finished(finish_event(later)))
+                      assert(later.technologies[ORDINARY].level==5 and later.worker_robots_storage_bonus==20)
+                      if drift=="science"then
+                        for _,id in ipairs{CANONICAL,ORDINARY}do
+                          table.insert(prototypes.technology[id].research_unit_ingredients,{name="se-material-science-pack-1",amount=1})
+                        end
+                      elseif drift=="prerequisite"then
+                        for _,id in ipairs{CANONICAL,ORDINARY}do
+                          prototypes.technology[id].prerequisites["space-science-pack"]={name="space-science-pack"}
+                        end
+                      else
+                        for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_energy=3600 end
+                      end
+                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                      local before,state=all_frames(),copy(storage[OWNER_KEY]);writes=0;queue_writes={};progress_writes={}
+                      local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                      assert(not ok and tostring(message):find("automatic contract change has invested work",1,true))
+                      assert(writes==0 and same(before,all_frames())and same(state,storage[OWNER_KEY]))
+                      -- Deleting only the new guard restores the exact 411
+                      -- behavior: it accepts the false-setting drift and
+                      -- replaces recorded provenance without native writes.
+                      history=assert(load(legacy))()
+                      local plan=history.default_owner_preflight(event,nil,true)
+                      assert(plan.already_owned and history.default_owner_apply(plan))
+                      assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY].contract~=state.contract)
+                    ''')
+
+    def test_automatic_owner_contract_drift_updates_only_uninvested_existing_owners(self):
+        for target in ("f200","f210"):
+            for drift in ("science","prerequisite","time"):
+                with self.subTest(target=target,drift=drift):
+                    lua=self.world(target);lua.globals().drift=drift
+                    lua.execute(r'''
+                      init_default()
+                      if drift=="science"then
+                        for _,id in ipairs{CANONICAL,ORDINARY}do
+                          table.insert(prototypes.technology[id].research_unit_ingredients,{name="se-material-science-pack-1",amount=1})
+                        end
+                      elseif drift=="prerequisite"then
+                        for _,id in ipairs{CANONICAL,ORDINARY}do
+                          prototypes.technology[id].prerequisites["space-science-pack"]={name="space-science-pack"}
+                        end
+                      else
+                        for _,id in ipairs{CANONICAL,ORDINARY}do prototypes.technology[id].research_unit_energy=3600 end
+                      end
+                      local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                      local before,contract=all_frames(),storage[OWNER_KEY].contract;writes=0;queue_writes={};progress_writes={}
+                      local plan=history.default_owner_preflight(event,nil,true)
+                      assert(plan.already_owned and history.default_owner_apply(plan))
+                      assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY].contract~=contract)
+                    ''')
+
+    def test_unchanged_automatic_configuration_keeps_invested_zero_reward_work(self):
+        for target in ("f200","f210"):
+            with self.subTest(target=target):
+                lua=self.world(target)
+                lua.execute(r'''
+                  set_reward(0);init_default()
+                  local later=make_force("later",5);install_force(later);game.forces.later=later
+                  history.on_force_created{force=later};assert(history.default_owner_on_force_created{force=later})
+                  finish_frame(later,"advanced",{ORDINARY},false)
+                  assert(history.default_owner_on_research_finished(finish_event(later)))
+                  local event=owner_event(package_family=="f200"and"5.0.20017"or"5.0.21017")
+                  local before,state=all_frames(),storage[OWNER_KEY];writes=0;queue_writes={};progress_writes={}
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(plan.already_owned and not history.default_owner_apply(plan))
+                  assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==state)
+                ''')
+
 
 class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
     def world(self,target="f210"):
