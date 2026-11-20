@@ -1500,92 +1500,100 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     end
   end
   local items, seen, moved = {}, {}, false
+  local local_force = not context.configuration and not initializing
+    and (context.created_force or context.reset_force or context.finished_force)
   for _, force in ipairs(forces()) do
     seen[force.index] = true
     local finished = context.finished_force == force.index
     local prior = owned and owned.forces[force.index]
     if legacy_active and prior and prior.phase == "legacy-completion-pending" then
-      -- The callback row may not be a settled native frame yet. Its durable
-      -- marker alone establishes historical debt for configuration/reset.
-      recover_error("published517 SE paid-worker completion is awaiting its bounded native observation")
-    end
-    local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
-    local public = prepared and default_frame(force, recovery.canonical, finished) or source
-    local destination = default_frame(force, id, finished)
-    local gate = gate_frame(force, owned ~= nil and context.configuration == true)
-    local refresh = context.created_force == force.index or context.reset_force == force.index
-    if context.created_force == force.index and prior then recover_error("new default force already has history") end
-    local action, next_force = "validate", prior and clone(prior) or nil
-    local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
-    if legacy_active and prior and prior.phase == "legacy" then
-      if refresh then
-        -- A force reset intentionally discards that force's native progress.
-        -- It may therefore resume ordinary current-contract ownership only
-        -- after the old holder itself proves empty.  Do not call an observed
-        -- reset permission to erase historical paid work that survived it.
-        if not pristine_default_frame(legacy, recovery.published517_se_id) or legacy.visible then
-          recover_error("published517 SE paid-worker reset retained historical work")
-        end
-      elseif not legacy_paid_pair(source, destination, gate, legacy) then
-        recover_error("published517 SE paid-worker active frame differs")
-      else
-        action = "legacy-validate"
+      -- A local event on another force cannot settle or rewrite this native
+      -- callback frame. Retain its exact authenticated debt/rights until the
+      -- completion observer; affected-force and configuration work still wait.
+      if not integer(local_force) or local_force == force.index then
+        recover_error("published517 SE paid-worker completion is awaiting its bounded native observation")
       end
-    end
-    if action == "legacy-validate" then
-      -- The historical holder, rather than the current full pair, carries
-      -- this force's authenticated paid work until its ordinary completion.
-    elseif not prior or refresh then
-      if owned and not refresh then recover_error("default force history is missing") end
-      if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
-          or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
-          or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
-        recover_error("full default owner/debit is not pristine")
-      end
-      if (initializing or refresh) and (source.next_level ~= 4 or source.researched
-          or source.saved_progress ~= 0 or source.occurrences ~= 0) then
-        recover_error("first initialization/new force cannot adopt existing default work")
-      end
-      if not owned and producer.kind == "published511-empty-default"
-          and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
-            or source.occurrences ~= 0 or source.current == recovery.canonical) then
-        recover_error("published11 empty default source has invested or queued worker work")
-      end
-      if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
-        if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
-          recover_error("older default source has unfinished native worker work")
-        end
-        if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
-          recover_error("older MIR501 source requires every native worker4 to be empty")
+      items[#items + 1] = {force=force, phase=prior.phase, action="pending-unchanged", pending_record=clone(prior)}
+    else
+      local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
+      local public = prepared and default_frame(force, recovery.canonical, finished) or source
+      local destination = default_frame(force, id, finished)
+      local gate = gate_frame(force, owned ~= nil and context.configuration == true)
+      local refresh = context.created_force == force.index or context.reset_force == force.index
+      if context.created_force == force.index and prior then recover_error("new default force already has history") end
+      local action, next_force = "validate", prior and clone(prior) or nil
+      local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
+      if legacy_active and prior and prior.phase == "legacy" then
+        if refresh then
+          -- A force reset intentionally discards that force's native progress.
+          -- It may therefore resume ordinary current-contract ownership only
+          -- after the old holder itself proves empty.  Do not call an observed
+          -- reset permission to erase historical paid work that survived it.
+          if not pristine_default_frame(legacy, recovery.published517_se_id) or legacy.visible then
+            recover_error("published517 SE paid-worker reset retained historical work")
+          end
+        elseif not legacy_paid_pair(source, destination, gate, legacy) then
+          recover_error("published517 SE paid-worker active frame differs")
+        else
+          action = "legacy-validate"
         end
       end
-      if source.occurrences > 0 then requeueable(force, source, true, true) end
-      if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
-      action, moved = "transfer", true
-      next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
-        disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
-    elseif not full_pair(source, destination, gate) then
-      if finished and source.next_level == 4 and not source.researched and not source.enabled
-          and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
-          and destination.next_level >= 5 then
-        action = "first-credit"
-      else recover_error("full default native owner/first-level debit changed") end
+      if action == "legacy-validate" then
+        -- The historical holder, rather than the current full pair, carries
+        -- this force's authenticated paid work until its ordinary completion.
+      elseif not prior or refresh then
+        if owned and not refresh then recover_error("default force history is missing") end
+        if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
+            or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
+            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
+          recover_error("full default owner/debit is not pristine")
+        end
+        if (initializing or refresh) and (source.next_level ~= 4 or source.researched
+            or source.saved_progress ~= 0 or source.occurrences ~= 0) then
+          recover_error("first initialization/new force cannot adopt existing default work")
+        end
+        if not owned and producer.kind == "published511-empty-default"
+            and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
+              or source.occurrences ~= 0 or source.current == recovery.canonical) then
+          recover_error("published11 empty default source has invested or queued worker work")
+        end
+        if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
+          if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
+            recover_error("older default source has unfinished native worker work")
+          end
+          if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
+            recover_error("older MIR501 source requires every native worker4 to be empty")
+          end
+        end
+        if source.occurrences > 0 then requeueable(force, source, true, true) end
+        if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
+        action, moved = "transfer", true
+        next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
+          disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
+      elseif not full_pair(source, destination, gate) then
+        if finished and source.next_level == 4 and not source.researched and not source.enabled
+            and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
+            and destination.next_level >= 5 then
+          action = "first-credit"
+        else recover_error("full default native owner/first-level debit changed") end
+      end
+      if action == "validate" and gate.enabled then action = "settle-gate" end
+      record.forces[force.index] = next_force
+      items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
+        gate_enabled=gate.enabled,
+        bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
+        moved=action == "transfer", action=action,
+        target_enabled=public.enabled, target_visible=public.visible}
     end
-    if action == "validate" and gate.enabled then action = "settle-gate" end
-    record.forces[force.index] = next_force
-    items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
-      gate_enabled=gate.enabled,
-      bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
-      moved=action == "transfer", action=action,
-      target_enabled=public.enabled, target_visible=public.visible}
   end
+  if local_force and not seen[local_force] then recover_error("default local event force is unavailable") end
   if #items == 0 then recover_error("default transfer requires native force frames") end
   if owned then
     for index in pairs(owned.forces) do if not seen[index] then recover_error("stale default owner force record") end end
   end
   local changed = not owned or not equal_plain(record, owned)
   for _, item in ipairs(items) do
-    if item.action ~= "validate" and item.action ~= "legacy-validate" then changed = true end
+    if item.action ~= "validate" and item.action ~= "legacy-validate" and item.action ~= "pending-unchanged" then changed = true end
   end
   return {kind="default-native-owner-transfer", event=clone(event), context=clone(context), initializing=initializing,
     prior_state=state, prior_owner=owned, contract=contract, cap=selected_cap, enabled=selected_enabled, items=items,
@@ -1610,7 +1618,11 @@ function M.apply_default_owner_transfer(plan)
       or not equal_plain(plan.record, fresh.record) then recover_error("stale default transfer plan") end
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
-    if old.force.index ~= item.force.index or old.action ~= item.action or old.gate_paid ~= item.gate_paid
+    if item.action == "pending-unchanged" then
+      if old.force ~= item.force or old.action ~= item.action or not equal_plain(old.pending_record, item.pending_record) then
+        recover_error("pending completion changed after default preflight")
+      end
+    elseif old.force.index ~= item.force.index or old.action ~= item.action or old.gate_paid ~= item.gate_paid
         or old.bonus ~= item.bonus or not equal_plain(frame_values(old.source), frame_values(item.source))
         or not equal_plain(frame_values(old.public), frame_values(item.public))
         or not equal_plain(frame_values(old.destination), frame_values(item.destination))
@@ -1620,80 +1632,89 @@ function M.apply_default_owner_transfer(plan)
   end
   local id = recovery.ordinary_default_id
   for _, item in ipairs(fresh.items) do
-    local previous = default_mutating_force
-    default_mutating_force = item.force.index
-    local ok, message = pcall(function()
-      local frame, holder, canonical, gate = item.source, item.destination.technology, item.public.technology, item.gate
-      if item.action == "transfer" then
-        if holder.level ~= frame.next_level or holder.researched then holder.level = frame.next_level end
-        holder.enabled, holder.visible_when_disabled = item.target_enabled, item.target_visible
-        local public_level = frame.next_level >= 5 and 5 or 4
-        if canonical.level ~= public_level or canonical.researched then canonical.level = public_level end
-        canonical.enabled, canonical.visible_when_disabled = false, item.target_visible
-        set_gate_paid(gate, frame.next_level >= 5)
-        if fresh.prepared_default then
-          frame.technology.level = 4
-          frame.technology.enabled, frame.technology.visible_when_disabled = false, false
-          frame.technology.saved_progress = 0
+    if item.action ~= "pending-unchanged" then
+      local previous = default_mutating_force
+      default_mutating_force = item.force.index
+      local ok, message = pcall(function()
+        local frame, holder, canonical, gate = item.source, item.destination.technology, item.public.technology, item.gate
+        if item.action == "transfer" then
+          if holder.level ~= frame.next_level or holder.researched then holder.level = frame.next_level end
+          holder.enabled, holder.visible_when_disabled = item.target_enabled, item.target_visible
+          local public_level = frame.next_level >= 5 and 5 or 4
+          if canonical.level ~= public_level or canonical.researched then canonical.level = public_level end
+          canonical.enabled, canonical.visible_when_disabled = false, item.target_visible
+          set_gate_paid(gate, frame.next_level >= 5)
+          if fresh.prepared_default then
+            frame.technology.level = 4
+            frame.technology.enabled, frame.technology.visible_when_disabled = false, false
+            frame.technology.saved_progress = 0
+          end
+          canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
+          if frame.occurrences > 0 then
+            local queue = {}
+            local source_id = fresh.prepared_default and recovery.id or recovery.canonical
+            for index, name in ipairs(frame.queue) do queue[index] = name == source_id and id or name end
+            assign_queue(item.force, frame, queue, true, id, nil, source_id)
+          end
+          canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
+          if fresh.prepared_default then frame.technology.saved_progress = 0 end
+          if frame.current == (fresh.prepared_default and recovery.id or recovery.canonical) then item.force.research_progress = frame.current_progress end
+          if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("native full default work price differs") end
+        elseif item.action == "first-credit" then
+          -- The paid work is already on T4. Never rewrite its queue or progress
+          -- at completion, including the observed nil-current/queued remainder.
+          canonical.level = 5
+          canonical.enabled, canonical.visible_when_disabled = false, frame.visible
+          set_gate_paid(gate, true)
+        elseif item.action == "settle-gate" then
+          gate.enabled = false
         end
-        canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
-        if frame.occurrences > 0 then
-          local queue = {}
-          local source_id = fresh.prepared_default and recovery.id or recovery.canonical
-          for index, name in ipairs(frame.queue) do queue[index] = name == source_id and id or name end
-          assign_queue(item.force, frame, queue, true, id, nil, source_id)
-        end
-        canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
-        if fresh.prepared_default then frame.technology.saved_progress = 0 end
-        if frame.current == (fresh.prepared_default and recovery.id or recovery.canonical) then item.force.research_progress = frame.current_progress end
-        if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("native full default work price differs") end
-      elseif item.action == "first-credit" then
-        -- The paid work is already on T4. Never rewrite its queue or progress
-        -- at completion, including the observed nil-current/queued remainder.
-        canonical.level = 5
-        canonical.enabled, canonical.visible_when_disabled = false, frame.visible
-        set_gate_paid(gate, true)
-      elseif item.action == "settle-gate" then
-        gate.enabled = false
-      end
-    end)
-    default_mutating_force = previous
-    if not ok then error(message, 0) end
+      end)
+      default_mutating_force = previous
+      if not ok then error(message, 0) end
+    end
   end
   for _, item in ipairs(fresh.items) do
-    local finished = fresh.context.finished_force == item.force.index
-    local actual_source = default_frame(item.force, recovery.canonical, finished)
-    local actual_owner, gate = default_frame(item.force, id, finished), gate_frame(item.force)
-    if (item.action ~= "legacy-validate" and not full_pair(actual_source, actual_owner, gate))
-        or native_bonus(item.force) ~= item.bonus
-        or actual_source.visible ~= item.public.visible then
-      recover_error("native full default contribution/first-level state was not preserved; reload the original copy")
-    end
-    if item.action == "transfer" then
-      local expected = frame_values(item.source)
-      local source_id = fresh.prepared_default and recovery.id or recovery.canonical
-      expected.researched = false
-      expected.enabled, expected.visible = item.target_enabled, item.target_visible
-      expected.current = expected.current == source_id and id or expected.current
-      for index, name in ipairs(expected.queue) do if name == source_id then expected.queue[index] = id end end
-      if expected.queued_saved[source_id] ~= nil then
-        expected.queued_saved[id], expected.queued_saved[source_id] = expected.queued_saved[source_id], nil
+    if item.action == "pending-unchanged" then
+      if storage[OWNER_KEY] ~= fresh.prior_owner
+          or not equal_plain(item.pending_record, fresh.prior_owner.forces[item.force.index]) then
+        recover_error("pending completion changed during default mutation; reload the original copy")
       end
-      if item.source.researched then expected.count = actual_owner.count end
-      if not equal_plain(expected, frame_values(actual_owner)) or actual_source.visible ~= item.public.visible then
-        recover_error("native full default transfer did not preserve the exact frame; reload the original copy")
+    else
+      local finished = fresh.context.finished_force == item.force.index
+      local actual_source = default_frame(item.force, recovery.canonical, finished)
+      local actual_owner, gate = default_frame(item.force, id, finished), gate_frame(item.force)
+      if (item.action ~= "legacy-validate" and not full_pair(actual_source, actual_owner, gate))
+          or native_bonus(item.force) ~= item.bonus
+          or actual_source.visible ~= item.public.visible then
+        recover_error("native full default contribution/first-level state was not preserved; reload the original copy")
       end
-    elseif item.action == "legacy-validate" then
-      local actual_legacy = default_frame(item.force, recovery.published517_se_id, finished)
-      if not legacy_paid_pair(actual_source, actual_owner, gate, actual_legacy)
-          or not equal_plain(frame_values(item.legacy), frame_values(actual_legacy)) then
-        recover_error("validated published517 SE paid worker changed")
+      if item.action == "transfer" then
+        local expected = frame_values(item.source)
+        local source_id = fresh.prepared_default and recovery.id or recovery.canonical
+        expected.researched = false
+        expected.enabled, expected.visible = item.target_enabled, item.target_visible
+        expected.current = expected.current == source_id and id or expected.current
+        for index, name in ipairs(expected.queue) do if name == source_id then expected.queue[index] = id end end
+        if expected.queued_saved[source_id] ~= nil then
+          expected.queued_saved[id], expected.queued_saved[source_id] = expected.queued_saved[source_id], nil
+        end
+        if item.source.researched then expected.count = actual_owner.count end
+        if not equal_plain(expected, frame_values(actual_owner)) or actual_source.visible ~= item.public.visible then
+          recover_error("native full default transfer did not preserve the exact frame; reload the original copy")
+        end
+      elseif item.action == "legacy-validate" then
+        local actual_legacy = default_frame(item.force, recovery.published517_se_id, finished)
+        if not legacy_paid_pair(actual_source, actual_owner, gate, actual_legacy)
+            or not equal_plain(frame_values(item.legacy), frame_values(actual_legacy)) then
+          recover_error("validated published517 SE paid worker changed")
+        end
+      elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
+        recover_error("native full default owner work changed during first-level credit")
+      elseif (item.action == "validate" or item.action == "settle-gate")
+          and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
+        recover_error("validated native public first-level state changed")
       end
-    elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
-      recover_error("native full default owner work changed during first-level credit")
-    elseif (item.action == "validate" or item.action == "settle-gate")
-        and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
-      recover_error("validated native public first-level state changed")
     end
   end
   if fresh.prepared_default then empty_private() end

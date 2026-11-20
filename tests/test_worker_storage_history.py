@@ -1707,6 +1707,104 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
     def world(self,target="f210"):
         return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
 
+    def test_unrelated_force_operations_preserve_another_forces_pending_completion(self):
+        for pending in (False, True):
+            for operation in ("create", "reset", "finish"):
+                with self.subTest(pending=pending, operation=operation):
+                    lua=self.world("f200")
+                    lua.globals().completion_pending=pending
+                    lua.globals().operation=operation
+                    lua.execute(r'''
+                      published517_source_contract();init_default()
+                      finish_frame(player,"advanced",{ORDINARY},false)
+                      assert(history.default_owner_on_research_finished(finish_event(player)))
+                      player.technologies[ORDINARY].saved_progress=.42
+                      player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+                      current_se_contract()
+                      assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+                      if completion_pending then
+                        local legacy=player.technologies[LEGACY517]
+                        player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+                        assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101})
+                      end
+                      local before,marker=frame(player),copy(storage[OWNER_KEY].forces[player.index])
+                      local event_force=detached
+                      if operation=="create" then
+                        event_force=make_force("late",5);install_force(event_force);game.forces.late=event_force
+                        history.on_force_created{force=event_force}
+                      elseif operation=="finish" then finish_frame(event_force,"advanced",{},false) end
+                      writes=0
+                      local changed
+                      if operation=="create" then changed=history.default_owner_on_force_created{force=event_force}
+                      elseif operation=="reset" then changed=history.default_owner_on_force_reset{force=event_force}
+                      else changed=history.default_owner_on_research_finished(finish_event(event_force)) end
+                      assert(changed and writes>0)
+                      assert(same(before,frame(player)) and same(marker,storage[OWNER_KEY].forces[player.index]))
+                      assert(storage[OWNER_KEY].forces[event_force.index].phase=="owned")
+                      if operation=="finish" then assert(event_force.technologies[CANONICAL].level==5)
+                      else assert(event_force.technologies[ORDINARY].level==4) end
+                    ''')
+
+    def test_pending_completion_does_not_admit_reset_of_its_own_force(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101})
+          local before,marker=all_frames(),copy(storage[OWNER_KEY]);writes=0
+          local ok,message=pcall(history.default_owner_on_force_reset,{force=player})
+          assert(not ok and tostring(message):find("awaiting its bounded native observation",1,true))
+          assert(writes==0 and same(before,all_frames()) and same(marker,storage[OWNER_KEY]))
+          ok,message=pcall(history.default_owner_preflight,published517_se_bridge_event(),nil,true)
+          assert(not ok and tostring(message):find("awaiting its bounded native observation",1,true))
+          assert(writes==0 and same(before,all_frames()) and same(marker,storage[OWNER_KEY]))
+        ''')
+
+    def test_unrelated_force_apply_rejects_a_changed_pending_completion_marker(self):
+        lua=self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          finish_frame(player,"advanced",{ORDINARY},false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.technologies[ORDINARY].saved_progress=.42
+          player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local legacy=player.technologies[LEGACY517]
+          player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
+          assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101})
+          local fresh=make_force("late",5);install_force(fresh);game.forces.late=fresh
+          history.on_force_created{force=fresh}
+          local plan=history.plan_default_owner_transfer(nil,nil,false,{created_force=fresh.index})
+          local owner=storage[OWNER_KEY];owner.forces[player.index].completion_tick=102
+          local before=all_frames();writes=0
+          local ok,message=pcall(history.apply_default_owner_transfer,plan)
+          assert(not ok and tostring(message):find("stale default transfer plan",1,true))
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==owner
+            and owner.forces[player.index].completion_tick==102)
+          -- A nested setter callback must not let the final metadata publish
+          -- overwrite a completion marker changed during native mutation.
+          owner.forces[player.index].completion_tick=101
+          plan=history.plan_default_owner_transfer(nil,nil,false,{created_force=fresh.index})
+          local pending_frame=frame(player)
+          local mt=getmetatable(fresh.technologies[ORDINARY]);local write=mt.__newindex;local nested=false
+          mt.__newindex=function(object,key,value)
+            write(object,key,value)
+            if not nested then nested=true;owner.forces[player.index].completion_tick=103 end
+          end
+          writes=0;ok,message=pcall(history.apply_default_owner_transfer,plan)
+          assert(not ok and tostring(message):find("pending completion changed during default mutation",1,true))
+          assert(nested and writes>0 and same(pending_frame,frame(player)) and storage[OWNER_KEY]==owner
+            and owner.forces[player.index].completion_tick==103)
+        ''')
+
     def test_init_noop_unsupported_provider_and_manual_prepare_are_explicit(self):
         lua=self.world();lua.execute(r'''
           init_default();assert(history.needs_research_events());local b=all_frames();writes=0
