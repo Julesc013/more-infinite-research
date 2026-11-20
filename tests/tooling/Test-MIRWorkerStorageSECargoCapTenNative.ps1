@@ -127,9 +127,30 @@ Add-Check 'candidate partial progress rejects nonfinite marker values' {
 }
 Add-Check 'candidate role, all-force, seven-pack, and configuration observations reject malformed endpoint frames' {
     $wrongRole=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-wrong-role');Write-Text $wrongRole.candidate.log ((Get-Content -LiteralPath $wrongRole.candidate.log -Raw).Replace("worker=$script:CargoPrivateWorker", "worker=$script:CargoSourceWorker"));Assert-Refuses -Contains 'candidate pre-work worker' -Action {Read-CargoCapTenCompleteChain $wrongRole|Out-Null}
-    $foreignForce=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-foreign-force');Write-Text $foreignForce.candidate.log ((Get-Content -LiteralPath $foreignForce.candidate.log -Raw).Replace('force_bonuses=1:7,2:0','force_bonuses=1:7,2:1'));Assert-Refuses -Contains 'candidate force bonus changes differ' -Action {Read-CargoCapTenCompleteChain $foreignForce|Out-Null}
+    $foreignForce=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-foreign-force');Write-Text $foreignForce.candidate.log ((Get-Content -LiteralPath $foreignForce.candidate.log -Raw).Replace('force_bonuses=1:7,2:0','force_bonuses=1:7,2:1'));Assert-Refuses -Contains 'candidate foreign force bonus differs' -Action {Read-CargoCapTenCompleteChain $foreignForce|Out-Null}
     $wrongScience=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-wrong-science');Write-Text $wrongScience.candidate.log ((Get-Content -LiteralPath $wrongScience.candidate.log -Raw).Replace('science_debit=automation-science-pack:7.42','science_debit=automation-science-pack:7.41'));Assert-Refuses -Contains 'candidate closed science accounting automation-science-pack' -Action {Read-CargoCapTenCompleteChain $wrongScience|Out-Null}
     $wrongConfiguration=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-wrong-configuration');Write-Text $wrongConfiguration.candidate.log ((Get-Content -LiteralPath $wrongConfiguration.candidate.log -Raw).Replace('configuration_startup_settings_changed=true','configuration_startup_settings_changed=unknown'));Assert-Refuses -Contains 'candidate configuration observation differs' -Action {Read-CargoCapTenCompleteChain $wrongConfiguration|Out-Null}
+}
+Add-Check 'reader derives a nonzero player baseline and rejects source or candidate foreign-only advances' {
+    $before=[ordered]@{'1'=8.0;'2'=8.0};$healthy=[ordered]@{'1'=10.0;'2'=8.0}
+    Assert-CargoCapTenOnlyWorkerBonusAdvance $before $healthy 10 2 $script:CargoPlayerForceIndex 'healthy candidate'
+    $foreignOnly=[ordered]@{'1'=8.0;'2'=10.0}
+    Assert-Refuses -Contains 'candidate player worker bonus increment' -Action {Assert-CargoCapTenOnlyWorkerBonusAdvance $before $foreignOnly 10 2 $script:CargoPlayerForceIndex 'candidate'}
+
+    $nonzero=New-SyntheticCargoChain (Join-Path $OutputRoot 'nonzero-player-baseline')
+    $sourceText=(Get-Content -LiteralPath $nonzero.source.log -Raw).Replace('force_bonuses=1:0,2:0','force_bonuses=1:3,2:0').Replace('expected_worker_bonus=0','expected_worker_bonus=3').Replace('force_bonuses=1:5,2:0','force_bonuses=1:8,2:0').Replace('expected_worker_bonus=5','expected_worker_bonus=8');Write-Text $nonzero.source.log $sourceText
+    $candidateText=(Get-Content -LiteralPath $nonzero.candidate.log -Raw).Replace('force_bonuses=1:5,2:0','force_bonuses=1:8,2:0').Replace('expected_worker_bonus=5','expected_worker_bonus=8').Replace('force_bonuses=1:7,2:0','force_bonuses=1:10,2:0').Replace('expected_worker_bonus=7','expected_worker_bonus=10');Write-Text $nonzero.candidate.log $candidateText
+    foreach($cold in @($nonzero.cold1,$nonzero.cold2)){$coldText=(Get-Content -LiteralPath $cold.log -Raw).Replace('force_bonuses=1:7,2:0','force_bonuses=1:10,2:0').Replace('expected_worker_bonus=7','expected_worker_bonus=10');Write-Text $cold.log $coldText}
+    Read-CargoCapTenCompleteChain $nonzero|Out-Null
+
+    $foreignSource=New-SyntheticCargoChain (Join-Path $OutputRoot 'source-foreign-only-advance')
+    $sourceText=(Get-Content -LiteralPath $foreignSource.source.log -Raw).Replace('force_bonuses=1:0,2:0','force_bonuses=1:0,2:8').Replace('force_bonuses=1:5,2:0','force_bonuses=1:5,2:10');Write-Text $foreignSource.source.log $sourceText
+    Assert-Refuses -Contains 'source foreign force bonus differs' -Action {Read-CargoCapTenCompleteChain $foreignSource|Out-Null}
+
+    $foreignCandidate=New-SyntheticCargoChain (Join-Path $OutputRoot 'candidate-foreign-only-advance')
+    $sourceText=(Get-Content -LiteralPath $foreignCandidate.source.log -Raw).Replace('force_bonuses=1:0,2:0','force_bonuses=1:0,2:8').Replace('force_bonuses=1:5,2:0','force_bonuses=1:5,2:8');Write-Text $foreignCandidate.source.log $sourceText
+    $candidateText=(Get-Content -LiteralPath $foreignCandidate.candidate.log -Raw).Replace('force_bonuses=1:5,2:0','force_bonuses=1:5,2:8').Replace('force_bonuses=1:7,2:0','force_bonuses=1:7,2:10');Write-Text $foreignCandidate.candidate.log $candidateText
+    Assert-Refuses -Contains 'candidate foreign force bonus differs' -Action {Read-CargoCapTenCompleteChain $foreignCandidate|Out-Null}
 }
 Add-Check 'every source, successor, and cold stage requires its active-mod and construction data markers' {
     $wrongMod=New-SyntheticCargoChain (Join-Path $OutputRoot 'active-wrong-mir');Write-Text $wrongMod.source.log ((Get-Content -LiteralPath $wrongMod.source.log -Raw).Replace('more-infinite-research@4.7.20002','more-infinite-research@5.0.20018'));Assert-Refuses -Contains 'source active-mods data marker differs' -Action {Read-CargoCapTenCompleteChain $wrongMod|Out-Null}
