@@ -158,6 +158,7 @@ $controls = @(
   [ordered]@{path='tests/test_fixture_controls.py';lua=$true},
   [ordered]@{path='tests/test_foreign_research_preservation.py';lua=$true},
   [ordered]@{path='tests/test_capture_controls.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_se_cap_ten_data_observer.py';lua=$true},
   [ordered]@{path='tests/test_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_native_owners.py';lua=$true},
   [ordered]@{path='tests/test_module_permissions_override.py';lua=$true},
