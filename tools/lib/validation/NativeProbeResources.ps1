@@ -52,7 +52,8 @@ function New-MIRNativeProbeResourceContext {
 
 function Add-MIRNativeProbeImmutableLease {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)]$Lease)
-  if($null -ne $Context.policy.PSObject.Properties['linux_write_storage']){throw '[mir-linux-storage-no-external-hardlinks]'}
+  $policyProperty=$Context.PSObject.Properties['policy']
+  if($null -ne $policyProperty -and $null -ne $policyProperty.Value.PSObject.Properties['linux_write_storage']){throw '[mir-linux-storage-no-external-hardlinks]'}
   if(-not $Lease.record.Contains('require_hard_links') -or -not $Lease.record.require_hard_links) {
     throw '[mir-native-probe-strict-lease-required]'
   }
@@ -74,7 +75,8 @@ function Add-MIRNativeProbeImmutableLease {
 
 function Get-MIRNativeProbeRemainingOutputBytes {
   param([Parameter(Mandatory)]$Context,[switch]$IncludeResultReserve)
-  $storageProperty=$Context.policy.PSObject.Properties['linux_write_storage']
+  $policyProperty=$Context.PSObject.Properties['policy']
+  $storageProperty=if($null -ne $policyProperty){$policyProperty.Value.PSObject.Properties['linux_write_storage']}else{$null}
   if($null -ne $storageProperty){
     $observation=Get-MIRLinuxWriteStorageObservation -Storage $storageProperty.Value
     [int64]$newBytes=0
@@ -125,7 +127,8 @@ function Get-MIRNativeProbeRemainingOutputBytes {
 
 function Add-MIRNativeProbeLibraryActivation {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)]$Activation)
-  $storageProperty=$Context.policy.PSObject.Properties['linux_write_storage']
+  $policyProperty=$Context.PSObject.Properties['policy']
+  $storageProperty=if($null -ne $policyProperty){$policyProperty.Value.PSObject.Properties['linux_write_storage']}else{$null}
   if($null -ne $storageProperty -and [IO.Path]::GetFullPath($Activation.library) -cne @($storageProperty.Value.roots | Where-Object role -CEQ 'library')[0].path){throw '[mir-linux-storage-library-root]'}
   if($Activation.closed -or -not $Activation.lock.CanRead -or
     (Test-MIR441PathContained -Root $Context.root -Path $Activation.library)) {throw '[mir-native-probe-library-activation]'}

@@ -56,6 +56,12 @@ try{
   [IO.Directory]::CreateDirectory($scratch) | Out-Null
   $dataRoot=Join-Path $scratch 'data';$controlRoot=Join-Path $scratch 'control';$libraryRoot=Join-Path $scratch 'library'
   foreach($directory in @($dataRoot,$controlRoot,$libraryRoot)){[IO.Directory]::CreateDirectory($directory) | Out-Null}
+  $minimal=Join-Path $scratch 'legacy-scan';[IO.Directory]::CreateDirectory($minimal) | Out-Null
+  $junction=Join-Path $minimal 'excluded'
+  New-Item -ItemType $(if($IsWindows){'Junction'}else{'SymbolicLink'}) -Path $junction -Target $libraryRoot | Out-Null
+  try{
+    Refuses-Storage {Get-MIRNativeProbeRemainingOutputBytes -Context ([pscustomobject]@{aliases=@();root=$minimal})} '[mir441-resource-output-scan-incomplete] '
+  }finally{[IO.Directory]::Delete($junction)}
   if($LinuxDataTestParent -or $LinuxLibraryRoot){
     if(-not $IsLinux -or -not $LinuxDataTestParent -or -not $LinuxLibraryRoot){throw 'Linux mount controls require both explicit existing input roots.'}
     $parent=Resolve-MIRLinuxWritePath -Path $LinuxDataTestParent
