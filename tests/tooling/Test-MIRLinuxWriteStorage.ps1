@@ -56,6 +56,8 @@ try{
   [IO.Directory]::CreateDirectory($scratch) | Out-Null
   $dataRoot=Join-Path $scratch 'data';$controlRoot=Join-Path $scratch 'control';$libraryRoot=Join-Path $scratch 'library'
   foreach($directory in @($dataRoot,$controlRoot,$libraryRoot)){[IO.Directory]::CreateDirectory($directory) | Out-Null}
+  $filesystemRoot=[IO.Path]::GetPathRoot($scratch)
+  Assert-Storage ((Resolve-MIRLinuxWritePath -Path $filesystemRoot) -ceq $filesystemRoot) 'filesystem-root-metadata'
   $minimal=Join-Path $scratch 'legacy-scan';[IO.Directory]::CreateDirectory($minimal) | Out-Null
   $junction=Join-Path $minimal 'excluded'
   New-Item -ItemType $(if($IsWindows){'Junction'}else{'SymbolicLink'}) -Path $junction -Target $libraryRoot | Out-Null

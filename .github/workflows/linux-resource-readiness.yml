@@ -7,12 +7,29 @@ on:
       - 'tools/lib/validation/ResourceGovernor.ps1'
       - 'tools/lib/validation/LinuxResourceObservation.py'
       - 'tools/lib/validation/NativeProbeResources.ps1'
+      - 'tools/lib/validation/LinuxWriteStorage.ps1'
+      - 'tests/test_linux_write_storage.py'
+      - 'tests/tooling/Test-MIRLinuxWriteStorage.ps1'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  write-storage-controls:
+    name: linux-write-storage-controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check current capacity rules and real Linux mount paths without an engine
+        env:
+          MIR_REQUIRE_LINUX_WRITE_MOUNTS: '1'
+        run: python3 -B tests/test_linux_write_storage.py
+
   resource-readiness:
     name: linux-resource-readiness
     runs-on: ubuntu-24.04

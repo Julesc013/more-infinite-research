@@ -5,8 +5,10 @@ Set-StrictMode -Version Latest
 function Resolve-MIRLinuxWritePath {
   param([Parameter(Mandatory)][string]$Path)
   if(-not [IO.Path]::IsPathFullyQualified($Path)){throw '[mir-linux-storage-absolute-path]'}
-  $full=[IO.Path]::GetFullPath($Path).TrimEnd([IO.Path]::DirectorySeparatorChar)
-  if(-not $full){throw '[mir-linux-storage-root-path]'}
+  $full=[IO.Path]::GetFullPath($Path)
+  # '/' is a valid mount identity. The plan separately requires each job
+  # directory to be a strict child of its mount; never trim that identity away.
+  if($full -cne [IO.Path]::GetPathRoot($full)){$full=$full.TrimEnd([IO.Path]::DirectorySeparatorChar)}
   $current=$full
   while($current){
     if(Test-Path -LiteralPath $current){
