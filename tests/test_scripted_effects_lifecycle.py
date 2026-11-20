@@ -37,6 +37,66 @@ class ScriptedEffectsLifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_invalid_resolved_configuration_root_refuses_before_world_or_saved_state_access(self):
+        for value in (False, True, "invalid", 1):
+            with self.subTest(value=value):
+                self.setUp()
+                self.lua.globals().invalid_configuration = value
+                self.lua.execute(r'''
+                  package.preload["runtime.configuration"] = function() return invalid_configuration end
+                  storage = setmetatable({}, {
+                    __index=function() error("read saved state before valid configuration") end,
+                    __newindex=function() error("wrote saved state before valid configuration") end
+                  })
+                  game = setmetatable({}, {
+                    __index=function() error("read world before valid configuration") end,
+                    __newindex=function() error("wrote world before valid configuration") end
+                  })
+                  local ok, reason = pcall(require, "runtime.scripted_effects")
+                  assert(not ok and tostring(reason):find("MIR scripted-effects requires a resolved configuration table", 1, true),
+                    "invalid configuration root did not receive its bounded contract refusal: " .. tostring(reason))
+                ''')
+
+    def test_invalid_resolved_configuration_refuses_before_world_or_saved_state_access(self):
+        for feature in ("agricultural_growth_speed", "spoilage_preservation"):
+            for fault in ("absent", "not-table", "missing-enabled", "invalid-enabled",
+                          "missing-percent", "invalid-percent", "negative-percent",
+                          "infinite-percent", "nan-percent"):
+                with self.subTest(feature=feature, fault=fault):
+                    self.setUp()
+                    self.lua.globals().invalid_feature = feature
+                    self.lua.globals().configuration_fault = fault
+                    self.lua.execute(r'''
+                      local config = {
+                        agricultural_growth_speed = {enabled=true, effect_percent=1},
+                        spoilage_preservation = {enabled=true, effect_percent=1},
+                        options = {}
+                      }
+                      local row = config[invalid_feature]
+                      if configuration_fault == "absent" then config[invalid_feature] = nil
+                      elseif configuration_fault == "not-table" then config[invalid_feature] = false
+                      elseif configuration_fault == "missing-enabled" then row.enabled = nil
+                      elseif configuration_fault == "invalid-enabled" then row.enabled = "true"
+                      elseif configuration_fault == "missing-percent" then row.effect_percent = nil
+                      elseif configuration_fault == "invalid-percent" then row.effect_percent = "1"
+                      elseif configuration_fault == "negative-percent" then row.effect_percent = -1
+                      elseif configuration_fault == "infinite-percent" then row.effect_percent = math.huge
+                      elseif configuration_fault == "nan-percent" then row.effect_percent = 0/0 end
+                      package.preload["runtime.configuration"] = function() return config end
+                      storage = setmetatable({}, {
+                        __index=function() error("read saved state before valid configuration") end,
+                        __newindex=function() error("wrote saved state before valid configuration") end
+                      })
+                      game = setmetatable({}, {
+                        __index=function() error("read world before valid configuration") end,
+                        __newindex=function() error("wrote world before valid configuration") end
+                      })
+                      local ok, reason = pcall(require, "runtime.scripted_effects")
+                      assert(not ok, "invalid active configuration was silently admitted")
+                      assert(tostring(reason):find(invalid_feature, 1, true),
+                        "configuration refusal did not identify the affected feature: " .. tostring(reason))
+                    ''')
+
     def test_imports_historical_buckets_and_uses_named_event_paths(self):
         self.lua.execute(r'''
           local agriculture = "recipe-prod-research_agricultural_growth_speed-1"
