@@ -37,6 +37,26 @@ class ScriptedEffectsLifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_invalid_resolved_configuration_root_refuses_before_world_or_saved_state_access(self):
+        for value in (False, True, "invalid", 1):
+            with self.subTest(value=value):
+                self.setUp()
+                self.lua.globals().invalid_configuration = value
+                self.lua.execute(r'''
+                  package.preload["runtime.configuration"] = function() return invalid_configuration end
+                  storage = setmetatable({}, {
+                    __index=function() error("read saved state before valid configuration") end,
+                    __newindex=function() error("wrote saved state before valid configuration") end
+                  })
+                  game = setmetatable({}, {
+                    __index=function() error("read world before valid configuration") end,
+                    __newindex=function() error("wrote world before valid configuration") end
+                  })
+                  local ok, reason = pcall(require, "runtime.scripted_effects")
+                  assert(not ok and tostring(reason):find("MIR scripted-effects requires a resolved configuration table", 1, true),
+                    "invalid configuration root did not receive its bounded contract refusal: " .. tostring(reason))
+                ''')
+
     def test_invalid_resolved_configuration_refuses_before_world_or_saved_state_access(self):
         for feature in ("agricultural_growth_speed", "spoilage_preservation"):
             for fault in ("absent", "not-table", "missing-enabled", "invalid-enabled",

@@ -11,6 +11,9 @@ local AGRICULTURE_BUCKET = "agricultural_growth_speed"
 local SPOILAGE_BUCKET = "spoilage_preservation"
 
 local function resolved_config(name)
+  if type(effective_values) ~= "table" then
+    error("MIR scripted-effects requires a resolved configuration table", 2)
+  end
   local values = effective_values[name]
   if type(values) ~= "table" or type(values.enabled) ~= "boolean" then
     error("MIR scripted-effects requires resolved " .. name .. " configuration", 2)
