@@ -733,7 +733,7 @@ local function observe_cap12_configuration(event, state)
   check(change_valid, "cap12 MIR change differs")
   check(prototype_available and maximum_available and count_available and time_available and formula_available,
     "cap12 current contract unavailable")
-  check(type(maximum) == "number" and type(count) == "number" and type(time) == "number" and type(formula) == "string",
+  check(contribution_finite(maximum) and contribution_finite(count) and contribution_finite(time) and type(formula) == "string",
     "cap12 current contract differs")
   observe_force_contributions("cap12-configuration")
   frame_diagnostics(state.closed, observed, "cap12-configuration")

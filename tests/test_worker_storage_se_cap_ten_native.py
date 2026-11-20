@@ -870,6 +870,37 @@ local function assert_candidate_transfer(state)'''
         with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
             self.lua.globals().cargo_tick(1)
 
+    def test_cap12_configuration_logs_and_refuses_nonfinite_current_contract_scalars(self):
+        cases = (
+            ("maximum-nan", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].prototype.max_level=0/0", "maximum="),
+            ("count-infinity", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].research_unit_count=math.huge", "unit_count="),
+            ("time-negative-infinity", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].research_unit_energy=-math.huge", "unit_time="),
+        )
+        for label, mutate, field in cases:
+            with self.subTest(label=label):
+                actor = self.fresh_actor()
+                self.candidate_to_closed(actor)
+                before = {
+                    "phase": actor.globals().cargo_phase(),
+                    "saves": list(actor.globals().cargo_saves().values()),
+                    "science": dict(actor.globals().cargo_counts().items()),
+                    "bonus": actor.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+                    "current": actor.globals().cargo_current_name(),
+                    "queue": list(actor.globals().cargo_queue_names().values()),
+                }
+                actor.execute(mutate)
+                with self.assertRaisesRegex(LuaError, "cap12 current contract differs"):
+                    self.closed_cap12_configuration(actor)
+                snapshot = next(line for line in actor.globals().cargo_logs().values()
+                                if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+                self.assertIn(field, snapshot)
+                self.assertEqual(before["phase"], actor.globals().cargo_phase())
+                self.assertEqual(before["saves"], list(actor.globals().cargo_saves().values()))
+                self.assertEqual(before["science"], dict(actor.globals().cargo_counts().items()))
+                self.assertEqual(before["bonus"], actor.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+                self.assertEqual(before["current"], actor.globals().cargo_current_name())
+                self.assertEqual(before["queue"], list(actor.globals().cargo_queue_names().values()))
+
     def test_cap12_configuration_marks_an_unavailable_mir_change_before_refusing_it(self):
         self.candidate_to_closed()
         self.lua.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
