@@ -116,6 +116,54 @@ try{
       New-Item -ItemType SymbolicLink -Path $link -Target $external | Out-Null
       Refuses-Storage {Resolve-MIRLinuxWritePath -Path $link} '[mir-linux-storage-reparse]'
       Remove-Item -LiteralPath $link
+      # Run the real library launch path/config guards against this actual
+      # external data mount. Only final archive activation observation is
+      # substituted: this host control never leases the supplied library.
+      . (Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1')
+      $activationGuard=${function:Assert-MIRLibraryActivation}
+      $script:storageLaunchObservations=0
+      function Assert-MIRLibraryActivation {param($Activation,$OwnedProcesses) $script:storageLaunchObservations++}
+      $launchConfig=Join-Path $external 'config.ini'
+      $launchWrite=Join-Path $external 'write-data'
+      try{
+        [IO.Directory]::CreateDirectory($launchWrite) | Out-Null
+        $launchEngine=Join-Path $scratch 'launch-engine/bin/x64/factorio'
+        $launchData=Join-Path $scratch 'launch-engine/data'
+        [IO.Directory]::CreateDirectory($launchData) | Out-Null
+        [IO.File]::WriteAllText($launchConfig,"[path]`nread-data=$launchData`nwrite-data=$launchWrite`n[other]`nenable-new-mods=false`n")
+        $launchActivation=[pscustomobject]@{library=$LinuxLibraryRoot;engine_data=$launchData}
+        $launchArguments=@('--config',$launchConfig,'--mod-directory',$LinuxLibraryRoot)
+        $launchPolicy=[pscustomobject]@{linux_write_storage=$storage}
+        Refuses-Storage {Assert-MIRLibraryLaunch -Activation $launchActivation -FactorioBin $launchEngine -Arguments $launchArguments} '[mir441-resource-output-root]'
+        Assert-MIRLibraryLaunch -Activation $launchActivation -FactorioBin $launchEngine -Arguments $launchArguments -WriteStoragePolicy $launchPolicy
+        Assert-Storage ($script:storageLaunchObservations -eq 1) 'external-config-launch-observation'
+        # Exercise the actual generic fixture stage's handoff too. Stop at
+        # the process boundary after its real path/library launch validation.
+        $tokens=$null;$parseErrors=$null
+        $runnerAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tools/Invoke-NativeFixture.ps1'),[ref]$tokens,[ref]$parseErrors)
+        $stage=@($runnerAst.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Invoke-FixtureStage'},$true))
+        Assert-Storage ($parseErrors.Count -eq 0 -and $stage.Count -eq 1) 'actual-fixture-stage-source'
+        Invoke-Expression $stage[0].Extent.Text
+        $processActor=${function:Invoke-MIRNativeProbeFactorioProcess}
+        function Invoke-MIRNativeProbeFactorioProcess {throw '[storage-control-before-native-process]'}
+        try{
+          $config=$launchConfig;$writeData=$launchWrite;$activation=$launchActivation;$engine=$launchEngine
+          $historicalProcess=$true;$historical=$true;$historicalFixture=@{factorio_version='0.13'}
+          $activeModsObserverName='';$resources=[pscustomobject]@{policy=$launchPolicy};$TimeoutSeconds=30;$AdmissionWaitSeconds=0
+          Refuses-Storage {Invoke-FixtureStage -Name 'launch-composition-control' -StageArguments @('--create','unused.zip')} '[storage-control-before-native-process]'
+        }finally{Set-Item Function:Invoke-MIRNativeProbeFactorioProcess $processActor}
+        Assert-Storage ($script:storageLaunchObservations -eq 2) 'generic-fixture-admitted-launch-handoff'
+        $dataPin=@($storage.roots | Where-Object role -CEQ 'data')[0]
+        $dataPin.mount_id++
+        try{Refuses-Storage {Assert-MIRLibraryLaunch -Activation $launchActivation -FactorioBin $launchEngine -Arguments $launchArguments -WriteStoragePolicy $launchPolicy} '[mir-linux-storage-mount-changed]'}finally{$dataPin.mount_id--}
+        [IO.File]::WriteAllText($launchConfig,"[path]`nread-data=$launchData`nwrite-data=$controlRoot`n[other]`nenable-new-mods=false`n")
+        Refuses-Storage {Assert-MIRLibraryLaunch -Activation $launchActivation -FactorioBin $launchEngine -Arguments $launchArguments -WriteStoragePolicy $launchPolicy} '[mir-linux-storage-output-path]'
+        Assert-Storage ($script:storageLaunchObservations -eq 2) 'bad-launch-paths-stop-before-activation'
+      }finally{
+        Set-Item Function:Assert-MIRLibraryActivation $activationGuard
+        if(Test-Path -LiteralPath $launchConfig){Remove-Item -LiteralPath $launchConfig}
+        if(Test-Path -LiteralPath $launchWrite){[IO.Directory]::Delete($launchWrite)}
+      }
       if($GovernedSplitChild){
         # Exercise the existing actor, not its later mock: real POSIX session,
         # control working directory/TEMP, external data captures and cleanup.
@@ -133,7 +181,13 @@ print(json.dumps({"cwd": os.getcwd(), "temp": os.environ["TMPDIR"], "pid": os.ge
         Assert-Storage ($run.result.passed -and $run.result.exit_code -eq 0 -and $witness.cwd -ceq $controlRoot) 'governed-child-control-cwd'
         Assert-Storage ((Test-MIR441PathContained -Root $controlRoot -Path $witness.temp) -and -not (Test-Path -LiteralPath $witness.temp)) 'governed-child-owned-temp-cleanup'
         Assert-Storage ($witness.pid -eq $witness.session) 'governed-child-owned-session'
-        Assert-Storage ((Test-MIR441PathContained -Root $external -Path $run.stdout) -and (Test-MIR441PathContained -Root $external -Path $run.ledger)) 'governed-child-data-captures'
+        foreach($capture in @($run.stdout,$run.stderr,$run.ledger)){
+          Assert-Storage ((Test-MIR441PathContained -Root $external -Path $capture) -and (Test-Path -LiteralPath $capture -PathType Leaf)) 'governed-child-data-capture-file'
+        }
+        $monitor=@(Get-Content -LiteralPath $run.ledger | Where-Object {$_} | ForEach-Object {$_ | ConvertFrom-Json})
+        Assert-Storage ($monitor.Count -ge 2 -and @($monitor | Where-Object phase -CEQ 'completed').Count -eq 1 -and $monitor[-1].phase -ceq 'completed' -and $monitor[-1].exit_code -eq 0) 'governed-child-monitor-completion'
+        Assert-Storage (@($monitor | Where-Object {$null -ne $_.PSObject.Properties['process'] -and $_.process.phase -ceq 'running'}).Count -ge 1) 'governed-child-monitor-live-sample'
+        Assert-Storage (@(Get-ChildItem -LiteralPath $controlRoot -Force).Count -eq 0) 'governed-child-control-residue'
         $payloadBytes=[IO.File]::ReadAllBytes($payload)
         Assert-Storage ($payloadBytes.Length -eq 65536 -and @($payloadBytes|Where-Object {$_ -ne 90}).Count -eq 0) 'governed-child-external-file'
         Write-MIRNativeProbeResult -Context $context -Record ([ordered]@{kind='MIRLinuxGovernedSplitChildControlV1';passed=$true;factorio_started=$false;child=$witness;data_root=$context.root;payload_sha256=(Get-FileHash -LiteralPath $payload).Hash})
