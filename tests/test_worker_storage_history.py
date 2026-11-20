@@ -1313,7 +1313,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
     def test_automatic_owner_contract_investment_disjuncts_are_independent(self):
         source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
-        marker="\nlocal function automatic_owner_contract_has_invested_work()"
+        marker="\nlocal function automatic_owner_contract_has_invested_work(owned)"
         self.assertEqual(source.count(marker),1)
         exposed=source.replace(marker,"\nM._test_default_owner_frame_has_invested_work=default_owner_frame_has_invested_work"+marker)
         disjuncts={
@@ -1844,6 +1844,133 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
     def world(self,target="f210"):
         return build_default_native_owner_world(LuaRuntime, target=target, source_root=ROOT / "source")
+
+    def retuned_legacy_world(self, *, price=False, time=False, before_retune=None):
+        """Old five-pack work and future seven-pack terms are independent inputs."""
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract();init_default()
+          for _,force in ipairs{player,suspended}do
+            finish_frame(force,"advanced",{ORDINARY},false)
+            assert(history.default_owner_on_research_finished(finish_event(force)))
+            force.technologies[ORDINARY].saved_progress=.42
+            force.research_queue={ORDINARY,ORDINARY,OTHER};force.research_progress=.42
+          end
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          old_current_contract=storage[OWNER_KEY].contract
+          old_legacy_contract=storage[OWNER_KEY].legacy.contract
+        ''')
+        if before_retune:
+            lua.execute(before_retune)
+        if price:
+            lua.execute(r'''
+              local config=require("runtime.configuration").streams["worker-robots-storage"]
+              config.base_cost,config.growth_factor=900,2
+              for _,id in ipairs{CANONICAL,ORDINARY,ID}do
+                prototypes.technology[id].research_unit_count_formula="7200*2^(L-4)"
+                for _,force in pairs(game.forces)do
+                  local row=force.technologies[id];local mt=getmetatable(row);local read=mt.__index
+                  mt.__index=function(object,key)
+                    if key=="research_unit_count"then return math.floor(7200*2^(read(object,"level")-4))end
+                    return read(object,key)
+                  end
+                end
+              end
+            ''')
+        if time:
+            lua.execute(r'''
+              require("runtime.configuration").streams["worker-robots-storage"].research_time=120
+              for _,id in ipairs{CANONICAL,ORDINARY,ID}do prototypes.technology[id].research_unit_energy=7200 end
+            ''')
+        return lua
+
+    def test_legacy_work_survives_explicit_future_price_time_changes_and_later_handover(self):
+        for price, time in ((True, False), (False, True), (True, True)):
+            with self.subTest(price=price, time=time):
+                lua = self.retuned_legacy_world(price=price, time=time)
+                lua.globals().price_changed = price
+                lua.execute(r'''
+                  local before,prior=all_frames(),storage[OWNER_KEY];writes=0
+                  local event={mod_startup_settings_changed=true,mod_changes={}}
+                  assert(history.default_owner_apply(history.default_owner_preflight(event,nil,true)))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]~=prior)
+                  assert(storage[OWNER_KEY].contract~=old_current_contract
+                    and storage[OWNER_KEY].legacy.contract==old_legacy_contract)
+                  assert(prototypes.technology[LEGACY517].research_unit_energy==3600
+                    and player.technologies[LEGACY517].research_unit_count==1012)
+                  for cycle=1,2 do
+                    local native_game,native_prototypes=game,prototypes
+                    game,prototypes=nil,nil;history.default_owner_on_load()
+                    game,prototypes=native_game,native_prototypes
+                    local steady={mod_startup_settings_changed=false,mod_changes={}}
+                    assert(not history.default_owner_apply(history.default_owner_preflight(steady,nil,true)))
+                    assert(writes==0 and same(before,all_frames()))
+                  end
+                  local legacy=player.technologies[LEGACY517]
+                  player.research_progress=1;legacy.researched=true
+                  assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101})
+                  player.research_progress=0;player.research_queue={LEGACY517,OTHER}
+                  legacy.level=6;legacy.researched=false;legacy.saved_progress=0
+                  assert(history.default_owner_on_completion_tick{tick=102})
+                  assert(storage[OWNER_KEY].forces[player.index].phase=="legacy"
+                    and player.current_research.name==LEGACY517
+                    and legacy.research_unit_count==1518
+                    and prototypes.technology[LEGACY517].research_unit_energy==3600)
+                  player.research_progress=1;legacy.researched=true
+                  assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=103})
+                  player.research_progress=0;player.research_queue={OTHER}
+                  legacy.level=7;legacy.researched=false;legacy.saved_progress=0
+                  local bonus,other=player.worker_robots_storage_bonus,frame(suspended)
+                  assert(history.default_owner_on_completion_tick{tick=104})
+                  assert(player.worker_robots_storage_bonus==bonus and same(other,frame(suspended)))
+                  assert(storage[OWNER_KEY].forces[player.index].phase=="owned"
+                    and storage[OWNER_KEY].forces[suspended.index].phase=="legacy")
+                  assert(player.technologies[ORDINARY].level==7 and legacy.level==4
+                    and player.technologies[ORDINARY].research_unit_count==(price_changed and 57600 or 2278))
+                  assert(player.current_research.name==OTHER and player.research_progress==0)
+                ''')
+
+    def test_legacy_retuning_still_requires_recorded_relevant_settings_and_configuration_authority(self):
+        for change, message in (
+            ('storage[OWNER_KEY].settings=nil', "no recorded relevant startup settings"),
+            ('require("runtime.configuration").streams["worker-robots-storage"].research_time=60', "unrelated startup setting"),
+            ('event.mod_startup_settings_changed=false', "without a configuration-change authority"),
+        ):
+            with self.subTest(change=change):
+                lua = self.retuned_legacy_world(time=True)
+                lua.execute('local event={mod_startup_settings_changed=true,mod_changes={}};' + change + r'''
+                  local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+                  local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and tostring(message):find(''' + repr(message) + r''',1,true),tostring(message))
+                  assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+                ''')
+
+    def test_legacy_retuning_refuses_effect_changes_and_other_force_current_investment_before_writes(self):
+        for change in (
+            'set_reward(2);require("runtime.configuration").streams["worker-robots-storage"].effect_percent=2',
+            'finish_frame(uninvested,"advanced",{},false);assert(history.default_owner_on_research_finished(finish_event(uninvested)))',
+            'uninvested.technologies[ORDINARY].saved_progress=.23',
+            'uninvested.research_queue={ORDINARY,OTHER};uninvested.research_progress=.27',
+            'storage[OWNER_KEY].legacy.contract="worker-storage-1:counterfeit"',
+        ):
+            with self.subTest(change=change):
+                lua = self.retuned_legacy_world(time=True, before_retune=change)
+                lua.execute(r'''
+                  local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+                  local ok=pcall(history.default_owner_preflight,{mod_startup_settings_changed=true,mod_changes={}},nil,true)
+                  assert(not ok and writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+                ''')
+
+    def test_legacy_retuning_revalidates_another_force_old_work_before_application(self):
+        lua = self.retuned_legacy_world(price=True, time=True)
+        lua.execute(r'''
+          local plan=history.default_owner_preflight({mod_startup_settings_changed=true,mod_changes={}},nil,true)
+          suspended.research_progress=.31
+          local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+          assert(not pcall(history.default_owner_apply,plan))
+          assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+        ''')
 
     def test_unrelated_force_operations_preserve_another_forces_pending_completion(self):
         for pending in (False, True):

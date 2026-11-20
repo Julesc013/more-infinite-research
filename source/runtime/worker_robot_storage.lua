@@ -1366,12 +1366,16 @@ local function default_owner_frame_has_unsettled_work(frame, id)
   return frame.saved_progress > 0 or frame.current == id or frame.occurrences > 0
 end
 
-local function automatic_owner_contract_has_invested_work()
+local function automatic_owner_contract_has_invested_work(owned)
   local id = recovery.ordinary_default_id
   for _, force in ipairs(forces()) do
     local frame = snapshot(force, id)
     if default_owner_frame_has_invested_work(frame, id) then
       return true
+    end
+    if owned and owned.schema == 4 then
+      local legacy = snapshot(force, recovery.published517_se_id)
+      if default_owner_frame_has_invested_work(legacy, recovery.published517_se_id) then return true end
     end
   end
   return false
@@ -1544,7 +1548,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   if owned and owned.contract ~= contract then
     if not context.configuration then
       recover_error("default native-owner contract changed")
-    elseif automatic_owner_contract_has_invested_work() then
+    elseif automatic_owner_contract_has_invested_work(owned) then
       if owned.settings == nil then
         recover_error("default native-owner has paid work but no recorded relevant startup settings")
       elseif same_worker_configuration(owned.settings, current_settings) then
@@ -1574,10 +1578,17 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     gate=recovery.head_id, contract=contract, producer=producer, forces={}}
   record.contract, record.settings = contract, current_settings
   local legacy_active, legacy_contract = owned and owned.schema == 4, nil
+  local legacy_retuned = legacy_active and owned.contract ~= contract
   if legacy_active then
-    _, legacy_contract = published517_se_contract(source_prototype)
-    if owned.legacy.contract ~= legacy_contract or owned.contract ~= contract then
+    local legacy_prototype
+    legacy_prototype, legacy_contract = published517_se_contract(source_prototype)
+    if owned.legacy.contract ~= legacy_contract then
       recover_error("published517 SE paid-worker contract changed")
+    end
+    -- Old work keeps its fixed native holder. Only future price/time may
+    -- change here: settlement must still preserve the old earned scalar.
+    if legacy_retuned and source_prototype.effects[1].modifier ~= legacy_prototype.effects[1].modifier then
+      recover_error("published517 SE paid-worker settlement requires its earned effect")
     end
   end
   local items, seen, moved = {}, {}, false
@@ -1611,6 +1622,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
       local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
+      if legacy_retuned and (not prior or prior.phase ~= "legacy")
+          and default_owner_frame_has_invested_work(destination, id) then
+        recover_error("published517 SE future contract cannot replace invested current worker work")
+      end
       if legacy_active and prior and prior.phase == "legacy" then
         if refresh then
           -- A force reset intentionally discards that force's native progress.
