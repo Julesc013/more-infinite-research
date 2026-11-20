@@ -1,0 +1,220 @@
+{
+  "schema": "MIRFiniteFourHostedNativeActualIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-20T00:23:56Z",
+  "reviewed_by": "independent release-queue review",
+  "verdict": "GO_ACTUAL_FINITE_FOUR_FUNCTIONAL_EVIDENCE_ONLY",
+  "verdict_scope": "One exact hosted-Linux Execute result: published MIR 4.7.21003 finite-four source to candidate 5.0.21018, two ordinary worker-storage completions across the upgrade, then two cold loads.",
+  "case": {
+    "workflow_run_id": 44642883136,
+    "workflow_event": "workflow_dispatch",
+    "native_mode": "Execute",
+    "head_sha": "c7399979410d8e684571bea8b5f13606988d8bef",
+    "tree": "c8ace799810d4ffb1828e4c9b69ffc96a748dffb",
+    "source": {
+      "version": "4.7.21003",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "bytes": 1463293
+    },
+    "candidate": {
+      "version": "5.0.21018",
+      "sha256": "C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D",
+      "bytes": 1053618
+    },
+    "engine": {
+      "version": "2.1.24 Linux headless",
+      "factorio_binary_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF",
+      "bytes": 260556936
+    },
+    "fixture_sha256": "6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1",
+    "observer_sha256": "DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C"
+  },
+  "independent_custody_verification": {
+    "controller_custody": {
+      "path": "actual-execution-custody-r02.json",
+      "sha256": "18124AF4C38E33F38D69250B3DAA314707C51B3674C8DE9BA266B199DDAF04A1"
+    },
+    "native_only_manifest": {
+      "path": "native-artifact-file-manifest-r02.json",
+      "sha256": "CA0CA95DBED55651E563FE1C144DB5F9AE93B93A7BB74B8A984BEDA398C3089A",
+      "artifact_root": "artifacts/worker-storage-finite-four-44642883136-1",
+      "rows": 164,
+      "bytes": 3493695,
+      "canonical_rows_sha256": "5164E5F940D71E802465FE449542BD94BCD29B8BAB41823C065FE6369BDD489B",
+      "independent_rehash": {
+        "missing": 0,
+        "extra": 0,
+        "byte_or_sha256_mismatches": 0,
+        "canonical_rows_sha256": "5164E5F940D71E802465FE449542BD94BCD29B8BAB41823C065FE6369BDD489B"
+      }
+    },
+    "prior_adverse_preserved": {
+      "manifest": "artifact-file-manifest-r01.json",
+      "manifest_sha256": "349069AAD740A75440DBC30961CFA327171D5F813B8B495ABD40724641B1FC5F",
+      "rows_rehashed": 256,
+      "bytes_rehashed": 3196607,
+      "missing": 0,
+      "byte_or_sha256_mismatches": 0,
+      "adverse_summary_sha256": "D42B4E6B3FBF7E0616B236E26D32207ACB84F9BF760730DBA6789A37B8FCD120"
+    },
+    "excluded_from_native_verdict": [
+      "worker-storage-finite-four-controls-44642883136-1",
+      "worker-storage-public-input-readiness-44642883136-1",
+      "worker-storage-exact-packages-44642883136-1"
+    ]
+  },
+  "actual_process_and_resource_evidence": {
+    "execution_result": {
+      "path": "artifacts/worker-storage-finite-four-44642883136-1/execution/result.json",
+      "sha256": "28F54CFBDCC6097B6FB66D0104BC0B77E98510D78DB52B49111CCC475B3B0AF7",
+      "status": "completed-await-independent-review"
+    },
+    "processes": [
+      {
+        "index": 1,
+        "pid": 2454,
+        "role": "create source seed",
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false
+      },
+      {
+        "index": 2,
+        "pid": 2752,
+        "role": "source ordinary completion",
+        "exit_code": 137,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "terminal_ledger_phase": "completed",
+        "leaf_cgroup_oom": 0,
+        "leaf_cgroup_oom_kill": 0
+      },
+      {
+        "index": 3,
+        "pid": 2904,
+        "role": "successor ordinary completion",
+        "exit_code": 137,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "terminal_ledger_phase": "completed",
+        "leaf_cgroup_oom": 0,
+        "leaf_cgroup_oom_kill": 0
+      },
+      {
+        "index": 4,
+        "pid": 3043,
+        "role": "first cold load",
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false
+      },
+      {
+        "index": 5,
+        "pid": 3158,
+        "role": "second cold load",
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false
+      }
+    ],
+    "governed_137_interpretation": "Both nonzero server exits are accepted only because their respective result rows say timed_out=false and completion_predicate_observed=true, their final resource-ledger rows say phase=completed, and the required save/marker evidence exists. They are not treated as natural exits, timeouts, or OOM acceptance."
+  },
+  "functional_observations": {
+    "ordinary_event_guard": {
+      "actor_member": "fixture-projections/observer/control.lua",
+      "sha256": "6C8FB257FEB3BE0614F32A4F8AADA558946F5C43EEC5378804F3FAF20630F276",
+      "contract": "The observer increments native_lab_completions only in on_research_finished after rejecting event.by_script=true."
+    },
+    "source": {
+      "earned_marker_sha256": "0ED05484225A8AD316DF580ABC842794EC21162B8EA7A68C4CC37D5A4142A1FB",
+      "finished_marker_sha256": "C6FE4BCEB00072267B431CF63C540A1FBD5DC8749DA55EDAA48124AC63923995",
+      "earned_tick": 3728,
+      "finished_tick": 3732,
+      "completed": 1,
+      "next_level": 6,
+      "worker_bonus": 7,
+      "native_lab_completions": 1,
+      "save_finished_before_governed_stop": true
+    },
+    "successor": {
+      "configuration_marker_sha256": "12AD906312288947E709799029A98E1E8917472FA4BDC30D203C1720C7AB563A",
+      "before_lab_marker_sha256": "776AAA34E02ED8D40EEC9167E0BD104AAF01F1633D2108C506325F81523DA706",
+      "earned_marker_sha256": "94F9B31D3A3E8880F2826B22735333F644DFCF85A19073CAA4CC451C00162267",
+      "finished_marker_sha256": "ED6ECCD16A8C2C5A2EDB40D14AE48B06D43B568D9F94291D104EA1AAD8B47806",
+      "configuration_tick": 3729,
+      "before_lab_tick": 4545,
+      "earned_tick": 7712,
+      "finished_tick": 7716,
+      "completed": 2,
+      "next_level": 7,
+      "worker_bonus": 9,
+      "native_lab_completions": 2,
+      "save_finished_before_governed_stop": true
+    },
+    "queue_and_finite_continuity": {
+      "main_current": "worker-robots-storage-5",
+      "queue": [
+        "worker-robots-storage-5",
+        "mir-worker-test-unrelated"
+      ],
+      "finite_researched": true,
+      "finite_maximum": 4,
+      "finite_effect": 2
+    },
+    "sentinel_not_science_evidence": {
+      "main_research_progress": 0.42,
+      "unrelated_saved_progress": 0.27,
+      "meaning": "Scripted continuity sentinels retained across the upgrade and cold loads; neither value is counted as earned partial science or as a physical science-debit proof."
+    }
+  },
+  "save_and_cold_custody": {
+    "source_seed_and_consumed": {
+      "sha256": "9D3B1FCF675B093ACDBC2A46C10E32DCBA378CDF8A511FDF49710FB211B7B179",
+      "bytes": 214606,
+      "zip_entries": 55,
+      "crc_rechecked": "passed"
+    },
+    "source_output_and_protected_copy": {
+      "sha256": "B298A223A5EF10E607AFE544DFCF1EA33ED2930868D3EA525061CAB0AF82079A",
+      "bytes": 218444,
+      "zip_entries": 55,
+      "crc_rechecked": "passed"
+    },
+    "successor_consumed": {
+      "sha256": "B298A223A5EF10E607AFE544DFCF1EA33ED2930868D3EA525061CAB0AF82079A",
+      "bytes": 218444,
+      "zip_entries": 55,
+      "crc_rechecked": "passed"
+    },
+    "successor_output_protected_and_cold_inputs": {
+      "sha256": "B07B20F0F786C49DB70922D279896D621D889D7740133220F9D22DDC2FCEE533",
+      "bytes": 219958,
+      "zip_entries": 55,
+      "crc_rechecked": "passed",
+      "cold_paths": [
+        "execution/cold-1/cold-input.zip",
+        "execution/cold-2/cold-input.zip"
+      ],
+      "cold_marker_sha256": "53C048EF18D9C87D3829331D37D9E0473FD72DFF4BFE6608EE78F3E876F2A253",
+      "cold_observed_completed": 2,
+      "cold_observed_next_level": 7,
+      "cold_observed_worker_bonus": 9,
+      "limit": "The extracted artifact proves distinct cold working paths and matching valid ZIP bytes; it does not reproduce original-run inode identity."
+    }
+  },
+  "activation_and_cleanup": {
+    "direct_library_control_restorations": 4,
+    "every_restoration_reports_lock_released": true,
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "cleanup_attempted": true,
+    "cleanup_succeeded": true,
+    "cleanup_errors": []
+  },
+  "limits": [
+    "This is exact functional native evidence for the recorded four-mod worker-storage scenario only; it is not a release, stable-acceptance, performance, UI, report-export, or general paid-science-accounting verdict.",
+    "The top-level preparation admission result declaring native_processes=0 is not used as execution evidence; the reviewed execution/result.json and five resource ledgers are the native result.",
+    "Related controls, public-input readiness, and exact-package artifacts are synthetic or preparation evidence and are deliberately excluded from this native-result verdict.",
+    "The two prior adverse runs, including the 256-body manifest and D42B adverse summary, remain preserved rather than being relabeled or superseded."
+  ]
+}
