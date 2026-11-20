@@ -16,6 +16,9 @@ local PUBLISHED517_SE_SCIENCE = {
 local PUBLISHED517_SE_PREREQUISITES = {
   "worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3",
 }
+local PUBLISHED517_SE_TERMS = {
+  formula="675*1.5^(L-4)", seconds=60, modifier=1, ignore_map_price=false,
+}
 local CURRENT_F200_SE_SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack",
@@ -155,13 +158,15 @@ function M.published517_se_contract(source)
   assert(exact_native_ingredients(source.research_unit_ingredients, CURRENT_F200_SE_SCIENCE)
       and exact_native_prerequisites(source.prerequisites, {"worker-robots-storage-3"}),
     "MIR published517 SE current contract differs")
+  M.fingerprint(source) -- Retain validation of the caller's complete current row.
   local ingredients, prerequisites = {}, {}
   for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do ingredients[index] = {name=name, amount=1} end
   for _, name in ipairs(PUBLISHED517_SE_PREREQUISITES) do prerequisites[name] = {name=name} end
-  return M.fingerprint({level=source.level, max_level=source.max_level, effects=source.effects,
-    research_unit_count_formula=source.research_unit_count_formula, research_unit_count=source.research_unit_count,
-    research_unit_energy=source.research_unit_energy, research_unit_ingredients=ingredients,
-    prerequisites=prerequisites, ignore_tech_cost_multiplier=source.ignore_tech_cost_multiplier})
+  return M.fingerprint({level=4, max_level=MAX,
+    effects={{type="worker-robot-storage", modifier=PUBLISHED517_SE_TERMS.modifier}},
+    research_unit_count_formula=PUBLISHED517_SE_TERMS.formula,
+    research_unit_energy=PUBLISHED517_SE_TERMS.seconds * 60, research_unit_ingredients=ingredients,
+    prerequisites=prerequisites, ignore_tech_cost_multiplier=PUBLISHED517_SE_TERMS.ignore_map_price})
 end
 
 -- Compare only the caller's detached owned emissions. The projection uses
@@ -285,6 +290,11 @@ function M.published517_se_owner(authored)
   local out = owner_source(authored, M.published517_se_id)
   out.name, out.hidden, out.enabled, out.visible_when_disabled = M.published517_se_id, true, false, false
   out.order = "zz[mir-worker-storage-published517]"
+  -- The admitted historical producer has one literal paid-work contract.
+  -- Authored presentation remains detached from its immutable work terms.
+  out.unit.count, out.unit.count_formula, out.unit.time = nil, PUBLISHED517_SE_TERMS.formula, PUBLISHED517_SE_TERMS.seconds
+  out.effects[1].modifier = PUBLISHED517_SE_TERMS.modifier
+  out.ignore_tech_cost_multiplier = PUBLISHED517_SE_TERMS.ignore_map_price
   out.unit.ingredients, out.prerequisites = {}, copy(PUBLISHED517_SE_PREREQUISITES)
   for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do out.unit.ingredients[index] = {name, 1} end
   return out
