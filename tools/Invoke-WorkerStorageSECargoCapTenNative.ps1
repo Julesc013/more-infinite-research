@@ -138,18 +138,22 @@ function Read-CargoCapTenJson { param([Parameter(Mandatory)][string]$Path) if(-n
 function Resolve-CargoCapTenPath { param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path) if([IO.Path]::IsPathRooted($Path)){return [IO.Path]::GetFullPath($Path)};[IO.Path]::GetFullPath((Join-Path $RepoRoot $Path)) }
 
 function Test-CargoCapTenFile {
-    param([Parameter(Mandatory)][System.Collections.IDictionary]$Descriptor,[Parameter(Mandatory)][string]$Label)
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Descriptor,[Parameter(Mandatory)][string]$Label,[switch]$ObserveMismatch)
     $path=if($Descriptor.Contains('path') -and $null-ne$Descriptor['path']){[string]$Descriptor['path']}else{''}
     $expected=[string]$Descriptor['sha256'];$bytes=if($Descriptor.Contains('bytes') -and $null-ne$Descriptor['bytes']){[int64]$Descriptor['bytes']}else{$null}
     if([string]::IsNullOrWhiteSpace($path)-or-not(Test-Path -LiteralPath $path -PathType Leaf)){return [ordered]@{label=$Label;state='missing_local_input';path=$path;sha256=$expected;bytes=$bytes}}
     $item=Get-Item -LiteralPath $path -Force
-    if($null-ne$bytes-and$item.Length-ne$bytes){throw "$Label bytes differ"}
-    $actual=Get-CargoCapTenSha256 $path;if($actual-cne$expected.ToUpperInvariant()){throw "$Label SHA-256 differs"}
+    if($null-ne$bytes-and$item.Length-ne$bytes-and-not$ObserveMismatch){throw "$Label bytes differ"}
+    $actual=Get-CargoCapTenSha256 $path
+    if(($null-ne$bytes-and$item.Length-ne$bytes)-or$actual-cne$expected.ToUpperInvariant()){
+        if(-not$ObserveMismatch){throw "$Label SHA-256 differs"}
+        return [ordered]@{label=$Label;state='mismatched_local_input';path=$item.FullName;sha256=$expected;bytes=$bytes;observed_sha256=$actual;observed_bytes=$item.Length}
+    }
     [ordered]@{label=$Label;state='verified_local_input';path=$item.FullName;sha256=$actual;bytes=$item.Length}
 }
 
 function Assert-CargoCapTenPacket {
-    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot,[switch]$DeferLocalHelperObservation)
     Assert-CargoCapTenEqual $Packet['schema'] 1 'packet schema'
     Assert-CargoCapTenEqual $Packet['kind'] 'MIRWorkerStorageSECargoCapTenF200NativeExecutorPacketV1' 'packet kind'
     Assert-CargoCapTenEqual $Packet['case_id'] 'gamer433-se0757-worker-storage-cap-ten-f394-to-e334' 'packet case'
@@ -201,8 +205,10 @@ function Assert-CargoCapTenPacket {
         Assert-CargoCapTenEqual $pin[0]['sha256'].ToUpperInvariant() $canonical.sha256 "helper SHA-256 $($canonical.path)"
         Assert-CargoCapTenEqual ([int64]$pin[0]['bytes']) ([int64]$canonical.bytes) "helper bytes $($canonical.path)"
         $path=Resolve-CargoCapTenPath $RepoRoot $canonical.path
-        $state=Test-CargoCapTenFile -Descriptor ([ordered]@{path=$path;sha256=$canonical.sha256;bytes=$canonical.bytes}) -Label "helper $($canonical.path)"
-        Require-CargoCapTen ($state.state-ceq'verified_local_input') "helper source is unavailable: $($canonical.path)"
+        if(-not$DeferLocalHelperObservation){
+            $state=Test-CargoCapTenFile -Descriptor ([ordered]@{path=$path;sha256=$canonical.sha256;bytes=$canonical.bytes}) -Label "helper $($canonical.path)"
+            Require-CargoCapTen ($state.state-ceq'verified_local_input') "helper source is unavailable: $($canonical.path)"
+        }
     }
     $control=Get-Content -LiteralPath (Join-Path $RepoRoot (Join-Path $script:CargoActorRoot 'control.lua')) -Raw
     foreach($fragment in @('remote.add_interface(FIXTURE, {begin = begin_source})','local player = game.forces.player','check(event and event.research == target and event.by_script == false','state.source_frame, state.source_canonical, state.source_role, state.phase = frame(state),','assert_candidate_transfer(state)','assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate cap")','assert_tail_current(state, "candidate cap")','cold_phase = type(state) == "table" and state.phase or nil','elseif cold_phase == "idle" then','elseif cold_phase == "source-partial" then','marker("candidate-closed", state, {cap_attempt = "refused"','marker("cold-read", state, {cold_writes = 0}')){
@@ -211,8 +217,12 @@ function Assert-CargoCapTenPacket {
 }
 
 function Get-CargoCapTenInputStates {
-    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet)
+    param([Parameter(Mandatory)][System.Collections.IDictionary]$Packet,[Parameter(Mandatory)][string]$RepoRoot)
     $states=@()
+    foreach($helper in $Packet['helper_pins']){
+        $descriptor=[ordered]@{path=(Resolve-CargoCapTenPath $RepoRoot $helper['path']);sha256=$helper['sha256'];bytes=$helper['bytes']}
+        $states+=Test-CargoCapTenFile -Descriptor $descriptor -Label "helper $($helper['path'])" -ObserveMismatch
+    }
     foreach($name in @('source_mir','candidate_mir','fixture','settings')){$states+=Test-CargoCapTenFile -Descriptor $Packet['inputs'][$name] -Label $name}
     $binding=Get-CargoCapTenEngineBinding $Packet['inputs']['engine'];$engine=[ordered]@{path=$Packet['inputs']['engine']['binary_path'];sha256=$Packet['inputs']['engine']['factorio_binary_sha256'];bytes=$(if($binding.Contains('factorio_binary_bytes')){[int64]$binding['factorio_binary_bytes']}else{$null})};$states+=Test-CargoCapTenFile -Descriptor $engine -Label 'Factorio 2.0.77 binary'
     $engineData=[string]$Packet['inputs']['engine']['engine_data_path']
@@ -503,9 +513,17 @@ function Invoke-CargoCapTenExecution {
 
 function Invoke-CargoCapTenExecutor {
     param([Parameter(Mandatory)][ValidateSet('Validate','Compose','Execute')][string]$RequestedMode,[Parameter(Mandatory)][string]$RequestedPacketPath,[Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RequestedOutputPath)
-    $packet=Read-CargoCapTenJson $RequestedPacketPath;Assert-CargoCapTenPacket $packet $RepoRoot;$states=Get-CargoCapTenInputStates $packet;$missing=@($states|Where-Object {$_.state -match '^missing'})
+    $packet=Read-CargoCapTenJson $RequestedPacketPath
+    # Planning may describe absent frozen helpers; execution still requires
+    # every exact pinned byte before importing or allocating anything native.
+    Assert-CargoCapTenPacket $packet $RepoRoot -DeferLocalHelperObservation:($RequestedMode -ne 'Execute')
+    $states=Get-CargoCapTenInputStates $packet $RepoRoot;$missing=@($states|Where-Object {$_.state -match '^missing'})
+    $mismatched=@($states|Where-Object {$_.state -ceq 'mismatched_local_input'})
     $record=[ordered]@{schema=1;kind='MIRWorkerStorageSECargoCapTenF200NativeExecutorReceiptV1';mode=$RequestedMode;packet_sha256=(Get-CargoCapTenSha256 $RequestedPacketPath);input_states=$states;deferred_missing_bindings=@($missing|ForEach-Object label);native_processes_started=0;library_activation=$false;resource_context_allocated=$false;execution_plan=(New-CargoCapTenComposePlan $packet);limit='No current result is gameplay evidence.'}
-    if($RequestedMode-eq'Validate'){$record.status=if($missing.Count){'DEFERRED_MISSING_LOCAL_BINDINGS'}else{'VALIDATED_NOT_ADMITTED'}}elseif($RequestedMode-eq'Compose'){$record.status=if($missing.Count){'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'}else{'COMPOSED_NOT_ADMITTED'}}else{$binding=Assert-CargoCapTenHostEngineBinding $packet;if($missing.Count){throw 'Execute refuses missing local bindings'};Assert-CargoCapTenEnginePaths $packet $binding;$record=Invoke-CargoCapTenExecution $packet $RepoRoot}
+    $record.unavailable_helper_bindings=@($states|Where-Object {$_.label -like 'helper *' -and $_.state -cne 'verified_local_input'}|ForEach-Object label)
+    if($RequestedMode-eq'Validate'){$record.status=if($mismatched.Count){'DEFERRED_LOCAL_HELPER_MISMATCH'}elseif($missing.Count){'DEFERRED_MISSING_LOCAL_BINDINGS'}else{'VALIDATED_NOT_ADMITTED'}}
+    elseif($RequestedMode-eq'Compose'){$record.status=if($mismatched.Count){'COMPOSED_DEFERRED_LOCAL_HELPER_MISMATCH'}elseif($missing.Count){'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'}else{'COMPOSED_NOT_ADMITTED'}}
+    else{$binding=Assert-CargoCapTenHostEngineBinding $packet;if($mismatched.Count){throw 'Execute refuses mismatched local helpers'};if($missing.Count){throw 'Execute refuses missing local bindings'};Assert-CargoCapTenEnginePaths $packet $binding;$record=Invoke-CargoCapTenExecution $packet $RepoRoot}
     Write-CargoCapTenReceipt $RequestedOutputPath $record;[pscustomobject]$record
 }
 

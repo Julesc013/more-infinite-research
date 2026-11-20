@@ -265,13 +265,47 @@ Add-Check 'Validate requires an explicit receipt path and defers missing runtime
     $output=@(& $pwsh.Source -NoProfile -NonInteractive -File $ControllerPath -Mode Validate -OutputPath $receiptPath 2>&1)
     if($LASTEXITCODE-ne0){throw "Validate command failed: $($output -join ' ' )"}
     $receipt=Get-Content -LiteralPath $receiptPath -Raw|ConvertFrom-Json
-    if($receipt.status-ne'DEFERRED_MISSING_LOCAL_BINDINGS'-or$receipt.native_processes_started-ne0-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Validate crossed an execution boundary'}
+    if($receipt.status -cnotin @('DEFERRED_MISSING_LOCAL_BINDINGS','DEFERRED_LOCAL_HELPER_MISMATCH') -or$receipt.native_processes_started-ne0-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Validate crossed an execution boundary'}
+    if($receipt.status -ceq 'DEFERRED_LOCAL_HELPER_MISMATCH' -and (@($receipt.input_states|Where-Object {$_.state -ceq 'mismatched_local_input' -and $_.label -like 'helper *'}).Count -eq 0 -or $receipt.unavailable_helper_bindings.Count -eq 0)){throw 'Validate concealed the missing frozen helper identity'}
 }
 
 Add-Check 'Compose reports the five bounded stages and remains non-activating' {
     $receipt=Invoke-FiniteFourNativeExecutor -RequestedMode Compose -RequestedPacketPath $PacketPath -RepoRoot (Find-FiniteFourNativeRepoRoot -StartPath $PSScriptRoot) -RequestedOutputPath (Join-Path $OutputRoot 'compose.json')
-    if($receipt.status-ne'COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS'-or$receipt.execution_plan.stages.Count-ne5-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Compose crossed an execution boundary or changed the five-stage contract'}
+    if($receipt.status -cnotin @('COMPOSED_DEFERRED_MISSING_LOCAL_BINDINGS','COMPOSED_DEFERRED_LOCAL_HELPER_MISMATCH') -or$receipt.execution_plan.stages.Count-ne5-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Compose crossed an execution boundary or changed the five-stage contract'}
     if($receipt.execution_plan.stages[2].acceleration_reapplied-ne1000-or-not$receipt.execution_plan.stages[2].configuration_precedes_console_request-or$receipt.execution_plan.protocol_difference_from_r02-notmatch'ConsoleStartup'){throw 'Compose lost the bounded ConsoleStartup protocol'}
+}
+
+Add-Check 'local helper observations retain exact expected and observed identity while strict file admission still refuses' {
+    $path=Join-Path $OutputRoot 'helper-identity.txt'
+    [IO.File]::WriteAllText($path,'ABCD',[Text.UTF8Encoding]::new($false))
+    $descriptor=[ordered]@{path=$path;bytes=4;sha256='E12E115ACF4552B2568B55E93CBD39394C4EF81C82447FAFC997882A02D23677'}
+    $matching=Test-FiniteFourNativeFile -Descriptor $descriptor -Label 'helper control' -ObserveMismatch
+    if($matching.state -cne 'verified_local_input'){throw 'matching frozen helper did not verify'}
+    [IO.File]::WriteAllText($path,'WXYZ',[Text.UTF8Encoding]::new($false))
+    $changed=Test-FiniteFourNativeFile -Descriptor $descriptor -Label 'helper control' -ObserveMismatch
+    if($changed.state -cne 'mismatched_local_input' -or $changed.sha256 -cne $descriptor.sha256 -or $changed.observed_sha256 -cne '21E32F5321CAD49AB4CF78BA5ED231E0F36D0C78D34108FDA1BE939F33FBA149' -or $changed.observed_bytes -ne 4){throw 'same-size helper drift was hidden or adopted'}
+    Assert-Refuses {Test-FiniteFourNativeFile -Descriptor $descriptor -Label 'helper control'} 'helper control SHA-256 differs'
+    [IO.File]::WriteAllText($path,'ABCDE',[Text.UTF8Encoding]::new($false))
+    $changed=Test-FiniteFourNativeFile -Descriptor $descriptor -Label 'helper control' -ObserveMismatch
+    if($changed.state -cne 'mismatched_local_input' -or $changed.bytes -ne 4 -or $changed.observed_bytes -ne 5){throw 'helper byte drift was hidden or adopted'}
+    Assert-Refuses {Test-FiniteFourNativeFile -Descriptor $descriptor -Label 'helper control'} 'helper control bytes differ'
+}
+
+Add-Check 'nonexecuting helper observation cannot authorize changed canonical packet pins' {
+    $packet=Read-FiniteFourNativeJson $PacketPath
+    $packet.helper_pins[2].sha256='A'*64
+    Assert-Refuses {Assert-FiniteFourNativePacket -Packet $packet -RepoRoot $repo -DeferLocalHelperObservation} 'helper SHA-256'
+}
+
+Add-Check 'Execute refuses unavailable exact helpers or runtime inputs before its execution function' {
+    $prior=(Get-Command Invoke-FiniteFourNativeExecution -CommandType Function).ScriptBlock
+    $script:finiteFourUnexpectedExecution=$false
+    try{
+        Set-Item -Path Function:Invoke-FiniteFourNativeExecution -Value {param($Packet,$RepoRoot) $script:finiteFourUnexpectedExecution=$true;throw 'unexpected execution boundary'}
+        $errorText=''
+        try{Invoke-FiniteFourNativeExecutor -RequestedMode Execute -RequestedPacketPath $PacketPath -RepoRoot $repo -RequestedOutputPath (Join-Path $OutputRoot 'must-not-execute.json')|Out-Null}catch{$errorText=$_.Exception.Message}
+        if($script:finiteFourUnexpectedExecution -or $errorText -notmatch 'helper .+ (bytes differ|SHA-256 differs)|Execute refuses missing local bindings' -or (Test-Path -LiteralPath (Join-Path $OutputRoot 'must-not-execute.json'))){throw "unavailable inputs crossed execution: $errorText"}
+    }finally{Set-Item -Path Function:Invoke-FiniteFourNativeExecution -Value $prior}
 }
 
 Add-Check 'clean PowerShell reproduces the retained r01 scope adverse and proves public Execution imports helpers in the caller scope' {
