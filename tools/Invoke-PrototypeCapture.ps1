@@ -102,7 +102,8 @@ function Get-MIR5PrototypeCaptureSettingsArguments {
   Assert-MIR5PrototypeCapture ($mode -ceq 'File') 'File settings require profile settings_mode File'
   Assert-MIR5PrototypeCapture ($ProfileDefinition.ContainsKey('settings_sha256') -and [string]$ProfileDefinition.settings_sha256 -match '^[A-Fa-f0-9]{64}$') 'File settings profile requires a 64-character settings_sha256'
   $expected = $ExpectedSha256.ToUpperInvariant()
-  Assert-MIR5PrototypeCapture ([string]$ProfileDefinition.settings_sha256 -ceq $expected) 'File settings profile SHA-256 differs from expected input'
+  $profileExpected = ([string]$ProfileDefinition.settings_sha256).ToUpperInvariant()
+  Assert-MIR5PrototypeCapture ($profileExpected -ceq $expected) 'File settings profile SHA-256 differs from expected input'
   Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $Path -PathType Leaf) 'SettingsPath must name an existing regular file'
   # The activation helper applies this same reparse-point rule immediately
   # before its controlled library mutation. Reject it before admission too.

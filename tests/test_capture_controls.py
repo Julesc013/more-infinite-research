@@ -342,16 +342,33 @@ def prototype_capture_file_settings_guard_cases() -> dict:
         "-ProfileDefinition $profileDefinition -Path $SettingsPath "
         "-ExpectedSha256 $ExpectedSettingsSha256"
     )
+    normalized_profile_compare = (
+        "$profileExpected = ([string]$ProfileDefinition.settings_sha256).ToUpperInvariant()\n"
+        "  Assert-MIR5PrototypeCapture ($profileExpected -ceq $expected) "
+        "'File settings profile SHA-256 differs from expected input'"
+    )
+    case_sensitive_profile_compare = (
+        "Assert-MIR5PrototypeCapture ([string]$ProfileDefinition.settings_sha256 -ceq $expected) "
+        "'File settings profile SHA-256 differs from expected input'"
+    )
     if source.count(settings_call) != 1:
         raise AssertionError("prototype capture File-settings admission is missing or ambiguous")
+    if source.count(normalized_profile_compare) != 1:
+        raise AssertionError("prototype capture normalized profile comparison is missing or ambiguous")
 
     with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-file-settings-") as temp:
         root = Path(temp)
         runner = root / "Invoke-PrototypeCapture-file-settings-preflight.ps1"
         old_runner = root / "Invoke-PrototypeCapture-file-settings-preflight-old.ps1"
+        case_sensitive_runner = root / "Invoke-PrototypeCapture-file-settings-preflight-case-sensitive.ps1"
         runner.write_text(source[:offset] + "\nreturn\n", encoding="utf-8", newline="\n")
         old_runner.write_text(
             source[:offset].replace(settings_call, "", 1) + "\nreturn\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        case_sensitive_runner.write_text(
+            source[:offset].replace(normalized_profile_compare, case_sensitive_profile_compare, 1) + "\nreturn\n",
             encoding="utf-8",
             newline="\n",
         )
@@ -383,6 +400,10 @@ def prototype_capture_file_settings_guard_cases() -> dict:
         settings = root / "cap10-settings.dat"
         settings.write_bytes(bytes.fromhex("020001001400000000050000000000"))
         settings_hash = hashlib.sha256(settings.read_bytes()).hexdigest().upper()
+        mixed_hash = "".join(
+            character.lower() if index % 2 else character
+            for index, character in enumerate(settings_hash)
+        )
         archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest().upper()
         engine_hash = hashlib.sha256(factorio.read_bytes()).hexdigest().upper()
         profile = root / "profile.json"
@@ -436,6 +457,19 @@ def prototype_capture_file_settings_guard_cases() -> dict:
             }
 
         valid = invoke("valid", settings_path=settings, expected_hash=settings_hash)
+        lowercase_valid = invoke(
+            "lowercase-valid", settings_path=settings,
+            expected_hash=settings_hash.lower(), profile_hash=settings_hash.lower(),
+        )
+        mixed_case_valid = invoke(
+            "mixed-case-valid", settings_path=settings,
+            expected_hash=mixed_hash, profile_hash=mixed_hash.swapcase(),
+        )
+        old_case_sensitive_lowercase = invoke(
+            "old-case-sensitive-lowercase", settings_path=settings,
+            expected_hash=settings_hash.lower(), profile_hash=settings_hash.lower(),
+            runner_path=case_sensitive_runner,
+        )
         defaults = invoke(
             "defaults", settings_path=None, expected_hash=None,
             mode="Defaults", include_profile_hash=False,
@@ -459,6 +493,9 @@ def prototype_capture_file_settings_guard_cases() -> dict:
         )
         return {
             "valid": valid,
+            "lowercase_valid": lowercase_valid,
+            "mixed_case_valid": mixed_case_valid,
+            "old_case_sensitive_lowercase": old_case_sensitive_lowercase,
             "defaults": defaults,
             "file_without_inputs": file_without_inputs,
             "path_without_hash": path_without_hash,
@@ -1140,7 +1177,7 @@ class CaptureControlTests(unittest.TestCase):
     def test_prototype_capture_binds_only_hash_declared_file_settings_before_admission(self):
         cases = prototype_capture_file_settings_guard_cases()
 
-        for name in ("valid", "defaults"):
+        for name in ("valid", "lowercase_valid", "mixed_case_valid", "defaults"):
             with self.subTest(name=name):
                 self.assertEqual(cases[name]["returncode"], 0, cases[name]["output"])
                 self.assertFalse(cases[name]["output_exists"])
@@ -1156,6 +1193,7 @@ class CaptureControlTests(unittest.TestCase):
             "missing_profile_hash": "File settings profile requires a 64-character settings_sha256",
             "missing_file": "SettingsPath must name an existing regular file",
             "changed_file": "SettingsPath SHA-256 differs from expected input",
+            "old_case_sensitive_lowercase": "File settings profile SHA-256 differs from expected input",
         }
         for name, message in expected.items():
             with self.subTest(name=name):
