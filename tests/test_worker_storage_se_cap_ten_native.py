@@ -11,6 +11,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -228,6 +229,97 @@ local function assert_candidate_transfer(state)'''
         execute = lua.eval("function(path, env) local fn, message = loadfile(path, 't', env); if not fn then return false, message end; return pcall(fn) end")
         result = execute((FIXTURE / "data-final-fixes.lua").as_posix(), env)
         return result, logs
+
+    def inert_data_sources(self):
+        baseline = subprocess.run(
+            ["git", "show", "0720e904666267a7673afe95faa9f9acac29a651:tests/fixtures/worker-storage-se-cap-ten-native/data.lua"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        return baseline, (FIXTURE / "data.lua").read_text(encoding="utf-8")
+
+    def inert_data_world(self):
+        self.lua.execute(r'''
+          local function deep(value)
+            if type(value) ~= "table" then return value end
+            local output = {}
+            for key, child in pairs(value) do output[key] = deep(child) end
+            return output
+          end
+          local function same_data(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not same_data(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          function inert_data_build(source, collision)
+            local original_interface = {type="electric-energy-interface",name="electric-energy-interface",energy_source={type="electric",usage_priority="secondary-output"},energy_production="1W",energy_usage="1W",minable={mining_time=1,result="electric-energy-interface"}}
+            local original_worker = {type="technology",name="worker-robots-storage-4",unit={count=675,time=60,ingredients={{"automation-science-pack",1}}},effects={{type="worker-robot-storage",modifier=1}},enabled=true}
+            local raw = { ["electric-energy-interface"] = {["electric-energy-interface"] = original_interface}, technology = {["worker-robots-storage-4"] = original_worker} }
+            local collision_row
+            if collision then
+              collision_row = {type="technology",name=INERT_CONTROL,marker="preexisting"}
+              raw.technology[INERT_CONTROL] = collision_row
+            end
+            local data = {raw=raw, emitted={}}
+            data.extend = function(self, rows)
+              for _, row in ipairs(rows) do
+                local bucket = self.raw[row.type]
+                if bucket == nil then bucket = {}; self.raw[row.type] = bucket end
+                assert(bucket[row.name] == nil, "data.extend collision: " .. tostring(row.name))
+                bucket[row.name] = deep(row)
+                self.emitted[#self.emitted + 1] = bucket[row.name]
+              end
+            end
+            local environment = {data=data, table={deepcopy=deep}, error=error}
+            setmetatable(environment, {__index=function(_, key) error("unexpected data-stage global: " .. tostring(key)) end})
+            local chunk = assert(load(source, "fixture-data.lua", "t", environment))
+            local ok, message = pcall(chunk)
+            return ok, message, data, original_interface, original_worker, collision_row
+          end
+          function inert_same_data(left, right) return same_data(left, right) end
+        ''')
+
+    def test_exact_0720_data_delta_adds_only_one_inert_technology(self):
+        baseline, candidate = self.inert_data_sources()
+        self.lua.globals().INERT_CONTROL = "mir-fixture-worker-storage-se-inert-control"
+        self.inert_data_world()
+        self.lua.globals().baseline_data_source = baseline
+        self.lua.globals().candidate_data_source = candidate
+        self.lua.execute(r'''
+          local baseline_ok, _, baseline = inert_data_build(baseline_data_source, false)
+          local candidate_ok, _, candidate, candidate_interface, candidate_worker = inert_data_build(candidate_data_source, false)
+          assert(baseline_ok and candidate_ok and #baseline.emitted == 2 and #candidate.emitted == 3)
+          assert(inert_same_data(baseline.emitted[1], candidate.emitted[1]) and inert_same_data(baseline.emitted[2], candidate.emitted[2]))
+          assert(inert_same_data(baseline.raw["electric-energy-interface"]["mir-fixture-worker-storage-se-cap-ten-power"], candidate.raw["electric-energy-interface"]["mir-fixture-worker-storage-se-cap-ten-power"]))
+          assert(inert_same_data(baseline.raw.technology["mir-fixture-worker-storage-se-cap-ten-tail"], candidate.raw.technology["mir-fixture-worker-storage-se-cap-ten-tail"]))
+          assert(inert_same_data(candidate.raw["electric-energy-interface"]["electric-energy-interface"], candidate_interface))
+          assert(inert_same_data(candidate.raw.technology["worker-robots-storage-4"], candidate_worker))
+          assert(baseline.raw.technology[INERT_CONTROL] == nil)
+          for name, row in pairs(baseline.raw.technology) do assert(inert_same_data(row, candidate.raw.technology[name])) end
+          for name in pairs(candidate.raw.technology) do assert(name == INERT_CONTROL or baseline.raw.technology[name] ~= nil) end
+          local inert = candidate.raw.technology[INERT_CONTROL]
+          assert(inert and inert.type == "technology" and inert.name == INERT_CONTROL)
+          assert(inert.icon == "__base__/graphics/technology/automation.png" and inert.icon_size == 256)
+          assert(inert.unit.count == 1 and inert.unit.time == 1 and #inert.unit.ingredients == 1)
+          assert(inert.unit.ingredients[1][1] == "automation-science-pack" and inert.unit.ingredients[1][2] == 1)
+          assert(next(inert.effects) == nil and inert.prerequisites == nil)
+          assert(inert.enabled == false and inert.hidden == true and inert.visible_when_disabled == false)
+        ''')
+
+    def test_inert_technology_collision_refuses_without_overwriting_source_row(self):
+        _, candidate = self.inert_data_sources()
+        self.lua.globals().INERT_CONTROL = "mir-fixture-worker-storage-se-inert-control"
+        self.inert_data_world()
+        self.lua.globals().candidate_data_source = candidate
+        self.lua.execute(r'''
+          local ok, message, data, _, _, collision_row = inert_data_build(candidate_data_source, true)
+          assert(not ok and tostring(message):find("fixture inert technology collision", 1, true))
+          assert(#data.emitted == 0 and data.raw.technology[INERT_CONTROL] == collision_row and collision_row.marker == "preexisting")
+        ''')
 
     def test_metadata_has_same_full_actor_identity_for_both_engine_families(self):
         canonical = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))

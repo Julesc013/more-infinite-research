@@ -14,6 +14,9 @@ interface.energy_production = "25MW"
 interface.energy_usage = "0W"
 interface.minable = {mining_time = 0.1, result = "electric-energy-interface"}
 
+local inert_name = "mir-fixture-worker-storage-se-inert-control"
+if data.raw.technology[inert_name] then error("fixture inert technology collision: " .. inert_name) end
+
 data:extend({
   interface,
   {
@@ -24,5 +27,16 @@ data:extend({
     prerequisites = {"automation-science-pack"},
     unit = {count = 1, time = 1, ingredients = {{"automation-science-pack", 1}}},
     effects = {}
+  },
+  {
+    type = "technology",
+    name = inert_name,
+    icon = "__base__/graphics/technology/automation.png",
+    icon_size = 256,
+    unit = {count = 1, time = 1, ingredients = {{"automation-science-pack", 1}}},
+    effects = {},
+    enabled = false,
+    hidden = true,
+    visible_when_disabled = false
   }
 })
