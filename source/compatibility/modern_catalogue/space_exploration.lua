@@ -2,6 +2,7 @@
 -- Captured rows are literal named inputs: this module does not inspect mod graphs,
 -- enumerate recipes, or mutate prototypes. Shared composition is owned by modern_catalogue.lua.
 local OVERLAY = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"
+local WORKER_STORAGE = require("compatibility.modern_catalogue.space_exploration_worker_storage")
 
 local function effect(recipe, scale)
   return {recipe = recipe, scale = scale or 1}
@@ -90,15 +91,7 @@ return {
       "se-material-science-pack-1",
       "production-science-pack"
     },
-    science_se_worker_robots_storage = {
-      "automation-science-pack",
-      "logistic-science-pack",
-      "chemical-science-pack",
-      "production-science-pack",
-      "se-rocket-science-pack",
-      "se-material-science-pack-1",
-      "space-science-pack"
-    },
+    science_se_worker_robots_storage = WORKER_STORAGE.science,
     science_se_research_belts = {
       "automation-science-pack",
       "logistic-science-pack",
@@ -882,9 +875,7 @@ return {
     weapon_shooting_speed = {science="science_se_weapon_shooting_speed", prerequisites={
         "weapon-shooting-speed-6"
       }, effects={direct_effect("gun-speed", 1.0, "bullet"), direct_effect("gun-speed", 1.0, "shotgun-shell"), direct_effect("gun-speed", 1.25, "railgun")}},
-    worker_robots_storage = {science="science_se_worker_robots_storage", prerequisites={
-        "worker-robots-storage-3"
-      }, effects={direct_effect("worker-robot-storage", 1.0)}},
+    worker_robots_storage = WORKER_STORAGE.continuation,
   },
   exact_product_target_families = {
     research_belts = true,
