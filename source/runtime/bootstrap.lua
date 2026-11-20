@@ -70,6 +70,8 @@ local repair_config = {enabled = effective.passive_repair_enabled == true}
 -- The Space Age lifecycle body is absent from base-only control stages.
 local scripted_effects, native_gun_credits
 local active_mods = script and script.active_mods or mods or {}
+local se_system_force = target.id == "f200" and active_mods["space-exploration"] == "0.7.57"
+  and require("runtime.space_exploration_system_force")
 if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
   if target.recipe_productivity == true then native_gun_credits = require("runtime.native_gun_credits") end
@@ -392,6 +394,7 @@ local function discard_absent_competing_productivity_state()
 end
 
 local function on_configuration_changed(event)
+  local se_system_force_plan = se_system_force and se_system_force.preflight(event)
   local cap_plan = lifecycle.preflight(true)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
@@ -481,6 +484,9 @@ local function on_configuration_changed(event)
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
+  -- Restore only the separately admitted SE scripted NPC policy, after all
+  -- native plans have verified their original zero-contribution frames.
+  if se_system_force then se_system_force.apply(se_system_force_plan) end
   if diagnostics then diagnostics.startup("MIR configuration change") end
 end
 
