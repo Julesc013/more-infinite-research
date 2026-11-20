@@ -1,0 +1,136 @@
+{
+  "kind": "MIR5LibraryAvailabilityLocalizedSearchExpectationV1",
+  "schema": 1,
+  "baseline": {
+    "inspected_at": "2026-11-15",
+    "repository": "Julesc013/more-infinite-research",
+    "dev_commit": "b45ffd980edcceceac3a0065cd1d342e4ddce00d",
+    "published_release": "v5.0.14",
+    "release_class": "prerelease",
+    "files": [
+      {
+        "path": "source/presentation/availability.lua",
+        "blob": "8f645818aa57940610c5861f866df078b1c225f7",
+        "lines": "180-196, 249-266"
+      },
+      {
+        "path": "source/runtime/library.lua",
+        "blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+        "lines": "2025-2057,2428-2437"
+      },
+      {
+        "path": "source/locale/de/more-infinite-research.cfg",
+        "blob": "430f954e91412ccdd89c608584b8e913d2ba7d5c",
+        "lines": "1-4"
+      },
+      {
+        "path": "source/locale/de/mir-library.cfg",
+        "blob": "21177d6f16cf36724f1f77abeef3459dcc552b33",
+        "lines": "53-56"
+      },
+      {
+        "path": "source/locale/en/more-infinite-research.cfg",
+        "blob": "e9ea4f62a807b2225437abc67126612cfdbc254b",
+        "lines": "1-5"
+      }
+    ]
+  },
+  "contract": {
+    "scope": "One authored Availability projection and already-resolved language labels; no speculative omissions, research generation, save migration or native owner inference",
+    "situation": {
+      "target": {
+        "id": "f210",
+        "factorio_version": "2.1",
+        "minimum_base": "2.1.23",
+        "recipe_productivity": true
+      },
+      "active_mods": {
+        "base": "2.1.23"
+      },
+      "force": null,
+      "effective_streams": {
+        "research_agricultural_growth_speed": {
+          "enabled": true
+        },
+        "research_spoilage_preservation": {
+          "enabled": true
+        }
+      },
+      "player_locale": "de"
+    },
+    "expected_captions": {
+      "research_agricultural_growth_speed": "Wachstumsgeschwindigkeit der Landwirtschaft",
+      "research_spoilage_preservation": "Schutz vor Verderb",
+      "reason_requires_space_age": "Erfordert die Erweiterung Space Age."
+    },
+    "scenarios": [
+      {
+        "id": "DE-NAME-AGRICULTURE",
+        "query": "Landwirtschaft",
+        "expected_families": [
+          "research_agricultural_growth_speed"
+        ],
+        "observed_dev_families": [],
+        "disposition": "known-negative-source-witness"
+      },
+      {
+        "id": "DE-NAME-SPOILAGE",
+        "query": "Verderb",
+        "expected_families": [
+          "research_spoilage_preservation"
+        ],
+        "observed_dev_families": [],
+        "disposition": "known-negative-source-witness"
+      },
+      {
+        "id": "DE-REASON-SPACE-AGE",
+        "query": "Erweiterung",
+        "expected_families": [
+          "research_agricultural_growth_speed",
+          "research_spoilage_preservation"
+        ],
+        "observed_dev_families": [],
+        "disposition": "proposed-search-reason-parity-not-yet-product-approved"
+      },
+      {
+        "id": "CANONICAL-CONTROL",
+        "query": "agricultural",
+        "expected_families": [
+          "research_agricultural_growth_speed"
+        ],
+        "observed_dev_families": [
+          "research_agricultural_growth_speed"
+        ],
+        "disposition": "source-control-only"
+      },
+      {
+        "id": "CANONICAL-SPOILAGE",
+        "query": "spoilage",
+        "expected_families": [
+          "research_spoilage_preservation"
+        ],
+        "observed_dev_families": [
+          "research_spoilage_preservation"
+        ],
+        "disposition": "source-control-only"
+      }
+    ]
+  },
+  "observed_mechanism": {
+    "matching": "availability.matches concatenates family/status/reason/required_mod/native_owner and normalizes ASCII lowercase, underscores and hyphens; it has no localized caption or localized reason input",
+    "caller": "runtime.library.update_availability_content passes model_view(...).search to availability.rows; it renders the row as a LocalisedString and discards the ordinary Research translation cache on entry",
+    "interpretation": "Display and search operate on different vocabularies. These observations are deductions from the fixed published source, not screenshots or executed GUI events.",
+    "preservation": "The returned rows are informational only; this witness supplies no evidence about earned research, queued work, bonus, save correctness or functional worker loading."
+  },
+  "admission": {
+    "current_status": "unresolved-prepared-fixture",
+    "accepted_native_run": false,
+    "accepted_locale_input": false,
+    "accepted_client_lifecycle": false,
+    "accepted_export": false,
+    "accepted_whole_product_performance": false,
+    "owner": "Unassigned downstream Library implementation/native qualification; no claim on Black Glass or Aero lanes",
+    "next_steps": "Implement or explicitly decline localized Availability row/reason search in a separately reviewed source change. Test German display text via real translated input with settled translation callbacks and a canonical English control; prove no stale-client publication, tab displacement, accidental native catalogue traversal or loss of view state. Compare actual search results with this frozen fixture. Reuse existing accepted inputs where their source boundaries are unchanged.",
+    "coexistence": "PR #1949 and #1950 independently modify disabled-stream Availability gating; compose them without overwriting the checks. PR #1948 separately addresses broader MIR4 omission coverage and remains an independent obligation."
+  }
+}
