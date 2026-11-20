@@ -510,6 +510,127 @@ def prototype_capture_file_settings_guard_cases() -> dict:
         }
 
 
+def prototype_capture_file_settings_activation_routing_cases() -> dict:
+    """Run the prepared capture route through an activation boundary only.
+
+    The synthetic repository supplies the three imported helper surfaces as
+    narrow host stubs.  The real entry point performs its ordinary settings
+    preflight, resource-context call, selection/config preparation, and
+    activation-argument construction.  The stubbed activation records its
+    bound parameters and throws before any library mutation or process launch.
+    """
+    source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+    routing_condition = "if ($captureSettings.SettingsMode -ceq 'File')"
+    if source.count(routing_condition) != 1:
+        raise AssertionError("prototype capture File activation routing is missing or ambiguous")
+
+    with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-file-routing-") as temp:
+        root = Path(temp)
+        repo = root / "repo"
+        tool = repo / "tools/Invoke-PrototypeCapture.ps1"
+        immutable = repo / "tools/lib/validation/ImmutableInputStaging.ps1"
+        direct = repo / "tools/lib/validation/DirectLibraryStartupMeasurement.ps1"
+        native = repo / "tools/lib/validation/NativeProbeResources.ps1"
+        activation = repo / "tools/lib/compatibility/LibraryActivation.ps1"
+        health = repo / "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1"
+        for path in (tool, immutable, direct, native, activation, health):
+            path.parent.mkdir(parents=True, exist_ok=True)
+        tool.write_text(source, encoding="utf-8", newline="\n")
+        # The entry point imports ImmutableInputStaging directly, then imports
+        # the direct-startup helper.  This direct-startup host stub owns the
+        # normally-transitive library/resource functions so the actual entry
+        # point reaches Start-MIRLibraryActivation without a real context,
+        # direct-library control write, or process launch.
+        immutable.write_text(
+            """function Get-MIRImmutableInputSha256 { param([string]$Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
+function Get-MIRImmutableInputFileIdentity { param([string]$Path) [pscustomobject]@{path=$Path} }
+function Assert-MIRCheckoutHardLinkBoundary { param([string]$Path) }
+""",
+            encoding="utf-8", newline="\n",
+        )
+        direct.write_text(
+            """function Assert-MIRLibraryPath { param([string]$Path) if(-not (Test-Path -LiteralPath $Path -PathType Leaf)){throw 'HOST_SETTINGS_PATH'} }
+function Read-MIRDirectLibraryStartupProfile { param([string]$Path) @() }
+function Get-MIRDirectLibraryStartupEngineIdentity { param([string]$FactorioBin,[string]$EngineDataDirectory) [pscustomobject]@{path=$FactorioBin;sha256=('E'*64);base_version='2.0.77'} }
+function Get-MIRDirectLibraryStartupArchiveHashes { param([string]$LibraryDirectory,[string]$EngineDataDirectory,$BaseRows,$MirArchive) @{} }
+function Assert-MIRDirectLibraryStartupDeclaredInputs { param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,[string]$ErrorPrefix) }
+function Wait-MIRDirectLibraryStartupAdmission { param($Policy,[string]$WorkRoot,[int64]$EstimatedPeakBytes,[int64]$ExpectedPeakMemoryBytes,[int]$AdmissionWaitSeconds,[string]$Phase) [pscustomobject]@{phase=$Phase;host_only=$true} }
+function New-MIRNativeProbeResourceContext { param([string]$RepoRoot,[string]$OutputRoot,[int]$ExpectedPeakMemoryMiB,[int]$MaxNewOutputMiB,[switch]$UseExactOutputRoot) [pscustomobject]@{root=$OutputRoot;runs=[Collections.Generic.List[object]]::new();host_only=$true} }
+function Write-MIRDirectLibraryStartupProfile { param([string]$Path,$BaseRows,$MirArchive) [IO.Directory]::CreateDirectory(([IO.Path]::GetDirectoryName($Path)))|Out-Null; '{\"mods\":[]}' | Set-Content -LiteralPath $Path -Encoding utf8NoBOM }
+function New-MIRDirectLibraryStartupConfig { param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory) [IO.Directory]::CreateDirectory($WriteDataDirectory)|Out-Null; 'host-only' | Set-Content -LiteralPath $Path -Encoding utf8NoBOM }
+function Start-MIRLibraryActivation {
+  param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$SettingsPath,$SettingsSha256)
+  $capture=[ordered]@{keys=@($PSBoundParameters.Keys|Sort-Object);settings_mode=$SettingsMode;settings_path=$SettingsPath;settings_sha256=$SettingsSha256}
+  [IO.File]::WriteAllText($env:MIR_CAPTURE_ROUTING_CAPTURE,($capture|ConvertTo-Json -Depth 5 -Compress),[Text.UTF8Encoding]::new($false))
+  throw 'HOST_ACTIVATION_BOUNDARY'
+}
+function Write-MIRNativeProbeResult { param($Context,$Record) }
+""",
+            encoding="utf-8", newline="\n",
+        )
+        # These files are identity-only: the direct-startup stub above replaces
+        # their transitive functions before the real tool can invoke them.
+        native.write_text("# host-only native resource identity stub\n", encoding="utf-8", newline="\n")
+        activation.write_text("# host-only library activation identity stub\n", encoding="utf-8", newline="\n")
+        health.write_text("param()\n", encoding="utf-8", newline="\n")
+
+        subprocess.run(["git", "init", "-q", str(repo)], cwd=root, check=True, text=True, capture_output=True)
+        engine = root / "engine"
+        factorio = engine / "bin/x64/factorio.exe"
+        factorio.parent.mkdir(parents=True)
+        factorio.write_bytes(b"host-only capture routing engine")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text(json.dumps({"name": "base", "version": "2.0.77"}), encoding="utf-8")
+        library = root / "library"
+        library.mkdir()
+        settings = root / "cap10-settings.dat"
+        settings.write_bytes(bytes.fromhex("020001001400000000050000000000"))
+        settings_hash = hashlib.sha256(settings.read_bytes()).hexdigest().upper()
+        profile = root / "profile.json"
+        output = repo / "build/tmp/capture-routing-output"
+        capture = root / "activation-arguments.json"
+
+        def invoke(name: str, *, mode: str, runner: Path = tool) -> dict:
+            value = {"mods": [], "settings_mode": mode}
+            command = [
+                "pwsh", "-NoProfile", "-File", str(runner),
+                "-ArchiveLibrary", str(library),
+                "-FactorioBin", str(factorio),
+                "-ProfilePath", str(profile),
+                "-OutputRoot", str(output.with_name(f"capture-routing-{name}")),
+                "-RepoRoot", str(repo),
+            ]
+            if mode == "File":
+                value["settings_sha256"] = settings_hash
+                command.extend(["-SettingsPath", str(settings), "-ExpectedSettingsSha256", settings_hash])
+            profile.write_text(json.dumps(value), encoding="utf-8", newline="\n")
+            capture.unlink(missing_ok=True)
+            result = subprocess.run(
+                command,
+                cwd=repo,
+                text=True,
+                capture_output=True,
+                env={**os.environ, "MIR_CAPTURE_ROUTING_CAPTURE": str(capture)},
+            )
+            return {
+                "returncode": result.returncode,
+                "output": result.stdout + result.stderr,
+                "activation": json.loads(capture.read_text(encoding="utf-8")) if capture.exists() else None,
+            }
+
+        mutant = root / "Invoke-PrototypeCapture-defaults-routing-mutant.ps1"
+        mutant.write_text(
+            source.replace(routing_condition, "if ($captureSettings.SettingsMode -ceq 'Defaults')", 1),
+            encoding="utf-8", newline="\n",
+        )
+        return {
+            "file": invoke("file", mode="File"),
+            "defaults": invoke("defaults", mode="Defaults"),
+            "defaults_routing_mutant": invoke("defaults-routing-mutant", mode="Defaults", runner=mutant),
+        }
+
+
 def prototype_capture_linked_settings_case() -> dict:
     """The real shared reparse guard must reject a linked File-mode input."""
     capture = str(PROTOTYPE_CAPTURE).replace("'", "''")
@@ -1226,6 +1347,41 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("$activationArguments.SettingsSha256 = $captureSettings.SettingsSha256", source)
         self.assertIn("$activation = Start-MIRLibraryActivation @activationArguments", source)
         self.assertIn("settings=[ordered]@{mode=$captureSettings.SettingsMode", source)
+
+    def test_prototype_capture_routes_file_settings_to_activation_without_native_work(self):
+        cases = prototype_capture_file_settings_activation_routing_cases()
+
+        for name in ("file", "defaults"):
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn("HOST_ACTIVATION_BOUNDARY", cases[name]["output"])
+                self.assertIsNotNone(cases[name]["activation"])
+
+        file_activation = cases["file"]["activation"]
+        self.assertEqual(file_activation["settings_mode"], "File")
+        self.assertEqual(file_activation["settings_sha256"], hashlib.sha256(
+            bytes.fromhex("020001001400000000050000000000")
+        ).hexdigest().upper())
+        self.assertTrue(Path(file_activation["settings_path"]).is_absolute())
+        self.assertIn("SettingsPath", file_activation["keys"])
+        self.assertIn("SettingsSha256", file_activation["keys"])
+
+        defaults_activation = cases["defaults"]["activation"]
+        self.assertEqual(defaults_activation["settings_mode"], "Defaults")
+        self.assertIsNone(defaults_activation["settings_path"])
+        self.assertIsNone(defaults_activation["settings_sha256"])
+        self.assertNotIn("SettingsPath", defaults_activation["keys"])
+        self.assertNotIn("SettingsSha256", defaults_activation["keys"])
+
+        # This mutation retains every existing source-string assertion above,
+        # but reverses the actual routing branch.  Its Defaults call wrongly
+        # splats File-only keys, proving this is an execution-path control.
+        mutant = cases["defaults_routing_mutant"]
+        self.assertNotEqual(mutant["returncode"], 0)
+        self.assertIn("HOST_ACTIVATION_BOUNDARY", mutant["output"])
+        self.assertIsNotNone(mutant["activation"])
+        self.assertIn("SettingsPath", mutant["activation"]["keys"])
+        self.assertIn("SettingsSha256", mutant["activation"]["keys"])
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")
