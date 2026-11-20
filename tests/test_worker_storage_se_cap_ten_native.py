@@ -116,8 +116,14 @@ local function create_lab_and_power(force)'''
     def unconditional_cold_pending_actor(self):
         """Load the AFA actor behavior that treated every saved phase as cold."""
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
-        fixed = '''  if cold_pending then
-    if cold_phase == "closed" then
+        diagnostic = '''  if cold_pending then
+    if not source_reload_observed and cold_phase == "source-partial"
+      and script.active_mods["more-infinite-research"] == SOURCE_MIR and state.phase == "source-partial" then
+      source_reload_observed = true
+      frame_diagnostics(state.source_frame, frame(state), "source-reload")
+    end
+'''
+        fixed = diagnostic + '''    if cold_phase == "closed" then
       check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
       marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
     elseif cold_phase == "idle" then
@@ -129,8 +135,7 @@ local function create_lab_and_power(force)'''
     end
     cold_pending, cold_phase = false, nil
   end'''
-        original = '''  if cold_pending then
-    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+        original = diagnostic + '''    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
     marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
   end'''
         self.assertIn(fixed, source)
@@ -139,6 +144,26 @@ local function create_lab_and_power(force)'''
         world.install(lua)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "unconditional-cold-pending-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def extra_expected_frame_actor(self):
+        """Add only synthetic expected leaves to exercise diagnostic bounds."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  return expected
+end
+local function assert_candidate_transfer(state)'''
+        new = '''  for index = 1, 130 do expected["diagnostic-extra-" .. tostring(index)] = index end
+  return expected
+end
+local function assert_candidate_transfer(state)'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-expected-frame-control.lua"
             path.write_text(source, encoding="utf-8", newline="\n")
             lua.globals().cargo_load(path.as_posix())
         return lua
@@ -165,6 +190,9 @@ local function create_lab_and_power(force)'''
 
     def logs(self):
         return list(self.lua.globals().cargo_logs().values())
+
+    def frame_diffs(self):
+        return [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_FRAME_DIFF]")]
 
     def data_stage(self, values=None, ingredients=None):
         """Execute the data-only marker through strict, actual-value proxies."""
@@ -356,9 +384,18 @@ local function create_lab_and_power(force)'''
 
     def test_on_load_source_partial_requires_configuration_before_first_tick(self):
         self.source_to_partial()
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        before_saves = list(self.lua.globals().cargo_saves().values())
         self.lua.globals().cargo_on_load()
         with self.assertRaisesRegex(LuaError, "cold load phase differs"):
             self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before_saves, list(self.lua.globals().cargo_saves().values()))
+        self.assertIn(
+            "summary path=frame origin=source-reload count=0 truncated=false",
+            self.frame_diffs()[-1],
+        )
 
     def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
         lua = self.unsupported_queue_flag_actor()
@@ -425,6 +462,60 @@ local function create_lab_and_power(force)'''
         self.assertIn(f"private_role={world.CANDIDATE}:9:false:true:false", marker)
         self.assertIn(f"head_role={world.HEAD}:5:false:false:false", marker)
         self.assertIn("configuration_startup_settings_changed=true", marker)
+
+    def test_unchanged_candidate_frame_emits_no_transfer_diff(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.frame_diffs())
+
+    def test_candidate_partial_mismatch_keeps_refusal_and_emits_typed_leaf(self):
+        self.source_to_partial()
+        self.lua.execute("CARGO_TRANSFER(); CARGO_FORCE_VALUES._progress=0.25; "
+                         "script.active_mods['more-infinite-research']='5.0.20018'")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.execute("CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                             "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        line = next(line for line in self.frame_diffs() if "path=frame.progress" in line)
+        self.assertIn("expected(number)=", line)
+        self.assertIn("observed(number)=0.25", line)
+        self.assertIn("summary path=frame origin=candidate-transfer count=1 truncated=false", self.frame_diffs()[-1])
+
+    def test_candidate_queue_mismatch_keeps_refusal_and_reports_missing_leaf(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_drop_queue()
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.globals().cargo_candidate("5.0.20018", None)
+        line = next(line for line in self.frame_diffs() if "path=frame.queue[1]" in line)
+        self.assertIn(f'expected(string)="{world.CANDIDATE}"', line)
+        self.assertIn("observed(missing)=<missing>", line)
+
+    def test_candidate_flag_mismatch_keeps_refusal_and_reports_boolean_leaf(self):
+        self.source_to_partial()
+        mutate = self.lua.eval("function(candidate) candidate.enabled=false end")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.globals().cargo_candidate("5.0.20018", mutate)
+        line = next(line for line in self.frame_diffs() if "path=frame.target.enabled" in line)
+        self.assertIn("expected(boolean)=true", line)
+        self.assertIn("observed(boolean)=false", line)
+
+    def test_transfer_diagnostic_bounds_large_missing_expected_set(self):
+        lua = self.extra_expected_frame_actor()
+        lua.globals().cargo_begin()
+        for _ in range(5):
+            lua.globals().cargo_complete(False)
+            lua.globals().cargo_tick(1)
+        lua.globals().cargo_partial(0.42)
+        lua.globals().cargo_tick(1)
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            lua.globals().cargo_candidate("5.0.20018", None)
+        diffs = [line for line in lua.globals().cargo_logs().values()
+                 if line.startswith("[MIR_SE_CARGO_FRAME_DIFF]")]
+        self.assertEqual(2, len(diffs))
+        self.assertIn("path=frame expected(table)=<key-limit-exceeded>", diffs[0])
+        self.assertIn("observed(table)=<key-limit-exceeded>", diffs[0])
+        self.assertIn("summary path=frame origin=candidate-transfer count=1 truncated=true", diffs[-1])
 
     def test_static_canonical_role_mutant_rejects_the_published_private_mapping(self):
         lua = self.static_role_actor()

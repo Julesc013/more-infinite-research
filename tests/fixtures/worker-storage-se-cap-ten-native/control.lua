@@ -332,6 +332,94 @@ local function same(left, right)
   for key in pairs(right) do if left[key] == nil then return false end end
   return true
 end
+-- This is a bounded diagnostic for the one opaque transferred-frame refusal.
+-- It only consumes the fixture's already-constructed plain frame values; it
+-- neither traverses Factorio objects nor changes state, research, or queues.
+local FRAME_DIFF_MAX, FRAME_DIFF_DEPTH, FRAME_DIFF_VISITS, FRAME_DIFF_KEYS = 24, 6, 128, 64
+local source_reload_observed = false
+local function frame_key(key)
+  if type(key) == "number" then return string.format("#%.17g", key) end
+  if type(key) == "string" then return "$" .. key end
+  return "?" .. type(key)
+end
+local function frame_path_key(key)
+  if type(key) == "number" then return "[" .. string.format("%.17g", key) .. "]" end
+  if type(key) == "string" then return "." .. key end
+  return ".<" .. type(key) .. ">"
+end
+local function frame_value(value, present)
+  if not present then return "missing", "<missing>" end
+  local kind = type(value)
+  if kind == "number" then return kind, string.format("%.17g", value) end
+  if kind == "string" then
+    local bounded = #value > 160 and value:sub(1, 160) .. "..." or value
+    return kind, string.format("%q", bounded)
+  end
+  if kind == "boolean" or kind == "nil" then return kind, tostring(value) end
+  return kind, "<" .. kind .. ">"
+end
+local function frame_diagnostics(expected, observed, origin)
+  local rows, visits, truncated = {}, 0, false
+  local function add(path, expected_value, expected_present, observed_value, observed_present)
+    if #rows >= FRAME_DIFF_MAX then truncated = true; return false end
+    local expected_kind, expected_text = frame_value(expected_value, expected_present)
+    local observed_kind, observed_text = frame_value(observed_value, observed_present)
+    rows[#rows + 1] = {path = path, expected_kind = expected_kind, expected_text = expected_text,
+      observed_kind = observed_kind, observed_text = observed_text}
+    return true
+  end
+  local function add_table_limit(path, expected_value, observed_value)
+    truncated = true
+    local row = {path = path, expected_kind = type(expected_value), expected_text = "<key-limit-exceeded>",
+      observed_kind = type(observed_value), observed_text = "<key-limit-exceeded>"}
+    -- Retain an explicit table-level diagnostic even when earlier leaf rows
+    -- used the output allowance; the omitted fields must not depend on pair order.
+    if #rows >= FRAME_DIFF_MAX then rows[#rows] = row else rows[#rows + 1] = row end
+  end
+  local function bounded_keys(expected_value, observed_value)
+    local keys, seen, count = {}, {}, 0
+    local function collect(value)
+      for key in pairs(value) do
+        if not seen[key] then
+          count = count + 1
+          if count > FRAME_DIFF_KEYS then return false end
+          seen[key], keys[#keys + 1] = true, key
+        end
+      end
+      return true
+    end
+    if not collect(expected_value) or not collect(observed_value) then return nil end
+    table.sort(keys, function(left, right) return frame_key(left) < frame_key(right) end)
+    return keys
+  end
+  local function walk(path, expected_value, expected_present, observed_value, observed_present, depth)
+    if #rows >= FRAME_DIFF_MAX then truncated = true; return end
+    visits = visits + 1
+    if visits > FRAME_DIFF_VISITS then truncated = true; return end
+    local expected_kind = expected_present and type(expected_value) or "missing"
+    local observed_kind = observed_present and type(observed_value) or "missing"
+    if expected_kind ~= observed_kind then add(path, expected_value, expected_present, observed_value, observed_present); return end
+    if expected_kind ~= "table" then
+      if not expected_present or expected_value ~= observed_value then add(path, expected_value, expected_present, observed_value, observed_present) end
+      return
+    end
+    if depth >= FRAME_DIFF_DEPTH then truncated = true; return end
+    local keys = bounded_keys(expected_value, observed_value)
+    if not keys then add_table_limit(path, expected_value, observed_value); return end
+    for _, key in ipairs(keys) do
+      walk(path .. frame_path_key(key), expected_value[key], expected_value[key] ~= nil,
+        observed_value[key], observed_value[key] ~= nil, depth + 1)
+      if #rows >= FRAME_DIFF_MAX then truncated = true; return end
+    end
+  end
+  walk("frame", expected, true, observed, true, 0)
+  for _, row in ipairs(rows) do
+    log("[MIR_SE_CARGO_FRAME_DIFF] path=" .. row.path .. " expected(" .. row.expected_kind .. ")=" .. row.expected_text
+      .. " observed(" .. row.observed_kind .. ")=" .. row.observed_text .. " origin=" .. origin)
+  end
+  log("[MIR_SE_CARGO_FRAME_DIFF] summary path=frame origin=" .. origin .. " count=" .. tostring(#rows)
+    .. " truncated=" .. tostring(truncated))
+end
 local function mapped_source_name(name) return name == SOURCE and CANDIDATE or name end
 local function expected_candidate_frame(source)
   local expected = copy(source)
@@ -342,7 +430,9 @@ local function expected_candidate_frame(source)
 end
 local function assert_candidate_transfer(state)
   local expected = expected_candidate_frame(state.source_frame)
-  check(same(frame(state), expected), "candidate changed source frame before observation")
+  local observed = frame(state)
+  if not same(observed, expected) then frame_diagnostics(expected, observed, "candidate-transfer") end
+  check(same(observed, expected), "candidate changed source frame before observation")
   local canonical, gate = technology(state.player, SOURCE), technology(state.player, HEAD)
   check(canonical.level == 5 and canonical.researched == false and canonical.enabled == false
     and canonical.visible_when_disabled == state.source_canonical.visible, "candidate canonical handoff differs")
@@ -415,9 +505,14 @@ local function stage_source_partial_queue(state)
 end
 local function configuration(event)
   check(event and type(event.mod_startup_settings_changed) == "boolean" and type(event.mod_changes) == "table", "configuration event differs")
+  local state = storage[KEY]
+  if not source_reload_observed and script.active_mods["more-infinite-research"] == SOURCE_MIR
+    and type(state) == "table" and state.phase == "source-partial" then
+    source_reload_observed = true
+    frame_diagnostics(state.source_frame, frame(state), "source-reload")
+  end
   local change = event.mod_changes["more-infinite-research"]
   check(change and change.old_version == SOURCE_MIR and type(change.new_version) == "string" and change.new_version ~= SOURCE_MIR, "source-to-candidate identity differs")
-  local state = storage[KEY]
   check(type(state) == "table" and state.phase == "source-partial", "candidate source state differs")
   assert_active_tuple(); assert_settings(); state.worker = CANDIDATE; assert_worker_contract(state.player, CANDIDATE)
   -- This comparison intentionally occurs before candidate feeding or queueing.
@@ -519,6 +614,11 @@ script.on_event(defines.events.on_tick, function(event)
     return
   end
   if cold_pending then
+    if not source_reload_observed and cold_phase == "source-partial"
+      and script.active_mods["more-infinite-research"] == SOURCE_MIR and state.phase == "source-partial" then
+      source_reload_observed = true
+      frame_diagnostics(state.source_frame, frame(state), "source-reload")
+    end
     if cold_phase == "closed" then
       check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
       marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
