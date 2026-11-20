@@ -55,6 +55,17 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
         ok, message = self.lua.eval("paid_source_until_saved(600)")
         self.assertTrue(ok, message)
 
+    def reach_holding(self) -> None:
+        # Use the same finite tick allowance as source creation. A stalled or
+        # changed fixture must fail rather than leave a host process spinning.
+        for _ in range(600):
+            phase = self.lua_value("storage.mir_published473_base_paid_source.phase")
+            if phase == "holding":
+                return
+            self.tick()
+        phase = self.lua_value("storage.mir_published473_base_paid_source.phase")
+        self.assertEqual(phase, "holding", f"source did not reach holding after 600 ticks; phase={phase!r}")
+
     def test_captured_facts_are_small_exact_authoring_input(self) -> None:
         facts = json.loads(FACTS.read_text(encoding="utf-8"))
         description = json.loads(DESCRIPTION.read_text(encoding="utf-8"))
@@ -187,8 +198,7 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
 
     def test_endpoint_mutation_during_hold_refuses(self) -> None:
         self.init()
-        while self.lua_value("storage.mir_published473_base_paid_source.phase") != "holding":
-            self.tick()
+        self.reach_holding()
         self.lua.eval("paid_source_drift_foreign_queue()")
         ok, message = self.lua.eval("paid_source_tick(1, false)")
         self.assertFalse(ok)
@@ -197,8 +207,7 @@ class PublishedBasePaidSourceTests(unittest.TestCase):
 
     def test_material_nonzero_progress_drift_refuses_despite_native_float_tolerance(self) -> None:
         self.init()
-        while self.lua_value("storage.mir_published473_base_paid_source.phase") != "holding":
-            self.tick()
+        self.reach_holding()
         self.lua.execute(f'game.forces["{FOREIGN}"].research_progress=.421')
         ok, message = self.lua.eval("paid_source_tick(1, false)")
         self.assertFalse(ok)
@@ -252,7 +261,7 @@ def main() -> int:
     runtime_dir = Path(args.lua_runtime_dir)
     sys.path.insert(0, str(runtime_dir))
     global LuaRuntime
-    from lupa import LuaRuntime
+    from lupa.lua52 import LuaRuntime
 
     unittest.main(argv=[sys.argv[0], *remaining], verbosity=2)
     return 0
