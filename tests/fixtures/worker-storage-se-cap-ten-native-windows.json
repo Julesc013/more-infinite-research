@@ -4,10 +4,10 @@
   "case_id": "gamer433-se0757-worker-storage-cap-ten-f394-to-e334",
   "authority": "PREPARED_CASE_SPECIFIC_OWNER_ONLY; EXECUTE_REQUIRES_SEPARATE_NATIVE_ADMISSION_AND_INDEPENDENT_REVIEW",
   "prepared_from": {
-    "fixture_commit": "038426b9d6cec8ad9b0abfc99db2e9dd23950b42",
+    "fixture_commit": "7cfad2708e790b024e2493d00ed5892ac0c2601a",
     "fixture_strict_world_test_followup": "69bb6aa197534dae1a0d63569ac46130d6806f4a",
-    "source_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/source-f394-full-cargo-profile-windows-r03.json",
-    "candidate_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/candidate-e334-full-cargo-profile-windows-r03.json",
+    "source_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/source-f394-full-cargo-profile-windows-r04.json",
+    "candidate_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/candidate-e334-full-cargo-profile-windows-r04.json",
     "generic_runner_limit": "Invoke-NativeFixture retains its F210/default finite-speed File-settings guard. This owner is the narrow F200/File-settings/console/marker lifecycle consumer; it does not weaken or call the generic guard.",
     "engine_binding_limit": "This packet selects only the reviewed Windows D3 full 2.0.77 binding. It is distinct from, and does not relabel, the Linux C9 headless packet."
   },
@@ -26,17 +26,17 @@
     "source_mir": {"filename":"more-infinite-research_4.7.20002.zip","sha256":"F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7","bytes":1449338,"path":null,"published_commit":"bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"},
     "candidate_mir": {"filename":"more-infinite-research_5.0.20018.zip","sha256":"E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD","bytes":1054386,"path":null,"source_commit":"862dee34c4716cb17dfb48deb12a99e6bc8f1dfc","player_tree":"ec9abdc840aefdd25e66a5787d89e5ad045837c9"},
     "fixture": {
-      "filename":"mir-fixture-mir5-worker-storage-se-cap-ten-native_0.1.0.zip","sha256":"B1C657AEC7D4DA2F1A608D2EEA8D989EE51A216A4CD830C94AA1FB631F3297FE","bytes":11278,"path":null,"source_commit":"038426b9d6cec8ad9b0abfc99db2e9dd23950b42",
+      "filename":"mir-fixture-mir5-worker-storage-se-cap-ten-native_0.1.0.zip","sha256":"228791861B63A1C9B4FE6083594C20DE66C877F685652DD981B76491C598D52E","bytes":11472,"path":null,"source_commit":"7cfad2708e790b024e2493d00ed5892ac0c2601a",
       "expected_data_stage_construction":{"name":"worker-robots-storage-4","prerequisite":"worker-robots-storage-3","formula":"675*1.5^(L-4)","time":"60","ingredients":"automation-science-pack:1,chemical-science-pack:1,logistic-science-pack:1,production-science-pack:1,se-material-science-pack-1:1,se-rocket-science-pack:1,space-science-pack:1","effects":"worker-robot-storage:1"}
     },
     "settings": {
       "sha256":"149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7","bytes":511,"typed_value_count":7,
       "expected_data_stage_values":{"mir-enable-worker-robots-storage":"boolean:true","mir-max-level-worker-robots-storage":"number:10","mir-cost-base-worker-robots-storage":"number:200","mir-cost-linear-increment-worker-robots-storage":"number:0","mir-cost-growth-worker-robots-storage":"number:1.5","mir-research-time-worker-robots-storage":"number:60","mir-effect-per-level-worker-robots-storage":"number:1"},"path":null
     },
-    "source_profile":{"sha256":"8C7872264BB01F5730A77F90BF44B44CAB6BB37FF5521113DC0C6B7ED8D637E9","bytes":5277,"path":null},
-    "candidate_profile":{"sha256":"2D7BAE057E1E7E49AE46293DD4FA34C9DA8793F72922D866C77ADB34010E2AEB","bytes":5342,"path":null},
+    "source_profile":{"sha256":"76273C6BBE25D0E0CC18CD447057A715A4052E3186CD032DBCC02152D53FFF67","bytes":5007,"path":null},
+    "candidate_profile":{"sha256":"FFF9560988F0A6E7EC08C30245494DA38D0E3A50AAF4352F2A491930B2188490","bytes":5072,"path":null},
     "actor_members":[
-      {"path":"control.lua","sha256":"F94E54FD268FB94D8B793E83233D650549044C0326B4352B398538987C951453","bytes":26050},
+      {"path":"control.lua","sha256":"43BDC761671F6DE2DD43634C15B7A7A08E8F482E700045717145A52945BB7141","bytes":27285},
       {"path":"data-final-fixes.lua","sha256":"E860A534CE99E25D300988E9684B1D03F2DC3CA6CAEF8BB0851E5066270B1926","bytes":3493},
       {"path":"data.lua","sha256":"6C30FB3F21238E3D3AC46D09C7F23A2510FA215E26F312850276E2579C690CEF","bytes":1053},
       {"path":"info-f200.json","sha256":"280292F01A17994DCEB5D7731FA60029928A7F9E9F28890EBB0872A099D01398","bytes":452},

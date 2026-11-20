@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop'
 # F210/default-settings-only for its existing finite-speed protocol.
 $script:CargoActorRoot = 'tests/fixtures/worker-storage-se-cap-ten-native'
 $script:CargoActorMembers = @(
-    [ordered]@{path='control.lua';sha256='F94E54FD268FB94D8B793E83233D650549044C0326B4352B398538987C951453';bytes=26050},
+    [ordered]@{path='control.lua';sha256='43BDC761671F6DE2DD43634C15B7A7A08E8F482E700045717145A52945BB7141';bytes=27285},
     [ordered]@{path='data-final-fixes.lua';sha256='E860A534CE99E25D300988E9684B1D03F2DC3CA6CAEF8BB0851E5066270B1926';bytes=3493},
     [ordered]@{path='data.lua';sha256='6C30FB3F21238E3D3AC46D09C7F23A2510FA215E26F312850276E2579C690CEF';bytes=1053},
     [ordered]@{path='info-f200.json';sha256='280292F01A17994DCEB5D7731FA60029928A7F9E9F28890EBB0872A099D01398';bytes=452},
@@ -38,12 +38,12 @@ $script:CargoEngineBindings = [ordered]@{
 }
 $script:CargoProfilePins = [ordered]@{
     'linux-c9-headless-2.0.77' = [ordered]@{
-        source_sha256='38662DED354D9602E1CBDB2F13DFFF7B439C929A6F81619742968CA7D61C083D';source_bytes=5108
-        candidate_sha256='D540C424BC8D98CF8E73EEB4FCF0E68684B9CA18F3E2254FEF3BBACA6A55614C';candidate_bytes=5176
+        source_sha256='FE43E77B748F026D0D040913A37BDA3687658AE1FA720F3DC96C6D5758CB7633';source_bytes=4809
+        candidate_sha256='DE15A5B886E883C76B0C07FAF238571541E346C4A4CC76B1D25E42381902762B';candidate_bytes=4874
     }
     'windows-d3-full-2.0.77' = [ordered]@{
-        source_sha256='8C7872264BB01F5730A77F90BF44B44CAB6BB37FF5521113DC0C6B7ED8D637E9';source_bytes=5277
-        candidate_sha256='2D7BAE057E1E7E49AE46293DD4FA34C9DA8793F72922D866C77ADB34010E2AEB';candidate_bytes=5342
+        source_sha256='76273C6BBE25D0E0CC18CD447057A715A4052E3186CD032DBCC02152D53FFF67';source_bytes=5007
+        candidate_sha256='FFF9560988F0A6E7EC08C30245494DA38D0E3A50AAF4352F2A491930B2188490';candidate_bytes=5072
     }
 }
 $script:CargoSEMods = @(
@@ -156,9 +156,9 @@ function Assert-CargoCapTenPacket {
     Assert-CargoCapTenEqual ([int64]$Packet['inputs']['candidate_mir']['bytes']) 1054386 'candidate MIR bytes'
     Assert-CargoCapTenEqual $Packet['inputs']['candidate_mir']['source_commit'] '862dee34c4716cb17dfb48deb12a99e6bc8f1dfc' 'candidate source commit'
     Assert-CargoCapTenEqual $Packet['inputs']['candidate_mir']['player_tree'] 'ec9abdc840aefdd25e66a5787d89e5ad045837c9' 'candidate player tree'
-    Assert-CargoCapTenEqual $Packet['inputs']['fixture']['sha256'].ToUpperInvariant() 'B1C657AEC7D4DA2F1A608D2EEA8D989EE51A216A4CD830C94AA1FB631F3297FE' 'fixture SHA-256'
-    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['fixture']['bytes']) 11278 'fixture bytes'
-    Assert-CargoCapTenEqual $Packet['inputs']['fixture']['source_commit'] '038426b9d6cec8ad9b0abfc99db2e9dd23950b42' 'fixture source commit'
+    Assert-CargoCapTenEqual $Packet['inputs']['fixture']['sha256'].ToUpperInvariant() '228791861B63A1C9B4FE6083594C20DE66C877F685652DD981B76491C598D52E' 'fixture SHA-256'
+    Assert-CargoCapTenEqual ([int64]$Packet['inputs']['fixture']['bytes']) 11472 'fixture bytes'
+    Assert-CargoCapTenEqual $Packet['inputs']['fixture']['source_commit'] '7cfad2708e790b024e2493d00ed5892ac0c2601a' 'fixture source commit'
     $expectedConstruction=$Packet['inputs']['fixture']['expected_data_stage_construction'];Require-CargoCapTen ($expectedConstruction-is[Collections.IDictionary]) 'fixture data-stage construction is unavailable';Require-CargoCapTen ($expectedConstruction.Count-eq$script:CargoExpectedConstruction.Count) 'fixture data-stage construction count differs'
     foreach($field in $script:CargoExpectedConstruction.Keys){Require-CargoCapTen ($expectedConstruction.Contains($field)) "fixture data-stage construction field is absent: $field";Assert-CargoCapTenEqual $expectedConstruction[$field] $script:CargoExpectedConstruction[$field] "fixture data-stage construction $field"}
     Assert-CargoCapTenEqual $Packet['inputs']['settings']['sha256'].ToUpperInvariant() '149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7' 'File settings SHA-256'
@@ -200,7 +200,7 @@ function Assert-CargoCapTenPacket {
         Require-CargoCapTen ($state.state-ceq'verified_local_input') "helper source is unavailable: $($canonical.path)"
     }
     $control=Get-Content -LiteralPath (Join-Path $RepoRoot (Join-Path $script:CargoActorRoot 'control.lua')) -Raw
-    foreach($fragment in @('remote.add_interface(FIXTURE, {begin = begin_source})','check(event and event.research == target and event.by_script == false','state.source_frame, state.source_canonical, state.source_role, state.phase = frame(state),','assert_candidate_transfer(state)','assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate cap")','assert_tail_current(state, "candidate cap")','marker("candidate-closed", state, {cap_attempt = "refused"','marker("cold-read", state, {cold_writes = 0}')){
+    foreach($fragment in @('remote.add_interface(FIXTURE, {begin = begin_source})','check(event and event.research == target and event.by_script == false','state.source_frame, state.source_canonical, state.source_role, state.phase = frame(state),','assert_candidate_transfer(state)','assert_earned_bonuses(state, state.ordinary, state.candidate_events, "candidate cap")','assert_tail_current(state, "candidate cap")','cold_phase = type(state) == "table" and state.phase or nil','elseif cold_phase == "idle" then','elseif cold_phase == "source-partial" then','marker("candidate-closed", state, {cap_attempt = "refused"','marker("cold-read", state, {cold_writes = 0}')){
         Require-CargoCapTen $control.Contains($fragment) "actor contract source fragment is absent: $fragment"
     }
 }
