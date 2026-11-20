@@ -4,10 +4,10 @@
   "case_id": "gamer433-se0757-worker-storage-cap-ten-f394-to-e334",
   "authority": "PREPARED_CASE_SPECIFIC_OWNER_ONLY; EXECUTE_REQUIRES_SEPARATE_NATIVE_ADMISSION_AND_INDEPENDENT_REVIEW",
   "prepared_from": {
-    "fixture_commit": "00d6b2dca3dca5da8584577178e9d4cb12ac589b",
-    "fixture_merged_commit": "25fb01763a5789b6a2838ae2053b5e979fcab62f",
-    "source_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/source-f394-full-cargo-profile-r01.json",
-    "candidate_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/candidate-e334-full-cargo-profile-r01.json",
+    "fixture_commit": "038426b9d6cec8ad9b0abfc99db2e9dd23950b42",
+    "fixture_strict_world_test_followup": "69bb6aa197534dae1a0d63569ac46130d6806f4a",
+    "source_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/source-f394-full-cargo-profile-r02.json",
+    "candidate_profile_receipt": "build/qualification/mir5-audit-intake-20261118-r01/gamer433-se-cargo-full-preparation-r01/candidate-e334-full-cargo-profile-r02.json",
     "generic_runner_limit": "Invoke-NativeFixture retains its F210/default finite-speed File-settings guard. This owner is the narrow F200/File-settings/console/marker lifecycle consumer; it does not weaken or call the generic guard."
   },
   "inputs": {
@@ -36,10 +36,10 @@
     },
     "fixture": {
       "filename": "mir-fixture-mir5-worker-storage-se-cap-ten-native_0.1.0.zip",
-      "sha256": "FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0",
-      "bytes": 9275,
+      "sha256": "B1C657AEC7D4DA2F1A608D2EEA8D989EE51A216A4CD830C94AA1FB631F3297FE",
+      "bytes": 11278,
       "path": null,
-      "source_commit": "00d6b2dca3dca5da8584577178e9d4cb12ac589b",
+      "source_commit": "038426b9d6cec8ad9b0abfc99db2e9dd23950b42",
       "expected_data_stage_construction": {
         "name": "worker-robots-storage-4",
         "prerequisite": "worker-robots-storage-3",
@@ -64,10 +64,10 @@
       },
       "path": null
     },
-    "source_profile": {"sha256": "763454DAC5447C12918296DFB0CA11678B2B794A8309E4846D0524FB17F3A2D7", "bytes": 5388, "path": null},
-    "candidate_profile": {"sha256": "C82C3BC3DD7A4CA3F6E38F54B37F09A1E40B94D7259BA6294C3F26941B247052", "bytes": 5462, "path": null},
+    "source_profile": {"sha256": "38662DED354D9602E1CBDB2F13DFFF7B439C929A6F81619742968CA7D61C083D", "bytes": 5108, "path": null},
+    "candidate_profile": {"sha256": "D540C424BC8D98CF8E73EEB4FCF0E68684B9CA18F3E2254FEF3BBACA6A55614C", "bytes": 5176, "path": null},
     "actor_members": [
-      {"path":"control.lua","sha256":"0013ED9DABFCB4DA35B65434026046175F1D944932EB4343DE9121DAF3F347E2","bytes":16493},
+      {"path":"control.lua","sha256":"F94E54FD268FB94D8B793E83233D650549044C0326B4352B398538987C951453","bytes":26050},
       {"path":"data-final-fixes.lua","sha256":"E860A534CE99E25D300988E9684B1D03F2DC3CA6CAEF8BB0851E5066270B1926","bytes":3493},
       {"path":"data.lua","sha256":"6C30FB3F21238E3D3AC46D09C7F23A2510FA215E26F312850276E2579C690CEF","bytes":1053},
       {"path":"info-f200.json","sha256":"280292F01A17994DCEB5D7731FA60029928A7F9E9F28890EBB0872A099D01398","bytes":452},
