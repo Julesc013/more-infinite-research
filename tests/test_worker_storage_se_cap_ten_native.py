@@ -70,6 +70,36 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
             lua.globals().cargo_load(path.as_posix())
         return lua
 
+    def absent_science_reader_actor(self):
+        """Load the exact former nonempty-stack requirement as an in-memory mutant."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old_total = "  local total = 0"
+        new_total = "  local total, stacks = 0, 0"
+        self.assertIn(old_total, source)
+        source = source.replace(old_total, new_total, 1)
+        old_increment = "      total = total + stack.count - 1 + durability / maximum"
+        new_increment = "      total, stacks = total + stack.count - 1 + durability / maximum, stacks + 1"
+        self.assertIn(old_increment, source)
+        source = source.replace(old_increment, new_increment, 1)
+        old = '''  end
+  return total
+end
+local assert_lab'''
+        new = '''  end
+  check(stacks > 0, label .. " native science stack is absent: " .. item)
+  return total
+end
+local assert_lab'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "absent-science-reader-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
     def historical_buffer_refill_actor(self):
         """Load the exact pre-grid feed write against the strict entity proxy."""
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -189,6 +219,24 @@ local function assert_candidate_transfer(state)'''
         self.lua.globals().cargo_complete(False)
         self.lua.globals().cargo_tick(1)
         self.assertEqual("closed", self.lua.globals().cargo_phase())
+
+    def candidate_to_await_close(self, lua=None):
+        actor = lua or self.lua
+        actor.globals().cargo_begin()
+        for _ in range(5):
+            actor.globals().cargo_complete(False)
+            actor.globals().cargo_tick(1)
+        self.assertEqual("source-await-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_partial(0.42)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("source-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_candidate("5.0.20018", None)
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        actor.globals().cargo_complete(False)
+        self.assertEqual(world.TAIL, actor.globals().cargo_current_name())
+        self.assertEqual([world.TAIL], list(actor.globals().cargo_queue_names().values()))
+        return actor
 
     def logs(self):
         return list(self.lua.globals().cargo_logs().values())
@@ -713,6 +761,46 @@ local function assert_candidate_transfer(state)'''
         self.assertIn("science_debit=automation-science-pack:7.42", log)
         self.assertEqual(["mir5-se-worker-storage-cap10-source", "mir5-se-worker-storage-cap10-candidate"], list(self.lua.globals().cargo_saves().values()))
         self.assert_complete_policy_observation("candidate-closed")
+
+    def test_exhausted_valid_native_lab_science_closes_candidate_with_zero_remaining(self):
+        self.candidate_to_await_close()
+        self.lua.globals().cargo_exhaust_science()
+        self.assertEqual({pack: 0 for pack in world.SCIENCE}, dict(self.lua.globals().cargo_counts().items()))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+        log = self.logs()[-1]
+        self.assertIn("science_remaining=automation-science-pack:0", log)
+        self.assertIn("science_debit=automation-science-pack:200", log)
+        self.assertIn(f"current={world.TAIL}", log)
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_former_nonempty_science_stack_reader_refuses_the_valid_exhausted_lab(self):
+        lua = self.absent_science_reader_actor()
+        self.candidate_to_await_close(lua)
+        lua.globals().cargo_exhaust_science()
+        with self.assertRaisesRegex(LuaError, "native science stack is absent: automation-science-pack"):
+            lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-await-cap", lua.globals().cargo_phase())
+
+    def test_unavailable_unreadable_and_malformed_science_observations_do_not_become_zero(self):
+        for setup, expected in (
+            ("cargo_missing_science_input", "native SE lab input differs"),
+            ("cargo_invalid_science_input", "native SE lab input differs"),
+            ("cargo_missing_science_input_valid", "native SE lab input differs"),
+            ("cargo_nonboolean_science_input_valid", "native SE lab input differs"),
+            ("cargo_missing_science_stack_flag", "native science read flag differs: automation-science-pack"),
+            ("cargo_nonboolean_science_stack_flag", "native science read flag differs: automation-science-pack"),
+            ("cargo_missing_science_prototype", "native science prototype differs: automation-science-pack"),
+            ("cargo_science_stack_read_error", "LuaInventory science stack read unavailable"),
+            ("cargo_malformed_science_stack", "native science count differs: automation-science-pack"),
+        ):
+            with self.subTest(setup=setup):
+                lua = self.fresh_actor()
+                self.candidate_to_await_close(lua)
+                getattr(lua.globals(), setup)()
+                with self.assertRaisesRegex(LuaError, expected):
+                    lua.globals().cargo_tick(1)
+                self.assertEqual("candidate-await-cap", lua.globals().cargo_phase())
 
     def assert_complete_policy_observation(self, phase):
         rows = [row for row in self.force_contributions()
