@@ -1,0 +1,128 @@
+{
+  "kind": "MIRCapConfigurationObservationEvidenceV1",
+  "schema": 1,
+  "verdict": "expected-read-only-cap-projection-observed",
+  "qualification": false,
+  "scope": "Original R04 successor, same f5/D1/2.0.77/SE0.7.57, only typed worker cap10-to12. Not ordinary research/save/cold qualification.",
+  "input": {
+    "source_save_sha256": "AA1F1B849F65757E67C708356F6273DF2E3FB7FA22126FC694A16F70D5A5B5B1",
+    "source_save_bytes": 1463731,
+    "candidate_source_commit": "f5b63b1c76d5714b0e8c41fe4dbe42ce30b5d859",
+    "candidate_player_tree": "57063da4e3f3fc988584b2769b8497903a33a98d",
+    "candidate_archive_sha256": "D1DCD353829FFD4F647544474E117AE4B7AD47C3E32CAFA4BA0A4B24E0F04C43",
+    "actor_commit": "e40623d96dc05c670d75c6f472f3ca2def84114d",
+    "actor_archive_sha256": "A079A911C09B7E65195FC3030F593DE3E5826B3C2D694D5DA420B5EEA77800A4",
+    "settings_sha256": "05B34741E565FBBC8485276D0EB49FB661000AA3F1E26BAFA6CA495792B944A1",
+    "controller_sha256": "E55808722763EFA7C073AE1E1CF39EEBC6421960914BC82FF89040689D5DF2CF",
+    "packet_sha256": "F5A6FC2F547AC8F4D59458DA93BC0D5C4E5E1651EEF6CFBEFEF34BAC242FB89F",
+    "dependency_archive_count": 17,
+    "all13_packet_inputs_verified": true,
+    "typed_settings_independently_decoded_changes": {
+      "mir-max-level-worker-robots-storage": [
+        10.0,
+        12.0
+      ]
+    }
+  },
+  "execution": {
+    "invocation_id": "3be7494931ef4c3a9b341ba1449347d6",
+    "controller_pid": 127335,
+    "native_identity": {
+      "pid": 129425,
+      "start_ticks": 4614620,
+      "session_id": 129425,
+      "kind": "MIR441LinuxNativeLaunchV1"
+    },
+    "process_count": 1,
+    "native_exit_code": 1,
+    "timed_out": false,
+    "native_duration_seconds": 2.790758,
+    "result_status": "failed",
+    "result_passed": false,
+    "qualification": false,
+    "reason": "The unchanged old closed-state comparator rejects the intended enabled false-to-true change after complete observation; the native exit is not relabelled as a functional pass."
+  },
+  "observations": {
+    "actual_marker": {
+      "event_startup_settings_changed": "true",
+      "saved_configuration_startup_settings_changed": "false",
+      "configured_cap": "12",
+      "mir_change": "missing",
+      "mir_old": "missing",
+      "mir_new": "missing",
+      "worker": "mir-worker-storage-default-4",
+      "level": "11",
+      "enabled": "true",
+      "current": "mir-fixture-worker-storage-se-cap-ten-tail",
+      "progress": "0",
+      "queue": "mir-fixture-worker-storage-se-cap-ten-tail",
+      "science_issued": "automation-science-pack:22600,logistic-science-pack:22600,chemical-science-pack:22600,production-science-pack:22600,se-rocket-science-pack:22600,se-material-science-pack-1:22600,space-science-pack:22600",
+      "science_remaining": "automation-science-pack:0,logistic-science-pack:0,chemical-science-pack:0,production-science-pack:0,se-rocket-science-pack:0,se-material-science-pack-1:0,space-science-pack:0",
+      "science_debit": "automation-science-pack:22600,logistic-science-pack:22600,chemical-science-pack:22600,production-science-pack:22600,se-rocket-science-pack:22600,se-material-science-pack-1:22600,space-science-pack:22600",
+      "bonus": "number:10",
+      "maximum": "number:4294967295",
+      "unit_count": "number:11533",
+      "unit_time": "number:3600",
+      "unit_formula": "string:\"675*1.5^(L-4)\""
+    },
+    "all42_original_closed_force_fields_unchanged": true,
+    "science_and_tail_progress_unchanged": true,
+    "sole_complete_bounded_difference": "frame.target.enabled false to true; count1; truncated=false",
+    "event_startup_flag": true,
+    "original_saved_startup_flag": false,
+    "new_research_or_save": false,
+    "eligibility_not_start": "Worker11 is enabled; no actual research start/completion was attempted.",
+    "source_interpretation": "The narrow SE bridge skips this same-version settings event, but no SE-field reset was observed. This case does not justify broadening restoration."
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "f654eea8f893395143f5c15f23938b75d30f2e95",
+    "path": "projects/mir/tasks/gunmetal-worker-cap10-diagnostic-r01/cap12-configuration-probe-r02",
+    "primary_path": "build/qualification/gunmetal-cap12-r02-root-readback-r01",
+    "verified_remote_files": 55,
+    "verified_original_bodies": 11,
+    "save_copies_crc_checked": 2,
+    "capsules": [
+      {
+        "path": "native-original-body-custody.tar.gz",
+        "sha256": "AB1EC0BA499E754159C0301D4F789FF21F88EC13532FCE1644193C1B8B98CF9D",
+        "bytes": 2915711,
+        "manifest": "native-original-body-custody-manifest.json",
+        "manifest_sha256": "DD264D5D0757462D98EB2AD722F44B7F2049D2D2E9F6E6020AE156DC40E1CADA",
+        "bodies": 10,
+        "uncompressed_bytes": 3067902
+      },
+      {
+        "path": "control-original-body-custody.tar.gz",
+        "sha256": "38D261E6CA5FCE12F39895EF5D5100F8EF47F25667CB3A234344500A18908976",
+        "bytes": 745,
+        "manifest": "control-original-body-custody-manifest.json",
+        "manifest_sha256": "2C6CAFB23D3F16AC5CC40CFD540D7395E56270B12B47D87A0B19465142818E67",
+        "bodies": 1,
+        "uncompressed_bytes": 4552
+      }
+    ],
+    "raw_result_sha256": "0CA35A9C12D232FF9C16647A82BE822BEA72B50E89A595DA27FA8A8A808A5785",
+    "independent_verdict": "independent-native-verdict-r01.json",
+    "review_timing": "Root independently reviewed the actor before adopting its original completed packet/raw custody retrospectively; no pre-dispatch packet approval is fabricated.",
+    "retracted_reviewer_claim": "Root incorrectly claimed Technology lacked the formula getter, then immediately retracted it after exact2.0.77 API inspection. Both Technology and Prototype expose it; the actor required no change."
+  },
+  "cleanup": {
+    "status": "post-cleanup-readback",
+    "observed_utc": "2026-11-20T22:34:44.047158+00:00",
+    "checks": {
+      "data_removed": true,
+      "control_removed": true,
+      "no_active_profile": true,
+      "unit_collected": true,
+      "no_factorio": true,
+      "protected_inputs_preserved": true
+    }
+  },
+  "remaining": [
+    "Authentic published517 five-pack earned-source and affected transfer/lifetime/settings/provider/force-merge routes",
+    "A separately identified actual cap12 research/successor/two-cold phase, preferably combined with historical qualification",
+    "Other family/edition/client/physical-output/performance/stable and verified delivery gates",
+    "Continuous worker and abrupt interruption/reboot recovery"
+  ]
+}
