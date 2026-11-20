@@ -1009,7 +1009,7 @@ end
 local function default_contract_failure(predicate, source, owner, current, owner_creator, comparison, cause)
   local details = {"predicate=" .. predicate,
     "route=" .. configuration_context.rejected_value(current and current.kind or "unclassified"),
-    "owner_creator=" .. configuration_context.rejected_value(owner_creator)}
+    "owner_creator=" .. (predicate == "public-route" and "unobserved" or configuration_context.rejected_value(owner_creator))}
   if comparison then details[#details + 1] = "comparison=" .. comparison end
   if cause ~= nil then details[#details + 1] = "cause=" .. configuration_context.rejected_value(cause) end
   local function observed(read)
