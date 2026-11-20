@@ -1700,6 +1700,10 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
             "reset did not clear legacy holder: level="..legacy.level.." researched="..tostring(legacy.researched)
               .." saved="..legacy.saved_progress.." enabled="..tostring(legacy.enabled)
               .." visible="..tostring(legacy.visible_when_disabled))
+          -- Bootstrap routes the retained private-worker reset hook before
+          -- default-owner recovery.  Its no-history path must not turn the
+          -- cleared historical holder into current work.
+          history.on_force_reset{force=player};writes=0
           assert(history.default_owner_on_force_reset{force=player})
           local record=storage[OWNER_KEY]
           assert(record.schema==4 and record.forces[player.index].phase=="owned")
