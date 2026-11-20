@@ -126,6 +126,7 @@ local function create_lab_and_power(force)'''
 '''
         fixed = diagnostic + '''    if cold_phase == "closed" then
       check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      observe_force_contributions("cold-read")
       marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
     elseif cold_phase == "idle" then
       check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
@@ -711,6 +712,20 @@ local function assert_candidate_transfer(state)'''
         self.assertIn("technology_price_multiplier=1", log)
         self.assertIn("science_debit=automation-science-pack:7.42", log)
         self.assertEqual(["mir5-se-worker-storage-cap10-source", "mir5-se-worker-storage-cap10-candidate"], list(self.lua.globals().cargo_saves().values()))
+        self.assert_complete_policy_observation("candidate-closed")
+
+    def assert_complete_policy_observation(self, phase):
+        rows = [row for row in self.force_contributions()
+                if f"phase={phase} " in row and 'force_name="conquest" kind=force ' in row]
+        self.assertEqual(len(rows), 1)
+        expected = {"worker_robots_storage_bonus": 3, "worker_robots_speed_modifier": 5.65,
+                    "artillery_range_modifier": 1.8, "artillery_shell_gun_speed_modifier": 6,
+                    "laser_gun_speed_modifier": 2.2, "laser_ammo_damage_modifier": 5.1}
+        for name, value in expected.items():
+            match = re.search(rf"\b{name}=([^ ]+)", rows[0])
+            self.assertIsNotNone(match, name)
+            self.assertEqual(float(match.group(1)), value, name)
+        self.assertIn(f"summary phase={phase} forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
 
     def test_cap_refusal_preserves_unrelated_tail_as_current_queue_and_science(self):
         self.source_to_partial()
@@ -777,6 +792,7 @@ local function assert_candidate_transfer(state)'''
         self.assertEqual(saves, list(self.lua.globals().cargo_saves().values()))
         self.assertIn("phase=cold-read", self.logs()[-1])
         self.assertIn("cold_writes=0", self.logs()[-1])
+        self.assert_complete_policy_observation("cold-read")
 
     def test_cold_mutation_is_rejected(self):
         self.candidate_to_closed()

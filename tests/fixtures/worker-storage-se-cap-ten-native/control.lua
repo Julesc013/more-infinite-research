@@ -348,7 +348,9 @@ local CONTRIBUTION_PHASES = {
   ["mir-config-entry"] = true,
   ["mir-worker-applied"] = true,
   ["mir-config-exit"] = true,
-  ["candidate-transfer"] = true
+  ["candidate-transfer"] = true,
+  ["candidate-closed"] = true,
+  ["cold-read"] = true
 }
 local CONTRIBUTION_TECHNOLOGIES = {
   "worker-robots-storage-1", "worker-robots-storage-2", "worker-robots-storage-3", "worker-robots-storage-4",
@@ -706,6 +708,7 @@ local function close_candidate(state)
   state.player.laboratory_speed_modifier = state.speed_before
   for _, pack in ipairs(SCIENCE) do check(after.debit[pack] > state.source_frame.science.debit[pack], "candidate native science debit differs: " .. pack) end
   state.closed, state.phase = frame(state), "closed"
+  observe_force_contributions("candidate-closed")
   game.server_save(CANDIDATE_SAVE)
   marker("candidate-closed", state, {cap_attempt = "refused", candidate_events = state.candidate_events, save = CANDIDATE_SAVE})
 end
@@ -785,6 +788,7 @@ script.on_event(defines.events.on_tick, function(event)
     end
     if cold_phase == "closed" then
       check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      observe_force_contributions("cold-read")
       marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
     elseif cold_phase == "idle" then
       check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
