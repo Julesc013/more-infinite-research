@@ -1110,8 +1110,11 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
     def test_default_contract_refusals_identify_failed_predicate_without_writes(self):
         opponents = (
-            ('creators[CANONICAL]="foreign"', ('predicate=public-route', 'route=external')),
+            ('creators[CANONICAL]="foreign"', ('predicate=public-route', 'route=external', 'owner_creator=unobserved')),
             ('creators[ORDINARY]="foreign"', ('predicate=owner-creator', 'owner_creator=foreign')),
+            ('local previous_history=prototypes.get_history;prototypes.get_history=function(kind,name) '
+             'if name==ORDINARY then return {} end;return previous_history(kind,name) end',
+             ('predicate=owner-creator', 'owner_creator=absent')),
             ('prototypes.technology[ORDINARY].research_unit_energy=3600',
              ('predicate=work-contract', 'comparison=unequal-fingerprint', 'research_unit_energy.canonical=1800',
               'research_unit_energy.owner=3600')),
