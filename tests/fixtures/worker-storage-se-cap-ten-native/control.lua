@@ -433,8 +433,13 @@ script.on_event(defines.events.on_tick, function()
   if not active() then return end
   local state = storage[KEY]; if type(state) ~= "table" then return end
   if cold_pending then
-    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
-    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+    cold_pending = false
+    -- The source seed and the upgrading source also run on_load.  Only a
+    -- completed candidate is a read-only verification endpoint.
+    if state.phase == "closed" then
+      check(same(frame(state), state.closed), "cold process changed candidate endpoint")
+      marker("cold-read", state, {cold_writes = 0}); return
+    end
   end
   if state.phase == "source-working" or state.phase == "candidate-working" then feed(state)
   elseif state.phase == "source-await-queue" then stage_source_partial_queue(state)

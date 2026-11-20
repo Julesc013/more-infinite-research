@@ -86,6 +86,28 @@ class WorkerStorageSECapTenNativeTests(unittest.TestCase):
         self.lua.globals().cargo_tick(1)
         self.assertEqual("closed", self.lua.globals().cargo_phase())
 
+    def test_source_seed_reload_waits_for_explicit_begin(self):
+        # --create initializes an idle seed; --start-server subsequently loads it.
+        self.lua.globals().cargo_cold()
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertFalse(self.lua.globals().cargo_current_name())
+        self.assertEqual([], list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual([], list(self.lua.globals().cargo_saves().values()))
+        self.assertFalse(any("phase=cold-read" in line for line in self.logs()))
+        self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+    def test_candidate_load_precedes_configuration_without_final_cold_check(self):
+        self.source_to_partial()
+        self.lua.globals().CARGO_CALLBACKS.load()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertEqual(world.CANDIDATE, self.lua.globals().cargo_current_name())
+        self.assertEqual([world.CANDIDATE, world.CANDIDATE, world.TAIL],
+                         list(self.lua.globals().cargo_queue_names().values()))
+        self.assertFalse(any("phase=cold-read" in line for line in self.logs()))
+
     def logs(self):
         return list(self.lua.globals().cargo_logs().values())
 
