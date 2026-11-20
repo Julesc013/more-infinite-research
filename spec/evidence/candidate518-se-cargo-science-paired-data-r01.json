@@ -1,0 +1,680 @@
+{
+  "kind": "MIRSECargoSciencePairedDataAcceptanceV1",
+  "schema": 1,
+  "verdict": "ACCEPTED_EXACT_PAIRED_DATA_ONLY",
+  "scope": "Two real Windows2.0.77 data-stage processes; authentic published5.0.20017 versus private EC9 candidate, same SE0.7.57 closure, actor and File settings. No world or work transfer.",
+  "source": {
+    "commit": "cd02652282d277b63664fed91977ae4d5e92de7a",
+    "version": "5.0.20017",
+    "sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+    "bytes": 1044815
+  },
+  "candidate": {
+    "commit": "411b74c364bee277b7f8bedc80679aa602935682",
+    "player_tree": "ec9abdc840aefdd25e66a5787d89e5ad045837c9",
+    "version": "5.0.20018",
+    "sha256": "E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD",
+    "bytes": 1054386,
+    "private_unpublished": true
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "controller": {
+    "runner_head": "008b8e6638c272abe12a41cf01eb8257dded9519",
+    "packet_sha256": "FB3AA5C3748539F73607AA250B3787CC51F0E56A6CE020CC4B6EE8208664BDC6",
+    "owner_sha256": "D962E28536EA1112683281DEACD91DC817582EC907D335264AB853DF8ECFC84D",
+    "capture_sha256": "1737F5A019EB4510C9B37C15B969248A1B89F55EB739C47FA55B05A3DB438A2F",
+    "helper_engine_pin_count": 26,
+    "profile_sha256": "A5EEFB61221A6D44CE457AB3F51354D0633A7D15F53F3CC56C18DCC9CBCA0181",
+    "headless": false,
+    "native_command": "--dump-data with --disable-audio; exact arguments in raw result files"
+  },
+  "settings": {
+    "mode": "File",
+    "bytes": 511,
+    "sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7"
+  },
+  "actor": {
+    "filename": "mir-fixture-mir5-worker-storage-se-cap-ten-native_0.1.0.zip",
+    "bytes": 9275,
+    "sha256": "FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0",
+    "member_count": 5,
+    "limit": "Only the data-final-fixes observer runs during these dumps; its control-stage gameplay actor is not exercised."
+  },
+  "public_archives": [
+    {
+      "name": "space-exploration",
+      "version": "0.7.57",
+      "bytes": 3834305,
+      "sha256": "F95214FEBF53BA3F751C83A2374AA69646FDE0595C9B9158D7C6F51CB068DA27"
+    },
+    {
+      "name": "aai-containers",
+      "version": "0.3.2",
+      "bytes": 930330,
+      "sha256": "E6AF069C46A438B7CF6DA091E024769AB4BB18FD232EC92C649181517141D969"
+    },
+    {
+      "name": "aai-industry",
+      "version": "0.6.16",
+      "bytes": 9505332,
+      "sha256": "CBE1507235F318C016266E355482062033FD561942BA48E30FCF5395C9660573"
+    },
+    {
+      "name": "alien-biomes",
+      "version": "0.7.4",
+      "bytes": 610540,
+      "sha256": "D7D28A9FB748556D4181098CE4A9AD7BFA54DDFD6542F1AD127CF01044FCECDC"
+    },
+    {
+      "name": "alien-biomes-graphics",
+      "version": "0.7.1",
+      "bytes": 197598218,
+      "sha256": "2ED150DB02C77BA8AA4891B2FF80B74E30D2D631636EFDF7C7DCD5268C16C685"
+    },
+    {
+      "name": "jetpack",
+      "version": "0.4.17",
+      "bytes": 1015892,
+      "sha256": "3386FB7A3F43014B763D1AFC1F9BED201A321551A4696A168A4650887C6152C9"
+    },
+    {
+      "name": "robot_attrition",
+      "version": "0.6.6",
+      "bytes": 216385,
+      "sha256": "27E73BF498886290C384C40A3DD69F2B16EBB3690B75527FE8820C4D929969F4"
+    },
+    {
+      "name": "shield-projector",
+      "version": "0.2.2",
+      "bytes": 43200705,
+      "sha256": "D4623DDB9EDF264FD3F6F200FB8BD09752D4BEF0C9945285DC374AD7B514AF6A"
+    },
+    {
+      "name": "space-exploration-graphics",
+      "version": "0.7.5",
+      "bytes": 49950991,
+      "sha256": "788307CF7D6656E2612960F9C14ED65A70F6D18A2924FBFE430F14486BA86E83"
+    },
+    {
+      "name": "space-exploration-graphics-2",
+      "version": "0.7.2",
+      "bytes": 41850378,
+      "sha256": "EA157F01A93B9127EF65C8D11A3375509296F11B27A1E6361D719768BEDD8A6F"
+    },
+    {
+      "name": "space-exploration-graphics-3",
+      "version": "0.7.2",
+      "bytes": 40632851,
+      "sha256": "03500070A085E19D2AE2D1405D6FABC8BF88865AD5F5CC3796BA910950EF501F"
+    },
+    {
+      "name": "space-exploration-graphics-4",
+      "version": "0.7.2",
+      "bytes": 49165934,
+      "sha256": "6FC08892330C445510826903D5DC0A8E20820D2D194972398071BF21CED6F166"
+    },
+    {
+      "name": "space-exploration-graphics-5",
+      "version": "0.7.3",
+      "bytes": 47497620,
+      "sha256": "EFE06BF335780F22964CC6D6AFD064FE5D70C7CB7489885EBD69CDAFE8737EE2"
+    },
+    {
+      "name": "space-exploration-menu-simulations",
+      "version": "0.7.4",
+      "bytes": 66315256,
+      "sha256": "5CFC3E93FD2916AD71926D37E9D5AFE7C30DFB800732735FAF3B84CF86F59D68"
+    },
+    {
+      "name": "space-exploration-postprocess",
+      "version": "0.7.5",
+      "bytes": 107415,
+      "sha256": "D25FBC6AA73E65C1C2F80DFF21970C0ACBD9D8AFB4E5FAAAA71B942EDC150677"
+    },
+    {
+      "name": "informatron",
+      "version": "0.4.0",
+      "bytes": 122525,
+      "sha256": "0458791AFF196B758C8836D649C91C56BA79207EA162E5E6BB4D180ED9A4E208"
+    },
+    {
+      "name": "aai-signal-transmission",
+      "version": "0.5.3",
+      "bytes": 17609532,
+      "sha256": "DD7559167B69F9A0AFF10AD5E93E0E23A5FA1F34B64E4CE12E3B53DC763161D7"
+    }
+  ],
+  "observations": {
+    "published17": {
+      "archive_sha256": "7A30705CB510E668544D7827BE44F7FA7232BEBE30DB10FED540522DE338E4E5",
+      "observation_sha256": "AB6D640B048984AD6B23F510FFD00204CFD36290013A52503C6B7CB1FB47850C",
+      "result_sha256": "6AB896B6CCB26B65DC913F31538CCC6A5209B822B4A7F29A18C1B827B885A950",
+      "data_sha256": "488CBDB6BFF7902350E725A65943BE2F399D7A4B3630C983C4916B2677E115D5",
+      "actual_typed_settings": {
+        "mir-enable-worker-robots-storage": true,
+        "mir-max-level-worker-robots-storage": 10.0,
+        "mir-cost-base-worker-robots-storage": 200.0,
+        "mir-cost-linear-increment-worker-robots-storage": 0.0,
+        "mir-cost-growth-worker-robots-storage": 1.5,
+        "mir-research-time-worker-robots-storage": 60.0,
+        "mir-effect-per-level-worker-robots-storage": 1.0
+      },
+      "loaded_selection": [
+        "aai-containers@0.3.2",
+        "aai-industry@0.6.16",
+        "aai-signal-transmission@0.5.3",
+        "alien-biomes-graphics@0.7.1",
+        "alien-biomes@0.7.4",
+        "base@2.0.77",
+        "informatron@0.4.0",
+        "jetpack@0.4.17",
+        "mir-fixture-mir5-worker-storage-se-cap-ten-native@0.1.0",
+        "more-infinite-research@5.0.20017",
+        "robot_attrition@0.6.6",
+        "shield-projector@0.2.2",
+        "space-exploration-graphics-2@0.7.2",
+        "space-exploration-graphics-3@0.7.2",
+        "space-exploration-graphics-4@0.7.2",
+        "space-exploration-graphics-5@0.7.3",
+        "space-exploration-graphics@0.7.5",
+        "space-exploration-menu-simulations@0.7.4",
+        "space-exploration-postprocess@0.7.5",
+        "space-exploration@0.7.57"
+      ],
+      "contracts": {
+        "worker-robots-storage-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "utility-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "utility-science-pack",
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": false,
+          "enabled": true,
+          "visible_when_disabled": true,
+          "ignore_tech_cost_multiplier": false
+        },
+        "mir-worker-storage-default-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "utility-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "utility-science-pack",
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": false,
+          "enabled": true,
+          "visible_when_disabled": true,
+          "ignore_tech_cost_multiplier": false
+        },
+        "mir-worker-storage-preservation-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "utility-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "utility-science-pack",
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": true,
+          "enabled": false,
+          "visible_when_disabled": false,
+          "ignore_tech_cost_multiplier": false
+        }
+      },
+      "processes": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "peak_working_set_bytes": 537333760,
+      "controls_restored": true,
+      "initial_admission_wait": {
+        "status": "admitted-after-wait",
+        "attempts": 13,
+        "prestart_refusals": 12,
+        "last_error": "[mir441-resource-admission-commit]"
+      }
+    },
+    "candidate": {
+      "archive_sha256": "E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD",
+      "observation_sha256": "4C1768B61DC114B18D3C80760CD9AAF6D8653A5102302936594CEF1F066DCB87",
+      "result_sha256": "9C2EFB571A7455472C2969CA1D92F3E008BF265FF3C606B03788FCF909B36B2E",
+      "data_sha256": "FAA3579FAA3A76A248F4D092A3BE9B2D6C5587F6055B37C513CD590B51D15A45",
+      "actual_typed_settings": {
+        "mir-enable-worker-robots-storage": true,
+        "mir-max-level-worker-robots-storage": 10.0,
+        "mir-cost-base-worker-robots-storage": 200.0,
+        "mir-cost-linear-increment-worker-robots-storage": 0.0,
+        "mir-cost-growth-worker-robots-storage": 1.5,
+        "mir-research-time-worker-robots-storage": 60.0,
+        "mir-effect-per-level-worker-robots-storage": 1.0
+      },
+      "loaded_selection": [
+        "aai-containers@0.3.2",
+        "aai-industry@0.6.16",
+        "aai-signal-transmission@0.5.3",
+        "alien-biomes-graphics@0.7.1",
+        "alien-biomes@0.7.4",
+        "base@2.0.77",
+        "informatron@0.4.0",
+        "jetpack@0.4.17",
+        "mir-fixture-mir5-worker-storage-se-cap-ten-native@0.1.0",
+        "more-infinite-research@5.0.20018",
+        "robot_attrition@0.6.6",
+        "shield-projector@0.2.2",
+        "space-exploration-graphics-2@0.7.2",
+        "space-exploration-graphics-3@0.7.2",
+        "space-exploration-graphics-4@0.7.2",
+        "space-exploration-graphics-5@0.7.3",
+        "space-exploration-graphics@0.7.5",
+        "space-exploration-menu-simulations@0.7.4",
+        "space-exploration-postprocess@0.7.5",
+        "space-exploration@0.7.57"
+      ],
+      "contracts": {
+        "worker-robots-storage-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "se-rocket-science-pack",
+                1
+              ],
+              [
+                "se-material-science-pack-1",
+                1
+              ],
+              [
+                "space-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": false,
+          "enabled": true,
+          "visible_when_disabled": true,
+          "ignore_tech_cost_multiplier": false
+        },
+        "mir-worker-storage-default-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "se-rocket-science-pack",
+                1
+              ],
+              [
+                "se-material-science-pack-1",
+                1
+              ],
+              [
+                "space-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": false,
+          "enabled": true,
+          "visible_when_disabled": true,
+          "ignore_tech_cost_multiplier": false
+        },
+        "mir-worker-storage-preservation-4": {
+          "level": 4,
+          "max_level": "infinite",
+          "unit": {
+            "count_formula": "675*1.5^(L-4)",
+            "time": 60,
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "se-rocket-science-pack",
+                1
+              ],
+              [
+                "se-material-science-pack-1",
+                1
+              ],
+              [
+                "space-science-pack",
+                1
+              ]
+            ]
+          },
+          "prerequisites": [
+            "worker-robots-storage-3"
+          ],
+          "effects": [
+            {
+              "type": "worker-robot-storage",
+              "modifier": 1
+            }
+          ],
+          "hidden": true,
+          "enabled": false,
+          "visible_when_disabled": false,
+          "ignore_tech_cost_multiplier": false
+        }
+      },
+      "processes": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "peak_working_set_bytes": 537100288,
+      "controls_restored": true,
+      "initial_admission_wait": {
+        "status": "admitted-after-wait",
+        "attempts": 35,
+        "prestart_refusals": 34,
+        "last_error": "[mir441-resource-admission-commit]"
+      }
+    }
+  },
+  "finding": "All three exact published17 canonical/default/preservation rows have five Base packs including utility and the utility prerequisite. All three EC9 rows have the seven captured SE packs and worker-storage3 prerequisite only, with unchanged level4/infinite/formula675*1.5^(L-4)/60second unit/one worker-storage effect. This accepts the data construction correction only.",
+  "custody": {
+    "file_count": 18,
+    "bytes": 72147171,
+    "files": [
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/config.ini",
+        "bytes": 280,
+        "sha256": "1A985F16422A1241FEB17AA96342F8D03D2A4976E16A855C416DDD84649AC63C"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/process-1.resources.jsonl",
+        "bytes": 3838,
+        "sha256": "751F13A84E8262BAFA9C8C376D8E79A992576CD94C33FF1AD0EE8BCA325586AF"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/process-1.stdout.txt",
+        "bytes": 15680,
+        "sha256": "AE5638D9B86656A029EFD99E177FBBEB22A23F850765E1EB2236B494F3A09076"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/result.json",
+        "bytes": 28491,
+        "sha256": "6AB896B6CCB26B65DC913F31538CCC6A5209B822B4A7F29A18C1B827B885A950"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/selection.json",
+        "bytes": 2133,
+        "sha256": "0D27903AF86925C80F73BFB32FFB0639AD823C115D1543272CF541F91EE1263C"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/write-data/factorio-current.log",
+        "bytes": 15499,
+        "sha256": "567D7A84DA186B12546D0BF6BB6BD90C4B6A16A87FA242D70480DBF865F2333B"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/write-data/script-output/data-raw-dump.json",
+        "bytes": 35238085,
+        "sha256": "488CBDB6BFF7902350E725A65943BE2F399D7A4B3630C983C4916B2677E115D5"
+      },
+      {
+        "role": "published17",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-published17-r01/write-data/script-output/mod-settings-dump.json",
+        "bytes": 770042,
+        "sha256": "55C04A099CA157F4F7DC0F573B875D96B90B08945D2079B9BC6564ABCE6BA0F1"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/config.ini",
+        "bytes": 278,
+        "sha256": "3F80F96355903CA614D1ED34EA963A88874659083EE99DDD8FA2104603CFDFB0"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/process-1.resources.jsonl",
+        "bytes": 2010,
+        "sha256": "C819E87FD0443B43F604AB8172F996BF20733B1C12104C0FA30FB17C1BF04F46"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/process-1.stdout.txt",
+        "bytes": 15730,
+        "sha256": "E7FCC1C4516AABF1ECB766F671CBD5709C25D4BF5BAEDF18018D3FA2A49F56AB"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/result.json",
+        "bytes": 28484,
+        "sha256": "9C2EFB571A7455472C2969CA1D92F3E008BF265FF3C606B03788FCF909B36B2E"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/selection.json",
+        "bytes": 2133,
+        "sha256": "DB97903F5845D6AEF72D4F1C06435629F1C72AA51949586F393FC396C7754CFF"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/write-data/factorio-current.log",
+        "bytes": 15549,
+        "sha256": "EE8420A20FFEA4206D2EB34EA1422623D90D4987BF77B1378DE31BA0D5E67C86"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/write-data/script-output/data-raw-dump.json",
+        "bytes": 35238897,
+        "sha256": "FAA3579FAA3A76A248F4D092A3BE9B2D6C5587F6055B37C513CD590B51D15A45"
+      },
+      {
+        "role": "candidate",
+        "path": "build/qualification/current518-ec9-data-blackglass-r02/RAW-candidate-r01/write-data/script-output/mod-settings-dump.json",
+        "bytes": 770042,
+        "sha256": "55C04A099CA157F4F7DC0F573B875D96B90B08945D2079B9BC6564ABCE6BA0F1"
+      }
+    ],
+    "primary_root": "build/qualification/current518-ec9-data-blackglass-r02",
+    "independent_review": {
+      "path": "build/qualification/current518-ec9-data-result-review-r01/RESULT-REVIEW-r01.json",
+      "sha256": "E8B54B4913202F5C5B760EE6BBA1F155F99AEA08C135AE27E4E75069EE54D562"
+    },
+    "ordered_manifest_sha256": "2F594C84ADBE4064B2D27627F2756E80D496C43F2DA2531B92C7CDC2AB5A04DF"
+  },
+  "adverse_preparation": {
+    "linux_r01": "Pin-only Validate0 retained; independent pre-native review found missing declared File settings hash and a nonexclusive outcome writer. No Compose/Execute.",
+    "linux_r02": "Actual zero-native Compose refused system-disk reserve before activation; regenerated APT caches and all original refusal bodies retained. Reserves unchanged.",
+    "linux_r03": "Fresh corrected namespace/preflight only; no Compose/Execute.",
+    "windows_r01": "Preparation stopped on an absent irrelevant retained SDK receipt before staging or native. The final Windows packet uses its actual committed helper closure."
+  },
+  "limits": {
+    "worlds": 0,
+    "ordinary_research": 0,
+    "saves": 0,
+    "cold_reloads": 0,
+    "cap_behavior": false,
+    "paid_work_preservation": false,
+    "queue_bonus_preservation": false,
+    "performance": false,
+    "reporter_closure": false,
+    "later_guard_runtime_qualification": false,
+    "release_or_stable": false
+  },
+  "remaining": "Exact source4.7 SE cap/progression/save/cold sequence and the invested published17 old-five-pack transition remain open. PR2199 refusal safety changes runtime and is not executed by these EC9 archives. No automatic equivalence to later packages or Linux executions."
+}
