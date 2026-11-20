@@ -595,9 +595,22 @@ function New-MIR441FactorioConsoleStartup {
       ready_marker_observed=$false;ready_elapsed_monotonic_milliseconds=$null
       confirmation_marker_observed=$false;confirmation_elapsed_monotonic_milliseconds=$null
       send_count=0;sends=[Collections.Generic.List[object]]::new()
+      send_attempt_count=0;send_attempts=[Collections.Generic.List[object]]::new();delivery_unknown=$false
     }
     streams=[Collections.Generic.List[object]]::new();ready_marker_seen=$false;confirmation_marker_seen=$false
   }
+}
+
+function Get-MIR441FactorioConsoleExceptionChain {
+  param([Parameter(Mandatory)][Exception]$Exception,[ValidateRange(1,8)][int]$MaximumDepth=4)
+  # Exception messages can include caller-controlled command or credential
+  # text. Retain only the bounded exception type/HResult chain in the receipt.
+  $chain=[Collections.Generic.List[object]]::new();$current=$Exception;$depth=0
+  while($null-ne$current-and$depth-lt$MaximumDepth){
+    $chain.Add([ordered]@{type=[string]$current.GetType().FullName;hresult=[int64]$current.HResult})
+    $current=$current.InnerException;$depth++
+  }
+  return [ordered]@{members=@($chain.ToArray());truncated=($null-ne$current)}
 }
 
 function Add-MIR441FactorioConsoleStartupOutput {
@@ -648,6 +661,7 @@ function Update-MIR441FactorioConsoleStartupOutput {
 
 function Send-MIR441FactorioConsoleStartupLine {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
+  if([bool]$State.receipt.delivery_unknown){throw '[mir441-factorio-console-delivery-unknown]'}
   if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
   # Capture each stream before WriteLine/Flush. A Factorio response can be
   # appended synchronously by Flush, so a post-flush measurement is too late
@@ -668,7 +682,20 @@ function Send-MIR441FactorioConsoleStartupLine {
       if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or[int64]$boundary.bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
     }
   }
-  try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
+  $State.receipt.send_attempt_count++
+  $attempt=[ordered]@{order=[int]$State.receipt.send_attempt_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command;phase='write';delivery='unknown';exception_chain=$null}
+  try {$Writer.WriteLine($State.command)}catch{
+    $attempt.exception_chain=Get-MIR441FactorioConsoleExceptionChain -Exception $_.Exception
+    $State.receipt.send_attempts.Add($attempt);$State.receipt.delivery_unknown=$true
+    throw '[mir441-factorio-console-write]'
+  }
+  $attempt.phase='flush'
+  try {$Writer.Flush()}catch{
+    $attempt.exception_chain=Get-MIR441FactorioConsoleExceptionChain -Exception $_.Exception
+    $State.receipt.send_attempts.Add($attempt);$State.receipt.delivery_unknown=$true
+    throw '[mir441-factorio-console-write]'
+  }
+  $attempt.delivery='writer-flushed';$State.receipt.send_attempts.Add($attempt)
   $State.receipt.send_count++
   $send=[ordered]@{
     order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command
