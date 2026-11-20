@@ -48,6 +48,28 @@ class LinuxWriteStorageTests(unittest.TestCase):
             self.assertEqual(list(data.iterdir()), [], "owned external data test child was not removed")
             self.assertEqual(list(library.iterdir()), [], "mount control changed the supplied library")
 
+    @unittest.skipUnless(sys.platform == "linux", "requires actual Linux process and mounts")
+    def test_actual_linux_governed_split_child(self):
+        findmnt = shutil.which("findmnt")
+        if findmnt is None:
+            self.skipTest("findmnt unavailable")
+        mount = subprocess.run([findmnt, "-n", "-o", "FSTYPE", "-T", str(ROOT)], text=True, capture_output=True, timeout=10)
+        if mount.returncode != 0 or mount.stdout.strip() != "ext4":
+            self.skipTest("executing checkout is not on ext4")
+        with tempfile.TemporaryDirectory(prefix="mir-governed-split-child-") as temporary:
+            parent = Path(temporary)
+            library, data = parent / "library", parent / "data"
+            library.mkdir()
+            data.mkdir()
+            result = subprocess.run(
+                [shutil.which("pwsh"), "-NoProfile", "-File", str(ROOT / "tests/tooling/Test-MIRLinuxWriteStorage.ps1"),
+                 "-RepoRoot", str(ROOT), "-LinuxDataTestParent", str(data), "-LinuxLibraryRoot", str(library), "-GovernedSplitChild"],
+                cwd=ROOT, text=True, capture_output=True, timeout=90,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(list(data.iterdir()), [], "owned governed-child output was not removed")
+            self.assertEqual(list(library.iterdir()), [], "governed child changed the supplied library")
+
 
 if __name__ == "__main__":
     unittest.main()

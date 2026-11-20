@@ -581,7 +581,8 @@ function Assert-MIRLibraryObservationCoverage {
 function Assert-MIRLibraryLaunch {
   param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@(),
     [switch]$RequireLoadedSelection,[string]$ActiveModsObserver='',
-    [ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua')
+    [ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua',
+    $WriteStoragePolicy=$null)
   . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   foreach($arg in $Arguments){
     if($arg -match '^(?:--(?:sync-mods|apply-update|download|update-mods)(?:=|$)|--(?:config|mod-directory)=|-c$)'){throw '[mir-library-acquisition-or-ambiguous-argument]'}
@@ -592,12 +593,19 @@ function Assert-MIRLibraryLaunch {
   }
   $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
   if([IO.Path]::GetFullPath($mods) -cne $Activation.library){throw '[mir-library-launch-directory]'}
-  $configPath=Resolve-MIR441RecoveryScratchPath -Path $Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+  $configArgument=$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+  # The optional policy comes from the executing probe's admitted context.
+  # Recheck each external write path against its exact live data-mount pin;
+  # callers without that context retain the checkout-local launch boundary.
+  $configPath=if($null -eq $WriteStoragePolicy){Resolve-MIR441RecoveryScratchPath -Path $configArgument}else{Resolve-MIR441ProcessOutputPath -Policy $WriteStoragePolicy -Path $configArgument}
   $config=[IO.File]::ReadAllText($configPath)
   foreach($entry in @('read-data','write-data')){
     $matches=[regex]::Matches($config,"(?m)^\s*$entry\s*=\s*(.+?)\s*$")
     if($matches.Count -ne 1){throw '[mir-library-launch-config]'}
-    if($entry -ceq 'write-data'){$null=Resolve-MIR441RecoveryScratchPath -Path $matches[0].Groups[1].Value}
+    if($entry -ceq 'write-data'){
+      $writePath=$matches[0].Groups[1].Value
+      if($null -eq $WriteStoragePolicy){$null=Resolve-MIR441RecoveryScratchPath -Path $writePath}else{$null=Resolve-MIR441ProcessOutputPath -Policy $WriteStoragePolicy -Path $writePath}
+    }
     elseif([IO.Path]::GetFullPath($matches[0].Groups[1].Value) -cne $Activation.engine_data){throw '[mir-library-launch-engine-data]'}
   }
   $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent ([IO.Path]::GetFullPath($FactorioBin))))) 'data'
