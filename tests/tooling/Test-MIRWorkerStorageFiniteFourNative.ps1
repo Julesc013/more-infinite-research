@@ -266,7 +266,10 @@ Add-Check 'Validate requires an explicit receipt path and defers missing runtime
     if($LASTEXITCODE-ne0){throw "Validate command failed: $($output -join ' ' )"}
     $receipt=Get-Content -LiteralPath $receiptPath -Raw|ConvertFrom-Json
     if($receipt.status -cnotin @('DEFERRED_MISSING_LOCAL_BINDINGS','DEFERRED_LOCAL_HELPER_MISMATCH') -or$receipt.native_processes_started-ne0-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Validate crossed an execution boundary'}
-    if($receipt.status -ceq 'DEFERRED_LOCAL_HELPER_MISMATCH' -and (@($receipt.input_states|Where-Object {$_.state -ceq 'mismatched_local_input' -and $_.label -like 'helper *'}).Count -eq 0 -or $receipt.unavailable_helper_bindings.Count -eq 0)){throw 'Validate concealed the missing frozen helper identity'}
+    $helpers=@($receipt.input_states | Where-Object {$_.label -like 'helper *'})
+    if($helpers.Count -ne 4 -or @($helpers | Where-Object {$_.state -cne 'verified_local_input'}).Count -ne 0) {
+        throw 'The checked-in finite-four packet helper pins differ from the executing controller checkout'
+    }
 }
 
 Add-Check 'Compose reports the five bounded stages and remains non-activating' {
