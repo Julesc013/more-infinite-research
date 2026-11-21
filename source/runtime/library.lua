@@ -2045,38 +2045,54 @@ end
 
 local function update_availability_content(content, player, view, context)
   if not valid(content) then return end
-  content.clear()
-  -- This bounded view has no compiler ledger and no native catalogue pass. It
-  -- presents only the authored terminal explanations selected by exact active
-  -- mod and named native-owner facts.
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
-  local query = model_view(view, context).search
-  local rows = availability.rows(active_mods, target, player and player.force, query, effective_streams)
-  -- One full-width child owns scrolling; explanations are not Research table
-  -- columns. Leave the same scrollbar/padding budget as the other panes.
-  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
-  local height = content.style and content.style.maximal_height or 220
-  local viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
-    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
-  viewport.style.width, viewport.style.height = width, height
-  local entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
-  local entry_width = math.max(1, width - 16)
-  entries.style.width, entries.style.vertical_spacing = entry_width, library_layout.section_gap
-  if #rows == 0 then
-    local label = add(entries, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
-    label.style.width = entry_width
-    return
-  end
+  local rows = availability.rows(active_mods, target, player and player.force, model_view(view, context).search, effective_streams)
+  local labels = {}
   for index, row in ipairs(rows) do
-    local label = add(entries, {
-      type = "label",
-      name = PREFIX .. "availability_" .. index,
+    labels[index] = {type = "label", name = PREFIX .. "availability_" .. index,
       caption = {"mir-browser.availability-entry",
         {"technology-name.more-infinite-research." .. row.family},
-        {"mir-browser.availability-" .. row.reason}}
-    })
-    label.style.width = entry_width
+        {"mir-browser.availability-" .. row.reason}}}
+  end
+  if #labels == 0 then
+    labels[1] = {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}}
+  end
+
+  -- The native viewport owns scroll position. Keep it through tabs and
+  -- refreshes with identical rows, and start at the top for a new projection.
+  local viewport = content[PREFIX .. "availability_viewport"]
+  local entries = valid(viewport) and viewport[PREFIX .. "availability_entries"] or nil
+  local previous = valid(entries) and entries.children
+  local reuse = valid(viewport) and viewport.type == "scroll-pane" and valid(entries)
+    and entries.type == "flow" and entries.direction == "vertical"
+    and #content.children == 1 and #viewport.children == 1 and #previous == #labels
+  if reuse then
+    for index, spec in ipairs(labels) do
+      local label = previous[index]
+      if label.type ~= "label" or label.name ~= spec.name or not same_list_caption(label.caption, spec.caption, {left = 256}) then
+        reuse = false
+        break
+      end
+    end
+  end
+  if not reuse then
+    content.clear()
+    viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+    entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
+    entries.style.vertical_spacing = library_layout.section_gap
+    for _, spec in ipairs(labels) do add(entries, spec) end
+  end
+
+  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
+  local height = content.style and content.style.maximal_height or 220
+  local entry_width = math.max(1, width - 16)
+  if viewport.style.maximal_width ~= width then viewport.style.width = width end
+  if viewport.style.maximal_height ~= height then viewport.style.height = height end
+  if not reuse or entries.style.maximal_width ~= entry_width then
+    entries.style.width = entry_width
+    for _, label in ipairs(entries.children) do label.style.width = entry_width end
   end
 end
 
