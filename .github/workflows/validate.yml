@@ -393,6 +393,8 @@ jobs:
             'tests/tooling/Test-MIRPlayerReport.ps1'
             'tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1'
             'tests/tooling/Test-MIRWorkerStorageSECargoCapTenNative.ps1'
+            'tests/tooling/Test-MIRGunmetalNativeDispatcher.ps1'
+            'tests/tooling/Test-MIRGunmetalNativeDispatcherInstall.ps1'
           )
           foreach ($control in $controls) {
             & pwsh -NoLogo -NoProfile -File $control
