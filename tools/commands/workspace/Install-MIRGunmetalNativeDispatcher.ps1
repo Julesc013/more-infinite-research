@@ -26,13 +26,14 @@ function Write-MIRGunmetalDispatcherInstallBytes {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][byte[]]$Bytes,[switch]$NewOnly)
   [IO.Directory]::CreateDirectory((Split-Path -Parent $Path)) | Out-Null
   $temporary=Join-Path (Split-Path -Parent $Path) ('.'+[IO.Path]::GetFileName($Path)+'.'+[guid]::NewGuid().ToString('N')+'.new')
-  $stream=$null
   try {
     $stream=[IO.File]::Open($temporary,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
-    $stream.Write($Bytes,0,$Bytes.Length)
-    $stream.Flush($true)
-  } finally { if($null-ne$stream){$stream.Dispose()} }
-  if($NewOnly){[IO.File]::Move($temporary,$Path)}else{[IO.File]::Move($temporary,$Path,$true)}
+    try {
+      $stream.Write($Bytes,0,$Bytes.Length)
+      $stream.Flush($true)
+    } finally { $stream.Dispose() }
+    if($NewOnly){[IO.File]::Move($temporary,$Path)}else{[IO.File]::Move($temporary,$Path,$true)}
+  } finally { if ([IO.File]::Exists($temporary)) { [IO.File]::Delete($temporary) } }
 }
 
 function Invoke-MIRGunmetalDispatcherInstallSystemctl {
@@ -77,7 +78,10 @@ ExecStart=/usr/bin/pwsh -NoProfile -NonInteractive -File $installedDispatcher -M
 Description=Watch MIR reviewed native successor pointer
 
 [Path]
-PathExists=$([string]$policyObject.spool_root)/state/pending.json
+# `pending.json` is durable and deliberately remains while a predecessor is
+# active or held. The separate signal is removed by the consumer on its first
+# wakeup, avoiding a PathExists restart loop/start-limit failure.
+PathExists=$([string]$policyObject.spool_root)/state/pending.signal
 Unit=mir-native-dispatcher.service
 
 [Install]
@@ -110,12 +114,48 @@ WantedBy=timers.target
 function Test-MIRGunmetalDispatcherInstallFileIdentity {
   param([Parameter(Mandatory)]$File)
   if(-not(Test-Path -LiteralPath $File.path -PathType Leaf)){return $false}
+  if ((Get-Item -LiteralPath $File.path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { return $false }
   return ((Get-FileHash -LiteralPath $File.path -Algorithm SHA256).Hash.ToUpperInvariant() -ceq $File.sha256)
+}
+
+function Enter-MIRGunmetalDispatcherInstallLock {
+  param([Parameter(Mandatory)]$Plan)
+  [IO.Directory]::CreateDirectory($Plan.unit_directory) | Out-Null
+  $directory = if ($IsLinux -and $env:XDG_RUNTIME_DIR) { $env:XDG_RUNTIME_DIR } else { $Plan.unit_directory }
+  $path = Join-Path $directory ('.' + $Plan.units[0] + '.install.lock')
+  try { return [IO.File]::Open($path, 'OpenOrCreate', 'ReadWrite', 'None') }
+  catch [IO.IOException] { throw '[mir-gunmetal-dispatcher-install-busy]' }
+}
+
+function Get-MIRGunmetalDispatcherInstallTransactionPath($Plan) {
+  # All installations which claim these unit names share one durable record,
+  # including installations that select a different script directory.
+  return Join-Path $Plan.unit_directory ('.' + $Plan.units[0] + '.install.json')
+}
+
+function Get-MIRGunmetalDispatcherInstallUnits {
+  param([Parameter(Mandatory)]$Plan)
+  foreach ($name in $Plan.units) {
+    $reply = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments @('show','--all','--property=LoadState,ActiveState,FragmentPath,DropInPaths',$name)
+    $fields = @{}
+    foreach ($line in $reply.lines) {
+      if ($line -cmatch '^(LoadState|ActiveState|FragmentPath|DropInPaths)=(.*)$' -and -not $fields.ContainsKey($Matches[1])) {
+        $fields[$Matches[1]] = $Matches[2]
+      }
+    }
+    if ($fields.Count -ne 4) { throw '[mir-gunmetal-dispatcher-install-unit-state-unavailable]' }
+    $path = Join-Path $Plan.unit_directory $name
+    $absent = ($reply.exit_code -in @(0,4) -and $fields.LoadState -ceq 'not-found' -and
+               $fields.ActiveState -ceq 'inactive' -and -not $fields.FragmentPath -and -not $fields.DropInPaths)
+    if (-not $absent -and ($reply.exit_code -ne 0 -or $fields.LoadState -cne 'loaded' -or
+        $fields.FragmentPath -cne $path -or $fields.DropInPaths)) { throw '[mir-gunmetal-dispatcher-install-unit-identity]' }
+    [pscustomobject]@{ name=$name; present=(-not $absent); active=$fields.ActiveState; path=$path }
+  }
 }
 
 function Read-MIRGunmetalDispatcherInstallTransaction {
   param([Parameter(Mandatory)]$Plan)
-  $path=Join-Path $Plan.install_root 'install-transaction.json'
+  $path=Get-MIRGunmetalDispatcherInstallTransactionPath $Plan
   if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw '[mir-gunmetal-dispatcher-install-transaction-missing]'}
   try{return Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -ErrorAction Stop}catch{throw '[mir-gunmetal-dispatcher-install-transaction-invalid]'}
 }
@@ -125,7 +165,7 @@ function Write-MIRGunmetalDispatcherInstallTransaction {
   $files=@($Plan.files|ForEach-Object {[ordered]@{path=$_.path;sha256=$_.sha256}})
   $record=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherInstallTransactionV1';stage=$Stage;install_root=$Plan.install_root;unit_directory=$Plan.unit_directory;policy_sha256=$Plan.policy_sha256;files=$files;units=$Plan.units;created_utc=[datetime]::UtcNow.ToString('o')}
   $bytes=[Text.UTF8Encoding]::new($false).GetBytes(($record|ConvertTo-Json -Depth 12 -Compress)+"`n")
-  Write-MIRGunmetalDispatcherInstallBytes -Path (Join-Path $Plan.install_root 'install-transaction.json') -Bytes $bytes
+  Write-MIRGunmetalDispatcherInstallBytes -Path (Get-MIRGunmetalDispatcherInstallTransactionPath $Plan) -Bytes $bytes -NewOnly:($Stage -ceq 'prepared')
 }
 
 function Assert-MIRGunmetalDispatcherInstallTransaction {
@@ -160,32 +200,48 @@ function Write-MIRGunmetalDispatcherInstallFiles {
 function Invoke-MIRGunmetalDispatcherInstallLifecycle {
   param([Parameter(Mandatory)]$Plan,[ValidateSet('Install','Resume')][string]$Action,[switch]$TestOnly)
   if (-not $IsLinux -and -not $TestOnly) { throw '[mir-gunmetal-dispatcher-install-linux-required]' }
+  $lock = Enter-MIRGunmetalDispatcherInstallLock $Plan
+  try { Install-MIRGunmetalDispatcherOwnedFiles $Plan $Action } finally { $lock.Dispose() }
+}
+
+function Install-MIRGunmetalDispatcherOwnedFiles {
+  param([Parameter(Mandatory)]$Plan,[ValidateSet('Install','Resume')][string]$Action)
   $linger = Get-MIRGunmetalDispatcherInstallLinger
   if ($linger.exit_code -ne 0 -or $linger.lines.Count -ne 1 -or $linger.lines[0].Trim() -cne 'yes') {
     throw '[mir-gunmetal-dispatcher-install-linger-required]'
   }
-  if ($Action -ceq 'Install') {
+  $recordPath = Get-MIRGunmetalDispatcherInstallTransactionPath $Plan
+  if (Test-Path -LiteralPath $recordPath) {
+    $transaction = Read-MIRGunmetalDispatcherInstallTransaction -Plan $Plan
+    Assert-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Transaction $transaction
+    if ($Action -ceq 'Install') { throw '[mir-gunmetal-dispatcher-install-resume-required]' }
+    if ($transaction.stage -ceq 'rolling-back') { throw '[mir-gunmetal-dispatcher-install-rollback-required]' }
+    $null = Get-MIRGunmetalDispatcherInstallUnits $Plan
+  } else {
+    if ($Action -ceq 'Resume') { throw '[mir-gunmetal-dispatcher-install-transaction-missing]' }
     if (Test-Path -LiteralPath $Plan.install_root) { throw '[mir-gunmetal-dispatcher-install-root-exists]' }
     foreach ($file in @($Plan.files | Where-Object { $_.path.StartsWith($Plan.unit_directory + [IO.Path]::DirectorySeparatorChar) })) {
       if (Test-Path -LiteralPath $file.path) { throw '[mir-gunmetal-dispatcher-install-unit-exists]' }
     }
-    [IO.Directory]::CreateDirectory($Plan.install_root) | Out-Null
+    if (@(Get-MIRGunmetalDispatcherInstallUnits $Plan | Where-Object present).Count) { throw '[mir-gunmetal-dispatcher-install-unit-exists]' }
     Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage prepared
-  } else {
-    $transaction = Read-MIRGunmetalDispatcherInstallTransaction -Plan $Plan
-    Assert-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Transaction $transaction
   }
   # Every resume rehashes its exact planned files. It can finish a reload or
   # enable interruption, but cannot adopt altered dispatcher or unit bytes.
   Write-MIRGunmetalDispatcherInstallFiles -Plan $Plan
   Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage files-written
+  $null = Get-MIRGunmetalDispatcherInstallUnits $Plan
   $reload = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments @('daemon-reload')
   if ($reload.exit_code -ne 0) {
     Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage reload-pending
     throw '[mir-gunmetal-dispatcher-install-daemon-reload-resume-required]'
   }
   Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage reloaded
-  $enable = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments @('enable','--now','mir-native-dispatcher.path','mir-native-dispatcher.timer')
+  if (@(Get-MIRGunmetalDispatcherInstallUnits $Plan | Where-Object { -not $_.present }).Count) {
+    throw '[mir-gunmetal-dispatcher-install-unit-not-loaded]'
+  }
+  $triggerNames = @($Plan.units | Where-Object { $_ -cne $Plan.units[0] })
+  $enable = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments (@('enable','--now') + $triggerNames)
   if ($enable.exit_code -ne 0) {
     Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage enable-pending
     throw '[mir-gunmetal-dispatcher-install-enable-resume-required]'
@@ -196,31 +252,50 @@ function Invoke-MIRGunmetalDispatcherInstallLifecycle {
     status = 'installed'
     install_root = $Plan.install_root
     units = $Plan.units
-    operational_scope = 'dispatcher installed only; no native packet was launched and no gameplay acceptance is established.'
+    operational_scope = 'user-manager installation; job execution is recorded in the dispatcher spool.'
   }
 }
 
 function Undo-MIRGunmetalDispatcherInstall {
   param([Parameter(Mandatory)]$Plan)
+  $lock = Enter-MIRGunmetalDispatcherInstallLock $Plan
+  try { Uninstall-MIRGunmetalDispatcherOwnedFiles $Plan } finally { $lock.Dispose() }
+}
+
+function Uninstall-MIRGunmetalDispatcherOwnedFiles {
+  param([Parameter(Mandatory)]$Plan)
   $transaction = Read-MIRGunmetalDispatcherInstallTransaction -Plan $Plan
   Assert-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Transaction $transaction
-  $disable = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments @('disable','--now','mir-native-dispatcher.path','mir-native-dispatcher.timer')
-  if ($disable.exit_code -ne 0) { throw '[mir-gunmetal-dispatcher-install-disable-required]' }
   foreach ($file in $Plan.files) {
-    if (Test-Path -LiteralPath $file.path) {
-      if (-not (Test-MIRGunmetalDispatcherInstallFileIdentity -File $file)) {
-        throw '[mir-gunmetal-dispatcher-install-rollback-file-conflict]'
-      }
-      Remove-Item -LiteralPath $file.path -Force
+    if ((Test-Path -LiteralPath $file.path) -and -not (Test-MIRGunmetalDispatcherInstallFileIdentity $file)) {
+      throw '[mir-gunmetal-dispatcher-install-rollback-file-conflict]'
     }
+  }
+  $units = @(Get-MIRGunmetalDispatcherInstallUnits $Plan)
+  if (($units | Where-Object name -CEQ $Plan.units[0]).active -cnotin @('inactive','failed')) {
+    throw '[mir-gunmetal-dispatcher-install-service-busy]'
+  }
+  # A partial install may have written only a subset. Never disable another
+  # resolved fragment or remove a script while the manager still executes it.
+  $triggers = @($units | Where-Object { $_.present -and $_.name -cne $Plan.units[0] -and (Test-Path -LiteralPath $_.path) } | ForEach-Object name)
+  if ($triggers.Count) {
+    $disable = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments (@('disable','--now') + $triggers)
+    if ($disable.exit_code -ne 0) { throw '[mir-gunmetal-dispatcher-install-disable-required]' }
+  }
+  $units = @(Get-MIRGunmetalDispatcherInstallUnits $Plan)
+  if (@($units | Where-Object { $_.active -cnotin @('inactive','failed') }).Count) {
+    throw '[mir-gunmetal-dispatcher-install-service-busy]'
+  }
+  Write-MIRGunmetalDispatcherInstallTransaction -Plan $Plan -Stage rolling-back
+  foreach ($file in $Plan.files) {
+    if (Test-Path -LiteralPath $file.path) { Remove-Item -LiteralPath $file.path -Force }
   }
   $reload = Invoke-MIRGunmetalDispatcherInstallSystemctl -Arguments @('daemon-reload')
   if ($reload.exit_code -ne 0) { throw '[mir-gunmetal-dispatcher-install-rollback-daemon-reload]' }
-  $transactionPath = Join-Path $Plan.install_root 'install-transaction.json'
-  if (Test-Path -LiteralPath $transactionPath) { Remove-Item -LiteralPath $transactionPath -Force }
   if ((Test-Path -LiteralPath $Plan.install_root) -and @((Get-ChildItem -LiteralPath $Plan.install_root -Force)).Count -eq 0) {
     Remove-Item -LiteralPath $Plan.install_root -Force
   }
+  Remove-Item -LiteralPath (Get-MIRGunmetalDispatcherInstallTransactionPath $Plan) -Force
   return [pscustomobject]@{
     kind = 'MIRGunmetalNativeDispatcherInstallRollbackV1'
     status = 'rolled-back'
