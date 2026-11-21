@@ -42,7 +42,7 @@ jobs:
           [IO.Directory]::CreateDirectory($context.root) | Out-Null
           python -c "import sys,zlib; assert sys.version_info[:3]==(3,14,7); assert zlib.ZLIB_VERSION==zlib.ZLIB_RUNTIME_VERSION=='1.3.1.zlib-ng'"
           if ($LASTEXITCODE -ne 0) { throw 'Frozen package producer differs.' }
-          $revision = '765703144972763bc5071b0fd7ef46aea86e3c97'
+          $revision = 'ebd6e044e1c1a045ba7ccbf6a3b3eedf427039b0'
           $fixtureRevision = '22f34725d00befd4c80160105b98b556824b57ed'
           python -B tools/package.py --source source --revision $revision --target f210 --output "$out/more-infinite-research_5.0.21018.zip" --record "$out/candidate.json"
           if ($LASTEXITCODE -ne 0) { throw 'Candidate reconstruction failed.' }
@@ -51,7 +51,7 @@ jobs:
           python -B tools/package.py --source tests/fixtures/worker-storage-finite-provider --revision $fixtureRevision --output "$out/mir-worker-storage-finite-fixture_0.1.0.zip" --record "$out/provider.json"
           if ($LASTEXITCODE -ne 0) { throw 'Provider reconstruction failed.' }
           $pins = @(
-            @('more-infinite-research_5.0.21018.zip', '4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E', 1069479),
+            @('more-infinite-research_5.0.21018.zip', '7C2FDABAEE0E2E36BC822C5FC480D358A597727E7E17D7B83C7312DF76D9E473', 1069717),
             @('mir-worker-storage-native-observer_0.1.2.zip', 'DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C', 3086),
             @('mir-worker-storage-finite-fixture_0.1.0.zip', '6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1', 1064)
           )
@@ -119,7 +119,7 @@ jobs:
                   return hashlib.file_digest(stream, 'sha256').hexdigest().upper()
 
           pins = {
-              'more-infinite-research_5.0.21018.zip': ('4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E', 1069479),
+              'more-infinite-research_5.0.21018.zip': ('7C2FDABAEE0E2E36BC822C5FC480D358A597727E7E17D7B83C7312DF76D9E473', 1069717),
               'more-infinite-research_4.7.21003.zip': ('B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852', 1463293),
               'mir-worker-storage-native-observer_0.1.2.zip': ('DB33C8FABDF6AB1759726BE5D17F4920337478581E50838025B8F8F3755E7B0C', 3086),
               'mir-worker-storage-finite-fixture_0.1.0.zip': ('6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1', 1064),
