@@ -592,6 +592,85 @@ class CompetingProductivityTests(unittest.TestCase):
           end
         ''')
 
+    def exercise_nested_queue_start(self, fail_nested):
+        self.lua.execute(r'''
+          local fail_nested = ...
+          local binding = require("compatibility.competing_productivity")
+          local force = force_from_contract(binding.select(exact_active(), f200_target()))
+          local capped = force.technologies["epr_copper-plate-productivity-5"]
+          local retained = force.technologies["epr_iron-plate-productivity-5"]
+          local foreign = force.technologies["epr_iron-gear-wheel-productivity-5"]
+          force.technologies["recipe-prod-research_iron-1"] = nil
+          foreign.enabled = false
+          capped.level = 7
+          local queue = {capped, retained, retained}
+          force.current_research, force.research_queue = capped, nil
+          storage = {}
+          local runtime = install_competing(true, force)
+          game.forces = {[force.index]=force}
+          local started
+          settings = {startup={["mir-prefer-this-mod-for-competing-techs"]={value=true}}}
+          package.loaded["runtime.configuration"] = require("research.settings").resolve(settings.startup)
+          remote = {interfaces={}, add_interface=function() end}
+          script.on_nth_tick = function() end
+          defines = {events={on_research_started=5}}
+          script.on_event = function(id, handler)
+            if id == defines.events.on_research_started then started = handler end
+          end
+          require("runtime.bootstrap").register()
+          assert(type(started) == "function")
+          local outer_state, starts = nil, 0
+          local original_prototype, failure = retained.prototype, {}
+          setmetatable(force, {
+            __index=function(_, key)
+              if key == "research_queue" then return queue end
+            end,
+            __newindex=function(t, key, value)
+              if key ~= "research_queue" then rawset(t, key, value); return end
+              queue = value
+              outer_state = storage.mir_competing_productivity
+              assert(outer_state and next(outer_state.owned_disabled) == nil)
+              assert(value[1] == retained)
+              t.current_research = value[1]
+              starts = starts + 1
+              if fail_nested then
+                retained.prototype = nil
+                setmetatable(retained, {__index=function(_, member)
+                  if member == "prototype" then error(failure, 0) end
+                end})
+              end
+              started({research=value[1]})
+            end,
+          })
+          if fail_nested then
+            local ok, reason = pcall(runtime.on_configuration_changed)
+            assert(starts == 1 and not ok and reason == failure)
+            assert(capped.enabled and not foreign.enabled)
+            setmetatable(retained, nil)
+            retained.prototype = original_prototype
+            started({research=retained})
+            assert(storage.mir_competing_productivity == nil, "failed writer kept the empty ledger pinned")
+            return
+          end
+          runtime.on_configuration_changed()
+          assert(starts == 1 and #queue == 2 and queue[1] == retained and queue[2] == retained)
+          assert(capped.level == 7 and not capped.enabled and retained.enabled)
+          assert(storage.mir_competing_productivity == outer_state, "outer restoration ledger detached")
+          local rights = outer_state.owned_disabled[force.index]
+          assert(rights[capped.name].disabled == true and rights[foreign.name].disabled == false)
+          assert(rights[retained.name] == nil)
+          install_competing(false, force).on_configuration_changed()
+          assert(capped.enabled and not capped.visible_when_disabled and capped.level == 7)
+          assert(not foreign.enabled and not foreign.visible_when_disabled and retained.enabled)
+          assert(starts == 1 and #queue == 2 and storage.mir_competing_productivity == nil)
+        ''', fail_nested)
+
+    def test_queue_start_preserves_the_outer_restoration_right(self):
+        self.exercise_nested_queue_start(False)
+
+    def test_nested_start_error_releases_both_writers_and_preserves_the_original_error(self):
+        self.exercise_nested_queue_start(True)
+
     def test_bootstrap_registers_the_single_named_event_composition(self):
         self.lua.execute(r'''
           local calls, cleanup_calls, handlers = {}, {}, {events={}}
