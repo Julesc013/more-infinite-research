@@ -160,7 +160,10 @@ class Published517EarnedSourceTests(unittest.TestCase):
         with self.assertRaisesRegex(LuaError, "force vector limit differs"):
             self.lua.globals().p517_begin()
         self.assertEqual("idle", self.lua.globals().p517_phase())
-        self.assertEqual([], self.logs())
+        self.assertEqual(
+            ["[MIR_PUBLISHED517_EARNED_SOURCE] stage=refusal|message=force vector limit differs"],
+            self.logs(),
+        )
 
     def test_runtime_logs_the_actual_prerequisite_map_before_any_finite_setup_grant_refusal(self):
         self.lua.execute("P517_EXTRA_TARGET_PREREQUISITE='worker-robots-storage-2'")
@@ -183,6 +186,52 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.assertIn("observed_count=1", diagnostic)
         self.assertIn("observed=worker-robots-storage-3", diagnostic)
         self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
+
+    def test_initial_role_marker_records_each_typed_observed_and_expected_predicate(self):
+        self.lua.globals().p517_begin()
+        pregrant = next(row for row in self.logs() if "stage=runtime-pregrant" in row)
+        self.assertIn("before_force_count=4", pregrant)
+        self.assertIn("after_force_count=5", pregrant)
+        for index, name, bonus in ((1, "player", 0), (2, "enemy", 0), (3, "neutral", 0), (4, "se-system", 3),
+                                   (5, "mir5-worker-storage-published517-earned-source", 0)):
+            self.assertIn(f'{index}:"{name}":{bonus}:0:0:0:0:0', pregrant)
+        diagnostic = next(row for row in self.logs() if "stage=runtime-initial-role" in row)
+        self.assertIn("level_observed=number:4|level_expected=number:4|level_matches=true", diagnostic)
+        self.assertIn("researched_observed=boolean:false|researched_expected=boolean:false|researched_matches=true", diagnostic)
+        self.assertIn("enabled_observed=boolean:true|enabled_expected=boolean:true|enabled_matches=true", diagnostic)
+        self.assertIn("visible_observed=boolean:true|visible_expected=boolean:true|visible_matches=true", diagnostic)
+
+    def test_initial_role_refusal_reports_each_changed_predicate_before_finite_setup_writes(self):
+        for field, value, observed, expected in (
+            ("level", 5, "number:5", "number:4"),
+            ("researched", True, "boolean:true", "boolean:false"),
+            ("enabled", False, "boolean:false", "boolean:true"),
+            ("visible_when_disabled", False, "boolean:false", "boolean:true"),
+        ):
+            with self.subTest(field=field):
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                world.install(lua)
+                world.load(lua)
+                lua.globals().p517_override_initial_role(field, value)
+                with self.assertRaisesRegex(LuaError, "ordinary worker initial role differs"):
+                    lua.globals().p517_begin()
+                logs = list(lua.globals().p517_logs().values())
+                diagnostic = next(row for row in logs if "stage=runtime-initial-role" in row)
+                marker = "visible" if field == "visible_when_disabled" else field
+                self.assertIn(f"{marker}_observed={observed}|{marker}_expected={expected}|{marker}_matches=false", diagnostic)
+                self.assertIn("[MIR_PUBLISHED517_EARNED_SOURCE] stage=refusal|message=ordinary worker initial role differs", logs)
+                self.assertEqual("idle", lua.globals().p517_phase())
+                self.assertFalse(lua.eval("p517_force().technologies['efficiency-module'].researched"))
+                self.assertEqual([], list(lua.globals().p517_saves().values()))
+
+    def test_initial_role_marker_distinguishes_unavailable_nil_from_false(self):
+        self.lua.globals().p517_omit_initial_role("visible_when_disabled")
+        with self.assertRaisesRegex(LuaError, "ordinary worker initial role differs"):
+            self.lua.globals().p517_begin()
+        diagnostic = next(row for row in self.logs() if "stage=runtime-initial-role" in row)
+        self.assertIn("visible_observed=unavailable:nil|visible_expected=boolean:true|visible_matches=false", diagnostic)
+        self.assertIn("[MIR_PUBLISHED517_EARNED_SOURCE] stage=refusal|message=ordinary worker initial role differs", self.logs())
+        self.assertFalse(self.lua.eval("p517_force().technologies['efficiency-module'].researched"))
 
     def test_configuration_change_refuses_instead_of_entering_a_candidate_route(self):
         self.source_to_partial()

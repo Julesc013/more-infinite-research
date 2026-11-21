@@ -37,8 +37,17 @@ local CLOSURE = {
   ["space-exploration-postprocess"] = "0.7.5", informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3"
 }
 local cold_pending, cold_phase, pending_setup = false, nil, nil
+local force_vectors, vector_text, vector_count
 
-local function fail(message) error("[mir5-worker-storage-published517-earned-source] " .. message) end
+local function bounded_refusal(message)
+  if type(message) ~= "string" then return "invalid-refusal-message" end
+  if #message > 160 then return string.sub(message, 1, 160) .. ":truncated" end
+  return message
+end
+local function fail(message)
+  log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=refusal|message=" .. bounded_refusal(message))
+  error("[mir5-worker-storage-published517-earned-source] " .. message)
+end
 local function check(value, message) if not value then fail(message) end end
 local function finite(value) return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge end
 local function close(left, right) return finite(left) and finite(right) and math.abs(left - right) <= 0.0000001 end
@@ -109,14 +118,19 @@ local function parent_names(row)
   for key, value in pairs(row.prerequisites or {}) do out[#out + 1] = type(key) == "string" and key or value.name end
   table.sort(out); return out
 end
-local function observe_runtime_prerequisites(force)
+local function observe_runtime_prerequisites(force, before_vectors)
   local row = technology(force, TARGET)
+  local after_vectors = force_vectors()
+  local vectors = "|before_force_count=" .. tostring(vector_count(before_vectors))
+    .. "|before_vectors=" .. vector_text(before_vectors)
+    .. "|after_force_count=" .. tostring(vector_count(after_vectors))
+    .. "|after_vectors=" .. vector_text(after_vectors)
   local prerequisites = row.prerequisites
   if prerequisites == nil then
     log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
       .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
       .. "|observed=unavailable|final_expected=utility-science-pack,worker-robots-storage-3"
-      .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+      .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3" .. vectors)
     fail("ordinary worker runtime prerequisite is unavailable")
   end
   local names, seen, count = {}, {}, 0
@@ -132,7 +146,32 @@ local function observe_runtime_prerequisites(force)
     .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
     .. "|observed_count=" .. tostring(#names) .. "|observed=" .. table.concat(names, ",")
     .. "|final_expected=utility-science-pack,worker-robots-storage-3"
-    .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+    .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3" .. vectors)
+end
+local function role_observed(value)
+  if value == nil then return "unavailable:nil" end
+  if type(value) == "boolean" then return "boolean:" .. tostring(value) end
+  if type(value) == "number" then
+    if finite(value) then return "number:" .. string.format("%.17g", value) end
+    return "number:nonfinite"
+  end
+  return type(value)
+end
+local function observe_initial_role(row)
+  local fields = {
+    {name = "level", expected = 4},
+    {name = "researched", expected = false},
+    {name = "enabled", expected = true},
+    {name = "visible", expected = true, key = "visible_when_disabled"}
+  }
+  local parts = {"[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-initial-role", "target=" .. TARGET}
+  for _, field in ipairs(fields) do
+    local observed = row[field.key or field.name]
+    parts[#parts + 1] = field.name .. "_observed=" .. role_observed(observed)
+    parts[#parts + 1] = field.name .. "_expected=" .. role_observed(field.expected)
+    parts[#parts + 1] = field.name .. "_matches=" .. tostring(observed == field.expected)
+  end
+  log(table.concat(parts, "|"))
 end
 local function assert_worker_contract(force)
   local row = technology(force, TARGET)
@@ -150,6 +189,7 @@ local function assert_worker_contract(force)
   local effects = row.prototype.effects
   check(type(effects) == "table" and #effects == 1 and effects[1].type == "worker-robot-storage" and close(effects[1].modifier, 1),
     "ordinary worker effect differs")
+  observe_initial_role(row)
   check(row.level == 4 and row.researched == false and row.enabled == true and row.visible_when_disabled == true,
     "ordinary worker initial role differs")
 end
@@ -170,7 +210,7 @@ end
 -- This is the complete six-component native vector needed for this source
 -- slice. It records each existing force before creation, then proves that the
 -- new dedicated force is the only member whose earned worker bonus changes.
-local function force_vectors()
+force_vectors = function()
   local seen, out, count = {}, {}, 0
   for _, force in pairs(game.forces or {}) do
     check(force and force.valid ~= false and finite(force.index) and type(force.name) == "string", "force registry differs")
@@ -194,7 +234,7 @@ local function force_vectors()
   check(next(out) ~= nil, "force vector is absent")
   return out
 end
-local function vector_text(vectors)
+vector_text = function(vectors)
   local indexes, rows = {}, {}
   for index in pairs(vectors) do indexes[#indexes + 1] = index end
   table.sort(indexes)
@@ -206,7 +246,7 @@ local function vector_text(vectors)
   end
   return table.concat(rows, ";")
 end
-local function vector_count(vectors)
+vector_count = function(vectors)
   local count = 0
   for _ in pairs(vectors) do count = count + 1 end
   return count
@@ -390,7 +430,7 @@ local function begin_source()
   local force = game.create_force(RESEARCH_FORCE)
   check(force and force.valid ~= false and force.name == RESEARCH_FORCE and finite(force.index), "dedicated research force differs")
   state.research_force, state.research_force_name, state.research_force_index = force, force.name, force.index
-  observe_runtime_prerequisites(force)
+  observe_runtime_prerequisites(force, state.foreign_baseline)
   assert_setup_declaration(force); assert_worker_contract(force)
   for _, declared in ipairs(fixture.rows) do technology(force, declared.name).researched = true end
   assert_foreign_vectors(state, force_vectors(), "source setup")
