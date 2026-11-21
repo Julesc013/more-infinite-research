@@ -835,32 +835,40 @@ local function default_origin_error(reason, event, state, current, rejected, adv
   recover_error(reason, nil, event, state, current, rejected, advice)
 end
 
-local function older_default_origin(event, change, active, base_hop, state, current)
+local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
   local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
     or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
     and same_family_engine_patch(event)
-  if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false) then
+  if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false and not empty_source) then
     default_origin_error("older default source requires its qualified Base engine and unchanged settings", event, state, current)
   end
   for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
     if active[name] ~= nil then default_origin_error("older default source requires its Base-only profile", event, state, current) end
   end
-  for name, version in pairs(active) do
-    if name ~= "base" and name ~= MIR then
-      local addition = event.mod_changes[name]
-      if type(version) ~= "string" or type(addition) ~= "table" or addition.old_version ~= nil
-          or addition.new_version ~= version then
-        default_origin_error("older default prior mod selection is not Base+MIR", event, state, current)
+  if not empty_source then
+    for name, version in pairs(active) do
+      if name ~= "base" and name ~= MIR then
+        local addition = event.mod_changes[name]
+        if type(version) ~= "string" or type(addition) ~= "table" or addition.old_version ~= nil
+            or addition.new_version ~= version then
+          default_origin_error("older default prior mod selection is not Base+MIR", event, state, current)
+        end
       end
     end
+  end
+  if empty_source and (getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
+      or getmetatable(change) ~= nil) then
+    default_origin_error("published473 empty worker source requires a plain configuration event", event, state, current)
   end
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR then
       -- Same-edition Base changes already passed the supported-patch check.
       -- The separately qualified cross-edition hop keeps its exact source.
-      if type(item) ~= "table" or item.new_version ~= active[name] or type(item.new_version) ~= "string"
+      if type(item) ~= "table" or empty_source and getmetatable(item) ~= nil
+          or item.new_version ~= active[name] or type(item.new_version) ~= "string"
           or name == "base" and base_hop and item.old_version ~= "2.0.77"
-          or name ~= "base" and item.old_version ~= nil then
+          or name ~= "base" and item.old_version ~= nil
+            and (not empty_source or type(item.old_version) ~= "string" or item.old_version == "") then
         default_origin_error("older default source changed a previous mod or engine", event, state, current)
       end
     end
@@ -895,7 +903,8 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   if next(packs) ~= nil then default_origin_error("published473 default science differs", event, state, current) end
   -- The exact default tuple has the same native earning/work contract. Keep
   -- pending work in the ordinary transfer path, not the older empty-only path.
-  return {kind="published473-default", old_version=change.old_version, new_version=active[MIR]}
+  return {kind=empty_source and "published473-idle-default" or "published473-default",
+    old_version=change.old_version, new_version=active[MIR]}
 end
 
 local function published11_empty_origin(event, change, active)
@@ -1021,6 +1030,13 @@ local function default_origin(event, initializing, state, current)
   if state == nil and (event.mod_startup_settings_changed == true or new_selection) then
     local empty = published11_empty_origin(event, change, active)
     if empty then return empty end
+  end
+  -- The Factorio flag does not identify the edited settings. Admit this
+  -- published F200 route only when the later all-force plan proves that no
+  -- worker research or earned worker level depends on the old contract.
+  if state == nil and target.id == "f200" and active.base == "2.0.77" and not base_hop
+      and change and change.old_version == "4.7.20003" and event.mod_startup_settings_changed == true then
+    return older_default_origin(event, change, active, false, state, current, true)
   end
   if state == nil and event.mod_startup_settings_changed ~= false
       and not (base_hop and change.old_version == "4.7.20003") then
@@ -1677,8 +1693,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
           if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
             recover_error("older default source has unfinished native worker work")
           end
-          if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
-            recover_error("older MIR501 source requires every native worker4 to be empty")
+          if source.next_level ~= 4 or source.researched then
+            recover_error(producer.kind == "published473-idle-default"
+              and "published473 startup-change source has earned worker levels"
+              or "older MIR501 source requires every native worker4 to be empty")
           end
         end
         if source.occurrences > 0 then requeueable(force, source, true, true) end

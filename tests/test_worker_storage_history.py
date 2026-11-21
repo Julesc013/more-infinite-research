@@ -3271,6 +3271,57 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
         ''')
 
+    def test_f200_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
+        lua=self.older_world()
+        lua.execute(r'''
+          player.research_queue={OTHER};player.research_progress=.42
+          suspended.technologies[OTHER].saved_progress=.27
+          uninvested.technologies[CANONICAL].enabled=false
+          local event=older_event("4.7.20003",false);event.mod_startup_settings_changed=true
+          script.active_mods["unrelated-updated-mod"]="0.8.0"
+          script.active_mods["unrelated-unchanged-mod"]="1.0.0"
+          event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
+          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+          assert(plan.record.producer.kind=="published473-idle-default")
+          assert(history.default_owner_apply(plan))
+          history.default_owner_on_load()
+          for _,force in pairs(game.forces)do
+            local old,now=before[force.index],frame(force)
+            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+          end
+        ''')
+
+    def test_f200_473_startup_change_refuses_worker_investment_or_unavailable_inputs(self):
+        opponents=(
+            'detached.technologies[CANONICAL].level=5',
+            'detached.technologies[CANONICAL].researched=true',
+            'detached.technologies[CANONICAL].saved_progress=.27',
+            'detached.research_queue={CANONICAL}',
+            'detached.research_queue={OTHER,CANONICAL}',
+            'detached.technologies[ORDINARY].level=5',
+            'event.mod_changes.removed={old_version="1"}',
+            'event.mod_changes["unrelated-updated-mod"].new_version="0.9.0"',
+            'event.mod_changes["unrelated-updated-mod"].old_version=false',
+            'setmetatable(event.mod_changes["unrelated-updated-mod"],{})',
+            'script.active_mods["space-age"]="2.0.77"',
+            'require("runtime.configuration").streams["worker-robots-storage"].base_cost=201',
+        )
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                lua=self.older_world()
+                lua.execute(r'''
+                  local event=older_event("4.7.20003",false);event.mod_startup_settings_changed=true
+                  script.active_mods["unrelated-updated-mod"]="0.8.0"
+                  event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
+                '''+opponent+r'''
+                  refuse_older(event)
+                ''')
+
     def test_473_paid_idle_preserves_native_levels_and_foreign_work(self):
         lua=self.older_world();lua.execute(r'''
           paid_idle();local event=older_event("4.7.20003",true);local before=all_frames()
@@ -3591,7 +3642,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'script.active_mods["test-observer"]="0.2.0"',
             'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
             'event.mod_changes.base={new_version="2.0.77"}',
-            'event.mod_startup_settings_changed=true',
+            'event.mod_startup_settings_changed=true;paid_idle()',
             'event.mod_changes["more-infinite-research"].new_version="5.0.20013"',
             'script.active_mods["space-age"]="2.0.77";event.mod_changes["space-age"]={new_version="2.0.77"}',
             'creators[CANONICAL]="foreign"',
