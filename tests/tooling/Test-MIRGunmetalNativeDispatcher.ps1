@@ -40,6 +40,9 @@ function Invoke-MIRGunmetalDispatcherSystemctl {
     'active' {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=active','SubState=running','MainPID=4242',('InvocationID='+$script:fakeInvocation),'Result=success','ExecMainCode=','ExecMainStatus=') }
     }
+    'exited' {
+      return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=active','SubState=exited','MainPID=0',('InvocationID='+$script:fakeInvocation),'Result=success','ExecMainCode=exited','ExecMainStatus=0') }
+    }
     'failed' {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=failed','SubState=failed','MainPID=0',('InvocationID='+$script:fakeInvocation),'Result=exit-code','ExecMainCode=exited','ExecMainStatus=1') }
     }
@@ -63,6 +66,14 @@ function Get-MIRGunmetalDispatcherInstallLinger { return [pscustomobject]@{exit_
 function Invoke-MIRGunmetalDispatcherInstallSystemctl {
   param([Parameter(Mandatory)][string[]]$Arguments)
   $script:installCalls.Add(($Arguments -join ' '))
+  if ($Arguments[0] -ceq 'show') {
+    $unit = $Arguments[$Arguments.Count - 1]
+    $unitPath = Join-Path $Plan.unit_directory $unit
+    if (Test-Path -LiteralPath $unitPath -PathType Leaf) {
+      return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=inactive',('FragmentPath='+$unitPath),'DropInPaths=') }
+    }
+    return [pscustomobject]@{ exit_code = 4; lines = @('LoadState=not-found','ActiveState=inactive','FragmentPath=','DropInPaths=') }
+  }
   if ($script:installState -ceq 'reload-fail' -and $Arguments[0] -ceq 'daemon-reload') {
     return [pscustomobject]@{ exit_code = 1; lines = @('reload failed') }
   }
@@ -73,7 +84,7 @@ function Invoke-MIRGunmetalDispatcherInstallSystemctl {
 }
 
 function New-DispatcherPolicy {
-  param([Parameter(Mandatory)]$Control,[Parameter(Mandatory)][string]$RequestId,[Parameter(Mandatory)][string]$PacketText)
+  param([Parameter(Mandatory)]$Control,[Parameter(Mandatory)][string]$RequestId,[Parameter(Mandatory)][string]$PacketText,[string]$ResultStatus='passed')
   $case=Join-Path $Control.checkout ('build/p/'+$RequestId)
   $resultDirectory=Join-Path $Control.result_root $RequestId
   [IO.Directory]::CreateDirectory($case)|Out-Null
@@ -83,7 +94,7 @@ function New-DispatcherPolicy {
   $result=Join-Path $resultDirectory 'result.json'
   [IO.File]::WriteAllText($launcher,"#!/bin/bash`nexit 0`n",[Text.UTF8Encoding]::new($false))
   [IO.File]::WriteAllText($packet,('{"packet":"'+$PacketText+'"}'+"`n"),[Text.UTF8Encoding]::new($false))
-  $policy=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherPolicyV1';execution_account=[Environment]::UserName;spool_root=$Control.spool;allowed_checkout_root=$Control.checkout;allowed_result_root=$Control.result_root;native_unit='mir-native.service';approval=[ordered]@{request_id=$RequestId;owner=[Environment]::UserName;reviewed_by='independent-review';review_reference='https://example.invalid/review';execution_class='functional-not-timing';launcher_relative_path=('build/p/'+$RequestId+'/Launch-Transient.sh');launcher_sha256=(Get-FileHash -LiteralPath $launcher -Algorithm SHA256).Hash;packet_relative_path=('build/p/'+$RequestId+'/packet.json');packet_sha256=(Get-FileHash -LiteralPath $packet -Algorithm SHA256).Hash;result_path=$result;result_kind='MIRDispatcherControlResultV1'}}
+  $policy=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherPolicyV1';execution_account=[Environment]::UserName;spool_root=$Control.spool;allowed_checkout_root=$Control.checkout;allowed_result_root=$Control.result_root;native_unit='mir-native.service';approval=[ordered]@{request_id=$RequestId;owner=[Environment]::UserName;reviewed_by='independent-review';review_reference='https://example.invalid/review';execution_class='functional-not-timing';launcher_relative_path=('build/p/'+$RequestId+'/Launch-Transient.sh');launcher_sha256=(Get-FileHash -LiteralPath $launcher -Algorithm SHA256).Hash;packet_relative_path=('build/p/'+$RequestId+'/packet.json');packet_sha256=(Get-FileHash -LiteralPath $packet -Algorithm SHA256).Hash;result_path=$result;result_kind='MIRDispatcherControlResultV1';result_status=$ResultStatus}}
   $path=Join-Path $Control.root ($RequestId+'-policy.json')
   $policy|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $path -NoNewline
   return Get-MIRGunmetalDispatcherPolicy -Path $path
@@ -97,7 +108,7 @@ function New-DispatcherControl {
   $control|Add-Member -NotePropertyName base -NotePropertyValue (New-DispatcherPolicy -Control $control -RequestId ('native-control-'+$Name) -PacketText 'base')
   return $control
 }
-function Write-DispatcherResult { param([Parameter(Mandatory)]$Policy)[IO.File]::WriteAllText($Policy.approval.result_path,('{"kind":"MIRDispatcherControlResultV1","status":"passed","packet_sha256":"'+$Policy.approval.packet_sha256+'"}'+"`n"),[Text.UTF8Encoding]::new($false)) }
+function Write-DispatcherResult { param([Parameter(Mandatory)]$Policy,[string]$Status=$Policy.approval.result_status)[IO.File]::WriteAllText($Policy.approval.result_path,('{"kind":"MIRDispatcherControlResultV1","status":"'+$Status+'","packet_sha256":"'+$Policy.approval.packet_sha256+'"}'+"`n"),[Text.UTF8Encoding]::new($false)) }
 function Read-DispatcherTerminal { param([Parameter(Mandatory)]$Control,[Parameter(Mandatory)][string]$RequestId) return (Get-Content -LiteralPath (Join-Path $Control.spool ('terminal/'+$RequestId+'.json')) -Raw|ConvertFrom-Json) }
 function Remove-DispatcherControl { param([Parameter(Mandatory)]$Control)if(Test-Path -LiteralPath $Control.root){[IO.Directory]::Delete($Control.root,$true)} }
 
@@ -113,14 +124,36 @@ try {
   [IO.File]::AppendAllText((Join-Path $identity.checkout 'build/p/native-control-identity/packet.json'),"changed`n")
   Refuses-Dispatcher {Get-MIRGunmetalDispatcherPolicy -Path $identity.base.path} '[mir-gunmetal-dispatcher-packet-hash]'
 
+  # A controller success is a reviewed exact protocol conclusion, not a
+  # generic exit code. The demonstrated source-controller conclusion is
+  # admitted verbatim; pending independent review is deliberately not one.
+  $precise=New-DispatcherControl -Name 'precise-status';$controls+=@($precise)
+  $sourceConclusion=New-DispatcherPolicy -Control $precise -RequestId 'native-control-precise-source' -PacketText 'source' -ResultStatus 'source-earned-and-read-only-cold-observed'
+  Write-DispatcherResult -Policy $sourceConclusion
+  $sourceResult=Get-MIRGunmetalDispatcherResult -Approval $sourceConclusion.approval
+  Assert-Dispatcher ($sourceResult.valid-and$sourceResult.status-ceq'source-earned-and-read-only-cold-observed') 'precise-controller-conclusion-bound'
+  Refuses-Dispatcher {New-DispatcherPolicy -Control $precise -RequestId 'native-control-precise-awaiting' -PacketText 'awaiting' -ResultStatus 'completed-await-independent-review'} '[mir-gunmetal-dispatcher-policy-result-status]'
+
+  # A submit crash may leave request.json durable before its pending pointer.
+  # Retrying the exact reviewed policy adopts that snapshot; a second retry
+  # adopts the exact pending pointer rather than minting another request.
+  $snapshotRecovery=New-DispatcherControl -Name 'snapshot-recovery';$controls+=@($snapshotRecovery)
+  New-MIRGunmetalDispatcherDirectories -Policy $snapshotRecovery.base
+  $orphanSnapshot=New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $snapshotRecovery.base -CandidatePolicy $snapshotRecovery.base
+  Assert-Dispatcher ($orphanSnapshot.recovered-eq$false) 'normal-snapshot-created-before-pointer'
+  $recoveredSubmission=Submit-MIRGunmetalDispatcherApproved -Policy $snapshotRecovery.base
+  Assert-Dispatcher ($recoveredSubmission.status-ceq'queued'-and(Test-Path -LiteralPath (Join-Path $snapshotRecovery.spool 'state/pending.json'))) 'normal-snapshot-retry-adopted'
+  $repeatedSubmission=Submit-MIRGunmetalDispatcherApproved -Policy $snapshotRecovery.base
+  Assert-Dispatcher ($repeatedSubmission.status-ceq'already-queued') 'normal-pending-retry-adopted'
+
   # One active job can carry exactly one distinct immutable successor. The
   # successor is a copied reviewed policy, not a mutable installed-policy read.
   $normal=New-DispatcherControl -Name 'normal';$controls+=@($normal)
   $script:fakeState='gone';$script:nextLaunchState='active';$script:fakeJournal=[pscustomobject]@{observed=$false;exit_code=$null}
   $queued=Submit-MIRGunmetalDispatcherApproved -Policy $normal.base
-  Assert-Dispatcher ($queued.status-ceq'queued') 'initial-policy-snapshotted'
+  Assert-Dispatcher ($queued.status-ceq'queued'-and(Test-Path -LiteralPath (Join-Path $normal.spool 'state/pending.signal'))) 'initial-policy-snapshotted-and-signalled'
   $first=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
-  Assert-Dispatcher ($first.status-ceq'submitted'-and$script:launches-eq1) 'active-launch-once'
+  Assert-Dispatcher ($first.status-ceq'submitted'-and$script:launches-eq1-and-not(Test-Path -LiteralPath (Join-Path $normal.spool 'state/pending.signal'))) 'active-launch-once-and-signal-consumed'
   $successor=New-DispatcherPolicy -Control $normal -RequestId 'native-control-normal-successor' -PacketText 'successor'
   $pending=Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $normal.base -SuccessorPolicyPath $successor.path
   Assert-Dispatcher ($pending.request_id-ceq$successor.approval.request_id-and(Test-Path -LiteralPath (Join-Path $normal.spool ('requests/'+$successor.approval.request_id+'/policy.json')))) 'one-immutable-successor-snapshot'
@@ -132,6 +165,14 @@ try {
   Assert-Dispatcher ($terminal.status-ceq'succeeded'-and$terminal.packet_sha256-ceq$normal.base.approval.packet_sha256-and$terminal.completion_envelope_sha256-match'^[A-F0-9]{64}$') 'packet-result-invocation-envelope-success'
   $script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   Assert-Dispatcher ($script:launches-eq2-and(Get-MIRGunmetalDispatcherStateRecord -Policy $normal.base -Name running).request_id-ceq$successor.approval.request_id) 'successor-starts-only-after-prior-success'
+
+  # A retained user-systemd oneshot reports ActiveState=active/SubState=exited.
+  # That is a terminal property result, not a still-running native session.
+  $retained=New-DispatcherControl -Name 'retained-exit';$controls+=@($retained)
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $retained.base;$script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
+  Write-DispatcherResult -Policy $retained.base;$script:fakeState='exited';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
+  $retainedTerminal=Read-DispatcherTerminal -Control $retained -RequestId $retained.base.approval.request_id
+  Assert-Dispatcher ($retainedTerminal.status-ceq'succeeded'-and$retainedTerminal.result.result.status-ceq'passed') 'retained-oneshot-exit-is-terminal-with-verbatim-status'
 
   # A failed/unavailable unit query is not proof of absence; no launcher runs.
   $uncertain=New-DispatcherControl -Name 'uncertain';$controls+=@($uncertain)
@@ -165,7 +206,7 @@ try {
   $held=New-DispatcherPolicy -Control $adverse -RequestId 'native-control-adverse-held' -PacketText 'unchanged'
   $null=Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $adverse.base -SuccessorPolicyPath $held.path
   $beforeLaunches=$script:launches;$heldResult=Invoke-MIRGunmetalDispatcherConsume -Policy $adverse.base
-  Assert-Dispatcher ($heldResult.status-ceq'held-after-adverse-terminal'-and$script:launches-eq$beforeLaunches) 'adverse-holds-pending-successor'
+  Assert-Dispatcher ($heldResult.status-ceq'held-after-adverse-terminal'-and$script:launches-eq$beforeLaunches-and(Test-Path -LiteralPath (Join-Path $adverse.spool 'state/pending.json'))-and-not(Test-Path -LiteralPath (Join-Path $adverse.spool 'state/pending.signal'))) 'adverse-holds-pending-without-path-loop-signal'
   $replacement=New-DispatcherPolicy -Control $adverse -RequestId 'native-control-adverse-replacement' -PacketText 'changed'
   $heldCollisionPath=Join-Path $adverse.root 'native-control-adverse-held-collision-policy.json'
   $heldCollisionRecord=Get-Content -LiteralPath $held.path -Raw|ConvertFrom-Json
@@ -173,8 +214,11 @@ try {
   $heldCollisionRecord|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $heldCollisionPath -NoNewline
   $heldCollision=Get-MIRGunmetalDispatcherPolicy -Path $heldCollisionPath
   Refuses-Dispatcher {Replace-MIRGunmetalDispatcherHeldSuccessor -BasePolicy $adverse.base -SuccessorPolicyPath $heldCollision.path -DispositionReference 'reviewed'} '[mir-gunmetal-dispatcher-held-snapshot-policy-mismatch]'
+  $holdRecord=Get-MIRGunmetalDispatcherStateRecord -Policy $adverse.base -Name hold
+  $replacementSnapshot=New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $adverse.base -CandidatePolicy $replacement -PredecessorRequestId $holdRecord.predecessor_request_id -DispositionReference 'https://example.invalid/disposition'
+  Set-MIRGunmetalDispatcherPending -Policy $adverse.base -Snapshot $replacementSnapshot -PredecessorRequestId $holdRecord.predecessor_request_id -DispositionReference 'https://example.invalid/disposition'
   $resolution=Replace-MIRGunmetalDispatcherHeldSuccessor -BasePolicy $adverse.base -SuccessorPolicyPath $replacement.path -DispositionReference 'https://example.invalid/disposition'
-  Assert-Dispatcher ($resolution.status-ceq'replaced'-and-not(Test-Path -LiteralPath (Join-Path $adverse.spool 'state/hold.json'))) 'held-successor-replaced-by-distinct-policy'
+  Assert-Dispatcher ($resolution.status-ceq'released'-and-not(Test-Path -LiteralPath (Join-Path $adverse.spool 'state/hold.json'))-and(Test-Path -LiteralPath (Join-Path $adverse.spool ('held/'+$holdRecord.predecessor_request_id+'-'+$replacement.approval.request_id+'.json')))) 'held-replacement-crash-recovered-idempotently'
   $script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $adverse.base
   Assert-Dispatcher ($script:launches-eq($beforeLaunches+1)) 'disposed-successor-starts-once'
 
@@ -192,8 +236,29 @@ try {
   $beforeLaunches=$script:launches;$script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $release.base
   Assert-Dispatcher ($script:launches-eq($beforeLaunches+1)) 'released-exact-snapshot-starts-once'
 
+  # A terminal may have reached durable custody before cleanup of running,
+  # pending, or last-terminal pointers. Both the running and fresh-start paths
+  # finalize that exact terminal without invoking the launcher again.
+  $terminalRecovery=New-DispatcherControl -Name 'terminal-recovery';$controls+=@($terminalRecovery)
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $terminalRecovery.base;$script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $terminalRecovery.base
+  $savedRunning=Get-MIRGunmetalDispatcherStateRecord -Policy $terminalRecovery.base -Name running
+  $savedSnapshot=Get-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $terminalRecovery.base -RequestId $terminalRecovery.base.approval.request_id
+  $savedSubmission=[pscustomobject]@{request_id=$savedSnapshot.request.request_id;policy_sha256=$savedSnapshot.request.policy_sha256}
+  Write-DispatcherResult -Policy $terminalRecovery.base
+  $terminalResult=[ordered]@{result=(Get-MIRGunmetalDispatcherResult -Approval $terminalRecovery.base.approval);journal=[ordered]@{observed=$true;exit_code=0;source='control'}}
+  New-MIRGunmetalDispatcherTerminal -Policy $terminalRecovery.base -Running $savedRunning -Status succeeded -Reason 'control-terminal' -Result $terminalResult
+  Write-MIRGunmetalDispatcherJson -Path (Join-Path $terminalRecovery.spool 'state/running.json') -Value $savedRunning
+  Set-MIRGunmetalDispatcherPending -Policy $terminalRecovery.base -Snapshot $savedSubmission
+  Remove-Item -LiteralPath (Join-Path $terminalRecovery.spool 'state/last-terminal.json') -Force
+  $beforeLaunches=$script:launches;$finalizedRunning=Invoke-MIRGunmetalDispatcherConsume -Policy $terminalRecovery.base
+  Assert-Dispatcher ($finalizedRunning.status-ceq'running-terminal-finalized'-and$script:launches-eq$beforeLaunches-and-not(Test-Path -LiteralPath (Join-Path $terminalRecovery.spool 'state/running.json'))-and-not(Test-Path -LiteralPath (Join-Path $terminalRecovery.spool 'state/pending.json'))) 'terminal-crash-finalizes-running-and-pending'
+  Set-MIRGunmetalDispatcherPending -Policy $terminalRecovery.base -Snapshot $savedSubmission
+  Remove-Item -LiteralPath (Join-Path $terminalRecovery.spool 'state/last-terminal.json') -Force
+  $beforeLaunches=$script:launches;$finalizedStart=Invoke-MIRGunmetalDispatcherConsume -Policy $terminalRecovery.base
+  Assert-Dispatcher ($finalizedStart.status-ceq'submitted'-and$script:launches-eq$beforeLaunches-and-not(Test-Path -LiteralPath (Join-Path $terminalRecovery.spool 'state/pending.json'))) 'terminal-crash-is-recognized-before-start'
+
   $plan=& $installer -Mode Compose -PolicyPath $normal.base.path -InstallRoot (Join-Path $normal.root 'install') -UnitDirectory (Join-Path $normal.root 'units')
-  Assert-Dispatcher ($plan.files['mir-native-dispatcher.path'].Contains(('PathExists='+$normal.spool+'/state/pending.json'))) 'path-consumer-composed'
+  Assert-Dispatcher ($plan.files['mir-native-dispatcher.path'].Contains(('PathExists='+$normal.spool+'/state/pending.signal'))) 'edge-triggered-path-consumer-composed'
   Assert-Dispatcher ($plan.files['mir-native-dispatcher.timer'].Contains('OnUnitInactiveSec=1min')-and$plan.files['mir-native-dispatcher.service'].Contains('NoNewPrivileges=yes')) 'bounded-timer-and-unit-hardening'
 
   # A failed enable keeps only this transaction's bytes for a byte-identical

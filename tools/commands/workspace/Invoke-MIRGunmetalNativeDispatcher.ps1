@@ -81,6 +81,13 @@ function Assert-MIRGunmetalDispatcherText {
   return [string]$Value
 }
 
+function Get-MIRGunmetalDispatcherExpectedNativeUnit {
+  # Production deliberately has one fixed owner unit. Test controls may replace
+  # this function only in their own PowerShell process to exercise a uniquely
+  # named harmless systemd stand-in; no installed policy gets that override.
+  return 'mir-native.service'
+}
+
 function Get-MIRGunmetalDispatcherPolicy {
   param([Parameter(Mandatory)][string]$Path)
   $path = Resolve-MIRGunmetalDispatcherPath -Path $Path
@@ -94,7 +101,7 @@ function Get-MIRGunmetalDispatcherPolicy {
   $checkout = Resolve-MIRGunmetalDispatcherPath -Path (Assert-MIRGunmetalDispatcherText $policy.allowed_checkout_root '[mir-gunmetal-dispatcher-policy-checkout]') -Directory
   $resultRoot = Resolve-MIRGunmetalDispatcherPath -Path (Assert-MIRGunmetalDispatcherText $policy.allowed_result_root '[mir-gunmetal-dispatcher-policy-result-root]') -Directory -MayNotExist
   $unit = Assert-MIRGunmetalDispatcherText $policy.native_unit '[mir-gunmetal-dispatcher-policy-unit]' 96
-  if ($unit -cne 'mir-native.service') { throw '[mir-gunmetal-dispatcher-policy-unit]' }
+  if ($unit -cne (Get-MIRGunmetalDispatcherExpectedNativeUnit)) { throw '[mir-gunmetal-dispatcher-policy-unit]' }
   $approval = $policy.approval
   if ($null -eq $approval -or @($approval.PSObject.Properties).Count -lt 10) {
     throw '[mir-gunmetal-dispatcher-policy-approval]'
@@ -133,6 +140,14 @@ function Get-MIRGunmetalDispatcherPolicy {
   $result = Resolve-MIRGunmetalDispatcherPath -Path (Assert-MIRGunmetalDispatcherText $approval.result_path '[mir-gunmetal-dispatcher-policy-result-path]') -Root $resultRoot -MayNotExist
   if ((Split-Path -Leaf $result) -cne 'result.json') { throw '[mir-gunmetal-dispatcher-result-name]' }
   $resultKind = Assert-MIRGunmetalDispatcherText $approval.result_kind '[mir-gunmetal-dispatcher-policy-result-kind]' 256
+  $resultStatus = Assert-MIRGunmetalDispatcherText $approval.result_status '[mir-gunmetal-dispatcher-policy-result-status]' 256
+  # `passed` is the deliberately small control-protocol success state. The
+  # retained R04 source controller has a more precise positive conclusion.
+  # Incomplete custody (`completed-await-independent-review`) is not terminal
+  # success and must be independently reviewed before it is ever allowlisted.
+  if ($resultStatus -cnotin @('passed','source-earned-and-read-only-cold-observed')) {
+    throw '[mir-gunmetal-dispatcher-policy-result-status]'
+  }
   return [pscustomobject][ordered]@{
     path = $path
     account = $account
@@ -152,6 +167,7 @@ function Get-MIRGunmetalDispatcherPolicy {
       packet_sha256 = $approval.packet_sha256.ToUpperInvariant()
       result_path = $result
       result_kind = $resultKind
+      result_status = $resultStatus
     }
   }
 }
@@ -201,6 +217,26 @@ function Get-MIRGunmetalDispatcherRequestDirectory {
   return Join-Path $Policy.spool ('requests/'+$RequestId)
 }
 
+function Test-MIRGunmetalDispatcherSnapshotIdentity {
+  param([Parameter(Mandatory)]$Request,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$PolicySha256,[string]$PredecessorRequestId='',[string]$DispositionReference='')
+  if (
+    $Request.schema -ne 1 -or
+    $Request.kind -cne 'MIRGunmetalNativeDispatcherRequestSnapshotV1' -or
+    $Request.request_id -cne $Candidate.approval.request_id -or
+    $Request.policy_sha256 -cne $PolicySha256 -or
+    $Request.packet_sha256 -cne $Candidate.approval.packet_sha256 -or
+    $Request.launcher_sha256 -cne $Candidate.approval.launcher_sha256 -or
+    $Request.result_path -cne $Candidate.approval.result_path -or
+    $Request.result_kind -cne $Candidate.approval.result_kind -or
+    $Request.result_status -cne $Candidate.approval.result_status -or
+    [string]$Request.predecessor_request_id -cne [string]$PredecessorRequestId -or
+    [string]$Request.disposition_reference -cne [string]$DispositionReference
+  ) {
+    return $false
+  }
+  return $true
+}
+
 function New-MIRGunmetalDispatcherRequestSnapshot {
   param([Parameter(Mandatory)]$BasePolicy,[Parameter(Mandatory)]$CandidatePolicy,[string]$PredecessorRequestId='',[string]$DispositionReference='')
   Assert-MIRGunmetalDispatcherSchedulingIdentity -Base $BasePolicy -Candidate $CandidatePolicy
@@ -210,17 +246,26 @@ function New-MIRGunmetalDispatcherRequestSnapshot {
   $requestPath=Join-Path $directory 'request.json'
   $sourceBytes=[IO.File]::ReadAllBytes($CandidatePolicy.path)
   $sourceHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($sourceBytes))
-  if(Test-Path -LiteralPath $requestPath){throw '[mir-gunmetal-dispatcher-request-exists]'}
+  if(Test-Path -LiteralPath $requestPath) {
+    $existing = Read-MIRGunmetalDispatcherJson -Path $requestPath -MaximumBytes 16384
+    if (-not (Test-MIRGunmetalDispatcherSnapshotIdentity -Request $existing -Candidate $CandidatePolicy -PolicySha256 $sourceHash -PredecessorRequestId $PredecessorRequestId -DispositionReference $DispositionReference)) {
+      throw '[mir-gunmetal-dispatcher-request-exists-conflict]'
+    }
+    if (-not (Test-Path -LiteralPath $policyCopy) -or (Get-MIRGunmetalDispatcherSha256 $policyCopy) -cne $sourceHash) {
+      throw '[mir-gunmetal-dispatcher-request-partial-conflict]'
+    }
+    return [pscustomobject]@{request_id=$id;policy_sha256=$sourceHash;path=$requestPath;recovered=$true}
+  }
   if(Test-Path -LiteralPath $directory) {
     # A previous process may have died after copying the policy but before its
     # final request marker. Resume only byte-identical own preparation.
     if(-not(Test-Path -LiteralPath $policyCopy) -or (Get-MIRGunmetalDispatcherSha256 $policyCopy) -cne $sourceHash){throw '[mir-gunmetal-dispatcher-request-partial-conflict]'}
   } else { [IO.Directory]::CreateDirectory($directory) | Out-Null }
   if(-not(Test-Path -LiteralPath $policyCopy)){Write-MIRGunmetalDispatcherBytes -Path $policyCopy -Bytes $sourceBytes -Replace:$false}
-  $request=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherRequestSnapshotV1';request_id=$id;created_utc=[datetime]::UtcNow.ToString('o');policy_sha256=$sourceHash;packet_sha256=$CandidatePolicy.approval.packet_sha256;launcher_sha256=$CandidatePolicy.approval.launcher_sha256;result_path=$CandidatePolicy.approval.result_path;result_kind=$CandidatePolicy.approval.result_kind;predecessor_request_id=$PredecessorRequestId;disposition_reference=$DispositionReference}
+  $request=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherRequestSnapshotV1';request_id=$id;created_utc=[datetime]::UtcNow.ToString('o');policy_sha256=$sourceHash;packet_sha256=$CandidatePolicy.approval.packet_sha256;launcher_sha256=$CandidatePolicy.approval.launcher_sha256;result_path=$CandidatePolicy.approval.result_path;result_kind=$CandidatePolicy.approval.result_kind;result_status=$CandidatePolicy.approval.result_status;predecessor_request_id=$PredecessorRequestId;disposition_reference=$DispositionReference}
   # request.json is the commit marker. Consumers ignore an incomplete directory.
   Write-MIRGunmetalDispatcherJson -Path $requestPath -Value $request -NewOnly
-  return [pscustomobject]@{request_id=$id;policy_sha256=$sourceHash;path=$requestPath}
+  return [pscustomobject]@{request_id=$id;policy_sha256=$sourceHash;path=$requestPath;recovered=$false}
 }
 
 function Get-MIRGunmetalDispatcherRequestSnapshot {
@@ -233,7 +278,7 @@ function Get-MIRGunmetalDispatcherRequestSnapshot {
   if((Get-MIRGunmetalDispatcherSha256 $policyPath) -cne $request.policy_sha256.ToUpperInvariant()){throw '[mir-gunmetal-dispatcher-request-policy-hash]'}
   $policy=Get-MIRGunmetalDispatcherPolicy -Path $policyPath
   Assert-MIRGunmetalDispatcherSchedulingIdentity -Base $BasePolicy -Candidate $policy
-  foreach($field in @('request_id','packet_sha256','launcher_sha256','result_path','result_kind')) {
+  foreach($field in @('request_id','packet_sha256','launcher_sha256','result_path','result_kind','result_status')) {
     if([string]$request.$field -cne [string]$policy.approval.$field){throw '[mir-gunmetal-dispatcher-request-identity]'}
   }
   return [pscustomobject]@{request=$request;policy=$policy}
@@ -250,6 +295,15 @@ function Set-MIRGunmetalDispatcherPending {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot,[string]$PredecessorRequestId='',[string]$DispositionReference='')
   $value=[ordered]@{schema=1;kind='MIRGunmetalNativeDispatcherPendingV1';request_id=$Snapshot.request_id;policy_sha256=$Snapshot.policy_sha256;queued_utc=[datetime]::UtcNow.ToString('o');predecessor_request_id=$PredecessorRequestId;disposition_reference=$DispositionReference}
   Write-MIRGunmetalDispatcherJson -Path (Join-Path $Policy.spool 'state/pending.json') -Value $value
+  # `pending.json` remains until the request is terminal. The path unit must
+  # therefore watch a separate one-shot edge marker; otherwise a held pointer
+  # reactivates the oneshot until systemd start-limits it. The recovery timer
+  # observes pending state even after this marker has been consumed.
+  Write-MIRGunmetalDispatcherJson -Path (Join-Path $Policy.spool 'state/pending.signal') -Value ([ordered]@{
+    kind = 'MIRGunmetalNativeDispatcherPendingSignalV1'
+    request_id = $Snapshot.request_id
+    queued_utc = [datetime]::UtcNow.ToString('o')
+  })
 }
 
 function Get-MIRGunmetalDispatcherPending {
@@ -338,21 +392,90 @@ function Get-MIRGunmetalDispatcherJournalTerminal {
 
 function Get-MIRGunmetalDispatcherResult {
   param([Parameter(Mandatory)]$Approval)
-  if(-not(Test-Path -LiteralPath $Approval.result_path)){return [pscustomobject]@{exists=$false;valid=$false;sha256='';reason='result-absent'}}
+  if(-not(Test-Path -LiteralPath $Approval.result_path)){return [pscustomobject]@{exists=$false;valid=$false;sha256='';kind='';status='';packet_sha256='';reason='result-absent'}}
   try{
     $result=Read-MIRGunmetalDispatcherJson -Path $Approval.result_path -MaximumBytes 8388608
     $kind=if($result.PSObject.Properties['kind']){[string]$result.kind}else{''}
     $status=if($result.PSObject.Properties['status']){[string]$result.status}else{''}
     $packet=if($result.PSObject.Properties['packet_sha256']){[string]$result.packet_sha256}else{''}
-    if($kind-cne$Approval.result_kind-or$status-cne'passed'-or$packet-cne$Approval.packet_sha256){return [pscustomobject]@{exists=$true;valid=$false;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);reason='result-contract-or-packet'}}
-    return [pscustomobject]@{exists=$true;valid=$true;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);reason='passed'}
-  }catch{return [pscustomobject]@{exists=$true;valid=$false;sha256='';reason='result-invalid'}}
+    if($kind-cne$Approval.result_kind-or$status-cne$Approval.result_status-or$packet-cne$Approval.packet_sha256){return [pscustomobject]@{exists=$true;valid=$false;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);kind=$kind;status=$status;packet_sha256=$packet;reason='result-contract-or-packet'}}
+    return [pscustomobject]@{exists=$true;valid=$true;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);kind=$kind;status=$status;packet_sha256=$packet;reason='passed'}
+  }catch{return [pscustomobject]@{exists=$true;valid=$false;sha256='';kind='';status='';packet_sha256='';reason='result-invalid'}}
+}
+
+function Complete-MIRGunmetalDispatcherTerminal {
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Running)
+  $path = Join-Path $Policy.spool ('terminal/'+$Running.request_id+'.json')
+  if (-not (Test-Path -LiteralPath $path)) { return $false }
+  $terminal = Read-MIRGunmetalDispatcherJson -Path $path -MaximumBytes 8388608
+  if (
+    $terminal.kind -cne 'MIRGunmetalNativeDispatcherTerminalV2' -or
+    $terminal.request_id -cne $Running.request_id -or
+    $terminal.request_snapshot_sha256 -cne $Running.request_snapshot_sha256 -or
+    $terminal.dispatch_id -cne $Running.dispatch_id -or
+    $terminal.packet_sha256 -cne $Policy.approval.packet_sha256 -or
+    $terminal.launcher_sha256 -cne $Policy.approval.launcher_sha256
+  ) {
+    throw '[mir-gunmetal-dispatcher-terminal-identity]'
+  }
+
+  $lastPath = Join-Path $Policy.spool 'state/last-terminal.json'
+  $last = [ordered]@{
+    request_id = $Running.request_id
+    status = $terminal.status
+    reason = $terminal.reason
+    packet_sha256 = $Policy.approval.packet_sha256
+    terminal_path = $path
+    recorded_utc = $terminal.recorded_utc
+  }
+  if (Test-Path -LiteralPath $lastPath) {
+    $existingLast = Read-MIRGunmetalDispatcherJson -Path $lastPath -MaximumBytes 65536
+    if ($existingLast.request_id -ceq $Running.request_id -and (
+      $existingLast.status -cne $terminal.status -or
+      $existingLast.reason -cne $terminal.reason -or
+      $existingLast.packet_sha256 -cne $Policy.approval.packet_sha256 -or
+      $existingLast.terminal_path -cne $path
+    )) {
+      throw '[mir-gunmetal-dispatcher-last-terminal-conflict]'
+    }
+  }
+  Write-MIRGunmetalDispatcherJson -Path $lastPath -Value $last
+
+  foreach ($name in @('running','intent')) {
+    $activePath = Join-Path $Policy.spool ('state/'+$name+'.json')
+    if (Test-Path -LiteralPath $activePath) {
+      $active = Read-MIRGunmetalDispatcherJson -Path $activePath -MaximumBytes 65536
+      if ($active.request_id -ceq $Running.request_id) {
+        if ($active.dispatch_id -cne $Running.dispatch_id) { throw '[mir-gunmetal-dispatcher-terminal-active-conflict]' }
+        Remove-Item -LiteralPath $activePath -Force
+      }
+    }
+  }
+  Clear-MIRGunmetalDispatcherPending -Policy $Policy -RequestId $Running.request_id
+  return $true
+}
+
+function Complete-MIRGunmetalDispatcherTerminalForSnapshot {
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot)
+  $path = Join-Path $Policy.spool ('terminal/'+$Snapshot.request.request_id+'.json')
+  if (-not (Test-Path -LiteralPath $path)) { return $false }
+  $terminal = Read-MIRGunmetalDispatcherJson -Path $path -MaximumBytes 8388608
+  $running = [pscustomobject]@{
+    request_id = $Snapshot.request.request_id
+    request_snapshot_sha256 = $Snapshot.request.policy_sha256
+    dispatch_id = $terminal.dispatch_id
+    launch = $terminal.launch
+  }
+  return Complete-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $running
 }
 
 function New-MIRGunmetalDispatcherTerminal {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Running,[Parameter(Mandatory)][ValidateSet('succeeded','failed','interrupted','rejected')][string]$Status,[Parameter(Mandatory)][string]$Reason,$Unit=$null,$Result=$null)
   $path = Join-Path $Policy.spool ('terminal/'+$Running.request_id+'.json')
-  if (Test-Path -LiteralPath $path) { return }
+  if (Test-Path -LiteralPath $path) {
+    $null = Complete-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running
+    return
+  }
   $record = [ordered]@{
     kind = 'MIRGunmetalNativeDispatcherTerminalV2'
     request_id = $Running.request_id
@@ -391,29 +514,36 @@ function New-MIRGunmetalDispatcherTerminal {
       packet_sha256 = $Policy.approval.packet_sha256
       result_path = $Policy.approval.result_path
       result_sha256 = $resultRecord.sha256
+      controller_kind = $resultRecord.kind
+      controller_status = $resultRecord.status
       invocation_id = $Running.launch.start_ack.invocation_id
       terminal_evidence = $journal
       created_utc = [datetime]::UtcNow.ToString('o')
     }
     $envelopePath = Join-Path (Get-MIRGunmetalDispatcherRequestDirectory -Policy $Policy -RequestId $Running.request_id) ('completion-'+$Running.dispatch_id+'.json')
-    Write-MIRGunmetalDispatcherJson -Path $envelopePath -Value $envelope -NewOnly
+    if (Test-Path -LiteralPath $envelopePath) {
+      $existingEnvelope = Read-MIRGunmetalDispatcherJson -Path $envelopePath -MaximumBytes 8388608
+      if (
+        $existingEnvelope.kind -cne $envelope.kind -or
+        $existingEnvelope.request_id -cne $envelope.request_id -or
+        $existingEnvelope.dispatch_id -cne $envelope.dispatch_id -or
+        $existingEnvelope.packet_sha256 -cne $envelope.packet_sha256 -or
+        $existingEnvelope.result_path -cne $envelope.result_path -or
+        $existingEnvelope.result_sha256 -cne $envelope.result_sha256 -or
+        $existingEnvelope.controller_kind -cne $envelope.controller_kind -or
+        $existingEnvelope.controller_status -cne $envelope.controller_status -or
+        $existingEnvelope.invocation_id -cne $envelope.invocation_id
+      ) {
+        throw '[mir-gunmetal-dispatcher-completion-envelope-conflict]'
+      }
+    } else {
+      Write-MIRGunmetalDispatcherJson -Path $envelopePath -Value $envelope -NewOnly
+    }
     $record.completion_envelope_path=$envelopePath
     $record.completion_envelope_sha256=Get-MIRGunmetalDispatcherSha256 $envelopePath
   }
   Write-MIRGunmetalDispatcherJson -Path $path -Value $record
-  Write-MIRGunmetalDispatcherJson -Path (Join-Path $Policy.spool 'state/last-terminal.json') -Value ([ordered]@{
-    request_id = $Running.request_id
-    status = $Status
-    reason = $Reason
-    packet_sha256 = $Policy.approval.packet_sha256
-    terminal_path = $path
-    recorded_utc = $record.recorded_utc
-  })
-  foreach ($name in @('running','intent')) {
-    $active = Join-Path $Policy.spool ('state/'+$name+'.json')
-    if (Test-Path -LiteralPath $active) { Remove-Item -LiteralPath $active -Force }
-  }
-  Clear-MIRGunmetalDispatcherPending -Policy $Policy -RequestId $Running.request_id
+  $null = Complete-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running
 }
 
 function Reconcile-MIRGunmetalDispatcherRunning {
@@ -435,13 +565,20 @@ function Reconcile-MIRGunmetalDispatcherRunning {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'native-unit-invocation-replaced' -Unit $unit
     return
   }
-  if ($unit.found -and $unit.active_state -in @('active','activating','deactivating')) { return }
+  $stillRunning = (
+    $unit.active_state -in @('activating','deactivating') -or
+    ($unit.active_state -ceq 'active' -and $unit.sub_state -cne 'exited')
+  )
+  if ($unit.found -and $stillRunning) { return }
 
   $result = Get-MIRGunmetalDispatcherResult -Approval $Policy.approval
   if ($unit.found) {
+    # systemctl show reports CLD_EXITED numerically on the real user manager
+    # (`1`), while fixture/older manager shapes spell it `exited`.
+    $explicitExit = $unit.exec_main_code -in @('exited','1')
     $good = (
       $unit.result -ceq 'success' -and
-      $unit.exec_main_code -ceq 'exited' -and
+      $explicitExit -and
       $unit.exec_main_status -ceq '0' -and
       $result.valid
     )
@@ -471,6 +608,10 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
   if ($Snapshot.request.request_id -cne $Policy.approval.request_id) {
     throw '[mir-gunmetal-dispatcher-submission-not-approved]'
   }
+  # A crash can leave the immutable terminal record durable while state cleanup
+  # is incomplete. Finalize that exact request instead of treating its pending
+  # pointer as new permission to launch it again.
+  if (Complete-MIRGunmetalDispatcherTerminalForSnapshot -Policy $Policy -Snapshot $Snapshot) { return }
   $record = [pscustomobject]@{
     request_id = $Policy.approval.request_id
     request_snapshot_sha256 = $Snapshot.request.policy_sha256
@@ -524,13 +665,21 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status failed -Reason 'reviewed-launcher-refused-before-acknowledgement'
     return
   }
-  $after = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
-  $acknowledged = (
-    $after.found -and
-    $after.active_state -in @('active','activating') -and
-    $after.main_pid -match '^[1-9][0-9]*$' -and
-    $after.invocation_id -cmatch '^[A-Fa-f0-9]{32}$'
-  )
+  $after = $null
+  $acknowledged = $false
+  # A systemd-run launcher may return before its user manager has populated
+  # MainPID. Bounded acknowledgement sampling does not rerun the launcher.
+  for ($attempt = 0; $attempt -lt 8; $attempt++) {
+    $after = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
+    $acknowledged = (
+      $after.found -and
+      $after.active_state -in @('active','activating') -and
+      $after.main_pid -match '^[1-9][0-9]*$' -and
+      $after.invocation_id -cmatch '^[A-Fa-f0-9]{32}$'
+    )
+    if ($acknowledged) { break }
+    Start-Sleep -Milliseconds 125
+  }
   if (-not $acknowledged) {
     $record.launch = $launch
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status interrupted -Reason 'launcher-returned-without-native-start-acknowledgement' -Unit $after
@@ -576,6 +725,9 @@ function Recover-MIRGunmetalDispatcherLaunchIntent {
     return [pscustomobject]@{status='intent-recovery-held';side_effects='state-only'}
   }
   $record=[pscustomobject]@{request_id=$Intent.request_id;request_snapshot_sha256=$Intent.request_snapshot_sha256;dispatch_id=$Intent.dispatch_id;launch=$null}
+  if (Complete-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record) {
+    return [pscustomobject]@{status='intent-terminal-finalized';side_effects='terminal-finalization-only'}
+  }
   $unit=Get-MIRGunmetalDispatcherUnit -Unit $snapshot.policy.unit
   if($unit.ambiguous){New-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record -Status interrupted -Reason 'intent-recovery-unit-state-ambiguous' -Unit $unit;return [pscustomobject]@{status='intent-interrupted';side_effects='terminal-only'}}
   if($unit.absence_confirmed){New-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record -Status interrupted -Reason 'intent-recovered-without-native-unit' -Unit $unit;return [pscustomobject]@{status='intent-interrupted';side_effects='terminal-only'}}
@@ -595,6 +747,11 @@ function Invoke-MIRGunmetalDispatcherConsume {
   New-MIRGunmetalDispatcherDirectories -Policy $Policy
   $lock=Enter-MIRGunmetalDispatcherLock -Policy $Policy;if($null-eq$lock){return [pscustomobject]@{status='busy';side_effects='none'}}
   try {
+    # Consume the edge marker before inspecting durable state. This keeps a
+    # path wakeup one-shot when a request stays pending behind an active or
+    # held predecessor; the minute timer provides subsequent recovery.
+    $signal = Join-Path $Policy.spool 'state/pending.signal'
+    if (Test-Path -LiteralPath $signal) { Remove-Item -LiteralPath $signal -Force }
     $intent=Get-MIRGunmetalDispatcherStateRecord -Policy $Policy -Name intent
     if($null-ne$intent){
       return Recover-MIRGunmetalDispatcherLaunchIntent -BasePolicy $Policy -Intent $intent
@@ -603,6 +760,9 @@ function Invoke-MIRGunmetalDispatcherConsume {
     if(Test-Path -LiteralPath $runningPath) {
       $running=Read-MIRGunmetalDispatcherJson -Path $runningPath
       $snapshot=Get-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $Policy -RequestId $running.request_id
+      if (Complete-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $running) {
+        return [pscustomobject]@{status='running-terminal-finalized';side_effects='terminal-finalization-only'}
+      }
       Reconcile-MIRGunmetalDispatcherRunning -Policy $snapshot.policy -Running $running
       return [pscustomobject]@{status='reconciled';side_effects='state-only'}
     }
@@ -631,13 +791,27 @@ function Submit-MIRGunmetalDispatcherPolicy {
   $running=Get-MIRGunmetalDispatcherStateRecord -Policy $BasePolicy -Name running
   $intent=Get-MIRGunmetalDispatcherStateRecord -Policy $BasePolicy -Name intent
   $pending=Get-MIRGunmetalDispatcherPending -Policy $BasePolicy
-  if($null-ne$pending){throw '[mir-gunmetal-dispatcher-pending-slot-not-empty]'}
+  $candidatePolicySha256 = Get-MIRGunmetalDispatcherSha256 $CandidatePolicy.path
+  if($null-ne$pending) {
+    $samePending = (
+      $pending.pending.request_id -ceq $CandidatePolicy.approval.request_id -and
+      $pending.pending.policy_sha256 -ceq $candidatePolicySha256 -and
+      [string]$pending.pending.predecessor_request_id -ceq [string]$PredecessorRequestId -and
+      [string]$pending.pending.disposition_reference -ceq [string]$DispositionReference
+    )
+    if (-not $samePending) { throw '[mir-gunmetal-dispatcher-pending-slot-not-empty]' }
+    if (-not (Test-MIRGunmetalDispatcherSnapshotIdentity -Request $pending.snapshot.request -Candidate $CandidatePolicy -PolicySha256 $candidatePolicySha256 -PredecessorRequestId $PredecessorRequestId -DispositionReference $DispositionReference)) {
+      throw '[mir-gunmetal-dispatcher-pending-identity]'
+    }
+    return [pscustomobject]@{kind='MIRGunmetalNativeDispatcherSubmissionV2';status='already-queued';request_id=$pending.snapshot.request.request_id;policy_sha256=$candidatePolicySha256;side_effects='recovered an exact immutable pending request; no launcher or native process was started.'}
+  }
   if($null-ne$running-and$running.request_id-ceq$CandidatePolicy.approval.request_id){throw '[mir-gunmetal-dispatcher-active-request-duplicate]'}
   if($null-ne$intent-and$intent.request_id-ceq$CandidatePolicy.approval.request_id){throw '[mir-gunmetal-dispatcher-intent-request-duplicate]'}
   if(Test-Path -LiteralPath (Join-Path $BasePolicy.spool ('terminal/'+$CandidatePolicy.approval.request_id+'.json'))){throw '[mir-gunmetal-dispatcher-terminal-request-duplicate]'}
   $snapshot=New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $BasePolicy -CandidatePolicy $CandidatePolicy -PredecessorRequestId $PredecessorRequestId -DispositionReference $DispositionReference
   Set-MIRGunmetalDispatcherPending -Policy $BasePolicy -Snapshot $snapshot -PredecessorRequestId $PredecessorRequestId -DispositionReference $DispositionReference
-  return [pscustomobject]@{kind='MIRGunmetalNativeDispatcherSubmissionV2';status='queued';request_id=$snapshot.request_id;policy_sha256=$snapshot.policy_sha256;side_effects='one immutable request snapshot and one atomic pending pointer; no launcher or native process was started.'}
+  $sideEffects = if ($snapshot.recovered) { 'adopted an exact immutable request snapshot and wrote its pending pointer; no launcher or native process was started.' } else { 'one immutable request snapshot and one atomic pending pointer; no launcher or native process was started.' }
+  return [pscustomobject]@{kind='MIRGunmetalNativeDispatcherSubmissionV2';status='queued';request_id=$snapshot.request_id;policy_sha256=$snapshot.policy_sha256;side_effects=$sideEffects}
 }
 
 function Submit-MIRGunmetalDispatcherApproved {
@@ -678,8 +852,15 @@ function Replace-MIRGunmetalDispatcherHeldSuccessor {
       $snapshot=New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $BasePolicy -CandidatePolicy $successor -PredecessorRequestId $hold.predecessor_request_id -DispositionReference $DispositionReference
     }
     Set-MIRGunmetalDispatcherPending -Policy $BasePolicy -Snapshot $snapshot -PredecessorRequestId $hold.predecessor_request_id -DispositionReference $DispositionReference
-    $archive=Join-Path $BasePolicy.spool ('held/'+$hold.predecessor_request_id+'-'+[datetime]::UtcNow.ToString('yyyyMMddHHmmss')+'-'+[guid]::NewGuid().ToString('N')+'.json')
-    Write-MIRGunmetalDispatcherJson -Path $archive -Value $hold -NewOnly
+    $archive=Join-Path $BasePolicy.spool ('held/'+$hold.predecessor_request_id+'-'+$snapshot.request_id+'.json')
+    if (Test-Path -LiteralPath $archive) {
+      $archived = Read-MIRGunmetalDispatcherJson -Path $archive -MaximumBytes 65536
+      if ($archived.predecessor_request_id -cne $hold.predecessor_request_id -or $archived.predecessor_packet_sha256 -cne $hold.predecessor_packet_sha256) {
+        throw '[mir-gunmetal-dispatcher-held-archive-conflict]'
+      }
+    } else {
+      Write-MIRGunmetalDispatcherJson -Path $archive -Value $hold -NewOnly
+    }
     Remove-Item -LiteralPath (Join-Path $BasePolicy.spool 'state/hold.json') -Force
     return [pscustomobject]@{kind='MIRGunmetalNativeDispatcherHeldDispositionV1';status=$(if($samePending){'released'}else{'replaced'});request_id=$snapshot.request_id;predecessor_request_id=$hold.predecessor_request_id;side_effects=$(if($samePending){'existing immutable successor snapshot was released with an explicit disposition; no launcher was started.'}else{'new immutable successor snapshot and pending pointer only; no launcher was started.'})}
   } finally {$lock.Dispose()}
