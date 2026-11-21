@@ -20,6 +20,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Factorio 2.0/2.1: Report missing internal restoration interfaces immediately instead of silently disabling their restoration paths.
 - Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
 - Factorio 2.0/2.1: Remove inapplicable worker-cargo preparation instructions and explain the supported upgrade sequence.
+- Prevent changes to MIR's minimum Factorio patch from hiding Bob and Angel research or blocking ATAN startup.
 
 ## [5.0.17] - 2026-11-17
 

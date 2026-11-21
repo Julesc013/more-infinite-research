@@ -385,9 +385,9 @@ class AtanProductivityTests(unittest.TestCase):
         self.assertEqual(0, len(self.select()))
         self.lua.execute("f200()")
         self.lua.execute('target.minimum_base = "2.0.78"')
-        with self.assertRaisesRegex(Exception, "unsupported F200 ATAN saved-profile transition"):
-            self.select()
-        self.lua.execute('target.minimum_base = "2.0.77"')
+        for variant in ("base", "space_age"):
+            with self.subTest(variant=variant):
+                self.assert_definition_bindings(self.select(variant), variant)
 
         self.assertEqual(0, len(self.select(mods=self.active_mods(names={}))))
         base = _plain(self.emitted_rows("base"))

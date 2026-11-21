@@ -192,13 +192,14 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertEqual(set(emitted), set(public) | set(expected))
         self.assertEqual({name: emitted[name] for name in expected}, expected)
 
-    def data_final_stage(self, raw=None, mods=None, expect_failure=False):
+    def data_final_stage(self, raw=None, mods=None, expect_failure=False, *, minimum_base="2.0.77"):
         raw = deepcopy(self.context["raw"] if raw is None else raw)
         mods = deepcopy(self.context["profile"]["selection"] if mods is None else mods)
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().source_root = SOURCE.as_posix()
         lua.globals().captured_raw = lua_value(lua, raw)
         lua.globals().active_mods = lua_value(lua, mods)
+        lua.globals().minimum_base = minimum_base
         lua.execute(r'''
           package.path=source_root.."/?.lua;"..source_root.."/?/init.lua"; package.cpath=""
           mods,script,helpers,log=active_mods,nil,{},function() end
@@ -215,7 +216,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
             if published then technology_publications=technology_publications+1 end
           end
           local target=require("platform.target")
-          target.id,target.factorio_version,target.minimum_base="f200","2.0","2.0.77"
+          target.id,target.factorio_version,target.minimum_base="f200","2.0",minimum_base
           target.distribution_version,target.cargo_research="5.0.20000",false
           target.recipe_probability,target.receiver_limits,target.productivity_ignores_stats="probability",false,true
           assert(loadfile(source_root.."/settings.lua"))()
@@ -394,8 +395,8 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("lab inputs changed", message)
 
-    def test_actual_data_final_matches_the_independent_complete_public_contract(self):
-        lua = self.data_final_stage()
+    def test_actual_data_final_matches_the_independent_complete_public_contract_at_raised_minimum(self):
+        lua = self.data_final_stage(minimum_base="2.0.78")
         emitted = plain(lua.globals().emitted)
         expected = {
             name: captured["row"]

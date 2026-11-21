@@ -73,7 +73,8 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         if cls.facts.get("schema") != "MIR5BobPlatesF210CapturedFactsV1":
             raise AssertionError("Bob Plates published facts schema changed")
 
-    def stage(self, case, startup_overrides=None, raw_override=None, mods_override=None, before_final=None):
+    def stage(self, case, startup_overrides=None, raw_override=None, mods_override=None, before_final=None,
+              *, minimum_base="2.1.23"):
         context = self.context["cases"][case]
         raw = deepcopy(raw_override if raw_override is not None else context["raw"])
         mods = deepcopy(mods_override if mods_override is not None else {
@@ -86,12 +87,13 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         lua.globals().active_mods = _lua_value(lua, mods)
         lua.globals().startup_overrides = _lua_value(lua, startup_overrides)
         lua.globals().before_final = before_final
+        lua.globals().minimum_base = minimum_base
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           mods, script, helpers, log = active_mods, nil, {}, function() end
           local target = require("platform.target")
-          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", minimum_base
           target.distribution_version, target.cargo_research = "5.0.21000", true
           target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
           data = {raw = captured_raw}
@@ -209,10 +211,10 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         self.assertNotIn("space-age", {row["name"] for row in self.context["cases"]["q097"]["selection"]})
         self.assertIn("space-age", {row["name"] for row in self.context["cases"]["q098"]["selection"]})
 
-    def test_full_settings_data_and_final_pipeline_matches_all_independent_restored_rows(self):
+    def test_full_settings_data_and_final_pipeline_matches_all_independent_restored_rows_at_raised_minimum(self):
         for case, expected_count in (("q097", 31), ("q098", 16)):
             with self.subTest(case=case):
-                lua = self.stage(case)
+                lua = self.stage(case, minimum_base="2.1.24")
                 restored = self._restored_rows(lua, case)
                 expected = self._expected_rows(case)
                 self.assertEqual(expected_count, len(expected))
