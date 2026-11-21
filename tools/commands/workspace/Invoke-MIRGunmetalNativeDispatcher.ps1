@@ -909,6 +909,7 @@ function Replace-MIRGunmetalDispatcherHeldSuccessor {
       $snapshot=New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $BasePolicy -CandidatePolicy $successor -PredecessorRequestId $hold.predecessor_request_id -DispositionReference $DispositionReference
     }
     Set-MIRGunmetalDispatcherPending -Policy $BasePolicy -Snapshot $snapshot -PredecessorRequestId $hold.predecessor_request_id -DispositionReference $DispositionReference
+    $holdPath = Join-Path $BasePolicy.spool 'state/hold.json'
     $archive=Join-Path $BasePolicy.spool ('held/'+$hold.predecessor_request_id+'-'+$snapshot.request_id+'.json')
     if (Test-Path -LiteralPath $archive) {
       $archived = Read-MIRGunmetalDispatcherJson -Path $archive -MaximumBytes 65536
@@ -916,9 +917,11 @@ function Replace-MIRGunmetalDispatcherHeldSuccessor {
         throw '[mir-gunmetal-dispatcher-held-archive-conflict]'
       }
     } else {
-      Write-MIRGunmetalDispatcherJson -Path $archive -Value $hold -NewOnly
+      # Archive the validated record as written. Parsing JSON timestamps can
+      # normalize their spelling and change the receipt hash.
+      Write-MIRGunmetalDispatcherBytes -Path $archive -Bytes ([IO.File]::ReadAllBytes($holdPath))
     }
-    Remove-Item -LiteralPath (Join-Path $BasePolicy.spool 'state/hold.json') -Force
+    Remove-Item -LiteralPath $holdPath -Force
     return [pscustomobject]@{kind='MIRGunmetalNativeDispatcherHeldDispositionV1';status=$(if($samePending){'released'}else{'replaced'});request_id=$snapshot.request_id;predecessor_request_id=$hold.predecessor_request_id;side_effects=$(if($samePending){'existing immutable successor snapshot was released with an explicit disposition; no launcher was started.'}else{'new immutable successor snapshot and pending pointer only; no launcher was started.'})}
   } finally {$lock.Dispose()}
 }
