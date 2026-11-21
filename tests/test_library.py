@@ -4241,6 +4241,78 @@ class LibraryTests(unittest.TestCase):
             "the modern Library host must supply its trigger capability to the pure model")
         ''')
 
+    def test_prerequisite_read_failure_does_not_display_ready_or_locked(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          boot()
+          local force = player.force
+          gear.enabled, gear.researched, gear.prototype.hidden = true, false, false
+          local queue = {foreign}
+          force.research_queue, force.current_research, force.research_progress = queue, foreign, .42
+          local root = library.open(player, {tab="research", selected=gear.name, query=gear.name})
+          local function refresh(status)
+            assert(library.open(player, {tab="research", status=status}) == root)
+            local content = research_content(root)
+            return content.mir_library_list_pane.mir_library_count.caption, content.mir_library_detail
+          end
+          local function unavailable(label)
+            return label[1] == "mir-browser.detail-unavailable"
+              and label[2][1] == "mir-browser.research-requirements"
+          end
+          local function detail_status(detail)
+            return detail.mir_library_research_facts.mir_library_detail_context.mir_library_context_status.caption[2]
+          end
+
+          gear.prerequisites = nil
+          setmetatable(gear, {__index=function(_, key)
+            if key == "prerequisites" then error("native prerequisites unavailable") end
+          end})
+          local count, detail = refresh(1)
+          assert(count[1] == "mir-browser.count" and count[2] == 1)
+          assert(unavailable(detail_status(detail)), "thrown prerequisite access supplied a known readiness status")
+          assert(unavailable(refresh(2)), "Ready displayed a count from an incomplete observation")
+
+          setmetatable(gear, nil)
+          local invalid = setmetatable({name="invalid"}, {__index=function(_, key)
+            if key == "researched" then error("native prerequisite state unavailable") end
+          end})
+          gear.prerequisites = {{name="automation", researched=true}, invalid}
+          assert(unavailable(refresh(3)), "Locked displayed a count from an incomplete observation")
+          count, detail = refresh(1)
+          assert(unavailable(detail_status(detail)), "selection was lost after the incomplete Locked view")
+          assert(detail.mir_library_research_facts.mir_library_prerequisite_icons == nil,
+            "partial prerequisites were displayed")
+
+          gear.prerequisites = {{name="automation", researched=false}}
+          count, detail = refresh(3)
+          assert(count[1] == "mir-browser.count" and count[2] == 1
+            and detail_status(detail)[1] == "mir-browser.status-locked")
+          gear.prerequisites[1].researched = true
+          count, detail = refresh(2)
+          assert(count[1] == "mir-browser.count" and count[2] == 1
+            and detail_status(detail)[1] == "mir-browser.status-ready")
+          assert(force.research_queue == queue and queue[1] == foreign
+            and force.current_research == foreign and force.research_progress == .42)
+
+          -- Complete-empty and unreadable prerequisites both have no icons.
+          -- The retained queued detail must still update its availability.
+          local repeated = {gear, foreign, gear}
+          force.research_queue = repeated
+          gear.prerequisites = {}
+          count, detail = refresh(4)
+          assert(detail_status(detail)[1] == "mir-browser.status-queued")
+          assert(detail.mir_library_research_facts.mir_library_detail_prerequisites == nil)
+          gear.prerequisites = {invalid}
+          count, detail = refresh(4)
+          assert(detail_status(detail)[1] == "mir-browser.status-queued" and count[2] == 1)
+          assert(unavailable(detail.mir_library_research_facts.mir_library_detail_prerequisites.caption))
+          gear.prerequisites = {}
+          count, detail = refresh(4)
+          assert(detail.mir_library_research_facts.mir_library_detail_prerequisites == nil)
+          assert(force.research_queue == repeated and repeated[2] == foreign
+            and force.current_research == foreign and force.research_progress == .42)
+        ''')
+
     def test_research_queue_filter_and_details_distinguish_unavailable_empty_and_repeated(self):
         self.lua.execute(r'''
           package.preload["presentation.library_model"] = nil

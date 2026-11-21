@@ -6,7 +6,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Show when the Research Library cannot read the queue or research list. Keep the selection, hide incomplete queued results, and restore counts and positions when the next read succeeds.
+- Show when the Research Library cannot read the queue, research list or prerequisites. Keep the selection and restore counts and positions when the next read succeeds.
 - Factorio 2.1: Add missing K2: Spaced Out silicon, glass and rare-metals productivity continuations so a zero research limit permits research beyond level 3.
 - Factorio 2.0: Keep Space Exploration worker robot cargo research on its seven captured science packs and prerequisite instead of reverting it to the Base science contract.
 - Factorio 2.0/2.1: Refuse an automatic worker cargo contract change when saved paid work exists, while allowing an uninvested owner to adopt the new contract safely.

@@ -49,6 +49,8 @@ The [maintainer-approved worker identity exception](https://github.com/Julesc013
 
 The Queue tab, Research filters and selected details must distinguish a complete empty observation from a failed queue or catalogue read. Discard partial results for the affected selection, retain personal focus and show the unavailable information. After a successful read, restore the observed count, duplicate entries and order. Rendering or selecting a Library row must preserve native research.
 
+An incomplete prerequisite observation leaves research readiness unavailable where a Ready or Locked filter depends on it. Keep independently observed queue and completion information available.
+
 Build only the visible/required view; search is allowed to inspect the necessary names/text linearly. Translation/search caches have clear locale/force/configuration lifetimes and bounded sizes. Discard stale callbacks by generation token. Revalidate on open and actual events; do not run a hidden continuous whole-catalogue refresh merely to keep closed UI current.
 
 Native research is authoritative. Do not implement a second research queue or a UI selection path that overrides lab/engine selection. Separate global/force/player observations. User-language changes must not mutate gameplay state.
