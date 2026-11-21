@@ -11,6 +11,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Factorio 2.0: Keep Space Exploration worker robot cargo research on its seven captured science packs and prerequisite instead of reverting it to the Base science contract.
 - Factorio 2.0/2.1: Refuse an automatic worker cargo contract change when saved paid work exists, while allowing an uninvested owner to adopt the new contract safely.
 - Preserve research availability when raising or removing a limit after MIR cancels over-limit queued research.
+- Factorio 2.0: Allow ordinary Space Exploration worker cargo research to resume when raising the cap after completing historical paid levels.
 - Factorio 2.0/2.1: Preserve earned recipe productivity when upgrading a Base-only MIR 4.7.3 save and adding mods with unchanged startup settings.
 - Factorio 2.0/2.1: Fix an upgrade crash caused by importing internal productivity helpers after startup parsing.
 - Factorio 2.0/2.1: Preserve recorded worker cargo ownership across successive MIR updates before adding a supported cargo research mod.

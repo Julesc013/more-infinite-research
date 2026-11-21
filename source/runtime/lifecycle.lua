@@ -216,6 +216,18 @@ local function ensure_state()
   return value
 end
 
+-- Paid worker settlement already applied the cap without enabling the
+-- successor. Record the eligibility observed on the retired holder.
+function M.record_completed_worker_cap(force, restore_enabled)
+  local state = ensure_state()
+  local owned = state.owned_disabled[force.index] or {}
+  local name = "mir-worker-storage-default-4"
+  local record = owned[name] or {}
+  if record.disabled == nil or not restore_enabled then record.disabled = restore_enabled end
+  owned[name] = record
+  state.owned_disabled[force.index] = owned
+end
+
 -- The native split moves the old repeat levels and their force flags to the
 -- stable tail. Move the existing cap restoration right with that work; a
 -- false flag alone never authorizes MIR to enable a technology later.

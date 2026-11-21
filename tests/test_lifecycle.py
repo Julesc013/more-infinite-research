@@ -373,10 +373,13 @@ class LifecycleTests(unittest.TestCase):
 
     def test_full_worker_cap_raise_restores_only_actual_prior_enablement(self):
         self.lua.execute(r'''
+          for _, settled in ipairs({false, true}) do
           for _, external in ipairs({false, true}) do
             local name, owner_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
-            local head, owner = technology(name, 5, false), technology(owner_name, 5, not external)
-            local f = force(97, {[name]=head, [owner_name]=owner})
+            local level = settled and 11 or 5
+            local head, owner = technology(name, 5, false), technology(owner_name, level, not settled and not external)
+            local tail = technology("unrelated-queued-research", 1)
+            local f = force(97, {[name]=head, [owner_name]=owner, [tail.name]=tail}, {tail}, tail, .42)
             head.force, owner.force = f, f
             local function load_caps(maximum, saved)
               boot({[97]=f}, 0, "", saved, nil, 0, nil, nil, {["mir-max-level-worker-robots-storage"]=maximum})
@@ -393,13 +396,20 @@ class LifecycleTests(unittest.TestCase):
               package.loaded["runtime.lifecycle"] = nil
               return require("runtime.lifecycle")
             end
-            local lifecycle = load_caps(4)
-            lifecycle.on_init()
+            local lifecycle = load_caps(level - 1)
+            if settled then lifecycle.record_completed_worker_cap(f, not external) else lifecycle.on_init() end
             assert(not owner.enabled and storage.mir_caps.owned_disabled[97][owner_name].disabled == not external)
-            lifecycle = load_caps(8, storage)
-            lifecycle.on_init()
+            if settled and external then
+              lifecycle.record_completed_worker_cap(f, true)
+              assert(storage.mir_caps.owned_disabled[97][owner_name].disabled == false)
+            end
+            lifecycle = load_caps(level + 1, storage)
+            lifecycle.on_configuration_changed({mod_changes={}, mod_startup_settings_changed=true})
             assert(owner.enabled == not external, "cap increase enabled a foreign-disabled native owner")
             assert(not head.enabled, "cap increase enabled the retired public head")
+            assert(owner.level == level and not owner.visible_when_disabled)
+            assert(f.current_research == tail and f.research_progress == .42 and #f.research_queue == 1)
+          end
           end
         ''')
 

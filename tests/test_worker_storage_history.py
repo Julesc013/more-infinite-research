@@ -1775,8 +1775,10 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
         ''')
 
     def test_published517_completion_keeps_the_current_cap_when_old_work_reaches_its_boundary(self):
-        lua=self.world("f200")
-        lua.execute(r'''
+        for holder_enabled in (False, True):
+            lua=self.world("f200")
+            lua.globals().holder_enabled = holder_enabled
+            lua.execute(r'''
           published517_source_contract();init_default()
           finish_frame(player,"advanced",{ORDINARY},false)
           assert(history.default_owner_on_research_finished(finish_event(player)))
@@ -1792,11 +1794,17 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           player.research_queue={LEGACY517,OTHER};player.research_progress=1;legacy.researched=true
           assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=271})
           player.research_progress=0;player.research_queue={OTHER}
-          legacy.researched=false;legacy.level=11;legacy.saved_progress=0;writes=0
-          assert(history.default_owner_on_completion_tick{tick=272})
+          legacy.researched=false;legacy.level=11;legacy.saved_progress=0
+          legacy.enabled=holder_enabled;writes=0
+          local restore_enabled
+          assert(history.default_owner_on_completion_tick({tick=272},function(force, enabled)
+            assert(force==player)
+            restore_enabled=enabled
+          end))
           local current=player.technologies[ORDINARY]
           assert(current.level==11 and not current.enabled and legacy.level==4 and not legacy.enabled)
           assert(player.current_research.name==OTHER and storage[OWNER_KEY].forces[player.index].phase=="owned")
+          assert(restore_enabled==holder_enabled,"settlement lost the holder's cap restoration baseline")
         ''')
 
     def test_published517_pending_completion_admits_ordinary_repeats_without_duplicate_authority(self):
