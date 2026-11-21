@@ -1020,7 +1020,7 @@ if ($RconSelfCheck) {
 $externalStorage=$null
 if($LinuxStoragePlanPath -or $LinuxStoragePlanSha256 -or $LinuxStorageControlRoot -or $LinuxStorageLibrary){
   . (Join-Path $PSScriptRoot 'lib/validation/DirectLibraryStartupMeasurement.ps1')
-  $externalStorage=Read-MIRLinuxWriteStorage -Path $LinuxStoragePlanPath -Sha256 $LinuxStoragePlanSha256 -ControlRoot $LinuxStorageControlRoot -LibraryRoot $LinuxStorageLibrary -MaxNewOutputBytes (512MB)
+  $externalStorage=Read-MIRLinuxWriteStorage -Path $LinuxStoragePlanPath -Sha256 $LinuxStoragePlanSha256 -ControlRoot $LinuxStorageControlRoot -LibraryRoot $LinuxStorageLibrary -MaxNewOutputBytes (512MB) -ExistingJobOutput
   $buildRoot=Resolve-Existing (($externalStorage.roots|Where-Object role -CEQ 'data').path) 'Container' 'admitted session data'
   Assert-Session ($SpecPath -ceq (Join-Path $buildRoot 'session-spec.json')) 'external session spec differs from its data role'
 }
