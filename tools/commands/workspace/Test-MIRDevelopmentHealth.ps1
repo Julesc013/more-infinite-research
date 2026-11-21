@@ -122,8 +122,15 @@ function Get-MIRDevelopmentHealthWorktrees {
   }
   $rows=[Collections.Generic.List[object]]::new();$truncated=$records.Count-gt$Limit
   foreach($record in @($records|Select-Object -First $Limit)) {
-    $exists=Test-Path -LiteralPath $record.path -PathType Container
-    $resolvedPath=if($exists){(Resolve-Path -LiteralPath $record.path).Path.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)}else{$record.path}
+    $resolvedPath=$record.path
+    try {
+      $exists=Test-Path -LiteralPath $record.path -PathType Container
+      if($exists){$resolvedPath=(Resolve-Path -LiteralPath $record.path).Path.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)}
+    } catch [System.UnauthorizedAccessException] {
+      # A different account can register a private worktree in this shared
+      # Git store. Its existence and custody are unknown to this process.
+      $exists=$null
+    }
     $isCurrent=$exists-and$resolvedPath.Equals($CurrentRoot,$comparison)
     $dirty=if($exists){Get-MIRDevelopmentHealthDirtyState -Repository $resolvedPath}else{[pscustomobject]@{readable=$false;count=$null;examples=@();operations=@()}}
     $lastCommit=if($exists){Invoke-MIRDevelopmentHealthGit -Repository $resolvedPath -Arguments @('log','-1','--format=%ct')}else{$null}
