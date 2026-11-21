@@ -1285,9 +1285,13 @@ local function published517_se_contract(source)
 end
 
 local function published517_se_configuration()
-  return same_worker_configuration(relevant_worker_configuration(), {
+  local current = relevant_worker_configuration()
+  if current.max_level ~= selected_cap or current.enabled ~= selected_enabled then return false end
+  -- A cap limits future admission; it does not change the historical paid
+  -- unit contract. Preserve its native work at unlimited and finite caps.
+  return same_worker_configuration(current, {
     enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
-    max_level=10, research_time=60, effect_percent=1,
+    max_level=current.max_level, research_time=60, effect_percent=1,
   })
 end
 

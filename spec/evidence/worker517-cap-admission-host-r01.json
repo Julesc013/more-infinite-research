@@ -1,0 +1,114 @@
+{
+  "kind": "MIRPublished517CapAdmissionHostCorrectionV1",
+  "schema": 1,
+  "verdict": "HOST_CORRECTED_NATIVE_UPGRADE_PENDING",
+  "problem": "The published517 SE paid-work bridge required max_level=10 although the saved work contract does not encode a cap. It rejects unchanged default unlimited and cap12 inputs before writes, and admits a cap10 effective configuration inconsistent with selected cap0.",
+  "requirements": [
+    "SET-03",
+    "MIG-03"
+  ],
+  "production_before": {
+    "commit": "6da6c8a9b9493d2694880e51acb5c32a202f184f",
+    "module": "source/runtime/worker_robot_storage.lua",
+    "sha256": "E238610DD34870D30C3F218125063596B1701967DE878F381BD67D7EFEFD7C6F"
+  },
+  "production_after": {
+    "module": "source/runtime/worker_robot_storage.lua",
+    "sha256": "764DF0516CFD00C58254B1F045C7F9FAD69B670DB3659AB354ABA8DB556F85AA",
+    "change": "Require the resolved cap and enabled value to agree with selected runtime policy, then keep the other six published configuration terms exact. A cap no longer has to equal10. No saved schema or historical unit contract changes."
+  },
+  "published_producer": {
+    "release": "v5.0.17",
+    "distribution_version": "5.0.20017",
+    "archive_sha256": "B0BFA7418CFF77F249262C98864A386FA022C73E59B29EC30D028AE279A6AB27",
+    "archive_bytes": 1046681,
+    "source_commit": "17e78c4d5d339413668e30e8eb422b915d390179",
+    "modules": {
+      "source/runtime/caps.lua": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52",
+      "source/research/worker_storage_recovery.lua": "074D9EE66CFFC82DA30B6D1B950D7538A2E2C6E673C0E7B9D63BD36B12390381",
+      "source/runtime/worker_robot_storage.lua": "A393C05576193B6D3D16AEA125C185CD36AAF87BA9126720C87DDA479C1143F9"
+    },
+    "identity_receipt": "published517-archive-attribution-correction-r01.json",
+    "module_equivalence": "These three pinned Git module bodies match their actual published archive members; the test checks each hash before loading. This is not a native replay of the complete package.",
+    "state": "The actual published initializer and research-finished callback produce the schema3 initial-empty record without settings. The test does not fabricate that absence by deleting current-producer settings."
+  },
+  "host_world": {
+    "native_contract": "The independent two-parent literal retained in seedCCC6EB4A under private7A30, already recorded by worker517-native-prerequisite-contract-host-r01.json. The public B0BF constructor/postprocess replay agrees, without relabelling7A30 native history.",
+    "work": "One old native-owner completion, then42% partial and repeated worker/worker/unrelated queue; aggregate cargo and all represented other force frames remain unchanged by transfer. Host doubles are not native save proof.",
+    "positive_cap_cases": [
+      {
+        "old": 0,
+        "new": 0,
+        "startup_changed": false
+      },
+      {
+        "old": 10,
+        "new": 10,
+        "startup_changed": false
+      },
+      {
+        "old": 12,
+        "new": 12,
+        "startup_changed": false
+      },
+      {
+        "old": 10,
+        "new": 0,
+        "startup_changed": true
+      },
+      {
+        "old": 10,
+        "new": 4,
+        "startup_changed": true
+      }
+    ],
+    "opponents": {
+      "inconsistent_resolved_and_selected_caps": [
+        [
+          0,
+          10
+        ],
+        [
+          10,
+          0
+        ]
+      ],
+      "other_configuration_terms": [
+        "enabled",
+        "base_cost",
+        "linear_increment",
+        "growth_factor",
+        "research_time",
+        "effect_percent"
+      ],
+      "preflight_writes": 0
+    },
+    "successor": "Uses existing schema4 settings.max_level and exact old legacy contract. on_load and a steady configuration pass do not mutate native frames or saved state. No nonexistent full-default cap/family_enabled fields are introduced."
+  },
+  "regression": {
+    "before_log": "cap-admission-before-controls-r03.log",
+    "before_exit": 1,
+    "before": "On exact6da production, unlimited/cap12/uncapping subcases refuse with no recorded relevant startup settings; inconsistent effective10/selected0 incorrectly admits. The cap10 positive and opposite mismatch refusal remain controls.",
+    "early_setup_adverses": "r01/r02 before logs used a current initializer or nonexistent schema fields and are retained as fixture setup failures, not final regression evidence."
+  },
+  "validation": {
+    "runtime": "Pinned Lupa2.6/lupa.lua52",
+    "worker_history": 201,
+    "worker_construction": 24,
+    "worker_native_owner_data": 25,
+    "all_passed": true,
+    "native_execution": false,
+    "logs": {
+      "cap-admission-before-controls-r03.log": "C9447CA19C2EB5B0905B4D2E85362623B9B6CAA5004653C808638F1470F6B8EF",
+      "cap-admission-history-r03.log": "4C700EA84211AA99D4B81637AA49EE0D09C38C51BD7750BAD8A3323580E8C506",
+      "cap-admission-construction-r01.log": "46C01D8ED095A664550190ED43DF978E7D263B0DC003FC21E73C48115364B952",
+      "cap-admission-owner-data-r01.log": "C60F41BB9F7568E0229BA14B9D350B63B0011E1209693BEDA1DCBB3AAEB1665C"
+    },
+    "ci_fetch": "validate.yml fetches exact17e producer source for shallow checkouts; there is no network/current-source fallback in the reader."
+  },
+  "remaining": [
+    "Exact-head CI, independent review and checked integration into recovery draft2209",
+    "Actual publishedB0BF earned source, candidate upgrade, ordinary correct-science research, cap changes, successor save and two cold loads",
+    "Broader source histories, provider/force lifecycle, all-force SE policy, remaining package/stable and verified delivery gates"
+  ]
+}

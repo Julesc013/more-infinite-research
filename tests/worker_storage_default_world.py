@@ -128,11 +128,12 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         writes=0;queue_writes={};progress_writes={}
       end
       function finish_event(force)return{research=force.technologies[ORDINARY],by_script=false,tick=100}end
-      function published517_source_contract()
+      function published517_source_contract(cap)
         target.distribution_version="5.0.20017";script.active_mods["more-infinite-research"]=target.distribution_version
         script.active_mods["space-exploration"]="0.7.57"
         local values=require("runtime.configuration").streams["worker-robots-storage"]
-        values.max_level=10;history.configure(10,true)
+        if cap==nil then cap=10 end
+        values.max_level=cap;history.configure(cap,true)
         local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
           "production-science-pack","utility-science-pack"}
         -- The retained native517 contract has these two direct prerequisites;

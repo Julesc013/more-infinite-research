@@ -50,6 +50,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.11 worker-history source fetch failed.' }
           git fetch --no-tags --depth=1 origin 411b74c364bee277b7f8bedc80679aa602935682
           if ($LASTEXITCODE -ne 0) { throw 'Exact automatic worker owner-contract regression source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 17e78c4d5d339413668e30e8eb422b915d390179
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.17 native-owner producer source fetch failed.' }
           git fetch --no-tags --depth=1 origin a6ace8a48dd59b3f5eb46722273d7545e0de7011
           if ($LASTEXITCODE -ne 0) { throw 'Exact passive Library personal-view fixture source fetch failed.' }
           git fetch --no-tags --depth=1 origin 57b8cd6da9b07a76f6b328dc7442d0c223c1c619
