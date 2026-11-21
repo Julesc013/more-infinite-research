@@ -173,6 +173,72 @@ local function observe_initial_role(row)
   end
   log(table.concat(parts, "|"))
 end
+local function observed_next_level(row)
+  if type(row.level) ~= "number" or not finite(row.level) or row.level % 1 ~= 0 or type(row.researched) ~= "boolean" then
+    return "unavailable"
+  end
+  return role_observed(row.level + (row.researched and 1 or 0))
+end
+local function bounded_prerequisites(row, label)
+  local prerequisites = row.prerequisites
+  check(prerequisites ~= nil, label .. " prerequisites are unavailable")
+  local count, names, seen = 0, {}, {}
+  for key, value in pairs(prerequisites) do
+    local name = type(key) == "string" and key or value and value.name
+    check(type(name) == "string" and name ~= "" and not seen[name], label .. " prerequisite differs")
+    count = count + 1
+    check(count <= 8, label .. " prerequisite exceeds bounded observation")
+    seen[name], names[#names + 1] = true, name
+  end
+  table.sort(names)
+  return names
+end
+local function bounded_queue_rows(force)
+  local queue = force.research_queue
+  check(queue ~= nil, "source partial queue is unavailable")
+  local length = #queue
+  check(type(length) == "number" and finite(length) and length >= 0 and length % 1 == 0,
+    "source partial queue length differs")
+  local count, rows = 0, {}
+  for key, row in pairs(queue) do
+    check(type(key) == "number" and finite(key) and key > 0 and key % 1 == 0,
+      "source partial queue key differs")
+    check(row and row.valid ~= false and type(row.object_name) == "string" and type(row.name) == "string" and row.name ~= "",
+      "source partial queue row differs")
+    count = count + 1
+    check(count <= 8, "source partial queue exceeds bounded observation")
+    rows[#rows + 1] = string.format("number:%.17g:%s:%s", key, row.object_name, row.name)
+  end
+  table.sort(rows)
+  return length, count, rows
+end
+local function observe_partial_queue(state, stage)
+  local force = state.research_force
+  local target, tail = technology(force, TARGET), technology(force, TAIL)
+  local queue_length, queue_pair_count, queue_rows = bounded_queue_rows(force)
+  local current = force.current_research
+  local current_name, current_object = "none", "none"
+  if current ~= nil then
+    check(current.valid ~= false and type(current.object_name) == "string" and type(current.name) == "string" and current.name ~= "",
+      "source partial current differs")
+    current_name, current_object = current.name, current.object_name
+  end
+  local tail_prerequisites = bounded_prerequisites(tail, "source partial tail")
+  log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=" .. stage
+    .. "|research_force=" .. force.name .. "|research_force_index=" .. tostring(force.index)
+    .. "|current_name=" .. current_name .. "|current_object=" .. current_object
+    .. "|progress=" .. role_observed(force.research_progress)
+    .. "|queue_array_length=" .. tostring(queue_length) .. "|queue_pair_count=" .. tostring(queue_pair_count)
+    .. "|queue_pairs=" .. table.concat(queue_rows, ";")
+    .. "|target_name=" .. target.name .. "|target_level=" .. role_observed(target.level)
+    .. "|target_next_level=" .. observed_next_level(target) .. "|target_researched=" .. role_observed(target.researched)
+    .. "|target_enabled=" .. role_observed(target.enabled) .. "|target_visible=" .. role_observed(target.visible_when_disabled)
+    .. "|tail_name=" .. tail.name .. "|tail_level=" .. role_observed(tail.level)
+    .. "|tail_researched=" .. role_observed(tail.researched) .. "|tail_enabled=" .. role_observed(tail.enabled)
+    .. "|tail_visible=" .. role_observed(tail.visible_when_disabled)
+    .. "|tail_prerequisite_count=" .. tostring(#tail_prerequisites)
+    .. "|tail_prerequisites=" .. table.concat(tail_prerequisites, ","))
+end
 local function assert_worker_contract(force)
   local row = technology(force, TARGET)
   check(row.prototype and row.prototype.max_level == UINT32_MAX, "ordinary worker maximum differs")
@@ -397,7 +463,9 @@ local function start_research(state, lab, power, pole)
 end
 local function stage_partial_queue(state)
   local target = technology(state.research_force, TARGET)
+  observe_partial_queue(state, "source-partial-queue-before-assignment")
   state.research_force.research_queue = {target, target, technology(state.research_force, TAIL)}
+  observe_partial_queue(state, "source-partial-queue-after-assignment")
   check(state.research_force.current_research == target and state.research_force.research_progress == 0, "source partial queue differs")
   state.phase = "source-await-partial"
   state.lab.disabled_by_script = false
@@ -409,6 +477,7 @@ local function source_partial(state)
     "source partial target role differs")
   check(state.research_force.current_research == target and state.research_force.research_progress > 0
     and state.research_force.research_progress < 1, "source partial progress differs")
+  observe_partial_queue(state, "source-partial-queue-before-refusal")
   exact_names(queue_names(state.research_force), {TARGET, TARGET, TAIL}, "source partial queue")
   state.lab.disabled_by_script = true
   state.research_force.laboratory_speed_modifier = state.speed_before

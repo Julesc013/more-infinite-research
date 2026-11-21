@@ -141,6 +141,46 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.assertIn("vectors_complete=true", partial)
         self.assertEqual(["mir5-published517-earned-source"], list(self.lua.globals().p517_saves().values()))
 
+    def test_partial_queue_diagnostics_preserve_the_documented_active_first_three_row_frame(self):
+        self.source_to_partial()
+        stages = {
+            row.split("|", 1)[0].split("stage=", 1)[1]: row
+            for row in self.logs()
+            if row.startswith("[MIR_PUBLISHED517_EARNED_SOURCE] stage=source-partial-queue")
+        }
+        before = stages["source-partial-queue-before-assignment"]
+        after = stages["source-partial-queue-after-assignment"]
+        pre_refusal = stages["source-partial-queue-before-refusal"]
+        self.assertIn("current_name=none|current_object=none|progress=number:0|queue_array_length=0|queue_pair_count=0|queue_pairs=", before)
+        expected_rows = "queue_pairs=number:1:LuaTechnology:mir-worker-storage-default-4;number:2:LuaTechnology:mir-worker-storage-default-4;number:3:LuaTechnology:mir-fixture-published517-earned-source-tail"
+        for diagnostic in (after, pre_refusal):
+            self.assertIn("current_name=mir-worker-storage-default-4|current_object=LuaTechnology", diagnostic)
+            self.assertIn("queue_array_length=3|queue_pair_count=3|" + expected_rows, diagnostic)
+            self.assertIn("target_level=number:9|target_next_level=number:9|target_researched=boolean:false|target_enabled=boolean:true|target_visible=boolean:false", diagnostic)
+            self.assertIn("tail_name=mir-fixture-published517-earned-source-tail|tail_level=number:1|tail_researched=boolean:false|tail_enabled=boolean:true|tail_visible=boolean:false|tail_prerequisite_count=1|tail_prerequisites=automation-science-pack", diagnostic)
+
+    def test_host_tail_drop_is_diagnosed_then_retains_the_strict_three_row_refusal(self):
+        self.lua.globals().p517_drop_tail_on_partial_assignment()
+        self.lua.globals().p517_begin()
+        self.lua.globals().p517_tick(1)
+        for _ in range(5):
+            self.lua.globals().p517_complete(False)
+            self.lua.globals().p517_tick(1)
+        self.assertEqual("source-await-partial", self.lua.globals().p517_phase())
+        self.lua.globals().p517_partial(0.42)
+        with self.assertRaisesRegex(LuaError, "source partial queue count differs"):
+            self.lua.globals().p517_tick(1)
+        logs = self.logs()
+        after = next(row for row in logs if "stage=source-partial-queue-after-assignment" in row)
+        pre_refusal = next(row for row in logs if "stage=source-partial-queue-before-refusal" in row)
+        for diagnostic in (after, pre_refusal):
+            self.assertIn("queue_array_length=2|queue_pair_count=2|queue_pairs=number:1:LuaTechnology:mir-worker-storage-default-4;number:2:LuaTechnology:mir-worker-storage-default-4", diagnostic)
+            self.assertIn("tail_name=mir-fixture-published517-earned-source-tail", diagnostic)
+            self.assertIn("tail_prerequisites=automation-science-pack", diagnostic)
+        self.assertIn("[MIR_PUBLISHED517_EARNED_SOURCE] stage=refusal|message=source partial queue count differs", logs)
+        self.assertEqual("source-await-partial", self.lua.globals().p517_phase())
+        self.assertEqual([], list(self.lua.globals().p517_saves().values()))
+
     def test_source_cold_read_preserves_the_complete_partial_frame_without_writes(self):
         self.source_to_partial()
         state_before = self.lua.globals().p517_state()
