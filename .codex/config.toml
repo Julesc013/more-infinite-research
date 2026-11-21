@@ -6,5 +6,5 @@ hooks = true
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 2
-default_subagent_model = "gpt-5.6-terra"
-default_subagent_reasoning_effort = "xhigh"
+default_subagent_model = "gpt-6.2-sol"
+default_subagent_reasoning_effort = "medium"
