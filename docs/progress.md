@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-21
+last_reviewed: 2026-11-22
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,8 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+The [current finite-provider replay](../spec/evidence/worker-storage-finite-four-hosted-4f506f-native-r01.json) accepts the exact frozen F210 archive on Factorio 2.1.24. A controlled published 4.7.3 save retained its finite effect, queue and progress sentinels. Ordinary lab research raised cargo from 7 to 9 and both cold tests observed the resulting state. Earlier runs retain their zero-native helper refusal and historical package verdict separately. The tested player tree is merged in [#2209](https://github.com/Julesc013/more-infinite-research/pull/2209). Other native and publication gates continue.
 
 The [published 4.7.3 gear replay](../spec/evidence/gunmetal-published473-gear-upgrade-r14.json) identified a false worker refusal on startup changes. The retained source had empty worker rows on all four forces and an unrelated research job at 42%. The corrected private package completed one ordinary gear level, kept the saved queue, and matched checksum 2452635032 in two independent cold loads. All 80 original files rehashed, and the shared library and lease were restored. Windows R11 and native R12–R13 adverse results retain their original scope. The exact integrated candidate now also carries the checked Library and dispatcher work and needs its own affected acceptance.
 

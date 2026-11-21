@@ -18,9 +18,9 @@ $script:CanonicalActorMembers = @(
 )
 $script:CanonicalHelperPins = @(
     [ordered]@{path='tools/lib/validation/ImmutableInputStaging.ps1';sha256='25523C83C26501444A01729226E504199A3294F02E5330DEB1BB4D305832FBEE';bytes=27295},
-    [ordered]@{path='tools/lib/compatibility/LibraryActivation.ps1';sha256='A98570967D35048ECFEAEC7124BB1D9A4501B208E9EAB8CC6E647A638CA2DF7D';bytes=41094},
-    [ordered]@{path='tools/lib/validation/NativeProbeResources.ps1';sha256='1504B4BE12920BE4354CA74204D9B0621481215D08A5F4D231C8C75BCB8D7CB3';bytes=15778},
-    [ordered]@{path='tools/lib/validation/ResourceGovernor.ps1';sha256='D7CEFFD1DC7D9E1A2B0D0CB19FE78D6AF31157B9CB40A0E4548F5397D6D43195';bytes=63682}
+    [ordered]@{path='tools/lib/compatibility/LibraryActivation.ps1';sha256='9AF7F47B52FDA7AEB027DF78A4058398BFB9BD2720536A692A1B48A90C44EDC1';bytes=41671},
+    [ordered]@{path='tools/lib/validation/NativeProbeResources.ps1';sha256='B13AE87CB88EB2CEDA6EED23AC336DC39FB23CA23B5809E677F6114922F66286';bytes=17987},
+    [ordered]@{path='tools/lib/validation/ResourceGovernor.ps1';sha256='41F04E16794BBD4CCCE308F14275DB9A2AD8E41D87E79B02786083067078956E';bytes=66493}
 )
 $script:CanonicalFixtureArchives = @(
     [ordered]@{role='finite provider archive';filename='mir-worker-storage-finite-fixture_0.1.0.zip';sha256='6AB77CAF709F88029EE26E30CD932FD03558EE2059068176989B9423DCC678B1';bytes=1064},
@@ -112,10 +112,10 @@ function Assert-FiniteFourNativePacket {
     Assert-FiniteFourNativeEqual $Packet['case_id'] 'worker-storage-finite-four-published473-to-current-a504' 'packet case'
     Assert-FiniteFourNativeEqual $Packet['inputs']['source_mir']['sha256'].ToUpperInvariant() 'B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852' 'published473 SHA-256'
     Assert-FiniteFourNativeEqual ([int64]$Packet['inputs']['source_mir']['bytes']) ([int64]1463293) 'published473 bytes'
-    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['sha256'].ToUpperInvariant() 'C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D' 'candidate SHA-256'
-    Assert-FiniteFourNativeEqual ([int64]$Packet['inputs']['candidate_mir']['bytes']) ([int64]1053618) 'candidate bytes'
-    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['source_commit'] '22f34725d00befd4c80160105b98b556824b57ed' 'candidate source commit'
-    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['player_tree'] 'a504d92fe798d570df58514f9f839c4954af14f3' 'candidate player tree'
+    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['sha256'].ToUpperInvariant() '4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E' 'candidate SHA-256'
+    Assert-FiniteFourNativeEqual ([int64]$Packet['inputs']['candidate_mir']['bytes']) ([int64]1069479) 'candidate bytes'
+    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['source_commit'] '765703144972763bc5071b0fd7ef46aea86e3c97' 'candidate source commit'
+    Assert-FiniteFourNativeEqual $Packet['inputs']['candidate_mir']['player_tree'] '2f7d9b257b323b13bb8594a19f9a151d68815c57' 'candidate player tree'
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['archive_sha256'].ToUpperInvariant() 'C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F' 'engine archive SHA-256'
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['factorio_binary_sha256'].ToUpperInvariant() '062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF' 'engine binary SHA-256'
     Assert-FiniteFourNativeEqual $Packet['inputs']['engine']['platform'] 'Linux headless' 'engine distribution'

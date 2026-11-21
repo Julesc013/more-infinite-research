@@ -501,7 +501,7 @@ jobs:
           archive = root / 'factorio-headless-2.1.24.tar.xz'
           if digest(source) != 'B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852' or source.stat().st_size != 1463293:
               raise ValueError('Published predecessor differs')
-          if digest(candidate) != 'C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D' or candidate.stat().st_size != 1053618:
+          if digest(candidate) != '4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E' or candidate.stat().st_size != 1069479:
               raise ValueError('Frozen candidate differs')
           if digest(archive) != 'C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F' or archive.stat().st_size != 61211876:
               raise ValueError('Official engine archive differs')
