@@ -54,7 +54,7 @@ class Published517EarnedSourceTests(unittest.TestCase):
             "max_level": "infinite", "level": 4, "enabled": True, "hidden": False,
             "prerequisites": lua.table_from({
                 index: name for index, name in enumerate(
-                    prerequisites or ("worker-robots-storage-2", "utility-science-pack", world.PREDECESSOR), 1
+                    prerequisites or ("utility-science-pack", world.PREDECESSOR), 1
                 )
             }),
             "unit": lua.table_from({"count_formula": "675*1.5^(L-4)", "time": 60, "ingredients": unit_rows}),
@@ -93,7 +93,7 @@ class Published517EarnedSourceTests(unittest.TestCase):
         marker = next(row for row in logs if row.startswith("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data target="))
         self.assertIn("science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,utility-science-pack", marker)
         self.assertIn("formula=675*1.5^(L-4)", marker)
-        self.assertIn("prerequisites=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", marker)
+        self.assertIn("prerequisites=utility-science-pack,worker-robots-storage-3", marker)
         self.assertIn("mir-max-level-worker-robots-storage=number:10", next(row for row in logs if row.startswith("[MIR_WORKER_STORAGE_SETTINGS]")))
 
     def test_data_stage_rejects_a_changed_five_pack_contract_before_runtime(self):
@@ -102,13 +102,20 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.assertIn("published ordinary worker science count differs", result[1])
 
     def test_data_stage_logs_the_actual_prerequisite_map_before_refusing_an_extra_or_missing_contract(self):
-        result, logs = self.data_stage(prerequisites=("utility-science-pack", world.PREDECESSOR))
-        self.assertFalse(result[0])
-        self.assertIn("published ordinary worker prerequisite count differs", result[1])
-        diagnostic = next(row for row in logs if "stage=data-prerequisites" in row)
-        self.assertIn("observed_count=2", diagnostic)
-        self.assertIn("observed=utility-science-pack,worker-robots-storage-3", diagnostic)
-        self.assertIn("authored_expected=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
+        for label, prerequisites, count, observed in (
+            ("extra", ("worker-robots-storage-2", "utility-science-pack", world.PREDECESSOR), 3,
+             "utility-science-pack,worker-robots-storage-2,worker-robots-storage-3"),
+            ("missing", (world.PREDECESSOR,), 1, "worker-robots-storage-3"),
+        ):
+            with self.subTest(label=label):
+                result, logs = self.data_stage(prerequisites=prerequisites)
+                self.assertFalse(result[0])
+                self.assertIn("published ordinary worker prerequisite count differs", result[1])
+                diagnostic = next(row for row in logs if "stage=data-prerequisites" in row)
+                self.assertIn(f"observed_count={count}", diagnostic)
+                self.assertIn(f"observed={observed}", diagnostic)
+                self.assertIn("final_expected=utility-science-pack,worker-robots-storage-3", diagnostic)
+                self.assertIn("catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
 
     def test_dedicated_force_natively_earns_four_through_eight_then_partial_nine(self):
         self.source_to_partial()
@@ -163,8 +170,18 @@ class Published517EarnedSourceTests(unittest.TestCase):
         diagnostic = next(row for row in self.logs() if "stage=runtime-pregrant" in row)
         self.assertIn("observed_count=3", diagnostic)
         self.assertIn("observed=utility-science-pack,worker-robots-storage-2,worker-robots-storage-3", diagnostic)
-        self.assertIn("runtime_expected=utility-science-pack,worker-robots-storage-3", diagnostic)
-        self.assertIn("authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertIn("final_expected=utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertIn("catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3", diagnostic)
+        self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
+
+    def test_runtime_missing_parent_logs_before_any_finite_setup_grant_refusal(self):
+        self.lua.execute("P517_OMIT_TARGET_PREREQUISITE='utility-science-pack'")
+        with self.assertRaisesRegex(LuaError, "ordinary worker direct prerequisite count differs"):
+            self.lua.globals().p517_begin()
+        self.assertEqual("idle", self.lua.globals().p517_phase())
+        diagnostic = next(row for row in self.logs() if "stage=runtime-pregrant" in row)
+        self.assertIn("observed_count=1", diagnostic)
+        self.assertIn("observed=worker-robots-storage-3", diagnostic)
         self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
 
     def test_configuration_change_refuses_instead_of_entering_a_candidate_route(self):

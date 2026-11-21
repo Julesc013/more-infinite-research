@@ -115,8 +115,8 @@ local function observe_runtime_prerequisites(force)
   if prerequisites == nil then
     log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
       .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
-      .. "|observed=unavailable|runtime_expected=utility-science-pack,worker-robots-storage-3"
-      .. "|authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+      .. "|observed=unavailable|final_expected=utility-science-pack,worker-robots-storage-3"
+      .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
     fail("ordinary worker runtime prerequisite is unavailable")
   end
   local names, seen, count = {}, {}, 0
@@ -131,8 +131,8 @@ local function observe_runtime_prerequisites(force)
   log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-pregrant|research_force=" .. force.name
     .. "|research_force_index=" .. tostring(force.index) .. "|target=" .. TARGET
     .. "|observed_count=" .. tostring(#names) .. "|observed=" .. table.concat(names, ",")
-    .. "|runtime_expected=utility-science-pack,worker-robots-storage-3"
-    .. "|authored_construction=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
+    .. "|final_expected=utility-science-pack,worker-robots-storage-3"
+    .. "|catalogue_declaration=worker-robots-storage-2,utility-science-pack,worker-robots-storage-3")
 end
 local function assert_worker_contract(force)
   local row = technology(force, TARGET)

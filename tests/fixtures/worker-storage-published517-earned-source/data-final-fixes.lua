@@ -6,7 +6,8 @@ local SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
   "utility-science-pack"
 }
-local PREREQUISITES = {"worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3"}
+local FINAL_PREREQUISITES = {"utility-science-pack", "worker-robots-storage-3"}
+local CATALOGUE_DECLARATION = {"worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3"}
 local SETTINGS = {
   {name = "mir-enable-worker-robots-storage", value_type = "boolean", value = true},
   {name = "mir-max-level-worker-robots-storage", value_type = "number", value = 10},
@@ -38,7 +39,8 @@ end
 local function bounded_prerequisite_names(rows, label)
   if type(rows) ~= "table" then
     log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data-prerequisites target=" .. TARGET
-      .. "|observed=unavailable|authored_expected=" .. table.concat(PREREQUISITES, ","))
+      .. "|observed=unavailable|final_expected=" .. table.concat(FINAL_PREREQUISITES, ",")
+      .. "|catalogue_declaration=" .. table.concat(CATALOGUE_DECLARATION, ","))
     fail(label .. " is unavailable")
   end
   local names, seen, count = {}, {}, 0
@@ -88,13 +90,14 @@ exact_rows(technology.unit.ingredients, SCIENCE, "published ordinary worker scie
 local observed_prerequisites = bounded_prerequisite_names(technology.prerequisites, "published ordinary worker prerequisite")
 log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data-prerequisites target=" .. TARGET
   .. "|observed_count=" .. tostring(#observed_prerequisites) .. "|observed=" .. table.concat(observed_prerequisites, ",")
-  .. "|authored_expected=" .. table.concat(PREREQUISITES, ","))
-exact_names(technology.prerequisites, PREREQUISITES, "published ordinary worker prerequisite")
+  .. "|final_expected=" .. table.concat(FINAL_PREREQUISITES, ",")
+  .. "|catalogue_declaration=" .. table.concat(CATALOGUE_DECLARATION, ","))
+exact_names(technology.prerequisites, FINAL_PREREQUISITES, "published ordinary worker prerequisite")
 if type(technology.effects) ~= "table" or #technology.effects ~= 1
     or technology.effects[1].type ~= "worker-robot-storage" or technology.effects[1].modifier ~= 1 then
   fail("published ordinary worker effect differs")
 end
 log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data target=" .. TARGET
   .. "|formula=" .. technology.unit.count_formula .. "|time=" .. tostring(technology.unit.time)
-  .. "|science=" .. table.concat(SCIENCE, ",") .. "|prerequisites=" .. table.concat(PREREQUISITES, ",")
+  .. "|science=" .. table.concat(SCIENCE, ",") .. "|prerequisites=" .. table.concat(FINAL_PREREQUISITES, ",")
   .. "|effect=worker-robot-storage:1")
