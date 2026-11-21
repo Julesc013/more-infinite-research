@@ -544,6 +544,54 @@ class CompetingProductivityTests(unittest.TestCase):
           end
         ''')
 
+    def test_failed_queue_observation_preserves_rights_before_configuration_cleanup(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local contract = binding.select(exact_active(), f200_target())
+          local first, second = force_from_contract(contract), force_from_contract(contract)
+          second.index = first.index + 1
+          storage = {}
+          install_competing(true, first).on_init()
+          local current = storage.mir_competing_productivity
+          local live_rights = current.owned_disabled[first.index]
+          local stale_rights = {[contract.bindings[1].id]={disabled=true}}
+          current.owned_disabled[99] = stale_rights
+          local runtime = install_competing(false, first)
+          second.research_queue = nil
+          setmetatable(second, {__index=function(_, key)
+            if key == "research_queue" then error("synthetic second queue read failure", 0) end
+          end})
+          game.forces = setmetatable({}, {__pairs=function() return ipairs({first, second}) end})
+          local ok, message = pcall(runtime.on_configuration_changed)
+          assert(not ok and tostring(message):find("synthetic second queue read failure", 1, true))
+          assert(storage.mir_competing_productivity == current)
+          assert(current.owned_disabled[first.index] == live_rights, "live rights were released before queue readback")
+          assert(current.owned_disabled[99] == stale_rights, "stale rights were cleaned before queue readback")
+          for _, item in ipairs(contract.bindings) do
+            assert(first.technologies[item.id].enabled == false)
+            assert(second.technologies[item.id].enabled == true)
+          end
+        ''')
+
+    def test_failed_event_queue_observation_does_not_create_rights(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local contract = binding.select(exact_active(), f200_target())
+          local force = force_from_contract(contract)
+          storage = {}
+          local runtime = install_competing(true, force)
+          force.research_queue = nil
+          setmetatable(force, {__index=function(_, key)
+            if key == "research_queue" then error("synthetic event queue read failure", 0) end
+          end})
+          local ok, message = pcall(runtime.on_technology_effects_reset, {force=force})
+          assert(not ok and tostring(message):find("synthetic event queue read failure", 1, true))
+          assert(storage.mir_competing_productivity == nil, "failed queue read created a restoration ledger")
+          for _, item in ipairs(contract.bindings) do
+            assert(force.technologies[item.id].enabled == true)
+          end
+        ''')
+
     def test_bootstrap_registers_the_single_named_event_composition(self):
         self.lua.execute(r'''
           local calls, cleanup_calls, handlers = {}, {}, {events={}}
