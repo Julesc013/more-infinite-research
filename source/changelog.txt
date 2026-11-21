@@ -29,6 +29,7 @@ Date: 2026-11-19
       paths.
     - Factorio 2.0/2.1: Include the active game version and engine-change details when a worker cargo upgrade is refused.
     - Factorio 2.0/2.1: Remove inapplicable worker-cargo preparation instructions and explain the supported upgrade sequence.
+    - Prevent changes to MIR's minimum Factorio patch from hiding Bob and Angel research or blocking ATAN startup.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.17

@@ -29,7 +29,7 @@ local function all_present(active, names)
 end
 
 function M.select(active)
-  if target.id ~= "f210" or target.factorio_version ~= "2.1" or target.minimum_base ~= "2.1.23"
+  if target.id ~= "f210" or target.factorio_version ~= "2.1"
       or type(active) ~= "table" or not all_present(active, REQUIRED) then
     return nil
   end

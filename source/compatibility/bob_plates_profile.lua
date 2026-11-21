@@ -13,7 +13,7 @@ local function overlaps_bob_core(active)
 end
 
 function M.select(active)
-  if target.id ~= "f210" or target.factorio_version ~= "2.1" or target.minimum_base ~= "2.1.23"
+  if target.id ~= "f210" or target.factorio_version ~= "2.1"
       or type(active) ~= "table" then return nil end
   for _, name in ipairs(REQUIRED) do if active[name] == nil then return nil end end
   if active[ANGEL_OWNERSHIP_CONFLICT] ~= nil or overlaps_bob_core(active) then return nil end

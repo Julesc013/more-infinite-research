@@ -49,14 +49,15 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
         if cls.pipeline_context.get("schema") != "MIR5BobWarfareF210PipelineContextV1":
             raise AssertionError("Bob productivity pipeline context schema changed")
 
-    def lua(self):
+    def lua(self, minimum_base="2.1.23"):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE_ROOT.as_posix()
+        lua.globals().minimum_base = minimum_base
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           local target = require("platform.target")
-          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+          target.id, target.factorio_version, target.minimum_base = "f210", "2.1", minimum_base
           target.distribution_version, target.cargo_research = "5.0.21000", true
           target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "independent_probability", true, true
         ''')
@@ -113,12 +114,12 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
     def _pipeline_case(self, name):
         return self.pipeline_context["cases"]["q006" if name == "space_age" else "q005"]
 
-    def _stage_pipeline(self, name, startup=None, mutate=None):
+    def _stage_pipeline(self, name, startup=None, mutate=None, *, minimum_base="2.1.23"):
         case = self._pipeline_case(name)
         raw = deepcopy(case["raw"])
         if mutate is not None:
             mutate(raw)
-        lua = self.lua()
+        lua = self.lua(minimum_base)
         lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, deepcopy(case["selection"]))
         lua.globals().startup_values = _lua_value(lua, startup or {})
@@ -158,9 +159,9 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
             "effects": row.get("effects", []),
         }
 
-    def _catalogue_selection(self, name):
+    def _catalogue_selection(self, name, *, minimum_base="2.1.23"):
         case = self._pipeline_case(name)
-        lua = self.lua()
+        lua = self.lua(minimum_base)
         lua.globals().captured_raw = _lua_value(lua, deepcopy(case["raw"]))
         lua.globals().active_mods = _lua_value(lua, deepcopy(case["selection"]))
         return _plain(lua.execute('return require("compatibility.modern_catalogue").select(active_mods, captured_raw)'))
@@ -211,14 +212,14 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
                     self.assertNotIn("sulfur", [row["recipe"] for row in observed[technology_name]["effects"]])
                     self.assertNotIn("sulfuric-acid", [row["recipe"] for row in observed[technology_name]["effects"]])
 
-    def test_full_settings_data_final_pipeline_matches_independent_q005_q006_b6_vectors(self):
+    def test_full_settings_data_final_pipeline_matches_independent_q005_q006_b6_vectors_at_raised_minimum(self):
         for name in ("base", "space_age"):
             with self.subTest(name=name):
                 case = self.case(name)
                 pipeline = self._pipeline_case(name)
                 self.assertEqual(case["capture"]["upstream_raw_sha256"], pipeline["provenance"]["upstream"]["raw_sha256"])
                 self.assertEqual(case["capture"]["published_raw_sha256"], pipeline["provenance"]["published"]["raw_sha256"])
-                lua = self._stage_pipeline(name)
+                lua = self._stage_pipeline(name, minimum_base="2.1.24")
                 self.assertTrue(lua.globals().outcome, str(lua.globals().message))
                 emitted = _plain(lua.globals().emitted)
                 for technology_name, expected in case["published_rows"].items():
@@ -226,7 +227,7 @@ class BobProductivityF210PipelineTests(unittest.TestCase):
                     self.assertEqual(self._technology_vector(expected), self._technology_vector(emitted[technology_name]))
                 self.assertEqual(1, lua.globals().technology_publications)
 
-                selected = self._catalogue_selection(name)
+                selected = self._catalogue_selection(name, minimum_base="2.1.24")
                 self.assertEqual(name.replace("_", "-"), selected["bob_productivity"])
                 self.assertTrue(selected["replacement_product_target_families"]["research_sulfur"])
                 self.assertTrue(selected["replacement_product_target_families"]["research_sulfuric_acid_productivity"])
