@@ -811,6 +811,43 @@ class LibraryTests(unittest.TestCase):
           end
         ''')
 
+    def test_availability_retains_native_viewport_until_the_displayed_rows_change(self):
+        self.lua.execute("""
+          boot()
+          local family = "research_spoilage_preservation"
+          require("presentation.availability").rows = function()
+            local rows = {}
+            for index = 1, 24 do
+              rows[index] = {family=family, reason="requires-space-age"}
+            end
+            return rows
+          end
+          local root = library.open(player, {tab="availability", query="research"})
+          local body = research_content(root)
+          local viewport = body.mir_library_availability_viewport
+          local label = availability_entries(root).mir_library_availability_24
+          local tabs = root.mir_library_tabs
+          local native_current, native_progress = player.force.current_research, player.force.research_progress
+          library.open(player, {tab="queue"})
+          library.open(player, {tab="research"})
+          assert(viewport.valid and body.mir_library_availability_viewport == viewport and label.valid,
+            "tab return discarded the native scroll pane for unchanged rows")
+
+          library.on_native_state_changed({force=player.force})
+          library.on_native_refresh_tick()
+          assert(viewport.valid and body.mir_library_availability_viewport == viewport and label.valid,
+            "a same-view refresh discarded the native scroll pane")
+          assert(root.mir_library_tabs == tabs and research_filters(root).mir_library_query.text == "research")
+
+          family = "research_agricultural_growth_speed"
+          library.on_native_state_changed({force=player.force})
+          library.on_native_refresh_tick()
+          assert(not viewport.valid and not label.valid and #availability_entries(root).children == 24)
+          assert(availability_entries(root).mir_library_availability_24.caption[2][1]
+            == "technology-name.more-infinite-research.research_agricultural_growth_speed")
+          assert(player.force.current_research == native_current and player.force.research_progress == native_progress)
+        """)
+
     def test_returning_from_availability_removes_its_projection_before_research(self):
         self.lua.execute('''
           for _,width in ipairs{592,528} do
