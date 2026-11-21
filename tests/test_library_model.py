@@ -1398,7 +1398,7 @@ class LibraryModelTests(unittest.TestCase):
             if key == "current_research" then error("current research unavailable") end
           end})
           local detail = assert(model.detail(force, {}, view))
-          assert(detail.current == nil and detail.queued_count == 0)
+          assert(detail.current == nil and detail.queued_count == nil and detail.status == "queue_unavailable")
           setmetatable(force, nil)
           assert(model.detail(force, {}, view).current == false)
           force.technologies = setmetatable({}, {__index=function() error("native lookup unavailable") end})
@@ -1429,7 +1429,7 @@ class LibraryModelTests(unittest.TestCase):
           local prerequisite = hostile({name = "automation", researched = true}, "LuaTechnology prerequisite")
           local prototype = hostile({max_level = 4294967295, effects = {effect}, hidden = false}, "LuaTechnologyPrototype")
           local gear = hostile({
-            name = id, level = 6, researched = false, enabled = true,
+            valid = true, name = id, level = 6, researched = false, enabled = true,
             visible_when_disabled = false, order = "p[research_gears]",
             prerequisites = {automation = prerequisite}, prototype = prototype,
             research_unit_count = 8000, research_unit_count_formula = "100*L",

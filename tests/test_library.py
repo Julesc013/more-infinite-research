@@ -4267,6 +4267,58 @@ class LibraryTests(unittest.TestCase):
           assert(pane().mir_library_count.caption[1] == "mir-browser.count" and #pane().mir_library_results.items > 0)
         ''')
 
+    def test_research_queue_filter_requires_observed_current_research(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          boot()
+          local force = player.force
+          force.current_research, force.research_queue = nil, {}
+          local root = library.open(player, {tab="research", selected=gear.name, status=4})
+          local pane = research_content(root).mir_library_list_pane
+          local function refresh()
+            assert(library.open(player, {tab="research", selected=gear.name, status=4}) == root)
+            return pane.mir_library_count.caption
+          end
+          assert(refresh()[2] == 0)
+          setmetatable(force, {__index=function(_, key)
+            if key == "current_research" then error("unavailable active research") end
+          end})
+          local label = refresh()
+          assert(label[1] == "mir-browser.detail-unavailable" and label[2][1] == "mir-browser.queue",
+            "active research read failed but the queue filter reported an ordinary result")
+          setmetatable(force, nil)
+          force.current_research = {name=""}
+          assert(refresh()[1] == "mir-browser.detail-unavailable")
+          force.current_research, force.research_queue = gear, {gear,gear}
+          assert(refresh()[2] == 1 and storage.mir_library.players[player.index].selected == gear.name)
+        ''')
+
+    def test_detail_lookup_failure_after_successful_enumeration_retains_focus(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          boot()
+          local force = player.force
+          local original = force.technologies
+          local root = library.open(player, {tab="research", family="all", selected=gear.name})
+          force.technologies = setmetatable({}, {
+            __pairs=function() return next, original, nil end,
+            __index=function(_, id)
+              if id == gear.name then error("selected native research unavailable") end
+              return original[id]
+            end
+          })
+          assert(library.open(player, {tab="research", family="all"}) == root)
+          local content = research_content(root)
+          assert(#content.mir_library_list_pane.mir_library_results.items > 0)
+          local empty = content.mir_library_detail.mir_library_detail_empty
+          assert(empty and empty.caption[1] == "mir-browser.detail-unavailable"
+            and empty.caption[2][1] == "mir-browser.research", "selected lookup failure rendered ordinary detail")
+          assert(storage.mir_library.players[player.index].selected == gear.name)
+          force.technologies = original
+          assert(library.open(player, {tab="research", family="all"}) == root)
+          assert(content.mir_library_detail.mir_library_research_facts and not content.mir_library_detail.mir_library_detail_empty)
+        ''')
+
     def test_cap_provider_is_configured_without_force_extension_or_periodic_work(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = nil

@@ -210,6 +210,15 @@ end
 
 -- Both Library views project the native queue into temporary display data.
 -- A failed read invalidates everything the visitor collected in this pass.
+local function queue_name(entry)
+  local id = entry
+  if type(entry) ~= "string" then
+    if entry.valid == false then return nil end
+    id = entry.name
+  end
+  if type(id) == "string" and id ~= "" and #id <= MAX_SEARCH then return id end
+end
+
 local function visit_queue(force, visit, limit)
   if not force or force.valid == false then return false end
   local queue = force.research_queue
@@ -217,12 +226,8 @@ local function visit_queue(force, visit, limit)
   local count = 0
   for index, entry in ipairs(queue) do
     if index ~= count + 1 or (limit and index > limit) then return false end
-    local id = entry
-    if type(entry) ~= "string" then
-      if entry.valid == false then return false end
-      id = entry.name
-    end
-    if type(id) ~= "string" or id == "" or #id > MAX_SEARCH then return false end
+    local id = queue_name(entry)
+    if id == nil then return false end
     visit(index, id)
     count = index
   end
@@ -237,14 +242,13 @@ end
 local function current_research_name(force)
   local current = force.current_research
   if current == nil then return false end
-  local id = type(current) == "string" and current or current.name
-  return bounded_string(id, MAX_SEARCH)
+  return queue_name(current)
 end
 
 local function queue_facts(force)
   local counts, first = {}, {}
   local read, current = pcall(current_research_name, force)
-  if not read then current = nil end
+  if not read or current == nil then return nil, nil, nil end
   local complete = M.observe_queue(force, function(index, id)
     counts[id] = (counts[id] or 0) + 1
     if first[id] == nil then first[id] = index end

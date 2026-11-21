@@ -1703,7 +1703,12 @@ local function update_research_content(content, player, view, context, translati
   elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(selected_index, "in-view")
   end
-  local detail = selected and selected_detail(player, view, context, translations) or nil
+  local detail, reason
+  if selected then detail, reason = selected_detail(player, view, context, translations) end
+  local detail_row = selected
+  if reason == "research_unavailable" then
+    detail_row, unavailable = nil, "research"
+  end
   local detail_box = content[PREFIX .. "detail"]
   if not valid(detail_box) then
     detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
@@ -1713,13 +1718,13 @@ local function update_research_content(content, player, view, context, translati
     detail_box.style.width, detail_box.style.height = panes.detail_width, panes.detail_height
     detail_box.style.maximal_width = panes.detail_width
   end
-  local recipes = selected and affected_recipe_rows(player, detail) or {}
-  local inputs = detail_inputs(player, selected, detail, panes, recipes)
+  local recipes = detail_row and affected_recipe_rows(player, detail) or {}
+  local inputs = detail_inputs(player, detail_row, detail, panes, recipes)
   local tags = detail_box.tags or {}
   if not (inputs and detail_subtree_present(detail_box, inputs)
       and same_detail_inputs(inputs, tags.mir_detail_inputs, {left = 8192})) then
     detail_box.clear()
-    detail_lines(detail_box, selected, detail, player, recipes, unavailable)
+    detail_lines(detail_box, detail_row, detail, player, recipes, unavailable)
     tags.mir_detail_inputs = inputs
     detail_box.tags = tags
   end
