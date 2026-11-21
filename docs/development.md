@@ -112,6 +112,8 @@ Use one implementer, one independent review responsibility and one test worker w
 
 ## Coordinate native execution and independent review through GitHub
 
+Trusted MIR checkouts default to GPT-6.2 Sol at medium effort for the coordinator and generic delegated work. Select an explicit higher-effort model for a disputed migration or release decision. The named review profiles carry their own settings. Use ordinary programs for builds, catalogue inspection, hashing and waiting on jobs. Give a worker one input revision, an owned file set, an independent expected result and a stopping condition. [Recovery workflow](implementation/architecture-regression-response-2026-11-18.md#gunmetal-and-the-model-budget)
+
 One integration owner coordinates the current branch, the sole native-test lane and release. The current branch and frozen test inputs are named in [progress](progress.md). An independent reviewer checks pushed commits and may prepare corrections on separate branches and PRs. Use a bounded file responsibility in each task/PR, fetch remote changes before integration, and reconcile overlapping edits explicitly. Never reset another worker's changes, force-push a shared review branch or substitute a moving branch head for a test's full source commit.
 
 Issue comments record assignments and results; they do not start an idle Codex session. Confirm execution through an actual session response or runner job and its result. If a session is unavailable, carry urgent work forward in a separate branch through the available authorized execution lane, retain one integration owner and reconcile any late work before integration. Do not wait for an unreachable session or assume its disconnected process stopped. The existing native runner executes its reviewed named tasks; its smoke result establishes readiness, not gameplay acceptance or agent steering.
@@ -159,6 +161,8 @@ Show the real repeated code or concrete safety boundary, why native Factorio beh
 Code should be concise enough to follow, not minified. Prefer ordinary arrays/maps and direct field changes. Do not hide complexity in generated data. Explain any shared Generator growth together with the total declarations/adapters/UI/tooling footprint.
 
 ## Test selection
+
+For a bounded host batch, use `-ControlPath` with exact paths from the driver. For example, `./tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir $luaRuntime -ControlPath 'tests/test_library.py','tests/test_library_model.py'` runs those two scripts in plan order. Adding `-Plan` prints the selected rows. Invoking the driver with only the pinned Lua directory runs the full host gate. It uses `python3` when the system provides Python under that name alone.
 
 Follow [verification](../spec/verification.md). Run cheap affected checks first, native slices for changed gameplay, migrations/clients when state is affected, and the full relevant frozen-candidate campaign before release. A documentation typo is not a new native campaign. A new engine is not covered by an old native receipt.
 
