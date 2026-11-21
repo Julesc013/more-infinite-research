@@ -17,6 +17,11 @@ the existing exact snapshot may be released, or a different reviewed snapshot
 may replace it. The durable intent closes the marker-to-launch acknowledgement
 window without silently relaunching an uncertain invocation.
 
+A reviewed launcher can include Record-MIRGunmetalNativeExit.sh in its
+packet and run it with the packet hash through ExecStopPost. The matching
+unit and invocation in the journal preserve the manager-supplied exit fields
+through transient-unit collection.
+
 This is an operational hand-off, not a native test runner.  It never builds a
 Factorio command, chooses an engine, changes a library, establishes gameplay
 acceptance, or permits timing/performance work.
@@ -375,21 +380,65 @@ function Get-MIRGunmetalDispatcherUnit {
   }
 }
 
-function Get-MIRGunmetalDispatcherJournalTerminal {
-  param([Parameter(Mandatory)][string]$InvocationId)
-  if($InvocationId -cnotmatch '^[A-Fa-f0-9]{32}$'){throw '[mir-gunmetal-dispatcher-invocation-id]'}
-  # A user-manager unit records USER_INVOCATION_ID, not the system-manager
-  # _SYSTEMD_INVOCATION_ID field. The collected-unit sample intentionally
-  # showed only a started message, so absence of an explicit main-process exit
-  # remains interruption rather than a manufactured success.
-  $lines=@(& /usr/bin/journalctl --user --no-pager --output=json "USER_INVOCATION_ID=$InvocationId" 2>$null)
-  $exit=$null
-  foreach($line in $lines){
-    try{$entry=$line|ConvertFrom-Json -ErrorAction Stop}catch{continue}
-    $message=if($entry.PSObject.Properties['MESSAGE']){[string]$entry.MESSAGE}else{''}
-    if($message-match'Main process exited, code=exited, status=(\d+)/'){$exit=[int]$Matches[1]}
+function ConvertFrom-MIRGunmetalDispatcherExitJournal {
+  param([string[]]$ManagerRecords,[string[]]$HookRecords,[string]$Unit,[string]$InvocationId,[string]$PacketSha256)
+  $managerExit = $null
+  $hook = $null
+  $conflict = $false
+  foreach ($line in $ManagerRecords) {
+    try { $entry = $line | ConvertFrom-Json -AsHashtable -ErrorAction Stop } catch { continue }
+    if ($entry -isnot [Collections.IDictionary] -or $entry['MESSAGE'] -isnot [string]) { continue }
+    if ($entry['USER_INVOCATION_ID'] -cne $InvocationId -or $entry['MESSAGE'] -cnotmatch 'Main process exited, code=exited, status=([0-9]{1,3})/') { continue }
+    $status = [int]$Matches[1]
+    if ($null -ne $managerExit -and $managerExit -ne $status) { $conflict = $true }
+    $managerExit = $status
   }
-  return [pscustomobject]@{observed=($null-ne$exit);exit_code=$exit}
+  foreach ($line in $HookRecords) {
+    try { $entry = $line | ConvertFrom-Json -AsHashtable -ErrorAction Stop } catch { continue }
+    if ($entry -isnot [Collections.IDictionary] -or $entry['MESSAGE'] -isnot [string]) { continue }
+    if ($entry['_SYSTEMD_USER_UNIT'] -cne $Unit -or $entry['_SYSTEMD_INVOCATION_ID'] -cne $InvocationId -or $entry['_TRANSPORT'] -cne 'stdout') { continue }
+    if ($entry['MESSAGE'] -cnotmatch '^MIR_NATIVE_SYSTEMD_EXIT_V1 invocation=([0-9a-f]{32}) packet=([A-F0-9]{64}) result=([a-z-]+) code=(exited|killed|dumped) status=([A-Z0-9+-]+)$') { continue }
+    if ($Matches[1] -cne $InvocationId -or $Matches[2] -cne $PacketSha256) { continue }
+    $serviceResult, $kind, $status = $Matches[3], $Matches[4], $Matches[5]
+    $exit = $null
+    if ($kind -ceq 'exited') {
+      if ($status -cnotmatch '^[0-9]{1,3}$' -or [int]$status -gt 255) { continue }
+      $exit = [int]$status
+    }
+    if ($null -ne $hook -or ($serviceResult -ceq 'success' -and ($null -eq $exit -or $exit -ne 0))) { $conflict = $true }
+    $hook = [pscustomobject]@{
+      observed = $true
+      conflict = $false
+      source = 'systemd-exit-hook'
+      unit = $Unit
+      invocation_id = $InvocationId
+      packet_sha256 = $PacketSha256
+      service_result = $serviceResult
+      exit_kind = $kind
+      exit_status = $status
+      exit_code = $exit
+      journal_cursor = $entry['__CURSOR']
+    }
+  }
+  if ($conflict -or ($null -ne $hook -and $null -ne $managerExit -and $hook.exit_code -ne $managerExit)) {
+    return [pscustomobject]@{ observed = $false; conflict = $true; source = 'conflicting-exit-records'; exit_code = $null }
+  }
+  if ($null -ne $hook) { return $hook }
+  return [pscustomobject]@{ observed = ($null -ne $managerExit); conflict = $false; source = 'manager-journal'; exit_code = $managerExit }
+}
+
+function Get-MIRGunmetalDispatcherJournalTerminal {
+  param([Parameter(Mandatory)][string]$InvocationId,[Parameter(Mandatory)][string]$Unit,[Parameter(Mandatory)][string]$PacketSha256)
+  if ($InvocationId -cnotmatch '^[0-9a-f]{32}$') { throw '[mir-gunmetal-dispatcher-invocation-id]' }
+  # The user manager's own events and the hook's stdout use different fields.
+  # Give the journal a bounded interval to receive stdout after collection.
+  for ($attempt = 0; $attempt -lt 4; $attempt++) {
+    $manager = @(& /usr/bin/journalctl --user --no-pager --output=json "USER_INVOCATION_ID=$InvocationId" 2>$null)
+    $hook = @(& /usr/bin/journalctl --user --no-pager --output=json '--grep=^MIR_NATIVE_SYSTEMD_EXIT_V1 ' "_SYSTEMD_USER_UNIT=$Unit" "_SYSTEMD_INVOCATION_ID=$InvocationId" 2>$null)
+    $record = ConvertFrom-MIRGunmetalDispatcherExitJournal -ManagerRecords $manager -HookRecords $hook -Unit $Unit -InvocationId $InvocationId -PacketSha256 $PacketSha256
+    if ($record.observed -or $record.conflict -or $attempt -eq 3) { return $record }
+    Start-Sleep -Milliseconds 150
+  }
 }
 
 function Get-MIRGunmetalDispatcherResult {
@@ -403,32 +452,6 @@ function Get-MIRGunmetalDispatcherResult {
     if($kind-cne$Approval.result_kind-or$status-cne$Approval.result_status-or$packet-cne$Approval.packet_sha256){return [pscustomobject]@{exists=$true;valid=$false;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);kind=$kind;status=$status;packet_sha256=$packet;reason='result-contract-or-packet'}}
     return [pscustomobject]@{exists=$true;valid=$true;sha256=(Get-MIRGunmetalDispatcherSha256 $Approval.result_path);kind=$kind;status=$status;packet_sha256=$packet;reason='passed'}
   }catch{return [pscustomobject]@{exists=$true;valid=$false;sha256='';kind='';status='';packet_sha256='';reason='result-invalid'}}
-}
-
-function Release-MIRGunmetalDispatcherRetainedUnit {
-  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Terminal)
-  if (
-    $Terminal.status -cne 'succeeded' -or $Terminal.reason -cne 'unit-and-result-passed' -or
-    $Terminal.unit.active_state -cne 'active' -or $Terminal.unit.sub_state -cne 'exited'
-  ) { return }
-
-  $requestDirectory = Get-MIRGunmetalDispatcherRequestDirectory -Policy $Policy -RequestId $Terminal.request_id
-  $envelopePath = Join-Path $requestDirectory ('completion-'+$Terminal.dispatch_id+'.json')
-  if (
-    $Terminal.completion_envelope_path -cne $envelopePath -or
-    (Get-MIRGunmetalDispatcherSha256 $envelopePath) -cne $Terminal.completion_envelope_sha256
-  ) { throw '[mir-gunmetal-dispatcher-retained-unit-envelope]' }
-
-  $unit = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
-  if ($unit.absence_confirmed) { return }
-  if (
-    -not $unit.found -or $unit.invocation_id -cne $Terminal.launch.start_ack.invocation_id -or
-    $unit.active_state -cne 'active' -or $unit.sub_state -cne 'exited' -or $unit.main_pid -cne '0' -or
-    $unit.result -cne 'success' -or $unit.exec_main_code -cnotin @('exited','1') -or $unit.exec_main_status -cne '0'
-  ) { throw '[mir-gunmetal-dispatcher-retained-unit-changed]' }
-
-  $stopped = Invoke-MIRGunmetalDispatcherSystemctl -Arguments @('stop',$Policy.unit)
-  if ($stopped.exit_code -ne 0) { throw '[mir-gunmetal-dispatcher-retained-unit-stop]' }
 }
 
 function Complete-MIRGunmetalDispatcherTerminal {
@@ -467,9 +490,6 @@ function Complete-MIRGunmetalDispatcherTerminal {
       throw '[mir-gunmetal-dispatcher-last-terminal-conflict]'
     }
   }
-  # The terminal and its completion envelope are durable at this point.
-  # Keep active state until the matched exited unit can be released or is absent.
-  Release-MIRGunmetalDispatcherRetainedUnit -Policy $Policy -Terminal $terminal
   Write-MIRGunmetalDispatcherJson -Path $lastPath -Value $last
 
   foreach ($name in @('running','intent')) {
@@ -623,13 +643,18 @@ function Reconcile-MIRGunmetalDispatcherRunning {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status $status -Reason $reason -Unit $unit -Result $terminalResult
     return
   }
-  $journal = Get-MIRGunmetalDispatcherJournalTerminal -InvocationId $expected
+  $journal = Get-MIRGunmetalDispatcherJournalTerminal -InvocationId $expected -Unit $Policy.unit -PacketSha256 $Policy.approval.packet_sha256
+  if ($journal.PSObject.Properties['conflict'] -and $journal.conflict) {
+    New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'unit-terminal-journal-conflict' -Result ([ordered]@{ result = $result; journal = $journal })
+    return
+  }
   if (-not $journal.observed) {
     # A collected unit's disappearance/deactivation is not an exit status.
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'unit-unloaded-without-terminal-journal' -Result $result
     return
   }
-  $good = ($journal.exit_code -eq 0 -and $result.valid)
+  $serviceSucceeded = (-not $journal.PSObject.Properties['service_result'] -or $journal.service_result -ceq 'success')
+  $good = ($journal.exit_code -eq 0 -and $serviceSucceeded -and $result.valid)
   $reason = if ($good) { 'journal-and-result-passed' } else { 'journal-terminal-or-result-failed' }
   $status = if ($good) { 'succeeded' } else { 'failed' }
   New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status $status -Reason $reason -Result ([ordered]@{ result = $result; journal = $journal })
