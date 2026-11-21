@@ -162,7 +162,7 @@ local function observe_initial_role(row)
     {name = "level", expected = 4},
     {name = "researched", expected = false},
     {name = "enabled", expected = true},
-    {name = "visible", expected = true, key = "visible_when_disabled"}
+    {name = "visible", expected = false, key = "visible_when_disabled"}
   }
   local parts = {"[MIR_PUBLISHED517_EARNED_SOURCE] stage=runtime-initial-role", "target=" .. TARGET}
   for _, field in ipairs(fields) do
@@ -190,7 +190,7 @@ local function assert_worker_contract(force)
   check(type(effects) == "table" and #effects == 1 and effects[1].type == "worker-robot-storage" and close(effects[1].modifier, 1),
     "ordinary worker effect differs")
   observe_initial_role(row)
-  check(row.level == 4 and row.researched == false and row.enabled == true and row.visible_when_disabled == true,
+  check(row.level == 4 and row.researched == false and row.enabled == true and row.visible_when_disabled == false,
     "ordinary worker initial role differs")
 end
 local function assert_setup_declaration(force)
@@ -405,7 +405,7 @@ local function stage_partial_queue(state)
 end
 local function source_partial(state)
   local target = technology(state.research_force, TARGET)
-  check(target.level == 9 and target.researched == false and target.enabled == true and target.visible_when_disabled == true,
+  check(target.level == 9 and target.researched == false and target.enabled == true and target.visible_when_disabled == false,
     "source partial target role differs")
   check(state.research_force.current_research == target and state.research_force.research_progress > 0
     and state.research_force.research_progress < 1, "source partial progress differs")
