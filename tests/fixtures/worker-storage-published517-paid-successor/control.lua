@@ -116,8 +116,130 @@ local function observe(phase, event)
     end
   end
   log("[MIR_PUBLISHED517_SUCCESSOR] " .. helpers.table_to_json({phase = phase, tick = game.tick,
-    frame = frame(), mod_changes = changes, mod_startup_settings_changed = startup_changed}))
+    frame = frame(), mod_changes = changes, mod_startup_settings_changed = startup_changed,
+    laboratory_speed = storage[KEY].research_force.laboratory_speed_modifier}))
 end
+
+-- Use the existing isolated fixture lab and the existing native queue.
+local PACKS = {
+  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+  "production-science-pack", "utility-science-pack"
+}
+local completion
+
+local function science_units(input)
+  local totals = {}
+  for _, name in ipairs(PACKS) do totals[name] = 0 end
+  for index = 1, #input do
+    local stack = input[index]
+    if stack.valid_for_read and totals[stack.name] ~= nil then
+      local maximum = prototypes.item[stack.name].get_durability(stack.quality)
+      local durability = stack.durability
+      check(stack.quality.name == "normal" and stack.is_tool and maximum == 1
+        and finite(durability) and durability > 0 and durability <= maximum, "paid science stack differs")
+      totals[stack.name] = totals[stack.name] + stack.count - 1 + durability / maximum
+    end
+  end
+  return totals
+end
+
+local function feed_paid(actor)
+  for _, name in ipairs(PACKS) do
+    local present = actor.input.get_item_count(name)
+    if present < 32 then
+      local count = 200 - present
+      check(actor.input.insert{name = name, count = count} == count, "could not feed paid science: " .. name)
+      actor.issued[name] = actor.issued[name] + count
+    end
+  end
+end
+
+local function observe_paid(phase, actor, event)
+  local remaining = science_units(actor.input)
+  local debit = {}
+  for _, name in ipairs(PACKS) do
+    debit[name] = actor.initial[name] + actor.issued[name] - remaining[name]
+  end
+  log("[MIR_PUBLISHED517_SUCCESSOR] " .. helpers.table_to_json({
+    phase = phase, tick = game.tick, frame = frame(), finished = actor.finished,
+    research = event and event.research.name or false, by_script = event and event.by_script == true or false,
+    laboratory_speed = actor.force.laboratory_speed_modifier, science_debit = debit,
+    next_level_refused = actor.next_level_refused or false
+  }))
+end
+
+local function begin_paid()
+  check(completion == nil and not cold_pending, "paid test load is not ready")
+  local before = frame()
+  check(before.lab_disabled and before.current == HOLDER and before.holder.level == 9
+    and before.progress > 0 and before.progress < 1 and #before.queue == 3
+    and before.queue[1] == HOLDER and before.queue[2] == HOLDER and before.queue[3] == TAIL,
+    "protected paid starting frame differs")
+  for _, name in ipairs(PACKS) do
+    check(before.holder.science[name] == 1, "historical science differs: " .. name)
+  end
+  local state = storage[KEY]
+  local lab, force = state.lab, state.research_force
+  local input = lab.get_inventory(defines.inventory.lab_input)
+  check(input and input.valid and lab.is_connected_to_electric_network(), "paid native lab supply is unavailable")
+  local speed = force.laboratory_speed_modifier
+  check(finite(speed) and speed == state.speed_before, "saved laboratory speed differs")
+  completion = {lab = lab, force = force, input = input, started = game.tick, speed = speed,
+    initial = science_units(input), issued = {}, finished = 0}
+  for _, name in ipairs(PACKS) do completion.issued[name] = 0 end
+  observe_paid("paid-begin", completion)
+  -- Same laboratory speed stimulus as the original earned-source fixture.
+  force.laboratory_speed_modifier = speed + 115199
+  feed_paid(completion)
+  lab.disabled_by_script = false
+end
+
+script.on_event(defines.events.on_research_finished, function(event)
+  local actor = completion
+  if actor == nil or event.research.force ~= actor.force then return end
+  check(event.research.name == HOLDER and event.by_script == false and actor.finished < 2
+    and (actor.finished == 0 or actor.second_observed),
+    "unexpected research completion on the paid force")
+  actor.finished = actor.finished + 1
+  if actor.finished == 2 then
+    actor.lab.disabled_by_script = true
+    actor.force.laboratory_speed_modifier = actor.speed
+  end
+  observe_paid("holder-completed", actor, event)
+end)
+
+local function advance_paid()
+  local actor = completion
+  if actor == nil then return end
+  check(game.tick - actor.started <= 2700, "native holder did not complete and settle within 2700 updates")
+  if actor.finished < 2 then
+    if actor.finished == 1 and not actor.second_observed then
+      local second = frame()
+      if second.current == HOLDER and second.holder.level == 10 and not second.holder.researched
+        and #second.queue == 2 and second.queue[1] == HOLDER and second.queue[2] == TAIL then
+        actor.second_observed = true
+        observe_paid("second-holder-started", actor)
+      end
+    end
+    feed_paid(actor)
+    return
+  end
+  local settled = frame()
+  if settled.ordinary.level ~= 11 or settled.current ~= TAIL then return end
+  check(settled.lab_disabled and settled.holder.level == 4 and not settled.holder.enabled
+    and not settled.holder.visible and not settled.ordinary.enabled and settled.progress == 0
+    and #settled.queue == 1 and settled.queue[1] == TAIL and not settled.tail.researched,
+    "settled cap or unrelated tail differs")
+  check(actor.force.add_research(actor.force.technologies[ORDINARY]) == false, "cap allowed ordinary level 11 to start")
+  local after_refusal = frame()
+  check(after_refusal.current == TAIL and after_refusal.progress == 0
+    and #after_refusal.queue == 1 and after_refusal.queue[1] == TAIL, "cap refusal changed the unrelated tail")
+  actor.next_level_refused = true
+  observe_paid("paid-completion-save", actor)
+  game.server_save("mir5-published517-paid-completion")
+  completion = nil
+end
+
 
 script.on_load(function()
   cold_pending = true
@@ -134,9 +256,7 @@ script.on_event(defines.events.on_tick, function()
     cold_pending = false
     observe("cold-read")
   end
+  advance_paid()
 end)
 
-remote.add_interface(FIXTURE, {save_successor = function()
-  observe("successor-save")
-  game.server_save(SAVE)
-end})
+remote.add_interface(FIXTURE, {complete_paid = begin_paid})
