@@ -129,7 +129,7 @@ local function check_closure()
     end
   elseif plan.stage == SUCCESSOR then
     if plan.successor_engine == "f110" then
-      if mods.base ~= "1.1.110" or mods["more-infinite-research"] ~= "5.0.11000"
+      if mods.base ~= "1.1.110" or mods["more-infinite-research"] ~= "5.0.11018"
           or mods[FIXTURE] ~= "0.3.0" then
         fail("MIR5 F110 successor closure differs")
       end
