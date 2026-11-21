@@ -1421,7 +1421,18 @@ local function plan_published517_se_paid_bridge(event, state, owned, source_prot
     local legacy = default_frame(force, recovery.published517_se_id)
     local gate = gate_frame(force, true)
     if not full_pair(source, owner, gate) or not pristine_default_frame(legacy, recovery.published517_se_id)
-        or legacy.visible then recover_error("published517 SE paid-worker frame differs") end
+        or legacy.visible then
+      log("[MIR-PUBLISHED517-PAID-PREFLIGHT-REFUSAL] " .. helpers.table_to_json({
+        force_index=force.index, force_name=force.name,
+        pair_matches=full_pair(source, owner, gate),
+        holder_pristine=pristine_default_frame(legacy, recovery.published517_se_id),
+        holder_visible=legacy.visible,
+        source=frame_values(source), owner=frame_values(owner), holder=frame_values(legacy),
+        gate={level=gate.level, researched=gate.researched, enabled=gate.enabled,
+          visible=gate.visible_when_disabled, saved_progress=gate.saved_progress},
+      }))
+      recover_error("published517 SE paid-worker frame differs")
+    end
     local action = "validate"
     if default_owner_frame_has_unsettled_work(owner, recovery.ordinary_default_id) then
       if owner.occurrences > 0 then requeueable(force, owner, true, true) end
