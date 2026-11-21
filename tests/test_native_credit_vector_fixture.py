@@ -7,7 +7,7 @@ import re
 import sys
 import unittest
 
-import test_native_family_paid_credits as family_fixture
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/native-credit-vectors"
@@ -411,10 +411,12 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
         # doubles. The engine fixture itself never imports this runtime.
         for target in ("f200", "f210"):
             with self.subTest(target=target):
-                family_fixture.LuaRuntime = LuaRuntime
-                harness = family_fixture.NativeFamilyPaidCreditsTests()
-                harness.setUp()
-                lua = harness.lua
+                # Preserve the original family harness's initial f210 world.
+                # The unchanged scenario below owns its target-specific reload.
+                lua = build_native_credit_runtime_world(
+                    LuaRuntime, target="f210", source_root=ROOT / "source"
+                )
+                install_native_family_paid_world(lua, target="f210")
                 lua.globals().case_target = target
                 lua.execute(r'''
                   local family='research_low_density_structure'

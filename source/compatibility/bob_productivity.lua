@@ -37,7 +37,7 @@ local function require_route(recipes, name, expected_type, expected_name)
 end
 
 function M.select(active_mods)
-  if target.id ~= "f210" or target.factorio_version ~= "2.1" or target.minimum_base ~= "2.1.23"
+  if target.id ~= "f210" or target.factorio_version ~= "2.1"
       or type(active_mods) ~= "table" then
     return nil
   end

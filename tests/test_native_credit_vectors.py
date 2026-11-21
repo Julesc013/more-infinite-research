@@ -4,8 +4,9 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_native_family_paid_credits as family_fixture
 import test_generator as generator_fixture
+from generator_world import build_generator_world
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,10 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NativeCreditVectorTests(unittest.TestCase):
     def setUp(self):
-        family_fixture.LuaRuntime = LuaRuntime
-        case = family_fixture.NativeFamilyPaidCreditsTests()
-        case.setUp()
-        self.lua = case.lua
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=ROOT / "source"
+        )
+        install_native_family_paid_world(self.lua, target="f210")
         self.lua.execute(r'''
           function vector_world(size, included, target, change, level, family, recipe, public_id)
             family=family or "research_low_density_structure";recipe=recipe or "scrap-recycling"
@@ -85,14 +86,66 @@ class NativeCreditVectorTests(unittest.TestCase):
           end
         ''')
 
+    def test_explicit_credit_world_construction_ignores_foreign_testcase_and_runtime_globals(self):
+        import test_native_credits as credit_fixture
+        import test_native_family_paid_credits as paid_fixture
+
+        absent = object()
+        original_credit_runtime = getattr(credit_fixture, "LuaRuntime", absent)
+        original_paid_runtime = getattr(paid_fixture, "LuaRuntime", absent)
+        original_paid_case = paid_fixture.NativeFamilyPaidCreditsTests
+        factory_calls = []
+
+        def forbidden_factory(**_):
+            raise AssertionError("borrowed test-module LuaRuntime was used")
+
+        class ForbiddenPaidCase:
+            def __init__(self):
+                raise AssertionError("borrowed paid-family TestCase was constructed")
+
+        def supplied_factory(*, unpack_returned_tuples):
+            factory_calls.append(unpack_returned_tuples)
+            return LuaRuntime(unpack_returned_tuples=unpack_returned_tuples)
+
+        credit_fixture.LuaRuntime = forbidden_factory
+        paid_fixture.LuaRuntime = forbidden_factory
+        paid_fixture.NativeFamilyPaidCreditsTests = ForbiddenPaidCase
+        try:
+            self.setUp()
+            self.lua.execute("assert(type(vector_world)=='function')")
+            lua = build_native_credit_runtime_world(
+                supplied_factory, target="f200", source_root=ROOT / "source"
+            )
+            install_native_family_paid_world(lua, target="f200")
+        finally:
+            if original_credit_runtime is absent:
+                delattr(credit_fixture, "LuaRuntime")
+            else:
+                credit_fixture.LuaRuntime = original_credit_runtime
+            if original_paid_runtime is absent:
+                delattr(paid_fixture, "LuaRuntime")
+            else:
+                paid_fixture.LuaRuntime = original_paid_runtime
+            paid_fixture.NativeFamilyPaidCreditsTests = original_paid_case
+
+        self.assertEqual([True], factory_calls)
+        lua.execute(r'''
+          assert(require("platform.target").id=="f200")
+          local force=make_collected_force(1,1,{},false)
+          native_credits.on_init()
+          assert(record(force,"research_steel","steel-plate").included==false)
+        ''')
+
     def test_real_collection_then_cerys_loop_admits_complete_carriers_with_broader_public_owner(self):
         # The extra producer is explicitly synthetic. The collector, carrier
         # constructor and unchanged Cerys loop are real source. This is a host
         # reproduction of their composition, not either reporter's modpack.
-        generator_fixture.LuaRuntime = LuaRuntime
-        stage = generator_fixture.GeneratorTests()
-        stage.setUp()
-        stage.lua.execute(r'''
+        stage = build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator_fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator_fixture.K2SO_MATERIAL_NATIVE,
+        )
+        stage.execute(r'''
           mods={base="2.1.23",["space-age"]="2.1.23"}
           package.loaded["research.settings"]=nil
           local config=require("research.settings");local startup={}
@@ -120,16 +173,16 @@ class NativeCreditVectorTests(unittest.TestCase):
           assert(#emitted_groups.research_processing_unit==3,"collector omitted a productive recipe")
           assert(#data.raw.technology[owner].effects==3,"public owner lost a collected recipe")
         ''')
-        stage.lua.execute((ROOT / "tests/fixtures/native-credit-vectors/cerys-technology-first45.lua").read_text())
-        stage.lua.execute(r'''
+        stage.execute((ROOT / "tests/fixtures/native-credit-vectors/cerys-technology-first45.lua").read_text())
+        stage.execute(r'''
           local prefix="mir-native-credit-research_processing_unit-"
           assert(#data.raw.technology[prefix.."processing-unit-positive"].effects==2)
           assert(#data.raw.technology[prefix.."processing-unit-negative"].effects==2)
           assert(#data.raw.technology[prefix.."mir-vector-independent-processing-positive"].effects==1)
           assert(#data.raw.technology["processing-unit-productivity"].effects==3)
         ''')
-        groups = generator_fixture.plain_lua(stage.lua.globals().emitted_groups)
-        emitted = generator_fixture.plain_lua(stage.lua.globals().data.raw.technology)
+        groups = generator_fixture.plain_lua(stage.globals().emitted_groups)
+        emitted = generator_fixture.plain_lua(stage.globals().data.raw.technology)
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.setUp()

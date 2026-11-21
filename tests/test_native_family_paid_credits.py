@@ -11,115 +11,34 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_native_credits as fixture
-import test_bootstrap as bootstrap_fixture
 import test_generator as generator_fixture
+from bootstrap_control_world import install_bootstrap_control_world
+from generator_world import build_generator_world
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFamilyPaidCreditsTests(unittest.TestCase):
     def setUp(self):
-        fixture.LuaRuntime = LuaRuntime
-        case = fixture.NativeCreditRuntimeTests()
-        case.setUp()
-        self.lua = case.lua
-        self.lua.globals().fixture_float32 = lambda value: struct.unpack("<f", struct.pack("<f", value))[0]
-        self.lua.execute(r'''
-          GROUPS={research_steel={
-            {recipe="alternate-steel",change=.17},{recipe="multi-native",change=.17},
-            {recipe="steel-plate",change=.17},{recipe="casting-steel",change=.17}},
-            research_low_density_structure={{recipe="multi-native",change=.1}}}
-          local function copy(value)
-            if type(value)~="table" then return value end
-            local out={};for k,v in pairs(value) do out[k]=copy(v) end;return out
-          end
-          -- Ordinary fixture defaults are authored exact quanta. Precision
-          -- cases below replace these fields from independent observed units.
-          function fixture_effect(value)
-            return require("platform.target").id=="f200" and fixture_float32(value) or value
-          end
-          function reload_credits(active,target_id)
-            script={active_mods=active or {base="2.1.23",["space-age"]="2.1.23",["more-infinite-research"]="5.0.21003"}}
-            require("platform.target").id=target_id or "f210"
-            prototypes={technology={},mod_data={
-              ["more-infinite-research-native-adoptions"]={data={schema=1,owners={},withheld={},credits=copy(GROUPS)}}},
-              get_history=function(_,name) return {created=foreign_creation==name and "foreign" or "more-infinite-research"} end}
-            package.loaded["research.catalogue"]=nil
-            package.loaded["runtime.catalogue"]=nil
-            package.loaded["runtime.native_credits"]=nil
-            native_credits=require("runtime.native_credits")
-          end
-          function make_collected_force(index,level,mask,private)
-            local force={index=index,valid=true,technologies=setmetatable({}, {
-              __pairs=function()error("whole technology traversal")end}),_states={},
-              foreign_bonus=17.25,recipes=setmetatable({}, {__index=function()error("aggregate recipe read")end}),
-              reset_technology_effects=function()error("force reset")end,research_progress=.42}
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              if not force.technologies[d.main_id] then
-                local t,s=make_technology(d.main_id,{name=d.main_id,level=1,max_level=UINT32_MAX,
-                  hidden=private==true,effects={}},level or 1,false,true)
-                t.force=force;force.technologies[d.main_id]=t;force._states[d.main_id]=s
-              end
-              for _,direction in ipairs({"positive","negative"}) do
-                local name=direction=="positive" and d.positive_id or d.negative_id
-                local t,s=make_technology(name,{name=name,level=1,max_level=UINT32_MAX,hidden=true,
-                  enabled=false,visible_when_disabled=false,effects={{type="change-recipe-productivity",
-                    recipe=d.recipe,change=direction=="positive" and fixture_effect(d.change)
-                      or -fixture_effect(d.change)}}},1,false,false)
-                t.force=force;force.technologies[name]=t;force._states[name]=s
-              end
-            end
-            local t,s=make_technology("foreign",{name="foreign",level=1,max_level=UINT32_MAX,effects={}},3,false,false)
-            t.force=force;force.technologies.foreign=t;force._states.foreign=s
-            game.forces[index]=force;set_mask(force,mask or {},private)
-            return force
-          end
-          function set_mask(force,mask,private)
-            local seen={}
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              local proto=force.technologies[d.main_id].prototype
-              if not seen[d.main_id] then proto.effects={};proto.hidden=private==true;seen[d.main_id]=true end
-              if mask[d.family.."\0"..d.recipe] then
-                proto.effects[#proto.effects+1]={type="change-recipe-productivity",recipe=d.recipe,change=fixture_effect(d.change)}
-              end
-            end
-          end
-          function key(family,recipe)return family.."\0"..recipe end
-          function record(force,family,recipe)
-            return storage.mir_native_credits and storage.mir_native_credits.forces[force.index]
-              and storage.mir_native_credits.forces[force.index][key(family,recipe)]
-          end
-          function own_contribution(force,family,recipe)
-            local wanted
-            for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
-              if d.family==family and d.recipe==recipe then wanted=d end
-            end
-            local function completed(t)return t.level-1+(t.researched and 1 or 0)end
-            local main=force.technologies[wanted.main_id];local included=false
-            for _,e in ipairs(main.prototype.effects) do if e.recipe==recipe then included=true end end
-            return wanted.change*((included and completed(main) or 0)
-              +completed(force.technologies[wanted.positive_id])-completed(force.technologies[wanted.negative_id]))
-          end
-          function close(a,b)assert(math.abs(a-b)<1e-8,tostring(a).." differs "..tostring(b))end
-          function no_foreign_write(force)
-            assert(force.foreign_bonus==17.25 and not force.technologies.foreign.enabled)
-            assert(force._states.foreign.writes.enabled==0 and force._states.foreign.writes.level==0)
-          end
-          function advance(force,id,level,researched)
-            force._states[id].level=level;force._states[id].researched=researched
-          end
-          reload_credits()
-        ''')
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=ROOT / "source"
+        )
+        install_native_family_paid_world(self.lua, target="f210")
 
     FAMILIES = ("research_low_density_structure", "research_plastic",
                 "research_processing_unit", "research_rocket_fuel", "research_steel")
 
     def minimum_pipeline(self, target):
         """Run real settings/data stages; only the native scalar is an oracle."""
-        generator_fixture.LuaRuntime = LuaRuntime
-        stage = generator_fixture.GeneratorTests()
-        stage.setUp()
-        stage.lua.globals().case_target = target
-        stage.lua.execute(r'''
+        stage = build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator_fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator_fixture.K2SO_MATERIAL_NATIVE,
+        )
+        stage.globals().case_target = target
+        stage.execute(r'''
           local t=require("platform.target");t.id=case_target
           local base=case_target=="f200" and "2.0.77" or "2.1.23"
           t.factorio_version=case_target=="f200" and "2.0" or "2.1";t.minimum_base=base
@@ -149,7 +68,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
             local row=emitted_groups[family][1];assert(row.change==.0001)
           end
         ''')
-        g = stage.lua.globals()
+        g = stage.globals()
         return (generator_fixture.plain_lua(g.emitted_groups),
                 generator_fixture.plain_lua(g.emitted_prototypes))
 
@@ -317,15 +236,15 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       assert_partial_and_foreign()
                     ''')
 
-    def test_zero_noncollected_carrier_still_has_no_valid_credit_observation(self):
+    def test_unconstructed_noncollected_carrier_is_an_optional_absence(self):
         self.lua.execute(r'''
+          -- Neither the data-stage declaration nor any named holder is
+          -- present. This is optional absence, unlike a zero-valued emitted
+          -- carrier whose authenticated raw scalar is still nonzero.
           GROUPS={};reload_credits()
-          local force=make_force(1,nil,nil,nil,{["copper-plate"]=0});game.forces[1]=force
-          local positive=holder(force,"copper-plate","positive")
-          local negative=holder(force,"copper-plate","negative")
+          local force={index=1,valid=true,technologies={}};game.forces[1]=force
           native_credits.on_init()
-          assert(ledger(force,"copper-plate")==nil and positive.level==1 and negative.level==1)
-          assert(force._states[positive.name].writes.level==0 and force._states[negative.name].writes.level==0)
+          assert(ledger(force,"copper-plate")==nil)
         ''')
 
     def precision_attempt(self, target, family, authored, actual=None, units=None):
@@ -374,7 +293,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     @staticmethod
     def observed_oracle(target):
-        path = fixture.ROOT / "tests/fixtures" / ("native-effect-conversion-" + target + ".json")
+        path = ROOT / "tests/fixtures" / ("native-effect-conversion-" + target + ".json")
         oracle = json.loads(path.read_text())
         assert oracle["target"] == target
         assert len(oracle["cases"]) == (20 if target == "f200" else 36)
@@ -1176,7 +1095,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base("f200", "f200")
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1205,6 +1124,104 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       no_foreign_write(force)
                     ''')
 
+    def test_published_m4_base_with_only_new_mods_preserves_known_paid_mask(self):
+        for target, patch in (("f200", False), ("f210", False), ("f210", True)):
+            for explicit_base in (False, True):
+                with self.subTest(target=target, patch=patch, explicit_base=explicit_base):
+                    self.setUp()
+                    self._published_m4_base(target, target)
+                    self.lua.globals().base_target = target
+                    self.lua.globals().base_patch = patch
+                    self.lua.globals().explicit_base = explicit_base
+                    self.lua.execute('''
+                      local old=base_target=="f200" and "4.7.20003" or "4.7.21003"
+                      local changes={["more-infinite-research"]={old_version=old,
+                        new_version=BASE_ACTIVE["more-infinite-research"]},
+                        ["new-extra-a"]={new_version="1.2.3"},["new-extra-b"]={new_version="2.3.4"}}
+                      BASE_ACTIVE["new-extra-a"]="1.2.3";BASE_ACTIVE["new-extra-b"]="2.3.4"
+                      if explicit_base then changes.base={old_version=BASE_ACTIVE.base,new_version=BASE_ACTIVE.base} end
+                      if base_patch then BASE_ACTIVE.base="2.1.24";changes.base={old_version="2.1.23",new_version="2.1.24"} end
+                      reload_credits(BASE_ACTIVE,base_target)
+                      local force=make_collected_force(1,8,published_base_mask,false)
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      local detached=force.technologies["recipe-prod-research_plastic-1"]
+                      main.saved_progress=.27;detached.saved_progress=.31
+                      local queue={main,main,force.technologies.foreign}
+                      force.research_queue=queue;force.current_research=main
+                      native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes=changes})
+                      for family,recipes in pairs(GROUPS) do
+                        close(own_contribution(force,family,recipes[1].recipe),.7)
+                      end
+                      close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                      assert(record(force,"research_steel","new-unpaid-steel").offset==-7)
+                      assert(main.level==8 and not main.researched and main.saved_progress==.27
+                        and detached.level==8 and detached.saved_progress==.31
+                        and force.research_queue==queue and force.current_research==main and force.research_progress==.42)
+                      for _=1,2 do
+                        reload_credits(BASE_ACTIVE,base_target);native_credits.on_load()
+                        native_credits.on_configuration_changed()
+                        close(own_contribution(force,"research_steel","steel-plate"),.7)
+                        close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                        assert(force.research_queue==queue and main.saved_progress==.27 and detached.saved_progress==.31)
+                      end
+                      no_foreign_write(force)
+                    ''')
+
+    def test_m4_added_mod_route_requires_complete_prior_base_proof_before_writes(self):
+        opponents = ("missing-change", "old-present", "updated", "removed", "wrong-new", "malformed",
+                     "metatable", "startup", "unknown-startup", "invalid-startup", "unknown-origin",
+                     "wrong-engine", "wrong-destination", "cross-engine", "private-main", "incomplete-old-mask")
+        for target in ("f200", "f210"):
+            for opponent in opponents:
+                with self.subTest(target=target, opponent=opponent):
+                    self.setUp()
+                    self._published_m4_base(target, target)
+                    self.lua.globals().base_target = target
+                    self.lua.globals().opponent = opponent
+                    self.lua.execute('''
+                      local old=base_target=="f200" and "4.7.20003" or "4.7.21003"
+                      BASE_ACTIVE.extra="1.0.0"
+                      local changes={["more-infinite-research"]={old_version=old,
+                        new_version=BASE_ACTIVE["more-infinite-research"]},extra={new_version="1.0.0"}}
+                      local startup=false
+                      if opponent=="missing-change" then changes.extra=nil end
+                      if opponent=="old-present" then changes.extra.old_version="1.0.0" end
+                      if opponent=="updated" then changes.extra.old_version="0.9.0" end
+                      if opponent=="removed" then changes.gone={old_version="1.0.0"} end
+                      if opponent=="wrong-new" then changes.extra.new_version="2.0.0" end
+                      if opponent=="malformed" then changes.extra=false end
+                      if opponent=="metatable" then changes.extra=setmetatable({}, {__index={new_version="1.0.0"}}) end
+                      if opponent=="startup" then startup=true end
+                      if opponent=="unknown-startup" then startup=nil end
+                      if opponent=="invalid-startup" then startup="false" end
+                      if opponent=="unknown-origin" then changes["more-infinite-research"].old_version=old.."0" end
+                      if opponent=="wrong-engine" then BASE_ACTIVE.base=base_target=="f200" and "2.0.76" or "2.1.22" end
+                      if opponent=="wrong-destination" then
+                        BASE_ACTIVE["more-infinite-research"]=base_target=="f200" and "5.0.21003" or "5.0.20003"
+                        changes["more-infinite-research"].new_version=BASE_ACTIVE["more-infinite-research"]
+                      end
+                      if opponent=="cross-engine" then
+                        BASE_ACTIVE.base=base_target=="f200" and "2.1.23" or "2.0.77"
+                        BASE_ACTIVE["more-infinite-research"]=base_target=="f200" and "5.0.21003" or "5.0.20003"
+                        changes["more-infinite-research"].new_version=BASE_ACTIVE["more-infinite-research"]
+                        changes.base={old_version=base_target=="f200" and "2.0.77" or "2.1.23",new_version=BASE_ACTIVE.base}
+                      end
+                      if opponent=="incomplete-old-mask" then GROUPS.research_plastic=nil end
+                      reload_credits(BASE_ACTIVE,base_target)
+                      local force=make_collected_force(1,8,published_base_mask,opponent=="private-main")
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      main.saved_progress=.27;local queue={main,main,force.technologies.foreign}
+                      force.research_queue=queue;force.current_research=main
+                      local ok,message=pcall(native_credits.on_configuration_changed,
+                        {mod_startup_settings_changed=startup,mod_changes=changes})
+                      assert(not ok and tostring(message):find("native family",1,true),"unproven M4 old Base closure admitted")
+                      assert(next(storage)==nil,"refusal allocated MIR history")
+                      for _,s in pairs(force._states) do assert(s.writes.level==0 and s.writes.enabled==0) end
+                      assert(force.research_queue==queue and force.current_research==main and force.research_progress==.42
+                        and main.level==8 and main.saved_progress==.27)
+                      no_foreign_write(force)
+                    ''')
+
     def test_published_f200_base_direct_reader_refuses_unproven_inputs_before_writes(self):
         opponents=("startup", "unknown-startup", "unchanged-provider", "removed-provider", "observer",
                    "unknown-origin", "wrong-family", "wrong-active-engine", "engine-change",
@@ -1215,7 +1232,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base("f200", "f200")
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1324,7 +1341,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     def test_published_f210_m4_base_patch24_reader_refuses_other_inputs_before_writes(self):
         opponents = ("old-below-floor", "downgrade", "missing-base", "new-mismatch", "cross-family",
-                     "changed-settings", "foreign-mod", "invalid-settings-flag")
+                     "changed-settings", "updated-extra", "invalid-settings-flag")
         for opponent in opponents:
             with self.subTest(opponent=opponent):
                 self.setUp()
@@ -1348,8 +1365,8 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     changes["more-infinite-research"].new_version="5.0.20015"
                   end
                   if opponent=="changed-settings" then changed=true end
-                  if opponent=="foreign-mod" then
-                    BASE_ACTIVE.foreign="1.0.0";changes.foreign={new_version="1.0.0"}
+                  if opponent=="updated-extra" then
+                    BASE_ACTIVE.foreign="1.0.0";changes.foreign={old_version="0.9.0",new_version="1.0.0"}
                   end
                   if opponent=="invalid-settings-flag" then changed="false" end
                   reload_credits(BASE_ACTIVE,"f210")
@@ -1380,7 +1397,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
@@ -1426,7 +1443,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
-                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        install_bootstrap_control_world(self.lua, source_root=ROOT / "source")
                         self.lua.execute('''
                           local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}

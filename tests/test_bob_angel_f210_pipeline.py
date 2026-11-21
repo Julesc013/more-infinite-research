@@ -252,7 +252,8 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         if cls.context.get("schema") != "MIR5BobAngelF210UpstreamPipelineContextV1":
             raise AssertionError("Bob+Angel F210 context schema changed")
 
-    def stage(self, case, startup=None, raw=None, mods=None, expect_failure=False, refuse_pure_angel=False):
+    def stage(self, case, startup=None, raw=None, mods=None, expect_failure=False, refuse_pure_angel=False,
+              *, minimum_base="2.1.23"):
         source = self.context["cases"][case]
         raw = deepcopy(source["raw"] if raw is None else raw)
         mods = deepcopy(source["selection"] if mods is None else mods)
@@ -262,6 +263,7 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         lua.globals().active_mods = _lua_value(lua, mods)
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.globals().refuse_pure_angel = refuse_pure_angel
+        lua.globals().minimum_base = minimum_base
         lua.execute(r'''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
           mods,script,helpers,log=active_mods,nil,{},function() end
@@ -278,7 +280,7 @@ class BobAngelF210PipelineTests(unittest.TestCase):
             if published then technology_publications=technology_publications+1 end
           end
           local target=require("platform.target")
-          target.id,target.factorio_version,target.minimum_base="f210","2.1","2.1.23"
+          target.id,target.factorio_version,target.minimum_base="f210","2.1",minimum_base
           target.distribution_version,target.cargo_research="5.0.21000",true
           target.recipe_probability,target.receiver_limits,target.productivity_ignores_stats="independent_probability",true,true
           assert(loadfile(player_root.."/settings.lua"))()
@@ -483,10 +485,10 @@ class BobAngelF210PipelineTests(unittest.TestCase):
         self.assertNotIn("space-age", self.context["cases"]["base"]["selection"])
         self.assertIn("space-age", self.context["cases"]["space_age"]["selection"])
 
-    def test_full_settings_data_and_final_pipeline_matches_independent_b6_rows(self):
+    def test_full_settings_data_and_final_pipeline_matches_independent_b6_rows_at_raised_minimum(self):
         for case, expected_count in (("base", 12), ("space_age", 11)):
             with self.subTest(case=case):
-                rows = self._rows(self.stage(case))
+                rows = self._rows(self.stage(case, minimum_base="2.1.24"))
                 expected = self._expected(case)
                 self.assertEqual(expected_count, len(expected))
                 for name, published in expected.items():

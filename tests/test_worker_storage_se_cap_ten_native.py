@@ -1,0 +1,1293 @@
+"""Strict Lua52 controls for the F200/SE worker-storage cargo fixture.
+
+These are fixture-construction controls only.  They do not package an actor,
+create a Factorio process, or establish a gameplay result.  Their host world
+records save requests as assertions; it never creates an engine save.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import re
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURE = ROOT / "tests" / "fixtures" / "worker-storage-se-cap-ten-native"
+sys.path.insert(0, str(ROOT))
+from tests import worker_storage_se_cap_ten_native_world as world
+
+
+LuaRuntime = None
+LuaError = RuntimeError
+
+
+def _lua_array(values):
+    return "{" + ",".join(json.dumps(value) for value in values) + "}"
+
+
+class WorkerStorageSECapTenNativeTests(unittest.TestCase):
+    maxDiff = None
+
+    def setUp(self):
+        self.lua = self.fresh_actor()
+
+    def fresh_actor(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        world.load(lua)
+        return lua
+
+    def static_role_actor(self):
+        """Load the former static-C4 expectation as an in-memory actor mutant."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = "state.worker = CANDIDATE; assert_worker_contract(state.player, CANDIDATE)"
+        self.assertIn(old, source)
+        source = source.replace(old, "state.worker = SOURCE; assert_worker_contract(state.player, SOURCE)", 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "static-canonical-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def unsupported_queue_flag_actor(self):
+        """Load an in-memory actor mutant that reads a removed LuaForce member."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = "local player = game.forces.player\n  check(player and player.valid ~= false, \"player force differs\")"
+        new = "local player = game.forces.player\n  local removed_queue_flag = player.research_queue_enabled\n  check(player and player.valid ~= false, \"player force differs\")"
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "removed-queue-flag-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def absent_science_reader_actor(self):
+        """Load the exact former nonempty-stack requirement as an in-memory mutant."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old_total = "  local total = 0"
+        new_total = "  local total, stacks = 0, 0"
+        self.assertIn(old_total, source)
+        source = source.replace(old_total, new_total, 1)
+        old_increment = "      total = total + stack.count - 1 + durability / maximum"
+        new_increment = "      total, stacks = total + stack.count - 1 + durability / maximum, stacks + 1"
+        self.assertIn(old_increment, source)
+        source = source.replace(old_increment, new_increment, 1)
+        old = '''  end
+  return total
+end
+local assert_lab'''
+        new = '''  end
+  check(stacks > 0, label .. " native science stack is absent: " .. item)
+  return total
+end
+local assert_lab'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "absent-science-reader-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def historical_buffer_refill_actor(self):
+        """Load the exact pre-grid feed write against the strict entity proxy."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  end
+end
+local function create_lab_and_power(force)'''
+        new = '''  end
+  state.lab.energy = state.lab.electric_buffer_size
+end
+local function create_lab_and_power(force)'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "historical-buffer-refill-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def all_three_connection_predicate_actor(self):
+        """Load the rejected all-entity predicate against a real distributor row."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network(), "fixture electric network differs")'''
+        new = '''  check(type(lab.is_connected_to_electric_network) == "function"
+    and type(power.is_connected_to_electric_network) == "function"
+    and type(pole.is_connected_to_electric_network) == "function"
+    and lab.is_connected_to_electric_network()
+    and power.is_connected_to_electric_network()
+    and pole.is_connected_to_electric_network(), "fixture electric network differs")'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "all-three-connection-predicate-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def unconditional_cold_pending_actor(self):
+        """Load the AFA actor behavior that treated every saved phase as cold."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        diagnostic = '''  if cold_pending then
+    if not source_reload_observed and cold_phase == "source-partial"
+      and script.active_mods["more-infinite-research"] == SOURCE_MIR and state.phase == "source-partial" then
+      source_reload_observed = true
+      observe_force_contributions("source-reload")
+      frame_diagnostics(state.source_frame, frame(state), "source-reload")
+    end
+'''
+        fixed = diagnostic + '''    if cold_phase == "closed" then
+      check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+      observe_force_contributions("cold-read")
+      marker("cold-read", state, {cold_writes = 0}); cold_pending, cold_phase = false, nil; return
+    elseif cold_phase == "idle" then
+      check(state.phase == "idle" or state.phase == "source-working", "cold load phase differs")
+    elseif cold_phase == "source-partial" then
+      check(state.phase == "candidate-working", "cold load phase differs")
+    else
+      fail("cold load phase differs")
+    end
+    cold_pending, cold_phase = false, nil
+  end'''
+        original = diagnostic + '''    check(state.phase == "closed" and same(frame(state), state.closed), "cold process changed candidate endpoint")
+    marker("cold-read", state, {cold_writes = 0}); cold_pending = false; return
+  end'''
+        self.assertIn(fixed, source)
+        source = source.replace(fixed, original, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unconditional-cold-pending-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def extra_expected_frame_actor(self):
+        """Add only synthetic expected leaves to exercise diagnostic bounds."""
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        old = '''  return expected
+end
+local function assert_candidate_transfer(state)'''
+        new = '''  for index = 1, 130 do expected["diagnostic-extra-" .. tostring(index)] = index end
+  return expected
+end
+local function assert_candidate_transfer(state)'''
+        self.assertIn(old, source)
+        source = source.replace(old, new, 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "extra-expected-frame-control.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        return lua
+
+    def source_to_partial(self, lua=None):
+        actor = lua or self.lua
+        actor.globals().cargo_begin()
+        for _ in range(5):
+            actor.globals().cargo_complete(False)
+            actor.globals().cargo_tick(1)
+        self.assertEqual("source-await-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_partial(0.42)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("source-partial", actor.globals().cargo_phase())
+
+    def candidate_to_closed(self, lua=None):
+        actor = lua or self.lua
+        self.source_to_partial(actor)
+        actor.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("candidate-working", actor.globals().cargo_phase())
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("closed", actor.globals().cargo_phase())
+
+    def closed_cap12_configuration(self, lua=None, *, startup_changed=True, mir_change=None):
+        actor = lua or self.lua
+        actor.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+        changes = actor.table()
+        if mir_change is not None:
+            changes["more-infinite-research"] = actor.table_from(mir_change, recursive=True)
+        event = actor.table_from({
+            "mod_startup_settings_changed": startup_changed,
+            "mod_changes": changes,
+        }, recursive=True)
+        actor.globals().cargo_configuration(event)
+
+    def candidate_to_await_close(self, lua=None):
+        actor = lua or self.lua
+        actor.globals().cargo_begin()
+        for _ in range(5):
+            actor.globals().cargo_complete(False)
+            actor.globals().cargo_tick(1)
+        self.assertEqual("source-await-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_partial(0.42)
+        actor.globals().cargo_tick(1)
+        self.assertEqual("source-partial", actor.globals().cargo_phase())
+        actor.globals().cargo_candidate("5.0.20018", None)
+        actor.globals().cargo_complete(False)
+        actor.globals().cargo_tick(1)
+        actor.globals().cargo_complete(False)
+        self.assertEqual(world.TAIL, actor.globals().cargo_current_name())
+        self.assertEqual([world.TAIL], list(actor.globals().cargo_queue_names().values()))
+        return actor
+
+    def logs(self):
+        return list(self.lua.globals().cargo_logs().values())
+
+    def frame_diffs(self):
+        return [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_FRAME_DIFF]")]
+
+    def force_contributions(self):
+        return [line for line in self.logs() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
+
+    def data_stage(self, values=None, ingredients=None):
+        """Execute the data-only marker through strict, actual-value proxies."""
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        rows = dict(world.SETTINGS if values is None else values)
+        active = {**world.CLOSURE, "more-infinite-research": "5.0.20018",
+                  "mir-fixture-mir5-worker-storage-se-cap-ten-native": "0.1.0"}
+        startup = lua.table()
+        for name, value in rows.items():
+            startup[name] = lua.table_from({"value": value, "default_value": 0}, recursive=True)
+        science = world.SCIENCE if ingredients is None else ingredients
+        unit_rows = lua.table()
+        for index, name in enumerate(science, 1):
+            unit_rows[index] = lua.table_from({1: name, 2: 1}, recursive=True)
+        target = lua.table_from({
+            "prerequisites": lua.table_from({1: world.PREDECESSOR}),
+            "unit": lua.table_from({"count_formula": "675*1.5^(L-4)", "time": 60, "ingredients": unit_rows}),
+            "effects": lua.table_from({1: lua.table_from({"type": "worker-robot-storage", "modifier": 1})}),
+        }, recursive=True)
+        logs: list[str] = []
+        env = lua.table_from({
+            "mods": lua.table_from(active, recursive=True),
+            "settings": lua.table_from({"startup": startup}),
+            "data": lua.table_from({"raw": lua.table_from({"technology": lua.table_from({world.TARGET: target})})}),
+            "log": logs.append,
+        })
+        lua.globals().DATA_ENV = env
+        lua.execute("setmetatable(DATA_ENV, {__index = _G})")
+        execute = lua.eval("function(path, env) local fn, message = loadfile(path, 't', env); if not fn then return false, message end; return pcall(fn) end")
+        result = execute((FIXTURE / "data-final-fixes.lua").as_posix(), env)
+        return result, logs
+
+    def test_metadata_has_same_full_actor_identity_for_both_engine_families(self):
+        canonical = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
+        f200 = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        self.assertEqual(canonical["name"], f200["name"])
+        self.assertEqual(canonical["version"], f200["version"])
+        self.assertEqual("2.1", canonical["factorio_version"])
+        self.assertEqual("2.0", f200["factorio_version"])
+        self.assertEqual(["base >= 2.0.77", "space-exploration >= 0.7.57", "more-infinite-research"], f200["dependencies"])
+
+    def test_fixed_declaration_has_exact_roots_order_and_count(self):
+        rows = world.rows()
+        self.assertEqual(98, len(rows))
+        self.assertEqual(["worker-robots-storage-2", "se-material-science-pack-1"], rows["worker-robots-storage-3"])
+        self.assertEqual(["se-space-belt"], rows["se-space-science-lab"])
+        self.assertEqual(["se-processing-iridium", "se-space-catalogue-material-1", "se-space-hypercooling-1"], rows["se-material-science-pack-1"])
+        declaration = (FIXTURE / "prerequisites.lua").read_text(encoding="utf-8")
+        self.assertNotIn("research_recursive", declaration)
+        self.assertNotIn("data.raw", declaration)
+
+    def test_source_stays_idle_until_explicit_remote_begin(self):
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.logs())
+        self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        self.assertIn("phase=source-begin", self.logs()[-1])
+
+    def test_setup_declaration_matches_independent_native_parent_rows(self):
+        declared = world.rows()
+        for name, parents in world.NATIVE_SETUP_PARENTS.items():
+            with self.subTest(name=name):
+                self.assertEqual(parents, declared[name])
+
+    def test_scripted_finite_setup_callbacks_do_not_become_worker_completions(self):
+        self.lua.globals().cargo_begin()
+        self.assertEqual(98, self.lua.globals().CARGO_SCRIPTED_RESEARCH_CALLBACKS)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        self.assertIn("ordinary=0", self.logs()[-1])
+        self.assertEqual(0, len(self.lua.globals().cargo_saves()))
+
+    def test_scripted_worker_completion_before_begin_still_refuses(self):
+        with self.assertRaisesRegex(LuaError, "scripted worker completion differs"):
+            self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['worker-robots-storage-4'],by_script=true}")
+
+    def test_scripted_configuration_handoff_notifications_wait_for_full_frame_check(self):
+        self.source_to_partial()
+        logs, saves = len(self.logs()), len(self.lua.globals().cargo_saves())
+        self.lua.execute("CARGO_TRANSFER(); "
+                         "for _, name in ipairs({'worker-robots-storage-4','mir-worker-storage-default-4'}) do "
+                         "CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES[name],by_script=true} end")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        self.assertEqual(logs, len(self.logs()))
+        self.assertEqual(saves, len(self.lua.globals().cargo_saves()))
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20018'; "
+                         "CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                         "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        before = len(self.logs())
+        self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['worker-robots-storage-4'],by_script=true}; "
+                         "CARGO_CALLBACKS[2]{research={name='mir-worker-storage-default-4',force=game.forces.foreign},by_script=false}")
+        self.assertEqual(before, len(self.logs()))
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        with self.assertRaisesRegex(LuaError, "scripted worker completion differs"):
+            self.lua.execute("CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['mir-worker-storage-default-4'],by_script=true}")
+
+    def test_completed_and_settled_native_cursor_pairs_mean_the_same_earned_levels(self):
+        self.lua.globals().cargo_begin()
+        for level in range(4, 9):
+            self.lua.globals().cargo_complete(False, level, None, True)
+            self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_partial(0.42)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        for level in (9, 10):
+            self.lua.globals().cargo_complete(False, level, None, True)
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+
+    def test_handoff_notification_cannot_bless_changed_partial_work(self):
+        self.source_to_partial()
+        self.lua.execute("CARGO_TRANSFER(); CARGO_FORCE_VALUES._progress=0.25; "
+                         "CARGO_CALLBACKS[2]{research=CARGO_TECHNOLOGIES['mir-worker-storage-default-4'],by_script=true}; "
+                         "script.active_mods['more-infinite-research']='5.0.20018'")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.execute("CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                             "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+
+    def test_omitted_native_parent_refuses_before_source_setup(self):
+        for name, parent in (("rocket-silo", "se-heat-shielding"), ("speed-module", "se-fuel-refining")):
+            with self.subTest(name=name):
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                world.install(lua)
+                lua.execute("for _, row in ipairs(CARGO_DECLARATION_ORDER) do "
+                            f"if row[1] == {json.dumps(name)} then "
+                            "for index, value in ipairs(row[2]) do "
+                            f"if value == {json.dumps(parent)} then table.remove(row[2], index); break end "
+                            "end end end")
+                world.load(lua)
+                with self.assertRaisesRegex(LuaError, f"setup parents {name} count differs"):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+                self.assertEqual(0, len(lua.globals().cargo_entities()))
+                self.assertEqual(0, len(lua.globals().cargo_saves()))
+
+    def test_afa_cold_pending_mutant_refuses_both_source_load_orders(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        old_after_begin = self.unconditional_cold_pending_actor()
+        old_after_begin.globals().cargo_on_load()
+        old_after_begin.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old_after_begin.globals().cargo_tick(1)
+
+    def test_documented_on_load_source_idle_admits_both_first_tick_orders(self):
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.logs())
+        self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+        after_begin = self.fresh_actor()
+        after_begin.globals().cargo_on_load()
+        after_begin.globals().cargo_begin()
+        after_begin.globals().cargo_tick(1)
+        self.assertEqual("source-working", after_begin.globals().cargo_phase())
+
+    def test_documented_on_load_configuration_then_candidate_tick_remains_working(self):
+        old = self.unconditional_cold_pending_actor()
+        old.globals().cargo_begin()
+        for _ in range(5):
+            old.globals().cargo_complete(False)
+            old.globals().cargo_tick(1)
+        old.globals().cargo_partial(0.42)
+        old.globals().cargo_tick(1)
+        old.globals().cargo_on_load()
+        old.globals().cargo_candidate("5.0.20018", None, True)
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            old.globals().cargo_tick(1)
+
+        self.source_to_partial()
+        self.lua.globals().cargo_on_load()
+        self.lua.globals().cargo_candidate("5.0.20018", None, True)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertIn("phase=candidate-pre-work", self.logs()[-1])
+        self.assertNotIn("phase=cold-read", self.logs()[-1])
+
+    def test_on_load_refuses_unrecognized_persisted_phase(self):
+        self.lua.globals().cargo_set_phase("unknown-persisted-phase")
+        self.lua.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_on_load_source_partial_requires_configuration_before_first_tick(self):
+        self.source_to_partial()
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        before_saves = list(self.lua.globals().cargo_saves().values())
+        self.lua.globals().cargo_on_load()
+        with self.assertRaisesRegex(LuaError, "cold load phase differs"):
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before_saves, list(self.lua.globals().cargo_saves().values()))
+        self.assertIn(
+            "summary path=frame origin=source-reload count=0 truncated=false",
+            self.frame_diffs()[-1],
+        )
+        self.assertIn(
+            "summary phase=source-reload forces=7 truncated=false unavailable=false",
+            self.force_contributions()[-1],
+        )
+
+    def test_force_contributor_snapshot_is_read_only_and_exposes_complete_conquest_vector(self):
+        before_phase = self.lua.globals().cargo_phase()
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        before_saves = list(self.lua.globals().cargo_saves().values())
+        before_queue = list(self.lua.globals().cargo_queue_names().values())
+        before_current = self.lua.globals().cargo_current_name()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-entry"))
+        rows = self.force_contributions()
+        conquest = next(row for row in rows if "kind=force" in row and 'force_name="conquest"' in row)
+        self.assertIn("force_index=4", conquest)
+        self.assertIn("worker_robots_storage_bonus=3", conquest)
+        self.assertIn("worker_robots_speed_modifier=5.6500000000000004", conquest)
+        self.assertIn("artillery_range_modifier=1.8", conquest)
+        self.assertIn("artillery_shell_gun_speed_modifier=6", conquest)
+        self.assertIn("laser_gun_speed_modifier=2.2000000000000002", conquest)
+        self.assertIn("laser_ammo_damage_modifier=5.0999999999999996", conquest)
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=present", source)
+        self.assertIn('effect_1_type="worker-robot-storage"', source)
+        self.assertIn("effect_1_modifier=1", source)
+        legacy = next(row for row in rows if "kind=technology" in row and 'technology="mir-worker-storage-published517-4"' in row)
+        self.assertIn("state=absent", legacy)
+        self.assertIn("summary phase=mir-config-entry forces=7 truncated=false unavailable=false", rows[-1])
+        self.assertEqual(before_phase, self.lua.globals().cargo_phase())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before_saves, list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before_queue, list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(before_current, self.lua.globals().cargo_current_name())
+
+    def test_force_contributor_snapshot_labels_absent_row_without_treating_it_as_unavailable(self):
+        self.lua.globals().cargo_remove_contributor_technology(world.SOURCE)
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        row = next(row for row in self.force_contributions()
+                   if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=absent", row)
+        self.assertNotIn("state=unavailable", row)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
+
+    def test_force_contributor_snapshot_refuses_unrecognized_phase_without_observation(self):
+        before_logs = list(self.logs())
+        before_counts = dict(self.lua.globals().cargo_counts().items())
+        with self.assertRaisesRegex(LuaError, "contribution observation phase differs"):
+            self.lua.globals().cargo_observe_force_contributions("ordinary-fixture-play")
+        self.assertEqual(before_logs, self.logs())
+        self.assertEqual(before_counts, dict(self.lua.globals().cargo_counts().items()))
+
+    def test_force_contributor_snapshot_truncates_oversize_force_registry_without_arbitrary_rows(self):
+        self.lua.globals().cargo_add_contributor_forces(10)
+        before = len(self.logs())
+        self.assertFalse(self.lua.globals().cargo_observe_force_contributions("mir-config-exit"))
+        rows = self.logs()[before:]
+        self.assertEqual(["[MIR_SE_FORCE_CONTRIBUTIONS] summary phase=mir-config-exit forces=0 truncated=true unavailable=false"], rows)
+
+    def test_force_contributor_summary_marks_throwing_or_nonfinite_vector_observations_unavailable(self):
+        self.lua.globals().cargo_contributor_bad_vector()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-entry"))
+        player = next(row for row in self.force_contributions()
+                      if "kind=force" in row and 'force_name="player"' in row)
+        self.assertIn("worker_robots_storage_bonus=unavailable", player)
+        self.assertIn("artillery_shell_gun_speed_modifier=unavailable", player)
+        self.assertIn("summary phase=mir-config-entry forces=7 truncated=false unavailable=true", self.force_contributions()[-1])
+
+    def test_force_contributor_summary_marks_technology_and_effect_observation_unavailable(self):
+        self.lua.globals().cargo_contributor_effects_unavailable()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        source = next(row for row in self.force_contributions()
+                      if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=present", source)
+        self.assertIn("effects=unavailable", source)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=true", self.force_contributions()[-1])
+
+        lua = self.fresh_actor()
+        lua.globals().cargo_contributor_technology_unavailable()
+        self.assertTrue(lua.globals().cargo_observe_force_contributions("mir-worker-applied"))
+        rows = [line for line in lua.globals().cargo_logs().values() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("state=unavailable", source)
+        self.assertIn("summary phase=mir-worker-applied forces=7 truncated=false unavailable=true", rows[-1])
+
+    def test_force_contributor_summary_marks_effect_and_name_bounds_truncated(self):
+        self.lua.globals().cargo_contributor_effects_overflow()
+        self.lua.globals().cargo_add_long_name_contributor()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("mir-config-exit"))
+        rows = self.force_contributions()
+        source = next(row for row in rows if "kind=technology" in row and 'technology="worker-robots-storage-4"' in row)
+        self.assertIn("effects=truncated", source)
+        long_force = next(row for row in rows if "kind=force" in row and "name_truncated=true" in row)
+        self.assertIn("force_index=8", long_force)
+        self.assertIn("summary phase=mir-config-exit forces=8 truncated=true unavailable=false", rows[-1])
+
+    def test_force_contributor_accepts_custom_force_table_but_reports_iteration_failure(self):
+        self.lua.globals().cargo_custom_force_registry()
+        self.assertTrue(self.lua.globals().cargo_observe_force_contributions("candidate-transfer"))
+        self.assertIn("summary phase=candidate-transfer forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
+
+        lua = self.fresh_actor()
+        lua.globals().cargo_throwing_force_registry()
+        self.assertFalse(lua.globals().cargo_observe_force_contributions("candidate-transfer"))
+        rows = [line for line in lua.globals().cargo_logs().values() if line.startswith("[MIR_SE_FORCE_CONTRIBUTIONS]")]
+        self.assertEqual(["[MIR_SE_FORCE_CONTRIBUTIONS] summary phase=candidate-transfer forces=0 truncated=false unavailable=true"], rows)
+
+    def test_strict_world_rejects_removed_research_queue_enabled_force_read(self):
+        lua = self.unsupported_queue_flag_actor()
+        with self.assertRaisesRegex(LuaError, "LuaForce unsupported read research_queue_enabled"):
+            lua.globals().cargo_begin()
+
+    def test_source_records_five_native_ordinary_completions_then_real_partial(self):
+        self.source_to_partial()
+        log = self.logs()[-1]
+        self.assertIn("phase=source-partial", log)
+        self.assertIn("ordinary=5", log)
+        self.assertIn("level=9", log)
+        self.assertIn("progress=0.42", log)
+        self.assertIn("queue=worker-robots-storage-4,worker-robots-storage-4,mir-fixture-worker-storage-se-cap-ten-tail", log)
+        self.assertEqual(["mir5-se-worker-storage-cap10-source"], list(self.lua.globals().cargo_saves().values()))
+
+    def test_synthetic_partial_exercises_the_f200_normal_tool_durability_reader(self):
+        self.source_to_partial()
+        log = self.logs()[-1]
+        self.assertIn("science_remaining=automation-science-pack:194.58", log)
+        self.assertIn("science_debit=automation-science-pack:5.42", log)
+
+    def test_f200_tool_science_reader_rejects_invalid_durability_before_research(self):
+        self.lua.globals().cargo_bad_science_durability()
+        with self.assertRaisesRegex(LuaError, "native science durability differs"):
+            self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+    def test_source_requires_the_native_plus_one_worker_bonus_for_each_completion(self):
+        self.lua.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "source ordinary earned worker bonus differs"):
+            self.lua.globals().cargo_complete(False, None, -100)
+
+    def test_source_requires_existing_foreign_force_bonus_to_stay_unchanged(self):
+        self.lua.globals().cargo_begin()
+        self.lua.globals().cargo_add_late_force()
+        with self.assertRaisesRegex(LuaError, "source ordinary foreign worker bonus differs"):
+            self.lua.globals().cargo_complete(False)
+
+    def test_native_completions_consume_the_five_row_queue_before_staging_partial_and_tail(self):
+        self.lua.globals().cargo_begin()
+        self.assertEqual([world.SOURCE] * 5, list(self.lua.globals().cargo_queue_names().values()))
+        for expected_remaining in range(4, -1, -1):
+            self.lua.globals().cargo_complete(False)
+            self.assertEqual(expected_remaining, len(self.lua.globals().cargo_queue_names()))
+            if expected_remaining:
+                self.assertEqual(world.SOURCE, self.lua.globals().cargo_current_name())
+            else:
+                self.assertFalse(self.lua.globals().cargo_current_name())
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual([world.SOURCE, world.SOURCE, world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(world.SOURCE, self.lua.globals().cargo_current_name())
+
+    def test_published_canonical_to_private_transfer_maps_current_and_all_worker_queue_rows(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None, True)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        marker = self.logs()[-1]
+        self.assertIn(f"worker={world.CANDIDATE}", marker)
+        self.assertIn(f"current={world.CANDIDATE}", marker)
+        self.assertIn(f"queue={world.CANDIDATE},{world.CANDIDATE},{world.TAIL}", marker)
+        self.assertIn(f"source_role={world.SOURCE}:9:false:true:false", marker)
+        self.assertIn(f"canonical_role={world.SOURCE}:5:false:false:false", marker)
+        self.assertIn(f"private_role={world.CANDIDATE}:9:false:true:false", marker)
+        self.assertIn(f"head_role={world.HEAD}:5:false:false:false", marker)
+        self.assertIn("configuration_startup_settings_changed=true", marker)
+
+    def test_unchanged_candidate_frame_emits_no_transfer_diff(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertEqual([], self.frame_diffs())
+
+    def test_candidate_partial_mismatch_keeps_refusal_and_emits_typed_leaf(self):
+        self.source_to_partial()
+        self.lua.execute("CARGO_TRANSFER(); CARGO_FORCE_VALUES._progress=0.25; "
+                         "script.active_mods['more-infinite-research']='5.0.20018'")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.execute("CARGO_CALLBACKS.configuration{mod_startup_settings_changed=false,mod_changes={"
+                             "['more-infinite-research']={old_version='4.7.20002',new_version='5.0.20018'}}}")
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+        line = next(line for line in self.frame_diffs() if "path=frame.progress" in line)
+        self.assertIn("expected(number)=", line)
+        self.assertIn("observed(number)=0.25", line)
+        self.assertIn("summary path=frame origin=candidate-transfer count=1 truncated=false", self.frame_diffs()[-1])
+
+    def test_candidate_queue_mismatch_keeps_refusal_and_reports_missing_leaf(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_drop_queue()
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.globals().cargo_candidate("5.0.20018", None)
+        line = next(line for line in self.frame_diffs() if "path=frame.queue[1]" in line)
+        self.assertIn(f'expected(string)="{world.CANDIDATE}"', line)
+        self.assertIn("observed(missing)=<missing>", line)
+
+    def test_candidate_flag_mismatch_keeps_refusal_and_reports_boolean_leaf(self):
+        self.source_to_partial()
+        mutate = self.lua.eval("function(candidate) candidate.enabled=false end")
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            self.lua.globals().cargo_candidate("5.0.20018", mutate)
+        line = next(line for line in self.frame_diffs() if "path=frame.target.enabled" in line)
+        self.assertIn("expected(boolean)=true", line)
+        self.assertIn("observed(boolean)=false", line)
+
+    def test_transfer_diagnostic_bounds_large_missing_expected_set(self):
+        lua = self.extra_expected_frame_actor()
+        lua.globals().cargo_begin()
+        for _ in range(5):
+            lua.globals().cargo_complete(False)
+            lua.globals().cargo_tick(1)
+        lua.globals().cargo_partial(0.42)
+        lua.globals().cargo_tick(1)
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame before observation"):
+            lua.globals().cargo_candidate("5.0.20018", None)
+        diffs = [line for line in lua.globals().cargo_logs().values()
+                 if line.startswith("[MIR_SE_CARGO_FRAME_DIFF]")]
+        self.assertEqual(2, len(diffs))
+        self.assertIn("path=frame expected(table)=<key-limit-exceeded>", diffs[0])
+        self.assertIn("observed(table)=<key-limit-exceeded>", diffs[0])
+        self.assertIn("summary path=frame origin=candidate-transfer count=1 truncated=true", diffs[-1])
+
+    def test_static_canonical_role_mutant_rejects_the_published_private_mapping(self):
+        lua = self.static_role_actor()
+        lua.globals().cargo_begin()
+        for _ in range(5):
+            lua.globals().cargo_complete(False)
+            lua.globals().cargo_tick(1)
+        lua.globals().cargo_partial(0.42)
+        lua.globals().cargo_tick(1)
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame"):
+            lua.globals().cargo_candidate("5.0.20018", None)
+
+    def test_configuration_requires_boolean_event_flag_but_does_not_presume_false(self):
+        self.source_to_partial()
+        with self.assertRaisesRegex(LuaError, "configuration event differs"):
+            self.lua.globals().cargo_candidate("5.0.20018", None, 0)
+
+    def test_candidate_rejects_published_head_gate_mismatch_before_new_work(self):
+        self.source_to_partial()
+        with self.assertRaisesRegex(LuaError, "candidate head debit differs"):
+            self.lua.globals().cargo_candidate("5.0.20018", self.lua.globals().cargo_wrong_gate)
+
+    def test_candidate_rejects_later_existing_force_bonus_change(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_add_late_force()
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame"):
+            self.lua.globals().cargo_candidate("5.0.20018", None)
+
+    def test_candidate_requires_the_native_plus_one_bonus(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        with self.assertRaisesRegex(LuaError, "candidate ordinary earned worker bonus differs"):
+            self.lua.globals().cargo_complete(False, None, -100)
+
+    def test_candidate_requires_existing_foreign_force_bonus_to_stay_unchanged(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_add_late_force()
+        with self.assertRaisesRegex(LuaError, "candidate ordinary foreign worker bonus differs"):
+            self.lua.globals().cargo_complete(False)
+
+    def test_scripted_completion_is_rejected(self):
+        self.lua.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "scripted worker completion"):
+            self.lua.globals().cargo_complete(True)
+
+    def test_engine_event_cursor_must_be_incremented_before_callback(self):
+        self.lua.globals().cargo_begin()
+        with self.assertRaisesRegex(LuaError, "source ordinary completion level differs"):
+            self.lua.globals().cargo_complete(False, 4)
+
+    def test_candidate_configuration_observes_source_before_any_new_work(self):
+        self.source_to_partial()
+        before = list(self.lua.globals().cargo_counts().values())
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("candidate-working", self.lua.globals().cargo_phase())
+        self.assertIn("phase=candidate-pre-work", self.logs()[-1])
+        self.assertGreaterEqual(sum(self.lua.globals().cargo_counts().values()), sum(before))
+
+    def test_candidate_rejects_wrong_five_pack_construction_before_work(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_science(self.lua.eval(_lua_array(world.SCIENCE[:5])))
+        with self.assertRaisesRegex(LuaError, "worker science count differs"):
+            self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.assertEqual("source-partial", self.lua.globals().cargo_phase())
+
+    def test_candidate_rejects_changed_partial_current_or_queue(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_drop_queue()
+        with self.assertRaisesRegex(LuaError, "candidate changed source frame"):
+            self.lua.globals().cargo_candidate("5.0.20018", None)
+
+    def test_candidate_completes_two_ordinary_events_and_refuses_cap_start_without_debit(self):
+        self.candidate_to_closed()
+        log = self.logs()[-1]
+        self.assertIn("phase=candidate-closed", log)
+        self.assertIn("candidate_events=2", log)
+        self.assertIn("cap_attempt=refused", log)
+        self.assertIn("level=11", log)
+        self.assertIn(f"current={world.TAIL}", log)
+        self.assertIn(f"queue={world.TAIL}", log)
+        self.assertIn("expected_worker_bonus=7", log)
+        self.assertIn("laboratory_productivity_bonus=0", log)
+        self.assertIn("technology_price_multiplier=1", log)
+        self.assertIn("science_debit=automation-science-pack:7.42", log)
+        self.assertEqual(["mir5-se-worker-storage-cap10-source", "mir5-se-worker-storage-cap10-candidate"], list(self.lua.globals().cargo_saves().values()))
+        self.assert_complete_policy_observation("candidate-closed")
+
+    def test_cap12_configuration_probe_observes_closed_state_without_actor_mutation(self):
+        self.candidate_to_closed()
+        before = {
+            "phase": self.lua.globals().cargo_phase(),
+            "saves": list(self.lua.globals().cargo_saves().values()),
+            "science": dict(self.lua.globals().cargo_counts().items()),
+            "bonus": self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+            "current": self.lua.globals().cargo_current_name(),
+            "queue": list(self.lua.globals().cargo_queue_names().values()),
+            "saved_flag": self.lua.eval("storage['mir5_worker_storage_se_cap_ten_native'].configuration_startup_settings_changed"),
+        }
+        self.closed_cap12_configuration()
+        self.assertEqual(before["phase"], self.lua.globals().cargo_phase())
+        self.assertEqual(before["saves"], list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before["science"], dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before["bonus"], self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+        self.assertEqual(before["current"], self.lua.globals().cargo_current_name())
+        self.assertEqual(before["queue"], list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(False, before["saved_flag"])
+        self.assertEqual(before["saved_flag"], self.lua.eval("storage['mir5_worker_storage_se_cap_ten_native'].configuration_startup_settings_changed"))
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("event_startup_settings_changed=true", snapshot)
+        self.assertIn("saved_configuration_startup_settings_changed=false", snapshot)
+        self.assertIn("configured_cap=12", snapshot)
+        self.assertIn("mir_change=missing", snapshot)
+        self.assertIn("mir_old=missing", snapshot)
+        self.assertIn("mir_new=missing", snapshot)
+        self.assertIn(f"worker={world.CANDIDATE}", snapshot)
+        self.assertIn("level=11", snapshot)
+        self.assertIn("enabled=false", snapshot)
+        self.assertIn(f"current={world.TAIL}", snapshot)
+        self.assertIn(f"queue={world.TAIL}", snapshot)
+        self.assertIn("progress=0", snapshot)
+        self.assertIn("science_issued=automation-science-pack:", snapshot)
+        self.assertIn("science_remaining=automation-science-pack:", snapshot)
+        self.assertIn("science_debit=automation-science-pack:", snapshot)
+        self.assertIn("bonus=number:7", snapshot)
+        self.assertIn("maximum=number:4294967295", snapshot)
+        self.assertIn("unit_count=number:675", snapshot)
+        self.assertIn("unit_time=number:3600", snapshot)
+        self.assertIn('unit_formula=string:"675*1.5^(L-4)"', snapshot)
+        self.assertIn(
+            "summary path=frame origin=cap12-configuration count=0 truncated=false",
+            self.frame_diffs()[-1],
+        )
+        self.assert_complete_policy_observation("cap12-configuration")
+
+    def test_cap12_configuration_observes_event_values_without_authorizing_changed_cap_state(self):
+        self.candidate_to_closed()
+        self.closed_cap12_configuration(
+            startup_changed=False,
+            mir_change={"old_version": "5.0.20018", "new_version": "5.0.20018"},
+        )
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("event_startup_settings_changed=false", snapshot)
+        self.assertIn("mir_change=present", snapshot)
+        self.assertIn('mir_old="5.0.20018"', snapshot)
+        self.assertIn('mir_new="5.0.20018"', snapshot)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_cap12_configuration_observes_incompatible_current_contract_before_old_closed_refusal(self):
+        self.candidate_to_closed()
+        self.lua.globals().cargo_incompatible_candidate_contract()
+        before = {
+            "phase": self.lua.globals().cargo_phase(),
+            "saves": list(self.lua.globals().cargo_saves().values()),
+            "science": dict(self.lua.globals().cargo_counts().items()),
+            "bonus": self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+            "current": self.lua.globals().cargo_current_name(),
+            "queue": list(self.lua.globals().cargo_queue_names().values()),
+        }
+        self.closed_cap12_configuration()
+        self.assertEqual(before["phase"], self.lua.globals().cargo_phase())
+        self.assertEqual(before["saves"], list(self.lua.globals().cargo_saves().values()))
+        self.assertEqual(before["science"], dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(before["bonus"], self.lua.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+        self.assertEqual(before["current"], self.lua.globals().cargo_current_name())
+        self.assertEqual(before["queue"], list(self.lua.globals().cargo_queue_names().values()))
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("maximum=number:12", snapshot)
+        self.assertIn('unit_formula=string:"999+L"', snapshot)
+        self.assertIn("unit_count=number:675", snapshot)
+        self.assertIn("unit_time=number:3600", snapshot)
+        contributor = next(line for line in self.force_contributions()
+                           if 'phase=cap12-configuration force_index=1 force_name="player" kind=technology ' in line
+                           and 'technology="mir-worker-storage-default-4"' in line)
+        self.assertIn('effect_1_type="worker-robot-storage"', contributor)
+        self.assertIn("effect_1_modifier=2", contributor)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "closed endpoint changed"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_cap12_configuration_logs_and_refuses_nonfinite_current_contract_scalars(self):
+        cases = (
+            ("maximum-nan", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].prototype.max_level=0/0", "maximum="),
+            ("count-infinity", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].research_unit_count=math.huge", "unit_count="),
+            ("time-negative-infinity", "CARGO_TECH_BACKING['mir-worker-storage-default-4'].research_unit_energy=-math.huge", "unit_time="),
+        )
+        for label, mutate, field in cases:
+            with self.subTest(label=label):
+                actor = self.fresh_actor()
+                self.candidate_to_closed(actor)
+                before = {
+                    "phase": actor.globals().cargo_phase(),
+                    "saves": list(actor.globals().cargo_saves().values()),
+                    "science": dict(actor.globals().cargo_counts().items()),
+                    "bonus": actor.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus,
+                    "current": actor.globals().cargo_current_name(),
+                    "queue": list(actor.globals().cargo_queue_names().values()),
+                }
+                actor.execute(mutate)
+                with self.assertRaisesRegex(LuaError, "cap12 current contract differs"):
+                    self.closed_cap12_configuration(actor)
+                snapshot = next(line for line in actor.globals().cargo_logs().values()
+                                if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+                self.assertIn(field, snapshot)
+                self.assertEqual(before["phase"], actor.globals().cargo_phase())
+                self.assertEqual(before["saves"], list(actor.globals().cargo_saves().values()))
+                self.assertEqual(before["science"], dict(actor.globals().cargo_counts().items()))
+                self.assertEqual(before["bonus"], actor.globals().CARGO_FORCE_VALUES.worker_robots_storage_bonus)
+                self.assertEqual(before["current"], actor.globals().cargo_current_name())
+                self.assertEqual(before["queue"], list(actor.globals().cargo_queue_names().values()))
+
+    def test_cap12_configuration_marks_an_unavailable_mir_change_before_refusing_it(self):
+        self.candidate_to_closed()
+        self.lua.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+        changes = self.lua.table_from({"more-infinite-research": "unavailable"}, recursive=True)
+        event = self.lua.table_from({"mod_startup_settings_changed": True, "mod_changes": changes}, recursive=True)
+        with self.assertRaisesRegex(LuaError, "cap12 MIR change differs"):
+            self.lua.globals().cargo_configuration(event)
+        snapshot = next(line for line in self.logs() if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]"))
+        self.assertIn("mir_change=unavailable", snapshot)
+        self.assertIn("mir_old=unavailable", snapshot)
+        self.assertIn("mir_new=unavailable", snapshot)
+
+    def test_cap12_configuration_rejects_wrong_source_cap_cost_phase_and_unavailable_inputs(self):
+        cases = (
+            ("source", "script.active_mods['more-infinite-research']='4.7.20002'", "cap12 MIR identity differs"),
+            ("cap", "settings.startup['mir-max-level-worker-robots-storage'].value=10", "cap12 startup setting value differs: mir-max-level-worker-robots-storage"),
+            ("cost", "settings.startup['mir-cost-base-worker-robots-storage'].value=201", "cap12 startup setting value differs: mir-cost-base-worker-robots-storage"),
+            ("phase", "storage['mir5_worker_storage_se_cap_ten_native'].phase='candidate-working'", "cap12 configuration state differs"),
+            ("unavailable", "settings.startup['mir-max-level-worker-robots-storage']=nil", "cap12 startup setting differs: mir-max-level-worker-robots-storage"),
+        )
+        for label, mutate, expected in cases:
+            with self.subTest(label=label):
+                actor = self.fresh_actor()
+                self.candidate_to_closed(actor)
+                actor.globals().cargo_setting("mir-max-level-worker-robots-storage", 12)
+                actor.execute(mutate)
+                event = actor.table_from({"mod_startup_settings_changed": True, "mod_changes": actor.table()}, recursive=True)
+                with self.assertRaisesRegex(LuaError, expected):
+                    actor.globals().cargo_configuration(event)
+                self.assertEqual([], [line for line in actor.globals().cargo_logs().values()
+                                      if line.startswith("[MIR_SE_CARGO_CAP12_CONFIGURATION]")])
+
+    def test_exhausted_valid_native_lab_science_closes_candidate_with_zero_remaining(self):
+        self.candidate_to_await_close()
+        self.lua.globals().cargo_exhaust_science()
+        self.assertEqual({pack: 0 for pack in world.SCIENCE}, dict(self.lua.globals().cargo_counts().items()))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+        log = self.logs()[-1]
+        self.assertIn("science_remaining=automation-science-pack:0", log)
+        self.assertIn("science_debit=automation-science-pack:200", log)
+        self.assertIn(f"current={world.TAIL}", log)
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_former_nonempty_science_stack_reader_refuses_the_valid_exhausted_lab(self):
+        lua = self.absent_science_reader_actor()
+        self.candidate_to_await_close(lua)
+        lua.globals().cargo_exhaust_science()
+        with self.assertRaisesRegex(LuaError, "native science stack is absent: automation-science-pack"):
+            lua.globals().cargo_tick(1)
+        self.assertEqual("candidate-await-cap", lua.globals().cargo_phase())
+
+    def test_unavailable_unreadable_and_malformed_science_observations_do_not_become_zero(self):
+        for setup, expected in (
+            ("cargo_missing_science_input", "native SE lab input differs"),
+            ("cargo_invalid_science_input", "native SE lab input differs"),
+            ("cargo_missing_science_input_valid", "native SE lab input differs"),
+            ("cargo_nonboolean_science_input_valid", "native SE lab input differs"),
+            ("cargo_missing_science_stack_flag", "native science read flag differs: automation-science-pack"),
+            ("cargo_nonboolean_science_stack_flag", "native science read flag differs: automation-science-pack"),
+            ("cargo_missing_science_prototype", "native science prototype differs: automation-science-pack"),
+            ("cargo_science_stack_read_error", "LuaInventory science stack read unavailable"),
+            ("cargo_malformed_science_stack", "native science count differs: automation-science-pack"),
+        ):
+            with self.subTest(setup=setup):
+                lua = self.fresh_actor()
+                self.candidate_to_await_close(lua)
+                getattr(lua.globals(), setup)()
+                with self.assertRaisesRegex(LuaError, expected):
+                    lua.globals().cargo_tick(1)
+                self.assertEqual("candidate-await-cap", lua.globals().cargo_phase())
+
+    def assert_complete_policy_observation(self, phase):
+        rows = [row for row in self.force_contributions()
+                if f"phase={phase} " in row and 'force_name="conquest" kind=force ' in row]
+        self.assertEqual(len(rows), 1)
+        expected = {"worker_robots_storage_bonus": 3, "worker_robots_speed_modifier": 5.65,
+                    "artillery_range_modifier": 1.8, "artillery_shell_gun_speed_modifier": 6,
+                    "laser_gun_speed_modifier": 2.2, "laser_ammo_damage_modifier": 5.1}
+        for name, value in expected.items():
+            match = re.search(rf"\b{name}=([^ ]+)", rows[0])
+            self.assertIsNotNone(match, name)
+            self.assertEqual(float(match.group(1)), value, name)
+        self.assertIn(f"summary phase={phase} forces=7 truncated=false unavailable=false", self.force_contributions()[-1])
+
+    def test_cap_refusal_preserves_unrelated_tail_as_current_queue_and_science(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+        self.assertEqual(world.TAIL, self.lua.globals().cargo_current_name())
+        before = dict(self.lua.globals().cargo_counts().items())
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+        self.assertEqual(before, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_cap_refusal_requires_native_disabled_endpoint_before_trying_to_queue_again(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_reenable_cap()
+        with self.assertRaisesRegex(LuaError, "candidate cap disabled state differs"):
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual(world.TAIL, self.lua.globals().cargo_current_name())
+        self.assertEqual([world.TAIL], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_queue_enabled_model_appends_an_explicitly_reenabled_cap_technology_after_the_tail(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.assertTrue(self.lua.globals().cargo_reenable_cap_and_queue())
+        self.assertEqual([world.TAIL, world.CANDIDATE], list(self.lua.globals().cargo_queue_names().values()))
+
+    def test_candidate_close_rejects_post_completion_wrong_earned_bonus(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_mutate_bonus(-100)
+        with self.assertRaisesRegex(LuaError, "candidate cap earned worker bonus differs"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_tail_loss_after_native_candidate_completion_is_rejected(self):
+        self.source_to_partial()
+        self.lua.globals().cargo_candidate("5.0.20018", None)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_tick(1)
+        self.lua.globals().cargo_complete(False)
+        self.lua.globals().cargo_drop_queue()
+        with self.assertRaisesRegex(LuaError, "candidate cap tail current differs"):
+            self.lua.globals().cargo_tick(1)
+
+    def test_cold_handler_reads_closed_state_without_feed_or_persistent_initialization(self):
+        self.candidate_to_closed()
+        before = dict(self.lua.globals().cargo_counts().items())
+        saves = list(self.lua.globals().cargo_saves().values())
+        self.lua.globals().cargo_cold()
+        self.assertEqual("closed", self.lua.globals().cargo_phase())
+        self.assertEqual(before, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(saves, list(self.lua.globals().cargo_saves().values()))
+        self.assertIn("phase=cold-read", self.logs()[-1])
+        self.assertIn("cold_writes=0", self.logs()[-1])
+        self.assert_complete_policy_observation("cold-read")
+
+    def test_cold_mutation_is_rejected(self):
+        self.candidate_to_closed()
+        self.lua.globals().cargo_mutate_closed()
+        with self.assertRaisesRegex(LuaError, "cold process changed candidate endpoint"):
+            self.lua.globals().cargo_cold()
+
+    def test_missing_fixture_owned_external_power_refuses_before_research(self):
+        self.lua.globals().cargo_missing_power()
+        with self.assertRaisesRegex(LuaError, "fixture external power differs"):
+            self.lua.globals().cargo_begin()
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+
+    def test_fixture_requires_owned_connected_substation_grid_before_research(self):
+        for mutator, expected in (
+            ("cargo_missing_pole", "fixture substation differs"),
+            ("cargo_disconnected_electric_network", "fixture electric network differs"),
+            ("cargo_wrong_electric_network", "fixture electric network differs"),
+        ):
+            with self.subTest(mutator=mutator):
+                lua = self.fresh_actor()
+                getattr(lua.globals(), mutator)()
+                with self.assertRaisesRegex(LuaError, expected):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+
+    def test_fixture_constructs_the_three_owned_nonoverlapping_grid_entities(self):
+        self.lua.globals().cargo_begin()
+        entities = list(self.lua.globals().cargo_entities().values())
+        self.assertEqual(
+            [(world.POWER, 0, 0), (world.LAB, 8.5, 0.5), (world.POLE, 0, 6)],
+            [(entity["name"], entity["x"], entity["y"]) for entity in entities],
+        )
+
+    def test_old_integer_lab_anchor_fails_against_odd_native_grid(self):
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn("positioned(lab, 8.5, 0.5)", source)
+        self.assertIn("position = {8.5, 0.5}", source)
+        source = source.replace("positioned(lab, 8.5, 0.5)", "positioned(lab, 8, 0)", 1)
+        source = source.replace("position = {8.5, 0.5}", "position = {8, 0}", 1)
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        world.install(lua)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "integer-lab-anchor.lua"
+            path.write_text(source, encoding="utf-8", newline="\n")
+            lua.globals().cargo_load(path.as_posix())
+        with self.assertRaisesRegex(LuaError, "native SE lab position differs"):
+            lua.globals().cargo_begin()
+        self.assertEqual("idle", lua.globals().cargo_phase())
+        self.assertFalse(list(lua.globals().cargo_saves().values()))
+
+    def test_aligned_but_displaced_lab_still_refuses_with_observed_position(self):
+        for x, y in ((1, 0), (0, -1)):
+            with self.subTest(offset=(x, y)):
+                lua = self.fresh_actor()
+                lua.globals().cargo_offset_lab(x, y)
+                with self.assertRaisesRegex(LuaError, r"native SE lab position differs: expected=8.5,0.5 observed="):
+                    lua.globals().cargo_begin()
+                self.assertEqual("idle", lua.globals().cargo_phase())
+                self.assertFalse(list(lua.globals().cargo_saves().values()))
+
+    def test_setup_defers_all_work_until_one_native_update_and_rejects_reentry(self):
+        self.lua.globals().cargo_begin_only()
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.assertEqual({}, dict(self.lua.globals().cargo_counts().items()))
+        self.assertEqual(0, self.lua.globals().CARGO_FORCE_VALUES.laboratory_speed_modifier)
+        with self.assertRaisesRegex(LuaError, "source setup already scheduled"):
+            self.lua.globals().cargo_begin_only()
+        self.assertEqual(98, self.lua.globals().CARGO_SCRIPTED_RESEARCH_CALLBACKS)
+        self.assertEqual(3, len(list(self.lua.globals().cargo_entities().values())))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        snapshots = [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]
+        self.assertEqual(2, len(snapshots))
+        self.assertIn("stage=created tick=0", snapshots[0])
+        self.assertIn("stage=next-update tick=1", snapshots[1])
+        for line in snapshots:
+            self.assertIn("power requested=0,0 actual=0,0 valid=true grid=2,2", line)
+            self.assertIn("lab requested=8.5,0.5 actual=8.5,0.5 valid=true grid=7,7", line)
+            self.assertIn("pole requested=0,6 actual=0,6 valid=true grid=2,2", line)
+            self.assertEqual(3, line.count("collision="))
+            self.assertEqual(3, line.count("selection="))
+            self.assertEqual(3, line.count("network="))
+            self.assertEqual(3, line.count("connected="))
+
+    def test_delayed_network_publication_passes_only_on_next_native_update(self):
+        self.lua.globals().cargo_delay_network()
+        self.lua.globals().cargo_begin_only()
+        self.assertEqual(3, self.logs()[-1].count("network=nil"))
+        self.lua.execute("CARGO_CALLBACKS[1]({tick=game.tick})")
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+        snapshot = next(line for line in self.logs() if "stage=next-update" in line)
+        self.assertEqual(3, snapshot.count("network=1"))
+
+    def test_permanently_missing_network_refuses_once_before_work(self):
+        self.lua.globals().cargo_missing_network()
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "fixture electric network differs"):
+            self.lua.globals().cargo_tick(1)
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.assertEqual({}, dict(self.lua.globals().cargo_counts().items()))
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual(2, len([line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]))
+
+    def test_skipped_setup_update_refuses_and_does_not_retry(self):
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "source setup update boundary differs"):
+            self.lua.execute("game.tick=2; CARGO_CALLBACKS[1]({tick=game.tick})")
+        self.assertEqual("idle", self.lua.globals().cargo_phase())
+        self.assertIsNone(self.lua.globals().CARGO_FORCE_VALUES._current)
+        self.lua.globals().cargo_tick(1)
+        self.assertEqual(2, len([line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]))
+
+    def test_missing_entity_snapshot_retains_the_other_two_before_refusal(self):
+        self.lua.globals().cargo_missing_power()
+        self.lua.globals().cargo_begin_only()
+        with self.assertRaisesRegex(LuaError, "fixture external power differs"):
+            self.lua.globals().cargo_tick(1)
+        snapshots = [line for line in self.logs() if line.startswith("[MIR_SE_CARGO_SETUP]")]
+        self.assertEqual(2, len(snapshots))
+        for line in snapshots:
+            self.assertIn("power requested=0,0 status=absent actual=unavailable", line)
+            self.assertIn("lab requested=8.5,0.5 actual=8.5,0.5", line)
+            self.assertIn("pole requested=0,6 actual=0,6", line)
+
+    def test_strict_world_rejects_the_historical_direct_lab_buffer_refill(self):
+        lua = self.historical_buffer_refill_actor()
+        with self.assertRaisesRegex(LuaError, "LuaEntity unsupported write energy"):
+            lua.globals().cargo_begin()
+        self.assertEqual("source-working", lua.globals().cargo_phase())
+
+    def test_substation_network_identity_does_not_require_a_producer_consumer_predicate(self):
+        self.lua.globals().cargo_begin()
+        lua = self.all_three_connection_predicate_actor()
+        with self.assertRaisesRegex(LuaError, "fixture electric network differs"):
+            lua.globals().cargo_begin()
+        self.assertEqual("idle", lua.globals().cargo_phase())
+
+    def test_missing_science_feed_refuses_without_completion(self):
+        self.lua.globals().cargo_block_feed()
+        with self.assertRaisesRegex(LuaError, "native science feed differs"):
+            self.lua.globals().cargo_begin()
+        self.assertEqual("source-working", self.lua.globals().cargo_phase())
+
+    def test_unmodified_native_se_lab_speed_is_required(self):
+        self.lua.globals().cargo_lab_speed(14400)
+        with self.assertRaisesRegex(LuaError, "native SE lab speed differs"):
+            self.lua.globals().cargo_begin()
+
+    def test_loaded_file_settings_are_not_prototype_defaults(self):
+        source = (FIXTURE / "data-final-fixes.lua").read_text(encoding="utf-8")
+        self.assertIn("settings.startup", source)
+        self.assertIn("row.value", source)
+        self.assertNotIn("default_value", source)
+        self.assertEqual(10, world.SETTINGS["mir-max-level-worker-robots-storage"])
+
+    def test_data_stage_strict_proxy_logs_all_twenty_mods_and_actual_file_values(self):
+        result, logs = self.data_stage()
+        self.assertTrue(result)
+        active = next(row for row in logs if row.startswith("[MIR_ACTIVE_MODS]"))
+        settings = next(row for row in logs if row.startswith("[MIR_WORKER_STORAGE_SETTINGS]"))
+        construction = next(row for row in logs if row.startswith("[MIR_SE_CARGO_CONSTRUCTION]"))
+        self.assertEqual(20, active.count("@"))
+        self.assertIn("mir-max-level-worker-robots-storage=number:10", settings)
+        self.assertIn("mir-enable-worker-robots-storage=boolean:true", settings)
+        self.assertIn("se-material-science-pack-1:1", construction)
+        self.assertIn("space-science-pack:1", construction)
+
+    def test_data_stage_rejects_missing_wrong_or_nonfinite_loaded_setting(self):
+        for label, values, expected in (
+            ("missing", {key: value for key, value in world.SETTINGS.items() if key != "mir-max-level-worker-robots-storage"}, "missing setting"),
+            ("wrong-type", {**world.SETTINGS, "mir-max-level-worker-robots-storage": True}, "wrong setting type"),
+            ("nonfinite", {**world.SETTINGS, "mir-cost-growth-worker-robots-storage": float("inf")}, "nonfinite setting"),
+        ):
+            with self.subTest(label=label):
+                result, _ = self.data_stage(values)
+                self.assertFalse(result[0])
+                self.assertIn(expected, result[1])
+
+    def test_data_stage_observes_wrong_five_pack_construction_without_masking_candidate_refusal(self):
+        result, logs = self.data_stage(ingredients=world.SCIENCE[:5])
+        self.assertTrue(result)
+        construction = next(row for row in logs if row.startswith("[MIR_SE_CARGO_CONSTRUCTION]"))
+        self.assertNotIn("se-material-science-pack-1", construction)
+        self.assertNotIn("space-science-pack", construction)
+
+    def test_data_stage_construction_marker_is_observation_not_candidate_mask(self):
+        source = (FIXTURE / "data-final-fixes.lua").read_text(encoding="utf-8")
+        self.assertIn("[MIR_SE_CARGO_CONSTRUCTION]", source)
+        self.assertNotIn("error(PREFIX .. \" worker science", source)
+        self.assertIn("assert_worker_contract(state.player, CANDIDATE)", (FIXTURE / "control.lua").read_text(encoding="utf-8"))
+
+    def test_actor_uses_no_continuation_or_progress_setter(self):
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertNotRegex(source, r"target\.level\s*=(?!=)")
+        self.assertNotRegex(source, r"research_progress\s*=(?!=)")
+        self.assertIn("event.by_script == false", source)
+        self.assertIn("state.player.add_research(target) == false", source)
+
+    def test_fixture_power_is_owned_but_never_clones_or_alters_the_native_lab_prototype(self):
+        data = (FIXTURE / "data.lua").read_text(encoding="utf-8")
+        control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn('data.raw["electric-energy-interface"]["electric-energy-interface"]', data)
+        self.assertIn("mir-fixture-worker-storage-se-cap-ten-power", data)
+        self.assertIn('local POLE = "substation"', control)
+        self.assertIn("se-space-science-lab", control)
+        self.assertIn("electric_network_id", control)
+        self.assertIn("is_connected_to_electric_network", control)
+        self.assertNotRegex(control, r"state\.lab\.energy\s*=(?!=)")
+        self.assertNotIn("and pole.is_connected_to_electric_network()", control)
+        self.assertNotIn("table.deepcopy(data.raw.lab", data)
+        self.assertNotIn("researching_speed =", data)
+
+    def test_strict_world_rejects_unapproved_force_write(self):
+        with self.assertRaisesRegex(LuaError, "LuaForce unsupported write"):
+            self.lua.globals().cargo_unsupported_force_write()
+
+    def test_full_actor_keeps_data_observer_and_runtime_role_distinct(self):
+        data_observer = ROOT / "tests" / "fixtures" / "worker-storage-se-cap-ten"
+        self.assertNotEqual(data_observer.name, FIXTURE.name)
+        self.assertNotEqual((data_observer / "data-final-fixes.lua").read_bytes(), (FIXTURE / "data-final-fixes.lua").read_bytes())
+        self.assertTrue((FIXTURE / "control.lua").is_file())
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    arguments = parser.parse_args()
+    sys.path.insert(0, str(arguments.lua_runtime_dir.resolve(strict=True)))
+    from lupa.lua52 import LuaError as _LuaError, LuaRuntime as _LuaRuntime
+    LuaRuntime, LuaError = _LuaRuntime, _LuaError
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(WorkerStorageSECapTenNativeTests)
+    )
+    sys.exit(0 if result.wasSuccessful() else 1)

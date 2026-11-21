@@ -7,6 +7,7 @@ import struct
 import subprocess
 import tempfile
 import threading
+import time
 import unittest
 import uuid
 
@@ -128,15 +129,33 @@ def command_handler(password, expected_commands, mode="success"):
     return handler
 
 
-def run_helper(port, password, commands, authentication_request_id=43101):
+def run_helper(port, password, commands, authentication_request_id=43101, after_write_mode=None, marker_path=None):
     script = r'''
-param([string]$Helper,[int]$Port,[string]$PasswordJson,[string]$CommandsJson,[int]$AuthenticationRequestId)
+param([string]$Helper,[int]$Port,[string]$PasswordJson,[string]$CommandsJson,[int]$AuthenticationRequestId,[string]$AfterWriteMode,[string]$MarkerPath)
 $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
 . $Helper
 try {
   $Password=[string]($PasswordJson|ConvertFrom-Json)
   $commands=@($CommandsJson|ConvertFrom-Json -AsHashtable)
-  $receipt=Invoke-MIRLoopbackRconCommands -Port $Port -Password $Password -Commands $commands -AuthenticationRequestId $AuthenticationRequestId
+  $afterWrite=$null
+  switch($AfterWriteMode){
+    'valid' {
+      $afterWrite={param($metadata)
+        [IO.File]::WriteAllText($MarkerPath,($metadata|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+        return [ordered]@{kind='post-write';request_id=$metadata.request_id;command_sha256=$metadata.command_sha256;command_bytes=$metadata.command_bytes;write_monotonic_milliseconds=$metadata.write_monotonic_milliseconds}
+      }.GetNewClosure()
+      break
+    }
+    'null' {$afterWrite={param($metadata) $null}.GetNewClosure();break}
+    'malformed' {$afterWrite={param($metadata) Write-Output -NoEnumerate 'not-a-dictionary'}.GetNewClosure();break}
+    'multiple' {$afterWrite={param($metadata) 'ordinary-hook-output';[ordered]@{one=1}}.GetNewClosure();break}
+    'throw' {$afterWrite={param($metadata) throw '[test-after-write-throw]'}.GetNewClosure();break}
+    '' {break}
+    default {throw "unexpected test after-write mode: $AfterWriteMode"}
+  }
+  $invoke=[ordered]@{Port=$Port;Password=$Password;Commands=$commands;AuthenticationRequestId=$AuthenticationRequestId}
+  if($null-ne$afterWrite){$invoke.AfterWrite=$afterWrite}
+  $receipt=Invoke-MIRLoopbackRconCommands @invoke
   [pscustomobject]@{ok=$true;receipt=$receipt}|ConvertTo-Json -Depth 12 -Compress
 } catch {
   [pscustomobject]@{ok=$false;message=$_.Exception.Message;has_cleanup=$_.Exception.Data.Contains('mir_loopback_rcon_cleanup_facts');cleanup_facts=$_.Exception.Data['mir_loopback_rcon_cleanup_facts'];receipt=$_.Exception.Data['mir_loopback_rcon_receipt']}|ConvertTo-Json -Depth 12 -Compress
@@ -150,7 +169,35 @@ try {
         result = subprocess.run(
             ["pwsh", "-NoLogo", "-NoProfile", "-File", str(runner), "-Helper", str(HELPER), "-Port", str(port),
              "-PasswordJson", json.dumps(password, ensure_ascii=False), "-CommandsJson", json.dumps(commands, ensure_ascii=False),
-             "-AuthenticationRequestId", str(authentication_request_id)],
+              "-AuthenticationRequestId", str(authentication_request_id), "-AfterWriteMode", after_write_mode or "",
+              "-MarkerPath", marker_path or ""],
+            cwd=ROOT, capture_output=True, text=True, timeout=20,
+        )
+    if result.returncode:
+        raise AssertionError(result.stdout + result.stderr)
+    return json.loads(result.stdout), result
+
+
+def run_failed_write_hook(marker_path):
+    script = r'''
+param([string]$Helper,[string]$MarkerPath)
+$ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+. $Helper
+$stream=[IO.MemoryStream]::new();$stream.Dispose()
+$session=[pscustomobject]@{closed=$false;commands=[Collections.Generic.List[object]]::new();authentication_request_id=43101;stream=$stream;timer=[Diagnostics.Stopwatch]::StartNew()}
+$hook={param($metadata) [IO.File]::WriteAllText($MarkerPath,'called',[Text.UTF8Encoding]::new($false));Write-Output -NoEnumerate ([ordered]@{kind='after-write'})}.GetNewClosure()
+try {
+  Send-MIRLoopbackRconCommand -Session $session -Command '/silent-command rcon.print("never")' -RequestId 43102 -AfterWrite $hook
+  throw 'write failure unexpectedly succeeded'
+} catch {
+  [pscustomobject]@{message=$_.Exception.Message;marker_exists=(Test-Path -LiteralPath $MarkerPath);attempts=$session.commands.Count;row=$session.commands[0]}|ConvertTo-Json -Depth 8 -Compress
+}
+'''
+    with tempfile.TemporaryDirectory() as temporary:
+        runner = Path(temporary) / "loopback-rcon-failed-write.ps1"
+        runner.write_text(script, encoding="utf-8")
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-File", str(runner), "-Helper", str(HELPER), "-MarkerPath", str(marker_path)],
             cwd=ROOT, capture_output=True, text=True, timeout=20,
         )
     if result.returncode:
@@ -227,8 +274,105 @@ class LoopbackRconTests(unittest.TestCase):
                                            "payload_text": "reply-43102",
                                            "payload_sha256": hashlib.sha256(b"reply-43102").hexdigest().upper()})
         self.assertLessEqual(row["write_monotonic_milliseconds"], row["response_monotonic_milliseconds"])
+        self.assertNotIn("write_observation", row)
         self.assertNotIn(password, raw.stdout + raw.stderr)
         self.assertNotIn(command, raw.stdout + raw.stderr)
+
+    def test_after_write_hook_runs_after_flush_before_raw_peer_response(self):
+        password = "generic-nonempty-password"
+        command = "/silent-command rcon.print('MIR after write')"
+        with tempfile.TemporaryDirectory() as temporary:
+            marker = Path(temporary) / "after-write.json"
+
+            def handler(connection):
+                authenticate(connection, password, optional_text_frame=True)
+                request_id, packet_type, payload = receive_packet(connection)
+                if (request_id, packet_type, payload) != (43102, 2, command.encode("utf-8")):
+                    raise AssertionError("hook-order command frame differs")
+                deadline = time.monotonic() + 5
+                while not marker.exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                if not marker.exists():
+                    raise AssertionError("raw peer did not observe after-write hook before response")
+                observed = json.loads(marker.read_text(encoding="utf-8"))
+                if set(observed) != {"request_id", "command_sha256", "command_bytes", "write_monotonic_milliseconds"}:
+                    raise AssertionError("after-write metadata shape differs")
+                if observed["request_id"] != 43102 or observed["command_bytes"] != len(command.encode("utf-8")):
+                    raise AssertionError("after-write metadata differs")
+                connection.sendall(packet(43102, 0, b"hook-observed"))
+
+            with RawRconPeer(handler) as peer:
+                payload, raw = run_helper(peer.port, password, [command], after_write_mode="valid", marker_path=str(marker))
+
+            self.assertTrue(payload["ok"], raw.stdout + raw.stderr)
+            row = payload["receipt"]["commands"][0]
+            observation = row["write_observation"]
+            self.assertEqual(
+                observation,
+                {
+                    "kind": "post-write",
+                    "request_id": 43102,
+                    "command_sha256": hashlib.sha256(command.encode("utf-8")).hexdigest().upper(),
+                    "command_bytes": len(command.encode("utf-8")),
+                    "write_monotonic_milliseconds": row["write_monotonic_milliseconds"],
+                },
+            )
+            self.assertEqual(row["response"]["payload_text"], "hook-observed")
+            self.assertNotIn(password, raw.stdout + raw.stderr)
+            self.assertNotIn(command, raw.stdout + raw.stderr)
+
+    def test_after_write_hook_failures_refuse_before_response_and_retain_primary_cleanup(self):
+        password = "generic-nonempty-password"
+        command = "/silent-command rcon.print('MIR hook refusal')"
+        cases = (
+            ("null", "after-write observation is invalid"),
+            ("malformed", "after-write observation is invalid"),
+            ("multiple", "after-write observation output is invalid"),
+            ("throw", "[test-after-write-throw]"),
+        )
+        for mode, expected in cases:
+            with self.subTest(mode=mode):
+                received = []
+
+                def handler(connection):
+                    authenticate(connection, password, optional_text_frame=True)
+                    received.append(receive_packet(connection))
+                    connection.settimeout(3)
+                    try:
+                        trailing = connection.recv(1)
+                    except TimeoutError as error:
+                        raise AssertionError("client waited for a response after hook failure") from error
+                    if trailing:
+                        raise AssertionError("client sent an unexpected additional request after hook failure")
+
+                with RawRconPeer(handler) as peer:
+                    payload, raw = run_helper(peer.port, password, [command], after_write_mode=mode)
+
+                self.assertFalse(payload["ok"])
+                self.assertIn(expected, payload["message"])
+                self.assertEqual(received, [(43102, 2, command.encode("utf-8"))])
+                self.assertTrue(payload["has_cleanup"])
+                receipt = payload["receipt"]
+                self.assertEqual(receipt["command_attempts"], 1)
+                self.assertFalse(receipt["commands"][0]["complete"])
+                self.assertIsNone(receipt["commands"][0]["response"])
+                self.assertNotIn("write_observation", receipt["commands"][0])
+                self.assertEqual([(fact["step"], fact["succeeded"]) for fact in receipt["cleanup_facts"]],
+                                 [("stream-dispose", True), ("tcp-dispose", True)])
+                self.assertNotIn(password, raw.stdout + raw.stderr)
+                self.assertNotIn(command, raw.stdout + raw.stderr)
+                self.assertNotIn("ordinary-hook-output", raw.stdout + raw.stderr)
+
+    def test_failed_write_does_not_invoke_after_write_hook(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            marker = Path(temporary) / "after-write-called.txt"
+            payload, raw = run_failed_write_hook(marker)
+        self.assertFalse(payload["marker_exists"])
+        self.assertEqual(payload["attempts"], 1)
+        self.assertIsNone(payload["row"]["write_monotonic_milliseconds"])
+        self.assertNotIn("write_observation", payload["row"])
+        self.assertIn("closed", payload["message"].lower())
+        self.assertNotIn("/silent-command", raw.stdout + raw.stderr)
 
     def test_raw_peer_refusals_are_fail_closed(self):
         password = "generic-nonempty-password"

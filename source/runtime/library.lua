@@ -970,9 +970,9 @@ local function update_discovery_indicator(content, record)
 end
 
 local function rows_for(player, view, context, labels)
-  local rows = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
-  if type(rows) ~= "table" then return {} end
-  return rows
+  local rows, unavailable = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
+  if type(rows) ~= "table" then return {}, "research" end
+  return rows, unavailable
 end
 
 local function selected_detail(player, view, context, labels)
@@ -1287,7 +1287,8 @@ local function detail_inputs(player, row, detail, panes, recipes)
     status = row.status, current = row.current, queued_count = row.queued_count, queue_index = row.queue_index,
     level = row.current_level, cap = row.cap, cap_state = row.cap_state, cap_setting = row.cap_setting,
     effects = detail.effects, effects_complete = detail.effects_complete, cost = detail.cost,
-    prerequisites = detail.prerequisites, recipe_benefits = detail.recipe_benefits,
+    prerequisites = detail.prerequisites, prerequisites_complete = detail.prerequisites_complete,
+    recipe_benefits = detail.recipe_benefits,
     recipe_benefits_state = detail.recipe_benefits_state,
     next_level_has_effective_benefit = detail.next_level_has_effective_benefit,
     recipe_benefits_only_effects = detail.recipe_benefits_only_effects,
@@ -1337,9 +1338,14 @@ local function library_section(parent, name, caption, width)
   heading.style.font, heading.style.bottom_margin = "default-bold", 4
 end
 
-local function detail_lines(parent, row, detail, player, recipe_rows)
+local function unavailable_caption(subject)
+  return {"mir-browser.detail-unavailable", {"mir-browser." .. subject}}
+end
+
+local function detail_lines(parent, row, detail, player, recipe_rows, unavailable)
   if not row then
-    add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
+    add(parent, {type = "label", name = PREFIX .. "detail_empty",
+      caption = unavailable and unavailable_caption(unavailable) or {"mir-browser.no-results"}})
     return
   end
 
@@ -1406,7 +1412,13 @@ local function detail_lines(parent, row, detail, player, recipe_rows)
     queued = "mir-browser.status-queued",
     missing = "mir-browser.status-missing"
   }
-  add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", {status_key[row.status] or "mir-browser.detail-unavailable"}}})
+  local unavailable_subject = {
+    queue_unavailable = "queue",
+    prerequisites_unavailable = "research-requirements"
+  }
+  local status = status_key[row.status] and {status_key[row.status]}
+    or unavailable_caption(unavailable_subject[row.status] or "research")
+  add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", status}})
   if row.current == true then
     add(context, {type = "label", name = PREFIX .. "context_current", caption = {"mir-browser.context-current"}})
   elseif type(row.queued_count) == "number" and row.queued_count > 0 then
@@ -1454,7 +1466,11 @@ local function detail_lines(parent, row, detail, player, recipe_rows)
       end
     end
   end
-  if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
+  if type(detail) == "table" and detail.prerequisites_complete == false
+      and row.status ~= "prerequisites_unavailable" then
+    add(parent, {type = "label", name = PREFIX .. "detail_prerequisites",
+      caption = unavailable_caption("research-requirements")})
+  elseif type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
     local prerequisite_heading = add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
     if prerequisite_heading.style then prerequisite_heading.style.font = "default-bold" end
     local prerequisites = add(parent, {type = "table", name = PREFIX .. "prerequisite_icons",
@@ -1608,7 +1624,7 @@ local function update_research_content(content, player, view, context, translati
     content.clear()
   end
 
-  local rows = rows_for(player, view, context, translations)
+  local rows, unavailable = rows_for(player, view, context, translations)
   local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
@@ -1670,7 +1686,7 @@ local function update_research_content(content, player, view, context, translati
   actions[PREFIX .. "inspect_settings"].style.minimal_width = 0
   actions[PREFIX .. "inspect_settings"].style.maximal_width = math.max(1, panes.list_width - (action_columns == 2 and 40 or 132))
   local count = list_pane[PREFIX .. "count"]
-  count.caption = {"mir-browser.count", #rows}
+  count.caption = unavailable and unavailable_caption(unavailable) or {"mir-browser.count", #rows}
   local hide = actions[PREFIX .. "hide"]
   hide.sprite, hide.enabled = selected and selected.hidden and "utility/expand" or "utility/collapse", selected ~= nil
   hide.tooltip = {"mir-browser." .. (selected and selected.hidden and "show-tooltip" or "hide-tooltip")}
@@ -1696,7 +1712,12 @@ local function update_research_content(content, player, view, context, translati
   elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(selected_index, "in-view")
   end
-  local detail = selected and selected_detail(player, view, context, translations) or nil
+  local detail, reason
+  if selected then detail, reason = selected_detail(player, view, context, translations) end
+  local detail_row = selected
+  if reason == "research_unavailable" then
+    detail_row, unavailable = nil, "research"
+  end
   local detail_box = content[PREFIX .. "detail"]
   if not valid(detail_box) then
     detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
@@ -1706,13 +1727,13 @@ local function update_research_content(content, player, view, context, translati
     detail_box.style.width, detail_box.style.height = panes.detail_width, panes.detail_height
     detail_box.style.maximal_width = panes.detail_width
   end
-  local recipes = selected and affected_recipe_rows(player, detail) or {}
-  local inputs = detail_inputs(player, selected, detail, panes, recipes)
+  local recipes = detail_row and affected_recipe_rows(player, detail) or {}
+  local inputs = detail_inputs(player, detail_row, detail, panes, recipes)
   local tags = detail_box.tags or {}
   if not (inputs and detail_subtree_present(detail_box, inputs)
       and same_detail_inputs(inputs, tags.mir_detail_inputs, {left = 8192})) then
     detail_box.clear()
-    detail_lines(detail_box, selected, detail, player, recipes)
+    detail_lines(detail_box, detail_row, detail, player, recipes, unavailable)
     tags.mir_detail_inputs = inputs
     detail_box.tags = tags
   end
@@ -1981,24 +2002,12 @@ local function update_settings_content(content, view, preserve_query, translatio
   })
 end
 
-local function queue_name(entry)
-  if type(entry) == "string" then return technology_id(entry) end
-  local ok, name = pcall(function() return entry and entry.name end)
-  return ok and technology_id(name) or nil
-end
-
 local function queue_entries(force)
-  local ok, queue = pcall(function() return force and force.research_queue end)
-  if not ok or queue == nil then return {} end
-  local result = {}
-  local complete = pcall(function()
-    for index, entry in ipairs(queue) do
-      if index > MAX_PAGE then error("MIR Library queue limit") end
-      local id = queue_name(entry)
-      if id and not private_credit_id(id) then result[#result + 1] = id end
-    end
-  end)
-  return complete and result or {}
+  local ids = {}
+  local complete = library_model.observe_queue(force, function(_, id)
+    if not private_credit_id(id) then ids[#ids + 1] = id end
+  end, MAX_PAGE)
+  return complete and ids or nil
 end
 
 local function update_queue_content(content, player, view)
@@ -2012,13 +2021,20 @@ local function update_queue_content(content, player, view)
     list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = {}})
     add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
   end
+  local unavailable = content[PREFIX .. "queue_unavailable"]
+  if not valid(unavailable) then
+    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
+      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
+  end
   local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local available_width = math.max(1, width - 64)
   list.style.width = available_width
   list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
   local guidance = content[PREFIX .. "queue_guidance"]
   guidance.style.single_line, guidance.style.maximal_width = false, available_width
-  local ids, items = queue_entries(player.force), {}
+  unavailable.style.single_line, unavailable.style.maximal_width = false, available_width
+  local observed = queue_entries(player.force)
+  local ids, items = observed or {}, {}
   local context = DISCOVERY_TREE and context_for(player.force) or nil
   for index, id in ipairs(ids) do
     local technology = known_technology(player, id)
@@ -2032,43 +2048,60 @@ local function update_queue_content(content, player, view)
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
   update_list_items(list, items, selected_index)
   list.visible = #items > 0
-  content[PREFIX .. "queue_empty"].visible = #items == 0
+  content[PREFIX .. "queue_empty"].visible = observed ~= nil and #items == 0
+  unavailable.visible = observed == nil
 end
 
 local function update_availability_content(content, player, view, context)
   if not valid(content) then return end
-  content.clear()
-  -- This bounded view has no compiler ledger and no native catalogue pass. It
-  -- presents only the authored terminal explanations selected by exact active
-  -- mod and named native-owner facts.
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
-  local query = model_view(view, context).search
-  local rows = availability.rows(active_mods, target, player and player.force, query, effective_streams)
-  -- One full-width child owns scrolling; explanations are not Research table
-  -- columns. Leave the same scrollbar/padding budget as the other panes.
-  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
-  local height = content.style and content.style.maximal_height or 220
-  local viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
-    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
-  viewport.style.width, viewport.style.height = width, height
-  local entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
-  local entry_width = math.max(1, width - 16)
-  entries.style.width, entries.style.vertical_spacing = entry_width, library_layout.section_gap
-  if #rows == 0 then
-    local label = add(entries, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
-    label.style.width = entry_width
-    return
-  end
+  local rows = availability.rows(active_mods, target, player and player.force, model_view(view, context).search, effective_streams)
+  local labels = {}
   for index, row in ipairs(rows) do
-    local label = add(entries, {
-      type = "label",
-      name = PREFIX .. "availability_" .. index,
+    labels[index] = {type = "label", name = PREFIX .. "availability_" .. index,
       caption = {"mir-browser.availability-entry",
         {"technology-name.more-infinite-research." .. row.family},
-        {"mir-browser.availability-" .. row.reason}}
-    })
-    label.style.width = entry_width
+        {"mir-browser.availability-" .. row.reason}}}
+  end
+  if #labels == 0 then
+    labels[1] = {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}}
+  end
+
+  -- The native viewport owns scroll position. Keep it through tabs and
+  -- refreshes with identical rows, and start at the top for a new projection.
+  local viewport = content[PREFIX .. "availability_viewport"]
+  local entries = valid(viewport) and viewport[PREFIX .. "availability_entries"] or nil
+  local previous = valid(entries) and entries.children
+  local reuse = valid(viewport) and viewport.type == "scroll-pane" and valid(entries)
+    and entries.type == "flow" and entries.direction == "vertical"
+    and #content.children == 1 and #viewport.children == 1 and #previous == #labels
+  if reuse then
+    for index, spec in ipairs(labels) do
+      local label = previous[index]
+      if label.type ~= "label" or label.name ~= spec.name or not same_list_caption(label.caption, spec.caption, {left = 256}) then
+        reuse = false
+        break
+      end
+    end
+  end
+  if not reuse then
+    content.clear()
+    viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+    entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
+    entries.style.vertical_spacing = library_layout.section_gap
+    for _, spec in ipairs(labels) do add(entries, spec) end
+  end
+
+  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
+  local height = content.style and content.style.maximal_height or 220
+  local entry_width = math.max(1, width - 16)
+  if viewport.style.maximal_width ~= width then viewport.style.width = width end
+  if viewport.style.maximal_height ~= height then viewport.style.height = height end
+  if not reuse or entries.style.maximal_width ~= entry_width then
+    entries.style.width = entry_width
+    for _, label in ipairs(entries.children) do label.style.width = entry_width end
   end
 end
 
@@ -2724,7 +2757,8 @@ function M.on_gui_selection_state_changed(event)
     if not owns_element(player, element, {
       PREFIX .. "queue_list", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT
     }) then return end
-    local id = queue_entries(player.force)[element.selected_index]
+    local ids = queue_entries(player.force)
+    local id = ids and ids[element.selected_index]
     if id == nil or known_technology(player, id) == nil then return end
     local view = view_for(player.index)
     view.selected, view.tab, view.page, view.scroll = id, "research", 1, 1

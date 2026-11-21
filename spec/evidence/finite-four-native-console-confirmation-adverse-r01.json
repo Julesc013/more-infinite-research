@@ -1,0 +1,43 @@
+{
+  "schema": "MIRWorkerStorageFiniteFourConsoleConfirmationAdverseV1",
+  "observed_at_utc": "2026-11-19T21:11:00Z",
+  "run": {
+    "repository": "Julesc013/more-infinite-research",
+    "actions_run_id": 44614968225,
+    "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/44614968225",
+    "head_commit": "a65c40730dc6c5b9ac46de17d0e438e9cc64dcee",
+    "head_tree": "303945005c5c6413fcbba6290263efca8b856fe6"
+  },
+  "exact_input": {
+    "engine": {
+      "version": "2.1.24",
+      "platform": "Linux headless",
+      "factorio_binary_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF"
+    },
+    "packet": {
+      "path": "runtime-packet.json",
+      "sha256": "4ABC7D7CFED09E8514FA76FAB99BC804D08C97CD3E7843E4F2193F4277505A62",
+      "confirmation_marker": ""
+    }
+  },
+  "observed_source_server": {
+    "stdout_path": "execution/process-2.stdout.txt",
+    "stdout_sha256": "EC7671CE116949505F56292E96E0E7A703C17D6C02D29FA01FAE67EA977DFB34",
+    "warning_line": "2026-11-19 21:06:57 [WARNING] Using Lua console commands will disable achievements. Please repeat the command to proceed.",
+    "warning_line_utf8_sha256": "4729E7AA3FBE9DB452D7229C497DE5DBB39F88A766685E9BC0D0EF8FF9B86BC6",
+    "confirmation_marker": "Using Lua console commands will disable achievements. Please repeat the command to proceed.",
+    "confirmation_marker_utf8_sha256": "F5F37A7206390ADD9B1DB0C2F108794CC75C58DC69F55EEFEDC0D06352DEF588",
+    "result": "The empty packet marker prevented the existing ConsoleStartup helper from replaying its already-authorized identical source command after the engine requested confirmation."
+  },
+  "repair_boundary": {
+    "controller": "The finite-four packet fixes the confirmation marker to this exact literal and requires it before execution.",
+    "existing_helper": "ConsoleStartup sends either stage's already-authorized identical command at most once more, only after that stage's first send and an observed matching confirmation marker.",
+    "excluded": [
+      "new command text",
+      "timeout change",
+      "actor or gameplay-oracle change",
+      "native retry or acceptance"
+    ]
+  },
+  "adverse_limit": "The interrupted run reached only source-server setup, emitted no earned marker, and created no candidate or cold process. This records an observed harness boundary only."
+}

@@ -537,6 +537,7 @@ class BobCoreMaterialTests(unittest.TestCase):
             stage.installs=(stage.installs or 0)+1;stage.installed=rows end} end
           package.preload["compatibility.modern_catalogue"] = function()
             return {is_k2_base=function() return false end, is_k2so=function() return false end,
+              is_f200_non_k2_space_exploration=function() return false end,
               retains_bob_native_continuations=function() return false end,
               native_owner_fallbacks=function() return {} end,
               continuations=function() return {{id="worker-robots-storage-4",defaults={

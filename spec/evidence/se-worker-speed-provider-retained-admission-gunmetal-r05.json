@@ -1,0 +1,180 @@
+{
+  "kind": "MIRSEProviderRetainedAdmissionNativeV1",
+  "date": "2026-11-19",
+  "status": "accepted_retained_source_configuration_and_one_cold",
+  "scope": "Exact controlled published15 predecessor admission and one independent cold load; suitable input for a separately reviewed cap-successor test only.",
+  "source_actor_commit": "c98303ed6f22174bde6bc7112c025b8414181ded",
+  "admission_actor_commit": "8f391d29e04b38c402a472b2d712b8e82e823ff2",
+  "fixture_integration": {
+    "pr": 2131,
+    "reviewed_head": "8f391d29e04b38c402a472b2d712b8e82e823ff2",
+    "merge": "040aed0d1823c9adc258dbe3a3e69e3f37f83498",
+    "merged_tree": "8b93c57281cdbb46bdf1557fd4a4e045cb682073",
+    "source_tree": "651fb717e0dc67f11a61472391d2eed63ee1159c",
+    "required_checks": "Four completed/success on exact8f head; original branch retained."
+  },
+  "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-8f391d29-r05",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "mir-fixture-se-worker-speed-provider-admitted": "0.2.1"
+  },
+  "player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-8f391d29-r05/build/qualification/se-provider-admission-native-r05/inputs/mir-fixture-se-worker-speed-provider-admitted_0.2.1.zip",
+    "bytes": 14388,
+    "sha256": "7FAA7D1A7A614697768ABFF1B01E8CAC2CE73C91C090D7244B04F17410586E39"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 2,
+    "admission_wait_seconds": 30
+  },
+  "source": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-c98303ed-r03/build/tmp/se-provider-admission-r03-native/source/write/saves/source.zip",
+    "bytes": 849928,
+    "sha256": "FAD88AE24184CCFD09F29930E0D31E58D0C4340F26487D24F407D95E988DB3CB"
+  },
+  "accepted_protected_admission": {
+    "bytes": 833284,
+    "sha256": "7FAD213E47A0AB6B2660FE67C4047213B5048063A5F571C82321EBF148D243C7",
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-8f391d29-r05/build/tmp/se-provider-admission-r05-native/protected/admission.zip"
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-admission-native-r05/packet.json",
+      "bytes": 24298,
+      "sha256": "624B0E77200EE33EB1A431974E8B4FA3BE0739DDE12B2CFCFE0F0B7AB58C532E"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-admission-native-r05/Invoke-RetainedProviderAdmission.ps1",
+      "bytes": 20099,
+      "sha256": "38D08A5B17AA1AEC3E8F8B87C1962598F8B0DA91A60335A6ACF33BD63F3CAA7C"
+    },
+    "reader": {
+      "path": "build/qualification/se-provider-admission-native-r05/Verify-ProviderAdmission.py",
+      "bytes": 7548,
+      "sha256": "7D59D2D728BCABA186EF7C098B6B1AE97B830D90C73B06095534A040B06891A9"
+    },
+    "compose": {
+      "path": "build/qualification/se-provider-admission-native-r05/composition.json",
+      "bytes": 130262,
+      "sha256": "90FC7DA9F5273D441DF135F6794597C2E0AB0DBCDD6734097049503CEEBA160D"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-admission-native-r05/REVIEW-EXECUTE.json",
+      "bytes": 3939,
+      "sha256": "B48C243A1FD0B6601E2F7C2A7F2965E6B13576E74DECEECD089BB784A5036A2E"
+    },
+    "actual_review_preflight": {
+      "path": "build/qualification/se-provider-admission-native-r05/ACTUAL-REVIEW-PREFLIGHT-r05.json",
+      "bytes": 552,
+      "sha256": "7E1E82AD7B263F63AEA37EDA83CA15E5F2F075D6E38EC73ACDC3B40F32BAB5E2"
+    },
+    "actor_checks": {
+      "path": "build/qualification/se-provider-admission-native-r05/ACTOR-CHECKS-r05.json",
+      "bytes": 1093,
+      "sha256": "F74D3D911519599831B9170C61C97808358C9147E28B1F9BA9EC7B0ECC277742"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-admission-native-r05/terminal.json",
+      "bytes": 212719,
+      "sha256": "FDC7332DAEAA901F592822B56EC171134BF99A978DA40269BE46866B016D4C44"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-admission-native-r05/EXECUTE-READBACK.json",
+      "bytes": 45743,
+      "sha256": "5F52AB7C5E31FA2AE41745C7A599AA6F99BBCA155473D28228CDD426A00B8A15"
+    },
+    "before": {
+      "path": "build/qualification/se-provider-admission-native-r05/execute-custody/custody/admission-pre-hold.json",
+      "bytes": 141321,
+      "sha256": "1CEB1B7364DE1D2FFCB0E979DCD989DD425F544CAB0A4522012376C77307FB22"
+    },
+    "after": {
+      "path": "build/qualification/se-provider-admission-native-r05/execute-custody/custody/admission-saved.json",
+      "bytes": 211182,
+      "sha256": "755D53D1F0C9715C5650DBE464AD570F5EE9053C289DCB0DFF34E4C71CDD0CEB"
+    },
+    "cold": {
+      "path": "build/qualification/se-provider-admission-native-r05/execute-custody/custody/admission-cold.json",
+      "bytes": 211151,
+      "sha256": "830774FB3D65C3A8DD290AE97D974E0F251C28946D9C4775AF70CCA354387959"
+    }
+  },
+  "independent_result_review": {
+    "path": "build/qualification/se-provider-admission-r05-review-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+    "bytes": 4193,
+    "sha256": "31F9E4E4DE04EB443641B72884EED67E62751789DE5834EB2CF8DF6D516A58DF"
+  },
+  "actual": {
+    "native_processes": 2,
+    "owned_pids": [
+      314682,
+      316847
+    ],
+    "admission_saved_completion": true,
+    "admission_governed_exit_code": 137,
+    "admission_exit_scope": "Expected controlled stop only after saved-completion predicate; no timeout.",
+    "cold_natural_exit_code": 0,
+    "before_tick": 0,
+    "saved_tick": 2,
+    "cold_tick": 3,
+    "elapsed_hold_ticks": 2,
+    "hold_callbacks": 3,
+    "three_force_frames_and_196_rows_each_unchanged": true,
+    "readback_bodies": 87,
+    "protected_zip_crc_entries_each": 55,
+    "cold_input_equals_protected_admission": true,
+    "original_source_unchanged": true,
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "earlier_adverses_preserved": [
+    "se-worker-speed-provider-wire-queue-gunmetal-r03-adverse.json",
+    "se-worker-speed-provider-elapsed-hold-gunmetal-r04-adverse.json"
+  ],
+  "continuation": "Use exact protected7FAD admission as both old15 and candidate18 input in a separate reviewed four-stage packet. No source world recreation.",
+  "not_established": [
+    "old cap opponent",
+    "candidate upgrade",
+    "ordinary research completion",
+    "two candidate cold loads",
+    "cargo or mining behavior",
+    "original reporter-save repair",
+    "GUI/client/performance",
+    "release or stable acceptance"
+  ],
+  "published_assets_changed": false
+}

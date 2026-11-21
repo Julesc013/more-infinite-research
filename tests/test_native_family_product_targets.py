@@ -54,10 +54,11 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         self.boot()
 
     def boot(self):
-        generator_fixture.LuaRuntime = LuaRuntime
-        harness = generator_fixture.GeneratorTests()
-        harness.setUp()
-        self.lua = harness.lua
+        self.lua = generator_fixture.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator_fixture.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator_fixture.K2SO_MATERIAL_NATIVE,
+        )
         self.lua.execute('''
           mods={base="2.1.23",["space-age"]="2.1.23"}
           package.loaded["research.settings"]=nil

@@ -1,0 +1,145 @@
+{
+  "kind": "MIRSEProviderNativeWritesAdverseV1",
+  "status": "adverse_source_constructor_native_progress_write",
+  "date": "2026-11-19",
+  "scope": "One disposable source constructor; no accepted source save, provider configuration, cold load, candidate, reporter or stable qualification.",
+  "actor_commit": "f8eb89ec27d0fb72efad336effa5eac3778869f9",
+  "fixture_integration": {
+    "pr": 2126,
+    "merge": "f5c8963798bd50db9bfb2130b09f0d3f4a3fd067",
+    "reviewed_head": "f8eb89ec27d0fb72efad336effa5eac3778869f9",
+    "required_checks": "All four completed/success at exact head."
+  },
+  "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-f8eb89ec-r02",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-f8eb89ec-r02/build/qualification/se-provider-admission-native-r02/inputs/mir-fixture-se-worker-speed-provider-admitted_0.1.0.zip",
+    "bytes": 13907,
+    "sha256": "20B4E95EE3E7B0A71273AF29B005BA64ABE8A6259568C3CB9CEF356B13CA720A"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "mir-fixture-se-worker-speed-provider-admitted": "0.1.0"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 3,
+    "admission_wait_seconds": 30
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-admission-native-r02/packet.json",
+      "bytes": 19671,
+      "sha256": "97CA0428AD41BEE600D077DD3572D0465ACEF6D54C9F85A405949FF9F49640DA"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-admission-native-r02/Invoke-ProviderAdmission.ps1",
+      "bytes": 19336,
+      "sha256": "9EA26DD6CEDBDB7E9F50828226AAF7596F1FF24C80B190B02FFD15B5F77B66E6"
+    },
+    "compose": {
+      "path": "build/qualification/se-provider-admission-native-r02/composition.json",
+      "bytes": 171722,
+      "sha256": "67BDD6157A0A7EAFB420FC65BF1AE1710436791CF22A547BBE748F25ACD057FA"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-admission-native-r02/REVIEW-EXECUTE.json",
+      "bytes": 4356,
+      "sha256": "0A1F55300D0E36DC9F93F4B29C0E1E7E0FB2223E907458F099CB9F2C5CAB057E"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-admission-native-r02/terminal.json",
+      "bytes": 86269,
+      "sha256": "AE621A03CE48C00308891633A52F3D998A5B0AE992DDE55A475CEE54812F6BA9"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-admission-native-r02/EXECUTE-READBACK.json",
+      "bytes": 4710,
+      "sha256": "25B6100877699844EFF7EEDF26FF72F662168687A22454A1367D218781522115"
+    },
+    "independent_result_review": {
+      "path": "build/qualification/se-provider-admission-native-r02/INDEPENDENT-RESULT-REVIEW-r02.json",
+      "bytes": 2869,
+      "sha256": "B23A17EC6C323EBE22CC4D3B7B78E487F7EAD63389BA97233665A99DBA1CD0D0"
+    },
+    "stdout": {
+      "path": "build/qualification/se-provider-admission-native-r02/execute-custody/process-1.stdout.txt",
+      "bytes": 20213,
+      "sha256": "6B141341CCD37CB2D5D4108DD34BCC383F46E25D4BFFA910CCD5DEE3B6814419"
+    }
+  },
+  "native": {
+    "planned_stages": [
+      "source",
+      "admission",
+      "cold"
+    ],
+    "processes": 1,
+    "owned_pids": [
+      288695
+    ],
+    "source_exit_code": 1,
+    "timed_out": false,
+    "reached_after_declared_prerequisite_grant_loop": true,
+    "source_marker_or_save": false,
+    "admission_ran": false,
+    "cold_ran": false,
+    "remaining_factorio": 0,
+    "restored": true,
+    "cleanup_errors": [],
+    "protected_outputs": {}
+  },
+  "observed_error": {
+    "module": "mir-fixture-se-worker-speed-provider-admitted",
+    "event": "on_init",
+    "file": "fixture_control.lua",
+    "line": 283,
+    "text": "No research in progress.",
+    "statement": "player.research_queue, player.research_progress = {worker, worker}, .27",
+    "classification": "The native progress setter runs before a current research is established at this combined assignment boundary. The frozen actor also has an idle-force progress=0 setter later, which the next input must remove."
+  },
+  "independent_result": {
+    "verdict": "NO-GO",
+    "readback_bodies": 10,
+    "hash_mismatches": 0,
+    "attribution": "Actor native-write-order defect; no MIR/product defect is established."
+  },
+  "next_boundary": "Sequence dependent native writes; establish and verify current research before assigning progress. Read/assert idle zero rather than writing it. Model the native setter restriction and retain old-red/new-green controls, all source frames and earlier adverse inputs.",
+  "nonclaims": [
+    "No source frame/bonus accepted or saved.",
+    "No configuration/cold/candidate/ordinary result.",
+    "No cargo/mining/fixed-credit/original-reporter or stable closure.",
+    "No release or published package changed."
+  ]
+}

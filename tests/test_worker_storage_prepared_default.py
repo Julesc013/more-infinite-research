@@ -4,8 +4,12 @@ from pathlib import Path
 import sys
 import unittest
 
-import test_worker_storage_inherited_origin as origin
-import test_bootstrap as bootstrap_fixture
+from bootstrap_control_world import build_bootstrap_control_world
+from test_worker_storage_inherited_origin import published_modules
+from worker_storage_default_world import (
+    build_default_native_owner_world,
+    install_published_default_reader,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,12 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 class WorkerPreparedDefaultTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        origin.WorkerInheritedOriginTests.setUpClass.__func__(cls)
+        cls.published = published_modules()
 
-    world = origin.WorkerInheritedOriginTests.world
+    def world(self, target):
+        lua = build_default_native_owner_world(
+            LuaRuntime, target=target, source_root=ROOT / "source"
+        )
+        return install_published_default_reader(lua, historical_sources=self.published)
 
     def prepared(self, target):
-        origin.LuaRuntime = LuaRuntime
         lua = self.world(target)
         lua.execute(r'''
           seed_owner();local old=inherited_configuration(package_family=="f200"and"4.7.20002"or"4.7.21002")
@@ -29,7 +36,6 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_published_preparation_transfers_the_complete_work_once(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
-                origin.LuaRuntime = LuaRuntime
                 lua = self.world(target)
                 lua.execute(r'''
                   seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
@@ -186,7 +192,6 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_prepared_above_cap_earnings_and_cap_restoration_right_follow_the_owner(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
-                origin.LuaRuntime = LuaRuntime
                 lua = self.world(target)
                 lua.execute(r'''
                   seed_owner();uninvested.technologies[CANONICAL].level=11
@@ -200,7 +205,16 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
                   for _,row in ipairs(require("runtime.catalogue").declared())do
                     if values.streams[row.family]==nil then values.streams[row.family]={enabled=false,max_level=0}end
                   end
-                  values.streams["worker-robots-storage"]={enabled=true,max_level=10}
+                  -- Keep the active resolved worker contract intact while
+                  -- selecting this test's enabled/cap pair.  A partial table
+                  -- is not an intentional disabled configuration and must
+                  -- not weaken the production reader.
+                  local configured=copy(values.streams["worker-robots-storage"])
+                  for _,key in ipairs({"base_cost","linear_increment","growth_factor","research_time","effect_percent"})do
+                    assert(type(configured[key])=="number", "fixture omitted resolved worker setting "..key)
+                  end
+                  configured.enabled=true;configured.max_level=10
+                  values.streams["worker-robots-storage"]=configured
                   local lifecycle=require("runtime.lifecycle")
                   local before=all_frames();local plan=history.default_owner_preflight(owner_event(published_version),nil,true)
                   local caps=lifecycle.preflight_worker_storage_split_caps(plan)
@@ -215,12 +229,11 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
     def test_actual_bootstrap_consumes_prepared_default_without_issuing_a_legacy_quota(self):
         # Callback routing is an actual bootstrap control. The authentic old11
         # native-frame host controls above separately exercise the transfer.
-        bootstrap_fixture.LuaRuntime = LuaRuntime
         for invalid_caps in (False, True):
             with self.subTest(invalid_caps=invalid_caps):
-                fixture = bootstrap_fixture.BootstrapTests();fixture.setUp()
-                fixture.lua.globals().invalid_caps = invalid_caps
-                fixture.lua.execute(r'''
+                lua = build_bootstrap_control_world(LuaRuntime, source_root=ROOT / "source")
+                lua.globals().invalid_caps = invalid_caps
+                lua.execute(r'''
                   install_modules(false);install_runtime()
                   local catalogue=require("runtime.catalogue")
                   catalogue.worker_default_split=function()return true end
@@ -258,6 +271,27 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
                     assert(lifecycle_calls.configuration~=nil)
                   end
                 ''')
+
+    def test_prepared_default_bootstrap_uses_explicit_world_not_bootstrap_testcase(self):
+        import test_bootstrap as bootstrap_fixture
+
+        missing_runtime = object()
+        original_runtime = getattr(bootstrap_fixture, "LuaRuntime", missing_runtime)
+        original_setup = bootstrap_fixture.BootstrapTests.setUp
+
+        def forbidden_setup(_case):
+            raise AssertionError("prepared-default bootstrap selected borrowed BootstrapTests.setUp")
+
+        bootstrap_fixture.BootstrapTests.setUp = forbidden_setup
+        try:
+            self.test_actual_bootstrap_consumes_prepared_default_without_issuing_a_legacy_quota()
+        finally:
+            bootstrap_fixture.BootstrapTests.setUp = original_setup
+            if original_runtime is missing_runtime:
+                if hasattr(bootstrap_fixture, "LuaRuntime"):
+                    delattr(bootstrap_fixture, "LuaRuntime")
+            else:
+                bootstrap_fixture.LuaRuntime = original_runtime
 
 
 if __name__ == "__main__":

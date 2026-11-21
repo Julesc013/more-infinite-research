@@ -1,0 +1,70 @@
+{
+  "kind": "MIRPublished473BasePaidSourceFactsV1",
+  "scope": "offline data-stage authoring input only; no world, save, gameplay, or qualification result",
+  "raw": {
+    "sha256": "43FF6868BCE10E7290A5E656F6E7A55A67F16B575C3BB54B8E0A05C057B37097",
+    "bytes": 13358004,
+    "technology_count": 250
+  },
+  "tuple": {
+    "base": "2.0.77",
+    "more-infinite-research": "4.7.20003"
+  },
+  "science": {
+    "packs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack"
+    ],
+    "first_level_count_each": 8000,
+    "first_level_time_seconds": 60,
+    "ordinary_first_levels": 5,
+    "ordinary_consumed_each_pack": 40000
+  },
+  "public_mains": [
+    {"name": "recipe-prod-research_low_density_structure-1", "recipe": "low-density-structure", "modifier": 0.1},
+    {"name": "recipe-prod-research_plastic-1", "recipe": "plastic-bar", "modifier": 0.1},
+    {"name": "recipe-prod-research_processing_unit-1", "recipe": "processing-unit", "modifier": 0.1},
+    {"name": "recipe-prod-research_rocket_fuel-1", "recipe": "rocket-fuel", "modifier": 0.1},
+    {"name": "recipe-prod-research_steel-1", "recipe": "steel-plate", "modifier": 0.1}
+  ],
+  "finite_prerequisite_order": [
+    "electronics", "steam-power", "automation-science-pack", "logistic-science-pack", "automation",
+    "steel-processing", "automation-2", "engine", "fluid-handling", "oil-gathering", "oil-processing",
+    "plastics", "advanced-circuit", "sulfur-processing", "chemical-science-pack", "advanced-material-processing",
+    "advanced-material-processing-2", "modules", "productivity-module", "logistics", "logistics-2", "railway",
+    "production-science-pack"
+  ],
+  "finite_direct_parents": {
+    "electronics": [],
+    "steam-power": [],
+    "automation-science-pack": ["steam-power", "electronics"],
+    "logistic-science-pack": ["automation-science-pack"],
+    "automation": ["automation-science-pack"],
+    "steel-processing": ["automation-science-pack"],
+    "automation-2": ["automation", "steel-processing", "logistic-science-pack"],
+    "engine": ["steel-processing", "logistic-science-pack"],
+    "fluid-handling": ["automation-2", "engine"],
+    "oil-gathering": ["fluid-handling"],
+    "oil-processing": ["oil-gathering"],
+    "plastics": ["oil-processing"],
+    "advanced-circuit": ["plastics"],
+    "sulfur-processing": ["oil-processing"],
+    "chemical-science-pack": ["advanced-circuit", "sulfur-processing"],
+    "advanced-material-processing": ["steel-processing", "logistic-science-pack"],
+    "advanced-material-processing-2": ["advanced-material-processing", "chemical-science-pack"],
+    "modules": ["advanced-circuit"],
+    "productivity-module": ["modules"],
+    "logistics": ["automation-science-pack"],
+    "logistics-2": ["logistics", "logistic-science-pack"],
+    "railway": ["logistics-2", "engine"],
+    "production-science-pack": ["productivity-module", "advanced-material-processing-2", "railway"]
+  },
+  "foreign_control": {
+    "current": "braking-force-1",
+    "current_parents": ["railway", "chemical-science-pack"],
+    "tail": "recipe-prod-research_gears-1",
+    "tail_parents": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"]
+  }
+}

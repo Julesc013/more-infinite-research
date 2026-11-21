@@ -1,0 +1,201 @@
+{
+  "kind": "MIRNativeEarnedCargoEvidenceV1",
+  "schema": 1,
+  "verdict": "accepted-representative-initial-upgrade-operation",
+  "scope": "F200/2.0.77/SE0.7.57, authentic published4.7.20002 earned source to exact experimental5.0.20018; no reporter/stable/release verdict",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "execution_account": "jules"
+  },
+  "candidate": {
+    "source_commit": "f5b63b1c76d5714b0e8c41fe4dbe42ce30b5d859",
+    "player_tree": "57063da4e3f3fc988584b2769b8497903a33a98d",
+    "archive_sha256": "D1DCD353829FFD4F647544474E117AE4B7AD47C3E32CAFA4BA0A4B24E0F04C43",
+    "archive_bytes": 1067589,
+    "version": "5.0.20018",
+    "draft_pr": 2209
+  },
+  "fixture": {
+    "source_commit": "786b03e5e32453f99cb973ba9a26150f52623684",
+    "archive_sha256": "834438473102CC718A0EB142C49454D176D9800471B700022B641C282C511A14",
+    "archive_bytes": 15760,
+    "member_readback": "Four Lua members equal raw Git; info.json is the exact Factorio2.0/base2.0.77 adaptation of canonical2.1 metadata.",
+    "later_refusal_guard_commit": "f769e2c2119469f0d6be7e258b75fb060bbf5beb",
+    "later_guard_limits": "Four failing-original metadata opponents and81 corrected Lua5.2 host controls; this native result is not relabelled as execution of the later fixture."
+  },
+  "source": {
+    "invocation_id": "fa811a87fba4419d873895ad86a7b997",
+    "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "save_sha256": "862253C69BFA7DF6E543ED613B3B0529F7D50F0F5A3034B47E0D7C28A69DA8E1",
+    "save_bytes": 1459955,
+    "stdout_sha256": "D705A1221A8C9BD12B0CFF7290E539E881D4419E6D5712DF3175BBECF9C50EC0",
+    "source_ordinary_events": 5,
+    "earned_levels": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "next_level": 9,
+    "partial": 0.039024390243902,
+    "queue": [
+      "worker",
+      "worker",
+      "unrelated-tail"
+    ],
+    "source_assessment": "Independent authentic-source acceptance preserves the original overall adverse diagnostic/classifier receipt under its original identity."
+  },
+  "execution": {
+    "invocation_id": "f0ed386b4127476392b531c7d01add89",
+    "controller_pid": 118508,
+    "runner_commit": "199a9cb93bf683dd49266d41e62c0fbcffe78662",
+    "prepared_commit": "5ed4365ea5fbcd451c78e2246671bb04defa7405",
+    "packet_sha256": "62B116E091522821760210DF26A954C2FF94CA7ED745075B465ADDE61E62464A",
+    "settings_sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7",
+    "dependency_archive_count": 17,
+    "raw_result_sha256": "882823423EFA896DD913E2198EB6AF2EB218A93769BB19972810606178DE5373",
+    "native_processes": [
+      {
+        "process_index": 1,
+        "first_observed_at": "2026-11-20T21:08:36.9555445+00:00",
+        "last_observed_at": "2026-11-20T21:08:41.1000068+00:00",
+        "identity": {
+          "pid": 120486,
+          "start_ticks": 4138186,
+          "session_id": 120486,
+          "kind": "MIR441LinuxNativeLaunchV1"
+        },
+        "last_phase": "running",
+        "root_exited": false
+      },
+      {
+        "process_index": 2,
+        "first_observed_at": "2026-11-20T21:08:54.9025963+00:00",
+        "last_observed_at": "2026-11-20T21:08:58.4015207+00:00",
+        "identity": {
+          "pid": 121942,
+          "start_ticks": 4139983,
+          "session_id": 121942,
+          "kind": "MIR441LinuxNativeLaunchV1"
+        },
+        "last_phase": "running",
+        "root_exited": true
+      },
+      {
+        "process_index": 3,
+        "first_observed_at": "2026-11-20T21:09:11.9441597+00:00",
+        "last_observed_at": "2026-11-20T21:09:15.4322971+00:00",
+        "identity": {
+          "pid": 123266,
+          "start_ticks": 4141687,
+          "session_id": 123266,
+          "kind": "MIR441LinuxNativeLaunchV1"
+        },
+        "last_phase": "running",
+        "root_exited": true
+      }
+    ],
+    "process_exit_codes": [
+      137,
+      0,
+      0
+    ],
+    "server_stop": "Reviewed completed-save predicate and CRC, followed by planned stop137; not a timeout or natural exit0.",
+    "cold_updates_each": 1200,
+    "cold_checksums": [
+      516441790,
+      516441790
+    ],
+    "after_controller_disconnection": "Launch SSH exited0; separate later SSH observed the same running transient invocation; all native children started after launch SSH exit.",
+    "bounded_unattended_slice": "Completed after launch SSH disconnection; results retained, controls restored and owned data/control cleaned. No continuous queue, logout/reboot/interruption or all-resource utilization claim."
+  },
+  "observations": {
+    "source_frame_preserved": true,
+    "candidate_ordinary_events": 2,
+    "candidate_earned_levels": [
+      9,
+      10
+    ],
+    "next_level": 11,
+    "next_level_disabled_and_start_refused": true,
+    "player_cargo_before": 8,
+    "player_cargo_after": 10,
+    "tail_current_and_only_queue_entry": true,
+    "source_only_ordinary_counter_retained": 5,
+    "science_per_pack": {
+      "source_issued": 10000,
+      "source_remaining": 200,
+      "source_debit": 9800,
+      "closed_issued": 22600,
+      "closed_remaining": 0,
+      "closed_debit": 22600
+    },
+    "science_scope": "Actual native seven-pack ledger under the recorded115199 speed stimulus/200-item feed; not a nominal-cost equivalence or normal-speed efficiency claim.",
+    "six_fields_across_seven_forces": "All42 independently observed source-A values retained at transfer; only player cargo+2 at closed and both cold processes.",
+    "conquest_vector": [
+      3,
+      5.65,
+      1.8,
+      6,
+      2.2,
+      5.1
+    ],
+    "all_force_summaries": "Seven forces, unavailable=false, truncated=false at transfer/closed/cold1/cold2",
+    "cold_fixture_writes": 0,
+    "protected_source_unchanged": true,
+    "protected_successor_sha256": "AA1F1B849F65757E67C708356F6273DF2E3FB7FA22126FC694A16F70D5A5B5B1",
+    "protected_successor_bytes": 1463731,
+    "six_save_copies_crc_clean": true
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "559fa8881b417b894acff6b91803c01b8e918b3e",
+    "path": "projects/mir/tasks/gunmetal-worker-cap10-diagnostic-r01/se-conquest-repair-r04",
+    "primary_path": "build/qualification/gunmetal-se-conquest-repair-r04-root-readback-r01",
+    "capsules": [
+      {
+        "path": "native-original-body-custody.tar.gz",
+        "sha256": "EA6A0217D9DF6F860D716A3B36B50A2624BD63C39543B9278F0CAE844760D875",
+        "bytes": 9155136,
+        "manifest": "native-original-body-custody-manifest.json",
+        "manifest_sha256": "A118FB3C9D40DB428840B5615A85C1CD66686A630927FE520E7657C35D59EDC0",
+        "bodies": 80,
+        "uncompressed_bytes": 10747636
+      },
+      {
+        "path": "control-original-body-custody.tar.gz",
+        "sha256": "DD50936A3153AB405A0743023805D23D1B9F6D830CD1519E45DB20230ACE51C2",
+        "bytes": 746,
+        "manifest": "control-original-body-custody-manifest.json",
+        "manifest_sha256": "891D969FFC0EE0D4176D73EC64FFE0C596307C7212F019150C2A732A967A5686",
+        "bodies": 1,
+        "uncompressed_bytes": 4546
+      }
+    ],
+    "verified_bodies": 81,
+    "independent_verdict": "independent-native-verdict-r01.json",
+    "protected_successor": "protected-successor.zip",
+    "original_failed_r03": "Retained independently at original invocation69a13563d0fc4b788d757ad320ea9c6e and raw9CC02D; no failure erased or relabelled.",
+    "cleanup_commit": "5daba703add84ad098ec76db46fa5d10ccff13cc",
+    "cleanup_primary_readback": "cleanup-readback-r01.json"
+  },
+  "restoration": {
+    "library_controls_unchanged": true,
+    "archive_restoration_failures": [],
+    "original_mir_sha256": "E334881F3BA653FAD1288E213D0EB5864551A10A2CE14911D1D0B54A1FE4C4CD",
+    "original_fixture_sha256": "FAA5A97C8639A128C2F1F680C650C02B0F3E24DB5670C069D109D0E348FF90A0",
+    "collected_unit_and_absent_controller": "Separate independent terminal readback at2026-11-20T21:18:15Z; default Result=success is not the completed job result.",
+    "raw_cleanup": "Execution-owner guarded cleanup receipt independently rehashed at private5daba703add84ad098ec76db46fa5d10ccff13cc; removes only owned R04 data/control trees after sealed81-body custody. Original862 source and a separately verified staged AA1F successor remain. This adopts the original operator result, not a new root SSH execution."
+  },
+  "remaining": [
+    "Same-candidate cap/settings and provider operations",
+    "Historical517 and other required predecessor routes",
+    "Exact unavailable reporter inputs",
+    "Worker speed/productivity/extraction dispositions",
+    "Other stable editions, GUI/client/multiplayer, physical-output and performance gates",
+    "Continuous unattended queue/reboot/interruption guarantees",
+    "Exact release qualification, publication, anonymous downloads and primary dist delivery"
+  ]
+}

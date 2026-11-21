@@ -1,0 +1,8 @@
+{
+  "name": "mir-worker-uninvested-inherited-addition",
+  "version": "0.1.0",
+  "title": "MIR inherited-worker inert addition",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": ["base"]
+}

@@ -6,7 +6,8 @@ import sys
 import unittest
 
 import test_generator as generator
-import test_native_family_paid_credits as paid_fixture
+from generator_world import build_generator_world
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/known-base-addition"
@@ -158,10 +159,11 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
         return lua
 
     def pipeline(self, retire=True):
-        generator.LuaRuntime = LuaRuntime
-        case = generator.GeneratorTests()
-        case.setUp()
-        lua = case.lua
+        lua = build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=generator.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=generator.K2SO_MATERIAL_NATIVE,
+        )
         lua.globals().addition_fixture = FIXTURE.as_posix()
         lua.execute('''
           -- Stand-in for the engine-provided helper, absent in bare Lua.
@@ -293,10 +295,10 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
         groups = generator.plain_lua(pipeline.globals().data.raw["mod-data"]
                                      ["more-infinite-research-native-adoptions"].data.credits)
         prototypes = generator.plain_lua(pipeline.globals().data.raw.technology)
-        paid_fixture.LuaRuntime = LuaRuntime
-        case = paid_fixture.NativeFamilyPaidCreditsTests()
-        case.setUp()
-        lua = case.lua
+        lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=ROOT / "source"
+        )
+        install_native_family_paid_world(lua, target="f210")
         lua.globals().GROUPS = generator.lua_table(lua, groups)
         lua.globals().emitted = generator.lua_table(lua, prototypes)
         lua.execute('''

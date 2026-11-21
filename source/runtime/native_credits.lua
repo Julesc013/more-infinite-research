@@ -32,10 +32,16 @@ local function require_catalogue_export(name)
 end
 
 local groups = require_catalogue_export("native_credit_groups")()
+local fixed_credit_scalar_export = require_catalogue_export("native_credit_scalars")
 local DESCRIPTORS = definitions.descriptors(groups)
 local GALORE_DESCRIPTOR
+local FIXED_BY_RECIPE = {}
 for _, row in ipairs(DESCRIPTORS) do
   if row.family == "research_sulfur" and row.recipe == "vgal-coal-crushing" then GALORE_DESCRIPTOR = row end
+  if not row.collected then
+    if FIXED_BY_RECIPE[row.recipe] ~= nil then error("MIR native credit duplicate fixed descriptor", 2) end
+    FIXED_BY_RECIPE[row.recipe] = row
+  end
 end
 local COLLECTED_BY_KEY, COLLECTED_BY_MAIN, history_seen = {}, {}, {}
 local FAMILY_IDS = {
@@ -123,6 +129,26 @@ local function native_effect_change_matches(actual, expected)
     return actual == math.floor(expected * 10000 + .5) / 10000
   end
   return false
+end
+
+-- The private data-stage map states exactly which static carrier pairs the
+-- current package emitted and their raw authored positive deltas.  It does not
+-- grant a historical baseline; it only makes a present pair inspectable at the
+-- target's established native representation.
+local function fixed_credit_scalars()
+  local value = fixed_credit_scalar_export()
+  if type(value) ~= "table" or getmetatable(value) ~= nil then
+    error("MIR native credits require plain fixed-credit construction data", 2)
+  end
+  local out = {}
+  for recipe, change in pairs(value) do
+    if FIXED_BY_RECIPE[recipe] == nil or type(change) ~= "number" or change ~= change
+        or change <= 0 or change == math.huge or change == -math.huge then
+      error("MIR native credits have invalid fixed-credit construction data", 2)
+    end
+    out[recipe] = change
+  end
+  return out
 end
 
 local function integer(value)
@@ -345,6 +371,141 @@ local function inspect_with_mask(force, descriptor, scope)
   }
 end
 
+-- Static carrier pairs are never inferred from their current public main
+-- effect.  Their current construction declaration supplies the raw authored
+-- scalar; the existing target adapter checks each observed signed effect.
+-- A missing declaration is optional only when both signed holders are absent,
+-- the generic main carries no effect for this recipe, and no saved record can
+-- represent paid work.
+local function inspect_fixed_credit(force, descriptor, expected, record)
+  local technologies = force and force.technologies
+  local main = technologies and technologies[descriptor.main_id]
+  local positive = technologies and technologies[descriptor.positive_id]
+  local negative = technologies and technologies[descriptor.negative_id]
+  if expected == nil then
+    -- A fixed row can be optional because its recipe was not present when
+    -- this package was constructed.  The unrelated authored main may still
+    -- exist, but it must not carry this recipe's effect and neither signed
+    -- carrier may exist.  A record can make that formerly optional absence
+    -- paid state, so only the explicit unearned zero form remains harmless.
+    if positive == nil and negative == nil then
+      local effect, effects_valid = nil, true
+      if main ~= nil then effect, effects_valid = named_main_effect(main.prototype, descriptor.recipe) end
+      if effects_valid ~= false and effect == nil then
+        if record == nil or record.included == false and record.offset == 0 then return nil end
+        return nil, {reason="required-fixed-credit-absent"}
+      end
+    end
+    return nil, {reason="undeclared-fixed-credit-present"}
+  end
+  local prototype = main and main.prototype
+  if main == nil or main.valid == false or main.name ~= descriptor.main_id
+      or prototype == nil or prototype.name ~= descriptor.main_id
+      or prototype.level ~= 1 or prototype.max_level ~= UINT32_MAX then
+    return nil, {reason="main-shape"}
+  end
+  local positive_scalar = carrier_scalar(positive, descriptor, "positive")
+  local negative_scalar = carrier_scalar(negative, descriptor, "negative")
+  if not native_effect_change_matches(positive_scalar, expected)
+      or not native_effect_change_matches(type(negative_scalar) == "number" and -negative_scalar or nil, expected) then
+    return nil, {reason="carrier-native-scalar", expected=expected,
+      positive=positive_scalar, negative=negative_scalar}
+  end
+  local positive_completed = completed_infinite(positive)
+  local negative_completed = completed_infinite(negative)
+  local main_completed = completed_infinite(main)
+  if positive_completed == nil or negative_completed == nil or main_completed == nil then
+    return nil, {reason="carrier-or-main-completed-count"}
+  end
+  local effect, effects_valid = named_main_effect(prototype, descriptor.recipe)
+  if not effects_valid or effect ~= nil and not native_effect_change_matches(effect, expected) then
+    return nil, {reason="main-native-scalar", expected=expected, main=effect}
+  end
+  return {
+    descriptor=descriptor, included=effect ~= nil, completed=main_completed,
+    offset=positive_completed-negative_completed, positive=positive, negative=negative,
+    private=prototype.hidden == true, scalar=positive_scalar, basis={[descriptor.recipe]=1},
+  }
+end
+
+local function fixed_failure_detail(force, descriptor, expected, rejection)
+  local function value(item)
+    if type(item) == "number" or type(item) == "boolean" or type(item) == "string" or item == nil then return tostring(item) end
+    return "<" .. type(item) .. ">"
+  end
+  local function scalar(item)
+    -- A rejection can occur before a later scalar is read. Do not imply that
+    -- its holder/effect was established absent merely because this diagnostic
+    -- path did not observe a value.
+    if item == nil then return "unavailable" end
+    if type(item) ~= "number" or item ~= item or item == math.huge or item == -math.huge then return "invalid" end
+    return tostring(item)
+  end
+  return "MIR native fixed credit has invalid construction or paid-state evidence [MIR-FIXED-CREDIT"
+    .. " force=" .. value(force and force.index) .. " recipe=" .. descriptor.recipe
+    .. " expected_raw_change=" .. scalar(expected) .. " reason=" .. value(rejection and rejection.reason)
+    .. " observed_positive=" .. scalar(rejection and rejection.positive)
+    .. " observed_negative=" .. scalar(rejection and rejection.negative)
+    .. " observed_main=" .. scalar(rejection and rejection.main) .. "]"
+end
+
+local function fixed_observations(force)
+  local scalars = fixed_credit_scalars()
+  local records = records_for(force, false)
+  validate_records(records)
+  local out = {}
+  for _, descriptor in ipairs(DESCRIPTORS) do
+    if not descriptor.collected then
+      local expected = scalars[descriptor.recipe]
+      local observation, rejection = inspect_fixed_credit(force, descriptor, expected,
+        records and records[descriptor.recipe])
+      if rejection then error(fixed_failure_detail(force, descriptor, expected, rejection), 3) end
+      if observation then out[#out + 1] = observation end
+    end
+  end
+  return out
+end
+
+-- A native infinite carrier has a uint32 level and represents zero at level
+-- one. Calculate the exact level adjustment before reconciliation so a later
+-- force cannot discover an unrepresentable offset after an earlier force was
+-- already changed. Galore's recorded baseline is part of the same fixed-row
+-- plan, rather than a special post-write adjustment.
+local function projected_fixed_offset(force, observation, record, galore_baselines)
+  local offset
+  if record == nil then
+    offset = observation.offset
+    local prior = galore_baselines and galore_baselines[force.index]
+    if observation.descriptor == GALORE_DESCRIPTOR and prior ~= nil then
+      offset = offset + ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
+    end
+  else
+    local old_included = record.included and 1 or 0
+    local new_included = observation.included and 1 or 0
+    offset = record.offset + (old_included - new_included) * observation.completed
+  end
+  if not integer(offset) or offset <= -UINT32_MAX or offset >= UINT32_MAX then
+    error("MIR native fixed credit projected carrier level exceeds the uint32 setter range"
+      .. " [MIR-FIXED-CREDIT force=" .. tostring(force.index)
+      .. " recipe=" .. observation.descriptor.recipe .. "]", 3)
+  end
+  return offset
+end
+
+local function preflight_fixed_offsets(fixed_plans, galore_baselines, discard_existing)
+  for _, plan in pairs(fixed_plans or {}) do
+    local records = records_for(plan.force, false)
+    validate_records(records)
+    for _, observation in ipairs(plan.observations) do
+      -- Force-created/reset clears this force's ledger before reconciliation.
+      -- It still validates any stale indexed record above, but its new carrier
+      -- plan must use the same fresh baseline the writer will see afterwards.
+      local record = not discard_existing and records and records[observation.descriptor.recipe] or nil
+      projected_fixed_offset(plan.force, observation, record, galore_baselines)
+    end
+  end
+end
+
 -- Error-path-only observation; no state/level writes or broad scans.
 local function family_failure_detail(force, descriptor, scope, rejection)
   local function text(value)
@@ -493,14 +654,16 @@ local function set_level_and_disable(technology, wanted)
 end
 
 local function apply_offset(observation, offset)
-  if not integer(offset) then error("MIR native credit offset is not integral", 3) end
+  if not integer(offset) or offset <= -UINT32_MAX or offset >= UINT32_MAX then
+    error("MIR native credit offset exceeds the uint32 carrier setter range", 3)
+  end
   local positive = offset > 0 and offset or 0
   local negative = offset < 0 and -offset or 0
   set_level_and_disable(observation.positive, 1 + positive)
   set_level_and_disable(observation.negative, 1 + negative)
 end
 
-local function reconcile_force(force, galore_baselines)
+local function reconcile_force(force, galore_baselines, prepared_observations)
   if not valid_force(force) then return end
   local existing = records_for(force, false)
   -- Validate all stored values before any native write.  It is legitimate for
@@ -508,11 +671,7 @@ local function reconcile_force(force, galore_baselines)
   -- a baseline, not a guessed historic preference.
   validate_records(existing)
 
-  local observations = {}
-  for index = 1, #DESCRIPTORS do
-    local observation = not DESCRIPTORS[index].collected and inspect_with_mask(force, DESCRIPTORS[index])
-    if observation then observations[#observations + 1] = observation end
-  end
+  local observations = prepared_observations or fixed_observations(force)
   if #observations == 0 then return end
 
   local records = existing or records_for(force, true)
@@ -520,14 +679,10 @@ local function reconcile_force(force, galore_baselines)
   for index = 1, #observations do
     local observation = observations[index]
     local record = records[observation.descriptor.recipe]
+    local offset = projected_fixed_offset(force, observation, record, galore_baselines)
     if record == nil then
       -- MIR4 did not persist the prior preference.  Current inclusion and
       -- native carrier levels are the only honest first-upgrade baseline.
-      local prior = galore_baselines and galore_baselines[force.index]
-      local offset = observation.offset
-      if observation.descriptor == GALORE_DESCRIPTOR and prior ~= nil then
-        offset = offset + ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
-      end
       record = {
         included = observation.included,
         offset = offset,
@@ -537,10 +692,6 @@ local function reconcile_force(force, galore_baselines)
         plans[#plans + 1] = {observation=observation, record=record, offset=offset}
       end
     else
-      local old_included = record.included and 1 or 0
-      local new_included = observation.included and 1 or 0
-      local offset = record.offset + (old_included - new_included) * observation.completed
-      if not integer(offset) then error("MIR native credit calculated a non-integral offset", 2) end
       plans[#plans + 1] = {observation = observation, record = record, offset = offset}
     end
   end
@@ -656,6 +807,27 @@ local function family_histories(current, index)
   return histories
 end
 
+-- A new selection does not erase a known old Base mask. The event must prove
+-- that every extra mod is newly added, with no old provider updated/removed.
+-- Engine version and producer qualification remain the caller's decision.
+local function added_to_previous_base(changes, active)
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR_MOD then
+      local change = changes[name]
+      if type(change) ~= "table" or getmetatable(change) ~= nil
+          or rawget(change, "old_version") ~= nil or rawget(change, "new_version") ~= version then return false end
+    end
+  end
+  for name, change in pairs(changes) do
+    if name ~= "base" and name ~= MIR_MOD then
+      if type(name) ~= "string" or type(change) ~= "table" or getmetatable(change) ~= nil
+          or rawget(change, "old_version") ~= nil or type(rawget(change, "new_version")) ~= "string"
+          or rawget(change, "new_version") == "" or rawget(change, "new_version") ~= active[name] then return false end
+    end
+  end
+  return true
+end
+
 local function legacy_family_context(event)
   local changes = type(event) == "table" and event.mod_changes
   local mir = type(changes) == "table" and changes[MIR_MOD]
@@ -681,18 +853,21 @@ local function legacy_family_context(event)
   local m4_base, data_only_base = false, nil
   local m4_mask = CREDIT_CONTRACTS.published_m4_base_paid_recipe_sets(old)
   local data_only_mask = CREDIT_CONTRACTS.published_data_only_base_paid_recipe_sets(old)
+  local m4_added_base = valid and m4_mask ~= nil and not plain_base
+    and (old == "4.7.20003" and f200_destination or old == "4.7.21003" and f210_destination)
+    and event.mod_startup_settings_changed == false and added_to_previous_base(changes, active)
   -- These data-only producers have fixed recipe masks. Known startup
   -- changes (including modules=false) do not make that old mask unknowable.
   -- The separate exact MIR4 engine hop below also has a known old mask.
   local data_only_startup_known = data_only_mask ~= nil
     and type(event.mod_startup_settings_changed) == "boolean"
-  if plain_base and (old == "4.7.20003" or old == "4.7.21003" or data_only_mask ~= nil) then
+  if (plain_base or m4_added_base) and (old == "4.7.20003" or old == "4.7.21003" or data_only_mask ~= nil) then
     -- These published Base origins have independently known source masks,
     -- not today's collected output. Admit only their exact engine routes.
     local f200_origin = old == "4.7.20003" or data_only_mask ~= nil
     local base_change = changes.base
     local same_f200 = f200_origin and f200_destination and active.base == "2.0.77"
-      and (same_inputs or data_only_startup_known) and (base_change == nil or type(base_change) == "table"
+      and (same_inputs or m4_added_base or data_only_startup_known) and (base_change == nil or type(base_change) == "table"
         and base_change.old_version == "2.0.77" and base_change.new_version == "2.0.77")
     local exact_hop = f200_origin and type(base_change) == "table"
       and base_change.old_version == "2.0.77" and base_change.new_version == "2.1.23"
@@ -701,11 +876,12 @@ local function legacy_family_context(event)
     -- fixed mask proves retained earning rights even if old tuning changed.
     local m4_hop_mask_known = old == "4.7.20003" and m4_mask ~= nil and exact_hop
       and type(event.mod_startup_settings_changed) == "boolean"
-    local same_engine = old == "4.7.21003" and same_inputs and (base_change == nil
+    local same_engine = old == "4.7.21003" and (same_inputs or m4_added_base) and (base_change == nil
       or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
     -- This is one observed published Base migration, not a patch-family rule:
     -- 4.7.21003/Base2.1.23 may enter a current F210 successor on Base2.1.24
-    -- only with unchanged startup settings and no other active mod.
+    -- only with unchanged startup settings and a proven old Base-only closure.
+    -- Current extras must be fully witnessed additions, never prior providers.
     local exact_f210_patch24 = old == "4.7.21003" and f210_destination and active.base == "2.1.24"
       and type(base_change) == "table" and base_change.old_version == "2.1.23"
       and base_change.new_version == "2.1.24" and event.mod_startup_settings_changed == false
@@ -713,7 +889,7 @@ local function legacy_family_context(event)
       and (same_engine or exact_hop) or exact_f210_patch24)
       and (event.mod_startup_settings_changed == false or data_only_startup_known or m4_hop_mask_known)
     for name in pairs(changes) do
-      if name ~= MIR_MOD and name ~= "base" then admitted = false end
+      if name ~= MIR_MOD and name ~= "base" and not m4_added_base then admitted = false end
     end
     m4_base = admitted and data_only_mask == nil
     data_only_base = admitted and data_only_mask or nil
@@ -733,21 +909,9 @@ local function legacy_family_context(event)
   local beta_added_base = valid and beta_origin and event.mod_startup_settings_changed == false and not plain_base
     and (f200_destination and active.base:match("^2%.0%.") or f210_destination and active.base:match("^2%.1%."))
   if beta_added_base then
-    for name, version in pairs(active) do
-      if name ~= "base" and name ~= MIR_MOD then
-        local change = changes[name]
-        if type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= version then
-          beta_added_base = false
-        end
-      end
-    end
-    for name, change in pairs(changes) do
-      if name ~= MIR_MOD then
-        if type(change) ~= "table" or change.new_version ~= active[name] or active[name] == nil
-            or (name == "base" and change.old_version ~= active.base
-              or name ~= "base" and change.old_version ~= nil) then beta_added_base = false end
-      end
-    end
+    local base_change = changes.base
+    beta_added_base = added_to_previous_base(changes, active) and (base_change == nil
+      or type(base_change) == "table" and base_change.old_version == active.base and base_change.new_version == active.base)
   end
   local beta_base = beta_origin and (same_inputs and plain_base or beta_added_base)
   return {beta_base=beta_base, beta_unchanged=beta_unchanged, m4_base=m4_base,
@@ -816,13 +980,27 @@ end
 
 function M.needs_research_events() return pending_active end
 
+-- Observe every fixed carrier before a lifecycle caller changes a force, its
+-- storage or a carrier flag.  The returned observations are passed unchanged
+-- to the later bounded reconciliation; this is a preflight, not a rollback.
+function M.preflight_fixed_credits(selected_force)
+  local plans, forces = {}, selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}
+  for _, force in pairs(forces) do
+    if valid_force(force) then
+      plans[force.index] = {force=force, observations=fixed_observations(force)}
+    end
+  end
+  return plans
+end
+
 -- Preflight every affected force before any core or family level/state write.
 -- A complete previous recipe set proves a new recipe was not previously paid;
 -- an isolated schema-shaped record is not that proof.
 function M.preflight_family_transition(event, fresh, selected_force)
   local current = existing_state()
-  local context, plans = legacy_family_context(event), {}
+  local context, plans = legacy_family_context(event), {fixed_credits=M.preflight_fixed_credits(selected_force)}
   plans.galore_baselines = preflight_galore(context, fresh, selected_force)
+  preflight_fixed_offsets(plans.fixed_credits, plans.galore_baselines, fresh == true)
   if next(COLLECTED_BY_MAIN) == nil and (groups == nil or next(groups) == nil)
       and (not current or current.families == nil) then return plans end
   local forces = selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}
@@ -1035,13 +1213,11 @@ end
 -- A technology-effects reset does not need to recalculate migration credit.
 -- It may re-enable native hidden carriers, so inspect exact owned shapes and
 -- restore only the carrier flags.  No level, force effect, or ledger changes.
-local function disable_exact_carriers(force)
+local function disable_exact_carriers(force, prepared)
   if not valid_force(force) then return end
   local observations = family_observations(force)
-  for index = 1, #DESCRIPTORS do
-    local observation = not DESCRIPTORS[index].collected and inspect_with_mask(force, DESCRIPTORS[index])
-    if observation then observations[#observations + 1] = observation end
-  end
+  local fixed = prepared or fixed_observations(force)
+  for _, observation in ipairs(fixed) do observations[#observations + 1] = observation end
   for _, observation in ipairs(observations) do
     if observation then
       observation.positive.enabled = false
@@ -1050,13 +1226,16 @@ local function disable_exact_carriers(force)
   end
 end
 
-local function reconcile_all(galore_baselines)
+local function reconcile_all(galore_baselines, fixed_plans)
   -- Factorio exposes this collection as LuaCustomTable userdata, not a plain
   -- Lua table. Its supported pairs iterator is the force lifecycle boundary.
   if not game or not game.forces then return end
   -- This iterates only Factorio's force lifecycle collection.  Technology and
   -- prototype access stays direct and descriptor-named in inspect_with_mask.
-  for _, force in pairs(game.forces) do reconcile_force(force, galore_baselines) end
+  for _, force in pairs(game.forces) do
+    local plan = valid_force(force) and fixed_plans and fixed_plans[force.index] or nil
+    reconcile_force(force, galore_baselines, plan and plan.observations)
+  end
 end
 
 local function published_m4_startup_change(event)
@@ -1103,54 +1282,79 @@ function M.preflight_legacy_preference_transition(event, competing_provider_rele
   end
 end
 
-function M.on_init()
-  local plans = M.preflight_family_transition(nil, true)
-  reconcile_all(plans.galore_baselines)
+function M.on_init(plans)
+  plans = plans or M.preflight_family_transition(nil, true)
+  reconcile_all(plans.galore_baselines, plans.fixed_credits)
   apply_family_plans(plans)
 end
 
 function M.on_configuration_changed(event, plans)
   plans = plans or M.preflight_family_transition(event)
-  reconcile_all(plans.galore_baselines)
+  reconcile_all(plans.galore_baselines, plans.fixed_credits)
   apply_family_plans(plans)
 end
 
-function M.on_force_created(event)
+function M.preflight_force_created(event)
+  local force = event and event.force
+  if not valid_force(force) then return nil end
+  return M.preflight_family_transition(nil, true, force)
+end
+
+function M.on_force_created(event, plans)
   local force = event and event.force
   if not valid_force(force) then return end
-  local plans = M.preflight_family_transition(nil, true, force)
+  plans = plans or M.preflight_force_created(event)
   clear_force(force.index)
-  reconcile_force(force, plans.galore_baselines)
+  reconcile_force(force, plans.galore_baselines, plans.fixed_credits[force.index].observations)
   apply_family_plans(plans)
-  disable_exact_carriers(force)
+  disable_exact_carriers(force, plans.fixed_credits[force.index].observations)
 end
 
-function M.on_force_reset(event)
+function M.preflight_force_reset(event)
+  local force = event and event.force
+  if not valid_force(force) then return nil end
+  return M.preflight_family_transition(nil, true, force)
+end
+
+function M.on_force_reset(event, plans)
   local force = event and event.force
   if not valid_force(force) then return end
-  local plans = M.preflight_family_transition(nil, true, force)
+  plans = plans or M.preflight_force_reset(event)
   clear_force(force.index)
-  reconcile_force(force, plans.galore_baselines)
+  reconcile_force(force, plans.galore_baselines, plans.fixed_credits[force.index].observations)
   apply_family_plans(plans)
-  disable_exact_carriers(force)
+  disable_exact_carriers(force, plans.fixed_credits[force.index].observations)
 end
 
-function M.on_forces_merged(event)
+function M.preflight_forces_merged(event)
   local destination = event and event.destination
-  if not valid_force(destination) then return end
+  if not valid_force(destination) then return nil end
   -- Native merging retains destination research and bonuses, discarding the
   -- source's. Validate its existing family history before either ledger is
   -- cleared; pending private work keeps its original payable decision.
-  local plans = M.preflight_family_transition(nil, false, destination)
-  clear_force(event and event.source_index)
-  clear_force(destination.index)
-  reconcile_force(destination, plans.galore_baselines)
-  apply_family_plans(plans)
-  disable_exact_carriers(destination)
+  return M.preflight_family_transition(nil, false, destination)
 end
 
-function M.on_technology_effects_reset(event)
-  disable_exact_carriers(event and event.force)
+function M.on_forces_merged(event, plans)
+  local destination = event and event.destination
+  if not valid_force(destination) then return end
+  plans = plans or M.preflight_forces_merged(event)
+  clear_force(event and event.source_index)
+  clear_force(destination.index)
+  reconcile_force(destination, plans.galore_baselines, plans.fixed_credits[destination.index].observations)
+  apply_family_plans(plans)
+  disable_exact_carriers(destination, plans.fixed_credits[destination.index].observations)
+end
+
+function M.preflight_technology_effects_reset(event)
+  local force = event and event.force
+  if not valid_force(force) then return nil end
+  return {force=force, fixed=fixed_observations(force)}
+end
+
+function M.on_technology_effects_reset(event, plan)
+  plan = plan or M.preflight_technology_effects_reset(event)
+  if plan then disable_exact_carriers(plan.force, plan.fixed) end
 end
 
 -- Parse-time registration owns activation.  This must not touch storage or
