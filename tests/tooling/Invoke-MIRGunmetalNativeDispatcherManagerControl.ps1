@@ -138,14 +138,14 @@ try {
 
   $firstTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $first.approval.request_id
   Assert-ManagerControl ($firstTerminal.status -ceq 'succeeded' -and $firstTerminal.result.result.packet_sha256 -ceq $first.approval.packet_sha256 -and $firstTerminal.result.result.status -ceq 'passed') 'first-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  Assert-ManagerControl ((Get-MIRGunmetalDispatcherUnit -Unit $script:unit).absence_confirmed) 'first-retained-unit-released-by-dispatcher'
 
   $secondStarted = Invoke-MIRGunmetalDispatcherConsume -Policy $first
   $secondRunning = Get-MIRGunmetalDispatcherStateRecord -Policy $first -Name running
   Assert-ManagerControl ($secondStarted.status -ceq 'submitted' -and $secondRunning.request_id -ceq $second.approval.request_id -and $secondRunning.packet_sha256 -ceq $second.approval.packet_sha256) 'second-distinct-packet-started'
   $secondTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $second.approval.request_id
   Assert-ManagerControl ($secondTerminal.status -ceq 'succeeded' -and $secondTerminal.result.result.packet_sha256 -ceq $second.approval.packet_sha256) 'second-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  Assert-ManagerControl ((Get-MIRGunmetalDispatcherUnit -Unit $script:unit).absence_confirmed) 'second-retained-unit-released-by-dispatcher'
   $cleanup = 'unit-cleaned'
 
   [pscustomobject]@{

@@ -16,6 +16,8 @@ $script:fakeState='gone'
 $script:nextLaunchState='active'
 $script:fakeJournal=[pscustomobject]@{observed=$false;exit_code=$null}
 $script:fakeInvocation='0123456789abcdef0123456789abcdef'
+$script:stopCalls=0
+$script:failStop=$false
 
 function Assert-Dispatcher {
   param([bool]$Condition,[string]$Name)
@@ -36,6 +38,12 @@ function Refuses-Dispatcher {
 
 function Invoke-MIRGunmetalDispatcherSystemctl {
   param([Parameter(Mandatory)][string[]]$Arguments)
+  if ($Arguments[0] -ceq 'stop') {
+    $script:stopCalls++
+    if ($script:failStop) { return [pscustomobject]@{ exit_code = 1; lines = @('stop failed') } }
+    $script:fakeState = 'gone'
+    return [pscustomobject]@{ exit_code = 0; lines = @() }
+  }
   switch ($script:fakeState) {
     'active' {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=active','SubState=running','MainPID=4242',('InvocationID='+$script:fakeInvocation),'Result=success','ExecMainCode=','ExecMainStatus=') }
@@ -169,13 +177,40 @@ try {
   $script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   Assert-Dispatcher ($script:launches-eq2-and(Get-MIRGunmetalDispatcherStateRecord -Policy $normal.base -Name running).request_id-ceq$successor.approval.request_id) 'successor-starts-only-after-prior-success'
 
-  # A retained user-systemd oneshot reports ActiveState=active/SubState=exited.
-  # That is a terminal property result, not a still-running native session.
+  # Reconcile a retained exit before releasing it. A restart must use the
+  # stored disposition and must not stop a replacement invocation.
   $retained=New-DispatcherControl -Name 'retained-exit';$controls+=@($retained)
   $null=Submit-MIRGunmetalDispatcherApproved -Policy $retained.base;$script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
-  Write-DispatcherResult -Policy $retained.base;$script:fakeState='exited';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
+  Write-DispatcherResult -Policy $retained.base
+  $script:fakeState = 'exited'
+  $script:failStop = $true
+  Refuses-Dispatcher { Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base } '[mir-gunmetal-dispatcher-retained-unit-stop]'
   $retainedTerminal=Read-DispatcherTerminal -Control $retained -RequestId $retained.base.approval.request_id
   Assert-Dispatcher ($retainedTerminal.status-ceq'succeeded'-and$retainedTerminal.result.result.status-ceq'passed') 'retained-oneshot-exit-is-terminal-with-verbatim-status'
+  Assert-Dispatcher ($null -ne (Get-MIRGunmetalDispatcherStateRecord -Policy $retained.base -Name running)) 'retained-stop-failure-keeps-running-pointer'
+  $originalInvocation = $script:fakeInvocation
+  $script:fakeInvocation = 'fedcba9876543210fedcba9876543210'
+  Refuses-Dispatcher { Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base } '[mir-gunmetal-dispatcher-retained-unit-changed]'
+  $script:fakeInvocation = $originalInvocation
+  $envelopePath = $retainedTerminal.completion_envelope_path
+  $envelopeBytes = [IO.File]::ReadAllBytes($envelopePath)
+  [IO.File]::WriteAllText($envelopePath, '{}')
+  Refuses-Dispatcher { Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base } '[mir-gunmetal-dispatcher-retained-unit-envelope]'
+  [IO.File]::WriteAllBytes($envelopePath, $envelopeBytes)
+  Assert-Dispatcher ($script:stopCalls -eq 1) 'retained-release-refuses-changed-evidence'
+  $script:failStop = $false
+  $reconciled = Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
+  Assert-Dispatcher ($reconciled.status -ceq 'running-terminal-finalized' -and $script:stopCalls -eq 2 -and $script:fakeState -ceq 'gone') 'matched-retained-exit-released-on-reconciliation'
+
+  $terminalFailure = New-DispatcherControl -Name 'explicit-nonzero-exit'
+  $controls += @($terminalFailure)
+  $null = Submit-MIRGunmetalDispatcherApproved -Policy $terminalFailure.base
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $terminalFailure.base
+  Write-DispatcherResult -Policy $terminalFailure.base
+  $script:fakeState = 'failed'
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $terminalFailure.base
+  $failedExit = Read-DispatcherTerminal -Control $terminalFailure -RequestId $terminalFailure.base.approval.request_id
+  Assert-Dispatcher ($failedExit.status -ceq 'failed' -and $failedExit.result.journal.exit_code -eq 1 -and $script:stopCalls -eq 2) 'explicit-nonzero-exit-preserved'
 
   # A failed/unavailable unit query is not proof of absence; no launcher runs.
   $uncertain=New-DispatcherControl -Name 'uncertain';$controls+=@($uncertain)

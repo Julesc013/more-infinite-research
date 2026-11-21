@@ -405,6 +405,32 @@ function Get-MIRGunmetalDispatcherResult {
   }catch{return [pscustomobject]@{exists=$true;valid=$false;sha256='';kind='';status='';packet_sha256='';reason='result-invalid'}}
 }
 
+function Release-MIRGunmetalDispatcherRetainedUnit {
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Terminal)
+  if (
+    $Terminal.status -cne 'succeeded' -or $Terminal.reason -cne 'unit-and-result-passed' -or
+    $Terminal.unit.active_state -cne 'active' -or $Terminal.unit.sub_state -cne 'exited'
+  ) { return }
+
+  $requestDirectory = Get-MIRGunmetalDispatcherRequestDirectory -Policy $Policy -RequestId $Terminal.request_id
+  $envelopePath = Join-Path $requestDirectory ('completion-'+$Terminal.dispatch_id+'.json')
+  if (
+    $Terminal.completion_envelope_path -cne $envelopePath -or
+    (Get-MIRGunmetalDispatcherSha256 $envelopePath) -cne $Terminal.completion_envelope_sha256
+  ) { throw '[mir-gunmetal-dispatcher-retained-unit-envelope]' }
+
+  $unit = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
+  if ($unit.absence_confirmed) { return }
+  if (
+    -not $unit.found -or $unit.invocation_id -cne $Terminal.launch.start_ack.invocation_id -or
+    $unit.active_state -cne 'active' -or $unit.sub_state -cne 'exited' -or $unit.main_pid -cne '0' -or
+    $unit.result -cne 'success' -or $unit.exec_main_code -cnotin @('exited','1') -or $unit.exec_main_status -cne '0'
+  ) { throw '[mir-gunmetal-dispatcher-retained-unit-changed]' }
+
+  $stopped = Invoke-MIRGunmetalDispatcherSystemctl -Arguments @('stop',$Policy.unit)
+  if ($stopped.exit_code -ne 0) { throw '[mir-gunmetal-dispatcher-retained-unit-stop]' }
+}
+
 function Complete-MIRGunmetalDispatcherTerminal {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Running)
   $path = Join-Path $Policy.spool ('terminal/'+$Running.request_id+'.json')
@@ -441,6 +467,9 @@ function Complete-MIRGunmetalDispatcherTerminal {
       throw '[mir-gunmetal-dispatcher-last-terminal-conflict]'
     }
   }
+  # The terminal and its completion envelope are durable at this point.
+  # Keep active state until the matched exited unit can be released or is absent.
+  Release-MIRGunmetalDispatcherRetainedUnit -Policy $Policy -Terminal $terminal
   Write-MIRGunmetalDispatcherJson -Path $lastPath -Value $last
 
   foreach ($name in @('running','intent')) {
@@ -577,16 +606,17 @@ function Reconcile-MIRGunmetalDispatcherRunning {
   if ($unit.found) {
     # systemctl show reports CLD_EXITED numerically on the real user manager
     # (`1`), while fixture/older manager shapes spell it `exited`.
-    $explicitExit = $unit.exec_main_code -in @('exited','1')
+    $exitCode = 0
+    $explicitExit = ($unit.exec_main_code -cin @('exited','1') -and [int]::TryParse($unit.exec_main_status, [ref]$exitCode))
     $good = (
       $unit.result -ceq 'success' -and
       $explicitExit -and
-      $unit.exec_main_status -ceq '0' -and
+      $exitCode -eq 0 -and
       $result.valid
     )
     $terminalResult = [ordered]@{
       result = $result
-      journal = [ordered]@{ observed = $true; exit_code = 0; source = 'systemctl-properties' }
+      journal = [ordered]@{ observed = $explicitExit; exit_code = $(if ($explicitExit) { $exitCode }); source = 'systemctl-properties' }
     }
     $reason = if ($good) { 'unit-and-result-passed' } else { 'unit-terminal-or-result-failed' }
     $status = if ($good) { 'succeeded' } else { 'failed' }
