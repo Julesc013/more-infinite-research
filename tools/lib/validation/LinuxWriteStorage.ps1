@@ -43,7 +43,8 @@ function Read-MIRLinuxWriteStorage {
   param(
     [Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Sha256,
     [Parameter(Mandatory)][string]$ControlRoot,[Parameter(Mandatory)][string]$LibraryRoot,
-    [Parameter(Mandatory)][int64]$MaxNewOutputBytes
+    [Parameter(Mandatory)][int64]$MaxNewOutputBytes,
+    [switch]$ActiveJobRoots
   )
   if(-not $IsLinux){throw '[mir-linux-storage-linux-required]'}
   $item=Get-Item -LiteralPath $Path -Force -ErrorAction Stop
@@ -78,7 +79,9 @@ function Read-MIRLinuxWriteStorage {
       $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
       if(Test-MIR441PathContained -Root $repo -Path $full -AllowEqual){throw '[mir-linux-storage-data-external]'}
     }
-    if($role -cne 'library' -and (Test-Path -LiteralPath $full) -and @(Get-ChildItem -LiteralPath $full -Force -ErrorAction Stop).Count -ne 0){throw '[mir-linux-storage-job-not-empty]'}
+    # A governed child revalidates its parent's plans after preparation has
+    # written files. Initial resource admission still requires fresh roots.
+    if(-not $ActiveJobRoots -and $role -cne 'library' -and (Test-Path -LiteralPath $full) -and @(Get-ChildItem -LiteralPath $full -Force -ErrorAction Stop).Count -ne 0){throw '[mir-linux-storage-job-not-empty]'}
     foreach($previous in $roots){
       if((Test-MIR441PathContained -Root $previous.path -Path $full -AllowEqual) -or (Test-MIR441PathContained -Root $full -Path $previous.path -AllowEqual)){throw '[mir-linux-storage-overlap]'}
     }

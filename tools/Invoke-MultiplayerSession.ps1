@@ -9,6 +9,7 @@
 [CmdletBinding()]
 param(
   [Parameter(Mandatory, ParameterSetName='session')][string]$SpecPath,
+  [Parameter(ParameterSetName='session')][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedSpecSha256,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][switch]$SelfCheck,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][string]$CheckFile,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][string]$CheckDirectory,
@@ -74,7 +75,7 @@ function Resolve-PrivateDisplayCli([string]$Path) {
   # output root.  Do not admit another external executable merely because it
   # has a supplied digest.
   $resolved = Resolve-Existing $Path 'Leaf' 'private display CLI'
-  if (Test-Within $buildRoot $resolved) { return $resolved }
+  if (Test-Within (Join-Path $repoRoot 'build') $resolved) { return $resolved }
   $canonical = Resolve-Existing (Join-Path $repoRoot 'tools/Invoke-LibraryLinuxDisplay.py') 'Leaf' 'canonical private display CLI'
   Assert-Session ($resolved -ceq $canonical) 'private display CLI is neither checkout build input nor canonical CLI'
   return $resolved
@@ -101,6 +102,22 @@ function Resolve-BuildOutput([string]$Path, [string]$Label) {
 }
 function Assert-Under([string]$Root, [string]$Path, [string]$Label) {
   Assert-Session (Test-Within $Root $Path) "$Label is outside its declared root"
+}
+function Get-LinuxSessionWritePaths([hashtable]$Spec, [string]$SpecPath, [string]$Library) {
+  $binding=$Spec.linux_write_storage
+  Assert-Session ($IsLinux -and $Spec.ContainsKey('linux_private_displays') -and
+    $binding -is [System.Collections.IDictionary] -and $binding.Count -eq 4) 'Linux session write binding differs'
+  $sessionControl=Split-Path -Parent $SpecPath
+  $preparationControl=Join-Path (Split-Path -Parent $sessionControl) 'preparation'
+  $session=Read-MIRLinuxWriteStorage -Path $binding.session_plan -Sha256 $binding.session_sha256 -ControlRoot $sessionControl -LibraryRoot $Library -MaxNewOutputBytes 512MB -ActiveJobRoots
+  $preparation=Read-MIRLinuxWriteStorage -Path $binding.preparation_plan -Sha256 $binding.preparation_sha256 -ControlRoot $preparationControl -LibraryRoot $Library -MaxNewOutputBytes 128MB -ActiveJobRoots
+  $sessionRoot=($session.roots | Where-Object role -CEQ 'data').path
+  $preparationRoot=($preparation.roots | Where-Object role -CEQ 'data').path
+  Assert-Session (-not (Test-Within $sessionRoot $preparationRoot) -and
+    -not (Test-Within $preparationRoot $sessionRoot)) 'preparation and session data roots must be disjoint'
+  $seed=Join-Path $preparationRoot 'write-data/saves/seed.zip'
+  Assert-Session ([string]$Spec.workroot -ceq $sessionRoot -and [string]$Spec.seed_save -ceq $seed) 'Linux session write or seed path differs'
+  return [pscustomobject]@{root=$sessionRoot;seed=$seed}
 }
 function Test-SaveReady([string]$Path) {
   $stream = $null; $zip = $null
@@ -950,7 +967,14 @@ if ($RconSelfCheck) {
   return
 }
 $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
-$spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
+if($ExpectedSpecSha256){
+  $specBytes=[IO.File]::ReadAllBytes($specPath)
+  $specSha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($specBytes))
+  Assert-Session ($specSha256 -ceq $ExpectedSpecSha256.ToUpperInvariant()) 'session spec hash differs'
+  $spec=[Text.UTF8Encoding]::new($false,$true).GetString($specBytes) | ConvertFrom-Json -AsHashtable
+}else{
+  $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
+}
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
 $standaloneIdentityDiscovery=$false
@@ -1007,8 +1031,19 @@ Assert-Session (-not $apiClientConsumers -or
   ($spec.ContainsKey('private_credit_checks') -and $spec.private_credit_checks -and
     $libraryWitnessTarget.base -ceq '2.0.77' -and $libraryWitnessTarget.mir -ceq '5.0.20000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
+if($spec.ContainsKey('linux_write_storage')){
+  Assert-Session ([bool]$ExpectedSpecSha256) 'Linux session write binding requires a pinned spec'
+  . (Join-Path $PSScriptRoot 'lib/validation/NativeProbeCommon.ps1')
+  . (Join-Path $PSScriptRoot 'lib/validation/ResourceGovernor.ps1')
+  $writePaths=Get-LinuxSessionWritePaths -Spec $spec -SpecPath $specPath -Library $library
+  # From here runtime artifacts are checked against the selected data root.
+  # The control specification was already read from the checkout build.
+  $buildRoot=$writePaths.root
+  $seed=Resolve-Existing $writePaths.seed 'Leaf' 'seed save'
+}else{
+  $seed=Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
+}
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
-$seed = Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
 Assert-Session ([string]$spec.seed_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'seed hash is invalid'
 $seedHash = Get-SessionHash $seed
 Assert-Session ($seedHash -ceq ([string]$spec.seed_sha256).ToUpperInvariant()) 'seed save hash differs'

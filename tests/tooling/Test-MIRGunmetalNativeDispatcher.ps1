@@ -272,8 +272,15 @@ try {
   $releaseHeld=New-DispatcherPolicy -Control $release -RequestId 'native-control-release-held' -PacketText 'reviewed-successor'
   $null=Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $release.base -SuccessorPolicyPath $releaseHeld.path
   $null=Invoke-MIRGunmetalDispatcherConsume -Policy $release.base
+  $holdPath = Join-Path $release.spool 'state/hold.json'
+  $originalHold = Read-MIRGunmetalDispatcherJson -Path $holdPath
+  $originalHold.held_utc = '2026-11-21T15:36:52.6741800Z'
+  Write-MIRGunmetalDispatcherJson -Path $holdPath -Value $originalHold
+  $originalHoldSha256 = Get-MIRGunmetalDispatcherSha256 $holdPath
   $released=Replace-MIRGunmetalDispatcherHeldSuccessor -BasePolicy $release.base -SuccessorPolicyPath $releaseHeld.path -DispositionReference 'https://example.invalid/release-disposition'
-  Assert-Dispatcher ($released.status-ceq'released'-and-not(Test-Path -LiteralPath (Join-Path $release.spool 'state/hold.json'))) 'held-exact-snapshot-released-with-disposition'
+  Assert-Dispatcher ($released.status-ceq'released'-and-not(Test-Path -LiteralPath $holdPath)) 'held-exact-snapshot-released-with-disposition'
+  $archivedHold = Join-Path $release.spool ('held/' + $originalHold.predecessor_request_id + '-' + $releaseHeld.approval.request_id + '.json')
+  Assert-Dispatcher ((Get-MIRGunmetalDispatcherSha256 $archivedHold) -ceq $originalHoldSha256) 'held-disposition-preserves-original-record-bytes'
   $beforeLaunches=$script:launches;$script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $release.base
   Assert-Dispatcher ($script:launches-eq($beforeLaunches+1)) 'released-exact-snapshot-starts-once'
 

@@ -62,6 +62,32 @@ try {
   Invoke-HealthFixtureGit -Arguments @('commit','--quiet','-m','fixture: baseline')
   Invoke-HealthFixtureGit -Arguments @('branch','-M','main')
 
+  & {
+    $tokens=$null;$parseErrors=$null
+    $ast=[Management.Automation.Language.Parser]::ParseFile($checker,[ref]$tokens,[ref]$parseErrors)
+    if($parseErrors.Count){throw $parseErrors[0].Message}
+    $function=$ast.Find({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Get-MIRDevelopmentHealthWorktrees'},$true)
+    Invoke-Expression $function.Extent.Text
+    $comparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
+    $private=Join-Path $fixture 'other-account/private'
+    function Invoke-MIRDevelopmentHealthGit {
+      param($Repository,$Arguments)
+      if($Arguments[0]-eq'worktree'){return [pscustomobject]@{succeeded=$true;lines=@("worktree $private",'',"worktree $fixture",'')}}
+      return [pscustomobject]@{succeeded=$false;lines=@()}
+    }
+    function Test-Path {
+      param($LiteralPath,$PathType)
+      if($LiteralPath-eq$private){throw [System.UnauthorizedAccessException]::new('Fixture access denied')}
+      Microsoft.PowerShell.Management\Test-Path -LiteralPath $LiteralPath -PathType $PathType
+    }
+    function Get-MIRDevelopmentHealthDirtyState { [pscustomobject]@{readable=$true;count=0;examples=@();operations=@()} }
+    $report=Get-MIRDevelopmentHealthWorktrees -Repository $fixture -CurrentRoot $fixture -Limit 2 -OldDays 30 -Now ([datetime]::UtcNow) -IncludeUniqueCommitCounts:$false
+    if($null-ne$report.rows[0].exists-or-not$report.rows[0].review_needed-or
+       $report.rows[0].preservation-cne'preserve-unreadable-worktree'-or-not$report.rows[1].current){
+      throw '[mir-development-health-private-worktree-custody]'
+    }
+  }
+
   $env:GIT_AUTHOR_DATE = '2024-01-01T00:00:00Z'
   $env:GIT_COMMITTER_DATE = '2024-01-01T00:00:00Z'
   Invoke-HealthFixtureGit -Arguments @('checkout','--quiet','-b','health-old')

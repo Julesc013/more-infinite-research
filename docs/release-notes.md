@@ -1,27 +1,27 @@
 ---
-title: "MIR 5.0.18 beta release notes"
+title: "MIR 5.0.17 beta release notes"
 status: current
-applies_to: "MIR 5.0.18 GitHub prerelease"
+applies_to: "MIR 5.0.17 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-17
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-518-release-notes
+  - mir-517-release-notes
 ---
 
-MIR 5.0.18 preserves earned and unfinished worker robot cargo research on supported upgrades and improves how the Research Library handles availability.
+Repairs a worker-cargo upgrade refusal for inherited MIR 5.0.11 saves and improves Research Library details and internal error handling.
 
-- On Factorio 2.0.77 with Space Exploration 0.7.57, finish saved worker robot cargo levels 9 and 10 at their original five-pack price. The tested cap of 10 still refused level 11.
-- On Factorio 2.1.24 with Krastorio 2: Spaced Out, preserve earned silicon, glass and rare-metals productivity through the tested upgrade and cap changes. Restore unlimited continuations for those materials when the research limit is set to zero.
-- Retain earned recipe productivity when adding mods to a supported Base-only MIR 4.7.3 save with matching startup settings.
-- Keep Library Availability scroll position when returning to the same results. Show when the queue, research list or prerequisites cannot be read, and restore counts and positions when the next read succeeds.
-- Keep the right to restore earned research after a research-list read failure. Keep supported Bob and Angel research and ATAN startup available when MIR's minimum Factorio patch changes.
+- Allow inherited MIR 5.0.11 saves previously using only Base and MIR to upgrade after startup settings change or mods are added, when no worker-cargo continuation research has been earned, started or queued on any force.
+- Apply the configured worker robot speed limit to Space Exploration's infinite research beginning at level 10.
+- Avoid invalid GUI style reads when refreshing the Library's Settings tab.
+- Distinguish finite and continuing research with the same localized name, including their effective limits.
+- Reject incomplete internal preservation interfaces before changing research, and retain unexpected integration errors instead of misreporting them as missing research or history.
 
-Update a copy and keep the original save with its previous mod versions and startup settings. MIR can still refuse an upgrade when it cannot establish the earlier cargo research history. Removing MIR, saving and adding it back risks discarding research data.
+Update a copy first and keep the protected original with its matching mods and startup settings. This worker-cargo repair covers a verified empty inherited 5.0.11 history; it does not reconstruct unknown earned research or every earlier mod selection. Other unprepared older saves can still be refused. Removing MIR, saving and re-adding it can discard research and preservation data; use an original backup or a supported recovery route instead.
 
-This GitHub beta covers the tested upgrades. Other reported save cases, remaining Research Library input and export checks, K2SO manufacturing measurements and broader performance acceptance remain open for stable MIR 5.
+This is a GitHub beta. Remaining Library input/export checks, broader performance testing and unresolved historical save cases remain open for stable MIR 5. No blanket save or modpack qualification is claimed.
 
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.18/docs/support.md).
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.17/docs/support.md).
