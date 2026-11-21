@@ -72,10 +72,10 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   }else{
     Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and [string]::IsNullOrWhiteSpace($InputSave) -and [string]::IsNullOrWhiteSpace($InputSaveSha256)) 'F110 published cross source does not accept active or input-save modes'
   }
-  $mirVersion=if($SameEditionSuccessor){'5.0.11000'}else{'4.7.11003'}
+  $mirVersion=if($SameEditionSuccessor){'5.0.11018'}else{'4.7.11003'}
   $fixtureVersion=if($SameEditionSuccessor){'0.3.0'}else{'0.1.0'}
   $profileKind=if($SameEditionSuccessor){'mir5-f110-same-edition-successor'}else{'mir5-f110-f200-transition-source'}
-  $mirSha=if($SameEditionSuccessor){'1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9'}else{'66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'}
+  $mirSha=if($SameEditionSuccessor){'64F70D7963686A833E011B3FA60F18BB6B60C18816F4711D308D1D550849FD64'}else{'66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'}
   Assert-Fixture ([string]::IsNullOrWhiteSpace($Observer) -and $Markers.Count -eq 0) 'F110 published cross source does not accept modern observers or consumers'
   Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalTarget) -and [string]::IsNullOrWhiteSpace($HistoricalMetadata) -and [string]::IsNullOrWhiteSpace($TransitionStage) -and [string]::IsNullOrWhiteSpace($TransitionMetadata)) 'F110 published cross source does not accept historical fixture parameters'
   Assert-Fixture ($Case -ceq 'f110-f200-transition') 'F110 published cross source case differs'

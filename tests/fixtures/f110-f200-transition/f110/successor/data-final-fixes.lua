@@ -1,4 +1,4 @@
-if mods.base ~= "1.1.110" or mods["more-infinite-research"] ~= "5.0.11000"
+if mods.base ~= "1.1.110" or mods["more-infinite-research"] ~= "5.0.11018"
     or mods["mir-fixture-mir5-f110-f200-transition"] ~= "0.3.0" then
   error("[mir5-f110-f200-transition] F110 successor closure differs")
 end
