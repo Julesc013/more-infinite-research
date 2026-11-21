@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-14
+last_reviewed: 2026-11-22
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -84,6 +84,16 @@ source_of_truth_for:
 4. Only then change the provider, preference, settings or Factorio version.
 
 - MIR can refuse this first upgrade when it cannot determine a safe productivity preference. Do not remove a provider or change settings merely to force an upgrade through.
+
+### Removing Space Is Fake on Factorio 2.0
+
+Use two separate loads when upgrading an older MIR 5 save and removing Space Is Fake. The combined change can stop if the save still needs its worker research history established.
+
+1. Keep the original save. Upgrade a copy to MIR 5.0.18 with the same Factorio version, enabled mods and startup settings. Leave Space Is Fake installed.
+2. Check the research queue and earned bonuses. Save under a new name and exit.
+3. Load that new save with MIR still at 5.0.18 after removing Space Is Fake. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
+
+This sequence preserved queued mining and plastic research, unfinished progress and earned recipe bonuses in the tested Factorio 2.0.77 save with Space Is Fake 1.0.60.
 
 ### Preparing worker cargo research before adding a provider
 
