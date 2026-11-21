@@ -205,7 +205,16 @@ class WorkerPreparedDefaultTests(unittest.TestCase):
                   for _,row in ipairs(require("runtime.catalogue").declared())do
                     if values.streams[row.family]==nil then values.streams[row.family]={enabled=false,max_level=0}end
                   end
-                  values.streams["worker-robots-storage"]={enabled=true,max_level=10}
+                  -- Keep the active resolved worker contract intact while
+                  -- selecting this test's enabled/cap pair.  A partial table
+                  -- is not an intentional disabled configuration and must
+                  -- not weaken the production reader.
+                  local configured=copy(values.streams["worker-robots-storage"])
+                  for _,key in ipairs({"base_cost","linear_increment","growth_factor","research_time","effect_percent"})do
+                    assert(type(configured[key])=="number", "fixture omitted resolved worker setting "..key)
+                  end
+                  configured.enabled=true;configured.max_level=10
+                  values.streams["worker-robots-storage"]=configured
                   local lifecycle=require("runtime.lifecycle")
                   local before=all_frames();local plan=history.default_owner_preflight(owner_event(published_version),nil,true)
                   local caps=lifecycle.preflight_worker_storage_split_caps(plan)

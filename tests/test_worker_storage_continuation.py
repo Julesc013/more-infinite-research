@@ -60,6 +60,10 @@ class WorkerStorageContinuationTests(unittest.TestCase):
           for _,spec in ipairs(config.prototypes())do settings.startup[spec.name]={value=spec.default_value}end
           for key,value in pairs(selected_changes)do settings.startup[key].value=value end
           data,helpers,log=full_world(mods,true),nil,function()end
+          -- These are existing native predecessors, not emitted MIR rows.
+          -- Level3 still names level2, while the historical holder preserves
+          -- the observed direct prerequisite set of utility plus level3.
+          data.raw.technology["worker-robots-storage-2"]={type="technology",name="worker-robots-storage-2"}
           data.raw.technology["worker-robots-storage-3"]={type="technology",name="worker-robots-storage-3",
             upgrade=true,prerequisites={"worker-robots-storage-2"},
             effects={{type="worker-robot-storage",modifier=1}},
@@ -180,6 +184,15 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         ):
             with self.subTest(holder=name):
                 self.assert_f200_se_worker_contract(scaffold.plain_lua(technologies[name]))
+
+    def test_f200_se_historical_holder_preserves_native_direct_prerequisites_without_mutating_the_predecessor(self):
+        lua = self.f200_se_stage()
+        predecessor = scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-2"])
+        self.assertEqual({"type": "technology", "name": "worker-robots-storage-2"}, predecessor)
+        self.pipeline(lua)
+        self.assertEqual(predecessor, scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-2"]))
+        holder = scaffold.plain_lua(lua.globals().data.raw.technology["mir-worker-storage-published517-4"])
+        self.assertEqual(["utility-science-pack", "worker-robots-storage-3"], holder["prerequisites"])
 
     def test_f200_se_final_emission_resolves_worker_science_without_loading_the_f210_catalogue(self):
         lua = self.f200_se_stage()

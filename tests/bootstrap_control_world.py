@@ -301,7 +301,7 @@ def install_bootstrap_control_world(lua, *, source_root):
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
               on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23,
-              on_gui_checked_state_changed = 24
+              on_gui_checked_state_changed = 24, on_forces_merging = 26
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},

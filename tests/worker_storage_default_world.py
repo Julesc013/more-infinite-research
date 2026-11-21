@@ -34,7 +34,7 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
     lua.execute(r'''
       local target=require("platform.target")
       script.active_mods.base=target.minimum_base;script.active_mods["more-infinite-research"]=target.distribution_version
-      ORDINARY="mir-worker-storage-default-4";HEAD="mir-worker-storage-head-4";OWNER_KEY="mir_worker_storage_native_owner"
+      ORDINARY="mir-worker-storage-default-4";HEAD="mir-worker-storage-head-4";LEGACY517="mir-worker-storage-published517-4";OWNER_KEY="mir_worker_storage_native_owner"
       function copy(v)if type(v)~="table"then return v end local o={}for k,x in pairs(v)do o[k]=copy(x)end return o end
       function same(a,b)if type(a)~=type(b)then return false end;if type(a)~="table"then return a==b end
         for k,v in pairs(a)do if not same(v,b[k])then return false end end;for k in pairs(b)do if a[k]==nil then return false end end;return true end
@@ -44,12 +44,14 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
       debit.name=HEAD;debit.max_level=4294967295;debit.hidden=true;debit.enabled=false;debit.visible_when_disabled=false
       debit.effects[1].modifier=-1;debit.research_unit_count_formula=nil;debit.research_unit_count=1
       debit.research_unit_energy=60;debit.prerequisites={};debit.ignore_tech_cost_multiplier=true
-      creators[ORDINARY]="more-infinite-research";creators[HEAD]="more-infinite-research"
+      local legacy=copy(prototypes.technology[CANONICAL]);prototypes.technology[LEGACY517]=legacy
+      legacy.name=LEGACY517;legacy.hidden=true;legacy.enabled=false;legacy.visible_when_disabled=false
+      creators[ORDINARY]="more-infinite-research";creators[HEAD]="more-infinite-research";creators[LEGACY517]="more-infinite-research"
       detached=make_force("detached",4);game.forces.detached=detached
       queue_writes={};progress_writes={};foreign_bonus={};gaps={}
       function install_force(force)
         local index=force.index;foreign_bonus[index]=20
-        for _,id in ipairs{ORDINARY,HEAD}do
+        for _,id in ipairs{ORDINARY,HEAD,LEGACY517}do
           local proto=prototypes.technology[id]
           local v={name=id,level=4,researched=false,enabled=proto.enabled,visible_when_disabled=proto.visible_when_disabled,
             saved_progress=0,prototype=proto,force=force,prerequisites=id==HEAD and{}or{foundation={researched=true}}}
@@ -65,7 +67,7 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         mt.__index=function(object,key)
           if key=="worker_robots_storage_bonus"then
             local total=foreign_bonus[index]
-            for _,id in ipairs{CANONICAL,ORDINARY,ID}do local t=force.technologies[id]
+            for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517,ID}do local t=force.technologies[id]
               total=total+(t.level-4+(t.researched and 1 or 0))*prototypes.technology[id].effects[1].modifier
             end
             local h=force.technologies[HEAD]
@@ -109,7 +111,7 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
       function frame(f)
         local queue={}for i,t in ipairs(f.research_queue)do queue[i]=t.name end
         return{source=tech_frame(f.technologies[CANONICAL]),owner=tech_frame(f.technologies[ORDINARY]),
-          debit=tech_frame(f.technologies[HEAD]),private=tech_frame(f.technologies[ID]),
+          debit=tech_frame(f.technologies[HEAD]),legacy517=tech_frame(f.technologies[LEGACY517]),private=tech_frame(f.technologies[ID]),
           current=f.current_research and f.current_research.name,progress=f.research_progress,queue=queue,
           bonus=f.worker_robots_storage_bonus,other_saved=f.technologies[OTHER].saved_progress}
       end
@@ -126,6 +128,49 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         writes=0;queue_writes={};progress_writes={}
       end
       function finish_event(force)return{research=force.technologies[ORDINARY],by_script=false,tick=100}end
+      function published517_source_contract(cap)
+        target.distribution_version="5.0.20017";script.active_mods["more-infinite-research"]=target.distribution_version
+        script.active_mods["space-exploration"]="0.7.57"
+        local values=require("runtime.configuration").streams["worker-robots-storage"]
+        if cap==nil then cap=10 end
+        values.max_level=cap;history.configure(cap,true)
+        local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
+          "production-science-pack","utility-science-pack"}
+        -- The retained native517 contract has these two direct prerequisites;
+        -- authored preflight rows can still contain the redundant second level.
+        local prerequisites={"utility-science-pack","worker-robots-storage-3"}
+        for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517}do
+          local p=prototypes.technology[id];p.research_unit_count_formula="675*1.5^(L-4)";p.research_unit_count=nil
+          p.research_unit_energy=3600;p.ignore_tech_cost_multiplier=false;p.research_unit_ingredients={};p.prerequisites={}
+          for _,name in ipairs(packs)do p.research_unit_ingredients[#p.research_unit_ingredients+1]={name=name,amount=1}end
+          for _,name in ipairs(prerequisites)do p.prerequisites[name]={name=name}end
+        end
+        for _,force in pairs(game.forces)do
+          for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517}do
+            local t=force.technologies[id];local mt=getmetatable(t);local read=mt.__index
+            mt.__index=function(object,key)
+              if key=="research_unit_count"then return math.floor(675*1.5^(read(object,"level")-4))end
+              return read(object,key)
+            end
+          end
+        end
+      end
+      function current_se_contract()
+        target.distribution_version="5.0.20018";script.active_mods["more-infinite-research"]=target.distribution_version
+        local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
+          "production-science-pack","se-rocket-science-pack","se-material-science-pack-1","space-science-pack"}
+        for _,id in ipairs{CANONICAL,ORDINARY,ID}do
+          local p=prototypes.technology[id];p.research_unit_ingredients={};p.prerequisites={}
+          if id==ID then p.research_unit_count_formula="675*1.5^(L-4)";p.research_unit_count=nil;p.research_unit_energy=3600 end
+          for _,name in ipairs(packs)do p.research_unit_ingredients[#p.research_unit_ingredients+1]={name=name,amount=1}end
+          p.prerequisites["worker-robots-storage-3"]={name="worker-robots-storage-3"}
+        end
+      end
+      function published517_se_bridge_event()
+        return {mod_startup_settings_changed=false,mod_changes={
+          ["more-infinite-research"]={old_version="5.0.20017",new_version=target.distribution_version},
+          ["space-exploration"]={old_version="0.7.57",new_version="0.7.57"}}}
+      end
     ''')
     return lua
 

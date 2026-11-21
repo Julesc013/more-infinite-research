@@ -1,0 +1,152 @@
+{
+  "kind": "MIRPublished473GearUpgradeEvidenceV1",
+  "schema": 1,
+  "verdict": "accepted-exact-f200-published-473-paid-gear-operation",
+  "limits": "Observed published 4.7.3 gear work and empty worker rows on Factorio 2.0.77, with the original unrelated queued work. Applies to the recorded private archive and save.",
+  "proof": {
+    "status": "published473_paid_gear_upgrade_and_two_cold_reads_verified",
+    "source": {
+      "save_sha256": "81AFD312CB2391C7B0CF92C82CD022F93751E9E3FC99D181795078FC9651E4F9",
+      "version": "4.7.20003",
+      "published_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"
+    },
+    "candidate": {
+      "filename": "more-infinite-research_5.0.20018.zip",
+      "version": "5.0.20018",
+      "sha256": "43306E5E172A19E727BB935127F6F579042E4608028957EB5F50DB7B957E7C75",
+      "source_commit": "672821bcc62863f583ea6b9f2fb43418b35ee8a6",
+      "bytes": 1068431
+    },
+    "fixture": {
+      "filename": "mir-fixture-mir5-f200-legacy-cap_0.8.0.zip",
+      "version": "0.8.0",
+      "sha256": "2ECA9903ED298131ECC5E633B8A080A2299E9B677D0F155178564EF7F314B750",
+      "bytes": 8760,
+      "binding": "Only the passed 0.8 case's candidate version admission and metadata differ."
+    },
+    "packet_sha256": "6CBF76953E06F5E0F1D4AF1960078338D99A7D507BF8D2902D82032D0B0DF707",
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+    },
+    "invocation": "ab6f5e0788ca44c2984280c935235075",
+    "witness": {
+      "source_mir": "4.7.20003",
+      "destination_mir": "5.0.20018",
+      "source_actual_lab_completions": 2,
+      "destination_actual_lab_completions": 1,
+      "milestone": "actual2labs",
+      "next_level": 4,
+      "productivity_bonus": 0.029999999329447746,
+      "player_enabled": true,
+      "player_visible_when_disabled": true,
+      "foreign_queue_progress": 0.42000000000000004,
+      "science_consumed_units": 0.7333333333333333,
+      "science_inventory_consumed_units": 0.7333333333333333,
+      "science_type": "tool",
+      "science_remaining_ticks": 44,
+      "science_processing_ticks": 44,
+      "science_elapsed_ticks": 43,
+      "science_units_after": {
+        "automation-science-pack": 21.266666666666666,
+        "logistic-science-pack": 21.266666666666666,
+        "chemical-science-pack": 21.266666666666666,
+        "production-science-pack": 21.266666666666666
+      },
+      "on_load_read_only": false
+    },
+    "cold_checksums": [
+      2452635032,
+      2452635032
+    ],
+    "cold_updates": 1200,
+    "successor_sha256": "A1DAFF04A49F6194E0873118205B321D0631255A22D8AE850586AC72855D520A",
+    "original_files_verified": 80,
+    "predecessor_untouched": true,
+    "library_restored": true,
+    "observed_predecessor_frame": {
+      "forces": [
+        {
+          "name": "player",
+          "index": 1,
+          "level": 4,
+          "researched": false,
+          "enabled": true,
+          "visible": false,
+          "saved_progress": 0,
+          "current": false,
+          "current_progress": 0,
+          "queue": {},
+          "cargo": 0
+        },
+        {
+          "name": "enemy",
+          "index": 2,
+          "level": 4,
+          "researched": false,
+          "enabled": true,
+          "visible": false,
+          "saved_progress": 0,
+          "current": false,
+          "current_progress": 0,
+          "queue": {},
+          "cargo": 0
+        },
+        {
+          "name": "neutral",
+          "index": 3,
+          "level": 4,
+          "researched": false,
+          "enabled": true,
+          "visible": false,
+          "saved_progress": 0,
+          "current": false,
+          "current_progress": 0,
+          "queue": {},
+          "cargo": 0
+        },
+        {
+          "name": "mir5-f200-legacy-cap-foreign",
+          "index": 4,
+          "level": 4,
+          "researched": false,
+          "enabled": true,
+          "visible": false,
+          "saved_progress": 0,
+          "current": "braking-force-1",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "braking-force-1"
+          ],
+          "cargo": 0
+        }
+      ],
+      "mod_changes": {
+        "more-infinite-research": {
+          "old_version": "4.7.20003",
+          "new_version": "5.0.20018"
+        },
+        "mir-fixture-mir5-f200-legacy-cap": {
+          "old_version": "0.4.0",
+          "new_version": "0.8.0"
+        }
+      },
+      "flag": true,
+      "settings": {
+        "enabled": true,
+        "base_cost": 200,
+        "linear_increment": 0,
+        "growth_factor": 1.5,
+        "max_level": 0,
+        "research_time": 60,
+        "effect_percent": 1
+      }
+    },
+    "adverse_receipts": [
+      "Windows R11 commit-memory refusal",
+      "R12 product refusal",
+      "R13 trace then unchanged refusal"
+    ]
+  },
+  "primary_custody": "build/qualification/gunmetal-published517-successor-r01/legacy473-r14-corrected"
+}
