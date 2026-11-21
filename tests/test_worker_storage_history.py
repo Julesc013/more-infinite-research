@@ -1519,6 +1519,59 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
         ''')
 
+    def test_published517_paid_bridge_settles_exact_engine_reenabled_owned_shell(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract(); init_default()
+          finish_frame(player, "advanced", {ORDINARY, ORDINARY, OTHER}, false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          local old = player.technologies[ORDINARY]
+          old.level = 9
+          player.research_queue = {ORDINARY, ORDINARY, OTHER}
+          player.research_progress = .039024390243902438
+          local bonus = player.worker_robots_storage_bonus
+          current_se_contract()
+          local canonical = player.technologies[CANONICAL]
+          local gate = player.technologies["mir-worker-storage-head-4"]
+          assert(canonical.level == 5 and gate.level == 5)
+          canonical.enabled, canonical.visible_when_disabled, gate.enabled = true, true, true
+          assert(storage[OWNER_KEY].forces[player.index].retired_flags.disabled_by_mir)
+          local before, ownership = all_frames(), copy(storage[OWNER_KEY]); writes = 0
+          local plan = history.default_owner_preflight(published517_se_bridge_event(), nil, true)
+          assert(writes == 0 and same(before, all_frames()) and same(ownership, storage[OWNER_KEY]))
+          assert(history.default_owner_apply(plan))
+          assert(canonical.level == 5 and not canonical.enabled and canonical.visible_when_disabled)
+          assert(gate.level == 5 and not gate.enabled and player.worker_robots_storage_bonus == bonus)
+          assert(player.technologies[LEGACY517].level == 9 and player.current_research.name == LEGACY517)
+          assert(player.research_progress == .039024390243902438)
+          assert(player.research_queue[1].name == LEGACY517 and player.research_queue[2].name == LEGACY517
+            and player.research_queue[3].name == OTHER)
+        ''')
+
+    def test_published517_reenabled_shell_preserves_ambiguous_states_without_writes(self):
+        for mutation in ("debit stayed disabled", "parked canonical work", "no MIR disablement right"):
+            with self.subTest(mutation=mutation):
+                lua = self.world("f200")
+                lua.globals().modify_shell = mutation
+                lua.execute(r'''
+                  published517_source_contract(); init_default()
+                  finish_frame(player, "advanced", {ORDINARY, ORDINARY, OTHER}, false)
+                  assert(history.default_owner_on_research_finished(finish_event(player)))
+                  player.research_queue = {ORDINARY, ORDINARY, OTHER}; player.research_progress = .42
+                  current_se_contract()
+                  canonical = player.technologies[CANONICAL]
+                  gate = player.technologies["mir-worker-storage-head-4"]
+                  flags = storage[OWNER_KEY].forces[player.index].retired_flags
+                  canonical.enabled, canonical.visible_when_disabled, gate.enabled = true, true, true
+                  if modify_shell == "debit stayed disabled" then gate.enabled = false
+                  elseif modify_shell == "parked canonical work" then canonical.saved_progress = .27
+                  else flags.enabled, flags.disabled_by_mir = false, false end
+                  local before, ownership = all_frames(), copy(storage[OWNER_KEY]); writes = 0
+                  local ok, reason = pcall(history.default_owner_preflight, published517_se_bridge_event(), nil, true)
+                  assert(not ok and tostring(reason):find("published517 SE paid-worker frame differs", 1, true))
+                  assert(writes == 0 and same(before, all_frames()) and same(ownership, storage[OWNER_KEY]))
+                ''')
+
     def test_published517_se_paid_contract_moves_only_known_old_work_to_the_old_holder(self):
         """A published F200 SE Base-five partial must not become current SE-seven work."""
         lua=self.world("f200")
