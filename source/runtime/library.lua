@@ -1287,7 +1287,8 @@ local function detail_inputs(player, row, detail, panes, recipes)
     status = row.status, current = row.current, queued_count = row.queued_count, queue_index = row.queue_index,
     level = row.current_level, cap = row.cap, cap_state = row.cap_state, cap_setting = row.cap_setting,
     effects = detail.effects, effects_complete = detail.effects_complete, cost = detail.cost,
-    prerequisites = detail.prerequisites, recipe_benefits = detail.recipe_benefits,
+    prerequisites = detail.prerequisites, prerequisites_complete = detail.prerequisites_complete,
+    recipe_benefits = detail.recipe_benefits,
     recipe_benefits_state = detail.recipe_benefits_state,
     next_level_has_effective_benefit = detail.next_level_has_effective_benefit,
     recipe_benefits_only_effects = detail.recipe_benefits_only_effects,
@@ -1411,8 +1412,12 @@ local function detail_lines(parent, row, detail, player, recipe_rows, unavailabl
     queued = "mir-browser.status-queued",
     missing = "mir-browser.status-missing"
   }
+  local unavailable_subject = {
+    queue_unavailable = "queue",
+    prerequisites_unavailable = "research-requirements"
+  }
   local status = status_key[row.status] and {status_key[row.status]}
-    or unavailable_caption(row.status == "queue_unavailable" and "queue" or "research")
+    or unavailable_caption(unavailable_subject[row.status] or "research")
   add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", status}})
   if row.current == true then
     add(context, {type = "label", name = PREFIX .. "context_current", caption = {"mir-browser.context-current"}})
@@ -1461,7 +1466,11 @@ local function detail_lines(parent, row, detail, player, recipe_rows, unavailabl
       end
     end
   end
-  if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
+  if type(detail) == "table" and detail.prerequisites_complete == false
+      and row.status ~= "prerequisites_unavailable" then
+    add(parent, {type = "label", name = PREFIX .. "detail_prerequisites",
+      caption = unavailable_caption("research-requirements")})
+  elseif type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
     local prerequisite_heading = add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
     if prerequisite_heading.style then prerequisite_heading.style.font = "default-bold" end
     local prerequisites = add(parent, {type = "table", name = PREFIX .. "prerequisite_icons",
