@@ -3,6 +3,7 @@
 The native fixture/custody owns engine and save qualification, not this world.
 """
 import argparse
+from itertools import product
 from pathlib import Path
 import sys
 import unittest
@@ -86,9 +87,13 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         self.assertEqual(self.lua.eval("forbidden_writes"), 0, mutation)
 
     def test_source_authored_values_only_on_the_same_production_predicate_with_or_without_observer(self):
-        for extra in (None, "mir-fixture-mir5-worker-storage-se-cap-ten-native", "unrelated-unchanged-mod"):
-            with self.subTest(extra=extra):
+        predecessors = ("4.7.20002", "5.0.20017")
+        unchanged_mods = (None, "mir-fixture-mir5-worker-storage-se-cap-ten-native", "unrelated-unchanged-mod")
+        for predecessor, extra in product(predecessors, unchanged_mods):
+            with self.subTest(predecessor=predecessor, extra=extra):
                 self.setUp()
+                self.lua.globals().predecessor = predecessor
+                self.lua.execute('event.mod_changes["more-infinite-research"].old_version=predecessor')
                 if extra:
                     self.lua.globals().extra_mod = extra
                     self.lua.execute('active[extra_mod]="0.1.0";event.mod_changes[extra_mod]={old_version="0.1.0",new_version="0.1.0"}')
@@ -156,6 +161,14 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                          'rows.artillery.prototype.effects=nil', 'rows["worker-robots-storage-1"].valid=false'):
             with self.subTest(mutation=mutation):
                 self.setUp()
+                self.rejected(mutation)
+
+    def test_published517_refuses_ambiguous_or_invested_system_force(self):
+        for mutation in ('gun.laser=.4', 'rows["worker-robots-storage-4"].saved_progress=.12',
+                         'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                self.lua.execute('event.mod_changes["more-infinite-research"].old_version="5.0.20017"')
                 self.rejected(mutation)
 
     def test_revalidation_refuses_intervening_foreign_changes(self):
