@@ -7,6 +7,6 @@
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.24",
-    "more-infinite-research = 5.0.21017"
+    "more-infinite-research = 5.0.21018"
   ]
 }

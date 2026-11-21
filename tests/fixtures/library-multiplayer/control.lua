@@ -58,7 +58,7 @@ end
 local function responsive_current_linux()
   return script ~= nil and script.active_mods ~= nil
     and script.active_mods.base == "2.1.24"
-    and script.active_mods["more-infinite-research"] == "5.0.21017"
+    and script.active_mods["more-infinite-research"] == "5.0.21018"
     and (script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.3"
       or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.4"
       or script.active_mods["mir-fixture-mir5-library-multiplayer"] == "0.1.5")
@@ -1225,7 +1225,7 @@ end
 local TARGETS = {
   ["2.0.77"] = {label="F200", mir_version="5.0.20000"},
   ["2.1.23"] = {label="F210", mir_version="5.0.21000"},
-  ["2.1.24"] = {label="F210-current", mir_version="5.0.21017"},
+  ["2.1.24"] = {label="F210-current", mir_version="5.0.21018"},
 }
 
 local function closure()
@@ -1240,7 +1240,7 @@ local function closure()
     end
   end
   local current517 = script.active_mods.base == "2.1.24"
-    and script.active_mods["more-infinite-research"] == "5.0.21017"
+    and script.active_mods["more-infinite-research"] == "5.0.21018"
   if current517 and (space_age_library() or standalone_identity_discovery() or private_credit_browser_probe() or positive_state) then
     fail("current517 admits only the Base API-consumer Library closure")
   end
