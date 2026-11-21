@@ -1199,14 +1199,19 @@ class BootstrapTests(unittest.TestCase):
           install_modules(true);install_runtime();load_control()
           local worker=require("runtime.worker_robot_storage")
           local lifecycle=require("runtime.lifecycle")
-          local due,calls=nil,{}
+          local due,calls,restored=nil,{},nil
           lifecycle.on_research_finished=function(event)calls[#calls+1]=event end
+          lifecycle.record_completed_worker_cap=function(force, enabled)
+            assert(force==player.force);restored=enabled
+          end
           worker.default_owner_completion_pending_tick=function()return due end
           worker.default_owner_on_research_finished=function(event)
             due=401;return true,false
           end
-          worker.default_owner_on_completion_tick=function(event)
-            assert(event.tick==401);due=nil;return true,{player.force}
+          worker.default_owner_on_completion_tick=function(event, record_completed_worker_cap)
+            assert(event.tick==401)
+            record_completed_worker_cap(player.force, false)
+            due=nil;return true,{player.force}
           end
           player.force.technologies["worker-robots-storage-4"]={name="worker-robots-storage-4"}
           handlers.init()
@@ -1214,9 +1219,11 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[defines.events.on_research_finished](event)
           assert(#calls==1 and calls[1]==event,
             "deferred completion published the canonical public research early")
+          assert(restored==nil,"deferred completion recorded cap restoration early")
           assert(type(handlers.events[defines.events.on_tick])=="function")
           handlers.events[defines.events.on_tick]({tick=401})
           assert(#calls==2 and calls[2].research==player.force.technologies["worker-robots-storage-4"])
+          assert(restored==false,"deferred completion lost the holder's foreign disablement")
           assert(handlers.events[defines.events.on_tick]==nil)
         ''')
 

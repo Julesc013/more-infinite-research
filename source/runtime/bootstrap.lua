@@ -596,7 +596,8 @@ local function on_research_finished(event)
   if not (event and event.research) or event.research.valid == false then return end
   local worker_default_changed, worker_default_settled = false, false
   if worker_robot_storage then
-    worker_default_changed, worker_default_settled = worker_robot_storage.default_owner_on_research_finished(event)
+    worker_default_changed, worker_default_settled =
+      worker_robot_storage.default_owner_on_research_finished(event, lifecycle.record_completed_worker_cap)
     if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
   end
   if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
@@ -653,7 +654,9 @@ end
 
 local function on_worker_completion_tick(event)
   local changed, settled = false, nil
-  if worker_robot_storage then changed, settled = worker_robot_storage.default_owner_on_completion_tick(event) end
+  if worker_robot_storage then
+    changed, settled = worker_robot_storage.default_owner_on_completion_tick(event, lifecycle.record_completed_worker_cap)
+  end
   if lifecycle.caps_active() and changed and type(settled) == "table" then
     for _, force in ipairs(settled) do
       lifecycle.on_research_finished({research=force.technologies["worker-robots-storage-4"]})

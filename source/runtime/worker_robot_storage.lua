@@ -2309,7 +2309,7 @@ end
 -- The only writer for schema-4 completion phase changes. A deferred marker
 -- records that Factorio has reported completion but still owns its row; it
 -- deliberately carries no copied native level, progress, queue, or cost.
-local function apply_published517_completion_transition(state, items)
+local function apply_published517_completion_transition(state, items, record_completed_worker_cap)
   local next_state = clone(state)
   for _, item in ipairs(items) do
     local prior, next_force = state.forces[item.force.index], next_state.forces[item.force.index]
@@ -2375,12 +2375,22 @@ local function apply_published517_completion_transition(state, items)
     end
   end
   if storage[OWNER_KEY] ~= state then recover_error("published517 SE paid completion ownership changed during application") end
+  if record_completed_worker_cap and selected_enabled and selected_cap > 0 then
+    for _, item in ipairs(items) do
+      if item.action == "settle" and item.legacy.next_level > selected_cap then
+        -- The old holder's observed eligibility survives its retirement. The
+        -- successor is already capped, so reading its live false flag loses
+        -- the distinction between our cap and a foreign disablement.
+        record_completed_worker_cap(item.force, item.legacy.enabled)
+      end
+    end
+  end
   storage[OWNER_KEY] = next_state
   reconnect_default(next_state)
   return true
 end
 
-local function settle_published517_se_paid_completion(state, force, event)
+local function settle_published517_se_paid_completion(state, force, event, record_completed_worker_cap)
   local prior = state.forces[force.index]
   if not prior then recover_error("published517 SE paid completion has unknown force history") end
   if event.by_script ~= false then recover_error("published517 SE paid completion must be ordinary native research") end
@@ -2407,7 +2417,7 @@ local function settle_published517_se_paid_completion(state, force, event)
   -- re-enter this same checked boundary.
   if default_owner_frame_has_unsettled_work(item.legacy, recovery.published517_se_id) then return false, false end
   item.action = "settle"
-  return apply_published517_completion_transition(state, {item}), true
+  return apply_published517_completion_transition(state, {item}, record_completed_worker_cap), true
 end
 
 function M.default_owner_completion_pending_tick()
@@ -2423,7 +2433,7 @@ function M.default_owner_completion_pending_tick()
   return earliest
 end
 
-function M.default_owner_on_completion_tick(event)
+function M.default_owner_on_completion_tick(event, record_completed_worker_cap)
   local state = owner_record()
   if not state or state.schema ~= 4 then return false end
   if not event or not tick(event.tick) then recover_error("published517 SE pending completion has no native tick") end
@@ -2452,15 +2462,15 @@ function M.default_owner_on_completion_tick(event)
   for _, item in ipairs(pending) do
     if item.action == "settle" then settled[#settled + 1] = item.force end
   end
-  return apply_published517_completion_transition(state, pending), settled
+  return apply_published517_completion_transition(state, pending, record_completed_worker_cap), settled
 end
 
-function M.default_owner_on_research_finished(event)
+function M.default_owner_on_research_finished(event, record_completed_worker_cap)
   local force, research = event and event.research and event.research.force, event and event.research
   if not default_head_pending or not force or M.default_owner_mutating(event) then return false, false end
   local state = owner_record()
   if state and state.schema == 4 and research.name == recovery.published517_se_id then
-    return settle_published517_se_paid_completion(state, force, event)
+    return settle_published517_se_paid_completion(state, force, event, record_completed_worker_cap)
   end
   if research.name ~= recovery.ordinary_default_id then return false, false end
   if not state or not state.forces[force.index] then recover_error("default completion has unknown force history") end
