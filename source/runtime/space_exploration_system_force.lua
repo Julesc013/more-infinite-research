@@ -1,4 +1,4 @@
--- One published-source bridge for SE's scripted NPC policy, never research
+-- One profile bridge for SE's scripted NPC policy, never research
 -- credit. SE 0.7.57 scripts/system-forces.lua owns these six defaults and
 -- reapplies them on its reset events. No other force or upstream state is ours.
 -- An intentional third-party all-zero override is indistinguishable from
@@ -82,7 +82,8 @@ function M.preflight(event)
   local active = script and script.active_mods or {}
   if target.id ~= "f200" or active["space-exploration"] ~= "0.7.57" then return nil end
   local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[MIR]
-  if type(change) ~= "table" or change.old_version ~= "4.7.20002" then return nil end
+  if type(change) ~= "table" then return nil end
+  if change.old_version ~= "4.7.20002" and change.old_version ~= "5.0.20017" then return nil end
   require_policy(type(target.distribution_version) == "string" and target.distribution_version ~= ""
     and active[MIR] == target.distribution_version and change.new_version == target.distribution_version,
     "target/package version differs")

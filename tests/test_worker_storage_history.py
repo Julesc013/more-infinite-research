@@ -1,6 +1,7 @@
 """Worker continuation identity guards; host doubles are not native save proof."""
 import argparse
 import ast
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -12,6 +13,7 @@ from worker_storage_default_world import (
     build_default_native_owner_world,
     build_full_default_provider_handover_world,
     build_older_default_admission_world,
+    install_published_default_reader,
 )
 from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS, RECOVERY_WORLD as RECOVERY_WORLD_FIXTURE
 
@@ -978,6 +980,33 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=Path(__file__).resolve().parents[1] / "source"
         )
 
+    def published517_world(self, cap):
+        """Use the three actual published B0BF producer bodies, not a current initializer."""
+        revision = "17e78c4d5d339413668e30e8eb422b915d390179"
+        pins = {
+            "runtime.caps": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52",
+            "research.worker_storage_recovery": "074D9EE66CFFC82DA30B6D1B950D7538A2E2C6E673C0E7B9D63BD36B12390381",
+            "runtime.worker_robot_storage": "A393C05576193B6D3D16AEA125C185CD36AAF87BA9126720C87DDA479C1143F9",
+        }
+        historical = {}
+        for name, expected in pins.items():
+            body = subprocess.run(["git", "show", revision + ":source/" + name.replace(".", "/") + ".lua"],
+                                  cwd=ROOT, check=True, capture_output=True).stdout
+            self.assertEqual(expected, hashlib.sha256(body).hexdigest().upper(), name)
+            historical[name] = body.decode("utf-8")
+        lua = self.world("f200")
+        install_published_default_reader(lua, historical_sources=historical)
+        lua.globals().source_cap = cap
+        lua.execute(r'''
+          published517_source_contract(source_cap)
+          published_version="5.0.20017";history=published_reader();history.configure(source_cap,true)
+          init_default()
+          assert(storage[OWNER_KEY].schema==3 and storage[OWNER_KEY].settings==nil
+            and storage[OWNER_KEY].producer.kind=="initial-empty"
+            and storage[OWNER_KEY].producer.new_version=="5.0.20017")
+        ''')
+        return lua
+
     def test_default_world_uses_the_explicit_runtime_factory(self):
         calls = []
 
@@ -1397,6 +1426,82 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             and player.technologies[LEGACY517].saved_progress==before[player.index].owner.saved)
         ''')
 
+    def test_published517_preserves_default_and_other_caps_and_explicit_uncapping(self):
+        for old_cap, new_cap, startup_changed in (
+            (0, 0, False), (10, 10, False), (12, 12, False), (10, 0, True), (10, 4, True)
+        ):
+            with self.subTest(old_cap=old_cap, new_cap=new_cap, startup_changed=startup_changed):
+                lua = self.published517_world(old_cap)
+                lua.globals().old_cap, lua.globals().new_cap = old_cap, new_cap
+                lua.globals().startup_changed = startup_changed
+                lua.globals().native_contract = NATIVE_517_SE_CONTRACT
+                lua.execute(r'''
+                  assert(storage[OWNER_KEY].contract==native_contract and storage[OWNER_KEY].settings==nil)
+                  finish_frame(player,"advanced",{ORDINARY,ORDINARY,OTHER},false)
+                  assert(history.default_owner_on_research_finished(finish_event(player)))
+                  assert(storage[OWNER_KEY].settings==nil)
+                  player.research_queue={ORDINARY,ORDINARY,OTHER};player.research_progress=.42
+                  require("runtime.configuration").streams["worker-robots-storage"].max_level=new_cap
+                  candidate_reader();history.configure(new_cap,true);current_se_contract()
+                  local event=published517_se_bridge_event();event.mod_startup_settings_changed=startup_changed
+                  local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+                  assert(history.default_owner_apply(plan))
+                  local record=storage[OWNER_KEY]
+                  assert(record.schema==4 and record.settings.max_level==new_cap
+                    and record.legacy.contract==native_contract)
+                  assert(record.forces[player.index].phase=="legacy"
+                    and player.worker_robots_storage_bonus==before[player.index].bonus
+                    and player.technologies[LEGACY517].level==before[player.index].owner.level
+                    and player.technologies[LEGACY517].saved_progress==before[player.index].owner.saved
+                    and player.research_progress==.42 and player.research_queue[1].name==LEGACY517
+                    and player.research_queue[2].name==LEGACY517 and player.research_queue[3].name==OTHER)
+                  for _,f in ipairs{uninvested,suspended,detached}do assert(same(frame(f),before[f.index]))end
+                  local closed,saved=all_frames(),copy(record);writes=0
+                  history.default_owner_on_load()
+                  assert(writes==0 and same(closed,all_frames()) and same(saved,storage[OWNER_KEY]))
+                  local steady={mod_startup_settings_changed=false,mod_changes={}}
+                  history.default_owner_apply(history.default_owner_preflight(steady,nil,true))
+                  assert(writes==0 and same(closed,all_frames()) and same(saved,storage[OWNER_KEY]))
+                ''')
+
+    def test_published517_cap_admission_requires_consistent_configuration_and_selected_policy(self):
+        for configured, selected in ((0, 10), (10, 0)):
+            with self.subTest(configured=configured, selected=selected):
+                lua = self.published517_world(10)
+                lua.globals().configured, lua.globals().selected = configured, selected
+                lua.execute(r'''
+                  finish_frame(player,"advanced",{ORDINARY,OTHER},false)
+                  assert(history.default_owner_on_research_finished(finish_event(player)))
+                  player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+                  require("runtime.configuration").streams["worker-robots-storage"].max_level=configured
+                  candidate_reader();history.configure(selected,true);current_se_contract()
+                  local event=published517_se_bridge_event();event.mod_startup_settings_changed=true
+                  local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+                ''')
+
+    def test_published517_cap_fix_keeps_the_other_paid_terms_exact(self):
+        for field, changed in (("enabled", False), ("base_cost", 201), ("linear_increment", 1),
+                               ("growth_factor", 2), ("research_time", 61), ("effect_percent", 2)):
+            with self.subTest(field=field, changed=changed):
+                lua = self.published517_world(10)
+                lua.globals().field, lua.globals().changed = field, changed
+                lua.execute(r'''
+                  finish_frame(player,"advanced",{ORDINARY,OTHER},false)
+                  assert(history.default_owner_on_research_finished(finish_event(player)))
+                  player.research_queue={ORDINARY,OTHER};player.research_progress=.42
+                  local config=require("runtime.configuration").streams["worker-robots-storage"]
+                  config[field]=changed
+                  candidate_reader();history.configure(10,config.enabled);current_se_contract()
+                  local event=published517_se_bridge_event();event.mod_startup_settings_changed=true
+                  local before,prior=all_frames(),copy(storage[OWNER_KEY]);writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
+                ''')
+
     def test_published517_bridge_rejects_an_extra_holder_prerequisite_before_writes(self):
         lua = self.world("f200")
         lua.globals().native_contract = NATIVE_517_SE_CONTRACT
@@ -1413,6 +1518,59 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(not ok and tostring(message):find("holder or current contract differs",1,true),tostring(message))
           assert(writes==0 and same(before,all_frames()) and same(prior,storage[OWNER_KEY]))
         ''')
+
+    def test_published517_paid_bridge_settles_exact_engine_reenabled_owned_shell(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract(); init_default()
+          finish_frame(player, "advanced", {ORDINARY, ORDINARY, OTHER}, false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          local old = player.technologies[ORDINARY]
+          old.level = 9
+          player.research_queue = {ORDINARY, ORDINARY, OTHER}
+          player.research_progress = .039024390243902438
+          local bonus = player.worker_robots_storage_bonus
+          current_se_contract()
+          local canonical = player.technologies[CANONICAL]
+          local gate = player.technologies["mir-worker-storage-head-4"]
+          assert(canonical.level == 5 and gate.level == 5)
+          canonical.enabled, canonical.visible_when_disabled, gate.enabled = true, true, true
+          assert(storage[OWNER_KEY].forces[player.index].retired_flags.disabled_by_mir)
+          local before, ownership = all_frames(), copy(storage[OWNER_KEY]); writes = 0
+          local plan = history.default_owner_preflight(published517_se_bridge_event(), nil, true)
+          assert(writes == 0 and same(before, all_frames()) and same(ownership, storage[OWNER_KEY]))
+          assert(history.default_owner_apply(plan))
+          assert(canonical.level == 5 and not canonical.enabled and canonical.visible_when_disabled)
+          assert(gate.level == 5 and not gate.enabled and player.worker_robots_storage_bonus == bonus)
+          assert(player.technologies[LEGACY517].level == 9 and player.current_research.name == LEGACY517)
+          assert(player.research_progress == .039024390243902438)
+          assert(player.research_queue[1].name == LEGACY517 and player.research_queue[2].name == LEGACY517
+            and player.research_queue[3].name == OTHER)
+        ''')
+
+    def test_published517_reenabled_shell_preserves_ambiguous_states_without_writes(self):
+        for mutation in ("debit stayed disabled", "parked canonical work", "no MIR disablement right"):
+            with self.subTest(mutation=mutation):
+                lua = self.world("f200")
+                lua.globals().modify_shell = mutation
+                lua.execute(r'''
+                  published517_source_contract(); init_default()
+                  finish_frame(player, "advanced", {ORDINARY, ORDINARY, OTHER}, false)
+                  assert(history.default_owner_on_research_finished(finish_event(player)))
+                  player.research_queue = {ORDINARY, ORDINARY, OTHER}; player.research_progress = .42
+                  current_se_contract()
+                  canonical = player.technologies[CANONICAL]
+                  gate = player.technologies["mir-worker-storage-head-4"]
+                  flags = storage[OWNER_KEY].forces[player.index].retired_flags
+                  canonical.enabled, canonical.visible_when_disabled, gate.enabled = true, true, true
+                  if modify_shell == "debit stayed disabled" then gate.enabled = false
+                  elseif modify_shell == "parked canonical work" then canonical.saved_progress = .27
+                  else flags.enabled, flags.disabled_by_mir = false, false end
+                  local before, ownership = all_frames(), copy(storage[OWNER_KEY]); writes = 0
+                  local ok, reason = pcall(history.default_owner_preflight, published517_se_bridge_event(), nil, true)
+                  assert(not ok and tostring(reason):find("published517 SE paid-worker frame differs", 1, true))
+                  assert(writes == 0 and same(before, all_frames()) and same(ownership, storage[OWNER_KEY]))
+                ''')
 
     def test_published517_se_paid_contract_moves_only_known_old_work_to_the_old_holder(self):
         """A published F200 SE Base-five partial must not become current SE-seven work."""
@@ -1477,6 +1635,51 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             and not player.technologies[LEGACY517].enabled)
           assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5)
           assert(player.worker_robots_storage_bonus==before_bonus+1 and player.current_research.name==OTHER)
+        ''')
+
+    def test_published517_advanced_completion_waits_for_the_unstarted_queue_tail(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract(); init_default()
+          finish_frame(player, "advanced", {ORDINARY}, false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.research_queue={ORDINARY,ORDINARY,OTHER}; player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local debit_meta=getmetatable(player.technologies[HEAD])
+          local debit_read=debit_meta.__index
+          debit_meta.__index=function(technology,key)
+            local value=debit_read(technology,key)
+            assert(value~=nil,"LuaTechnology doesn't contain key "..key)
+            return value
+          end
+          local legacy=player.technologies[LEGACY517]
+          legacy.level=6; player.research_queue={LEGACY517,OTHER}; player.research_progress=0
+          gaps[player.index]=true
+          local before=all_frames(); writes=0
+          local changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101}
+          assert(changed and not settled and writes==0 and same(before,all_frames()))
+          assert(history.default_owner_completion_pending_tick()==102)
+          gaps[player.index]=false
+          changed,settled=history.default_owner_on_completion_tick{tick=102}
+          assert(changed and #settled==0 and writes==0 and player.current_research.name==LEGACY517)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="legacy")
+
+          legacy.level=7; player.research_queue={OTHER}; player.research_progress=0
+          player.technologies[OTHER].saved_progress=.19
+          gaps[player.index]=true
+          local bonus=player.worker_robots_storage_bonus
+          before=all_frames(); writes=0; queue_writes={}; progress_writes={}
+          changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=105}
+          assert(changed and not settled and history.default_owner_completion_pending_tick()==106)
+          assert(writes==0 and same(before,all_frames()) and player.current_research==nil)
+          gaps[player.index]=false
+          changed,settled=history.default_owner_on_completion_tick{tick=106}
+          assert(changed and #settled==1 and settled[1]==player)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned")
+          assert(player.technologies[ORDINARY].level==7 and legacy.level==4 and not legacy.enabled)
+          assert(player.current_research.name==OTHER and player.technologies[OTHER].saved_progress==.19)
+          assert(player.worker_robots_storage_bonus==bonus and queue_writes[1]==nil and progress_writes[1]==nil)
         ''')
 
     def test_published517_engine_owned_completion_defers_then_settles_without_repricing(self):

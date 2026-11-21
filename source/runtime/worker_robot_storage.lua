@@ -1285,9 +1285,13 @@ local function published517_se_contract(source)
 end
 
 local function published517_se_configuration()
-  return same_worker_configuration(relevant_worker_configuration(), {
+  local current = relevant_worker_configuration()
+  if current.max_level ~= selected_cap or current.enabled ~= selected_enabled then return false end
+  -- A cap limits future admission; it does not change the historical paid
+  -- unit contract. Preserve its native work at unlimited and finite caps.
+  return same_worker_configuration(current, {
     enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
-    max_level=10, research_time=60, effect_percent=1,
+    max_level=current.max_level, research_time=60, effect_percent=1,
   })
 end
 
@@ -1343,10 +1347,10 @@ local function default_frame(force, id, finished)
   return snapshot(force, id)
 end
 
-local function full_pair(source, owner, gate)
+local function full_pair(source, owner, gate, settle_source)
   local paid = owner.next_level >= 5
   return source.next_level == (paid and 5 or 4) and not source.researched
-    and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not source.enabled
+    and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and (not source.enabled or settle_source == true)
     and gate_paid(gate) == paid
 end
 
@@ -1416,7 +1420,11 @@ local function plan_published517_se_paid_bridge(event, state, owned, source_prot
     local owner = default_frame(force, recovery.ordinary_default_id)
     local legacy = default_frame(force, recovery.published517_se_id)
     local gate = gate_frame(force, true)
-    if not full_pair(source, owner, gate) or not pristine_default_frame(legacy, recovery.published517_se_id)
+    -- Configuration can re-enable both native halves of an already-paid
+    -- shelf. Settle only this observed frame with MIR's own recorded right.
+    local settle_source = source.enabled and source.visible and gate.enabled and gate_paid(gate)
+      and prior.retired_flags.disabled_by_mir
+    if not full_pair(source, owner, gate, settle_source) or not pristine_default_frame(legacy, recovery.published517_se_id)
         or legacy.visible then recover_error("published517 SE paid-worker frame differs") end
     local action = "validate"
     if default_owner_frame_has_unsettled_work(owner, recovery.ordinary_default_id) then
@@ -1425,7 +1433,8 @@ local function plan_published517_se_paid_bridge(event, state, owned, source_prot
       record.forces[force.index] = {phase="legacy", retired_flags=clone(prior.retired_flags)}
     end
     items[#items + 1] = {force=force, source=source, owner=owner, legacy=legacy, gate=gate,
-      gate_paid=gate_paid(gate), bonus=native_bonus(force), action=action}
+      gate_paid=gate_paid(gate), gate_enabled=gate.enabled, settle_source=settle_source,
+      bonus=native_bonus(force), action=action}
   end
   if #items == 0 then recover_error("published517 SE paid-worker requires native force frames") end
   for index in pairs(owned.forces) do if not seen[index] then recover_error("stale published517 SE paid-worker force history") end end
@@ -1452,6 +1461,7 @@ local function apply_published517_se_paid_bridge(plan)
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
     if not old or old.force.index ~= item.force.index or old.action ~= item.action or old.gate_paid ~= item.gate_paid
+        or old.gate_enabled ~= item.gate_enabled or old.settle_source ~= item.settle_source
         or old.bonus ~= item.bonus or not equal_plain(frame_values(old.source), frame_values(item.source))
         or not equal_plain(frame_values(old.owner), frame_values(item.owner))
         or not equal_plain(frame_values(old.legacy), frame_values(item.legacy)) then
@@ -1459,10 +1469,13 @@ local function apply_published517_se_paid_bridge(plan)
     end
   end
   for _, item in ipairs(fresh.items) do
-    if item.action == "legacy-transfer" then
+    if item.action == "legacy-transfer" or item.settle_source or item.gate_enabled then
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
+        if item.settle_source then item.source.technology.enabled = false end
+        if item.gate_enabled then item.gate.enabled = false end
+        if item.action ~= "legacy-transfer" then return end
         local frame, holder, retired = item.owner, item.legacy.technology, item.owner.technology
         if holder.level ~= frame.next_level or holder.researched then holder.level = frame.next_level end
         holder.enabled, holder.visible_when_disabled = frame.enabled, frame.visible
@@ -1492,7 +1505,7 @@ local function apply_published517_se_paid_bridge(plan)
     local actual_source = default_frame(item.force, recovery.canonical)
     local actual_owner = default_frame(item.force, recovery.ordinary_default_id)
     local actual_legacy = default_frame(item.force, recovery.published517_se_id)
-    local actual_gate = gate_frame(item.force, true)
+    local actual_gate = gate_frame(item.force)
     if native_bonus(item.force) ~= item.bonus then recover_error("published517 SE paid contribution changed") end
     if item.action == "legacy-transfer" then
       local expected = frame_values(item.owner)
@@ -2246,13 +2259,15 @@ local function published517_completion_frame(force, finished)
   if not legacy_paid_pair(source, owner, gate, legacy) then
     recover_error("published517 SE paid completion frame differs")
   end
-  return {force=force, source=source, owner=owner, legacy=legacy, gate=gate, bonus=native_bonus(force)}
+  return {force=force, source=source, owner=owner, legacy=legacy, gate_paid=gate_paid(gate), bonus=native_bonus(force)}
 end
 
 local function engine_owned_published517_completion(frame)
   local legacy, id = frame.legacy, recovery.published517_se_id
-  return legacy.researched and ((legacy.current == id and legacy.current_progress == 1 and legacy.queue[1] == id)
-    or (legacy.current == nil and legacy.current_progress == 0 and legacy.queue[1] ~= nil))
+  -- Factorio can advance the holder before it starts the queued remainder.
+  -- Its normal unresearched next-level row is still inside that callback.
+  return (legacy.current == nil and legacy.current_progress == 0 and legacy.queue[1] ~= nil)
+    or (legacy.researched and legacy.current == id and legacy.current_progress == 1 and legacy.queue[1] == id)
 end
 
 local function same_published517_completion_frame(expected, actual)
@@ -2260,7 +2275,7 @@ local function same_published517_completion_frame(expected, actual)
     and equal_plain(frame_values(expected.source), frame_values(actual.source))
     and equal_plain(frame_values(expected.owner), frame_values(actual.owner))
     and equal_plain(frame_values(expected.legacy), frame_values(actual.legacy))
-    and equal_plain(frame_values(expected.gate), frame_values(actual.gate))
+    and expected.gate_paid == actual.gate_paid
 end
 
 local function revalidate_published517_completion_item(state, item)
