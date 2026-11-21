@@ -183,7 +183,7 @@ local function reconcile_item(force, current, item, limits, unearned, queued)
   end
 end
 
-local function reconcile_force(force, target_name, discovery_observed)
+local function reconcile_force(force, target_name, discovery_observed, queued)
   if not valid_force(force) then return end
   local selected_item = target_name and BINDING_BY_ID[target_name] or nil
   if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
@@ -194,9 +194,9 @@ local function reconcile_force(force, target_name, discovery_observed)
   -- after the exact foreign tail itself is still known. Do not allocate state
   -- for a fresh no-preference profile.
   if not current and PREFER_MIR ~= true then return end
+  queued = queued or queued_names(force)
   current = current or ensure_state()
   local limits, unearned = {}, {}
-  local queued = queued_names(force)
   if selected_item then
     reconcile_item(force, current, selected_item, limits, unearned, queued)
   else
@@ -239,17 +239,19 @@ local function reconcile_all(clean_stale, discovery_observed)
     return
   end
   if not game or not game.forces then return end
-  -- Finish observing live membership before discarding any restoration right.
-  -- Reuse those force objects for reconciliation after the observation succeeds.
+  if not current and PREFER_MIR ~= true then return end
+  -- Observe every live force and its queue before changing restoration rights.
   local observed, live_forces = {}, {}
   for _, force in pairs(game.forces) do
     if valid_force(force) then
-      observed[#observed + 1] = force
+      observed[#observed + 1] = {force=force, queued=queued_names(force)}
       live_forces[force.index] = true
     end
   end
   if clean_stale and current then discard_unselected_rights(current, live_forces) end
-  for _, force in ipairs(observed) do reconcile_force(force, nil, discovery_observed) end
+  for _, observation in ipairs(observed) do
+    reconcile_force(observation.force, nil, discovery_observed, observation.queued)
+  end
   discard_empty_state(existing_state())
 end
 
