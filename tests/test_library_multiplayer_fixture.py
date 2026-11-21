@@ -4926,8 +4926,11 @@ def no_network_sockets(pid):
           [IO.File]::WriteAllText($fake,@'
 param([Parameter(ValueFromRemainingArguments=$true)]$rest)
 $encoding=[Text.UTF8Encoding]::new($false)
-[IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
 [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+[IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
+# Publishing readiness promises that the PID handoff is already complete.
+# Keep later startup work pending so the parent must rely on that ordering.
+Start-Sleep -Milliseconds 250
 while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
 '@,$encoding)
           $pwsh=(Get-Command pwsh -ErrorAction Stop).Source;$pythonHash=(Get-FileHash -LiteralPath $pwsh -Algorithm SHA256).Hash.ToUpperInvariant();$probe=Join-Path $workroot 'probe.py';[IO.File]::WriteAllText($probe,("PINS = {`n  '"+$pwsh+"': '"+$pythonHash+"',`n}`n"),$encoding)

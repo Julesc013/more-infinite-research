@@ -102,6 +102,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/base.lua",
                 "compatibility/modern_catalogue/k2_base.lua",
                 "compatibility/modern_catalogue/space_exploration.lua",
+                "compatibility/modern_catalogue/space_exploration_worker_storage.lua",
                 "compatibility/modern_catalogue/k2_space_exploration.lua",
                 "compatibility/modern_catalogue/bob_angel.lua",
                 "compatibility/modern_catalogue/bob_angel_f200_combined.lua",

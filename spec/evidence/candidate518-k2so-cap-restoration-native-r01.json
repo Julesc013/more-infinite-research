@@ -1,0 +1,376 @@
+{
+  "kind": "MIRK2SOCapRestorationNativeEvidenceV1",
+  "schema": 1,
+  "observed_date": "2026-11-20",
+  "status": "independently-accepted-bounded-native-research-and-cap-history",
+  "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+  "integration_commit": "8d7ad78dd859ae96a8505773bd7a3e90880eeb63",
+  "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+  "source_pr": 2185,
+  "package": {
+    "path": "build/qualification/cap-state-queue-reentrancy-2397-r01/more-infinite-research_5.0.21018.zip",
+    "bytes": 1053909,
+    "sha256": "001189ACF5D2030FADD91A369E2B2E0FB7B2A3CDE0FF7285934823C064650A2E"
+  },
+  "package_record": {
+    "path": "build/qualification/cap-state-queue-reentrancy-2397-r01/PACKAGE-r01.json",
+    "bytes": 42387,
+    "sha256": "B36E4CE61B39005FECDD8A804CF0B5BDDA58CDBA9E63199EE53FEFBD2399F96B"
+  },
+  "exact_member_readback": {
+    "path": "build/qualification/cap-state-queue-reentrancy-2397-r01/EXACT-READBACK-r01.json",
+    "bytes": 1201,
+    "sha256": "A00A297EB4AB31DAA2B66D2B2D0E6DCB8577CB63FC53ABE5EE1FB74E678E8F87"
+  },
+  "source_ci": {
+    "path": "build/qualification/cap-state-queue-reentrancy-2397-r01/PLAYER-CHECKS-r01.json",
+    "bytes": 24542,
+    "sha256": "8F925FA7DB5D3A9CF0829E50E8FBB77B1F1D7702FAAD349C0B593EE53D7B193C"
+  },
+  "integration_readback": {
+    "path": "build/qualification/cap-state-queue-reentrancy-2397-r01/INTEGRATION-r01.json",
+    "bytes": 1530,
+    "sha256": "BCF4A7CFA67D483372C0F24CFC0FB5581B527A78B4672BE60A3FEC6C889332A9"
+  },
+  "independent_code_review": {
+    "path": "build/qualification/cap-state-queue-reentrancy-review-r01/CODE-REVIEW-r01.json",
+    "bytes": 6029,
+    "sha256": "DF3E021A8F0CC4CDE91A4B29F838022A1E21692E18AD9623F85F72B4EEC8AD18"
+  },
+  "native_executor": {
+    "runner_commit": "873b8cdfc1bd8811c3efcb2bdd2b7102ed51c1ce",
+    "runner_source_tree": "a504d92fe798d570df58514f9f839c4954af14f3",
+    "engine_version": "2.1.24",
+    "engine_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF",
+    "sdk_members": 59,
+    "memory_mib": 8192,
+    "per_stage_output_mib": 128,
+    "aggregate_output_mib": 1024,
+    "per_process_timeout_seconds": 300
+  },
+  "selection": {
+    "official": [
+      "base",
+      "space-age",
+      "quality",
+      "recycler",
+      "elevated-rails"
+    ],
+    "external_versions": {
+      "Krastorio2": "2.1.4",
+      "Krastorio2-spaced-out": "2.0.19",
+      "Krastorio2Assets": "2.1.0",
+      "k2so-assets": "1.0.7",
+      "flib": "0.17.2",
+      "Krastorio2MenuSimulations": "2.1.0",
+      "xy-k2so-enhancements-nulls-fork": "0.8.3"
+    },
+    "selected_mods": 15,
+    "fixture_source_commit": "61307a4813e3c6df6443add66a9dff5ce3f375f9",
+    "actors_unchanged": true
+  },
+  "predecessor": {
+    "version": "5.0.21017",
+    "published_archive_sha256": "C31162E77F671B47B713A5E902201F112125BA734AAC8954119BF8AF01DDF191",
+    "protected_source_sha256": "13B60BE7D329B80223F600AA0970E851145183651C7ADB1735C0D077D3945B13",
+    "protected_source_bytes": 735212,
+    "scope": "Reuse the authentic published17 producer save; its original four-process source result remains under the original controller and is not counted as a new execution."
+  },
+  "current_native_processes": 9,
+  "current_cold_reloads": 6,
+  "roles": [
+    {
+      "role": "upgrade",
+      "packet": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-r01/packet.json",
+        "bytes": 28528,
+        "sha256": "586A14B1F18B74460FB66AAF8DD312092371B3953D956C6C92ADF15A78A2B5EA"
+      },
+      "owner": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-r01/Invoke-Probe.ps1",
+        "bytes": 14773,
+        "sha256": "F4F0616879B955F3155118E1F0D54734E01C34EA062A724AD2825455A6ED1FAD"
+      },
+      "profile_sha256": "4099CA8FA0031DF4FA76221F5BA5C417105AB0898D075C1244BA2234B9706412",
+      "actor": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-paid-a504-873-controller-r01/retained-inputs/build/qualification/k2so-current718-paid-inputs-r01/packages/upgrade/mir-fixture-k2so-material-continuation_0.2.0.zip",
+        "bytes": 9883,
+        "sha256": "EDC90C7A2A53C2674E4756BAE8A453A336D45C6C5B8755435904ADBA3877DE42",
+        "name": "mir-fixture-k2so-material-continuation",
+        "version": "0.2.0"
+      },
+      "input_save": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-paid-a504-873-controller-r01/retained-native-custody-r01/protected/source.zip",
+        "bytes": 735212,
+        "sha256": "13B60BE7D329B80223F600AA0970E851145183651C7ADB1735C0D077D3945B13"
+      },
+      "terminal": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-r01/terminal.json",
+        "bytes": 246434,
+        "sha256": "8805C07F9987F9FB8AA9E3CF879C181B7FDF8288855573CE9966D036E755E98B"
+      },
+      "raw_readback": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-r01/EXECUTE-READBACK-r01.json",
+        "bytes": 10161,
+        "sha256": "E04D49F9DB3E54C8426478F7FE5F3CBE50EFE843CE254DF200AF4A8F41C19FC4"
+      },
+      "raw_inventory": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-r01/EXECUTE-ROOT-INVENTORY-r01.json",
+        "bytes": 3733,
+        "sha256": "0771021BE1E0F8973F2D31D5FBF119A2803B965C14661F74C021A36B9CF8FB78"
+      },
+      "independent_result_review": {
+        "path": "build/qualification/k2so-cap-state-2397-upgrade-review-r01/RESULT-REVIEW-r01.json",
+        "bytes": 4109,
+        "sha256": "B4F07B6C863F54E18E109F9BA3A268D25DB62E53B6553090AC6D1982F3A481ED"
+      },
+      "native_processes": 3,
+      "cold_reloads": 2,
+      "input_unchanged": true,
+      "cold_save_bytes_unchanged": true,
+      "cold_load_read_only": true,
+      "library_restored": true,
+      "factorio_remaining": 0,
+      "successor": {
+        "relative_path": "probe/write-data/saves/mir5-native-complete.zip",
+        "bytes": 736624,
+        "sha256": "F0FF4DA59FD9BEE4DC8A9D0434B8F940A63CFD09BA86309F67EC9289EF33AB7A"
+      },
+      "observed_jobs_completed": 3,
+      "observed_science_consumed": {
+        "automation-science-pack": 0,
+        "logistic-science-pack": 0,
+        "chemical-science-pack": 0,
+        "space-science-pack": 5160
+      },
+      "observed_player_bonuses": {
+        "kr-rare-metals": 0.08,
+        "kr-rare-metals-from-enriched-rare-metals": 0.08,
+        "kr-silicon": 0.08,
+        "kr-glass": 0.08
+      },
+      "observed_foreign_bonuses": {
+        "kr-rare-metals": 0,
+        "kr-rare-metals-from-enriched-rare-metals": 0,
+        "kr-silicon": 0,
+        "kr-glass": 0
+      }
+    },
+    {
+      "role": "finite",
+      "packet": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-r01/packet.json",
+        "bytes": 29091,
+        "sha256": "1CF7AEB29C7EA292441FC136ECEFDD18B767979DFB6AD853A613ABD1985C2E63"
+      },
+      "owner": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-r01/Invoke-Probe.ps1",
+        "bytes": 14771,
+        "sha256": "BA9F3B1991FB91B7108CB3E4A4E6420B2AF1ED7FFBFA0CF8BFE8AA41BF9A2F3A"
+      },
+      "profile_sha256": "69CC4FD4CD0940C3822F928EF15913D5EA0BCFCB38963C162614A0771D9BCD6A",
+      "actor": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-paid-a504-873-controller-r01/retained-inputs/build/qualification/k2so-current718-paid-inputs-r01/packages/finite/mir-fixture-k2so-material-continuation_0.3.0.zip",
+        "bytes": 9877,
+        "sha256": "844DFC9152F325E63E448D04386C28C031D49D0939D661F5D5368E1455A4725F",
+        "name": "mir-fixture-k2so-material-continuation",
+        "version": "0.3.0"
+      },
+      "input_save": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-cap-state-2397-upgrade-r01/protected-upgrade.zip",
+        "bytes": 736624,
+        "sha256": "F0FF4DA59FD9BEE4DC8A9D0434B8F940A63CFD09BA86309F67EC9289EF33AB7A"
+      },
+      "terminal": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-r01/terminal.json",
+        "bytes": 245362,
+        "sha256": "7515AF11CD2937E1EE19999E5E4E776D8E8E9F3D51FE4BABCAB8BCF5C597CC63"
+      },
+      "raw_readback": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-r01/EXECUTE-READBACK-r01.json",
+        "bytes": 10117,
+        "sha256": "B537C0BF1EA681889D8993318D538E8A1E0C762D4BDAF9EC65B30152A33E30DA"
+      },
+      "raw_inventory": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-r01/EXECUTE-ROOT-INVENTORY-r01.json",
+        "bytes": 3732,
+        "sha256": "274E1FCD1970E075B38E8CFCC419F56ED45CA96C34BA971FF5AB03EB0FB60117"
+      },
+      "independent_result_review": {
+        "path": "build/qualification/k2so-cap-state-2397-finite-review-r01/RESULT-REVIEW-r01.json",
+        "bytes": 4109,
+        "sha256": "C42B97F82999134D64A7700AB7E92BFFDB2CD0D2CF3C362563FABD1454DEC9A9"
+      },
+      "native_processes": 3,
+      "cold_reloads": 2,
+      "input_unchanged": true,
+      "cold_save_bytes_unchanged": true,
+      "cold_load_read_only": true,
+      "library_restored": true,
+      "factorio_remaining": 0,
+      "successor": {
+        "relative_path": "probe/write-data/saves/mir5-native-complete.zip",
+        "bytes": 736877,
+        "sha256": "78E0ADC55471F594356DFBE7C79B9F4336D1577BFAB5DAEEDF6E3BEDE3A34EF9"
+      },
+      "observed_jobs_completed": 0,
+      "observed_science_consumed": {},
+      "observed_player_bonuses": {
+        "kr-rare-metals": 0.08,
+        "kr-rare-metals-from-enriched-rare-metals": 0.08,
+        "kr-silicon": 0.08,
+        "kr-glass": 0.08
+      },
+      "observed_foreign_bonuses": {
+        "kr-rare-metals": 0,
+        "kr-rare-metals-from-enriched-rare-metals": 0,
+        "kr-silicon": 0,
+        "kr-glass": 0
+      }
+    },
+    {
+      "role": "relaxed",
+      "packet": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-r01/packet.json",
+        "bytes": 29114,
+        "sha256": "8C8885E3C741D3FD0458CA33BDA501CA970CD876DDB081309A061C50F61039E8"
+      },
+      "owner": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-r01/Invoke-Probe.ps1",
+        "bytes": 14773,
+        "sha256": "8249AA7CF1C0266CF5D4026C65D0B3420916D9D267243EEED82DE9FEE692B7C1"
+      },
+      "profile_sha256": "1AE7AF76E0A30CF16F6FABF5DEF9A376B2D6E84C1FB5B296E8252E51076CBCC9",
+      "actor": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-paid-a504-873-controller-r01/retained-inputs/build/qualification/k2so-current718-paid-inputs-r01/packages/relaxed/mir-fixture-k2so-material-continuation_0.4.0.zip",
+        "bytes": 9885,
+        "sha256": "BA87528D21181315FA0FE0B4980B7A24BAF41D98362CFC24313F3B68CF2ED82D",
+        "name": "mir-fixture-k2so-material-continuation",
+        "version": "0.4.0"
+      },
+      "input_save": {
+        "path": "/home/agents/Projects/Factorio/MIR/.task-builds/k2so-current-a504-873b-r01/build/qualification/k2so-cap-state-2397-finite-r01/protected-finite.zip",
+        "bytes": 736877,
+        "sha256": "78E0ADC55471F594356DFBE7C79B9F4336D1577BFAB5DAEEDF6E3BEDE3A34EF9"
+      },
+      "terminal": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-r01/terminal.json",
+        "bytes": 245673,
+        "sha256": "F46990EDC16964051E4C2B9728CB9CF41961B122E09498CA87F91A81B1453523"
+      },
+      "raw_readback": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-r01/EXECUTE-READBACK-r01.json",
+        "bytes": 10161,
+        "sha256": "826E39B68B426A7D9F86D88B709B78C3D0E94BD6BAFC9129E3B6DBFBE559C600"
+      },
+      "raw_inventory": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-r01/EXECUTE-ROOT-INVENTORY-r01.json",
+        "bytes": 3733,
+        "sha256": "DF997C638856A17D0AEAD8BA66AA4E01236178DEBC88E28B4093F79EE1B5C68B"
+      },
+      "independent_result_review": {
+        "path": "build/qualification/k2so-cap-state-2397-relaxed-review-r01/RESULT-REVIEW-r01.json",
+        "bytes": 5760,
+        "sha256": "25F23D31330FA8F0E3B03773561D0435C4AE4214023ED8D384E1CF171C8B94BD"
+      },
+      "native_processes": 3,
+      "cold_reloads": 2,
+      "input_unchanged": true,
+      "cold_save_bytes_unchanged": true,
+      "cold_load_read_only": true,
+      "library_restored": true,
+      "factorio_remaining": 0,
+      "successor": {
+        "relative_path": "probe/write-data/saves/mir5-native-complete.zip",
+        "bytes": 736913,
+        "sha256": "644694DD6FFB889F6BA36AB4CBE35ED69FDF745096DFFD5600E4782EBABA9050"
+      },
+      "observed_jobs_completed": 3,
+      "observed_science_consumed": {
+        "automation-science-pack": 20,
+        "logistic-science-pack": 0,
+        "chemical-science-pack": 0,
+        "space-science-pack": 3440
+      },
+      "observed_player_bonuses": {
+        "kr-rare-metals": 0.08,
+        "kr-rare-metals-from-enriched-rare-metals": 0.08,
+        "kr-silicon": 0.12,
+        "kr-glass": 0.08
+      },
+      "observed_foreign_bonuses": {
+        "kr-rare-metals": 0,
+        "kr-rare-metals-from-enriched-rare-metals": 0,
+        "kr-silicon": 0,
+        "kr-glass": 0
+      }
+    }
+  ],
+  "old_failure": {
+    "archive_sha256": "C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D",
+    "terminal": {
+      "path": "build/qualification/k2so-paid-a504-873-controller-r01/terminal.json",
+      "bytes": 927330,
+      "sha256": "08AC97434A3704AD4C9D58F0C7DC6D9D0C84617F786EAC0E55F5ACF84D8E9908"
+    },
+    "observed_processes": 11,
+    "expected_full_chain_processes": 13,
+    "failure": "Role relaxed runner: [mir441-process-exit] 1",
+    "retained_bad_finite_sha256": "2D0A858715FE9C80FD317634FA0540271B419FA0A68E841A9D0B0151FA6AB4BD",
+    "scope": "Source, upgrade and finite stages passed; the first original relaxed assertion failed. This adverse is preserved, not adopted as current qualification."
+  },
+  "cause": {
+    "diagnostic_markers": {
+      "path": "build/qualification/k2so-cap-producer-queue-observation-r01/ACTUAL-OBSERVATIONS-r01.json",
+      "bytes": 37419,
+      "sha256": "CF3F1B8A71A3D74C374B45FEA3C41D5EE4E96CB22AFFB3DF162F5660AC9E1FDB"
+    },
+    "observation": "Queue-before, attached empty-state removal, queue-after, then outer local rights creation. The log-only replay generated the exact original bad finite save bytes. The corrected lifecycle retains its state until the outermost reconciliation finishes.",
+    "diagnostic_is_release_candidate": false
+  },
+  "host_controls": {
+    "focused_methods": 111,
+    "changelog_methods": 6,
+    "old_source_opponent": {
+      "path": "build/qualification/k2so-cap-plan-component-observation-r01/HOST-RED-r01.json",
+      "bytes": 334,
+      "sha256": "DA743FD494894E2351AF24FB82B854BA67BD0244B3330AC6C5BDA12F0896789A"
+    },
+    "corrected_opponent": {
+      "path": "build/qualification/k2so-cap-plan-component-observation-r01/HOST-GREEN-r01.json",
+      "bytes": 336,
+      "sha256": "F5792692E348345D0806877B3B3206BD4B3D9A869F4C09C4CBEE24F1B97ABEA7"
+    },
+    "error_unwind_mutation_opponent": {
+      "path": "build/qualification/k2so-cap-plan-component-observation-r01/ERROR-UNWIND-OPPONENT-r01.json",
+      "bytes": 264,
+      "sha256": "AEC9E4B5360AAE9FD679CEA7E2F66F250CD1D915BDFFC1B88073CC173F011827"
+    }
+  },
+  "reused_data_scope": {
+    "current_vs_c962": "249 members;247 byte-identical. Only runtime/lifecycle.lua and changelog.txt differ; no data-stage input changed.",
+    "data_acceptance": {
+      "path": "build/qualification/k2so-material-frontier-a504-r04/DATA-FRONTIER-ACCEPTANCE-r01.json",
+      "bytes": 970,
+      "sha256": "C2E991F396CFC586D72E6BE6A898ACBED8E7F38B46556A6AE312D92D9655AEE6"
+    },
+    "scope": "The three original C962 data captures retain their identities. They are not new current-package engine executions."
+  },
+  "accepted_observations": [
+    "Direct17-to-current ordinary continuation and paid/unfinished state preservation.",
+    "Finite clamping leaves earned bonuses and silicon twenty-percent work intact; unrelated probe and foreign flags survive.",
+    "Unlimited transition restores only MIR-owned player enablement and foreign visibility baseline, preserving foreign disablement.",
+    "Unchanged actor completes probe20 automation plus silicon level5 remaining1440 white and level6 full2000 white; silicon next cursor7/bonus0.12, other material cursors5/bonus0.08 and foreign bonuses0.",
+    "Every stage saves and passes two independent read-only cold loads with completed-save bytes unchanged."
+  ],
+  "limitations": [
+    "Exact Factorio2.1.24/SpaceAge/K2SO selection and controlled history only; no original reporter save acceptance.",
+    "Fixture temporarily accelerates force laboratory speed and restores its baseline; elapsed performance is not qualified.",
+    "No physical manufacturing/mining output, GUI/client/multiplayer, other edition, full release or stable acceptance.",
+    "The earlier seventeen-archive C962 freeze is preserved, but it is not the current2397 player freeze."
+  ],
+  "bounded_native_acceptance": true,
+  "release_acceptance": false,
+  "stable_acceptance": false,
+  "publication_performed": false
+}

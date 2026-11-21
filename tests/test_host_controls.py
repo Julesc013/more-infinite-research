@@ -254,10 +254,34 @@ Delivery evidence: exact delivered remedy and readback at evidence/delivery.json
 
 
 class HostControlsTests(unittest.TestCase):
+    def test_named_batch_uses_declared_order_and_rejects_unknown_or_duplicate_paths(self):
+        prefix = "./tests/Test-MIR5HostControls.ps1 -Plan -ControlPath "
+        result = run_powershell(["-Command", prefix +
+            "@('tests/test_library_model.py','tests/test_library.py') | ConvertTo-Json -Depth 8 -Compress"])
+        plan = json.loads(result.stdout)
+        self.assertEqual([row["path"] for row in plan["controls"]], [
+            "tests/test_library.py", "tests/test_library_model.py"])
+        self.assertEqual(plan["selection"], "named")
+        for entries in ("@('tests/test_library.py','tests/not-in-plan.py')",
+                        "@('tests/test_library.py','tests/test_library.py')"):
+            with self.subTest(entries=entries), self.assertRaises(subprocess.CalledProcessError) as error:
+                run_powershell(["-Command", prefix + entries])
+            self.assertIn("mir5-host-controls-selection", error.exception.stderr)
+
     def test_wrapper_has_one_explicit_current_host_control_plan(self):
         plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
         plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
         validate_host_control_plan(plan, ROOT)
+
+    def test_plan_registers_published_base_paid_source_control_with_lua_runtime(self):
+        plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
+        plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
+        self.assertIn({"path": "tests/test_published_base_paid_source.py", "lua": True}, plan["controls"])
+
+    def test_plan_registers_published_base_added_successor_control_with_lua_runtime(self):
+        plan_command = "& { ./tests/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
+        plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
+        self.assertIn({"path": "tests/test_published_base_added_successor.py", "lua": True}, plan["controls"])
 
     def test_plan_properties_reject_missing_duplicate_wrong_mode_and_escaped_controls(self):
         with tempfile.TemporaryDirectory(prefix="mir-host-plan-contract-") as directory:

@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate518Current2397AssetFreezeV1",
+  "status": "independently-reviewed-integrity-and-primary-custody-only",
+  "source_version": "5.0.18",
+  "source_commit": "59c70bd7d2edfa9bf2e82590fd9d6de0ba6df3ff",
+  "player_tree": "2397d1792d59f78a09884ab1b9fb390e7fa477e2",
+  "source_integration": "8d7ad78dd859ae96a8505773bd7a3e90880eeb63",
+  "primary_snapshot_commit": "d8931b799774fd7ff3706708f011eedfe3b4f4c2",
+  "player_zip_count": 17,
+  "manifest_member_count": 1584,
+  "stable_target_definitions": 9,
+  "experimental_f018_definitions": 1,
+  "best_effort_early_definitions": 7,
+  "assets": [
+    {
+      "name": "more-infinite-research_5.0.00618.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.00618.zip",
+      "bytes": 140593,
+      "sha256": "4338637529B1B279053097C0B470C2F06DA66259F05F77CD37AD868BEA5CA38B"
+    },
+    {
+      "name": "more-infinite-research_5.0.00718.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.00718.zip",
+      "bytes": 140593,
+      "sha256": "AC310F4F6C7002E967F1D44E42B1D2D31E95AD03D459D52DF61676D43234E1AA"
+    },
+    {
+      "name": "more-infinite-research_5.0.00818.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.00818.zip",
+      "bytes": 140591,
+      "sha256": "953E87F3594B053905D008004F3D30952BE9528380CF05D7D82DF2D54C601DE5"
+    },
+    {
+      "name": "more-infinite-research_5.0.00918.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.00918.zip",
+      "bytes": 140593,
+      "sha256": "BD93995E20E1FF53388AE067511202F9738B77A98A9A70C1BB882CF008DFBF4E"
+    },
+    {
+      "name": "more-infinite-research_5.0.01018.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01018.zip",
+      "bytes": 140592,
+      "sha256": "46FF50E231B50EFA88E698289CF60A9E4C0E0AD1F68650E7B154F54CBFAE9F88"
+    },
+    {
+      "name": "more-infinite-research_5.0.01118.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01118.zip",
+      "bytes": 140593,
+      "sha256": "475740F629C38B8D019982CD6E3602256DA241B9243ADBD5CC853C8A89DBB055"
+    },
+    {
+      "name": "more-infinite-research_5.0.01218.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01218.zip",
+      "bytes": 140595,
+      "sha256": "2C7D7D6947B583A815D51AB6E54A45AA0DD9B7A02A98907687040349B850704D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01318.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01318.zip",
+      "bytes": 677850,
+      "sha256": "C3F397DFAF8BBABD85A536BCE8FEB74EA6213C2AFBFD12E2BAEAEBD7E84CD7E0"
+    },
+    {
+      "name": "more-infinite-research_5.0.01418.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01418.zip",
+      "bytes": 677852,
+      "sha256": "AA80DABDBBFD5C17A790106CB7F8F7FF93C642A43E5A36E4226B099BC91696BE"
+    },
+    {
+      "name": "more-infinite-research_5.0.01518.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01518.zip",
+      "bytes": 677850,
+      "sha256": "391E8D97CE0A078BAD6D8EC0A09ECE37F37A59CEAB94BE6D4265660E8B17C4C7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01618.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01618.zip",
+      "bytes": 677851,
+      "sha256": "B14DFD37C91932C282DB7AFFD965A5916225371CB480A6CC8D353273ECFF2636"
+    },
+    {
+      "name": "more-infinite-research_5.0.01718.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01718.zip",
+      "bytes": 677852,
+      "sha256": "AEF4A2FAC215D2729CB29DF9FEC9DD3B5EFE2C1FB1404B7E3A01D9470D3F8E51"
+    },
+    {
+      "name": "more-infinite-research_5.0.01818.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.01818.zip",
+      "bytes": 677851,
+      "sha256": "264773619649B5B1933E466CDC7A9E2C59AE6DB95629BBBC3FC78BA6C0C7EE7B"
+    },
+    {
+      "name": "more-infinite-research_5.0.10018.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.10018.zip",
+      "bytes": 677844,
+      "sha256": "7D5F48FB971428E5D3550F3DE0536B28AFEB2AFB27D9A8A9A8978BF728E90C10"
+    },
+    {
+      "name": "more-infinite-research_5.0.11018.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.11018.zip",
+      "bytes": 678154,
+      "sha256": "4BB8A42BC06DDCBE2E0239B3322D6494AFC205DD75E13C0B43587D967E4CBD14"
+    },
+    {
+      "name": "more-infinite-research_5.0.20018.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.20018.zip",
+      "bytes": 1053483,
+      "sha256": "3C82F7F9E3D879243B64423A96D00301BBF5A406CCD77BC0F6F06FE23FAF299D"
+    },
+    {
+      "name": "more-infinite-research_5.0.21018.zip",
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/more-infinite-research_5.0.21018.zip",
+      "bytes": 1053909,
+      "sha256": "001189ACF5D2030FADD91A369E2B2E0FB7B2A3CDE0FF7285934823C064650A2E"
+    }
+  ],
+  "integrity_files": [
+    {
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 218941,
+      "sha256": "64AD2FAC24E5844F0004070203A8D5D449AE09005B4CE4E4A023FCA401059192"
+    },
+    {
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "A1C46EFCFB732B48E4602379107F34DA8EACBB5C2B3027CE186B005A15FC30E4"
+    },
+    {
+      "path": "build/packages/mir518-2397-complete-blackglass-r01/SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "377E6241FF9B77CA3E28D475DC4309B2ABA8538988C147C4FF69CC2309B1DBE0"
+    }
+  ],
+  "independent_review": {
+    "path": "build/qualification/foundation518-gunmetal-asset-review-2397-r01/ASSET-REVIEW-r01.json",
+    "bytes": 4564,
+    "sha256": "875F6AF9E07FFEF3795FBCBE2D8B7E55BC3AC2B75CCB3CCE7AF953CFCD99B156"
+  },
+  "freeze_verification": {
+    "path": "build/qualification/foundation518-gunmetal-inputs-2397-r01/ASSETS-r01.json",
+    "bytes": 4026,
+    "sha256": "9E7478FD43F5308F39D3AE7A94BB8184EF8E05AA44D4CFC3B65E3636A36A2B11"
+  },
+  "primary_custody": {
+    "path": "build/qualification/foundation518-gunmetal-inputs-2397-r01/ASSETS-PRIMARY-r01.json",
+    "bytes": 9575,
+    "sha256": "0B9D30AF80D4A489BF4EFA908302BEB5A9AEF3326716F5D5EA6DB0B144B01925"
+  },
+  "exact_member_delta": {
+    "path": "build/qualification/foundation518-gunmetal-inputs-2397-r01/ASSETS-DELTA-r01.json",
+    "bytes": 6385,
+    "sha256": "E18D664E46FE77846341369543FFADE5F36E137D972C66CB972313EAA79F5AF1"
+  },
+  "comparison_to_preserved_a504": {
+    "all_memberships_equal": true,
+    "changelog_only_archives": [
+      "more-infinite-research_5.0.00618.zip",
+      "more-infinite-research_5.0.00718.zip",
+      "more-infinite-research_5.0.00818.zip",
+      "more-infinite-research_5.0.00918.zip",
+      "more-infinite-research_5.0.01018.zip",
+      "more-infinite-research_5.0.01118.zip",
+      "more-infinite-research_5.0.01218.zip",
+      "more-infinite-research_5.0.01318.zip",
+      "more-infinite-research_5.0.01418.zip",
+      "more-infinite-research_5.0.01518.zip",
+      "more-infinite-research_5.0.01618.zip",
+      "more-infinite-research_5.0.01718.zip",
+      "more-infinite-research_5.0.01818.zip",
+      "more-infinite-research_5.0.10018.zip",
+      "more-infinite-research_5.0.11018.zip"
+    ],
+    "lifecycle_and_changelog_archives": [
+      "more-infinite-research_5.0.20018.zip",
+      "more-infinite-research_5.0.21018.zip"
+    ],
+    "existing_accepted_f200_sha256": "3C82F7F9E3D879243B64423A96D00301BBF5A406CCD77BC0F6F06FE23FAF299D",
+    "existing_accepted_f210_sha256": "001189ACF5D2030FADD91A369E2B2E0FB7B2A3CDE0FF7285934823C064650A2E",
+    "exact_existing_modern_bytes_reproduced": true
+  },
+  "scope": [
+    "The committed shared player tree and declared edition records produce the complete 17-file delivery candidate set.",
+    "CRC, every manifest member, info projection, checksum and Python/package/release controller provenance were independently reviewed.",
+    "Both external freeze and byte-identical primary custody are retained. Existing published assets, tags and releases are untouched.",
+    "Older results retain their original inputs and identities; changelog-only member equivalence does not relabel an old execution as this freeze."
+  ],
+  "native_qualification": false,
+  "release_published": false,
+  "stable_acceptance": false,
+  "published_objects_changed": false
+}

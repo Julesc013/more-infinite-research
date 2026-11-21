@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "MIRWorkerStorageFiniteFourNativeReadbackV1",
+  "status": "accepted-controlled-finite-provider-upgrade",
+  "scope": "Factorio 2.1.24 headless, published MIR 4.7.3 to the exact private MIR 5.0.18 F210 archive with the controlled finite provider fixture.",
+  "run": "https://github.com/Julesc013/more-infinite-research/actions/runs/44909824141",
+  "controller_commit": "6f321ae95b5b00c8091595e6237b80404dcaef28",
+  "source_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "candidate": {
+    "source_commit": "765703144972763bc5071b0fd7ef46aea86e3c97",
+    "player_tree": "2f7d9b257b323b13bb8594a19f9a151d68815c57",
+    "version": "5.0.21018",
+    "sha256": "4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E",
+    "bytes": 1069479,
+    "byte_identical_to_primary_freeze": true
+  },
+  "native": {
+    "process_exits": [0, 137, 137, 0, 0],
+    "ordinary_lab_completions_before_and_after": [1, 2],
+    "next_level_before_and_after": [6, 7],
+    "worker_bonus_before_and_after": [7, 9],
+    "finite_predecessor_effect": 2,
+    "retained_queue": ["worker-robots-storage-5", "mir-worker-test-unrelated"],
+    "retained_research_progress_sentinel": 0.42,
+    "retained_unrelated_progress_sentinel": 0.27,
+    "protected_source_sha256": "07202EB1134E97613BDF05EE40E66A300278DEC9F10CE7B1642CA59B3CCDAED4",
+    "protected_successor_sha256": "6E6DA2173CE787F4ED812980EBB402FAB19064719A710524157CB908C58BA3A8",
+    "cold_copies_same_as_protected_successor": true,
+    "cold_test_pass_ticks": [7706, 7706],
+    "direct_library_restoration_receipts": 4
+  },
+  "primary_readback": "build/qualification/gunmetal-published517-successor-r01/finite-four-hosted-44909824141/independent-readback.json",
+  "retained_related_runs": {
+    "44908653920": "Zero-native refusal from three stale helper pins.",
+    "44909203209": "Historical C962 archive replay after the helper-pin repair."
+  },
+  "limits": "The saved progress sentinels establish continuity of state. Reporter-specific, physical output, client, performance and stable release acceptance remain separate."
+}

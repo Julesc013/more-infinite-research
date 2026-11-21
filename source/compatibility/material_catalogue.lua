@@ -1,12 +1,10 @@
--- Three fixed K2SO material technologies. This is a bounded native constructor,
+-- Three fixed K2SO material families. This is a bounded native constructor,
 -- not a route, owner, or progression discovery mechanism.
-local cost = require("research.cost")
+local stages = require("research.material_stages")
 local catalogue = require("compatibility.modern_catalogue")
 local target = require("platform.target")
 
 local M = {}
-
-local OVERLAY = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"
 
 local DEFINITIONS = require("research.k2_materials")
 
@@ -112,56 +110,11 @@ local function stream_for(values, definition)
   if type(stream) ~= "table" or type(stream.enabled) ~= "boolean"
       or not finite(stream.base_cost) or not finite(stream.linear_increment)
       or not finite(stream.growth_factor)
+      or not finite(stream.max_level) or stream.max_level < 0 or stream.max_level ~= math.floor(stream.max_level)
       or not finite(stream.research_time) or not finite(stream.effect_percent) then
     fail(definition.key .. " resolved settings are invalid")
   end
   return stream
-end
-
-local function copy_names(names)
-  local output = {}
-  for index, name in ipairs(names) do output[index] = name end
-  return output
-end
-
-local function ingredients(science)
-  local output = {}
-  for index, science_pack in ipairs(science) do output[index] = {science_pack, 1} end
-  return output
-end
-
-local function effects(routes, effect_percent)
-  local output = {}
-  for index, route in ipairs(routes) do
-    output[index] = {type = "change-recipe-productivity", recipe = route.recipe, change = effect_percent / 100}
-  end
-  return output
-end
-
-local function technology(definition, stream)
-  local output = {
-    type = "technology",
-    name = definition.name,
-    icons = {
-      {icon = definition.icon, icon_size = 64},
-      {icon = OVERLAY, icon_size = 128, scale = 0.5, shift = {50, 50}, floating = true},
-    },
-    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. definition.item}},
-    localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
-    level = 1,
-    upgrade = true,
-    max_level = 3,
-    order = definition.order,
-    prerequisites = copy_names(definition.prerequisites),
-    effects = effects(definition.routes, stream.effect_percent),
-    unit = {
-      count_formula = cost.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
-      time = stream.research_time,
-      ingredients = ingredients(definition.science),
-    },
-  }
-  if stream.enabled == false then output.enabled = false end
-  return output
 end
 
 function M.technologies(values, raw, active_mods, upstream_startup)
@@ -177,7 +130,14 @@ function M.technologies(values, raw, active_mods, upstream_startup)
   end
 
   local output = {}
-  for index, definition in ipairs(bindings) do output[index] = technology(definition, streams[index]) end
+  -- Keep the existing finite stages intact. Limits belong to the runtime
+  -- cap controller so tightening a cap cannot truncate already-earned levels.
+  for index, definition in ipairs(bindings) do
+    output[#output + 1] = stages.technology(definition, definition.early, streams[index], fail)
+  end
+  for index, definition in ipairs(bindings) do
+    output[#output + 1] = stages.technology(definition, definition.continuation, streams[index], fail)
+  end
   return output
 end
 

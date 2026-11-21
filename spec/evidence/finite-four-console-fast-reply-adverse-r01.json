@@ -1,0 +1,48 @@
+{
+  "schema": "MIRWorkerStorageFiniteFourConsoleFastReplyAdverseV1",
+  "observed_run": {
+    "repository": "Julesc013/more-infinite-research",
+    "workflow_run_id": 44629476191,
+    "native_job_id": 135933278136,
+    "head_commit": "6425417d5666274d0638e409f8b8ffa427ba1357",
+    "head_tree": "bd88268a9001a609f5b6fa0ba8f8c646b4dd1f8c",
+    "conclusion": "failure"
+  },
+  "trusted_inputs": {
+    "engine": {
+      "version": "2.1.24",
+      "platform": "Linux headless",
+      "factorio_binary_sha256": "062277B9D91F5DF9E655A77E6A94EC0208E668ECFC1C4424EE1B12C9AAAB2DCF"
+    },
+    "published473_source_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "a504_candidate_sha256": "C9620529B4BBF65B30DF728DE47B93B0BE45D938417FD387D92F4B64AA1A837D"
+  },
+  "observed_console_boundary": {
+    "stdout_path": "artifacts/worker-storage-finite-four-44629476191-1/execution/process-2.stdout.txt",
+    "stdout_sha256": "F2404A36A42D20967C2B8A1DAF32FB87590A1D79BC44E055E4E99873ECD655FC",
+    "stdout_bytes": 26071,
+    "confirmation_marker": "Using Lua console commands will disable achievements. Please repeat the command to proceed.",
+    "marker_start_offset": 25979,
+    "marker_end_exclusive": 26070,
+    "recorded_post_flush_confirmation_floor": 26071,
+    "first_send_count": 1,
+    "confirmation_marker_observed": false,
+    "fact": "The exact marker was appended during the first command's write/flush interval and lies wholly before the old post-flush reader floor."
+  },
+  "bounded_repair": {
+    "shared_primitive": "Send-MIR441FactorioConsoleStartupLine",
+    "rule": "Capture each stream's length before WriteLine/Flush, commit those lengths as confirmation floors only after the write and flush succeed, and retain post-flush output-boundary receipt fields unchanged.",
+    "preserved_guards": [
+      "preexisting unread output remains excluded",
+      "at most one identical confirmation replay remains allowed",
+      "pre-write observation failure sends no command",
+      "post-flush observation failure retains the successful-send receipt",
+      "replay refuses a regressed stream before a second send"
+    ]
+  },
+  "limits": [
+    "This is an adverse controller-observation record, not a native acceptance result.",
+    "The run reached no source-earned, candidate, successor, or cold-reload result and created no reusable earned protected source.",
+    "This record does not authorize a retry, timeout or resource-policy change, actor change, oracle change, or release claim."
+  ]
+}

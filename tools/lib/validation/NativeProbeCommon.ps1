@@ -75,3 +75,10 @@ function Assert-MIR441MainAncestor {
   if($LASTEXITCODE-ne0){throw "[mir441-main-ancestry-required] main=$main revision=$Revision"}
   return $main
 }
+
+# Callers select the actual CLI distribution explicitly; operating system and
+# executable filename do not establish whether GUI-only options are supported.
+function Get-MIRNativeAudioArguments {
+  param([switch]$Headless)
+  if (-not $Headless) { return '--disable-audio' }
+}

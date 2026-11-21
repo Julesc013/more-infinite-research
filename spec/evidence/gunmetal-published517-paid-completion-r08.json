@@ -1,0 +1,145 @@
+{
+  "kind": "MIRPublishedPaidCompletionEvidenceV1",
+  "schema": 1,
+  "verdict": "accepted-exact-f200-published-paid-operation",
+  "predecessor": {
+    "tag": "v5.0.17",
+    "version": "5.0.20017",
+    "ordinary_levels": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "partial_level": 9,
+    "partial_progress": "0.039024390243902438"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198"
+  },
+  "provider": {
+    "space-exploration": "0.7.57",
+    "space-exploration-postprocess": "0.7.5"
+  },
+  "settings_sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7",
+  "proof": {
+    "status": "published_paid_upgrade_completion_and_two_cold_reads_verified",
+    "source_save_sha256": "EC9A55A60CDCDCB7DE2945FA3AC81EEAA97FA82860F4A7B56EF2B8508D7A07A4",
+    "published_archive_sha256": "B0BFA7418CFF77F249262C98864A386FA022C73E59B29EC30D028AE279A6AB27",
+    "candidate": {
+      "filename": "more-infinite-research_5.0.20018.zip",
+      "version": "5.0.20018",
+      "sha256": "C8ED1B060BD5C6FCA486A475B760C9BD9349123F14CC0627ED36CFA88008C399",
+      "source_commit": "cf3ab1d98eebcaf95828f361169f4bd086cf9a3f",
+      "bytes": 1067972
+    },
+    "observer": {
+      "filename": "mir-fixture-mir5-worker-storage-published517-earned-source_0.1.0.zip",
+      "sha256": "4BEEFB53295C029A54CF1B350B50802C635CEE6DC002F30B8E5084830F33F097",
+      "bytes": 6120,
+      "source_commit": "9262e15c42175470a1cdf3ee0a3e6a920bdc3eba"
+    },
+    "packet_sha256": "2ACD49DF10ABD4A07A4731FE99C6B08133DD890A6E9FE539662244A4A03C95A9",
+    "invocation": "1ba97507ce404274aac22c3d01e08e6f",
+    "originals_verified": 80,
+    "completed_levels": [
+      9,
+      10
+    ],
+    "historical_science_debit": {
+      "automation-science-pack": 12800,
+      "logistic-science-pack": 12800,
+      "chemical-science-pack": 12800,
+      "production-science-pack": 12800,
+      "utility-science-pack": 12800
+    },
+    "settled_effect_changes": [
+      [
+        "mir5-worker-storage-published517-earned-source",
+        0,
+        8,
+        10
+      ]
+    ],
+    "unchanged_force_fields": 47,
+    "settled_queue": [
+      "mir-fixture-published517-earned-source-tail"
+    ],
+    "disabled_level": 11,
+    "native_cap_refusal": true,
+    "scripted_transfer_notifications": [
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      },
+      {
+        "research": "mir-worker-storage-default-4",
+        "by_script": true,
+        "tick": 277,
+        "finished": 2
+      }
+    ],
+    "successor_sha256": "C55ADB008A3E76D13429DDC7305EDA9BE2F3C12D6691D751DE65E24FB91CBE6B",
+    "cold_checksums": [
+      "2011124702",
+      "2011124702"
+    ],
+    "cold_updates_per_process": 1200,
+    "native_exit_codes": [
+      137,
+      0,
+      0
+    ],
+    "manifest_sha256": "2CD5E0CC7336C7D769F1A5A8FF75AD278714F5ACF69680F24B657C3AE6A309F1",
+    "scope": "Exact Factorio 2.0.77 and Space Exploration 0.7.57 published paid upgrade and completion."
+  },
+  "runner_checkout": "199a9cb93bf683dd49266d41e62c0fbcffe78662",
+  "custody": {
+    "primary": "D:/Projects/Factorio/more-infinite-research/build/qualification/gunmetal-published517-successor-r01/paid-completion-r08",
+    "source_preserved": true,
+    "lib_controls_restored": true,
+    "adverse_attempts_retained": [
+      "R01",
+      "R02",
+      "R03",
+      "R05",
+      "R06",
+      "R07"
+    ]
+  },
+  "limits": "Exact published archive and representative recorded earned save in the named provider profile. Integrated bytes, reporter reproduction, other profiles and public delivery have separate verdicts."
+}

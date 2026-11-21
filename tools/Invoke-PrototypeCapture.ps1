@@ -8,11 +8,15 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$MIRArchive = '',
   [string]$ExpectedMIRArchiveSha256 = '',
+  [string]$SettingsPath = '',
+  [string]$ExpectedSettingsSha256 = '',
   [string]$ActiveModsObserver = '',
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,8192)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds = 30,
+  # Explicit CLI selection: headless distributions omit the GUI audio option.
+  [switch]$Headless,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 )
 
@@ -27,6 +31,17 @@ function Assert-MIR5PrototypeCapture {
 function Get-MIR5PrototypeCaptureSha256 {
   param([Parameter(Mandatory)][string]$Path)
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+
+function Get-MIR5PrototypeCaptureArguments {
+  param(
+    [Parameter(Mandatory)][string]$ConfigPath,
+    [Parameter(Mandatory)][string]$LibraryDirectory,
+    [switch]$Headless
+  )
+  $arguments = @('--config',$ConfigPath,'--mod-directory',$LibraryDirectory,'--no-log-rotation')
+  $arguments += @(Get-MIRNativeAudioArguments -Headless:$Headless)
+  return $arguments + @('--dump-data')
 }
 
 function Test-MIR5PrototypeCaptureContainedPath {
@@ -63,6 +78,43 @@ function Get-MIR5PrototypeCaptureMIRArchive {
     Assert-MIR5PrototypeCapture ([IO.Path]::GetFileName($path) -ceq ($root + '.zip')) 'MIR archive filename differs from metadata'
     [pscustomobject][ordered]@{path=$path;sha256=Get-MIR5PrototypeCaptureSha256 $path;name=[string]$info.name;version=[string]$info.version;factorio_version=[string]$info.factorio_version;root=$root}
   } finally { $zip.Dispose() }
+}
+
+function Get-MIR5PrototypeCaptureSettingsArguments {
+  param(
+    [Parameter(Mandatory)][Collections.IDictionary]$ProfileDefinition,
+    [string]$Path = '',
+    [string]$ExpectedSha256 = ''
+  )
+  $hasPath = -not [string]::IsNullOrWhiteSpace($Path)
+  $hasHash = -not [string]::IsNullOrWhiteSpace($ExpectedSha256)
+  Assert-MIR5PrototypeCapture ($hasPath -eq $hasHash) 'SettingsPath and ExpectedSettingsSha256 must be supplied together'
+  $mode = if ($ProfileDefinition.ContainsKey('settings_mode')) { [string]$ProfileDefinition.settings_mode } else { 'Defaults' }
+
+  if (-not $hasPath) {
+    Assert-MIR5PrototypeCapture ($mode -cne 'File') 'File settings profile requires explicit SettingsPath and ExpectedSettingsSha256'
+    Assert-MIR5PrototypeCapture ($mode -ceq 'Defaults') 'profile settings_mode must be Defaults or File'
+    Assert-MIR5PrototypeCapture (-not $ProfileDefinition.ContainsKey('settings_sha256')) 'Defaults profile must not declare settings_sha256'
+    return [ordered]@{SettingsMode='Defaults';SettingsPath=$null;SettingsSha256=$null;SettingsBytes=$null}
+  }
+
+  Assert-MIR5PrototypeCapture ($ExpectedSha256 -match '^[A-Fa-f0-9]{64}$') 'ExpectedSettingsSha256 requires a 64-character SHA-256'
+  Assert-MIR5PrototypeCapture ($mode -ceq 'File') 'File settings require profile settings_mode File'
+  Assert-MIR5PrototypeCapture ($ProfileDefinition.ContainsKey('settings_sha256') -and [string]$ProfileDefinition.settings_sha256 -match '^[A-Fa-f0-9]{64}$') 'File settings profile requires a 64-character settings_sha256'
+  $expected = $ExpectedSha256.ToUpperInvariant()
+  $profileExpected = ([string]$ProfileDefinition.settings_sha256).ToUpperInvariant()
+  Assert-MIR5PrototypeCapture ($profileExpected -ceq $expected) 'File settings profile SHA-256 differs from expected input'
+  Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $Path -PathType Leaf) 'SettingsPath must name an existing regular file'
+  # The activation helper applies this same reparse-point rule immediately
+  # before its controlled library mutation. Reject it before admission too.
+  Assert-MIRLibraryPath $Path
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  $item = Get-Item -LiteralPath $resolved -Force
+  Assert-MIR5PrototypeCapture ($item -is [IO.FileInfo] -and -not ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) 'SettingsPath must name an unlinked regular file'
+  Assert-MIR5PrototypeCapture ($item.Length -le 4MB) 'SettingsPath exceeds the control-file budget'
+  $actual = Get-MIR5PrototypeCaptureSha256 $resolved
+  Assert-MIR5PrototypeCapture ($actual -ceq $expected) 'SettingsPath SHA-256 differs from expected input'
+  return [ordered]@{SettingsMode='File';SettingsPath=$resolved;SettingsSha256=$expected;SettingsBytes=[int64]$item.Length}
 }
 
 function Get-MIR5PrototypeCaptureFatalDiagnostic {
@@ -118,6 +170,7 @@ $identityModule = New-Module -Name MIR5PrototypeCaptureImmutableInputs -Argument
 Import-Module $identityModule -Force
 . (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
 
+$captureSettings = Get-MIR5PrototypeCaptureSettingsArguments -ProfileDefinition $profileDefinition -Path $SettingsPath -ExpectedSha256 $ExpectedSettingsSha256
 $baseRows = @(Read-MIRDirectLibraryStartupProfile -Path $profileInput)
 $mir = if ($hasMIRArchive) { Get-MIR5PrototypeCaptureMIRArchive -Archive $MIRArchive -Library $library -ExpectedSha256 $ExpectedMIRArchiveSha256 -EngineLine $engineLine } else { $null }
 $engineIdentity = Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
@@ -146,7 +199,9 @@ $record = [ordered]@{
     library_activation_sha256=Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
   }
   engine=[ordered]@{path=$engineIdentity.path;sha256=$engineIdentity.sha256;base_version=$engineIdentity.base_version;factorio_version=$engineLine}
+  headless_requested=[bool]$Headless
   profile_input=[ordered]@{path=$profileInput;sha256=Get-MIR5PrototypeCaptureSha256 $profileInput}
+  settings=[ordered]@{mode=$captureSettings.SettingsMode;path=$captureSettings.SettingsPath;sha256=$captureSettings.SettingsSha256;bytes=$captureSettings.SettingsBytes}
   mir_archive=$mir
   active_mods_observer=$null
   budget=[ordered]@{timeout_seconds=$TimeoutSeconds;expected_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB}
@@ -166,7 +221,12 @@ try {
   Write-MIRDirectLibraryStartupProfile -Path $selection -BaseRows $baseRows -MirArchive $mir
   $config = Join-Path $run 'config.ini'
   New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
-  $activation = Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $selection -ArchiveHashes $archiveHashes -SettingsMode Defaults
+  $activationArguments = @{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$selection;ArchiveHashes=$archiveHashes;SettingsMode=$captureSettings.SettingsMode}
+  if ($captureSettings.SettingsMode -ceq 'File') {
+    $activationArguments.SettingsPath = $captureSettings.SettingsPath
+    $activationArguments.SettingsSha256 = $captureSettings.SettingsSha256
+  }
+  $activation = Start-MIRLibraryActivation @activationArguments
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   $record.generated_selection = [ordered]@{
     path=[IO.Path]::GetRelativePath($run,$selection).Replace('\','/')
@@ -189,8 +249,9 @@ try {
     }
   }
 
-  $arguments = @('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--dump-data')
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  $arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)
+  $record.arguments = $arguments
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver
   $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
   Assert-MIR5PrototypeCapture ([bool]$native.result.passed -and -not [bool]$native.result.timed_out -and [int]$native.result.exit_code -eq 0) 'Factorio dump process must exit naturally with code zero'

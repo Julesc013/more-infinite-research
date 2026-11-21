@@ -40,10 +40,11 @@ class RicMarineTests(unittest.TestCase):
             "90AD546D217DF361376BA28E96225A6B8B6AF9AEFB7CF00DB8B0A71DDADD248F").decode()
 
     def stage(self, mode="marine", provider=True, target="f210", changes=None):
-        scaffold.LuaRuntime = LuaRuntime
-        harness = scaffold.GeneratorTests()
-        harness.setUp()
-        lua = harness.lua
+        lua = scaffold.build_generator_world(
+            LuaRuntime, source_root=ROOT / "source",
+            science_sources=scaffold.SCIENCE_SOURCE_ORACLE["profiles"],
+            material_native=scaffold.K2SO_MATERIAL_NATIVE,
+        )
         lua.globals().selected_mode = mode
         lua.globals().selected_provider = provider
         major, minor, encoded = SOURCE_VERSION.split(".")

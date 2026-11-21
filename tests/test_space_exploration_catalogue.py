@@ -96,6 +96,9 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
         cls.facts = json.loads(FACTS_PATH.read_text(encoding="utf-8"))
         cls.se = _require_lua("compatibility.modern_catalogue.space_exploration")
         cls.k2se = _require_lua("compatibility.modern_catalogue.k2_space_exploration")
+        cls.worker_storage = _require_lua(
+            "compatibility.modern_catalogue.space_exploration_worker_storage"
+        )
 
     def assertEffectsAlmostEqual(self, expected, actual):
         self.assertEqual([name for name, _ in actual], [name for name, _ in expected])
@@ -262,9 +265,24 @@ class SpaceExplorationCatalogueTests(unittest.TestCase):
         for delta in (self.se, self.k2se):
             for key in expected:
                 self.assertNotIn("icons", delta["definition_overrides"].get(key, {}), key)
+        self.assertEqual(
+            self.worker_storage["science"],
+            self.se["science"][self.worker_storage["science_key"]],
+        )
+        self.assertEqual(
+            self.worker_storage["continuation"],
+            self.se["continuation_overrides"]["worker_robots_storage"],
+        )
+        source = (ROOT / "source/compatibility/modern_catalogue/space_exploration.lua").read_text(
+            encoding="utf-8"
+        )
+        self.assertEqual(
+            'local WORKER_STORAGE = require("compatibility.modern_catalogue.space_exploration_worker_storage")',
+            next(line for line in source.splitlines() if "space_exploration_worker_storage" in line),
+        )
         for relative in (
-            "source/compatibility/modern_catalogue/space_exploration.lua",
             "source/compatibility/modern_catalogue/k2_space_exploration.lua",
+            "source/compatibility/modern_catalogue/space_exploration_worker_storage.lua",
         ):
             source = (ROOT / relative).read_text(encoding="utf-8")
             self.assertNotIn("require(", source, relative)

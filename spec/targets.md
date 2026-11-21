@@ -58,6 +58,8 @@ Verify each current executable, official mods and consumed API against the actua
 
 ## Package contract
 
+The loader uses the declared patch minimum for installation. Compatibility selection within an edition follows the active providers and the authored data contracts in [Compatibility](compatibility.md).
+
 A packager copies known player source/assets, selects actual adapter files, applies explicit metadata and creates a deterministic ZIP. It does not infer research. Keep the Factorio mod identity unchanged. Package member paths are **relative to the selected player root**; they never contain repository prefixes such as `source/` or the staging directory.
 
 `TGT-03` — Player ZIP membership is an allowlist: necessary Lua, locale, graphics, migration files, metadata, license and complete applicable changelog. Exclude tests, docs, SDK, schemas, plans, inventories, evidence, local caches and agent tools. A working development root is not automatically a package boundary.

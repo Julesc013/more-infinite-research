@@ -531,8 +531,58 @@ function Assert-MIRLibraryLoadedSelection {
   return $observed
 }
 
+function Get-MIRLibraryScriptNames {
+  param([Parameter(Mandatory)]$Row)
+  $names=@('settings.lua','settings-updates.lua','settings-final-fixes.lua','data.lua','data-updates.lua','data-final-fixes.lua','control.lua')
+  if($Row.builtin){
+    foreach($name in $names){
+      $path=Join-Path (Split-Path -Parent $Row.path) $name
+      try{$attributes=[IO.File]::GetAttributes($path)}
+      catch [IO.FileNotFoundException]{continue}
+      catch [IO.DirectoryNotFoundException]{continue}
+      Assert-MIRLibraryPath $path
+      if($attributes -band [IO.FileAttributes]::Directory){throw "[mir-library-script-shape] $($Row.name): $name"}
+      $name
+    }
+    return
+  }
+  $zip=[IO.Compression.ZipFile]::OpenRead($Row.path)
+  try{
+    $metadata=@($zip.Entries|Where-Object FullName -Match '^[^/]+/info[.]json$')
+    if($metadata.Count-ne1){throw "[mir-library-mod-metadata] $($Row.name)"}
+    $prefix=$metadata[0].FullName.Substring(0,$metadata[0].FullName.Length-'info.json'.Length)
+    foreach($name in $names){if($null-ne$zip.GetEntry($prefix+$name)){$name}}
+  }finally{$zip.Dispose()}
+}
+
+function Assert-MIRLibraryObservationCoverage {
+  param([Parameter(Mandatory)]$Activation,[string]$ActiveModsObserver='',
+    [ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua')
+  $hasObserver=-not [string]::IsNullOrWhiteSpace($ActiveModsObserver)
+  if($hasObserver){
+    $observers=@($Activation.selected|Where-Object name -CEQ $ActiveModsObserver)
+    if($observers.Count-ne1-or$observers[0].builtin-or[string]$observers[0].sha256-cnotmatch'^[A-Fa-f0-9]{64}$'){
+      throw '[mir-library-loaded-observer] A selected hash-bound archive observer is required.'
+    }
+  }
+  $withoutLoadingScript=[Collections.Generic.List[string]]::new()
+  foreach($row in $Activation.selected){
+    $scripts=@(Get-MIRLibraryScriptNames -Row $row)
+    if(@($scripts|Where-Object {$_-cne'control.lua'}).Count-eq0){$withoutLoadingScript.Add($row.name+'@'+$row.version)}
+    if($hasObserver-and$row.name-ceq$ActiveModsObserver-and$ActiveModsObserverScript-cnotin$scripts){
+      throw "[mir-library-loaded-observer-script] $ActiveModsObserver lacks $ActiveModsObserverScript"
+    }
+  }
+  if($withoutLoadingScript.Count-and-not$hasObserver){
+    throw "[mir-library-loaded-observer-required] Selected mods have no Lua-stage loading entry: $($withoutLoadingScript -join ', '); select a hash-bound active-mod observer."
+  }
+}
+
 function Assert-MIRLibraryLaunch {
-  param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@())
+  param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@(),
+    [switch]$RequireLoadedSelection,[string]$ActiveModsObserver='',
+    [ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua',
+    $WriteStoragePolicy=$null)
   . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   foreach($arg in $Arguments){
     if($arg -match '^(?:--(?:sync-mods|apply-update|download|update-mods)(?:=|$)|--(?:config|mod-directory)=|-c$)'){throw '[mir-library-acquisition-or-ambiguous-argument]'}
@@ -543,12 +593,19 @@ function Assert-MIRLibraryLaunch {
   }
   $mods=$Arguments[[Array]::IndexOf($Arguments,'--mod-directory')+1]
   if([IO.Path]::GetFullPath($mods) -cne $Activation.library){throw '[mir-library-launch-directory]'}
-  $configPath=Resolve-MIR441RecoveryScratchPath -Path $Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+  $configArgument=$Arguments[[Array]::IndexOf($Arguments,'--config')+1]
+  # The optional policy comes from the executing probe's admitted context.
+  # Recheck each external write path against its exact live data-mount pin;
+  # callers without that context retain the checkout-local launch boundary.
+  $configPath=if($null -eq $WriteStoragePolicy){Resolve-MIR441RecoveryScratchPath -Path $configArgument}else{Resolve-MIR441ProcessOutputPath -Policy $WriteStoragePolicy -Path $configArgument}
   $config=[IO.File]::ReadAllText($configPath)
   foreach($entry in @('read-data','write-data')){
     $matches=[regex]::Matches($config,"(?m)^\s*$entry\s*=\s*(.+?)\s*$")
     if($matches.Count -ne 1){throw '[mir-library-launch-config]'}
-    if($entry -ceq 'write-data'){$null=Resolve-MIR441RecoveryScratchPath -Path $matches[0].Groups[1].Value}
+    if($entry -ceq 'write-data'){
+      $writePath=$matches[0].Groups[1].Value
+      if($null -eq $WriteStoragePolicy){$null=Resolve-MIR441RecoveryScratchPath -Path $writePath}else{$null=Resolve-MIR441ProcessOutputPath -Policy $WriteStoragePolicy -Path $writePath}
+    }
     elseif([IO.Path]::GetFullPath($matches[0].Groups[1].Value) -cne $Activation.engine_data){throw '[mir-library-launch-engine-data]'}
   }
   $engineData=Join-Path (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent ([IO.Path]::GetFullPath($FactorioBin))))) 'data'
@@ -556,6 +613,9 @@ function Assert-MIRLibraryLaunch {
   if($config -notmatch '(?m)^enable-new-mods=false\s*$'){throw '[mir-library-auto-enable]'}
   foreach($process in $OwnedProcesses){if([IO.Path]::GetFullPath($process.Path)-cne[IO.Path]::GetFullPath($FactorioBin)){throw '[mir-library-owned-engine]'}}
   Assert-MIRLibraryActivation -Activation $Activation -OwnedProcesses $OwnedProcesses
+  if($RequireLoadedSelection-or-not[string]::IsNullOrWhiteSpace($ActiveModsObserver)){
+    Assert-MIRLibraryObservationCoverage -Activation $Activation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript $ActiveModsObserverScript
+  }
 }
 
 function Complete-MIRLibraryActivation {

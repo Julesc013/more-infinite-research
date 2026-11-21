@@ -4,7 +4,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
-from historical_sources import read_published_source
+from historical_sources import read_captured_settings, read_published_source
 from repository_paths import reference_path
 import sys
 import unittest
@@ -53,10 +53,11 @@ def _load_generator_harness():
         raise AssertionError("cannot load the MIR5 Generator host harness")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    module.LuaRuntime = LuaRuntime
-    harness = module.GeneratorTests()
-    harness.setUp()
-    return harness
+    return module.build_generator_world(
+        LuaRuntime, source_root=ROOT / "source",
+        science_sources=module.SCIENCE_SOURCE_ORACLE["profiles"],
+        material_native=module.K2SO_MATERIAL_NATIVE,
+    )
 
 
 class AutomaticFamilyNonEmissionTests(unittest.TestCase):
@@ -82,12 +83,14 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
         ):
             record = cls.facts[group]
             for path_key, hash_key in paths:
-                if group != "observer_fixture" and path_key != "historical_settings_path":
+                if group == "observer_fixture":
+                    path = reference_path(record[path_key])
+                    if _sha256(path) != record[hash_key]:
+                        raise AssertionError(f"automatic-family source evidence changed: {path}")
+                elif path_key == "historical_settings_path":
+                    read_captured_settings(ROOT, record[path_key], record[hash_key])
+                else:
                     read_published_source(ROOT, record[path_key], record[hash_key])
-                    continue
-                path = reference_path(record[path_key])
-                if _sha256(path) != record[hash_key]:
-                    raise AssertionError(f"automatic-family source evidence changed: {path}")
 
         profile = reference_path(cls.facts["profile"])
         if _sha256(profile) != cls.facts["profile_sha256"]:
@@ -147,7 +150,9 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
 
         streams = read_published_source(ROOT, evidence["streams_path"], evidence["streams_sha256"]).decode("utf-8")
         providers = read_published_source(ROOT, evidence["providers_path"], evidence["providers_sha256"]).decode("utf-8")
-        settings = reference_path(evidence["historical_settings_path"]).read_text(encoding="utf-8")
+        settings = read_captured_settings(
+            ROOT, evidence["historical_settings_path"], evidence["historical_settings_sha256"]
+        ).decode("utf-8")
         for family in ("research_auto_assembling_machine", "research_auto_lab"):
             self.assertIn(family, streams)
             self.assertIn(family, providers)
@@ -188,9 +193,7 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
             self._verify_published_settings(json.loads(settings_path.read_text(encoding="utf-8")), self.facts)
 
     def test_full_f200_data_final_pipeline_keeps_opt_in_but_does_not_emit_automatic_ids(self):
-        harness = _load_generator_harness()
-        self.addCleanup(lambda: setattr(harness, "lua", None))
-        lua = harness.lua
+        lua = _load_generator_harness()
         lua.globals().automatic_facts = _lua_value(lua, self.facts)
         lua.execute(r'''
           local target = require("platform.target")

@@ -257,6 +257,9 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   -- default4, independently of a currently selected foreign finite route.
   local recovery = require("research.worker_storage_recovery")
   local baseline_mods = mods["space-age"] and {["space-age"]=mods["space-age"]} or {}
+  if modern_catalogue.is_f200_non_k2_space_exploration(mods) then
+    baseline_mods["space-exploration"] = mods["space-exploration"]
+  end
   local definition
   for _, row in ipairs(modern_catalogue.continuations(baseline_mods, nil)) do
     if row.id == recovery.canonical then definition = row; break end
@@ -315,6 +318,12 @@ if worker_default_available then
   science.apply_family({worker_default_authored}, {[recovery.canonical]=
     require("compatibility.science_bindings").conditions_for("worker-robots-storage")},
     science_environment, science_context)
+  if modern_catalogue.is_f200_non_k2_space_exploration(mods) then
+    -- A hidden Base-five holder is the one explicit historical F200 SE work
+    -- contract. Runtime admission still requires the exact published517
+    -- record and frame; emitting this row does not migrate any save by itself.
+    technologies[#technologies + 1] = recovery.published517_se_owner(worker_default_authored)
+  end
   local owner = recovery.default_owner(worker_default_authored)
   if not worker_default_is_head then
     -- Current finite profiles retain the old contract without offering a
@@ -331,9 +340,6 @@ if worker_default_available then
   end
   technologies[#technologies + 1] = recovery.head_debit(worker_default_authored, head_scalar)
 end
-native_adoption_patch = modern and require("research.native_adoption").plan(
-  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
-  modern_selection.worker_storage, worker_default_available or nil)
 if electric_full then
   for _, technology in ipairs(technologies) do
     if technology.name == electric_full.name then
@@ -357,12 +363,17 @@ end
 -- Stable native credit holders preserve already-earned partial overlaps when
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
-if modern and require("research.product_target_extension").retain_galore_carbon_owner(technologies) then
+local galore_sulfur_retired = modern
+  and require("research.product_target_extension").retain_galore_carbon_owner(technologies)
+local _, fixed_native_credit_scalars = require("research.native_credit_definitions").append(
+  technologies, data.raw, values, require("platform.target"), native_credit_groups)
+native_adoption_patch = modern and require("research.native_adoption").plan(
+  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups, fixed_native_credit_scalars,
+  modern_selection.worker_storage, worker_default_available or nil)
+if galore_sulfur_retired then
   if not native_adoption_patch then error("MIR Galore missing private admission facts", 0) end
   native_adoption_patch.galore_sulfur_retired = true
 end
-require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"), native_credit_groups)
-
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.
 -- A removed optional recipe cannot make its hidden holder a startup failure.
 if require("platform.target").recipe_productivity == true then

@@ -145,6 +145,112 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_nested_queue_start_keeps_cap_rights_attached_through_relaxation(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local gear, probe = technology(name, 6, true), technology("unrelated-probe", 1, true)
+          local f = force(1, {[name]=gear, [probe.name]=probe}, {gear, probe}, gear, .42)
+          gear.force, probe.force = f, f
+          boot({[1]=f}, 3, "")
+          local meta, nested, before, after = getmetatable(f), 0
+          local write = meta.__newindex
+          meta.__newindex = function(object, key, value)
+            local current = object.current_research
+            write(object, key, value)
+            if key == "research_queue" and current ~= object.current_research and object.current_research then
+              nested = nested + 1
+              before = storage.mir_caps
+              handlers.events[defines.events.on_research_started]({research=object.current_research})
+              after = storage.mir_caps
+            end
+          end
+          require("runtime.lifecycle").on_init()
+          local state = storage.mir_caps
+          assert(nested == 1 and before ~= nil and after == before,
+            "nested queue callback detached the outer cap writer's state")
+          assert(state == before and state.owned_disabled[1][name].disabled == true,
+            "native disablement lost its durable restoration right")
+          assert(not gear.enabled and gear.visible_when_disabled and gear.level == 6 and not gear.researched)
+          assert(f.current_research == probe and #f.research_queue == 1 and f.research_queue[1] == probe)
+
+          -- A later independent force starts disabled by another owner. Its
+          -- visibility write is ours; its enablement is never ours to restore.
+          local foreign = technology(name, 6, false)
+          local other = force(2, {[name]=foreign})
+          foreign.force = other
+          game.forces[2] = other
+          require("runtime.lifecycle").on_force_created({force=other})
+          assert(state.owned_disabled[2][name].disabled == false)
+          local saved, queue = storage, f.research_queue
+          boot({[1]=f, [2]=other}, 0, "", saved)
+          require("runtime.lifecycle").on_configuration_changed({})
+          assert(gear.enabled and not gear.visible_when_disabled,
+            "relaxation did not restore the outer writer's actual flags")
+          assert(not foreign.enabled and not foreign.visible_when_disabled,
+            "relaxation changed the foreign enablement baseline")
+          assert(gear.level == 6 and not gear.researched and foreign.level == 6 and not foreign.researched)
+          assert(f.research_queue == queue and f.current_research == probe)
+          assert(storage.mir_caps == nil, "completed outermost relaxation retained empty cap state")
+        ''')
+
+    def test_nested_queue_failure_unwinds_state_lifetime_without_replacing_error(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local gear, probe = technology(name, 6, true), technology("unrelated-probe", 1, true)
+          local f = force(1, {[name]=gear, [probe.name]=probe}, {gear, probe}, gear, .42)
+          gear.force, probe.force = f, f
+          boot({[1]=f}, 3, "")
+          local meta, sentinel = getmetatable(f), {}
+          local write = meta.__newindex
+          meta.__newindex = function(object, key, value)
+            local current = object.current_research
+            write(object, key, value)
+            if key == "research_queue" and current ~= object.current_research then
+              handlers.events[defines.events.on_research_started]({research=object.current_research})
+              error(sentinel, 0)
+            end
+          end
+          local ok, reason = pcall(require("runtime.lifecycle").on_init)
+          assert(not ok and reason == sentinel, "reconciliation replaced the original structured error")
+          meta.__newindex = write
+          -- A later ordinary callback must be able to finish empty-state
+          -- cleanup. An unbalanced transient depth would pin it indefinitely.
+          handlers.events[defines.events.on_research_started]({research=probe})
+          assert(storage.mir_caps == nil, "failed reconciliation left its state lifetime active")
+          assert(gear.enabled and gear.level == 6 and not gear.researched)
+          assert(f.current_research == probe and #f.research_queue == 1)
+        ''')
+
+    def test_required_restoration_catalogue_export_cannot_silently_drop_rights(self):
+        for active in ({}, {"space-age": "2.1.23"}):
+            for missing in (None, False, "wrong", 12):
+                with self.subTest(active=active, missing=missing):
+                    self.setUp()
+                    self.lua.globals().bad_restoration_export = missing
+                    self.lua.globals().active_selection = self.lua.table_from(active)
+                    self.lua.execute('''
+                      boot({},0,"",nil,nil,0,active_selection)
+                      local catalogue=require("runtime.catalogue")
+                      catalogue.restoration_only=bad_restoration_export
+                      package.loaded["runtime.lifecycle"]=nil
+                      local before=storage
+                      local ok,reason=pcall(require,"runtime.lifecycle")
+                      assert(not ok,"missing required restoration catalogue became an empty selection")
+                      assert(tostring(reason):find("requires callable restoration_only",1,true))
+                      assert(storage==before and next(storage)==nil,
+                        "broken restoration interface allocated or rewrote cap rights")
+                    ''')
+        self.setUp()
+        self.lua.execute('''
+          boot({},0,"")
+          local catalogue=require("runtime.catalogue")
+          catalogue.restoration_only=function()return {}end
+          package.loaded["runtime.lifecycle"]=nil
+          local lifecycle=require("runtime.lifecycle")
+          lifecycle.on_load()
+          assert(next(storage)==nil,"valid empty restoration result initialized state")
+        ''')
+
     def test_full_worker_owner_is_capped_from_first_four_and_public_head_stays_retired(self):
         self.lua.execute(r'''
           for _, configured in ipairs({0, 4, 8}) do
@@ -267,10 +373,13 @@ class LifecycleTests(unittest.TestCase):
 
     def test_full_worker_cap_raise_restores_only_actual_prior_enablement(self):
         self.lua.execute(r'''
+          for _, settled in ipairs({false, true}) do
           for _, external in ipairs({false, true}) do
             local name, owner_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
-            local head, owner = technology(name, 5, false), technology(owner_name, 5, not external)
-            local f = force(97, {[name]=head, [owner_name]=owner})
+            local level = settled and 11 or 5
+            local head, owner = technology(name, 5, false), technology(owner_name, level, not settled and not external)
+            local tail = technology("unrelated-queued-research", 1)
+            local f = force(97, {[name]=head, [owner_name]=owner, [tail.name]=tail}, {tail}, tail, .42)
             head.force, owner.force = f, f
             local function load_caps(maximum, saved)
               boot({[97]=f}, 0, "", saved, nil, 0, nil, nil, {["mir-max-level-worker-robots-storage"]=maximum})
@@ -287,13 +396,20 @@ class LifecycleTests(unittest.TestCase):
               package.loaded["runtime.lifecycle"] = nil
               return require("runtime.lifecycle")
             end
-            local lifecycle = load_caps(4)
-            lifecycle.on_init()
+            local lifecycle = load_caps(level - 1)
+            if settled then lifecycle.record_completed_worker_cap(f, not external) else lifecycle.on_init() end
             assert(not owner.enabled and storage.mir_caps.owned_disabled[97][owner_name].disabled == not external)
-            lifecycle = load_caps(8, storage)
-            lifecycle.on_init()
+            if settled and external then
+              lifecycle.record_completed_worker_cap(f, true)
+              assert(storage.mir_caps.owned_disabled[97][owner_name].disabled == false)
+            end
+            lifecycle = load_caps(level + 1, storage)
+            lifecycle.on_configuration_changed({mod_changes={}, mod_startup_settings_changed=true})
             assert(owner.enabled == not external, "cap increase enabled a foreign-disabled native owner")
             assert(not head.enabled, "cap increase enabled the retired public head")
+            assert(owner.level == level and not owner.visible_when_disabled)
+            assert(f.current_research == tail and f.research_progress == .42 and #f.research_queue == 1)
+          end
           end
         ''')
 
@@ -400,7 +516,10 @@ class LifecycleTests(unittest.TestCase):
           assert(table.concat(trace, ",") == "split-finished,legacy-finished,caps-finished",
             "native split guard suppressed another force's cap callback")
           trace = {}
-          worker.default_owner_on_research_finished = function() note("split-finished");return true end
+          -- A changed, genuinely settled default holder fulfils its public
+          -- prerequisite. The worker boundary now reports that separately
+          -- from a durable deferred completion marker.
+          worker.default_owner_on_research_finished = function() note("split-finished");return true,true end
           local tail = technology("mir-worker-storage-default-4", 5)
           row.force.technologies[tail.name] = tail
           tail.force = row.force
@@ -408,6 +527,11 @@ class LifecycleTests(unittest.TestCase):
           handlers.events[defines.events.on_research_finished]({research=tail, by_script=false})
           assert(table.concat(trace, ",") == "split-finished,legacy-finished,mir-worker-storage-default-4,worker-robots-storage-4",
             "completion invoked an extra cap callback for a different technology")
+          trace = {}
+          worker.default_owner_on_research_finished = function() note("split-finished");return true,false end
+          handlers.events[defines.events.on_research_finished]({research=tail, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished,mir-worker-storage-default-4",
+            "deferred native completion published the public worker cap callback")
         ''')
 
     def test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration(self):
@@ -829,6 +953,113 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_authored_cap_read_faults_preserve_actual_restoration_rights(self):
+        for target_id in ("f200", "f210"):
+            for origin in ("finite-cap", "prototype-policy"):
+                for boundary in ("named-research", "effects-reset"):
+                    for fault in ("none", "lookup", "prototype", "enabled"):
+                        with self.subTest(target=target_id, origin=origin, boundary=boundary, fault=fault):
+                            self.setUp()
+                            for key, value in {"target_id": target_id, "origin": origin,
+                                               "boundary": boundary, "fault": fault}.items():
+                                self.lua.globals()[key] = value
+                            self.lua.execute(r'''
+                              local target = require("platform.target")
+                              target.id, target.factorio_version = target_id, target_id == "f200" and "2.0" or "2.1"
+                              local name = "recipe-prod-research_gears-1"
+                              local owner, queued = technology(name, 3), technology("unrelated-queue", 1)
+                              local foreign = technology("foreign-disabled", 2, false)
+                              owner.saved_progress = .27
+                              if origin == "prototype-policy" then owner.prototype.enabled = false end
+                              local f = force(74, {[name]=owner,[queued.name]=queued,[foreign.name]=foreign}, {queued}, queued, .42)
+                              owner.force, queued.force, f.worker_robots_storage_bonus = f, f, .17
+                              -- A different finite family keeps normal research
+                              -- callbacks active when this family is unlimited.
+                              boot({[74]=f}, origin == "finite-cap" and 2 or 0, "", nil, nil, 0, nil, nil,
+                                {["ips-max-level-research_copper"]=2})
+                              handlers.init()
+                              local state, right = storage.mir_caps, storage.mir_caps.owned_disabled[74][name]
+                              assert(right and right.disabled and not owner.enabled,
+                                "fixture did not establish an actual MIR disablement")
+                              local visible = right.visible_when_disabled
+                              local prototype, expected_phase = owner.prototype
+                              if fault == "lookup" then
+                                f.technologies[name] = nil
+                                setmetatable(f.technologies, {__index=function(_, key)
+                                  if key == name then error("authored lookup sentinel") end
+                                end})
+                                expected_phase = "technology lookup"
+                              elseif fault == "prototype" then
+                                owner.prototype = nil
+                                setmetatable(owner, {__index=function(_, key)
+                                  if key == "prototype" then error("authored prototype sentinel") end
+                                end})
+                                expected_phase = "prototype lookup"
+                              elseif fault == "enabled" then
+                                prototype.enabled = nil
+                                setmetatable(prototype, {__index=function(_, key)
+                                  if key == "enabled" then error("authored enabled sentinel") end
+                                end})
+                                expected_phase = "prototype enabled"
+                              end
+                              local callback, event
+                              if boundary == "named-research" then
+                                callback, event = handlers.events[defines.events.on_research_reversed], {research=owner}
+                              else
+                                callback, event = handlers.events[defines.events.on_technology_effects_reset], {force=f}
+                              end
+                              assert(type(callback) == "function", "ordinary callback is unavailable")
+                              local ok, message = pcall(callback, event)
+                              local retained = storage.mir_caps == state and state.owned_disabled[74]
+                                and state.owned_disabled[74][name] == right
+                              if fault == "none" then
+                                assert(ok and retained, "healthy observation lost its actual cap right")
+                              else
+                                assert(not ok and retained, "authored read fault: callback_succeeded=" .. tostring(ok)
+                                  .. "; right_retained=" .. tostring(retained))
+                                message = tostring(message)
+                                assert(message:find(name,1,true) and message:find(expected_phase,1,true)
+                                  and message:find("authored " .. fault .. " sentinel",1,true),
+                                  "read diagnostic omitted technology, phase or original cause")
+                              end
+                              assert(right.disabled and right.visible_when_disabled == visible
+                                and owner.level == 3 and owner.saved_progress == .27 and not owner.enabled
+                                and f.current_research == queued and f.research_progress == .42
+                                and #f.research_queue == 1 and f.research_queue[1] == queued
+                                and f.cancelled == 0 and f.worker_robots_storage_bonus == .17 and not foreign.enabled,
+                                "native read boundary changed ownership or unrelated work")
+                              if fault == "lookup" then setmetatable(f.technologies,nil); f.technologies[name] = owner
+                              elseif fault == "prototype" then setmetatable(owner,nil); owner.prototype = prototype
+                              elseif fault == "enabled" then setmetatable(prototype,nil) end
+                              prototype.enabled, owner.level = true, 2
+                              -- Host catch/retry only: after the readable
+                              -- below-cap frame returns, the normal event must
+                              -- still release the existing positive right.
+                              handlers.events[defines.events.on_research_reversed]({research=owner})
+                              assert(owner.enabled and storage.mir_caps == nil and not foreign.enabled
+                                and f.current_research == queued and f.research_progress == .42
+                                and owner.saved_progress == .27 and f.worker_robots_storage_bonus == .17,
+                                "recovered observation did not restore the retained MIR-owned flag")
+                            ''')
+
+    def test_authored_cap_absent_technology_or_prototype_remains_an_ordinary_nonmatch(self):
+        for missing in ("technology", "prototype", "enabled"):
+            with self.subTest(missing=missing):
+                self.setUp()
+                self.lua.globals().missing = missing
+                self.lua.execute(r'''
+                  local name = "recipe-prod-research_gears-1"
+                  local owner = technology(name, 3, false)
+                  local f = force(75, {[name]=owner})
+                  if missing == "technology" then f.technologies[name] = nil
+                  elseif missing == "prototype" then owner.prototype = nil
+                  else owner.prototype.enabled = nil end
+                  boot({[75]=f}, 2)
+                  handlers.init()
+                  assert(not owner.enabled and storage.mir_caps == nil,
+                    "legitimate missing authored observation was treated as an owned policy")
+                ''')
+
     def test_policy_disabled_generated_prototype_reconciles_only_proven_mir_disablement(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"
@@ -1021,6 +1252,77 @@ class LifecycleTests(unittest.TestCase):
           handlers.init()
           assert(malformed.enabled and not malformed.visible_when_disabled and storage.mir_caps == nil,
             "a malformed native owner gained cap ownership")
+        ''')
+
+    def test_native_cap_fault_retains_proven_right_until_ordinary_below_cap_restoration(self):
+        # Host-only actual cap/lifecycle wiring. Both failures must abort before
+        # the event path can interpret a read error as an absent native owner.
+        # This is neither a Factorio cold load nor historical paid-work proof.
+        self.lua.execute(r'''
+          for _, fault in ipairs({"lookup", "prototype"}) do
+            local name = "low-density-structure-productivity"
+            local owner = technology(name, 3, true)
+            owner.prototype = {max_level = 4294967295, effects = {
+              {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1},
+              {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .1}
+            }}
+            local queued = technology("unrelated-native-cap-queue", 1, true)
+            local force_row = force(59, {[name] = owner, [queued.name] = queued}, {queued}, queued, .42)
+            owner.force, queued.force = force_row, force_row
+            force_row.worker_robots_storage_bonus = .17
+            boot({[59] = force_row}, 0, "", nil, nil, 0,
+              {["space-age"] = "2.1.23"}, nil,
+              {["ips-max-level-research_low_density_structure"] = 2})
+            handlers.init()
+            local right = storage.mir_caps.owned_disabled[59][name]
+            assert(right and right.disabled == true and not owner.enabled,
+              "fixture did not record MIR's actual native cap-disablement right")
+            local lifecycle = require("runtime.lifecycle")
+
+            if fault == "lookup" then
+              force_row.technologies[name] = nil
+              setmetatable(force_row.technologies, {__index = function(_, key)
+                if key == name then error("native cap lookup sentinel") end
+                return nil
+              end})
+            else
+              owner.prototype.max_level = nil
+              setmetatable(owner.prototype, {__index = function(_, key)
+                if key == "max_level" then error("native cap prototype sentinel") end
+                return nil
+              end})
+            end
+            local ok, message = pcall(lifecycle.on_research_finished, {research = owner})
+            assert(not ok, "native owner read fault was treated as legitimate absence")
+            local prefix = fault == "lookup" and "MIR native cap owner lookup failed for "
+              or "MIR native cap owner admission failed for "
+            assert(tostring(message):find(prefix .. name, 1, true)
+              and tostring(message):find("native cap " .. fault, 1, true),
+              "rejection discarded the native read phase, owner, or original cause")
+            assert(storage.mir_caps.owned_disabled[59][name] == right and right.disabled == true
+              and not owner.enabled and owner.level == 3,
+              "unexpected native read lost a previously proved restoration right")
+            assert(force_row.current_research == queued and force_row.research_progress == .42
+              and #force_row.research_queue == 1 and force_row.research_queue[1] == queued
+              and force_row.worker_robots_storage_bonus == .17,
+              "failed admission rewrote unrelated queue, paid partial or bonus")
+
+            if fault == "lookup" then
+              setmetatable(force_row.technologies, nil)
+              force_row.technologies[name] = owner
+            else
+              setmetatable(owner.prototype, nil)
+              owner.prototype.max_level = 4294967295
+            end
+            owner.level = 2
+            lifecycle.on_research_reversed({research = owner})
+            assert(owner.enabled and not owner.visible_when_disabled,
+              "valid below-cap event did not restore previously owned enablement")
+            assert(force_row.current_research == queued and force_row.research_progress == .42
+              and #force_row.research_queue == 1 and force_row.research_queue[1] == queued
+              and force_row.worker_robots_storage_bonus == .17,
+              "recovery changed unrelated current research, queue, partial work or bonus")
+          end
         ''')
 
     def test_space_age_native_owner_effect_permutation_retains_only_proven_cap_rights(self):
@@ -1366,6 +1668,194 @@ class LifecycleTests(unittest.TestCase):
             "effects reset did not restore MIR-owned worker disablement below its cap")
         ''')
 
+    def test_worker_merge_qualification_does_not_suppress_other_family_caps(self):
+        # The worker's real frame classifier is covered in worker-storage
+        # controls. Supply its three outcomes here while using actual
+        # bootstrap, lifecycle and caps to observe cross-family behavior.
+        cases = [(outcome, "other", False) for outcome in ("unqualified", "qualified", "refused")]
+        cases += [("unqualified", current, policy_disabled)
+                  for current in ("public", "owner") for policy_disabled in (False, True)]
+        cases += [("unqualified", "excluded-read-fault", False)]
+        for target_id in ("f200", "f210"):
+            for outcome, current_kind, policy_disabled in cases:
+                with self.subTest(target_id=target_id, outcome=outcome,
+                                  current=current_kind, policy_disabled=policy_disabled):
+                    self.setUp()
+                    self.lua.globals().target_id = target_id
+                    self.lua.globals().outcome = outcome
+                    self.lua.globals().current_kind = current_kind
+                    self.lua.globals().policy_disabled = policy_disabled
+                    self.lua.execute(r'''
+                      local target = require("platform.target")
+                      target.id, target.factorio_version = target_id, target_id == "f200" and "2.0" or "2.1"
+                      local gear_name = "recipe-prod-research_gears-1"
+                      local public_name, owner_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
+                      local gear, public, owner = technology(gear_name, 11), technology(public_name, 6), technology(owner_name, 8)
+                      local other = technology("unrelated-research", 3)
+                      local foreign = technology("recipe-prod-research_electronic_circuit-1", 1, false)
+                      public.saved_progress, owner.saved_progress, other.saved_progress = .27, .19, .23
+                      if policy_disabled then public.prototype.enabled, owner.prototype.enabled = false, false end
+                      local current, queue, expected_queue = other, {other, public, gear, owner, public}, {other, public, owner, public}
+                      if current_kind == "public" then
+                        current, queue, expected_queue = public, {public, other, gear, owner, public}, {public, other, owner, public}
+                      elseif current_kind == "owner" then
+                        current, queue, expected_queue = owner, {owner, public, gear, owner, other}, {owner, public, owner, other}
+                      end
+                      local destination = force(8, {[gear_name]=gear, [public_name]=public, [owner_name]=owner,
+                        [other.name]=other, [foreign.name]=foreign}, queue, current, .37)
+                      for _, t in pairs(destination.technologies) do t.force = destination end
+                      -- The split declaration is already independently checked
+                      -- against mod-data/native contracts by the catalogue tests.
+                      package.preload["runtime.catalogue"] = function()
+                        local catalogue = dofile(player_root .. "/runtime/catalogue.lua")
+                        local declared = catalogue.declared
+                        catalogue.declared = function()
+                          local rows = declared()
+                          for _, row in ipairs(rows) do if row.id == public_name then
+                            local tail = {}; for key, value in pairs(row) do tail[key] = value end
+                            row.fixed_maximum, tail.id, tail.progression = 4, owner_name, 4
+                            if policy_disabled then row.cancel_queued_when_unavailable, tail.cancel_queued_when_unavailable = true, true end
+                            rows[#rows + 1] = tail; break
+                          end end
+                          return rows
+                        end
+                        return catalogue
+                      end
+                      local public_right, owner_right = {disabled=true,visible_when_disabled=false}, {disabled=true,visible_when_disabled=false}
+                      local source_right = {disabled=true}
+                      local saved = {mir_caps={schema=1,owned_disabled={
+                        [7]={[gear_name]={disabled=true},[public_name]=source_right},
+                        [8]={[public_name]=public_right,[owner_name]=owner_right,
+                          [foreign.name]={disabled=false,visible_when_disabled=false}}
+                      }}}
+                      boot({[8]=destination}, 10, "", saved, nil, 0, nil, nil,
+                        {["mir-max-level-worker-robots-storage"]=4})
+                      if current_kind == "excluded-read-fault" then
+                        local unavailable = setmetatable({}, {__index=function()
+                          error("unqualified worker prototype must not be read by caps") end})
+                        public.prototype, owner.prototype = unavailable, unavailable
+                      end
+                      local worker = require("runtime.worker_robot_storage")
+                      worker.default_owner_on_forces_merged = function(event)
+                        assert(event.source_index == 7 and event.destination == destination)
+                        if outcome == "refused" then error("unproven worker merge identity") end
+                        if outcome == "unqualified" then return false, "unqualified-native-merge-frame" end
+                        return true, "native-merge-metadata-only"
+                      end
+                      local ok, message = pcall(handlers.events[defines.events.on_forces_merged],
+                        {source_index=7,destination=destination})
+                      if outcome == "refused" then
+                        assert(not ok and tostring(message):find("unproven worker merge identity",1,true))
+                        assert(gear.enabled and public.enabled and owner.enabled and #destination.research_queue == 5
+                          and storage.mir_caps.owned_disabled[7] ~= nil, "worker refusal was swallowed or followed by writes")
+                      else
+                        assert(ok, message)
+                        assert(not gear.enabled and gear.visible_when_disabled and gear.level == 11,
+                          "unqualified worker merge suppressed an unrelated gear cap")
+                        assert(not foreign.enabled, "merge reconciliation enabled foreign-disabled unrelated research")
+                        assert(destination.current_research == current and destination.research_progress == .37
+                          and other.saved_progress == .23 and public.saved_progress == .27 and owner.saved_progress == .19,
+                          "merge reconciliation changed retained research work")
+                        if outcome == "unqualified" then
+                          assert(storage.mir_caps.owned_disabled[7][gear_name] == nil
+                            and storage.mir_caps.owned_disabled[7][public_name] == source_right and source_right.disabled,
+                            "merge either retained unrelated source caps or erased unqualified worker rights")
+                          assert(public.enabled and owner.enabled and public.level == 6 and owner.level == 8
+                            and not public.visible_when_disabled and not owner.visible_when_disabled,
+                            "unqualified worker rows were reconciled")
+                          assert(storage.mir_caps.owned_disabled[8][public_name] == public_right
+                            and storage.mir_caps.owned_disabled[8][owner_name] == owner_right
+                            and public_right.disabled and owner_right.disabled
+                            and not public_right.visible_when_disabled and not owner_right.visible_when_disabled,
+                            "unqualified destination worker cap rights were lost or changed")
+                          assert(#destination.research_queue == #expected_queue, "worker queue entries were altered")
+                          for i, retained in ipairs(expected_queue) do
+                            assert(destination.research_queue[i] == retained, "worker work or queue order was altered")
+                          end
+                          -- A later native force boundary must discard retained
+                          -- source rights before an index can identify a new force.
+                          local fresh_public = technology(public_name, 4, false)
+                          local fresh = force(7, {[public_name]=fresh_public})
+                          fresh_public.force, game.forces[7] = fresh, fresh
+                          handlers.events[defines.events.on_force_created]({force=fresh})
+                          assert(storage.mir_caps.owned_disabled[7] == nil and not fresh_public.enabled,
+                            "reused force index inherited the deferred worker restoration right")
+                          storage.mir_caps.owned_disabled[7] = {[public_name]=source_right}
+                          handlers.events[defines.events.on_force_reset]({force=fresh})
+                          assert(storage.mir_caps.owned_disabled[7] == nil and not fresh_public.enabled,
+                            "force reset retained an old deferred worker restoration right")
+                        else
+                          assert(storage.mir_caps.owned_disabled[7] == nil, "qualified merge retained source cap rights")
+                          assert(not public.enabled and not owner.enabled and #destination.research_queue == 1,
+                            "qualified worker merge bypassed its ordinary cap reconciliation")
+                        end
+                      end
+                    ''')
+
+    def test_force_registry_read_failure_cannot_retire_an_earned_cap_right(self):
+        for target_id in ("f200", "f210"):
+            for observation in ("healthy", "lookup-failure", "iteration-failure", "absent-force"):
+                with self.subTest(target=target_id, observation=observation):
+                    self.setUp()
+                    self.lua.globals().target_id = target_id
+                    self.lua.globals().observation = observation
+                    self.lua.execute(r'''
+                      local target = require("platform.target")
+                      target.id, target.factorio_version = target_id, target_id == "f200" and "2.0" or "2.1"
+                      local name = "recipe-prod-research_gears-1"
+                      local owner, second = technology(name, 3), technology(name, 3)
+                      local queued, foreign = technology("unrelated-queue", 1), technology("foreign-disabled", 2, false)
+                      owner.saved_progress = .27
+                      local f = force(74, {[name]=owner,[queued.name]=queued,[foreign.name]=foreign}, {queued}, queued, .42)
+                      local other_force = force(95, {[name]=second})
+                      owner.force, queued.force, second.force = f, f, other_force
+                      boot({[74]=f,[95]=other_force}, 2)
+                      handlers.init()
+                      local lifecycle = require("runtime.lifecycle")
+                      local state, right = storage.mir_caps, storage.mir_caps.owned_disabled[74][name]
+                      local second_right = state.owned_disabled[95][name]
+                      assert(right.disabled and second_right.disabled and not owner.enabled and not second.enabled,
+                        "initial native cap writes did not establish restoration rights")
+                      local registry = game.forces
+                      if observation == "lookup-failure" or observation == "iteration-failure" then
+                        game.forces = setmetatable({}, {
+                          __index=function(_, index)
+                            if observation == "lookup-failure" and index == 74 then error("force registry lookup sentinel") end
+                            return registry[index]
+                          end,
+                          __pairs=function()
+                            if observation == "iteration-failure" then error("force registry iteration sentinel") end
+                            return next, registry, nil
+                          end
+                        })
+                      elseif observation == "absent-force" then registry[95] = nil end
+                      local ok, message = pcall(lifecycle.on_configuration_changed,
+                        {mod_changes={},mod_startup_settings_changed=false})
+                      local retained = storage.mir_caps == state and state.owned_disabled[74]
+                        and state.owned_disabled[74][name] == right and right.disabled
+                      if observation == "iteration-failure" then
+                        assert(not ok and retained, "force read failure was mistaken for an absent force")
+                        message = tostring(message)
+                        assert(message:find("force registry iteration sentinel",1,true),
+                          "force inventory failure omitted its original cause")
+                      else assert(ok and retained, "ordinary force observation changed a valid cap right") end
+                      if observation == "absent-force" then
+                        assert(state.owned_disabled[95] == nil, "genuinely removed force retained obsolete cap rights")
+                      else
+                        assert(state.owned_disabled[95][name] == second_right and second_right.disabled,
+                          "another force lost its restoration right")
+                      end
+                      assert(owner.level == 3 and owner.saved_progress == .27 and not owner.enabled
+                        and f.current_research == queued and f.research_progress == .42
+                        and #f.research_queue == 1 and f.research_queue[1] == queued and not foreign.enabled,
+                        "force cleanup changed native or unrelated work")
+                      game.forces, owner.level = registry, 2
+                      lifecycle.on_research_reversed({research=owner})
+                      assert(owner.enabled and not foreign.enabled and owner.saved_progress == .27
+                        and f.current_research == queued and f.research_progress == .42,
+                        "read recovery could not restore the actual MIR-owned enablement")
+                    ''')
+
     def test_foreign_disable_and_force_lifecycle_cleanup_remain_owned(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"
@@ -1486,6 +1976,144 @@ class LifecycleTests(unittest.TestCase):
             and #f.research_queue == 1 and f.research_queue[1] == six,
             "cap presentation rewrote native work")
         ''')
+
+    def test_native_cap_observation_failure_preserves_right_and_later_restoration(self):
+        for boundary in ("lookup", "predicate"):
+            with self.subTest(boundary=boundary):
+                self.setUp()
+                self.lua.globals().fault_boundary = boundary
+                self.lua.execute('''
+                  local name="low-density-structure-productivity"
+                  local exact=technology(name,3,true)
+                  exact.prototype={max_level=4294967295,effects={
+                    {type="change-recipe-productivity",recipe="low-density-structure",change=.1},
+                    {type="change-recipe-productivity",recipe="casting-low-density-structure",change=.1}}}
+                  local f=force(44,{[name]=exact},{},nil,nil);exact.force=f
+                  boot({[44]=f},0,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+                    {["ips-max-level-research_low_density_structure"]=2})
+                  handlers.init()
+                  local state=storage.mir_caps
+                  local right=state.owned_disabled[44][name]
+                  assert(not exact.enabled and right.disabled==true)
+                  local technologies,prototype=f.technologies,exact.prototype
+                  local cause={boundary=fault_boundary}
+                  if fault_boundary=="lookup" then
+                    f.technologies=setmetatable({},{__index=function(_,key)
+                      if key==name then error(cause) end
+                      return technologies[key]
+                    end})
+                  else
+                    exact.prototype=setmetatable({},{__index=function()error(cause)end})
+                  end
+                  local lifecycle=require("runtime.lifecycle")
+                  local ok,reason=pcall(lifecycle.on_research_finished,{research=exact})
+                  assert(not ok and reason==cause,"unexpected owner failure lost its original cause")
+                  assert(storage.mir_caps==state and state.owned_disabled[44][name]==right
+                    and right.disabled==true and not exact.enabled,
+                    "failed observation discarded restoration rights or changed native flags")
+                  f.technologies,exact.prototype=technologies,prototype
+                  exact.level=2
+                  lifecycle.on_research_reversed{research=exact}
+                  assert(exact.enabled and exact.level==2,
+                    "recovery after the failed observation did not restore earned cap right")
+                  lifecycle.on_research_reversed{research=exact}
+                  assert(exact.enabled,"repeated reconciliation consumed restoration incorrectly")
+                ''')
+
+    def test_late_cap_observation_failure_precedes_all_force_writes(self):
+        for callback in ("init", "configuration"):
+            for kind in ("native", "authored"):
+                with self.subTest(callback=callback, kind=kind):
+                    self.setUp()
+                    self.lua.globals().fault_callback = callback
+                    self.lua.globals().fault_kind = kind
+                    self.lua.execute('''
+                      local name="low-density-structure-productivity"
+                      local function owner()
+                        local t=technology(name,3,true)
+                        t.prototype={max_level=4294967295,effects={
+                          {type="change-recipe-productivity",recipe="low-density-structure",change=.1},
+                          {type="change-recipe-productivity",recipe="casting-low-density-structure",change=.1}}}
+                        return t
+                      end
+                      local one,two=owner(),owner()
+                      local f1=force(41,{[name]=one},{one},one,.37)
+                      local f2=force(42,{[name]=two},{two},two,.29)
+                      one.force,two.force=f1,f2
+                      boot({f1,f2},2,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+                        {["ips-max-level-research_low_density_structure"]=2})
+                      local cause={boundary="late-"..fault_kind}
+                      local original=f2.technologies
+                      local rejected=fault_kind=="native" and name or "recipe-prod-research_gears-1"
+                      f2.technologies=setmetatable({},{__index=function(_,key)
+                        if key==rejected then error(cause) end
+                        return original[key]
+                      end})
+                      local lifecycle=require("runtime.lifecycle")
+                      local ok,reason=pcall(lifecycle["on_"..(fault_callback=="init" and "init" or "configuration_changed")],{})
+                      assert(not ok and reason==cause,"late observation failure was hidden")
+                      assert(storage.mir_caps==nil,"failed all-force admission allocated durable cap state")
+                      assert(one.enabled and two.enabled and one.level==3 and two.level==3,
+                        "late admission failure followed an earlier native cap write")
+                      assert(f1.current_research==one and f1.research_progress==.37
+                        and #f1.research_queue==1 and f2.current_research==two
+                        and f2.research_progress==.29 and #f2.research_queue==1,
+                        "failed admission changed unrelated paid work")
+                    ''')
+
+    def test_cap_admission_distinguishes_optional_shape_and_unexpected_failure(self):
+        self.lua.execute('''
+          local admission=require("runtime.cap_admission")
+          local declaration={id="native-productivity",native_owner_identity="native-productivity",
+            ownership_kind="nativeowner",native_admission={effect_type="change-recipe-productivity",recipes={"gear"}}}
+          assert(not admission.admits_native_owner(function()return nil end,declaration))
+          assert(not admission.admits_native_owner(function()return {name="other"}end,declaration))
+          assert(not admission.admits_native_owner(function()error("must not query malformed declaration")end,{}))
+          local cause={unexpected=true}
+          local ok,reason=pcall(admission.admits_native_owner,function()error(cause)end,declaration)
+          assert(not ok and reason==cause,"lookup error became optional absence")
+          local exact={name=declaration.id,prototype={max_level=4294967295,effects={
+            {type="change-recipe-productivity",recipe="gear",change=.1}}}}
+          assert(admission.admits_native_owner(function()return exact end,declaration))
+          exact.prototype.effects[2]={type="change-recipe-productivity",recipe="foreign",change=.1}
+          assert(not admission.admits_native_owner(function()return exact end,declaration),
+            "extra native effect was silently ignored")
+          assert(not pcall(admission.admits_native_owner,false,declaration),
+            "missing required lookup was treated as absent optional technology")
+        ''')
+
+    def test_cap_observation_failure_preserves_force_boundary_and_legacy_rights(self):
+        for callback in ("on_force_created", "on_force_reset", "on_forces_merged", "on_configuration_changed"):
+            with self.subTest(callback=callback):
+                self.setUp()
+                self.lua.globals().fault_callback = callback
+                self.lua.execute('''
+                  local name="recipe-prod-research_gears-1"
+                  local main=technology(name,3,true)
+                  local f=force(44,{[name]=main},{main},main,.37);main.force=f
+                  local right={disabled=true}
+                  local legacy={policy_version=3,retained="do not consume"}
+                  local saved={mir={maximum_level_control=legacy},mir_caps={schema=1,
+                    owned_disabled={[44]={[name]=right},[43]={[name]={disabled=true}}}}}
+                  boot({[44]=f},2,"",saved,nil,0)
+                  local original=f.technologies
+                  local cause={boundary=fault_callback}
+                  f.technologies=setmetatable({},{__index=function(_,key)
+                    if key==name then error(cause)end
+                    return original[key]
+                  end})
+                  local ok,reason=pcall(require("runtime.lifecycle")[fault_callback],
+                    {force=f,destination=f,source_index=43})
+                  assert(not ok and reason==cause,"force-boundary read failure was hidden")
+                  assert(storage==saved and saved.mir.maximum_level_control==legacy
+                    and saved.mir_caps.owned_disabled[44][name]==right
+                    and saved.mir_caps.owned_disabled[43][name].disabled
+                    and saved.mir_caps.legacy_caps_checked==nil,
+                    "failed force admission cleared or consumed existing rights")
+                  assert(main.enabled and main.level==3 and f.current_research==main
+                    and f.research_progress==.37 and #f.research_queue==1,
+                    "failed force admission rewrote research")
+                ''')
 
     def test_published_worker_cap_boundary_preserves_earned_bonus_and_partial_work(self):
         self.lua.execute('''
