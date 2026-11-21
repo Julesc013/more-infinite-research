@@ -1433,8 +1433,8 @@ add(
   false,
   nil)
 
--- K2SO historically exposed these six carried material settings. They remain
--- declared even though only Imersite has an emitted K2SO research identity.
+-- K2SO historically exposed these six material settings. This table controls
+-- their visibility. The named material declarations select the emitted research.
 local K2SO_VISIBLE = {
   research_material_black_paving = true,
   research_material_glass = true,

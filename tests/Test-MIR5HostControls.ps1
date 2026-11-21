@@ -1,6 +1,8 @@
+[CmdletBinding()]
 param(
   [string]$LuaRuntimeDir,
-  [switch]$Plan
+  [switch]$Plan,
+  [string[]]$ControlPath
 )
 
 Set-StrictMode -Version Latest
@@ -226,20 +228,32 @@ $controls = @(
   [ordered]@{path='tools/check_repository.py';lua=$false}
 )
 
+$namedBatch = $PSBoundParameters.ContainsKey('ControlPath')
+if ($namedBatch) {
+  $batch = @($controls | Where-Object { $ControlPath -ccontains $_.path })
+  if ($batch.Count -eq 0 -or $batch.Count -ne $ControlPath.Count) {
+    throw '[mir5-host-controls-selection] Supply each named path once, exactly as listed in the host plan.'
+  }
+  $controls = $batch
+}
 if ($Plan) {
-  [pscustomobject][ordered]@{schema=1;kind='MIR5HostControlsPlanV1';controls=$controls;native_execution=$false;release_qualification=$false}
+  $manifest = [ordered]@{schema=1;kind='MIR5HostControlsPlanV1';controls=$controls;native_execution=$false;release_qualification=$false}
+  if ($namedBatch) { $manifest.selection = 'named' }
+  [pscustomobject]$manifest
   return
 }
 if ([string]::IsNullOrWhiteSpace($LuaRuntimeDir)) { $LuaRuntimeDir = [string]$env:MIR5_LUA_RUNTIME }
 if ([string]::IsNullOrWhiteSpace($LuaRuntimeDir)) { throw '[mir5-host-controls-lua-runtime-required]' }
 $runtime = (Resolve-Path -LiteralPath $LuaRuntimeDir -ErrorAction Stop).Path
 if (-not (Test-Path -LiteralPath (Join-Path $runtime 'lupa') -PathType Container)) { throw '[mir5-host-controls-lua-runtime-invalid]' }
-$python = (Get-Command python -ErrorAction Stop).Source
+$pythonCommand = Get-Command python -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $pythonCommand) { $pythonCommand = Get-Command python3 -CommandType Application -ErrorAction Stop | Select-Object -First 1 }
+$python = $pythonCommand.Source
 
 foreach ($control in $controls) {
-  $controlPath = Join-Path $repo ([string]$control.path)
-  if (-not (Test-Path -LiteralPath $controlPath -PathType Leaf)) { throw "[mir5-host-controls-missing] $($control.path)" }
-  $arguments = @('-B', $controlPath)
+  $scriptPath = Join-Path $repo ([string]$control.path)
+  if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) { throw "[mir5-host-controls-missing] $($control.path)" }
+  $arguments = @('-B', $scriptPath)
   if ([bool]$control.lua) { $arguments += @('--lua-runtime-dir', $runtime) }
   & $python @arguments
   if ($LASTEXITCODE -ne 0) { throw "[mir5-host-controls-failed] $($control.path)" }

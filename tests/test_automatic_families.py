@@ -4,7 +4,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
-from historical_sources import read_published_source
+from historical_sources import read_captured_settings, read_published_source
 from repository_paths import reference_path
 import sys
 import unittest
@@ -83,12 +83,14 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
         ):
             record = cls.facts[group]
             for path_key, hash_key in paths:
-                if group != "observer_fixture" and path_key != "historical_settings_path":
+                if group == "observer_fixture":
+                    path = reference_path(record[path_key])
+                    if _sha256(path) != record[hash_key]:
+                        raise AssertionError(f"automatic-family source evidence changed: {path}")
+                elif path_key == "historical_settings_path":
+                    read_captured_settings(ROOT, record[path_key], record[hash_key])
+                else:
                     read_published_source(ROOT, record[path_key], record[hash_key])
-                    continue
-                path = reference_path(record[path_key])
-                if _sha256(path) != record[hash_key]:
-                    raise AssertionError(f"automatic-family source evidence changed: {path}")
 
         profile = reference_path(cls.facts["profile"])
         if _sha256(profile) != cls.facts["profile_sha256"]:
@@ -148,7 +150,9 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
 
         streams = read_published_source(ROOT, evidence["streams_path"], evidence["streams_sha256"]).decode("utf-8")
         providers = read_published_source(ROOT, evidence["providers_path"], evidence["providers_sha256"]).decode("utf-8")
-        settings = reference_path(evidence["historical_settings_path"]).read_text(encoding="utf-8")
+        settings = read_captured_settings(
+            ROOT, evidence["historical_settings_path"], evidence["historical_settings_sha256"]
+        ).decode("utf-8")
         for family in ("research_auto_assembling_machine", "research_auto_lab"):
             self.assertIn(family, streams)
             self.assertIn(family, providers)
