@@ -37,7 +37,11 @@ function Write-ManagerControlText {
 }
 
 function New-ManagerControlPolicy {
-  param([Parameter(Mandatory)][string]$RequestId,[Parameter(Mandatory)][string]$PacketText)
+  param(
+    [Parameter(Mandatory)][string]$RequestId,
+    [Parameter(Mandatory)][string]$PacketText,
+    [int]$ExitCode = 0
+  )
   $checkout = Join-Path $rootFull 'checkout'
   $resultRoot = Join-Path $rootFull 'results'
   $job = Join-Path $checkout ('jobs/'+$RequestId)
@@ -57,11 +61,15 @@ set -euo pipefail
 sleep 1
 printf '%s\n' '{"kind":"MIRGunmetalNativeDispatcherManagerControlResultV1","status":"passed","packet_sha256":"$packetHash"}' > '$result'
 sleep 2
+exit $ExitCode
 "@
+  $terminalProperty = 'ExecStopPost=/usr/bin/printf "MIR_NATIVE_CONTROLLER_EXIT %s %s %s\n" $SERVICE_RESULT $EXIT_CODE $EXIT_STATUS'
   $launcherText = @"
 #!/usr/bin/env bash
 set -euo pipefail
-/usr/bin/systemd-run --user --no-block --unit='$($script:unit)' --collect --property=Type=oneshot --property=RemainAfterExit=yes /usr/bin/bash '$controller'
+/usr/bin/systemd-run --user --no-block --unit='$($script:unit)' --collect \
+  --property=Type=exec --property=RuntimeMaxSec=15 --property=MemoryMax=32M --property=TasksMax=8 \
+  --property=StandardOutput=journal --property='$terminalProperty' /usr/bin/bash '$controller'
 "@
   Write-ManagerControlText -Path $controller -Text $controllerText
   Write-ManagerControlText -Path $launcher -Text $launcherText
@@ -119,7 +127,7 @@ function Wait-ManagerControlTerminal {
 $cleanup = 'not-started'
 try {
   $first = New-ManagerControlPolicy -RequestId 'manager-control-first' -PacketText 'first'
-  $second = New-ManagerControlPolicy -RequestId 'manager-control-second' -PacketText 'second'
+  $second = New-ManagerControlPolicy -RequestId 'manager-control-second' -PacketText 'second' -ExitCode 17
   $submitted = Submit-MIRGunmetalDispatcherApproved -Policy $first
   Assert-ManagerControl ($submitted.status -ceq 'queued') 'first-queued'
   $started = Invoke-MIRGunmetalDispatcherConsume -Policy $first
@@ -137,15 +145,19 @@ try {
   Assert-ManagerControl ($wake.status -ceq 'reconciled' -and -not (Test-Path -LiteralPath (Join-Path $first.spool 'state/pending.signal'))) 'held-pending-edge-consumed-without-start-loop'
 
   $firstTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $first.approval.request_id
-  Assert-ManagerControl ($firstTerminal.status -ceq 'succeeded' -and $firstTerminal.result.result.packet_sha256 -ceq $first.approval.packet_sha256 -and $firstTerminal.result.result.status -ceq 'passed') 'first-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  if ($firstTerminal.status -cne 'succeeded') {
+    $detail = $firstTerminal | ConvertTo-Json -Depth 12 -Compress
+    throw "[mir-gunmetal-dispatcher-manager-control-collected-success:$detail]"
+  }
+  Assert-ManagerControl ($firstTerminal.result.result.packet_sha256 -ceq $first.approval.packet_sha256 -and $firstTerminal.result.journal.exit_code -eq 0) 'first-manager-terminal-packet-bound'
+  Assert-ManagerControl ((Get-MIRGunmetalDispatcherUnit -Unit $script:unit).absence_confirmed) 'first-collected-without-stop'
 
   $secondStarted = Invoke-MIRGunmetalDispatcherConsume -Policy $first
   $secondRunning = Get-MIRGunmetalDispatcherStateRecord -Policy $first -Name running
   Assert-ManagerControl ($secondStarted.status -ceq 'submitted' -and $secondRunning.request_id -ceq $second.approval.request_id -and $secondRunning.packet_sha256 -ceq $second.approval.packet_sha256) 'second-distinct-packet-started'
   $secondTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $second.approval.request_id
-  Assert-ManagerControl ($secondTerminal.status -ceq 'succeeded' -and $secondTerminal.result.result.packet_sha256 -ceq $second.approval.packet_sha256) 'second-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  Assert-ManagerControl ($secondTerminal.status -ceq 'failed' -and $secondTerminal.result.result.valid -and $secondTerminal.result.journal.exit_code -eq 17) 'positive-controller-result-cannot-hide-exit-17'
+  Assert-ManagerControl ((Get-MIRGunmetalDispatcherUnit -Unit $script:unit).absence_confirmed) 'second-collected-without-stop'
   $cleanup = 'unit-cleaned'
 
   [pscustomobject]@{
@@ -155,6 +167,8 @@ try {
     unit = $script:unit
     first_packet_sha256 = $first.approval.packet_sha256
     second_packet_sha256 = $second.approval.packet_sha256
+    terminals = @($firstTerminal,$secondTerminal)
+    cleanup = $cleanup
     native_execution = $false
     gameplay_acceptance = $false
     operational_scope = 'two disposable user-systemd stand-ins only; no Factorio, direct library, or agents-owned unit.'

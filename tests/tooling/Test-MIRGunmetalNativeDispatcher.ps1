@@ -58,7 +58,10 @@ function Invoke-MIRGunmetalDispatcherLauncher {
   $script:fakeState=$script:nextLaunchState
   return [pscustomobject]@{exit_code=0;lines=@('{"event":"systemd-launch-returned","exit_code":0}')}
 }
-function Get-MIRGunmetalDispatcherJournalTerminal { param([Parameter(Mandatory)][string]$InvocationId) return $script:fakeJournal }
+function Get-MIRGunmetalDispatcherJournalTerminal {
+  param([Parameter(Mandatory)][string]$Unit,[Parameter(Mandatory)][string]$InvocationId)
+  return $script:fakeJournal
+}
 
 $script:installState='success'
 $script:installCalls=[Collections.Generic.List[string]]::new()
@@ -135,7 +138,7 @@ try {
   Write-DispatcherResult -Policy $sourceConclusion
   $sourceResult=Get-MIRGunmetalDispatcherResult -Approval $sourceConclusion.approval
   Assert-Dispatcher ($sourceResult.valid-and$sourceResult.status-ceq'source-earned-and-read-only-cold-observed') 'precise-controller-conclusion-bound'
-  Refuses-Dispatcher {New-DispatcherPolicy -Control $precise -RequestId 'native-control-precise-awaiting' -PacketText 'awaiting' -ResultStatus 'completed-await-independent-review'} '[mir-gunmetal-dispatcher-policy-result-status]'
+  Refuses-Dispatcher {New-DispatcherPolicy -Control $precise -RequestId 'native-control-precise-adverse' -PacketText 'adverse' -ResultStatus 'failed-retained-adverse'} '[mir-gunmetal-dispatcher-policy-result-status]'
 
   # A submit crash may leave request.json durable before its pending pointer.
   # Retrying the exact reviewed policy adopts that snapshot; a second retry
@@ -162,12 +165,54 @@ try {
   Assert-Dispatcher ($pending.request_id-ceq$successor.approval.request_id-and(Test-Path -LiteralPath (Join-Path $normal.spool ('requests/'+$successor.approval.request_id+'/policy.json')))) 'one-immutable-successor-snapshot'
   $secondSuccessor=New-DispatcherPolicy -Control $normal -RequestId 'native-control-normal-third' -PacketText 'third'
   Refuses-Dispatcher {Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $normal.base -SuccessorPolicyPath $secondSuccessor.path} '[mir-gunmetal-dispatcher-pending-slot-not-empty]'
-  Write-DispatcherResult -Policy $normal.base;$script:fakeState='gone';$script:fakeJournal=[pscustomobject]@{observed=$true;exit_code=0}
+  Write-DispatcherResult -Policy $normal.base;$script:fakeState='gone';$script:fakeJournal=[pscustomobject]@{observed=$true;exit_code=0;service_result='success'}
   $null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   $terminal=Read-DispatcherTerminal -Control $normal -RequestId $normal.base.approval.request_id
   Assert-Dispatcher ($terminal.status-ceq'succeeded'-and$terminal.packet_sha256-ceq$normal.base.approval.packet_sha256-and$terminal.completion_envelope_sha256-match'^[A-F0-9]{64}$') 'packet-result-invocation-envelope-success'
   $script:fakeState='gone';$script:nextLaunchState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   Assert-Dispatcher ($script:launches-eq2-and(Get-MIRGunmetalDispatcherStateRecord -Policy $normal.base -Name running).request_id-ceq$successor.approval.request_id) 'successor-starts-only-after-prior-success'
+
+  $journalUnit = 'mir-native.service'
+  $invocation = $script:fakeInvocation
+  $stop = @{
+    '_SYSTEMD_INVOCATION_ID' = $invocation
+    '_SYSTEMD_USER_UNIT' = $journalUnit
+    'MESSAGE' = 'MIR_NATIVE_CONTROLLER_EXIT success exited 0'
+    '__CURSOR' = 'stop-record'
+    '_BOOT_ID' = '11111111111111111111111111111111'
+  }
+  $stopLine = $stop | ConvertTo-Json -Compress
+  $manager = @{
+    'USER_INVOCATION_ID' = $invocation
+    'USER_UNIT' = $journalUnit
+    'MESSAGE' = "$($journalUnit): Main process exited, code=exited, status=17/n/a"
+  } | ConvertTo-Json -Compress
+  $journal = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $journalUnit -InvocationId $invocation -Lines @($stopLine)
+  Assert-Dispatcher ($journal.service_result -ceq 'success' -and $null -ne $journal.exit_code -and $journal.exit_code -eq 0 -and $journal.journal_cursor -ceq 'stop-record') 'actual-stop-hook-shape'
+  $failure = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $journalUnit -InvocationId $invocation -Lines @($manager)
+  Assert-Dispatcher ($failure.service_result -ceq 'exit-code' -and $failure.exit_code -eq 17) 'legacy-manager-observes-nonzero'
+  $duplicate = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $journalUnit -InvocationId $invocation -Lines @($stopLine,$stopLine)
+  Assert-Dispatcher (-not $duplicate.observed) 'duplicate-terminal-evidence-refuses'
+  $conflict = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $journalUnit -InvocationId $invocation -Lines @($stopLine,$manager)
+  Assert-Dispatcher (-not $conflict.observed) 'conflicting-terminal-evidence-refuses'
+  $unobserved = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit 'different.service' -InvocationId $invocation -Lines @($stopLine)
+  Assert-Dispatcher (-not $unobserved.observed) 'same-invocation-different-unit-refuses'
+  $stop['MESSAGE'] = 'MIR_NATIVE_CONTROLLER_EXIT success killed TERM'
+  $signal = Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $journalUnit -InvocationId $invocation -Lines @($stop | ConvertTo-Json -Compress)
+  Assert-Dispatcher ($signal.observed -and $null -eq $signal.exit_code -and $signal.exit_status -ceq 'TERM') 'termination-signal-is-not-exit-zero'
+
+  $loadedFailure = New-DispatcherControl -Name 'loaded-nonzero'
+  $controls += @($loadedFailure)
+  $reviewedFinish = New-DispatcherPolicy -Control $loadedFailure -RequestId 'native-control-reviewed-finish' -PacketText 'bound' -ResultStatus 'completed-await-independent-review'
+  $null = Submit-MIRGunmetalDispatcherApproved -Policy $reviewedFinish
+  $script:fakeState = 'gone'
+  $script:nextLaunchState = 'active'
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $reviewedFinish
+  Write-DispatcherResult -Policy $reviewedFinish
+  $script:fakeState = 'failed'
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $reviewedFinish
+  $nonzero = Read-DispatcherTerminal -Control $loadedFailure -RequestId $reviewedFinish.approval.request_id
+  Assert-Dispatcher ($nonzero.status -ceq 'failed' -and $nonzero.result.result.valid -and $nonzero.result.journal.exit_code -eq 1) 'loaded-controller-exact-nonzero'
 
   # A retained user-systemd oneshot reports ActiveState=active/SubState=exited.
   # That is a terminal property result, not a still-running native session.

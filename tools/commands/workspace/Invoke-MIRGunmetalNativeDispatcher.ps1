@@ -11,7 +11,14 @@ is active. The systemd path/timer runs `-Mode Consume`; it invokes only that
 hash-pinned launcher and retains a terminal record. A launcher return is never
 a pass: success additionally needs its PID/invocation acknowledgement, the
 expected packet-bound controller result, and explicit terminal systemd
-evidence. Missing or conflicting evidence is terminal `interrupted` and is
+evidence. A collected service can preserve its manager-supplied exit via these
+arguments to its reviewed systemd-run launcher:
+
+  --property=StandardOutput=journal
+  '--property=ExecStopPost=/usr/bin/printf "MIR_NATIVE_CONTROLLER_EXIT %s %s %s\n" $SERVICE_RESULT $EXIT_CODE $EXIT_STATUS'
+
+The exit hook uses the unit's own journal invocation. Missing or conflicting
+evidence is terminal `interrupted` and is
 never retried. A held successor requires an explicit disposition reference;
 the existing exact snapshot may be released, or a different reviewed snapshot
 may replace it. The durable intent closes the marker-to-launch acknowledgement
@@ -143,9 +150,9 @@ function Get-MIRGunmetalDispatcherPolicy {
   $resultStatus = Assert-MIRGunmetalDispatcherText $approval.result_status '[mir-gunmetal-dispatcher-policy-result-status]' 256
   # `passed` is the deliberately small control-protocol success state. The
   # retained R04 source controller has a more precise positive conclusion.
-  # Incomplete custody (`completed-await-independent-review`) is not terminal
-  # success and must be independently reviewed before it is ever allowlisted.
-  if ($resultStatus -cnotin @('passed','source-earned-and-read-only-cold-observed')) {
+  # Native scenario controllers can finish their packet while its evidence
+  # still awaits an independent acceptance decision.
+  if ($resultStatus -cnotin @('passed','source-earned-and-read-only-cold-observed','completed-await-independent-review')) {
     throw '[mir-gunmetal-dispatcher-policy-result-status]'
   }
   return [pscustomobject][ordered]@{
@@ -375,21 +382,67 @@ function Get-MIRGunmetalDispatcherUnit {
   }
 }
 
-function Get-MIRGunmetalDispatcherJournalTerminal {
-  param([Parameter(Mandatory)][string]$InvocationId)
-  if($InvocationId -cnotmatch '^[A-Fa-f0-9]{32}$'){throw '[mir-gunmetal-dispatcher-invocation-id]'}
-  # A user-manager unit records USER_INVOCATION_ID, not the system-manager
-  # _SYSTEMD_INVOCATION_ID field. The collected-unit sample intentionally
-  # showed only a started message, so absence of an explicit main-process exit
-  # remains interruption rather than a manufactured success.
-  $lines=@(& /usr/bin/journalctl --user --no-pager --output=json "USER_INVOCATION_ID=$InvocationId" 2>$null)
-  $exit=$null
-  foreach($line in $lines){
-    try{$entry=$line|ConvertFrom-Json -ErrorAction Stop}catch{continue}
-    $message=if($entry.PSObject.Properties['MESSAGE']){[string]$entry.MESSAGE}else{''}
-    if($message-match'Main process exited, code=exited, status=(\d+)/'){$exit=[int]$Matches[1]}
+function Resolve-MIRGunmetalDispatcherJournalTerminal {
+  param(
+    [Parameter(Mandatory)][string]$Unit,
+    [Parameter(Mandatory)][string]$InvocationId,
+    [string[]]$Lines = @()
+  )
+  $hook = $null
+  $managerExit = $null
+  $unobserved = [pscustomobject]@{observed=$false;exit_code=$null;service_result='';reason='no-unique-explicit-exit'}
+  if ($Lines.Count -ge 24) { return $unobserved }
+  foreach ($line in $Lines) {
+    try { $entry = ConvertFrom-Json -InputObject $line -AsHashtable -ErrorAction Stop }
+    catch { return $unobserved }
+    if ($entry -isnot [Collections.IDictionary]) { return $unobserved }
+    if ($entry['_SYSTEMD_INVOCATION_ID'] -ceq $InvocationId -and $entry['_SYSTEMD_USER_UNIT'] -ceq $Unit) {
+      if ($null -ne $hook -or $entry['MESSAGE'] -cnotmatch '^MIR_NATIVE_CONTROLLER_EXIT ([a-z-]+) (exited|killed|dumped) ([A-Z0-9]+)$') { return $unobserved }
+      $serviceResult, $exitKind, $exitStatus = $Matches[1], $Matches[2], $Matches[3]
+      $exitCode = $null
+      if ($exitKind -ceq 'exited') {
+        if ($exitStatus -cnotmatch '^(?:0|[1-9][0-9]{0,2})$' -or [int]$exitStatus -gt 255) { return $unobserved }
+        $exitCode = [int]$exitStatus
+      }
+      $hook = [pscustomobject][ordered]@{
+        observed=$true
+        exit_code=$exitCode
+        service_result=$serviceResult
+        exit_kind=$exitKind
+        exit_status=$exitStatus
+        source='systemd-exec-stop-post'
+        journal_cursor=$entry['__CURSOR']
+        boot_id=$entry['_BOOT_ID']
+      }
+    } elseif (
+      $entry['USER_INVOCATION_ID'] -ceq $InvocationId -and $entry['USER_UNIT'] -ceq $Unit -and
+      $entry['MESSAGE'] -cmatch ('^' + [regex]::Escape($Unit) + ': Main process exited, code=exited, status=([1-9][0-9]{0,2})/')
+    ) {
+      if ($null -ne $managerExit -or [int]$Matches[1] -gt 255) { return $unobserved }
+      $managerExit = [int]$Matches[1]
+    }
   }
-  return [pscustomobject]@{observed=($null-ne$exit);exit_code=$exit}
+  if ($null -ne $hook) {
+    if ($null -ne $managerExit -and $hook.exit_code -ne $managerExit) { return $unobserved }
+    return $hook
+  }
+  if ($null -ne $managerExit) {
+    return [pscustomobject]@{observed=$true;exit_code=$managerExit;service_result='exit-code';source='systemd-user-manager'}
+  }
+  return $unobserved
+}
+
+function Get-MIRGunmetalDispatcherJournalTerminal {
+  param([Parameter(Mandatory)][string]$Unit,[Parameter(Mandatory)][string]$InvocationId)
+  if ($InvocationId -cnotmatch '^[a-f0-9]{32}$') { throw '[mir-gunmetal-dispatcher-invocation-id]' }
+  # Journal fields distinguish processes in the user unit from the user
+  # manager's own log messages. Bind both to the acknowledged invocation.
+  $lines = @(& /usr/bin/journalctl --user --no-pager --output=json --lines=24 `
+    '--grep=^MIR_NATIVE_CONTROLLER_EXIT |Main process exited, code=exited, status=' `
+    "_SYSTEMD_INVOCATION_ID=$InvocationId" "_SYSTEMD_USER_UNIT=$Unit" '+' `
+    "USER_INVOCATION_ID=$InvocationId" "USER_UNIT=$Unit" 2>$null)
+  if ($LASTEXITCODE -ne 0) { $lines = @() }
+  return Resolve-MIRGunmetalDispatcherJournalTerminal -Unit $Unit -InvocationId $InvocationId -Lines $lines
 }
 
 function Get-MIRGunmetalDispatcherResult {
@@ -577,29 +630,30 @@ function Reconcile-MIRGunmetalDispatcherRunning {
   if ($unit.found) {
     # systemctl show reports CLD_EXITED numerically on the real user manager
     # (`1`), while fixture/older manager shapes spell it `exited`.
-    $explicitExit = $unit.exec_main_code -in @('exited','1')
+    $exitCode = if ($unit.exec_main_code -in @('exited','1') -and $unit.exec_main_status -cmatch '^(?:0|[1-9][0-9]{0,2})$') {
+      [int]$unit.exec_main_status
+    } else { $null }
     $good = (
       $unit.result -ceq 'success' -and
-      $explicitExit -and
-      $unit.exec_main_status -ceq '0' -and
+      $null -ne $exitCode -and $exitCode -eq 0 -and
       $result.valid
     )
     $terminalResult = [ordered]@{
       result = $result
-      journal = [ordered]@{ observed = $true; exit_code = 0; source = 'systemctl-properties' }
+      journal = [ordered]@{ observed = $true; exit_code = $exitCode; service_result = $unit.result; source = 'systemctl-properties' }
     }
     $reason = if ($good) { 'unit-and-result-passed' } else { 'unit-terminal-or-result-failed' }
     $status = if ($good) { 'succeeded' } else { 'failed' }
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status $status -Reason $reason -Unit $unit -Result $terminalResult
     return
   }
-  $journal = Get-MIRGunmetalDispatcherJournalTerminal -InvocationId $expected
+  $journal = Get-MIRGunmetalDispatcherJournalTerminal -Unit $Policy.unit -InvocationId $expected
   if (-not $journal.observed) {
     # A collected unit's disappearance/deactivation is not an exit status.
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'unit-unloaded-without-terminal-journal' -Result $result
     return
   }
-  $good = ($journal.exit_code -eq 0 -and $result.valid)
+  $good = ($journal.service_result -ceq 'success' -and $null -ne $journal.exit_code -and $journal.exit_code -eq 0 -and $result.valid)
   $reason = if ($good) { 'journal-and-result-passed' } else { 'journal-terminal-or-result-failed' }
   $status = if ($good) { 'succeeded' } else { 'failed' }
   New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status $status -Reason $reason -Result ([ordered]@{ result = $result; journal = $journal })
