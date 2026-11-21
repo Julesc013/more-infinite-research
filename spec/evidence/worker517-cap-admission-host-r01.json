@@ -104,7 +104,14 @@
       "cap-admission-construction-r01.log": "46C01D8ED095A664550190ED43DF978E7D263B0DC003FC21E73C48115364B952",
       "cap-admission-owner-data-r01.log": "C60F41BB9F7568E0229BA14B9D350B63B0011E1209693BEDA1DCBB3AAEB1665C"
     },
-    "ci_fetch": "validate.yml fetches exact17e producer source for shallow checkouts; there is no network/current-source fallback in the reader."
+    "ci_fetch": "validate.yml fetches exact17e producer source for shallow checkouts; there is no network/current-source fallback in the reader.",
+    "initial_required_ci": {
+      "commit": "ecfcebf825587d4a911ad8374704beb12db69e4b",
+      "run": 44847212455,
+      "verdict": "FAILED_MISSING_HISTORICAL_INPUT_IN_SEPARATE_HOST_JOB",
+      "detail": "Verification-plan fetched exact17e but the separately checked-out host-controls job did not. All13 new subcases failed git show before executing the producer. The follow-up adds the exact fetch and exit guard to that second job; production and regression bodies are unchanged.",
+      "adverse_log": "cap-admission-ci-ecfc-adverse-r01.log"
+    }
   },
   "remaining": [
     "Exact-head CI, independent review and checked integration into recovery draft2209",
