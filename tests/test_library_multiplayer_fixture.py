@@ -2634,6 +2634,61 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_linux_preparation_uses_its_pinned_data_root_and_rejects_session_overlap(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          $function=$ast.Find({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MultiplayerFixturePreparation'},$true)
+          Invoke-Expression $function.Extent.Text
+          . (Join-Path $env:MIR_TEST_REPO 'tools/lib/validation/NativeProbeCommon.ps1')
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $control=Join-Path $env:MIR_TEST_WORK 'control/preparation'
+          $session=Join-Path $env:MIR_TEST_WORK 'data/session'
+          $data=Join-Path $env:MIR_TEST_WORK 'data/preparation'
+          $script:planData=$data;$script:createCount=0
+          function Read-MIRLinuxWriteStorage {
+            param($Path,$Sha256,$ControlRoot,$LibraryRoot,$MaxNewOutputBytes)
+            if($Path-cne'preparation.json'-or$Sha256-cne('9'*64)-or$ControlRoot-cne$control-or$LibraryRoot-cne'library'-or$MaxNewOutputBytes-ne128MB){
+              throw 'preparation storage binding differs'
+            }
+            [pscustomobject]@{roots=@([pscustomobject]@{role='data';path=$script:planData})}
+          }
+          $argsForPreparation=@{
+            ArchiveLibrary='library';FactorioBin='engine';ProfilePath='profile';FixtureSources=@('fixture')
+            ExpectedMIRArchiveSha256=('A'*64);FixtureCase='library-multiplayer';PreparationRoot=$control;RepoRoot=$env:MIR_TEST_REPO
+            LinuxStoragePlanPath='preparation.json';LinuxStoragePlanSha256=('9'*64);LinuxSessionDataRoot=$session
+            CreateOnlyInvoker={
+              param($arguments)
+              $script:createCount++
+              if($arguments.OutputRoot-cne$control-or-not$arguments.CreateOnly-or$arguments.LinuxStoragePlanPath-cne'preparation.json'-or
+                 $arguments.LinuxStoragePlanSha256-cne('9'*64)-or$arguments.MaxNewOutputMiB-ne128){throw 'CreateOnly plan was not forwarded'}
+              $seed=Join-Path $data 'write-data/saves/seed.zip'
+              $null=[IO.Directory]::CreateDirectory((Split-Path -Parent $seed))
+              [IO.File]::WriteAllText($seed,'seed bytes')
+              $receipt=@{status='passed-private-native-runtime-load-only';seed_sha256=(Get-FileHash -LiteralPath $seed).Hash}
+              $receipt | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $data 'result.json')
+            }
+          }
+          $result=Invoke-MultiplayerFixturePreparation @argsForPreparation
+          if($result.seed-cne(Join-Path $data 'write-data/saves/seed.zip')-or(Test-Path -LiteralPath $control)){
+            throw 'preparation read from the wrong root'
+          }
+          $script:planData=Join-Path $session 'nested'
+          $rejected=$false
+          try {Invoke-MultiplayerFixturePreparation @argsForPreparation|Out-Null}
+          catch {$rejected=$_.Exception.Message-eq'preparation and session data roots must be disjoint'}
+          if(-not$rejected-or$script:createCount-ne1){throw 'overlapping roots reached CreateOnly'}
+        '''
+        with tempfile.TemporaryDirectory() as work:
+            result = subprocess.run(
+                ["pwsh", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_WORK=work),
+                check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_standalone_identity_discovery_stops_after_the_real_pair_before_gui_work(self):
         result = self.run_case("standalone-identity-discovery", target="f210")
         self.assertTrue(result["ok"], result.get("message"))

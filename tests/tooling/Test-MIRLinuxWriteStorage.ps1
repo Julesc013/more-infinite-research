@@ -84,14 +84,17 @@ try{
       $plan=[ordered]@{schema=1;execution_account=[Environment]::UserName;roots=$planRoots}
       $planPath=Join-Path $scratch 'storage.json'
       function Read-StorageControlPlan {
+        param([switch]$ActiveJobRoots)
         $plan | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $planPath
-        Read-MIRLinuxWriteStorage -Path $planPath -Sha256 (Get-FileHash -LiteralPath $planPath).Hash -ControlRoot $controlRoot -LibraryRoot $LinuxLibraryRoot -MaxNewOutputBytes 4MB
+        Read-MIRLinuxWriteStorage -Path $planPath -Sha256 (Get-FileHash -LiteralPath $planPath).Hash -ControlRoot $controlRoot -LibraryRoot $LinuxLibraryRoot -MaxNewOutputBytes 4MB -ActiveJobRoots:$ActiveJobRoots
       }
       $storage=Read-StorageControlPlan
       $observed=Get-MIRLinuxWriteStorageObservation -Storage $storage
       Assert-Storage ($observed.roots.Count -eq 3 -and @($observed.roots | Where-Object used_new_bytes -NE 0).Count -eq 0) 'actual-linux-mounted-roots'
       [IO.File]::WriteAllBytes((Join-Path $external 'observed.bin'),[byte[]]::new(113))
-      $observed=Get-MIRLinuxWriteStorageObservation -Storage $storage
+      Refuses-Storage {Read-StorageControlPlan} '[mir-linux-storage-job-not-empty]'
+      $activeStorage=Read-StorageControlPlan -ActiveJobRoots
+      $observed=Get-MIRLinuxWriteStorageObservation -Storage $activeStorage
       Assert-Storage (@($observed.roots | Where-Object role -CEQ 'data')[0].used_new_bytes -eq 113) 'actual-linux-data-growth'
       Remove-Item -LiteralPath (Join-Path $external 'observed.bin')
       $plan.roots[1].mount_id++
