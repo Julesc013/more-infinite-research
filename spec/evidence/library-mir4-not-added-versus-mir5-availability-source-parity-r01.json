@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "kind": "MIR4LibraryNotAddedVsMIR5AvailabilitySourceParityReviewV1",
+  "reviewed_on": "2026-11-14",
+  "status": "source-scope-narrowing-confirmed-native-parity-unqualified",
+  "purpose": "Independently reconcile the MIR4 Research Library's omitted-research explanation capability with published MIR5.0.14 and current-dev Availability before stable; retain a finite, reviewable parity requirement without restoring the retired compiler or claiming native execution.",
+  "inputs": {
+    "mir4_tag": "v4.7.3",
+    "mir5_tag": "v5.0.14",
+    "current_dev": "b45ffd980edcceceac3a0065cd1d342e4ddce00d",
+    "mir4_provider": {
+      "path": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+      "blob": "522a8bc25cb5cc4a0bf0a237e790eb201ee1e09e",
+      "lines": "467-526"
+    },
+    "mir4_browser": {
+      "path": "source/prototypes/mir/runtime/research_browser.lua",
+      "blob": "4c375e78aa53ae11a7c464f4ade8e1f370437da5",
+      "lines": "1007-1078"
+    },
+    "mir5_availability": {
+      "path": "source/presentation/availability.lua",
+      "blob": "8f645818aa57940610c5861f866df078b1c225f7",
+      "lines": "1-6,14-110,246-269"
+    },
+    "mir5_library": {
+      "path": "source/runtime/library.lua",
+      "blob": "54ae09e769dda2ad40c24312252b34412ddf1563",
+      "lines": "2025-2069"
+    },
+    "mir5_en_locale": {
+      "path": "source/locale/en/mir-library.cfg",
+      "blob": "13be84be1357e36af10756dde934833543e992d5",
+      "line": 72
+    },
+    "source_identity": "Both inspected MIR5 availability and library blobs match their respective published v5.0.14 tag and inspected dev head."
+  },
+  "original_capability": {
+    "authority": "MIR4 reads the immutable, validated more-infinite-research-generation-plan public artifact and filters all rows whose action is skip and validated disposition inclusion is excluded, retaining stream, optional technology identity, reason and decision fingerprint.",
+    "force_filter": "MIR4 excludes omission rows when the omitted technology actually exists in the force.",
+    "player_presentation": "The third Research visibility mode validates the portable-research-omissions envelope and displays the selected omitted stream and specific reason, or explicit unavailable state for a bad envelope.",
+    "source_proof": [
+      "mir4_provider:480-506",
+      "mir4_provider:509-526",
+      "mir4_browser:1010-1078"
+    ]
+  },
+  "current_capability": {
+    "authority": "MIR5 availability.rows is a bounded authored finite list selected from missing Space Age, a precisely observed native research-productivity owner, and three exact Bob/Angel/Bob-core closures; it does not read a general generation-plan exclusion ledger.",
+    "player_presentation": "The third Research visibility mode uses availability.rows and displays authored terminal explanations. The English empty state explicitly says no authored availability explanations apply, not that no research was skipped.",
+    "diagnostics": "The optional omission section of the Help report reuses the same authored availability.rows, so it is not an independent complete ledger.",
+    "source_proof": [
+      "mir5_availability:1-6",
+      "mir5_availability:14-110",
+      "mir5_availability:246-269",
+      "mir5_library:2025-2069",
+      "mir5_en_locale:72"
+    ]
+  },
+  "finding": {
+    "classification": "source-level-functionality-scope-contraction",
+    "verified": "MIR4 could present any validated skip/excluded row of its published generation plan; MIR5's Availability only presents a fixed authored subset and cannot present an unlisted skip reason through that view. This is a change in the informational contract, independent of whether any specific current pack requires an unlisted reason.",
+    "not_verified": [
+      "A specific current MIR5 modpack with an unlisted skip reason",
+      "An observed Factorio GUI/rendering failure",
+      "User-visible loss for a specific predecessor save",
+      "Any research, queue, partial progress, bonus or other saved-state mutation",
+      "An unintended decision to delete the old behavior"
+    ],
+    "interpretation": "MIR5 replaced the automatic compiler; reusing MIR4's plan envelope verbatim is not an implied remedy. Stable Library parity requires either a deliberately documented scope exception or a bounded equivalent source of omission explanations with faithful provenance."
+  },
+  "finite_follow_up": [
+    {
+      "id": "PARITY-AVAIL-01",
+      "type": "source-design-decision",
+      "requirement": "Classify what MIR4 not-added explanation fidelity means under explicit MIR5 generation and record whether omission reason coverage is retained or intentionally reduced; do not conflate lack of an authored row with proof no stream was omitted."
+    },
+    {
+      "id": "PARITY-AVAIL-02",
+      "type": "focused-host-opponents",
+      "requirement": "For one currently supported, reproducible configuration with a skipped/generated candidate outside the three curated Bob closure sets, compare the actual generation decision to Library Availability without assuming a historical compiler exists; check that present and intentionally disabled technologies are not falsely described as absent."
+    },
+    {
+      "id": "PARITY-AVAIL-03",
+      "type": "native-acceptance",
+      "requirement": "Where the feature is applicable, verify real F200/F210 Library navigation/search, exact displayed explanation, selection ownership, stable frame/tab geometry, localization and input/export/client lifecycle on an actual native game; preserve published reports and all stable requirements."
+    }
+  ],
+  "verification": {
+    "method": "Exact GitHub blob readback and fifteen source-text/identity predicates; source-only, no Lua host control or Factorio native process.",
+    "static_predicates_passed": 15,
+    "static_predicates_total": 15,
+    "validation_scope": [
+      "mir4 public artifact lookup and skip/excluded filter",
+      "mir4 fingerprint-preserving forced omission envelope",
+      "mir4 GUI consumption/explanation/unavailable distinction",
+      "mir5 deliberate absence of broad compiler ledger",
+      "mir5 finite authored list and same-row Help export",
+      "mir5 English empty-state scope wording",
+      "tag/dev source identity"
+    ],
+    "native_execution": "not performed",
+    "production_changes": "none",
+    "historical_save_or_migration_execution": "not performed",
+    "acceptance": "not established"
+  },
+  "ownership": "Independent additive evidence only. Black Glass retains release14 integration/native/publication and angelbob_fix worker-history functionality; Aero retains Linux adapter/probe. No additional native run, accepted-test rerun, source/runtime edit, version bump, release or stable declaration authorized by this record.",
+  "disposition": "Submit for ordinary independent review; retain MIR4 Library parity and whole-product stable gates open."
+}
