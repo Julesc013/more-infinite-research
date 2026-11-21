@@ -123,6 +123,9 @@ try {
   $identity=New-DispatcherControl -Name 'identity';$controls+=@($identity)
   [IO.File]::AppendAllText((Join-Path $identity.checkout 'build/p/native-control-identity/packet.json'),"changed`n")
   Refuses-Dispatcher {Get-MIRGunmetalDispatcherPolicy -Path $identity.base.path} '[mir-gunmetal-dispatcher-packet-hash]'
+  $policyMutation=New-DispatcherControl -Name 'policy-mutation';$controls+=@($policyMutation)
+  [IO.File]::AppendAllText($policyMutation.base.path," `n")
+  Refuses-Dispatcher {New-MIRGunmetalDispatcherRequestSnapshot -BasePolicy $policyMutation.base -CandidatePolicy $policyMutation.base} '[mir-gunmetal-dispatcher-policy-source-hash]'
 
   # A controller success is a reviewed exact protocol conclusion, not a
   # generic exit code. The demonstrated source-controller conclusion is

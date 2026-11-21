@@ -150,6 +150,7 @@ function Get-MIRGunmetalDispatcherPolicy {
   }
   return [pscustomobject][ordered]@{
     path = $path
+    policy_sha256 = Get-MIRGunmetalDispatcherSha256 $path
     account = $account
     spool = $spool
     checkout = $checkout
@@ -246,6 +247,7 @@ function New-MIRGunmetalDispatcherRequestSnapshot {
   $requestPath=Join-Path $directory 'request.json'
   $sourceBytes=[IO.File]::ReadAllBytes($CandidatePolicy.path)
   $sourceHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($sourceBytes))
+  if ($sourceHash -cne $CandidatePolicy.policy_sha256) { throw '[mir-gunmetal-dispatcher-policy-source-hash]' }
   if(Test-Path -LiteralPath $requestPath) {
     $existing = Read-MIRGunmetalDispatcherJson -Path $requestPath -MaximumBytes 16384
     if (-not (Test-MIRGunmetalDispatcherSnapshotIdentity -Request $existing -Candidate $CandidatePolicy -PolicySha256 $sourceHash -PredecessorRequestId $PredecessorRequestId -DispositionReference $DispositionReference)) {
@@ -791,7 +793,7 @@ function Submit-MIRGunmetalDispatcherPolicy {
   $running=Get-MIRGunmetalDispatcherStateRecord -Policy $BasePolicy -Name running
   $intent=Get-MIRGunmetalDispatcherStateRecord -Policy $BasePolicy -Name intent
   $pending=Get-MIRGunmetalDispatcherPending -Policy $BasePolicy
-  $candidatePolicySha256 = Get-MIRGunmetalDispatcherSha256 $CandidatePolicy.path
+  $candidatePolicySha256 = $CandidatePolicy.policy_sha256
   if($null-ne$pending) {
     $samePending = (
       $pending.pending.request_id -ceq $CandidatePolicy.approval.request_id -and
