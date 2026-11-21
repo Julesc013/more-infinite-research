@@ -1646,6 +1646,13 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           player.research_queue={ORDINARY,ORDINARY,OTHER}; player.research_progress=.42
           current_se_contract()
           assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local debit_meta=getmetatable(player.technologies[HEAD])
+          local debit_read=debit_meta.__index
+          debit_meta.__index=function(technology,key)
+            local value=debit_read(technology,key)
+            assert(value~=nil,"LuaTechnology doesn't contain key "..key)
+            return value
+          end
           local legacy=player.technologies[LEGACY517]
           legacy.level=6; player.research_queue={LEGACY517,OTHER}; player.research_progress=0
           gaps[player.index]=true

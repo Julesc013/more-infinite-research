@@ -2259,7 +2259,7 @@ local function published517_completion_frame(force, finished)
   if not legacy_paid_pair(source, owner, gate, legacy) then
     recover_error("published517 SE paid completion frame differs")
   end
-  return {force=force, source=source, owner=owner, legacy=legacy, gate=gate, bonus=native_bonus(force)}
+  return {force=force, source=source, owner=owner, legacy=legacy, gate_paid=gate_paid(gate), bonus=native_bonus(force)}
 end
 
 local function engine_owned_published517_completion(frame)
@@ -2275,7 +2275,7 @@ local function same_published517_completion_frame(expected, actual)
     and equal_plain(frame_values(expected.source), frame_values(actual.source))
     and equal_plain(frame_values(expected.owner), frame_values(actual.owner))
     and equal_plain(frame_values(expected.legacy), frame_values(actual.legacy))
-    and equal_plain(frame_values(expected.gate), frame_values(actual.gate))
+    and expected.gate_paid == actual.gate_paid
 end
 
 local function revalidate_published517_completion_item(state, item)
