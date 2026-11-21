@@ -58,7 +58,44 @@ function Invoke-MIRGunmetalDispatcherLauncher {
   $script:fakeState=$script:nextLaunchState
   return [pscustomobject]@{exit_code=0;lines=@('{"event":"systemd-launch-returned","exit_code":0}')}
 }
-function Get-MIRGunmetalDispatcherJournalTerminal { param([Parameter(Mandatory)][string]$InvocationId) return $script:fakeJournal }
+function Get-MIRGunmetalDispatcherJournalTerminal {
+  param([Parameter(Mandatory)][string]$InvocationId,[string]$Unit,[string]$PacketSha256)
+  return $script:fakeJournal
+}
+
+function Test-DispatcherExitJournal {
+  $packet = 'A' * 64
+  $unit = 'mir-native.service'
+  $invocation = $script:fakeInvocation
+  $args = @{ Unit = $unit; InvocationId = $invocation; PacketSha256 = $packet }
+  $entry = @{
+    _SYSTEMD_USER_UNIT = $unit
+    _SYSTEMD_INVOCATION_ID = $invocation
+    _TRANSPORT = 'stdout'
+    MESSAGE = "MIR_NATIVE_SYSTEMD_EXIT_V1 invocation=$invocation packet=$packet result=success code=exited status=0"
+  }
+  $hook = $entry | ConvertTo-Json -Compress
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($hook)
+  Assert-Dispatcher ($exit.observed -and $exit.exit_code -eq 0 -and $exit.source -ceq 'systemd-exit-hook') 'collected-hook-exit-zero'
+
+  $wrongUnit = $hook.Replace($unit,'another.service')
+  $wrongInvocation = $hook.Replace($invocation,('1' * 32))
+  $wrongPacket = $hook.Replace($packet,('B' * 64))
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($wrongUnit,$wrongInvocation,$wrongPacket,'null','[]')
+  Assert-Dispatcher (-not $exit.observed -and -not $exit.conflict) 'foreign-exit-records-ignored'
+
+  $terminal = @{USER_INVOCATION_ID=$invocation;MESSAGE='Main process exited, code=exited, status=7/NOTRUNNING'} | ConvertTo-Json -Compress
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -ManagerRecords @($terminal)
+  Assert-Dispatcher ($exit.observed -and $exit.exit_code -eq 7 -and $exit.source -ceq 'manager-journal') 'legacy-manager-exit-preserved'
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -ManagerRecords @($terminal) -HookRecords @($hook)
+  Assert-Dispatcher (-not $exit.observed -and $exit.conflict) 'conflicting-exit-evidence-refused'
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($hook,$hook)
+  Assert-Dispatcher (-not $exit.observed -and $exit.conflict) 'duplicate-hook-evidence-refused'
+
+  $timeout = $hook.Replace('result=success code=exited status=0','result=timeout code=killed status=TERM')
+  $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($timeout)
+  Assert-Dispatcher ($exit.observed -and $null -eq $exit.exit_code -and $exit.service_result -ceq 'timeout' -and $exit.exit_status -ceq 'TERM') 'collected-timeout-preserved'
+}
 
 $script:installState='success'
 $script:installCalls=[Collections.Generic.List[string]]::new()
@@ -176,6 +213,7 @@ try {
   Write-DispatcherResult -Policy $retained.base;$script:fakeState='exited';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $retained.base
   $retainedTerminal=Read-DispatcherTerminal -Control $retained -RequestId $retained.base.approval.request_id
   Assert-Dispatcher ($retainedTerminal.status-ceq'succeeded'-and$retainedTerminal.result.result.status-ceq'passed') 'retained-oneshot-exit-is-terminal-with-verbatim-status'
+  Test-DispatcherExitJournal
 
   # A failed/unavailable unit query is not proof of absence; no launcher runs.
   $uncertain=New-DispatcherControl -Name 'uncertain';$controls+=@($uncertain)
