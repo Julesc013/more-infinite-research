@@ -2264,8 +2264,10 @@ end
 
 local function engine_owned_published517_completion(frame)
   local legacy, id = frame.legacy, recovery.published517_se_id
-  return legacy.researched and ((legacy.current == id and legacy.current_progress == 1 and legacy.queue[1] == id)
-    or (legacy.current == nil and legacy.current_progress == 0 and legacy.queue[1] ~= nil))
+  -- Factorio can advance the holder before it starts the queued remainder.
+  -- Its normal unresearched next-level row is still inside that callback.
+  return (legacy.current == nil and legacy.current_progress == 0 and legacy.queue[1] ~= nil)
+    or (legacy.researched and legacy.current == id and legacy.current_progress == 1 and legacy.queue[1] == id)
 end
 
 local function same_published517_completion_frame(expected, actual)
