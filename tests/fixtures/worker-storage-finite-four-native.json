@@ -44,11 +44,11 @@
     },
     "candidate_mir": {
       "filename": "more-infinite-research_5.0.21018.zip",
-      "sha256": "4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E",
-      "bytes": 1069479,
+      "sha256": "7C2FDABAEE0E2E36BC822C5FC480D358A597727E7E17D7B83C7312DF76D9E473",
+      "bytes": 1069717,
       "path": null,
-      "source_commit": "765703144972763bc5071b0fd7ef46aea86e3c97",
-      "player_tree": "2f7d9b257b323b13bb8594a19f9a151d68815c57"
+      "source_commit": "ebd6e044e1c1a045ba7ccbf6a3b3eedf427039b0",
+      "player_tree": "fd833dbf940c9b4d4704018e4fe11d33c697faaf"
     },
     "fixtures": [
       {

@@ -479,6 +479,7 @@ jobs:
           set -euo pipefail
           out=build/tmp/worker-storage-finite-four
           curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1463293 --output "$out/more-infinite-research_4.7.21003.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.21003.zip
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1069717 --output "$out/more-infinite-research_5.0.21018.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.18/more-infinite-research_5.0.21018.zip
           curl --fail --location --proto '=https' --proto-redir '=https' --max-time 300 --max-filesize 61211876 --output "$out/factorio-headless-2.1.24.tar.xz" https://factorio.com/get-download/2.1.24/headless/linux64
       - name: Bind the finite public runtime inputs
         shell: python
@@ -497,12 +498,15 @@ jobs:
                   stream.write('\n')
           packet = json.loads((repo / 'tests/fixtures/worker-storage-finite-four-native.json').read_text())
           source = root / 'more-infinite-research_4.7.21003.zip'
-          candidate = root / 'packages/more-infinite-research_5.0.21018.zip'
+          candidate = root / 'more-infinite-research_5.0.21018.zip'
+          rebuilt = root / 'packages' / candidate.name
           archive = root / 'factorio-headless-2.1.24.tar.xz'
           if digest(source) != 'B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852' or source.stat().st_size != 1463293:
               raise ValueError('Published predecessor differs')
-          if digest(candidate) != '4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E' or candidate.stat().st_size != 1069479:
-              raise ValueError('Frozen candidate differs')
+          if digest(candidate) != '7C2FDABAEE0E2E36BC822C5FC480D358A597727E7E17D7B83C7312DF76D9E473' or candidate.stat().st_size != 1069717:
+              raise ValueError('Published candidate differs')
+          if candidate.read_bytes() != rebuilt.read_bytes():
+              raise ValueError('Rebuilt candidate differs from the published bytes')
           if digest(archive) != 'C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F' or archive.stat().st_size != 61211876:
               raise ValueError('Official engine archive differs')
           engine_root = root / 'engine'
