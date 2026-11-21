@@ -12,7 +12,7 @@
   "mods": [
     {"name": "base", "version": "2.1.24", "enabled": true},
     {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
-    {"name": "more-infinite-research", "version": "5.0.21017", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21018", "enabled": true},
     {"name": "mir-fixture-mir5-library-multiplayer", "version": "0.1.5", "enabled": true},
     {"name": "mir-fixture-mir5-api-alpha", "version": "0.1.0", "enabled": true},
     {"name": "mir-fixture-mir5-api-beta", "version": "0.1.0", "enabled": true}
@@ -21,7 +21,7 @@
     "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
     "mir-fixture-mir5-api-beta_0.1.0.zip": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "more-infinite-research_5.0.21017.zip": "5B22C97C4E63456AC4F6F4C28784B039A1AE9A6B09886D15FF068B740421CB50"
+    "more-infinite-research_5.0.21018.zip": "4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E"
   },
   "scope": "Prepared Linux2.1.24/current17 fresh Base-only two-client Library API-consumer selection with a separately pinned 0.1.5 responsive Availability and terminal-queue-context observer. It observes authored responsive filter, Availability viewport/entry, and absent settled-queue context facts only. It is not imported-save, multiplayer, graphical, API, laboratory, restart, or performance acceptance."
 }

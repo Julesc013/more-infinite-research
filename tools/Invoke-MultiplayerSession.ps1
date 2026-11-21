@@ -566,6 +566,7 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21004';standalone_identity_discovery=$false},
     [ordered]@{engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';base='2.1.24';mir='5.0.21017';standalone_identity_discovery=$false;linux_private_displays=$true},
+    [ordered]@{engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';base='2.1.24';mir='5.0.21018';standalone_identity_discovery=$false;linux_private_displays=$true},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
   )
   $requestedStandaloneIdentityDiscovery=$false
@@ -1066,7 +1067,7 @@ if($fixtureCase-ceq'library-multiplayer'){
 }
 Assert-Session (-not $apiClientConsumers -or
   ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000') -or
-  ($libraryWitnessTarget.base -ceq '2.1.24' -and $libraryWitnessTarget.mir -ceq '5.0.21017' -and $spec.ContainsKey('linux_private_displays')) -or
+  ($libraryWitnessTarget.base -ceq '2.1.24' -and $libraryWitnessTarget.mir -cin @('5.0.21017','5.0.21018') -and $spec.ContainsKey('linux_private_displays')) -or
   ($spec.ContainsKey('private_credit_checks') -and $spec.private_credit_checks -and
     $libraryWitnessTarget.base -ceq '2.0.77' -and $libraryWitnessTarget.mir -ceq '5.0.20000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
