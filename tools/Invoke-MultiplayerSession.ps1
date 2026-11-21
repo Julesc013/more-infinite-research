@@ -9,6 +9,10 @@
 [CmdletBinding()]
 param(
   [Parameter(Mandatory, ParameterSetName='session')][string]$SpecPath,
+  [Parameter(ParameterSetName='session')][string]$LinuxStoragePlanPath,
+  [Parameter(ParameterSetName='session')][string]$LinuxStoragePlanSha256,
+  [Parameter(ParameterSetName='session')][string]$LinuxStorageControlRoot,
+  [Parameter(ParameterSetName='session')][string]$LinuxStorageLibrary,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][switch]$SelfCheck,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][string]$CheckFile,
   [Parameter(Mandatory, ParameterSetName='selfcheck')][string]$CheckDirectory,
@@ -1013,6 +1017,13 @@ if ($RconSelfCheck) {
   [pscustomobject]@{status='passed-nonnative-rcon-self-check';port=$RconCheckPort;commands=2}
   return
 }
+$externalStorage=$null
+if($LinuxStoragePlanPath -or $LinuxStoragePlanSha256 -or $LinuxStorageControlRoot -or $LinuxStorageLibrary){
+  . (Join-Path $PSScriptRoot 'lib/validation/DirectLibraryStartupMeasurement.ps1')
+  $externalStorage=Read-MIRLinuxWriteStorage -Path $LinuxStoragePlanPath -Sha256 $LinuxStoragePlanSha256 -ControlRoot $LinuxStorageControlRoot -LibraryRoot $LinuxStorageLibrary -MaxNewOutputBytes (512MB)
+  $buildRoot=Resolve-Existing (($externalStorage.roots|Where-Object role -CEQ 'data').path) 'Container' 'admitted session data'
+  Assert-Session ($SpecPath -ceq (Join-Path $buildRoot 'session-spec.json')) 'external session spec differs from its data role'
+}
 $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
@@ -1072,6 +1083,9 @@ Assert-Session (-not $apiClientConsumers -or
     $libraryWitnessTarget.base -ceq '2.0.77' -and $libraryWitnessTarget.mir -ceq '5.0.20000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
+if($externalStorage){
+  Assert-Session ($fixtureCase -ceq 'library-multiplayer' -and $spec.ContainsKey('linux_private_displays') -and $library -ceq $LinuxStorageLibrary -and $workroot -ceq $buildRoot) 'external private Library session roles differ'
+}
 $seed = Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
 Assert-Session ([string]$spec.seed_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'seed hash is invalid'
 $seedHash = Get-SessionHash $seed

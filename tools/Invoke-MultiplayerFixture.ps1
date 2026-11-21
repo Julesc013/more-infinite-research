@@ -1178,6 +1178,12 @@ $record=[ordered]@{
 try {
   if($null-eq$resources){$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot @sessionStorage}
   $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$standaloneClientNames
+  if($LinuxStorage){
+    $preparedSeed=$seed
+    $seed=Resolve-MIR441ProcessOutputPath -Policy $resources.policy -Path (Join-Path $resources.root 'protected-seed.zip')
+    [IO.File]::Copy($preparedSeed,$seed,$false)
+    Assert-Session ((Get-FileHash -LiteralPath $preparedSeed).Hash -ceq $prepared.seed_sha256 -and (Get-FileHash -LiteralPath $seed).Hash -ceq $prepared.seed_sha256) 'prepared seed copy differs'
+  }
   $serverWrite=$layout.server_write;$serverConfig=$layout.server_config;$serverSettings=$layout.server_settings;$serverPort=$layout.server_port;$rconPort=$layout.rcon_port;$rconPassword=$layout.rcon_password;$clients=@($layout.clients)
   $record.loopback_ports=[ordered]@{udp=$layout.udp_ports;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
   $pairedArm=$null
@@ -1238,6 +1244,10 @@ try {
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash
   $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
   $sessionArguments=@('-NoLogo','-NoProfile','-File',(Join-Path $PSScriptRoot 'Invoke-MultiplayerSession.ps1'),'-SpecPath',$specPath)
+  if($LinuxStorage){
+    $sessionArguments+=@('-LinuxStoragePlanPath',$LinuxStorage.session.path,'-LinuxStoragePlanSha256',$LinuxStorage.session.sha256,
+      '-LinuxStorageControlRoot',$resources.control_root,'-LinuxStorageLibrary',$library)
+  }
   # Every display leaf has a hard 900-second maximum.  The containing session
   # cannot outlive that bound on the Linux route, including its teardown.
   $processArguments=@{Context=$resources;FilePath=$pwsh;Arguments=$sessionArguments;TimeoutSeconds=$(if($StandaloneIdentityDiscovery){220}elseif($usesLinuxPrivateDisplays){900}else{1000})}
