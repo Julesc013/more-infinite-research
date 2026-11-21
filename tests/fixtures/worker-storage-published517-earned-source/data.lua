@@ -19,7 +19,7 @@ data:extend({
   {
     type = "technology",
     name = "mir-fixture-published517-earned-source-tail",
-    icon = "__base__/graphics/technology/automation.png",
+    icon = "__base__/graphics/technology/automation-1.png",
     icon_size = 256,
     prerequisites = {"automation-science-pack"},
     unit = {count = 1, time = 1, ingredients = {{"automation-science-pack", 1}}},

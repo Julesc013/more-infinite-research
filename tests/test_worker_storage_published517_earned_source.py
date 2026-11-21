@@ -86,6 +86,11 @@ class Published517EarnedSourceTests(unittest.TestCase):
         metadata = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertIn("more-infinite-research = 5.0.20017", metadata["dependencies"])
 
+    def test_tail_uses_the_available_automation_one_icon_asset(self):
+        source = (FIXTURE / "data.lua").read_text(encoding="utf-8")
+        self.assertIn('icon = "__base__/graphics/technology/automation-1.png"', source)
+        self.assertNotIn('icon = "__base__/graphics/technology/automation.png"', source)
+
     def test_data_stage_proves_the_five_pack_published_default_contract(self):
         result, logs = self.data_stage()
         self.assertTrue(result)
