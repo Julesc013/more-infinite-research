@@ -1,4 +1,5 @@
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'LinuxWriteStorage.ps1')
 
 function Get-MIR441PhysicalMemorySnapshot {
   if (-not $IsWindows) { throw '[mir441-resource-monitor-windows-required]' }
@@ -23,6 +24,12 @@ public static class MIR441MemoryNative {
   }
   $info=[MIR441MemoryNative]::Read();$page=$info.PageSize.ToUInt64()
   return [pscustomobject][ordered]@{total_bytes=[int64]($info.PhysicalTotal.ToUInt64()*$page);free_bytes=[int64]($info.PhysicalAvailable.ToUInt64()*$page);committed_bytes=[int64]($info.CommitTotal.ToUInt64()*$page);commit_limit_bytes=[int64]($info.CommitLimit.ToUInt64()*$page)}
+}
+
+function Resolve-MIR441LinuxObservationFailureCode {
+  param([string]$Code)
+  if($Code-match'^mir441-linux-[a-z0-9-]+$'-or$Code-cin@('mir441-owned-root-identity','mir441-owned-child-identity','mir441-owned-session-identity')){return $Code}
+  return 'mir441-resource-linux-observer'
 }
 
 function Invoke-MIR441LinuxResourceObservation {
@@ -54,8 +61,7 @@ function Invoke-MIR441LinuxResourceObservation {
   if($lines.Count-ne1){throw '[mir441-resource-linux-observer-output]'}
   try{$envelope=([string]$lines[0]|ConvertFrom-Json -Depth 100)}catch{throw '[mir441-resource-linux-observer-json]'}
   if($exit-ne0-or$null-eq$envelope-or-not[bool]$envelope.ok){
-    $code=[string]$envelope.code
-    if($code-notmatch'^mir441-linux-[a-z0-9-]+$'){$code='mir441-resource-linux-observer'}
+    $code=Resolve-MIR441LinuxObservationFailureCode -Code ([string]$envelope.code)
     throw ('['+$code+']')
   }
   return $envelope.value
@@ -129,7 +135,8 @@ function Resolve-MIR441RecoveryScratchPath {
   $current=$full
   while($current){
     if(Test-Path -LiteralPath $current){if((Get-Item -LiteralPath $current -Force).Attributes-band[IO.FileAttributes]::ReparsePoint){throw '[mir441-resource-output-reparse]'}}
-    $current=Split-Path -Parent $current
+    $parent=[IO.Directory]::GetParent($current)
+    $current=if($null-ne$parent){$parent.FullName}else{$null}
   }
   return $full
 }
@@ -224,11 +231,20 @@ function Assert-MIR441ResourceAdmission {
   $null=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot
   if($EstimatedPeakBytes-lt0-or$EstimatedPeakBytes-gt8GB-or$ExpectedPeakMemoryBytes-lt0){throw '[mir441-resource-staging-budget]'}
   $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot;$limits=Get-MIR441ResourceLimits -Policy $Policy -Snapshot $snapshot
+  $storageProperty=$Policy.PSObject.Properties['linux_write_storage']
+  if($null -ne $storageProperty){
+    if(-not $IsLinux){throw '[mir-linux-storage-linux-required]'}
+    $control=@($storageProperty.Value.roots | Where-Object role -CEQ 'control')[0]
+    if([IO.Path]::GetFullPath($WorkRoot) -cne $control.path){throw '[mir-linux-storage-control-root]'}
+    $storageObservation=Get-MIRLinuxWriteStorageObservation -Storage $storageProperty.Value
+    $snapshot | Add-Member -NotePropertyName write_storage -NotePropertyValue $storageObservation
+    $limits.system_bytes=$null;$limits.work_bytes=$null
+  }
   $failure=''
   if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
   elseif($IsLinux-and$null-ne$snapshot.memory.cgroup_v2.effective_headroom_bytes-and[int64]$snapshot.memory.cgroup_v2.effective_headroom_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-cgroup]'}
   elseif(-not$IsLinux-and[int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
-  else{
+  elseif($null -eq $storageProperty){
     [int64]$systemOutputAllowance=2*$EstimatedPeakBytes
     if($IsLinux){
       $systemDevice=Get-MIR441LinuxVolumeDevice -Volume $snapshot.system_volume
@@ -374,6 +390,7 @@ function Get-MIR441OwnedProcessTree {
       working_set_bytes=[int64]$tree.working_set_bytes;private_bytes=[int64]$tree.private_bytes;children=$children
       root_exited=[bool]$tree.root_exited;root_identity=$tree.root_identity
       private_measure=[string]$tree.private_measure;private_resident_bytes=[int64]$tree.private_resident_bytes;private_swap_bytes=[int64]$tree.private_swap_bytes
+      released_address_space_members=@($tree.released_address_space_members)
     }
   }
   # Query only direct children of processes we have already established as
@@ -621,9 +638,9 @@ function Update-MIR441FactorioConsoleStartupOutput {
       if(-not$State.ready_marker_seen-and$tail.IndexOf($State.ready_marker,[StringComparison]::Ordinal)-ge0){$State.ready_marker_seen=$true}
       $stream.tail=if($tail.Length-gt8192){$tail.Substring($tail.Length-8192)}else{$tail}
       if($State.receipt.send_count-ge1){
-        # The first command establishes a per-stream byte boundary after its
-        # successful write.  Output already present at that boundary may have
-        # been emitted before the command even when the bounded reader has not
+        # The first command commits the per-stream byte boundary captured
+        # immediately before its successful write. Bytes before that boundary
+        # predate the command even when the bounded reader has not
         # reached it yet, so it cannot request a replay.
         $confirmationStart=[int64]$stream.confirmation_start_offset
         $confirmationOffset=[Math]::Max(0L,$confirmationStart-$readOffset)
@@ -643,17 +660,61 @@ function Update-MIR441FactorioConsoleStartupOutput {
 function Send-MIR441FactorioConsoleStartupLine {
   param([Parameter(Mandatory)]$State,[Parameter(Mandatory)][IO.StreamWriter]$Writer,[Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,[Parameter(Mandatory)][ValidateSet('command','confirmation-replay')][string]$Kind)
   if(($Kind-ceq'command'-and$State.receipt.send_count-ne0)-or($Kind-ceq'confirmation-replay'-and$State.receipt.send_count-ne1)){throw '[mir441-factorio-console-send-order]'}
-  try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
-  if($Kind-ceq'command'){
-    foreach($stream in $State.streams){
-      try {
-        $stream.confirmation_start_offset=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
-        $stream.confirmation_tail=''
-      } catch {throw '[mir441-factorio-console-baseline]'}
+  # Capture each stream before WriteLine/Flush. A Factorio response can be
+  # appended synchronously by Flush, so a post-flush measurement is too late
+  # to distinguish that response from unread pre-command output.
+  $preWriteBoundaries=[Collections.Generic.List[object]]::new()
+  foreach($stream in $State.streams){
+    try {
+      $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+      $preWriteBoundaries.Add([ordered]@{kind=$stream.kind;path=$stream.path;bytes=$bytes})
+    } catch {throw '[mir441-factorio-console-baseline]'}
+  }
+  $priorSend=if($Kind-ceq'confirmation-replay'){$State.receipt.sends[$State.receipt.sends.Count-1]}else{$null}
+  if($Kind-ceq'confirmation-replay'){
+    # Reject a regressed stream before repeating the one allowed command.
+    # This leaves the receipt truthful: no second command was delivered.
+    foreach($boundary in $preWriteBoundaries){
+      $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$boundary.kind-and$_.path-ceq$boundary.path})
+      if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or[int64]$boundary.bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
     }
   }
+  try {$Writer.WriteLine($State.command);$Writer.Flush()}catch{throw '[mir441-factorio-console-write]'}
   $State.receipt.send_count++
-  $State.receipt.sends.Add([ordered]@{order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command;elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)})
+  $send=[ordered]@{
+    order=$State.receipt.send_count;kind=$Kind;command_sha256=Get-MIR441TextSha256 $State.command
+    elapsed_monotonic_milliseconds=[Math]::Round([double]$Timer.Elapsed.TotalMilliseconds,3)
+    pre_write_output_boundaries=[Collections.Generic.List[object]]::new()
+    output_boundaries=[Collections.Generic.List[object]]::new();output_boundaries_complete=$false
+  }
+  # Record that WriteLine and Flush succeeded before observing output files.
+  # A post-send observation failure must not turn an already-delivered command
+  # into a receipt that claims no command was sent.
+  $State.receipt.sends.Add($send)
+  foreach($boundary in $preWriteBoundaries){
+    $send.pre_write_output_boundaries.Add([ordered]@{kind=$boundary.kind;path=$boundary.path;bytes=[int64]$boundary.bytes})
+  }
+  if($Kind-ceq'command'){
+    for($index=0;$index-lt$State.streams.Count;$index++){
+      # Commit pre-write snapshots only after WriteLine and Flush succeeded.
+      # The post-flush boundaries below remain separate observational facts.
+      $State.streams[$index].confirmation_start_offset=[int64]$preWriteBoundaries[$index].bytes
+      $State.streams[$index].confirmation_tail=''
+    }
+  }
+  foreach($stream in $State.streams){
+    try {
+      $bytes=if(Test-Path -LiteralPath $stream.path -PathType Leaf){[int64](Get-Item -LiteralPath $stream.path).Length}else{0L}
+      # Each boundary is a conservative post-flush floor.  Output present at
+      # or before it may have arrived too quickly to attribute to this send.
+      $send.output_boundaries.Add([ordered]@{kind=$stream.kind;path=$stream.path;bytes=$bytes})
+      if($Kind-ceq'confirmation-replay'){
+        $priorBoundary=@($priorSend.output_boundaries|Where-Object {$_.kind-ceq$stream.kind-and$_.path-ceq$stream.path})
+        if(-not[bool]$priorSend.output_boundaries_complete-or$priorBoundary.Count-ne1-or$bytes-lt[int64]$priorBoundary[0].bytes){throw '[mir441-factorio-console-baseline]'}
+      }
+    } catch {throw '[mir441-factorio-console-baseline]'}
+  }
+  $send.output_boundaries_complete=$true
 }
 
 function Invoke-MIR441MonitoredProcess {
@@ -683,11 +744,12 @@ function Invoke-MIR441MonitoredProcess {
     $consoleStartup=New-MIR441FactorioConsoleStartup -Definition $FactorioConsoleStartup
     if([string]::IsNullOrWhiteSpace($StdoutPath)-and[string]::IsNullOrWhiteSpace($StderrPath)){throw '[mir441-factorio-console-output-required]'}
   }
-  $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
+  $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $LedgerPath
+  $splitStorage=$null -ne $Policy.PSObject.Properties['linux_write_storage']
   $pathComparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
-    $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
-    if(-not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,$pathComparison)){throw '[mir441-resource-output-work-root]'}
+    $resolved=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $path
+    if(-not $splitStorage -and -not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,$pathComparison)){throw '[mir441-resource-output-work-root]'}
   }
   if($EstimatedPeakBytes-le0-or$ExpectedPeakMemoryBytes-le0){throw '[mir441-resource-peak-budget-required]'}
   if($null -ne $PreStartAdmissionWait){Assert-MIR441PreStartAdmissionWaitState -State $PreStartAdmissionWait}
@@ -696,16 +758,46 @@ function Invoke-MIR441MonitoredProcess {
   }else{
     $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
   }
-  $before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}
+  $before=$null
+  if(-not $splitStorage){$before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}}
   $lockPath=Join-Path ([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))) 'build/tmp/mir-heavy.lock'
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$launchReceipt='';$launchAck='';$preAckIdentity=$null;$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$launchReceipt='';$launchAck='';$preAckIdentity=$null;$peak=0L;$privatePeak=0L;$started=$null;$rootIdentity=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null;$inputWriter=$null;$accountLock=$null;$linuxCgroupBaseline=$null;$primaryFailure=$null
+  $cleanupFacts=[Collections.Generic.List[object]]::new()
+  # Cleanup must not replace the process failure it is trying to contain. Each
+  # fact is deliberately small and serializable so callers can retain an
+  # interrupted receipt without inferring that every later cleanup succeeded.
+  $recordCleanup={
+    param([Parameter(Mandatory)][string]$Step,[bool]$Attempted,[scriptblock]$Action=$null)
+    $fact=[ordered]@{step=$Step;attempted=[bool]$Attempted;succeeded=$true;error=$null}
+    if($Attempted){
+      try{$null=& $Action}catch{$fact.succeeded=$false;$fact.error=$_.Exception.Message}
+    }
+    [void]$cleanupFacts.Add([pscustomobject]$fact)
+  }.GetNewClosure()
+  $attachCleanupFacts={
+    param([Parameter(Mandatory)]$Failure)
+    $failed=@($cleanupFacts|Where-Object {-not $_.succeeded})
+    if($failed.Count-eq0){return $false}
+    $exception=if($Failure-is[Management.Automation.ErrorRecord]){$Failure.Exception}else{$Failure}
+    $exception.Data['mir441_process_cleanup_facts']=@($cleanupFacts)
+    # Keep the historical summary key for existing consumers while providing
+    # the complete per-step record to new custody readers.
+    $exception.Data['mir441_process_cleanup']=($failed|ForEach-Object { $_.step+': '+$_.error })-join'; '
+    return $true
+  }.GetNewClosure()
   # This is deliberately outside the output-writing try/catch: contention is
   # a prelaunch refusal, not an interrupted governed execution. Its scope is
   # the current Linux execution account, never a host-wide scheduler claim.
-  try{$accountLock=New-MIR441LinuxExecutionAccountLock}catch{$accountLockFailure=$_;try{$lock.Dispose()}catch{};throw $accountLockFailure}
+  try{$accountLock=New-MIR441LinuxExecutionAccountLock}catch{
+    $accountLockFailure=$_
+    & $recordCleanup 'account-lock-dispose' $false $null
+    & $recordCleanup 'main-lock-dispose' ($null-ne$lock) { $lock.Dispose() }
+    $null=& $attachCleanupFacts $accountLockFailure
+    throw $accountLockFailure
+  }
   try{
     # Check again under the lock, before any job output or worker is allocated.
     if($null -ne $PreStartAdmissionWait){
@@ -772,13 +864,16 @@ function Invoke-MIR441MonitoredProcess {
       # Preserve the triggering process observation before enforcing its budget.
       # Private bytes can exceed working set during graphical resource loading.
       $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
-      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
+      if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.released_address_space_members=@($tree.released_address_space_members);$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
+      $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}
       if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
-      $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
-      if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
+      if(-not $splitStorage){
+        $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
+        if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
+      }
       if($process.HasExited){
         Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
         break
@@ -811,6 +906,7 @@ function Invoke-MIR441MonitoredProcess {
     $passed=$completionObserved-or$process.ExitCode-eq0
     $completedLedger=[ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}
     if($IsLinux){$completedLedger.clock_scope='linux-launcher-session-inclusive'}
+    $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
     Write-MIR441Json -Value $completedLedger -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
     $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
@@ -826,32 +922,56 @@ function Invoke-MIR441MonitoredProcess {
     }
     return $completed
   }catch{
-    $failure=$_
+    $failure=$_;$primaryFailure=$failure
     if($null-ne$consoleStartup){$failure.Exception.Data['mir441_factorio_console_startup']=$consoleStartup.receipt}
     $isNaturalExitFailure=[object]::ReferenceEquals($failure.Exception,$naturalExitFailure)
     # A callback or unrelated failure cannot supply this reserved terminal.
     if(-not$isNaturalExitFailure){$failure.Exception.Data.Remove('mir441_process_result')}
     if($null-ne$process-and$null-ne$rootIdentity){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started -RootIdentity $rootIdentity;$children=@($children+$tree.children)}catch{}}
-    $cleanupFailure=$null
-    try{
+    & $recordCleanup 'process-stop-on-failure' ($null-ne$process) {
       if($IsLinux-and$null-eq$rootIdentity){Stop-MIR441LinuxPreAckLauncher -Process $process -Identity $preAckIdentity}else{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}
-    }catch{$cleanupFailure=$_.Exception.Message}
-    if($null-ne$cleanupFailure){$failure.Exception.Data['mir441_process_cleanup']=$cleanupFailure}
+    }
     if(-not$isNaturalExitFailure){
-      Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+      & $recordCleanup 'interrupted-ledger-write' $true {
+        $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
+        Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+      }
     }
     throw $failure
   }finally{
-    try{
-      try{
-        if($IsLinux-and$null-eq$rootIdentity){Stop-MIR441LinuxPreAckLauncher -Process $process -Identity $preAckIdentity}else{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}
-      }catch{}
-    }finally{
-      try{
-        foreach($copy in $copies){try{$null=$copy.Wait(3000)}catch{}}
-        foreach($stream in $streams){$stream.Dispose()};if($null-ne$inputWriter){$inputWriter.Dispose()};if($null-ne$process){$process.Dispose()}
-        if(Test-Path -LiteralPath $temp){$null=Resolve-MIR441RecoveryScratchPath -Path $temp;Remove-Item -LiteralPath $temp -Recurse -Force}
-      }finally{try{if($null-ne$accountLock){$accountLock.stream.Dispose()}}finally{$lock.Dispose()}}
+    # Every disposal is isolated: a closed stdin pipe, for example, must not
+    # prevent stream/process/temp/lock cleanup or hide the original failure.
+    & $recordCleanup 'process-stop-finally' ($null-ne$process) {
+      if($IsLinux-and$null-eq$rootIdentity){Stop-MIR441LinuxPreAckLauncher -Process $process -Identity $preAckIdentity}else{Stop-MIR441OwnedProcess -Process $process -Children $children -RootIdentity $rootIdentity}
+    }
+    foreach($copy in $copies){
+      & $recordCleanup 'output-copy-wait' $true { $null=$copy.Wait(3000) }
+    }
+    foreach($stream in $streams){
+      & $recordCleanup 'output-stream-dispose' $true { $stream.Dispose() }
+    }
+    & $recordCleanup 'stdinwriter-dispose' ($null-ne$inputWriter) { $inputWriter.Dispose() }
+    & $recordCleanup 'process-dispose' ($null-ne$process) { $process.Dispose() }
+    & $recordCleanup 'temporary-root-remove' $true {
+      if(Test-Path -LiteralPath $temp){
+        $null=Resolve-MIR441RecoveryScratchPath -Path $temp
+        Remove-Item -LiteralPath $temp -Recurse -Force
+      }
+    }
+    & $recordCleanup 'account-lock-dispose' ($null-ne$accountLock) {
+      if($null-ne$accountLock.stream){$accountLock.stream.Dispose()}
+    }
+    & $recordCleanup 'main-lock-dispose' ($null-ne$lock) { $lock.Dispose() }
+    $cleanupFailed=@($cleanupFacts|Where-Object {-not $_.succeeded})
+    if($cleanupFailed.Count-gt0){
+      if($null-ne$primaryFailure){
+        $null=& $attachCleanupFacts $primaryFailure
+      }else{
+        $cleanupFailure=[InvalidOperationException]::new('[mir441-process-cleanup]')
+        $null=& $attachCleanupFacts $cleanupFailure
+        if($null-ne$consoleStartup){$cleanupFailure.Data['mir441_factorio_console_startup']=$consoleStartup.receipt}
+        throw $cleanupFailure
+      }
     }
   }
 }

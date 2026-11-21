@@ -22,6 +22,7 @@ param(
   # plans.  This wrapper does not own global host-idle/campaign admission or
   # create a second governor; the governed session owns their lifetime.
   [System.Collections.IDictionary]$LinuxPrivateDisplays,
+  [System.Collections.IDictionary]$LinuxStorage,
   # Validate the complete current Linux composition without creating a world,
   # starting a display, activating a client, or claiming a seed result.
   [switch]$ComposeOnly,
@@ -279,7 +280,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-api-consumers-current-linux-responsive-v015-f210-native-selection';factorio_line='2.1';base='2.1.24'
       engine_sha256='1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF';mir='5.0.21018';build_version=87808
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
-      mir_archive_sha256='4F506FB2F819235D2BC884D52459BE24459C45E0B1AB63C1F1B5DCB2A190F87E'
+      mir_archive_sha256='7C2FDABAEE0E2E36BC822C5FC480D358A597727E7E17D7B83C7312DF76D9E473'
       fixture_archive_sha256='C357F3D8D4D9C3EA7597035CC586EFF79C8FFD3501EF7658726ACF93BBDBAF4D'
       fixture_archive_name='mir-fixture-mir5-library-multiplayer_0.1.5.zip'
       fixture_source_revision='f5001209379a4f8505b08ecd54e4e204e74435f1'
@@ -838,6 +839,7 @@ function Invoke-MultiplayerFixturePreparation {
     [Parameter(Mandatory)][string]$RepoRoot,
     [switch]$StandaloneIdentityDiscovery,
     $DiscoveryFixture,
+    [Collections.IDictionary]$StoragePlan,
     [scriptblock]$CreateOnlyInvoker
   )
   # A staged discovery fixture remains installed only after every CreateOnly
@@ -851,15 +853,22 @@ function Invoke-MultiplayerFixturePreparation {
       ExpectedMIRArchiveSha256=$ExpectedMIRArchiveSha256;ActiveModsObserver='mir-fixture-mir5-active-mods-observer'
       CaseName=$FixtureCase;OutputRoot=$PreparationRoot;CreateOnly=$true;ExpectedPeakMemoryMiB=4096;TimeoutSeconds=180;RepoRoot=$RepoRoot
     }
+    $resultRoot=$PreparationRoot
+    if($StoragePlan){
+      $nativeArguments.LinuxStoragePlanPath=$StoragePlan.path
+      $nativeArguments.LinuxStoragePlanSha256=$StoragePlan.sha256
+      $storage=Read-MIRLinuxWriteStorage -Path $StoragePlan.path -Sha256 $StoragePlan.sha256 -ControlRoot $PreparationRoot -LibraryRoot $ArchiveLibrary -MaxNewOutputBytes (128MB)
+      $resultRoot=($storage.roots | Where-Object role -CEQ 'data').path
+    }
     if($null-ne$CreateOnlyInvoker){& $CreateOnlyInvoker $nativeArguments|Out-Null}
     else{& (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') @nativeArguments|Out-Null}
-    $prepared=Get-Content -LiteralPath (Join-Path $PreparationRoot 'result.json') -Raw|ConvertFrom-Json
+    $prepared=Get-Content -LiteralPath (Join-Path $resultRoot 'result.json') -Raw|ConvertFrom-Json
     Assert-Session ($prepared.status -ceq 'passed-private-native-runtime-load-only') 'native world preparation failed'
     if($StandaloneIdentityDiscovery){
       $actualFixture=@($prepared.fixtures|Where-Object {[IO.Path]::GetFileName([string]$_.archive) -ceq 'mir-fixture-mir5-library-multiplayer_0.1.1.zip'})
       Assert-Session ($actualFixture.Count-eq1 -and [string]$actualFixture[0].source -ceq [string]$DiscoveryFixture.source -and [string]$actualFixture[0].sha256 -ceq [string]$DiscoveryFixture.sha256) 'standalone identity discovery fixture bytes differ from its profile binding'
     }
-    $seed=Join-Path $PreparationRoot 'write-data/saves/seed.zip'
+    $seed=Join-Path $resultRoot 'write-data/saves/seed.zip'
     Assert-Session ((Get-FileHash -LiteralPath $seed).Hash -ceq $prepared.seed_sha256) 'prepared seed differs'
     $completed=$true
     return [pscustomobject]@{prepared=$prepared;seed=$seed;install=$install}
@@ -1092,13 +1101,20 @@ Assert-Session (-not $StandaloneIdentityDiscovery -or ($FixtureCase -ceq 'librar
 Assert-Session (-not $StandaloneIdentityDiscovery -or $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'standalone identity discovery MIR archive differs'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
+$sessionStorage=@{}
+$seedStorage=@{}
+if($LinuxStorage){
+  Assert-Session ($IsLinux -and $usesLinuxPrivateDisplays -and $LinuxStorage.Count -eq $(if($ComposeOnly){1}else{2}) -and $LinuxStorage.Contains('session') -and ($ComposeOnly -or $LinuxStorage.Contains('seed'))) 'storage plans require all current private Linux output roles'
+  $sessionStorage=@{LinuxStoragePlanPath=$LinuxStorage.session.path;LinuxStoragePlanSha256=$LinuxStorage.session.sha256;LibraryRoot=$library}
+  if(-not $ComposeOnly){$seedStorage=@{StoragePlan=$LinuxStorage.seed}}
+}
 $activation=$null;$resources=$null;$failure=$null
 $linuxDisplayRuntime=$null
 if($usesLinuxPrivateDisplays){
   # Current Linux display plans must be schema-accepted before a CreateOnly
   # world is considered. Their runtime roots are always direct children of the
   # one future governed session root, never caller-selected sibling paths.
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot @sessionStorage
   $null=New-Item -ItemType Directory -Path $resources.root
   $linuxDisplayRuntime=New-LinuxPrivateDisplayRuntime -Binding $LinuxPrivateDisplays -Context $resources
 }
@@ -1127,8 +1143,8 @@ if($ComposeOnly){
       $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $actualHashes -SettingsMode Defaults -LibraryLock $lease
       Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
       $prospectiveSeed=Join-Path $layout.server_write 'saves/seed.zip'
-      Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
-      foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
+      Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -WriteStoragePolicy $resources.policy -Arguments @('--config',$layout.server_config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$prospectiveSeed,'--server-settings',$layout.server_settings,'--bind','127.0.0.1','--port',[string]$layout.server_port,'--rcon-bind',('127.0.0.1:'+ [string]$layout.rcon_port),'--rcon-password',$layout.rcon_password)
+      foreach($client in $layout.clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -WriteStoragePolicy $resources.policy -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ [string]$layout.server_port),'--port',[string]$client.port)}
       $record=[ordered]@{
         kind='MIR5LibraryMultiplayerComposeV1';case=$FixtureCase;status='composed-zero-native'
         native_processes=0;factorio_processes=0;display_processes=0;engine=$engineIdentity
@@ -1149,7 +1165,7 @@ if($ComposeOnly){
   $record.process_runs=@($resources.runs.ToArray());Write-MIRNativeProbeResult -Context $resources -Record $record
   exit 0
 }
-$preparationResult=Invoke-MultiplayerFixturePreparation -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -FixtureCase $FixtureCase -PreparationRoot $preparation -RepoRoot $repo -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -DiscoveryFixture $discoveryFixture
+$preparationResult=Invoke-MultiplayerFixturePreparation -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $fixtureSourcesForRun -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -FixtureCase $FixtureCase -PreparationRoot $preparation -RepoRoot $repo -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -DiscoveryFixture $discoveryFixture @seedStorage
 $prepared=$preparationResult.prepared;$seed=[string]$preparationResult.seed;$discoveryInstall=$preparationResult.install
 $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head
@@ -1160,7 +1176,7 @@ $record=[ordered]@{
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
-  if($null-eq$resources){$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot}
+  if($null-eq$resources){$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot @sessionStorage}
   $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$standaloneClientNames
   $serverWrite=$layout.server_write;$serverConfig=$layout.server_config;$serverSettings=$layout.server_settings;$serverPort=$layout.server_port;$rconPort=$layout.rcon_port;$rconPassword=$layout.rcon_password;$clients=@($layout.clients)
   $record.loopback_ports=[ordered]@{udp=$layout.udp_ports;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
@@ -1181,9 +1197,9 @@ try {
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   # Validate the entire fixed launch set before starting the governed tree.
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$seed,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort,'--rcon-bind',('127.0.0.1:'+ $rconPort),'--rcon-password',$rconPassword)
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -WriteStoragePolicy $resources.policy -Arguments @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$seed,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort,'--rcon-bind',('127.0.0.1:'+ $rconPort),'--rcon-password',$rconPassword)
   $clientGraphics=@(if($FixtureCase-ceq'scripted-effects-multiplayer' -or $spaceAgeLibrary){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
-  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)}
+  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -WriteStoragePolicy $resources.policy -Arguments (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)}
   $screenshots=@(
     if($FixtureCase-ceq'library-multiplayer' -and -not $StandaloneIdentityDiscovery){
       foreach($client in $clients){foreach($stage in @('availability','initial','settled','rejoin','restart')){Join-Path $client.write_data ('script-output/mir5-library-multiplayer/'+$stage+'-*.png')}}

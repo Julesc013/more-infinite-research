@@ -11,7 +11,10 @@ function New-MIRNativeProbeResourceContext {
     [Parameter(Mandatory)][string]$OutputRoot,
     [ValidateRange(0,10240)][int]$ExpectedPeakMemoryMiB=0,
     [ValidateRange(1,8192)][int]$MaxNewOutputMiB=120,
-    [switch]$UseExactOutputRoot
+    [switch]$UseExactOutputRoot,
+    [string]$LinuxStoragePlanPath='',
+    [string]$LinuxStoragePlanSha256='',
+    [string]$LibraryRoot=''
   )
   $path=if([IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot } else { Join-Path $RepoRoot $OutputRoot }
   $output=Resolve-MIR441RecoveryScratchPath -Path ([IO.Path]::GetFullPath($path))
@@ -23,6 +26,13 @@ function New-MIRNativeProbeResourceContext {
   $policy=[pscustomobject]@{minimum_free_ram_gib=4}
   $peak=[int64]$ExpectedPeakMemoryMiB*1MB
   $writes=[int64]$MaxNewOutputMiB*1MB
+  $dataRoot=$output
+  if($LinuxStoragePlanPath -or $LinuxStoragePlanSha256){
+    if(-not $UseExactOutputRoot){throw '[mir-linux-storage-exact-root-required]'}
+    $storage=Read-MIRLinuxWriteStorage -Path $LinuxStoragePlanPath -Sha256 $LinuxStoragePlanSha256 -ControlRoot $output -LibraryRoot $LibraryRoot -MaxNewOutputBytes $writes
+    $policy | Add-Member -NotePropertyName linux_write_storage -NotePropertyValue $storage
+    $dataRoot=@($storage.roots | Where-Object role -CEQ 'data')[0].path
+  }
   # Candidate authentication prepares temporary source/archive inventories.
   # Release completed host allocations before the initial admission, as the
   # direct-library actor already does before each child. Keep all live inputs,
@@ -30,7 +40,8 @@ function New-MIRNativeProbeResourceContext {
   [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
   $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $output -EstimatedPeakBytes $writes -ExpectedPeakMemoryBytes $peak
   [pscustomobject]@{
-    root=$(if($UseExactOutputRoot){$output}else{Join-Path $output ([guid]::NewGuid().ToString('N'))})
+    root=$(if($UseExactOutputRoot){$dataRoot}else{Join-Path $output ([guid]::NewGuid().ToString('N'))})
+    control_root=$(if($UseExactOutputRoot){$output}else{$null})
     policy=$policy;peak_memory_bytes=$peak;max_new_output_bytes=$writes
     shared_alias_bytes=0L;process_index=0;result_reserve_bytes=64KB
     alias_paths=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
@@ -41,6 +52,8 @@ function New-MIRNativeProbeResourceContext {
 
 function Add-MIRNativeProbeImmutableLease {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)]$Lease)
+  $policyProperty=$Context.PSObject.Properties['policy']
+  if($null -ne $policyProperty -and $null -ne $policyProperty.Value.PSObject.Properties['linux_write_storage']){throw '[mir-linux-storage-no-external-hardlinks]'}
   if(-not $Lease.record.Contains('require_hard_links') -or -not $Lease.record.require_hard_links) {
     throw '[mir-native-probe-strict-lease-required]'
   }
@@ -62,6 +75,19 @@ function Add-MIRNativeProbeImmutableLease {
 
 function Get-MIRNativeProbeRemainingOutputBytes {
   param([Parameter(Mandatory)]$Context,[switch]$IncludeResultReserve)
+  $policyProperty=$Context.PSObject.Properties['policy']
+  $storageProperty=if($null -ne $policyProperty){$policyProperty.Value.PSObject.Properties['linux_write_storage']}else{$null}
+  if($null -ne $storageProperty){
+    $observation=Get-MIRLinuxWriteStorageObservation -Storage $storageProperty.Value
+    [int64]$newBytes=0
+    foreach($row in $observation.roots){$newBytes += $row.used_new_bytes}
+    $remaining=[int64]$Context.max_new_output_bytes-$newBytes
+    $data=@($observation.roots | Where-Object role -CEQ 'data')[0]
+    $remaining=[Math]::Min($remaining,[int64]$data.peak_new_bytes-[int64]$data.used_new_bytes)
+    if(-not $IncludeResultReserve){$remaining -= [int64]$Context.result_reserve_bytes}
+    if($remaining -le 0){throw '[mir441-resource-output-budget]'}
+    return $remaining
+  }
   foreach($alias in $Context.aliases) {
     if(-not (Test-Path -LiteralPath $alias.stage_path -PathType Leaf) -or
       -not (Test-Path -LiteralPath $alias.source_path -PathType Leaf) -or
@@ -101,6 +127,9 @@ function Get-MIRNativeProbeRemainingOutputBytes {
 
 function Add-MIRNativeProbeLibraryActivation {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)]$Activation)
+  $policyProperty=$Context.PSObject.Properties['policy']
+  $storageProperty=if($null -ne $policyProperty){$policyProperty.Value.PSObject.Properties['linux_write_storage']}else{$null}
+  if($null -ne $storageProperty -and [IO.Path]::GetFullPath($Activation.library) -cne @($storageProperty.Value.roots | Where-Object role -CEQ 'library')[0].path){throw '[mir-linux-storage-library-root]'}
   if($Activation.closed -or -not $Activation.lock.CanRead -or
     (Test-MIR441PathContained -Root $Context.root -Path $Activation.library)) {throw '[mir-native-probe-library-activation]'}
   $previous=$Context.PSObject.Properties['library_activation']
@@ -138,6 +167,7 @@ function Invoke-MIRNativeProbeProcess {
       LedgerPath=($prefix+'.resources.jsonl');StdoutPath=($prefix+'.stdout.txt');StderrPath=($prefix+'.stderr.txt')
       TimeoutSeconds=$TimeoutSeconds;CompletionPredicate=$CompletionPredicate
     }
+    if($null -ne $Context.policy.PSObject.Properties['linux_write_storage']){$governorArguments.WorkRoot=$Context.control_root}
     # Do not add an unknown named parameter to existing non-Factorio mock
     # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
     if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
@@ -163,6 +193,8 @@ function Invoke-MIRNativeProbeProcess {
     $entry=[ordered]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$failure.Exception.Message}
     $consoleReceipt=$failure.Exception.Data['mir441_factorio_console_startup']
     if($consoleReceipt-is[Collections.IDictionary] -or $consoleReceipt-is[pscustomobject]){$entry.console_startup=$consoleReceipt}
+    $cleanupFacts=$failure.Exception.Data['mir441_process_cleanup_facts']
+    if($cleanupFacts-is[Collections.IEnumerable]-and$cleanupFacts-isnot[string]){$entry.cleanup_facts=@($cleanupFacts)}
     $terminal=$failure.Exception.Data['mir441_process_result']
     if($terminal-is[pscustomobject]-and
       @('status','exit_code','passed','timed_out','completion_predicate_observed'|Where-Object {$null-eq$terminal.PSObject.Properties[$_]}).Count-eq0-and
@@ -189,7 +221,14 @@ function Write-MIRNativeProbeResult {
   $bytes=[Text.UTF8Encoding]::new($false).GetBytes($json)
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context -IncludeResultReserve
   if($bytes.Length -ge $remaining) { throw '[mir441-resource-output-budget]' }
-  [IO.File]::WriteAllBytes((Join-Path $Context.root 'result.json'),$bytes)
+  $stream=$null
+  try {
+    $stream=[IO.File]::Open((Join-Path $Context.root 'result.json'),[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $stream.Write($bytes,0,$bytes.Length)
+    $stream.Flush($true)
+  } finally {
+    if($null-ne$stream){$stream.Dispose()}
+  }
 }
 
 function Invoke-MIRNativeProbeFactorioProcess {
