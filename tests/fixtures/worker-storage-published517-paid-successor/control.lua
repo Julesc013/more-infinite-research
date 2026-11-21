@@ -197,6 +197,15 @@ end
 script.on_event(defines.events.on_research_finished, function(event)
   local actor = completion
   if actor == nil or event.research.force ~= actor.force then return end
+  if event.by_script == true then
+    local name = event.research.name
+    check(actor.finished == 2 and actor.lab.disabled_by_script and (name == ORDINARY or name == HOLDER),
+      "unexpected scripted research notification: " .. name)
+    log("[MIR_PUBLISHED517_SETTLEMENT_EVENT] " .. helpers.table_to_json({
+      research = name, by_script = true, tick = game.tick, finished = actor.finished
+    }))
+    return
+  end
   check(event.research.name == HOLDER and event.by_script == false and actor.finished < 2
     and (actor.finished == 0 or actor.second_observed),
     "unexpected research completion on the paid force")
