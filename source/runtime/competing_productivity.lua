@@ -53,8 +53,12 @@ local function ensure_state()
   return value
 end
 
+-- A native queue write can start another admitted research before the outer
+-- call records the rows it disabled. Keep that same ledger attached until
+-- the last writer returns, including when a nested callback raises.
+local reconciliation_depth = 0
 local function discard_empty_state(value)
-  if value and next(value.owned_disabled) == nil then storage[STORAGE_KEY] = nil end
+  if reconciliation_depth == 0 and value and next(value.owned_disabled) == nil then storage[STORAGE_KEY] = nil end
 end
 
 local function drop_owned(owned_disabled, force_index, name)
@@ -183,19 +187,7 @@ local function reconcile_item(force, current, item, limits, unearned, queued)
   end
 end
 
-local function reconcile_force(force, target_name, discovery_observed, queued)
-  if not valid_force(force) then return end
-  local selected_item = target_name and BINDING_BY_ID[target_name] or nil
-  if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
-  if not CONTRACT then return end
-
-  local current = existing_state()
-  -- A false preference or an invalid replacement can only restore a right
-  -- after the exact foreign tail itself is still known. Do not allocate state
-  -- for a fresh no-preference profile.
-  if not current and PREFER_MIR ~= true then return end
-  queued = queued or queued_names(force)
-  current = current or ensure_state()
+local function apply_force(force, current, selected_item, discovery_observed, queued)
   local limits, unearned = {}, {}
   if selected_item then
     reconcile_item(force, current, selected_item, limits, unearned, queued)
@@ -214,6 +206,25 @@ local function reconcile_force(force, target_name, discovery_observed, queued)
     end
   end
   for _, item in ipairs(unearned) do retire_unearned(force, current, item) end
+end
+
+local function reconcile_force(force, target_name, discovery_observed, queued)
+  if not valid_force(force) then return end
+  local selected_item = target_name and BINDING_BY_ID[target_name] or nil
+  if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
+  if not CONTRACT then return end
+
+  local current = existing_state()
+  -- A false preference or an invalid replacement can only restore a right
+  -- after the exact foreign tail itself is still known. Do not allocate state
+  -- for a fresh no-preference profile.
+  if not current and PREFER_MIR ~= true then return end
+  queued = queued or queued_names(force)
+  current = current or ensure_state()
+  reconciliation_depth = reconciliation_depth + 1
+  local ok, reason = pcall(apply_force, force, current, selected_item, discovery_observed, queued)
+  reconciliation_depth = reconciliation_depth - 1
+  if not ok then error(reason, 0) end
   discard_empty_state(current)
 end
 
