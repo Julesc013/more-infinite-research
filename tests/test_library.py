@@ -923,13 +923,34 @@ class LibraryTests(unittest.TestCase):
     def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
         self.lua.execute('''
           boot()
+          gear.localised_name={"", "Gear ", 3, true}
+          local model=require("presentation.library_model")
+          local original=model.rows
+          model.rows=function(...)
+            local rows=original(...)
+            rows[1].name=gear.name
+            return rows
+          end
           local root=library.open(player,{selected=gear.name})
           local body=research_content(root)
           local list,actions=body.mir_library_list_pane.mir_library_results,body.mir_library_list_pane.mir_library_actions
           local detail=body.mir_library_detail
           local scroll_calls=0
           list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
-          local items,writes=list.items,0
+          local converted={}
+          local function native_caption(value)
+            local kind=type(value)
+            if kind=="number" or kind=="boolean" then
+              converted[kind]=true
+              return tostring(value)
+            end
+            if kind~="table" then return value end
+            local caption={}
+            for index,parameter in ipairs(value) do caption[index]=native_caption(parameter) end
+            return caption
+          end
+          local items,writes=native_caption(list.items),0
+          assert(converted.number and converted.boolean,"exercise textual numeric and boolean captions")
           rawset(list,"items",nil)
           local meta=getmetatable(list)
           local previous_index,previous_write=meta.__index,meta.__newindex
@@ -938,7 +959,7 @@ class LibraryTests(unittest.TestCase):
             return previous_index(target,key)
           end
           meta.__newindex=function(target,key,value)
-            if key=="items" then writes=writes+1;items=value else previous_write(target,key,value) end
+            if key=="items" then writes=writes+1;items=native_caption(value) else previous_write(target,key,value) end
           end
           library.open(player)
           assert(body.mir_library_list_pane.mir_library_results==list and list.valid and body.mir_library_list_pane.mir_library_actions==actions,
@@ -949,13 +970,14 @@ class LibraryTests(unittest.TestCase):
           assert(research_content(root).mir_library_list_pane.mir_library_results==list and list.valid)
           assert(scroll_calls==0,"unchanged lists must not be programmatically scrolled again")
           assert(writes==0,"unchanged native items must not be reassigned")
-          local model=require("presentation.library_model")
-          local original=model.rows
+          gear.localised_name[3]=4
+          library.open(player)
+          assert(writes==1 and list.items[1][3][3]=="4","changed numeric parameters must update the retained list")
           model.rows=function(...)
             local rows=original(...);rows[1].name="Updated display name";return rows
           end
           library.open(player)
-          assert(body.mir_library_list_pane.mir_library_results==list and writes==1 and list.items[1][3]=="Updated display name",
+          assert(body.mir_library_list_pane.mir_library_results==list and writes==2 and list.items[1][3]=="Updated display name",
             "changed display names must update the retained native list")
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')

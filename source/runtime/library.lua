@@ -1591,7 +1591,12 @@ local function same_list_caption(left, right, budget)
   if budget.left == 0 then return false end
   budget.left = budget.left - 1
   if left == right then return true end
-  if type(left) ~= "table" or type(right) ~= "table" or #left ~= #right then return false end
+  local left_type, right_type = type(left), type(right)
+  -- Factorio stores numeric and boolean LocalisedString parameters as text.
+  if left_type == "string" and (right_type == "number" or right_type == "boolean") then
+    return left == tostring(right)
+  end
+  if left_type ~= "table" or right_type ~= "table" or #left ~= #right then return false end
   for index = 1, #left do
     if not same_list_caption(left[index], right[index], budget) then return false end
   end
