@@ -135,7 +135,9 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         values.max_level=10;history.configure(10,true)
         local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
           "production-science-pack","utility-science-pack"}
-        local prerequisites={"worker-robots-storage-2","utility-science-pack","worker-robots-storage-3"}
+        -- The retained native517 contract has these two direct prerequisites;
+        -- authored preflight rows can still contain the redundant second level.
+        local prerequisites={"utility-science-pack","worker-robots-storage-3"}
         for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517}do
           local p=prototypes.technology[id];p.research_unit_count_formula="675*1.5^(L-4)";p.research_unit_count=nil
           p.research_unit_energy=3600;p.ignore_tech_cost_multiplier=false;p.research_unit_ingredients={};p.prerequisites={}
