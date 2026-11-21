@@ -1,10 +1,11 @@
 # A Linux-only, disposable control for the normal dispatcher state machine.
-# It runs two uniquely named user-systemd stand-ins; it never starts Factorio,
+# It runs three disposable user-systemd stand-ins; it never starts Factorio,
 # opens a direct library, installs a persistent unit, or touches mir-native.
 [CmdletBinding()]
 param(
   [Parameter(Mandatory)][string]$DispatcherPath,
-  [Parameter(Mandatory)][string]$Root
+  [Parameter(Mandatory)][string]$Root,
+  [string]$ExitRecorderPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,6 +14,8 @@ if (-not $IsLinux) { throw '[mir-gunmetal-dispatcher-manager-control-linux-requi
 $dispatcherFull = [IO.Path]::GetFullPath($DispatcherPath)
 $rootFull = [IO.Path]::GetFullPath($Root).TrimEnd('/')
 if (-not (Test-Path -LiteralPath $dispatcherFull -PathType Leaf)) { throw '[mir-gunmetal-dispatcher-manager-control-dispatcher-missing]' }
+if (-not $ExitRecorderPath) { $ExitRecorderPath = Join-Path (Split-Path -Parent $dispatcherFull) 'Record-MIRGunmetalNativeExit.sh' }
+$exitRecorder = (Resolve-Path -LiteralPath $ExitRecorderPath).Path
 if ($rootFull -cnotmatch '^/home/shared/Projects/Factorio/MIR/\.task-builds/mir-dispatcher-manager-control-[a-z0-9-]+$') { throw '[mir-gunmetal-dispatcher-manager-control-root]' }
 if (Test-Path -LiteralPath $rootFull) { throw '[mir-gunmetal-dispatcher-manager-control-root-exists]' }
 
@@ -37,7 +40,7 @@ function Write-ManagerControlText {
 }
 
 function New-ManagerControlPolicy {
-  param([Parameter(Mandatory)][string]$RequestId,[Parameter(Mandatory)][string]$PacketText)
+  param([Parameter(Mandatory)][string]$RequestId,[Parameter(Mandatory)][string]$PacketText,[int]$ExitCode=0)
   $checkout = Join-Path $rootFull 'checkout'
   $resultRoot = Join-Path $rootFull 'results'
   $job = Join-Path $checkout ('jobs/'+$RequestId)
@@ -57,11 +60,12 @@ set -euo pipefail
 sleep 1
 printf '%s\n' '{"kind":"MIRGunmetalNativeDispatcherManagerControlResultV1","status":"passed","packet_sha256":"$packetHash"}' > '$result'
 sleep 2
+exit $ExitCode
 "@
   $launcherText = @"
 #!/usr/bin/env bash
 set -euo pipefail
-/usr/bin/systemd-run --user --no-block --unit='$($script:unit)' --collect --property=Type=oneshot --property=RemainAfterExit=yes /usr/bin/bash '$controller'
+/usr/bin/systemd-run --user --no-block --unit='$($script:unit)' --collect --property=Type=exec --property=StandardOutput=journal '--property=ExecStopPost=/usr/bin/bash $exitRecorder $packetHash' /usr/bin/bash '$controller'
 "@
   Write-ManagerControlText -Path $controller -Text $controllerText
   Write-ManagerControlText -Path $launcher -Text $launcherText
@@ -109,6 +113,7 @@ function Wait-ManagerControlTerminal {
   param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)][string]$RequestId)
   for ($attempt = 0; $attempt -lt 20; $attempt++) {
     Start-Sleep -Milliseconds 250
+    if (-not (Get-MIRGunmetalDispatcherUnit -Unit $script:unit).absence_confirmed) { continue }
     $null = Invoke-MIRGunmetalDispatcherConsume -Policy $Policy
     $terminal = Join-Path $Policy.spool ('terminal/'+$RequestId+'.json')
     if (Test-Path -LiteralPath $terminal) { return (Read-MIRGunmetalDispatcherJson -Path $terminal) }
@@ -137,15 +142,20 @@ try {
   Assert-ManagerControl ($wake.status -ceq 'reconciled' -and -not (Test-Path -LiteralPath (Join-Path $first.spool 'state/pending.signal'))) 'held-pending-edge-consumed-without-start-loop'
 
   $firstTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $first.approval.request_id
-  Assert-ManagerControl ($firstTerminal.status -ceq 'succeeded' -and $firstTerminal.result.result.packet_sha256 -ceq $first.approval.packet_sha256 -and $firstTerminal.result.result.status -ceq 'passed') 'first-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  Assert-ManagerControl ($firstTerminal.status -ceq 'succeeded' -and $firstTerminal.result.result.packet_sha256 -ceq $first.approval.packet_sha256 -and $firstTerminal.result.journal.source -ceq 'systemd-exit-hook') 'first-collected-terminal-packet-bound'
 
   $secondStarted = Invoke-MIRGunmetalDispatcherConsume -Policy $first
   $secondRunning = Get-MIRGunmetalDispatcherStateRecord -Policy $first -Name running
   Assert-ManagerControl ($secondStarted.status -ceq 'submitted' -and $secondRunning.request_id -ceq $second.approval.request_id -and $secondRunning.packet_sha256 -ceq $second.approval.packet_sha256) 'second-distinct-packet-started'
   $secondTerminal = Wait-ManagerControlTerminal -Policy $first -RequestId $second.approval.request_id
-  Assert-ManagerControl ($secondTerminal.status -ceq 'succeeded' -and $secondTerminal.result.result.packet_sha256 -ceq $second.approval.packet_sha256) 'second-manager-terminal-packet-bound'
-  Remove-ManagerControlUnit
+  Assert-ManagerControl ($secondTerminal.status -ceq 'succeeded' -and $secondTerminal.result.result.packet_sha256 -ceq $second.approval.packet_sha256 -and $secondTerminal.result.journal.source -ceq 'systemd-exit-hook') 'second-collected-terminal-packet-bound'
+  Assert-ManagerControl ($firstTerminal.result.journal.invocation_id -cne $secondTerminal.result.journal.invocation_id) 'distinct-collected-invocations'
+
+  $third = New-ManagerControlPolicy -RequestId 'manager-control-failed' -PacketText 'failed' -ExitCode 7
+  $null = Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $first -SuccessorPolicyPath $third.path
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $first
+  $failed = Wait-ManagerControlTerminal -Policy $first -RequestId $third.approval.request_id
+  Assert-ManagerControl ($failed.status -ceq 'failed' -and $failed.result.result.valid -and $failed.result.journal.exit_code -eq 7 -and $failed.result.journal.source -ceq 'systemd-exit-hook') 'nonzero-exit-preserved-with-valid-controller-result'
   $cleanup = 'unit-cleaned'
 
   [pscustomobject]@{
@@ -155,9 +165,10 @@ try {
     unit = $script:unit
     first_packet_sha256 = $first.approval.packet_sha256
     second_packet_sha256 = $second.approval.packet_sha256
+    exits = @($firstTerminal.result.journal, $secondTerminal.result.journal, $failed.result.journal)
     native_execution = $false
     gameplay_acceptance = $false
-    operational_scope = 'two disposable user-systemd stand-ins only; no Factorio, direct library, or agents-owned unit.'
+    operational_scope = 'three disposable user-systemd stand-ins only; no Factorio, direct library, or production native unit.'
   }
 } finally {
   if ($cleanup -ne 'unit-cleaned') { try { Remove-ManagerControlUnit } catch { } }
