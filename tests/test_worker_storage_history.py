@@ -1637,6 +1637,51 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(player.worker_robots_storage_bonus==before_bonus+1 and player.current_research.name==OTHER)
         ''')
 
+    def test_published517_advanced_completion_waits_for_the_unstarted_queue_tail(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract(); init_default()
+          finish_frame(player, "advanced", {ORDINARY}, false)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          player.research_queue={ORDINARY,ORDINARY,OTHER}; player.research_progress=.42
+          current_se_contract()
+          assert(history.default_owner_apply(history.default_owner_preflight(published517_se_bridge_event(),nil,true)))
+          local debit_meta=getmetatable(player.technologies[HEAD])
+          local debit_read=debit_meta.__index
+          debit_meta.__index=function(technology,key)
+            local value=debit_read(technology,key)
+            assert(value~=nil,"LuaTechnology doesn't contain key "..key)
+            return value
+          end
+          local legacy=player.technologies[LEGACY517]
+          legacy.level=6; player.research_queue={LEGACY517,OTHER}; player.research_progress=0
+          gaps[player.index]=true
+          local before=all_frames(); writes=0
+          local changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=101}
+          assert(changed and not settled and writes==0 and same(before,all_frames()))
+          assert(history.default_owner_completion_pending_tick()==102)
+          gaps[player.index]=false
+          changed,settled=history.default_owner_on_completion_tick{tick=102}
+          assert(changed and #settled==0 and writes==0 and player.current_research.name==LEGACY517)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="legacy")
+
+          legacy.level=7; player.research_queue={OTHER}; player.research_progress=0
+          player.technologies[OTHER].saved_progress=.19
+          gaps[player.index]=true
+          local bonus=player.worker_robots_storage_bonus
+          before=all_frames(); writes=0; queue_writes={}; progress_writes={}
+          changed,settled=history.default_owner_on_research_finished{research=legacy,by_script=false,tick=105}
+          assert(changed and not settled and history.default_owner_completion_pending_tick()==106)
+          assert(writes==0 and same(before,all_frames()) and player.current_research==nil)
+          gaps[player.index]=false
+          changed,settled=history.default_owner_on_completion_tick{tick=106}
+          assert(changed and #settled==1 and settled[1]==player)
+          assert(storage[OWNER_KEY].forces[player.index].phase=="owned")
+          assert(player.technologies[ORDINARY].level==7 and legacy.level==4 and not legacy.enabled)
+          assert(player.current_research.name==OTHER and player.technologies[OTHER].saved_progress==.19)
+          assert(player.worker_robots_storage_bonus==bonus and queue_writes[1]==nil and progress_writes[1]==nil)
+        ''')
+
     def test_published517_engine_owned_completion_defers_then_settles_without_repricing(self):
         """The progress-one callback is Factorio-owned, not a settled paid-work frame."""
         lua=self.world("f200")
