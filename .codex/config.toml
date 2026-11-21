@@ -1,5 +1,8 @@
 # MIR Development: trusted project health checks alongside normal Git/GitHub access.
 
+model = "gpt-6.2-sol"
+model_reasoning_effort = "medium"
+
 [features]
 hooks = true
 
