@@ -76,9 +76,9 @@
   },
   "helper_pins": [
     {"path":"tools/lib/validation/ImmutableInputStaging.ps1","sha256":"25523C83C26501444A01729226E504199A3294F02E5330DEB1BB4D305832FBEE","bytes":27295},
-    {"path":"tools/lib/compatibility/LibraryActivation.ps1","sha256":"A98570967D35048ECFEAEC7124BB1D9A4501B208E9EAB8CC6E647A638CA2DF7D","bytes":41094},
-    {"path":"tools/lib/validation/NativeProbeResources.ps1","sha256":"1504B4BE12920BE4354CA74204D9B0621481215D08A5F4D231C8C75BCB8D7CB3","bytes":15778},
-    {"path":"tools/lib/validation/ResourceGovernor.ps1","sha256":"D7CEFFD1DC7D9E1A2B0D0CB19FE78D6AF31157B9CB40A0E4548F5397D6D43195","bytes":63682}
+    {"path":"tools/lib/compatibility/LibraryActivation.ps1","sha256":"9AF7F47B52FDA7AEB027DF78A4058398BFB9BD2720536A692A1B48A90C44EDC1","bytes":41671},
+    {"path":"tools/lib/validation/NativeProbeResources.ps1","sha256":"B13AE87CB88EB2CEDA6EED23AC336DC39FB23CA23B5809E677F6114922F66286","bytes":17987},
+    {"path":"tools/lib/validation/ResourceGovernor.ps1","sha256":"41F04E16794BBD4CCCE308F14275DB9A2AD8E41D87E79B02786083067078956E","bytes":66493}
   ],
   "runtime_bindings": {
     "library_directory": null,
