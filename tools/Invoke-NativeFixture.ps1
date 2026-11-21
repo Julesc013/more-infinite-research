@@ -9,6 +9,8 @@ param(
   [string]$ActiveModsObserver='',
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$LinuxStoragePlanPath='',
+  [string]$LinuxStoragePlanSha256='',
   [string[]]$ConsumerMarkers=@(),
   [ValidateSet('load','configuration')][string]$ProductionConsumerStage='load',
   # Empty retains the F200/F210 runner byte path.  A selected reduced target
@@ -44,6 +46,7 @@ param(
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(16,128)][int]$MaxNewOutputMiB=128,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
+  [switch]$Headless,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -714,14 +717,15 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
   $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation')
   if(-not $historicalProcess){
-    $arguments+='--disable-audio'
+    $arguments+=@(Get-MIRNativeAudioArguments -Headless:$Headless)
   }elseif(-not $historical -or $historicalFixture.factorio_version -notin @('0.13','0.14')){
     # Keep the older-engine exception tied to the historical fixture metadata;
     # the F110 published source leg is an explicit 1.1 process-mode caller.
-    $arguments+='--disable-audio'
+    $arguments+=@(Get-MIRNativeAudioArguments -Headless:$Headless)
   }
   $arguments+=$StageArguments
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  # Historical process modes keep their separately qualified log protocol.
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection:(-not $historicalProcess) -ActiveModsObserver $activeModsObserverName -WriteStoragePolicy $resources.policy
   # Completed host parsing/interop allocations need not occupy commit while a
   # later native stage waits for admission. Keep every governor limit intact.
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
@@ -887,7 +891,7 @@ Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdenti
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -Mode Hook -MaxWorktrees 2 -MaxBranches 4 -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
 $record=[ordered]@{
-  kind='MIR5NativeFixtureV1';status='prepared';case=$CaseName
+  kind='MIR5NativeFixtureV1';status='prepared';case=$CaseName;headless_requested=[bool]$Headless
   source_head=[string](& git -C $repo rev-parse HEAD)
   source_dirty=(@(& git -C $repo status --porcelain=v1).Count -gt 0)
   harness_sha256=Get-FixtureSha $PSCommandPath
@@ -912,8 +916,17 @@ try{
   # Linux admission uses its proc/cgroup observer, with no Windows Add-Type.
   if($IsWindows){$null=Get-MIR441PhysicalMemorySnapshot}
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
-  $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
+  $storageArguments=@{}
+  if($LinuxStoragePlanPath -or $LinuxStoragePlanSha256){
+    $storageArguments=@{LinuxStoragePlanPath=$LinuxStoragePlanPath;LinuxStoragePlanSha256=$LinuxStoragePlanSha256;LibraryRoot=$library}
+  }else{
+    $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
+  }
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot @storageArguments
+  if($storageArguments.Count){
+    $record.linux_write_storage=$resources.policy.linux_write_storage
+    $record.linux_write_storage_helper_sha256=Get-FixtureSha (Join-Path $repo 'tools/lib/validation/LinuxWriteStorage.ps1')
+  }
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
   $workingInputSave=$null

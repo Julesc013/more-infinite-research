@@ -1,6 +1,8 @@
+[CmdletBinding()]
 param(
   [string]$LuaRuntimeDir,
-  [switch]$Plan
+  [switch]$Plan,
+  [string[]]$ControlPath
 )
 
 Set-StrictMode -Version Latest
@@ -11,6 +13,7 @@ $controls = @(
   [ordered]@{path='tests/test_generator.py';lua=$true},
   [ordered]@{path='tests/test_library_render_capture.py';lua=$true},
   [ordered]@{path='tests/test_library_personal_view_input_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_library_localized_search_native.py';lua=$true},
   [ordered]@{path='tests/test_library_fresh_export_input.py';lua=$true},
   [ordered]@{path='tests/test_continuation_ownership.py';lua=$true},
   [ordered]@{path='tests/test_native_research_speed_finite_fixture.py';lua=$true},
@@ -19,8 +22,10 @@ $controls = @(
   [ordered]@{path='tests/test_worker_storage_history.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_inherited_origin.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_prepared_default.py';lua=$true},
+  [ordered]@{path='tests/test_worker_uninvested_inherited_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_worker_native_owner_data.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_default_native.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_uninvested_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_prepared_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_provider_native.py';lua=$true},
   [ordered]@{path='tests/test_worker_default_snapshot_probe.py';lua=$true},
@@ -119,6 +124,7 @@ $controls = @(
   [ordered]@{path='tests/test_cryogenic_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/test_material_catalogue.py';lua=$true},
   [ordered]@{path='tests/test_material_native_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_k2so_material_continuation_fixture.py';lua=$true},
   [ordered]@{path='tests/test_product_targets.py';lua=$true},
   [ordered]@{path='tests/test_product_target_extension.py';lua=$true},
   [ordered]@{path='tests/test_native_family_product_targets.py';lua=$true},
@@ -138,6 +144,9 @@ $controls = @(
     [ordered]@{path='tests/test_f200_foreign_cap_baseline_fixture.py';lua=$true},
   [ordered]@{path='tests/test_native_owner_cap_order_fixture.py';lua=$true},
   [ordered]@{path='tests/test_worker_speed_cap_ten_native.py';lua=$true},
+  [ordered]@{path='tests/test_se_worker_speed_provider_source.py';lua=$true},
+  [ordered]@{path='tests/test_published_base_paid_source.py';lua=$true},
+  [ordered]@{path='tests/test_published_base_added_successor.py';lua=$true},
   [ordered]@{path='tests/test_f200_legacy_worker_fixture.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_migration.py';lua=$true},
   [ordered]@{path='tests/test_k2_imersite_transition_fixture.py';lua=$true},
@@ -151,6 +160,8 @@ $controls = @(
   [ordered]@{path='tests/test_fixture_controls.py';lua=$true},
   [ordered]@{path='tests/test_foreign_research_preservation.py';lua=$true},
   [ordered]@{path='tests/test_capture_controls.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_se_cap_ten_data_observer.py';lua=$true},
+  [ordered]@{path='tests/test_worker_storage_se_cap_ten_native.py';lua=$true},
   [ordered]@{path='tests/test_lifecycle.py';lua=$true},
   [ordered]@{path='tests/test_native_owners.py';lua=$true},
   [ordered]@{path='tests/test_module_permissions_override.py';lua=$true},
@@ -159,6 +170,7 @@ $controls = @(
   [ordered]@{path='tests/test_prerequisite_repairs.py';lua=$true},
   [ordered]@{path='tests/test_module_permissions_activation.py';lua=$true},
   [ordered]@{path='tests/test_bootstrap.py';lua=$true},
+  [ordered]@{path='tests/test_space_exploration_system_force.py';lua=$true},
   [ordered]@{path='tests/test_library.py';lua=$true},
   [ordered]@{path='tests/test_library_legacy_settings_search_probe.py';lua=$true},
   [ordered]@{path='tests/test_library_multiplayer_fixture.py';lua=$true},
@@ -213,23 +225,36 @@ $controls = @(
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
   [ordered]@{path='tests/test_input_filesystem_boundaries.py';lua=$false},
   [ordered]@{path='tests/test_linux_resource_platform.py';lua=$false},
+  [ordered]@{path='tests/test_linux_write_storage.py';lua=$false},
   [ordered]@{path='tools/check_repository.py';lua=$false}
 )
 
+$namedBatch = $PSBoundParameters.ContainsKey('ControlPath')
+if ($namedBatch) {
+  $batch = @($controls | Where-Object { $ControlPath -ccontains $_.path })
+  if ($batch.Count -eq 0 -or $batch.Count -ne $ControlPath.Count) {
+    throw '[mir5-host-controls-selection] Supply each named path once, exactly as listed in the host plan.'
+  }
+  $controls = $batch
+}
 if ($Plan) {
-  [pscustomobject][ordered]@{schema=1;kind='MIR5HostControlsPlanV1';controls=$controls;native_execution=$false;release_qualification=$false}
+  $manifest = [ordered]@{schema=1;kind='MIR5HostControlsPlanV1';controls=$controls;native_execution=$false;release_qualification=$false}
+  if ($namedBatch) { $manifest.selection = 'named' }
+  [pscustomobject]$manifest
   return
 }
 if ([string]::IsNullOrWhiteSpace($LuaRuntimeDir)) { $LuaRuntimeDir = [string]$env:MIR5_LUA_RUNTIME }
 if ([string]::IsNullOrWhiteSpace($LuaRuntimeDir)) { throw '[mir5-host-controls-lua-runtime-required]' }
 $runtime = (Resolve-Path -LiteralPath $LuaRuntimeDir -ErrorAction Stop).Path
 if (-not (Test-Path -LiteralPath (Join-Path $runtime 'lupa') -PathType Container)) { throw '[mir5-host-controls-lua-runtime-invalid]' }
-$python = (Get-Command python -ErrorAction Stop).Source
+$pythonCommand = Get-Command python -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $pythonCommand) { $pythonCommand = Get-Command python3 -CommandType Application -ErrorAction Stop | Select-Object -First 1 }
+$python = $pythonCommand.Source
 
 foreach ($control in $controls) {
-  $controlPath = Join-Path $repo ([string]$control.path)
-  if (-not (Test-Path -LiteralPath $controlPath -PathType Leaf)) { throw "[mir5-host-controls-missing] $($control.path)" }
-  $arguments = @('-B', $controlPath)
+  $scriptPath = Join-Path $repo ([string]$control.path)
+  if (-not (Test-Path -LiteralPath $scriptPath -PathType Leaf)) { throw "[mir5-host-controls-missing] $($control.path)" }
+  $arguments = @('-B', $scriptPath)
   if ([bool]$control.lua) { $arguments += @('--lua-runtime-dir', $runtime) }
   & $python @arguments
   if ($LASTEXITCODE -ne 0) { throw "[mir5-host-controls-failed] $($control.path)" }

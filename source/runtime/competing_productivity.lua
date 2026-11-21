@@ -53,8 +53,12 @@ local function ensure_state()
   return value
 end
 
+-- A native queue write can start another admitted research before the outer
+-- call records the rows it disabled. Keep that same ledger attached until
+-- the last writer returns, including when a nested callback raises.
+local reconciliation_depth = 0
 local function discard_empty_state(value)
-  if value and next(value.owned_disabled) == nil then storage[STORAGE_KEY] = nil end
+  if reconciliation_depth == 0 and value and next(value.owned_disabled) == nil then storage[STORAGE_KEY] = nil end
 end
 
 local function drop_owned(owned_disabled, force_index, name)
@@ -183,20 +187,8 @@ local function reconcile_item(force, current, item, limits, unearned, queued)
   end
 end
 
-local function reconcile_force(force, target_name, discovery_observed)
-  if not valid_force(force) then return end
-  local selected_item = target_name and BINDING_BY_ID[target_name] or nil
-  if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
-  if not CONTRACT then return end
-
-  local current = existing_state()
-  -- A false preference or an invalid replacement can only restore a right
-  -- after the exact foreign tail itself is still known. Do not allocate state
-  -- for a fresh no-preference profile.
-  if not current and PREFER_MIR ~= true then return end
-  current = current or ensure_state()
+local function apply_force(force, current, selected_item, discovery_observed, queued)
   local limits, unearned = {}, {}
-  local queued = queued_names(force)
   if selected_item then
     reconcile_item(force, current, selected_item, limits, unearned, queued)
   else
@@ -214,17 +206,31 @@ local function reconcile_force(force, target_name, discovery_observed)
     end
   end
   for _, item in ipairs(unearned) do retire_unearned(force, current, item) end
+end
+
+local function reconcile_force(force, target_name, discovery_observed, queued)
+  if not valid_force(force) then return end
+  local selected_item = target_name and BINDING_BY_ID[target_name] or nil
+  if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
+  if not CONTRACT then return end
+
+  local current = existing_state()
+  -- A false preference or an invalid replacement can only restore a right
+  -- after the exact foreign tail itself is still known. Do not allocate state
+  -- for a fresh no-preference profile.
+  if not current and PREFER_MIR ~= true then return end
+  queued = queued or queued_names(force)
+  current = current or ensure_state()
+  reconciliation_depth = reconciliation_depth + 1
+  local ok, reason = pcall(apply_force, force, current, selected_item, discovery_observed, queued)
+  reconciliation_depth = reconciliation_depth - 1
+  if not ok then error(reason, 0) end
   discard_empty_state(current)
 end
 
-local function force_for_index(index)
-  local ok, force = pcall(function() return game.forces[index] end)
-  return ok and force or nil
-end
-
-local function discard_unselected_rights(current)
+local function discard_unselected_rights(current, live_forces)
   for index, owned in pairs(current.owned_disabled) do
-    if not valid_force(force_for_index(index)) then
+    if not live_forces[index] then
       current.owned_disabled[index] = nil
     elseif type(owned) == "table" then
       for name in pairs(owned) do
@@ -244,8 +250,19 @@ local function reconcile_all(clean_stale, discovery_observed)
     return
   end
   if not game or not game.forces then return end
-  if clean_stale and current then discard_unselected_rights(current) end
-  for _, force in pairs(game.forces) do reconcile_force(force, nil, discovery_observed) end
+  if not current and PREFER_MIR ~= true then return end
+  -- Observe every live force and its queue before changing restoration rights.
+  local observed, live_forces = {}, {}
+  for _, force in pairs(game.forces) do
+    if valid_force(force) then
+      observed[#observed + 1] = {force=force, queued=queued_names(force)}
+      live_forces[force.index] = true
+    end
+  end
+  if clean_stale and current then discard_unselected_rights(current, live_forces) end
+  for _, observation in ipairs(observed) do
+    reconcile_force(observation.force, nil, discovery_observed, observation.queued)
+  end
   discard_empty_state(existing_state())
 end
 

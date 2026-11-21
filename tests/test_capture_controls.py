@@ -8,6 +8,7 @@ import base64
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -22,6 +23,7 @@ REPLAY_CAPTURE = ROOT / "tools/Invoke-ReplayCapture.ps1"
 MENU_COMPARISON = ROOT / "tools/Invoke-MenuComparison.ps1"
 NATIVE_FIXTURE = ROOT / "tools/Invoke-NativeFixture.ps1"
 LIBRARY_ACTIVATION = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
+NATIVE_COMMON = ROOT / "tools/lib/validation/NativeProbeCommon.ps1"
 
 
 def assert_powershell_parses(path: Path) -> None:
@@ -76,6 +78,87 @@ def prototype_capture_output_budget_binder_cases() -> dict:
         }
 
     return {"eight_gib": invoke(8192), "over_limit": invoke(8193)}
+
+
+def audio_argument_builder_source() -> str:
+    """Load the real shared pure helper without executing a native entry point."""
+    path = str(NATIVE_COMMON).replace("'", "''")
+    return r"""
+$audioTokens=$null;$audioErrors=$null
+$audioAst=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$audioTokens,[ref]$audioErrors)
+if($audioErrors.Count){throw 'Native common source does not parse'}
+$audioFunctions=@($audioAst.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Get-MIRNativeAudioArguments'},$true))
+if($audioFunctions.Count -ne 1){throw 'One real audio argv helper required'}
+Invoke-Expression $audioFunctions[0].Extent.Text
+""".replace("__SOURCE__", path)
+
+
+def prototype_capture_argument_cases() -> dict:
+    """Execute the actual argv builder without starting capture or an engine."""
+    source = str(PROTOTYPE_CAPTURE).replace("'", "''")
+    script = audio_argument_builder_source() + r"""
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'Capture source does not parse'}
+$functions=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Get-MIR5PrototypeCaptureArguments'},$true))
+if($functions.Count -ne 1){throw 'One real capture argv builder required'}
+Invoke-Expression $functions[0].Extent.Text
+$common=@{ConfigPath='C:/capture/space dir/config.ini';LibraryDirectory='C:/MIR/test mods'}
+@{
+  default_gui=@(Get-MIR5PrototypeCaptureArguments @common)
+  explicit_gui=@(Get-MIR5PrototypeCaptureArguments @common -Headless:$false)
+  headless=@(Get-MIR5PrototypeCaptureArguments @common -Headless)
+}|ConvertTo-Json -Depth 5 -Compress
+""".replace("__SOURCE__", source)
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", script],
+        cwd=ROOT, text=True, capture_output=True, check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def native_fixture_argument_cases() -> dict:
+    """Stop the actual stage at launch validation; no process can be started."""
+    source = str(NATIVE_FIXTURE).replace("'", "''")
+    with tempfile.TemporaryDirectory(prefix="mir-headless-stage-") as directory:
+        scratch = directory.replace("'", "''")
+        script = audio_argument_builder_source() + r"""
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile('__SOURCE__',[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'Native fixture source does not parse'}
+$functions=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq 'Invoke-FixtureStage'},$true))
+if($functions.Count -ne 1){throw 'One actual native stage required'}
+Invoke-Expression $functions[0].Extent.Text
+function Assert-MIRLibraryLaunch {
+  param($Activation,$FactorioBin,$Arguments)
+  $script:observed=@($Arguments)
+  throw 'HOST_ARGV_BOUNDARY'
+}
+$writeData='__SCRATCH__';$config='C:/capture/space dir/config.ini'
+$activation=[pscustomobject]@{library='C:/MIR/test mods'};$engine='must-never-run'
+$results=@{}
+foreach($case in @(
+  @{name='modern_gui';headless=$false;process=$false;historical=$false;version='2.0'},
+  @{name='modern_headless';headless=$true;process=$false;historical=$false;version='2.0'},
+  @{name='legacy013_gui';headless=$false;process=$true;historical=$true;version='0.13'},
+  @{name='legacy014_gui';headless=$false;process=$true;historical=$true;version='0.14'},
+  @{name='legacy110_gui';headless=$false;process=$true;historical=$true;version='1.1'},
+  @{name='f110_process_gui';headless=$false;process=$true;historical=$false;version='0.13'},
+  @{name='legacy110_headless';headless=$true;process=$true;historical=$true;version='1.1'}
+)){
+  $Headless=$case.headless;$historicalProcess=$case.process;$historical=$case.historical
+  $historicalFixture=[pscustomobject]@{factorio_version=$case.version}
+  $script:observed=$null
+  try{Invoke-FixtureStage -Name 'host-only' -StageArguments @('--benchmark','owned-input.zip')}
+  catch{if($_.Exception.Message -cne 'HOST_ARGV_BOUNDARY'){throw}}
+  if($null -eq $script:observed){throw 'Stage failed before actual launch arguments'}
+  $results[$case.name]=$script:observed
+}
+$results|ConvertTo-Json -Depth 5 -Compress
+""".replace("__SOURCE__", source).replace("__SCRATCH__", scratch)
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                text=True, capture_output=True, check=True)
+        return json.loads(result.stdout)
 
 
 def prototype_capture_archive_guard_cases() -> dict:
@@ -247,6 +330,347 @@ def prototype_capture_declared_input_guard_cases() -> dict:
             "malformed_map": malformed_map,
             "call_removed": call_removed,
         }
+
+
+def prototype_capture_file_settings_guard_cases() -> dict:
+    """Exercise the real capture preflight through File-settings admission only."""
+    source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+    boundary = "$buildTmp = Join-Path $repo 'build/tmp'"
+    offset = source.index(boundary)
+    settings_call = (
+        "$captureSettings = Get-MIR5PrototypeCaptureSettingsArguments "
+        "-ProfileDefinition $profileDefinition -Path $SettingsPath "
+        "-ExpectedSha256 $ExpectedSettingsSha256"
+    )
+    normalized_profile_compare = (
+        "$profileExpected = ([string]$ProfileDefinition.settings_sha256).ToUpperInvariant()\n"
+        "  Assert-MIR5PrototypeCapture ($profileExpected -ceq $expected) "
+        "'File settings profile SHA-256 differs from expected input'"
+    )
+    case_sensitive_profile_compare = (
+        "Assert-MIR5PrototypeCapture ([string]$ProfileDefinition.settings_sha256 -ceq $expected) "
+        "'File settings profile SHA-256 differs from expected input'"
+    )
+    if source.count(settings_call) != 1:
+        raise AssertionError("prototype capture File-settings admission is missing or ambiguous")
+    if source.count(normalized_profile_compare) != 1:
+        raise AssertionError("prototype capture normalized profile comparison is missing or ambiguous")
+
+    with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-file-settings-") as temp:
+        root = Path(temp)
+        runner = root / "Invoke-PrototypeCapture-file-settings-preflight.ps1"
+        old_runner = root / "Invoke-PrototypeCapture-file-settings-preflight-old.ps1"
+        case_sensitive_runner = root / "Invoke-PrototypeCapture-file-settings-preflight-case-sensitive.ps1"
+        runner.write_text(source[:offset] + "\nreturn\n", encoding="utf-8", newline="\n")
+        old_runner.write_text(
+            source[:offset].replace(settings_call, "", 1) + "\nreturn\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        case_sensitive_runner.write_text(
+            source[:offset].replace(normalized_profile_compare, case_sensitive_profile_compare, 1) + "\nreturn\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        engine = root / "engine"
+        factorio = engine / "bin/x64/factorio.exe"
+        factorio.parent.mkdir(parents=True)
+        factorio.write_bytes(b"fake F200 capture engine identity for host-only settings admission")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text(
+            json.dumps({"name": "base", "version": "2.0.77", "dependencies": []}),
+            encoding="utf-8",
+        )
+        library = root / "library"
+        library.mkdir()
+        archive = library / "controlled_1.0.0.zip"
+        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as value:
+            value.writestr(
+                "controlled_1.0.0/info.json",
+                json.dumps(
+                    {
+                        "name": "controlled",
+                        "version": "1.0.0",
+                        "factorio_version": "2.0",
+                        "dependencies": ["base"],
+                    }
+                ),
+            )
+        settings = root / "cap10-settings.dat"
+        settings.write_bytes(bytes.fromhex("020001001400000000050000000000"))
+        settings_hash = hashlib.sha256(settings.read_bytes()).hexdigest().upper()
+        mixed_hash = "".join(
+            character.lower() if index % 2 else character
+            for index, character in enumerate(settings_hash)
+        )
+        archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest().upper()
+        engine_hash = hashlib.sha256(factorio.read_bytes()).hexdigest().upper()
+        profile = root / "profile.json"
+        output = root / "output"
+
+        def invoke(
+            name: str,
+            *,
+            settings_path: Path | None,
+            expected_hash: str | None,
+            mode: str = "File",
+            profile_hash: str | None = None,
+            include_profile_hash: bool = True,
+            runner_path: Path = runner,
+        ) -> dict:
+            value = {
+                "target": "f200",
+                "factorio_line": "2.0",
+                "settings_mode": mode,
+                "engine": {"version": "2.0.77", "sha256": engine_hash},
+                "archive_sha256": {archive.name: archive_hash},
+                "mods": [
+                    {"name": "base", "version": "2.0.77", "enabled": True},
+                    {"name": "controlled", "version": "1.0.0", "enabled": True},
+                ],
+            }
+            if include_profile_hash:
+                value["settings_sha256"] = settings_hash if profile_hash is None else profile_hash
+            profile.write_text(json.dumps(value), encoding="utf-8", newline="\n")
+            command = [
+                "pwsh", "-NoProfile", "-File", str(runner_path),
+                "-ArchiveLibrary", str(library),
+                "-FactorioBin", str(factorio),
+                "-ProfilePath", str(profile),
+                "-OutputRoot", str(output),
+                "-RepoRoot", str(ROOT),
+            ]
+            if settings_path is not None:
+                command.extend(["-SettingsPath", str(settings_path)])
+            if expected_hash is not None:
+                command.extend(["-ExpectedSettingsSha256", expected_hash])
+            result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
+            return {
+                "returncode": result.returncode,
+                "output": result.stdout + result.stderr,
+                "output_exists": output.exists(),
+                "controls_exist": any(
+                    (library / control).exists()
+                    for control in ("mod-list.json", "mod-settings.dat", ".mir-active-profile.json")
+                ),
+            }
+
+        valid = invoke("valid", settings_path=settings, expected_hash=settings_hash)
+        lowercase_valid = invoke(
+            "lowercase-valid", settings_path=settings,
+            expected_hash=settings_hash.lower(), profile_hash=settings_hash.lower(),
+        )
+        mixed_case_valid = invoke(
+            "mixed-case-valid", settings_path=settings,
+            expected_hash=mixed_hash, profile_hash=mixed_hash.swapcase(),
+        )
+        old_case_sensitive_lowercase = invoke(
+            "old-case-sensitive-lowercase", settings_path=settings,
+            expected_hash=settings_hash.lower(), profile_hash=settings_hash.lower(),
+            runner_path=case_sensitive_runner,
+        )
+        defaults = invoke(
+            "defaults", settings_path=None, expected_hash=None,
+            mode="Defaults", include_profile_hash=False,
+        )
+        file_without_inputs = invoke("file-without-inputs", settings_path=None, expected_hash=None)
+        path_without_hash = invoke("path-without-hash", settings_path=settings, expected_hash=None)
+        hash_without_path = invoke("hash-without-path", settings_path=None, expected_hash=settings_hash)
+        malformed_hash = invoke("malformed-hash", settings_path=settings, expected_hash="not-a-sha",
+                                profile_hash="not-a-sha")
+        default_profile = invoke("default-profile", settings_path=settings, expected_hash=settings_hash,
+                                 mode="Defaults", include_profile_hash=False)
+        profile_hash_mismatch = invoke("profile-hash-mismatch", settings_path=settings,
+                                       expected_hash=settings_hash, profile_hash="A" * 64)
+        missing_profile_hash = invoke("missing-profile-hash", settings_path=settings,
+                                      expected_hash=settings_hash, include_profile_hash=False)
+        missing_file = invoke("missing-file", settings_path=root / "missing.dat", expected_hash=settings_hash)
+        settings.write_bytes(b"mutated after hash")
+        changed_file = invoke("changed-file", settings_path=settings, expected_hash=settings_hash)
+        old_file_without_inputs = invoke(
+            "old-file-without-inputs", settings_path=None, expected_hash=None, runner_path=old_runner,
+        )
+        return {
+            "valid": valid,
+            "lowercase_valid": lowercase_valid,
+            "mixed_case_valid": mixed_case_valid,
+            "old_case_sensitive_lowercase": old_case_sensitive_lowercase,
+            "defaults": defaults,
+            "file_without_inputs": file_without_inputs,
+            "path_without_hash": path_without_hash,
+            "hash_without_path": hash_without_path,
+            "malformed_hash": malformed_hash,
+            "default_profile": default_profile,
+            "profile_hash_mismatch": profile_hash_mismatch,
+            "missing_profile_hash": missing_profile_hash,
+            "missing_file": missing_file,
+            "changed_file": changed_file,
+            "old_file_without_inputs": old_file_without_inputs,
+        }
+
+
+def prototype_capture_file_settings_activation_routing_cases() -> dict:
+    """Run the prepared capture route through an activation boundary only.
+
+    The synthetic repository supplies the three imported helper surfaces as
+    narrow host stubs.  The real entry point performs its ordinary settings
+    preflight, resource-context call, selection/config preparation, and
+    activation-argument construction.  The stubbed activation records its
+    bound parameters and throws before any library mutation or process launch.
+    """
+    source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+    routing_condition = "if ($captureSettings.SettingsMode -ceq 'File')"
+    if source.count(routing_condition) != 1:
+        raise AssertionError("prototype capture File activation routing is missing or ambiguous")
+
+    with tempfile.TemporaryDirectory(prefix="mir5-prototype-capture-file-routing-") as temp:
+        root = Path(temp)
+        repo = root / "repo"
+        tool = repo / "tools/Invoke-PrototypeCapture.ps1"
+        immutable = repo / "tools/lib/validation/ImmutableInputStaging.ps1"
+        direct = repo / "tools/lib/validation/DirectLibraryStartupMeasurement.ps1"
+        native = repo / "tools/lib/validation/NativeProbeResources.ps1"
+        activation = repo / "tools/lib/compatibility/LibraryActivation.ps1"
+        health = repo / "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1"
+        for path in (tool, immutable, direct, native, activation, health):
+            path.parent.mkdir(parents=True, exist_ok=True)
+        tool.write_text(source, encoding="utf-8", newline="\n")
+        # The entry point imports ImmutableInputStaging directly, then imports
+        # the direct-startup helper.  This direct-startup host stub owns the
+        # normally-transitive library/resource functions so the actual entry
+        # point reaches Start-MIRLibraryActivation without a real context,
+        # direct-library control write, or process launch.
+        immutable.write_text(
+            """function Get-MIRImmutableInputSha256 { param([string]$Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
+function Get-MIRImmutableInputFileIdentity { param([string]$Path) [pscustomobject]@{path=$Path} }
+function Assert-MIRCheckoutHardLinkBoundary { param([string]$Path) }
+""",
+            encoding="utf-8", newline="\n",
+        )
+        direct.write_text(
+            """function Assert-MIRLibraryPath { param([string]$Path) if(-not (Test-Path -LiteralPath $Path -PathType Leaf)){throw 'HOST_SETTINGS_PATH'} }
+function Read-MIRDirectLibraryStartupProfile { param([string]$Path) @() }
+function Get-MIRDirectLibraryStartupEngineIdentity { param([string]$FactorioBin,[string]$EngineDataDirectory) [pscustomobject]@{path=$FactorioBin;sha256=('E'*64);base_version='2.0.77'} }
+function Get-MIRDirectLibraryStartupArchiveHashes { param([string]$LibraryDirectory,[string]$EngineDataDirectory,$BaseRows,$MirArchive) @{} }
+function Assert-MIRDirectLibraryStartupDeclaredInputs { param($ProfileDefinition,$EngineIdentity,$ArchiveHashes,[string]$ErrorPrefix) }
+function Wait-MIRDirectLibraryStartupAdmission { param($Policy,[string]$WorkRoot,[int64]$EstimatedPeakBytes,[int64]$ExpectedPeakMemoryBytes,[int]$AdmissionWaitSeconds,[string]$Phase) [pscustomobject]@{phase=$Phase;host_only=$true} }
+function New-MIRNativeProbeResourceContext { param([string]$RepoRoot,[string]$OutputRoot,[int]$ExpectedPeakMemoryMiB,[int]$MaxNewOutputMiB,[switch]$UseExactOutputRoot) [pscustomobject]@{root=$OutputRoot;runs=[Collections.Generic.List[object]]::new();host_only=$true} }
+function Write-MIRDirectLibraryStartupProfile { param([string]$Path,$BaseRows,$MirArchive) [IO.Directory]::CreateDirectory(([IO.Path]::GetDirectoryName($Path)))|Out-Null; '{\"mods\":[]}' | Set-Content -LiteralPath $Path -Encoding utf8NoBOM }
+function New-MIRDirectLibraryStartupConfig { param([string]$Path,[string]$EngineDataDirectory,[string]$WriteDataDirectory) [IO.Directory]::CreateDirectory($WriteDataDirectory)|Out-Null; 'host-only' | Set-Content -LiteralPath $Path -Encoding utf8NoBOM }
+function Start-MIRLibraryActivation {
+  param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$SettingsPath,$SettingsSha256)
+  $capture=[ordered]@{keys=@($PSBoundParameters.Keys|Sort-Object);settings_mode=$SettingsMode;settings_path=$SettingsPath;settings_sha256=$SettingsSha256}
+  [IO.File]::WriteAllText($env:MIR_CAPTURE_ROUTING_CAPTURE,($capture|ConvertTo-Json -Depth 5 -Compress),[Text.UTF8Encoding]::new($false))
+  throw 'HOST_ACTIVATION_BOUNDARY'
+}
+function Write-MIRNativeProbeResult { param($Context,$Record) }
+""",
+            encoding="utf-8", newline="\n",
+        )
+        # These files are identity-only: the direct-startup stub above replaces
+        # their transitive functions before the real tool can invoke them.
+        native.write_text("# host-only native resource identity stub\n", encoding="utf-8", newline="\n")
+        activation.write_text("# host-only library activation identity stub\n", encoding="utf-8", newline="\n")
+        health.write_text("param()\n", encoding="utf-8", newline="\n")
+
+        subprocess.run(["git", "init", "-q", str(repo)], cwd=root, check=True, text=True, capture_output=True)
+        engine = root / "engine"
+        factorio = engine / "bin/x64/factorio.exe"
+        factorio.parent.mkdir(parents=True)
+        factorio.write_bytes(b"host-only capture routing engine")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text(json.dumps({"name": "base", "version": "2.0.77"}), encoding="utf-8")
+        library = root / "library"
+        library.mkdir()
+        settings = root / "cap10-settings.dat"
+        settings.write_bytes(bytes.fromhex("020001001400000000050000000000"))
+        settings_hash = hashlib.sha256(settings.read_bytes()).hexdigest().upper()
+        profile = root / "profile.json"
+        output = repo / "build/tmp/capture-routing-output"
+        capture = root / "activation-arguments.json"
+
+        def invoke(name: str, *, mode: str, runner: Path = tool) -> dict:
+            value = {"mods": [], "settings_mode": mode}
+            command = [
+                "pwsh", "-NoProfile", "-File", str(runner),
+                "-ArchiveLibrary", str(library),
+                "-FactorioBin", str(factorio),
+                "-ProfilePath", str(profile),
+                "-OutputRoot", str(output.with_name(f"capture-routing-{name}")),
+                "-RepoRoot", str(repo),
+            ]
+            if mode == "File":
+                value["settings_sha256"] = settings_hash
+                command.extend(["-SettingsPath", str(settings), "-ExpectedSettingsSha256", settings_hash])
+            profile.write_text(json.dumps(value), encoding="utf-8", newline="\n")
+            capture.unlink(missing_ok=True)
+            result = subprocess.run(
+                command,
+                cwd=repo,
+                text=True,
+                capture_output=True,
+                env={**os.environ, "MIR_CAPTURE_ROUTING_CAPTURE": str(capture)},
+            )
+            return {
+                "returncode": result.returncode,
+                "output": result.stdout + result.stderr,
+                "activation": json.loads(capture.read_text(encoding="utf-8")) if capture.exists() else None,
+            }
+
+        mutant = root / "Invoke-PrototypeCapture-defaults-routing-mutant.ps1"
+        mutant.write_text(
+            source.replace(routing_condition, "if ($captureSettings.SettingsMode -ceq 'Defaults')", 1),
+            encoding="utf-8", newline="\n",
+        )
+        return {
+            "file": invoke("file", mode="File"),
+            "defaults": invoke("defaults", mode="Defaults"),
+            "defaults_routing_mutant": invoke("defaults-routing-mutant", mode="Defaults", runner=mutant),
+        }
+
+
+def prototype_capture_linked_settings_case() -> dict:
+    """The real shared reparse guard must reject a linked File-mode input."""
+    capture = str(PROTOTYPE_CAPTURE).replace("'", "''")
+    activation = str(LIBRARY_ACTIVATION).replace("'", "''")
+    script = rf'''
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$captureAst=[Management.Automation.Language.Parser]::ParseFile('{capture}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw 'capture parse failed'}}
+$activationAst=[Management.Automation.Language.Parser]::ParseFile('{activation}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw 'activation parse failed'}}
+foreach($name in @('Assert-MIR5PrototypeCapture','Get-MIR5PrototypeCaptureSha256','Get-MIR5PrototypeCaptureSettingsArguments')){{
+  $node=@($captureAst.FindAll({{param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name}},$true))
+  if($node.Count-ne1){{throw ('capture settings function differs: '+$name)}}
+  Invoke-Expression $node[0].Extent.Text
+}}
+$pathNode=@($activationAst.FindAll({{param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MIRLibraryPath'}},$true))
+if($pathNode.Count-ne1){{throw 'library path guard differs'}}
+Invoke-Expression $pathNode[0].Extent.Text
+$root=Join-Path ([IO.Path]::GetTempPath()) ('mir5-capture-linked-settings-'+[guid]::NewGuid().ToString('N'))
+[IO.Directory]::CreateDirectory($root)|Out-Null
+try{{
+  $target=Join-Path $root 'target.dat'
+  [IO.File]::WriteAllBytes($target,[Convert]::FromHexString('020001001400000000050000000000'))
+  $link=Join-Path $root 'linked.dat'
+  [IO.File]::CreateSymbolicLink($link,$target)|Out-Null
+  $hash=Get-MIR5PrototypeCaptureSha256 $target
+  $accepted=$true;$message=''
+  try{{Get-MIR5PrototypeCaptureSettingsArguments @{{settings_mode='File';settings_sha256=$hash}} $link $hash|Out-Null}}catch{{$accepted=$false;$message=$_.Exception.Message}}
+  [ordered]@{{accepted=$accepted;message=$message;link_attributes=[string](Get-Item -LiteralPath $link -Force).Attributes}}|ConvertTo-Json -Compress
+}} finally {{[IO.Directory]::Delete($root,$true)}}
+'''
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-NonInteractive", "-Command", script],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
 
 
 def native_fixture_observer_guard_cases() -> dict:
@@ -475,6 +899,108 @@ try {{
     return json.loads(result.stdout)
 
 
+def loaded_selection_launch_cases(*, remove_coverage: bool = False) -> dict:
+    """Exercise the actual launch guard over real ZIPs; the endpoint is a counter."""
+    scratch = ROOT / "build/tmp"
+    scratch.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="mir-observation-launch-", dir=scratch) as directory:
+        root = Path(directory).resolve()
+        assert root.is_relative_to(scratch.resolve())
+        library = root / "library"
+        library.mkdir()
+        engine = root / "engine"
+        executable = engine / "bin/x64/factorio.exe"
+        executable.parent.mkdir(parents=True)
+        executable.write_bytes(b"host test; never executed")
+        base = engine / "data/base"
+        base.mkdir(parents=True)
+        (base / "info.json").write_text('{"name":"base","version":"2.1.24"}', encoding="utf-8")
+        (base / "data.lua").write_text("-- native loading entry\n", encoding="utf-8")
+        write_data = root / "write-data"
+        write_data.mkdir()
+        config = root / "config.ini"
+        config.write_text(
+            f"[path]\nread-data={engine / 'data'}\nwrite-data={write_data}\n"
+            "[other]\nenable-new-mods=false\n", encoding="utf-8"
+        )
+
+        def archive(name: str, scripts: tuple[str, ...], *, prefix: str | None = None) -> dict:
+            path = library / f"{name}_1.0.0.zip"
+            prefix = prefix or f"{name}_1.0.0"
+            with zipfile.ZipFile(path, "w") as z:
+                z.writestr(f"{prefix}/info.json", json.dumps({"name": name, "version": "1.0.0"}))
+                for script in scripts:
+                    z.writestr(f"{prefix}/{script}", "-- host fixture\n")
+            return {"name": name, "version": "1.0.0", "path": str(path), "builtin": False,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest().upper()}
+
+        base_row = {"name": "base", "version": "2.1.24", "path": str(base / "info.json"),
+                    "builtin": True, "sha256": "A" * 64}
+        ordinary = archive("ordinary", ("data.lua",), prefix="arbitrary-valid-root")
+        settings = archive("settings-only", ("settings-updates.lua",))
+        assets = archive("assets", ())
+        control = archive("control-only", ("control.lua",))
+        wrong_case = archive("wrong-case", ("Data.lua",))
+        observer = archive("observer", ("data-final-fixes.lua",))
+        control_observer = archive("control-observer", ("control.lua",))
+        broken = archive("unreadable", ("data.lua",))
+        Path(broken["path"]).unlink()
+        cases = []
+
+        def case(name: str, rows: list[dict], observer_name: str = "", *,
+                 script: str = "data-final-fixes.lua", require: bool = True) -> None:
+            cases.append({"name": name, "selected": [base_row, *rows], "observer": observer_name,
+                          "script": script, "require": require})
+
+        case("ordinary", [ordinary])
+        case("settings", [settings])
+        case("assets", [assets])
+        case("control-only", [control])
+        case("wrong-case", [wrong_case])
+        case("valid-observer", [assets, observer], "observer")
+        case("missing-observer", [assets], "observer")
+        case("disabled-observer", [assets], "observer")  # Present on disk, absent from active selection.
+        case("builtin-observer", [assets], "base")
+        case("unbound-observer", [assets, {**observer, "sha256": ""}], "observer")
+        case("wrong-script", [assets, control_observer], "control-observer")
+        case("control-observer", [assets, control_observer], "control-observer", script="control.lua")
+        case("duplicate-observer", [assets, observer, observer], "observer")
+        case("read-failure", [broken])
+        case("no-complete-selection-claim", [assets], require=False)
+        definition = root / "cases.json"
+        definition.write_text(json.dumps(cases), encoding="utf-8")
+        script = r"""
+          Set-StrictMode -Version Latest; $ErrorActionPreference='Stop'
+          . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
+          # The unit is launch admission, not activation/custody already covered elsewhere.
+          function Assert-MIRLibraryActivation { param($Activation,$OwnedProcesses) }
+          if($env:MIR_TEST_REMOVE_COVERAGE-ceq'1') {
+            function Assert-MIRLibraryObservationCoverage { param($Activation,$ActiveModsObserver,$ActiveModsObserverScript) }
+          }
+          $root=$env:MIR_TEST_CASE
+          $rows=Get-Content -Raw -LiteralPath (Join-Path $root 'cases.json')|ConvertFrom-Json
+          $observations=@(foreach($case in $rows) {
+            $activation=[pscustomobject]@{library=(Join-Path $root 'library');engine_data=(Join-Path $root 'engine/data');selected=@($case.selected)}
+            $launches=0; $errorText=$null; $errorType=$null
+            try {
+              Assert-MIRLibraryLaunch -Activation $activation -FactorioBin (Join-Path $root 'engine/bin/x64/factorio.exe') -Arguments @('--config',(Join-Path $root 'config.ini'),'--mod-directory',$activation.library,'--dump-data') -RequireLoadedSelection:$case.require -ActiveModsObserver $case.observer -ActiveModsObserverScript $case.script
+              $launches++  # Stubbed child endpoint. No executable is invoked.
+            } catch {
+              $errorText=$_.Exception.Message
+              $errorType=$_.Exception.GetType().FullName
+              if($_.Exception.InnerException){$errorType+=' / '+$_.Exception.InnerException.GetType().FullName}
+            }
+            [ordered]@{name=$case.name;launches=$launches;error=$errorText;error_type=$errorType}
+          })
+          ConvertTo-Json -InputObject $observations -Depth 10 -Compress
+        """
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                env={**os.environ, "MIR_TEST_REPO": str(ROOT), "MIR_TEST_CASE": str(root),
+                                     "MIR_TEST_REMOVE_COVERAGE": "1" if remove_coverage else "0"},
+                                capture_output=True, text=True, check=True)
+        return {row["name"]: row for row in json.loads(result.stdout)}
+
+
 class CaptureControlTests(unittest.TestCase):
     def test_broad_native_receipts_preserve_failures_and_data_only_scope(self):
         payload = (ROOT / "spec/evidence/broad-ecosystem-f210-b2-native-receipts.json.gz").read_bytes()
@@ -541,6 +1067,83 @@ class CaptureControlTests(unittest.TestCase):
             sorted(path.name for path in FIXTURE.iterdir()),
             ["data-final-fixes.lua", "info-f200.json", "info.json"],
         )
+
+    def test_complete_selection_rejects_unobservable_mods_before_child_launch(self):
+        cases = loaded_selection_launch_cases()
+        for name in ("assets", "control-only", "wrong-case"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 0)
+                self.assertIn("[mir-library-loaded-observer-required]", cases[name]["error"])
+        for name in ("missing-observer", "disabled-observer", "builtin-observer",
+                     "unbound-observer", "wrong-script", "duplicate-observer"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 0)
+                self.assertIn("[mir-library-loaded-observer", cases[name]["error"])
+        self.assertEqual(cases["read-failure"]["launches"], 0)
+        self.assertIn("FileNotFoundException", cases["read-failure"]["error_type"])
+        self.assertNotIn("loaded-observer-required", cases["read-failure"]["error"])
+
+    def test_complete_selection_allows_real_loading_entries_and_bound_observers(self):
+        cases = loaded_selection_launch_cases()
+        for name in ("ordinary", "settings", "valid-observer", "control-observer", "no-complete-selection-claim"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["launches"], 1, cases[name])
+                self.assertIsNone(cases[name]["error"])
+
+    def test_launch_opponent_demonstrates_missing_coverage_would_start_asset_case(self):
+        cases = loaded_selection_launch_cases(remove_coverage=True)
+        self.assertEqual(cases["assets"]["launches"], 1)
+        self.assertIsNone(cases["assets"]["error"])
+
+    def test_full_selection_callers_admit_the_same_observer_before_process_start(self):
+        script = r"""
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          function Observer-Argument($Command) {
+            for($i=0;$i-lt$Command.CommandElements.Count-1;$i++) {
+              $e=$Command.CommandElements[$i]
+              if($e-is[Management.Automation.Language.CommandParameterAst]-and$e.ParameterName-ceq'ActiveModsObserver') {
+                return $Command.CommandElements[$i+1].Extent.Text
+              }
+            }
+            return ''
+          }
+          function Check-Wiring([string]$Text) {
+            $t=$null;$e=$null;$ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$t,[ref]$e)
+            if($e.Count){return $false}
+            $commands=@($ast.FindAll({param($n) $n-is[Management.Automation.Language.CommandAst]},$true))
+            $launches=@($commands|Where-Object {$_.GetCommandName()-ceq'Assert-MIRLibraryLaunch'})
+            $proofs=@($commands|Where-Object {$_.GetCommandName()-ceq'Assert-MIRLibraryLoadedSelection'})
+            $processes=@($commands|Where-Object {$_.GetCommandName()-in@('Invoke-MIRNativeProbeFactorioProcess','Invoke-MIRNativeProbeProcess')})
+            if($launches.Count-ne1-or$proofs.Count-ne1-or$processes.Count-ne1){return $false}
+            $required=@($launches[0].CommandElements|Where-Object {$_-is[Management.Automation.Language.CommandParameterAst]-and$_.ParameterName-ceq'RequireLoadedSelection'})
+            $observer=Observer-Argument $launches[0]
+            return $required.Count-eq1-and$observer-ne''-and$observer-ceq(Observer-Argument $proofs[0])-and$launches[0].Extent.StartOffset-lt$processes[0].Extent.StartOffset-and$processes[0].Extent.StartOffset-lt$proofs[0].Extent.StartOffset
+          }
+          $rows=@(foreach($path in @('tools/Invoke-PrototypeCapture.ps1','tools/Invoke-NativeFixture.ps1','tools/lib/validation/DirectLibraryStartupMeasurement.ps1')) {
+            $text=[IO.File]::ReadAllText((Join-Path $env:MIR_TEST_REPO $path))
+            $t=$null;$e=$null;$ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$t,[ref]$e)
+            $launch=@($ast.FindAll({param($n) $n-is[Management.Automation.Language.CommandAst]-and$n.GetCommandName()-ceq'Assert-MIRLibraryLaunch'},$true))[0]
+            $flag=@($launch.CommandElements|Where-Object {$_-is[Management.Automation.Language.CommandParameterAst]-and$_.ParameterName-ceq'RequireLoadedSelection'})[0]
+            $withoutFlag=$text.Substring(0,$flag.Extent.StartOffset)+$text.Substring($flag.Extent.EndOffset)
+            $argument=Observer-Argument $launch
+            $wrongCall=$launch.Extent.Text.Replace('-ActiveModsObserver '+$argument,"-ActiveModsObserver 'wrong-observer'")
+            $wrongObserver=$text.Substring(0,$launch.Extent.StartOffset)+$wrongCall+$text.Substring($launch.Extent.EndOffset)
+            $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseInput($withoutFlag,[ref]$t,[ref]$e);$flagParses=$e.Count-eq0
+            $t=$null;$e=$null;[void][Management.Automation.Language.Parser]::ParseInput($wrongObserver,[ref]$t,[ref]$e)
+            [ordered]@{path=$path;admitted=Check-Wiring $text;missing_flag=Check-Wiring $withoutFlag;different_observer=Check-Wiring $wrongObserver;missing_flag_parses=$flagParses;different_observer_parses=($e.Count-eq0)}
+          })
+          ConvertTo-Json -InputObject $rows -Depth 6 -Compress
+        """
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                env={**os.environ, "MIR_TEST_REPO": str(ROOT)},
+                                capture_output=True, text=True, check=True)
+        for row in json.loads(result.stdout):
+            with self.subTest(path=row["path"]):
+                self.assertTrue(row["admitted"])
+                self.assertFalse(row["missing_flag"])
+                self.assertFalse(row["different_observer"])
+                self.assertTrue(row["missing_flag_parses"])
+                self.assertTrue(row["different_observer_parses"])
 
     def test_fixture_reports_the_actual_mod_table_in_sorted_order_once(self):
         mods = self.lua.table_from({
@@ -641,6 +1244,30 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("maximum allowed range", cases["over_limit"]["output"])
         self.assertNotIn("missing-factorio.exe", cases["over_limit"]["output"])
 
+    def test_prototype_capture_selects_explicit_headless_argv_and_preserves_gui_default(self):
+        cases = prototype_capture_argument_cases()
+        common = ["--config", "C:/capture/space dir/config.ini", "--mod-directory", "C:/MIR/test mods", "--no-log-rotation"]
+        self.assertEqual([*common, "--disable-audio", "--dump-data"], cases["default_gui"])
+        self.assertEqual(cases["default_gui"], cases["explicit_gui"])
+        # The real headless 2.0.77 CLI rejects --disable-audio. This expected
+        # vector also opposes accidentally appending the GUI option universally.
+        self.assertEqual([*common, "--dump-data"], cases["headless"])
+        source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+        self.assertIn("$arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)", source)
+        self.assertIn("headless_requested=[bool]$Headless", source)
+        self.assertIn("$record.arguments = $arguments", source)
+
+    def test_native_fixture_shares_headless_selection_and_preserves_legacy_cli_exclusions(self):
+        cases = native_fixture_argument_cases()
+        common = ["--config", "C:/capture/space dir/config.ini", "--mod-directory", "C:/MIR/test mods", "--no-log-rotation"]
+        for name in ("modern_gui", "legacy110_gui", "f110_process_gui"):
+            with self.subTest(case=name):
+                self.assertEqual([*common, "--disable-audio", "--benchmark", "owned-input.zip"], cases[name])
+        for name in ("modern_headless", "legacy013_gui", "legacy014_gui", "legacy110_headless"):
+            with self.subTest(case=name):
+                self.assertEqual([*common, "--benchmark", "owned-input.zip"], cases[name])
+        self.assertIn("headless_requested=[bool]$Headless", NATIVE_FIXTURE.read_text(encoding="utf-8"))
+
     def test_prototype_capture_refuses_declared_selected_inputs_before_output_or_admission(self):
         cases = prototype_capture_declared_input_guard_cases()
 
@@ -667,6 +1294,94 @@ class CaptureControlTests(unittest.TestCase):
         self.assertEqual(cases["call_removed"]["returncode"], 0, cases["call_removed"]["output"])
         self.assertFalse(cases["call_removed"]["output_exists"])
         self.assertFalse(cases["call_removed"]["controls_exist"])
+
+    def test_prototype_capture_binds_only_hash_declared_file_settings_before_admission(self):
+        cases = prototype_capture_file_settings_guard_cases()
+
+        for name in ("valid", "lowercase_valid", "mixed_case_valid", "defaults"):
+            with self.subTest(name=name):
+                self.assertEqual(cases[name]["returncode"], 0, cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        expected = {
+            "file_without_inputs": "File settings profile requires explicit SettingsPath and ExpectedSettingsSha256",
+            "path_without_hash": "SettingsPath and ExpectedSettingsSha256 must be supplied together",
+            "hash_without_path": "SettingsPath and ExpectedSettingsSha256 must be supplied together",
+            "malformed_hash": "ExpectedSettingsSha256 requires a 64-character SHA-256",
+            "default_profile": "File settings require profile settings_mode File",
+            "profile_hash_mismatch": "File settings profile SHA-256 differs from expected input",
+            "missing_profile_hash": "File settings profile requires a 64-character settings_sha256",
+            "missing_file": "SettingsPath must name an existing regular file",
+            "changed_file": "SettingsPath SHA-256 differs from expected input",
+            "old_case_sensitive_lowercase": "File settings profile SHA-256 differs from expected input",
+        }
+        for name, message in expected.items():
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn(f"[mir5-prototype-capture] {message}", cases[name]["output"])
+                self.assertFalse(cases[name]["output_exists"])
+                self.assertFalse(cases[name]["controls_exist"])
+
+        # The original Defaults-only entry point accepted this File profile
+        # without a supplied file. Its acceptance is the counterfactual that
+        # the real preflight above must reject.
+        self.assertEqual(cases["old_file_without_inputs"]["returncode"], 0,
+                         cases["old_file_without_inputs"]["output"])
+        self.assertFalse(cases["old_file_without_inputs"]["output_exists"])
+        self.assertFalse(cases["old_file_without_inputs"]["controls_exist"])
+
+        linked = prototype_capture_linked_settings_case()
+        self.assertFalse(linked["accepted"], linked)
+        self.assertIn("[mir-library-reparse]", linked["message"])
+
+        source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
+        self.assertIn(
+            "$captureSettings = Get-MIR5PrototypeCaptureSettingsArguments "
+            "-ProfileDefinition $profileDefinition -Path $SettingsPath "
+            "-ExpectedSha256 $ExpectedSettingsSha256",
+            source,
+        )
+        self.assertIn("SettingsMode=$captureSettings.SettingsMode", source)
+        self.assertIn("$activationArguments.SettingsPath = $captureSettings.SettingsPath", source)
+        self.assertIn("$activationArguments.SettingsSha256 = $captureSettings.SettingsSha256", source)
+        self.assertIn("$activation = Start-MIRLibraryActivation @activationArguments", source)
+        self.assertIn("settings=[ordered]@{mode=$captureSettings.SettingsMode", source)
+
+    def test_prototype_capture_routes_file_settings_to_activation_without_native_work(self):
+        cases = prototype_capture_file_settings_activation_routing_cases()
+
+        for name in ("file", "defaults"):
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn("HOST_ACTIVATION_BOUNDARY", cases[name]["output"])
+                self.assertIsNotNone(cases[name]["activation"])
+
+        file_activation = cases["file"]["activation"]
+        self.assertEqual(file_activation["settings_mode"], "File")
+        self.assertEqual(file_activation["settings_sha256"], hashlib.sha256(
+            bytes.fromhex("020001001400000000050000000000")
+        ).hexdigest().upper())
+        self.assertTrue(Path(file_activation["settings_path"]).is_absolute())
+        self.assertIn("SettingsPath", file_activation["keys"])
+        self.assertIn("SettingsSha256", file_activation["keys"])
+
+        defaults_activation = cases["defaults"]["activation"]
+        self.assertEqual(defaults_activation["settings_mode"], "Defaults")
+        self.assertIsNone(defaults_activation["settings_path"])
+        self.assertIsNone(defaults_activation["settings_sha256"])
+        self.assertNotIn("SettingsPath", defaults_activation["keys"])
+        self.assertNotIn("SettingsSha256", defaults_activation["keys"])
+
+        # This mutation retains every existing source-string assertion above,
+        # but reverses the actual routing branch.  Its Defaults call wrongly
+        # splats File-only keys, proving this is an execution-path control.
+        mutant = cases["defaults_routing_mutant"]
+        self.assertNotEqual(mutant["returncode"], 0)
+        self.assertIn("HOST_ACTIVATION_BOUNDARY", mutant["output"])
+        self.assertIsNotNone(mutant["activation"])
+        self.assertIn("SettingsPath", mutant["activation"]["keys"])
+        self.assertIn("SettingsSha256", mutant["activation"]["keys"])
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")

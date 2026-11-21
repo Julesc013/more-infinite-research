@@ -1,0 +1,249 @@
+{
+  "kind": "MIRLibraryRetainedRootColdNativeEvidenceV1",
+  "status": "accepted-one-retained-root-cold-observation",
+  "scope": "One zero-input cold observation of the exact private5.0.21018/9127 player on Linux2.1.24/Base, from the retained E086 save. No source session or earlier nine inputs replayed.",
+  "player": {
+    "source_commit": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "player_tree": "e2df21fbf5ae0fe3b359dc5b70e28be96b549045",
+    "distribution_version": "5.0.21018",
+    "private_unpublished": true,
+    "archive_bytes": 1053436,
+    "archive_sha256": "9127C343F1A2311F06287FCB97094059B6F6F802E7A3198B71B5E6CACC2EC14D"
+  },
+  "engine": {
+    "version": "2.1.24",
+    "platform": "Linux graphical server and German client; Base only",
+    "executable_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "base_info_sha256": "9565BEF9FCC0E53C032D0DD238B467CFFE4DED03466F3CF65E8F1D84AAF4637C"
+  },
+  "controller": {
+    "source_head": "60add71edfb69319bcca8b24d74530aa350c8821",
+    "source_tree": "6d5502d078560f6e61b1d4a606d090a5ab90f236",
+    "owner_sha256": "AB3CD58A56610FB3F9C76729C8B31A2361690D0D344E7149D5208176B7716431",
+    "actor": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-candidate18-restart-aero-r01/build/tmp/library518-retained-root-cold-r05/Run-Candidate18RetainedRootCold-r06.py",
+      "bytes": 17407,
+      "sha256": "F70D5F376B48FBCBE82697D2F99F8C714467E97C8A4CF2AEACC3165A53A71C02"
+    },
+    "packet_sha256": "DAAC9EDD94524F74AC71289EEC6FE9883859DB40CC563A961E91A76C0507336B",
+    "composition_sha256": "3D342267059501675CAE786C38ACE4FDE679F3397998925FE34A954718795343",
+    "composition_review_sha256": "A063570B1B6F03D6E024CEA72D00642DE9505B38AE860008F1FD99817AA2CAC6",
+    "custody_helper_sha256": "F4BE1A1D1D812DE78B6C27D8F2C0DBFE5D1D0FB7D04B85CC2230404028963047",
+    "resource_runs": {
+      "compose_exit": 0,
+      "execute_exit": 0
+    }
+  },
+  "fixture": {
+    "name": "mir-fixture-library-localized-search-native",
+    "version": "0.1.3",
+    "archive_sha256": "AAEBC1B50587DD9EA01F6CDD2B754AA1E0DF11245254A0F1E1DD35613911F1D0",
+    "instrumentation_revision": "candidate18-retained-root-cold-r02",
+    "instrumentation_limit": "The retained-root passive instrumentation differs from the earlier full input observer. Its saved original event envelope remains an observed input, not a new sequence of inputs."
+  },
+  "native": {
+    "factorio_processes": 2,
+    "server": {
+      "pid": 615898,
+      "exit_code": 0,
+      "controlled": true,
+      "forced": false
+    },
+    "german_client": {
+      "pid": 616037,
+      "exit_code": 0,
+      "controlled": true,
+      "forced": false
+    },
+    "input_events": 0,
+    "cold_observations": 1,
+    "configuration_changed_observed": false,
+    "active_mods": "base@2.1.24|mir-fixture-library-localized-search-native@0.1.3|mir-fixture-mir5-active-mods-observer@0.1.0|mir-fixture-mir5-api-alpha@0.1.0|mir-fixture-mir5-api-beta@0.1.0|more-infinite-research@5.0.21018",
+    "observation": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-candidate18-restart-aero-r01/build/p/library518-retained-root-cold-r07/case/restart-session/client-de/write-data/script-output/mir-library-localized-search-candidate18-retained-root-cold/retained-root.json",
+      "bytes": 1501,
+      "sha256": "48CDD2E87CC29D873911EA5F7E8E40061F6153F14CED18FA8552D3B62D5A79CD"
+    },
+    "observed_snapshot": {
+      "stage": "retained-root-cold",
+      "tick": 30807,
+      "native": {
+        "force": "player",
+        "gear": {
+          "name": "recipe-prod-research_gears-1",
+          "level": 3,
+          "researched": false,
+          "enabled": true
+        },
+        "gear_productivity": 0.2,
+        "current": false,
+        "progress": 0,
+        "queue": {},
+        "worker_robots_storage_bonus": 0
+      },
+      "geometry": {
+        "x": 320,
+        "y": 54,
+        "minimal_width": 853,
+        "maximal_width": 853,
+        "minimal_height": 720,
+        "maximal_height": 720,
+        "display_scale": 0.75,
+        "display_width": 1280,
+        "display_height": 720
+      },
+      "tab_bar": {
+        "name": "mir_library_tabs",
+        "type": "tabbed-pane",
+        "minimal_width": 821,
+        "maximal_width": 821
+      },
+      "tab_bar_index": 601,
+      "query": "Eisenzahnrad",
+      "result": {
+        "count": 1,
+        "icon": "[img=technology/recipe-prod-research_gears-1] ",
+        "caption": "Eisenzahnrad-Produktivität"
+      },
+      "retained_root": {
+        "owned": true,
+        "opened_owned": true,
+        "opened_absent": false
+      }
+    },
+    "original_observer": {
+      "phase": "await-restart-join",
+      "events": {
+        "joined": 1,
+        "shortcut": 2,
+        "tab_click": 2,
+        "tab_selected": 2,
+        "query_click": 1,
+        "clear": 1,
+        "text": 12,
+        "close": 0,
+        "restart_join": 0
+      },
+      "snapshot_count": 10
+    },
+    "retained_phase09_sha256": "24B75330A12AC709602C87E2333DC52BA8757BC8085C1134E1F1AE7EADC35526",
+    "native_query_result_geometry_tab_bar_exactly_match_phase09": true,
+    "capture": {
+      "path": "/home/jules/Projects/Factorio/MIR/.task-builds/linux-library-localized-search-candidate18-restart-aero-r01/build/p/library518-retained-root-cold-r07/case/restart-session/captures/retained-root-cold.png",
+      "bytes": 1195109,
+      "sha256": "B95660895C054664AD6C2FCCB3AB6435C6915B87D663A5CF1433A11CABB818BD"
+    },
+    "rendered_review": "The actual 1280x720 PNG shows the opened German Library, retained Eisenzahnrad search and one Eisenzahnrad-Produktivität result, level 3 and 20% recipe bonus. Numeric scale 0.75; no new input or all-scale parity claim."
+  },
+  "save_custody": {
+    "protected_source_sha256": "E08608B3BF796A3686428547CFF21774506B26EB9FACAA3CF36F306B2AEEC6E8",
+    "protected_source_bytes": 1451408,
+    "protected_source_unchanged": true,
+    "protected_source_device_inode": "2067:2360320",
+    "initial_cold_working_copy_sha256": "E08608B3BF796A3686428547CFF21774506B26EB9FACAA3CF36F306B2AEEC6E8",
+    "initial_cold_working_copy_device_inode": "2067:2393640",
+    "working_copy_distinct_from_protected": true,
+    "mutable_quit_save_sha256": "CC5B3AC671C78911F6C79F75843094EB7E40422C705DE51FA0CBA1B93AA29C50",
+    "mutable_quit_save_bytes": 1459665,
+    "limit": "The working copy changes on controlled server exit; only the protected original is required to remain E086. No second cold load of the successor is claimed."
+  },
+  "restoration": {
+    "owner_restored": true,
+    "restoration_errors": [],
+    "display_cleanup": {
+      "restart": {
+        "processes": [
+          {
+            "label": "client-de",
+            "pid": 616037,
+            "exit_code": 0,
+            "controlled_shutdown": true,
+            "forced": false
+          },
+          {
+            "label": "display-de",
+            "pid": 616028,
+            "exit_code": 0,
+            "controlled_shutdown": true,
+            "forced": false
+          },
+          {
+            "label": "server",
+            "pid": 615898,
+            "exit_code": 0,
+            "controlled_shutdown": true,
+            "forced": false
+          },
+          {
+            "display_role": "de",
+            "result": {
+              "authority_removed": true,
+              "cleanup_errors": [],
+              "display": ":194",
+              "display_exit": 0,
+              "display_identity": {
+                "pid": 616031,
+                "session_id": 615875,
+                "start_ticks": 51179268
+              },
+              "factorio_processes": 0,
+              "geometry": [
+                1280,
+                720
+              ],
+              "global_display_restored": true,
+              "kind": "MIRLinuxLibraryDisplayResultV1",
+              "pins_rechecked": true,
+              "private_viewer_restored": true,
+              "role": "client-de",
+              "status": "stop"
+            }
+          }
+        ],
+        "errors": [],
+        "remaining_owned_session_processes": [],
+        "verified": true
+      }
+    },
+    "canonical_current_archive_sha256_after_restore": "001189ACF5D2030FADD91A369E2B2E0FB7B2A3CDE0FF7285934823C064650A2E",
+    "temporary_fixtures_controls_journals_absent": true,
+    "owned_pids_absent": true
+  },
+  "custody": {
+    "original_file_count": 41,
+    "original_bytes": 8445397,
+    "manifest": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-retained-root-cold-only-r01/native-r10/remote-originals-manifest-r01.json",
+      "bytes": 6445,
+      "sha256": "61AAF997FC1868B3AE660CD26E2D4A6CB030E23DED2267E0FBF19E67042E30AB"
+    },
+    "local_readback": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-retained-root-cold-only-r01/native-r10/local-originals-readback-r01.json",
+      "bytes": 529,
+      "sha256": "18FECA786ED9C3DC7D6A6FF22C7121C2D455106AAA5F60B202C220DC9C7E44AE"
+    },
+    "independent_result_visual_review": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-retained-root-cold-only-r01/native-r10/r10-actual-cold-independent-result-visual-review-r01.json",
+      "bytes": 6036,
+      "sha256": "E8EBA65B6FC3CBB44C33597E38EAF08C4D33F860337A5582954B9BF97DCDE9C5"
+    },
+    "raw_originals": "build/qualification/library-localized-search-input-preparation-r01/candidate18-retained-root-cold-only-r01/native-r10/originals",
+    "independent_review_identity_correction": {
+      "path": "build/qualification/library-localized-search-input-preparation-r01/candidate18-retained-root-cold-only-r01/native-r10/r10-actual-cold-independent-result-visual-review-r02-identity-correction.json",
+      "bytes": 1826,
+      "sha256": "5CBD8454A22F0F19D058FCD9AC3EF490FED1441F152A4AE5A27D5BA198311AF5"
+    }
+  },
+  "retained_adverses": [
+    "Earlier protected cold-only attempt stopped on system-disk admission before engine launch.",
+    "Canonical custody preparation first omitted required display consumer fields; actual owner refused before resource context.",
+    "The next preparation refused two retained partial intake subdirectories; exact partial bytes were preserved to existing primary qualification custody. A missing expected.path check was separately corrected and opposed.",
+    "A later preparation refused the separate worker Foundation process. Its actual handle and the filesystem timing overlap were disclosed; no Foundation timing result is adopted."
+  ],
+  "limits": [
+    "This exact private18/9127 result is not a native execution of current EC9 or another current package.",
+    "One German Base-only cold endpoint at1280x720/scale0.75. No repeated cold, new input, whole Library, Windows, export, multiplayer or all-scale qualification.",
+    "No original reporter resolution, worker-cargo history/science/cap result, performance, release or stable acceptance.",
+    "Published17 and other earlier adverse/native records remain unchanged."
+  ]
+}

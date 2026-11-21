@@ -10,17 +10,23 @@ local M = {}
 local AGRICULTURE_BUCKET = "agricultural_growth_speed"
 local SPOILAGE_BUCKET = "spoilage_preservation"
 
-local function resolved_config(values)
-  -- Factorio reloads the control chunk when its active-mod set changes, so
-  -- these fields are present for a real Space Age save. Keep a conservative
-  -- inactive shape for a host reload that intentionally reuses a base-only
-  -- settings module; it cannot grant an effect or cap ownership.
-  if type(values) ~= "table" then return {enabled = false, per_level_percent = 0} end
-  return {enabled = values.enabled == true, per_level_percent = values.effect_percent}
+local function resolved_config(name)
+  if type(effective_values) ~= "table" then
+    error("MIR scripted-effects requires a resolved configuration table", 2)
+  end
+  local values = effective_values[name]
+  if type(values) ~= "table" or type(values.enabled) ~= "boolean" then
+    error("MIR scripted-effects requires resolved " .. name .. " configuration", 2)
+  end
+  local percent = values.effect_percent
+  if type(percent) ~= "number" or percent ~= percent or percent < 0 or percent == math.huge then
+    error("MIR scripted-effects requires finite nonnegative " .. name .. " effect_percent", 2)
+  end
+  return {enabled = values.enabled, per_level_percent = percent}
 end
 
-local agriculture_config = resolved_config(effective_values.agricultural_growth_speed)
-local spoilage_config = resolved_config(effective_values.spoilage_preservation)
+local agriculture_config = resolved_config("agricultural_growth_speed")
+local spoilage_config = resolved_config("spoilage_preservation")
 local scripted_effect_diagnostics = type(effective_values.options) == "table"
   and effective_values.options["mir-debug-scripted-effects"] == true
 

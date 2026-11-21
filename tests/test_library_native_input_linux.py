@@ -27,7 +27,8 @@ ENGINE_SHA = "A" * 64
 def valid_spec(action="escape", **changes):
     spec = {
         "schema": 1,
-        "kind": "MIRLibraryNativeInputV1",
+        "kind": ("MIRLinuxLibraryNativeClearTextV1" if action == "clear"
+                 else "MIRLibraryNativeInputV1"),
         "role": "client-en",
         "process_id": 4242,
         "process_start_utc": "2026-11-17T00:00:00Z",
@@ -67,12 +68,14 @@ def valid_binding(spec, **changes):
 class MockBackend:
     """A traceable XTest-shaped double; it has no process or X-server effects."""
 
-    keycodes = {"Escape": 9, "Tab": 23, "Shift_L": 50, "e": 26,
-                "A": 38, "z": 52, " ": 65}
+    keycodes = {"Escape": 9, "Tab": 23, "BackSpace": 22, "Shift_L": 50,
+                "Control_L": 37, "e": 26, "a": 38, "A": 38, "z": 52, " ": 65}
 
     def __init__(self, spec, binding, *, stolen_focus=False, mapped=True,
                  title="Factorio 2.1", pid=None, bounds=None, modifiers=0,
-                 group=0, reject=None, close_error=None):
+                 group=0, reject=None, close_error=None,
+                 changed_window_after_key_events=None, lose_focus_after_key_events=None,
+                 shifted_symbols=()):
         self.spec = spec
         self.binding = binding
         self.stolen_focus = stolen_focus
@@ -84,13 +87,21 @@ class MockBackend:
         self.group = group
         self.reject = reject
         self.close_error = close_error
+        self.changed_window_after_key_events = changed_window_after_key_events
+        self.lose_focus_after_key_events = lose_focus_after_key_events
+        self.shifted_symbols = set(shifted_symbols)
         self.events = []
+        self.key_event_count = 0
         self.focused_window = None
         self.close_calls = 0
 
     def window(self, binding, spec):
+        title = self.title
+        if (self.changed_window_after_key_events is not None
+                and self.key_event_count >= self.changed_window_after_key_events):
+            title = "other program"
         return {"pid": self.pid, "bounds": list(self.bounds),
-                "mapped": self.mapped, "title": self.title}
+                "mapped": self.mapped, "title": title}
 
     def focus(self, window):
         self.events.append(("focus", window))
@@ -98,6 +109,9 @@ class MockBackend:
             self.focused_window = window
 
     def focused(self):
+        if (self.lose_focus_after_key_events is not None
+                and self.key_event_count >= self.lose_focus_after_key_events):
+            return None
         return self.focused_window
 
     def modifiers(self):
@@ -107,11 +121,12 @@ class MockBackend:
         return self.group
 
     def keycode(self, symbol):
-        return self.keycodes[symbol], symbol == "A"
+        return self.keycodes[symbol], symbol == "A" or symbol in self.shifted_symbols
 
     def key(self, code, down):
         self.events.append(("key", code, down))
-        return 0 if self.reject == "key" else 1
+        self.key_event_count += 1
+        return 0 if self.reject in ("key", ("key", code, down)) else 1
 
     def motion(self, x, y):
         self.events.append(("motion", x, y))
@@ -202,6 +217,24 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
             lambda: ACTOR.validate_spec(valid_spec("text", text="café")), "text differs"
         )
 
+    def test_linux_clear_schema_is_distinct_from_the_unchanged_legacy_actions(self):
+        clear = valid_spec("clear")
+        self.assertIs(ACTOR.validate_spec(clear), clear)
+        self.assert_refuses(
+            lambda: ACTOR.validate_spec(valid_spec("clear", kind="MIRLibraryNativeInputV1")),
+            "action differs",
+        )
+        self.assert_refuses(
+            lambda: ACTOR.validate_spec(
+                valid_spec("escape", kind="MIRLinuxLibraryNativeClearTextV1")
+            ),
+            "action differs",
+        )
+        self.assert_refuses(
+            lambda: ACTOR.validate_spec(valid_spec("clear", text="gear")),
+            "spec fields differ",
+        )
+
     def test_binding_requires_exact_role_identity_private_display_paths_and_bounds(self):
         spec = valid_spec("escape")
         for changed, message in (
@@ -257,6 +290,31 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
                 )
                 self.assertEqual([row["down"] for row in trace], [True, False])
 
+    def test_linux_clear_emits_only_control_a_then_backspace(self):
+        spec = valid_spec("clear")
+        trace, backend, _, pauses = self.perform(spec)
+        self.assertEqual(pauses, [0.1, 0.05, 0.1])
+        self.assertEqual(
+            [event for event in backend.events if event[0] == "key"],
+            [("key", 37, True), ("key", 38, True), ("key", 38, False),
+             ("key", 37, False), ("key", 22, True), ("key", 22, False)],
+        )
+        self.assertEqual(
+            [(row["keycode"], row["down"], row["cleanup"]) for row in trace],
+            [(37, True, False), (38, True, False), (38, False, False),
+             (37, False, False), (22, True, False), (22, False, False)],
+        )
+        self.assertTrue(all(row["accepted_by_xtest"] for row in trace))
+
+    def test_linux_clear_refuses_a_nonplain_key_mapping_before_any_key(self):
+        spec = valid_spec("clear")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding, shifted_symbols={"a"})
+        with self.assertRaisesRegex(ACTOR.InputError, "key mapping differs") as caught:
+            self.perform(spec, backend=backend, binding=binding)
+        self.assertEqual(caught.exception.trace, [])
+        self.assertFalse(any(event[0] == "key" for event in backend.events))
+
     def test_drag_uses_only_its_finite_100_by_40_schedule(self):
         spec = valid_spec("drag")
         trace, backend, _, pauses = self.perform(spec)
@@ -272,7 +330,7 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
         self.assertEqual([row["api"] for row in trace].count("XTestFakeButtonEvent"), 2)
 
     def test_stolen_focus_or_changed_owned_window_refuses_before_an_input_event(self):
-        spec = valid_spec("escape")
+        spec = valid_spec("clear")
         binding = valid_binding(spec)
         for backend, message in (
             (MockBackend(spec, binding, stolen_focus=True), "owned window lost focus"),
@@ -287,7 +345,7 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
                 self.assertFalse(any(event[0] in ("key", "motion", "button") for event in backend.events))
 
     def test_live_window_pid_or_geometry_mismatch_refuses_before_an_input_event(self):
-        spec = valid_spec("escape")
+        spec = valid_spec("clear")
         binding = valid_binding(spec)
         for backend in (
             MockBackend(spec, binding, pid=4243),
@@ -337,6 +395,71 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
         self.assertEqual([event for event in backend.events if event[0] == "motion"],
                          [("motion", 100, 100)])
 
+    def test_clear_guard_loss_mid_chord_releases_a_then_control_without_new_input(self):
+        spec = valid_spec("clear")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding)
+        with self.assertRaisesRegex(ACTOR.InputError, "guard refused") as caught:
+            self.perform(spec, backend=backend, binding=binding, fail_guard_at=5)
+        trace = caught.exception.trace
+        self.assertEqual(
+            [(row["keycode"], row["down"], row["cleanup"]) for row in trace],
+            [(37, True, False), (38, True, False), (38, False, True),
+             (37, False, True)],
+        )
+        self.assertEqual(
+            [event for event in backend.events if event[0] == "key"],
+            [("key", 37, True), ("key", 38, True), ("key", 38, False),
+             ("key", 37, False)],
+        )
+
+    def test_clear_rechecks_lifetime_window_and_foreground_before_each_key_edge(self):
+        spec = valid_spec("clear")
+        binding = valid_binding(spec)
+
+        def lifetime_changed():
+            lifetime_changed.calls += 1
+            if lifetime_changed.calls == 4:
+                raise ACTOR.InputError("process lifetime differs")
+
+        lifetime_changed.calls = 0
+        cases = (
+            (MockBackend(spec, binding), lifetime_changed, "process lifetime differs"),
+            (MockBackend(spec, binding, changed_window_after_key_events=1),
+             lambda: None, "owned window differs"),
+            (MockBackend(spec, binding, lose_focus_after_key_events=1),
+             lambda: None, "owned window lost focus"),
+        )
+        for backend, guard, message in cases:
+            with self.subTest(message=message), self.assertRaisesRegex(ACTOR.InputError, message) as caught:
+                ACTOR.perform(spec, binding, backend, guard, lambda _: None)
+            self.assertEqual(
+                [event for event in backend.events if event[0] == "key"],
+                [("key", 37, True), ("key", 37, False)],
+            )
+            self.assertEqual(
+                [(row["keycode"], row["down"], row["cleanup"])
+                 for row in caught.exception.trace],
+                [(37, True, False), (37, False, True)],
+            )
+
+    def test_clear_refusal_at_select_key_releases_the_accepted_control_modifier(self):
+        spec = valid_spec("clear")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding, reject=("key", 38, True))
+        with self.assertRaisesRegex(ACTOR.InputError, "XTestFakeKeyEvent refused") as caught:
+            self.perform(spec, backend=backend, binding=binding)
+        self.assertEqual(
+            [(row["keycode"], row["down"], row["cleanup"], row["accepted_by_xtest"])
+             for row in caught.exception.trace],
+            [(37, True, False, True), (38, True, False, False),
+             (37, False, True, True)],
+        )
+        self.assertEqual(
+            [event for event in backend.events if event[0] == "key"],
+            [("key", 37, True), ("key", 38, True), ("key", 37, False)],
+        )
+
     def test_non_numlock_modifier_or_nonzero_keyboard_group_refuses_before_input(self):
         spec = valid_spec("escape")
         binding = valid_binding(spec)
@@ -350,7 +473,7 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
                 self.assertFalse(any(event[0] == "key" for event in backend.events))
 
     def test_validate_only_never_opens_x_or_reads_the_nonexistent_process_paths(self):
-        spec = valid_spec("escape", process_id=999_991)
+        spec = valid_spec("clear", process_id=999_991)
         binding = valid_binding(
             spec,
             engine_path="/missing/factorio/bin/x64/factorio",

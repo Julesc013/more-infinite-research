@@ -1,0 +1,126 @@
+{
+  "kind": "MIRPublished15SourceProducerEvidenceV1",
+  "status": "accepted_source_production_and_same_version_cold_only",
+  "scope": "Disposable Factorio2.0.77/SE0.7.57/published5.0.20015 cap-zero predecessor. No candidate transition, ordinary successor research, two successor cold reloads, original reporter, performance or release/stable qualification.",
+  "actor": {
+    "commit": "8cf9d9557fe405d62213a692cd2806c489290bb4",
+    "tree": "881bf18097351e4b51357b6ab5e0b197e57e2b0f",
+    "fixture": {
+      "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-corrected-producer-gunmetal-r01/inputs/mir-fixture-mir5-worker-speed-cap-ten_0.13.0.zip",
+      "bytes": 17796,
+      "sha256": "E20420672B88C0D01A1EB8172A0CC627A0258A4E65C4BCB665821F877444FA27"
+    }
+  },
+  "player": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "runner_commit": "3e1bba5d9ee88bffefa0ce97d7d0930e406a40a9",
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "mir-fixture-mir5-worker-speed-cap-ten": "0.13.0",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5"
+  },
+  "budgets": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 2
+  },
+  "packet": {
+    "path": "build\\qualification\\source15-corrected-producer-gunmetal-r04\\packet-corrected-r04.json",
+    "sha256": "41CE7D6B5FD44905D3E6C5242CD4AD86120F787A7CCE5203392A0793E3F18BC4"
+  },
+  "owner": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-corrected-producer-gunmetal-r04/Invoke-CorrectedProducer-r04.ps1",
+    "bytes": 17204,
+    "sha256": "7860C68C337A3AF0C82F0CFC232C6F8101E3DB9555AFADD120264BFA63FB726C"
+  },
+  "reader": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/Verify-Source15Producer.py",
+    "bytes": 5369,
+    "sha256": "89F70778A4A856CCAA6E44AF67A1C364BDE20CDB5EA6CDA06D0BD05A6F36CE19"
+  },
+  "compose": {
+    "path": "build\\qualification\\source15-corrected-producer-gunmetal-r04\\composition-corrected-r04.json",
+    "sha256": "30A501B0508CDCC208CC4675ED0D41B28DB6422B054C83C37F5383C22C71604C",
+    "native_processes": 0
+  },
+  "terminal": {
+    "path": "build\\qualification\\source15-corrected-producer-gunmetal-r04\\terminal-corrected-r04.json",
+    "sha256": "9B92EC2C4C67FBC09012AC2F9F835572224486C6DF35ADBBED8CFF883DE1FDE8",
+    "status": "observed-source-create-and-same-version-cold-independent-review-required",
+    "failure": null,
+    "native_processes": 2,
+    "owned_pids": [
+      231939,
+      234967
+    ],
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "stages": [
+    {
+      "stage": "source",
+      "exit_code": 0,
+      "reader_output": [
+        "PASS exact new-producer public frames and fifteen named rows; no upgrade qualification"
+      ],
+      "selected_mod_count": 20
+    },
+    {
+      "stage": "cold",
+      "exit_code": 0,
+      "reader_output": [
+        "PASS exact new-producer public frames and fifteen named rows; no upgrade qualification"
+      ],
+      "selected_mod_count": 20
+    }
+  ],
+  "protected_source": {
+    "path": "build\\qualification\\source15-corrected-producer-gunmetal-r04\\protected\\source.zip",
+    "bytes": 842143,
+    "sha256": "D6C2842F75083976D52FF2964F12375867840A87ADCBD6A7186AC8E10F7E5686",
+    "zip_members": 55,
+    "crc_passed": true,
+    "fixture_state": "source-producer-ready"
+  },
+  "readback": {
+    "path": "build\\qualification\\source15-corrected-producer-gunmetal-r04\\EXECUTE-READBACK-r04.json",
+    "sha256": "BA2EEC110DE301F261FC4A0ACF07BF54D71A21E29D2A567F6EA93492D49F6FED",
+    "files": 27,
+    "all_local_lengths_and_hashes_reverified": true
+  },
+  "independent_review": {
+    "path": "build\\qualification\\source15-corrected-producer-review-r01\\INDEPENDENT-R04-ACTUAL-PRODUCER-RESULT-REVIEW-r01.json",
+    "sha256": "8AD173BD35D8A6CE19880B3414006946977F2E935520EAFFA48D6B408D5F04F9",
+    "verdict": "bounded producer input accepted"
+  },
+  "adverse_identity_policy": "Original Windows admissions, unsupported headless flag, diagnostic and controller failures, and r03 precontext lane refusal retain their original identities. No adverse save is consumed by this accepted run; no old receipt is relabelled."
+}

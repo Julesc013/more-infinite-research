@@ -97,13 +97,15 @@ class RecipeSchemaRepairTests(unittest.TestCase):
 
     def test_real_data_entry_loads_the_body_only_for_the_two_admitted_versions(self):
         import test_generator
-        test_generator.LuaRuntime = LuaRuntime
         for selected in (False, True):
             with self.subTest(selected=selected):
-                host = test_generator.GeneratorTests("runTest")
-                host.setUp()
-                host.lua.globals().selected = selected
-                host.lua.execute('''
+                host = test_generator.build_generator_world(
+                    LuaRuntime, source_root=ROOT / "source",
+                    science_sources=test_generator.SCIENCE_SOURCE_ORACLE["profiles"],
+                    material_native=test_generator.K2SO_MATERIAL_NATIVE,
+                )
+                host.globals().selected = selected
+                host.execute('''
                   local environment = full_world({})
                   local recipe = {category="old",additional_categories={"other"},results={{name="ash",amount=1,probability=.25}}}
                   environment.raw.recipe["atan-ash-seperation"] = recipe
@@ -137,7 +139,7 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                 ''')
                 actual = {
                     row["name"]: test_generator.plain_lua(row)
-                    for row in host.lua.globals().schema_output.values()
+                    for row in host.globals().schema_output.values()
                 }
                 self.assertEqual(actual.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
                 canonical = expected_private_worker_row()
@@ -148,7 +150,7 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                     self.assertEqual(actual.pop(name), expected)
                 public = verified_public_rows(
                     actual,
-                    {str(name) for name in host.lua.globals().schema_recipes.keys()},
+                    {str(name) for name in host.globals().schema_recipes.keys()},
                 )
                 self.assertEqual(len(public), 54)
 

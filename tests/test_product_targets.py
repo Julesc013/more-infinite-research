@@ -189,6 +189,71 @@ class ProductTargetTests(unittest.TestCase):
           assert(not ok)
         ''')
 
+    def test_k2se_advanced_science_cards_are_research_inputs_not_productivity_effects(self):
+        # Host-only source-bound control for issue #1961. These are synthetic
+        # final-recipe opponents, not Raptor355's actual unprovided profile.
+        self.lua.execute(r'''
+          local k2se = require("compatibility.modern_catalogue.k2_space_exploration")
+          local family = "research_science_pack_productivity"
+          local science
+          for _, rule in ipairs(k2se.exact_product_bindings) do
+            if rule.family == family then
+              assert(science == nil, "K2SE science must have one exact recipe group")
+              science = rule
+            end
+          end
+          assert(science and science.reject_explicit_productivity_denial == true)
+          assert(science.weight == 1)
+          local named, effects, consumed = {}, {}, {}
+          for _, name in ipairs(science.recipes) do named[name] = true end
+          for _, row in ipairs(k2se.definition_overrides[family].effects) do
+            effects[row.recipe] = true
+          end
+          for _, name in ipairs(k2se.science.science_se_k2_research_science_pack_productivity) do
+            consumed[name] = true
+          end
+          assert(named["kr-matter-tech-card"] and effects["kr-matter-tech-card"])
+          for _, name in ipairs({
+            "kr-advanced-tech-card", "kr-singularity-tech-card",
+            "se-kr-advanced-science-pack-2"
+          }) do
+            assert(not named[name] and not effects[name],
+              "excluded advanced card must not acquire a production effect")
+          end
+          assert(consumed["kr-advanced-tech-card"] and consumed["kr-singularity-tech-card"],
+            "research cost ingredients are not productivity effect permissions")
+          local candidates = {
+            ["kr-matter-tech-card"] = recipe({}, {product("item","kr-matter-tech-card")},
+              {allow_productivity=true}),
+            ["kr-advanced-tech-card"] = recipe({}, {product("item","kr-advanced-tech-card")},
+              {allow_productivity=false}),
+            ["kr-singularity-tech-card"] = recipe({}, {product("item","kr-singularity-tech-card")},
+              {allow_productivity=false}),
+            ["se-kr-advanced-science-pack-2"] = recipe({},
+              {product("item","se-kr-advanced-science-pack-2")},
+              {allow_productivity=false}),
+          }
+          local actual = targets.collect(candidates, targets.prepare({science}))
+          local expected = family .. ":kr-matter-tech-card:item:kr-matter-tech-card:1"
+          assert(target_names(actual.by_family[family]) == expected)
+          -- An explicitly widened *synthetic* binding must still reject each
+          -- denied final recipe. Removing the denial guard admits all four.
+          local names = {
+            "kr-matter-tech-card", "kr-advanced-tech-card",
+            "kr-singularity-tech-card", "se-kr-advanced-science-pack-2"
+          }
+          local strict = binding(family, 1, {}, {
+            recipes=names, reject_explicit_productivity_denial=true
+          })
+          local guarded = targets.collect(candidates, targets.prepare({strict}))
+          assert(target_names(guarded.by_family[family]) == expected)
+          local relaxed = targets.collect(candidates, targets.prepare({
+            binding(family, 1, {}, {recipes=names})
+          }))
+          assert(#relaxed.by_family[family] == 4,
+            "the negative opponent must distinguish rejection from missing input")
+        ''')
+
     def test_collection_is_linear_in_recipe_products_and_never_mutates_raw_rows(self):
         self.lua.execute(r'''
           local recipes = {
@@ -473,6 +538,88 @@ class ProductTargetTests(unittest.TestCase):
             {type="item", name="same"}, {type="item", name="same"}
           })}) end))
           assert(not pcall(function() targets.prepare({[2]=binding("x", .1, {{type="item", name="x"}})}) end))
+        ''')
+
+
+    def test_k2se_drill_productivity_targets_manufacturing_not_ore_extraction(self):
+        """Source-bound scope guard for the unresolved mining-drill report, not native ore-yield proof."""
+        self.lua.execute(r'''
+          local profile = require("compatibility.modern_catalogue.k2_space_exploration")
+          local wanted = {
+            ["burner-mining-drill"] = 1,
+            ["electric-mining-drill"] = .5,
+            ["area-mining-drill"] = .25,
+            ["kr-quarry-drill"] = .25,
+            ["se-core-miner-drill"] = .25,
+          }
+          assert(profile.exact_product_target_families.research_mining_drill == true)
+          local effects = profile.definition_overrides.research_mining_drill.effects
+          local seen_effects = {}
+          assert(#effects == 5)
+          for _, effect in ipairs(effects) do
+            assert(wanted[effect.recipe] == effect.scale and not seen_effects[effect.recipe],
+              "drill-family effect must describe one named drill-manufacturing recipe")
+            seen_effects[effect.recipe] = true
+          end
+          local required = profile.required_product_targets.research_mining_drill
+          local seen_required = {}
+          assert(#required == 5)
+          for _, name in ipairs(required) do
+            assert(wanted[name] and not seen_required[name], "unexpected or duplicated required drill target")
+            seen_required[name] = true
+          end
+          local rules, seen_bindings = {}, {}
+          for _, binding in ipairs(profile.exact_product_bindings) do
+            if binding.family == "research_mining_drill" then
+              assert(binding.reject_explicit_productivity_denial == true
+                and binding.allow_shared_input_output == true and binding.include_recycling == true)
+              rules[#rules + 1] = binding
+              for _, name in ipairs(binding.recipes) do
+                assert(wanted[name] == binding.weight and not seen_bindings[name],
+                  "unexpected, duplicated or unweighted drill-manufacturing target")
+                seen_bindings[name] = true
+              end
+            end
+          end
+          assert(#rules == 3)
+          for name in pairs(wanted) do
+            assert(seen_effects[name] and seen_required[name] and seen_bindings[name])
+          end
+          local before = frozen_copy(rules)
+          local recipes = {}
+          for name in pairs(wanted) do
+            recipes[name] = recipe({}, {product("item", name)})
+          end
+          -- Mining an ore, and crafting a drill via an unbound alias, must not
+          -- become a recipe-productivity target merely because they exist.
+          recipes["synthetic-ore-extraction"] = recipe({}, {product("item", "iron-ore")})
+          recipes["synthetic-drill-alias"] = recipe({}, {product("item", "se-core-miner-drill")})
+          local baseline = targets.collect(recipes, targets.prepare(rules))
+          assert(#baseline.targets == 5)
+          for _, row in ipairs(baseline.targets) do
+            assert(row.family == "research_mining_drill" and wanted[row.recipe] == row.weight
+              and row.product_type == "item" and row.product_name == row.recipe)
+          end
+
+          -- Every denied opponent is a real named candidate in the authored
+          -- group, not an excluded/missing fixture recipe.
+          recipes["area-mining-drill"].allow_productivity = false
+          recipes["kr-quarry-drill"].maximum_productivity = 0
+          recipes["se-core-miner-drill"].results[1].ignored_by_productivity = 1
+          local guarded = targets.collect(recipes, targets.prepare(rules))
+          assert(#guarded.targets == 2 and guarded.targets[1].recipe == "burner-mining-drill"
+            and guarded.targets[2].recipe == "electric-mining-drill")
+          local unguarded = {}
+          for _, binding in ipairs(rules) do
+            local copy = {}
+            for key, value in pairs(binding) do copy[key] = value end
+            copy.reject_explicit_productivity_denial = false
+            unguarded[#unguarded + 1] = copy
+          end
+          local negative_control = targets.collect(recipes, targets.prepare(unguarded))
+          assert(#negative_control.targets == 4,
+            "unguarded comparator must expose the two explicitly denied recipe names")
+          assert(frozen_copy(rules) == before, "collection must not mutate authored bindings")
         ''')
 
 

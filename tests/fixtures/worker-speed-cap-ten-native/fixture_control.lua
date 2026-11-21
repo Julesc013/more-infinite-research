@@ -37,6 +37,9 @@ local STAGES = {
   ["current-successor16"] = {version = "0.8.0", cap = 10, mir = "5.0.20016"},
   ["current-observe16"] = {version = "0.9.0", cap = 10, mir = "5.0.20016"},
   ["current-successor17"] = {version = "0.12.0", cap = 10, mir = "5.0.20017"},
+  ["source-producer15"] = {version = "0.13.0", cap = 0, mir = "5.0.20015"},
+  ["producer-old15"] = {version = "0.14.0", cap = 10, mir = "5.0.20015"},
+  ["producer-successor17"] = {version = "0.15.0", cap = 10, mir = "5.0.20017"},
 }
 local CLOSURE = {
   base = "2.0.77", ["space-exploration"] = "0.7.57",
@@ -48,7 +51,19 @@ local CLOSURE = {
   ["space-exploration-menu-simulations"] = "0.7.4", ["space-exploration-postprocess"] = "0.7.5",
   informatron = "0.4.0", ["aai-signal-transmission"] = "0.5.3",
 }
+local SOURCE_PRODUCER_FLAGS = {
+  player = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = false, level = 1}, [ELECTRICITY] = {researched = false, level = 1},
+    [PROBE] = {researched = false, level = 1}},
+  foreign = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = true, level = 1}, [ELECTRICITY] = {researched = true, level = 1},
+    [PROBE] = {researched = false, level = 1}},
+  earned = {[PREDECESSOR] = {researched = true, level = 9}, [DEEP_SCIENCE] = {researched = true, level = 1},
+    [AUTOMATION_SCIENCE] = {researched = false, level = 1}, [ELECTRICITY] = {researched = false, level = 1},
+    [PROBE] = {researched = false, level = 1}},
+}
 local cold_requested, cold_logged = false, false
+local source_producer_cold_requested, source_producer_cold_logged = false, false
 
 local function fail(message) error("[mir5-worker-speed-cap-ten] " .. message) end
 
@@ -276,7 +291,19 @@ local function lab_snapshot(state, label)
     input_total = input_total, input_by_name = input_by_name}
 end
 
-local function marker(phase, state)
+-- This producer contract has no deferred worker work: current work remains
+-- on level ten and its retry is removed. Preserve that fact through every
+-- new transition record; other historical fixture protocols are unchanged.
+local function assert_producer_saved_progress(player, foreign, earned, label)
+  for _, row in ipairs({{name = "player", frame = player}, {name = "foreign", frame = foreign},
+      {name = "earned", frame = earned}}) do
+    if type(row.frame.saved_progress) ~= "number" or row.frame.saved_progress ~= 0 then
+      fail("producer source " .. label .. " saved progress differs: " .. row.name)
+    end
+  end
+end
+
+local function marker(phase, state, role)
   local player, foreign, earned = observe_all(state, phase)
   local mods, active_mod_count = active_mods_snapshot()
   local snapshot = {
@@ -301,6 +328,16 @@ local function marker(phase, state)
     scripted_lab_post_completion_top_up = copy(state.lab_post_completion_top_up or {}),
     on_load_read_only = phase == "cold",
   }
+  if role ~= nil then
+    local origin = state.producer_origin
+    if state.source_producer ~= true or state.source_mir ~= "5.0.20015" or type(origin) ~= "table"
+        or origin.phase ~= "source-producer-ready" or origin.source_mir ~= state.source_mir or origin.role ~= role then
+      fail("producer source successor provenance differs")
+    end
+    assert_producer_saved_progress(player, foreign, earned, phase)
+    snapshot.role, snapshot.source_origin = role, copy(origin)
+    snapshot.source_mir, snapshot.active_mir = state.source_mir, script.active_mods["more-infinite-research"]
+  end
   local body = helpers.table_to_json(snapshot)
   helpers.write_file("worker-speed-cap-ten/" .. phase .. ".json", body .. "\n", false)
   log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. body)
@@ -339,6 +376,61 @@ local function preconditions_marker(state)
   log("[MIR_WORKER_SPEED_CAP_TEN phase=preconditions] " .. body)
 end
 
+local function assert_source_producer_flags(state, label)
+  local player = game.forces.player
+  local foreign = force_by_index(state.foreign_index, label .. " foreign")
+  local earned = force_by_index(state.earned_index, label .. " earned")
+  for _, row in ipairs({{force = player, role = "player"}, {force = foreign, role = "foreign"},
+      {force = earned, role = "earned"}}) do
+    for _, name in ipairs({PREDECESSOR, DEEP_SCIENCE, AUTOMATION_SCIENCE, ELECTRICITY, PROBE}) do
+      local value = technology(row.force, name)
+      local expected = SOURCE_PRODUCER_FLAGS[row.role][name]
+      if value.researched ~= expected.researched or value.enabled ~= true
+          or value.level ~= expected.level or value.valid ~= true then
+        fail(label .. " " .. row.role .. " named flag differs: " .. name)
+      end
+    end
+  end
+end
+
+local function assert_source_producer_frames(state, label)
+  local player, foreign, earned = observe_all(state, label)
+  assert_player_seed(player, label)
+  assert_foreign_seed(foreign, state, label)
+  assert_earned_seed(earned, state, label)
+  if not close(player.bonus, 0.65) or not close(foreign.bonus, 1.3) or not close(earned.bonus, 2.6) then
+    fail(label .. " published source bonus frame differs")
+  end
+  if state.foreign_queue_admitted ~= true then fail(label .. " foreign automation queue admission differs") end
+  return player, foreign, earned
+end
+
+local function source_producer_marker(phase, state)
+  assert_source_producer_flags(state, phase)
+  local player, foreign, earned = assert_source_producer_frames(state, phase)
+  local mods, active_mod_count = active_mods_snapshot()
+  local snapshot = {
+    case = CASE, phase = phase, role = "published15-cap-zero-source-producer",
+    fixture_stage = script.active_mods[FIXTURE], mir_version = script.active_mods["more-infinite-research"],
+    mods = mods, active_mod_count = active_mod_count, cap = settings.startup["mir-max-level-worker-robots-speed"].value,
+    source_snapshot_role = phase == "source-producer" and "post-final-producer-validation"
+      or "same-version-source-cold-read-only",
+    source_state = {phase = state.phase, source_mir = state.source_mir},
+    worker_frames = {player = player, foreign = foreign, earned_above_cap = earned},
+    prerequisite_flags = {
+      player = prerequisite_flags(game.forces.player, phase .. " player"),
+      foreign = prerequisite_flags(force_by_index(state.foreign_index, phase .. " foreign"), phase .. " foreign"),
+      earned_above_cap = prerequisite_flags(force_by_index(state.earned_index, phase .. " earned"), phase .. " earned"),
+    },
+    foreign_queue_admitted = state.foreign_queue_admitted,
+    on_load_read_only = phase == "source-producer-cold",
+    save_requested = false,
+  }
+  local body = helpers.table_to_json(snapshot)
+  helpers.write_file("worker-speed-cap-ten/" .. phase .. ".json", body .. "\n", false)
+  log("[MIR_WORKER_SPEED_CAP_TEN phase=" .. phase .. "] " .. body)
+end
+
 local function seed_foreign(foreign)
   seed_worker_prerequisites(foreign, "foreign")
   local electricity = technology(foreign, ELECTRICITY)
@@ -364,6 +456,101 @@ local function seed_earned(earned)
   earned.reset_technology_effects()
   owner.enabled, owner.visible_when_disabled = true, false
   return earned
+end
+
+local function set_source_producer_prerequisite(force, name, label)
+  local value = technology(force, name)
+  value.researched = true
+  value.enabled = true
+  if value.researched ~= true or value.enabled ~= true then
+    fail(label .. " prerequisite could not be seeded: " .. name)
+  end
+end
+
+local function set_source_producer_target(force, level, enabled)
+  local owner = technology(force, WORKER)
+  -- Both the level setter and the effects-reset call (including its native
+  -- callbacks) can restore gates. Construct the intended source flags only
+  -- after those operations; later observations must never repair the frame.
+  owner.researched = false
+  owner.level = level
+  force.reset_technology_effects()
+  owner.enabled = enabled
+  owner.visible_when_disabled = false
+  return owner
+end
+
+local function assert_ready_producer_source(state)
+  if type(state) ~= "table" or state.source_producer ~= true or state.phase ~= "source-producer-ready"
+      or state.source_mir ~= "5.0.20015" or state.foreign_queue_admitted ~= true then
+    fail("producer source identity or queue admission differs")
+  end
+  for _, key in ipairs({"player_force_index", "foreign_index", "earned_index"}) do
+    local value = state[key]
+    if type(value) ~= "number" or not (value >= 1 and value < math.huge and value == math.floor(value)) then
+      fail("producer source force index differs: " .. key)
+    end
+  end
+  if state.player_force_index == state.foreign_index or state.player_force_index == state.earned_index
+      or state.foreign_index == state.earned_index then fail("producer source force indices alias") end
+  local player = force_by_index(state.player_force_index, "producer source player")
+  local foreign = force_by_index(state.foreign_index, "producer source foreign")
+  local earned = force_by_index(state.earned_index, "producer source earned")
+  if player ~= game.forces.player or foreign.name ~= FOREIGN_FORCE or earned.name ~= EARNED_FORCE then
+    fail("producer source force identities differ")
+  end
+  if state.ordinary_native_completion_count ~= 0 or state.level_eleven_start_count ~= 0
+      or type(state.ordinary_events) ~= "table" or next(state.ordinary_events) ~= nil
+      or type(state.scripted_administrative_events) ~= "table" then
+    fail("producer source work history differs")
+  end
+  for _, key in ipairs({"lab", "lab_feed", "lab_post_completion_top_up", "pre_work", "post_completion",
+      "post_completion_hold_started_tick", "post_completion_hold_ticks", "deadline_tick",
+      "level_eleven_queue_attempt", "producer_origin"}) do
+    if state[key] ~= nil then fail("producer source has prior successor state: " .. key) end
+  end
+  if not close(state.player_bonus_before, EFFECT) or not close(state.foreign_bonus, 2 * EFFECT)
+      or not close(state.earned_bonus, 4 * EFFECT) then fail("producer source saved bonus frame differs") end
+end
+
+local function begin_source_producer()
+  local state = {phase = "source-producer-setup", source_producer = true,
+    ordinary_native_completion_count = 0, level_eleven_start_count = 0,
+    ordinary_events = {}, scripted_administrative_events = {}}
+  storage[KEY] = state
+  local player = game.forces.player
+  state.player_force_index = player.index
+  local foreign = game.create_force(FOREIGN_FORCE)
+  state.foreign_index = foreign.index
+  local earned = game.create_force(EARNED_FORCE)
+  state.earned_index = earned.index
+
+  for _, row in ipairs({{force = player, label = "player"}, {force = foreign, label = "foreign"},
+      {force = earned, label = "earned"}}) do
+    set_source_producer_prerequisite(row.force, PREDECESSOR, row.label)
+    set_source_producer_prerequisite(row.force, DEEP_SCIENCE, row.label)
+  end
+  set_source_producer_prerequisite(foreign, AUTOMATION_SCIENCE, "foreign")
+  set_source_producer_prerequisite(foreign, ELECTRICITY, "foreign")
+
+  local player_owner = set_source_producer_target(player, 10, true)
+  player.research_queue = {player_owner, player_owner}
+  player.research_progress = PARTIAL
+
+  set_source_producer_target(foreign, 11, false)
+  if foreign.add_research(technology(foreign, PROBE)) ~= true then
+    fail("foreign automation queue was not admitted")
+  end
+  state.foreign_queue_admitted = true
+  foreign.research_progress = FOREIGN_PROGRESS
+
+  set_source_producer_target(earned, EARNED_LEVEL, true)
+  earned.research_queue = {}
+
+  local player_state, foreign_state, earned_state = observe_all(state, "source producer")
+  state.phase, state.source_mir = "source-producer-ready", script.active_mods["more-infinite-research"]
+  state.player_bonus_before, state.foreign_bonus, state.earned_bonus = player_state.bonus, foreign_state.bonus, earned_state.bonus
+  source_producer_marker("source-producer", state)
 end
 
 local function actor_force(state, force)
@@ -933,6 +1120,12 @@ function M.apply(stage, report_active_mods)
   local expected = STAGES[stage]
   if expected == nil then fail("unknown control stage") end
   local current_successor = stage == "current-successor16" or stage == "current-successor17"
+  local producer_transition = stage == "producer-old15" or stage == "producer-successor17"
+  local old_negative = stage == "old-negative15" or stage == "producer-old15"
+  local ordinary_successor = stage == "successor16" or stage == "producer-successor17"
+  local function emit_marker(phase, state)
+    marker(phase, state, producer_transition and stage or nil)
+  end
   if stage == "current-observe16" then
     if type(report_active_mods) ~= "function" then fail("current observe active-mod observer callback differs") end
     check_closure(stage)
@@ -940,6 +1133,12 @@ function M.apply(stage, report_active_mods)
   end
 
   script.on_init(function()
+    if stage == "source-producer15" then
+      check_closure(stage)
+      if storage[KEY] ~= nil then fail("fixture state already exists") end
+      begin_source_producer()
+      return
+    end
     if stage ~= "source15" then fail("only source stage may initialize") end
     check_closure(stage)
     if storage[KEY] ~= nil then fail("fixture state already exists") end
@@ -967,11 +1166,13 @@ function M.apply(stage, report_active_mods)
     local earned_state = worker_snapshot(earned, "source earned")
     state.phase, state.source_mir = "source-seeded", script.active_mods["more-infinite-research"]
     state.player_bonus_before, state.foreign_bonus, state.earned_bonus = player_state.bonus, foreign_state.bonus, earned_state.bonus
-    marker("source", state)
+    emit_marker("source", state)
   end)
 
   script.on_configuration_changed(function()
-    if stage == "source15" then fail("source stage does not accept configuration") end
+    if stage == "source15" or stage == "source-producer15" then
+      fail("source stage does not accept configuration")
+    end
     check_closure(stage)
     if stage == "current-observe16" then
       begin_current_observe()
@@ -1008,26 +1209,47 @@ function M.apply(stage, report_active_mods)
       return
     end
     local state = storage[KEY]
-    if type(state) ~= "table" or state.phase ~= "source-seeded" or state.source_mir ~= "5.0.20015" then
+    if producer_transition then
+      assert_ready_producer_source(state)
+    elseif type(state) ~= "table" or state.phase ~= "source-seeded" or state.source_mir ~= "5.0.20015" then
       fail("scripted source state is absent")
     end
     preconditions_marker(state)
     local player, foreign, earned = observe_all(state, "cap-ten configuration")
-    assert_seeded_prerequisites(state, "cap-ten configuration")
+    if producer_transition then
+      assert_source_producer_flags(state, "producer source configuration")
+      -- Validate the new protocol's public outcome before writing its fixture
+      -- continuation metadata. Historical roles retain their original order.
+      if old_negative then
+        assert_player_seed(player, "producer source published15 adverse")
+        assert_foreign_seed(foreign, state, "producer source published15 adverse")
+        assert_earned_seed(earned, state, "producer source published15 adverse")
+      else
+        assert_player_cap(player, state, "producer source successor configuration")
+        assert_foreign_cap(foreign, state, "producer source successor configuration")
+        assert_earned_cap(earned, state, "producer source successor configuration")
+      end
+      assert_producer_saved_progress(player, foreign, earned, "configuration")
+    else
+      assert_seeded_prerequisites(state, "cap-ten configuration")
+    end
     state.pre_work = {source_mir = state.source_mir, active_mir = script.active_mods["more-infinite-research"],
       player = copy(player), foreign = copy(foreign), earned_above_cap = copy(earned)}
-    if stage == "old-negative15" then
+    if producer_transition then
+      state.producer_origin = {phase = state.phase, source_mir = state.source_mir, role = stage}
+    end
+    if old_negative then
       assert_player_seed(player, "published15 adverse")
       assert_foreign_seed(foreign, state, "published15 adverse")
       assert_earned_seed(earned, state, "published15 adverse")
-      marker("old-negative", state)
+      emit_marker("old-negative", state)
       error("MIR_EXPECTED_OLD15_CAP_NOT_ENFORCED")
     end
-    if stage ~= "successor16" then fail("unknown cap-ten configuration stage") end
+    if not ordinary_successor then fail("unknown cap-ten configuration stage") end
     assert_player_cap(player, state, "successor configuration")
     assert_foreign_cap(foreign, state, "successor configuration")
     assert_earned_cap(earned, state, "successor configuration")
-    marker("pre-work", state)
+    emit_marker("pre-work", state)
     create_lab(state)
     state.phase, state.deadline_tick = "await-ordinary-level-ten", game.tick + DEADLINE_TICKS
   end)
@@ -1055,7 +1277,7 @@ function M.apply(stage, report_active_mods)
       state.phase = "current-ordinary-level-ten-finished"
       return
     end
-    if stage == "source15" then
+    if stage == "source15" or stage == "source-producer15" then
       local research = event.research
       local source_state = storage[KEY]
       if research == nil or research.name ~= WORKER then
@@ -1095,7 +1317,7 @@ function M.apply(stage, report_active_mods)
       if type(state) == "table" then current_observe_event(state, "on_research_started", event) end
       return
     end
-    if stage ~= "successor16" and not current_successor then return end
+    if not ordinary_successor and not current_successor then return end
     local state = storage[current_successor and CURRENT_KEY or KEY]
     if type(state) ~= "table" then return end
     local player = game.forces.player
@@ -1137,6 +1359,12 @@ function M.apply(stage, report_active_mods)
   end)
 
   script.on_load(function()
+    if stage == "source-producer15" then
+      -- Cold producer observation sets local flags only; its first later tick
+      -- re-reads public state and does not mutate the saved world.
+      source_producer_cold_requested, source_producer_cold_logged = true, false
+      return
+    end
     -- Cold snapshots set local flags only and read on one later tick.
     cold_requested, cold_logged = true, false
   end)
@@ -1159,8 +1387,19 @@ function M.apply(stage, report_active_mods)
       tick_current_state(state)
       return
     end
+    if stage == "source-producer15" then
+      if not source_producer_cold_requested or source_producer_cold_logged then return end
+      local state = storage[KEY]
+      if type(state) ~= "table" or state.phase ~= "source-producer-ready"
+          or state.source_mir ~= "5.0.20015" then
+        fail("source producer cold state is absent")
+      end
+      source_producer_marker("source-producer-cold", state)
+      source_producer_cold_logged = true
+      return
+    end
     if stage == "source15" then fail("source create-only stage received an actor tick") end
-    if stage == "old-negative15" then fail("published15 adverse stage received an actor tick") end
+    if old_negative then fail("published15 adverse stage received an actor tick") end
     local state = storage[KEY]
     if type(state) ~= "table" then fail("fixture state is absent") end
     if state.phase == "await-ordinary-level-ten" then
@@ -1193,7 +1432,7 @@ function M.apply(stage, report_active_mods)
       state.post_completion.end_earned_above_cap = copy(earned)
       state.post_completion.end_lab = ending_lab
       state.phase = "complete"
-      marker("complete", state)
+      emit_marker("complete", state)
       game.server_save(SAVE)
       cold_requested, cold_logged = false, true
       return
@@ -1206,7 +1445,7 @@ function M.apply(stage, report_active_mods)
     assert_foreign_cap(foreign, state, "cold")
     assert_earned_cap(earned, state, "cold")
     assert_feed_consumed_and_remaining(state, "cold")
-    marker("cold", state)
+    emit_marker("cold", state)
     cold_logged = true
   end)
 end

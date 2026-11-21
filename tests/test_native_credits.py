@@ -2,7 +2,10 @@
 import argparse
 from pathlib import Path
 import sys
+import tempfile
 import unittest
+
+from native_credit_world import build_native_credit_runtime_world, install_native_family_paid_world
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,132 +14,55 @@ PLAYER = ROOT / "source"
 
 class NativeCreditRuntimeTests(unittest.TestCase):
     def setUp(self):
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
-        self.lua.globals().player_root = PLAYER.as_posix()
-        self.lua.execute(r'''
-          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
-          package.cpath = ""
-          storage, game = {}, {forces={}}
-          native_credit_definitions = require("research.native_credit_definitions")
-          native_credits = require("runtime.native_credits")
-          descriptors = native_credit_definitions.descriptors()
-          -- These default worlds contain the original twelve recipes, not
-          -- Galore's optional recipe. Its explicit controls opt in below.
-          for i=#descriptors,1,-1 do
-            if descriptors[i].recipe=="vgal-coal-crushing" then table.remove(descriptors,i) end
-          end
-          UINT32_MAX = 4294967295
+        self.lua = build_native_credit_runtime_world(
+            LuaRuntime, target="f210", source_root=PLAYER
+        )
 
-          function make_technology(name, prototype, level, researched, enabled)
-            local state = {
-              name=name, valid=true, prototype=prototype, level=level or 1,
-              researched=researched == true, enabled=enabled == true,
-              visible_when_disabled=false, writes={level=0, enabled=0},
-            }
-            local object = {}
-            setmetatable(object, {
-              __index=state,
-              __newindex=function(_, key, value)
-                state[key] = value
-                if key == "level" then
-                  state.writes.level = state.writes.level + 1
-                  -- F200 level writes represent research through the preceding level.
-                  state.researched = false
-                  -- Native F200 setter behavior: setting a carrier level enables it.
-                  state.enabled = true
-                elseif key == "enabled" then
-                  state.writes.enabled = state.writes.enabled + 1
-                end
-              end,
-            })
-            return object, state
-          end
+    def test_explicit_credit_world_consumes_source_root_and_isolates_world_state(self):
+        calls = []
 
-          function descriptor_for(recipe)
-            for _, descriptor in ipairs(descriptors) do
-              if descriptor.recipe == recipe then return descriptor end
-            end
-            error("unknown descriptor " .. tostring(recipe))
-          end
+        def supplied_runtime(**kwargs):
+            calls.append(kwargs)
+            return LuaRuntime(**kwargs)
 
-          local function main_level(levels, main_id)
-            local specified = levels and levels[main_id]
-            if type(specified) == "table" then
-              return specified.level or 1, specified.researched == true
-            end
-            return specified or 1, false
-          end
+        with tempfile.TemporaryDirectory(prefix="mir-native-credit-world-") as directory:
+            root = Path(directory)
+            for relative in ("platform", "research", "runtime"):
+                (root / relative).mkdir()
+            (root / "platform/target.lua").write_text('return {id="f210"}\n', encoding="utf-8")
+            (root / "research/native_credit_definitions.lua").write_text(
+                """local rows={
+                  {recipe="builder-probe",main_id="probe-main",positive_id="probe-positive",negative_id="probe-negative"},
+                  {recipe="vgal-coal-crushing",main_id="galore-main",positive_id="galore-positive",negative_id="galore-negative"}}
+                return {fixed_descriptors=function()return rows end,descriptors=function()return rows end}
+                """, encoding="utf-8")
+            (root / "runtime/catalogue.lua").write_text("return {}\n", encoding="utf-8")
+            (root / "runtime/native_credits.lua").write_text(
+                'return {identity="native-credits-"..require("platform.target").id}\n', encoding="utf-8")
 
-          local function rebuild_effects(force, main_id)
-            local effects = {}
-            for _, descriptor in ipairs(descriptors) do
-              if descriptor.main_id == main_id and force._included[descriptor.recipe] ~= false then
-                effects[#effects + 1] = {
-                  type="change-recipe-productivity", recipe=descriptor.recipe, change=force._scalar[descriptor.recipe]
-                }
-              end
-            end
-            force.technologies[main_id].prototype.effects = effects
-          end
+            first = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            second = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            self.assertEqual([{"unpack_returned_tuples": True}] * 2, calls)
+            self.assertIsNot(first, second)
+            self.assertEqual("builder-probe", first.eval("descriptors[1].recipe"))
+            self.assertEqual("builder-probe", second.eval("descriptors[1].recipe"))
+            first.execute('storage.marker="first";package.loaded["runtime.native_credits"]={identity="first"}')
+            self.assertEqual("first", first.eval("storage.marker"))
+            self.assertIsNone(second.eval("storage.marker"))
+            self.assertEqual("first", first.eval('package.loaded["runtime.native_credits"].identity'))
+            self.assertEqual("native-credits-f200", second.eval('package.loaded["runtime.native_credits"].identity'))
 
-          function make_force(index, included, levels, offsets, scalar)
-            local technologies = setmetatable({}, {
-              __pairs=function() error("native credits scanned force technologies") end,
-            })
-            local force = {
-              index=index, valid=true, technologies=technologies, _included=included or {}, _scalar={}, _states={},
-              external_bonus=17.25, reset_calls=0,
-              reset_technology_effects=function() error("native credits reset force effects") end,
-              recipes=setmetatable({}, {__index=function() error("native credits read aggregate recipe bonus") end}),
-            }
-            local main_seen = {}
-            for _, descriptor in ipairs(descriptors) do
-              local change = scalar and scalar[descriptor.recipe] or .1
-              force._scalar[descriptor.recipe] = change
-              if not main_seen[descriptor.main_id] then
-                local level, researched = main_level(levels, descriptor.main_id)
-                local technology, state = make_technology(descriptor.main_id, {
-                  name=descriptor.main_id, level=1, max_level=UINT32_MAX, effects={}
-                }, level, researched, true)
-                technologies[descriptor.main_id], force._states[descriptor.main_id] = technology, state
-                main_seen[descriptor.main_id] = true
-              end
-              local offset = offsets and offsets[descriptor.recipe] or 0
-              local positive_level = 1 + (offset > 0 and offset or 0)
-              local negative_level = 1 + (offset < 0 and -offset or 0)
-              local positive, positive_state = make_technology(descriptor.positive_id, {
-                name=descriptor.positive_id, level=1, max_level=UINT32_MAX, hidden=true, enabled=false,
-                visible_when_disabled=false,
-                effects={{type="change-recipe-productivity", recipe=descriptor.recipe, change=change}},
-              }, positive_level, false, false)
-              local negative, negative_state = make_technology(descriptor.negative_id, {
-                name=descriptor.negative_id, level=1, max_level=UINT32_MAX, hidden=true, enabled=false,
-                visible_when_disabled=false,
-                effects={{type="change-recipe-productivity", recipe=descriptor.recipe, change=-change}},
-              }, negative_level, false, false)
-              technologies[descriptor.positive_id], technologies[descriptor.negative_id] = positive, negative
-              force._states[descriptor.positive_id], force._states[descriptor.negative_id] = positive_state, negative_state
-            end
-            for main_id in pairs(main_seen) do rebuild_effects(force, main_id) end
-            return force
-          end
-
-          function set_included(force, recipe, value)
-            local descriptor = descriptor_for(recipe)
-            force._included[recipe] = value
-            rebuild_effects(force, descriptor.main_id)
-          end
-
-          function ledger(force, recipe)
-            local current = storage.mir_native_credits
-            return current and current.forces[force.index] and current.forces[force.index][recipe] or nil
-          end
-
-          function holder(force, recipe, direction)
-            local descriptor = descriptor_for(recipe)
-            return force.technologies[direction == "positive" and descriptor.positive_id or descriptor.negative_id]
-          end
-        ''')
+            first = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            second = build_native_credit_runtime_world(supplied_runtime, target="f200", source_root=root)
+            install_native_family_paid_world(first, target="f200")
+            install_native_family_paid_world(second, target="f200")
+            first.execute('foreign_creation="first";reload_credits();first_history=prototypes.get_history("technology","first").created')
+            second.execute('foreign_creation="second";reload_credits();second_history=prototypes.get_history("technology","second").created')
+            self.assertEqual([{"unpack_returned_tuples": True}] * 4, calls)
+            self.assertEqual("foreign", first.eval("first_history"))
+            self.assertEqual("foreign", second.eval("second_history"))
+            self.assertEqual("more-infinite-research", first.eval('prototypes.get_history("technology","second").created'))
+            self.assertEqual("more-infinite-research", second.eval('prototypes.get_history("technology","first").created'))
 
     def galore_force(self, included=False, retired=True):
         self.lua.globals().galore_included = included
@@ -146,6 +72,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
             if d.recipe=="vgal-coal-crushing" then descriptors[#descriptors+1]=d;galore=d end
           end
           assert(galore)
+           fixed_credit_scalars[galore.recipe]=.17
           require("runtime.catalogue").galore_sulfur_retired=function()return galore_retired end
           script={active_mods={base="2.1.23",["space-age"]="2.1.23",
             ["fixture-galore-producer"]="0.1.0",["more-infinite-research"]="5.0.21003"}}
@@ -265,6 +192,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           package.loaded["runtime.native_credits"]=nil
           package.loaded["runtime.catalogue"]={
             native_credit_groups=function()return {} end,
+             native_credit_scalars=function()return {} end,
             galore_sulfur_retired=function()return false end,
           }
           local ok,loaded=pcall(require,"runtime.native_credits")
@@ -272,6 +200,9 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           native_credits=loaded
           assert(not native_credits.needs_research_events())
         ''')
+        # An empty construction map is legitimate only when no fixed carrier
+        # holder exists.  A later normal harness has the emitted row map.
+        self.setUp()
         self.galore_force(False,False)
         self.lua.execute(r'''
           native_credits.on_configuration_changed(beta_event)
@@ -301,6 +232,7 @@ class NativeCreditRuntimeTests(unittest.TestCase):
     def test_true_completed_level_one_to_false_writes_one_positive_credit_and_keeps_native_setter_hidden(self):
         self.lua.execute(r'''
           local fish = "fish-breeding"
+           fixed_credit_scalars[fish]=.025
           local force = make_force(1, {}, {['recipe-prod-research_breeding-1']={level=1, researched=true}}, nil, {[fish]=.025})
           game.forces[force.index] = force
           native_credits.on_init()
@@ -594,23 +526,175 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           native_credits.on_init()
           local positive = holder(force, fish, "positive")
           set_included(force, fish, false)
+          -- A coordinated foreign rewrite can make all three observed rows
+          -- agree with each other.  It still cannot replace the data-stage
+          -- raw scalar that authenticated this package's carrier pair.
+          local negative = holder(force, fish, "negative")
           positive.prototype.effects[1].change = .2
-          native_credits.on_configuration_changed()
+          negative.prototype.effects[1].change = -.2
+          for _, effect in ipairs(force.technologies[descriptor_for(fish).main_id].prototype.effects) do
+            if effect.recipe == fish then effect.change = .2 end
+          end
+           local ok, message = pcall(native_credits.on_configuration_changed)
+           assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+             "coordinated changed fixed scalar silently omitted the paid row")
+          assert(tostring(message):find("observed_positive=", 1, true)
+            and tostring(message):find("observed_negative=", 1, true)
+            and tostring(message):find("observed_main=", 1, true),
+            "fixed-carrier refusal omitted actual scalar observations")
           assert(ledger(force, fish).included == true and ledger(force, fish).offset == 0)
           assert(positive.level == 1 and force._states[positive.name].writes.level == 0)
 
           positive.prototype.effects[1].change = .1
-          force.technologies[descriptor_for(fish).main_id] = nil
-          native_credits.on_configuration_changed()
+           local descriptor = descriptor_for(fish)
+           local main = force.technologies[descriptor.main_id]
+           force.technologies[descriptor.main_id] = nil
+           ok, message = pcall(native_credits.on_configuration_changed)
+           assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+             "missing named fixed main silently omitted the paid row")
           assert(ledger(force, fish).included == true and ledger(force, fish).offset == 0)
+           force.technologies[descriptor.main_id] = main
 
           storage.mir_native_credits.forces[force.index][fish] = {included="broken", offset=0}
-          local ok, message = pcall(native_credits.on_configuration_changed)
+           ok, message = pcall(native_credits.on_configuration_changed)
           assert(not ok and tostring(message):find("unsupported native credit record", 1, true))
           assert(positive.level == 1, "malformed ledger mutated a holder before rejection")
           storage.mir_native_credits.forces[force.index][fish] = {included=true, offset=math.huge}
           ok, message = pcall(native_credits.on_configuration_changed)
           assert(not ok and tostring(message):find("unsupported native credit record", 1, true))
+        ''')
+
+    def test_optional_absence_required_paid_evidence_quantized_zero_and_all_force_preflight(self):
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          local force = make_force(1)
+          game.forces[force.index] = force
+          native_credits.on_init()
+          -- Galore was not constructed in this package: no declaration, no
+          -- main effect and no signed pair is a real optional absence.
+          assert(storage.mir_native_credits.forces[force.index]["vgal-coal-crushing"] == nil)
+          local before = {}
+          for name, state in pairs(force._states) do before[name] = {level=state.writes.level, enabled=state.writes.enabled} end
+          storage.mir_native_credits.forces[force.index]["vgal-coal-crushing"] = {included=true, offset=0}
+          local ok, message = pcall(native_credits.on_configuration_changed)
+          assert(not ok and tostring(message):find("required%-fixed%-credit%-absent"),
+            "a paid zero-offset record made optional absence acceptable")
+          for name, state in pairs(force._states) do
+            assert(state.writes.level == before[name].level and state.writes.enabled == before[name].enabled,
+              "required-absence rejection wrote a carrier")
+          end
+
+          -- The raw positive declaration is nonzero even when the F200
+          -- adapter observes its legitimate target quantum as zero.
+          storage, game = {}, {forces={}}
+          require("platform.target").id = "f200"
+          local standard_descriptors, standard_scalars = descriptors, fixed_credit_scalars
+          descriptors, fixed_credit_scalars = {}, {}
+          for _, descriptor in ipairs(standard_descriptors) do
+            if descriptor.recipe == fish then descriptors[#descriptors + 1] = descriptor end
+          end
+          fixed_credit_scalars[fish] = .00001
+          local rounded = make_force(2, {[fish]=true}, {['recipe-prod-research_breeding-1']=2}, nil, {[fish]=0})
+          game.forces[rounded.index] = rounded
+          native_credits.on_init()
+          assert(ledger(rounded, fish).included == true and ledger(rounded, fish).offset == 0,
+            "a target-quantized zero was treated as an absent paid row")
+          descriptors, fixed_credit_scalars = standard_descriptors, standard_scalars
+          require("platform.target").id = "f210"
+
+          storage, game = {}, {forces={}}
+          local first = make_force(3)
+          local later = make_force(4)
+          game.forces[first.index], game.forces[later.index] = first, later
+          local p, n = holder(later, fish, "positive"), holder(later, fish, "negative")
+          p.prototype.effects[1].change, n.prototype.effects[1].change = .2, -.2
+          for _, effect in ipairs(later.technologies[descriptor_for(fish).main_id].prototype.effects) do
+            if effect.recipe == fish then effect.change = .2 end
+          end
+          ok, message = pcall(native_credits.on_init)
+          assert(not ok and tostring(message):find("MIR%-FIXED%-CREDIT"),
+            "later force fixed-scalar fault was silently admitted")
+          assert(storage.mir_native_credits == nil,
+            "later force fault allocated a native ledger before refusal")
+          for _, state in pairs(first._states) do
+            assert(state.writes.level == 0 and state.writes.enabled == 0,
+              "later force fault allowed an earlier force carrier write")
+          end
+        ''')
+
+    def test_fixed_carrier_uint32_projection_preflights_every_force(self):
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          local original_descriptors, original_scalars = descriptors, fixed_credit_scalars
+          descriptors, fixed_credit_scalars = {}, {[fish]=.1}
+          for _, descriptor in ipairs(original_descriptors) do
+            if descriptor.recipe == fish then descriptors[#descriptors + 1] = descriptor end
+          end
+          local main_id = descriptor_for(fish).main_id
+          local maximum_offset = UINT32_MAX - 1
+
+          -- Level UINT32_MAX is a valid native carrier value for either sign.
+          -- The projection must accept both extrema rather than treating the
+          -- carrier's one-based level as an off-by-one refusal.
+          local positive = make_force(1, {}, {[main_id]=2}, {[fish]=maximum_offset})
+          local negative = make_force(2, {[fish]=false}, {[main_id]=2}, {[fish]=-maximum_offset})
+          game.forces[positive.index], game.forces[negative.index] = positive, negative
+          native_credits.on_init();native_credits.on_configuration_changed()
+          assert(holder(positive, fish, "positive").level == UINT32_MAX and ledger(positive, fish).offset == maximum_offset)
+          assert(holder(negative, fish, "negative").level == UINT32_MAX and ledger(negative, fish).offset == -maximum_offset)
+
+          -- An included completed main would add one more positive unit. The
+          -- target level becomes UINT32_MAX+1, so this must reject in the
+          -- all-force preflight before an earlier ordinary force is changed.
+          storage, game = {}, {forces={}}
+          local first = make_force(1, {}, {[main_id]=2}, {[fish]=0})
+          local later = make_force(2, {}, {[main_id]=2}, {[fish]=maximum_offset})
+          local first_positive = holder(first, fish, "positive")
+          local later_positive = holder(later, fish, "positive")
+          local function range_bound(technology)
+            local metatable = getmetatable(technology)
+            local original = metatable.__newindex
+            metatable.__newindex = function(object, key, value)
+              if key == "level" and value > UINT32_MAX then error("fixture uint32 overflow", 0) end
+              return original(object, key, value)
+            end
+          end
+          range_bound(first_positive);range_bound(later_positive)
+          local ordered = {[1]=first,[2]=later}
+          setmetatable(ordered, {__pairs=function()
+            local function iterate(_, key)
+              if key == nil then return 1, first end
+              if key == 1 then return 2, later end
+            end
+            return iterate, nil, nil
+          end})
+          game.forces = ordered
+          native_credits.on_init()
+          set_included(first, fish, false);set_included(later, fish, false)
+          local ok, message = pcall(native_credits.on_configuration_changed)
+          assert(not ok and tostring(message):find("projected carrier level exceeds the uint32 setter range", 1, true))
+          assert(first._states[first_positive.name].writes.level == 0
+            and later._states[later_positive.name].writes.level == 0,
+            "later range refusal changed an earlier or overflowing carrier")
+
+          -- A reset or reused force index deliberately discards its previous
+          -- fixed-credit ledger. Its preflight still validates that stale
+          -- record, but must use the fresh post-clear baseline rather than
+          -- falsely projecting one more unit from old inclusion state.
+          for _, boundary in ipairs({native_credits.on_force_created, native_credits.on_force_reset}) do
+            storage, game = {}, {forces={}}
+            local stale = make_force(7, {}, {[main_id]=2}, {[fish]=maximum_offset})
+            game.forces[stale.index] = stale
+            native_credits.on_init()
+            set_included(stale, fish, false)
+            local stale_positive = holder(stale, fish, "positive")
+            local ok, message = pcall(boundary, {force=stale})
+            assert(ok, message)
+            assert(ledger(stale, fish).included == false and ledger(stale, fish).offset == maximum_offset)
+            assert(stale._states[stale_positive.name].writes.level == 0,
+              "fresh force boundary used a stale record to write a carrier")
+          end
+          descriptors, fixed_credit_scalars = original_descriptors, original_scalars
         ''')
 
     def test_native_force_collection_userdata_is_iterated_at_configuration_boundaries(self):

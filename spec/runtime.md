@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-21
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -23,6 +23,8 @@ Use one explicit registration owner per shared event. Independent events need no
 Import modules while control code is parsed. Do not `require` within an event, GUI callback or remote call. `on_load` reconnects local references/subscriptions without changing saved state or using unavailable game state. Conditional handlers must reconstruct consistently on a joining client; multiple forces do not test multiplayer. [Libraries](https://lua-api.factorio.com/latest/auxiliary/libraries.html), [LuaBootstrap](https://lua-api.factorio.com/latest/classes/LuaBootstrap.html)
 
 `RUN-02` — Keep the minimum durable state with one owner per field, explicit schema evolution and tested invalid-object cleanup. Derivable immutable data belongs in local caches only when useful. The data-stage state does not persist into runtime. Do not transport the old compiler snapshot for caps or the Library.
+
+When changing a native queue can start another research callback, both writers must use the same saved restoration ledger. An empty ledger may be retired after the last writer exits successfully. An error must unwind the transient guard and propagate its original value. A later preference change must restore only the enablement and visibility MIR owned.
 
 A module is lazily activated by feature/settings checks, but a control-stage module needed for future callbacks must still be imported before callbacks. Lazy activation is not permission for prohibited late imports.
 
@@ -44,6 +46,10 @@ The [maintainer-approved worker identity exception](https://github.com/Julesc013
 ## Library
 
 `RUN-04` — Stable replacement scope retains delivered search, filters, details, settings/cap explanation, native research navigation, personal focus/scroll/query and translations. It uses a compact identity catalogue plus actual force/prototype state, never the Generator or reconstructed compilation proofs.
+
+The Queue tab, Research filters and selected details must distinguish a complete empty observation from a failed queue or catalogue read. Discard partial results for the affected selection, retain personal focus and show the unavailable information. After a successful read, restore the observed count, duplicate entries and order. Rendering or selecting a Library row must preserve native research.
+
+An incomplete prerequisite observation leaves research readiness unavailable where a Ready or Locked filter depends on it. Keep independently observed queue and completion information available.
 
 Build only the visible/required view; search is allowed to inspect the necessary names/text linearly. Translation/search caches have clear locale/force/configuration lifetimes and bounded sizes. Discard stale callbacks by generation token. Revalidate on open and actual events; do not run a hidden continuous whole-catalogue refresh merely to keep closed UI current.
 

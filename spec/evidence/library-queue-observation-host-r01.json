@@ -1,0 +1,144 @@
+{
+  "kind": "MIRLibraryQueueObservationHostCorrectionV1",
+  "schema": 1,
+  "status": "host-verified-functional-candidate",
+  "source_commit": "f8a39c0b7448ab0c02f7c5b8cc29d38160f89d58",
+  "player_tree": "622fcbc100358f2e1faa8d9480aceae0b62004a4",
+  "original_source_commit": "0bb697f512c85ebd8d40fc93b3e6d0ed979a49f5",
+  "requirements": [
+    "RUN-04",
+    "VER-02",
+    "VER-08"
+  ],
+  "mechanism": "Failed or incomplete queue observations previously appeared empty or exposed a selectable readable prefix. Unavailable observations now remain distinct from a successfully observed empty native array.",
+  "original_opponent": {
+    "loader": "original_git_controls.py preloads the exact original runtime.library Git blob into the unchanged selected host world",
+    "methods": 3,
+    "failing_subcases": 8,
+    "expected_exit": 1,
+    "rejection_scope": [
+      "queue read",
+      "partial iteration",
+      "entry read",
+      "invalid name",
+      "missing queue",
+      "invalid force",
+      "partial selection",
+      "retained view status"
+    ]
+  },
+  "runtime": {
+    "package": "lupa",
+    "version": "2.6",
+    "backend": "lua52",
+    "lua_version": "Lua 5.2",
+    "module": {
+      "path": "build/tmp/mir421-lua-runtime/lupa/lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "ffd2bdd291c14548e5a92f1e77f08400e6c0d173d01d30c8cc0821e0ab10a899"
+    }
+  },
+  "tested_checkout_inputs": [
+    {
+      "path": "source/runtime/library.lua",
+      "bytes": 153826,
+      "sha256": "92fe5448bdc45f2618b38a45abd825d6e13cb42c21b31da7c2fed6e2c9dd5497"
+    },
+    {
+      "path": "tests/test_library.py",
+      "bytes": 333028,
+      "sha256": "f8f7a9c16c38aef52423037b3ac4ea2a90adc2123ddc10bbaa94512a977e4c8f"
+    }
+  ],
+  "passing_controls": [
+    {
+      "command": "python -B build/qualification/library-queue-observation-r01/selected_controls.py",
+      "methods": 3
+    },
+    {
+      "command": "python -B tests/test_library.py --lua-runtime-dir build/tmp/mir421-lua-runtime",
+      "methods": 133
+    },
+    {
+      "command": "python -B tests/test_library_model.py --lua-runtime-dir build/tmp/mir421-lua-runtime",
+      "methods": 47
+    },
+    {
+      "command": "python -B tests/test_library_render_capture.py --lua-runtime-dir build/tmp/mir421-lua-runtime",
+      "methods": 22
+    },
+    {
+      "command": "python -B tests/test_changelog.py",
+      "methods": 6
+    },
+    {
+      "command": "python -B tools/check_repository.py",
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "build/qualification/library-queue-observation-r01/selected_controls.py",
+      "bytes": 723,
+      "sha256": "6cb18e185da48db3c17b9cf956fd4d57879855d455282d2724a12736d551ac1b"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/original_git_controls.py",
+      "bytes": 1064,
+      "sha256": "77ad7be9d42fa39a943f2b9d9ed87dc2788db72b4e92ad967a9f5340dec67de9"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/original-source.log",
+      "bytes": 13277,
+      "sha256": "41082472e762c5e0214e43cba05a5313d50e92d8aa12817f3879d54214bd161c"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/original-git-source.log",
+      "bytes": 13277,
+      "sha256": "7ac972d3115c7f01da8063c6e26809a53a43ee118c46c3a801865dbff689611e"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/corrected-source.log",
+      "bytes": 667,
+      "sha256": "d5c858b8a11762a26802904714b44279bb4f61789eb8a8a8809e7975d5e1f2e1"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/library-suite.log",
+      "bytes": 24559,
+      "sha256": "68101bf7fa48b4da208e1a5815023c6ff2b177b400965b953ed4ed3c362dea9e"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/library-model.log",
+      "bytes": 8585,
+      "sha256": "db931565ff1de956872e026e7a99e1be5d098c2cd28f576fabbfce082c513965"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/library-render.log",
+      "bytes": 3790,
+      "sha256": "61ab93129166ca5552f2f41f67f6631d196b2626608d8b671353c15d5210279a"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/changelog.log",
+      "bytes": 109,
+      "sha256": "b607bc210443228406b92d0ad2a84a69ff6b8918a2283bdfe10c7cbaea541a8e"
+    },
+    {
+      "path": "build/qualification/library-queue-observation-r01/repository.log",
+      "bytes": 462,
+      "sha256": "0e4522aad98ba2f72adb93e76ef3dd6a83433130358b35c774fa313cc36fa3e7"
+    }
+  ],
+  "native_execution": false,
+  "package_qualification": false,
+  "release_qualification": false,
+  "limits": [
+    "No native GUI/client/save result, original-reporter reproduction or public delivery is claimed.",
+    "The existing private-credit filtering and discovery-label controls pass under their existing host scope.",
+    "UI unavailability reuses existing localized detail-unavailable and queue keys; no new translation surface or persistent state is introduced.",
+    "Original working-tree baseline log is retained separately from the subsequent exact original-Git-blob replay."
+  ]
+}

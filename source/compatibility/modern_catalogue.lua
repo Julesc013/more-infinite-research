@@ -456,6 +456,16 @@ function M.is_space_exploration(active_mods)
     and active_mods["Krastorio2-spaced-out"] == nil
 end
 
+-- F200 carries this one captured SE worker-storage work contract. It is not
+-- the F210 SE/K2SE catalogue: those profiles retain their complete deltas
+-- below. K2 inputs keep their independently authored F200 route.
+function M.is_f200_non_k2_space_exploration(active_mods)
+  return target.id == "f200" and type(active_mods) == "table"
+    and active_mods["space-exploration"] ~= nil and not active_space_age(active_mods)
+    and active_mods["Krastorio2-spaced-out"] == nil
+    and not M.is_k2_base(active_mods)
+end
+
 -- Bob Logistics authors these named infinite native tails in its data stage.
 -- Its ownership does not depend on the rest of the Bob/Angel selection.
 function M.retains_bob_native_continuations(active_mods)
@@ -742,7 +752,9 @@ end
 function M.science_names(key)
   local vector = SCIENCE[key]
   if vector == nil and type(key) == "string" then
-    if key:match("^science_se_k2_") then
+    if key == "science_se_worker_robots_storage" then
+      vector = require("compatibility.modern_catalogue.space_exploration_worker_storage").science
+    elseif key:match("^science_se_k2_") then
       vector = require("compatibility.modern_catalogue.k2_space_exploration").science[key]
     elseif key:match("^science_se_") then
       vector = require("compatibility.modern_catalogue.space_exploration").science[key]
@@ -1226,6 +1238,11 @@ function M.continuations(active_mods, raw, external_continuations, worker_storag
     for _, fields in pairs(overrides) do
       if fields.prerequisites ~= nil then fields.exact_prerequisites = true end
     end
+  end
+  if M.is_f200_non_k2_space_exploration(active_mods) then
+    local worker = require("compatibility.modern_catalogue.space_exploration_worker_storage")
+    overrides.worker_robots_storage = copy(worker.continuation)
+    overrides.worker_robots_storage.exact_prerequisites = true
   end
   if active_space_age(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do

@@ -26,6 +26,8 @@ Read the implementation and its governing contract together. The [specification 
 
 Use the host driver's `-Plan` output before selecting checks and keep native, save, client and performance observations under their exact inputs. A current document, a host test or a built package does not close a missing native acceptance gate.
 
+The [18 November architecture and regression response](architecture-regression-response-2026-11-18.md) assesses the supplied audit against current source, records confirmed defects and integrated corrections, and orders the remaining preservation, component-refactoring and native qualification work. Its estimates and open-case dispositions do not replace the contracts or acceptance gates.
+
 ## Superseded implementation drafts
 
 The former API `1.0.0-draft.2` pseudocode, draft review and proposed opposing-test catalogue were temporary explanatory material. Their normative requirements remain governed by the adopted specification; their original proposal text and IDs remain in the exact Git references below. Current source, SDK examples, executable controls and the progress record replace their active reading instructions. This retirement neither marks unimplemented proposals delivered nor changes an acceptance threshold.

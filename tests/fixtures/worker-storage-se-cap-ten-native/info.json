@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-worker-storage-se-cap-ten-native",
+  "version": "0.1.0",
+  "title": "MIR SE worker-storage cap-ten native fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable source-to-candidate worker-storage cargo observer. It is test apparatus, not player content or a qualification result.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-exploration >= 0.7.57", "more-infinite-research"]
+}

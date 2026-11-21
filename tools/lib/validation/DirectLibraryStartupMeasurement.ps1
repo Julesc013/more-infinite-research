@@ -261,7 +261,15 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
     if(Test-Path -LiteralPath $engineLog){Remove-Item -LiteralPath $engineLog -Force}
     Assert-MIRDirectLibraryStartupMeasurement (-not(Test-Path -LiteralPath $actorRoot)) 'ordinary-menu-actor-root-preexisting'
     $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation')
-    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $arguments
+    $observerIdentity=$null
+    if(-not [string]::IsNullOrWhiteSpace($ActiveModsObserver)){
+      $observerRows=@($activation.selected|Where-Object {$_.name -ceq $ActiveModsObserver})
+      Assert-MIRDirectLibraryStartupMeasurement ($observerRows.Count-eq1) 'ordinary-menu-active-mods-observer-selection'
+      $observer=$observerRows[0]
+      Assert-MIRDirectLibraryStartupMeasurement (-not [bool]$observer.builtin -and [string]$observer.sha256 -match '^[A-Fa-f0-9]{64}$') 'ordinary-menu-active-mods-observer-identity'
+      $observerIdentity=[ordered]@{name=[string]$observer.name;version=[string]$observer.version;archive=[IO.Path]::GetFileName([string]$observer.path);sha256=[string]$observer.sha256}
+    }
+    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $FactorioBin -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $ActiveModsObserver
     $executionControls=[ordered]@{
       engine_sha256=Get-MIRImmutableInputSha256 -Path $FactorioBin
       arguments_sha256=Get-MIRDirectLibraryStartupTextSha256 -Text (ConvertTo-Json -InputObject $arguments -Compress)
@@ -290,14 +298,6 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
     [IO.File]::Copy($engineLog,$log,$true)
     $logText=Get-Content -Raw -LiteralPath $log
     Assert-MIRDirectLibraryStartupMeasurement ($logText -match '(?m)^\s*\d+[.]\d+ Factorio initialised\s*$') 'ordinary-menu-initialised'
-    $observerIdentity=$null
-    if(-not [string]::IsNullOrWhiteSpace($ActiveModsObserver)){
-      $observerRows=@($activation.selected|Where-Object {$_.name -ceq $ActiveModsObserver})
-      Assert-MIRDirectLibraryStartupMeasurement ($observerRows.Count-eq1) 'ordinary-menu-active-mods-observer-selection'
-      $observer=$observerRows[0]
-      Assert-MIRDirectLibraryStartupMeasurement (-not [bool]$observer.builtin -and [string]$observer.sha256 -match '^[A-Fa-f0-9]{64}$') 'ordinary-menu-active-mods-observer-identity'
-      $observerIdentity=[ordered]@{name=[string]$observer.name;version=[string]$observer.version;archive=[IO.Path]::GetFileName([string]$observer.path);sha256=[string]$observer.sha256}
-    }
     $loaded=@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript data-final-fixes.lua)
     Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $FactorioBin)-ceq$executionControls.engine_sha256-and(Get-MIRImmutableInputSha256 -Path $config)-ceq$executionControls.config.sha256-and(Get-MIRImmutableInputSha256 -Path $profile)-ceq$executionControls.selection.sha256) 'ordinary-menu-execution-controls-drift'
     $playerDataAfter=Get-MIRImmutableInputSha256 -Path $playerData

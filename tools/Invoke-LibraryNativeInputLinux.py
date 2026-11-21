@@ -2,7 +2,8 @@
 
 This leaf does not launch/stop a process, select mods, read a save, or grant a
 gameplay verdict. The existing native protocol's parent owns those decisions.
-Legacy ASCII plans match Invoke-LibraryNativeInput.ps1; Unicode is a separate,
+Legacy ASCII plans match Invoke-LibraryNativeInput.ps1; the separate Linux-only
+clear kind has one fixed Ctrl+A/Backspace gesture. Unicode is a separate,
 unqualified boundary. Validate-only never opens X or inspects a live process.
 """
 import argparse
@@ -48,14 +49,21 @@ def validate_spec(spec):
     require(isinstance(spec, dict), 'spec is not an object')
     common = {'schema', 'kind', 'role', 'process_id', 'process_start_utc',
               'engine_sha256', 'action', 'client_width', 'client_height'}
-    extras = {'text': {'text'}, 'click': {'x', 'y'},
-              'drag': {'x', 'y', 'target_x', 'target_y'},
-              'escape': set(), 'inventory': set(), 'tab': set()}
+    legacy_actions = {'text': {'text'}, 'click': {'x', 'y'},
+                      'drag': {'x', 'y', 'target_x', 'target_y'},
+                      'escape': set(), 'inventory': set(), 'tab': set()}
+    kind = spec.get('kind')
     action = spec.get('action')
-    require(isinstance(action, str) and action in extras, 'action differs')
-    require(set(spec) == common | extras[action], 'spec fields differ')
-    require(type(spec['schema']) is int and spec['schema'] == 1
-            and spec['kind'] == 'MIRLibraryNativeInputV1', 'schema differs')
+    require(type(spec.get('schema')) is int and spec['schema'] == 1
+            and kind in ('MIRLibraryNativeInputV1', 'MIRLinuxLibraryNativeClearTextV1'),
+            'schema differs')
+    if kind == 'MIRLibraryNativeInputV1':
+        require(isinstance(action, str) and action in legacy_actions, 'action differs')
+        extras = legacy_actions[action]
+    else:
+        require(action == 'clear', 'action differs')
+        extras = set()
+    require(set(spec) == common | extras, 'spec fields differ')
     require(spec['role'] in ('client-en', 'client-de'), 'client role differs')
     require(integer(spec['process_id']), 'process identity differs')
     utc(spec['process_start_utc'])
@@ -277,7 +285,8 @@ class LinuxX11:
         return state.raw[0]
 
     def keycode(self, symbol):
-        symbols = {'Escape': 0xFF1B, 'Tab': 0xFF09, 'Shift_L': 0xFFE1}
+        symbols = {'Escape': 0xFF1B, 'Tab': 0xFF09, 'BackSpace': 0xFF08,
+                   'Shift_L': 0xFFE1, 'Control_L': 0xFFE3}
         value = symbols[symbol] if symbol in symbols else ord(symbol)
         code = int(self.x.XKeysymToKeycode(self.d, value))
         require(code != 0, 'key mapping unavailable')
@@ -353,6 +362,21 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
         key(code, False)
         if shifted:
             key(shift, False)
+    def clear_text():
+        control, control_shifted = backend.keycode('Control_L')
+        select_all, select_all_shifted = backend.keycode('a')
+        backspace, backspace_shifted = backend.keycode('BackSpace')
+        require(not (control_shifted or select_all_shifted or backspace_shifted),
+                'key mapping differs')
+        key(control, True)
+        key(select_all, True)
+        pause(.1)
+        key(select_all, False)
+        key(control, False)
+        pause(.05)
+        key(backspace, True)
+        pause(.1)
+        key(backspace, False)
     try:
         checked_window(False)
         backend.focus(binding['window'])
@@ -360,7 +384,9 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
         require(backend.modifiers() & ~16 == 0 and backend.keyboard_group() == 0,
                 'unexpected held modifiers, buttons, or keyboard group')
         action = spec['action']
-        if action == 'text':
+        if action == 'clear':
+            clear_text()
+        elif action == 'text':
             for symbol in spec['text']:
                 typed(symbol, .05)
         elif action in ('escape', 'inventory', 'tab'):

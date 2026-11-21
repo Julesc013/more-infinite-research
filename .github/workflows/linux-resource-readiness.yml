@@ -1,0 +1,259 @@
+name: Linux resource readiness
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/linux-resource-readiness.yml'
+      - 'tools/lib/validation/ResourceGovernor.ps1'
+      - 'tools/lib/validation/LinuxResourceObservation.py'
+      - 'tools/lib/validation/NativeProbeResources.ps1'
+      - 'tools/lib/validation/LinuxWriteStorage.ps1'
+      - 'tests/test_linux_write_storage.py'
+      - 'tests/tooling/Test-MIRLinuxWriteStorage.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  write-storage-controls:
+    name: linux-write-storage-controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check current capacity rules and real Linux mount paths without an engine
+        env:
+          MIR_REQUIRE_LINUX_WRITE_MOUNTS: '1'
+        run: python3 -B tests/test_linux_write_storage.py
+
+  resource-readiness:
+    name: linux-resource-readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Check out the frozen K2SO governor inputs
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 61307a4813e3c6df6443add66a9dff5ce3f375f9
+          path: build/tmp/mir5-frozen-governor-613
+          fetch-depth: 1
+          persist-credentials: false
+      - id: probe
+        name: Observe real Linux admission without an engine
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+
+          $policy = [pscustomobject][ordered]@{ minimum_free_ram_gib = 4 }
+          $requests = @(
+            [ordered]@{ role = 'frozen-k2so-batch-pre-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 64 },
+            [ordered]@{ role = 'frozen-k2so-per-child-admission'; expected_peak_memory_mib = 4096; estimated_new_output_mib = 128 }
+          )
+          $outputDirectory = Join-Path $PWD 'build/host-gate'
+          [IO.Directory]::CreateDirectory($outputDirectory) | Out-Null
+          $outputPath = Join-Path $outputDirectory 'linux-resource-readiness.json'
+          $frozenGovernorCheckout = Join-Path $env:GITHUB_WORKSPACE 'build/tmp/mir5-frozen-governor-613'
+          $workRoot = Join-Path $frozenGovernorCheckout 'build/tmp/mir5-linux-resource-readiness'
+          $frozenGovernorCommit613 = '61307A4813E3C6DF6443ADD66A9DFF5CE3F375F9'
+          $frozenGovernorTree613 = '6DE3E707D7BE07BEE2B4DA69C052BCDA1E8BFA0D'
+          $governorPath = 'tools/lib/validation/ResourceGovernor.ps1'
+          $observerPath = 'tools/lib/validation/LinuxResourceObservation.py'
+          $probeResourcesPath = 'tools/lib/validation/NativeProbeResources.ps1'
+          $workflowPath = '.github/workflows/linux-resource-readiness.yml'
+          $k2soGovernorBlob613 = '8B3B81B4681BE982ACBEC26263901083E49260ED'
+          $k2soObserverBlob613 = 'E0D92EF66638078DF19FE6CE0346F4714AE97865'
+          $k2soProbeResourcesBlob613 = 'AA01743DE388238C8BB074C5BE0925BC48B62966'
+          $sourceCommit = $null; $sourceTree = $null; $frozenGovernorCommit = $null; $frozenGovernorTree = $null; $governorBlob = $null; $observerBlob = $null; $probeResourcesBlob = $null; $workflowBlob = $null
+          $governorActualBlob = $null; $observerActualBlob = $null; $probeResourcesActualBlob = $null
+          $governorHash = $null; $observerHash = $null; $probeResourcesHash = $null; $workflowHash = $null; $kernel = $null
+          $scope = [ordered]@{
+            engine_started = $false
+            factorio_started = $false
+            native_assignment_created = $false
+            package_or_save_input = $false
+            private_input_uploaded = $false
+            library_activated = $false
+            host_configuration_changed = $false
+          }
+
+          function Get-GitBlob([string]$Repository, [string]$Path) {
+            $blob = (& git -C $Repository rev-parse ('HEAD:{0}' -f $Path)).Trim().ToUpperInvariant()
+            if ($LASTEXITCODE -ne 0 -or $blob -notmatch '^[0-9A-F]{40}$') {
+              throw "Unable to resolve Git blob for $Path from $Repository."
+            }
+            return $blob
+          }
+
+          function Get-ActualGitBlob([string]$Repository, [string]$Path) {
+            $blob = (& git -C $Repository hash-object --no-filters -- $Path).Trim().ToUpperInvariant()
+            if ($LASTEXITCODE -ne 0 -or $blob -notmatch '^[0-9A-F]{40}$') {
+              throw "Unable to hash the checked-out file for $Path in $Repository."
+            }
+            return $blob
+          }
+
+          function New-CheckedFilesRecord {
+            return [ordered]@{
+              resource_governor = [ordered]@{
+                path = $governorPath
+                git_blob = $governorBlob
+                actual_git_blob = $governorActualBlob
+                sha256 = $governorHash
+                same_as_frozen_k2so_runner_613 = ($null -ne $governorBlob -and $null -ne $governorActualBlob -and $governorBlob -ceq $k2soGovernorBlob613 -and $governorActualBlob -ceq $k2soGovernorBlob613)
+                frozen_k2so_runner_613_blob = $k2soGovernorBlob613
+              }
+              linux_observer = [ordered]@{
+                path = $observerPath
+                git_blob = $observerBlob
+                actual_git_blob = $observerActualBlob
+                sha256 = $observerHash
+                same_as_frozen_k2so_runner_613 = ($null -ne $observerBlob -and $null -ne $observerActualBlob -and $observerBlob -ceq $k2soObserverBlob613 -and $observerActualBlob -ceq $k2soObserverBlob613)
+                frozen_k2so_runner_613_blob = $k2soObserverBlob613
+              }
+              probe_resources = [ordered]@{
+                path = $probeResourcesPath
+                git_blob = $probeResourcesBlob
+                actual_git_blob = $probeResourcesActualBlob
+                sha256 = $probeResourcesHash
+                same_as_frozen_k2so_runner_613 = ($null -ne $probeResourcesBlob -and $null -ne $probeResourcesActualBlob -and $probeResourcesBlob -ceq $k2soProbeResourcesBlob613 -and $probeResourcesActualBlob -ceq $k2soProbeResourcesBlob613)
+                frozen_k2so_runner_613_blob = $k2soProbeResourcesBlob613
+              }
+              workflow = [ordered]@{ path = $workflowPath; git_blob = $workflowBlob; sha256 = $workflowHash }
+            }
+          }
+
+          $failureStage = 'source-identity'
+          $initializationError = $null
+          try {
+            $sourceCommit = (& git -C $PWD rev-parse HEAD).Trim().ToUpperInvariant()
+            $sourceTree = (& git -C $PWD rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+            if ($LASTEXITCODE -ne 0 -or $sourceCommit -notmatch '^[0-9A-F]{40}$' -or $sourceTree -notmatch '^[0-9A-F]{40}$') {
+              throw 'Unable to resolve the checked-out source identity.'
+            }
+            $failureStage = 'frozen-governor-checkout-identity'
+            $frozenGovernorCommit = (& git -C $frozenGovernorCheckout rev-parse HEAD).Trim().ToUpperInvariant()
+            $frozenGovernorTree = (& git -C $frozenGovernorCheckout rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+            if ($LASTEXITCODE -ne 0 -or $frozenGovernorCommit -cne $frozenGovernorCommit613 -or $frozenGovernorTree -cne $frozenGovernorTree613) {
+              throw '[mir-hosted-resource-readiness-frozen-governor-checkout-mismatch]'
+            }
+            $failureStage = 'frozen-governor-identity'
+            $governorBlob = Get-GitBlob $frozenGovernorCheckout $governorPath
+            $observerBlob = Get-GitBlob $frozenGovernorCheckout $observerPath
+            $probeResourcesBlob = Get-GitBlob $frozenGovernorCheckout $probeResourcesPath
+            $workflowBlob = Get-GitBlob $PWD $workflowPath
+            if ($governorBlob -cne $k2soGovernorBlob613 -or $observerBlob -cne $k2soObserverBlob613 -or $probeResourcesBlob -cne $k2soProbeResourcesBlob613) {
+              throw '[mir-hosted-resource-readiness-frozen-governor-mismatch]'
+            }
+            $governorActualBlob = Get-ActualGitBlob $frozenGovernorCheckout $governorPath
+            $observerActualBlob = Get-ActualGitBlob $frozenGovernorCheckout $observerPath
+            $probeResourcesActualBlob = Get-ActualGitBlob $frozenGovernorCheckout $probeResourcesPath
+            if ($governorActualBlob -cne $k2soGovernorBlob613 -or $observerActualBlob -cne $k2soObserverBlob613 -or $probeResourcesActualBlob -cne $k2soProbeResourcesBlob613 -or $governorActualBlob -cne $governorBlob -or $observerActualBlob -cne $observerBlob -or $probeResourcesActualBlob -cne $probeResourcesBlob) {
+              throw '[mir-hosted-resource-readiness-frozen-governor-mismatch]'
+            }
+            $governorHash = (Get-FileHash -LiteralPath (Join-Path $frozenGovernorCheckout $governorPath) -Algorithm SHA256).Hash.ToUpperInvariant()
+            $observerHash = (Get-FileHash -LiteralPath (Join-Path $frozenGovernorCheckout $observerPath) -Algorithm SHA256).Hash.ToUpperInvariant()
+            $probeResourcesHash = (Get-FileHash -LiteralPath (Join-Path $frozenGovernorCheckout $probeResourcesPath) -Algorithm SHA256).Hash.ToUpperInvariant()
+            $workflowHash = (Get-FileHash -LiteralPath $workflowPath -Algorithm SHA256).Hash.ToUpperInvariant()
+            $failureStage = 'runner-observation'
+            $kernel = ((& uname -srm) -join ' ').Trim()
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($kernel)) { throw 'Unable to read the Linux kernel identity.' }
+            $failureStage = 'governor-module-load'
+            . (Join-Path $frozenGovernorCheckout $governorPath)
+          } catch {
+            $initializationError = $_
+          }
+
+          if ($null -ne $initializationError) {
+            $admissionStatus = 'integrity-error'
+            $record = [ordered]@{
+              schema = 1
+              kind = 'MIRHostedLinuxResourceReadinessProbeV1'
+              status = $admissionStatus
+              scope = $scope
+              source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
+              frozen_governor_checkout = [ordered]@{ path = 'build/tmp/mir5-frozen-governor-613'; commit = $frozenGovernorCommit; tree = $frozenGovernorTree; required_commit = $frozenGovernorCommit613; required_tree = $frozenGovernorTree613 }
+              checked_files = New-CheckedFilesRecord
+              runner = [ordered]@{ image_os = $env:ImageOS; image_version = $env:ImageVersion; kernel = $kernel; github_runner_os = $env:RUNNER_OS; github_runner_arch = $env:RUNNER_ARCH }
+              policy = $policy
+              work_root = $workRoot
+              requests = @()
+              failure = [ordered]@{ stage = $failureStage; error = $initializationError.Exception.Message }
+              conclusion = 'No admission observation was attempted. The pre-observation integrity or module-load boundary failed before the governor could be sourced.'
+            }
+          } else {
+            $results = [Collections.Generic.List[object]]::new()
+            foreach ($request in $requests) {
+              $expectedPeakBytes = [int64]$request.expected_peak_memory_mib * 1MB
+              $estimatedOutputBytes = [int64]$request.estimated_new_output_mib * 1MB
+              try {
+                $snapshot = Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $workRoot -EstimatedPeakBytes $estimatedOutputBytes -ExpectedPeakMemoryBytes $expectedPeakBytes
+                $limits = Get-MIR441ResourceLimits -Policy $policy -Snapshot $snapshot
+                $results.Add([ordered]@{ role = $request.role; state = 'admitted'; expected_peak_memory_mib = $request.expected_peak_memory_mib; estimated_new_output_mib = $request.estimated_new_output_mib; snapshot = $snapshot; limits = $limits })
+              } catch {
+                $admission = $_.Exception.Data['mir441_resource_admission']
+                if ($null -ne $admission) {
+                  $results.Add([ordered]@{ role = $request.role; state = 'refused'; error = $_.Exception.Message; expected_peak_memory_mib = $request.expected_peak_memory_mib; estimated_new_output_mib = $request.estimated_new_output_mib; snapshot = $admission.snapshot; limits = $admission.limits })
+                } else {
+                  $results.Add([ordered]@{ role = $request.role; state = 'observation-error'; error = $_.Exception.Message; expected_peak_memory_mib = $request.expected_peak_memory_mib; estimated_new_output_mib = $request.estimated_new_output_mib })
+                }
+              }
+            }
+            $states = @($results | ForEach-Object { [string]$_.state })
+            $admissionStatus = if ($states.Count -eq $requests.Count -and (@($states | Where-Object { $_ -ceq 'admitted' }).Count -eq $requests.Count)) {
+              'admitted'
+            } elseif (@($states | Where-Object { $_ -ceq 'observation-error' }).Count -gt 0) {
+              'observation-error'
+            } else {
+              'refused'
+            }
+            $record = [ordered]@{
+              schema = 1
+              kind = 'MIRHostedLinuxResourceReadinessProbeV1'
+              status = $admissionStatus
+              scope = $scope
+              source = [ordered]@{ commit = $sourceCommit; tree = $sourceTree }
+              frozen_governor_checkout = [ordered]@{ path = 'build/tmp/mir5-frozen-governor-613'; commit = $frozenGovernorCommit; tree = $frozenGovernorTree; required_commit = $frozenGovernorCommit613; required_tree = $frozenGovernorTree613 }
+              checked_files = New-CheckedFilesRecord
+              runner = [ordered]@{ image_os = $env:ImageOS; image_version = $env:ImageVersion; kernel = $kernel; github_runner_os = $env:RUNNER_OS; github_runner_arch = $env:RUNNER_ARCH }
+              policy = $policy
+              work_root = $workRoot
+              requests = $results
+              conclusion = 'This is a capacity-only observation. An admitted result does not launch Factorio and is not native, save, package, gameplay, performance, or release acceptance.'
+            }
+          }
+          [IO.File]::WriteAllText($outputPath, (($record | ConvertTo-Json -Depth 32) + "`n"), [Text.UTF8Encoding]::new($false))
+          $outputHash = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash.ToUpperInvariant()
+          "admission_status=$admissionStatus" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "receipt_sha256=$outputHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          (@(
+            '# Linux resource readiness',
+            '',
+            "Status: **$admissionStatus**",
+            ('Receipt SHA-256: `{0}`' -f $outputHash),
+            '',
+            'This job ran no engine and created no native assignment. Its result is capacity-only and does not qualify MIR behavior or release readiness.'
+          ) -join "`n") | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+      - name: Preserve the capacity receipt
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          include-hidden-files: true
+          name: linux-resource-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/host-gate/linux-resource-readiness.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Refuse unavailable hosted capacity
+        if: steps.probe.outputs.admission_status != 'admitted'
+        shell: pwsh
+        run: |
+          $status = '${{ steps.probe.outputs.admission_status }}'
+          throw "Hosted Linux resource admission was $status; inspect the preserved capacity receipt."

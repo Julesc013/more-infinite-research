@@ -1,0 +1,177 @@
+{
+  "kind": "MIRSEPublished15PrerequisiteMetadataEvidenceV1",
+  "status": "accepted_data_stage_metadata_only",
+  "date": "2026-11-19",
+  "scope": "Exact published15/SE0.7.57/Factorio2.0.77 final prototype observation and separately reviewed offline source-authoring input. No map, save, runtime callback, source construction, configuration admission, upgrade, ordinary research, reporter, release or stable qualification.",
+  "runner_commit": "86a889bab1f3d306e7c39a2911e049d5017094cb",
+  "capture_tool": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/prototype-headless-86a889-r01/tools/Invoke-PrototypeCapture.ps1",
+    "bytes": 16764,
+    "sha256": "2292C9177882BD1C50E706B8E45356205758CCEF846D24FB39F993C540FA8874"
+  },
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-corrected-producer-gunmetal-r01/inputs/mir-fixture-mir5-worker-speed-cap-ten_0.13.0.zip",
+    "bytes": 17796,
+    "sha256": "E20420672B88C0D01A1EB8172A0CC627A0258A4E65C4BCB665821F877444FA27"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "mir-fixture-mir5-worker-speed-cap-ten": "0.13.0",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 1
+  },
+  "native": {
+    "processes": 1,
+    "owned_pids": [
+      266309
+    ],
+    "exit_code": 0,
+    "arguments": [
+      "--config",
+      "/home/agents/Projects/Factorio/MIR/.task-builds/prototype-headless-86a889-r01/build/tmp/source15-prerequisite-capture-r01-native/capture/config.ini",
+      "--mod-directory",
+      "/home/agents/Projects/Factorio/MIR/testmods/2.0",
+      "--no-log-rotation",
+      "--dump-data"
+    ],
+    "headless_requested": true,
+    "no_world_created": true,
+    "source_D6_loaded_by_engine": false,
+    "remaining_factorio": 0,
+    "restored": true,
+    "cleanup_errors": []
+  },
+  "observed_data": {
+    "raw_dump": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/execute-custody/capture/write-data/script-output/data-raw-dump.json",
+      "bytes": 35237955,
+      "sha256": "AB6B409DAC6FED18DDE74461311BCDB33FAEAD9AA6CB9138E6349A20B3FB67BE"
+    },
+    "technology_rows": 683,
+    "direct_root_prerequisites": {
+      "worker-robots-speed-9": [
+        "worker-robots-speed-8",
+        "se-energy-science-pack-4"
+      ],
+      "se-deep-space-science-pack-1": [
+        "se-deep-catalogue-1"
+      ]
+    }
+  },
+  "offline_authoring_input": {
+    "manifest": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/OFFLINE-PREREQUISITE-CLOSURE-r01.json",
+      "bytes": 50811,
+      "sha256": "824993FFE7135A817759C77EBCA712E714DECF42988F42969E1CBEF9551C9A70"
+    },
+    "roots": [
+      "worker-robots-speed-9",
+      "se-deep-space-science-pack-1"
+    ],
+    "ancestor_rows": 196,
+    "infinite_rows": [],
+    "MIR_carrier_rows": [],
+    "worker_storage_rows": [],
+    "includes_base_automation_and_electricity": true,
+    "finite_worker_speed_effect_sum": 5.0,
+    "next_infinite_effect": 0.65,
+    "planned_source_bonuses_by_level": {
+      "10": 5.0,
+      "11": 5.65,
+      "13": 6.95
+    },
+    "planned_values_are_not_observed_force_state": true,
+    "runtime_discovery_or_solver": false,
+    "native_source_and_configuration_acceptance_pending": true
+  },
+  "reviews": {
+    "compose": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/REVIEW-COMPOSE.json",
+      "bytes": 2055,
+      "sha256": "76DA0A640DD427F8F3D9D6E1B884863EF57CAE1BAF169CDA0FEA5CF956E14B0A"
+    },
+    "execute": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/REVIEW-EXECUTE.json",
+      "bytes": 1832,
+      "sha256": "BA572BCF49A90FFA2E8BDD3A7E59EFEC6046CEFCC8969D0E1CD854AFD155DEDC"
+    },
+    "actual_data_result": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/INDEPENDENT-RESULT-REVIEW-r01.json",
+      "bytes": 2500,
+      "sha256": "8A9266DCFB5929D72862461EF42B121168A71917FDD505446EA32BF088A4465D"
+    },
+    "offline_authoring_input": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/INDEPENDENT-OFFLINE-PREREQUISITE-CLOSURE-REVIEW-r01.json",
+      "bytes": 4035,
+      "sha256": "35E788978E837179AAEE3D7687A723F54CE3C2AF73F0A8651A89BC4F0F80113F"
+    }
+  },
+  "custody": {
+    "packet": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/packet.json",
+      "bytes": 12647,
+      "sha256": "4356C020C679226C323CCB8071832F579CDCF78468267784A51F853E197E6B56"
+    },
+    "owner": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/Invoke-PrerequisiteCapture.ps1",
+      "bytes": 14917,
+      "sha256": "8B73A68286961C5C969DB4CF993F22DB6603F5CD60C21FB7E65EA223151D8FAE"
+    },
+    "composition": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/composition.json",
+      "bytes": 84344,
+      "sha256": "F259E359E7229FC5FE539CFD0EBE1670C7FAADB0F0DBF798CD2C33FDDEBA2F28"
+    },
+    "terminal": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/terminal.json",
+      "bytes": 128761,
+      "sha256": "2A0AAAABA6E8BE89C6CDF5628DCA160C6B5DF64A26711DF4062E1DFC22539763"
+    },
+    "readback": {
+      "path": "build/qualification/source15-prerequisites-capture-gunmetal-r01/EXECUTE-READBACK.json",
+      "bytes": 6560,
+      "sha256": "BFE49D84084D4CF384AA16796BBECE605FBFF10B87D08B9FE9EC5A6AA96DCB65"
+    },
+    "original_bodies": 13,
+    "all_actual_bodies_independently_rehashed": true,
+    "primary_directory": "build/qualification/source15-prerequisites-capture-gunmetal-r01"
+  },
+  "earlier_adverse": "spec/evidence/source15-cap-transition-gunmetal-r01-adverse.json",
+  "source_D6_and_prior_scope_preserved": true,
+  "published_bytes_changed": false,
+  "stable_acceptance": false
+}

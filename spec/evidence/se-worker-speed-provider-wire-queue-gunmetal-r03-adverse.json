@@ -1,0 +1,214 @@
+{
+  "kind": "MIRSEProviderQueueWireAdverseV1",
+  "date": "2026-11-19",
+  "status": "adverse_reader_after_actual_source_creation",
+  "scope": "Overall r03 NO-GO. Independent review permits only exact created-source adoption for a distinct packet; no configuration admission, cold reload or candidate result.",
+  "actor_commit": "c98303ed6f22174bde6bc7112c025b8414181ded",
+  "runner": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-c98303ed-r03",
+  "engine": {
+    "path": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/bin/x64/factorio",
+    "bytes": 244051696,
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "version": "2.0.77",
+    "data": "/home/agents/Programs/Factorio/headless/2.0.77/factorio/data"
+  },
+  "mods": {
+    "aai-containers": "0.3.2",
+    "aai-industry": "0.6.16",
+    "aai-signal-transmission": "0.5.3",
+    "alien-biomes": "0.7.4",
+    "alien-biomes-graphics": "0.7.1",
+    "base": "2.0.77",
+    "informatron": "0.4.0",
+    "jetpack": "0.4.17",
+    "more-infinite-research": "5.0.20015",
+    "robot_attrition": "0.6.6",
+    "shield-projector": "0.2.2",
+    "space-exploration": "0.7.57",
+    "space-exploration-graphics": "0.7.5",
+    "space-exploration-graphics-2": "0.7.2",
+    "space-exploration-graphics-3": "0.7.2",
+    "space-exploration-graphics-4": "0.7.2",
+    "space-exploration-graphics-5": "0.7.3",
+    "space-exploration-menu-simulations": "0.7.4",
+    "space-exploration-postprocess": "0.7.5",
+    "mir-fixture-se-worker-speed-provider-admitted": "0.1.0"
+  },
+  "fixture_integration": {
+    "pr": 2128,
+    "reviewed_head": "c98303ed6f22174bde6bc7112c025b8414181ded",
+    "merge": "49a616081a5bb5f0d5638ea400034b0991f15021",
+    "tree": "7406ba7fd612e12454cbe20d069f99046c2cd171",
+    "player_tree": "651fb717e0dc67f11a61472391d2eed63ee1159c",
+    "required_checks": "All four completed/success on exact reviewed head; original branch retained."
+  },
+  "player_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/more-infinite-research/build/qualification/source15-cap0-producer-gunmetal-r01/inputs/more-infinite-research_5.0.20015.zip",
+    "bytes": 1041561,
+    "sha256": "8BA91AC485D134CA8A3CF419A2BAEF015FE3CBA79E93F6137D02F479E5A3DEB9"
+  },
+  "fixture_archive": {
+    "path": "/home/agents/Projects/Factorio/MIR/.task-builds/se-provider-source-c98303ed-r03/build/qualification/se-provider-admission-native-r03/inputs/mir-fixture-se-worker-speed-provider-admitted_0.1.0.zip",
+    "bytes": 14207,
+    "sha256": "442D90C736D5ED7A2AF633936B9CB6857E10BCA4FC9B73A0ACE4B481B122132A"
+  },
+  "limits": {
+    "memory_mib": 8192,
+    "output_mib": 1024,
+    "timeout_seconds": 300,
+    "processes": 3,
+    "admission_wait_seconds": 30
+  },
+  "bindings": {
+    "packet": {
+      "path": "build/qualification/se-provider-admission-native-r03/packet.json",
+      "bytes": 20273,
+      "sha256": "37EF5D3C9AFA7A3949922DF3B054B12DD356315749D0C4CCBAB41D40B8710BF1"
+    },
+    "owner": {
+      "path": "build/qualification/se-provider-admission-native-r03/Invoke-ProviderAdmission.ps1",
+      "bytes": 19336,
+      "sha256": "6D02AD184B55A89A68D2E9D5FD579226C8CC75207E932DB737FD6A8319F4433C"
+    },
+    "compose": {
+      "path": "build/qualification/se-provider-admission-native-r03/composition.json",
+      "bytes": 171722,
+      "sha256": "F75A5D66D116B1C7CCDBA7B10E6E6A757CD7FD153964E73C5FA7DE49C08B4368"
+    },
+    "execute_review": {
+      "path": "build/qualification/se-provider-admission-native-r03/REVIEW-EXECUTE.json",
+      "bytes": 4308,
+      "sha256": "CB8B20D29D1BA810F8A5693F43F474F365AD3A74065E4AD737D86502CB90DD9B"
+    },
+    "terminal": {
+      "path": "build/qualification/se-provider-admission-native-r03/terminal.json",
+      "bytes": 120188,
+      "sha256": "9212799E953CBC5C9FAE0DA65C68C7C64BD82A4478D7D0AE8F7A7B213353BF7B"
+    },
+    "readback": {
+      "path": "build/qualification/se-provider-admission-native-r03/EXECUTE-READBACK.json",
+      "bytes": 6688,
+      "sha256": "210568974D9A8C5DF3A470AF251EB209E020EC641404D4186DCDD71D9B45C857"
+    },
+    "result_review": {
+      "path": "build/qualification/se-provider-admission-native-r03/INDEPENDENT-RESULT-REVIEW-r03.json",
+      "bytes": 3984,
+      "sha256": "12A660691966FA13839AA432CC13E2E0C5D696292A47895E5CEBEFCE1DF0BA2A"
+    },
+    "marker": {
+      "path": "build/qualification/se-provider-admission-native-r03/execute-custody/custody/source.json",
+      "bytes": 71401,
+      "sha256": "FA6ABA88EA2CDFCE3FB112C410100E71557CD565FEDD5C3AC2B84D96B28B9E75"
+    },
+    "created_save": {
+      "path": "build/qualification/se-provider-admission-native-r03/execute-custody/source/write/saves/source.zip",
+      "bytes": 849928,
+      "sha256": "FAD88AE24184CCFD09F29930E0D31E58D0C4340F26487D24F407D95E988DB3CB"
+    }
+  },
+  "actual": {
+    "native_processes": 1,
+    "owned_pids": [
+      298625
+    ],
+    "natural_source_exit": 0,
+    "source_marker_observed": true,
+    "created_save_crc_entries": 55,
+    "protected_saves": 0,
+    "configuration_admissions": 0,
+    "cold_loads": 0,
+    "readback_bodies": 14,
+    "restored": true,
+    "cleanup_errors": [],
+    "remaining_factorio": 0
+  },
+  "observed_source": {
+    "player": {
+      "name": "player",
+      "index": 1,
+      "bonus": 5,
+      "current": "worker-robots-speed-10",
+      "progress": 0.27,
+      "queue": [
+        "worker-robots-speed-10",
+        "worker-robots-speed-10"
+      ],
+      "worker": {
+        "level": 10,
+        "researched": false,
+        "enabled": true,
+        "visible": false,
+        "saved": 0
+      }
+    },
+    "foreign": {
+      "name": "mir5-se-worker-speed-provider-foreign",
+      "index": 8,
+      "bonus": 5.65,
+      "current": "mir-fixture-se-worker-speed-provider-unrelated",
+      "progress": 0.42000000000000004,
+      "queue": [
+        "mir-fixture-se-worker-speed-provider-unrelated",
+        "mir-fixture-se-worker-speed-provider-queued"
+      ],
+      "worker": {
+        "level": 11,
+        "researched": false,
+        "enabled": false,
+        "visible": false,
+        "saved": 0
+      }
+    },
+    "earned": {
+      "name": "mir5-se-worker-speed-provider-earned",
+      "index": 9,
+      "bonus": 6.950000000000001,
+      "current": false,
+      "progress": 0,
+      "queue": {},
+      "worker": {
+        "level": 13,
+        "researched": false,
+        "enabled": true,
+        "visible": false,
+        "saved": 0
+      }
+    }
+  },
+  "completed_rows": {
+    "each_force": 196,
+    "force_roles": [
+      "player",
+      "foreign",
+      "earned"
+    ],
+    "unique_complete_ordered_facts": true,
+    "raw_facts_retained_in": "bindings.marker"
+  },
+  "wire_boundary": {
+    "failure": "[se-provider-admission] Independent actual observation reader",
+    "field": "source.earned.queue",
+    "actual_json_value": {},
+    "actual_object_properties": 0,
+    "prior_reader_expected_json_value": [],
+    "disposition": "The reader failed after a successful native source constructor; no actor assertion or player-source defect is established."
+  },
+  "source_adoption": {
+    "verdict": "GO-created-source-only",
+    "bytes": 849928,
+    "sha256": "FAD88AE24184CCFD09F29930E0D31E58D0C4340F26487D24F407D95E988DB3CB",
+    "authority": "Exact existing archive only, as bounded by the independent result review. Keep the overall adverse and continue through a distinct reviewed packet without recreating the source."
+  },
+  "next_boundary": "Narrowly decode a zero-property object only at the declared empty queue field; reject null/false/scalar/nonempty-object/active-queue alternatives. Then run actual configuration admission and cold loading from this exact source.",
+  "not_established": [
+    "accepted complete r03 packet",
+    "configuration preservation",
+    "cold reload",
+    "old cap opponent",
+    "candidate upgrade",
+    "ordinary completion",
+    "reporter reproduction",
+    "release or stable acceptance"
+  ],
+  "published_assets_changed": false
+}

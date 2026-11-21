@@ -1,0 +1,82 @@
+{
+  "kind": "MIRLinuxWriteStorageHostControlsV1",
+  "tested_commit": "808a4d2e2449f58b0cff464c5c11290f64ba889a",
+  "platform": "Windows",
+  "focused_assertions": 21,
+  "focused_command": "pwsh -NoProfile -File tests/tooling/Test-MIRLinuxWriteStorage.ps1",
+  "focused_status": "passed",
+  "scope": "fixed write-capacity rules and mocked actor path composition; not actual Linux mount or native execution",
+  "helpers": [
+    {
+      "path": "tools/lib/validation/LinuxWriteStorage.ps1",
+      "sha256": "822A2E2AA40C22C173FA41DC676E1FD17765436C134BCD56D8E926951481024F"
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "sha256": "B13AE87CB88EB2CEDA6EED23AC336DC39FB23CA23B5809E677F6114922F66286"
+    },
+    {
+      "path": "tools/lib/validation/ResourceGovernor.ps1",
+      "sha256": "08BD11879153804F339F2F41F3DF7F14EA41C9635992DD76F03A9413A9CC9C2A"
+    },
+    {
+      "path": "tests/tooling/Test-MIRLinuxWriteStorage.ps1",
+      "sha256": "62ABDDD7837B5ECC58E5D83A19F2E0A2A1404E09B052C369622936C5CC4B3CC2"
+    }
+  ],
+  "adverse": [
+    {
+      "commit": "e818b236ba5f9bb076c83ed757081022604c94df",
+      "control": "Test-MIRNativeProbeResources.ps1",
+      "result": "failed",
+      "predicate": "mir5-native-probe-incomplete-scan-refusal-diagnostics",
+      "cause": "new unconditional policy lookup replaced an existing minimal-context scan refusal",
+      "disposition": "repaired in885d0da40 with focused opponent"
+    },
+    {
+      "commit": "885d0da40f0a967b12a19b9901d4423fccb54696",
+      "control": "Test-MIRNativeProbeResources.ps1",
+      "result": "refused before governed child",
+      "predicate": "mir441-resource-admission-commit",
+      "triggering_snapshot_retained": false,
+      "disposition": "local full suite not passed; no repeated capacity retries"
+    }
+  ],
+  "actual_linux_mount_control": "not run by root",
+  "governed_split_child": "not run",
+  "native_gameplay_acceptance": false,
+  "unattended_acceptance": false,
+  "release_acceptance": false,
+  "frozen_controller_observation": {
+    "cause": "Required CI job136245663805 refused changed live helper bytes while validating a frozen historical packet",
+    "frozen_packet_pins_changed": false,
+    "mode_scope": "Validate and Compose describe exact helper unavailability; Execute retains strict original helper admission before imports",
+    "finite_worker_host_controls": 24,
+    "se_cargo_host_controls": 22,
+    "native_execution": false,
+    "files": [
+      {
+        "path": "tools/Invoke-WorkerStorageFiniteFourNative.ps1",
+        "sha256": "A413B723C43FF2266177025B7BE905D9C5FF2E0C5DBFF7A10FD968069CC1BBD1"
+      },
+      {
+        "path": "tests/tooling/Test-MIRWorkerStorageFiniteFourNative.ps1",
+        "sha256": "B6D6A67E69E8586441608126B0288E654B20BDCDA81326121D991F315F5A8890"
+      },
+      {
+        "path": "tools/Invoke-WorkerStorageSECargoCapTenNative.ps1",
+        "sha256": "5B11684A70EA242AF848FD7198917A1EFA2DD12C6F854A3030D871B88CA8C7FD"
+      },
+      {
+        "path": "tests/tooling/Test-MIRWorkerStorageSECargoCapTenNative.ps1",
+        "sha256": "C2221ED0B366EBFFB7F96FF76A586C8E1D90D9E02C92D2DACA4EC0041D4627A4"
+      }
+    ],
+    "test_fixture_corrections": [
+      "First added finite identity assertion used an incorrect WXYZ SHA-256 literal; Python hashlib independently supplied21E32F5321CAD49AB4CF78BA5ED231E0F36D0C78D34108FDA1BE939F33FBA149.",
+      "First added execution-refusal regex expected bytes differs while the retained existing error says bytes differ; corrected the oracle, preserving the production error.",
+      "The first SE run reached a retained missing-binding assertion after the now-earlier exact-helper refusal; corrected its expected unavailable-input boundary.",
+      "A same-process wrapper incorrectly inspected stale LASTEXITCODE after the SE script completed22 checks; its retained result is22/22. The finite control was subsequently run in a fresh PowerShell child and exited0."
+    ]
+  }
+}

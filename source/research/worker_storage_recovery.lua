@@ -5,8 +5,26 @@ M.ordinary_default_id = "mir-worker-storage-default-4"
 M.ordinary_provider_id = "mir-worker-storage-provider-4"
 M.provider_debit_id = "mir-worker-storage-provider-debit-4"
 M.head_id = "mir-worker-storage-head-4"
+M.published517_se_id = "mir-worker-storage-published517-4"
 local target = require("platform.target")
 local MAX = 4294967295
+
+local PUBLISHED517_SE_SCIENCE = {
+  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+  "production-science-pack", "utility-science-pack",
+}
+local PUBLISHED517_SE_PREREQUISITES = {
+  -- Preserve the native direct prerequisite set, not the authored row's
+  -- redundant earlier level. The retained native saved contract names two.
+  "utility-science-pack", "worker-robots-storage-3",
+}
+local PUBLISHED517_SE_TERMS = {
+  formula="675*1.5^(L-4)", seconds=60, modifier=1, ignore_map_price=false,
+}
+local CURRENT_F200_SE_SCIENCE = {
+  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+  "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack",
+}
 
 local function copy(value)
   if type(value) ~= "table" then return value end
@@ -106,6 +124,51 @@ function M.fingerprint(prototype)
   out[#out + 1] = atom(#names)
   for _, name in ipairs(names) do out[#out + 1] = atom(name) end
   return table.concat(out, "|")
+end
+
+local function exact_native_ingredients(value, names)
+  if type(value) ~= "table" or #value ~= #names then return false end
+  local seen = {}
+  for _, ingredient in ipairs(value) do
+    if type(ingredient) ~= "table" or type(ingredient.name) ~= "string" or ingredient.amount ~= 1
+        or seen[ingredient.name] then return false end
+    seen[ingredient.name] = true
+  end
+  for _, name in ipairs(names) do if not seen[name] then return false end end
+  return true
+end
+
+local function exact_native_prerequisites(value, names)
+  local seen, count = {}, 0
+  for key, prerequisite in pairs(value or {}) do
+    local name = type(key) == "string" and key or type(prerequisite) == "table" and prerequisite.name
+    if type(name) ~= "string" or seen[name] then return false end
+    seen[name], count = true, count + 1
+  end
+  if count ~= #names then return false end
+  for _, name in ipairs(names) do if not seen[name] then return false end end
+  return true
+end
+
+-- This is an explicit, narrow historical work contract. It never derives an
+-- old selection from arbitrary installed science: the caller first proves the
+-- current F200 non-K2 SE row, then this projection names the one published
+-- 5.0.20017 Base-five holder that may finish already-paid work.
+function M.published517_se_contract(source)
+  assert(source and source.name == M.canonical and source.level == 4 and source.max_level == MAX,
+    "MIR published517 SE source contract is unavailable")
+  assert(exact_native_ingredients(source.research_unit_ingredients, CURRENT_F200_SE_SCIENCE)
+      and exact_native_prerequisites(source.prerequisites, {"worker-robots-storage-3"}),
+    "MIR published517 SE current contract differs")
+  M.fingerprint(source) -- Retain validation of the caller's complete current row.
+  local ingredients, prerequisites = {}, {}
+  for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do ingredients[index] = {name=name, amount=1} end
+  for _, name in ipairs(PUBLISHED517_SE_PREREQUISITES) do prerequisites[name] = {name=name} end
+  return M.fingerprint({level=4, max_level=MAX,
+    effects={{type="worker-robot-storage", modifier=PUBLISHED517_SE_TERMS.modifier}},
+    research_unit_count_formula=PUBLISHED517_SE_TERMS.formula,
+    research_unit_energy=PUBLISHED517_SE_TERMS.seconds * 60, research_unit_ingredients=ingredients,
+    prerequisites=prerequisites, ignore_tech_cost_multiplier=PUBLISHED517_SE_TERMS.ignore_map_price})
 end
 
 -- Compare only the caller's detached owned emissions. The projection uses
@@ -220,6 +283,33 @@ function M.default_owner(authored)
   return out
 end
 
+-- The private holder is emitted only for the exact F200 non-K2 SE data path.
+-- It preserves the old paid Base-five contract; it is hidden and disabled, so
+-- current players cannot select it as a second research route.
+function M.published517_se_owner(authored)
+  assert(type(authored) == "table" and authored.name == M.canonical,
+    "MIR published517 SE owner requires authored canonical4")
+  local out = owner_source(authored, M.published517_se_id)
+  out.name, out.hidden, out.enabled, out.visible_when_disabled = M.published517_se_id, true, false, false
+  out.order = "zz[mir-worker-storage-published517]"
+  -- The admitted historical producer has one literal paid-work contract.
+  -- Authored presentation remains detached from its immutable work terms.
+  out.unit.count, out.unit.count_formula, out.unit.time = nil, PUBLISHED517_SE_TERMS.formula, PUBLISHED517_SE_TERMS.seconds
+  out.effects[1].modifier = PUBLISHED517_SE_TERMS.modifier
+  out.ignore_tech_cost_multiplier = PUBLISHED517_SE_TERMS.ignore_map_price
+  out.unit.ingredients, out.prerequisites = {}, copy(PUBLISHED517_SE_PREREQUISITES)
+  for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do out.unit.ingredients[index] = {name, 1} end
+  return out
+end
+
+function M.matches_published517_se_owner(source, owner)
+  local ok, matches = pcall(function()
+    assert(owner and owner.name == M.published517_se_id and owner.level == 4 and owner.max_level == MAX)
+    return M.fingerprint(owner) == M.published517_se_contract(source)
+  end)
+  return ok and matches
+end
+
 function M.head_debit(authored, modifier)
   assert(type(authored) == "table" and authored.name == M.canonical,
     "MIR worker head debit requires authored canonical4")
@@ -240,12 +330,20 @@ end
 -- The detached owner starts at the same native level and retains the entire
 -- work contract. Public names and force flags confer no historical authority.
 function M.matches_default_owner(source, owner)
-  local ok, matches = pcall(function()
-    assert(source and source.name == M.canonical and source.level == 4)
-    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX)
-    return M.fingerprint(source) == M.fingerprint(owner)
+  local source_ok, expected = pcall(function()
+    assert(source and source.name == M.canonical and source.level == 4,
+      "MIR worker canonical identity is invalid")
+    return M.fingerprint(source)
   end)
-  return ok and matches
+  if not source_ok then return false, "canonical-fingerprint", expected end
+  local owner_ok, actual = pcall(function()
+    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX,
+      "MIR worker ordinary owner identity is invalid")
+    return M.fingerprint(owner)
+  end)
+  if not owner_ok then return false, "owner-fingerprint", actual end
+  if actual ~= expected then return false, "unequal-fingerprint" end
+  return true
 end
 
 function M.debit(authored)
