@@ -1666,13 +1666,12 @@ local function update_research_content(content, player, view, context, translati
   list_pane.style.height = math.max(header_height + 76, panes.list_height)
   local actions = list_pane[PREFIX .. "actions"]
   if valid(actions) and (actions.type ~= "table" or actions.column_count ~= action_columns) then
-    local previous_results = list_pane[PREFIX .. "results"]
-    if valid(previous_results) then previous_results.destroy() end
     actions.destroy()
     actions = nil
   end
   if not valid(actions) then
-    actions = add(list_pane, {type = "table", name = PREFIX .. "actions", column_count = action_columns})
+    -- The native result list keeps its scroll position when the buttons reflow.
+    actions = add(list_pane, {type = "table", name = PREFIX .. "actions", index = 2, column_count = action_columns})
     add(actions, {type = "sprite-button", name = PREFIX .. "hide", style = "tool_button"})
     add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
       tooltip = {"mir-browser.inspect-settings"}})

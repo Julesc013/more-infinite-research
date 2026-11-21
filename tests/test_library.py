@@ -1365,7 +1365,7 @@ class LibraryTests(unittest.TestCase):
                   rawset(target, key, field)
                 end
               })
-              value._children[#value._children + 1] = element
+              table.insert(value._children, spec.index or #value._children + 1, element)
               if element.name then value[element.name] = element end
               element.destroy = function()
                 if not element.valid then return end
@@ -2559,6 +2559,30 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_click({player_index=1, element=title["mir_library_layout_smaller"]})
           assert(storage.mir_library.players[1].geometry.width < geometry.width
             and storage.mir_library.players[1].geometry.height < geometry.height)
+        ''')
+
+    def test_resize_reflows_actions_without_replacing_the_research_results(self):
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution = {width=1920,height=1080}
+          local root = library.open(player, {query="gear"})
+          local pane = research_content(root).mir_library_list_pane
+          local results, actions = pane.mir_library_results, pane.mir_library_actions
+          local items = results.items
+          assert(actions.column_count == 5 and #items > 0)
+          local scroll = {index = 1, mode = "user-position"}
+          results.scrolled_to = scroll
+
+          for _ = 1, 4 do
+            library.on_gui_click({player_index=1, element=root.mir_library_title.mir_library_layout_smaller})
+          end
+
+          assert(pane.valid and not actions.valid and pane.mir_library_actions.column_count == 2)
+          assert(results.valid and pane.mir_library_results == results,
+            "changing the layout of the actions must preserve the native result list")
+          assert(results.items == items and results.scrolled_to == scroll)
+          assert(pane.children[1].name == "mir_library_count"
+            and pane.children[2] == pane.mir_library_actions and pane.children[3] == results)
         ''')
 
     def test_layout_tables_recreate_for_column_changes_and_never_mutate_column_count(self):
