@@ -70,7 +70,15 @@ class Published517EarnedSourceTests(unittest.TestCase):
             "log": logs.append,
         })
         lua.globals().DATA_ENV = env
-        lua.execute("setmetatable(DATA_ENV, {__index = _G})")
+        lua.execute("""
+            setmetatable(DATA_ENV, {__index = _G})
+            function DATA_ENV.data:extend(rows)
+              for _, row in ipairs(rows) do
+                assert(self.raw[row.type][row.name] == nil, "fixture overrides a prototype")
+                self.raw[row.type][row.name] = row
+              end
+            end
+        """)
         execute = lua.eval("function(path, env) local fn, message = loadfile(path, 't', env); if not fn then return false, message end; return pcall(fn) end")
         return execute((FIXTURE / "data-final-fixes.lua").as_posix(), env), logs
 
@@ -86,8 +94,11 @@ class Published517EarnedSourceTests(unittest.TestCase):
         metadata = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
         self.assertIn("more-infinite-research = 5.0.20017", metadata["dependencies"])
 
-    def test_tail_uses_the_available_automation_one_icon_asset(self):
-        source = (FIXTURE / "data.lua").read_text(encoding="utf-8")
+    def test_tail_is_declared_after_postprocess_using_the_automation_one_icon(self):
+        metadata = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
+        self.assertIn("space-exploration-postprocess = 0.7.5", metadata["dependencies"])
+        self.assertNotIn(world.TAIL, (FIXTURE / "data.lua").read_text(encoding="utf-8"))
+        source = (FIXTURE / "data-final-fixes.lua").read_text(encoding="utf-8")
         self.assertIn('icon = "__base__/graphics/technology/automation-1.png"', source)
         self.assertNotIn('icon = "__base__/graphics/technology/automation.png"', source)
 
@@ -231,6 +242,22 @@ class Published517EarnedSourceTests(unittest.TestCase):
         self.assertIn("observed_count=1", diagnostic)
         self.assertIn("observed=worker-robots-storage-3", diagnostic)
         self.assertNotIn("phase=source-begin", "\n".join(self.logs()))
+
+    def test_rewritten_tail_prerequisite_refuses_before_finite_setup_grants(self):
+        self.lua.execute("""
+            local create_force = game.create_force
+            game.create_force = function(name)
+              local force = create_force(name)
+              local prerequisites = force.technologies["mir-fixture-published517-earned-source-tail"].prerequisites
+              prerequisites["automation-science-pack"] = nil
+              prerequisites["se-deep-space-science-pack-4"] = {name="se-deep-space-science-pack-4"}
+              return force
+            end
+        """)
+        with self.assertRaisesRegex(LuaError, "source tail prerequisite differs: se-deep-space-science-pack-4"):
+            self.lua.globals().p517_begin()
+        self.assertEqual("idle", self.lua.globals().p517_phase())
+        self.assertFalse(self.lua.globals().p517_force().technologies["automation-science-pack"].researched)
 
     def test_initial_role_marker_records_each_typed_observed_and_expected_predicate(self):
         self.lua.globals().p517_begin()

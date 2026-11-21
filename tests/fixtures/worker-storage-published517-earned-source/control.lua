@@ -9,6 +9,7 @@ local RESEARCH_FORCE = "mir5-worker-storage-published517-earned-source"
 local TARGET = "mir-worker-storage-default-4"
 local PREDECESSOR = "worker-robots-storage-3"
 local TAIL = "mir-fixture-published517-earned-source-tail"
+local TAIL_PARENT = "automation-science-pack"
 local LAB, POWER, POLE = "se-space-science-lab", "mir-fixture-published517-earned-source-power", "substation"
 local SOURCE_MIR, UINT32_MAX = "5.0.20017", 4294967295
 local SOURCE_SAVE, FEED_REQUEST, SPEED_STIMULUS = "mir5-published517-earned-source", 200, 115199
@@ -501,7 +502,13 @@ local function begin_source()
   state.research_force, state.research_force_name, state.research_force_index = force, force.name, force.index
   observe_runtime_prerequisites(force, state.foreign_baseline)
   assert_setup_declaration(force); assert_worker_contract(force)
+  local tail = technology(force, TAIL)
+  local tail_parents = bounded_prerequisites(tail, "source tail")
+  check(#tail_parents == 1 and tail_parents[1] == TAIL_PARENT,
+    "source tail prerequisite differs: " .. table.concat(tail_parents, ","))
+  check(tail.level == 1 and tail.enabled == true and tail.researched == false, "source tail role differs")
   for _, declared in ipairs(fixture.rows) do technology(force, declared.name).researched = true end
+  check(technology(force, TAIL_PARENT).researched == true, "source tail prerequisite was not researched")
   assert_foreign_vectors(state, force_vectors(), "source setup")
   local lab, power, pole = create_lab_and_power(force)
   pending_setup = {tick = game.tick, lab = lab, power = power, pole = pole}

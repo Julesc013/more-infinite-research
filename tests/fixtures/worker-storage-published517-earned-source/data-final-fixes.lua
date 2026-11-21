@@ -1,7 +1,7 @@
--- Read-only data-stage evidence for the assigned published-5.0.20017 source
--- tuple. This fixture neither patches MIR nor supplies a successor route.
+-- Observe the published-5.0.20017 source tuple and define the fixture-owned tail.
 local PREFIX = "[mir5-worker-storage-published517-earned-source]"
 local TARGET = "mir-worker-storage-default-4"
+local TAIL = "mir-fixture-published517-earned-source-tail"
 local SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
   "utility-science-pack"
@@ -97,6 +97,18 @@ if type(technology.effects) ~= "table" or #technology.effects ~= 1
     or technology.effects[1].type ~= "worker-robot-storage" or technology.effects[1].modifier ~= 1 then
   fail("published ordinary worker effect differs")
 end
+-- Define this fixture technology after SE postprocess. R04 observed that the
+-- earlier declaration acquired se-deep-space-science-pack-4 as its prerequisite.
+if data.raw.technology[TAIL] ~= nil then fail("source tail already exists") end
+data:extend({{
+  type = "technology",
+  name = TAIL,
+  icon = "__base__/graphics/technology/automation-1.png",
+  icon_size = 256,
+  prerequisites = {"automation-science-pack"},
+  unit = {count = 1, time = 1, ingredients = {{"automation-science-pack", 1}}},
+  effects = {}
+}})
 log("[MIR_PUBLISHED517_EARNED_SOURCE] stage=data target=" .. TARGET
   .. "|formula=" .. technology.unit.count_formula .. "|time=" .. tostring(technology.unit.time)
   .. "|science=" .. table.concat(SCIENCE, ",") .. "|prerequisites=" .. table.concat(FINAL_PREREQUISITES, ",")
