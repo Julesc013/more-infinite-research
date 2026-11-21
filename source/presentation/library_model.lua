@@ -187,7 +187,7 @@ local function private_credit(context, id)
 end
 
 local function technology_for(force, id)
-  return native_read(native_read(force, "technologies"), id)
+  return force.technologies[id]
 end
 
 -- Discovery Tree uses per-force enabled state. The host may additionally
@@ -208,22 +208,48 @@ local function technology_name(technology)
   return bounded_string(native_read(technology, "name"), MAX_SEARCH)
 end
 
-local function queue_facts(force)
-  local counts, first, current = {}, {}, technology_name(native_read(force, "current_research"))
-  local queue = native_read(force, "research_queue")
-  if queue == nil then return counts, first, current end
-  local index = 0
-  -- Runtime queues are native player state. Preserve every duplicate and its
-  -- native ordering rather than presenting a bounded partial queue; this is
-  -- intentionally O(Q) during an explicit Library render/detail request.
-  for _, technology in ipairs(queue) do
-    index = index + 1
-    local id = technology_name(technology)
-    if id then
-      counts[id] = (counts[id] or 0) + 1
-      if first[id] == nil then first[id] = index end
+-- Both Library views project the native queue into temporary display data.
+-- A failed read invalidates everything the visitor collected in this pass.
+local function visit_queue(force, visit, limit)
+  if not force or force.valid == false then return false end
+  local queue = force.research_queue
+  if queue == nil then return false end
+  local count = 0
+  for index, entry in ipairs(queue) do
+    if index ~= count + 1 or (limit and index > limit) then return false end
+    local id = entry
+    if type(entry) ~= "string" then
+      if entry.valid == false then return false end
+      id = entry.name
     end
+    if type(id) ~= "string" or id == "" or #id > MAX_SEARCH then return false end
+    visit(index, id)
+    count = index
   end
+  return count == #queue
+end
+
+function M.observe_queue(force, visit, limit)
+  local ok, complete = pcall(visit_queue, force, visit, limit)
+  return ok and complete
+end
+
+local function current_research_name(force)
+  local current = force.current_research
+  if current == nil then return false end
+  local id = type(current) == "string" and current or current.name
+  return bounded_string(id, MAX_SEARCH)
+end
+
+local function queue_facts(force)
+  local counts, first = {}, {}
+  local read, current = pcall(current_research_name, force)
+  if not read then current = nil end
+  local complete = M.observe_queue(force, function(index, id)
+    counts[id] = (counts[id] or 0) + 1
+    if first[id] == nil then first[id] = index end
+  end)
+  if not complete then return nil, nil, current end
   return counts, first, current
 end
 
@@ -293,8 +319,9 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   if native_infinite ~= nil then finite = not native_infinite end
   if cap then finite = true end
   local prerequisites, ready, prerequisites_complete = prerequisite_facts(technology)
-  local queued_count = queue_count[id] or 0
-  local is_current = current == id
+  local queued_count = queue_count and (queue_count[id] or 0)
+  local is_current
+  if current ~= nil then is_current = current == id end
   local researched = native_read(technology, "researched") == true
   local enabled = native_read(technology, "enabled") == true
   local prototype = native_read(technology, "prototype")
@@ -331,7 +358,7 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
     enabled = enabled,
     visible = visible,
     queued_count = queued_count,
-    queue_index = queue_index[id],
+    queue_index = queue_index and queue_index[id],
     current = is_current,
     ready = ready,
     prerequisites = prerequisites,
@@ -339,7 +366,8 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
     hidden = false
   }
   if technology == nil then row.status = "missing"
-  elseif queued_count > 0 or is_current then row.status = "queued"
+  elseif is_current or (queued_count and queued_count > 0) then row.status = "queued"
+  elseif queued_count == nil then row.status = "queue_unavailable"
   elseif researched then row.status = "complete"
   elseif not enabled then row.status = "disabled"
   elseif ready then row.status = "ready"
@@ -500,26 +528,29 @@ function M.rows(force, catalogue, view, translations, context)
   local normalized = M.normalize(view, context)
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
+  if queue_count == nil and normalized.status == 4 then return {}, "queue" end
+  local technologies = native_read(force, "technologies")
+  if technologies == nil then return {}, "research" end
   local candidates = {}
   if wants_native_catalogue(normalized.family) then
-    local technologies = native_read(force, "technologies")
     local count = 0
-    if technologies ~= nil then
-      local ok = pcall(function()
-        for name, technology in pairs(technologies) do
-          count = count + 1
-          if count > MAX_NATIVE_ROWS then error("MIR Library native catalogue limit") end
-          local id = bounded_string(name, MAX_SEARCH) or technology_name(technology)
-          if id then candidates[id] = technology end
-        end
-      end)
-      if not ok then return {} end
-    end
+    local ok = pcall(function()
+      for name, technology in pairs(technologies) do
+        count = count + 1
+        if count > MAX_NATIVE_ROWS then error("MIR Library native catalogue limit") end
+        local id = bounded_string(name, MAX_SEARCH) or technology_name(technology)
+        if id then candidates[id] = technology end
+      end
+    end)
+    if not ok then return {}, "research" end
   else
-    for index = 1, #declared do
-      local id = declared[index].id
-      candidates[#candidates + 1] = {id = id, technology = technology_for(force, id)}
-    end
+    local ok = pcall(function()
+      for index = 1, #declared do
+        local id = declared[index].id
+        candidates[index] = {id = id, technology = technologies[id]}
+      end
+    end)
+    if not ok then return {}, "research" end
   end
   local selected = {}
   if wants_native_catalogue(normalized.family) then
@@ -542,6 +573,7 @@ function M.rows(force, catalogue, view, translations, context)
     end
   end
   table.sort(selected, function(left, right) return ordered(left, right, normalized.sort) end)
+  if queue_count == nil then return selected, "queue" end
   return selected
 end
 
@@ -630,7 +662,8 @@ function M.detail(force, catalogue, view, translations, context)
   if private_credit(context, id) then return nil, "technology_not_found" end
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
-  local technology = technology_for(force, id)
+  local observed, technology = pcall(technology_for, force, id)
+  if not observed then return nil, "research_unavailable" end
   if technology == nil or not M.technology_visible(technology, id, context) then return nil, "technology_not_found" end
   local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
   local effects, effects_complete = copy_effects(technology)

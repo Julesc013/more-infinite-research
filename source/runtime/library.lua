@@ -970,9 +970,9 @@ local function update_discovery_indicator(content, record)
 end
 
 local function rows_for(player, view, context, labels)
-  local rows = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
-  if type(rows) ~= "table" then return {} end
-  return rows
+  local rows, unavailable = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
+  if type(rows) ~= "table" then return {}, "research" end
+  return rows, unavailable
 end
 
 local function selected_detail(player, view, context, labels)
@@ -1337,9 +1337,14 @@ local function library_section(parent, name, caption, width)
   heading.style.font, heading.style.bottom_margin = "default-bold", 4
 end
 
-local function detail_lines(parent, row, detail, player, recipe_rows)
+local function unavailable_caption(subject)
+  return {"mir-browser.detail-unavailable", {"mir-browser." .. subject}}
+end
+
+local function detail_lines(parent, row, detail, player, recipe_rows, unavailable)
   if not row then
-    add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
+    add(parent, {type = "label", name = PREFIX .. "detail_empty",
+      caption = unavailable and unavailable_caption(unavailable) or {"mir-browser.no-results"}})
     return
   end
 
@@ -1406,7 +1411,9 @@ local function detail_lines(parent, row, detail, player, recipe_rows)
     queued = "mir-browser.status-queued",
     missing = "mir-browser.status-missing"
   }
-  add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", {status_key[row.status] or "mir-browser.detail-unavailable"}}})
+  local status = status_key[row.status] and {status_key[row.status]}
+    or unavailable_caption(row.status == "queue_unavailable" and "queue" or "research")
+  add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", status}})
   if row.current == true then
     add(context, {type = "label", name = PREFIX .. "context_current", caption = {"mir-browser.context-current"}})
   elseif type(row.queued_count) == "number" and row.queued_count > 0 then
@@ -1608,7 +1615,7 @@ local function update_research_content(content, player, view, context, translati
     content.clear()
   end
 
-  local rows = rows_for(player, view, context, translations)
+  local rows, unavailable = rows_for(player, view, context, translations)
   local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
@@ -1670,7 +1677,7 @@ local function update_research_content(content, player, view, context, translati
   actions[PREFIX .. "inspect_settings"].style.minimal_width = 0
   actions[PREFIX .. "inspect_settings"].style.maximal_width = math.max(1, panes.list_width - (action_columns == 2 and 40 or 132))
   local count = list_pane[PREFIX .. "count"]
-  count.caption = {"mir-browser.count", #rows}
+  count.caption = unavailable and unavailable_caption(unavailable) or {"mir-browser.count", #rows}
   local hide = actions[PREFIX .. "hide"]
   hide.sprite, hide.enabled = selected and selected.hidden and "utility/expand" or "utility/collapse", selected ~= nil
   hide.tooltip = {"mir-browser." .. (selected and selected.hidden and "show-tooltip" or "hide-tooltip")}
@@ -1712,7 +1719,7 @@ local function update_research_content(content, player, view, context, translati
   if not (inputs and detail_subtree_present(detail_box, inputs)
       and same_detail_inputs(inputs, tags.mir_detail_inputs, {left = 8192})) then
     detail_box.clear()
-    detail_lines(detail_box, selected, detail, player, recipes)
+    detail_lines(detail_box, selected, detail, player, recipes, unavailable)
     tags.mir_detail_inputs = inputs
     detail_box.tags = tags
   end
@@ -1982,24 +1989,11 @@ local function update_settings_content(content, view, preserve_query, translatio
 end
 
 local function queue_entries(force)
-  -- An empty native array is observed absence. A failed or incomplete read is
-  -- unavailable, never an empty queue or a selectable partial projection.
-  local ok, result = pcall(function()
-    if not valid(force) then return nil end
-    local queue = force.research_queue
-    if queue == nil then return nil end
-    local ids = {}
-    for index, entry in ipairs(queue) do
-      if index > MAX_PAGE then error("MIR Library queue limit") end
-      local id
-      if type(entry) == "string" then id = technology_id(entry)
-      elseif valid(entry) then id = technology_id(entry.name) end
-      if id == nil then error("MIR Library queue entry unavailable") end
-      if not private_credit_id(id) then ids[#ids + 1] = id end
-    end
-    return ids
-  end)
-  return ok and result or nil
+  local ids = {}
+  local complete = library_model.observe_queue(force, function(_, id)
+    if not private_credit_id(id) then ids[#ids + 1] = id end
+  end, MAX_PAGE)
+  return complete and ids or nil
 end
 
 local function update_queue_content(content, player, view)

@@ -1388,6 +1388,27 @@ class LibraryModelTests(unittest.TestCase):
           assert(detail.effects[2].type == "worker-robot-storage" and detail.effects[2].modifier == 1)
         ''')
 
+    def test_unreadable_selected_technology_and_current_research_do_not_establish_absence(self):
+        self.lua.execute(r'''
+          local id = "gear"
+          local tech = {name=id, enabled=true, prototype={}, prerequisites={}}
+          local force = {valid=true, research_queue={}, technologies={[id]=tech}}
+          local view = {selected=id}
+          setmetatable(force, {__index=function(_, key)
+            if key == "current_research" then error("current research unavailable") end
+          end})
+          local detail = assert(model.detail(force, {}, view))
+          assert(detail.current == nil and detail.queued_count == 0)
+          setmetatable(force, nil)
+          assert(model.detail(force, {}, view).current == false)
+          force.technologies = setmetatable({}, {__index=function() error("native lookup unavailable") end})
+          local row, reason = model.detail(force, {}, view)
+          assert(row == nil and reason == "research_unavailable")
+          force.technologies = {}
+          row, reason = model.detail(force, {}, view)
+          assert(row == nil and reason == "technology_not_found")
+        ''')
+
     def test_native_style_proxies_reject_unsupported_member_reads(self):
         self.lua.execute('''
           local reads = {}
@@ -1415,7 +1436,7 @@ class LibraryModelTests(unittest.TestCase):
             research_unit_energy = 60, research_unit_ingredients = {ingredient}
           }, "LuaTechnology")
           local force = hostile({
-            technologies = {[id] = gear}, research_queue = {id}, current_research = gear
+            valid = true, technologies = {[id] = gear}, research_queue = {id}, current_research = gear
           }, "LuaForce")
           local context = {cap_provider = function(actual_force)
             assert(actual_force == force)
