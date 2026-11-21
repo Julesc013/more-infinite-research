@@ -413,6 +413,70 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
           end
         ''')
 
+    def historical_contract_stage(self):
+        lua = self.stage("f200")
+        lua.execute('''
+          function current_se()
+            local row=authored();row.ignore_tech_cost_multiplier=false
+            row.prerequisites={"worker-robots-storage-3"};row.unit.ingredients={}
+            for i,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","se-rocket-science-pack","se-material-science-pack-1","space-science-pack"})do
+              row.unit.ingredients[i]={name,1}
+            end
+            return row
+          end
+          function historical_expected()
+            local row=authored();row.name="mir-worker-storage-published517-4"
+            row.hidden,row.enabled,row.visible_when_disabled=true,false,false
+            row.order="zz[mir-worker-storage-published517]";row.ignore_tech_cost_multiplier=false
+            row.unit.count,row.unit.count_formula,row.unit.time=nil,"675*1.5^(L-4)",60
+            row.effects[1].modifier=1;row.unit.ingredients={}
+            for i,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack"})do row.unit.ingredients[i]={name,1}end
+            -- Literal post-SE-postprocess/native parent set; the earlier
+            -- authored redundant level2 is not part of this exact contract.
+            row.prerequisites={"utility-science-pack","worker-robots-storage-3"}
+            return row
+          end
+        ''')
+        return lua
+
+    def test_published_holder_retains_old_contract_when_current_terms_change(self):
+        variants = {
+            "unchanged": "",
+            "price": 'current.unit.count_formula="900*2^(L-4)"',
+            "time": "current.unit.time=120",
+            "effect": "current.effects[1].modifier=2",
+            "map_price": "current.ignore_tech_cost_multiplier=true",
+        }
+        variants["combined"] = ";".join(variants.values())
+        for name, change in variants.items():
+            with self.subTest(name=name):
+                lua = self.historical_contract_stage()
+                lua.execute("current=current_se();" + change)
+                lua.execute('''
+                  local before=deep(current);local expected=historical_expected()
+                  local historic=owner.published517_se_owner(current)
+                  same(historic,expected);same(current,before)
+                  assert(owner.matches_published517_se_owner(native(current),native(historic)))
+                  assert(owner.published517_se_contract(native(current))==owner.fingerprint(native(expected)))
+                ''')
+
+    def test_published_holder_matching_rejects_current_terms_as_old_paid_terms(self):
+        variants = {
+            "price": 'current.unit.count_formula="900*2^(L-4)";bad.unit.count_formula=current.unit.count_formula',
+            "time": "current.unit.time=120;bad.unit.time=current.unit.time",
+            "effect": "current.effects[1].modifier=2;bad.effects[1].modifier=current.effects[1].modifier",
+            "map_price": "current.ignore_tech_cost_multiplier=true;bad.ignore_tech_cost_multiplier=true",
+        }
+        for name, change in variants.items():
+            with self.subTest(name=name):
+                lua = self.historical_contract_stage()
+                lua.execute("current=current_se();bad=historical_expected();" + change)
+                lua.execute('''
+                  assert(not owner.matches_published517_se_owner(native(current),native(bad)))
+                ''')
+
     def test_real_pipeline_preserves_public_default_and_legacy_holder_full_contract(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
