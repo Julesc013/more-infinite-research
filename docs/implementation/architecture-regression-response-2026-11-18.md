@@ -30,6 +30,8 @@ Another audit finding still has a different evidence level. The Library reads a 
 
 ### Worker cargo is the first subsystem decision
 
+The K2SO comment change exposed a separate false failure in two test suites. ATAN and automatic-family controls hashed today's editable settings file as evidence for October. Both stopped before running a single case. The two original fixtures appeared together at `6776d2c749e99a8c75d7cf36470dfc800c85e661`. The original 54,552-byte settings blob still matches their retained SHA256 `F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7`. The repaired readers authenticate that Git object at its original path. Their Lua behavior controls still load the current implementation. This lets a current declaration evolve while keeping the historical oracle exact. [Original settings](https://github.com/Julesc013/more-infinite-research/blob/6776d2c749e99a8c75d7cf36470dfc800c85e661/source/mir5/research/historical_settings.lua)
+
 | Question | Authoritative input | Admission or preservation decision |
 |---|---|---|
 | What can be researched in this installation? | Final engine prototypes after all providers and postprocessing, creator where available, named public prerequisite, ordinary owner, complete cost/effects/flags | Check the public route, owner creator, work contract and owner flags separately. Include which field or observation failed. Keep the original saved fingerprint reader for the schema that wrote it. |
