@@ -414,6 +414,32 @@ local function progress(value)
   return type(value) == "number" and value == value and value >= 0 and value < 1
 end
 
+local function observed_queue(force)
+  local queue = force.research_queue
+  if type(queue) ~= "table" then recover_error("native queue is unavailable") end
+  -- ipairs alone would stop at the first missing entry and hide the remainder.
+  local length, count = #queue, 0
+  for index in pairs(queue) do
+    if not integer(index) or index > length then recover_error("incomplete native queue") end
+    count = count + 1
+  end
+  if count ~= length then recover_error("incomplete native queue") end
+  return queue
+end
+
+local function snapshot_queue(force, id)
+  local native = observed_queue(force)
+  if #native > 1000 then recover_error("unsupported native queue") end
+  local queue, saved, occurrences = {}, {}, 0
+  for index, entry in ipairs(native) do
+    if not entry or type(entry.name) ~= "string" then recover_error("unsupported native queue") end
+    if not progress(entry.saved_progress) then recover_error("invalid queued saved work") end
+    queue[index], saved[entry.name] = entry.name, entry.saved_progress
+    if entry.name == id then occurrences = occurrences + 1 end
+  end
+  return queue, saved, occurrences
+end
+
 local function snapshot(force, id, finished_context, queued_observation)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
@@ -421,14 +447,7 @@ local function snapshot(force, id, finished_context, queued_observation)
       or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
     recover_error("invalid native worker frame for " .. tostring(force.name))
   end
-  local queue, saved, occurrences = {}, {}, 0
-  for _, value in ipairs(force.research_queue or {}) do
-    if #queue >= 1000 or not value or type(value.name) ~= "string" then recover_error("unsupported native queue") end
-    queue[#queue + 1] = value.name
-    if value.name == id then occurrences = occurrences + 1 end
-    if not progress(value.saved_progress) then recover_error("invalid queued saved work") end
-    saved[value.name] = value.saved_progress
-  end
+  local queue, saved, occurrences = snapshot_queue(force, id)
   local current = force.current_research and force.current_research.name or nil
   -- A finished callback can follow removal of its head but precede starting
   -- the queued remainder. Keep that observed nil current and zero progress;
@@ -484,7 +503,7 @@ local function empty_private(include_all)
       recover_error("unrecorded private worker investment")
     end
     if force.current_research and force.current_research.name == recovery.id then recover_error("unrecorded private worker current work") end
-    for _, technology in ipairs(force.research_queue or {}) do
+    for _, technology in ipairs(observed_queue(force)) do
       if technology.name == recovery.id then recover_error("unrecorded private worker queued work") end
     end
     if include_all or value.enabled or value.visible_when_disabled then out[#out + 1] = {force=force, technology=value} end
@@ -657,7 +676,7 @@ local function assign_queue(force, frame, queue, moved, destination, activate_re
   owned_queue_force = force.index
   local ok, message = pcall(function()
     force.research_queue = queue
-    local actual = force.research_queue or {}
+    local actual = observed_queue(force)
     if #actual ~= #queue then recover_error("native queue dropped a prepared entry; reload the original copy") end
     for index, name in ipairs(queue) do
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
@@ -1234,7 +1253,7 @@ local function gate_frame(force, configuration)
     recover_error("default head debit native state is invalid")
   end
   if force.current_research and force.current_research.name == recovery.head_id then recover_error("head debit cannot be current research") end
-  for _, entry in ipairs(force.research_queue or {}) do
+  for _, entry in ipairs(observed_queue(force)) do
     if entry.name == recovery.head_id then recover_error("head debit cannot be queued research") end
   end
   return gate
@@ -1410,14 +1429,7 @@ local function default_completion_frame(force, id)
       or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
     recover_error("invalid full default completion technology")
   end
-  local queue, saved, occurrences = {}, {}, 0
-  for _, entry in ipairs(force.research_queue or {}) do
-    if #queue >= 1000 or not entry or type(entry.name) ~= "string" or not progress(entry.saved_progress) then
-      recover_error("invalid full default completion queue")
-    end
-    queue[#queue + 1], saved[entry.name] = entry.name, entry.saved_progress
-    if entry.name == id then occurrences = occurrences + 1 end
-  end
+  local queue, saved, occurrences = snapshot_queue(force, id)
   local value = force.research_progress
   if type(value) ~= "number" or value ~= value or value < 0 or value > 1 then
     recover_error("invalid full default completion progress")
@@ -2799,7 +2811,9 @@ function M.on_force_created(event)
     recover_error("new force has unknown private worker investment")
   end
   if force.current_research and force.current_research.name == recovery.id then recover_error("new force has private current work") end
-  for _, queued in ipairs(force.research_queue or {}) do if queued.name == recovery.id then recover_error("new force has private queued work") end end
+  for _, queued in ipairs(observed_queue(force)) do
+    if queued.name == recovery.id then recover_error("new force has private queued work") end
+  end
   technology.enabled, technology.visible_when_disabled = false, false
   if state and state.schema == 2 and state.kind == "prepared" then state.forces[force.index] = actual_record(force); reconnect(state) end
 end
