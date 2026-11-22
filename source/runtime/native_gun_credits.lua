@@ -2,6 +2,7 @@
 -- Native holders carry paid counts; no aggregate gun modifier is read or set.
 local definitions = require("research.native_gun_credit_definitions")
 local target = require("platform.target")
+local credit_work = require("runtime.native_credit_work")
 local M = {}
 local MAIN, ROWS = definitions.main_id, definitions.descriptors()
 local KEY, MAX, MIR = "mir_native_gun_credits", 4294967295, "more-infinite-research"
@@ -196,7 +197,7 @@ local function plan_force(force, event, fresh)
   if observation == nil then return nil end
   local prior = not fresh and record_for(force) or nil
   local previous, payable, pending = prior and prior.included, prior and prior.payable, 0
-  local work = queued(force)
+  local work = credit_work.invested_count(queued(force), observation.main.saved_progress)
   if prior then
     for _, row in ipairs(ROWS) do
       local category = row.category
@@ -212,7 +213,7 @@ local function plan_force(force, event, fresh)
         refuse("unproven first holder counts")
       end
     end
-    local invested = observation.completed > 0 or work > 0 or (observation.main.saved_progress or 0) > 0
+    local invested = observation.completed > 0 or work > 0
     if fresh or not invested then previous = observation.included
     elseif published_pair(event) then previous = {electric=true, tesla=true}
     elseif observation.included.electric and observation.included.tesla then
@@ -343,7 +344,8 @@ function M.on_research_cancelled(event)
   if not integer(cancelled) then refuse("invalid cancellation count") end
   local record = record_for(event.force)
   if record then
-    record.pending = math.max(0, record.pending - cancelled)
+    local main = event.force.technologies[MAIN]
+    record.pending = credit_work.remaining_after_cancellation(record.pending, cancelled, main and main.saved_progress)
     if record.pending == 0 then record.payable = record.included end
   end
   return refresh_pending()
