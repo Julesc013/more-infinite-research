@@ -3199,13 +3199,15 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
-    def enable_f210_space_age(self, lua, engine_version="2.1.23"):
+    def enable_space_age(self, lua, engine_version="2.1.23", recycler=True):
         lua.globals().official_engine_version = engine_version
+        lua.globals().official_recycler = recycler
         lua.execute(r'''
           script.active_mods.base=official_engine_version
-          for _,name in ipairs({"space-age","quality","elevated-rails","recycler"})do
+          for _,name in ipairs({"space-age","quality","elevated-rails"})do
             script.active_mods[name]=official_engine_version
           end
+          if official_recycler then script.active_mods.recycler=official_engine_version end
           for _,id in ipairs({CANONICAL,ORDINARY,ID})do
             table.insert(prototypes.technology[id].research_unit_ingredients,
               {name="electromagnetic-science-pack",amount=1})
@@ -3610,6 +3612,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
         cases = (
             ("f200", "4.7.20003", "base", "2.0.77"),
+            ("f200", "4.7.20003", "space-age", "2.0.77"),
+            ("f200", "4.7.20003", "space-age-unchanged-rows", "2.0.77"),
             ("f210", "4.7.21003", "base", "2.1.23"),
             ("f210", "4.7.20003", "base-hop", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.23"),
@@ -3621,7 +3625,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
                 lua = self.older_world(target)
                 if selection.startswith("space-age"):
-                    self.enable_f210_space_age(lua, engine_version)
+                    self.enable_space_age(lua, engine_version, recycler=target == "f210")
                 lua.globals().old = old
                 lua.globals().selection = selection
                 lua.execute(r'''
@@ -3687,11 +3691,39 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
         for case, change in opponents.items():
             with self.subTest(case=case):
                 lua = self.older_world("f210")
-                self.enable_f210_space_age(lua)
+                self.enable_space_age(lua)
                 lua.execute(r'''
                   seed_owner()
                   local event=older_event("4.7.21003",false)
                   local packs=prototypes.technology[CANONICAL].research_unit_ingredients
+                ''' + change + r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                ''')
+
+    def test_473_f200_space_age_only_admits_unchanged_official_2077(self):
+        opponents = {
+            "added quality": 'event.mod_changes.quality={new_version="2.0.77"}',
+            "removed rails": 'script.active_mods["elevated-rails"]=nil; event.mod_changes["elevated-rails"]={old_version="2.0.77"}',
+            "recycler present": 'script.active_mods.recycler="2.0.77"',
+            "recycler event": 'event.mod_changes.recycler={old_version="2.0.77",new_version="2.0.77"}',
+            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "unqualified patch": '''
+              for name,version in pairs(script.active_mods)do
+                if version=="2.0.77"then script.active_mods[name]="2.0.78" end
+              end
+            ''',
+            "changed startup settings": 'event.mod_startup_settings_changed=true',
+            "wrong science": 'prototypes.technology[CANONICAL].research_unit_ingredients[6].name="metallurgic-science-pack"',
+        }
+        for case, change in opponents.items():
+            with self.subTest(case=case):
+                lua = self.older_world("f200")
+                self.enable_space_age(lua, "2.0.77", recycler=False)
+                lua.execute(r'''
+                  seed_owner()
+                  local event=older_event("4.7.20003",false)
                 ''' + change + r'''
                   local before=all_frames();writes=0
                   assert(not pcall(history.default_owner_preflight,event,nil,true))
