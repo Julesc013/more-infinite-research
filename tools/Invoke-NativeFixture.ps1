@@ -147,14 +147,20 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
   }else{
     Assert-Fixture ([string]::IsNullOrWhiteSpace($ActiveKind) -and [string]::IsNullOrWhiteSpace($InputSave) -and [string]::IsNullOrWhiteSpace($InputSaveSha256)) 'F110 published cross source does not accept active or input-save modes'
   }
-  $mirVersion=if($SameEditionSuccessor){'5.0.11000'}else{'4.7.11003'}
+  $mirVersion='4.7.11003'
+  if($SameEditionSuccessor){
+    $mirRows=@($ProfileRows|Where-Object name -CEQ 'more-infinite-research')
+    Assert-Fixture ($mirRows.Count -eq 1 -and $mirRows[0].version -is [string] -and $mirRows[0].version -cmatch '\A5\.0\.110[0-9]{2}\z') 'F110 same-edition successor profile differs'
+    $mirVersion=$mirRows[0].version
+  }
+  $projectVersion=$SameEditionSuccessor -and $mirVersion -cne '5.0.11000'
   $fixtureVersion=if($SameEditionSuccessor){'0.3.0'}else{'0.1.0'}
   $profileKind=if($SameEditionSuccessor){'mir5-f110-same-edition-successor'}else{'mir5-f110-f200-transition-source'}
   $mirSha=if($SameEditionSuccessor){'1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9'}else{'66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E'}
   Assert-Fixture ([string]::IsNullOrWhiteSpace($Observer) -and $Markers.Count -eq 0) 'F110 published cross source does not accept modern observers or consumers'
   Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalTarget) -and [string]::IsNullOrWhiteSpace($HistoricalMetadata) -and [string]::IsNullOrWhiteSpace($TransitionStage) -and [string]::IsNullOrWhiteSpace($TransitionMetadata)) 'F110 published cross source does not accept historical fixture parameters'
   Assert-Fixture ($Case -ceq 'f110-f200-transition') 'F110 published cross source case differs'
-  Assert-Fixture ($ExpectedMIRSha256.ToUpperInvariant() -ceq $mirSha) 'F110 published cross source MIR archive hash differs'
+  Assert-Fixture ($ExpectedMIRSha256 -cmatch '\A[A-Fa-f0-9]{64}\z' -and ($projectVersion -or $ExpectedMIRSha256.ToUpperInvariant() -ceq $mirSha)) 'F110 published cross source MIR archive hash differs'
   $expectedRows=@('base|1.1.110|True',('more-infinite-research|'+$mirVersion+'|True'),('mir-fixture-mir5-f110-f200-transition|'+$fixtureVersion+'|True'))
   $actualRows=@($ProfileRows|ForEach-Object {[string]$_.name+'|'+[string]$_.version+'|'+[string]$_.enabled})
   Assert-Fixture ($actualRows.Count -eq $expectedRows.Count -and (($actualRows -join "`n") -ceq ($expectedRows -join "`n"))) 'F110 published cross source profile differs'
@@ -195,7 +201,16 @@ function Get-F110PublishedCrossSourceFixture([string]$Repo,[hashtable]$ProfileDe
     $resolvedExpected=(Resolve-Path -LiteralPath $expectedPath).Path
     $expectedRelative=[IO.Path]::GetRelativePath($repoRoot,$resolvedExpected)
     Assert-Fixture (Test-F110PublishedCrossSourceRelativePath $expectedRelative) "F110 published cross source authoritative member leaves checkout: $relative"
-    Assert-Fixture ((Get-FixtureSha $resolvedActual) -ceq (Get-FixtureSha $resolvedExpected)) "F110 published cross source stage member differs: $relative"
+    if($projectVersion -and $relative -cin @('info.json','data-final-fixes.lua','fixture_control.lua')){
+      $utf8=[Text.UTF8Encoding]::new($false,$true)
+      $sourceText=$utf8.GetString([IO.File]::ReadAllBytes($resolvedExpected))
+      Assert-Fixture ([regex]::Matches($sourceText,'5\.0\.11000').Count -eq 1) "F110 successor version anchor differs: $relative"
+      $projected=$utf8.GetBytes($sourceText.Replace('5.0.11000',$mirVersion))
+      $expectedHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($projected))
+    }else{
+      $expectedHash=Get-FixtureSha $resolvedExpected
+    }
+    Assert-Fixture ((Get-FixtureSha $resolvedActual) -ceq $expectedHash) "F110 published cross source stage member differs: $relative"
   }
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ([string]$info.name -ceq 'mir-fixture-mir5-f110-f200-transition' -and [string]$info.version -ceq $fixtureVersion -and [string]$info.factorio_version -ceq '1.1') 'F110 published cross source fixture identity differs'
