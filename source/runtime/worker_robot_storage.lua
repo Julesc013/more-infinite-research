@@ -871,19 +871,25 @@ end
 local function published473_space_age_selection(event, change, active)
   -- A package-only upgrade can reconstruct the prior official selection.
   -- Additions, removals and other providers require their own source contract.
-  if target.id ~= "f210" or change.old_version ~= "4.7.21003"
-      or (active.base ~= "2.1.23" and active.base ~= "2.1.24")
+  local base = active.base
+  local f200 = target.id == "f200" and change.old_version == "4.7.20003" and base == "2.0.77"
+  local f210 = target.id == "f210" and change.old_version == "4.7.21003"
+    and (base == "2.1.23" or base == "2.1.24")
+  if not (f200 or f210)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
   for name in pairs(ENGINE_MODS) do
-    if active[name] ~= active.base then return false end
+    -- The separate recycler mod exists in the admitted 2.1 selection.
+    local expected = (name ~= "recycler" or f210) and base or nil
+    if active[name] ~= expected then return false end
   end
   for name in pairs(active) do
     if name ~= MIR and not ENGINE_MODS[name] then return false end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (not ENGINE_MODS[name] or type(item) ~= "table" or getmetatable(item) ~= nil
-        or item.old_version ~= active.base or item.new_version ~= active.base) then return false end
+    if name ~= MIR and (not ENGINE_MODS[name] or active[name] ~= base
+        or type(item) ~= "table" or getmetatable(item) ~= nil
+        or item.old_version ~= base or item.new_version ~= base) then return false end
   end
   return true
 end
