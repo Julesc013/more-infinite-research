@@ -152,6 +152,29 @@ class PublicReleaseTests(unittest.TestCase):
             self.verify()
         self.assertEqual((self.destination / name).read_bytes(), self.assets[name])
 
+    def test_existing_delivery_with_legacy_note_names_is_verified_in_place(self):
+        self.destination.mkdir(parents=True)
+        delivered = {**self.assets, "RELEASE_NOTES.md": self.body, "UPLOAD.txt": self.upload}
+        for name, data in delivered.items():
+            (self.destination / name).write_bytes(data)
+
+        result = self.verify()
+
+        self.assertEqual(result["local_file_sha256"], {name: release.digest(data) for name, data in delivered.items()})
+        self.assertEqual({path.name: path.read_bytes() for path in self.destination.iterdir()}, delivered)
+        self.assertEqual(list(self.destination.parent.iterdir()), [self.destination])
+
+    def test_duplicate_note_names_preserve_existing_files_and_verified_staging(self):
+        self.verify()
+        (self.destination / "UPLOAD.txt").write_bytes(self.upload)
+        (self.destination / "RELEASE_NOTES.md").write_bytes(self.body)
+        with self.assertRaisesRegex(ValueError, "Existing delivery differs"):
+            self.verify()
+        self.assertEqual((self.destination / "UPLOAD.txt").read_bytes(), self.upload)
+        self.assertEqual((self.destination / "upload-text.txt").read_bytes(), self.upload)
+        stage, = self.destination.parent.glob(f".{self.tag}-readback-*")
+        self.assertEqual((stage / "release-notes.md").read_bytes(), self.body)
+
     def test_conflicting_existing_notes_preserve_both_copies(self):
         self.verify()
         (self.destination / "release-notes.md").write_bytes(b"old")
