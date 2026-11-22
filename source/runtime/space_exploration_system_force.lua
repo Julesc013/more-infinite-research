@@ -27,8 +27,11 @@ local function origin(event, active)
   for name, change in pairs(event.mod_changes) do
     if name ~= MIR then
       require_policy(type(change) == "table" and type(change.old_version) == "string"
-        and change.old_version == change.new_version and active[name] == change.new_version,
-        "changed or removed mod: " .. tostring(name))
+        and type(change.new_version) == "string" and active[name] == change.new_version,
+        "incomplete or inconsistent mod history: " .. tostring(name))
+      if name == "base" or name == "space-exploration" then
+        require_policy(change.old_version == change.new_version, "changed policy owner: " .. name)
+      end
     end
   end
 end
@@ -39,6 +42,26 @@ local function values(force)
     force.get_ammo_damage_modifier("laser")}
   for index = 1, 6 do require_policy(finite(out[index]), "unavailable scripted field " .. index) end
   return out
+end
+
+local function validate_researched_effects(row, name, basic)
+  require_policy(row.prototype.max_level == row.prototype.level, "nonfinite researched technology: " .. name)
+  require_policy(type(row.prototype.effects) == "table", "researched effects are unavailable: " .. name)
+  for _, effect in pairs(row.prototype.effects) do
+    local kind, category = effect.type, effect.ammo_category
+    require_policy(type(kind) == "string", "unavailable researched effect: " .. name)
+    if basic then
+      require_policy(kind == "unlock-recipe" and type(effect.recipe) == "string",
+        "basic technology has a native modifier: " .. name)
+    else
+      -- These are the only native effect channels also written by this bridge.
+      local category_effect = kind == "gun-speed" or kind == "ammo-damage"
+      require_policy(not category_effect or type(category) == "string", "unavailable ammo category: " .. name)
+      local overlaps = kind == "worker-robot-speed" or kind == "worker-robot-storage" or kind == "artillery-range"
+        or category_effect and category == "laser" or kind == "gun-speed" and category == "artillery-shell"
+      require_policy(not overlaps, "researched technology affects scripted policy: " .. name)
+    end
+  end
 end
 
 local function needs_restoration(force)
@@ -66,19 +89,13 @@ local function needs_restoration(force)
     require_policy(count <= TECHNOLOGY_LIMIT, "technology observation exceeds bound")
     require_policy(type(name) == "string" and row.valid == true and row.name == name
       and row.prototype and finite(row.prototype.level) and row.level == row.prototype.level
-      and row.saved_progress == 0, "invested or unavailable technology: " .. tostring(name))
+      and row.saved_progress == 0 and type(row.researched) == "boolean",
+      "invested or unavailable technology: " .. tostring(name))
     if BASIC[name] then
       basics = basics + 1
-      require_policy(row.researched == true and row.prototype.max_level == row.prototype.level,
-        "basic system technology differs: " .. name)
-      require_policy(type(row.prototype.effects) == "table", "basic technology effects are unavailable: " .. name)
-      for _, effect in pairs(row.prototype.effects) do
-        require_policy(effect.type == "unlock-recipe" and type(effect.recipe) == "string",
-          "basic technology has a native modifier: " .. name)
-      end
-    else
-      require_policy(row.researched == false, "additional researched technology: " .. name)
+      require_policy(row.researched, "basic system technology differs: " .. name)
     end
+    if row.researched then validate_researched_effects(row, name, BASIC[name]) end
   end
   require_policy(basics == 9, "basic system technology set is incomplete: observed " .. basics .. ", expected 9")
   return true
