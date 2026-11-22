@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.22
+Date: 2026-11-22
+
+  Bugfixes:
+
+    - On Factorio 2.1.24, find omitted research in the Library's Availability view by its translated technology name.
+    - On Factorio 2.0.77, preserve worker cargo ownership and queued or parked work during the supported direct Space Is Fake
+      upgrade with default cargo settings and uninvested infinite cargo.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.21
 Date: 2026-11-22
 
