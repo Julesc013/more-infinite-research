@@ -8,6 +8,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Reflow the open Research Library after changing the display resolution or GUI scale while keeping its current results and selection.
 - Preserve earned worker cargo, current research and queued or parked work when upgrading MIR 4.7.3 on Factorio 2.1.23 with the unchanged official Space Age mods and default worker settings.
+- Fix the Space Exploration conquest-policy crash during the 4.7.2 upgrade on Factorio 2.0.77.
+- Preserve the cap-ten, seven-pack worker-cargo upgrade with unchanged Elevated Rails on Factorio 2.0.77 and Space Exploration 0.7.57.
 
 ## [5.0.19] - 2026-11-22
 
