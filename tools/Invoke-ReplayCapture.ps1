@@ -11,6 +11,8 @@ param(
   [Parameter(Mandatory)][string]$ProfilePath,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$ActiveModsObserver='',
+  [string]$LinuxStoragePlanPath='',
+  [string]$LinuxStoragePlanSha256='',
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=384
 )
 $ErrorActionPreference='Stop'
@@ -33,19 +35,27 @@ Assert-Replay (-not(Test-Path -LiteralPath $OutputRoot)) 'preserve existing outp
 function Set-ReplayLibraryArchive([string]$Source,[string]$ExpectedCurrent,[string]$ExpectedReplacement){
   Assert-Replay (@(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count -eq 0) 'Factorio must be idle before archive replacement'
   $lock=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+  $staged=Join-Path $library ('.mir-replay-'+[guid]::NewGuid().ToString('N')+'.pending')
   try{
     Assert-Replay (-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'active selection prevents archive replacement'
     Assert-Replay ((Get-ReplaySha $destination) -ceq $ExpectedCurrent.ToUpperInvariant()) 'live archive changed; preserve it for review'
     Assert-Replay ((Get-ReplaySha $Source) -ceq $ExpectedReplacement.ToUpperInvariant()) 'custody source changed'
-    [IO.File]::Copy($Source,$destination,$true)
-    Assert-Replay ((Get-ReplaySha $destination) -ceq $ExpectedReplacement.ToUpperInvariant()) 'replacement hash differs'
-  }finally{$lock.Dispose()}
+    [IO.File]::Copy($Source,$staged,$false)
+    Assert-Replay ((Get-ReplaySha $staged) -ceq $ExpectedReplacement.ToUpperInvariant()) 'replacement hash differs'
+    [IO.File]::Move($staged,$destination,$true)
+  }finally{
+    try{[IO.File]::Delete($staged)}finally{$lock.Dispose()}
+  }
 }
 $swapped=$false
 try{
   Set-ReplayLibraryArchive $replay $PublishedSha256 $ReplaySha256
   $swapped=$true
-  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60 -ActiveModsObserver $ActiveModsObserver
+  $storageArguments=@{
+    LinuxStoragePlanPath=$LinuxStoragePlanPath
+    LinuxStoragePlanSha256=$LinuxStoragePlanSha256
+  }
+  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60 -ActiveModsObserver $ActiveModsObserver @storageArguments
 }finally{
   if($swapped){Set-ReplayLibraryArchive $published $ReplaySha256 $PublishedSha256}
   Assert-Replay ((Get-ReplaySha $published) -ceq $PublishedSha256.ToUpperInvariant()) 'published custody changed'
