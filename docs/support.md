@@ -89,11 +89,11 @@ source_of_truth_for:
 
 On Factorio 2.0.77, MIR 5.0.22 admits a direct upgrade from MIR 5.0.3 that removes Space Is Fake 1.0.60 and its unused cr-commons 1.0.27 dependency. This requires the unchanged official Space Age mods, default worker cargo settings and no earned, current, queued or parked repeating worker cargo research on any force.
 
-Use two separate loads for an older MIR 5 save with invested worker cargo, different settings or another mod selection. The combined change can stop when MIR cannot establish the save's worker research history.
+For a save outside that direct route, keep Space Is Fake installed for the first load. An accepted load with the original selection and settings lets MIR record the worker research contract before you remove the mod.
 
-1. Keep the original save. Upgrade a copy to MIR 5.0.18 with the same Factorio version, enabled mods and startup settings. Leave Space Is Fake installed.
+1. Keep the original save. Load a copy with the same Factorio version, enabled mods and startup settings. Use MIR 5.0.18 for the tested upgrade from 5.0.3. If your save already uses 5.0.18 or later, keep its MIR version for the staged loads.
 2. Check the research queue and earned bonuses. Save under a new name and exit.
-3. Load that new save with MIR still at 5.0.18 after removing Space Is Fake. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
+3. Remove Space Is Fake and load the new save with the MIR version and startup settings from step 1. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
 
 This sequence preserved queued mining and plastic research, unfinished progress and earned recipe bonuses in the tested Factorio 2.0.77 save with Space Is Fake 1.0.60.
 
