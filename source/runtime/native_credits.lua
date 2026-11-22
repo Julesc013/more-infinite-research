@@ -2,12 +2,13 @@
 --
 -- The five-family and descriptor declarations own the rows this module reads or
 -- writes.  It intentionally does not inspect recipe bonuses, reset technology
--- effects. Native levels carry signed credit. Only previously queued private
+-- effects. Native levels carry signed credit. Only invested private
 -- manufacturing work needs a temporary completion/cancellation subscription.
 local definitions = require("research.native_credit_definitions")
 local catalogue = require("runtime.catalogue")
 local target = require("platform.target")
 local vectors = require("runtime.native_credit_vectors")
+local credit_work = require("runtime.native_credit_work")
 
 local M = {}
 
@@ -774,11 +775,6 @@ local function unknown_paid_mask(event, force, observation, queued, current)
     .. table.concat(fields, " ") .. "]")
 end
 
-local function has_saved_work(technology)
-  local progress = technology and technology.saved_progress
-  return type(progress) == "number" and progress > 0
-end
-
 local function research_counts(force)
   local queued = {}
   for _, technology in ipairs(force.research_queue or {}) do
@@ -788,9 +784,9 @@ local function research_counts(force)
   local current = force.current_research
   if current and COLLECTED_BY_MAIN[current.name] ~= nil and queued[current.name] == nil then queued[current.name] = 1 end
   local invested = {}
-  -- Saved progress belongs to the first occurrence if it is still queued.
   for name in pairs(COLLECTED_BY_MAIN) do
-    invested[name] = queued[name] or (has_saved_work(force.technologies[name]) and 1 or 0)
+    local main = force.technologies[name]
+    invested[name] = credit_work.invested_count(queued[name] or 0, main and main.saved_progress)
   end
   return queued, invested
 end
@@ -1202,12 +1198,13 @@ function M.on_research_cancelled(event)
   for name, count in pairs(cancelled) do
     if COLLECTED_BY_MAIN[name] then
       if not integer(count) or count < 0 then family_failure("invalid native cancellation count") end
-      local saved_work = has_saved_work(force.technologies[name])
+      local main = force.technologies[name]
+      local progress = main and main.saved_progress
       for _, descriptor in ipairs(COLLECTED_BY_MAIN[name]) do
         local record = records and records[descriptor.key]
         if record then
-          local retained = saved_work and math.min(1, record.pending) or 0
-          plans[#plans + 1] = {record=record, pending=math.max(retained, record.pending - count)}
+          plans[#plans + 1] = {record=record,
+            pending=credit_work.remaining_after_cancellation(record.pending, count, progress)}
         end
       end
     end
