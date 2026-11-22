@@ -1772,11 +1772,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local refresh = context.created_force == force.index or context.reset_force == force.index
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
-      -- A configuration change can re-enable both native level-5 sides of
-      -- the first-level debit. Reassert only MIR's saved retirement right,
-      -- and only with the complete paid pair and no work on the retired row.
+      -- A configuration can re-enable either side of the paid pair. To
+      -- retire the public row again, require MIR's saved retirement right
+      -- and the paid debit. The pair check verifies the work.
       local settle_source = context.configuration == true and prior and prior.phase == "owned"
-        and prior.retired_flags.disabled_by_mir and source.enabled and gate.enabled and gate_paid(gate) or false
+        and prior.retired_flags.disabled_by_mir and source.enabled and gate_paid(gate) or false
       local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
       if legacy_retuned and (not prior or prior.phase ~= "legacy")
           and default_owner_frame_has_invested_work(destination, id) then
@@ -1841,7 +1841,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
           action = "first-credit"
         else recover_error("full default native owner/first-level debit changed") end
       end
-      if action == "validate" and gate.enabled then action = "settle-gate" end
+      if action == "validate" and (gate.enabled or settle_source) then action = "settle-flags" end
       record.forces[force.index] = next_force
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled, settle_source=settle_source,
@@ -1873,6 +1873,9 @@ function M.apply_default_owner_transfer(plan)
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
     if not old or old.gate_enabled ~= item.gate_enabled then recover_error("head debit flag changed after default preflight") end
+    if old.action == "settle-flags" and old.source.enabled ~= item.source.enabled then
+      recover_error("retired public worker flag changed after default preflight")
+    end
   end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
@@ -1931,9 +1934,9 @@ function M.apply_default_owner_transfer(plan)
           canonical.level = 5
           canonical.enabled, canonical.visible_when_disabled = false, frame.visible
           set_gate_paid(gate, true)
-        elseif item.action == "settle-gate" then
+        elseif item.action == "settle-flags" then
           if item.settle_source then canonical.enabled = false end
-          gate.enabled = false
+          if item.gate_enabled then gate.enabled = false end
         end
       end)
       default_mutating_force = previous
@@ -1977,7 +1980,7 @@ function M.apply_default_owner_transfer(plan)
         end
       elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
         recover_error("native full default owner work changed during first-level credit")
-      elseif item.action == "validate" or item.action == "settle-gate" then
+      elseif item.action == "validate" or item.action == "settle-flags" then
         local expected = frame_values(item.source)
         if item.settle_source then expected.enabled = false end
         if not equal_plain(expected, frame_values(actual_source)) then
