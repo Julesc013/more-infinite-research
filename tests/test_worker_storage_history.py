@@ -3620,6 +3620,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.24"),
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
+            ("f210", "4.7.21003", "space-age", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
@@ -3638,6 +3640,12 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                     for name,version in pairs(script.active_mods)do
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version=version,new_version=version}
+                      end
+                    end
+                  elseif selection=="space-age-engine-patch"then
+                    for name,version in pairs(script.active_mods)do
+                      if name~="more-infinite-research"then
+                        event.mod_changes[name]={old_version="2.1.24",new_version=version}
                       end
                     end
                   end
@@ -3667,14 +3675,15 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
             "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
             "inactive DLC": 'script.active_mods.recycler=nil',
-            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.25" end end',
-            "repinned official set": '''
+            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.26" end end',
+            "missing official patch row": '''
               for name,version in pairs(script.active_mods)do
                 if version=="2.1.23"then
                   script.active_mods[name]="2.1.24"
                   event.mod_changes[name]={old_version=version,new_version="2.1.24"}
                 end
               end
+              event.mod_changes.recycler=nil
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
             "unrelated existing mod": 'script.active_mods.observer="1.0.0"',

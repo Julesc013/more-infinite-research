@@ -895,12 +895,15 @@ local function require_archived_default_contract(event, state, current, space_ag
 end
 
 local function published473_space_age_selection(event, change, active)
-  -- A package-only upgrade can reconstruct the prior official selection.
-  -- Additions, removals and other providers require their own source contract.
+  -- The configured official set must have remained installed across an
+  -- admitted engine patch. The caller verifies synchronized official rows.
   local base = active.base
+  local base_change = event.mod_changes.base
   local f200 = target.id == "f200" and change.old_version == "4.7.20003" and base == "2.0.77"
   local f210 = target.id == "f210" and change.old_version == "4.7.21003"
-    and (base == "2.1.23" or base == "2.1.24")
+    and (base == "2.1.23" or base == "2.1.24"
+      or base == "2.1.25" and (not base_change or base_change.old_version == "2.1.24"
+        or base_change.old_version == base))
   if not (f200 or f210)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
@@ -914,8 +917,7 @@ local function published473_space_age_selection(event, change, active)
   end
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR and (not ENGINE_MODS[name] or active[name] ~= base
-        or type(item) ~= "table" or getmetatable(item) ~= nil
-        or item.old_version ~= base or item.new_version ~= base) then return false end
+        or type(item) ~= "table" or getmetatable(item) ~= nil) then return false end
   end
   return true
 end
