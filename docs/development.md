@@ -309,6 +309,14 @@ This MIR5 procedure uses the maintainer's explicit publication authorization. It
 7. Verify tag/main identity, title/body, complete inventory-derived names/labels, the explicit prerelease flag and mutable-release probes, then publish that same release ID. A prerelease uses `make_latest="false"`; only an appropriate stable release may be selected as latest. These GitHub metadata fields do not modify ZIPs. Read the release ID after a lost response rather than creating another release, and record its URL, maturity and publication state. See [GitHub's release fields](https://docs.github.com/en/rest/releases/releases#create-a-release).
 8. Download every inventory-selected public asset anonymously with no authorization header and verify exact bytes/hashes. Copy the identical ZIPs, sums, matching release notes and upload text into primary `dist`, with hash verification. Retain developer inventory and publication/download receipts separately. Synchronize the primary branch with its remote and dispose only of completed clean disposable work after readback. Verified GitHub delivery completes that release's distribution; a prerelease does not complete stable qualification. The maintainer uploads the same ZIPs to Portal only for stable releases.
 
+Run the [anonymous readback command](../tools/verify_public_release.py) from the primary checkout after publication. Supply the earlier reviewed inventory hash, checked tag commit, release ID and chosen maturity. The command reads the release notes from that commit, verifies the anonymous assets, and keeps mismatched existing delivery files and verified staging available for reconciliation.
+
+```powershell
+python -B tools/verify_public_release.py --frozen <freeze-directory> --inventory-sha256 <sha256> --tag-commit <commit> --release-id <id> --maturity prerelease --receipt build/qualification/<new-readback-directory>
+```
+
+Use `--maturity stable` for a qualified stable release.
+
 ## Determinism and visual context
 
 Read [the architecture explainer](architecture.md) once, then only the relevant spec/diagram. For ordering, runtime, migration or package work, include [determinism](../spec/determinism.md) in the task packet. Do not supply all diagrams or old transcripts to every task.
