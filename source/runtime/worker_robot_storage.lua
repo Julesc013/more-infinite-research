@@ -838,7 +838,8 @@ end
 local function published473_space_age_selection(event, change, active)
   -- A package-only upgrade can reconstruct the prior official selection.
   -- Additions, removals and other providers require their own source contract.
-  if target.id ~= "f210" or change.old_version ~= "4.7.21003" or active.base ~= "2.1.23"
+  if target.id ~= "f210" or change.old_version ~= "4.7.21003"
+      or (active.base ~= "2.1.23" and active.base ~= "2.1.24")
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
   for name in pairs(ENGINE_MODS) do
