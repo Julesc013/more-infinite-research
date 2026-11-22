@@ -87,7 +87,9 @@ source_of_truth_for:
 
 ### Removing Space Is Fake on Factorio 2.0
 
-Use two separate loads when upgrading an older MIR 5 save and removing Space Is Fake. The combined change can stop if the save still needs its worker research history established.
+On Factorio 2.0.77, MIR 5.0.22 admits a direct upgrade from MIR 5.0.3 that removes Space Is Fake 1.0.60 and its unused cr-commons 1.0.27 dependency. This requires the unchanged official Space Age mods, default worker cargo settings and no earned, current, queued or parked repeating worker cargo research on any force.
+
+Use two separate loads for an older MIR 5 save with invested worker cargo, different settings or another mod selection. The combined change can stop when MIR cannot establish the save's worker research history.
 
 1. Keep the original save. Upgrade a copy to MIR 5.0.18 with the same Factorio version, enabled mods and startup settings. Leave Space Is Fake installed.
 2. Check the research queue and earned bonuses. Save under a new name and exit.
