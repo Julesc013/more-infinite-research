@@ -4336,6 +4336,42 @@ class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
                   assert(not message:find("/mir-worker-storage-recovery prepare",1,true))
                 ''')
 
+    def test_recorded_default_accepts_later_same_edition_mir5_producers(self):
+        for target in ("f200", "f210"):
+            for patch in ("12", "22"):
+                with self.subTest(target=target, patch=patch):
+                    lua = self.world(target)
+                    lua.globals().prior_patch = patch
+                    lua.execute(r'''
+                      seed_owner()
+                      storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                      local metadata = require("platform.target")
+                      local prefix = metadata.distribution_version:sub(1,-3)
+                      local prior, current = prefix..prior_patch, prefix.."23"
+                      metadata.distribution_version = current
+                      script.active_mods["more-infinite-research"] = current
+                      script.active_mods["credit-provider"] = "0.3.0"
+                      local event = {mod_startup_settings_changed=false,mod_changes={
+                        ["more-infinite-research"]={old_version=prior,new_version=current},
+                        ["credit-provider"]={old_version="0.2.0",new_version="0.3.0"},
+                      }}
+                      local before=all_frames();writes=0
+                      local plan=history.plan_default_owner_transfer(event,nil,false)
+                      assert(writes==0 and same(before,all_frames()))
+                      assert(history.apply_default_owner_transfer(plan))
+                      local producer=storage[OWNER_KEY].producer
+                      assert(producer.kind=="recorded-default" and producer.old_version==prior and producer.new_version==current)
+                      assert(player.current_research.name==ORDINARY and player.research_progress==.375)
+                      assert(player.research_queue[2].name==OTHER and suspended.current_research.name==OTHER)
+                      assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
+                      for _,force in pairs(game.forces) do assert(frame(force).bonus==before[force.index].bonus) end
+                      history.default_owner_on_load()
+                      local after=all_frames();writes=0
+                      local again=history.default_owner_preflight(event,nil,true)
+                      history.default_owner_apply(again)
+                      assert(writes==0 and same(after,all_frames()))
+                    ''')
+
     def test_recorded_default_preserves_paid_and_pending_work_across_consistent_mod_changes(self):
         for target in ("f200", "f210"):
             for change in ("added", "removed", "updated"):
