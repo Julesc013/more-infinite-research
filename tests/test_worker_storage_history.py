@@ -322,6 +322,34 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(player.worker_robots_storage_bonus==bonus)
         ''')
 
+    def test_prepare_refuses_unavailable_or_truncated_queues_before_any_force_writes(self):
+        for incomplete in ("unavailable", "hole"):
+            with self.subTest(incomplete=incomplete):
+                self.setUp()
+                self.lua.globals().incomplete = incomplete
+                self.lua.execute(r'''
+                  seed()
+                  local force = suspended
+                  if incomplete == "unavailable" then force.research_queue = {} end
+                  local queue = force.research_queue
+                  local observed = nil
+                  if incomplete == "hole" then observed = {queue[1], [3]=queue[2]} end
+                  local mt = getmetatable(force)
+                  local read = mt.__index
+                  mt.__index = function(object, key)
+                    if key == "research_queue" and writes == 0 then return observed end
+                    return read(object, key)
+                  end
+                  writes = 0
+                  local ok, failure = pcall(history.prepare, nil)
+                  mt.__index = read
+                  assert(not ok and tostring(failure):find("native queue", 1, true),
+                    "accepted an incomplete queue: " .. tostring(failure))
+                  assert(writes == 0 and storage.mir_worker_storage_route == nil)
+                  assert(force.research_queue == queue and force.technologies[CANONICAL].saved_progress == .27)
+                  assert(player.current_research.name == CANONICAL and player.research_progress == .375)
+                ''')
+
     def test_all_force_contract_custody_and_frame_opponents_refuse_before_writes(self):
         opponents = [
             'creators[CANONICAL]="foreign"', 'creators[ID]="foreign"',
