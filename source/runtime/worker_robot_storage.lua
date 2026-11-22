@@ -835,6 +835,25 @@ local function default_origin_error(reason, event, state, current, rejected, adv
   recover_error(reason, nil, event, state, current, rejected, advice)
 end
 
+local function published473_space_age_selection(event, change, active)
+  -- A package-only upgrade can reconstruct the prior official selection.
+  -- Additions, removals and other providers require their own source contract.
+  if target.id ~= "f210" or change.old_version ~= "4.7.21003" or active.base ~= "2.1.23"
+      or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
+      or getmetatable(change) ~= nil then return false end
+  for name in pairs(ENGINE_MODS) do
+    if active[name] ~= active.base then return false end
+  end
+  for name in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  end
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR and (not ENGINE_MODS[name] or type(item) ~= "table" or getmetatable(item) ~= nil
+        or item.old_version ~= active.base or item.new_version ~= active.base) then return false end
+  end
+  return true
+end
+
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
   local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
     or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
@@ -842,34 +861,41 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false and not empty_source) then
     default_origin_error("older default source requires its qualified Base engine and unchanged settings", event, state, current)
   end
-  for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
-    if active[name] ~= nil then default_origin_error("older default source requires its Base-only profile", event, state, current) end
-  end
-  if not empty_source then
-    for name, version in pairs(active) do
-      if name ~= "base" and name ~= MIR then
-        local addition = event.mod_changes[name]
-        if type(version) ~= "string" or type(addition) ~= "table" or addition.old_version ~= nil
-            or addition.new_version ~= version then
-          default_origin_error("older default prior mod selection is not Base+MIR", event, state, current)
+  local space_age = active["space-age"] ~= nil
+  if space_age then
+    if not published473_space_age_selection(event, change, active) then
+      default_origin_error("published473 Space Age source requires its unchanged official mod selection", event, state, current)
+    end
+  else
+    for _, name in ipairs({"quality", "elevated-rails", "recycler"}) do
+      if active[name] ~= nil then default_origin_error("older default source requires its Base-only profile", event, state, current) end
+    end
+    if not empty_source then
+      for name, version in pairs(active) do
+        if name ~= "base" and name ~= MIR then
+          local addition = event.mod_changes[name]
+          if type(version) ~= "string" or type(addition) ~= "table" or addition.old_version ~= nil
+              or addition.new_version ~= version then
+            default_origin_error("older default prior mod selection is not Base+MIR", event, state, current)
+          end
         end
       end
     end
-  end
-  if empty_source and (getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
-      or getmetatable(change) ~= nil) then
-    default_origin_error("published473 empty worker source requires a plain configuration event", event, state, current)
-  end
-  for name, item in pairs(event.mod_changes) do
-    if name ~= MIR then
-      -- Same-edition Base changes already passed the supported-patch check.
-      -- The separately qualified cross-edition hop keeps its exact source.
-      if type(item) ~= "table" or empty_source and getmetatable(item) ~= nil
-          or item.new_version ~= active[name] or type(item.new_version) ~= "string"
-          or name == "base" and base_hop and item.old_version ~= "2.0.77"
-          or name ~= "base" and item.old_version ~= nil
-            and (not empty_source or type(item.old_version) ~= "string" or item.old_version == "") then
-        default_origin_error("older default source changed a previous mod or engine", event, state, current)
+    if empty_source and (getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
+        or getmetatable(change) ~= nil) then
+      default_origin_error("published473 empty worker source requires a plain configuration event", event, state, current)
+    end
+    for name, item in pairs(event.mod_changes) do
+      if name ~= MIR then
+        -- Same-edition Base changes already passed the supported-patch check.
+        -- The separately qualified cross-edition hop keeps its exact source.
+        if type(item) ~= "table" or empty_source and getmetatable(item) ~= nil
+            or item.new_version ~= active[name] or type(item.new_version) ~= "string"
+            or name == "base" and base_hop and item.old_version ~= "2.0.77"
+            or name ~= "base" and item.old_version ~= nil
+              and (not empty_source or type(item.old_version) ~= "string" or item.old_version == "") then
+          default_origin_error("older default source changed a previous mod or engine", event, state, current)
+        end
       end
     end
   end
@@ -890,8 +916,9 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   end
   local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
     ["production-science-pack"]=1, ["utility-science-pack"]=1}
+  if space_age then packs["electromagnetic-science-pack"] = 1 end
   local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= 5 then
+  if type(ingredients) ~= "table" or #ingredients ~= (space_age and 6 or 5) then
     default_origin_error("published473 default science differs", event, state, current)
   end
   for _, ingredient in ipairs(ingredients) do
