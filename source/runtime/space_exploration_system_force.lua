@@ -105,8 +105,8 @@ function M.apply(plan)
   if plan == nil then return end
   require_policy(type(plan) == "table" and plan.used == false, "plan is invalid or already consumed")
   local current = M.preflight(plan.event)
-  require_policy(current ~= nil and current.force == plan.force, "configuration or force changed after preflight")
   plan.used = true
+  if not current or current.force ~= plan.force then return end
   local force = plan.force
   force.worker_robots_speed_modifier, force.worker_robots_storage_bonus, force.artillery_range_modifier =
     DEFAULTS[1], DEFAULTS[2], DEFAULTS[3]

@@ -81,15 +81,6 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         self.assertEqual(self.lua.eval("#native_writes"), 0, mutation)
         self.assertEqual(self.lua.eval("forbidden_writes"), 0, mutation)
 
-    def rejected_after_preflight(self, mutation):
-        self.lua.execute("plan=policy.preflight(event)")
-        self.lua.execute(mutation)
-        ok, message = self.lua.eval("pcall(function() policy.apply(plan);return nil end)")
-        self.assertFalse(ok, mutation)
-        self.assertTrue(message, mutation)
-        self.assertEqual(self.lua.eval("#native_writes"), 0, mutation)
-        self.assertEqual(self.lua.eval("forbidden_writes"), 0, mutation)
-
     def test_source_authored_values_only_on_the_same_production_predicate_with_or_without_observer(self):
         predecessors = ("4.7.20002", "5.0.20017")
         unchanged_mods = (None, "mir-fixture-mir5-worker-storage-se-cap-ten-native", "unrelated-unchanged-mod")
@@ -222,14 +213,21 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                 self.lua.execute('event.mod_changes["more-infinite-research"].old_version="5.0.20017"')
                 self.skipped(mutation)
 
-    def test_revalidation_refuses_intervening_foreign_changes(self):
+    def test_revalidation_skips_intervening_foreign_changes_without_blocking_load(self):
         for mutation in ('active.base="2.0.78"', 'event.mod_changes.foreign={new_version="1.0.0"}',
                          'fields.worker_robots_storage_bonus=9', 'ammo.laser=.25',
                          'fields.players={foreign}', 'rows["worker-robots-storage-4"].level=5',
+                         'add_row("foreign-worker",1,true).prototype.effects={{type="worker-robot-storage",modifier=2}}',
                          'game.forces.conquest=foreign'):
             with self.subTest(mutation=mutation):
                 self.setUp()
-                self.rejected_after_preflight(mutation)
+                self.lua.execute("plan=assert(policy.preflight(event))")
+                self.lua.execute(mutation)
+                self.lua.execute('''
+                  policy.apply(plan)
+                  assert(plan.used and #native_writes==0 and forbidden_writes==0)
+                  assert(not pcall(function() policy.apply(plan) end))
+                ''')
 
     def test_failed_postcondition_propagates_and_cannot_replay_the_plan(self):
         self.lua.execute('''
