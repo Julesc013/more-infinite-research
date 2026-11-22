@@ -953,6 +953,38 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_retired_paid_research_uses_only_owned_enablement_and_bounds_the_queue(self):
+        self.lua.execute('''
+          local id="recipe-prod-research_electric_shooting_speed-1"
+          local main,untouched,foreign=technology(id,2,true),technology("foreign",1,true),technology(id,2,false)
+          main.prototype.enabled,foreign.prototype.enabled=false,false
+          main.saved_progress,untouched.saved_progress=.244,.31
+          local owner=force(1,{[id]=main,foreign=untouched},{untouched},untouched,.12)
+          local other=force(2,{[id]=foreign})
+          main.force,untouched.force,foreign.force=owner,owner,other
+          boot({owner,other},0)
+          handlers.init()
+          assert(not main.enabled and not foreign.enabled)
+          local lifecycle=require("runtime.lifecycle")
+          local owed=true
+          lifecycle.set_retired_work_observer(function(f,name) return owed and f==owner and name==id end)
+          lifecycle.reconcile_retired_paid_work(owner,id,2)
+          lifecycle.reconcile_retired_paid_work(other,id,2)
+          assert(main.enabled and not foreign.enabled)
+          assert(owner.current_research==untouched and owner.research_progress==.12 and main.saved_progress==.244)
+          lifecycle.on_technology_effects_reset({force=owner})
+          assert(main.enabled, "ordinary reconciliation disabled an admitted paid row")
+          owner.research_queue={main,main,untouched}
+          owner.current_research,owner.research_progress=main,.244
+          lifecycle.reconcile_retired_paid_work(owner,id,2)
+          assert(#owner.research_queue==2 and owner.research_queue[1]==main and owner.research_queue[2]==untouched)
+          assert(owner.research_progress==.244 and untouched.saved_progress==.31)
+          owed=false;main.level=3;owner.research_progress=0
+          lifecycle.reconcile_retired_paid_work(owner,id,nil)
+          assert(not main.enabled and not foreign.enabled and main.level==3)
+          assert(#owner.research_queue==1 and owner.research_queue[1]==untouched and untouched.saved_progress==.31)
+        ''')
+
     def test_authored_cap_read_faults_preserve_actual_restoration_rights(self):
         for target_id in ("f200", "f210"):
             for origin in ("finite-cap", "prototype-policy"):
