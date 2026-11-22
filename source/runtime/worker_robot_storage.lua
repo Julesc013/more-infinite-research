@@ -894,13 +894,20 @@ local function require_archived_default_contract(event, state, current, space_ag
   if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
+local function published473_worker_has_official_editors()
+  local observed = prototypes.get_history("technology", recovery.canonical)
+  if type(observed) ~= "table" or type(observed.changed) ~= "table"
+      or observed.created ~= MIR and not ENGINE_MODS[observed.created] then return false end
+  for _, name in pairs(observed.changed) do
+    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  end
+  return true
+end
+
 local function published473_space_age_selection(event, change, active)
-  -- A package-only upgrade can reconstruct the prior official selection.
-  -- Additions, removals and other providers require their own source contract.
   local base = active.base
   local f200 = target.id == "f200" and change.old_version == "4.7.20003" and base == "2.0.77"
-  local f210 = target.id == "f210" and change.old_version == "4.7.21003"
-    and (base == "2.1.23" or base == "2.1.24")
+  local f210 = target.id == "f210" and change.old_version == "4.7.21003" and same_family_engine_patch(event)
   if not (f200 or f210)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
@@ -909,15 +916,24 @@ local function published473_space_age_selection(event, change, active)
     local expected = (name ~= "recycler" or f210) and base or nil
     if active[name] ~= expected then return false end
   end
-  for name in pairs(active) do
-    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  local has_other_mods = false
+  for name, version in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] then
+      if not f210 or type(name) ~= "string" or type(version) ~= "string" or version == "" then return false end
+      has_other_mods = true
+    end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (not ENGINE_MODS[name] or active[name] ~= base
-        or type(item) ~= "table" or getmetatable(item) ~= nil
-        or item.old_version ~= base or item.new_version ~= base) then return false end
+    if name ~= MIR then
+      if type(item) ~= "table" or getmetatable(item) ~= nil or item.new_version ~= active[name]
+          or type(item.new_version) ~= "string" then return false end
+      if not ENGINE_MODS[name] and (not f210 or item.old_version ~= item.new_version) then return false end
+      if f200 and (active[name] ~= base or item.old_version ~= base) then return false end
+    end
   end
-  return true
+  -- Unchanged extra mods are admissible only with readable material worker
+  -- provenance. The caller separately checks the archived work contract.
+  return not has_other_mods or published473_worker_has_official_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -1745,6 +1761,12 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local public = prepared and default_frame(force, recovery.canonical, finished) or source
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
+      -- A configuration can re-enable the retired public row. Only a saved
+      -- MIR disablement can authorize restoring it, and the paid pair below
+      -- must still prove every other field before a write is admitted.
+      local settle_public = context.configuration == true and prior and prior.phase == "owned"
+        and prior.retired_flags.disabled_by_mir and source.enabled
+        and source.visible == prior.retired_flags.visible
       local refresh = context.created_force == force.index or context.reset_force == force.index
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
@@ -1805,14 +1827,14 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         action, moved = "transfer", true
         next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
           disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
-      elseif not full_pair(source, destination, gate) then
+      elseif not full_pair(source, destination, gate, settle_public) then
         if finished and source.next_level == 4 and not source.researched and not source.enabled
             and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
             and destination.next_level >= 5 then
           action = "first-credit"
         else recover_error("full default native owner/first-level debit changed") end
       end
-      if action == "validate" and gate.enabled then action = "settle-gate" end
+      if action == "validate" and (gate.enabled or settle_public) then action = "settle-flags" end
       record.forces[force.index] = next_force
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled,
@@ -1844,6 +1866,9 @@ function M.apply_default_owner_transfer(plan)
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
     if not old or old.gate_enabled ~= item.gate_enabled then recover_error("head debit flag changed after default preflight") end
+    if old.action == "settle-flags" and old.source.enabled ~= item.source.enabled then
+      recover_error("retired public worker flag changed after default preflight")
+    end
   end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
@@ -1901,8 +1926,9 @@ function M.apply_default_owner_transfer(plan)
           canonical.level = 5
           canonical.enabled, canonical.visible_when_disabled = false, frame.visible
           set_gate_paid(gate, true)
-        elseif item.action == "settle-gate" then
-          gate.enabled = false
+        elseif item.action == "settle-flags" then
+          if frame.enabled then canonical.enabled = false end
+          if gate.enabled then gate.enabled = false end
         end
       end)
       default_mutating_force = previous
@@ -1946,9 +1972,12 @@ function M.apply_default_owner_transfer(plan)
         end
       elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
         recover_error("native full default owner work changed during first-level credit")
-      elseif (item.action == "validate" or item.action == "settle-gate")
-          and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
-        recover_error("validated native public first-level state changed")
+      elseif item.action == "validate" or item.action == "settle-flags" then
+        local expected = frame_values(item.source)
+        expected.enabled = false
+        if not equal_plain(expected, frame_values(actual_source)) then
+          recover_error("validated native public first-level state changed")
+        end
       end
     end
   end
