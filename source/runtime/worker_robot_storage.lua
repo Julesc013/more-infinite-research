@@ -1745,6 +1745,12 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local public = prepared and default_frame(force, recovery.canonical, finished) or source
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
+      -- A configuration can re-enable the retired public row. Only a saved
+      -- MIR disablement can authorize restoring it, and the paid pair below
+      -- must still prove every other field before a write is admitted.
+      local settle_public = context.configuration == true and prior and prior.phase == "owned"
+        and prior.retired_flags.disabled_by_mir and source.enabled
+        and source.visible == prior.retired_flags.visible
       local refresh = context.created_force == force.index or context.reset_force == force.index
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
@@ -1805,14 +1811,14 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         action, moved = "transfer", true
         next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
           disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
-      elseif not full_pair(source, destination, gate) then
+      elseif not full_pair(source, destination, gate, settle_public) then
         if finished and source.next_level == 4 and not source.researched and not source.enabled
             and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
             and destination.next_level >= 5 then
           action = "first-credit"
         else recover_error("full default native owner/first-level debit changed") end
       end
-      if action == "validate" and gate.enabled then action = "settle-gate" end
+      if action == "validate" and (gate.enabled or settle_public) then action = "settle-flags" end
       record.forces[force.index] = next_force
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled,
@@ -1844,6 +1850,9 @@ function M.apply_default_owner_transfer(plan)
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
     if not old or old.gate_enabled ~= item.gate_enabled then recover_error("head debit flag changed after default preflight") end
+    if old.action == "settle-flags" and old.source.enabled ~= item.source.enabled then
+      recover_error("retired public worker flag changed after default preflight")
+    end
   end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
@@ -1901,8 +1910,9 @@ function M.apply_default_owner_transfer(plan)
           canonical.level = 5
           canonical.enabled, canonical.visible_when_disabled = false, frame.visible
           set_gate_paid(gate, true)
-        elseif item.action == "settle-gate" then
-          gate.enabled = false
+        elseif item.action == "settle-flags" then
+          if frame.enabled then canonical.enabled = false end
+          if gate.enabled then gate.enabled = false end
         end
       end)
       default_mutating_force = previous
@@ -1946,9 +1956,12 @@ function M.apply_default_owner_transfer(plan)
         end
       elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
         recover_error("native full default owner work changed during first-level credit")
-      elseif (item.action == "validate" or item.action == "settle-gate")
-          and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
-        recover_error("validated native public first-level state changed")
+      elseif item.action == "validate" or item.action == "settle-flags" then
+        local expected = frame_values(item.source)
+        expected.enabled = false
+        if not equal_plain(expected, frame_values(actual_source)) then
+          recover_error("validated native public first-level state changed")
+        end
       end
     end
   end

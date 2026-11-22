@@ -3998,6 +3998,52 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
                   assert(not again.changed and not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
                 ''')
 
+    def test_solar_addition_retires_a_reenabled_mir_owned_public_worker_row(self):
+        for debit_reenabled in (False, True):
+            with self.subTest(debit_reenabled=debit_reenabled):
+                lua = self.world("f210")
+                lua.globals().debit_reenabled = debit_reenabled
+                lua.execute(r'''
+                  full_source(1,true)
+                  local before = all_frames()
+                  local owner = storage[OWNER_KEY]
+                  player.technologies[CANONICAL].enabled = true
+                  if debit_reenabled then player.technologies[HEAD].enabled = true end
+                  writes=0;queue_writes={};progress_writes={}
+                  script.active_mods["solar-productivity"]="3.0.0"
+                  local event={mod_startup_settings_changed=true,
+                    mod_changes={["solar-productivity"]={new_version="3.0.0"}}}
+                  local reset = all_frames()
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(plan.changed and writes==0 and same(reset,all_frames()))
+                  assert(history.default_owner_apply(plan))
+                  assert(same(before,all_frames()) and same(storage[OWNER_KEY],owner))
+                  assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                  assert(writes==(debit_reenabled and 2 or 1))
+                  writes=0
+                  local again=history.default_owner_preflight(event,nil,true)
+                  assert(not again.changed and not history.default_owner_apply(again) and writes==0)
+                ''')
+
+    def test_worker_flag_settlement_requires_saved_right_and_exact_debit(self):
+        for mutation in (
+            'rights.enabled=false;rights.disabled_by_mir=false',
+            'player.technologies[CANONICAL].saved_progress=.13',
+            'player.technologies[HEAD].level=4',
+        ):
+            with self.subTest(mutation=mutation):
+                lua = self.world("f210")
+                lua.globals().bad_frame = mutation
+                lua.execute(r'''
+                  full_source(1,true)
+                  player.technologies[CANONICAL].enabled=true
+                  rights=storage[OWNER_KEY].forces[player.index].retired_flags
+                  assert(load(bad_frame))()
+                  local before=all_frames();writes=0
+                  local ok=pcall(history.default_owner_preflight,default_config(),nil,true)
+                  assert(not ok and writes==0 and same(before,all_frames()))
+                ''')
+
     def test_provider_handover_settles_paid_head_flags_without_reconstructing_work(self):
         for target in ("f200", "f210"):
             for a,b in ((0,2),(1,1),(2,0)):
