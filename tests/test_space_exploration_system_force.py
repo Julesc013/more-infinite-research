@@ -120,14 +120,36 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                 self.lua.execute(mutation + ';game=setmetatable({}, {__index=function()error("world access")end})')
                 self.lua.execute("assert(policy.preflight(event)==nil);policy.apply(nil);assert(#native_writes==0)")
 
+    def test_authored_conquest_defaults_do_not_depend_on_the_startup_settings_flag(self):
+        for predecessor, flag in product(("4.7.20002", "5.0.20017"), ("true", "nil")):
+            with self.subTest(predecessor=predecessor, flag=flag):
+                self.setUp()
+                self.lua.globals().predecessor = predecessor
+                self.lua.execute(
+                    'event.mod_changes["more-infinite-research"].old_version=predecessor;'
+                    f'event.mod_startup_settings_changed={flag};'
+                    'plan=policy.preflight(event);assert(plan and #native_writes==0);'
+                    'policy.apply(plan);assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)'
+                )
+
+    def test_an_already_restored_conquest_policy_needs_no_writes(self):
+        self.lua.execute('''
+          event.mod_startup_settings_changed=true
+          fields.worker_robots_speed_modifier=5.65
+          fields.worker_robots_storage_bonus=3
+          fields.artillery_range_modifier=1.8
+          gun["artillery-shell"]=6;gun.laser=2.2;ammo.laser=5.1
+          assert(policy.preflight(event)==nil and #native_writes==0)
+        ''')
+
     def test_profile_and_configuration_opponents_refuse_before_writes(self):
-        mutations = ['event.mod_startup_settings_changed=true', 'event.mod_startup_settings_changed=nil',
-                     'target.distribution_version=nil', 'target.distribution_version=""',
+        mutations = ['target.distribution_version=nil', 'target.distribution_version=""',
                      'target.distribution_version="5.0.21018"',
                      'event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active["more-infinite-research"]="5.0.20019";event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active.base="2.0.78"', 'active.Krastorio2="1.0.0"', 'active["space-age"]="2.0.77"',
                      'event.mod_changes.foreign={old_version="1.0.0"}',
+                     'event.mod_startup_settings_changed=true;'
                      'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
                      'event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={old_version="0.1.0"}',
                      'active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0";event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={new_version="0.1.0"}']
@@ -173,7 +195,6 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
 
     def test_revalidation_refuses_intervening_foreign_changes(self):
         for mutation in ('active.base="2.0.78"', 'event.mod_changes.foreign={new_version="1.0.0"}',
-                         'event.mod_startup_settings_changed=true',
                          'fields.worker_robots_storage_bonus=9', 'ammo.laser=.25',
                          'fields.players={foreign}', 'rows["worker-robots-storage-4"].level=5',
                          'game.forces.conquest=foreign'):

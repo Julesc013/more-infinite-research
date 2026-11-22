@@ -974,10 +974,14 @@ local function published472_se_origin(event, change, active, state, current)
       or active["Krastorio2-spaced-out"] ~= nil then
     default_origin_error("published472 SE source requires its observed engine and provider", event, state, current)
   end
-  for _, name in ipairs{"space-age", "quality", "elevated-rails", "recycler"} do
+  for _, name in ipairs{"space-age", "quality", "recycler"} do
     if active[name] ~= nil then
       default_origin_error("published472 SE source has an unqualified official-mod selection", event, state, current)
     end
+  end
+  local rails = active["elevated-rails"]
+  if rails ~= nil and rails ~= active.base then
+    default_origin_error("published472 SE source requires Elevated Rails at its engine version", event, state, current)
   end
   for name, row in pairs(event.mod_changes) do
     if type(name) ~= "string" or type(row) ~= "table" or getmetatable(row) ~= nil
