@@ -252,8 +252,10 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         run_root.mkdir(parents=True)
         self.addCleanup(lambda: shutil.rmtree(run_root, ignore_errors=True))
         governor = ROOT / "tools" / "lib" / "validation" / "ResourceGovernor.ps1"
+        common = governor.with_name("NativeProbeCommon.ps1")
         script = rf"""
 $ErrorActionPreference='Stop'
+. '{common.as_posix()}'
 . '{governor.as_posix()}'
 $work='{run_root.as_posix()}'
 $ledger=Join-Path $work 'ledger.jsonl'
