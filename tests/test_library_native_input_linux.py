@@ -72,7 +72,7 @@ def valid_binding(spec, **changes):
 class MockBackend:
     """A traceable XTest-shaped double; it has no process or X-server effects."""
 
-    keycodes = {"Escape": 9, "Tab": 23, "BackSpace": 22, "Shift_L": 50,
+    keycodes = {"Escape": 9, "Tab": 23, "BackSpace": 22, "Shift_L": 50, "_": 20,
                 "Control_L": 37, "e": 26, "a": 38, "A": 38, "z": 52, " ": 65}
 
     def __init__(self, spec, binding, *, stolen_focus=False, mapped=True,
@@ -309,6 +309,21 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
         )
         self.assertEqual(len(trace), 8)
         self.assertTrue(all(row["api"] == "XTestFakeKeyEvent" for row in trace))
+
+    def test_material_filter_accepts_the_identifier_and_releases_shift_after_underscore(self):
+        selection = valid_spec("text", text="research_material_aluminium")
+        self.assertIs(ACTOR.validate_spec(selection), selection)
+        spec = valid_spec("text", text="a_z")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding, shifted_symbols=("_",))
+        trace, _, _, _ = self.perform(spec, backend=backend, binding=binding)
+        self.assertEqual(
+            [event for event in backend.events if event[0] == "key"],
+            [("key", 38, True), ("key", 38, False),
+             ("key", 50, True), ("key", 20, True), ("key", 20, False),
+             ("key", 50, False), ("key", 52, True), ("key", 52, False)],
+        )
+        self.assertTrue(all(edge["accepted_by_xtest"] and not edge["cleanup"] for edge in trace))
 
     def test_escape_inventory_and_tab_have_one_exact_key_pair(self):
         for action, code in (("escape", 9), ("inventory", 26), ("tab", 23)):
