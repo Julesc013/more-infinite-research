@@ -147,15 +147,26 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         ''')
 
     def test_completed_night_vision_does_not_block_the_se_policy_or_change_research(self):
-        self.lua.execute('''
-          local night_vision=add_row("night-vision-equipment",1,true)
-          night_vision.prototype.effects={{type="unlock-recipe",recipe="night-vision-equipment"}}
-          local plan=policy.preflight(event);assert(plan and #native_writes==0)
-          policy.apply(plan)
-          assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)
-          assert(night_vision.researched and night_vision.level==1 and night_vision.saved_progress==0)
-          assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
-        ''')
+        for predecessor, updated_addon in product(("4.7.20002", "5.0.20017"), (False, True)):
+            with self.subTest(predecessor=predecessor, updated_addon=updated_addon):
+                self.setUp()
+                self.lua.globals().predecessor = predecessor
+                self.lua.execute('event.mod_changes["more-infinite-research"].old_version=predecessor')
+                if updated_addon:
+                    self.lua.execute('''
+                      active["space-hall-fix"]="1.0.1"
+                      event.mod_changes["space-hall-fix"]={old_version="1.0.0",new_version="1.0.1"}
+                      event.mod_startup_settings_changed=true
+                    ''')
+                self.lua.execute('''
+                  local night_vision=add_row("night-vision-equipment",1,true)
+                  night_vision.prototype.effects={{type="unlock-recipe",recipe="night-vision-equipment"}}
+                  local plan=policy.preflight(event);assert(plan and #native_writes==0)
+                  policy.apply(plan)
+                  assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)
+                  assert(night_vision.researched and night_vision.level==1 and night_vision.saved_progress==0)
+                  assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
+                ''')
 
     def test_profile_and_configuration_opponents_skip_before_writes(self):
         mutations = ['target.distribution_version=nil', 'target.distribution_version=""',
@@ -164,8 +175,9 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                      'active["more-infinite-research"]="5.0.20019";event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active.base="2.0.78"', 'active.Krastorio2="1.0.0"', 'active["space-age"]="2.0.77"',
                      'event.mod_changes.foreign={old_version="1.0.0"}',
-                     'event.mod_startup_settings_changed=true;'
-                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
+                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.18"}',
+                     'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
+                     'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
                      'event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={old_version="0.1.0"}',
                      'active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0";event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={new_version="0.1.0"}']
         for mutation in mutations:
@@ -204,7 +216,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
 
     def test_published517_skips_ambiguous_or_invested_system_force(self):
         for mutation in ('gun.laser=.4', 'rows["worker-robots-storage-4"].saved_progress=.12',
-                         'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}'):
+                         'event.mod_changes.jetpack={old_version="0.4.16"}'):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute('event.mod_changes["more-infinite-research"].old_version="5.0.20017"')

@@ -24,8 +24,13 @@ end
 local function origin(event, active)
   if active.base ~= "2.0.77" or active.Krastorio2 ~= nil or active["space-age"] ~= nil then return false end
   for name, change in pairs(event.mod_changes) do
-    if name ~= MIR and (type(change) ~= "table" or type(change.old_version) ~= "string"
-        or change.old_version ~= change.new_version or active[name] ~= change.new_version) then return false end
+    if name ~= MIR then
+      if type(change) ~= "table" or type(change.old_version) ~= "string"
+          or type(change.new_version) ~= "string" or active[name] ~= change.new_version then return false end
+      if (name == "base" or name == "space-exploration") and change.old_version ~= change.new_version then
+        return false
+      end
+    end
   end
   return true
 end

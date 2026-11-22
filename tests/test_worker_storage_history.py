@@ -3622,6 +3622,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
             ("f210", "4.7.21003", "space-age", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch-with-addons", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
@@ -3642,11 +3643,25 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                         event.mod_changes[name]={old_version=version,new_version=version}
                       end
                     end
-                  elseif selection=="space-age-engine-patch"then
+                  elseif selection=="space-age-engine-patch" or selection=="space-age-engine-patch-with-addons"then
                     for name,version in pairs(script.active_mods)do
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version="2.1.24",new_version=version}
                       end
+                    end
+                  end
+                  if selection=="space-age-engine-patch-with-addons"then
+                    local addons={CleanedConcrete="2.1.0",["even-distribution-fork"]="2.1.2",
+                      pump="2.2.6",["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
+                    for name,version in pairs(addons)do script.active_mods[name]=version end
+                    event.mod_changes.pump={old_version="2.2.6",new_version="2.2.6"}
+                    local read=prototypes.get_history
+                    prototypes.get_history=function(kind,id)
+                      local result=read(kind,id)
+                      if kind=="technology" and id==CANONICAL then
+                        result.changed={"space-age","more-infinite-research"}
+                      end
+                      return result
                     end
                   end
                   local before=all_frames();writes=0;queue_writes={};progress_writes={}
@@ -3686,7 +3701,26 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
               event.mod_changes.recycler=nil
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
-            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "missing worker editor history": 'script.active_mods.observer="1.0.0"',
+            "foreign worker edit": '''
+              script.active_mods.observer="1.0.0"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"observer"} end
+                return result
+              end
+            ''',
+            "changed addon with known worker editors": '''
+              script.active_mods.observer="1.0.1"
+              event.mod_changes.observer={old_version="1.0.0",new_version="1.0.1"}
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"space-age"} end
+                return result
+              end
+            ''',
             "added mod": '''
               script.active_mods.observer="1.0.0"
               event.mod_changes.observer={new_version="1.0.0"}

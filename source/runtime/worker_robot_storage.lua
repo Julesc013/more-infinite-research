@@ -894,6 +894,17 @@ local function require_archived_default_contract(event, state, current, space_ag
   if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
+local function published473_worker_has_known_editors()
+  if not prototypes or type(prototypes.get_history) ~= "function" then return false end
+  local observed = prototypes.get_history("technology", recovery.canonical)
+  if type(observed) ~= "table" or type(observed.changed) ~= "table"
+      or observed.created ~= MIR and not ENGINE_MODS[observed.created] then return false end
+  for _, editor in pairs(observed.changed) do
+    if editor ~= MIR and not ENGINE_MODS[editor] then return false end
+  end
+  return true
+end
+
 local function published473_space_age_selection(event, change, active)
   -- The configured official set must have remained installed across an
   -- admitted engine patch. The caller verifies synchronized official rows.
@@ -912,14 +923,25 @@ local function published473_space_age_selection(event, change, active)
     local expected = (name ~= "recycler" or f210) and base or nil
     if active[name] ~= expected then return false end
   end
-  for name in pairs(active) do
-    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  local has_other_mods = false
+  for name, version in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] then
+      if not f210 or type(name) ~= "string" or type(version) ~= "string" or version == "" then return false end
+      has_other_mods = true
+    end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (not ENGINE_MODS[name] or active[name] ~= base
-        or type(item) ~= "table" or getmetatable(item) ~= nil) then return false end
+    if name ~= MIR then
+      if type(item) ~= "table" or getmetatable(item) ~= nil
+          or type(item.new_version) ~= "string" or item.new_version ~= active[name] then return false end
+      if ENGINE_MODS[name] then
+        if active[name] ~= base then return false end
+      elseif not f210 or item.old_version ~= item.new_version then return false end
+    end
   end
-  return true
+  -- Unchanged addons are admitted only with a readable worker prototype history.
+  -- The caller separately checks the archived price, science and native work.
+  return not has_other_mods or published473_worker_has_known_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -932,7 +954,7 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   local space_age = active["space-age"] ~= nil
   if space_age then
     if not published473_space_age_selection(event, change, active) then
-      default_origin_error("published473 Space Age source requires its unchanged official mod selection", event, state, current)
+      default_origin_error("published473 Space Age worker origin or prototype history is unverified", event, state, current)
     end
   else
     for _, name in ipairs({"quality", "elevated-rails", "recycler"}) do
