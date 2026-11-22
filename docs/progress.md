@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,16 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Verified 5.0.22 delivery and native results (2026-11-23)
+
+MIR 5.0.22 is GitHub prerelease `454462897`. Canonical tag `v5.0.22` and checked `main` resolve to `9e376928407e58f2921baf898a7edc398514a849`, whose tree matches frozen source `c54534acae88fe5e316aeae35d51e69c8897eb1a`. All 17 player ZIPs and both checksum files matched the frozen inventory, staged draft, anonymous downloads and primary `dist/v5.0.22`. The release notes and upload text match the checked source. GitHub's latest stable release remains 4.7.3. [Published prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.22) · [Verified delivery](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079781537)
+
+The exact F200 archive completed the two retained paid research jobs after direct Space Is Fake removal on Factorio 2.0.77. Five force observations held and two 1,200-update cold loads agreed on checksum `3943742311`. The exact F210 archive found `Landwirtschaft` in the Availability view of a real German Factorio 2.1.24 client. Ten observed input stages preserved four force frames. The shared library restored in both cases, and 33 and 236 original files were rehashed respectively. [Exact-package native evidence](https://github.com/Julesc013/scratchpad/blob/e1fee89c67f25a39e38124e4d3cde0d33be4b54b/projects/mir/evidence/mir522-exact-prerelease-native.json)
+
+The separate F200 Space Exploration physical extraction control measured all three tested drill types at 45 ore before ordinary mining productivity research and 49 afterward. The core miner produced 160 and 176 fragments over matched 80-cycle samples. Both cold loads matched checksum `2529157198`. The earlier 40-ore case recorded 43 from the area drill against its 44 expectation. Its 67 original files and the follow-up's 81 files are retained. The original #1959 report awaits the affected save and settings. [Physical output and custody](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079456413)
+
+Remaining stable work includes exact applicable save and provider transitions, full Library input and client scope, and matched performance. The F200 Bob/Angel preparation binds the full Factorio 2.0.77 Linux desktop engine, 14 exact dependency archives and both public player packages. Native prototype and replay comparison precede any timing score. [Stable worklist](https://github.com/Julesc013/more-infinite-research/issues/446) · [F200 preparation](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079937316)
 
 ## Verified 5.0.21 delivery and native results (2026-11-22)
 
