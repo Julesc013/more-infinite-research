@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.21
+Date: 2026-11-22
+
+  Bugfixes:
+
+    - On Factorio 2.1.24, preserve earned worker cargo, current research and queued or parked work when upgrading MIR 4.7.3 with the
+      unchanged official Space Age mods and default worker settings.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.20
 Date: 2026-11-22
 

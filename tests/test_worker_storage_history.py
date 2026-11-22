@@ -3171,10 +3171,12 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
-    def enable_f210_space_age(self, lua):
+    def enable_f210_space_age(self, lua, engine_version="2.1.23"):
+        lua.globals().official_engine_version = engine_version
         lua.execute(r'''
+          script.active_mods.base=official_engine_version
           for _,name in ipairs({"space-age","quality","elevated-rails","recycler"})do
-            script.active_mods[name]="2.1.23"
+            script.active_mods[name]=official_engine_version
           end
           for _,id in ipairs({CANONICAL,ORDINARY,ID})do
             table.insert(prototypes.technology[id].research_unit_ingredients,
@@ -3520,17 +3522,19 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
 
     def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
         cases = (
-            ("f200", "4.7.20003", "base"),
-            ("f210", "4.7.21003", "base"),
-            ("f210", "4.7.20003", "base-hop"),
-            ("f210", "4.7.21003", "space-age"),
-            ("f210", "4.7.21003", "space-age-unchanged-rows"),
+            ("f200", "4.7.20003", "base", "2.0.77"),
+            ("f210", "4.7.21003", "base", "2.1.23"),
+            ("f210", "4.7.20003", "base-hop", "2.1.23"),
+            ("f210", "4.7.21003", "space-age", "2.1.23"),
+            ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.23"),
+            ("f210", "4.7.21003", "space-age", "2.1.24"),
+            ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
         )
-        for target, old, selection in cases:
-            with self.subTest(target=target, old=old, selection=selection):
+        for target, old, selection, engine_version in cases:
+            with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
                 lua = self.older_world(target)
                 if selection.startswith("space-age"):
-                    self.enable_f210_space_age(lua)
+                    self.enable_f210_space_age(lua, engine_version)
                 lua.globals().old = old
                 lua.globals().selection = selection
                 lua.execute(r'''
@@ -3572,6 +3576,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
             "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
             "inactive DLC": 'script.active_mods.recycler=nil',
+            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.25" end end',
             "repinned official set": '''
               for name,version in pairs(script.active_mods)do
                 if version=="2.1.23"then
