@@ -21,6 +21,8 @@ ORIGIN = re.compile(r"(?:https://github\.com/|git@github\.com:|ssh://git@github\
                     + re.escape(REPOSITORY) + r"(?:\.git)?/?", re.IGNORECASE)
 SHA256 = re.compile(r"[0-9a-fA-F]{64}")
 COMMIT = re.compile(r"[0-9a-f]{40}")
+LEGACY_NOTE_NAMES = {"release-notes.md": "RELEASE_NOTES.md", "upload-text.txt": "UPLOAD.txt"}
+RESERVED_NAMES = {name.lower() for name in (*LEGACY_NOTE_NAMES, *LEGACY_NOTE_NAMES.values())} | {".", ".."}
 
 
 def _git(primary, *arguments):
@@ -89,8 +91,7 @@ def _public_assets(inventory):
         rows.extend([*cohort["assets"], cohort["checksums"]])
     assets = {row["name"]: row for row in rows}
     if len(assets) != len(rows) or any(
-        name in (".", "..", "release-notes.md", "upload-text.txt") or
-        not re.fullmatch(r"[A-Za-z0-9_.-]+", name)
+        name.lower() in RESERVED_NAMES or not re.fullmatch(r"[A-Za-z0-9_.-]+", name)
         for name in assets
     ):
         raise ValueError("Unsafe or repeated asset name in the frozen inventory")
@@ -132,14 +133,18 @@ def _install(stage, destination, files):
         except OSError:
             if not destination.exists():
                 raise
-    if _file_hashes(destination) != files:
+    installed_files = _file_hashes(destination)
+    if installed_files != files:
         if stage is None:
             raise ValueError(f"Files changed after installing {destination}")
-        raise ValueError(f"Existing delivery differs. Verified downloads remain at {stage}")
+        legacy_files = {LEGACY_NOTE_NAMES.get(name, name): digest for name, digest in files.items()}
+        if installed_files != legacy_files:
+            raise ValueError(f"Existing delivery differs. Verified downloads remain at {stage}")
     if stage is not None:
         for name in files:
             (stage / name).unlink()
         stage.rmdir()
+    return installed_files
 
 
 def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prerelease, receipt):
@@ -201,14 +206,14 @@ def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prere
     except ValueError as error:
         raise ValueError(f"{error}. Verified downloads remain at {stage}") from error
     destination = dist / tag
-    _install(stage, destination, files)
+    installed_files = _install(stage, destination, files)
     result = {
         "tag": tag, "tag_commit": commit, "release_id": release_id, "release_url": public["html_url"],
         "prerelease": prerelease, "source_tree": source["tree"], "primary_head": primary_head,
         "authorization_header_sent": False, "verified_at": datetime.now(timezone.utc).isoformat(),
         "inventory_sha256": inventory_sha256, "tagged_release_notes_blob_sha256": notes_blob,
         "readback_tool_sha256": release.digest(Path(__file__).read_bytes()),
-        "verified_assets": verified, "local_directory": str(destination), "local_file_sha256": files,
+        "verified_assets": verified, "local_directory": str(destination), "local_file_sha256": installed_files,
     }
     (receipt / "anonymous-readback.json").write_bytes(release.canonical_json(result))
     return result
