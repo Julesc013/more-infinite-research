@@ -265,7 +265,10 @@ function Get-MIR441ResourceSnapshot([string]$WorkRoot) {{
   $row=& $script:actualSnapshot -WorkRoot $WorkRoot
   $row.memory.free_bytes=if($script:lowHost){{0L}}else{{$row.memory.total_bytes}}
   $row.memory.cgroup_v2.effective_headroom_bytes=1L
-  if($script:lowDisk){{$row.work_volume.free_bytes=0L}}
+  $row.system_volume.total_bytes=128GB
+  $row.system_volume.free_bytes=64GB
+  $row.work_volume.total_bytes=128GB
+  $row.work_volume.free_bytes=if($script:lowDisk){{0L}}else{{64GB}}
   return $row
 }}
 function Get-Refusal {{
