@@ -8,6 +8,7 @@ longer relevant to the delivered host controls.
 import ast
 import copy
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
@@ -237,6 +238,61 @@ Delivery evidence: exact delivered remedy and readback at evidence/delivery.json
             result = subprocess.run(command, text=True, capture_output=True, check=False)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(git("remote"), "", "The control must not depend on a remote.")
+
+    def test_main_promotion_checks_the_candidate_release_text(self):
+        with tempfile.TemporaryDirectory(prefix="mir-release-text-") as directory:
+            repo = Path(directory)
+            script = repo / "tests/release/Test-MIRBranchPolicy.ps1"
+            script.parent.mkdir(parents=True)
+            script.write_bytes(BRANCH_POLICY.read_bytes())
+            for name in ("docs", "source", "targets", "scripts", "hooks"):
+                (repo / name).mkdir()
+
+            def git(*arguments):
+                return subprocess.run(
+                    ["git", "-C", str(repo), "-c", "user.name=MIR policy test",
+                     "-c", "user.email=policy-test@example.invalid", "-c", "commit.gpgsign=false",
+                     "-c", "core.hooksPath=" + str(repo / "hooks"), *arguments],
+                    text=True, capture_output=True, check=True).stdout.strip()
+
+            git("init", "--quiet", "--template=")
+            (repo / "source/info.json").write_text(json.dumps({
+                "name": "more-infinite-research", "version": "5.0.21019",
+                "factorio_version": "2.1", "dependencies": ["base >= 2.1.24"],
+            }), encoding="utf-8")
+            (repo / "targets/editions.json").write_text('{"editions":[]}', encoding="utf-8")
+            git("add", "source", "targets")
+            git("commit", "--quiet", "-m", "Protected source")
+            base = git("rev-parse", "HEAD")
+            for branch in ("main", "dev", "legacy", "release/4.0"):
+                git("update-ref", "refs/remotes/origin/" + branch, base)
+            event_path = repo / "event.json"
+            (repo / "docs/release-notes.md").write_text(
+                "---\ntitle: MIR 5.0.19 beta release notes\n---\n\nPreserve the Library selection.\n", encoding="utf-8")
+
+            for index, (title, body, expected) in enumerate((
+                ("MIR 5.0.17", "Preserve the Library selection.", "[mir-release-upload-title]"),
+                ("MIR 5.0.19", "Unrelated release copy.", "[mir-release-notes-mismatch]"),
+                ("MIR 5.0.19", "Preserve the Library selection.", None),
+            ), 1):
+                with self.subTest(title=title, body=body):
+                    (repo / "docs/upload-text.txt").write_text(
+                        f"{title}\nChannel: GitHub prerelease.\n\n{body}\n", encoding="utf-8")
+                    git("add", "docs")
+                    git("commit", "--quiet", "-m", "Review publication text")
+                    event_path.write_text(json.dumps({"pull_request": {
+                        "base": {"sha": base}, "head": {"sha": git("rev-parse", "HEAD")},
+                        "commits": index, "body": "Report scope: partial",
+                    }}), encoding="utf-8")
+                    result = subprocess.run(
+                        ["pwsh", "-NoProfile", "-File", str(script), "-SkipFetch", "-EventPath", str(event_path)],
+                        cwd=repo, env=dict(os.environ, GITHUB_BASE_REF="main", GITHUB_EVENT_NAME="pull_request"),
+                        text=True, capture_output=True, check=False)
+                    if expected:
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn(expected, result.stderr)
+                    else:
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_metadata_edits_recheck_the_existing_policy_without_full_host_reruns(self):
         branch = (ROOT / ".github/workflows/branch-policy.yml").read_text(encoding="utf-8")
