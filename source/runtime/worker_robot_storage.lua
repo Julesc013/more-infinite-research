@@ -894,13 +894,20 @@ local function require_archived_default_contract(event, state, current, space_ag
   if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
+local function published473_worker_has_official_editors()
+  local observed = prototypes.get_history("technology", recovery.canonical)
+  if type(observed) ~= "table" or type(observed.changed) ~= "table"
+      or observed.created ~= MIR and not ENGINE_MODS[observed.created] then return false end
+  for _, name in pairs(observed.changed) do
+    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  end
+  return true
+end
+
 local function published473_space_age_selection(event, change, active)
-  -- A package-only upgrade can reconstruct the prior official selection.
-  -- Additions, removals and other providers require their own source contract.
   local base = active.base
   local f200 = target.id == "f200" and change.old_version == "4.7.20003" and base == "2.0.77"
-  local f210 = target.id == "f210" and change.old_version == "4.7.21003"
-    and (base == "2.1.23" or base == "2.1.24")
+  local f210 = target.id == "f210" and change.old_version == "4.7.21003" and same_family_engine_patch(event)
   if not (f200 or f210)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
@@ -909,15 +916,24 @@ local function published473_space_age_selection(event, change, active)
     local expected = (name ~= "recycler" or f210) and base or nil
     if active[name] ~= expected then return false end
   end
-  for name in pairs(active) do
-    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  local has_other_mods = false
+  for name, version in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] then
+      if not f210 or type(name) ~= "string" or type(version) ~= "string" or version == "" then return false end
+      has_other_mods = true
+    end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (not ENGINE_MODS[name] or active[name] ~= base
-        or type(item) ~= "table" or getmetatable(item) ~= nil
-        or item.old_version ~= base or item.new_version ~= base) then return false end
+    if name ~= MIR then
+      if type(item) ~= "table" or getmetatable(item) ~= nil or item.new_version ~= active[name]
+          or type(item.new_version) ~= "string" then return false end
+      if not ENGINE_MODS[name] and (not f210 or item.old_version ~= item.new_version) then return false end
+      if f200 and (active[name] ~= base or item.old_version ~= base) then return false end
+    end
   end
-  return true
+  -- Unchanged extra mods are admissible only with readable material worker
+  -- provenance. The caller separately checks the archived work contract.
+  return not has_other_mods or published473_worker_has_official_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)

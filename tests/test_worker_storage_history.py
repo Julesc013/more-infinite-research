@@ -3620,6 +3620,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.24"),
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
+            ("f210", "4.7.21003", "space-age-synchronized-patch", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
@@ -3639,6 +3640,23 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version=version,new_version=version}
                       end
+                    end
+                  elseif selection=="space-age-synchronized-patch"then
+                    for name,version in pairs(script.active_mods)do
+                      if name~="more-infinite-research"then
+                        event.mod_changes[name]={old_version="2.1.24",new_version=version}
+                      end
+                    end
+                    local extra={CleanedConcrete="2.1.0",["even-distribution-fork"]="2.1.2",
+                      pump="2.2.6",["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
+                    for name,version in pairs(extra)do script.active_mods[name]=version end
+                    local original=prototypes.get_history
+                    prototypes.get_history=function(kind,id)
+                      local observed=original(kind,id)
+                      if kind=="technology" and id==CANONICAL then
+                        observed.changed={"space-age","more-infinite-research"}
+                      end
+                      return observed
                     end
                   end
                   local before=all_frames();writes=0;queue_writes={};progress_writes={}
@@ -3667,17 +3685,37 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
             "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
             "inactive DLC": 'script.active_mods.recycler=nil',
-            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.25" end end',
-            "repinned official set": '''
+            "unsynchronized official patch": 'script.active_mods.base="2.1.25";event.mod_changes.base={old_version="2.1.23",new_version="2.1.25"}',
+            "inconsistent official predecessor patch": '''
               for name,version in pairs(script.active_mods)do
                 if version=="2.1.23"then
                   script.active_mods[name]="2.1.24"
                   event.mod_changes[name]={old_version=version,new_version="2.1.24"}
                 end
               end
+              event.mod_changes.quality.old_version="2.1.22"
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
-            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "missing mod-editor provenance": 'script.active_mods.observer="1.0.0"',
+            "third-party worker edit": '''
+              script.active_mods.observer="1.0.0"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"observer"} end
+                return result
+              end
+            ''',
+            "updated third-party mod with official worker provenance": '''
+              script.active_mods.observer="1.0.1"
+              event.mod_changes.observer={old_version="1.0.0",new_version="1.0.1"}
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"more-infinite-research"} end
+                return result
+              end
+            ''',
             "added mod": '''
               script.active_mods.observer="1.0.0"
               event.mod_changes.observer={new_version="1.0.0"}
