@@ -921,6 +921,92 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_retired_mixed_gun_native_queue_admits_only_owned_paid_work(self):
+        cases = (
+            ("electric", True, False, 0.2444444444444444, True),
+            ("tesla", False, True, 0.2444444444444444, True),
+            ("electric", False, False, 0.2444444444444444, False),
+            ("tesla", True, False, 0, False),
+        )
+        for category, enabled, owned, fraction, can_resume in cases:
+            with self.subTest(category=category, enabled=enabled, owned=owned, fraction=fraction):
+                self.setUp()
+                self.lua.execute('''
+                  local category, enabled, owned, fraction, can_resume = ...
+                  local name = "recipe-prod-research_electric_shooting_speed-1"
+                  local paid = technology(name, 2, enabled)
+                  local sentinel = technology("foreign-sentinel", 3, true)
+                  paid.saved_progress, sentinel.saved_progress = fraction, .19
+                  paid.visible_when_disabled = true
+                  paid.research_unit_ingredients = {{name="automation-science-pack", amount=2}}
+                  paid.prototype = {name=name, level=1, max_level=4294967295, upgrade=true,
+                    hidden=false, enabled=true, effects={{type="gun-speed", ammo_category=category, modifier=.1}}}
+                  local technologies = {[name]=paid, [sentinel.name]=sentinel}
+                  local positive, negative = {}, {}
+                  for _, ammo in ipairs({"electric", "tesla"}) do
+                    for _, direction in ipairs({"positive", "negative"}) do
+                      local prefix = direction == "positive" and "mir-" or "zz-mir-"
+                      local id = prefix .. "native-credit-research_electric_shooting_speed-" .. ammo .. "-" .. direction
+                      local holder = technology(id, 1, false)
+                      holder.research_unit_count, holder.research_unit_energy = 1, 60
+                      holder.research_unit_ingredients = {{name="automation-science-pack", amount=1}}
+                      local modifier = direction == "positive" and .1 or (ammo == category and -.1 or 0)
+                      holder.prototype = {name=id, level=1, max_level=4294967295, upgrade=true,
+                        enabled=false, hidden=true, visible_when_disabled=false,
+                        effects={{type="gun-speed", ammo_category=ammo, modifier=modifier}}}
+                      technologies[id] = holder
+                      if direction == "positive" then positive[ammo] = holder else negative[ammo] = holder end
+                    end
+                  end
+
+                  local queue = {sentinel}
+                  local f = force(48, technologies, queue, sentinel, .42)
+                  for _, row in pairs(technologies) do row.force = f end
+                  -- Factorio 2.1.23 rejects a replacement queue containing a disabled row.
+                  local meta = getmetatable(f)
+                  local consume_queue = meta.__newindex
+                  meta.__newindex = function(self, key, replacement)
+                    if key == "research_queue" then
+                      for _, row in ipairs(replacement) do
+                        assert(row.enabled, "native setter refused disabled research: " .. row.name)
+                      end
+                    end
+                    consume_queue(self, key, replacement)
+                  end
+                  local active = {base="2.1.23", ["space-age"]="2.1.23",
+                    ["more-infinite-research"]=require("platform.target").distribution_version}
+                  local function creation(_, id)
+                    return {created=id == sentinel.name and "base" or "more-infinite-research"}
+                  end
+                  boot({[48]=f}, 0, "", nil, nil, 0, active, nil,
+                    {["ips-max-level-research_electric_shooting_speed"]=0}, nil, nil, creation)
+                  handlers.init()
+                  if owned then
+                    storage.mir_caps = {schema=1, owned_disabled={[48]={[name]={disabled=true}}}}
+                  end
+                  paid.prototype.enabled, paid.prototype.effects = false, {}
+                  for _, row in pairs(negative) do row.prototype.effects[1].modifier = 0 end
+                  handlers.configuration()
+
+                  assert(f.research_queue == queue and f.current_research == sentinel
+                    and f.research_progress == .42 and sentinel.saved_progress == .19
+                    and paid.saved_progress == fraction and paid.level == 2 and f.cancelled == 0,
+                    "retirement changed prior queue, paid work or unrelated progress")
+                  local other = category == "electric" and "tesla" or "electric"
+                  assert(positive[category].level == 2 and positive[other].level == 1,
+                    "retirement changed the earned mask")
+
+                  local admitted, message = pcall(function() f.research_queue = {sentinel, paid} end)
+                  if can_resume then
+                    assert(admitted, message)
+                    assert(f.research_queue[2] == paid and paid.saved_progress == fraction
+                      and f.current_research == sentinel and f.research_progress == .42)
+                  else
+                    assert(not admitted and f.research_queue == queue and paid.saved_progress == fraction,
+                      "foreign disablement or an already earned level admitted new work")
+                  end
+                ''', category, enabled, owned, fraction, can_resume)
+
     def test_unlimited_disabled_prototype_survives_effects_reset_and_force_boundaries(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"
