@@ -726,6 +726,16 @@ local function producer_edition(version)
   if version:match("^5%.0%.210%d%d$") then return "f210" end
 end
 
+local function recorded_default_versions_match(old_version, new_version)
+  local old_edition, new_edition = producer_edition(old_version), producer_edition(new_version)
+  if not old_edition or not new_edition then return false end
+  -- A recorded default route is checked against the surviving native contract.
+  -- The published-origin allowlist is still required when no route was saved.
+  local allowed_edition = old_edition == new_edition or old_edition == "f200" and new_edition == "f210"
+    and DIRECT_DEFAULT_HOP_ORIGINS[old_version] == true
+  return allowed_edition and tonumber(old_version:sub(-2)) <= tonumber(new_version:sub(-2))
+end
+
 local function exact_base_hop(event, old_version, owned)
   local active = script and script.active_mods or {}
   local changes = event and event.mod_changes
@@ -834,11 +844,8 @@ local function owner_record()
       or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
-      or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
-        and (not known or not known[value.producer.old_version]
-          or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
-          or old_edition ~= edition and not (old_edition == "f200" and edition == "f210"
-            and DIRECT_DEFAULT_HOP_ORIGINS[value.producer.old_version])) then
+      or value.producer.kind == "recorded-default"
+        and not recorded_default_versions_match(value.producer.old_version, value.producer.new_version) then
     recover_error("unknown default native-owner producer")
   end
   if type(value.forces) ~= "table" or getmetatable(value.forces) ~= nil then
@@ -1183,8 +1190,8 @@ local function default_origin(event, initializing, state, current)
       default_origin_error("recorded default source cannot be a first-install event", event, state, current)
     end
     local old = change and change.old_version or active[MIR]
-    local known = DEFAULT_ORIGINS[base_hop and "f200" or target.id]
-    if type(old) ~= "string" or old ~= active[MIR] and (not known or not known[old]) then
+    if producer_edition(old) ~= (base_hop and "f200" or target.id)
+        or not recorded_default_versions_match(old, active[MIR]) then
       default_origin_error("recorded default source has an inconsistent producer event", event, state, current)
     end
     return {kind=prepared and "prepared-default" or "recorded-default", old_version=old, new_version=active[MIR]}
