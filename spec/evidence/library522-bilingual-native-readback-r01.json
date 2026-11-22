@@ -1,0 +1,174 @@
+{
+  "kind": "MIR522NativeBilingualLibraryReadbackV1",
+  "tag": "v5.0.22",
+  "release_id": 454462897,
+  "target": "f210",
+  "factorio": "2.1.24",
+  "published_package_sha256": "847399EE8BCA28E1A893761873E5C8B04E9B0FD168D8669575CC9D080F4E602F",
+  "scroll_receipt": {
+    "path": "build/qualification/library522-availability-scroll-r09/native/verified-native-scroll.json",
+    "sha256": "1F8DFB86C04807CC95CA8CEEEC1747DFC69254723D1A3F26FF038083A505AF57"
+  },
+  "scroll_readback": {
+    "status": "verified-bilingual-bob-availability-scroll",
+    "engine": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+    "archive_sha256": "847399EE8BCA28E1A893761873E5C8B04E9B0FD168D8669575CC9D080F4E602F",
+    "protected_seed_sha256": "D9C091FBAFD7BB92372F11ED5821F16D06D6D426BB2F06916541DFCC72F9CAD7",
+    "packet_sha256": "E36DAFF6618AEB56F83CECFC2682F794EC95DDD250F330902200D9462A81FF31",
+    "invocation": "266b6606e60a473fa824461566a87dc1",
+    "wheel_and_retention": {
+      "en": {
+        "vertical_shift_pixels": 51,
+        "matching_text_rows": 44,
+        "start_pixels_sha256": "79498B9559E58D07C6A62D7D85ABAD71F8EDEB6870B513EA636DC3E8147FF0B0",
+        "scrolled_pixels_sha256": "3BE862303F5FF7BDA5367A1012096AB03565681A03483B6DA69743738CAAC086"
+      },
+      "de": {
+        "vertical_shift_pixels": 51,
+        "matching_text_rows": 44,
+        "start_pixels_sha256": "0470D2D3460E412B5F60E211BF7CED6B971643A039EF59F06395B8471D1020B7",
+        "scrolled_pixels_sha256": "B10B2DBA9BB995020757C9C3AE440F541AA95DFAA28E836BCD666A0501ABFAD7"
+      }
+    },
+    "originals": 593,
+    "library_restored": true
+  },
+  "export_receipt": {
+    "path": "build/qualification/library522-fresh-export-r03/verified-exports.json",
+    "sha256": "1E9AEECB9C4CC6F141218F2F9EC79C27EA379A65CBC531378C4A706AC62EF7B0"
+  },
+  "export_files": [
+    {
+      "phase": "en-full",
+      "receipt_sha256": "F124C830B2E2C7B0BAA418F714635D008A872738F38ECA7EE4E3AEC0D9E466B4",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 6517,
+          "sha256": "AC3BAA0BE701F0E909B5D2C9B361E1801328B74C5C2A46AF3D5F2C6157713001",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        }
+      },
+      "click": {
+        "action": "en-full",
+        "role": "en",
+        "player_index": 1,
+        "element_name": "mir_library_export_settings",
+        "tick": 13352
+      }
+    },
+    {
+      "phase": "en-compact",
+      "receipt_sha256": "E25868850E768D639BAA12D93DAB0ABCF17187015729B6ED1886C772BDBF9B95",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 285,
+          "sha256": "670169DBDD19E89F9F7754F125EF5CA771920193F6D738EB43143426BE69604B",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        }
+      },
+      "click": {
+        "action": "en-compact",
+        "role": "en",
+        "player_index": 1,
+        "element_name": "mir_library_export_compact",
+        "tick": 13996
+      }
+    },
+    {
+      "phase": "en-diagnostics",
+      "receipt_sha256": "A9A88010B9FE5D92CD243F28D8F312B51F9154ECFE870FBC2FDF88F47482A91D",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 6517,
+          "sha256": "AC3BAA0BE701F0E909B5D2C9B361E1801328B74C5C2A46AF3D5F2C6157713001",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        },
+        "diagnostics": {
+          "bytes": 1276,
+          "sha256": "462E417E6A90BFF41B254EF77AD442176E5FC864C54A49302F1EFA7AB28B1261",
+          "path": "more-infinite-research/mir.log"
+        }
+      },
+      "click": {
+        "action": "en-diagnostics",
+        "role": "en",
+        "player_index": 1,
+        "element_name": "mir_library_export_diagnostics",
+        "tick": 15227
+      }
+    },
+    {
+      "phase": "de-full",
+      "receipt_sha256": "B50A81D93C7CC4028162BC7261D5788C64A2489A4CA390D81B9372F19DFC8914",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 6513,
+          "sha256": "1D09E2D4F2BB6C3E581CE074CC9B734261D108F0F4619D240B76A97184A9F3D8",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        }
+      },
+      "click": {
+        "action": "de-full",
+        "role": "de",
+        "player_index": 2,
+        "element_name": "mir_library_export_settings",
+        "tick": 16975
+      }
+    },
+    {
+      "phase": "de-compact",
+      "receipt_sha256": "A89B5AA299ADFD6D988443939702E459FBA8F0937ACAC09FF3B4761F3B73AD55",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 281,
+          "sha256": "B900DB1C260306C3F94224071D73C3B117B9DD52FDA33827851DD494361BAC13",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        }
+      },
+      "click": {
+        "action": "de-compact",
+        "role": "de",
+        "player_index": 2,
+        "element_name": "mir_library_export_compact",
+        "tick": 17597
+      }
+    },
+    {
+      "phase": "de-diagnostics",
+      "receipt_sha256": "E4CA6C9E6FE8C6CFDCE10AF5D99F85DDCF61E8EDE3C6E90135C6B1503C95129C",
+      "validated_files": {
+        "settings_profile": {
+          "bytes": 6513,
+          "sha256": "1D09E2D4F2BB6C3E581CE074CC9B734261D108F0F4619D240B76A97184A9F3D8",
+          "path": "more-infinite-research/settings/mir-settings-profile.txt"
+        },
+        "diagnostics": {
+          "bytes": 1283,
+          "sha256": "F82F9B93B47CD278DDC48EF1E3A4AC8232DD9DD4E50CFE5A28A9B10495D13654",
+          "path": "more-infinite-research/mir.log"
+        }
+      },
+      "click": {
+        "action": "de-diagnostics",
+        "role": "de",
+        "player_index": 2,
+        "element_name": "mir_library_export_diagnostics",
+        "tick": 18840
+      }
+    }
+  ],
+  "export_original_files_rehashed": 274,
+  "export_packet": {
+    "bytes": 10675,
+    "sha256": "4FAE87997B4C599101A516A3A0E0ABE58A28E42D4A3C0795E683CA76AB3CBC84"
+  },
+  "export_invocation": "438fb97d0cd5468198d5474dfde47372",
+  "roles": [
+    "English",
+    "German"
+  ],
+  "still_unverified_here": [
+    "Persistence of personal views after restart and rejoin",
+    "Other Library actions and compatibility profiles"
+  ]
+}

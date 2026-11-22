@@ -1,24 +1,23 @@
 ---
-title: "MIR 5.0.22 beta release notes"
+title: "MIR 5.0.23 beta release notes"
 status: current
-applies_to: "MIR 5.0.22 GitHub prerelease"
+applies_to: "MIR 5.0.23 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-522-release-notes
+  - mir-523-release-notes
 ---
 
-MIR 5.0.22 fixes localized Availability search and a Space Is Fake upgrade refusal.
+MIR 5.0.23 fixes worker cargo upgrades and preserves credit for unfinished research.
 
-- Search the Research Library's Availability view by the translated family name. The German client check used Factorio 2.1.24.
-- On Factorio 2.0.77 with the unchanged official Space Age mods, the supported MIR 5.0.3 upgrade can remove Space Is Fake 1.0.60 and its unused dependency while retaining earned recipe effects and queued or unfinished research. This path requires default worker cargo settings and an uninvested repeating worker cargo research row.
+- On Factorio 2.0.77 with the unchanged official Space Age mods and default worker cargo settings, upgrade a MIR 4.7.3 save with worker cargo, queued levels and unfinished research intact. The active level keeps its original six-pack price.
+- Preserve a saved default worker cargo route across a same-edition MIR 5 upgrade. If the complete research queue is unavailable, stop the transfer before using the incomplete queue.
+- Keep the historical credit owed to unfinished productivity and electric or Tesla research while the paid level is outside the queue.
 
-Keep the original save. For invested worker cargo or different settings, use the staged removal in the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md#removing-space-is-fake-on-factorio-20).
+Keep a copy of your original save before upgrading. Broader compatibility, personal-view persistence and performance qualification continue for stable.
 
-Broader Library, compatibility and performance qualification continues for stable.
-
-See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md) for supported editions and installation.
+See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md) for supported editions and installation.

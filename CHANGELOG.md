@@ -2,6 +2,18 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.23] - 2026-11-23
+
+### Bugfixes
+
+- On Factorio 2.0.77, preserve earned worker cargo and paid, queued or parked research when upgrading MIR 4.7.3 with the unchanged official Space Age mods and default worker cargo settings.
+- Stop a worker cargo transfer when Factorio cannot supply the complete force research queue.
+- Preserve recorded default worker cargo research when upgrading from an earlier MIR 5 release.
+- Keep completed night-vision research and the scripted conquest-force modifiers when upgrading eligible Space Exploration 0.7.57 saves on Factorio 2.0.77.
+- Preserve paid worker cargo and queue order when upgrading MIR 4.7.3 alongside the official Space Age mods from Factorio 2.1.24 to 2.1.25.
+- On Factorio 2.1.24, preserve paid worker cargo when adding Solar Productivity 3.0.0 to a save with MIR's recorded worker ownership.
+- Preserve the historical credit owed to unfinished productivity and electric or Tesla research while the paid level is outside the queue.
+
 ## [5.0.22] - 2026-11-22
 
 ### Bugfixes

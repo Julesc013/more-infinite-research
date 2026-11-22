@@ -3620,6 +3620,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.24"),
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
+            ("f210", "4.7.21003", "space-age", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
@@ -3638,6 +3640,12 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                     for name,version in pairs(script.active_mods)do
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version=version,new_version=version}
+                      end
+                    end
+                  elseif selection=="space-age-engine-patch"then
+                    for name,version in pairs(script.active_mods)do
+                      if name~="more-infinite-research"then
+                        event.mod_changes[name]={old_version="2.1.24",new_version=version}
                       end
                     end
                   end
@@ -3667,14 +3675,15 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
             "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
             "inactive DLC": 'script.active_mods.recycler=nil',
-            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.25" end end',
-            "repinned official set": '''
+            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.26" end end',
+            "missing official patch row": '''
               for name,version in pairs(script.active_mods)do
                 if version=="2.1.23"then
                   script.active_mods[name]="2.1.24"
                   event.mod_changes[name]={old_version=version,new_version="2.1.24"}
                 end
               end
+              event.mod_changes.recycler=nil
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
             "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
@@ -4058,6 +4067,44 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
                       assert(not pcall(history.default_owner_preflight,event,route,true))
                       assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==key)
                     ''')
+
+    def test_adding_solar_restores_only_owned_retirement_and_debit_flags(self):
+        lua = self.world()
+        lua.execute(r'''
+          full_source(1,true);reenable_paid_heads()
+          local retired=player.technologies[CANONICAL]
+          retired.enabled=true;retired.visible_when_disabled=true
+          local event=default_config()
+          event.mod_changes["solar-productivity"]={new_version="3.0.0"}
+          script.active_mods["solar-productivity"]="3.0.0"
+          local before=all_frames();local ownership=copy(storage[OWNER_KEY])
+          writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(writes==0 and same(before,all_frames()))
+          assert(history.default_owner_apply(plan))
+          before[player.index].source.enabled=false
+          for _,row in pairs(before)do row.debit.enabled=false end
+          assert(same(before,all_frames())and same(ownership,storage[OWNER_KEY]))
+          assert(next(queue_writes)==nil and next(progress_writes)==nil)
+        ''')
+
+    def test_configuration_cannot_retake_a_foreign_retirement_or_discard_work(self):
+        for opponent in ('local flags=storage[OWNER_KEY].forces[player.index].retired_flags;'
+                         'flags.enabled=false;flags.disabled_by_mir=false',
+                         'retired.saved_progress=.1',
+                         'retired.level=6',
+                         'player.research_queue={CANONICAL,ORDINARY,OTHER}',
+                         'player.technologies[HEAD].enabled=false'):
+            with self.subTest(opponent=opponent):
+                lua = self.world()
+                lua.execute(r'''
+                  full_source(1,true);reenable_paid_heads()
+                  local retired=player.technologies[CANONICAL];retired.enabled=true
+                ''' + opponent + r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,default_config(),nil,true))
+                  assert(writes==0 and same(before,all_frames()))
+                ''')
 
     def test_raw_head_enabled_is_sealed_against_both_stale_directions(self):
         for context in ("default", "handover", "retired"):

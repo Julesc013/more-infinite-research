@@ -22,15 +22,12 @@ local function finite(value)
 end
 
 local function origin(event, active)
-  require_policy(active.base == "2.0.77" and active.Krastorio2 == nil and active["space-age"] == nil,
-    "unsupported engine or provider")
+  if active.base ~= "2.0.77" or active.Krastorio2 ~= nil or active["space-age"] ~= nil then return false end
   for name, change in pairs(event.mod_changes) do
-    if name ~= MIR then
-      require_policy(type(change) == "table" and type(change.old_version) == "string"
-        and change.old_version == change.new_version and active[name] == change.new_version,
-        "changed or removed mod: " .. tostring(name))
-    end
+    if name ~= MIR and (type(change) ~= "table" or type(change.old_version) ~= "string"
+        or change.old_version ~= change.new_version or active[name] ~= change.new_version) then return false end
   end
+  return true
 end
 
 local function values(force)
@@ -41,47 +38,45 @@ local function values(force)
   return out
 end
 
-local function needs_restoration(force)
-  require_policy(force and force.valid == true and force.name == "conquest"
-    and force.ai_controllable == true and finite(force.index) and force.index > 0 and force.index % 1 == 0
-    and game.forces.conquest == force and game.forces[force.index] == force,
-    "system-force identity differs")
-  for _ in pairs(force.players) do require_policy(false, "system force has players") end
-  require_policy(force.current_research == nil and force.research_progress == 0, "system force has current work")
-  local queue = force.research_queue
-  require_policy(queue == nil or type(queue) == "table" or type(queue) == "userdata", "research queue is unavailable")
-  for _ in pairs(queue or {}) do require_policy(false, "system force has queued work") end
-  local observed = values(force)
-  local already_present = true
-  for index = 1, 6 do
-    if observed[index] ~= DEFAULTS[index] then already_present = false; break end
+local function recipe_unlocks_only(prototype)
+  if type(prototype.effects) ~= "table" or prototype.max_level ~= prototype.level then return false end
+  for _, effect in pairs(prototype.effects) do
+    if effect.type ~= "unlock-recipe" or type(effect.recipe) ~= "string" then return false end
   end
-  if already_present then return false end
-  for index = 1, 6 do require_policy(observed[index] == 0, "scripted vector is nonzero or mixed") end
-  require_policy(type(force.set_gun_speed_modifier) == "function"
-    and type(force.set_ammo_damage_modifier) == "function", "scripted setters are unavailable")
+  return true
+end
+
+local function needs_restoration(force)
+  if not force or force.valid ~= true or force.name ~= "conquest" or force.ai_controllable ~= true
+      or not finite(force.index) or force.index <= 0 or force.index % 1 ~= 0
+      or game.forces[force.index] ~= force then return false end
+  for _ in pairs(force.players) do return false end
+  if force.current_research ~= nil or force.research_progress ~= 0 then return false end
+  local queue = force.research_queue
+  if queue ~= nil and type(queue) ~= "table" and type(queue) ~= "userdata" then return false end
+  for _ in pairs(queue or {}) do return false end
+  local readable, observed = pcall(values, force)
+  if not readable then return false end
+  for index = 1, 6 do
+    if observed[index] ~= 0 then return false end
+  end
+  if type(force.set_gun_speed_modifier) ~= "function"
+      or type(force.set_ammo_damage_modifier) ~= "function" then return false end
   local count, basics = 0, 0
   for name, row in pairs(force.technologies) do
     count = count + 1
-    require_policy(count <= TECHNOLOGY_LIMIT, "technology observation exceeds bound")
-    require_policy(type(name) == "string" and row.valid == true and row.name == name
-      and row.prototype and finite(row.prototype.level) and row.level == row.prototype.level
-      and row.saved_progress == 0, "invested or unavailable technology: " .. tostring(name))
+    if count > TECHNOLOGY_LIMIT or type(name) ~= "string" or row.valid ~= true or row.name ~= name
+        or not row.prototype or not finite(row.prototype.level) or row.level ~= row.prototype.level
+        or row.saved_progress ~= 0 or type(row.researched) ~= "boolean" then return false end
     if BASIC[name] then
+      if not row.researched then return false end
       basics = basics + 1
-      require_policy(row.researched == true and row.prototype.max_level == row.prototype.level,
-        "basic system technology differs: " .. name)
-      require_policy(type(row.prototype.effects) == "table", "basic technology effects are unavailable: " .. name)
-      for _, effect in pairs(row.prototype.effects) do
-        require_policy(effect.type == "unlock-recipe" and type(effect.recipe) == "string",
-          "basic technology has a native modifier: " .. name)
-      end
-    else
-      require_policy(row.researched == false, "additional researched technology: " .. name)
     end
+    -- A finite recipe unlock such as night vision does not contribute to
+    -- any of the six fields. Leave the researched row itself untouched.
+    if row.researched and not recipe_unlocks_only(row.prototype) then return false end
   end
-  require_policy(basics == 9, "basic system technology set is incomplete: observed " .. basics .. ", expected 9")
-  return true
+  return basics == 9
 end
 
 function M.preflight(event)
@@ -90,12 +85,12 @@ function M.preflight(event)
   local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[MIR]
   if type(change) ~= "table" then return nil end
   if change.old_version ~= "4.7.20002" and change.old_version ~= "5.0.20017" then return nil end
-  require_policy(type(target.distribution_version) == "string" and target.distribution_version ~= ""
-    and active[MIR] == target.distribution_version and change.new_version == target.distribution_version,
-    "target/package version differs")
+  if type(target.distribution_version) ~= "string" or target.distribution_version == ""
+      or active[MIR] ~= target.distribution_version or change.new_version ~= target.distribution_version then return nil end
   -- SE authors these fixed NPC values independently of startup settings.
-  -- The package event and native system-force state establish this repair.
-  origin(event, active)
+  -- Skip this optional repair when the native frame cannot prove it applies.
+  -- An ambiguous NPC configuration must not stop an otherwise valid save.
+  if not origin(event, active) then return nil end
   local force = game.forces.conquest
   if not needs_restoration(force) then return nil end
   return {force=force, event=event, used=false}
