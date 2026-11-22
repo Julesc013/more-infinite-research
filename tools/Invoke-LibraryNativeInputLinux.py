@@ -2,9 +2,10 @@
 
 This leaf does not launch/stop a process, select mods, read a save, or grant a
 gameplay verdict. The existing native protocol's parent owns those decisions.
-Legacy ASCII plans match Invoke-LibraryNativeInput.ps1; the separate Linux-only
-clear kind has one fixed Ctrl+A/Backspace gesture. Unicode is a separate,
-unqualified boundary. Validate-only never opens X or inspects a live process.
+Legacy ASCII plans match Invoke-LibraryNativeInput.ps1. The Linux-only input
+kinds add one fixed Ctrl+A/Backspace gesture or one vertical wheel step.
+Unicode is a separate, unqualified boundary. Validate-only never opens X or
+inspects a live process.
 """
 import argparse
 import ctypes as C
@@ -17,6 +18,9 @@ import re
 import stat
 import sys
 import time
+
+
+WHEEL_BUTTONS = {'up': 4, 'down': 5}
 
 
 class InputError(ValueError):
@@ -52,17 +56,19 @@ def validate_spec(spec):
     legacy_actions = {'text': {'text'}, 'click': {'x', 'y'},
                       'drag': {'x', 'y', 'target_x', 'target_y'},
                       'escape': set(), 'inventory': set(), 'tab': set()}
+    linux_actions = {'MIRLinuxLibraryNativeClearTextV1': ('clear', set()),
+                     'MIRLinuxLibraryNativeWheelV1': ('wheel', {'x', 'y', 'direction'})}
     kind = spec.get('kind')
     action = spec.get('action')
     require(type(spec.get('schema')) is int and spec['schema'] == 1
-            and kind in ('MIRLibraryNativeInputV1', 'MIRLinuxLibraryNativeClearTextV1'),
+            and isinstance(kind, str) and (kind == 'MIRLibraryNativeInputV1' or kind in linux_actions),
             'schema differs')
     if kind == 'MIRLibraryNativeInputV1':
         require(isinstance(action, str) and action in legacy_actions, 'action differs')
         extras = legacy_actions[action]
     else:
-        require(action == 'clear', 'action differs')
-        extras = set()
+        expected_action, extras = linux_actions[kind]
+        require(action == expected_action, 'action differs')
     require(set(spec) == common | extras, 'spec fields differ')
     require(spec['role'] in ('client-en', 'client-de'), 'client role differs')
     require(integer(spec['process_id']), 'process identity differs')
@@ -75,10 +81,13 @@ def validate_spec(spec):
     if action == 'text':
         require(isinstance(spec['text'], str)
                 and re.fullmatch('[A-Za-z0-9 -]{1,32}', spec['text']), 'text differs')
-    if action in ('click', 'drag'):
+    if action in ('click', 'drag', 'wheel'):
         for x, y in [('x', 'y')] + ([('target_x', 'target_y')] if action == 'drag' else []):
             require(integer(spec[x], 2, width - 3) and integer(spec[y], 2, height - 3),
                     'point outside client')
+    if action == 'wheel':
+        require(isinstance(spec['direction'], str) and spec['direction'] in WHEEL_BUTTONS,
+                'wheel direction differs')
     if action == 'drag':
         dx, dy = spec['target_x'] - spec['x'], spec['target_y'] - spec['y']
         require(abs(dx) <= 80 and abs(dy) <= 80 and (dx or dy), 'drag distance differs')
@@ -301,8 +310,8 @@ class LinuxX11:
     def motion(self, x, y):
         return self.t.XTestFakeMotionEvent(self.d, -1, x, y, 0)
 
-    def button(self, down):
-        return self.t.XTestFakeButtonEvent(self.d, 1, int(down), 0)
+    def button(self, down, number=1):
+        return self.t.XTestFakeButtonEvent(self.d, number, int(down), 0)
 
     def sync(self):
         self.x.XSync(self.d, 0)
@@ -318,7 +327,7 @@ class LinuxX11:
 def perform(spec, binding, backend, guard, pause=time.sleep):
     validate_spec(spec)
     validate_binding(spec, binding)
-    trace, held, mouse = [], [], False
+    trace, held, held_button = [], [], None
     def checked_window(focused=True):
         guard()
         observed = backend.window(binding, spec)
@@ -344,10 +353,10 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
         elif code in held:
             held.remove(code)
         backend.sync()
-    def button(down):
-        nonlocal mouse
-        emit('XTestFakeButtonEvent', lambda: backend.button(down), button=1, down=down)
-        mouse = down
+    def button(number, down):
+        nonlocal held_button
+        emit('XTestFakeButtonEvent', lambda: backend.button(down, number), button=number, down=down)
+        held_button = number if down else None
         backend.sync()
     def move(x, y):
         emit('XTestFakeMotionEvent', lambda: backend.motion(x, y), x=x, y=y)
@@ -393,7 +402,8 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
             typed({'escape': 'Escape', 'inventory': 'e', 'tab': 'Tab'}[action], .1)
         else:
             move(spec['x'], spec['y'])
-            button(True)
+            button_number = WHEEL_BUTTONS[spec['direction']] if action == 'wheel' else 1
+            button(button_number, True)
             pause(.1)
             if action == 'drag':
                 for step in range(1, 5):
@@ -401,7 +411,7 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
                     move(round(spec['x'] + (spec['target_x'] - spec['x']) * step / 4),
                          round(spec['y'] + (spec['target_y'] - spec['y']) * step / 4))
                 pause(.1)
-            button(False)
+            button(button_number, False)
         checked_window()
     except Exception as error:
         raise InputError(str(error), trace) from error
@@ -417,10 +427,10 @@ def perform(spec, binding, backend, guard, pause=time.sleep):
                 backend.sync()
             except Exception as error:
                 trace.append({'api': 'cleanup-error', 'cleanup': True, 'error': type(error).__name__})
-        if mouse:
+        if held_button is not None:
             try:
-                result = backend.button(False)
-                trace.append({'api': 'XTestFakeButtonEvent', 'cleanup': True, 'button': 1,
+                result = backend.button(False, held_button)
+                trace.append({'api': 'XTestFakeButtonEvent', 'cleanup': True, 'button': held_button,
                               'down': False, 'result': result,
                               'accepted_by_xtest': type(result) is int and result != 0})
                 backend.sync()
