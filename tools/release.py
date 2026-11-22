@@ -373,13 +373,15 @@ def freeze(source, output, revision="HEAD", target_record=package.TARGET_RECORD,
                   early_target_record=(None if early_identity is None else early_identity["path"]))
 
 
-def _read_inventory(output):
+def _read_inventory(output, expected_sha256=None):
     path = output / INVENTORY_NAME
     try:
         raw = path.read_bytes()
         inventory = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError("Release inventory is missing or invalid") from error
+    if expected_sha256 is not None and digest(raw) != expected_sha256:
+        raise ValueError("Frozen release inventory digest differs")
     if not isinstance(inventory, dict) or canonical_json(inventory) != raw:
         raise ValueError("Release inventory is not canonical")
     claimed = inventory.pop("inventory_sha256", None)
