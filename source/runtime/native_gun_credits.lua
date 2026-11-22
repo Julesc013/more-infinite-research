@@ -7,9 +7,26 @@ local M = {}
 local MAIN, ROWS = definitions.main_id, definitions.descriptors()
 local KEY, MAX, MIR = "mir_native_gun_credits", 4294967295, "more-infinite-research"
 local pending_active = false
+local retirement_policy
+local reconciling_retirement = {}
 
 local function refuse(message)
   error("MIR native gun credit: " .. message, 3)
+end
+
+function M.set_retirement_policy(policy)
+  retirement_policy = policy
+end
+
+local function reconcile_retired_work(force, record)
+  if not retirement_policy or record.included.electric or record.included.tesla or reconciling_retirement[force.index] then return end
+  local limit = record.pending > 0 and record.completed + record.pending or nil
+  -- A bounded queue write may synchronously report removal of the excess.
+  -- Those entries never owned the saved allowance.
+  reconciling_retirement[force.index] = true
+  local ok, reason = pcall(retirement_policy, force, MAIN, limit)
+  reconciling_retirement[force.index] = nil
+  if not ok then error(reason, 0) end
 end
 
 local function integer(value)
@@ -64,6 +81,12 @@ end
 local function record_for(force)
   local value = state()
   return value and value.forces[force.index]
+end
+
+function M.has_retired_work(force, name)
+  if name ~= MAIN or not pending_active then return false end
+  local record = record_for(force)
+  return record ~= nil and record.pending > 0 and not record.included.electric and not record.included.tesla
 end
 
 local function refresh_pending()
@@ -226,6 +249,7 @@ local function plan_force(force, event, fresh)
   if observation.private then
     if not prior or previous.electric or previous.tesla then pending, payable = work, previous end
   else pending, payable = 0, observation.included end
+  if not integer(observation.completed + pending) then refuse("unfinished work exceeds native range") end
   if pending == 0 then payable = observation.included end
   local next_record = {included=observation.included, completed=observation.completed,
     pending=pending, payable=payable, positive={}, negative={}}
@@ -306,6 +330,9 @@ function M.apply(plans)
     apply_counts(plan.observation, plan.record)
     value.forces[plan.observation.force.index] = plan.record
   end
+  for _, plan in ipairs(plans) do
+    if plan.record.pending > 0 then reconcile_retired_work(plan.observation.force, plan.record) end
+  end
   return refresh_pending()
 end
 
@@ -334,19 +361,29 @@ function M.on_research_finished(event)
   apply_counts(observation, record)
   record.completed, record.pending = observation.completed, record.pending - 1
   if record.pending == 0 then record.payable = record.included end
+  reconcile_retired_work(research.force, record)
   return refresh_pending()
+end
+
+function M.on_research_queue_event(event)
+  local research = event and event.research
+  if not pending_active or not research or research.valid == false or research.name ~= MAIN then return end
+  local record = record_for(research.force)
+  if record and record.pending > 0 then reconcile_retired_work(research.force, record) end
 end
 
 function M.on_research_cancelled(event)
   if not pending_active or not event or not valid_force(event.force) or type(event.research) ~= "table" then return false end
+  if reconciling_retirement[event.force.index] then return false end
   local cancelled = event.research[MAIN]
   if cancelled == nil then return false end
   if not integer(cancelled) then refuse("invalid cancellation count") end
   local record = record_for(event.force)
-  if record then
+  if record and record.pending > 0 then
     local main = event.force.technologies[MAIN]
     record.pending = credit_work.remaining_after_cancellation(record.pending, cancelled, main and main.saved_progress)
     if record.pending == 0 then record.payable = record.included end
+    reconcile_retired_work(event.force, record)
   end
   return refresh_pending()
 end
@@ -372,6 +409,8 @@ function M.on_technology_effects_reset(event)
   if not event or not valid_force(event.force) then return end
   local observation = observe(event.force)
   if observation then suppress(observation) end
+  local record = pending_active and record_for(event.force)
+  if record and record.pending > 0 then reconcile_retired_work(event.force, record) end
 end
 
 return M

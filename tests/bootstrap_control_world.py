@@ -120,6 +120,9 @@ def install_bootstrap_control_world(lua, *, source_root):
             end
             package.preload["runtime.native_gun_credits"] = function()
               local module = {
+                set_retirement_policy = function(policy) gun_credit_calls.retirement_policy=policy end,
+                has_retired_work = function() return false end,
+                on_research_queue_event = function(event) gun_credit_calls.queue_event=event end,
                 preflight = function(event)
                   gun_credit_calls.preflight = event
                   table.insert(configuration_order, "gun-credit-preflight")
@@ -165,6 +168,8 @@ def install_bootstrap_control_world(lua, *, source_root):
             end
             package.preload["runtime.lifecycle"] = function()
               return {
+                set_retired_work_observer = function(observer) lifecycle_calls.retired_work_observer=observer end,
+                reconcile_retired_paid_work = function() end,
                 preflight = function(configuration_changed)
                   local plan = {configuration_changed=configuration_changed}
                   lifecycle_calls.cap_plan = plan
@@ -302,7 +307,7 @@ def install_bootstrap_control_world(lua, *, source_root):
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
               on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23,
-              on_gui_checked_state_changed = 24, on_forces_merging = 26
+              on_gui_checked_state_changed = 24, on_forces_merging = 26, on_research_queued = 27
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
