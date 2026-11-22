@@ -46,6 +46,10 @@ function Invoke-MIRGunmetalDispatcherSystemctl {
     'failed' {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=failed','SubState=failed','MainPID=0',('InvocationID='+$script:fakeInvocation),'Result=exit-code','ExecMainCode=exited','ExecMainStatus=1') }
     }
+    'activating-without-pid' {
+      return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=activating','SubState=start','MainPID=0','InvocationID=','Result=success','ExecMainCode=','ExecMainStatus=') }
+    }
+    'query-partial' { return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=active','MainPID=4242') } }
     'query-error' { return [pscustomobject]@{ exit_code = 1; lines = @('Failed to connect to bus') } }
     default {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=not-found','ActiveState=inactive','SubState=dead','MainPID=0','InvocationID=','Result=','ExecMainCode=','ExecMainStatus=') }
@@ -199,6 +203,19 @@ try {
   Assert-Dispatcher ($pending.request_id-ceq$successor.approval.request_id-and(Test-Path -LiteralPath (Join-Path $normal.spool ('requests/'+$successor.approval.request_id+'/policy.json')))) 'one-immutable-successor-snapshot'
   $secondSuccessor=New-DispatcherPolicy -Control $normal -RequestId 'native-control-normal-third' -PacketText 'third'
   Refuses-Dispatcher {Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $normal.base -SuccessorPolicyPath $secondSuccessor.path} '[mir-gunmetal-dispatcher-pending-slot-not-empty]'
+  $runningPath=Join-Path $normal.spool 'state/running.json'
+  $pendingPath=Join-Path $normal.spool 'state/pending.json'
+  $terminalPath=Join-Path $normal.spool ('terminal/'+$normal.base.approval.request_id+'.json')
+  $runningHash=(Get-FileHash -LiteralPath $runningPath).Hash
+  $pendingHash=(Get-FileHash -LiteralPath $pendingPath).Hash
+  foreach($mode in @('query-error','query-partial')){
+    $script:fakeState=$mode
+    $observation=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
+    Assert-Dispatcher ($observation.status-ceq'waiting-for-native-unit-observation' -and $script:launches-eq1 -and
+      (Test-Path -LiteralPath $runningPath) -and (Get-FileHash -LiteralPath $runningPath).Hash-ceq$runningHash -and
+      (Get-FileHash -LiteralPath $pendingPath).Hash-ceq$pendingHash -and
+      -not (Test-Path -LiteralPath $terminalPath)) "running-$mode-preserves-invocation-and-successor"
+  }
   Write-DispatcherResult -Policy $normal.base;$script:fakeState='gone';$script:fakeJournal=[pscustomobject]@{observed=$true;exit_code=0}
   $null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   $terminal=Read-DispatcherTerminal -Control $normal -RequestId $normal.base.approval.request_id
@@ -249,6 +266,30 @@ try {
   $beforeLaunches=$script:launches;$script:fakeState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $adopt.base
   $adopted=Get-MIRGunmetalDispatcherStateRecord -Policy $adopt.base -Name running
   Assert-Dispatcher ($adopted.launch.acknowledgement-ceq'adopted-after-durable-intent'-and$script:launches-eq$beforeLaunches) 'durable-intent-adopts-live-unit'
+  $starting=New-DispatcherControl -Name 'intent-observation';$controls+=@($starting)
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $starting.base
+  $beforeLaunches=$script:launches;$script:fakeState='gone';$script:nextLaunchState='query-error'
+  $startObservation=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+  $intentPath=Join-Path $starting.spool 'state/intent.json'
+  $startTerminalPath=Join-Path $starting.spool ('terminal/'+$starting.base.approval.request_id+'.json')
+  Assert-Dispatcher ($startObservation.status-ceq'waiting-for-native-unit-observation' -and
+    $script:launches-eq($beforeLaunches+1) -and (Test-Path -LiteralPath $intentPath) -and
+    -not (Test-Path -LiteralPath $startTerminalPath)) 'acknowledgement-query-error-preserves-durable-intent'
+  $intentHash=(Get-FileHash -LiteralPath $intentPath).Hash
+  foreach($mode in @('query-partial','activating-without-pid')){
+    $script:fakeState=$mode
+    $recoveryObservation=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+    Assert-Dispatcher ($recoveryObservation.status-ceq'waiting-for-native-unit-observation' -and
+      $script:launches-eq($beforeLaunches+1) -and (Test-Path -LiteralPath $intentPath) -and
+      (Get-FileHash -LiteralPath $intentPath).Hash-ceq$intentHash -and
+      -not (Test-Path -LiteralPath $startTerminalPath)) "intent-$mode-preserves-original-intent"
+  }
+  $script:fakeState='active';$recovered=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+  $started=Get-MIRGunmetalDispatcherStateRecord -Policy $starting.base -Name running
+  Assert-Dispatcher ($recovered.status-ceq'intent-adopted' -and
+    $started.launch.start_ack.invocation_id-ceq$script:fakeInvocation -and
+    $script:launches-eq($beforeLaunches+1)) 'observation-recovery-adopts-same-invocation-once'
+
   $absent=New-DispatcherControl -Name 'intent-absent';$controls+=@($absent)
   $null=Submit-MIRGunmetalDispatcherApproved -Policy $absent.base;$snapshot=Get-MIRGunmetalDispatcherPending -Policy $absent.base
   Write-MIRGunmetalDispatcherJson -Path (Join-Path $absent.spool 'state/intent.json') -Value ([ordered]@{kind='MIRGunmetalNativeDispatcherLaunchIntentV1';request_id=$absent.base.approval.request_id;request_snapshot_sha256=$snapshot.snapshot.request.policy_sha256;packet_sha256=$absent.base.approval.packet_sha256;launcher_sha256=$absent.base.approval.launcher_sha256;result_path=$absent.base.approval.result_path;dispatch_id='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';written_utc='2026-11-21T00:00:00Z'})

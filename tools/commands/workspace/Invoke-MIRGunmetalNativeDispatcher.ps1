@@ -11,8 +11,10 @@ is active. The systemd path/timer runs `-Mode Consume`; it invokes only that
 hash-pinned launcher and retains a terminal record. A launcher return is never
 a pass: success additionally needs its PID/invocation acknowledgement, the
 expected packet-bound controller result, and explicit terminal systemd
-evidence. Missing or conflicting evidence is terminal `interrupted` and is
-never retried. A held successor requires an explicit disposition reference;
+evidence. An incomplete unit query keeps the issued request for the next
+observation. A confirmed replacement or collected unit lacking authenticated
+terminal evidence is recorded as interrupted. A held successor requires an
+explicit disposition reference.
 the existing exact snapshot may be released, or a different reviewed snapshot
 may replace it. The durable intent closes the marker-to-launch acknowledgement
 window without silently relaunching an uncertain invocation.
@@ -347,7 +349,7 @@ function Invoke-MIRGunmetalDispatcherLauncher {
 function Get-MIRGunmetalDispatcherUnit {
   param([Parameter(Mandatory)][string]$Unit)
   $response = Invoke-MIRGunmetalDispatcherSystemctl -Arguments @(
-    'show', $Unit, '--no-pager',
+    'show', $Unit, '--no-pager', '--all',
     '--property=LoadState', '--property=ActiveState', '--property=SubState',
     '--property=MainPID', '--property=InvocationID', '--property=Result',
     '--property=ExecMainCode', '--property=ExecMainStatus'
@@ -362,13 +364,19 @@ function Get-MIRGunmetalDispatcherUnit {
   # Only a successful query with the actual LoadState key establishes absence.
   # An empty/partial response or an error is intentionally ambiguous.
   $absenceConfirmed = ($response.exit_code -eq 0 -and $loadObserved -and $load -ceq 'not-found')
-  $found = ($response.exit_code -eq 0 -and $loadObserved -and $load -cne 'not-found')
+  $required = @('ActiveState','SubState','MainPID','InvocationID','Result','ExecMainCode','ExecMainStatus')
+  $missing = @($required | Where-Object { -not $values.ContainsKey($_) })
+  $found = ($response.exit_code -eq 0 -and $loadObserved -and $load -cne 'not-found' -and
+    -not [string]::IsNullOrWhiteSpace($load) -and $missing.Count -eq 0)
+  $inProgress = $found -and ($values.ActiveState -in @('activating','deactivating') -or
+    ($values.ActiveState -ceq 'active' -and $values.SubState -cne 'exited'))
   return [pscustomobject]@{
     query_succeeded = ($response.exit_code -eq 0)
     load_state_observed = $loadObserved
     absence_confirmed = $absenceConfirmed
     found = $found
     ambiguous = (-not $found -and -not $absenceConfirmed)
+    in_progress = $inProgress
     load_state = $load
     active_state = if ($values.ContainsKey('ActiveState')) { [string]$values.ActiveState } else { '' }
     sub_state = if ($values.ContainsKey('SubState')) { [string]$values.SubState } else { '' }
@@ -608,19 +616,14 @@ function Reconcile-MIRGunmetalDispatcherRunning {
   }
   $unit = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
   $expected = [string]$Running.launch.start_ack.invocation_id
-  if ($unit.ambiguous) {
-    New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'native-unit-state-ambiguous' -Unit $unit
-    return
+  if ($unit.ambiguous -or ($unit.in_progress -and $unit.invocation_id -cnotmatch '^[A-Fa-f0-9]{32}$')) {
+    return [pscustomobject]@{status='waiting-for-native-unit-observation';side_effects='none';unit=$unit}
   }
   if ($unit.found -and $unit.invocation_id -cne $expected) {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'native-unit-invocation-replaced' -Unit $unit
     return
   }
-  $stillRunning = (
-    $unit.active_state -in @('activating','deactivating') -or
-    ($unit.active_state -ceq 'active' -and $unit.sub_state -cne 'exited')
-  )
-  if ($unit.found -and $stillRunning) { return }
+  if ($unit.in_progress) { return }
 
   $result = Get-MIRGunmetalDispatcherResult -Approval $Policy.approval
   if ($unit.found) {
@@ -744,6 +747,9 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
     Start-Sleep -Milliseconds 125
   }
   if (-not $acknowledged) {
+    if ($after.ambiguous -or $after.in_progress) {
+      return [pscustomobject]@{status='waiting-for-native-unit-observation';side_effects='intent-retained';unit=$after}
+    }
     $record.launch = $launch
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status interrupted -Reason 'launcher-returned-without-native-start-acknowledgement' -Unit $after
     return $submitted
@@ -793,9 +799,12 @@ function Recover-MIRGunmetalDispatcherLaunchIntent {
     return [pscustomobject]@{status='intent-terminal-finalized';side_effects='terminal-finalization-only'}
   }
   $unit=Get-MIRGunmetalDispatcherUnit -Unit $snapshot.policy.unit
-  if($unit.ambiguous){New-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record -Status interrupted -Reason 'intent-recovery-unit-state-ambiguous' -Unit $unit;return [pscustomobject]@{status='intent-interrupted';side_effects='terminal-only'}}
+  if($unit.ambiguous -or ($unit.in_progress -and
+    ($unit.main_pid -notmatch '^[1-9][0-9]*$' -or $unit.invocation_id -cnotmatch '^[A-Fa-f0-9]{32}$'))){
+    return [pscustomobject]@{status='waiting-for-native-unit-observation';side_effects='none';unit=$unit}
+  }
   if($unit.absence_confirmed){New-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record -Status interrupted -Reason 'intent-recovered-without-native-unit' -Unit $unit;return [pscustomobject]@{status='intent-interrupted';side_effects='terminal-only'}}
-  if($unit.active_state-notin@('active','activating','deactivating')-or$unit.main_pid-notmatch'^[1-9][0-9]*$'-or$unit.invocation_id-cnotmatch'^[A-Fa-f0-9]{32}$'){
+  if(-not $unit.in_progress){
     New-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $record -Status interrupted -Reason 'intent-recovery-unit-not-adoptable' -Unit $unit
     return [pscustomobject]@{status='intent-interrupted';side_effects='terminal-only'}
   }
@@ -827,7 +836,8 @@ function Invoke-MIRGunmetalDispatcherConsume {
       if (Complete-MIRGunmetalDispatcherTerminal -Policy $snapshot.policy -Running $running) {
         return [pscustomobject]@{status='running-terminal-finalized';side_effects='terminal-finalization-only'}
       }
-      Reconcile-MIRGunmetalDispatcherRunning -Policy $snapshot.policy -Running $running
+      $observation = Reconcile-MIRGunmetalDispatcherRunning -Policy $snapshot.policy -Running $running
+      if ($null -ne $observation) { return $observation }
       return [pscustomobject]@{status='reconciled';side_effects='state-only'}
     }
     $pending=Get-MIRGunmetalDispatcherPending -Policy $Policy
