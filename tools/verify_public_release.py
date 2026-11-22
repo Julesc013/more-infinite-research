@@ -146,7 +146,15 @@ def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prere
     if not COMMIT.fullmatch(commit) or not SHA256.fullmatch(inventory_sha256) or release_id <= 0:
         raise ValueError("A full reviewed commit, frozen inventory digest and valid release ID are required")
     inventory_sha256 = inventory_sha256.lower()
-    inventory = release._read_inventory(frozen, expected_sha256=inventory_sha256)
+    frozen_bytes = (frozen / release.INVENTORY_NAME).read_bytes()
+    if release.digest(frozen_bytes) != inventory_sha256:
+        raise ValueError("Frozen release inventory digest differs")
+    inventory = json.loads(frozen_bytes)
+    if not isinstance(inventory, dict):
+        raise ValueError("Invalid frozen release inventory")
+    inventory.pop("inventory_sha256", None)
+    if release._inventory_bytes(inventory) != frozen_bytes:
+        raise ValueError("Frozen release inventory is not canonical or its self-digest differs")
     if inventory.get("schema") != 1 or inventory.get("kind") != release.KIND:
         raise ValueError("Unsupported frozen release inventory")
     source = inventory["source"]
