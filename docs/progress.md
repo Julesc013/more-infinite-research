@@ -14,6 +14,10 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Factorio 2.0 Space Age upgrade hotfix (2026-11-23)
+
+The public 5.0.22 package refused a protected 4.7.3 save on Factorio 2.0.77 with the unchanged official Space Age selection. Two ordinary predecessor labs had earned worker storage and paid toward the active and parked levels. The verified private repair admits that exact selection. The upgrade preserved the paid work, repeated queue entries and unrelated research. The active lab completed at its retained six-pack price, cargo rose from four to five, and the parked force stayed unchanged. Both cold loads matched, the libraries restored, and 181 original files were rehashed. The hotfix still needs release packaging and publication. [Native refusal and repair evidence](../spec/evidence/worker473-f200-official-space-age-522-native.json)
+
 ## Verified 5.0.22 delivery and native results (2026-11-23)
 
 MIR 5.0.22 is GitHub prerelease `454462897`. Canonical tag `v5.0.22` and checked `main` resolve to `9e376928407e58f2921baf898a7edc398514a849`, whose tree matches frozen source `c54534acae88fe5e316aeae35d51e69c8897eb1a`. All 17 player ZIPs and both checksum files matched the frozen inventory, staged draft, anonymous downloads and primary `dist/v5.0.22`. The release notes and upload text match the checked source. GitHub's latest stable release remains 4.7.3. [Published prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.22) · [Verified delivery](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079781537)
