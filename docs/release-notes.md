@@ -1,27 +1,21 @@
 ---
-title: "MIR 5.0.17 beta release notes"
+title: "MIR 5.0.19 beta release notes"
 status: current
-applies_to: "MIR 5.0.17 GitHub prerelease"
+applies_to: "MIR 5.0.19 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-17
+last_reviewed: 2026-11-22
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-517-release-notes
+  - mir-519-release-notes
 ---
 
-Repairs a worker-cargo upgrade refusal for inherited MIR 5.0.11 saves and improves Research Library details and internal error handling.
+MIR 5.0.19 keeps the visible Research Library rows and selected technology in place when you resize the window on Factorio 2.0.77 and 2.1.24.
 
-- Allow inherited MIR 5.0.11 saves previously using only Base and MIR to upgrade after startup settings change or mods are added, when no worker-cargo continuation research has been earned, started or queued on any force.
-- Apply the configured worker robot speed limit to Space Exploration's infinite research beginning at level 10.
-- Avoid invalid GUI style reads when refreshing the Library's Settings tab.
-- Distinguish finite and continuing research with the same localized name, including their effective limits.
-- Reject incomplete internal preservation interfaces before changing research, and retain unexpected integration errors instead of misreporting them as missing research or history.
+The tested upgrades from MIR 5.0.18 preserved earned drill manufacturing productivity with Space Exploration 0.7.57 and preserved worker-cargo bonuses, unfinished research and queues on Factorio 2.1.24.
 
-Update a copy first and keep the protected original with its matching mods and startup settings. This worker-cargo repair covers a verified empty inherited 5.0.11 history; it does not reconstruct unknown earned research or every earlier mod selection. Other unprepared older saves can still be refused. Removing MIR, saving and re-adding it can discard research and preservation data; use an original backup or a supported recovery route instead.
+Keep the original save with its matching mod versions and startup settings when updating. This GitHub beta covers the resize repair and the tested upgrade paths.
 
-This is a GitHub beta. Remaining Library input/export checks, broader performance testing and unresolved historical save cases remain open for stable MIR 5. No blanket save or modpack qualification is claimed.
-
-[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.17/docs/support.md).
+See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.19/docs/support.md) for installation and supported editions.
