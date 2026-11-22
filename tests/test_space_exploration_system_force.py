@@ -132,6 +132,31 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                     'policy.apply(plan);assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)'
                 )
 
+    def test_reported_night_vision_and_unrelated_mod_update_preserve_the_save(self):
+        for changed_mod, researched in ((True, False), (False, True), (True, True)):
+            with self.subTest(changed_mod=changed_mod, researched=researched):
+                self.setUp()
+                self.lua.globals().changed_mod = changed_mod
+                self.lua.globals().researched = researched
+                self.lua.execute('''
+                  local tech = add_row("night-vision-equipment",1,researched)
+                  local effects = {{type="unlock-recipe",recipe="night-vision-equipment"}}
+                  tech.prototype.effects = effects
+                  if changed_mod then
+                    active["factorissimo-space-hall-fix"]="1.0.1"
+                    event.mod_changes["factorissimo-space-hall-fix"]={old_version="1.0.0",new_version="1.0.1"}
+                  end
+                  plan=policy.preflight(event);assert(plan and #native_writes==0)
+                  policy.apply(plan)
+                  assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
+                  assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
+                  assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
+                  assert(tech.researched==researched and tech.level==1 and tech.saved_progress==0)
+                  assert(tech.prototype.effects==effects and forbidden_writes==0)
+                  assert(foreign.worker_robots_storage_bonus==8 and foreign.research_progress==.039024390243902)
+                  assert(foreign.queue=="worker,worker,tail")
+                ''')
+
     def test_an_already_restored_conquest_policy_needs_no_writes(self):
         self.lua.execute('''
           event.mod_startup_settings_changed=true
@@ -150,7 +175,9 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                      'active.base="2.0.78"', 'active.Krastorio2="1.0.0"', 'active["space-age"]="2.0.77"',
                      'event.mod_changes.foreign={old_version="1.0.0"}',
                      'event.mod_startup_settings_changed=true;'
-                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
+                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.18"}',
+                     'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
+                     'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
                      'event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={old_version="0.1.0"}',
                      'active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0";event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={new_version="0.1.0"}']
         for mutation in mutations:
@@ -185,9 +212,24 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                 self.setUp()
                 self.rejected(mutation)
 
+    def test_researched_nonbasic_effects_cannot_recreate_ambiguous_scripted_values(self):
+        effects = (
+            '{type="worker-robot-speed",modifier=1}',
+            '{type="worker-robot-storage",modifier=1}',
+            '{type="artillery-range",modifier=1}',
+            '{type="gun-speed",ammo_category="artillery-shell",modifier=1}',
+            '{type="gun-speed",ammo_category="laser",modifier=1}',
+            '{type="ammo-damage",ammo_category="laser",modifier=1}',
+            '{type="gun-speed",modifier=1}',
+        )
+        for effect in effects:
+            with self.subTest(effect=effect):
+                self.setUp()
+                self.rejected('add_row("extra-research",1,true).prototype.effects={' + effect + '}')
+
     def test_published517_refuses_ambiguous_or_invested_system_force(self):
         for mutation in ('gun.laser=.4', 'rows["worker-robots-storage-4"].saved_progress=.12',
-                         'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}'):
+                         'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}'):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute('event.mod_changes["more-infinite-research"].old_version="5.0.20017"')
