@@ -202,6 +202,15 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         stale_version["targets"]["f015"]["published_mir_version"] = "4.7.01502"
         extra_target = json.loads(json.dumps(metadata))
         extra_target["targets"]["f017"] = self.metadata["targets"]["f017"]
+        successor_hash = "21A0D5894A1566C16AAC4779DC7D86A6D70F47D4536C176E6C549166CF2A0BAA"
+        current = json.loads(json.dumps(metadata))
+        current["targets"]["f013"].update(mir_version="5.0.01319", mir5_archive_sha256=successor_hash)
+        unpinned = json.loads(json.dumps(current))
+        del unpinned["targets"]["f013"]["mir5_archive_sha256"]
+        wrong_edition = json.loads(json.dumps(current))
+        wrong_edition["targets"]["f013"]["mir_version"] = "5.0.01419"
+        bad_successor_hash = json.loads(json.dumps(current))
+        bad_successor_hash["targets"]["f013"]["mir5_archive_sha256"] = "invalid"
         with tempfile.TemporaryDirectory(prefix="mir5-historical-transition-473-") as work:
             root = Path(work)
             paths = {
@@ -212,10 +221,15 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 "hash": root / "wrong-hash.json",
                 "version": root / "stale-version.json",
                 "extra": root / "extra-target.json",
+                "current": root / "pinned-5.0.19.json",
+                "unpinned": root / "unpinned-5.0.19.json",
+                "wrong_edition": root / "wrong-successor-edition.json",
+                "successor_hash": root / "bad-successor-hash.json",
             }
             for key, value in (("release", wrong_release), ("release_id", wrong_release_id),
                                ("release_id_type", wrong_release_id_type), ("tag_source", wrong_tag_source), ("hash", wrong_hash),
-                               ("version", stale_version), ("extra", extra_target)):
+                               ("version", stale_version), ("extra", extra_target), ("current", current),
+                               ("unpinned", unpinned), ("wrong_edition", wrong_edition), ("successor_hash", bad_successor_hash)):
                 paths[key].write_text(json.dumps(value), encoding="utf-8")
             v473_rejection = v473_functions + r'''
               $checks=@(
@@ -225,7 +239,10 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 @{path=$env:MIR_TEST_473_WRONG_TAG_SOURCE;target='f013';message='published tag source'},
                 @{path=$env:MIR_TEST_473_WRONG_HASH;target='f014';message='published archive hash'},
                 @{path=$env:MIR_TEST_473_STALE_VERSION;target='f015';message='MIR versions differ'},
-                @{path=$env:MIR_TEST_473_EXTRA_TARGET;target='f013';message='target set differs'}
+                @{path=$env:MIR_TEST_473_EXTRA_TARGET;target='f013';message='target set differs'},
+                @{path=$env:MIR_TEST_473_UNPINNED;target='f013';message='MIR versions differ'},
+                @{path=$env:MIR_TEST_473_WRONG_EDITION;target='f013';message='MIR versions differ'},
+                @{path=$env:MIR_TEST_473_BAD_SUCCESSOR_HASH;target='f013';message='MIR5 archive hash differs'}
               )
               foreach($check in $checks){
                 $refused=$false
@@ -237,12 +254,27 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               try { Get-HistoricalTransitionFixtureTarget -Target f017 -MetadataPath $env:MIR_TEST_473 -Stage published | Out-Null }
               catch { if($_.Exception.Message -match 'target is unsupported'){$wrongTarget=$true}else{throw} }
               if(-not $wrongTarget){throw 'v4.7.3 admitted unreviewed target'}
+              $published=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_473_CURRENT -Stage published
+              $successor=Get-HistoricalTransitionFixtureTarget -Target f013 -MetadataPath $env:MIR_TEST_473_CURRENT -Stage mir5
+              if($published.mir_version -cne '4.7.01303' -or $published.archive_sha256 -cne $expected.f013.archive){
+                throw 'Explicit successor pin changed predecessor admission'
+              }
+              if($successor.mir_version -cne '5.0.01319' -or $successor.archive_sha256 -cne $env:MIR_TEST_473_SUCCESSOR_HASH){
+                throw 'Current successor version and digest were not bound together'
+              }
+              if((ConvertTo-HistoricalTransitionFixtureTargetLiteral $successor) -cnotmatch 'mir_version="5\.0\.01319"'){
+                throw 'Current successor literal differs'
+              }
             '''
             v473_env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_473=str(FIXTURE_473),
                             MIR_TEST_473_WRONG_RELEASE=str(paths["release"]), MIR_TEST_473_WRONG_RELEASE_ID=str(paths["release_id"]),
                             MIR_TEST_473_WRONG_RELEASE_ID_TYPE=str(paths["release_id_type"]), MIR_TEST_473_WRONG_TAG_SOURCE=str(paths["tag_source"]),
                             MIR_TEST_473_WRONG_HASH=str(paths["hash"]),
-                            MIR_TEST_473_STALE_VERSION=str(paths["version"]), MIR_TEST_473_EXTRA_TARGET=str(paths["extra"]))
+                            MIR_TEST_473_STALE_VERSION=str(paths["version"]), MIR_TEST_473_EXTRA_TARGET=str(paths["extra"]),
+                            MIR_TEST_473_CURRENT=str(paths["current"]), MIR_TEST_473_UNPINNED=str(paths["unpinned"]),
+                            MIR_TEST_473_WRONG_EDITION=str(paths["wrong_edition"]),
+                            MIR_TEST_473_BAD_SUCCESSOR_HASH=str(paths["successor_hash"]),
+                            MIR_TEST_473_SUCCESSOR_HASH=successor_hash)
             result = subprocess.run(["pwsh", "-NoProfile", "-Command", v473_functions], cwd=ROOT,
                                     text=True, capture_output=True, env=v473_env, check=False)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
