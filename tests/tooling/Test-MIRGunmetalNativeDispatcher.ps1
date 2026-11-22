@@ -215,12 +215,30 @@ try {
   Assert-Dispatcher ($retainedTerminal.status-ceq'succeeded'-and$retainedTerminal.result.result.status-ceq'passed') 'retained-oneshot-exit-is-terminal-with-verbatim-status'
   Test-DispatcherExitJournal
 
-  # A failed/unavailable unit query is not proof of absence; no launcher runs.
-  $uncertain=New-DispatcherControl -Name 'uncertain';$controls+=@($uncertain)
-  $null=Submit-MIRGunmetalDispatcherApproved -Policy $uncertain.base;$beforeLaunches=$script:launches;$script:fakeState='query-error'
-  $null=Invoke-MIRGunmetalDispatcherConsume -Policy $uncertain.base
-  $terminal=Read-DispatcherTerminal -Control $uncertain -RequestId $uncertain.base.approval.request_id
-  Assert-Dispatcher ($terminal.status-ceq'interrupted'-and$terminal.reason-ceq'native-unit-absence-not-confirmed'-and$script:launches-eq$beforeLaunches) 'unit-query-error-is-not-absence'
+  # An external timing service or a failed manager query leaves the same
+  # request queued. A later timer wakeup can launch it after proven absence.
+  $waiting=New-DispatcherControl -Name 'waiting-for-unit';$controls+=@($waiting)
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $waiting.base
+  $beforeLaunches=$script:launches
+  $waitingPath=Join-Path $waiting.spool 'state/pending.json'
+  $waitingHash=(Get-FileHash -LiteralPath $waitingPath).Hash
+  foreach($mode in @('active','query-error','failed')) {
+    $script:fakeState=$mode
+    $wait=Invoke-MIRGunmetalDispatcherConsume -Policy $waiting.base
+    Assert-Dispatcher ($wait.status -ceq 'waiting-for-native-unit' -and $wait.request_id -ceq $waiting.base.approval.request_id -and $script:launches -eq $beforeLaunches) "unit-$mode-defers-launch"
+    Assert-Dispatcher ((Get-FileHash -LiteralPath $waitingPath).Hash -ceq $waitingHash -and
+      -not (Test-Path -LiteralPath (Join-Path $waiting.spool 'state/pending.signal')) -and
+      -not (Test-Path -LiteralPath (Join-Path $waiting.spool 'state/intent.json')) -and
+      -not (Test-Path -LiteralPath (Join-Path $waiting.spool 'state/running.json')) -and
+      -not (Test-Path -LiteralPath (Join-Path $waiting.spool ('terminal/'+$waiting.base.approval.request_id+'.json')))) "unit-$mode-preserves-pending-without-rearm"
+  }
+  $script:fakeState='gone'
+  $script:nextLaunchState='active'
+  $submitted=Invoke-MIRGunmetalDispatcherConsume -Policy $waiting.base
+  $null=Invoke-MIRGunmetalDispatcherConsume -Policy $waiting.base
+  $running=Get-MIRGunmetalDispatcherStateRecord -Policy $waiting.base -Name running
+  Assert-Dispatcher ($submitted.status -ceq 'submitted' -and $script:launches -eq ($beforeLaunches+1) -and
+    $running.packet_sha256 -ceq $waiting.base.approval.packet_sha256 -and -not (Test-Path -LiteralPath $waitingPath)) 'same-pending-launches-once-after-unit-disappears'
 
   # A durable intent is written before a launcher. Restart adopts only a live
   # unit and exact immutable snapshot; an absent unit becomes interrupted,

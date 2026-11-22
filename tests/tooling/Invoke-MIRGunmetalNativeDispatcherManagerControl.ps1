@@ -1,6 +1,6 @@
 # A Linux-only, disposable control for the normal dispatcher state machine.
-# It runs three disposable user-systemd stand-ins; it never starts Factorio,
-# opens a direct library, installs a persistent unit, or touches mir-native.
+# It uses a disposable user-systemd unit for the occupied-slot and launch
+# controls. It owns only that test unit and its scratch directory.
 [CmdletBinding()]
 param(
   [Parameter(Mandatory)][string]$DispatcherPath,
@@ -127,6 +127,18 @@ try {
   $second = New-ManagerControlPolicy -RequestId 'manager-control-second' -PacketText 'second'
   $submitted = Submit-MIRGunmetalDispatcherApproved -Policy $first
   Assert-ManagerControl ($submitted.status -ceq 'queued') 'first-queued'
+  & /usr/bin/systemd-run --user --unit=$script:unit --collect --property=Type=exec -- /usr/bin/sleep 30 2>&1 | Out-Null
+  Assert-ManagerControl ($LASTEXITCODE -eq 0) 'occupied-unit-started'
+  $occupied = Get-MIRGunmetalDispatcherUnit -Unit $script:unit
+  Assert-ManagerControl ($occupied.found -and $occupied.active_state -ceq 'active' -and $occupied.main_pid -match '^[1-9][0-9]*$') 'occupied-real-manager-ack'
+  $pendingPath = Join-Path $first.spool 'state/pending.json'
+  $pendingHash = (Get-FileHash -LiteralPath $pendingPath).Hash
+  $wait = Invoke-MIRGunmetalDispatcherConsume -Policy $first
+  Assert-ManagerControl ($wait.status -ceq 'waiting-for-native-unit' -and $wait.unit.invocation_id -ceq $occupied.invocation_id -and
+    (Get-FileHash -LiteralPath $pendingPath).Hash -ceq $pendingHash -and
+    -not (Test-Path -LiteralPath (Join-Path $first.spool 'state/running.json'))) 'occupied-unit-preserves-pending'
+  Remove-ManagerControlUnit
+
   $started = Invoke-MIRGunmetalDispatcherConsume -Policy $first
   $running = Get-MIRGunmetalDispatcherStateRecord -Policy $first -Name running
   if ($null -eq $running) {
@@ -135,6 +147,7 @@ try {
     throw "[mir-gunmetal-dispatcher-manager-control-first-running-missing:$terminalDetail]"
   }
   Assert-ManagerControl ($started.status -ceq 'submitted' -and $running.launch.start_ack.pid -gt 0 -and $running.launch.start_ack.invocation_id -match '^[a-f0-9]{32}$') 'first-real-manager-ack'
+  Assert-ManagerControl ($running.launch.start_ack.invocation_id -cne $occupied.invocation_id) 'first-is-distinct-from-occupied-unit'
 
   $next = Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $first -SuccessorPolicyPath $second.path
   Assert-ManagerControl ($next.status -ceq 'queued' -and (Test-Path -LiteralPath (Join-Path $first.spool 'state/pending.signal'))) 'second-literal-packet-queued'
@@ -163,12 +176,13 @@ try {
     status = 'passed'
     checks = $script:checks
     unit = $script:unit
+    occupied_invocation_id = $occupied.invocation_id
     first_packet_sha256 = $first.approval.packet_sha256
     second_packet_sha256 = $second.approval.packet_sha256
     exits = @($firstTerminal.result.journal, $secondTerminal.result.journal, $failed.result.journal)
     native_execution = $false
     gameplay_acceptance = $false
-    operational_scope = 'three disposable user-systemd stand-ins only; no Factorio, direct library, or production native unit.'
+    operational_scope = 'An occupied-unit observation and three reviewed launches using one disposable user-systemd unit.'
   }
 } finally {
   if ($cleanup -ne 'unit-cleaned') { try { Remove-ManagerControlUnit } catch { } }

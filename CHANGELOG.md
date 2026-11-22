@@ -2,6 +2,13 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.22] - 2026-11-22
+
+### Bugfixes
+
+- Let the Research Library's Availability view find research by its translated family name.
+- On Factorio 2.0.77, preserve research and earned recipe effects when removing Space Is Fake during an older MIR 5 upgrade with unchanged official Space Age mods, default worker cargo settings and no invested repeating worker cargo research.
+
 ## [5.0.21] - 2026-11-22
 
 ### Bugfixes

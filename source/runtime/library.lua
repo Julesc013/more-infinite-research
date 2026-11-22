@@ -43,6 +43,7 @@ local MAX_PAGE = 30000
 local MAX_FAMILY_DESCRIPTORS = 128
 local MAX_SETTING_DESCRIPTORS = 2048
 local SETTING_TRANSLATION_PREFIX = "@setting:"
+local AVAILABILITY_TRANSLATION_FAMILY = "@availability"
 local LEGACY_NAMESPACE = "mir"
 local LEGACY_BROWSER_KEY = "research_browser"
 local LEGACY_ROOT_MARKER = "mir_browser_tabs"
@@ -824,19 +825,38 @@ local function discard_translation_cache(index)
   translation_caches[index] = nil
 end
 
-local function open_translation_cache(player, view)
+local function open_translation_cache(player, view, availability_rows)
   local index = player and player.index
   if not whole_number(index, 1) then return nil end
-  local family = type(view) == "table" and view.tab == "settings" and "settings"
+  local family = availability_rows and AVAILABILITY_TRANSLATION_FAMILY
+    or type(view) == "table" and view.tab == "settings" and "settings"
     or (type(view) == "table" and family_option(view.family) or "mir")
+  local availability_ids
+  if availability_rows then
+    availability_ids = {}
+    local seen = {}
+    for _, row in ipairs(availability_rows) do
+      if not seen[row.family] then
+        seen[row.family] = true
+        availability_ids[#availability_ids + 1] = row.family
+      end
+    end
+  end
   local retained = translation_caches[index]
   local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
     and retained.scope.force_index == (player.force and player.force.index)
 
   if retained and same_live_scope and retained.family == family
       and translation_queue.discovery_limited(retained.cache, retained.scope) ~= nil then
-    -- Ordered identities are local immutable presentation data. Reusing this
-    -- record prevents a native catalogue traversal on every GUI render.
+    -- Availability can change when a named technology appears. Renew the
+    -- generation on a changed set so its former replies cannot label this view.
+    if availability_ids then
+      local prepared, reason = translation_queue.prepare(retained.cache, retained.scope, availability_ids)
+      if not prepared and reason ~= "unchanged" then
+        discard_translation_cache(index)
+        return nil
+      end
+    end
     return retained
   end
 
@@ -844,7 +864,7 @@ local function open_translation_cache(player, view)
     -- Family selection or an older metadata-free cache renews derived work.
     -- Retain engine IDs already issued, but replace unissued work under a fresh caller
     -- epoch so former responses cannot label the new view.
-    local ids = ordered_translation_ids(player, family)
+    local ids = availability_ids or ordered_translation_ids(player, family)
     local ledger = retained.ledger
     local scope = ledger and scope_for(player, next_translation_epoch(ledger)) or nil
     if ids == nil or scope == nil or not translation_queue.prepare(retained.cache, scope, ids) then
@@ -878,7 +898,7 @@ local function open_translation_cache(player, view)
   end
 
   local scope = scope_for(player, next_translation_epoch(ledger))
-  local ids = ordered_translation_ids(player, family)
+  local ids = availability_ids or ordered_translation_ids(player, family)
   local cache = scope and ids and translation_queue.new(scope) or nil
   if cache == nil or not translation_queue.prepare(cache, scope, ids) then return nil end
   if pending and not translation_queue.hydrate_pending(cache, pending) then return nil end
@@ -921,11 +941,14 @@ local function prototype_collection(kind)
   return legacy_ok and legacy or nil
 end
 
-local function request_translation(player, key)
+local function request_translation(player, key, family)
   if not valid(player) or player.connected ~= true
       or type(player.request_translation) ~= "function" then return nil end
   local subjects, limited = 0, false
   local ok, request_id = pcall(function()
+    if family == AVAILABILITY_TRANSLATION_FAMILY then
+      return player.request_translation(availability.localised_name(key))
+    end
     local setting_name = type(key) == "string" and key:match("^" .. SETTING_TRANSLATION_PREFIX .. "(.+)$") or nil
     if setting_name then
       local prototypes = setting_prototypes_by_name()
@@ -954,7 +977,7 @@ end
 local function dispatch_translations(player, record)
   if type(record) ~= "table" or player.connected ~= true or not valid(owned_root(player)) then return end
   translation_queue.dispatch(record.cache, record.scope, current_tick(), function(key)
-    return request_translation(player, key)
+    return request_translation(player, key, record.family)
   end)
   sync_issued_cache(record)
 end
@@ -2060,15 +2083,31 @@ local function update_availability_content(content, player, view, context)
   if not valid(content) then return end
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
-  local rows = availability.rows(active_mods, target, player and player.force, model_view(view, context).search, effective_streams)
+  local rows = availability.rows(active_mods, target, player.force, nil, effective_streams)
+  local query = model_view(view, context).search
+  local translations
+  if query ~= "" and #rows > 0 then
+    translations = open_translation_cache(player, view, rows)
+    dispatch_translations(player, translations)
+    local available_labels = translated_labels(translations)
+    rows = availability.filter(rows, query, function(family)
+      local label = available_labels[family]
+      return label ~= nil and library_model.matches_search(label, query, context)
+    end)
+  else
+    discard_translation_cache(player.index)
+  end
+  local search_pending = translations ~= nil
+    and translation_queue.is_complete(translations.cache, translations.scope) == false
+    and translation_queue.needs_maintenance(translations.cache)
   local labels = {}
   for index, row in ipairs(rows) do
     labels[index] = {type = "label", name = PREFIX .. "availability_" .. index,
       caption = {"mir-browser.availability-entry",
-        {"technology-name.more-infinite-research." .. row.family},
+        availability.localised_name(row.family),
         {"mir-browser.availability-" .. row.reason}}}
   end
-  if #labels == 0 then
+  if #labels == 0 and not search_pending then
     labels[1] = {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}}
   end
 
@@ -2476,7 +2515,6 @@ local function render(player, view, context, preserve_query)
   if valid(tabs) then tabs.selected_tab_index = TAB_INDEX[view.tab] or 1 end
   local content = tab_content(frame, view.tab)
   if view.tab == "research" and view.visibility == 3 then
-    discard_translation_cache(player.index)
     update_availability_content(content, player, view, context)
   elseif view.tab == "research" then
     local translations = open_translation_cache(player, view)

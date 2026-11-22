@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.22
+Date: 2026-11-22
+
+  Bugfixes:
+
+    - Let the Research Library's Availability view find research by its translated family name.
+    - On Factorio 2.0.77, preserve research and earned recipe effects when removing Space Is Fake during an older MIR 5 upgrade with
+      unchanged official Space Age mods, default worker cargo settings and no invested repeating worker cargo research.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.21
 Date: 2026-11-22
 

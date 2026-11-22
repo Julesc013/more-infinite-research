@@ -1,12 +1,13 @@
-MIR 5.0.21
+MIR 5.0.22
 Channel: GitHub prerelease (beta). Mod Portal publication remains with the maintainer for stable releases.
 
-MIR 5.0.21 fixes a worker-cargo upgrade refusal on Factorio 2.1.24.
+MIR 5.0.22 fixes localized Availability search and a Space Is Fake upgrade refusal.
 
-- With the unchanged official Space Age mods and default worker cargo settings, saves from MIR 4.7.3 keep earned cargo, current research, repeated queue entries and parked research. The next cargo level still uses its original six science packs and grants the next cargo bonus.
+- Search the Research Library's Availability view by the translated family name. The German client check used Factorio 2.1.24.
+- On Factorio 2.0.77 with the unchanged official Space Age mods, the supported MIR 5.0.3 upgrade can remove Space Is Fake 1.0.60 and its unused dependency while retaining earned recipe effects and queued or unfinished research. This path requires default worker cargo settings and an uninvested repeating worker cargo research row.
 
-Keep the original save. For the first upgrade, sync a copy with its exact mod versions and startup settings, then change only MIR.
+Keep the original save. For invested worker cargo or different settings, use the staged removal in the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md#removing-space-is-fake-on-factorio-20).
 
-Broader Library interaction, mod-profile and performance qualification remain open for stable.
+Broader Library, compatibility and performance qualification continues for stable.
 
-See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.21/docs/support.md) for installation and supported editions.
+See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md) for supported editions and installation.
