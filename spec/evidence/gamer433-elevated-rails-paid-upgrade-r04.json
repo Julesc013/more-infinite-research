@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeEarnedCargoEvidenceV1",
+  "verdict": "accepted-controlled-paid-upgrade",
+  "scope": "Factorio 2.0.77 with Space Exploration 0.7.57 and Elevated Rails 2.0.77. A controlled world generated paid work on published MIR 4.7.20002. The upgrade changed only MIR to the revised 5.0.20020 ZIP, using unchanged startup settings and the same actor.",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+    "execution_account": "jules"
+  },
+  "source": {
+    "version": "4.7.20002",
+    "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "protected_save_sha256": "3D4DB07D2239F22793E2498348D471AC0CBD41797E1CB23F1C2137A33C1CEA43",
+    "prior_distinct_protected_save_sha256": "862253C69BFA7DF6E543ED613B3B0529F7D50F0F5A3034B47E0D7C28A69DA8E1"
+  },
+  "candidate": {
+    "version": "5.0.20020",
+    "commit": "f14391ac3711134cb81044b260c18398fe8e190a",
+    "player_tree": "77763fac5f4f49b4c4d8052b940b87e5c0d2edc8",
+    "archive_sha256": "E6DF47BAF29A9CAE5AB4F1BC72CF06FA8185B9A8F9F50E04DB7E341AA6C3244D",
+    "protected_save_sha256": "82C96012AD270CA7AE15830798AF518402F57081A79C586F12117C69E8307BA7"
+  },
+  "execution": {
+    "invocation_id": "53ec92ce73a341fb84d2d44a7be094e7",
+    "packet_sha256": "2BEE6BDCD3213F77EEAFBC4495FB94F5231DFD0C2B882B9ECF46A4FA1C775608",
+    "runner_commit": "dbc06872bd821a561c58dfd696e1f377c5e03815",
+    "settings_sha256": "149E5D54766983A1FA22423439C8DA0ABDF5C8F3F27DF208A3FC753E681192F7",
+    "fixture_sha256": "18F8BD1C04A526A6611BDDA4C81433D0858669D851235846A5C00D3279F49E30",
+    "dependency_archives": 17,
+    "processes": ["create source", "source lab and save", "upgrade, candidate lab and save", "cold read 1", "cold read 2"],
+    "exit_codes": [0, 137, 137, 0, 0],
+    "server_stop": "Each server completed its own verified save predicate before the governor stopped it. Neither timed out.",
+    "prior_attempts": "R02 refused staging at a nonexistent destination before the engine. R03 refused a profile with a stale archive row before the engine. Both restored library controls and retained the original fixture."
+  },
+  "observations": {
+    "ordinary_source_levels": [4, 5, 6, 7, 8],
+    "paid_level": 9,
+    "retained_progress": 0.039024390243902,
+    "retained_queue": ["worker", "worker", "unrelated tail"],
+    "worker_price_formula": "675*1.5^(L-4)",
+    "worker_science_packs": 7,
+    "worker_unit_seconds": 60,
+    "normal_map_price_treatment": true,
+    "candidate_ordinary_levels": [9, 10],
+    "cargo_before_and_after": [8, 10],
+    "next_level": 11,
+    "cap_start": "refused at cap ten, with the unrelated tail still current",
+    "conquest_vector": [3, 5.65, 1.8, 6, 2.2, 5.1],
+    "unchanged_other_force_fields_from_transfer_to_cold": 41,
+    "cold_ticks_each": 1200,
+    "cold_checksums": [3888787189, 3888787189],
+    "cold_fixture_writes": 0,
+    "library_controls_restored": true
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "e9d14c873a5b41c2e2b66d15d3870254143551fc",
+    "path": "projects/mir/evidence/gamer433-f200-rails-paid-r04",
+    "primary_path": "build/qualification/gamer433-protected-source-r01/rails-paid-r04",
+    "original_bodies": 148,
+    "crc_clean_save_copies": 10,
+    "capsule_sha256": "7F1D78EF47878D0CFE7032DA9DE3F235E56CDC07F13581ECFFDB89B9C4C1EB4C",
+    "independent_verdict_sha256": "D84489DF8CEB1B6191CBB4069B079FDF072741FDC3338DB4C42516E523927D00",
+    "coordination": "https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7076324071"
+  },
+  "remaining": "The reporter's private save, full reported selection, transitions with actual startup changes, and ore extraction output remain unverified. The revised F210 and stable gates have separate evidence."
+}
