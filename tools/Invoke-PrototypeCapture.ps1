@@ -11,6 +11,8 @@ param(
   [string]$SettingsPath = '',
   [string]$ExpectedSettingsSha256 = '',
   [string]$ActiveModsObserver = '',
+  [string]$LinuxStoragePlanPath = '',
+  [string]$LinuxStoragePlanSha256 = '',
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,8192)][int]$MaxNewOutputMiB = 512,
@@ -210,8 +212,23 @@ $record = [ordered]@{
 
 try {
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
-  $record.initial_admission_wait = Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $output -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'prototype-capture-initial'
-  $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
+  $storageArguments = @{}
+  if ($LinuxStoragePlanPath -or $LinuxStoragePlanSha256) {
+    $storageArguments = @{
+      LinuxStoragePlanPath=$LinuxStoragePlanPath
+      LinuxStoragePlanSha256=$LinuxStoragePlanSha256
+      LibraryRoot=$library
+    }
+  } else {
+    $record.initial_admission_wait = Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $output -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'prototype-capture-initial'
+  }
+  $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot @storageArguments
+  $launchStorageArguments = @{}
+  if ($storageArguments.Count) {
+    $record.linux_write_storage = $resources.policy.linux_write_storage
+    $record.linux_write_storage_helper_sha256 = Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/validation/LinuxWriteStorage.ps1')
+    $launchStorageArguments.WriteStoragePolicy = $resources.policy
+  }
   $run = $resources.root
   $writeData = Join-Path $run 'write-data'
   $dumpRoot = Join-Path $writeData 'script-output'
@@ -251,7 +268,7 @@ try {
 
   $arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)
   $record.arguments = $arguments
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver @launchStorageArguments
   $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
   Assert-MIR5PrototypeCapture ([bool]$native.result.passed -and -not [bool]$native.result.timed_out -and [int]$native.result.exit_code -eq 0) 'Factorio dump process must exit naturally with code zero'
