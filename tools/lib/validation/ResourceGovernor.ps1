@@ -1,6 +1,10 @@
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'LinuxWriteStorage.ps1')
 
+function Test-MIR441UseLinuxHostMemory {
+  return ($IsLinux -and $env:MIR_NATIVE_USE_HOST_MEMORY -ceq '1')
+}
+
 function Get-MIR441PhysicalMemorySnapshot {
   if (-not $IsWindows) { throw '[mir441-resource-monitor-windows-required]' }
   if ($null -eq ('MIR441MemoryNative' -as [type])) {
@@ -241,8 +245,10 @@ function Assert-MIR441ResourceAdmission {
     $limits.system_bytes=$null;$limits.work_bytes=$null
   }
   $failure=''
-  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
-  elseif($IsLinux-and$null-ne$snapshot.memory.cgroup_v2.effective_headroom_bytes-and[int64]$snapshot.memory.cgroup_v2.effective_headroom_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-cgroup]'}
+  $useHostMemory=Test-MIR441UseLinuxHostMemory
+  if($useHostMemory){$snapshot.platform.memory_policy='Linux manages memory; the runner records physical and cgroup usage without applying a projected memory reserve'}
+  if(-not $useHostMemory -and [int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
+  elseif($IsLinux -and -not $useHostMemory -and $null-ne$snapshot.memory.cgroup_v2.effective_headroom_bytes-and[int64]$snapshot.memory.cgroup_v2.effective_headroom_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-cgroup]'}
   elseif(-not$IsLinux-and[int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
   elseif($null -eq $storageProperty){
     [int64]$systemOutputAllowance=2*$EstimatedPeakBytes
@@ -773,6 +779,8 @@ function Invoke-MIR441MonitoredProcess {
   }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $LedgerPath
   $splitStorage=$null -ne $Policy.PSObject.Properties['linux_write_storage']
+  $useHostMemory=Test-MIR441UseLinuxHostMemory
+  $memoryEnforcement=if($useHostMemory){'linux-host-managed'}else{'sampled-watchdog-not-hard-cap'}
   $pathComparison=if($IsWindows){[StringComparison]::OrdinalIgnoreCase}else{[StringComparison]::Ordinal}
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $path
@@ -890,13 +898,13 @@ function Invoke-MIR441MonitoredProcess {
       $cgroupDelta=$null;if($IsLinux){$cgroupDelta=Get-MIR441LinuxCgroupEventDelta -Baseline $linuxCgroupBaseline -Current $sample.memory.cgroup_v2}
       # Preserve the triggering process observation before enforcing its budget.
       # Private bytes can exceed working set during graphical resource loading.
-      $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'}
+      $processRecord=[ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement=$memoryEnforcement}
       if($IsLinux){$processRecord.start_identity=$rootIdentity;$processRecord.root_exited=$tree.root_exited;$processRecord.private_measure=$tree.private_measure;$processRecord.private_resident_bytes=$tree.private_resident_bytes;$processRecord.private_swap_bytes=$tree.private_swap_bytes;$processRecord.released_address_space_members=@($tree.released_address_space_members);$processRecord.cgroup_events=$cgroupDelta;$processRecord.clock_scope='linux-launcher-session-inclusive'}
       $sample|Add-Member -NotePropertyName process -NotePropertyValue $processRecord
       $null=Resolve-MIR441ProcessOutputPath -Policy $Policy -Path $ledger
       Write-MIR441Json -Value $sample -Path $ledger -Append
       if($IsLinux-and$cgroupDelta.leaf_local_adverse){throw '[mir441-resource-linux-cgroup-local-event]'}
-      if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
+      if(-not $useHostMemory -and ($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes)){throw '[mir441-resource-process-budget]'}
       if(-not $splitStorage){
         $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
         if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
