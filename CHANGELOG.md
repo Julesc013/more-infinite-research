@@ -8,6 +8,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - On Factorio 2.0.77, preserve earned worker cargo and paid, queued or parked research when upgrading MIR 4.7.3 with the unchanged official Space Age mods and default worker cargo settings.
 - Stop a worker cargo transfer when Factorio cannot supply the complete force research queue.
+- Preserve recorded default worker cargo research when upgrading from an earlier MIR 5 release.
 - Preserve the historical credit owed to unfinished productivity and electric or Tesla research while the paid level is outside the queue.
 
 ## [5.0.22] - 2026-11-22
