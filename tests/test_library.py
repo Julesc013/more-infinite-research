@@ -2607,6 +2607,42 @@ class LibraryTests(unittest.TestCase):
             and pane.children[2] == pane.mir_library_actions and pane.children[3] == results)
         ''')
 
+    def test_display_changes_reflow_the_open_library_and_keep_research_state(self):
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution = {width=1920, height=1080}
+          local root = library.open(player, {query="gear", selected=gear.name})
+          local tabs = root.mir_library_tabs
+          local query = research_filters(root).mir_library_query
+          local results = research_content(root).mir_library_list_pane.mir_library_results
+          local items, selection = results.items, results.selected_index
+          local scroll = {index=1, mode="user-position"}
+          results.scrolled_to = scroll
+          root.location = {x=900, y=200}
+          library.on_gui_location_changed({player_index=1, element=root})
+          local level, progress = gear.level, player.force.research_progress
+          assert(root.style.maximal_width == 960 and root.style.maximal_height == 810 and selection == 1)
+
+          player.display_scale = 1.5
+          library.on_player_display_changed({player_index=1, old_scale=1})
+          assert(root.style.maximal_width == 640 and root.style.maximal_height == 540)
+
+          player.display_resolution = {width=960, height=660}
+          library.on_player_display_changed({player_index=1, old_resolution={width=1920, height=1080}})
+          assert(root.style.maximal_width == 616 and root.style.maximal_height == 400)
+          assert(root.location.x <= 36 and root.location.y <= 60)
+          assert(root.valid and root.mir_library_tabs == tabs and tabs.selected_tab_index == 1)
+          assert(research_filters(root).mir_library_query == query and query.text == "gear")
+          assert(research_content(root).mir_library_list_pane.mir_library_results == results)
+          assert(results.items == items and results.selected_index == selection and results.scrolled_to == scroll)
+          assert(gear.level == level and player.force.research_progress == progress)
+
+          library.close(player)
+          local saved = storage.mir_library.players[1]
+          library.on_player_display_changed({player_index=1, old_scale=1})
+          assert(player.gui.screen.mir_research_browser == nil and storage.mir_library.players[1] == saved)
+        ''')
+
     def test_layout_tables_recreate_for_column_changes_and_never_mutate_column_count(self):
         self.lua.execute(r'''
           boot()

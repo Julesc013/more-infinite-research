@@ -545,6 +545,10 @@ local function on_library_location_changed(event)
   reconcile_translations()
 end
 
+local function on_library_display_changed(event)
+  if library.on_player_display_changed(event) then reconcile_translations() end
+end
+
 local function on_library_closed(event)
   library.on_gui_closed(event)
   reconcile_translations()
@@ -895,6 +899,8 @@ function M.register()
   if events.on_gui_checked_state_changed then script.on_event(events.on_gui_checked_state_changed, on_library_checked_changed) end
   if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
   if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end
+  if events.on_player_display_scale_changed then script.on_event(events.on_player_display_scale_changed, on_library_display_changed) end
+  if events.on_player_display_resolution_changed then script.on_event(events.on_player_display_resolution_changed, on_library_display_changed) end
   if events.on_gui_closed then script.on_event(events.on_gui_closed, on_library_closed) end
   if events.on_pre_player_removed then script.on_event(events.on_pre_player_removed, on_library_player_pre_removed) end
   if events.on_player_removed then script.on_event(events.on_player_removed, on_library_player_removed) end

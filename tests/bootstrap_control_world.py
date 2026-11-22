@@ -240,6 +240,7 @@ def install_bootstrap_control_world(lua, *, source_root):
               module.on_gui_checked_state_changed = function(event) library_calls.checked = event end
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
+              module.on_player_display_changed = function(event) library_calls.display_changed = event end
               module.on_gui_closed = function(event) library_calls.closed = event end
               module.on_pre_player_removed = function(event) library_calls.pre_removed = event end
               module.on_player_removed = function(event) library_calls.removed = event end
