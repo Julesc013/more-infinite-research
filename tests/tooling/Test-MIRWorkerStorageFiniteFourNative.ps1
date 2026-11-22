@@ -265,11 +265,26 @@ Add-Check 'Validate requires an explicit receipt path and defers missing runtime
     $output=@(& $pwsh.Source -NoProfile -NonInteractive -File $ControllerPath -Mode Validate -OutputPath $receiptPath 2>&1)
     if($LASTEXITCODE-ne0){throw "Validate command failed: $($output -join ' ' )"}
     $receipt=Get-Content -LiteralPath $receiptPath -Raw|ConvertFrom-Json
-    if($receipt.status -cnotin @('DEFERRED_MISSING_LOCAL_BINDINGS','DEFERRED_LOCAL_HELPER_MISMATCH') -or$receipt.native_processes_started-ne0-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Validate crossed an execution boundary'}
+    if($receipt.native_processes_started-ne0-or$receipt.library_activation-or$receipt.resource_context_allocated){throw 'Validate crossed an execution boundary'}
+    $packet=Read-FiniteFourNativeJson $PacketPath
     $helpers=@($receipt.input_states | Where-Object {$_.label -like 'helper *'})
-    if($helpers.Count -ne 4 -or @($helpers | Where-Object {$_.state -cne 'verified_local_input'}).Count -ne 0) {
-        throw 'The checked-in finite-four packet helper pins differ from the executing controller checkout'
+    if($helpers.Count -ne $packet.helper_pins.Count){throw 'Validate did not report all frozen helper identities'}
+    $hasMismatch=$false
+    foreach($pin in $packet.helper_pins){
+        $label="helper $([IO.Path]::GetFileName($pin.path))"
+        $reported=@($helpers | Where-Object label -CEQ $label)
+        if($reported.Count-ne1-or$reported[0].sha256-cne$pin.sha256-or$reported[0].bytes-ne$pin.bytes){throw "Frozen helper identity in Validate differs for $label"}
+        $actual=Get-Item -LiteralPath (Join-Path $repo $pin.path)
+        $hash=(Get-FileHash -LiteralPath $actual.FullName -Algorithm SHA256).Hash
+        if($actual.Length-eq$pin.bytes-and$hash-ceq$pin.sha256){
+            if($reported[0].state-cne'verified_local_input'){throw "Matching helper was not verified for $label"}
+        }else{
+            $hasMismatch=$true
+            if($reported[0].state-cne'mismatched_local_input'-or$reported[0].observed_sha256-cne$hash-or$reported[0].observed_bytes-ne$actual.Length){throw "Observed helper mismatch differs for $label"}
+        }
     }
+    $expectedStatus=if($hasMismatch){'DEFERRED_LOCAL_HELPER_MISMATCH'}else{'DEFERRED_MISSING_LOCAL_BINDINGS'}
+    if($receipt.status-cne$expectedStatus){throw 'Validate did not defer for the observed reason'}
 }
 
 Add-Check 'Compose reports the five bounded stages and remains non-activating' {
