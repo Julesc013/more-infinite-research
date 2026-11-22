@@ -203,6 +203,26 @@ function Read-InfoJsonFromRef {
   return ($text -join "`n") | ConvertFrom-Json
 }
 
+function Test-MIRPublicationTextFromRef {
+  param([string]$Ref)
+  $version = [string](Read-InfoJsonFromRef $Ref).version
+  if ($version -cnotmatch '^5\.') { return }
+  if ($version -cnotmatch '^5\.(0|[1-9][0-9]*)\.210([0-9]{2})$') {
+    throw '[mir-release-source-version] The main candidate needs a canonical MIR 5 source version.'
+  }
+  $title = "MIR 5.$($Matches[1]).$([int]$Matches[2])"
+  $upload = @(Invoke-Git show "${Ref}:docs/upload-text.txt")
+  if ($upload.Count -lt 3 -or $upload[0] -cne $title) {
+    throw "[mir-release-upload-title] The candidate upload text must begin with $title."
+  }
+  $uploadBlocks = ($upload -join "`n") -split '\n[ \t]*\n',2
+  $notes = (Invoke-Git show "${Ref}:docs/release-notes.md") -join "`n"
+  $notes = ($notes -replace '\A---\n(?s:.*?)\n---(?:\n|\z)', '').Trim()
+  if ($uploadBlocks.Count -ne 2 -or [string]::IsNullOrWhiteSpace($notes) -or $uploadBlocks[1].Trim() -cne $notes) {
+    throw '[mir-release-notes-mismatch] The candidate release notes and upload body must match.'
+  }
+}
+
 if (-not $SkipFetch) {
   foreach ($branch in $branches.Keys) {
     Invoke-Git fetch --no-tags origin "+refs/heads/$branch`:refs/remotes/origin/$branch" | Out-Null
@@ -221,6 +241,10 @@ if ($originHead -and $originHead -ne "refs/remotes/origin/main") {
 $baseRef = $env:GITHUB_BASE_REF
 if (-not [string]::IsNullOrWhiteSpace($baseRef) -and -not $branches.ContainsKey($baseRef)) {
   throw "Pull requests must target main, dev, legacy, or release/4.0; found $baseRef."
+}
+if ($baseRef -eq 'main' -and -not [string]::IsNullOrWhiteSpace($EventPath)) {
+  $promotion = (Get-Content -LiteralPath $EventPath -Raw | ConvertFrom-Json -Depth 64).pull_request
+  if ($null -ne $promotion) { Test-MIRPublicationTextFromRef -Ref $promotion.head.sha }
 }
 
 foreach ($branch in @("main", "dev", "legacy", "release/4.0")) {

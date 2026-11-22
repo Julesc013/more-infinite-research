@@ -11,6 +11,8 @@ param(
   [string]$SettingsPath = '',
   [string]$ExpectedSettingsSha256 = '',
   [string]$ActiveModsObserver = '',
+  [string]$LinuxStoragePlanPath = '',
+  [string]$LinuxStoragePlanSha256 = '',
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,8192)][int]$MaxNewOutputMiB = 512,
@@ -132,6 +134,24 @@ function Assert-MIR5PrototypeCaptureNoFatalDiagnostic {
   }
 }
 
+function Get-MIR5PrototypeCaptureFailureDiagnostic {
+  param(
+    [Parameter(Mandatory)][string]$LogPath,
+    [Parameter(Mandatory)][string]$OutputRoot
+  )
+  $log = Get-Item -LiteralPath $LogPath -Force -ErrorAction SilentlyContinue
+  if ($log -isnot [IO.FileInfo] -or $log.Length -gt 8MB -or
+    ($log.Attributes -band [IO.FileAttributes]::ReparsePoint)) { return }
+  $fatal = Get-MIR5PrototypeCaptureFatalDiagnostic ([IO.File]::ReadAllText($log.FullName))
+  if ($null -eq $fatal -or -not $fatal.Success) { return }
+  $message = $fatal.Value.Trim()
+  [ordered]@{
+    path=[IO.Path]::GetRelativePath($OutputRoot,$log.FullName).Replace('\','/')
+    message=$message.Substring(0,[Math]::Min(2048,$message.Length))
+    truncated=$message.Length -gt 2048
+  }
+}
+
 function Get-MIR5PrototypeCaptureDumpFile {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$OutputRoot)
   Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $Path -PathType Leaf) "required dump is absent: $([IO.Path]::GetFileName($Path))"
@@ -186,6 +206,7 @@ Assert-MIR5PrototypeCapture (Test-MIR5PrototypeCaptureContainedPath -Root $build
 
 $resources = $null
 $activation = $null
+$factorioLog = $null
 $pendingFailure = $null
 $record = [ordered]@{
   schema=1;kind='MIR5PrototypeCaptureV1';status='prepared';endpoint_class='factorio-data-stage-dump-only'
@@ -210,10 +231,26 @@ $record = [ordered]@{
 
 try {
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
-  $record.initial_admission_wait = Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $output -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'prototype-capture-initial'
-  $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
+  $storageArguments = @{}
+  if ($LinuxStoragePlanPath -or $LinuxStoragePlanSha256) {
+    $storageArguments = @{
+      LinuxStoragePlanPath=$LinuxStoragePlanPath
+      LinuxStoragePlanSha256=$LinuxStoragePlanSha256
+      LibraryRoot=$library
+    }
+  } else {
+    $record.initial_admission_wait = Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $output -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'prototype-capture-initial'
+  }
+  $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot @storageArguments
+  $launchStorageArguments = @{}
+  if ($storageArguments.Count) {
+    $record.linux_write_storage = $resources.policy.linux_write_storage
+    $record.linux_write_storage_helper_sha256 = Get-MIR5PrototypeCaptureSha256 (Join-Path $repo 'tools/lib/validation/LinuxWriteStorage.ps1')
+    $launchStorageArguments.WriteStoragePolicy = $resources.policy
+  }
   $run = $resources.root
   $writeData = Join-Path $run 'write-data'
+  $factorioLog = Join-Path $writeData 'factorio-current.log'
   $dumpRoot = Join-Path $writeData 'script-output'
   # F200 writes its settings dump before creating this parent directory.
   [IO.Directory]::CreateDirectory($dumpRoot) | Out-Null
@@ -251,12 +288,11 @@ try {
 
   $arguments = @(Get-MIR5PrototypeCaptureArguments -ConfigPath $config -LibraryDirectory $activation.library -Headless:$Headless)
   $record.arguments = $arguments
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -RequireLoadedSelection -ActiveModsObserver $activeModsObserver @launchStorageArguments
   $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
   Assert-MIR5PrototypeCapture ([bool]$native.result.passed -and -not [bool]$native.result.timed_out -and [int]$native.result.exit_code -eq 0) 'Factorio dump process must exit naturally with code zero'
 
-  $factorioLog = Join-Path $writeData 'factorio-current.log'
   Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $factorioLog -PathType Leaf) 'Factorio did not produce factorio-current.log'
   Assert-MIR5PrototypeCaptureNoFatalDiagnostic -Path $factorioLog -Kind 'Factorio'
   foreach ($diagnostic in @($native.stdout,$native.stderr,(Join-Path $run 'process-1.stdout.txt'),(Join-Path $run 'process-1.stderr.txt')) | Select-Object -Unique) {
@@ -282,6 +318,14 @@ try {
   $record.failure = $_.Exception.Message
   $record.resource_admission = $_.Exception.Data['mir441_resource_admission']
   $pendingFailure = $_
+  if ($null -ne $factorioLog -and $record.failure.StartsWith('[mir441-process-exit] ',[StringComparison]::Ordinal)) {
+    try {
+      $diagnostic = Get-MIR5PrototypeCaptureFailureDiagnostic -LogPath $factorioLog -OutputRoot $run
+      if ($null -ne $diagnostic) { $record.native_fatal_diagnostic = $diagnostic }
+    } catch {
+      $record.native_fatal_diagnostic_error = $_.Exception.Message
+    }
+  }
 } finally {
   if ($null -ne $activation -and -not $activation.closed) {
     try {$record.library_control_restoration = Complete-MIRLibraryActivation -Activation $activation}

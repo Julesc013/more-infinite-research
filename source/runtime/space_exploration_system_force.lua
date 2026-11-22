@@ -41,7 +41,7 @@ local function values(force)
   return out
 end
 
-local function pristine(force)
+local function needs_restoration(force)
   require_policy(force and force.valid == true and force.name == "conquest"
     and force.ai_controllable == true and finite(force.index) and force.index > 0 and force.index % 1 == 0
     and game.forces.conquest == force and game.forces[force.index] == force,
@@ -52,6 +52,11 @@ local function pristine(force)
   require_policy(queue == nil or type(queue) == "table" or type(queue) == "userdata", "research queue is unavailable")
   for _ in pairs(queue or {}) do require_policy(false, "system force has queued work") end
   local observed = values(force)
+  local already_present = true
+  for index = 1, 6 do
+    if observed[index] ~= DEFAULTS[index] then already_present = false; break end
+  end
+  if already_present then return false end
   for index = 1, 6 do require_policy(observed[index] == 0, "scripted vector is nonzero or mixed") end
   require_policy(type(force.set_gun_speed_modifier) == "function"
     and type(force.set_ammo_damage_modifier) == "function", "scripted setters are unavailable")
@@ -76,6 +81,7 @@ local function pristine(force)
     end
   end
   require_policy(basics == 9, "basic system technology set is incomplete: observed " .. basics .. ", expected 9")
+  return true
 end
 
 function M.preflight(event)
@@ -87,10 +93,11 @@ function M.preflight(event)
   require_policy(type(target.distribution_version) == "string" and target.distribution_version ~= ""
     and active[MIR] == target.distribution_version and change.new_version == target.distribution_version,
     "target/package version differs")
-  require_policy(event.mod_startup_settings_changed == false, "startup settings changed or are unavailable")
+  -- SE authors these fixed NPC values independently of startup settings.
+  -- The package event and native system-force state establish this repair.
   origin(event, active)
   local force = game.forces.conquest
-  pristine(force)
+  if not needs_restoration(force) then return nil end
   return {force=force, event=event, used=false}
 end
 

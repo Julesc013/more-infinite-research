@@ -172,12 +172,27 @@ class F110F200RunnerControls(unittest.TestCase):
             result = _run_powershell(script, env)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def _assert_actual_fixture_profile_composition(self, successor=False):
+    def _assert_actual_fixture_profile_composition(self, successor=False, later_patch=False):
         """The caller-composed seven-file stage is bound to real tracked bytes."""
         with tempfile.TemporaryDirectory(prefix=".mir5-f110-composed-", dir=ROOT) as composed_work, \
                 tempfile.TemporaryDirectory(prefix="mir5-f110-cross-actual-composition-") as work:
             source = Path(composed_work)
             self._compose_actual_fixture_source(source, successor)
+            profile_path = ROOT / ("tests/profiles/f110-473-current-successor-11110.json" if successor
+                                   else "tests/profiles/f110-f200-transition-published-f110-11110.json")
+            mir_sha = "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9" if successor else MIR_SHA
+            if later_patch:
+                mir_sha = "B14A2352FC5C794F41D432E6071474199696B5C39CE1EC5CEECFA3EE263F74B4"
+                profile = json.loads(profile_path.read_bytes())
+                profile["mods"][1]["version"] = "5.0.11019"
+                profile["archive_sha256"] = {"more-infinite-research_5.0.11019.zip": mir_sha}
+                profile_path = Path(work) / "f110-pinned-later-patch.json"
+                profile_path.write_text(json.dumps(profile), encoding="utf-8")
+                for name in ("info.json", "data-final-fixes.lua", "fixture_control.lua"):
+                    member = source / name
+                    payload = member.read_bytes()
+                    self.assertEqual(payload.count(b"5.0.11000"), 1, name)
+                    member.write_bytes(payload.replace(b"5.0.11000", b"5.0.11019"))
             fixture_version = "0.3.0" if successor else "0.1.0"
             archive = Path(work) / f"{FIXTURE}_{fixture_version}.zip"
             with zipfile.ZipFile(archive, "w") as output:
@@ -215,7 +230,8 @@ class F110F200RunnerControls(unittest.TestCase):
                 }
                 Expect-SuccessorRefusal @{InputSave=''} 'protected D524 source save'
                 Expect-SuccessorRefusal @{InputSaveSha256=('0'*64)} 'protected D524 source save'
-                Expect-SuccessorRefusal @{ExpectedMIRSha256=('0'*64)} 'MIR archive hash differs'
+                $hashFailure=if($env:MIR_TEST_LATER -ceq 'true'){'profile archive differs'}else{'MIR archive hash differs'}
+                Expect-SuccessorRefusal @{ExpectedMIRSha256=('0'*64)} $hashFailure
                 Expect-SuccessorRefusal @{Observer='modern-observer'} 'modern observers or consumers'
                 Expect-SuccessorRefusal @{Historical=$true} 'fresh installed-MIR source run'
                 Expect-SuccessorRefusal @{Create=$true} 'fresh installed-MIR source run'
@@ -227,15 +243,23 @@ class F110F200RunnerControls(unittest.TestCase):
               . (Join-Path $env:MIR_TEST_REPO 'tools/lib/validation/ImmutableInputStaging.ps1')
               . (Join-Path $env:MIR_TEST_REPO 'tools/lib/compatibility/LibraryActivation.ps1')
               Assert-MIRLibraryFixtureArchive -Archive $env:MIR_TEST_ARCHIVE -SourceDirectory $env:MIR_TEST_SOURCE
+              if($env:MIR_TEST_LATER -ceq 'true'){
+                $path=Join-Path $result.source 'data-final-fixes.lua'
+                $valid=[IO.File]::ReadAllBytes($path)
+                $text=[Text.Encoding]::UTF8.GetString($valid)
+                [IO.File]::WriteAllBytes($path,[Text.Encoding]::UTF8.GetBytes($text.Replace('5.0.11019','5.0.11000')))
+                Expect-SuccessorRefusal @{} 'stage member differs: data-final-fixes.lua'
+                [IO.File]::WriteAllBytes($path,[Text.Encoding]::UTF8.GetBytes($text.Replace('unit.count = 1','unit.count = 2')))
+                Expect-SuccessorRefusal @{} 'stage member differs: data-final-fixes.lua'
+              }
             '''
             env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_REPO=str(ROOT),
-                       MIR_TEST_PROFILE=str(ROOT / ("tests/profiles/f110-473-current-successor-11110.json" if successor
-                                                  else "tests/profiles/f110-f200-transition-published-f110-11110.json")),
+                       MIR_TEST_PROFILE=str(profile_path),
                        MIR_TEST_SOURCE=str(source), MIR_TEST_ARCHIVE=str(archive),
                        MIR_TEST_ENGINE_DATA=str(engine_data), MIR_TEST_ENGINE=str(engine),
                        MIR_TEST_ENGINE_SHA=ENGINE_SHA,
-                       MIR_TEST_MIR_SHA="1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9" if successor else MIR_SHA,
-                       MIR_TEST_SAME="true" if successor else "false",
+                       MIR_TEST_MIR_SHA=mir_sha, MIR_TEST_SAME="true" if successor else "false",
+                       MIR_TEST_LATER="true" if later_patch else "false",
                        MIR_TEST_INPUT_SAVE="protected-source.zip" if successor else "",
                        MIR_TEST_INPUT_SHA="D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253" if successor else "")
             result = _run_powershell(script, env)
@@ -246,6 +270,9 @@ class F110F200RunnerControls(unittest.TestCase):
 
     def test_same_edition_successor_requires_the_exact_protected_input_and_composition(self):
         self._assert_actual_fixture_profile_composition(successor=True)
+
+    def test_same_edition_successor_accepts_later_pins_with_only_the_version_fields_projected(self):
+        self._assert_actual_fixture_profile_composition(successor=True, later_patch=True)
 
     def test_generic_fixture_byte_verifier_remains_the_cross_source_archive_guard(self):
         source = RUNNER.read_text(encoding="utf-8")

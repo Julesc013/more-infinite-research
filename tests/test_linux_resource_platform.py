@@ -243,6 +243,69 @@ class LinuxResourcePlatformTests(unittest.TestCase):
         self.assertEqual(2, status)
         self.assertEqual("mir441-linux-cgroup-memory", payload["code"])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Linux procfs, cgroup v2, and pwsh")
+    def test_host_managed_memory_keeps_disk_checks_and_records_usage(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("PowerShell is unavailable")
+        run_root = ROOT / "build" / "tmp" / f"linux-host-memory-{uuid.uuid4().hex}"
+        run_root.mkdir(parents=True)
+        self.addCleanup(lambda: shutil.rmtree(run_root, ignore_errors=True))
+        governor = ROOT / "tools" / "lib" / "validation" / "ResourceGovernor.ps1"
+        common = governor.with_name("NativeProbeCommon.ps1")
+        script = rf"""
+$ErrorActionPreference='Stop'
+. '{common.as_posix()}'
+. '{governor.as_posix()}'
+$work='{run_root.as_posix()}'
+$ledger=Join-Path $work 'ledger.jsonl'
+$policy=[pscustomobject]@{{}}
+$script:actualSnapshot=${{function:Get-MIR441ResourceSnapshot}}
+$script:lowHost=$true
+$script:lowDisk=$false
+function Get-MIR441ResourceSnapshot([string]$WorkRoot) {{
+  $row=& $script:actualSnapshot -WorkRoot $WorkRoot
+  $row.memory.free_bytes=if($script:lowHost){{0L}}else{{$row.memory.total_bytes}}
+  $row.memory.cgroup_v2.effective_headroom_bytes=1L
+  $row.system_volume.total_bytes=128GB
+  $row.system_volume.free_bytes=64GB
+  $row.work_volume.total_bytes=128GB
+  $row.work_volume.free_bytes=if($script:lowDisk){{0L}}else{{64GB}}
+  return $row
+}}
+function Get-Refusal {{
+  try {{ $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $work -EstimatedPeakBytes 8MB -ExpectedPeakMemoryBytes 1MB }}
+  catch {{ return $_.Exception.Message }}
+  return ''
+}}
+$env:MIR_NATIVE_USE_HOST_MEMORY='0'
+$hostRefusal=Get-Refusal
+$script:lowHost=$false
+$cgroupRefusal=Get-Refusal
+$env:MIR_NATIVE_USE_HOST_MEMORY='1'
+$script:lowHost=$true
+$script:lowDisk=$true
+$diskRefusal=Get-Refusal
+$script:lowDisk=$false
+$result=Invoke-MIR441MonitoredProcess -FilePath '{Path(pwsh).resolve().as_posix()}' -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 1700; exit 0') -WorkRoot $work -LedgerPath $ledger -Policy $policy -EstimatedPeakBytes 8MB -ExpectedPeakMemoryBytes 1MB -TimeoutSeconds 20
+$rows=@(Get-Content -LiteralPath $ledger | ForEach-Object {{ $_ | ConvertFrom-Json -AsHashtable }} | Where-Object {{ $_.Contains('process') }})
+[ordered]@{{host=$hostRefusal;cgroup=$cgroupRefusal;disk=$diskRefusal;status=$result.status;rows=$rows}} | ConvertTo-Json -Depth 16 -Compress
+"""
+        completed = subprocess.run(
+            [pwsh, "-NoProfile", "-NonInteractive", "-Command", script],
+            cwd=ROOT, check=False, capture_output=True, text=True, timeout=45,
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual("[mir441-resource-admission-memory]", result["host"])
+        self.assertEqual("[mir441-resource-admission-cgroup]", result["cgroup"])
+        self.assertEqual("[mir441-resource-admission-work-disk]", result["disk"])
+        self.assertEqual("passed", result["status"])
+        samples = [row["process"] for row in result["rows"] if row["process"].get("phase") == "running"]
+        self.assertTrue(samples)
+        self.assertEqual({"linux-host-managed"}, {row["memory_enforcement"] for row in samples})
+        self.assertGreater(max(row["peak_working_set_bytes"] for row in samples), 1024**2)
+
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires real Linux procfs, cgroup v2, and pwsh")
     def test_real_linux_new_workroot_uses_existing_volume_and_case_sensitive_containment(self) -> None:
         pwsh = shutil.which("pwsh")

@@ -510,14 +510,14 @@ def prototype_capture_file_settings_guard_cases() -> dict:
         }
 
 
-def prototype_capture_file_settings_activation_routing_cases() -> dict:
-    """Run the prepared capture route through an activation boundary only.
+def prototype_capture_activation_cases() -> dict:
+    """Run the capture entry point through activation and simulated exits.
 
     The synthetic repository supplies the three imported helper surfaces as
     narrow host stubs.  The real entry point performs its ordinary settings
     preflight, resource-context call, selection/config preparation, and
-    activation-argument construction.  The stubbed activation records its
-    bound parameters and throws before any library mutation or process launch.
+    activation-argument construction. The stubs record those arguments and can
+    simulate an activation refusal or a natural nonzero process exit.
     """
     source = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
     routing_condition = "if ($captureSettings.SettingsMode -ceq 'File')"
@@ -539,7 +539,7 @@ def prototype_capture_file_settings_activation_routing_cases() -> dict:
         # The entry point imports ImmutableInputStaging directly, then imports
         # the direct-startup helper.  This direct-startup host stub owns the
         # normally-transitive library/resource functions so the actual entry
-        # point reaches Start-MIRLibraryActivation without a real context,
+        # point reaches the native resources boundary without a real context,
         # direct-library control write, or process launch.
         immutable.write_text(
             """function Get-MIRImmutableInputSha256 { param([string]$Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
@@ -562,9 +562,28 @@ function Start-MIRLibraryActivation {
   param($LibraryDirectory,$EngineDataDirectory,$ProfilePath,$ArchiveHashes,$SettingsMode,$SettingsPath,$SettingsSha256)
   $capture=[ordered]@{keys=@($PSBoundParameters.Keys|Sort-Object);settings_mode=$SettingsMode;settings_path=$SettingsPath;settings_sha256=$SettingsSha256}
   [IO.File]::WriteAllText($env:MIR_CAPTURE_ROUTING_CAPTURE,($capture|ConvertTo-Json -Depth 5 -Compress),[Text.UTF8Encoding]::new($false))
+  if($env:MIR_CAPTURE_NATIVE_EXIT){return [pscustomobject]@{library=$LibraryDirectory;selected=@();closed=$false}}
   throw 'HOST_ACTIVATION_BOUNDARY'
 }
-function Write-MIRNativeProbeResult { param($Context,$Record) }
+function Add-MIRNativeProbeLibraryActivation { param($Context,$Activation) }
+function Assert-MIRLibraryLaunch { param($Activation,$FactorioBin,$Arguments,[switch]$RequireLoadedSelection,$ActiveModsObserver) }
+function Get-MIRNativeAudioArguments { param([switch]$Headless) if(-not $Headless){'--disable-audio'} }
+function Invoke-MIRNativeProbeFactorioProcess {
+  param($Context,$FilePath,$Arguments,$TimeoutSeconds,$AdmissionWaitSeconds,$AdmissionPhase)
+  if($env:MIR_CAPTURE_NATIVE_EXIT -eq 'fatal-log'){
+    Set-Content -LiteralPath (Join-Path $Context.root 'write-data/factorio-current.log') -Encoding utf8NoBOM -Value @(
+      '   0.100 Checksum of fixture-mod: 123',
+      '   0.120 Error Util.cpp:81: Error while loading recipe prototype "sample" (recipe): invalid categories',
+      '   0.145 Goodbye'
+    )
+  }
+  throw '[mir441-process-exit] 1'
+}
+function Complete-MIRLibraryActivation { param($Activation) $Activation.closed=$true; @{status='restored'} }
+function Write-MIRNativeProbeResult {
+  param($Context,$Record)
+  $Record | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $Context.root 'result.json') -Encoding utf8NoBOM
+}
 """,
             encoding="utf-8", newline="\n",
         )
@@ -591,14 +610,15 @@ function Write-MIRNativeProbeResult { param($Context,$Record) }
         output = repo / "build/tmp/capture-routing-output"
         capture = root / "activation-arguments.json"
 
-        def invoke(name: str, *, mode: str, runner: Path = tool) -> dict:
+        def invoke(name: str, *, mode: str, runner: Path = tool, native_exit: str = "") -> dict:
             value = {"mods": [], "settings_mode": mode}
+            run_output = output.with_name(f"capture-routing-{name}")
             command = [
                 "pwsh", "-NoProfile", "-File", str(runner),
                 "-ArchiveLibrary", str(library),
                 "-FactorioBin", str(factorio),
                 "-ProfilePath", str(profile),
-                "-OutputRoot", str(output.with_name(f"capture-routing-{name}")),
+                "-OutputRoot", str(run_output),
                 "-RepoRoot", str(repo),
             ]
             if mode == "File":
@@ -611,12 +631,15 @@ function Write-MIRNativeProbeResult { param($Context,$Record) }
                 cwd=repo,
                 text=True,
                 capture_output=True,
-                env={**os.environ, "MIR_CAPTURE_ROUTING_CAPTURE": str(capture)},
+                env={**os.environ, "MIR_CAPTURE_ROUTING_CAPTURE": str(capture),
+                     "MIR_CAPTURE_NATIVE_EXIT": native_exit},
             )
+            receipt = run_output / "result.json"
             return {
                 "returncode": result.returncode,
                 "output": result.stdout + result.stderr,
                 "activation": json.loads(capture.read_text(encoding="utf-8")) if capture.exists() else None,
+                "receipt": json.loads(receipt.read_text(encoding="utf-8")) if receipt.exists() else None,
             }
 
         mutant = root / "Invoke-PrototypeCapture-defaults-routing-mutant.ps1"
@@ -628,6 +651,8 @@ function Write-MIRNativeProbeResult { param($Context,$Record) }
             "file": invoke("file", mode="File"),
             "defaults": invoke("defaults", mode="Defaults"),
             "defaults_routing_mutant": invoke("defaults-routing-mutant", mode="Defaults", runner=mutant),
+            "fatal_log": invoke("fatal-log", mode="Defaults", native_exit="fatal-log"),
+            "absent_log": invoke("absent-log", mode="Defaults", native_exit="absent-log"),
         }
 
 
@@ -1349,7 +1374,7 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("settings=[ordered]@{mode=$captureSettings.SettingsMode", source)
 
     def test_prototype_capture_routes_file_settings_to_activation_without_native_work(self):
-        cases = prototype_capture_file_settings_activation_routing_cases()
+        cases = prototype_capture_activation_cases()
 
         for name in ("file", "defaults"):
             with self.subTest(name=name):
@@ -1382,6 +1407,22 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIsNotNone(mutant["activation"])
         self.assertIn("SettingsPath", mutant["activation"]["keys"])
         self.assertIn("SettingsSha256", mutant["activation"]["keys"])
+
+        for name in ("fatal_log", "absent_log"):
+            with self.subTest(name=name):
+                self.assertNotEqual(cases[name]["returncode"], 0)
+                self.assertIn("[mir441-process-exit] 1", cases[name]["output"])
+                receipt = cases[name]["receipt"]
+                self.assertEqual(receipt["status"], "failed")
+                self.assertEqual(receipt["failure"], "[mir441-process-exit] 1")
+                self.assertEqual(receipt["library_control_restoration"]["status"], "restored")
+
+        self.assertEqual(cases["fatal_log"]["receipt"]["native_fatal_diagnostic"], {
+            "path": "write-data/factorio-current.log",
+            "message": '0.120 Error Util.cpp:81: Error while loading recipe prototype "sample" (recipe): invalid categories',
+            "truncated": False,
+        })
+        self.assertIsNone(cases["absent_log"]["receipt"].get("native_fatal_diagnostic"))
 
     def test_native_fixture_active_seed_mode_is_finite_and_deferred(self):
         source = NATIVE_FIXTURE.read_text(encoding="utf-8")

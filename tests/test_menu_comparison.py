@@ -157,6 +157,51 @@ try{
 
 
 class MenuComparisonTests(unittest.TestCase):
+    def test_prelaunch_refusal_keeps_exact_resource_snapshot_and_prior_samples(self):
+        command = r"""
+$ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$path=(Resolve-Path ./tools/Invoke-MenuComparison.ps1).Path
+$ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw $errors[0].Message}
+$terminal=$ast.EndBlock.Statements[-1]
+if($terminal -isnot [Management.Automation.Language.TryStatementAst] -or $terminal.CatchClauses.Count -ne 1){
+  throw 'Menu observation failure handler moved'
+}
+$body=$terminal.CatchClauses[0].Body.Extent.Text
+$refusingRun=[scriptblock]::Create('try {throw $original} catch ' + $body)
+$resources=[pscustomobject]@{};$RepeatabilityDiagnostic=$false;$ArchiveLibrary=''
+$current=@{label='36-control'};$developmentHealth=$null;$inputRecord=$null;$ordinaryMenuPreparation=$null
+$samples=@(@{label='35-prior-candidate'})
+function Write-MIRNativeProbeResult {param($Context,$Record) $script:receipt=$Record}
+foreach($refused in @($true,$false)){
+  $errorText=if($refused){'[mir441-resource-admission-cgroup]'}else{'independent failure'}
+  $original=[InvalidOperationException]::new($errorText)
+  $expected=$null
+  if($refused){
+    $expected=[ordered]@{snapshot=@{memory=@{cgroup_v2=@{effective_headroom_bytes=15000}}};limits=@{physical_bytes=12000};expected_peak_memory_bytes=9000}
+    $original.Data['mir441_resource_admission']=$expected
+  }
+  $script:receipt=$null;$observed=$null
+  try {. $refusingRun} catch {$observed=$_.Exception}
+  if(-not[object]::ReferenceEquals($observed,$original)){
+    throw ('Failure handler replaced the original error with ' + [string]$observed)
+  }
+  if($null-eq$script:receipt-or$script:receipt.status-cne'failed-observation-retained'-or
+     $script:receipt.current_plan_row.label-cne'36-control'-or$script:receipt.samples_so_far[0].label-cne'35-prior-candidate'){
+    throw 'Failure receipt lost the refused arm or prior observation'
+  }
+  if(-not[object]::ReferenceEquals($script:receipt.resource_admission,$expected)){
+    throw 'Failure receipt lost or recomputed the admission observation'
+  }
+}
+"""
+        completed = subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", command], cwd=ROOT,
+            text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
     def test_foreground_context_is_opt_in_and_refusal_still_stops(self):
         command = r'''
 . ./tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1

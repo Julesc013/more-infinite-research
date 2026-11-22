@@ -3171,6 +3171,17 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
+    def enable_f210_space_age(self, lua):
+        lua.execute(r'''
+          for _,name in ipairs({"space-age","quality","elevated-rails","recycler"})do
+            script.active_mods[name]="2.1.23"
+          end
+          for _,id in ipairs({CANONICAL,ORDINARY,ID})do
+            table.insert(prototypes.technology[id].research_unit_ingredients,
+              {name="electromagnetic-science-pack",amount=1})
+          end
+        ''')
+
     def published472_se_world(self):
         # Exact F394 data observation: 151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104.
         # These are native-frame doubles, not an earned source save.
@@ -3228,6 +3239,36 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(writes==0 and same(settled,all_frames()) and storage[OWNER_KEY].settings.max_level==0)
         ''')
 
+    def test_472_se_transfers_paid_work_with_unchanged_elevated_rails(self):
+        for explicit_rail_row in (False, True):
+            with self.subTest(explicit_rail_row=explicit_rail_row):
+                lua = self.published472_se_world()
+                lua.globals().explicit_rail_row = explicit_rail_row
+                lua.execute(r'''
+                  script.active_mods["elevated-rails"]="2.0.77"
+                  local event=older_event("4.7.20002",false)
+                  if explicit_rail_row then
+                    event.mod_changes["elevated-rails"]={old_version="2.0.77",new_version="2.0.77"}
+                  end
+                  seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
+                  -- Level 11 was already earned in this old save. A cap on
+                  -- future research must preserve that credit and parked work.
+                  detached.technologies[CANONICAL].level=12
+                  local before=all_frames();writes=0
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(plan.record.producer.kind=="published472-se-default")
+                  assert(writes==0 and same(before,all_frames()))
+                  assert(history.default_owner_apply(plan))
+                  for _,force in pairs(game.forces)do
+                    local a,b=frame(force),before[force.index]
+                    local queue={}for i,id in ipairs(b.queue)do queue[i]=id==CANONICAL and ORDINARY or id end
+                    assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                    assert(a.owner.count==b.source.count and a.bonus==b.bonus)
+                    assert(a.current==(b.current==CANONICAL and ORDINARY or b.current))
+                    assert(a.progress==b.progress and same(a.queue,queue)and a.other_saved==b.other_saved)
+                  end
+                ''')
+
     def test_472_se_admission_rejects_other_events_settings_and_native_contracts_without_writes(self):
         opponents=(
             'event.mod_startup_settings_changed=true',
@@ -3236,6 +3277,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'script.active_mods.base="2.0.78"',
             'script.active_mods.Krastorio2="1.0.0"',
             'script.active_mods["space-age"]="2.0.77"',
+            'script.active_mods["elevated-rails"]="2.0.76"',
+            'script.active_mods["elevated-rails"]="2.0.77";event.mod_changes["elevated-rails"]={new_version="2.0.77"}',
+            'script.active_mods["elevated-rails"]="2.0.77";event.mod_changes["elevated-rails"]={old_version="2.0.76",new_version="2.0.77"}',
+            'event.mod_changes["elevated-rails"]={old_version="2.0.77"}',
             'script.active_mods["new-mod"]="1";event.mod_changes["new-mod"]={new_version="1"}',
             'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
             'event.mod_changes["removed-mod"]={old_version="1"}',
@@ -3474,16 +3519,33 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
         ''')
 
     def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
-        for target,old,hop in (("f200","4.7.20003",False),
-                               ("f210","4.7.21003",False),
-                               ("f210","4.7.20003",True)):
-            with self.subTest(target=target,old=old,hop=hop):
-                lua=self.older_world(target);lua.globals().old=old;lua.globals().hop=hop
+        cases = (
+            ("f200", "4.7.20003", "base"),
+            ("f210", "4.7.21003", "base"),
+            ("f210", "4.7.20003", "base-hop"),
+            ("f210", "4.7.21003", "space-age"),
+            ("f210", "4.7.21003", "space-age-unchanged-rows"),
+        )
+        for target, old, selection in cases:
+            with self.subTest(target=target, old=old, selection=selection):
+                lua = self.older_world(target)
+                if selection.startswith("space-age"):
+                    self.enable_f210_space_age(lua)
+                lua.globals().old = old
+                lua.globals().selection = selection
                 lua.execute(r'''
                   seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
                   local event=older_event(old,false)
-                  if hop then event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
-                    event.mod_startup_settings_changed=true end
+                  if selection=="base-hop"then
+                    event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
+                    event.mod_startup_settings_changed=true
+                  elseif selection=="space-age-unchanged-rows"then
+                    for name,version in pairs(script.active_mods)do
+                      if name~="more-infinite-research"then
+                        event.mod_changes[name]={old_version=version,new_version=version}
+                      end
+                    end
+                  end
                   local before=all_frames();writes=0;queue_writes={};progress_writes={}
                   local plan=history.default_owner_preflight(event,nil,true)
                   assert(writes==0 and same(before,all_frames()))
@@ -3503,6 +3565,45 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   local settled=all_frames();writes=0;history.default_owner_on_load()
                   local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
                   assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
+                ''')
+
+    def test_473_f210_space_age_refuses_uncertain_origins_and_different_science(self):
+        opponents = {
+            "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
+            "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
+            "inactive DLC": 'script.active_mods.recycler=nil',
+            "repinned official set": '''
+              for name,version in pairs(script.active_mods)do
+                if version=="2.1.23"then
+                  script.active_mods[name]="2.1.24"
+                  event.mod_changes[name]={old_version=version,new_version="2.1.24"}
+                end
+              end
+            ''',
+            "changed startup settings": 'event.mod_startup_settings_changed=true',
+            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "added mod": '''
+              script.active_mods.observer="1.0.0"
+              event.mod_changes.observer={new_version="1.0.0"}
+            ''',
+            "removed mod": 'event.mod_changes.observer={old_version="1.0.0"}',
+            "missing science": 'table.remove(packs)',
+            "wrong science": 'packs[6].name="metallurgic-science-pack"',
+            "wrong science amount": 'packs[6].amount=2',
+            "duplicated science": 'packs[6].name=packs[5].name',
+        }
+        for case, change in opponents.items():
+            with self.subTest(case=case):
+                lua = self.older_world("f210")
+                self.enable_f210_space_age(lua)
+                lua.execute(r'''
+                  seed_owner()
+                  local event=older_event("4.7.21003",false)
+                  local packs=prototypes.technology[CANONICAL].research_unit_ingredients
+                ''' + change + r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
                 ''')
 
     def test_473_supported_same_edition_patches_preserve_the_complete_default_work(self):

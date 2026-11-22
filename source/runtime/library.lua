@@ -3071,6 +3071,13 @@ function M.on_player_locale_changed(event)
   if event and whole_number(event.player_index, 1) then invalidate_open_translation(event.player_index) end
 end
 
+function M.on_player_display_changed(event)
+  local player = player_for(event and event.player_index)
+  if player and player.connected == true and valid(owned_root(player)) then
+    return render(player, view_for(player.index), nil, true)
+  end
+end
+
 function M.on_player_changed_force(event)
   if event and whole_number(event.player_index, 1) then invalidate_open_translation(event.player_index) end
 end

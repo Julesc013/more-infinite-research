@@ -11,6 +11,8 @@ param(
   [Parameter(Mandatory)][string]$ProfilePath,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$ActiveModsObserver='',
+  [string]$LinuxStoragePlanPath='',
+  [string]$LinuxStoragePlanSha256='',
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=384
 )
 $ErrorActionPreference='Stop'
@@ -22,6 +24,9 @@ $library=(Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $published=(Resolve-Path -LiteralPath $PublishedArchive).Path
 $replay=(Resolve-Path -LiteralPath $ReplayArchive).Path
 $destination=Join-Path $library ([IO.Path]::GetFileName($published))
+$transaction=[guid]::NewGuid().ToString('N')
+$original="$destination.mir-replay-original-$transaction"
+$staged="$destination.mir-replay-pending-$transaction"
 Assert-Replay ($published -cne $destination -and $replay -cne $destination) 'custody sources must be outside the live library entry'
 Assert-Replay ([IO.Path]::GetFileName($replay) -ceq [IO.Path]::GetFileName($published)) 'replay must retain published filename'
 Assert-Replay ((Get-ReplaySha $published) -ceq $PublishedSha256.ToUpperInvariant()) 'published source hash differs'
@@ -30,25 +35,36 @@ Assert-Replay ((Get-ReplaySha $destination) -ceq $PublishedSha256.ToUpperInvaria
 Assert-Replay (-not(Test-Path -LiteralPath $OutputRoot)) 'preserve existing output'
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 1 -MaxEntriesPerRoot 100 | Out-Host
 
-function Set-ReplayLibraryArchive([string]$Source,[string]$ExpectedCurrent,[string]$ExpectedReplacement){
+function Set-ReplayLibraryArchive([switch]$Restore){
   Assert-Replay (@(Get-Process -Name factorio -ErrorAction SilentlyContinue).Count -eq 0) 'Factorio must be idle before archive replacement'
   $lock=[IO.File]::Open((Join-Path $library '.mir-library.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
   try{
     Assert-Replay (-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'active selection prevents archive replacement'
-    Assert-Replay ((Get-ReplaySha $destination) -ceq $ExpectedCurrent.ToUpperInvariant()) 'live archive changed; preserve it for review'
-    Assert-Replay ((Get-ReplaySha $Source) -ceq $ExpectedReplacement.ToUpperInvariant()) 'custody source changed'
-    [IO.File]::Copy($Source,$destination,$true)
-    Assert-Replay ((Get-ReplaySha $destination) -ceq $ExpectedReplacement.ToUpperInvariant()) 'replacement hash differs'
+    if($Restore){
+      Assert-Replay ((Get-ReplaySha $original) -ceq $PublishedSha256.ToUpperInvariant()) "preserved archive changed ($original)"
+      Assert-Replay ((-not [IO.File]::Exists($destination)) -or (Get-ReplaySha $destination) -ceq $ReplaySha256.ToUpperInvariant()) "live archive changed; original retained at $original"
+      [IO.File]::Move($original,$destination,$true)
+      return
+    }
+    Assert-Replay ((Get-ReplaySha $destination) -ceq $PublishedSha256.ToUpperInvariant()) 'live archive changed; preserve it for review'
+    [IO.File]::Copy($replay,$staged,$false)
+    Assert-Replay ((Get-ReplaySha $staged) -ceq $ReplaySha256.ToUpperInvariant()) 'replacement hash differs'
+    [IO.File]::Move($destination,$original,$false)
+    [IO.File]::Move($staged,$destination,$false)
   }finally{$lock.Dispose()}
 }
-$swapped=$false
 try{
-  Set-ReplayLibraryArchive $replay $PublishedSha256 $ReplaySha256
-  $swapped=$true
-  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60 -ActiveModsObserver $ActiveModsObserver
+  Set-ReplayLibraryArchive
+  $storageArguments=@{
+    LinuxStoragePlanPath=$LinuxStoragePlanPath
+    LinuxStoragePlanSha256=$LinuxStoragePlanSha256
+  }
+  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60 -ActiveModsObserver $ActiveModsObserver @storageArguments
 }finally{
-  if($swapped){Set-ReplayLibraryArchive $published $ReplaySha256 $PublishedSha256}
-  Assert-Replay ((Get-ReplaySha $published) -ceq $PublishedSha256.ToUpperInvariant()) 'published custody changed'
-  Assert-Replay ((Get-ReplaySha $replay) -ceq $ReplaySha256.ToUpperInvariant()) 'replay custody changed'
-  Assert-Replay ((Get-ReplaySha $destination) -ceq $PublishedSha256.ToUpperInvariant()) 'published library restoration failed'
+  try{
+    if([IO.File]::Exists($original)){Set-ReplayLibraryArchive -Restore}
+    Assert-Replay ((Get-ReplaySha $published) -ceq $PublishedSha256.ToUpperInvariant()) 'published custody changed'
+    Assert-Replay ((Get-ReplaySha $replay) -ceq $ReplaySha256.ToUpperInvariant()) 'replay custody changed'
+    Assert-Replay ((Get-ReplaySha $destination) -ceq $PublishedSha256.ToUpperInvariant()) 'published library restoration failed'
+  }finally{[IO.File]::Delete($staged)}
 }

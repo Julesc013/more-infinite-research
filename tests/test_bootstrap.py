@@ -202,7 +202,10 @@ class BootstrapTests(unittest.TestCase):
 
     def test_control_composes_lifecycle_library_api_legacy_interface_and_command(self):
         self.lua.execute('''
-          install_modules(true); install_runtime(); load_control()
+          install_modules(true); install_runtime()
+          defines.events.on_player_display_scale_changed = 1001
+          defines.events.on_player_display_resolution_changed = 1002
+          load_control()
           local api = remote.interfaces["more-infinite-research.api.v1"]
           assert(type(api) == "table" and type(api.get_version) == "function"
             and type(api.get_capabilities) == "function" and type(api.get_research) == "function")
@@ -244,6 +247,11 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[9]({player_index = 1})
           handlers.events[10]({player_index = 1})
           handlers.events[11]({player_index = 1})
+          handlers.events[defines.events.on_player_display_scale_changed]({player_index = 1, old_scale = 1})
+          assert(library_calls.display_changed.player_index == 1 and library_calls.display_changed.old_scale == 1)
+          handlers.events[defines.events.on_player_display_resolution_changed]({player_index = 1,
+            old_resolution = {width = 1920, height = 1080}})
+          assert(library_calls.display_changed.player_index == 1 and library_calls.display_changed.old_resolution.width == 1920)
           handlers.events[12]({player_index = 1})
           handlers.events[22]({player_index = 1})
           handlers.events[13]({player_index = 1})
