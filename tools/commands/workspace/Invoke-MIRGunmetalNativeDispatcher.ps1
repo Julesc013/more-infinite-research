@@ -665,10 +665,11 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
   if ($Snapshot.request.request_id -cne $Policy.approval.request_id) {
     throw '[mir-gunmetal-dispatcher-submission-not-approved]'
   }
+  $submitted = [pscustomobject]@{status='submitted';side_effects='intent-and-reviewed-launcher'}
   # A crash can leave the immutable terminal record durable while state cleanup
   # is incomplete. Finalize that exact request instead of treating its pending
   # pointer as new permission to launch it again.
-  if (Complete-MIRGunmetalDispatcherTerminalForSnapshot -Policy $Policy -Snapshot $Snapshot) { return }
+  if (Complete-MIRGunmetalDispatcherTerminalForSnapshot -Policy $Policy -Snapshot $Snapshot) { return $submitted }
   $record = [pscustomobject]@{
     request_id = $Policy.approval.request_id
     request_snapshot_sha256 = $Snapshot.request.policy_sha256
@@ -688,13 +689,18 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
     if (Test-Path -LiteralPath $Policy.approval.result_path) { throw '[mir-gunmetal-dispatcher-result-preexists]' }
   } catch {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status rejected -Reason 'prelaunch-pinned-input-refused'
-    return
+    return $submitted
   }
   $before = Get-MIRGunmetalDispatcherUnit -Unit $Policy.unit
   if (-not $before.absence_confirmed) {
-    $reason = if ($before.found) { 'native-unit-busy-before-launch' } else { 'native-unit-absence-not-confirmed' }
-    New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status interrupted -Reason $reason -Unit $before
-    return
+    # A reviewed timing run may own the unit outside the dispatcher. A failed
+    # query also leaves this request unattempted. The timer can recheck absence.
+    return [pscustomobject]@{
+      status = 'waiting-for-native-unit'
+      side_effects = 'pending-retained'
+      request_id = $record.request_id
+      unit = $before
+    }
   }
 
   # This write is deliberately before the only launcher call. If the consumer
@@ -720,7 +726,7 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
   if ($launched.exit_code -ne 0) {
     $record.launch = $launch
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status failed -Reason 'reviewed-launcher-refused-before-acknowledgement'
-    return
+    return $submitted
   }
   $after = $null
   $acknowledged = $false
@@ -740,7 +746,7 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
   if (-not $acknowledged) {
     $record.launch = $launch
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $record -Status interrupted -Reason 'launcher-returned-without-native-start-acknowledgement' -Unit $after
-    return
+    return $submitted
   }
   $launch.start_ack = [ordered]@{
     pid = [int]$after.main_pid
@@ -761,6 +767,7 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
   Write-MIRGunmetalDispatcherJson -Path (Join-Path $Policy.spool 'state/running.json') -Value $running
   Remove-Item -LiteralPath (Join-Path $Policy.spool 'state/intent.json') -Force
   Clear-MIRGunmetalDispatcherPending -Policy $Policy -RequestId $record.request_id
+  return $submitted
 }
 
 function Recover-MIRGunmetalDispatcherLaunchIntent {
@@ -836,8 +843,7 @@ function Invoke-MIRGunmetalDispatcherConsume {
         return [pscustomobject]@{status='held-after-adverse-terminal';side_effects='state-only'}
       }
     }
-    Start-MIRGunmetalDispatcherApprovedSubmission -Policy $pending.snapshot.policy -Snapshot $pending.snapshot
-    return [pscustomobject]@{status='submitted';side_effects='intent-and-reviewed-launcher'}
+    return (Start-MIRGunmetalDispatcherApprovedSubmission -Policy $pending.snapshot.policy -Snapshot $pending.snapshot)
   } finally {$lock.Dispose()}
 }
 

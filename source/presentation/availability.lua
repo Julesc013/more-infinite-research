@@ -165,9 +165,11 @@ local function normalized(value)
   return value:lower():gsub("[-_]", " ")
 end
 
-local function matches(row, query)
-  local needle = normalized(query)
-  if needle == "" then return true end
+function M.localised_name(family)
+  return {"technology-name.more-infinite-research." .. family}
+end
+
+local function matches(row, needle)
   local haystack = table.concat({
     normalized(row.family),
     normalized(row.status),
@@ -178,12 +180,24 @@ local function matches(row, query)
   return haystack:find(needle, 1, true) ~= nil
 end
 
-local function append_withheld(rows, definitions, force, query, effective_streams)
+function M.filter(rows, query, matches_label)
+  local needle = normalized(query)
+  if needle == "" then return rows end
+  local found = {}
+  for _, row in ipairs(rows) do
+    if matches(row, needle) or (matches_label and matches_label(row.family)) then
+      found[#found + 1] = row
+    end
+  end
+  return found
+end
+
+local function append_withheld(rows, definitions, force, effective_streams)
   for _, row in ipairs(definitions) do
     -- Do not describe an omission when the named technology really exists,
     -- including an intentionally disabled native technology.
     if emitted_technology_state(force, row.emitted_id) == false
-        and not is_explicitly_disabled(row, effective_streams) and matches(row, query) then
+        and not is_explicitly_disabled(row, effective_streams) then
       rows[#rows + 1] = copy(row)
     end
   end
@@ -237,27 +251,26 @@ function M.rows(active_mods, target, force, query, effective_streams)
       -- A disabled stream or present named technology is not an omission.
       -- A failed native read is not proof of absence; do not scan the catalogue.
       if not is_explicitly_disabled(row, effective_streams)
-          and emitted_technology_state(force, "recipe-prod-" .. row.family .. "-1") == false
-          and matches(row, query) then
+          and emitted_technology_state(force, "recipe-prod-" .. row.family .. "-1") == false then
         rows[#rows + 1] = copy(row)
       end
     end
   elseif not is_explicitly_disabled(NATIVE_LAB_PRODUCTIVITY, effective_streams)
       and emitted_technology_state(force,
         "recipe-prod-" .. NATIVE_LAB_PRODUCTIVITY.family .. "-1") == false
-      and has_native_lab_productivity(force) and matches(NATIVE_LAB_PRODUCTIVITY, query) then
+      and has_native_lab_productivity(force) then
     -- The named native owner is insufficient to claim omission if MIR's exact
     -- historical technology identity is also present in the force.
     rows[#rows + 1] = copy(NATIVE_LAB_PRODUCTIVITY)
   end
   if is_f200_bob_angel(active_mods, target) then
-    append_withheld(rows, F200_BOB_ANGEL_WITHHELD, force, query, effective_streams)
+    append_withheld(rows, F200_BOB_ANGEL_WITHHELD, force, effective_streams)
   elseif is_f210_bobtech_angel(active_mods, target) then
-    append_withheld(rows, F210_BOBTECH_ANGEL_WITHHELD, force, query, effective_streams)
+    append_withheld(rows, F210_BOBTECH_ANGEL_WITHHELD, force, effective_streams)
   elseif is_f210_bob_core(active_mods, target) then
-    append_withheld(rows, F210_BOB_CORE_WITHHELD, force, query, effective_streams)
+    append_withheld(rows, F210_BOB_CORE_WITHHELD, force, effective_streams)
   end
-  return rows
+  return M.filter(rows, query)
 end
 
 return M

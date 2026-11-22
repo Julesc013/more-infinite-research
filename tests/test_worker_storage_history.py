@@ -3377,6 +3377,65 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   refuse_older(event)
                 ''')
 
+    def sif_removal_world(self):
+        lua = self.older_world()
+        lua.execute(r'''
+          for _,name in ipairs({"space-age","quality","elevated-rails"}) do
+            script.active_mods[name]="2.0.77"
+          end
+          for _,id in ipairs({CANONICAL,ORDINARY,ID}) do
+            table.insert(prototypes.technology[id].research_unit_ingredients,
+              {name="electromagnetic-science-pack",amount=1})
+          end
+          event=older_event("5.0.20003",false)
+          event.mod_startup_settings_changed=true
+          event.mod_changes["space-is-fake"]={old_version="1.0.60"}
+          event.mod_changes["cr-commons"]={old_version="1.0.27"}
+        ''')
+        return lua
+
+    def test_sif_removal_transfers_empty_worker_ownership_and_keeps_unrelated_work(self):
+        lua = self.sif_removal_world()
+        lua.execute(r'''
+          player.research_queue={OTHER};player.research_progress=.42
+          suspended.technologies[OTHER].saved_progress=.27
+          uninvested.technologies[CANONICAL].enabled=false
+          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(event,nil,true)
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+          assert(plan.record.producer.kind=="published503-sif-empty-default")
+          assert(history.default_owner_apply(plan))
+          history.default_owner_on_load()
+          for _,force in pairs(game.forces) do
+            local old,now=before[force.index],frame(force)
+            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+          end
+        ''')
+
+    def test_sif_removal_refuses_invested_workers_and_different_source_contracts(self):
+        opponents = (
+            'detached.technologies[CANONICAL].level=5',
+            'detached.technologies[CANONICAL].researched=true',
+            'detached.technologies[CANONICAL].saved_progress=.27',
+            'detached.research_queue={OTHER,CANONICAL}',
+            'detached.research_queue={CANONICAL}',
+            'event.mod_changes["space-is-fake"].old_version="1.0.61"',
+            'event.mod_changes["cr-commons"]=nil',
+            'event.mod_changes.third={old_version="1.0.0"}',
+            'script.active_mods["extra"]="1.0.0"',
+            'script.active_mods.quality="2.0.76"',
+            'event.mod_changes.quality={old_version="2.0.76",new_version="2.0.77"}',
+            'event.mod_changes["more-infinite-research"].old_version="5.0.20004"',
+            'require("runtime.configuration").streams["worker-robots-storage"].base_cost=201',
+        )
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                lua = self.sif_removal_world()
+                lua.execute(opponent + "\nrefuse_older(event)")
+
     def test_473_paid_idle_preserves_native_levels_and_foreign_work(self):
         lua=self.older_world();lua.execute(r'''
           paid_idle();local event=older_event("4.7.20003",true);local before=all_frames()

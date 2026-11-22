@@ -63,7 +63,7 @@ local function searchable(value, context)
   return normalized:gsub("^ ", ""):gsub(" $", "")
 end
 
-local function matches(value, search, context)
+function M.matches_search(value, search, context)
   if string.find(M.search_text(value, context), search, 1, true) then return true end
   return string.find(searchable(value, context), search, 1, true) ~= nil
 end
@@ -495,7 +495,7 @@ local function recipe_id_matches(technology, search, context)
       local kind = native_read(effect, "type")
       if kind == "unlock-recipe" or kind == "change-recipe-productivity" then
         local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
-        if id and matches(id, search, context) then return true end
+        if id and M.matches_search(id, search, context) then return true end
       end
     end
     return false
@@ -511,7 +511,7 @@ local function row_matches(row, view, technology, context)
   if status == false or view.search == "" then return status end
   local search_text = row.id .. " " .. row.family .. " " .. row.name .. " " .. (row.search_text or "")
     .. " " .. (row.recipe or "") .. " " .. (row.locale_key or "")
-  if matches(search_text, view.search, context) or recipe_id_matches(technology, view.search, context) then
+  if M.matches_search(search_text, view.search, context) or recipe_id_matches(technology, view.search, context) then
     return status
   end
   return false
