@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,28 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Factorio 2.0 Space Age upgrade hotfix (2026-11-23)
+
+The public 5.0.22 package refused a protected 4.7.3 save on Factorio 2.0.77 with the unchanged official Space Age selection. Two ordinary predecessor labs had earned worker storage and paid toward the active and parked levels. The verified private repair admits that exact selection. The upgrade preserved the paid work, repeated queue entries and unrelated research. The active lab completed at its retained six-pack price, cargo rose from four to five, and the parked force stayed unchanged. Both cold loads matched, the libraries restored, and 181 original files were rehashed. The hotfix still needs release packaging and publication. [Native refusal and repair evidence](../spec/evidence/worker473-f200-official-space-age-522-native.json)
+
+## Verified 5.0.22 delivery and native results (2026-11-23)
+
+MIR 5.0.22 is GitHub prerelease `454462897`. Canonical tag `v5.0.22` and checked `main` resolve to `9e376928407e58f2921baf898a7edc398514a849`, whose tree matches frozen source `c54534acae88fe5e316aeae35d51e69c8897eb1a`. All 17 player ZIPs and both checksum files matched the frozen inventory, staged draft, anonymous downloads and primary `dist/v5.0.22`. The release notes and upload text match the checked source. GitHub's latest stable release remains 4.7.3. [Published prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.22) · [Verified delivery](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079781537)
+
+The exact F200 archive completed the two retained paid research jobs after direct Space Is Fake removal on Factorio 2.0.77. Five force observations held and two 1,200-update cold loads agreed on checksum `3943742311`. The exact F210 archive found `Landwirtschaft` in the Availability view of a real German Factorio 2.1.24 client. Ten observed input stages preserved four force frames. The shared library restored in both cases, and 33 and 236 original files were rehashed respectively. [Exact-package native evidence](https://github.com/Julesc013/scratchpad/blob/e1fee89c67f25a39e38124e4d3cde0d33be4b54b/projects/mir/evidence/mir522-exact-prerelease-native.json)
+
+The separate F200 Space Exploration physical extraction control measured all three tested drill types at 45 ore before ordinary mining productivity research and 49 afterward. The core miner produced 160 and 176 fragments over matched 80-cycle samples. Both cold loads matched checksum `2529157198`. The earlier 40-ore case recorded 43 from the area drill against its 44 expectation. Its 67 original files and the follow-up's 81 files are retained. The original #1959 report awaits the affected save and settings. [Physical output and custody](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079456413)
+
+Both API consumers passed on the exact published 5.0.22 packages with Space Age on Factorio 2.0.77 and 2.1.24. With empty module slots and no beacons, the assembler produced 200 copper cables before research and 202 after research from the same 100 copper plates on each engine. The native research setter applied the recipe productivity effect, and two cold loads per engine preserved the observed effects and loaded save bytes. The unattended dispatcher started the queued second case after the first restored its library. Both libraries restored and 60 original files were rehashed. Multiplayer client adoption and ordinary lab research retain their separate checks.
+
+The exact Factorio 1.1.110 package upgraded a protected save from published 4.7.3. It preserved the 42% current research and 27% suspended progress, foreign disablement, and earned inserter capacity. An ordinary lab completed the successor research and two cold loads matched the completed save bytes. The original source save remained byte-identical, 72 original files were rehashed, and both earlier runner refusals are retained. [Native API and save replay evidence](../spec/evidence/mir522-native-api-f110.json)
+
+The published 5.0.22 Research Library passed native Availability input on Factorio 2.1.24 with the 19-archive Bob profile. The English and German clients each moved the viewport by 51 pixels and recovered the exact scrolled region after switching tabs. The native filter selected aluminium and cleared successfully. A separate clean run verified both locales’ full, compact and diagnostic exports. Both runs restored the shared mod library and rehashed 867 original files. Personal views after restart and rejoin remain unverified by these runs. [Native Library readback](../spec/evidence/library522-bilingual-native-readback-r01.json)
+
+The F200 startup comparison completed 72 launches before the replay arm required a forced shutdown at launch 73. The library restored and the run remains failed. The F210 Library scroll test reached the compact view and stopped before sending the wheel input when its controller assumed 100% UI scale. The captured 75% view verified the corrected pixel coordinates. Matched timing and native scroll acceptance remain open.
+
+Remaining stable work includes exact applicable save and provider transitions, full Library input and client scope, and matched performance. The F200 Bob/Angel preparation binds the full Factorio 2.0.77 Linux desktop engine, 14 exact dependency archives and both public player packages. Native prototype and replay comparison precede any timing score. [Stable worklist](https://github.com/Julesc013/more-infinite-research/issues/446) · [F200 preparation](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7079937316)
 
 ## Verified 5.0.21 delivery and native results (2026-11-22)
 
@@ -24,7 +46,13 @@ The 38-launch Gunmetal menu comparison finished and restored the shared library.
 
 The separate 27-launch Foundation III save-load comparison used the published 5.0.20 package on Factorio 2.0.77. Mean server-ready time was 0.002 seconds higher than 4.7.3, with a paired 95% interval from −0.137 to +0.140 seconds against the 0.5-second limit. Mean peak process RSS was 67 MiB lower. Both prior 108,000-update runs agreed on the checksum, and the protected map and shared library verified. [Matched Foundation result](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7077526916) · [Functional soak](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7076963416)
 
-The Library Availability search fix and dispatcher queue fix are merged into dev. The German client test has a private package built at the exact merge and still needs native input, screenshots and restoration readback. The dispatcher now retains a waiting request while an independent timing run holds the unit. Its source and disposable manager controls passed. Production commissioning and remaining stable acceptance continue through the existing tracker. [Library test](https://github.com/Julesc013/more-infinite-research/issues/1768#issuecomment-7077743680) · [Dispatcher correction](https://github.com/Julesc013/more-infinite-research/pull/2284) · [Stable worklist](https://github.com/Julesc013/more-infinite-research/issues/446)
+The separate Foundation III in-world comparison used the published 5.0.21 and 4.7.3 archives on Factorio 2.0.77. All 18 native processes completed normally on the protected 57-surface save, and the shared library restored. Mean update time was 11.032 ms for 5.0.21 and 11.073 ms for 4.7.3. The paired difference was −0.041 ms per update with a 95% interval of −0.171 to +0.089 ms, within the predeclared 1 ms limit for this workload. [Exact timing and custody](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7078587862)
+
+The merged Library search fix passed paired native German input on Factorio 2.1.24 with the same Base save. `Landwirtschaft` returned the agricultural growth research on the private corrected build and no rows on the public 5.0.21 build. The English query `agricultural` found the row on both builds. The four observed forces kept their research and worker state, and both runs restored their shared library. [German Availability result](https://github.com/Julesc013/more-infinite-research/issues/1768#issuecomment-7078688327)
+
+The merged worker-history fix passed the direct Space Is Fake removal on Factorio 2.0.77 using the protected original and the private 5.0.20021 archive for #2286. Worker ownership and cargo held across five forces. Ordinary labs completed the existing mining and plastic work, debiting 1,160 and four of each original pack, respectively. The parked work remained at 27%, both plastic recipe bonuses gained the earned ten points and the other nine bonuses survived. The saved successor passed two separate 1,200-update loads with checksum `2649992179`. [Exact direct replay](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7078758250)
+
+The installed dispatcher started the queued direct replay after the German job finished and restored its library. The first replay's debit-check failure and subsequent zero-launch refusal are retained. The reviewed follow-up completed under full host memory and restored the shared library. Exact release-package qualification and remaining stable acceptance continue through the existing tracker. [Dispatcher correction](https://github.com/Julesc013/more-infinite-research/pull/2284) · [Stable worklist](https://github.com/Julesc013/more-infinite-research/issues/446)
 
 ## Verified 5.0.20 delivery and stable continuation (2026-11-22)
 

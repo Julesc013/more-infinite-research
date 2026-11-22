@@ -249,13 +249,42 @@ class NativeGunCreditTests(unittest.TestCase):
         self.lua.execute('''
           local f=make_force(1,2,true,true);credit.on_init()
           local main=f.technologies[main_id];f.current_research=main;f.research_queue={main,main}
+          main.saved_progress=0
           set_mask(f,false,false);configure({});expect(f,.34,.34)
+          f.research_queue={main}
           assert(not credit.on_research_cancelled({force=f,research={[main_id]=1}}))
+          f.research_queue={};f.current_research=nil
           assert(credit.on_research_cancelled({force=f,research={[main_id]=1}}))
           assert(not credit.needs_research_events())
           configure({});assert(not credit.needs_research_events())
           expect(f,.34,.34)
         ''')
+
+    def test_detached_private_work_keeps_only_its_prior_payable_category(self):
+        for mode in ("already_detached", "cancelled_after_retirement"):
+            with self.subTest(mode=mode):
+                self.setUp()
+                self.lua.execute('''
+                  local mode=...
+                  local f=make_force(1,3,false,true);configure(known_event())
+                  local main,foreign=f.technologies[main_id],f.technologies.foreign
+                  f.current_research=foreign;f.research_queue={foreign}
+                  if mode=="cancelled_after_retirement" then f.research_queue={foreign,main} end
+                  main.saved_progress=.27
+                  set_mask(f,false,false);configure({});expect(f,.51,.51)
+                  if mode=="cancelled_after_retirement" then
+                    f.research_queue={foreign}
+                    credit.on_research_cancelled({force=f,research={[main_id]=1}})
+                  end
+                  local before=public_snapshot(f);configure({});assert_public(f,before)
+                  reload();credit.on_load()
+                  assert(credit.needs_research_events(), "detached gun research lost its prior payable category")
+                  assert_public(f,before)
+                  main.saved_progress=0;main.level=5
+                  assert(credit.on_research_finished({research=main}));expect(f,.51,.68)
+                  main.level=6
+                  assert(not credit.on_research_finished({research=main}));expect(f,.51,.68)
+                ''', mode)
 
     def test_first_unknown_paid_or_detached_mask_refuses_before_any_force_write(self):
         self.lua.execute('''

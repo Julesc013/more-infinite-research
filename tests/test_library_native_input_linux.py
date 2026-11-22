@@ -27,8 +27,10 @@ ENGINE_SHA = "A" * 64
 def valid_spec(action="escape", **changes):
     spec = {
         "schema": 1,
-        "kind": ("MIRLinuxLibraryNativeClearTextV1" if action == "clear"
-                 else "MIRLibraryNativeInputV1"),
+        "kind": {
+            "clear": "MIRLinuxLibraryNativeClearTextV1",
+            "wheel": "MIRLinuxLibraryNativeWheelV1",
+        }.get(action, "MIRLibraryNativeInputV1"),
         "role": "client-en",
         "process_id": 4242,
         "process_start_utc": "2026-11-17T00:00:00Z",
@@ -43,6 +45,8 @@ def valid_spec(action="escape", **changes):
         spec.update(x=100, y=120)
     elif action == "drag":
         spec.update(x=100, y=100, target_x=180, target_y=140)
+    elif action == "wheel":
+        spec.update(x=100, y=120, direction="down")
     spec.update(changes)
     return spec
 
@@ -68,7 +72,7 @@ def valid_binding(spec, **changes):
 class MockBackend:
     """A traceable XTest-shaped double; it has no process or X-server effects."""
 
-    keycodes = {"Escape": 9, "Tab": 23, "BackSpace": 22, "Shift_L": 50,
+    keycodes = {"Escape": 9, "Tab": 23, "BackSpace": 22, "Shift_L": 50, "_": 20,
                 "Control_L": 37, "e": 26, "a": 38, "A": 38, "z": 52, " ": 65}
 
     def __init__(self, spec, binding, *, stolen_focus=False, mapped=True,
@@ -132,8 +136,8 @@ class MockBackend:
         self.events.append(("motion", x, y))
         return 0 if self.reject == "motion" else 1
 
-    def button(self, down):
-        self.events.append(("button", down))
+    def button(self, down, number=1):
+        self.events.append(("button", number, down))
         return 0 if self.reject == "button" else 1
 
     def sync(self):
@@ -235,6 +239,20 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
             "spec fields differ",
         )
 
+    def test_linux_wheel_schema_accepts_one_bounded_vertical_step(self):
+        for direction in ("up", "down"):
+            spec = valid_spec("wheel", direction=direction)
+            self.assertIs(ACTOR.validate_spec(spec), spec)
+        for changed, reason in (
+            ({"direction": "left"}, "wheel direction differs"),
+            ({"direction": []}, "wheel direction differs"),
+            ({"count": 2}, "spec fields differ"),
+            ({"x": 1}, "point outside client"),
+            ({"kind": "MIRLibraryNativeInputV1"}, "action differs"),
+        ):
+            with self.subTest(changed=changed):
+                self.assert_refuses(lambda: ACTOR.validate_spec(valid_spec("wheel", **changed)), reason)
+
     def test_binding_requires_exact_role_identity_private_display_paths_and_bounds(self):
         spec = valid_spec("escape")
         for changed, message in (
@@ -258,12 +276,26 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
         self.assertEqual(
             backend.events,
             [("focus", 7001), ("motion", 100, 120), ("sync",),
-             ("button", True), ("sync",), ("button", False), ("sync",)],
+             ("button", 1, True), ("sync",), ("button", 1, False), ("sync",)],
         )
         self.assertEqual([row["api"] for row in trace], [
             "XTestFakeMotionEvent", "XTestFakeButtonEvent", "XTestFakeButtonEvent"
         ])
         self.assertTrue(all(row["accepted_by_xtest"] and not row["cleanup"] for row in trace))
+
+    def test_linux_wheel_sends_one_matching_button_pair_through_the_input_guards(self):
+        for direction, number in (("up", 4), ("down", 5)):
+            with self.subTest(direction=direction):
+                trace, backend, calls, _ = self.perform(valid_spec("wheel", direction=direction))
+                self.assertEqual(calls, ["guard"] * 6)
+                self.assertEqual(
+                    backend.events,
+                    [("focus", 7001), ("motion", 100, 120), ("sync",),
+                     ("button", number, True), ("sync",), ("button", number, False), ("sync",)],
+                )
+                self.assertEqual([(row["button"], row["down"]) for row in trace[1:]],
+                                 [(number, True), (number, False)])
+                self.assertTrue(all(row["accepted_by_xtest"] and not row["cleanup"] for row in trace))
 
     def test_text_keeps_shift_only_for_the_uppercase_character_and_handles_space(self):
         spec = valid_spec("text")
@@ -277,6 +309,21 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
         )
         self.assertEqual(len(trace), 8)
         self.assertTrue(all(row["api"] == "XTestFakeKeyEvent" for row in trace))
+
+    def test_material_filter_accepts_the_identifier_and_releases_shift_after_underscore(self):
+        selection = valid_spec("text", text="research_material_aluminium")
+        self.assertIs(ACTOR.validate_spec(selection), selection)
+        spec = valid_spec("text", text="a_z")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding, shifted_symbols=("_",))
+        trace, _, _, _ = self.perform(spec, backend=backend, binding=binding)
+        self.assertEqual(
+            [event for event in backend.events if event[0] == "key"],
+            [("key", 38, True), ("key", 38, False),
+             ("key", 50, True), ("key", 20, True), ("key", 20, False),
+             ("key", 50, False), ("key", 52, True), ("key", 52, False)],
+        )
+        self.assertTrue(all(edge["accepted_by_xtest"] and not edge["cleanup"] for edge in trace))
 
     def test_escape_inventory_and_tab_have_one_exact_key_pair(self):
         for action, code in (("escape", 9), ("inventory", 26), ("tab", 23)):
@@ -325,7 +372,7 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
              ("motion", 160, 130), ("motion", 180, 140)],
         )
         self.assertEqual([event for event in backend.events if event[0] == "button"],
-                         [("button", True), ("button", False)])
+                         [("button", 1, True), ("button", 1, False)])
         self.assertEqual([row["api"] for row in trace].count("XTestFakeMotionEvent"), 5)
         self.assertEqual([row["api"] for row in trace].count("XTestFakeButtonEvent"), 2)
 
@@ -394,6 +441,18 @@ class LibraryNativeInputLinuxTests(unittest.TestCase):
                          [(True, False), (False, True)])
         self.assertEqual([event for event in backend.events if event[0] == "motion"],
                          [("motion", 100, 100)])
+
+    def test_guard_loss_releases_only_the_accepted_wheel_button(self):
+        spec = valid_spec("wheel", direction="down")
+        binding = valid_binding(spec)
+        backend = MockBackend(spec, binding)
+        with self.assertRaisesRegex(ACTOR.InputError, "guard refused") as caught:
+            self.perform(spec, backend=backend, binding=binding, fail_guard_at=5)
+        buttons = [row for row in caught.exception.trace if row["api"] == "XTestFakeButtonEvent"]
+        self.assertEqual([(row["button"], row["down"], row["cleanup"]) for row in buttons],
+                         [(5, True, False), (5, False, True)])
+        self.assertEqual([event for event in backend.events if event[0] == "button"],
+                         [("button", 5, True), ("button", 5, False)])
 
     def test_clear_guard_loss_mid_chord_releases_a_then_control_without_new_input(self):
         spec = valid_spec("clear")
