@@ -687,6 +687,7 @@ try {
     $failure = [pscustomobject][ordered]@{
       schema=1;kind=$(if($RepeatabilityDiagnostic){'MIR5ResponsiveMenuRepeatabilityDiagnosticObservationV1'}else{'MIR5ResponsiveMenuComparisonObservationV1'});status='failed-observation-retained';endpoint_class='ordinary-responsive-menu'
       current_plan_row=$current;development_health=$developmentHealth;inputs=$inputRecord;ordinary_menu_preparation=$ordinaryMenuPreparation;samples_so_far=@($samples);error=$_.Exception.Message
+      resource_admission=$_.Exception.Data['mir441_resource_admission']
       library_controls_restored=$(if([string]::IsNullOrWhiteSpace($ArchiveLibrary)){$false}else{-not(Test-Path -LiteralPath (Join-Path $ArchiveLibrary '.mir-active-profile.json'))})
       claims=[ordered]@{native_execution=$false;performance_measurement=$false;performance_comparison=$false;release_qualification=$false}
     }
