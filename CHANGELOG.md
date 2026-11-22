@@ -2,6 +2,13 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.20] - 2026-11-22
+
+### Bugfixes
+
+- Reflow the open Research Library after changing the display resolution or GUI scale while keeping its current results and selection.
+- Preserve earned worker cargo, current research and queued or parked work when upgrading MIR 4.7.3 on Factorio 2.1.23 with the unchanged official Space Age mods and default worker settings.
+
 ## [5.0.19] - 2026-11-22
 
 ### Bugfixes
