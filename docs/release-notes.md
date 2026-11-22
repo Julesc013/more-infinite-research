@@ -1,24 +1,25 @@
 ---
-title: "MIR 5.0.22 beta release notes"
+title: "MIR 5.0.23 beta release notes"
 status: current
-applies_to: "MIR 5.0.22 GitHub prerelease"
+applies_to: "MIR 5.0.23 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-522-release-notes
+  - mir-523-release-notes
 ---
 
-MIR 5.0.22 fixes localized Availability search and a Space Is Fake upgrade refusal.
+MIR 5.0.23 fixes a worker cargo upgrade refusal and preserves unfinished research.
 
-- Search the Research Library's Availability view by the translated family name. The German client check used Factorio 2.1.24.
-- On Factorio 2.0.77 with the unchanged official Space Age mods, the supported MIR 5.0.3 upgrade can remove Space Is Fake 1.0.60 and its unused dependency while retaining earned recipe effects and queued or unfinished research. This path requires default worker cargo settings and an uninvested repeating worker cargo research row.
+- On Factorio 2.0.77, upgrading MIR 4.7.3 with the unchanged official Space Age mods and default worker cargo settings preserves earned cargo, the previous science-pack requirements, queued levels and parked progress.
+- Preserve recorded ownership of default worker cargo research through MIR 5 updates. Stop a worker cargo transfer if Factorio cannot supply the complete research queue.
+- Keep the historical credit for unfinished recipe productivity and electric or Tesla research when the paid level is outside the queue.
 
-Keep the original save. For invested worker cargo or different settings, use the staged removal in the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md#removing-space-is-fake-on-factorio-20).
+Keep your original save and mod settings. Test the upgrade on a separate copy.
 
-Broader Library, compatibility and performance qualification continues for stable.
+The worker cargo upgrade passed on Factorio 2.0.77. A separate Factorio 2.1.23 test resumed paid recipe productivity research from outside the queue and completed the level. The electric and Tesla save replay is pending. Library restart, wider compatibility and performance checks continue toward stable.
 
-See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md) for supported editions and installation.
+See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md) for supported editions and installation.
