@@ -336,7 +336,8 @@ local function local_view(raw)
     refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
     geometry = geometry(raw.geometry),
-    scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
+    scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1,
+    scroll_to_selection = raw.scroll_to_selection == true or nil
   }
   -- The data-only model independently normalizes its own read surface. Keep
   -- this UI-owned record narrow and copy back only fields this host owns.
@@ -1734,8 +1735,12 @@ local function update_research_content(content, player, view, context, translati
   end
   local items_changed, selection_changed = update_list_items(results, item_labels, selected_index)
   if results.style then results.style.width, results.style.height = panes.list_width, math.max(76, panes.list_height - header_height) end
-  if created and view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
-    results.scroll_to_item(view.scroll, "top-third")
+  -- A selected technology's row can move while the Library is closed.
+  -- Older views can still restore their saved numeric positions.
+  local scroll_index = view.scroll_to_selection == true and selected_index or view.scroll
+  if created and type(scroll_index) == "number" and scroll_index > 0
+      and scroll_index <= #item_labels and type(results.scroll_to_item) == "function" then
+    results.scroll_to_item(scroll_index, "top-third")
   elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(selected_index, "in-view")
   end
@@ -2606,7 +2611,8 @@ function M.open(player, options)
     if sort == "progression" or sort == "native" then view.stable_sort = sort end
   end
   local selected = technology_id(options.selected)
-  if selected and known_technology(player, selected) then
+  local select_technology = selected and known_technology(player, selected)
+  if select_technology then
     view.selected, reset_page = selected, true
   end
   if options.hidden ~= nil then
@@ -2621,7 +2627,7 @@ function M.open(player, options)
   elseif reset_page then
     view.page = 1
   end
-  if reset_page then view.scroll = 1 end
+  if reset_page then view.scroll, view.scroll_to_selection = 1, select_technology and true or nil end
   local frame = render(player, view)
   -- Factorio routes Esc/E to this target. Only an explicit open may claim
   -- focus; translation/native refreshes must not displace another GUI.
@@ -2655,7 +2661,7 @@ function M.on_gui_text_changed(event)
   if element.name == PREFIX .. "query" then
     if not owns_element(player, element, {PREFIX .. "query", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT}) then return end
     local view = view_for(player.index)
-    view.query, view.page, view.scroll = text(element.text), 1, 1
+    view.query, view.page, view.scroll, view.scroll_to_selection = text(element.text), 1, 1, nil
     render(player, view, nil, true)
   elseif element.name == PREFIX .. "settings_query" then
     if not owns_element(player, element, {
@@ -2707,7 +2713,7 @@ function M.on_gui_selection_state_changed(event)
     if family == nil then return end
     view.family = family
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "visibility" then
     if not owns_element(player, element, {
@@ -2716,7 +2722,7 @@ function M.on_gui_selection_state_changed(event)
     local visibility = visibility_option(element.selected_index)
     if visibility == nil then return end
     local view = view_for(player.index)
-    view.visibility, view.page, view.scroll = visibility, 1, 1
+    view.visibility, view.page, view.scroll, view.scroll_to_selection = visibility, 1, 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "mode" then
     if not owns_element(player, element, {
@@ -2725,7 +2731,7 @@ function M.on_gui_selection_state_changed(event)
     local mode = whole_option(element.selected_index, 1, 3)
     if mode == nil then return end
     local view = view_for(player.index)
-    view.mode, view.page, view.scroll = mode, 1, 1
+    view.mode, view.page, view.scroll, view.scroll_to_selection = mode, 1, 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "status" then
     if not owns_element(player, element, {
@@ -2735,7 +2741,7 @@ function M.on_gui_selection_state_changed(event)
     local status = element.selected_index
     view.status = type(status) == "number" and status >= 1 and status <= 4 and math.floor(status) == status and status or 1
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "sort" then
     if not owns_element(player, element, {
@@ -2746,7 +2752,7 @@ function M.on_gui_selection_state_changed(event)
     view.sort = sort
     if sort == "progression" or sort == "native" then view.stable_sort = sort end
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "results" then
     if not owns_element(player, element, {
@@ -2759,7 +2765,7 @@ function M.on_gui_selection_state_changed(event)
     local row = type(index) == "number" and rows[index] or nil
     if row then
       view.selected = row.id
-      view.scroll = index
+      view.scroll, view.scroll_to_selection = index, true
       render(player, view, context)
     end
   elseif element.name == PREFIX .. "recipe_list" then
@@ -2804,6 +2810,7 @@ function M.on_gui_selection_state_changed(event)
     if id == nil or known_technology(player, id) == nil then return end
     local view = view_for(player.index)
     view.selected, view.tab, view.page, view.scroll = id, "research", 1, 1
+    view.scroll_to_selection = true
     render(player, view)
   end
 end
@@ -2914,7 +2921,7 @@ function M.on_gui_click(event)
       if count >= MAX_HIDDEN then return end
       view.hidden[id], view.selected = true, nil
     end
-    view.page, view.scroll = 1, 1
+    view.page, view.scroll, view.scroll_to_selection = 1, 1, nil
     render(player, view)
     return
   end
@@ -2924,7 +2931,7 @@ function M.on_gui_click(event)
     }) then return end
     local view = view_for(player.index)
     view.hidden, view.visibility, view.selected = {}, 1, nil
-    view.page, view.scroll = 1, 1
+    view.page, view.scroll, view.scroll_to_selection = 1, 1, nil
     render(player, view)
     return
   end
