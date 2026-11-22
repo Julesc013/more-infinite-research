@@ -8429,6 +8429,21 @@
           "evidence": "spec/evidence/historical-russian-fork389-disposition-aero-r01.json",
           "evidence_sha256": "A271B88ACB3708C9AFE1DD481E0FAD49C40438759FEB216DAB4812A23BC75A0B",
           "scope": "All33 contributed pairs have a bounded disposition:11 already covered,4 ported,11 adapted to current meaning/formatting,7 retired or rejected. Fifteen Russian entries change, including five missing current setting names; current placeholders/bounded-effect caveats retained. Original author commit remains on a preserved canonical branch. Other locale/UI/package acceptance remains open."
+        },
+        {
+          "id": "frozen-523-player-presentation",
+          "source": [
+            "README.md",
+            "docs/support.md",
+            "CHANGELOG.md",
+            "source/changelog.txt",
+            "source/LICENSE",
+            "source/locale",
+            "source/thumbnail.png"
+          ],
+          "evidence": "spec/evidence/candidate523-player-presentation-continuity-r01.json",
+          "evidence_sha256": "0260957C19F154F2D6DA6B3C30E6B9CBB593884508629CE02C532E7E64FA1311",
+          "scope": "The exact 5.0.23 freeze retains the published 4.7.3 player license and thumbnail. All nine published histories match their recorded hashes. All 17 frozen ZIPs and both checksum lists match their inventory. Package locales and the shared changelog match committed source. The player guides retain tracked local link destinations, the notes match the upload text, and 42 named controls pass. Native localization and stable publication retain their own gates."
         }
       ],
       "test_subjects": [
@@ -8436,10 +8451,10 @@
         "root_transfer"
       ],
       "remaining_implementation": [
-        "Complete final README/documentation/changelog acceptance against the current frozen packages. Canonical source-root asset/catalogue transfer is accepted in PR806 with actual nine-package parity; the complete authored README remains intact."
+        "Canonical source-root asset and catalogue transfer is accepted in PR806 with actual nine-package parity. Keep the complete authored README, matching player support guide and changelog on the stable freeze."
       ],
       "remaining_qualification": [
-        "Verify all player package assets, locales, support/changelog content and source-root transfer against final target packages."
+        "Recheck the stable freeze against the verified 5.0.23 presentation and published history. Use affected native Library scenarios for rendered localization and verify the final anonymous packages and notes."
       ]
     },
     {
