@@ -590,7 +590,17 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   $expected=$expectedTargets[$Target]
   Assert-Fixture ([string]$selected.factorio_version -ceq [string]$expected.factorio_version) 'historical transition factorio version differs'
   if($expected.ContainsKey('minimum_base')){Assert-Fixture ([string]$selected.minimum_base -ceq [string]$expected.minimum_base) 'historical transition minimum base differs'}
-  Assert-Fixture ([string]$selected.published_mir_version -ceq [string]$expected.published_mir_version -and [string]$selected.mir_version -ceq [string]$expected.mir_version) 'historical transition MIR versions differ'
+  $successorVersion=[string]$selected.mir_version
+  $successorMatches=$successorVersion -ceq $expected.mir_version
+  $successorHash=''
+  if($null -ne $predecessorRelease -and $selected.ContainsKey('mir5_archive_sha256')){
+    # Preserve the original fixture version unless an exact same-edition successor is pinned.
+    $editionPrefix=$expected.mir_version.Substring(0,$expected.mir_version.Length-2)
+    $successorMatches=$successorVersion -cmatch ('\A'+[regex]::Escape($editionPrefix)+'[0-9]{2}\z')
+    Assert-Fixture ($selected.mir5_archive_sha256 -is [string] -and $selected.mir5_archive_sha256 -cmatch '\A[A-Fa-f0-9]{64}\z') 'historical transition MIR5 archive hash differs'
+    $successorHash=$selected.mir5_archive_sha256.ToUpperInvariant()
+  }
+  Assert-Fixture ([string]$selected.published_mir_version -ceq [string]$expected.published_mir_version -and $successorMatches) 'historical transition MIR versions differ'
   Assert-Fixture ([string]$selected.published_archive_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'historical transition published archive hash differs'
   if($null -ne $predecessorRelease){Assert-Fixture ([string]$selected.published_archive_sha256 -ceq [string]$expected.published_archive_sha256) 'historical transition published archive hash differs'}
   Assert-Fixture ([string]$selected.direct -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition direct is not a literal-safe identifier'
@@ -612,14 +622,16 @@ function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$Metadata
   if($Target -ceq 'f018'){
     Assert-Fixture ([string]$selected.published_archive_sha256 -ceq 'D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24') 'F018 historical transition published archive hash differs'
     Assert-Fixture ([string]$selected.mir5_archive_sha256 -ceq '7803FC661DEFA441D1E9D508D1CA80029E619201BBECB0BF113D60D3D3ABEEB9') 'F018 historical transition MIR5 archive hash differs'
+    $successorHash=[string]$selected.mir5_archive_sha256
     Assert-Fixture ($selected.ContainsKey('foreign_force_name') -and [string]$selected.foreign_force_name -ceq 'mir5-historical-transition-foreign') 'F018 historical transition foreign force differs'
     Assert-Fixture ($selected.ContainsKey('foreign_saved_progress') -and [double]$selected.foreign_saved_progress -gt 0 -and [double]$selected.foreign_saved_progress -lt 1) 'F018 historical transition foreign progress differs'
     Assert-Fixture ([string]$selected.published_unit_count_formula -ceq '8000 * 2^(L-1)' -and [string]$selected.mir5_unit_count_formula -ceq '1*(8000*2^(L-1))') 'F018 historical transition cost contract differs'
   }elseif($selected.ContainsKey('foreign_force_name') -or $selected.ContainsKey('foreign_saved_progress') -or $selected.ContainsKey('published_unit_count_formula') -or $selected.ContainsKey('mir5_unit_count_formula')){
     throw '[mir5-native-fixture] non-F018 historical transition declares F018-only state'
   }
-  $version=if($Stage -ceq 'published'){[string]$selected.published_mir_version}else{[string]$selected.mir_version}
-  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;stage=$Stage;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=$version;definition=$selected}
+  $version=if($Stage -ceq 'published'){[string]$selected.published_mir_version}else{$successorVersion}
+  $archiveHash=if($Stage -ceq 'published'){[string]$selected.published_archive_sha256}else{$successorHash}
+  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;stage=$Stage;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=$version;archive_sha256=$archiveHash;definition=$selected}
 }
 function ConvertTo-HistoricalTransitionFixtureTargetLiteral($Fixture) {
   $value=$Fixture.definition
@@ -845,10 +857,9 @@ if($MIRAbsent){
   Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
   if($historicalTransition){
     Assert-Fixture ([string]$mirRows[0].version -ceq [string]$historicalFixture.mir_version) 'historical transition profile MIR version differs'
-    if($HistoricalTransitionStage -ceq 'published'){
-      Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$historicalFixture.definition.published_archive_sha256) 'historical transition published archive hash differs'
-    }elseif($historicalFixture.target -ceq 'f018'){
-      Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$historicalFixture.definition.mir5_archive_sha256) 'F018 historical transition MIR5 archive hash differs'
+    if($historicalFixture.archive_sha256){
+      $archiveRole=if($HistoricalTransitionStage -ceq 'published'){'published'}else{'MIR5'}
+      Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq $historicalFixture.archive_sha256) "historical transition $archiveRole archive hash differs"
     }
   }
 }
