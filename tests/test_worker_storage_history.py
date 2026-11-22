@@ -3239,6 +3239,36 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(writes==0 and same(settled,all_frames()) and storage[OWNER_KEY].settings.max_level==0)
         ''')
 
+    def test_472_se_transfers_paid_work_with_unchanged_elevated_rails(self):
+        for explicit_rail_row in (False, True):
+            with self.subTest(explicit_rail_row=explicit_rail_row):
+                lua = self.published472_se_world()
+                lua.globals().explicit_rail_row = explicit_rail_row
+                lua.execute(r'''
+                  script.active_mods["elevated-rails"]="2.0.77"
+                  local event=older_event("4.7.20002",false)
+                  if explicit_rail_row then
+                    event.mod_changes["elevated-rails"]={old_version="2.0.77",new_version="2.0.77"}
+                  end
+                  seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
+                  -- Level 11 was already earned in this old save. A cap on
+                  -- future research must preserve that credit and parked work.
+                  detached.technologies[CANONICAL].level=12
+                  local before=all_frames();writes=0
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(plan.record.producer.kind=="published472-se-default")
+                  assert(writes==0 and same(before,all_frames()))
+                  assert(history.default_owner_apply(plan))
+                  for _,force in pairs(game.forces)do
+                    local a,b=frame(force),before[force.index]
+                    local queue={}for i,id in ipairs(b.queue)do queue[i]=id==CANONICAL and ORDINARY or id end
+                    assert(a.owner.level==b.source.level and a.owner.saved==b.source.saved)
+                    assert(a.owner.count==b.source.count and a.bonus==b.bonus)
+                    assert(a.current==(b.current==CANONICAL and ORDINARY or b.current))
+                    assert(a.progress==b.progress and same(a.queue,queue)and a.other_saved==b.other_saved)
+                  end
+                ''')
+
     def test_472_se_admission_rejects_other_events_settings_and_native_contracts_without_writes(self):
         opponents=(
             'event.mod_startup_settings_changed=true',
@@ -3247,6 +3277,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'script.active_mods.base="2.0.78"',
             'script.active_mods.Krastorio2="1.0.0"',
             'script.active_mods["space-age"]="2.0.77"',
+            'script.active_mods["elevated-rails"]="2.0.76"',
+            'script.active_mods["elevated-rails"]="2.0.77";event.mod_changes["elevated-rails"]={new_version="2.0.77"}',
+            'script.active_mods["elevated-rails"]="2.0.77";event.mod_changes["elevated-rails"]={old_version="2.0.76",new_version="2.0.77"}',
+            'event.mod_changes["elevated-rails"]={old_version="2.0.77"}',
             'script.active_mods["new-mod"]="1";event.mod_changes["new-mod"]={new_version="1"}',
             'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
             'event.mod_changes["removed-mod"]={old_version="1"}',
