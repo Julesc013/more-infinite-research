@@ -1001,6 +1001,25 @@ class LifecycleTests(unittest.TestCase):
                     assert(admitted, message)
                     assert(f.research_queue[2] == paid and paid.saved_progress == fraction
                       and f.current_research == sentinel and f.research_progress == .42)
+
+                    -- Detaching one parked level leaves the exact native
+                    -- fraction owed, without creating another payable level.
+                    f.research_queue = queue
+                    handlers.events[6]({force=f, research={[name]=1}})
+                    assert(paid.saved_progress == fraction and positive[category].level == 2)
+                    f.research_queue = {sentinel, paid}
+
+                    -- Model the engine's post-completion state with the
+                    -- sentinel's independent work still intact.
+                    f.research_queue = queue
+                    paid.level, paid.saved_progress = 3, 0
+                    handlers.events[4]({research=paid})
+                    assert(positive[category].level == 3 and positive[other].level == 1,
+                      "native completion must pay exactly the prior category once")
+                    assert(not pcall(function() f.research_queue = {sentinel, paid} end),
+                      "settled retirement admitted new research")
+                    assert(f.research_queue == queue and f.current_research == sentinel
+                      and f.research_progress == .42 and sentinel.saved_progress == .19)
                   else
                     assert(not admitted and f.research_queue == queue and paid.saved_progress == fraction,
                       "foreign disablement or an already earned level admitted new work")
