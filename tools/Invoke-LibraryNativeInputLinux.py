@@ -80,7 +80,7 @@ def validate_spec(spec):
             and (width, height) in ((1280, 720), (2560, 1440)), 'client geometry differs')
     if action == 'text':
         require(isinstance(spec['text'], str)
-                and re.fullmatch('[A-Za-z0-9 -]{1,32}', spec['text']), 'text differs')
+                and re.fullmatch('[A-Za-z0-9 _-]{1,32}', spec['text']), 'text differs')
     if action in ('click', 'drag', 'wheel'):
         for x, y in [('x', 'y')] + ([('target_x', 'target_y')] if action == 'drag' else []):
             require(integer(spec[x], 2, width - 3) and integer(spec[y], 2, height - 3),
