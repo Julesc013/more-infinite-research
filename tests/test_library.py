@@ -3068,6 +3068,84 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
         ''')
 
+    def test_availability_searches_localized_names_and_reuses_resolved_labels(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          script = {active_mods = {}}
+          boot()
+          player.locale = "de"
+          local queue, current, progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          local name_prefix = "technology-name.more-infinite-research."
+          local agriculture = name_prefix .. "research_agricultural_growth_speed"
+          local spoilage = name_prefix .. "research_spoilage_preservation"
+          local german = {[agriculture]="Wachstumsgeschwindigkeit der Landwirtschaft",
+            [spoilage]="Schutz vor Verderb"}
+
+          local root = library.open(player, {tab="availability"})
+          assert(#player.translation_requests == 0)
+          local query = research_filters(root).mir_library_query
+          local function search(typed)
+            query.text = typed
+            library.on_gui_text_changed({player_index=1, element=query})
+            assert(query.text == typed)
+          end
+          local function result()
+            local entries = availability_entries(root)
+            return #entries.children == 1 and entries.mir_library_availability_1
+          end
+
+          search("landwirtschaft")
+          assert(#player.translation_requests == 2, "translate just the two visible availability families")
+          assert(not availability_entries(root).mir_library_availability_empty, "pending search is not an empty result")
+          local seen = {}
+          for index = 1, 2 do
+            local request = player.translation_requests[index]
+            local key = request.localised[1]
+            assert(german[key] and not seen[key], "unexpected translation request: " .. tostring(key))
+            seen[key] = true
+            library.on_string_translated({player_index=1, id=request.id, translated=true, result=german[key]})
+          end
+          assert(result().caption[2][1] == agriculture)
+          search("VERDERB")
+          assert(result().caption[2][1] == spoilage)
+          search("spoilage-preservation")
+          assert(result().caption[2][1] == spoilage)
+          search("ein nicht vorhandener Eintrag")
+          assert(availability_entries(root).mir_library_availability_empty.valid)
+          assert(#player.translation_requests == 2, "the same families must reuse settled labels")
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress and gear.level == 3 and not gear.enabled)
+        ''')
+
+    def test_availability_disregards_a_reply_for_a_family_that_has_become_available(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          script = {active_mods = {}}
+          boot()
+          player.locale = "de"
+          local root = library.open(player, {tab="availability", query="Landwirtschaft"})
+          local requests = player.translation_requests
+          assert(#requests == 2)
+          local name_prefix = "technology-name.more-infinite-research."
+          assert(requests[1].localised[1] == name_prefix .. "research_agricultural_growth_speed")
+          player.force.technologies["recipe-prod-research_agricultural_growth_speed-1"] = {valid=true}
+          library.open(player)
+          assert(#requests == 3 and requests[3].localised[1] == name_prefix .. "research_spoilage_preservation")
+
+          library.on_string_translated({player_index=1,id=requests[1].id,translated=true,
+            result="Wachstumsgeschwindigkeit der Landwirtschaft"})
+          library.on_string_translated({player_index=1,id=requests[2].id,translated=true,result="Landwirtschaft"})
+          local entries = availability_entries(root)
+          assert(#entries.children == 0, "a former request must not publish into the changed list: "
+            .. tostring(entries.children[1] and entries.children[1].name))
+          library.on_string_translated({player_index=1,id=requests[3].id,translated=true,result="Schutz vor Verderb"})
+          assert(availability_entries(root).mir_library_availability_empty.valid)
+          assert(#requests == 3)
+        ''')
+
     def test_availability_normalizes_detached_query_and_preserves_typed_text(self):
         self.lua.execute(r'''
           package.preload["presentation.library_model"] = nil
