@@ -788,9 +788,11 @@ local function owner_record()
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
   local published11_empty = value.producer.kind == "published511-empty-default"
+  local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default and not published472_se and not published11_empty)
+      and not older_empty and not older_idle and not published_default and not published472_se
+      and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -808,6 +810,8 @@ local function owner_record()
       or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
         or value.producer.old_version == "4.7.21003" and edition ~= "f210")
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
+      or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
+        or tonumber(value.producer.new_version:sub(-2)) <= 3)
       or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
@@ -833,6 +837,35 @@ end
 -- uses the common default contract. Observer additions never stand for old mods.
 local function default_origin_error(reason, event, state, current, rejected, advice)
   recover_error(reason, nil, event, state, current, rejected, advice)
+end
+
+local function require_archived_default_contract(event, state, current, space_age, label)
+  local values = effective_values.streams and effective_values.streams["worker-robots-storage"]
+  local prototype = native_prototype(recovery.canonical)
+  local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
+  if type(values) ~= "table" or values.base_cost ~= 200 or values.growth_factor ~= 1.5
+      or values.linear_increment ~= 0 or values.research_time ~= 60 or values.effect_percent ~= 1
+      or values.max_level ~= 0 or values.enabled ~= true or selected_cap ~= 0 or selected_enabled ~= true
+      or prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
+      or prototype.ignore_tech_cost_multiplier ~= false
+      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
+    default_origin_error(label .. " source requires the resolved default worker work contract", event, state, current)
+  end
+  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
+    ["production-science-pack"]=1, ["utility-science-pack"]=1}
+  if space_age then packs["electromagnetic-science-pack"] = 1 end
+  local ingredients = prototype.research_unit_ingredients
+  if type(ingredients) ~= "table" or #ingredients ~= (space_age and 6 or 5) then
+    default_origin_error(label .. " default science differs", event, state, current)
+  end
+  for _, ingredient in ipairs(ingredients) do
+    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
+      default_origin_error(label .. " default science differs", event, state, current)
+    end
+    packs[ingredient.name] = nil
+  end
+  if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
 local function published473_space_age_selection(event, change, active)
@@ -903,36 +936,40 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   if change.old_version == "5.0.20001" then
     return {kind="older-mir501-empty-default", old_version=change.old_version, new_version=active[MIR]}
   end
-  local values = effective_values.streams and effective_values.streams["worker-robots-storage"]
-  local prototype = native_prototype(recovery.canonical)
-  local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
-  if type(values) ~= "table" or values.base_cost ~= 200 or values.growth_factor ~= 1.5
-      or values.linear_increment ~= 0 or values.research_time ~= 60 or values.effect_percent ~= 1
-      or values.max_level ~= 0 or values.enabled ~= true or selected_cap ~= 0 or selected_enabled ~= true
-      or prototype.level ~= 4 or prototype.max_level ~= 4294967295
-      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
-      or prototype.ignore_tech_cost_multiplier ~= false
-      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
-    default_origin_error("published473 source requires the resolved default worker work contract", event, state, current)
-  end
-  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
-    ["production-science-pack"]=1, ["utility-science-pack"]=1}
-  if space_age then packs["electromagnetic-science-pack"] = 1 end
-  local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= (space_age and 6 or 5) then
-    default_origin_error("published473 default science differs", event, state, current)
-  end
-  for _, ingredient in ipairs(ingredients) do
-    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
-      default_origin_error("published473 default science differs", event, state, current)
-    end
-    packs[ingredient.name] = nil
-  end
-  if next(packs) ~= nil then default_origin_error("published473 default science differs", event, state, current) end
+  require_archived_default_contract(event, state, current, space_age, "published473")
   -- The exact default tuple has the same native earning/work contract. Keep
   -- pending work in the ordinary transfer path, not the older empty-only path.
   return {kind=empty_source and "published473-idle-default" or "published473-default",
     old_version=change.old_version, new_version=active[MIR]}
+end
+
+local function published503_sif_removal_origin(event, change, active, current)
+  -- The exact predecessor selection kept MIR's canonical worker continuation.
+  -- Reconstruct that selection from the two removals and unchanged official
+  -- mods; the all-force plan still requires a wholly uninvested worker source.
+  if target.id ~= "f200" or target.minimum_base ~= "2.0.77"
+      or type(change) ~= "table" or getmetatable(change) ~= nil or change.old_version ~= "5.0.20003"
+      or producer_edition(active[MIR]) ~= "f200" or tonumber(active[MIR]:sub(-2)) <= 3
+      or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil then return nil end
+  local official = {base=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true}
+  for name in pairs(official) do
+    if active[name] ~= "2.0.77" then return nil end
+  end
+  for name in pairs(active) do
+    if name ~= MIR and not official[name] then return nil end
+  end
+  local removed = {["space-is-fake"]="1.0.60", ["cr-commons"]="1.0.27"}
+  for name, version in pairs(removed) do
+    local item = event.mod_changes[name]
+    if type(item) ~= "table" or getmetatable(item) ~= nil or item.old_version ~= version
+        or item.new_version ~= nil then return nil end
+  end
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR and not removed[name] and (not official[name] or type(item) ~= "table"
+        or getmetatable(item) ~= nil or item.old_version ~= "2.0.77" or item.new_version ~= "2.0.77") then return nil end
+  end
+  require_archived_default_contract(event, nil, current, true, "published503 Space Is Fake")
+  return {kind="published503-sif-empty-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
 local function published11_empty_origin(event, change, active)
@@ -1069,6 +1106,10 @@ local function default_origin(event, initializing, state, current)
   if state == nil and target.id == "f200" and active.base == "2.0.77" and not base_hop
       and change and change.old_version == "4.7.20003" and event.mod_startup_settings_changed == true then
     return older_default_origin(event, change, active, false, state, current, true)
+  end
+  if state == nil and change and change.old_version == "5.0.20003" then
+    local empty = published503_sif_removal_origin(event, change, active, current)
+    if empty then return empty end
   end
   if state == nil and event.mod_startup_settings_changed ~= false
       and not (base_hop and change.old_version == "4.7.20003") then
@@ -1716,10 +1757,13 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
             or source.saved_progress ~= 0 or source.occurrences ~= 0) then
           recover_error("first initialization/new force cannot adopt existing default work")
         end
-        if not owned and producer.kind == "published511-empty-default"
+        if not owned and (producer.kind == "published511-empty-default"
+              or producer.kind == "published503-sif-empty-default")
             and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
               or source.occurrences ~= 0 or source.current == recovery.canonical) then
-          recover_error("published11 empty default source has invested or queued worker work")
+          recover_error(producer.kind == "published511-empty-default"
+            and "published11 empty default source has invested or queued worker work"
+            or "Space Is Fake removal requires every native worker4 to be uninvested")
         end
         if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
           if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
