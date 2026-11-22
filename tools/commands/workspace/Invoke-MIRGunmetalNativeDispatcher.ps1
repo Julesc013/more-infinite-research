@@ -11,11 +11,11 @@ is active. The systemd path/timer runs `-Mode Consume`; it invokes only that
 hash-pinned launcher and retains a terminal record. A launcher return is never
 a pass: success additionally needs its PID/invocation acknowledgement, the
 expected packet-bound controller result, and explicit terminal systemd
-evidence. An incomplete unit query keeps the issued request for the next
-observation. A confirmed replacement or collected unit lacking authenticated
-terminal evidence is recorded as interrupted. A held successor requires an
-explicit disposition reference.
-the existing exact snapshot may be released, or a different reviewed snapshot
+evidence. An incomplete unit or journal query keeps the issued request for
+the next observation. A confirmed replacement or collected unit lacking
+authenticated terminal evidence is recorded as interrupted. A held successor
+requires an explicit disposition reference. The existing exact snapshot may
+be released, or a different reviewed snapshot
 may replace it. The durable intent closes the marker-to-launch acknowledgement
 window without silently relaunching an uncertain invocation.
 
@@ -435,16 +435,40 @@ function ConvertFrom-MIRGunmetalDispatcherExitJournal {
   return [pscustomobject]@{ observed = ($null -ne $managerExit); conflict = $false; source = 'manager-journal'; exit_code = $managerExit }
 }
 
+function Invoke-MIRGunmetalDispatcherJournalctl {
+  param([Parameter(Mandatory)][string[]]$Arguments)
+  $PSNativeCommandUseErrorActionPreference = $false
+  $output = @(& /usr/bin/journalctl --user --no-pager --quiet --output=json @Arguments 2>&1)
+  $exitCode = $LASTEXITCODE
+  $diagnostics = $false
+  $lines = @(foreach ($line in $output) {
+    if ($line -is [System.Management.Automation.ErrorRecord]) { $diagnostics = $true }
+    else { [string]$line }
+  })
+  return [pscustomobject]@{exit_code=$exitCode;lines=$lines;diagnostics=$diagnostics}
+}
+
 function Get-MIRGunmetalDispatcherJournalTerminal {
   param([Parameter(Mandatory)][string]$InvocationId,[Parameter(Mandatory)][string]$Unit,[Parameter(Mandatory)][string]$PacketSha256)
   if ($InvocationId -cnotmatch '^[0-9a-f]{32}$') { throw '[mir-gunmetal-dispatcher-invocation-id]' }
   # The user manager's own events and the hook's stdout use different fields.
   # Give the journal a bounded interval to receive stdout after collection.
   for ($attempt = 0; $attempt -lt 4; $attempt++) {
-    $manager = @(& /usr/bin/journalctl --user --no-pager --output=json "USER_INVOCATION_ID=$InvocationId" 2>$null)
-    $hook = @(& /usr/bin/journalctl --user --no-pager --output=json '--grep=^MIR_NATIVE_SYSTEMD_EXIT_V1 ' "_SYSTEMD_USER_UNIT=$Unit" "_SYSTEMD_INVOCATION_ID=$InvocationId" 2>$null)
-    $record = ConvertFrom-MIRGunmetalDispatcherExitJournal -ManagerRecords $manager -HookRecords $hook -Unit $Unit -InvocationId $InvocationId -PacketSha256 $PacketSha256
-    if ($record.observed -or $record.conflict -or $attempt -eq 3) { return $record }
+    $manager = Invoke-MIRGunmetalDispatcherJournalctl -Arguments @("USER_INVOCATION_ID=$InvocationId")
+    $hook = Invoke-MIRGunmetalDispatcherJournalctl -Arguments @(
+      '--grep=^MIR_NATIVE_SYSTEMD_EXIT_V1 ', "_SYSTEMD_USER_UNIT=$Unit", "_SYSTEMD_INVOCATION_ID=$InvocationId")
+    # A quiet grep with no matches returns 1 and emits neither records nor
+    # diagnostics. Keep the optional hook compatible with older packets.
+    $hookObserved = -not $hook.diagnostics -and
+      ($hook.exit_code -eq 0 -or ($hook.exit_code -eq 1 -and $hook.lines.Count -eq 0))
+    if ($manager.exit_code -eq 0 -and -not $manager.diagnostics -and $hookObserved) {
+      $record = ConvertFrom-MIRGunmetalDispatcherExitJournal -ManagerRecords $manager.lines -HookRecords $hook.lines -Unit $Unit -InvocationId $InvocationId -PacketSha256 $PacketSha256
+      if ($record.observed -or $record.conflict -or $attempt -eq 3) { return $record }
+    } elseif ($attempt -eq 3) {
+      return [pscustomobject]@{observed=$false;incomplete=$true;source='journal-query-incomplete';
+        manager_exit_code=$manager.exit_code;manager_diagnostics=$manager.diagnostics;
+        hook_exit_code=$hook.exit_code;hook_diagnostics=$hook.diagnostics}
+    }
     Start-Sleep -Milliseconds 150
   }
 }
@@ -625,8 +649,8 @@ function Reconcile-MIRGunmetalDispatcherRunning {
   }
   if ($unit.in_progress) { return }
 
-  $result = Get-MIRGunmetalDispatcherResult -Approval $Policy.approval
   if ($unit.found) {
+    $result = Get-MIRGunmetalDispatcherResult -Approval $Policy.approval
     # systemctl show reports CLD_EXITED numerically on the real user manager
     # (`1`), while fixture/older manager shapes spell it `exited`.
     $exitCode = 0
@@ -647,6 +671,10 @@ function Reconcile-MIRGunmetalDispatcherRunning {
     return
   }
   $journal = Get-MIRGunmetalDispatcherJournalTerminal -InvocationId $expected -Unit $Policy.unit -PacketSha256 $Policy.approval.packet_sha256
+  if ($journal.PSObject.Properties['incomplete'] -and $journal.incomplete) {
+    return [pscustomobject]@{status='waiting-for-native-exit-journal-observation';side_effects='none';journal=$journal}
+  }
+  $result = Get-MIRGunmetalDispatcherResult -Approval $Policy.approval
   if ($journal.PSObject.Properties['conflict'] -and $journal.conflict) {
     New-MIRGunmetalDispatcherTerminal -Policy $Policy -Running $Running -Status interrupted -Reason 'unit-terminal-journal-conflict' -Result ([ordered]@{ result = $result; journal = $journal })
     return
