@@ -8,6 +8,12 @@ Date: 2026-11-23
       unchanged official Space Age mods and default worker cargo settings.
     - Stop a worker cargo transfer when Factorio cannot supply the complete force research queue.
     - Preserve recorded default worker cargo research when upgrading from an earlier MIR 5 release.
+    - Keep completed night-vision research and the scripted conquest-force modifiers when upgrading eligible Space Exploration
+      0.7.57 saves on Factorio 2.0.77.
+    - Preserve paid worker cargo and queue order when upgrading MIR 4.7.3 alongside the official Space Age mods from Factorio 2.1.24
+      to 2.1.25.
+    - On Factorio 2.1.24, preserve paid worker cargo when adding Solar Productivity 3.0.0 to a save with MIR's recorded worker
+      ownership.
     - Preserve the historical credit owed to unfinished productivity and electric or Tesla research while the paid level is outside
       the queue.
 
