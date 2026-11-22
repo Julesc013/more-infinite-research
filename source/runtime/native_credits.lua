@@ -774,15 +774,25 @@ local function unknown_paid_mask(event, force, observation, queued, current)
     .. table.concat(fields, " ") .. "]")
 end
 
-local function queued_counts(force)
-  local counts = {}
+local function has_saved_work(technology)
+  local progress = technology and technology.saved_progress
+  return type(progress) == "number" and progress > 0
+end
+
+local function research_counts(force)
+  local queued = {}
   for _, technology in ipairs(force.research_queue or {}) do
     local name = technology.name
-    if COLLECTED_BY_MAIN[name] ~= nil then counts[name] = (counts[name] or 0) + 1 end
+    if COLLECTED_BY_MAIN[name] ~= nil then queued[name] = (queued[name] or 0) + 1 end
   end
   local current = force.current_research
-  if current and COLLECTED_BY_MAIN[current.name] ~= nil and counts[current.name] == nil then counts[current.name] = 1 end
-  return counts
+  if current and COLLECTED_BY_MAIN[current.name] ~= nil and queued[current.name] == nil then queued[current.name] = 1 end
+  local invested = {}
+  -- Saved progress belongs to the first occurrence if it is still queued.
+  for name in pairs(COLLECTED_BY_MAIN) do
+    invested[name] = queued[name] or (has_saved_work(force.technologies[name]) and 1 or 0)
+  end
+  return queued, invested
 end
 
 local function family_histories(current, index)
@@ -1009,7 +1019,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
       local records = not fresh and current and current.forces[force.index] or {}
       validate_records(records)
       local histories = family_histories(not fresh and current or nil, force.index)
-      local queued = queued_counts(force)
+      local queued, invested = research_counts(force)
       for family, recipes in pairs(groups or {}) do
         if #recipes == 0 then
           local id = FAMILY_IDS[family]
@@ -1057,6 +1067,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
         local descriptor = observation.descriptor
         local key, family = descriptor.key, descriptor.family
         local record, history = records and records[key], histories[family]
+        local invested_count = invested[descriptor.main_id]
         preflight_basis(record,observation,force,queued)
         local prior_included, payable, pending
         if record then
@@ -1067,22 +1078,18 @@ function M.preflight_family_transition(event, fresh, selected_force)
           prior_included = record.included
           payable = record.included
           if record.private and record.pending > 0 then payable = record.payable end
-          pending = record.private and math.min(record.pending, queued[descriptor.main_id] or 0)
-            or (queued[descriptor.main_id] or 0)
+          pending = record.private and math.min(record.pending, invested_count) or invested_count
         elseif history then
           if history.recipes[descriptor.recipe] then family_failure("missing record in complete previous mask") end
           if observation.offset ~= 0 then family_failure("new recipe has unproven native credit") end
           prior_included, payable, pending = false, false, 0
         else
           if not fresh and observation.offset ~= 0 then family_failure("first baseline has unproven native credit") end
-          local main = force.technologies[descriptor.main_id]
           if context.data_only_base and context.data_only_base[family] == nil
-              and (observation.completed > 0 or (queued[descriptor.main_id] or 0) > 0
-                or type(main.saved_progress) == "number" and main.saved_progress > 0) then
+              and (observation.completed > 0 or invested_count > 0) then
             family_failure("unproven investment in a family absent from the published data-only source")
           end
-          local invested_private = observation.private and ((queued[descriptor.main_id] or 0) > 0
-            or type(main.saved_progress) == "number" and main.saved_progress > 0)
+          local invested_private = observation.private and invested_count > 0
           -- Zero earned levels do not prove the absence of original queued or
           -- detached work. Known source contracts must resolve that old mask;
           -- an unknown first investment cannot baseline from the new output.
@@ -1114,7 +1121,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
           -- version emitted the old recipe mask. Only the known source masks
           -- above or a complete saved ledger can establish prior paid rights.
           else unknown_paid_mask(event, force, observation, queued, current) end
-          payable, pending = prior_included, queued[descriptor.main_id] or 0
+          payable, pending = prior_included, invested_count
         end
         local offset = observation.offset + ((prior_included and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
         if not integer(offset) or math.abs(offset) >= UINT32_MAX then family_failure("credit exceeds native level range") end
@@ -1195,10 +1202,12 @@ function M.on_research_cancelled(event)
   for name, count in pairs(cancelled) do
     if COLLECTED_BY_MAIN[name] then
       if not integer(count) or count < 0 then family_failure("invalid native cancellation count") end
+      local saved_work = has_saved_work(force.technologies[name])
       for _, descriptor in ipairs(COLLECTED_BY_MAIN[name]) do
         local record = records and records[descriptor.key]
         if record then
-          plans[#plans + 1] = {record=record, pending=math.max(0, record.pending - count)}
+          local retained = saved_work and math.min(1, record.pending) or 0
+          plans[#plans + 1] = {record=record, pending=math.max(retained, record.pending - count)}
         end
       end
     end
