@@ -3257,6 +3257,46 @@ class LibraryTests(unittest.TestCase):
           assert(player.gui.screen["mir_research_browser"] == nil and not player.shortcut_toggled)
         ''')
 
+    def test_reopened_research_scroll_follows_the_selected_technology_after_reordering(self):
+        self.lua.execute('''
+          boot()
+          local gear_row = {id=gear.name, name=gear.localised_name, family="mir"}
+          local other_row = {id=foreign.name, name=foreign.localised_name, family="mir"}
+          library_declarations = {other_row, gear_row}
+          local function result_list(root)
+            return research_content(root).mir_library_list_pane.mir_library_results
+          end
+          local results = result_list(library.open(player))
+          assert(#results.items == 2 and results.items[2][2] == "[img=technology/" .. gear.name .. "] ")
+          results.selected_index = 2
+          library.on_gui_selection_state_changed({player_index=1, element=results})
+          assert(storage.mir_library.players[1].selected == gear.name)
+          assert(storage.mir_library.players[1].scroll == 2)
+          library.close(player)
+
+          local saved_view = storage.mir_library.players[1]
+          local queue = player.force.research_queue
+          library_declarations = {gear_row, other_row}
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          library.on_load()
+          assert(storage.mir_library.players[1] == saved_view)
+          results = result_list(library.open(player))
+          assert(results.selected_index == 1 and results.items[1][2] == "[img=technology/" .. gear.name .. "] ")
+          assert(results.scrolled_to.index == 1, "reopened view must scroll to the selected technology's new row")
+
+          library.close(player)
+          storage.mir_library.players[1].scroll_to_selection = nil
+          results = result_list(library.open(player))
+          assert(results.selected_index == 1 and results.scrolled_to.index == 2,
+            "older saved numeric scroll positions remain valid")
+          library.close(player)
+          results = result_list(library.open(player, {selected=foreign.name}))
+          assert(results.selected_index == 2 and results.scrolled_to.index == 2)
+          assert(player.force.research_queue == queue and player.force.current_research == gear
+            and player.force.research_progress == .5)
+        ''')
+
     def test_filters_and_foreign_events_are_bounded(self):
         self.lua.execute('''
           boot()
