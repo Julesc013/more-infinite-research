@@ -2408,6 +2408,36 @@ class LibraryTests(unittest.TestCase):
             "filter selection must update the retained view without replacing the window or query")
         ''')
 
+    def test_row_selection_reuses_one_catalogue_read_while_the_translation_scope_matches(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {family="all"})
+          local list = research_content(root).mir_library_list_pane.mir_library_results
+          local query = research_filters(root).mir_library_query
+          local queue, current, progress = player.force.research_queue, player.force.current_research,
+            player.force.research_progress
+          local model = require("presentation.library_model")
+          local rows, calls = model.rows, 0
+          model.rows = function(...) calls = calls + 1; return rows(...) end
+
+          list.selected_index = 1
+          library.on_gui_selection_state_changed{player_index=1, element=list}
+          assert(calls == 1, "a settled selection must use one catalogue observation")
+          local selected = storage.mir_library.players[1].selected
+          assert(selected ~= nil and list.selected_index == 1)
+
+          -- A native locale change can precede its event. Retain the clicked
+          -- identity from the displayed view and refresh the localized rows.
+          player.locale = "de"
+          calls = 0
+          library.on_gui_selection_state_changed{player_index=1, element=list}
+          assert(calls == 2 and storage.mir_library.players[1].selected == selected)
+          assert(research_content(root).mir_library_list_pane.mir_library_results == list
+            and research_filters(root).mir_library_query == query)
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress)
+        ''')
+
     def test_retained_filter_labels_follow_resize_within_the_same_column_band(self):
         self.lua.execute(r'''
           boot()
