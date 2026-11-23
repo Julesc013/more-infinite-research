@@ -3623,6 +3623,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch-with-addons", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch-with-reported-addons", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
@@ -3634,6 +3635,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                 lua.execute(r'''
                   seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
                   local event=older_event(old,false)
+                  local reported_addons=selection=="space-age-engine-patch-with-reported-addons"
+                  local checked_addons=reported_addons or selection=="space-age-engine-patch-with-addons"
                   if selection=="base-hop"then
                     event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
                     event.mod_startup_settings_changed=true
@@ -3643,15 +3646,21 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                         event.mod_changes[name]={old_version=version,new_version=version}
                       end
                     end
-                  elseif selection=="space-age-engine-patch" or selection=="space-age-engine-patch-with-addons"then
+                  elseif selection=="space-age-engine-patch" or checked_addons then
                     for name,version in pairs(script.active_mods)do
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version="2.1.24",new_version=version}
                       end
                     end
                   end
-                  if selection=="space-age-engine-patch-with-addons"then
+                  if checked_addons then
                     local addons={["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
+                    if reported_addons then
+                      addons.CleanedConcrete="2.1.0"
+                      addons["even-distribution-fork"]="2.1.2"
+                      addons.pump="2.2.6"
+                      event.mod_changes.pump={old_version="2.2.6",new_version="2.2.6"}
+                    end
                     for name,version in pairs(addons)do script.active_mods[name]=version end
                     event.mod_changes["Return-Inserter"]={old_version="1.0.0",new_version="1.0.0"}
                     local read=prototypes.get_history
