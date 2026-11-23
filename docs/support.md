@@ -97,6 +97,16 @@ For a save outside that direct route, keep Space Is Fake installed for the first
 
 This sequence preserved queued mining and plastic research, unfinished progress and earned recipe bonuses in the tested Factorio 2.0.77 save with Space Is Fake 1.0.60.
 
+### Upgrading MIR 4.7.20002 with Space Exploration
+
+On Factorio 2.0.77 with Space Exploration 0.7.57, keep MIR and add-on updates in separate loads when the save has earned or unfinished worker cargo research.
+
+1. Keep the original save and its mod selection and startup settings. Work on a separate copy.
+2. If you have already saved the add-on update successfully under MIR 4.7.20002, use a protected copy of that save with its matching mods and settings for the MIR upgrade. Otherwise try the MIR upgrade with the original add-on selection and exact MIR settings.
+3. Check the cargo bonus, current research and queue. If the upgrade succeeds, save the copy under a new name and cold-load it before making a separate add-on change. If the upgrade refuses, keep the original and its previous selection.
+
+The staged procedure preserved paid worker level 9, completed levels 9 and 10 in the lab and held the cap at 10 in the tested Space Halls Fix profile. The legacy `/mir-worker-storage-recovery prepare` procedure covers a different worker contract. [Staged Space Halls test](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7093996018)
+
 ### Preparing worker cargo research before adding a provider
 
 - First upgrade a copy with the protected original's previous enabled mods and exact MIR settings, then save separately before changing a provider or settings. MIR 5.0.12 transfers admitted default worker cargo history automatically to permanent native research on Factorio 2.0 and 2.1. The legacy preparation command is not needed after that transfer.
