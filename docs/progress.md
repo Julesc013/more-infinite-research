@@ -14,6 +14,16 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Verified reported profiles and publication hold (2026-11-23)
+
+The complete reported Space Age and Solar Productivity mod selections each reproduced the corresponding crash on public 5.0.21021. The private Factorio 2.1 archive from `2221ea25a8460ff7457f682b5d5b493f4e0cdd4c` preserved earned cargo, paid active and parked work, and unrelated research. The Space Age replay also preserved repeated cargo queue entries. Each replay completed the next cargo level through ordinary lab work and matched two cold loads. Both used protected test saves. The five-add-on Space Age correction is merged in dev. [Native readbacks](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7092150957)
+
+The 262-launch Factorio 2.0.77 Bob/Angel startup comparison on the earlier private F200 archive from `54fbed1d` completed all 64 paired blocks. Mean time to responsive Settings was 19.202 s without MIR, 20.868 s with published MIR 4.7.3 and 19.362 s with the private build. The paired interval passed the declared 50% reduction threshold for MIR-added time. The independent Factorio 2.1.24 run on the earlier private F210 archive from the same source also preserved the two clients' personal Library views after rejoin and server restart. Both jobs restored their shared libraries. [Timing and Library readbacks](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7092335632)
+
+The exact private F200 build preserved paid Space Is Fake cargo through the staged provider removal and ordinary completion of the next level. The direct combined transition refused the invested input. The six protected classic save upgrades passed on Factorio 0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79 and 1.0.0. Each transition retained the original save and the successor matched two cold loads. The earlier Linux harness failures remain in custody. [Staged provider result](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7088960064) · [Classic upgrade readback](https://github.com/Julesc013/more-infinite-research/pull/2317#issuecomment-7092414478)
+
+MIR 5.0.22 remains the current GitHub prerelease and verified local delivery. The original reporter saves remain unverified. The simultaneous Space Exploration add-on and MIR upgrade still refuses in the protected reproduction. Final-package qualification and the remaining stable gates are open.
+
 ## Private save repair qualification (2026-11-23)
 
 On frozen private source `54fbed1de9b8902e4d77369425558b6f28fb4859`, the staged Space Exploration upgrade on Factorio 2.0.77 preserved night vision, the conquest-force bonuses and unfinished worker cargo. Ordinary lab work completed levels 9 and 10, level 11 remained blocked, and both cold loads matched. The independent Space Age replay upgraded Factorio 2.1.24 to 2.1.25 with Return-Inserter 1.0.0 and spider-launcher 2.9.87. It preserved the worker price and both paid entries, completed the active level, kept the queue and passed two cold loads. A separate predecessor with a modified historical worker price was refused before transfer with its original bytes unchanged. [Exact upgrade results](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7088471526)
