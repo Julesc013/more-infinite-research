@@ -24,13 +24,14 @@ local function finite_integer(value, minimum)
     and value == math.floor(value) and value >= minimum
 end
 
+local function valid_scope(scope)
+  return type(scope) == "table" and finite_integer(scope.player_index, 1)
+    and type(scope.locale) == "string" and #scope.locale > 0 and #scope.locale <= M.label_limit
+    and finite_integer(scope.force_index, 1) and finite_integer(scope.generation, 0)
+end
+
 local function copy_scope(scope)
-  if type(scope) ~= "table" or not finite_integer(scope.player_index, 1)
-      or type(scope.locale) ~= "string" or #scope.locale == 0 or #scope.locale > M.label_limit
-      or not finite_integer(scope.force_index, 1)
-      or not finite_integer(scope.generation, 0) then
-    return nil
-  end
+  if not valid_scope(scope) then return nil end
   return {
     player_index = scope.player_index,
     locale = scope.locale,
@@ -168,7 +169,7 @@ end
 
 local function copy_pending_record(request_id, request)
   if not valid_request_id(request_id) or type(request) ~= "table" or not valid_key(request.key)
-      or copy_scope(request.scope) == nil or not finite_integer(request.generation, 0)
+      or not valid_scope(request.scope) or not finite_integer(request.generation, 0)
       or not valid_tick(request.requested_tick) then
     return nil
   end
@@ -181,53 +182,42 @@ local function copy_pending_record(request_id, request)
   }
 end
 
-local function exact_pending_record(record)
-  if type(record) ~= "table" then return nil end
-  local allowed = {
-    request_id = true,
-    key = true,
-    scope = true,
-    cache_generation = true,
-    requested_tick = true
-  }
+local pending_fields = {request_id = true, key = true, scope = true, cache_generation = true, requested_tick = true}
+
+local function valid_pending_record(record)
+  if type(record) ~= "table" then return false end
   for field in pairs(record) do
-    if allowed[field] ~= true then return nil end
+    if pending_fields[field] ~= true then return false end
   end
-  if not valid_request_id(record.request_id) or not valid_key(record.key)
-      or copy_scope(record.scope) == nil or not finite_integer(record.cache_generation, 0)
-      or not valid_tick(record.requested_tick) then
-    return nil
-  end
-  return {
-    request_id = record.request_id,
-    key = record.key,
-    scope = copy_scope(record.scope),
-    cache_generation = record.cache_generation,
-    requested_tick = record.requested_tick
-  }
+  return valid_request_id(record.request_id) and valid_key(record.key) and valid_scope(record.scope)
+    and finite_integer(record.cache_generation, 0) and valid_tick(record.requested_tick)
 end
 
-local function copy_pending_ledger(ledger)
+local function validated_pending_records(ledger)
   if type(ledger) ~= "table" or #ledger > M.outstanding_limit then return nil end
-  local count, copied, ids, keys = #ledger, {}, {}, {}
+  local count, records, ids, keys = #ledger, {}, {}, {}
   for index, record in pairs(ledger) do
     if not finite_integer(index, 1) or index > count then return nil end
-    local value = exact_pending_record(record)
-    if value == nil or ids[value.request_id] then return nil end
+    if not valid_pending_record(record) or ids[record.request_id] then return nil end
     -- Invalidation/reopen retains older issued IDs while a new scope can
     -- request the same key. Only a duplicate within the same complete request
     -- generation is malformed. This list is bounded by outstanding_limit=16.
-    local same_key = keys[value.key] or {}
+    local same_key = keys[record.key] or {}
     for _, prior in ipairs(same_key) do
-      if prior.cache_generation == value.cache_generation and same_scope(prior.scope, value.scope) then return nil end
+      if prior.cache_generation == record.cache_generation and same_scope(prior.scope, record.scope) then return nil end
     end
-    same_key[#same_key + 1] = value
-    copied[index], ids[value.request_id], keys[value.key] = value, true, same_key
+    same_key[#same_key + 1] = record
+    records[index], ids[record.request_id], keys[record.key] = record, true, same_key
   end
   for index = 1, count do
-    if copied[index] == nil then return nil end
+    if records[index] == nil then return nil end
   end
-  return copied
+  return records
+end
+
+function M.issued_window_can_expire(ledger)
+  local records = validated_pending_records(ledger)
+  return records ~= nil and #records > 0
 end
 
 local function release(cache, request_id)
@@ -295,7 +285,7 @@ function M.hydrate_pending(cache, ledger)
   if cache.outstanding ~= 0 or next(cache.pending_by_id) ~= nil or next(cache.pending_by_key) ~= nil then
     return false, "cache-not-empty"
   end
-  local records = copy_pending_ledger(ledger)
+  local records = validated_pending_records(ledger)
   if records == nil then return false, "invalid-ledger" end
   for _, record in ipairs(records) do
     cache.pending_by_id[record.request_id] = {

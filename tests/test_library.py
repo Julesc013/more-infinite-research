@@ -3977,12 +3977,32 @@ class LibraryTests(unittest.TestCase):
           local malformed = {pending = {{request_id = "not-a-native-id"}}}
           local ledger = {schema = 1, next_epoch = 0, active = {[1] = malformed}, retired = {}}
           storage.mir_library = {schema = 1, players = {}, translations = ledger}
+          assert(not library.subscription_needs(), "an invalid issued window cannot drain")
           library.open(player)
           assert(storage.mir_library.translations == ledger and ledger.active[1] == malformed)
-          assert(#player.translation_requests == 0)
+          assert(#player.translation_requests == 0 and not library.subscription_needs())
           library.on_translation_maintenance({tick = 1800})
           assert(ledger.active[1] == malformed and #player.translation_requests == 0)
         ''')
+
+    def test_closed_translation_timer_stops_when_only_preserved_records_remain(self):
+        self.lua.execute('''
+          boot()
+          library.open(player, {family = "all"})
+          assert(#player.translation_requests == 2)
+          library.close(player)
+          local ledger = storage.mir_library.translations
+          local invalid = {pending = {{request_id = "future-record"}}}
+          local unaddressable = ledger.active[1]
+          ledger.retired[2] = invalid
+          ledger.active.unknown_index = unaddressable
+          assert(library.subscription_needs(), "valid native requests still need their expiry")
+          library.on_translation_maintenance({tick = 1000000})
+          assert(ledger.active[1] == nil and not library.subscription_needs())
+          assert(ledger.retired[2] == invalid and ledger.active.unknown_index == unaddressable)
+          assert(#player.translation_requests == 2)
+        ''')
+
     def test_pending_translations_survive_locale_change_close_and_reload(self):
         self.lua.execute('''
           boot()
