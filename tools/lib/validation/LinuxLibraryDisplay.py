@@ -273,6 +273,17 @@ class SystemBackend:
     def unlink(self, path: Path) -> None:
         path.unlink()
 
+    def rename(self, path: Path, destination: Path) -> None:
+        path.rename(destination)
+
+    def read_pid_lock(self, path: Path, identity: tuple[int, int], uid: int) -> bytes:
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as stream:
+            info = os.fstat(stream.fileno())
+            require(stat.S_ISREG(info.st_mode) and (info.st_dev, info.st_ino) == identity
+                    and info.st_uid == uid and 0 < info.st_size <= 32, "display lock changed before read")
+            return stream.read(33)
+
     def rmdir(self, path: Path) -> None:
         path.rmdir()
 
@@ -609,6 +620,83 @@ def _remove_owned(backend: SystemBackend, path: Path, identity: tuple[int, int],
         return False
 
 
+def recover_display(plan: ValidatedPlan, ready_sha256: str, backend: Optional[SystemBackend] = None) -> dict[str, object]:
+    """After the owner exits, retain only its exact abandoned global X11 entries."""
+    require(sys.platform == "linux", "Linux private display recovery required")
+    backend = backend or SystemBackend()
+    info = _regular(plan.ready, "display-ready receipt")
+    require(0 < info.st_size <= MAX_RECORD_BYTES, "display-ready size differs")
+    with plan.ready.open("rb") as stream:
+        body = stream.read(MAX_RECORD_BYTES + 1)
+    require(len(body) == info.st_size and hashlib.sha256(body).hexdigest().upper() == ready_sha256,
+            "display-ready receipt changed")
+    ready = _strict_json(body, "display-ready receipt")
+    require(ready.get("kind") == READY_KIND and ready.get("role") == plan.role
+            and ready.get("display") == plan.display and ready.get("geometry") == list(plan.geometry),
+            "display-ready receipt does not own the planned display")
+    identity, binding = ready.get("display_identity"), ready.get("display_binding")
+    require(type(identity) is dict and type(binding) is dict, "display-ready identity differs")
+    uid, pid = backend.uid(), identity.get("pid")
+    require(all(type(identity.get(key)) is int and identity[key] > 0 for key in ("pid", "start_ticks", "session_id"))
+            and type(binding.get("uid")) is int and binding["uid"] == uid and binding.get("pid") == pid,
+            "display-ready process ownership differs")
+    _recheck_pins(plan)
+    probe = _load_probe(backend, plan)
+    _owned_directory(backend, Path("/tmp/.X11-unix"), 0, 0o1777, "shared X socket directory")
+    addresses = {str(plan.socket), "@" + str(plan.socket)}
+
+    def require_inactive():
+        try:
+            backend.process_identity(pid)
+        except (FileNotFoundError, ProcessLookupError):
+            pass
+        else:
+            raise DisplayError("preserve existing display process")
+        require(not probe.unix_listeners(addresses), "preserve existing X listener")
+
+    def check_owned(path, expected, kind):
+        observed = backend.lstat(path)
+        require(kind(observed.st_mode) and (observed.st_dev, observed.st_ino) == expected
+                and observed.st_uid == uid, "preserve changed display socket or lock")
+
+    require_inactive()
+    destination = plan.lock.parent / f".mir-retained-display-{uid}-{ready_sha256.lower()}"
+    if backend.lexists(destination):
+        _owned_directory(backend, destination, uid, 0o700, "display recovery directory")
+    members = []
+    for path, key, kind in ((plan.lock, "lock_device_inode", stat.S_ISREG),
+                            (plan.socket, "socket_device_inode", stat.S_ISSOCK)):
+        known = binding.get(key)
+        require(type(known) is list and len(known) == 2 and all(type(value) is int and value >= 0 for value in known),
+                "display-ready filesystem identity differs")
+        expected = tuple(known)
+        retained = destination / path.name
+        if backend.lexists(retained):
+            check_owned(retained, expected, kind)
+            require(not backend.lexists(path), "display binding has multiple paths")
+        if backend.lexists(path):
+            check_owned(path, expected, kind)
+            if path == plan.lock:
+                require(backend.read_pid_lock(path, expected, uid).strip() == str(pid).encode("ascii"),
+                        "display lock no longer records its owned PID")
+            members.append((path, retained, expected, kind))
+    if members and not backend.lexists(destination):
+        backend.mkdir(destination, 0o700)
+    if backend.lexists(destination):
+        _owned_directory(backend, destination, uid, 0o700, "display recovery directory")
+    for path, retained, expected, kind in members:
+        require_inactive()
+        check_owned(path, expected, kind)
+        require(not backend.lexists(retained), "display recovery destination already exists")
+        backend.rename(path, retained)
+        check_owned(retained, expected, kind)
+    require_inactive()
+    require(not backend.lexists(plan.lock) and not backend.lexists(plan.socket), "display recovery remains incomplete")
+    return {"kind": RESULT_KIND, "status": "recovered" if backend.lexists(destination) else "already-clear",
+            "role": plan.role, "display": plan.display, "ready_sha256": ready_sha256,
+            "retained_path": str(destination) if backend.lexists(destination) else None, "factorio_processes": 0}
+
+
 def stop_display(state: DisplayState, reason: str, error: Optional[str] = None) -> dict[str, object]:
     """Stop only an identity-matching display and remove only owned files."""
     require(reason in {"stop", "eof", "deadline", "failed"}, "display stop reason differs")
@@ -745,22 +833,24 @@ def run_display(plan: ValidatedPlan, backend: Optional[SystemBackend] = None, st
 def main(argv: Optional[list[str]] = None) -> int:
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("schema", "execute"), required=True)
+    parser.add_argument("--mode", choices=("schema", "execute", "recover"), required=True)
     parser.add_argument("--checkout", required=True)
     parser.add_argument("--plan", required=True)
     parser.add_argument("--plan-sha256", required=True)
+    parser.add_argument("--ready-sha256")
     args = parser.parse_args(argv)
     receipt: dict[str, object] = {"kind": RESULT_KIND, "status": "refused", "factorio_processes": 0}
     try:
         validated = load_bound_plan(args.plan, args.plan_sha256, args.checkout)
         receipt.update(role=validated.role, display=validated.display, geometry=list(validated.geometry))
+        require((args.mode == "recover") == (args.ready_sha256 is not None), "ready hash is required only for recovery")
         if args.mode == "schema":
             receipt["status"] = "validated-schema-only"
             print(json.dumps(receipt, sort_keys=True))
             return 0
-        receipt = run_display(validated)
+        receipt = recover_display(validated, args.ready_sha256) if args.mode == "recover" else run_display(validated)
         print(json.dumps(receipt, sort_keys=True))
-        return 0 if receipt["status"] in {"stop", "eof"} else 1
+        return 0 if receipt["status"] in {"stop", "eof", "recovered", "already-clear"} else 1
     except Exception as exc:
         receipt["error"] = str(exc)[:512]
         print(json.dumps(receipt, sort_keys=True))
