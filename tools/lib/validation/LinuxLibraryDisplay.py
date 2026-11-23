@@ -150,12 +150,12 @@ class ValidatedPlan:
     result: Path
 
 
-def validate_plan(plan: dict[str, object], checkout: Path | str) -> ValidatedPlan:
+def validate_plan(plan: dict[str, object], checkout: Path | str, *, recovery: bool = False) -> ValidatedPlan:
     """Validate a no-side-effect display plan.
 
-    The caller must have created an empty direct child of ``checkout/build/p``.
-    All output names and both global X paths are derived here rather than being
-    supplied by the plan.
+    New displays use an empty direct child of ``checkout/build/p``. Recovery
+    reopens that same directory after a display has recorded its ownership.
+    Output names and global X paths are derived here.
     """
     require(type(plan) is dict and set(plan) == PLAN_FIELDS, "display plan fields differ")
     require(type(plan["schema"]) is int and plan["schema"] == 1 and plan["kind"] == PLAN_KIND,
@@ -184,7 +184,7 @@ def validate_plan(plan: dict[str, object], checkout: Path | str) -> ValidatedPla
     require(stat.S_ISDIR(root_info.st_mode) and not root.is_symlink(), "role_root differs")
     root = root.resolve(strict=True)
     require(root.parent == output_parent and _under(root, output_parent), "role_root escapes checkout build/p")
-    require(not any(root.iterdir()), "role_root must be fresh and empty")
+    require(recovery or not any(root.iterdir()), "role_root must be fresh and empty")
 
     xtigervnc, _ = _record(plan["xtigervnc"], "Xtigervnc")
     xauth, _ = _record(plan["xauth"], "xauth")
@@ -206,7 +206,7 @@ def validate_plan(plan: dict[str, object], checkout: Path | str) -> ValidatedPla
     )
 
 
-def load_bound_plan(path: Path | str, expected_sha256: str, checkout: Path | str) -> ValidatedPlan:
+def load_bound_plan(path: Path | str, expected_sha256: str, checkout: Path | str, *, recovery: bool = False) -> ValidatedPlan:
     """Read at most 8 KiB and bind the exact raw plan bytes before validation."""
     plan_path = _absolute(str(path), "plan")
     info = _regular(plan_path, "plan")
@@ -216,7 +216,7 @@ def load_bound_plan(path: Path | str, expected_sha256: str, checkout: Path | str
     raw = plan_path.read_bytes()
     require(len(raw) == info.st_size and hashlib.sha256(raw).hexdigest().upper() == digest,
             "raw plan bytes differ")
-    return validate_plan(_strict_json(raw, "plan"), checkout)
+    return validate_plan(_strict_json(raw, "plan"), checkout, recovery=recovery)
 
 
 def _identity(pid: int) -> dict[str, int]:
@@ -841,9 +841,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
     receipt: dict[str, object] = {"kind": RESULT_KIND, "status": "refused", "factorio_processes": 0}
     try:
-        validated = load_bound_plan(args.plan, args.plan_sha256, args.checkout)
-        receipt.update(role=validated.role, display=validated.display, geometry=list(validated.geometry))
         require((args.mode == "recover") == (args.ready_sha256 is not None), "ready hash is required only for recovery")
+        validated = load_bound_plan(args.plan, args.plan_sha256, args.checkout, recovery=args.mode == "recover")
+        receipt.update(role=validated.role, display=validated.display, geometry=list(validated.geometry))
         if args.mode == "schema":
             receipt["status"] = "validated-schema-only"
             print(json.dumps(receipt, sort_keys=True))

@@ -565,6 +565,9 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
                     "display_binding": {"pid": backend.process.pid, "uid": backend.uid(),
                                         "lock_device_inode": [1, 21], "socket_device_inode": [1, 22]}}), encoding="utf8")
                 ready_sha = digest(plan.ready)
+                self.assert_refuses(lambda: DISPLAY.validate_plan(plan.raw, plan.checkout), "fresh and empty")
+                with mock.patch.object(DISPLAY, "PINNED_PROBE_DISPLAY_SHA256", plan.raw["probe_display"]["sha256"]):
+                    self.assertEqual(DISPLAY.validate_plan(plan.raw, plan.checkout, recovery=True).ready, plan.ready)
 
                 def pid_gone(_pid):
                     raise FileNotFoundError()
