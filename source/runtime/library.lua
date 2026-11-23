@@ -1643,7 +1643,7 @@ local function update_list_items(list, items, selected_index)
   return changed, selection_changed
 end
 
-local function update_research_content(content, player, view, context, translations, localized_search_pending)
+local function update_research_content(content, player, view, context, translations, localized_search_pending, observed)
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
@@ -1653,7 +1653,12 @@ local function update_research_content(content, player, view, context, translati
     content.clear()
   end
 
-  local rows, unavailable = rows_for(player, view, context, translations)
+  local rows, unavailable
+  if observed and observed.family == view.family and observed.labels == translations then
+    rows, unavailable = observed.rows, observed.unavailable
+  else
+    rows, unavailable = rows_for(player, view, context, translations)
+  end
   local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
@@ -2477,7 +2482,7 @@ end
 
 -- Dynamic list/detail content is rebuilt under a stable root. In particular,
 -- query edits preserve the existing text field, native focus and caret.
-local function render(player, view, context, preserve_query)
+local function render(player, view, context, preserve_query, observed)
   if not valid(player) or player.connected ~= true then return nil end
   context = context or context_for(player.force)
   local frame = owned_root(player)
@@ -2527,7 +2532,7 @@ local function render(player, view, context, preserve_query)
     local search_pending = view.query ~= "" and translations ~= nil
       and translation_queue.is_complete(translations.cache, translations.scope) == false
       and translation_queue.needs_maintenance(translations.cache)
-    update_research_content(content, player, view, context, translated_labels(translations), search_pending)
+    update_research_content(content, player, view, context, translated_labels(translations), search_pending, observed)
     update_discovery_indicator(content, translations)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
@@ -2760,13 +2765,15 @@ function M.on_gui_selection_state_changed(event)
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
-    local rows = rows_for(player, view, context, translated_labels(translation_caches[player.index]))
+    local labels = translated_labels(translation_caches[player.index])
+    local rows, unavailable = rows_for(player, view, context, labels)
     local index = element.selected_index
     local row = type(index) == "number" and rows[index] or nil
     if row then
       view.selected = row.id
       view.scroll, view.scroll_to_selection = index, true
-      render(player, view, context)
+      -- The detail render can reuse this observation within the same event.
+      render(player, view, context, nil, {family = view.family, labels = labels, rows = rows, unavailable = unavailable})
     end
   elseif element.name == PREFIX .. "recipe_list" then
     local ordinary = owns_element(player, element, {
