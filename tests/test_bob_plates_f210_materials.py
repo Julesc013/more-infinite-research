@@ -13,26 +13,14 @@ from pathlib import Path
 import sys
 import unittest
 
+from lua_table_values import to_lua as _lua_value
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "source"
 FACTS_PATH = ROOT / "tests/fixtures/bob-plates-f210-captured-facts.json.gz"
 MAX_FACTS_BYTES = 256 * 1024
 F210_SHA256 = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
 
 
 def _plain(value):

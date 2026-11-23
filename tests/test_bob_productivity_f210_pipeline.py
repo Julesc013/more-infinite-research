@@ -8,6 +8,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from lua_table_values import to_lua as _lua_value
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "source"
@@ -23,20 +25,6 @@ def _plain(value):
     if items and set(items) == set(range(1, len(items) + 1)):
         return [_plain(items[index]) for index in range(1, len(items) + 1)]
     return {key: _plain(nested) for key, nested in items.items()}
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
 
 
 class BobProductivityF210PipelineTests(unittest.TestCase):
