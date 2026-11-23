@@ -57,7 +57,7 @@ source_of_truth_for:
 
 - Back up the save, installed mods and startup settings.
 - Test a copy with the same Factorio family and matching mod set first.
-- Keep inherited settings for the first load.
+- Keep inherited settings for the first load. In Factorio 2.0 and 2.1, you can restore them from a copy of the original save using **Sync mods with save** in the **Load game** menu. Hold Ctrl when clicking the sync button to request the exact saved mod versions, and select the option to sync startup settings. [Factorio mod syncing](https://wiki.factorio.com/Mods#Automatic_mod_sync_for_saves_and_multiplayer_games)
 - Inspect earned bonuses, current research, queued or paused work, caps and research supplied by other mods.
 - Save the copy under a new name, then close and reload it before adopting the upgrade.
 
