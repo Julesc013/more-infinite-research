@@ -9,6 +9,7 @@ $dispatcher=Join-Path $RepoRoot 'tools/commands/workspace/Invoke-MIRGunmetalNati
 $installer=Join-Path $RepoRoot 'tools/commands/workspace/Install-MIRGunmetalNativeDispatcher.ps1'
 . $dispatcher
 . $installer
+$readDispatcherJournal = ${function:Get-MIRGunmetalDispatcherJournalTerminal}
 
 $script:checks=0
 $script:launches=0
@@ -67,6 +68,13 @@ function Get-MIRGunmetalDispatcherJournalTerminal {
   return $script:fakeJournal
 }
 
+function Invoke-MIRGunmetalDispatcherJournalctl {
+  param([Parameter(Mandatory)][string[]]$Arguments)
+  $script:journalReads++
+  if ($Arguments[0] -clike 'USER_INVOCATION_ID=*') { return $script:journalManagerReply }
+  return $script:journalHookReply
+}
+
 function Test-DispatcherExitJournal {
   $packet = 'A' * 64
   $unit = 'mir-native.service'
@@ -99,6 +107,30 @@ function Test-DispatcherExitJournal {
   $timeout = $hook.Replace('result=success code=exited status=0','result=timeout code=killed status=TERM')
   $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($timeout)
   Assert-Dispatcher ($exit.observed -and $null -eq $exit.exit_code -and $exit.service_result -ceq 'timeout' -and $exit.exit_status -ceq 'TERM') 'collected-timeout-preserved'
+
+  $script:journalReads = 0
+  $script:journalManagerReply = [pscustomobject]@{exit_code=0;lines=@($terminal);diagnostics=$false}
+  $script:journalHookReply = [pscustomobject]@{exit_code=1;lines=@();diagnostics=$false}
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.observed -and $exit.exit_code -eq 7 -and $script:journalReads -eq 2) 'absent-optional-grep-preserves-manager-exit'
+
+  $script:journalReads = 0
+  $script:journalManagerReply.lines = @()
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher (-not $exit.observed -and -not $exit.PSObject.Properties['incomplete'] -and
+    $script:journalReads -eq 8) 'two-empty-journal-queries-confirm-no-terminal'
+
+  $script:journalReads = 0
+  $script:journalManagerReply.lines = @($terminal)
+  $script:journalHookReply.diagnostics = $true
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.incomplete -and -not $exit.observed -and $script:journalReads -eq 8) 'hook-query-error-does-not-count-as-no-match'
+
+  $script:journalReads = 0
+  $script:journalManagerReply = [pscustomobject]@{exit_code=1;lines=@();diagnostics=$true}
+  $script:journalHookReply = [pscustomobject]@{exit_code=0;lines=@($hook);diagnostics=$false}
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.incomplete -and -not $exit.observed -and $script:journalReads -eq 8) 'manager-query-error-keeps-conflict-check-pending'
 }
 
 $script:installState='success'
@@ -151,7 +183,15 @@ function New-DispatcherControl {
 }
 function Write-DispatcherResult { param([Parameter(Mandatory)]$Policy,[string]$Status=$Policy.approval.result_status)[IO.File]::WriteAllText($Policy.approval.result_path,('{"kind":"MIRDispatcherControlResultV1","status":"'+$Status+'","packet_sha256":"'+$Policy.approval.packet_sha256+'"}'+"`n"),[Text.UTF8Encoding]::new($false)) }
 function Read-DispatcherTerminal { param([Parameter(Mandatory)]$Control,[Parameter(Mandatory)][string]$RequestId) return (Get-Content -LiteralPath (Join-Path $Control.spool ('terminal/'+$RequestId+'.json')) -Raw|ConvertFrom-Json) }
-function Remove-DispatcherControl { param([Parameter(Mandatory)]$Control)if(Test-Path -LiteralPath $Control.root){[IO.Directory]::Delete($Control.root,$true)} }
+function Remove-DispatcherControl {
+  param([Parameter(Mandatory)]$Control)
+  if (-not (Test-Path -LiteralPath $Control.root -PathType Container)) { return }
+  $root = Get-Item -LiteralPath (Resolve-Path -LiteralPath $Control.root).Path
+  $temporary = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path.TrimEnd([IO.Path]::DirectorySeparatorChar)
+  if ($root.Parent.FullName -ne $temporary -or $root.Name -notlike 'mir-dispatcher-*' -or
+      ($root.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw '[gunmetal-dispatcher-control-cleanup-path]' }
+  [IO.Directory]::Delete($root.FullName, $true)
+}
 
 $controls=@()
 try {
@@ -216,7 +256,15 @@ try {
       (Get-FileHash -LiteralPath $pendingPath).Hash-ceq$pendingHash -and
       -not (Test-Path -LiteralPath $terminalPath)) "running-$mode-preserves-invocation-and-successor"
   }
-  Write-DispatcherResult -Policy $normal.base;$script:fakeState='gone';$script:fakeJournal=[pscustomobject]@{observed=$true;exit_code=0}
+  Write-DispatcherResult -Policy $normal.base
+  $script:fakeState = 'gone'
+  $script:fakeJournal = [pscustomobject]@{observed=$false;exit_code=$null;incomplete=$true}
+  $observation = Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
+  Assert-Dispatcher ($null -ne $observation -and $observation.status -ceq 'waiting-for-native-exit-journal-observation' -and
+    $script:launches -eq 1 -and (Get-FileHash -LiteralPath $runningPath).Hash -ceq $runningHash -and
+    (Get-FileHash -LiteralPath $pendingPath).Hash -ceq $pendingHash -and
+    -not (Test-Path -LiteralPath $terminalPath)) 'journal-unavailable-preserves-invocation-and-successor'
+  $script:fakeJournal = [pscustomobject]@{observed=$true;exit_code=0}
   $null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   $terminal=Read-DispatcherTerminal -Control $normal -RequestId $normal.base.approval.request_id
   Assert-Dispatcher ($terminal.status-ceq'succeeded'-and$terminal.packet_sha256-ceq$normal.base.approval.packet_sha256-and$terminal.completion_envelope_sha256-match'^[A-F0-9]{64}$') 'packet-result-invocation-envelope-success'
