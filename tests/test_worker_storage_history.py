@@ -1287,6 +1287,23 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
               assert(not pcall(history.apply_default_owner_transfer,plan)and writes==0 and same(before,all_frames()))
             ''')
 
+    def test_default_transfer_preserves_newer_parked_work_on_a_later_force(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  seed_owner()
+                  local updated, owner = nil, storage[OWNER_KEY]
+                  after_first_level_write(player.technologies[ORDINARY], function()
+                    detached.technologies[CANONICAL].saved_progress = .71
+                    updated = frame(detached)
+                  end)
+                  local ok, message = pcall(transfer)
+                  assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+                  assert(updated and updated.source.saved == .71 and same(frame(detached), updated))
+                  assert(storage[OWNER_KEY] == owner and not history.default_owner_mutating{force=player})
+                ''')
+
     def test_malformed_old_split_record_and_native_owner_drift_refuse(self):
         for change in ('state.schema=2;state.kind="split-default"','state.owner="mir-worker-storage-default-5"',
                        'state.producer.old_version="5.0.21042"','state.forces[2].retired_flags.disabled_by_mir=true',
@@ -2137,6 +2154,31 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(pending.forces[player.index].phase=="legacy-completion-pending"
             and pending.forces[suspended.index].phase=="legacy-completion-pending")
           assert(player.technologies[ORDINARY].level==6 and second.researched and suspended.research_progress==1)
+        ''')
+
+    def test_published517_paid_bridge_preserves_newer_active_work_on_a_later_force(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract()
+          init_default()
+          for _, force in ipairs({player, detached}) do
+            finish_frame(force, "advanced", {ORDINARY}, false)
+            assert(history.default_owner_on_research_finished(finish_event(force)))
+            force.technologies[ORDINARY].saved_progress = .42
+            force.research_queue = {ORDINARY}
+            force.research_progress = .42
+          end
+          current_se_contract()
+          local plan = history.default_owner_preflight(published517_se_bridge_event(), nil, true)
+          local updated, owner = nil, storage[OWNER_KEY]
+          after_first_level_write(player.technologies[LEGACY517], function()
+            detached.research_progress = .71
+            updated = frame(detached)
+          end)
+          local ok, message = pcall(history.default_owner_apply, plan)
+          assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+          assert(updated and updated.current == ORDINARY and updated.progress == .71)
+          assert(same(frame(detached), updated) and storage[OWNER_KEY] == owner)
         ''')
 
     def test_published517_exact_settings_admit_the_paid_bridge_when_an_unrelated_setting_changed(self):
@@ -3158,6 +3200,25 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
               if fail then assert(not ok and tostring(e):find("injected provider native setter",1,true)and storage.mir_worker_storage_route==oldkey)
               else assert(ok);history.apply(legacy)end
             ''')
+
+    def test_provider_transfer_preserves_newer_parked_work_on_a_later_force(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  full_source(1, true)
+                  finite_entry(1)
+                  local plan = delegate()
+                  local updated, owner, quota = nil, storage[OWNER_KEY], storage.mir_worker_storage_route
+                  after_first_level_write(player.technologies[ID], function()
+                    detached.technologies[ORDINARY].saved_progress = .71
+                    updated = frame(detached)
+                  end)
+                  local ok, message = pcall(history.default_owner_apply, plan)
+                  assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+                  assert(updated and updated.owner.saved == .71 and same(frame(detached), updated))
+                  assert(storage[OWNER_KEY] == owner and storage.mir_worker_storage_route == quota)
+                ''')
 
     def test_completed_owner_cursor_normalizes_without_inventing_any_unfinished_quota(self):
         lua=self.world();lua.execute(r'''
