@@ -260,6 +260,32 @@ class NativeGunCreditTests(unittest.TestCase):
           expect(f,.34,.34)
         ''')
 
+    def test_retired_paid_level_survives_own_excess_queue_removal(self):
+        self.lua.execute('''
+          local f=make_force(1,1,true,false);credit.on_init()
+          local main, foreign=f.technologies[main_id], f.technologies.foreign
+          f.research_queue={foreign};f.current_research=foreign;main.saved_progress=.24
+          set_mask(f,false,false)
+          local observed={}
+          credit.set_retirement_policy(function(force,name,limit)
+            assert(force==f and name==main_id)
+            observed[#observed+1]=limit or "closed"
+            if #observed==2 then
+              credit.on_research_cancelled({force=f,research={[main_id]=1}})
+            end
+          end)
+          configure({})
+          assert(observed[1]==2 and credit.has_retired_work(f,main_id))
+          assert(not credit.has_retired_work(f,"foreign"))
+          f.research_queue={main,main,foreign};f.current_research=main;main.saved_progress=0
+          credit.on_research_queue_event({research=main})
+          assert(observed[2]==2 and credit.has_retired_work(f,main_id))
+          main.level=3;f.research_queue={foreign};f.current_research=foreign
+          assert(credit.on_research_finished({research=main}))
+          expect(f,.34,0)
+          assert(observed[3]=="closed" and not credit.has_retired_work(f,main_id))
+        ''')
+
     def test_detached_private_work_keeps_only_its_prior_payable_category(self):
         for mode in ("already_detached", "cancelled_after_retirement"):
             with self.subTest(mode=mode):
