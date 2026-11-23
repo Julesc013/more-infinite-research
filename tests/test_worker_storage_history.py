@@ -1008,6 +1008,69 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=Path(__file__).resolve().parents[1] / "source"
         )
 
+    def test_initial_native_mirror_keeps_one_award_and_unrelated_work(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  game.tick=0
+                  set_reward(.25)
+                  prototypes.technology[CANONICAL].visible_when_disabled=false
+                  for _,f in ipairs{player,detached}do
+                    f.technologies[CANONICAL].level=5
+                    f.technologies[ORDINARY].level=5
+                  end
+                  player.research_queue={OTHER}
+                  player.research_progress=.625
+                  assert(player.worker_robots_storage_bonus==20.5)
+                  local before=frame(player)
+                  queue_writes={};progress_writes={}
+                  history.on_init(nil)
+                  assert(history.default_owner_on_init(nil,true))
+                  for _,f in ipairs{player,detached}do
+                    local after=frame(f)
+                    assert(after.bonus==20.25 and after.owner.level==5 and after.owner.enabled)
+                    assert(after.source.level==5 and not after.source.enabled)
+                    assert(after.debit.level==5 and not after.debit.enabled)
+                    assert(storage[OWNER_KEY].forces[f.index].retired_flags.disabled_by_mir)
+                  end
+                  local after=frame(player)
+                  assert(same(before.owner,after.owner) and same(before.queue,after.queue))
+                  assert(after.current==before.current and after.progress==before.progress)
+                  assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                  local saved=all_frames();writes=0
+                  history.default_owner_on_load()
+                  assert(same(saved,all_frames()) and writes==0)
+                ''')
+
+    def test_initial_native_mirror_rejects_other_earned_or_unfinished_frames(self):
+        for change in (
+            "game.tick=1",
+            "game.tick=nil",
+            "detached.technologies[CANONICAL].level=4",
+            "detached.technologies[ORDINARY].level=4",
+            "detached.technologies[ORDINARY].level=6",
+            "detached.technologies[ORDINARY].saved_progress=.125",
+            "detached.technologies[CANONICAL].saved_progress=.125",
+            "detached.research_queue={ORDINARY}",
+            "detached.technologies[HEAD].level=5;detached.technologies[HEAD].enabled=false",
+        ):
+            with self.subTest(change=change):
+                lua = self.world()
+                lua.execute(r'''
+                  game.tick=0
+                  prototypes.technology[CANONICAL].visible_when_disabled=false
+                  for _,f in ipairs{player,detached}do
+                    f.technologies[CANONICAL].level=5
+                    f.technologies[ORDINARY].level=5
+                  end
+                ''' + change + r'''
+                  history.on_init(nil)
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_on_init,nil,true))
+                  assert(same(before,all_frames()) and writes==0 and storage[OWNER_KEY]==nil)
+                ''')
+
     def published517_world(self, cap):
         """Use the three actual published B0BF producer bodies, not a current initializer."""
         revision = "17e78c4d5d339413668e30e8eb422b915d390179"
