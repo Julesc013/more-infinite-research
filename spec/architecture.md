@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -97,6 +97,20 @@ Local validation is not a sandbox: data-stage mods share prototype access and ca
 `ARCH-10` — A new ordinary family should change its declaration and focused test; a new integration should change its adapter, one activation entry and relevant tests/docs. Changes to many infrastructure authorities require design review before proceeding.
 
 Readable compact code is preferred over compressed code. Core LOC/import growth, output size and tooling latency are review signals, not numerical substitutes for maintainability. No dependency-injection container, universal event bus, plugin registry or schema platform without a demonstrated consumer that cannot be served directly.
+
+## Declarative support and bounded behavior
+
+`ARCH-12` — Extend existing semantics through authored data. New technologies, native effects, science/cost vectors, settings metadata, explicit provider bindings and authenticated historical constants should reuse the existing constructors, validators and lifecycle operations whenever their behavior is already supported. Do not add a mod-name or technology-name branch to a shared algorithm merely to supply different facts. Keep one owner for each current fact; frozen historical contracts remain separately identified evidence and must not be regenerated from current defaults.
+
+A genuinely new engine capability, side effect or preservation invariant may require a small named Lua operation. Explain the concrete consumer and why the existing operation cannot express its behavior safely; define its authority, inputs, writes, failure behavior and work bound. Keep instance-specific choices in declarations. Do not encode arbitrary callbacks, control flow, recursive discovery, a mutation journal or a new expression interpreter in data to make the code count appear smaller. Native engine formulas remain native engine inputs. Prefer direct readable Lua tables over another production schema, registry or compiler.
+
+Fix the violated invariant across its actual consumers. Define the supported equivalence class by relevant contracts, authority and state, not by the first reporter's mod name. Addition, removal, replacement, setting changes and engine updates belong to the same repair only where those obligations match; inspect the relevant directions and lifecycle paths and explain exclusions. Successful handling of one member does not establish arbitrary-mod support. A missing historical fact remains unknown even when a descriptor names an intended transition.
+
+Declarations do not grant ownership or make mutation atomic. A historical reader may select a proven predecessor contract and supply constants to an existing transition; the transition still authenticates saved authority, distinguishes empty from invested work on every affected force, revalidates observations before its permitted writes and checks the result. Preserve published migration filenames and identities. Do not create a universal migration executor merely to represent every older branch as data.
+
+Third-party support uses the existing MIR API's documented lifecycle, dependency and capability boundaries. Its current admitted declaration subset is not a complete technology or migration API. Any added capability needs a real consumer, compatible versioning and independent tests; an external declaration cannot silently expand the existing API or authorize writes to another owner's saved state. Dependencies do not make MIR's final-fixes stage globally last, and this boundary cannot sandbox other mods.
+
+Evaluate the complete change: executable logic, declarations, shared helpers, retained state, emitted prototypes, imports and developer tooling. Prefer removing duplicated policy and unnecessary work; do not hide growth in generated tables or reject a necessary correctness repair solely because it adds lines. New output has an unavoidable processing/storage cost. After lightweight activation selection, an absent integration or inactive override must not import its implementation body, construct its mapping tables or enumerate prototypes, except for explicit reconciliation of existing saved obligations. For affected paths, demonstrate unchanged or justified bounded work and resource use through the existing `PERF-05` controls and applicable native evidence. No new acceptance framework or blanket full-campaign rerun follows from this requirement.
 
 ## References
 
