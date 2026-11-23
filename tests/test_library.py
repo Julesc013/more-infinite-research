@@ -920,6 +920,49 @@ class LibraryTests(unittest.TestCase):
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
+    def test_new_native_lists_start_with_final_items_without_a_readback(self):
+        for tab, name in (
+            ("research", "mir_library_results"),
+            ("settings", "mir_library_settings_list"),
+            ("queue", "mir_library_queue_list"),
+        ):
+            with self.subTest(tab=tab):
+                self.lua.execute('''
+                  local tab, name = ...
+                  local make_container = gui_container
+                  local created, reads, writes = 0, 0, 0
+                  gui_container = function(parent)
+                    local container = make_container(parent)
+                    local add = container.add
+                    container.add = function(spec)
+                      local element = add(spec)
+                      if spec.name ~= name then return element end
+                      created = created + 1
+                      local items = spec.items
+                      assert(type(items) == "table" and #items > 0 and spec.selected_index == 1,
+                        "create the native list with its actual items and selection")
+                      rawset(element, "items", nil)
+                      local meta = getmetatable(element)
+                      local read, write = meta.__index, meta.__newindex
+                      meta.__index = function(target, key)
+                        if key == "items" then reads = reads + 1; return items end
+                        return read(target, key)
+                      end
+                      meta.__newindex = function(target, key, value)
+                        if key == "items" then writes = writes + 1; items = value; return end
+                        write(target, key, value)
+                      end
+                      return element
+                    end
+                    return container
+                  end
+                  boot()
+                  local root = library.open(player, {tab = tab, selected = gear.name})
+                  gui_container = make_container
+                  assert(root and created == 1 and reads == 0 and writes == 0,
+                    "fresh native lists do not need an items read or write after creation")
+                ''', tab, name)
+
     def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
         self.lua.execute('''
           boot()

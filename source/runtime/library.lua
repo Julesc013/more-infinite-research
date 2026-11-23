@@ -1640,7 +1640,7 @@ local function update_list_items(list, items, selected_index)
   if changed then list.items = items end
   local selection_changed = list.selected_index ~= selected_index
   if selection_changed then list.selected_index = selected_index end
-  return changed, selection_changed
+  return changed or selection_changed
 end
 
 local function update_research_content(content, player, view, context, translations, localized_search_pending, observed)
@@ -1738,7 +1738,7 @@ local function update_research_content(content, player, view, context, translati
   if created then
     results = add(list_pane, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
   end
-  local items_changed, selection_changed = update_list_items(results, item_labels, selected_index)
+  local changed = not created and update_list_items(results, item_labels, selected_index)
   if results.style then results.style.width, results.style.height = panes.list_width, math.max(76, panes.list_height - header_height) end
   -- A selected technology's row can move while the Library is closed.
   -- Older views can still restore their saved numeric positions.
@@ -1746,7 +1746,7 @@ local function update_research_content(content, player, view, context, translati
   if created and type(scroll_index) == "number" and scroll_index > 0
       and scroll_index <= #item_labels and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(scroll_index, "top-third")
-  elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
+  elseif changed and selected_index > 0 and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(selected_index, "in-view")
   end
   local detail, reason
@@ -2022,9 +2022,9 @@ local function update_settings_content(content, view, preserve_query, translatio
   dynamic[PREFIX .. "settings_scope_label"].caption = {"mir-browser.settings-scope-" .. view.settings_scope}
   dynamic[PREFIX .. "settings_count"].style.width = panes.list_width
   dynamic[PREFIX .. "settings_scope_label"].style.width = panes.detail_width
-  local items_changed, selection_changed = update_list_items(list, items, selected_index)
+  local changed = created or update_list_items(list, items, selected_index)
   if list.style then list.style.width, list.style.height = panes.list_width, panes.list_height end
-  if (created or items_changed or selection_changed) and selected_index > 0 and type(list.scroll_to_item) == "function" then
+  if changed and selected_index > 0 and type(list.scroll_to_item) == "function" then
     list.scroll_to_item(selected_index, created and "top-third" or "in-view")
   end
   if detail.style then
@@ -2049,27 +2049,6 @@ end
 
 local function update_queue_content(content, player, view)
   if not valid(content) then return end
-  local list = content[PREFIX .. "queue_list"]
-  if not valid(list) or not valid(content[PREFIX .. "queue_heading"]) then
-    content.clear()
-    add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
-    add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
-    add(content, {type = "label", name = PREFIX .. "queue_heading", caption = {"mir-browser.queue"}})
-    list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = {}})
-    add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
-  end
-  local unavailable = content[PREFIX .. "queue_unavailable"]
-  if not valid(unavailable) then
-    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
-      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
-  end
-  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
-  local available_width = math.max(1, width - 64)
-  list.style.width = available_width
-  list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
-  local guidance = content[PREFIX .. "queue_guidance"]
-  guidance.style.single_line, guidance.style.maximal_width = false, available_width
-  unavailable.style.single_line, unavailable.style.maximal_width = false, available_width
   local observed = queue_entries(player.force)
   local ids, items = observed or {}, {}
   local context = DISCOVERY_TREE and context_for(player.force) or nil
@@ -2083,7 +2062,29 @@ local function update_queue_content(content, player, view)
   end
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
-  update_list_items(list, items, selected_index)
+  local list = content[PREFIX .. "queue_list"]
+  if not valid(list) or not valid(content[PREFIX .. "queue_heading"]) then
+    content.clear()
+    add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
+    add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
+    add(content, {type = "label", name = PREFIX .. "queue_heading", caption = {"mir-browser.queue"}})
+    list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = items, selected_index = selected_index})
+    add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
+  else
+    update_list_items(list, items, selected_index)
+  end
+  local unavailable = content[PREFIX .. "queue_unavailable"]
+  if not valid(unavailable) then
+    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
+      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
+  end
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local available_width = math.max(1, width - 64)
+  list.style.width = available_width
+  list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
+  local guidance = content[PREFIX .. "queue_guidance"]
+  guidance.style.single_line, guidance.style.maximal_width = false, available_width
+  unavailable.style.single_line, unavailable.style.maximal_width = false, available_width
   list.visible = #items > 0
   content[PREFIX .. "queue_empty"].visible = observed ~= nil and #items == 0
   unavailable.visible = observed == nil
