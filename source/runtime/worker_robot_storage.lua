@@ -1779,6 +1779,16 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
       local refresh = context.created_force == force.index or context.reset_force == force.index
+      -- A scenario can grant both authored aliases before MIR initializes.
+      -- on_init also runs on first install in an existing game. Require the
+      -- observed map-start tick for an automatic debit of the mirrored level.
+      local mirrored_first = initializing and not owned and not refresh and game.tick == 0
+        and source.next_level == 5 and destination.next_level == 5 and source.count == destination.count
+        and not source.researched and not destination.researched and not gate_paid(gate)
+        and source.enabled and source_prototype.enabled and destination.enabled and prototype.enabled
+        and source.visible == source_prototype.visible_when_disabled and destination.visible == prototype.visible_when_disabled
+        and not default_owner_frame_has_unsettled_work(source, recovery.canonical)
+        and not default_owner_frame_has_unsettled_work(destination, id)
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
       -- A configuration can re-enable either side of the paid pair. To
@@ -1811,12 +1821,12 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         -- this force's authenticated paid work until its ordinary completion.
       elseif not prior or refresh then
         if owned and not refresh then recover_error("default force history is missing") end
-        if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
+        if not mirrored_first and (destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
             or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
-            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
+            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate)) then
           recover_error("full default owner/debit is not pristine")
         end
-        if (initializing or refresh) and (source.next_level ~= 4 or source.researched
+        if not mirrored_first and (initializing or refresh) and (source.next_level ~= 4 or source.researched
             or source.saved_progress ~= 0 or source.occurrences ~= 0) then
           recover_error("first initialization/new force cannot adopt existing default work")
         end
@@ -1840,7 +1850,8 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         end
         if source.occurrences > 0 then requeueable(force, source, true, true) end
         if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
-        action, moved = "transfer", true
+        action = mirrored_first and "first-credit" or "transfer"
+        moved = moved or action == "transfer"
         next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
           disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
       elseif not full_pair(source, destination, gate, settle_source) then
@@ -1854,7 +1865,8 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       record.forces[force.index] = next_force
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled, settle_source=settle_source,
-        bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
+        bonus=native_bonus(force) - (mirrored_first and source_prototype.effects[1].modifier or 0),
+        phase=next_force and next_force.phase or "owned", legacy=legacy,
         moved=action == "transfer", action=action,
         target_enabled=public.enabled, target_visible=public.visible}
     end
@@ -1938,9 +1950,9 @@ function M.apply_default_owner_transfer(plan)
           if frame.current == (fresh.prepared_default and recovery.id or recovery.canonical) then item.force.research_progress = frame.current_progress end
           if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("native full default work price differs") end
         elseif item.action == "first-credit" then
-          -- The paid work is already on T4. Never rewrite its queue or progress
-          -- at completion, including the observed nil-current/queued remainder.
-          canonical.level = 5
+          -- The ordinary owner already holds the credit. Keep its queue and
+          -- progress, including an observed nil-current/queued remainder.
+          if canonical.level ~= 5 then canonical.level = 5 end
           canonical.enabled, canonical.visible_when_disabled = false, frame.visible
           set_gate_paid(gate, true)
         elseif item.action == "settle-flags" then
