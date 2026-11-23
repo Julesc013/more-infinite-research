@@ -149,6 +149,8 @@ def main():
                 counts["python"] += 1
             elif path.suffix == ".md":
                 text = path.read_text(encoding="utf-8")
+                if "\0" in text:
+                    raise CheckError("Markdown contains a NUL character")
                 counts["markdown"] += 1
                 if relative.startswith("spec/"):
                     for requirement in re.findall(r"^`([A-Z]+-[0-9]+)`\s*[—-]", text, re.M):
