@@ -22,7 +22,7 @@ class BootstrapTests(unittest.TestCase):
         )
 
     def test_se_scripted_policy_preflights_first_and_applies_after_existing_reconciliation(self):
-        for mode in ("success", "policy-refusal", "other-preflight-refusal"):
+        for mode in ("success", "observe", "policy-refusal", "other-preflight-refusal"):
             with self.subTest(mode=mode):
                 self.setUp()
                 self.lua.globals().policy_mode = mode
@@ -42,18 +42,26 @@ class BootstrapTests(unittest.TestCase):
                       assert(event.marker=="SE-policy"and library_calls.configuration==nil)
                       policy_preflight_seen=(policy_preflight_seen or 0)+1
                       if policy_mode=="policy-refusal"then error("SE policy refused")end
-                      return "SE-plan"
+                      if policy_mode~="observe"then return "SE-plan"end
                     end,
                     apply=function(plan)
-                      assert(plan=="SE-plan"and library_calls.configuration.marker=="SE-policy")
+                      assert(library_calls.configuration.marker=="SE-policy")
+                      assert(plan==(policy_mode~="observe"and "SE-plan"or nil))
                       policy_apply_seen=(policy_apply_seen or 0)+1
+                      return plan~=nil
+                    end,
+                    observe=function()
+                      assert(policy_apply_seen==1 and library_calls.configuration.marker=="SE-policy")
+                      policy_observe_seen=(policy_observe_seen or 0)+1
                     end}end
                   load_control()
                   local ok,message=pcall(handlers.configuration,{marker="SE-policy",mod_changes={}})
                   assert(policy_preflight_seen==1)
-                  if policy_mode=="success"then assert(ok,message);assert(policy_apply_seen==1)
+                  if policy_mode=="success" or policy_mode=="observe"then
+                    assert(ok,message);assert(policy_apply_seen==1)
+                    assert(policy_observe_seen==(policy_mode=="observe"and 1 or nil))
                   else assert(not ok and tostring(message):find("refused",1,true))
-                    assert(policy_apply_seen==nil and library_calls.configuration==nil)end
+                    assert(policy_apply_seen==nil and policy_observe_seen==nil and library_calls.configuration==nil)end
                 ''')
 
     def test_se_scripted_policy_body_is_not_imported_for_an_inactive_target_or_provider(self):
@@ -68,7 +76,10 @@ class BootstrapTests(unittest.TestCase):
                   local active={};active["space-exploration"]=selected_provider
                   install_runtime(nil,active)
                   package.preload["runtime.space_exploration_system_force"]=function()error("inactive body import")end
-                  load_control();handlers.configuration({mod_changes={}})
+                  load_control()
+                  local old_force={name="conquest"};storage.mir_se_conquest_policy_force=old_force
+                  handlers.configuration({mod_changes={}})
+                  assert(storage.mir_se_conquest_policy_force==(selected_target=="f210"and old_force or nil))
                 ''')
 
     def test_actual_bootstrap_keeps_gate_only_configuration_after_legacy_commit(self):
