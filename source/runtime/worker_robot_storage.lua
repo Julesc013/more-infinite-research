@@ -2636,11 +2636,13 @@ end
 function M.default_owner_on_research_finished(event, record_completed_worker_cap)
   local force, research = event and event.research and event.research.force, event and event.research
   if not default_head_pending or not force or M.default_owner_mutating(event) then return false, false end
+  local name = research.name
+  if name ~= recovery.ordinary_default_id and name ~= recovery.published517_se_id then return false, false end
   local state = owner_record()
-  if state and state.schema == 4 and research.name == recovery.published517_se_id then
+  if state and state.schema == 4 and name == recovery.published517_se_id then
     return settle_published517_se_paid_completion(state, force, event, record_completed_worker_cap)
   end
-  if research.name ~= recovery.ordinary_default_id then return false, false end
+  if name ~= recovery.ordinary_default_id then return false, false end
   if not state or not state.forces[force.index] then recover_error("default completion has unknown force history") end
   if event.by_script ~= false then recover_error("full default completion must be ordinary native research") end
   local owner = force.technologies[recovery.ordinary_default_id]
@@ -2654,16 +2656,14 @@ function M.default_owner_on_research_finished(event, record_completed_worker_cap
 end
 
 function M.default_owner_on_force_created(event)
-  local retired = owner_record()
-  if retired and retired.kind == "provider-retired" then return false end
-  if not owner_record() or not event or not event.force then return false end
+  local state = owner_record()
+  if not state or state.kind == "provider-retired" or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {created_force=event.force.index}))
 end
 
 function M.default_owner_on_force_reset(event)
-  local retired = owner_record()
-  if retired and retired.kind == "provider-retired" then return false end
-  if not owner_record() or not event or not event.force then return false end
+  local state = owner_record()
+  if not state or state.kind == "provider-retired" or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {reset_force=event.force.index}))
 end
 

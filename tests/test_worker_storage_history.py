@@ -1008,6 +1008,26 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=Path(__file__).resolve().parents[1] / "source"
         )
 
+    def test_unrelated_research_does_not_read_the_worker_owner(self):
+        lua = self.world()
+        lua.execute(r'''
+          init_default()
+          local saved = assert(storage[OWNER_KEY])
+          local other = assert(player.technologies[OTHER])
+          assert(other.force == player)
+          storage[OWNER_KEY] = nil
+          local reads = 0
+          setmetatable(storage, {__index=function(_, key)
+            if key == OWNER_KEY then
+              reads = reads + 1
+              return saved
+            end
+          end})
+          local handled, changed = history.default_owner_on_research_finished{research=other, by_script=false}
+          assert(not handled and not changed)
+          assert(reads == 0, "unrelated research read the worker owner")
+        ''')
+
     def test_initial_native_mirror_keeps_one_award_and_unrelated_work(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
