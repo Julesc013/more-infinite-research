@@ -381,6 +381,7 @@ local function on_init()
   library.on_init()
   reconcile_repair()
   reconcile_translations()
+  if se_system_force then se_system_force.observe() end
   if diagnostics then diagnostics.startup("MIR initialization") end
 end
 
@@ -491,7 +492,11 @@ local function on_configuration_changed(event)
   reconcile_translations()
   -- Restore only the separately admitted SE scripted NPC policy, after all
   -- native plans have verified their original zero-contribution frames.
-  if se_system_force then se_system_force.apply(se_system_force_plan) end
+  if se_system_force then
+    if not se_system_force.apply(se_system_force_plan) then se_system_force.observe() end
+  elseif target.id == "f200" then
+    storage.mir_se_conquest_policy_force = nil
+  end
   if diagnostics then diagnostics.startup("MIR configuration change") end
 end
 

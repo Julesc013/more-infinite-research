@@ -7,12 +7,15 @@
 local M = {}
 local target = require("platform.target")
 local MIR = "more-infinite-research"
-local RECOVERED_FORCE = "mir_se_conquest_policy_force"
-local LOADERS = "aai-loaders"
+local OBSERVED_FORCE = "mir_se_conquest_policy_force"
+local SE = "space-exploration"
+local PROVIDERS = {base=true, [MIR]=true, [SE]=true, Krastorio2=true,
+  ["Krastorio2-spaced-out"]=true, ["space-age"]=true}
 local BASIC = {artillery=true, tank=true, radar=true, electronics=true,
   ["sulfur-processing"]=true, explosives=true, electricity=true,
   ["fuel-processing"]=true, ["repair-pack"]=true}
 local DEFAULTS = {5.65, 3, 1.8, 6, 2.2, 5.1}
+local RESET = {0, 0, 0, 0, 0, 0}
 local TECHNOLOGY_LIMIT = 16384
 
 local function require_policy(condition, reason)
@@ -23,12 +26,19 @@ local function finite(value)
   return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
 end
 
+local function supported(active)
+  return target.id == "f200" and active[SE] == "0.7.57" and active.base == "2.0.77"
+    and active.Krastorio2 == nil and active["Krastorio2-spaced-out"] == nil and active["space-age"] == nil
+    and type(target.distribution_version) == "string" and target.distribution_version ~= ""
+    and active[MIR] == target.distribution_version
+end
+
 local function historical_origin(changes, active)
   for name, change in pairs(changes) do
     if name ~= MIR then
       if type(change) ~= "table" or type(change.old_version) ~= "string"
           or type(change.new_version) ~= "string" or active[name] ~= change.new_version then return false end
-      if (name == "base" or name == "space-exploration") and change.old_version ~= change.new_version then
+      if (name == "base" or name == SE) and change.old_version ~= change.new_version then
         return false
       end
     end
@@ -36,15 +46,20 @@ local function historical_origin(changes, active)
   return true
 end
 
-local function loaders_added(changes, active)
-  local addition = changes[LOADERS]
-  if type(addition) ~= "table" or addition.old_version ~= nil
-      or addition.new_version ~= "0.2.11" or active[LOADERS] ~= addition.new_version then return false end
+local function recorded_origin(changes, active)
+  local addon_changed = false
   for name, change in pairs(changes) do
-    if name ~= LOADERS and (type(change) ~= "table" or type(change.old_version) ~= "string"
-        or change.old_version ~= change.new_version or active[name] ~= change.new_version) then return false end
+    if type(name) ~= "string" or name == "" or type(change) ~= "table" then return false end
+    local old, new = change.old_version, change.new_version
+    if (old ~= nil and (type(old) ~= "string" or old == ""))
+        or (new ~= nil and (type(new) ~= "string" or new == ""))
+        or (old == nil and new == nil) or new ~= active[name] then return false end
+    if old ~= new then
+      if PROVIDERS[name] then return false end
+      addon_changed = true
+    end
   end
-  return true
+  return addon_changed
 end
 
 local function values(force)
@@ -63,20 +78,26 @@ local function recipe_unlocks_only(prototype)
   return true
 end
 
-local function needs_restoration(force)
-  if not force or force.valid ~= true or force.name ~= "conquest" or force.ai_controllable ~= true
-      or not finite(force.index) or force.index <= 0 or force.index % 1 ~= 0
-      or game.forces[force.index] ~= force then return false end
+local function canonical_force(force)
+  return force and force.valid == true and force.name == "conquest" and force.ai_controllable == true
+    and finite(force.index) and force.index > 0 and force.index % 1 == 0 and game.forces[force.index] == force
+end
+
+local function fields_match(force, expected)
+  local readable, observed = pcall(values, force)
+  if not readable then return false end
+  for index = 1, 6 do
+    if observed[index] ~= expected[index] then return false end
+  end
+  return true
+end
+
+local function uninvested(force)
   for _ in pairs(force.players) do return false end
   if force.current_research ~= nil or force.research_progress ~= 0 then return false end
   local queue = force.research_queue
   if queue ~= nil and type(queue) ~= "table" and type(queue) ~= "userdata" then return false end
   for _ in pairs(queue or {}) do return false end
-  local readable, observed = pcall(values, force)
-  if not readable then return false end
-  for index = 1, 6 do
-    if observed[index] ~= 0 then return false end
-  end
   if type(force.set_gun_speed_modifier) ~= "function"
       or type(force.set_ammo_damage_modifier) ~= "function" then return false end
   local count, basics = 0, 0
@@ -98,10 +119,7 @@ end
 
 function M.preflight(event)
   local active = script and script.active_mods or {}
-  if target.id ~= "f200" or active["space-exploration"] ~= "0.7.57" or active.base ~= "2.0.77"
-      or active.Krastorio2 ~= nil or active["space-age"] ~= nil then return nil end
-  if type(target.distribution_version) ~= "string" or target.distribution_version == ""
-      or active[MIR] ~= target.distribution_version then return nil end
+  if not supported(active) then return nil end
   local changes = type(event) == "table" and event.mod_changes
   if type(changes) ~= "table" then return nil end
   local change = changes[MIR]
@@ -112,15 +130,22 @@ function M.preflight(event)
   -- An ambiguous NPC configuration must not stop an otherwise valid save.
   if historical then
     if not historical_origin(changes, active) then return nil end
-  elseif not loaders_added(changes, active) or storage[RECOVERED_FORCE] == nil then
+  elseif storage[OBSERVED_FORCE] == nil or not recorded_origin(changes, active) then
     return nil
   end
   local force = game.forces.conquest
-  -- Adding AAI Loaders can reset all six native fields while MIR is unchanged.
-  -- A prior successful restoration identifies the same force across saves.
-  if not historical and force ~= storage[RECOVERED_FORCE] then return nil end
-  if not needs_restoration(force) then return nil end
+  -- The native reference survives saves and identifies the observed force.
+  if not historical and force ~= storage[OBSERVED_FORCE] then return nil end
+  if not canonical_force(force) or not fields_match(force, RESET) or not uninvested(force) then return nil end
   return {force=force, event=event, used=false}
+end
+
+function M.observe()
+  local active = script and script.active_mods or {}
+  local force = supported(active) and game.forces.conquest
+  local observed
+  if canonical_force(force) and fields_match(force, DEFAULTS) and uninvested(force) then observed = force end
+  storage[OBSERVED_FORCE] = observed
 end
 
 function M.apply(plan)
@@ -137,7 +162,8 @@ function M.apply(plan)
   force.set_ammo_damage_modifier("laser", DEFAULTS[6])
   local observed = values(force)
   for index = 1, 6 do require_policy(observed[index] == DEFAULTS[index], "scripted policy readback differs: " .. index) end
-  storage[RECOVERED_FORCE] = force
+  storage[OBSERVED_FORCE] = force
+  return true
 end
 
 return M
