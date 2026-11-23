@@ -167,24 +167,30 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
           assert(policy.preflight(event)==nil)
         ''')
 
-    def test_verified_conquest_defaults_survive_removing_aai_loaders(self):
-        self.replay_loaders_addition(recovered=True)
-        self.lua.execute('''
-          policy.apply(assert(policy.preflight(event)))
-          fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
-          fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
-          native_writes={}
-          active["aai-loaders"]=nil
-          event={mod_startup_settings_changed=true,mod_changes={
-            ["aai-loaders"]={old_version="0.2.11"}}}
-          local plan=assert(policy.preflight(event))
-          assert(#native_writes==0)
-          policy.apply(plan)
-          assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
-          assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
-          assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
-          assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
-        ''')
+    def test_recorded_conquest_defaults_survive_removing_unrelated_addons(self):
+        for addon, version in (("aai-loaders", "0.2.11"), ("jetpack", "0.4.17")):
+            with self.subTest(addon=addon):
+                self.setUp()
+                self.replay_loaders_addition(recovered=True)
+                self.lua.execute('''
+                  local addon, version = ...
+                  assert(active[addon]==version)
+                  policy.apply(assert(policy.preflight(event)))
+                  fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+                  fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+                  native_writes={}
+                  active[addon]=nil
+                  event={mod_startup_settings_changed=true,mod_changes={
+                    [addon]={old_version=version}}}
+                  local plan=assert(policy.preflight(event))
+                  assert(#native_writes==0)
+                  policy.apply(plan)
+                  assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
+                  assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
+                  assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
+                  assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
+                  assert(foreign.research_progress==.039024390243902 and forbidden_writes==0)
+                ''', addon, version)
 
     def test_later_configuration_requires_a_recorded_force_and_coherent_changes(self):
         self.replay_loaders_addition(recovered=False)
