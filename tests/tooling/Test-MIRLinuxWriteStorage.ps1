@@ -152,6 +152,7 @@ try{
         try{
           $config=$launchConfig;$writeData=$launchWrite;$activation=$launchActivation;$engine=$launchEngine
           $historicalProcess=$true;$historical=$true;$historicalFixture=@{factorio_version='0.13'}
+          $historicalProcessVersion=$historicalFixture.factorio_version
           $activeModsObserverName='';$resources=[pscustomobject]@{policy=$launchPolicy};$TimeoutSeconds=30;$AdmissionWaitSeconds=0
           Refuses-Storage {Invoke-FixtureStage -Name 'launch-composition-control' -StageArguments @('--create','unused.zip')} '[storage-control-before-native-process]'
         }finally{Set-Item Function:Invoke-MIRNativeProbeFactorioProcess $processActor}
