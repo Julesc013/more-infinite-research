@@ -894,6 +894,8 @@ local function require_archived_default_contract(event, state, current, space_ag
   if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
+local PUBLISHED473_F210_WORKER_ADDONS = {["Return-Inserter"]="1.0.0", ["spider-launcher"]="2.9.87"}
+
 local function published473_worker_has_known_editors()
   if not prototypes or type(prototypes.get_history) ~= "function" then return false end
   local observed = prototypes.get_history("technology", recovery.canonical)
@@ -926,7 +928,8 @@ local function published473_space_age_selection(event, change, active)
   local has_other_mods = false
   for name, version in pairs(active) do
     if name ~= MIR and not ENGINE_MODS[name] then
-      if not f210 or type(name) ~= "string" or type(version) ~= "string" or version == "" then return false end
+      -- Current editor history cannot establish the predecessor's price.
+      if not f210 or PUBLISHED473_F210_WORKER_ADDONS[name] ~= version then return false end
       has_other_mods = true
     end
   end
@@ -939,8 +942,8 @@ local function published473_space_age_selection(event, change, active)
       elseif not f210 or item.old_version ~= item.new_version then return false end
     end
   end
-  -- Unchanged addons are admitted only with a readable worker prototype history.
-  -- The caller separately checks the archived price, science and native work.
+  -- Verify the current prototype too. The caller checks the archived price,
+  -- science and native work before any transfer.
   return not has_other_mods or published473_worker_has_known_editors()
 end
 

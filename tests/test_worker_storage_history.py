@@ -3651,10 +3651,9 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                     end
                   end
                   if selection=="space-age-engine-patch-with-addons"then
-                    local addons={CleanedConcrete="2.1.0",["even-distribution-fork"]="2.1.2",
-                      pump="2.2.6",["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
+                    local addons={["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
                     for name,version in pairs(addons)do script.active_mods[name]=version end
-                    event.mod_changes.pump={old_version="2.2.6",new_version="2.2.6"}
+                    event.mod_changes["Return-Inserter"]={old_version="1.0.0",new_version="1.0.0"}
                     local read=prototypes.get_history
                     prototypes.get_history=function(kind,id)
                       local result=read(kind,id)
@@ -3701,23 +3700,41 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
               event.mod_changes.recycler=nil
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
-            "missing worker editor history": 'script.active_mods.observer="1.0.0"',
+            "missing worker editor history": 'script.active_mods["Return-Inserter"]="1.0.0"',
             "foreign worker edit": '''
-              script.active_mods.observer="1.0.0"
+              script.active_mods["Return-Inserter"]="1.0.0"
               local read=prototypes.get_history
               prototypes.get_history=function(kind,id)
                 local result=read(kind,id)
-                if kind=="technology" and id==CANONICAL then result.changed={"observer"} end
+                if kind=="technology" and id==CANONICAL then result.changed={"Return-Inserter"} end
                 return result
               end
             ''',
             "changed addon with known worker editors": '''
-              script.active_mods.observer="1.0.1"
-              event.mod_changes.observer={old_version="1.0.0",new_version="1.0.1"}
+              script.active_mods["Return-Inserter"]="1.0.0"
+              event.mod_changes["Return-Inserter"]={old_version="0.9.9",new_version="1.0.0"}
               local read=prototypes.get_history
               prototypes.get_history=function(kind,id)
                 local result=read(kind,id)
                 if kind=="technology" and id==CANONICAL then result.changed={"space-age"} end
+                return result
+              end
+            ''',
+            "historical-only addon edit with clean current history": '''
+              script.active_mods["mir-fixture-worker-source-only-price"]="0.1.0"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={} end
+                return result
+              end
+            ''',
+            "another version of an admitted addon": '''
+              script.active_mods["Return-Inserter"]="1.0.1"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={} end
                 return result
               end
             ''',
