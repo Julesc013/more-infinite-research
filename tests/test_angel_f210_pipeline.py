@@ -15,6 +15,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from lua_table_values import to_lua as _lua_value
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "source"
@@ -30,20 +32,6 @@ UPSTREAM_RESULT_SHA256 = {
     "base": "E42C6B6CB1E90B633367B8CF73C61A91DF3D5C3434536BA41B20BD0CE7E8191A",
     "space_age": "01CB0E564309D1FDA289AB41722993F3EEC324E0464D20BBA3BC098C95FC4D07",
 }
-
-
-def _lua_value(lua, value):
-    if isinstance(value, dict):
-        table = lua.table()
-        for key, nested in value.items():
-            table[key] = _lua_value(lua, nested)
-        return table
-    if isinstance(value, list):
-        table = lua.table()
-        for index, nested in enumerate(value, start=1):
-            table[index] = _lua_value(lua, nested)
-        return table
-    return value
 
 
 def _plain(value):
