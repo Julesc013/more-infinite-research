@@ -3411,8 +3411,9 @@ function M.subscription_needs()
   local ledger = existing_translation_ledger(state)
   if not ledger then return false end
   for _, group in ipairs({ledger.active, ledger.retired}) do
-    for _, entry in pairs(group) do
-      if entry_pending(entry) then return true end
+    for index, entry in pairs(group) do
+      local pending = entry_pending(entry)
+      if whole_number(index, 1) and pending and translation_queue.issued_window_can_expire(pending) then return true end
     end
   end
   return false
