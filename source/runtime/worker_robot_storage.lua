@@ -1780,8 +1780,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
       local refresh = context.created_force == force.index or context.reset_force == force.index
       -- A scenario can grant both authored aliases before MIR initializes.
-      -- Admit exactly one mirrored first level with no native work to move.
-      local mirrored_first = initializing and not owned and not refresh
+      -- on_init also runs on first install in an existing game. Require the
+      -- observed map-start tick for an automatic debit of the mirrored level.
+      local mirrored_first = initializing and not owned and not refresh and game.tick == 0
         and source.next_level == 5 and destination.next_level == 5 and source.count == destination.count
         and not source.researched and not destination.researched and not gate_paid(gate)
         and source.enabled and source_prototype.enabled and destination.enabled and prototype.enabled

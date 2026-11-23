@@ -1013,6 +1013,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             with self.subTest(target=target):
                 lua = self.world(target)
                 lua.execute(r'''
+                  game.tick=0
                   set_reward(.25)
                   prototypes.technology[CANONICAL].visible_when_disabled=false
                   for _,f in ipairs{player,detached}do
@@ -1044,6 +1045,8 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
     def test_initial_native_mirror_rejects_other_earned_or_unfinished_frames(self):
         for change in (
+            "game.tick=1",
+            "game.tick=nil",
             "detached.technologies[CANONICAL].level=4",
             "detached.technologies[ORDINARY].level=4",
             "detached.technologies[ORDINARY].level=6",
@@ -1055,6 +1058,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             with self.subTest(change=change):
                 lua = self.world()
                 lua.execute(r'''
+                  game.tick=0
                   prototypes.technology[CANONICAL].visible_when_disabled=false
                   for _,f in ipairs{player,detached}do
                     f.technologies[CANONICAL].level=5
