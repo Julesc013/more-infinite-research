@@ -1001,6 +1001,10 @@ try{
     # sole closed pending save directly at the active-save destination.
     # Agriculture still creates seed.zip and has its existing server stage.
     $seed=if($activeSeed -and $ActiveSeedKind -ceq 'repair-stress'){$activeSave}else{Join-Path $writeData 'saves/seed.zip'}
+    if($IsLinux -and $historicalProcessVersion -ceq "0.14"){
+      # Factorio 0.14 checks removal of this directory even on a fresh create.
+      [IO.Directory]::CreateDirectory((Join-Path $writeData 'temp/currently-playing')) | Out-Null
+    }
     $createArguments=@(Get-FixtureCreateArguments -Seed $seed -Case $CaseName -OnlyCreate ([bool]$CreateOnly))
     $record.create=Invoke-FixtureStage 'create' $createArguments
     $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
