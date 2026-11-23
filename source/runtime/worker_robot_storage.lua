@@ -878,20 +878,9 @@ local function require_archived_default_contract(event, state, current, space_ag
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
     default_origin_error(label .. " source requires the resolved default worker work contract", event, state, current)
   end
-  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
-    ["production-science-pack"]=1, ["utility-science-pack"]=1}
-  if space_age then packs["electromagnetic-science-pack"] = 1 end
-  local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= (space_age and 6 or 5) then
+  if not recovery.matches_archived_science(prototype.research_unit_ingredients, space_age and "space_age" or "base") then
     default_origin_error(label .. " default science differs", event, state, current)
   end
-  for _, ingredient in ipairs(ingredients) do
-    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
-      default_origin_error(label .. " default science differs", event, state, current)
-    end
-    packs[ingredient.name] = nil
-  end
-  if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
 local PUBLISHED473_F210_WORKER_ADDONS = {
@@ -1107,20 +1096,9 @@ local function published472_se_origin(event, change, active, state, current)
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 or effect.hidden == true then
     default_origin_error("published472 SE source work contract differs", event, state, current)
   end
-  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
-    ["production-science-pack"]=1, ["se-rocket-science-pack"]=1, ["se-material-science-pack-1"]=1,
-    ["space-science-pack"]=1}
-  local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= 7 then
+  if not recovery.matches_archived_science(prototype.research_unit_ingredients, "f200_se") then
     default_origin_error("published472 SE source science differs", event, state, current)
   end
-  for _, ingredient in ipairs(ingredients) do
-    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
-      default_origin_error("published472 SE source science differs", event, state, current)
-    end
-    packs[ingredient.name] = nil
-  end
-  if next(packs) ~= nil then default_origin_error("published472 SE source science differs", event, state, current) end
   local prerequisites = 0
   for key, prerequisite in pairs(prototype.prerequisites or {}) do
     local name = type(key) == "string" and key or prerequisite and prerequisite.name
