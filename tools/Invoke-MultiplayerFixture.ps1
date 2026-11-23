@@ -314,6 +314,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      paired_arm='published'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-published@0.1.0')
       optional_archives=@('more-infinite-research_4.7.20002.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip')
     }
@@ -322,6 +323,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      paired_arm='mir5'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
     }
@@ -339,8 +341,19 @@ function Assert-MultiplayerFixtureSelection {
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20005';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       mir_archive_sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
+      paired_arm='mir5'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20005.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+    }
+    [ordered]@{
+      fixture_case='library-paired-browser';target='f200'
+      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20023';build_version=84539
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      mir_archive_sha256='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+      paired_arm='mir5'
+      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20023.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
     }
   )
   # Two explicit disposable positive-state variants reuse the exact corrected
@@ -1207,17 +1220,7 @@ try {
   $layout=New-MultiplayerSessionLayout -Context $resources -EngineData $engineData -Target $target -StandaloneClientNames:$standaloneClientNames
   $serverWrite=$layout.server_write;$serverConfig=$layout.server_config;$serverSettings=$layout.server_settings;$serverPort=$layout.server_port;$rconPort=$layout.rcon_port;$rconPassword=$layout.rcon_password;$clients=@($layout.clients)
   $record.loopback_ports=[ordered]@{udp=$layout.udp_ports;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
-  $pairedArm=$null
-  if($FixtureCase -ceq 'library-paired-browser'){
-    Assert-Session ($selection.kind -ceq 'mir5-library-paired-browser-f200-native-selection') 'paired browser profile kind differs'
-    $mirRows=@($selection.mods | Where-Object {[string]$_.name -ceq 'more-infinite-research'})
-    $armRows=@($selection.mods | Where-Object {[string]$_.name -cmatch '^mir-fixture-mir5-library-paired-browser-arm-(published|mir5)$'})
-    Assert-Session ($mirRows.Count -eq 1 -and $armRows.Count -eq 1) 'paired browser profile arm selection differs'
-    $armName=[string]$armRows[0].name
-    if($armName -ceq 'mir-fixture-mir5-library-paired-browser-arm-published' -and [string]$mirRows[0].version -ceq '4.7.20002'){$pairedArm='published'}
-    elseif($armName -ceq 'mir-fixture-mir5-library-paired-browser-arm-mir5' -and [string]$mirRows[0].version -cin @('5.0.20000','5.0.20005')){$pairedArm='mir5'}
-    else{throw '[mir5-multiplayer-fixture] paired browser profile MIR arm/version differs'}
-  }
+  $pairedArm=if($FixtureCase -ceq 'library-paired-browser'){$target.paired_arm}else{$null}
   $hashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$hashes[$entry.Key]=$entry.Value}
   $hashes[[IO.Path]::GetFileName([string]$prepared.mir_archive.path)]=$ExpectedMIRArchiveSha256.ToUpperInvariant()
   foreach($fixture in $prepared.fixtures){$hashes[[IO.Path]::GetFileName([string]$fixture.archive)]=$fixture.sha256}
