@@ -894,7 +894,13 @@ local function require_archived_default_contract(event, state, current, space_ag
   if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
 end
 
-local PUBLISHED473_F210_WORKER_ADDONS = {["Return-Inserter"]="1.0.0", ["spider-launcher"]="2.9.87"}
+local PUBLISHED473_F210_WORKER_ADDONS = {
+  CleanedConcrete = "2.1.0",
+  ["even-distribution-fork"] = "2.1.2",
+  pump = "2.2.6",
+  ["Return-Inserter"] = "1.0.0",
+  ["spider-launcher"] = "2.9.87",
+}
 
 local function published473_worker_has_known_editors()
   if not prototypes or type(prototypes.get_history) ~= "function" then return false end
