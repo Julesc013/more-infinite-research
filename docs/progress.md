@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-23
+last_reviewed: 2026-11-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,20 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Guarded private 5.0.23 release freeze (2026-11-24)
+
+The offline release adapter built and independently verified all 17 ZIPs and both checksum files from private source `4890555a97b41480c3060051be6a05888debe083`. The combined inventory file SHA-256 is `34db0f1bc40da4139ed4f4c5ff53ad7981f0c9d921aba84ca5fdcd937759a469`. Fifteen ZIPs match the earlier documented freeze byte for byte. The two modern ZIPs each change only `runtime/worker_robot_storage.lua` and match their guarded native inputs. The checked release notes and upload text match the earlier documentation revision. [Guarded source and native scope](https://github.com/Julesc013/more-infinite-research/pull/2332) · [Release documents](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7098290603)
+
+The guarded F200 ZIP `7C37E4B1208301EDA09BE4C6922823C44B0714A05A9D3DD300EC70E600D1AC5D` passed two 144,000-update Foundation III runs. Both observed 57 surfaces, progress on 275 machines and checksum `1843963732`. The exact cap-twelve replay completed levels 11 and 12 with their seven-pack debits, refused level 13 and matched two cold loads. The guarded F210 ZIP `1CB0DF6FBF0329A1F25DF110CF7CAFE4224031C5802DE496220C43E36306CCEE` passed the staged Factorio 2.1.25 startup-setting change with recorded worker ownership. The altered setting preserved both worker prices, active and parked work, unrelated force bonuses and the repeated queue across the save and both cold loads. Each job restored the direct library. [Exact native readback](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7104612485)
+
+The guarded F210 export replay verified five output files before a Linux process-status observation stopped the session. The shared library restored and the protected save matched. The first composition refusal and the later native adverse remain under separate request IDs. A live kernel probe reproduced ESRCH from an open procfs descriptor after task exit. The observer repair handles that outcome. A later setup refusal preserved an earlier display lock until its original PID and filesystem identities were checked and the owned entries retired. [Export coordination](https://github.com/Julesc013/more-infinite-research/issues/1768#issuecomment-7105032721) · [Process observer repair](https://github.com/Julesc013/more-infinite-research/pull/2337)
+
+The clean replay on Factorio 2.1.24 passed the guarded F210 ZIP's six native full-settings, compact-settings and diagnostics export actions across English and German clients. The six action receipts, four final files and 24 native captures rehashed. The protected input matched, the owned processes exited and the direct library restored. [Exact export result](https://github.com/Julesc013/more-infinite-research/issues/1768#issuecomment-7105922224)
+
+The retained Library comparison stays open after the Windows commit-admission refusal. A 32 MiB residency probe on Gunmetal returned a zero paged-memory peak and unchanged `PrivateMemorySize64` while resident pages increased. The Windows retained-memory endpoints need their declared counters. [Windows admission receipt](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7100172501) · [Declared counter method](../spec/evidence/library-peak-retained-method-r01.json)
+
+The guarded freeze remains private. The simultaneous legacy Space Exploration and MIR upgrade still lacks predecessor price authority, and the original changed-settings save in #1944 remains unavailable. The archived-science refactor subsequently merged into `dev` and its native evidence uses its own ZIPs. MIR 5.0.22 remains the latest public prerelease. [Legacy price observation](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7096183506) · [Reported upgrade](https://github.com/Julesc013/more-infinite-research/issues/1944#issuecomment-7099564740) · [Archived-science refactor](https://github.com/Julesc013/more-infinite-research/pull/2335)
 
 ## Integrated private 5.0.23 save verification (2026-11-23)
 
