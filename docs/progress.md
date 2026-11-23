@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Current Library scheduler and client verification (2026-11-24)
+
+The private comparison source `4cad2d22e06caeccbc38fa0076083cce080720b8` projects the two current Library modules onto the guarded 5.0.23 source. Its F210 ZIP `611BF1007425BD38FF1194D16252549714A317BA4F2614AC805161A26D99BEC5` differs from the guarded archive only in `runtime/library.lua` and `runtime/library_translations.lua`. The guarded archive retains its own release evidence.
+
+The Factorio 2.1.24 headless comparison cold-loaded the same generated save with a malformed pending window. Identical test-only counters recorded ten actual 61-tick callbacks on the old Library and zero on the repaired Library between ticks 200 and 800. Both runs retained the original record, had zero players and restored the direct library. All 91 members of `closed-timer-native-proof.zip` rehashed in primary `build/qualification/mir523-library-updated-lifecycle-aero-r01`. [Native timer evidence](https://github.com/Julesc013/more-infinite-research/pull/2333#issuecomment-7116400860)
+
+The uninstrumented comparison ZIP passed 13 bilingual client steps on Factorio 2.1.24, including eight physical inputs. Both clients retained their own search, selection and width through rejoin and a saved-server restart. The guarded action replay matched observed GUI state and capture pixels at each click. Force state, protected input and shared library matched afterward. All 356 original outputs rehashed in place, and 23 copied receipts rehashed in `native-client-readback.zip` alongside the timer proof. The input-wait timeout and zero-native output-path refusal retain their own terminal records. Library elapsed-time and retained-memory qualification remain open. [Native client evidence](https://github.com/Julesc013/more-infinite-research/issues/1768#issuecomment-7116563150)
+
 ## Guarded private 5.0.23 release freeze (2026-11-24)
 
 The offline release adapter built and independently verified all 17 ZIPs and both checksum files from private source `4890555a97b41480c3060051be6a05888debe083`. The combined inventory file SHA-256 is `34db0f1bc40da4139ed4f4c5ff53ad7981f0c9d921aba84ca5fdcd937759a469`. Fifteen ZIPs match the earlier documented freeze byte for byte. The two modern ZIPs each change only `runtime/worker_robot_storage.lua` and match their guarded native inputs. The checked release notes and upload text match the earlier documentation revision. [Guarded source and native scope](https://github.com/Julesc013/more-infinite-research/pull/2332) · [Release documents](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7098290603)
