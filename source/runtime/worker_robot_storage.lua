@@ -1518,6 +1518,25 @@ local function native_bonus(force)
   return value -- postcondition only; never used to infer earned levels.
 end
 
+local function require_current_transfer(plan, item, finished, allow_enabled_gate, ...)
+  -- A previous force's setters can run callbacks before the next force's first write.
+  local force = item.force
+  local gate = gate_frame(force, allow_enabled_gate)
+  local message = "native worker work changed during another force's transfer; reload the original copy"
+  if storage[OWNER_KEY] ~= plan.prior_owner or storage[KEY] ~= plan.prior_state
+      or gate_paid(gate) ~= item.gate_paid or gate.enabled ~= item.gate_enabled
+      or native_bonus(force) ~= (item.initial_bonus or item.bonus) then
+    recover_error(message)
+  end
+  for index = 1, select("#", ...) do
+    local expected = select(index, ...)
+    if expected then
+      local current = default_frame(force, expected.technology.name, finished)
+      if not equal_plain(frame_values(expected), frame_values(current)) then recover_error(message) end
+    end
+  end
+end
+
 local function legacy_paid_pair(source, owner, gate, legacy)
   local paid = legacy.next_level >= 5
   return source.next_level == (paid and 5 or 4) and not source.researched
@@ -1593,8 +1612,10 @@ local function apply_published517_se_paid_bridge(plan)
       recover_error("published517 SE paid work changed after preflight")
     end
   end
+  local applied = false
   for _, item in ipairs(fresh.items) do
     if item.action == "legacy-transfer" or item.settle_source or item.gate_enabled then
+      if applied then require_current_transfer(fresh, item, false, true, item.source, item.owner, item.legacy) end
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
@@ -1624,6 +1645,7 @@ local function apply_published517_se_paid_bridge(plan)
       end)
       default_mutating_force = previous
       if not ok then error(message, 0) end
+      applied = true
     end
   end
   for _, item in ipairs(fresh.items) do
@@ -1841,9 +1863,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       end
       if action == "validate" and (gate.enabled or settle_source) then action = "settle-flags" end
       record.forces[force.index] = next_force
+      local initial_bonus = native_bonus(force)
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
-        gate_enabled=gate.enabled, settle_source=settle_source,
-        bonus=native_bonus(force) - (mirrored_first and source_prototype.effects[1].modifier or 0),
+        gate_enabled=gate.enabled, settle_source=settle_source, initial_bonus=initial_bonus,
+        bonus=initial_bonus - (mirrored_first and source_prototype.effects[1].modifier or 0),
         phase=next_force and next_force.phase or "owned", legacy=legacy,
         moved=action == "transfer", action=action,
         target_enabled=public.enabled, target_visible=public.visible}
@@ -1898,8 +1921,14 @@ function M.apply_default_owner_transfer(plan)
     end
   end
   local id = recovery.ordinary_default_id
+  local applied = false
   for _, item in ipairs(fresh.items) do
-    if item.action ~= "pending-unchanged" then
+    if item.action == "transfer" or item.action == "first-credit" or item.action == "settle-flags" then
+      if applied then
+        require_current_transfer(fresh, item, fresh.context.finished_force == item.force.index,
+          fresh.prior_owner ~= nil and fresh.context.configuration == true,
+          item.source, item.destination, item.public ~= item.source and item.public, item.legacy)
+      end
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
@@ -1940,6 +1969,7 @@ function M.apply_default_owner_transfer(plan)
       end)
       default_mutating_force = previous
       if not ok then error(message, 0) end
+      applied = true
     end
   end
   for _, item in ipairs(fresh.items) do
@@ -2221,7 +2251,8 @@ local function apply_provider_handover(plan)
   if authorization.legacy.delegated_handover ~= plan or not equal_plain(authorization.legacy.state, fresh.prepared) then
     recover_error("provider quota delegation changed before native writes")
   end
-  for _, item in ipairs(fresh.items) do
+  for index, item in ipairs(fresh.items) do
+    if index > 1 then require_current_transfer(fresh, item, false, true, item.source, item.destination, item.public) end
     local previous = default_mutating_force
     default_mutating_force = item.force.index
     local ok, message = pcall(function()
