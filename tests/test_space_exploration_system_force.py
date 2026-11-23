@@ -29,6 +29,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
             ["space-exploration-graphics-5"]="0.7.3",["space-exploration-menu-simulations"]="0.7.4",
             ["space-exploration-postprocess"]="0.7.5",["more-infinite-research"]="5.0.20018"}
           script={active_mods=active}
+          storage={}
           event={mod_startup_settings_changed=false,mod_changes={
             ["more-infinite-research"]={old_version="4.7.20002",new_version="5.0.20018"}}}
           native_writes={};forbidden_writes=0
@@ -136,6 +137,51 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
           gun["artillery-shell"]=6;gun.laser=2.2;ammo.laser=5.1
           assert(policy.preflight(event)==nil and #native_writes==0)
         ''')
+
+    def replay_loaders_addition(self, recovered):
+        if recovered:
+            self.lua.execute('policy.apply(assert(policy.preflight(event)));assert(#native_writes==6)')
+        self.lua.execute('''
+          -- The actual later callback saw all six fields at zero while the
+          -- player's native cargo and queue survived.
+          fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+          fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+          native_writes={}
+          package.loaded["runtime.space_exploration_system_force"]=nil
+          policy=require("runtime.space_exploration_system_force")
+          active["aai-loaders"]="0.2.11"
+          event={mod_startup_settings_changed=true,mod_changes={
+            ["aai-loaders"]={new_version="0.2.11"}}}
+        ''')
+
+    def test_verified_conquest_defaults_survive_a_later_aai_loaders_addition(self):
+        self.replay_loaders_addition(recovered=True)
+        self.lua.execute('''
+          local plan=assert(policy.preflight(event));assert(#native_writes==0)
+          policy.apply(plan)
+          assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
+          assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
+          assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
+          assert(foreign.worker_robots_storage_bonus==8 and foreign.research_progress==.039024390243902)
+          assert(foreign.queue=="worker,worker,tail" and forbidden_writes==0)
+          assert(policy.preflight(event)==nil)
+        ''')
+
+    def test_later_configuration_requires_the_same_recovered_force_and_exact_addition(self):
+        self.replay_loaders_addition(recovered=False)
+        self.skipped('game=setmetatable({}, {__index=function()error("world access")end})')
+        for mutation in (
+            'storage.mir_se_conquest_policy_force=foreign',
+            'event.mod_changes["aai-loaders"].old_version="0.2.10"',
+            'active["aai-loaders"]="0.2.12";event.mod_changes["aai-loaders"].new_version="0.2.12"',
+            'event.mod_changes["more-infinite-research"]={old_version="5.0.20017",new_version=active["more-infinite-research"]}',
+            'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
+            'fields.worker_robots_storage_bonus=4',
+        ):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                self.replay_loaders_addition(recovered=True)
+                self.skipped(mutation)
 
     def test_completed_night_vision_does_not_block_the_se_policy_or_change_research(self):
         for predecessor, updated_addon in product(("4.7.20002", "5.0.20017"), (False, True)):

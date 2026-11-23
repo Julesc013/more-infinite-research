@@ -7,6 +7,8 @@
 local M = {}
 local target = require("platform.target")
 local MIR = "more-infinite-research"
+local RECOVERED_FORCE = "mir_se_conquest_policy_force"
+local LOADERS = "aai-loaders"
 local BASIC = {artillery=true, tank=true, radar=true, electronics=true,
   ["sulfur-processing"]=true, explosives=true, electricity=true,
   ["fuel-processing"]=true, ["repair-pack"]=true}
@@ -21,9 +23,8 @@ local function finite(value)
   return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
 end
 
-local function origin(event, active)
-  if active.base ~= "2.0.77" or active.Krastorio2 ~= nil or active["space-age"] ~= nil then return false end
-  for name, change in pairs(event.mod_changes) do
+local function historical_origin(changes, active)
+  for name, change in pairs(changes) do
     if name ~= MIR then
       if type(change) ~= "table" or type(change.old_version) ~= "string"
           or type(change.new_version) ~= "string" or active[name] ~= change.new_version then return false end
@@ -31,6 +32,17 @@ local function origin(event, active)
         return false
       end
     end
+  end
+  return true
+end
+
+local function loaders_added(changes, active)
+  local addition = changes[LOADERS]
+  if type(addition) ~= "table" or addition.old_version ~= nil
+      or addition.new_version ~= "0.2.11" or active[LOADERS] ~= addition.new_version then return false end
+  for name, change in pairs(changes) do
+    if name ~= LOADERS and (type(change) ~= "table" or type(change.old_version) ~= "string"
+        or change.old_version ~= change.new_version or active[name] ~= change.new_version) then return false end
   end
   return true
 end
@@ -86,17 +98,27 @@ end
 
 function M.preflight(event)
   local active = script and script.active_mods or {}
-  if target.id ~= "f200" or active["space-exploration"] ~= "0.7.57" then return nil end
-  local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[MIR]
-  if type(change) ~= "table" then return nil end
-  if change.old_version ~= "4.7.20002" and change.old_version ~= "5.0.20017" then return nil end
+  if target.id ~= "f200" or active["space-exploration"] ~= "0.7.57" or active.base ~= "2.0.77"
+      or active.Krastorio2 ~= nil or active["space-age"] ~= nil then return nil end
   if type(target.distribution_version) ~= "string" or target.distribution_version == ""
-      or active[MIR] ~= target.distribution_version or change.new_version ~= target.distribution_version then return nil end
+      or active[MIR] ~= target.distribution_version then return nil end
+  local changes = type(event) == "table" and event.mod_changes
+  if type(changes) ~= "table" then return nil end
+  local change = changes[MIR]
+  local historical = type(change) == "table" and change.new_version == target.distribution_version
+    and (change.old_version == "4.7.20002" or change.old_version == "5.0.20017")
   -- SE authors these fixed NPC values independently of startup settings.
   -- Skip this optional repair when the native frame cannot prove it applies.
   -- An ambiguous NPC configuration must not stop an otherwise valid save.
-  if not origin(event, active) then return nil end
+  if historical then
+    if not historical_origin(changes, active) then return nil end
+  elseif not loaders_added(changes, active) or storage[RECOVERED_FORCE] == nil then
+    return nil
+  end
   local force = game.forces.conquest
+  -- Adding AAI Loaders can reset all six native fields while MIR is unchanged.
+  -- A prior successful restoration identifies the same force across saves.
+  if not historical and force ~= storage[RECOVERED_FORCE] then return nil end
   if not needs_restoration(force) then return nil end
   return {force=force, event=event, used=false}
 end
@@ -115,6 +137,7 @@ function M.apply(plan)
   force.set_ammo_damage_modifier("laser", DEFAULTS[6])
   local observed = values(force)
   for index = 1, 6 do require_policy(observed[index] == DEFAULTS[index], "scripted policy readback differs: " .. index) end
+  storage[RECOVERED_FORCE] = force
 end
 
 return M
