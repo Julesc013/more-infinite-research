@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import errno
 import importlib.util
 import json
 import os
@@ -740,7 +741,7 @@ try {{
 
     def test_exit_between_identity_and_memory_reads_discards_only_that_terminal_sample(self) -> None:
         for phase in ("rss", "private"):
-            for transition in ("vanished", "zombie"):
+            for transition in ("vanished", "zombie", "retired-during-read"):
                 with self.subTest(phase=phase, transition=transition), tempfile.TemporaryDirectory(
                     prefix="mir-linux-memory-exit-race-"
                 ) as directory:
@@ -748,19 +749,30 @@ try {{
                     process_files(proc, 100, 1, 1000, {100: "101"}, session=100)
                     process_files(proc, 101, 100, 1001, {101: ""}, session=100)
                     rss, private = OBSERVATION.read_status_rss, OBSERVATION.read_private_memory
+                    read_text = Path.read_text
+                    retired = False
+
+                    def read_path(path, *args, **kwargs):
+                        if retired and path == proc / "101/stat":
+                            raise ProcessLookupError(errno.ESRCH, "No such process")
+                        return read_text(path, *args, **kwargs)
 
                     def failed_read(function, label):
                         def read(root, pid):
+                            nonlocal retired
                             if pid == 101:
                                 if transition == "vanished":
                                     (proc / "101/stat").unlink()
-                                else:
+                                elif transition == "zombie":
                                     write(proc / "101/stat", proc_stat(101, 100, 1001, 100).replace(") S ", ") Z "))
+                                else:
+                                    retired = True
                                 raise OBSERVATION.ObservationFailure(label)
                             return function(root, pid)
                         return read
 
                     with (
+                        mock.patch.object(Path, "read_text", new=read_path),
                         mock.patch.object(OBSERVATION, "read_status_rss", side_effect=failed_read(
                             rss, "mir441-linux-process-status") if phase == "rss" else rss),
                         mock.patch.object(OBSERVATION, "read_private_memory", side_effect=failed_read(

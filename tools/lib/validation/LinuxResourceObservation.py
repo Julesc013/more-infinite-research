@@ -313,7 +313,8 @@ def read_proc_stat(proc_root: Path, pid: int, *, missing_is_exit: bool) -> dict[
     path = proc_root / str(pid) / "stat"
     try:
         text = path.read_text(encoding="utf-8")
-    except FileNotFoundError:
+    except (FileNotFoundError, ProcessLookupError):
+        # An opened procfs stat file can return ESRCH once its task is gone.
         if missing_is_exit:
             return None
         fail("mir441-linux-process-stat")
