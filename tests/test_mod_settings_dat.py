@@ -22,12 +22,20 @@ class ModSettingsDatControls(unittest.TestCase):
                 b"\x00\x10runtime-per-user\x05\x00\x00\x00\x00\x00"
                 b"\x00\x07startup\x05\x00\x01\x00\x00\x00"
                 b"\x00\x01x\x05\x00\x01\x00\x00\x00"
-                b"\x00\x05value\x01\x00\x00")
+                b"\x00\x05value")
         for version, header in (("2.0.77", bytes.fromhex("020000004d00000000")),
                                 ("2.1.23", bytes.fromhex("020001001700000000"))):
-            blob = header + root
+            blob = header + root + b"\x01\x00\x00"
             self.assertEqual(writer.encode(version, {"x": False}), blob)
             self.assertEqual(reader.decode(blob), {"engine": version, "startup": {"x": False}})
+            integers = (
+                (b"\x06\x00\x00\x00\x00\x00\x00\x00\x00\x80", -(2**63)),
+                (b"\x07\x00\xff\xff\xff\xff\xff\xff\xff\xff", 2**64 - 1),
+            )
+            for encoded, expected in integers:
+                result = reader.decode(header + root + encoded)
+                self.assertEqual(result, {"engine": version, "startup": {"x": expected}})
+                self.assertIs(type(result["startup"]["x"]), int)
 
     def test_string_length_boundaries_and_utf8_byte_count(self):
         for size in (0, 1, 254, 255, 256, 65535, 65536, 70000):

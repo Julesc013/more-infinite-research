@@ -66,6 +66,8 @@ class Reader:
             return number
         if kind == 3:
             return self.text()
+        if kind in (6, 7):
+            return struct.unpack("<q" if kind == 6 else "<Q", self.take(8))[0]
         if kind != 5:
             raise ValueError("unsupported property type")
         count = struct.unpack("<I", self.take(4))[0]
@@ -92,7 +94,7 @@ def decode(data):
         raise ValueError("only scalar startup settings are supported")
     startup = {}
     for name, row in root["startup"].items():
-        if type(row) is not dict or set(row) != {"value"} or type(row["value"]) not in (bool, float, str):
+        if type(row) is not dict or set(row) != {"value"} or type(row["value"]) not in (bool, float, int, str):
             raise ValueError("invalid startup setting shape")
         startup[name] = row["value"]
     return {"engine": VERSIONS[header], "startup": startup}
