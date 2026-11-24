@@ -54,7 +54,11 @@ local function idle(row)
 end
 
 local function check_unrelated()
-  assert(equal(storage.unrelated, unrelated()), "unrelated force changed")
+  local current = unrelated()
+  if not equal(storage.unrelated, current) then
+    record("unrelated-adverse", {phase=storage.phase, source=storage.unrelated, observed=current})
+    error("unrelated force changed")
+  end
 end
 
 script.on_init(function()
@@ -95,6 +99,7 @@ script.on_configuration_changed(function(event)
   for name in pairs(event.mod_changes) do assert(name == MIR, "unexpected mod change " .. name) end
   storage.event = {startup_settings_changed=event.mod_startup_settings_changed, old=change.old_version,
     new=change.new_version, setting=settings.startup[SETTING].value}
+  record("configuration-entry", {event=storage.event, unrelated=unrelated(), workers=workers(true)})
   storage.phase = "check-upgrade"
 end)
 
