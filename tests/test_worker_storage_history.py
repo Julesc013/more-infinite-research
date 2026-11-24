@@ -3500,6 +3500,72 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
         ''')
 
+    def archived_k2_worker_world(self):
+        lua = self.older_world("f210")
+        self.enable_space_age(lua, "2.1.23")
+        lua.execute(r'''
+          local frozen_dependencies={
+            Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19",
+            Krastorio2Assets="2.1.0", Krastorio2MenuSimulations="2.1.0",
+            ["k2so-assets"]="1.0.7", flib="0.17.2", ["xy-k2so-enhancements-nulls-fork"]="0.8.3"
+          }
+          for name,version in pairs(frozen_dependencies)do script.active_mods[name]=version end
+          script.active_mods["neutral-unchanged-addon"]="1.0.0"
+          local prior_history=prototypes.get_history
+          prototypes.get_history=function(kind,name)
+            if kind=="technology" and name==CANONICAL then
+              return {created="more-infinite-research",changed={"more-infinite-research"}}
+            end
+            return prior_history(kind,name)
+          end
+          archived_event=older_event("4.6.21000",false)
+        ''')
+        return lua
+
+    def test_archived_k2_worker_admission_preserves_unrelated_paid_work(self):
+        self.archived_k2_worker_world().execute(r'''
+          player.research_queue={OTHER};player.research_progress=.42
+          detached.technologies[OTHER].saved_progress=.27
+          uninvested.technologies[CANONICAL].enabled=false
+          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(archived_event,nil,true)
+          assert(plan.record.producer.kind=="archived-uninvested-default"
+            and plan.record.producer.old_version=="4.6.21000")
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+          assert(history.default_owner_apply(plan))
+          history.default_owner_on_load()
+          for _,force in pairs(game.forces)do
+            local old,now=before[force.index],frame(force)
+            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+          end
+        ''')
+
+    def test_archived_k2_worker_admission_refuses_unverified_history_before_writes(self):
+        for change, expected in (
+            ("detached.technologies[CANONICAL].level=5", "earned, queued or unfinished worker work"),
+            ("detached.research_queue={OTHER,CANONICAL}", "earned, queued or unfinished worker work"),
+            ("detached.technologies[CANONICAL].saved_progress=.27", "earned, queued or unfinished worker work"),
+            ("archived_event.mod_startup_settings_changed=true", "requires unchanged startup settings"),
+            ('archived_event.mod_changes["unreported-provider"]={old_version="1.0.0"}',
+             "requires the unchanged mod selection"),
+            ('script.active_mods["Krastorio2-spaced-out"]="2.0.18"', "qualified dependency versions"),
+            ('local prior=prototypes.get_history;prototypes.get_history=function(kind,name) '
+             'local observed=prior(kind,name);if name==CANONICAL then observed.changed={"unknown-worker-editor"} end;'
+             'return observed end', "unverified prototype history"),
+        ):
+            with self.subTest(change=change):
+                lua = self.archived_k2_worker_world()
+                lua.globals().expected_refusal = expected
+                lua.execute(change + r'''
+                  local before=all_frames();writes=0
+                  local ok,why=pcall(history.default_owner_preflight,archived_event,nil,true)
+                  assert(not ok and tostring(why):find(expected_refusal,1,true),tostring(why))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
+
     def test_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
         for target, legacy_version, base, space_age in (
             ("f200", "4.7.20003", "2.0.77", False),
