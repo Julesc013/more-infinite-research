@@ -155,6 +155,7 @@ local default_mutating_force
 local default_owner_merge_plans = {}
 local owned_queue_force
 local OWNER_KEY = "mir_worker_storage_native_owner"
+local ARCHIVE_KEY = "mir_worker_storage_provider_archive"
 local delegated_provider_preflight, delegated_provider_apply
 local selected_cap, selected_enabled = 0, true
 
@@ -672,10 +673,11 @@ function M.configure(maximum, enabled)
   selected_cap, selected_enabled = maximum or 0, enabled ~= false
 end
 
-local function assign_queue(force, frame, queue, source_id, destination)
+local function assign_queue(force, frame, queue, replacements)
+  replacements = replacements or {}
   if queue == nil then
     queue = {}
-    for index, name in ipairs(frame.queue) do queue[index] = name == source_id and destination or name end
+    for index, name in ipairs(frame.queue) do queue[index] = replacements[name] or name end
   end
   local previous_owner = owned_queue_force
   owned_queue_force = force.index
@@ -687,12 +689,12 @@ local function assign_queue(force, frame, queue, source_id, destination)
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
     end
     for name, saved in pairs(frame.queued_saved) do
-      local id = name == source_id and destination or name
+      local id = replacements[name] or name
       if force.technologies[id].saved_progress ~= saved then
         force.technologies[id].saved_progress = saved
       end
     end
-    local current = frame.current == source_id and destination or frame.current
+    local current = frame.current and (replacements[frame.current] or frame.current)
     if current then
       if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
       force.research_progress = frame.current_progress
@@ -1659,7 +1661,7 @@ local function apply_published517_se_paid_bridge(plan)
         holder.enabled, holder.visible_when_disabled = frame.enabled, frame.visible
         if retired.level ~= 4 or retired.researched then retired.level = 4 end
         if frame.occurrences > 0 then
-          assign_queue(item.force, frame, nil, recovery.ordinary_default_id, recovery.published517_se_id)
+          assign_queue(item.force, frame, nil, {[recovery.ordinary_default_id]=recovery.published517_se_id})
         end
         -- Replacing a current queue entry may cache its in-flight progress on
         -- the retired row. Clear that post-setter residue only after the
@@ -1974,7 +1976,7 @@ function M.apply_default_owner_transfer(plan)
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
           if frame.occurrences > 0 then
             local source_id = fresh.prepared_default and recovery.id or recovery.canonical
-            assign_queue(item.force, frame, nil, source_id, id)
+            assign_queue(item.force, frame, nil, {[source_id]=id})
           end
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
           if fresh.prepared_default then frame.technology.saved_progress = 0 end
@@ -2288,7 +2290,7 @@ local function apply_provider_handover(plan)
       frame.technology.enabled, frame.technology.visible_when_disabled = false, false
       frame.technology.saved_progress = 0
       if frame.occurrences > 0 then
-        assign_queue(item.force, frame, nil, recovery.ordinary_default_id, recovery.id)
+        assign_queue(item.force, frame, nil, {[recovery.ordinary_default_id]=recovery.id})
       end
       frame.technology.saved_progress, holder.saved_progress = 0, frame.saved_progress
       if frame.current == recovery.ordinary_default_id then item.force.research_progress = frame.current_progress end
@@ -2828,7 +2830,7 @@ local function prepare(route, before_apply)
     frame.technology.level = 4
     frame.technology.enabled, frame.technology.visible_when_disabled = frame.enabled, frame.visible
     frame.technology.saved_progress = 0
-    assign_queue(plan.force, frame, nil, recovery.canonical, recovery.id)
+    assign_queue(plan.force, frame, nil, {[recovery.canonical]=recovery.id})
     -- Cancelling the old current through the final queue setter can cache its
     -- progress on canonical4 again. Only the transferred private row owns it.
     frame.technology.saved_progress = 0
@@ -2869,6 +2871,136 @@ end
 
 function M.resume(force, route) return resume(force, route) end
 
+local function archive_profile(route)
+  if route == nil or not route.owned then recover_error("provider removal needs its recorded finite route", route) end
+  local archive = require("research.worker_storage_archive")
+  for _, profile in ipairs(archive.profiles) do
+    if target.id == profile.target and script.active_mods[profile.prerequisite_mod]
+        and script.active_mods[profile.provider] == profile.version
+        and #route.finite == #profile.stages and route.finite[1].provider == profile.provider
+        and route.technology == profile.stages[#profile.stages].source then
+      return archive, profile
+    end
+  end
+  recover_error("this provider has no declared removal contract", route)
+end
+
+local function archive_terms(archive, profile, stage)
+  local source, holder, debit = native_prototype(stage.source), native_prototype(stage.holder), native_prototype(stage.debit)
+  local count, formula, seconds, modifier = archive.terms(profile, stage, effective_values.streams["worker-robots-storage"])
+  local last = stage.last == "infinite" and 4294967295 or stage.last
+  local levels = {first=stage.first, last=last}
+  if creator(stage.source) ~= (stage.count and profile.provider or MIR)
+      or creator(stage.holder) ~= MIR or creator(stage.debit) ~= MIR then
+    recover_error("provider archive prototype custody changed: " .. stage.source)
+  end
+  local contract = recovery.fingerprint(source, levels)
+  if recovery.fingerprint(holder, levels) ~= contract or source.research_unit_count_formula ~= formula
+      or count and source.research_unit_count ~= count or source.research_unit_energy ~= seconds * 60
+      or source.effects[1].modifier ~= modifier or source.ignore_tech_cost_multiplier
+      or holder.enabled ~= false or holder.hidden ~= true or holder.visible_when_disabled ~= false
+      or not holder.prerequisites[profile.prerequisite] then
+    recover_error("provider work differs from its declared archive contract: " .. stage.source)
+  end
+  if debit.level ~= 1 or debit.max_level ~= 4294967295 or debit.enabled ~= false or debit.hidden ~= true
+      or #debit.effects ~= 1 or debit.effects[1].type ~= "worker-robot-storage" or debit.effects[1].modifier ~= -modifier then
+    recover_error("provider archive debit contract changed: " .. stage.source)
+  end
+  return contract
+end
+
+local function collect_provider_archive(route)
+  if storage[ARCHIVE_KEY] ~= nil then recover_error("this copy already contains a prepared provider archive", route) end
+  local owned, state = owner_record(), checked_state()
+  if not owned or owned.kind ~= "provider-retired" or not state or state.kind ~= "prepared" or state.phase ~= "provider" then
+    recover_error("provider removal requires the recorded native handover", route)
+  end
+  retired_provider_current(nil, route)
+  prepared_current(state, fact(route))
+  local archive, profile = archive_profile(route)
+  local contract, replacements, items = {}, {}, {}
+  for _, stage in ipairs(profile.stages) do
+    contract[stage.source] = archive_terms(archive, profile, stage)
+    replacements[stage.source] = stage.holder
+  end
+  for _, force in ipairs(forces()) do
+    local item = {force=force, stages={}, bonus=native_bonus(force), queued=false}
+    for _, stage in ipairs(profile.stages) do
+      local source, holder = snapshot(force, stage.source), snapshot(force, stage.holder)
+      local debit = force.technologies[stage.debit]
+      if holder.next_level ~= stage.first or holder.researched or holder.enabled or holder.visible or holder.allowance > 0
+          or not debit or debit.level ~= 1 or debit.researched ~= false or debit.enabled ~= false
+          or debit.saved_progress ~= 0 or debit.visible_when_disabled ~= false
+          or source.next_level < stage.first or stage.count and source.next_level > stage.first + 1
+          or not stage.count and source.researched then
+        recover_error("provider archive requires an intact source and unused holder: " .. stage.source)
+      end
+      if source.occurrences > 0 then
+        if not source.enabled or not holder.technology.prerequisites[profile.prerequisite].researched then
+          recover_error("provider archive prerequisite is unavailable: " .. stage.source)
+        end
+        item.queued = true
+      end
+      item.stages[#item.stages + 1] = {stage=stage, source=source, holder=holder.technology, debit=debit}
+    end
+    if item.queued then requeueable(force, item.stages[1].source, false, true) end
+    items[#items + 1] = item
+  end
+  return {profile=profile, contract=contract, replacements=replacements, items=items, owner=owned, quota=state}
+end
+
+local function apply_provider_archive_force(item, replacements)
+  local previous = default_mutating_force
+  default_mutating_force = item.force.index
+  local ok, result = pcall(function()
+    local records = {}
+    for _, row in ipairs(item.stages) do
+      local stage, source, holder, debit = row.stage, row.source, row.holder, row.debit
+      if stage.count then holder.researched = source.researched else holder.level = source.next_level end
+      debit.level = 1 + source.next_level - stage.first
+      debit.enabled, debit.visible_when_disabled = false, false
+      holder.saved_progress = source.saved_progress
+      holder.enabled, holder.visible_when_disabled = source.occurrences > 0, false
+      if not source.researched and holder.research_unit_count ~= source.count then
+        recover_error("provider archive native price changed: " .. stage.source)
+      end
+    end
+    if item.queued then assign_queue(item.force, item.stages[1].source, nil, replacements) end
+    for _, row in ipairs(item.stages) do
+      local stage, source = row.stage, row.source
+      source.technology.saved_progress, source.technology.enabled = 0, false
+      local actual = snapshot(item.force, stage.holder)
+      if actual.next_level ~= source.next_level or actual.researched ~= source.researched
+          or actual.occurrences ~= source.occurrences or actual.saved_progress ~= source.saved_progress
+          or source.technology.researched ~= source.researched then
+        recover_error("provider archive did not preserve paid or queued work: " .. stage.source)
+      end
+      records[stage.source] = {earned=source.next_level-stage.first, enabled=source.enabled,
+        visible=source.visible, price=source.count, queued=source.occurrences}
+    end
+    if native_bonus(item.force) ~= item.bonus then recover_error("provider archive changed earned worker cargo") end
+    return {cargo=item.bonus, stages=records}
+  end)
+  default_mutating_force = previous
+  if not ok then error(result, 0) end
+  return result
+end
+
+local function prepare_provider_archive(route, before_apply)
+  local plan = collect_provider_archive(route)
+  if before_apply then before_apply() end
+  local archive = {schema=1, provider=plan.profile.provider, version=plan.profile.version,
+    contract=plan.contract, forces={}}
+  for _, item in ipairs(plan.items) do
+    archive.forces[item.force.index] = apply_provider_archive_force(item, plan.replacements)
+  end
+  if storage[OWNER_KEY] ~= plan.owner or storage[KEY] ~= plan.quota or storage[ARCHIVE_KEY] ~= nil then
+    recover_error("worker archive authority changed during preparation")
+  end
+  storage[ARCHIVE_KEY] = archive
+  return true, "Prepared " .. #plan.items .. " forces. Save this COPY under a new name and exit immediately."
+end
+
 function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
@@ -2882,11 +3014,13 @@ function M.command(command, route)
   local applying = false
   local function before_apply() applying = true end
   if operation == "prepare" and name == "" then ok, result, message = pcall(prepare, route, before_apply)
+  elseif operation == "prepare-provider-removal" and name == "" then
+    ok, result, message = pcall(prepare_provider_archive, route, before_apply)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
     ok, result, message = pcall(resume, force, route, before_apply)
-  else reply("Usage: /mir-worker-storage-recovery prepare | resume <force-name>"); return end
+  else reply("Usage: /mir-worker-storage-recovery prepare | prepare-provider-removal | resume <force-name>"); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
       .. " before trying recovery again: " .. tostring(result), 0)

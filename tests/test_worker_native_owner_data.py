@@ -478,6 +478,52 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
           assert(data.raw.technology["mir-worker-storage-head-4"]==nil)
         ''')
 
+    def test_ferrum_archive_keeps_disappearing_levels_on_stable_dormant_rows(self):
+        inputs = worker_pipeline.finite_chain(5)
+        science = [[name, 1] for name in (
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "utility-science-pack", "ferrum-robotics-science-pack",
+        )]
+        for level, price in ((4, 675), (5, 1012)):
+            row = inputs[f"worker-robots-storage-{level}"]
+            row["unit"] = {"count": price, "time": 60, "ingredients": science}
+            row["effects"] = [{"type": "worker-robot-storage", "modifier": 1}]
+
+        base = {"space-age": "2.1.25"}
+        _, active = self.pipeline(rows=inputs, extra_mods={**base, "planet-ferrum": "0.1.5"}, before='''
+          local name="ferrum-robotics-science-pack"
+          data.raw.item[name]={type="item",name=name}
+          data.raw.lab.fixture.inputs[#data.raw.lab.fixture.inputs+1]=name
+        ''')
+        _, absent = self.pipeline(extra_mods=base)
+        plain = worker_pipeline.scaffold.plain_lua
+        current, fallback = (lua.globals().data.raw.technology for lua in (active, absent))
+        self.assertEqual(inputs["worker-robots-storage-5"], plain(current["worker-robots-storage-5"]))
+        for source, holder, debit, first, last, price in (
+            ("worker-robots-storage-5", "mir-worker-storage-ferrum-hold-5",
+             "mir-worker-storage-ferrum-debit-1", 5, 5, "count"),
+            ("worker-robots-storage-6", "mir-worker-storage-ferrum-tail-hold-6",
+             "mir-worker-storage-ferrum-tail-debit-1", 6, "infinite", "count_formula"),
+        ):
+            with self.subTest(source=source):
+                old, dormant = plain(current[holder]), plain(fallback[holder])
+                self.assertEqual(plain(current[source].unit), old["unit"])
+                self.assertEqual(old["unit"][price], dormant["unit"][price])
+                self.assertEqual(60, dormant["unit"]["time"])
+                self.assertIn(science[-1], old["unit"]["ingredients"])
+                self.assertNotIn(science[-1], dormant["unit"]["ingredients"])
+                for row in (old, dormant):
+                    self.assertEqual((first, last), (row["level"], row["max_level"]))
+                    self.assertEqual(["worker-robots-storage-3"], row["prerequisites"])
+                    self.assertTrue(row["hidden"])
+                    self.assertFalse(row["enabled"])
+                    self.assertFalse(row["visible_when_disabled"])
+                    self.assertEqual([{"type": "worker-robot-storage", "modifier": 1}], row["effects"])
+                self.assertEqual(-1, current[debit].effects[1].modifier)
+                self.assertEqual(0, fallback[debit].effects[1].modifier)
+                self.assertFalse(current[debit].enabled)
+                self.assertFalse(fallback[debit].enabled)
+
     def test_science_policy_applies_to_tail_but_never_bookkeeping_gate(self):
         for target in ("f200", "f210"):
             for sif in (False, True):

@@ -339,6 +339,10 @@ if worker_default_available then
     end
   end
   technologies[#technologies + 1] = recovery.head_debit(worker_default_authored, head_scalar)
+  if prerequisite_target.id == "f210" and mods["space-age"] then
+    require("research.worker_storage_archive").append(technologies, data.raw, mods, prerequisite_target.id,
+      worker_default_authored, values.streams["worker-robots-storage"], worker_storage)
+  end
 end
 if electric_full then
   for _, technology in ipairs(technologies) do

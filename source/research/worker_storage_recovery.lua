@@ -83,9 +83,11 @@ end
 -- A bounded exact native contract, not a reconstruction of previous settings.
 -- Names/presentation/force flags differ deliberately; all gameplay fields below
 -- must match before transfer and remain identical on the protected holder.
-function M.fingerprint(prototype)
-  assert(prototype and prototype.level == 4 and prototype.max_level == MAX,
-    "MIR worker recovery requires an infinite native level4 contract")
+function M.fingerprint(prototype, work_levels)
+  local first, last = 4, MAX
+  if work_levels then first, last = work_levels.first, work_levels.last end
+  assert(prototype and prototype.level == first and prototype.max_level == last,
+    "MIR worker recovery native level bounds differ")
   local effects = prototype.effects
   assert(type(effects) == "table" and #effects == 1, "MIR worker recovery requires the authored worker effect")
   local effect = effects[1]
@@ -129,7 +131,7 @@ function M.fingerprint(prototype)
     out[#out + 1], out[#out + 2] = atom(ingredient.name), atom(ingredient.amount)
   end
   local names = {}
-  for key, prerequisite in pairs(prototype.prerequisites or {}) do
+  for key, prerequisite in pairs(not work_levels and prototype.prerequisites or {}) do
     local name = type(key) == "string" and key or prerequisite and prerequisite.name
     assert(type(name) == "string" and name ~= "" and #names < 32,
       "MIR worker recovery prerequisite contract is invalid")
@@ -231,6 +233,7 @@ local function owner_copy(value, stack)
   stack[value] = nil
   return out
 end
+M.copy_owner = owner_copy
 
 local function owner_array(value, limit)
   assert(type(value) == "table" and #value <= limit, "MIR worker owner array is invalid")
