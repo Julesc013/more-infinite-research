@@ -14,6 +14,7 @@ $readDispatcherJournal = ${function:Get-MIRGunmetalDispatcherJournalTerminal}
 $script:checks=0
 $script:launches=0
 $script:fakeState='gone'
+$script:fakeFactorioActive=$false
 $script:nextLaunchState='active'
 $script:fakeJournal=[pscustomobject]@{observed=$false;exit_code=$null}
 $script:fakeInvocation='0123456789abcdef0123456789abcdef'
@@ -57,6 +58,10 @@ function Invoke-MIRGunmetalDispatcherSystemctl {
     }
   }
 }
+function Test-MIRGunmetalDispatcherFactorioActive {
+  return $script:fakeFactorioActive
+}
+
 function Invoke-MIRGunmetalDispatcherLauncher {
   param([Parameter(Mandatory)][string]$Path)
   $script:launches++
@@ -304,6 +309,50 @@ try {
   $running=Get-MIRGunmetalDispatcherStateRecord -Policy $waiting.base -Name running
   Assert-Dispatcher ($submitted.status -ceq 'submitted' -and $script:launches -eq ($beforeLaunches+1) -and
     $running.packet_sha256 -ceq $waiting.base.approval.packet_sha256 -and -not (Test-Path -LiteralPath $waitingPath)) 'same-pending-launches-once-after-unit-disappears'
+
+  # An external owner may hold a direct-library lease between game processes.
+  # The installed policy watches both editions even for a job approved without
+  # that list when its immutable snapshot was created.
+  $shared = New-DispatcherControl -Name 'shared-activity'
+  $controls += @($shared)
+  $otherEdition = Join-Path $shared.root '2.0'
+  $jobEdition = Join-Path $shared.root '2.1'
+  $null = [IO.Directory]::CreateDirectory($otherEdition)
+  $null = [IO.Directory]::CreateDirectory($jobEdition)
+  $baseRecord = Get-Content -LiteralPath $shared.base.path -Raw | ConvertFrom-Json -AsHashtable
+  $baseRecord['shared_library_roots'] = @($otherEdition, $jobEdition)
+  $baseRecord | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $shared.base.path -NoNewline
+  $shared.base = Get-MIRGunmetalDispatcherPolicy -Path $shared.base.path
+  $job = New-DispatcherPolicy -Control $shared -RequestId 'native-control-shared-job' -PacketText 'shared'
+  $null = Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $shared.base -SuccessorPolicyPath $job.path
+  $pendingPath = Join-Path $shared.spool 'state/pending.json'
+  $pendingHash = (Get-FileHash -LiteralPath $pendingPath).Hash
+  $beforeLaunches = $script:launches
+  $script:fakeState = 'gone'
+  $lease = [IO.File]::Open((Join-Path $otherEdition '.mir-library.lock'), 'CreateNew', 'ReadWrite', 'None')
+  try {
+    foreach ($reason in @('factorio-active', 'shared-library-lease')) {
+      $script:fakeFactorioActive = $reason -ceq 'factorio-active'
+      $waitingForSlot = Invoke-MIRGunmetalDispatcherConsume -Policy $shared.base
+      Assert-Dispatcher ($waitingForSlot.status -ceq 'waiting-for-native-slot' -and
+        $waitingForSlot.reason -ceq $reason -and $waitingForSlot.request_id -ceq $job.approval.request_id -and
+        $script:launches -eq $beforeLaunches) "$reason-defers-launch"
+      Assert-Dispatcher ((Get-FileHash -LiteralPath $pendingPath).Hash -ceq $pendingHash -and
+        -not (Test-Path -LiteralPath (Join-Path $shared.spool 'state/pending.signal')) -and
+        -not (Test-Path -LiteralPath (Join-Path $shared.spool 'state/intent.json')) -and
+        -not (Test-Path -LiteralPath (Join-Path $shared.spool 'state/running.json')) -and
+        -not (Test-Path -LiteralPath (Join-Path $shared.spool ('terminal/' + $job.approval.request_id + '.json')))) "$reason-preserves-original-pending"
+    }
+  } finally {
+    $lease.Dispose()
+    $script:fakeFactorioActive = $false
+  }
+  $submitted = Invoke-MIRGunmetalDispatcherConsume -Policy $shared.base
+  $null = Invoke-MIRGunmetalDispatcherConsume -Policy $shared.base
+  $running = Get-MIRGunmetalDispatcherStateRecord -Policy $shared.base -Name running
+  Assert-Dispatcher ($submitted.status -ceq 'submitted' -and $script:launches -eq ($beforeLaunches + 1) -and
+    $running.packet_sha256 -ceq $job.approval.packet_sha256 -and -not (Test-Path -LiteralPath $pendingPath) -and
+    -not (Test-Path -LiteralPath (Join-Path $jobEdition '.mir-library.lock'))) 'same-pending-launches-once-after-shared-lease-releases'
 
   # A durable intent is written before a launcher. Restart adopts only a live
   # unit and exact immutable snapshot; an absent unit becomes interrupted,
