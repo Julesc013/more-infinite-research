@@ -3500,6 +3500,78 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
         ''')
 
+    def archived_k2_worker_world(self, *, extra=True):
+        lua = self.older_world("f210")
+        self.enable_space_age(lua, "2.1.23")
+        lua.execute(r'''
+          local frozen_dependencies={
+            Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19",
+            Krastorio2Assets="2.1.0", Krastorio2MenuSimulations="2.1.0",
+            ["k2so-assets"]="1.0.7", flib="0.17.2", ["xy-k2so-enhancements-nulls-fork"]="0.8.3"
+          }
+          for name,version in pairs(frozen_dependencies)do script.active_mods[name]=version end
+          local prior_history=prototypes.get_history
+          prototypes.get_history=function(kind,name)
+            if kind=="technology" and name==CANONICAL then
+              return {created="more-infinite-research",changed={"more-infinite-research"}}
+            end
+            return prior_history(kind,name)
+          end
+          archived_event=older_event("4.6.21000",false)
+        ''')
+        if extra:
+            lua.execute('script.active_mods["neutral-unchanged-addon"]="1.0.0"')
+        return lua
+
+    def test_archived_k2_worker_admission_preserves_unrelated_paid_work(self):
+        self.archived_k2_worker_world().execute(r'''
+          player.research_queue={OTHER};player.research_progress=.42
+          detached.technologies[OTHER].saved_progress=.27
+          uninvested.technologies[CANONICAL].enabled=false
+          local before=all_frames();writes=0;queue_writes={};progress_writes={}
+          local plan=history.default_owner_preflight(archived_event,nil,true)
+          assert(plan.record.producer.kind=="archived-uninvested-default"
+            and plan.record.producer.old_version=="4.6.21000")
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+          assert(history.default_owner_apply(plan))
+          history.default_owner_on_load()
+          for _,force in pairs(game.forces)do
+            local old,now=before[force.index],frame(force)
+            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+          end
+        ''')
+
+    def test_archived_k2_worker_admission_refuses_unverified_history_before_writes(self):
+        for change, expected in (
+            ("detached.technologies[CANONICAL].level=5", "earned, queued or unfinished worker work"),
+            ("detached.research_queue={OTHER,CANONICAL}", "earned, queued or unfinished worker work"),
+            ("detached.technologies[CANONICAL].saved_progress=.27", "earned, queued or unfinished worker work"),
+            ("archived_event.mod_startup_settings_changed=true", "requires unchanged startup settings"),
+            ('archived_event.mod_changes["unreported-provider"]={old_version="1.0.0"}',
+             "requires the unchanged mod selection"),
+            ('script.active_mods["Krastorio2-spaced-out"]="2.0.18"', "qualified dependency versions"),
+            ('archived_event.mod_changes["more-infinite-research"].old_version="4.6.21001"',
+             "unrecorded default source has no qualified MIR5 producer"),
+            ('script.active_mods.recycler=nil', "requires its official mod selection"),
+            ('prototypes.technology[CANONICAL].research_unit_count_formula="676*1.5^(L-4)"',
+             "canonical4/full default4 contract or custody differs"),
+            ('local prior=prototypes.get_history;prototypes.get_history=function(kind,name) '
+             'local observed=prior(kind,name);if name==CANONICAL then observed.changed={"unknown-worker-editor"} end;'
+             'return observed end', "unverified prototype history"),
+        ):
+            with self.subTest(change=change):
+                lua = self.archived_k2_worker_world()
+                lua.globals().expected_refusal = expected
+                lua.execute(change + r'''
+                  local before=all_frames();writes=0
+                  local ok,why=pcall(history.default_owner_preflight,archived_event,nil,true)
+                  assert(not ok and tostring(why):find(expected_refusal,1,true),tostring(why))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
+
     def test_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
         for target, legacy_version, base, space_age in (
             ("f200", "4.7.20003", "2.0.77", False),
@@ -3877,33 +3949,12 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   assert(not history.default_owner_apply(again)and writes==0 and same(settled,all_frames()))
                 ''')
 
-    def archived_46_world(self):
-        lua = self.older_world("f210")
-        self.enable_space_age(lua, "2.1.23", recycler=True)
-        lua.execute(r'''
-          for name,version in pairs({Krastorio2="2.1.4",Krastorio2Assets="2.1.0",
-              Krastorio2MenuSimulations="2.1.0",["Krastorio2-spaced-out"]="2.0.19",
-              ["k2so-assets"]="1.0.7",flib="0.17.2",["xy-k2so-enhancements-nulls-fork"]="0.8.3"})do
-            script.active_mods[name]=version
-          end
-          local observed_history=prototypes.get_history
-          prototypes.get_history=function(kind,id)
-            local result=observed_history(kind,id)
-            if kind=="technology" and id==CANONICAL then
-              result.changed={"space-age","more-infinite-research"}
-            end
-            return result
-          end
-          event=older_event("4.6.21000",false)
-        ''')
-        return lua
-
     def test_archived_46_profile_preserves_current_and_detached_worker_work(self):
-        lua = self.archived_46_world()
+        lua = self.archived_k2_worker_world(extra=False)
         lua.execute(r'''
           seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
           local before=all_frames();writes=0;queue_writes={};progress_writes={}
-          local plan=history.default_owner_preflight(event,nil,true)
+          local plan=history.default_owner_preflight(archived_event,nil,true)
           assert(writes==0 and same(before,all_frames()))
           assert(plan.record.producer.kind=="archived-default" and plan.record.producer.old_version=="4.6.21000")
           assert(history.default_owner_apply(plan))
@@ -3920,45 +3971,6 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           local again=history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true)
           assert(not history.default_owner_apply(again) and writes==0 and same(settled,all_frames()))
         ''')
-
-    def test_archived_46_extra_mod_preserves_earned_levels_and_refuses_unfinished_worker_work(self):
-        lua = self.archived_46_world()
-        lua.execute(r'''
-          script.active_mods["extra-observer"]="1.0.0"
-          paid_idle()
-          local before=all_frames();writes=0
-          local plan=history.default_owner_preflight(event,nil,true)
-          assert(writes==0 and same(before,all_frames()) and plan.record.producer.kind=="archived-idle-default")
-          assert(history.default_owner_apply(plan))
-          for _,force in pairs(game.forces)do
-            local current,old=frame(force),before[force.index]
-            assert(current.owner.level==old.source.level and current.bonus==old.bonus and same(current.queue,old.queue))
-            assert(current.progress==old.progress and current.other_saved==old.other_saved)
-          end
-        ''')
-        for work in (
-            'detached.technologies[CANONICAL].saved_progress=.27',
-            'player.research_queue={CANONICAL,OTHER};player.research_progress=.125',
-            'suspended.research_queue={OTHER,CANONICAL}',
-        ):
-            with self.subTest(work=work):
-                lua = self.archived_46_world()
-                lua.execute('script.active_mods["extra-observer"]="1.0.0"\n' + work + '\nrefuse_older(event)')
-
-    def test_archived_46_refuses_profiles_without_matching_native_terms(self):
-        for change in (
-            'event.mod_changes["more-infinite-research"].old_version="4.6.21001"',
-            'event.mod_startup_settings_changed=true',
-            'event.mod_changes["changed-addon"]={old_version="0.1.0",new_version="0.2.0"};script.active_mods["changed-addon"]="0.2.0"',
-            'script.active_mods.recycler=nil',
-            'script.active_mods["Krastorio2-spaced-out"]="2.0.20"',
-            'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.24"end end',
-            'prototypes.get_history=function()return {created="base",changed={"foreign-editor"}}end',
-            'prototypes.technology[CANONICAL].research_unit_count_formula="676*1.5^(L-4)"',
-        ):
-            with self.subTest(change=change):
-                lua = self.archived_46_world()
-                lua.execute(change + "\nrefuse_older(event)")
 
     def test_473_f210_space_age_refuses_uncertain_origins_and_different_science(self):
         opponents = {
