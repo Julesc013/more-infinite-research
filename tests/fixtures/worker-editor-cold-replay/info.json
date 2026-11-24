@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-worker-init-frame",
+  "version": "0.1.2",
+  "title": "MIR worker startup and reload observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.24",
+    "space-age = 2.1.24",
+    "flib = 0.17.2"
+  ]
+}
