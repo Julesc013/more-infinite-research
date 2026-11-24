@@ -336,7 +336,8 @@ local function local_view(raw)
     refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
     geometry = geometry(raw.geometry),
-    scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
+    scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1,
+    scroll_to_selection = raw.scroll_to_selection == true or nil
   }
   -- The data-only model independently normalizes its own read surface. Keep
   -- this UI-owned record narrow and copy back only fields this host owns.
@@ -1639,10 +1640,10 @@ local function update_list_items(list, items, selected_index)
   if changed then list.items = items end
   local selection_changed = list.selected_index ~= selected_index
   if selection_changed then list.selected_index = selected_index end
-  return changed, selection_changed
+  return changed or selection_changed
 end
 
-local function update_research_content(content, player, view, context, translations, localized_search_pending)
+local function update_research_content(content, player, view, context, translations, localized_search_pending, observed)
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
@@ -1652,7 +1653,12 @@ local function update_research_content(content, player, view, context, translati
     content.clear()
   end
 
-  local rows, unavailable = rows_for(player, view, context, translations)
+  local rows, unavailable
+  if observed and observed.family == view.family and observed.labels == translations then
+    rows, unavailable = observed.rows, observed.unavailable
+  else
+    rows, unavailable = rows_for(player, view, context, translations)
+  end
   local stages = stage_annotations()
   local item_labels = {}
   for index, row in ipairs(rows) do
@@ -1732,11 +1738,15 @@ local function update_research_content(content, player, view, context, translati
   if created then
     results = add(list_pane, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
   end
-  local items_changed, selection_changed = update_list_items(results, item_labels, selected_index)
+  local changed = not created and update_list_items(results, item_labels, selected_index)
   if results.style then results.style.width, results.style.height = panes.list_width, math.max(76, panes.list_height - header_height) end
-  if created and view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
-    results.scroll_to_item(view.scroll, "top-third")
-  elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
+  -- A selected technology's row can move while the Library is closed.
+  -- Older views can still restore their saved numeric positions.
+  local scroll_index = view.scroll_to_selection == true and selected_index or view.scroll
+  if created and type(scroll_index) == "number" and scroll_index > 0
+      and scroll_index <= #item_labels and type(results.scroll_to_item) == "function" then
+    results.scroll_to_item(scroll_index, "top-third")
+  elseif changed and selected_index > 0 and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(selected_index, "in-view")
   end
   local detail, reason
@@ -2012,9 +2022,9 @@ local function update_settings_content(content, view, preserve_query, translatio
   dynamic[PREFIX .. "settings_scope_label"].caption = {"mir-browser.settings-scope-" .. view.settings_scope}
   dynamic[PREFIX .. "settings_count"].style.width = panes.list_width
   dynamic[PREFIX .. "settings_scope_label"].style.width = panes.detail_width
-  local items_changed, selection_changed = update_list_items(list, items, selected_index)
+  local changed = created or update_list_items(list, items, selected_index)
   if list.style then list.style.width, list.style.height = panes.list_width, panes.list_height end
-  if (created or items_changed or selection_changed) and selected_index > 0 and type(list.scroll_to_item) == "function" then
+  if changed and selected_index > 0 and type(list.scroll_to_item) == "function" then
     list.scroll_to_item(selected_index, created and "top-third" or "in-view")
   end
   if detail.style then
@@ -2039,27 +2049,6 @@ end
 
 local function update_queue_content(content, player, view)
   if not valid(content) then return end
-  local list = content[PREFIX .. "queue_list"]
-  if not valid(list) or not valid(content[PREFIX .. "queue_heading"]) then
-    content.clear()
-    add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
-    add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
-    add(content, {type = "label", name = PREFIX .. "queue_heading", caption = {"mir-browser.queue"}})
-    list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = {}})
-    add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
-  end
-  local unavailable = content[PREFIX .. "queue_unavailable"]
-  if not valid(unavailable) then
-    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
-      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
-  end
-  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
-  local available_width = math.max(1, width - 64)
-  list.style.width = available_width
-  list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
-  local guidance = content[PREFIX .. "queue_guidance"]
-  guidance.style.single_line, guidance.style.maximal_width = false, available_width
-  unavailable.style.single_line, unavailable.style.maximal_width = false, available_width
   local observed = queue_entries(player.force)
   local ids, items = observed or {}, {}
   local context = DISCOVERY_TREE and context_for(player.force) or nil
@@ -2073,7 +2062,29 @@ local function update_queue_content(content, player, view)
   end
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
-  update_list_items(list, items, selected_index)
+  local list = content[PREFIX .. "queue_list"]
+  if not valid(list) or not valid(content[PREFIX .. "queue_heading"]) then
+    content.clear()
+    add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
+    add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
+    add(content, {type = "label", name = PREFIX .. "queue_heading", caption = {"mir-browser.queue"}})
+    list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = items, selected_index = selected_index})
+    add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
+  else
+    update_list_items(list, items, selected_index)
+  end
+  local unavailable = content[PREFIX .. "queue_unavailable"]
+  if not valid(unavailable) then
+    unavailable = add(content, {type = "label", name = PREFIX .. "queue_unavailable",
+      caption = {"mir-browser.detail-unavailable", {"mir-browser.queue"}}})
+  end
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local available_width = math.max(1, width - 64)
+  list.style.width = available_width
+  list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
+  local guidance = content[PREFIX .. "queue_guidance"]
+  guidance.style.single_line, guidance.style.maximal_width = false, available_width
+  unavailable.style.single_line, unavailable.style.maximal_width = false, available_width
   list.visible = #items > 0
   content[PREFIX .. "queue_empty"].visible = observed ~= nil and #items == 0
   unavailable.visible = observed == nil
@@ -2472,7 +2483,7 @@ end
 
 -- Dynamic list/detail content is rebuilt under a stable root. In particular,
 -- query edits preserve the existing text field, native focus and caret.
-local function render(player, view, context, preserve_query)
+local function render(player, view, context, preserve_query, observed)
   if not valid(player) or player.connected ~= true then return nil end
   context = context or context_for(player.force)
   local frame = owned_root(player)
@@ -2522,7 +2533,7 @@ local function render(player, view, context, preserve_query)
     local search_pending = view.query ~= "" and translations ~= nil
       and translation_queue.is_complete(translations.cache, translations.scope) == false
       and translation_queue.needs_maintenance(translations.cache)
-    update_research_content(content, player, view, context, translated_labels(translations), search_pending)
+    update_research_content(content, player, view, context, translated_labels(translations), search_pending, observed)
     update_discovery_indicator(content, translations)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
@@ -2606,7 +2617,8 @@ function M.open(player, options)
     if sort == "progression" or sort == "native" then view.stable_sort = sort end
   end
   local selected = technology_id(options.selected)
-  if selected and known_technology(player, selected) then
+  local select_technology = selected and known_technology(player, selected)
+  if select_technology then
     view.selected, reset_page = selected, true
   end
   if options.hidden ~= nil then
@@ -2621,7 +2633,7 @@ function M.open(player, options)
   elseif reset_page then
     view.page = 1
   end
-  if reset_page then view.scroll = 1 end
+  if reset_page then view.scroll, view.scroll_to_selection = 1, select_technology and true or nil end
   local frame = render(player, view)
   -- Factorio routes Esc/E to this target. Only an explicit open may claim
   -- focus; translation/native refreshes must not displace another GUI.
@@ -2655,7 +2667,7 @@ function M.on_gui_text_changed(event)
   if element.name == PREFIX .. "query" then
     if not owns_element(player, element, {PREFIX .. "query", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT}) then return end
     local view = view_for(player.index)
-    view.query, view.page, view.scroll = text(element.text), 1, 1
+    view.query, view.page, view.scroll, view.scroll_to_selection = text(element.text), 1, 1, nil
     render(player, view, nil, true)
   elseif element.name == PREFIX .. "settings_query" then
     if not owns_element(player, element, {
@@ -2707,7 +2719,7 @@ function M.on_gui_selection_state_changed(event)
     if family == nil then return end
     view.family = family
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "visibility" then
     if not owns_element(player, element, {
@@ -2716,7 +2728,7 @@ function M.on_gui_selection_state_changed(event)
     local visibility = visibility_option(element.selected_index)
     if visibility == nil then return end
     local view = view_for(player.index)
-    view.visibility, view.page, view.scroll = visibility, 1, 1
+    view.visibility, view.page, view.scroll, view.scroll_to_selection = visibility, 1, 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "mode" then
     if not owns_element(player, element, {
@@ -2725,7 +2737,7 @@ function M.on_gui_selection_state_changed(event)
     local mode = whole_option(element.selected_index, 1, 3)
     if mode == nil then return end
     local view = view_for(player.index)
-    view.mode, view.page, view.scroll = mode, 1, 1
+    view.mode, view.page, view.scroll, view.scroll_to_selection = mode, 1, 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "status" then
     if not owns_element(player, element, {
@@ -2735,7 +2747,7 @@ function M.on_gui_selection_state_changed(event)
     local status = element.selected_index
     view.status = type(status) == "number" and status >= 1 and status <= 4 and math.floor(status) == status and status or 1
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "sort" then
     if not owns_element(player, element, {
@@ -2746,7 +2758,7 @@ function M.on_gui_selection_state_changed(event)
     view.sort = sort
     if sort == "progression" or sort == "native" then view.stable_sort = sort end
     view.page = 1
-    view.scroll = 1
+    view.scroll, view.scroll_to_selection = 1, nil
     render(player, view)
   elseif element.name == PREFIX .. "results" then
     if not owns_element(player, element, {
@@ -2754,13 +2766,15 @@ function M.on_gui_selection_state_changed(event)
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
-    local rows = rows_for(player, view, context, translated_labels(translation_caches[player.index]))
+    local labels = translated_labels(translation_caches[player.index])
+    local rows, unavailable = rows_for(player, view, context, labels)
     local index = element.selected_index
     local row = type(index) == "number" and rows[index] or nil
     if row then
       view.selected = row.id
-      view.scroll = index
-      render(player, view, context)
+      view.scroll, view.scroll_to_selection = index, true
+      -- The detail render can reuse this observation within the same event.
+      render(player, view, context, nil, {family = view.family, labels = labels, rows = rows, unavailable = unavailable})
     end
   elseif element.name == PREFIX .. "recipe_list" then
     local ordinary = owns_element(player, element, {
@@ -2804,6 +2818,7 @@ function M.on_gui_selection_state_changed(event)
     if id == nil or known_technology(player, id) == nil then return end
     local view = view_for(player.index)
     view.selected, view.tab, view.page, view.scroll = id, "research", 1, 1
+    view.scroll_to_selection = true
     render(player, view)
   end
 end
@@ -2914,7 +2929,7 @@ function M.on_gui_click(event)
       if count >= MAX_HIDDEN then return end
       view.hidden[id], view.selected = true, nil
     end
-    view.page, view.scroll = 1, 1
+    view.page, view.scroll, view.scroll_to_selection = 1, 1, nil
     render(player, view)
     return
   end
@@ -2924,7 +2939,7 @@ function M.on_gui_click(event)
     }) then return end
     local view = view_for(player.index)
     view.hidden, view.visibility, view.selected = {}, 1, nil
-    view.page, view.scroll = 1, 1
+    view.page, view.scroll, view.scroll_to_selection = 1, 1, nil
     render(player, view)
     return
   end
@@ -3397,8 +3412,9 @@ function M.subscription_needs()
   local ledger = existing_translation_ledger(state)
   if not ledger then return false end
   for _, group in ipairs({ledger.active, ledger.retired}) do
-    for _, entry in pairs(group) do
-      if entry_pending(entry) then return true end
+    for index, entry in pairs(group) do
+      local pending = entry_pending(entry)
+      if whole_number(index, 1) and pending and translation_queue.issued_window_can_expire(pending) then return true end
     end
   end
   return false

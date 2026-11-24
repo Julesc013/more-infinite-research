@@ -592,6 +592,59 @@ class LegacyCapsTests(unittest.TestCase):
           assert(rows[gear.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
         ''')
 
+    def test_native_cap_reads_require_sufficient_saved_restoration_evidence(self):
+        harness = """
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local index = 31
+          local reads = 0
+          local force = {valid = true, index = index, technologies = setmetatable({}, {
+            __index = function()
+              reads = reads + 1
+              error("legacy native lookup failed")
+            end
+          })}
+          local function assert_no_claim(import, saved, expected)
+            local ok, rows, facts = pcall(import, saved, force, {gear})
+            assert(ok, expected .. " unexpectedly read live technology: " .. tostring(rows))
+            assert(next(rows) == nil and facts.decisions[1].outcome == expected)
+          end
+          local function assert_lookup_required(import, saved)
+            local ok, cause = pcall(import, saved, force, {gear})
+            assert(not ok and tostring(cause):find("legacy native lookup failed", 1, true))
+          end
+
+        """
+        variants = (
+            (3, """
+              local structured = old_bucket(index, gear, 4, "mir32-1234abcd")
+              assert_lookup_required(legacy.import_for_force, structured)
+              structured.visibility_by_cap[index][gear.name] = nil
+              assert_no_claim(legacy.import_for_force, structured, "visibility_record_mismatch")
+              structured.managed_technologies[gear.name] = nil
+              assert_no_claim(legacy.import_for_force, structured, "policy_mismatch")
+              assert(reads == 1)
+            """),
+            (1, """
+              local boolean = boolean_bucket(index, gear, 4, true)
+              assert_lookup_required(legacy.import_boolean_for_force, boolean)
+              boolean.unowned_disabled_by_cap[index][gear.name] = true
+              assert_no_claim(legacy.import_boolean_for_force, boolean, "boolean_marker_missing")
+              boolean.disabled_by_cap[index][gear.name] = nil
+              assert_no_claim(legacy.import_boolean_for_force, boolean, "boolean_marker_missing")
+              boolean.visibility_by_cap = {[index] = {[gear.name] = false}}
+              assert_lookup_required(legacy.import_boolean_for_force, boolean)
+              boolean.visibility_by_cap[index][gear.name] = "invalid"
+              assert_no_claim(legacy.import_boolean_for_force, boolean, "visibility_record_mismatch")
+              boolean.managed_technologies[gear.name] = nil
+              assert_no_claim(legacy.import_boolean_for_force, boolean, "policy_mismatch")
+              assert(reads == 2)
+            """),
+        )
+        for schema, controls in variants:
+            with self.subTest(schema=schema):
+                self.lua.execute(harness + controls)
+
     def test_schema1_is_bounded_pure_and_does_not_change_structured_v3_imports(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",

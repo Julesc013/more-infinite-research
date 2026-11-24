@@ -322,6 +322,34 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(player.worker_robots_storage_bonus==bonus)
         ''')
 
+    def test_prepare_refuses_unavailable_or_truncated_queues_before_any_force_writes(self):
+        for incomplete in ("unavailable", "hole"):
+            with self.subTest(incomplete=incomplete):
+                self.setUp()
+                self.lua.globals().incomplete = incomplete
+                self.lua.execute(r'''
+                  seed()
+                  local force = suspended
+                  if incomplete == "unavailable" then force.research_queue = {} end
+                  local queue = force.research_queue
+                  local observed = nil
+                  if incomplete == "hole" then observed = {queue[1], [3]=queue[2]} end
+                  local mt = getmetatable(force)
+                  local read = mt.__index
+                  mt.__index = function(object, key)
+                    if key == "research_queue" and writes == 0 then return observed end
+                    return read(object, key)
+                  end
+                  writes = 0
+                  local ok, failure = pcall(history.prepare, nil)
+                  mt.__index = read
+                  assert(not ok and tostring(failure):find("native queue", 1, true),
+                    "accepted an incomplete queue: " .. tostring(failure))
+                  assert(writes == 0 and storage.mir_worker_storage_route == nil)
+                  assert(force.research_queue == queue and force.technologies[CANONICAL].saved_progress == .27)
+                  assert(player.current_research.name == CANONICAL and player.research_progress == .375)
+                ''')
+
     def test_all_force_contract_custody_and_frame_opponents_refuse_before_writes(self):
         opponents = [
             'creators[CANONICAL]="foreign"', 'creators[ID]="foreign"',
@@ -980,6 +1008,89 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=Path(__file__).resolve().parents[1] / "source"
         )
 
+    def test_unrelated_research_does_not_read_the_worker_owner(self):
+        lua = self.world()
+        lua.execute(r'''
+          init_default()
+          local saved = assert(storage[OWNER_KEY])
+          local other = assert(player.technologies[OTHER])
+          assert(other.force == player)
+          storage[OWNER_KEY] = nil
+          local reads = 0
+          setmetatable(storage, {__index=function(_, key)
+            if key == OWNER_KEY then
+              reads = reads + 1
+              return saved
+            end
+          end})
+          local handled, changed = history.default_owner_on_research_finished{research=other, by_script=false}
+          assert(not handled and not changed)
+          assert(reads == 0, "unrelated research read the worker owner")
+        ''')
+
+    def test_initial_native_mirror_keeps_one_award_and_unrelated_work(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  game.tick=0
+                  set_reward(.25)
+                  prototypes.technology[CANONICAL].visible_when_disabled=false
+                  for _,f in ipairs{player,detached}do
+                    f.technologies[CANONICAL].level=5
+                    f.technologies[ORDINARY].level=5
+                  end
+                  player.research_queue={OTHER}
+                  player.research_progress=.625
+                  assert(player.worker_robots_storage_bonus==20.5)
+                  local before=frame(player)
+                  queue_writes={};progress_writes={}
+                  history.on_init(nil)
+                  assert(history.default_owner_on_init(nil,true))
+                  for _,f in ipairs{player,detached}do
+                    local after=frame(f)
+                    assert(after.bonus==20.25 and after.owner.level==5 and after.owner.enabled)
+                    assert(after.source.level==5 and not after.source.enabled)
+                    assert(after.debit.level==5 and not after.debit.enabled)
+                    assert(storage[OWNER_KEY].forces[f.index].retired_flags.disabled_by_mir)
+                  end
+                  local after=frame(player)
+                  assert(same(before.owner,after.owner) and same(before.queue,after.queue))
+                  assert(after.current==before.current and after.progress==before.progress)
+                  assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                  local saved=all_frames();writes=0
+                  history.default_owner_on_load()
+                  assert(same(saved,all_frames()) and writes==0)
+                ''')
+
+    def test_initial_native_mirror_rejects_other_earned_or_unfinished_frames(self):
+        for change in (
+            "game.tick=1",
+            "game.tick=nil",
+            "detached.technologies[CANONICAL].level=4",
+            "detached.technologies[ORDINARY].level=4",
+            "detached.technologies[ORDINARY].level=6",
+            "detached.technologies[ORDINARY].saved_progress=.125",
+            "detached.technologies[CANONICAL].saved_progress=.125",
+            "detached.research_queue={ORDINARY}",
+            "detached.technologies[HEAD].level=5;detached.technologies[HEAD].enabled=false",
+        ):
+            with self.subTest(change=change):
+                lua = self.world()
+                lua.execute(r'''
+                  game.tick=0
+                  prototypes.technology[CANONICAL].visible_when_disabled=false
+                  for _,f in ipairs{player,detached}do
+                    f.technologies[CANONICAL].level=5
+                    f.technologies[ORDINARY].level=5
+                  end
+                ''' + change + r'''
+                  history.on_init(nil)
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_on_init,nil,true))
+                  assert(same(before,all_frames()) and writes==0 and storage[OWNER_KEY]==nil)
+                ''')
+
     def published517_world(self, cap):
         """Use the three actual published B0BF producer bodies, not a current initializer."""
         revision = "17e78c4d5d339413668e30e8eb422b915d390179"
@@ -1195,6 +1306,23 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
             '''+change+r''';local before=all_frames();writes=0
               assert(not pcall(history.apply_default_owner_transfer,plan)and writes==0 and same(before,all_frames()))
             ''')
+
+    def test_default_transfer_preserves_newer_parked_work_on_a_later_force(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  seed_owner()
+                  local updated, owner = nil, storage[OWNER_KEY]
+                  after_first_level_write(player.technologies[ORDINARY], function()
+                    detached.technologies[CANONICAL].saved_progress = .71
+                    updated = frame(detached)
+                  end)
+                  local ok, message = pcall(transfer)
+                  assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+                  assert(updated and updated.source.saved == .71 and same(frame(detached), updated))
+                  assert(storage[OWNER_KEY] == owner and not history.default_owner_mutating{force=player})
+                ''')
 
     def test_malformed_old_split_record_and_native_owner_drift_refuse(self):
         for change in ('state.schema=2;state.kind="split-default"','state.owner="mir-worker-storage-default-5"',
@@ -2046,6 +2174,31 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           assert(pending.forces[player.index].phase=="legacy-completion-pending"
             and pending.forces[suspended.index].phase=="legacy-completion-pending")
           assert(player.technologies[ORDINARY].level==6 and second.researched and suspended.research_progress==1)
+        ''')
+
+    def test_published517_paid_bridge_preserves_newer_active_work_on_a_later_force(self):
+        lua = self.world("f200")
+        lua.execute(r'''
+          published517_source_contract()
+          init_default()
+          for _, force in ipairs({player, detached}) do
+            finish_frame(force, "advanced", {ORDINARY}, false)
+            assert(history.default_owner_on_research_finished(finish_event(force)))
+            force.technologies[ORDINARY].saved_progress = .42
+            force.research_queue = {ORDINARY}
+            force.research_progress = .42
+          end
+          current_se_contract()
+          local plan = history.default_owner_preflight(published517_se_bridge_event(), nil, true)
+          local updated, owner = nil, storage[OWNER_KEY]
+          after_first_level_write(player.technologies[LEGACY517], function()
+            detached.research_progress = .71
+            updated = frame(detached)
+          end)
+          local ok, message = pcall(history.default_owner_apply, plan)
+          assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+          assert(updated and updated.current == ORDINARY and updated.progress == .71)
+          assert(same(frame(detached), updated) and storage[OWNER_KEY] == owner)
         ''')
 
     def test_published517_exact_settings_admit_the_paid_bridge_when_an_unrelated_setting_changed(self):
@@ -3068,6 +3221,25 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
               else assert(ok);history.apply(legacy)end
             ''')
 
+    def test_provider_transfer_preserves_newer_parked_work_on_a_later_force(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.world(target)
+                lua.execute(r'''
+                  full_source(1, true)
+                  finite_entry(1)
+                  local plan = delegate()
+                  local updated, owner, quota = nil, storage[OWNER_KEY], storage.mir_worker_storage_route
+                  after_first_level_write(player.technologies[ID], function()
+                    detached.technologies[ORDINARY].saved_progress = .71
+                    updated = frame(detached)
+                  end)
+                  local ok, message = pcall(history.default_owner_apply, plan)
+                  assert(not ok and tostring(message):find("work changed during another force's transfer", 1, true))
+                  assert(updated and updated.owner.saved == .71 and same(frame(detached), updated))
+                  assert(storage[OWNER_KEY] == owner and storage.mir_worker_storage_route == quota)
+                ''')
+
     def test_completed_owner_cursor_normalizes_without_inventing_any_unfinished_quota(self):
         lua=self.world();lua.execute(r'''
           full_source(2,false);player.research_queue={OTHER};player.research_progress=.45
@@ -3171,13 +3343,15 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
-    def enable_f210_space_age(self, lua, engine_version="2.1.23"):
+    def enable_space_age(self, lua, engine_version="2.1.23", recycler=True):
         lua.globals().official_engine_version = engine_version
+        lua.globals().official_recycler = recycler
         lua.execute(r'''
           script.active_mods.base=official_engine_version
-          for _,name in ipairs({"space-age","quality","elevated-rails","recycler"})do
+          for _,name in ipairs({"space-age","quality","elevated-rails"})do
             script.active_mods[name]=official_engine_version
           end
+          if official_recycler then script.active_mods.recycler=official_engine_version end
           for _,id in ipairs({CANONICAL,ORDINARY,ID})do
             table.insert(prototypes.technology[id].research_unit_ingredients,
               {name="electromagnetic-science-pack",amount=1})
@@ -3326,30 +3500,68 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
         ''')
 
-    def test_f200_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
-        lua=self.older_world()
-        lua.execute(r'''
-          player.research_queue={OTHER};player.research_progress=.42
-          suspended.technologies[OTHER].saved_progress=.27
-          uninvested.technologies[CANONICAL].enabled=false
-          local event=older_event("4.7.20003",false);event.mod_startup_settings_changed=true
-          script.active_mods["unrelated-updated-mod"]="0.8.0"
-          script.active_mods["unrelated-unchanged-mod"]="1.0.0"
-          event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
-          local before=all_frames();writes=0;queue_writes={};progress_writes={}
-          local plan=history.default_owner_preflight(event,nil,true)
-          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
-          assert(plan.record.producer.kind=="published473-idle-default")
-          assert(history.default_owner_apply(plan))
-          history.default_owner_on_load()
-          for _,force in pairs(game.forces)do
-            local old,now=before[force.index],frame(force)
-            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
-            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
-            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
-            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
-          end
-        ''')
+    def test_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
+        for target, legacy_version, base, space_age in (
+            ("f200", "4.7.20003", "2.0.77", False),
+            ("f200", "4.7.20003", "2.0.77", True),
+            ("f210", "4.7.21003", "2.1.24", False),
+            ("f210", "4.7.21003", "2.1.24", True),
+        ):
+            with self.subTest(target=target, space_age=space_age):
+                lua = self.older_world(target)
+                lua.globals().legacy_version = legacy_version
+                lua.globals().test_base = base
+                lua.execute("script.active_mods.base=test_base")
+                if space_age:
+                    self.enable_space_age(lua, base, recycler=target == "f210")
+                lua.execute(r'''
+                  player.research_queue={OTHER};player.research_progress=.42
+                  suspended.technologies[OTHER].saved_progress=.27
+                  uninvested.technologies[CANONICAL].enabled=false
+                  local event=older_event(legacy_version,false);event.mod_startup_settings_changed=true
+                  if not script.active_mods["space-age"] then
+                    script.active_mods["unrelated-updated-mod"]="0.8.0"
+                    script.active_mods["unrelated-unchanged-mod"]="1.0.0"
+                    event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
+                  end
+                  local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                  assert(plan.record.producer.kind=="published473-idle-default")
+                  assert(history.default_owner_apply(plan))
+                  history.default_owner_on_load()
+                  for _,force in pairs(game.forces)do
+                    local old,now=before[force.index],frame(force)
+                    assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+                    assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+                    assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+                    assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+                  end
+                ''')
+
+    def test_473_f210_startup_change_refuses_earned_queued_or_paid_cargo(self):
+        for change, expected in (
+            ("detached.technologies[CANONICAL].level=5", "earned worker levels"),
+            ("detached.research_queue={CANONICAL};detached.research_progress=.27",
+             "unfinished native worker work"),
+            ("detached.research_queue={OTHER,CANONICAL}", "unfinished native worker work"),
+            ("detached.technologies[CANONICAL].saved_progress=.27",
+             "unfinished native worker work"),
+            ("detached.technologies[HEAD].level=5;detached.technologies[HEAD].enabled=false",
+             "owner/debit is not pristine"),
+        ):
+            with self.subTest(change=change):
+                lua = self.older_world("f210")
+                self.enable_space_age(lua, "2.1.24")
+                lua.globals().expected_refusal = expected
+                lua.execute(change + r'''
+                  local event=older_event("4.7.21003",false)
+                  event.mod_startup_settings_changed=true
+                  local before=all_frames();writes=0
+                  local ok,reason=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and tostring(reason):find(expected_refusal,1,true),tostring(reason))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
 
     def test_f200_473_startup_change_refuses_worker_investment_or_unavailable_inputs(self):
         opponents=(
@@ -3501,7 +3713,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'script.active_mods.foreign="1"',
             'script.active_mods.foreign="1";event.mod_changes.foreign={old_version="1",new_version="1"}',
             'event.mod_changes.removed={old_version="1"}',
-            'event.mod_startup_settings_changed=true',
+            'event.mod_startup_settings_changed=true;detached.technologies[CANONICAL].saved_progress=.27',
             'event.mod_changes.base={old_version="2.1.22",new_version="2.1.23"}',
             'script.active_mods["space-age"]="2.1.23";event.mod_changes["space-age"]={new_version="2.1.23"}',
             'event.mod_changes["more-infinite-research"].old_version="4.7.21002"',
@@ -3519,8 +3731,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
 
     def test_first_owner_refusals_report_the_actual_473_event_base_and_current_route(self):
         cases=(
-            ("f210", "4.7.21003", "2.1.24", "2.1.23", "2.1.24", True,
+            ("f210", "4.7.21002", "2.1.24", "2.1.23", "2.1.24", True,
              "unrecorded default source requires unchanged startup settings"),
+            ("f210", "4.7.21003", "2.1.24", "2.1.22", "2.1.24", True,
+             "older default source requires its qualified Base engine and unchanged settings"),
             ("f200", "4.7.20003", "2.0.76", "2.0.77", "2.0.76", False,
              "older default source requires its qualified Base engine and unchanged settings"),
         )
@@ -3582,23 +3796,31 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     def test_473_matching_contract_transfers_current_repeated_queued_and_detached_work(self):
         cases = (
             ("f200", "4.7.20003", "base", "2.0.77"),
+            ("f200", "4.7.20003", "space-age", "2.0.77"),
+            ("f200", "4.7.20003", "space-age-unchanged-rows", "2.0.77"),
             ("f210", "4.7.21003", "base", "2.1.23"),
             ("f210", "4.7.20003", "base-hop", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.23"),
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.23"),
             ("f210", "4.7.21003", "space-age", "2.1.24"),
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
+            ("f210", "4.7.21003", "space-age", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch-with-addons", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch-with-reported-addons", "2.1.25"),
         )
         for target, old, selection, engine_version in cases:
             with self.subTest(target=target, old=old, selection=selection, engine_version=engine_version):
                 lua = self.older_world(target)
                 if selection.startswith("space-age"):
-                    self.enable_f210_space_age(lua, engine_version)
+                    self.enable_space_age(lua, engine_version, recycler=target == "f210")
                 lua.globals().old = old
                 lua.globals().selection = selection
                 lua.execute(r'''
                   seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER}
                   local event=older_event(old,false)
+                  local reported_addons=selection=="space-age-engine-patch-with-reported-addons"
+                  local checked_addons=reported_addons or selection=="space-age-engine-patch-with-addons"
                   if selection=="base-hop"then
                     event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
                     event.mod_startup_settings_changed=true
@@ -3607,6 +3829,31 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version=version,new_version=version}
                       end
+                    end
+                  elseif selection=="space-age-engine-patch" or checked_addons then
+                    for name,version in pairs(script.active_mods)do
+                      if name~="more-infinite-research"then
+                        event.mod_changes[name]={old_version="2.1.24",new_version=version}
+                      end
+                    end
+                  end
+                  if checked_addons then
+                    local addons={["Return-Inserter"]="1.0.0",["spider-launcher"]="2.9.87"}
+                    if reported_addons then
+                      addons.CleanedConcrete="2.1.0"
+                      addons["even-distribution-fork"]="2.1.2"
+                      addons.pump="2.2.6"
+                      event.mod_changes.pump={old_version="2.2.6",new_version="2.2.6"}
+                    end
+                    for name,version in pairs(addons)do script.active_mods[name]=version end
+                    event.mod_changes["Return-Inserter"]={old_version="1.0.0",new_version="1.0.0"}
+                    local read=prototypes.get_history
+                    prototypes.get_history=function(kind,id)
+                      local result=read(kind,id)
+                      if kind=="technology" and id==CANONICAL then
+                        result.changed={"space-age","more-infinite-research"}
+                      end
+                      return result
                     end
                   end
                   local before=all_frames();writes=0;queue_writes={};progress_writes={}
@@ -3635,17 +3882,55 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             "added DLC": 'event.mod_changes.quality={new_version="2.1.23"}',
             "removed DLC": 'script.active_mods.quality=nil; event.mod_changes.quality={old_version="2.1.23"}',
             "inactive DLC": 'script.active_mods.recycler=nil',
-            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.25" end end',
-            "repinned official set": '''
+            "unqualified official patch": 'for name,version in pairs(script.active_mods)do if version=="2.1.23"then script.active_mods[name]="2.1.26" end end',
+            "missing official patch row": '''
               for name,version in pairs(script.active_mods)do
                 if version=="2.1.23"then
                   script.active_mods[name]="2.1.24"
                   event.mod_changes[name]={old_version=version,new_version="2.1.24"}
                 end
               end
+              event.mod_changes.recycler=nil
             ''',
             "changed startup settings": 'event.mod_startup_settings_changed=true',
-            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "missing worker editor history": 'script.active_mods["Return-Inserter"]="1.0.0"',
+            "foreign worker edit": '''
+              script.active_mods["Return-Inserter"]="1.0.0"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"Return-Inserter"} end
+                return result
+              end
+            ''',
+            "changed addon with known worker editors": '''
+              script.active_mods["Return-Inserter"]="1.0.0"
+              event.mod_changes["Return-Inserter"]={old_version="0.9.9",new_version="1.0.0"}
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={"space-age"} end
+                return result
+              end
+            ''',
+            "historical-only addon edit with clean current history": '''
+              script.active_mods["mir-fixture-worker-source-only-price"]="0.1.0"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={} end
+                return result
+              end
+            ''',
+            "another version of an admitted addon": '''
+              script.active_mods["Return-Inserter"]="1.0.1"
+              local read=prototypes.get_history
+              prototypes.get_history=function(kind,id)
+                local result=read(kind,id)
+                if kind=="technology" and id==CANONICAL then result.changed={} end
+                return result
+              end
+            ''',
             "added mod": '''
               script.active_mods.observer="1.0.0"
               event.mod_changes.observer={new_version="1.0.0"}
@@ -3659,11 +3944,39 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
         for case, change in opponents.items():
             with self.subTest(case=case):
                 lua = self.older_world("f210")
-                self.enable_f210_space_age(lua)
+                self.enable_space_age(lua)
                 lua.execute(r'''
                   seed_owner()
                   local event=older_event("4.7.21003",false)
                   local packs=prototypes.technology[CANONICAL].research_unit_ingredients
+                ''' + change + r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,event,nil,true))
+                  assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                ''')
+
+    def test_473_f200_space_age_only_admits_unchanged_official_2077(self):
+        opponents = {
+            "added quality": 'event.mod_changes.quality={new_version="2.0.77"}',
+            "removed rails": 'script.active_mods["elevated-rails"]=nil; event.mod_changes["elevated-rails"]={old_version="2.0.77"}',
+            "recycler present": 'script.active_mods.recycler="2.0.77"',
+            "recycler event": 'event.mod_changes.recycler={old_version="2.0.77",new_version="2.0.77"}',
+            "unrelated existing mod": 'script.active_mods.observer="1.0.0"',
+            "unqualified patch": '''
+              for name,version in pairs(script.active_mods)do
+                if version=="2.0.77"then script.active_mods[name]="2.0.78" end
+              end
+            ''',
+            "changed startup settings": 'event.mod_startup_settings_changed=true',
+            "wrong science": 'prototypes.technology[CANONICAL].research_unit_ingredients[6].name="metallurgic-science-pack"',
+        }
+        for case, change in opponents.items():
+            with self.subTest(case=case):
+                lua = self.older_world("f200")
+                self.enable_space_age(lua, "2.0.77", recycler=False)
+                lua.execute(r'''
+                  seed_owner()
+                  local event=older_event("4.7.20003",false)
                 ''' + change + r'''
                   local before=all_frames();writes=0
                   assert(not pcall(history.default_owner_preflight,event,nil,true))
@@ -3999,6 +4312,51 @@ class WorkerPaidHeadConfigurationFlagTests(unittest.TestCase):
                       assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==key)
                     ''')
 
+    def test_adding_solar_restores_only_owned_retirement_and_debit_flags(self):
+        for debit_reenabled in (False, True):
+            with self.subTest(debit_reenabled=debit_reenabled):
+                lua = self.world()
+                lua.globals().debit_reenabled = debit_reenabled
+                lua.execute(r'''
+                  full_source(1,true);reenable_paid_heads()
+                  local retired=player.technologies[CANONICAL]
+                  retired.enabled=true;retired.visible_when_disabled=true
+                  player.technologies[HEAD].enabled=debit_reenabled
+                  local event=default_config()
+                  event.mod_changes["solar-productivity"]={new_version="3.0.0"}
+                  script.active_mods["solar-productivity"]="3.0.0"
+                  local before=all_frames();local ownership=copy(storage[OWNER_KEY])
+                  writes=0;queue_writes={};progress_writes={}
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(writes==0 and same(before,all_frames()))
+                  assert(history.default_owner_apply(plan))
+                  before[player.index].source.enabled=false
+                  for _,row in pairs(before)do row.debit.enabled=false end
+                  assert(same(before,all_frames())and same(ownership,storage[OWNER_KEY]))
+                  assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                  writes=0
+                  local again=history.default_owner_preflight(event,nil,true)
+                  assert(not again.changed and not history.default_owner_apply(again) and writes==0)
+                ''')
+
+    def test_configuration_cannot_retake_a_foreign_retirement_or_discard_work(self):
+        for opponent in ('local flags=storage[OWNER_KEY].forces[player.index].retired_flags;'
+                         'flags.enabled=false;flags.disabled_by_mir=false',
+                         'retired.saved_progress=.1',
+                         'retired.level=6',
+                         'player.research_queue={CANONICAL,ORDINARY,OTHER}',
+                         'player.technologies[HEAD].level=4'):
+            with self.subTest(opponent=opponent):
+                lua = self.world()
+                lua.execute(r'''
+                  full_source(1,true);reenable_paid_heads()
+                  local retired=player.technologies[CANONICAL];retired.enabled=true
+                ''' + opponent + r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.default_owner_preflight,default_config(),nil,true))
+                  assert(writes==0 and same(before,all_frames()))
+                ''')
+
     def test_raw_head_enabled_is_sealed_against_both_stale_directions(self):
         for context in ("default", "handover", "retired"):
             for initially_enabled in (False, True):
@@ -4275,6 +4633,42 @@ class WorkerRecordedDefaultModChangeTests(unittest.TestCase):
                   assert(message:find("keep the protected original COPY",1,true))
                   assert(not message:find("/mir-worker-storage-recovery prepare",1,true))
                 ''')
+
+    def test_recorded_default_accepts_later_same_edition_mir5_producers(self):
+        for target in ("f200", "f210"):
+            for patch in ("12", "22"):
+                with self.subTest(target=target, patch=patch):
+                    lua = self.world(target)
+                    lua.globals().prior_patch = patch
+                    lua.execute(r'''
+                      seed_owner()
+                      storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+                      local metadata = require("platform.target")
+                      local prefix = metadata.distribution_version:sub(1,-3)
+                      local prior, current = prefix..prior_patch, prefix.."23"
+                      metadata.distribution_version = current
+                      script.active_mods["more-infinite-research"] = current
+                      script.active_mods["credit-provider"] = "0.3.0"
+                      local event = {mod_startup_settings_changed=false,mod_changes={
+                        ["more-infinite-research"]={old_version=prior,new_version=current},
+                        ["credit-provider"]={old_version="0.2.0",new_version="0.3.0"},
+                      }}
+                      local before=all_frames();writes=0
+                      local plan=history.plan_default_owner_transfer(event,nil,false)
+                      assert(writes==0 and same(before,all_frames()))
+                      assert(history.apply_default_owner_transfer(plan))
+                      local producer=storage[OWNER_KEY].producer
+                      assert(producer.kind=="recorded-default" and producer.old_version==prior and producer.new_version==current)
+                      assert(player.current_research.name==ORDINARY and player.research_progress==.375)
+                      assert(player.research_queue[2].name==OTHER and suspended.current_research.name==OTHER)
+                      assert(suspended.technologies[ORDINARY].saved_progress==.27 and detached.technologies[ORDINARY].saved_progress==.23)
+                      for _,force in pairs(game.forces) do assert(frame(force).bonus==before[force.index].bonus) end
+                      history.default_owner_on_load()
+                      local after=all_frames();writes=0
+                      local again=history.default_owner_preflight(event,nil,true)
+                      history.default_owner_apply(again)
+                      assert(writes==0 and same(after,all_frames()))
+                    ''')
 
     def test_recorded_default_preserves_paid_and_pending_work_across_consistent_mod_changes(self):
         for target in ("f200", "f210"):

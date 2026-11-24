@@ -166,6 +166,12 @@ Show the real repeated code or concrete safety boundary, why native Factorio beh
 
 Code should be concise enough to follow, not minified. Prefer ordinary arrays/maps and direct field changes. Do not hide complexity in generated data. Explain any shared Generator growth together with the total declarations/adapters/UI/tooling footprint.
 
+## Development tools
+
+Lua implements the mod and Factorio fixtures. Use Python for portable developer work such as packaging, release verification and host assertions. The existing PowerShell entry points run the host plan and own native process, workspace and GitHub administration where they are already in use. When consolidating a tool, carry its behavior and checks into the shared implementation before retiring its old entry point.
+
+Use the governed native fixture runner with an exact engine, profile and archives for new gameplay work. The original private gear-slice command pinned to the first MIR5 build remains available in Git with its historical evidence. [Current fixture runner](../tools/Invoke-NativeFixture.ps1) · [Original gear-slice script](https://github.com/Julesc013/more-infinite-research/blob/c7c815d831c434a45d1965fe7e4acc1f0de3786d/tools/Invoke-NativeSlice.ps1)
+
 ## Test selection
 
 For a bounded host batch, use `-ControlPath` with exact paths from the driver. For example, `./tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir $luaRuntime -ControlPath 'tests/test_library.py','tests/test_library_model.py'` runs those two scripts in plan order. Adding `-Plan` prints the selected rows. Invoking the driver with only the pinned Lua directory runs the full host gate. It uses `python3` when the system provides Python under that name alone.
@@ -308,6 +314,14 @@ This MIR5 procedure uses the maintainer's explicit publication authorization. It
 6. Derive the complete public set from `assets` plus any `early_cohort.assets` and their checksum files; stage exactly those individual ZIPs and sums in the draft. Keep canonical filenames and use each inventory asset's `label`: `MIR MAJOR.MINOR.PATCH for Factorio x.y.z (zip)`, with the source release version and exact package minimum, without `+`. Link release notes to the [support guide](support.md) for standing edition limits and installation instructions; repeat only new, changed or update-specific limitations. For older frozen inventories without `label`, derive it from their unchanged `release.source_version` and asset `minimum_base`; do not rewrite the inventory or packages. Keep the developer inventory, bundles, upload instructions and receipts out of public assets. Reconcile existing asset IDs/names before a retry; do not overwrite a mismatched asset automatically. Download every staged asset and compare lengths and SHA256 hashes with the frozen inventory and sums.
 7. Verify tag/main identity, title/body, complete inventory-derived names/labels, the explicit prerelease flag and mutable-release probes, then publish that same release ID. A prerelease uses `make_latest="false"`; only an appropriate stable release may be selected as latest. These GitHub metadata fields do not modify ZIPs. Read the release ID after a lost response rather than creating another release, and record its URL, maturity and publication state. See [GitHub's release fields](https://docs.github.com/en/rest/releases/releases#create-a-release).
 8. Download every inventory-selected public asset anonymously with no authorization header and verify exact bytes/hashes. Copy the identical ZIPs, sums, matching release notes and upload text into primary `dist`, with hash verification. Retain developer inventory and publication/download receipts separately. Synchronize the primary branch with its remote and dispose only of completed clean disposable work after readback. Verified GitHub delivery completes that release's distribution; a prerelease does not complete stable qualification. The maintainer uploads the same ZIPs to Portal only for stable releases.
+
+Run the [anonymous readback command](../tools/verify_public_release.py) from the primary checkout after publication. Supply the earlier reviewed inventory hash, checked tag commit, release ID and chosen maturity. The command reads the release notes from that commit, verifies the anonymous assets, and keeps mismatched existing delivery files and verified staging available for reconciliation.
+
+```powershell
+python -B tools/verify_public_release.py --frozen <freeze-directory> --inventory-sha256 <sha256> --tag-commit <commit> --release-id <id> --maturity prerelease --receipt build/qualification/<new-readback-directory>
+```
+
+Use `--maturity stable` for a qualified stable release.
 
 ## Determinism and visual context
 

@@ -9,6 +9,7 @@ $dispatcher=Join-Path $RepoRoot 'tools/commands/workspace/Invoke-MIRGunmetalNati
 $installer=Join-Path $RepoRoot 'tools/commands/workspace/Install-MIRGunmetalNativeDispatcher.ps1'
 . $dispatcher
 . $installer
+$readDispatcherJournal = ${function:Get-MIRGunmetalDispatcherJournalTerminal}
 
 $script:checks=0
 $script:launches=0
@@ -46,6 +47,10 @@ function Invoke-MIRGunmetalDispatcherSystemctl {
     'failed' {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=failed','SubState=failed','MainPID=0',('InvocationID='+$script:fakeInvocation),'Result=exit-code','ExecMainCode=exited','ExecMainStatus=1') }
     }
+    'activating-without-pid' {
+      return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=activating','SubState=start','MainPID=0','InvocationID=','Result=success','ExecMainCode=','ExecMainStatus=') }
+    }
+    'query-partial' { return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=loaded','ActiveState=active','MainPID=4242') } }
     'query-error' { return [pscustomobject]@{ exit_code = 1; lines = @('Failed to connect to bus') } }
     default {
       return [pscustomobject]@{ exit_code = 0; lines = @('LoadState=not-found','ActiveState=inactive','SubState=dead','MainPID=0','InvocationID=','Result=','ExecMainCode=','ExecMainStatus=') }
@@ -61,6 +66,13 @@ function Invoke-MIRGunmetalDispatcherLauncher {
 function Get-MIRGunmetalDispatcherJournalTerminal {
   param([Parameter(Mandatory)][string]$InvocationId,[string]$Unit,[string]$PacketSha256)
   return $script:fakeJournal
+}
+
+function Invoke-MIRGunmetalDispatcherJournalctl {
+  param([Parameter(Mandatory)][string[]]$Arguments)
+  $script:journalReads++
+  if ($Arguments[0] -clike 'USER_INVOCATION_ID=*') { return $script:journalManagerReply }
+  return $script:journalHookReply
 }
 
 function Test-DispatcherExitJournal {
@@ -95,6 +107,30 @@ function Test-DispatcherExitJournal {
   $timeout = $hook.Replace('result=success code=exited status=0','result=timeout code=killed status=TERM')
   $exit = ConvertFrom-MIRGunmetalDispatcherExitJournal @args -HookRecords @($timeout)
   Assert-Dispatcher ($exit.observed -and $null -eq $exit.exit_code -and $exit.service_result -ceq 'timeout' -and $exit.exit_status -ceq 'TERM') 'collected-timeout-preserved'
+
+  $script:journalReads = 0
+  $script:journalManagerReply = [pscustomobject]@{exit_code=0;lines=@($terminal);diagnostics=$false}
+  $script:journalHookReply = [pscustomobject]@{exit_code=1;lines=@();diagnostics=$false}
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.observed -and $exit.exit_code -eq 7 -and $script:journalReads -eq 2) 'absent-optional-grep-preserves-manager-exit'
+
+  $script:journalReads = 0
+  $script:journalManagerReply.lines = @()
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher (-not $exit.observed -and -not $exit.PSObject.Properties['incomplete'] -and
+    $script:journalReads -eq 8) 'two-empty-journal-queries-confirm-no-terminal'
+
+  $script:journalReads = 0
+  $script:journalManagerReply.lines = @($terminal)
+  $script:journalHookReply.diagnostics = $true
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.incomplete -and -not $exit.observed -and $script:journalReads -eq 8) 'hook-query-error-does-not-count-as-no-match'
+
+  $script:journalReads = 0
+  $script:journalManagerReply = [pscustomobject]@{exit_code=1;lines=@();diagnostics=$true}
+  $script:journalHookReply = [pscustomobject]@{exit_code=0;lines=@($hook);diagnostics=$false}
+  $exit = & $readDispatcherJournal @args
+  Assert-Dispatcher ($exit.incomplete -and -not $exit.observed -and $script:journalReads -eq 8) 'manager-query-error-keeps-conflict-check-pending'
 }
 
 $script:installState='success'
@@ -147,7 +183,15 @@ function New-DispatcherControl {
 }
 function Write-DispatcherResult { param([Parameter(Mandatory)]$Policy,[string]$Status=$Policy.approval.result_status)[IO.File]::WriteAllText($Policy.approval.result_path,('{"kind":"MIRDispatcherControlResultV1","status":"'+$Status+'","packet_sha256":"'+$Policy.approval.packet_sha256+'"}'+"`n"),[Text.UTF8Encoding]::new($false)) }
 function Read-DispatcherTerminal { param([Parameter(Mandatory)]$Control,[Parameter(Mandatory)][string]$RequestId) return (Get-Content -LiteralPath (Join-Path $Control.spool ('terminal/'+$RequestId+'.json')) -Raw|ConvertFrom-Json) }
-function Remove-DispatcherControl { param([Parameter(Mandatory)]$Control)if(Test-Path -LiteralPath $Control.root){[IO.Directory]::Delete($Control.root,$true)} }
+function Remove-DispatcherControl {
+  param([Parameter(Mandatory)]$Control)
+  if (-not (Test-Path -LiteralPath $Control.root -PathType Container)) { return }
+  $root = Get-Item -LiteralPath (Resolve-Path -LiteralPath $Control.root).Path
+  $temporary = (Resolve-Path -LiteralPath ([IO.Path]::GetTempPath())).Path.TrimEnd([IO.Path]::DirectorySeparatorChar)
+  if ($root.Parent.FullName -ne $temporary -or $root.Name -notlike 'mir-dispatcher-*' -or
+      ($root.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw '[gunmetal-dispatcher-control-cleanup-path]' }
+  [IO.Directory]::Delete($root.FullName, $true)
+}
 
 $controls=@()
 try {
@@ -199,7 +243,28 @@ try {
   Assert-Dispatcher ($pending.request_id-ceq$successor.approval.request_id-and(Test-Path -LiteralPath (Join-Path $normal.spool ('requests/'+$successor.approval.request_id+'/policy.json')))) 'one-immutable-successor-snapshot'
   $secondSuccessor=New-DispatcherPolicy -Control $normal -RequestId 'native-control-normal-third' -PacketText 'third'
   Refuses-Dispatcher {Submit-MIRGunmetalDispatcherSuccessor -BasePolicy $normal.base -SuccessorPolicyPath $secondSuccessor.path} '[mir-gunmetal-dispatcher-pending-slot-not-empty]'
-  Write-DispatcherResult -Policy $normal.base;$script:fakeState='gone';$script:fakeJournal=[pscustomobject]@{observed=$true;exit_code=0}
+  $runningPath=Join-Path $normal.spool 'state/running.json'
+  $pendingPath=Join-Path $normal.spool 'state/pending.json'
+  $terminalPath=Join-Path $normal.spool ('terminal/'+$normal.base.approval.request_id+'.json')
+  $runningHash=(Get-FileHash -LiteralPath $runningPath).Hash
+  $pendingHash=(Get-FileHash -LiteralPath $pendingPath).Hash
+  foreach($mode in @('query-error','query-partial')){
+    $script:fakeState=$mode
+    $observation=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
+    Assert-Dispatcher ($observation.status-ceq'waiting-for-native-unit-observation' -and $script:launches-eq1 -and
+      (Test-Path -LiteralPath $runningPath) -and (Get-FileHash -LiteralPath $runningPath).Hash-ceq$runningHash -and
+      (Get-FileHash -LiteralPath $pendingPath).Hash-ceq$pendingHash -and
+      -not (Test-Path -LiteralPath $terminalPath)) "running-$mode-preserves-invocation-and-successor"
+  }
+  Write-DispatcherResult -Policy $normal.base
+  $script:fakeState = 'gone'
+  $script:fakeJournal = [pscustomobject]@{observed=$false;exit_code=$null;incomplete=$true}
+  $observation = Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
+  Assert-Dispatcher ($null -ne $observation -and $observation.status -ceq 'waiting-for-native-exit-journal-observation' -and
+    $script:launches -eq 1 -and (Get-FileHash -LiteralPath $runningPath).Hash -ceq $runningHash -and
+    (Get-FileHash -LiteralPath $pendingPath).Hash -ceq $pendingHash -and
+    -not (Test-Path -LiteralPath $terminalPath)) 'journal-unavailable-preserves-invocation-and-successor'
+  $script:fakeJournal = [pscustomobject]@{observed=$true;exit_code=0}
   $null=Invoke-MIRGunmetalDispatcherConsume -Policy $normal.base
   $terminal=Read-DispatcherTerminal -Control $normal -RequestId $normal.base.approval.request_id
   Assert-Dispatcher ($terminal.status-ceq'succeeded'-and$terminal.packet_sha256-ceq$normal.base.approval.packet_sha256-and$terminal.completion_envelope_sha256-match'^[A-F0-9]{64}$') 'packet-result-invocation-envelope-success'
@@ -249,6 +314,30 @@ try {
   $beforeLaunches=$script:launches;$script:fakeState='active';$null=Invoke-MIRGunmetalDispatcherConsume -Policy $adopt.base
   $adopted=Get-MIRGunmetalDispatcherStateRecord -Policy $adopt.base -Name running
   Assert-Dispatcher ($adopted.launch.acknowledgement-ceq'adopted-after-durable-intent'-and$script:launches-eq$beforeLaunches) 'durable-intent-adopts-live-unit'
+  $starting=New-DispatcherControl -Name 'intent-observation';$controls+=@($starting)
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $starting.base
+  $beforeLaunches=$script:launches;$script:fakeState='gone';$script:nextLaunchState='query-error'
+  $startObservation=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+  $intentPath=Join-Path $starting.spool 'state/intent.json'
+  $startTerminalPath=Join-Path $starting.spool ('terminal/'+$starting.base.approval.request_id+'.json')
+  Assert-Dispatcher ($startObservation.status-ceq'waiting-for-native-unit-observation' -and
+    $script:launches-eq($beforeLaunches+1) -and (Test-Path -LiteralPath $intentPath) -and
+    -not (Test-Path -LiteralPath $startTerminalPath)) 'acknowledgement-query-error-preserves-durable-intent'
+  $intentHash=(Get-FileHash -LiteralPath $intentPath).Hash
+  foreach($mode in @('query-partial','activating-without-pid')){
+    $script:fakeState=$mode
+    $recoveryObservation=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+    Assert-Dispatcher ($recoveryObservation.status-ceq'waiting-for-native-unit-observation' -and
+      $script:launches-eq($beforeLaunches+1) -and (Test-Path -LiteralPath $intentPath) -and
+      (Get-FileHash -LiteralPath $intentPath).Hash-ceq$intentHash -and
+      -not (Test-Path -LiteralPath $startTerminalPath)) "intent-$mode-preserves-original-intent"
+  }
+  $script:fakeState='active';$recovered=Invoke-MIRGunmetalDispatcherConsume -Policy $starting.base
+  $started=Get-MIRGunmetalDispatcherStateRecord -Policy $starting.base -Name running
+  Assert-Dispatcher ($recovered.status-ceq'intent-adopted' -and
+    $started.launch.start_ack.invocation_id-ceq$script:fakeInvocation -and
+    $script:launches-eq($beforeLaunches+1)) 'observation-recovery-adopts-same-invocation-once'
+
   $absent=New-DispatcherControl -Name 'intent-absent';$controls+=@($absent)
   $null=Submit-MIRGunmetalDispatcherApproved -Policy $absent.base;$snapshot=Get-MIRGunmetalDispatcherPending -Policy $absent.base
   Write-MIRGunmetalDispatcherJson -Path (Join-Path $absent.spool 'state/intent.json') -Value ([ordered]@{kind='MIRGunmetalNativeDispatcherLaunchIntentV1';request_id=$absent.base.approval.request_id;request_snapshot_sha256=$snapshot.snapshot.request.policy_sha256;packet_sha256=$absent.base.approval.packet_sha256;launcher_sha256=$absent.base.approval.launcher_sha256;result_path=$absent.base.approval.result_path;dispatch_id='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';written_utc='2026-11-21T00:00:00Z'})

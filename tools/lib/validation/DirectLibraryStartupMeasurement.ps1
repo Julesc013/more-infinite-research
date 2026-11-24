@@ -53,11 +53,22 @@ function Assert-MIRDirectLibraryStartupDeclaredInputs {
   if($ProfileDefinition.Contains('archive_sha256')){
     $declared=$ProfileDefinition['archive_sha256']
     if(-not($declared -is [Collections.IDictionary])){&$fail 'profile archive metadata differs'}
+    # A stale dependency pin must not silently leave an enabled dependency
+    # unchecked. MIR package selection has its own per-run archive checks.
+    $archivePattern = '^(?<mod>.+)_[0-9]+[.][0-9]+[.][0-9]+[.]zip$'
+    $pinnedDependencies = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($pin in $declared.Keys) {
+      if ([string]$pin -cmatch $archivePattern -and $Matches.mod -cne 'more-infinite-research') {
+        $null = $pinnedDependencies.Add($Matches.mod)
+      }
+    }
     foreach($name in $ArchiveHashes.Keys){
       if($declared.Contains($name)){
         $expected=$declared[$name]
         if(-not($expected -is [string] -and [string]$expected -cmatch '^[a-fA-F0-9]{64}$')){&$fail "profile selected archive hash is malformed: $name"}
         if([string]$expected -cne [string]$ArchiveHashes[$name]){&$fail "profile selected archive hash differs: $name"}
+      } elseif ([string]$name -cmatch $archivePattern -and $pinnedDependencies.Contains($Matches.mod)) {
+        &$fail "profile archive pin is for another version: $name"
       }
     }
   }

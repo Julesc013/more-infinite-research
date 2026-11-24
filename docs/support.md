@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -57,7 +57,7 @@ source_of_truth_for:
 
 - Back up the save, installed mods and startup settings.
 - Test a copy with the same Factorio family and matching mod set first.
-- Keep inherited settings for the first load.
+- Keep inherited settings for the first load. In Factorio 2.0 and 2.1, you can restore them from a copy of the original save using **Sync mods with save** in the **Load game** menu. Hold Ctrl when clicking the sync button to request the exact saved mod versions, and select the option to sync startup settings. [Factorio mod syncing](https://wiki.factorio.com/Mods#Automatic_mod_sync_for_saves_and_multiplayer_games)
 - Inspect earned bonuses, current research, queued or paused work, caps and research supplied by other mods.
 - Save the copy under a new name, then close and reload it before adopting the upgrade.
 
@@ -89,13 +89,23 @@ source_of_truth_for:
 
 On Factorio 2.0.77, MIR 5.0.22 admits a direct upgrade from MIR 5.0.3 that removes Space Is Fake 1.0.60 and its unused cr-commons 1.0.27 dependency. This requires the unchanged official Space Age mods, default worker cargo settings and no earned, current, queued or parked repeating worker cargo research on any force.
 
-Use two separate loads for an older MIR 5 save with invested worker cargo, different settings or another mod selection. The combined change can stop when MIR cannot establish the save's worker research history.
+For a save outside that direct route, keep Space Is Fake installed for the first load. An accepted load with the original selection and settings lets MIR record the worker research contract before you remove the mod.
 
-1. Keep the original save. Upgrade a copy to MIR 5.0.18 with the same Factorio version, enabled mods and startup settings. Leave Space Is Fake installed.
-2. Check the research queue and earned bonuses. Save under a new name and exit.
-3. Load that new save with MIR still at 5.0.18 after removing Space Is Fake. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
+1. Keep the original save. Load a copy with the same Factorio version, add-ons and startup settings. If you are upgrading MIR, make that the only mod update in this load.
+2. Check the current research, paid progress, queue and earned bonuses. Save under a new name and exit.
+3. Remove Space Is Fake and load the new save with the MIR version and startup settings from step 1. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
 
-This sequence preserved queued mining and plastic research, unfinished progress and earned recipe bonuses in the tested Factorio 2.0.77 save with Space Is Fake 1.0.60.
+The staged upgrade from MIR 5.0.3 to 5.0.18 preserved queued mining and plastic research, unfinished progress and earned recipe bonuses. A separate replay from MIR 5.0.3 to 5.0.23 kept paid worker cargo at its original price and let ordinary labs finish the level after removing Space Is Fake 1.0.60 and cr-commons 1.0.27. Both replays used Factorio 2.0.77. The combined 5.0.23 upgrade and removal on the paid save stopped before saving. [Paid worker cargo replay](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7122084174)
+
+### Upgrading MIR 4.7.20002 with Space Exploration
+
+On Factorio 2.0.77 with Space Exploration 0.7.57, keep MIR and add-on updates in separate loads when the save has earned or unfinished worker cargo research.
+
+1. Keep the original save and its mod selection and startup settings. Work on a separate copy.
+2. If you have already saved the add-on update successfully under MIR 4.7.20002, use a protected copy of that save with its matching mods and settings for the MIR upgrade. Otherwise try the MIR upgrade with the original add-on selection and exact MIR settings.
+3. Check the cargo bonus, current research and queue. If the upgrade succeeds, save the copy under a new name and cold-load it before making a separate add-on change. If the upgrade refuses, keep the original and its previous selection.
+
+The staged procedure preserved paid worker level 9, completed levels 9 and 10 in the lab and held the cap at 10 in the tested Space Halls Fix profile. The legacy `/mir-worker-storage-recovery prepare` procedure covers a different worker contract. [Staged Space Halls test](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7093996018)
 
 ### Preparing worker cargo research before adding a provider
 

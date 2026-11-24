@@ -395,6 +395,12 @@ try {
   Set-PreflightProfile (New-PreflightProfile -Engine $null -ArchiveHashes $null)
   & $preflightRunner @runnerArguments
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{'controlled_0.9.0.zip'=$removedPin})
+  Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile archive pin is for another version: controlled_1.0.0.zip'
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)=(Get-MIRImmutableInputSha256 $preflightDependency);'controlled_0.9.0.zip'=$removedPin})
+  & $preflightRunner @runnerArguments
+  Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
   Set-PreflightProfile (New-PreflightProfile -Engine @{version='2.1.22';sha256=$engineSha} -ArchiveHashes @{})
   Refuses-Library {& $preflightRunner @runnerArguments} '[mir5-native-fixture] profile engine base differs'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput

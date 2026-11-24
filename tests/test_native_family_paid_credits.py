@@ -741,6 +741,8 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                             local unpaid=record(force,"research_steel","new-unpaid-steel")
                             assert(paid.private and paid.payable and paid.pending==2)
                             assert(unpaid.private and not unpaid.payable and unpaid.pending==2)
+                            -- The simulated native completion consumes the saved fraction.
+                            main.saved_progress=0
                             advance(force,main.name,old_level+1,false)
                             native_credits.on_research_finished({research=main,by_script=false})
                             close(own_contribution(force,"research_steel","steel-plate"),old_level*.17)
@@ -754,6 +756,14 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                             native_credits.on_research_finished({research=main,by_script=true})
                             close(own_contribution(force,"research_steel","steel-plate"),old_level*.17)
                             close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                            local plastic=GROUPS.research_plastic[1]
+                            local suspended=record(force,"research_plastic",plastic.recipe)
+                            assert(suspended.private and suspended.payable and suspended.pending==1)
+                            detached.saved_progress=0
+                            advance(force,detached.name,old_level+1,false)
+                            native_credits.on_research_finished({research=detached,by_script=false})
+                            close(own_contribution(force,"research_plastic",plastic.recipe),old_level*plastic.change)
+                            assert(suspended.pending==0)
                           end
                         ''')
 

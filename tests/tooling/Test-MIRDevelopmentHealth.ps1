@@ -20,6 +20,18 @@ function Invoke-HealthFixtureGit {
   if ($LASTEXITCODE -ne 0) { throw "Fixture Git command failed: git -C $fixture $($Arguments -join ' ')" }
 }
 
+function Test-HealthFreeSpaceCheckpoint {
+  param([Parameter(Mandatory)]$Report)
+  $disk = $Report.disk
+  $belowMinimum = $disk.free_mib -lt $disk.minimum_free_mib
+  $expectedReason = if ($belowMinimum) { "free:$($disk.free_mib)-MiB-below-$($disk.minimum_free_mib)" } else { '' }
+  if ([bool]$Report.checkpoint_required -ne $belowMinimum -or
+      ($Report.checkpoint_reasons -join ',') -cne $expectedReason) {
+    throw '[mir-development-health-unexpected-clean-checkpoint]'
+  }
+  return $belowMinimum
+}
+
 function Invoke-HealthNativeHook {
   param([Parameter(Mandatory)][string]$ScriptPath,[Parameter(Mandatory)]$Payload,[string]$CheckerRepoRoot = '')
   $binary = Join-Path $PSHOME 'pwsh.exe'
@@ -134,6 +146,18 @@ try {
 
   $trackedBefore = [IO.File]::ReadAllText((Join-Path $fixture 'tracked.txt'))
   $linkedBefore = [IO.File]::ReadAllText((Join-Path $linked 'linked-uncommitted.txt'))
+  $slowGitReport = & {
+    $gitExecutable = (Get-Command git -CommandType Application | Select-Object -First 1).Source
+    function git {
+      if ($args -contains 'worktree' -and $args -contains 'list') { Start-Sleep -Milliseconds 2200 }
+      & $gitExecutable @args
+    }
+    & $checker -RepoRoot $fixture -AsJson -MaxScanSeconds 2 | ConvertFrom-Json -Depth 16
+  }
+  if (-not $slowGitReport.disk.build.complete -or $slowGitReport.disk.build.bytes -ne 23 -or
+      -not $slowGitReport.disk.dist.complete -or $slowGitReport.disk.dist.bytes -ne 7) {
+    throw '[mir-development-health-git-exhausted-directory-scan]'
+  }
   $report = (& $checker -RepoRoot $fixture -AsJson -MaxEntriesPerRoot 2 -MaxScanSeconds 10 -MaxWorktrees 4 -MaxBranches 8 -OldWorktreeDays 7 -OldBranchDays 7 -BuildBudgetMiB 0 -NowUtc $freshWorktreeNow | ConvertFrom-Json -Depth 16)
   if ([string]$report.kind -cne 'MIRDevelopmentWorkspaceHealthV1' -or [string]$report.side_effects -cne 'none-report-only' -or -not [bool]$report.checkpoint_required -or @($report.checkpoint_reasons | Where-Object { $_ -match '^dirty:' }).Count -ne 1) { throw '[mir-development-health-report-shape]' }
   if ($report.git.dirty.count -lt 1) { throw '[mir-development-health-dirty-current]' }
@@ -169,11 +193,14 @@ try {
   $repeatHook = $repeatHookOutput[0] | ConvertFrom-Json -Depth 8
   if (@($repeatHook.PSObject.Properties.Name | Where-Object { $_ -ceq 'decision' -or $_ -ceq 'continue' }).Count -ne 0 -or [string]$repeatHook.systemMessage -notmatch 'already active; no further checkpoint') { throw '[mir-development-health-hook-loop-guard]' }
   $cleanHealth = (& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson | ConvertFrom-Json -Depth 16)
-  if ([bool]$cleanHealth.checkpoint_required -or [bool]$cleanHealth.disk.build.complete -or [string]$cleanHealth.disk.build_budget_observation -cne 'incomplete-lower-bound') { throw '[mir-development-health-clean-partial-state]' }
+  $belowMinimum = Test-HealthFreeSpaceCheckpoint -Report $cleanHealth
+  if ([bool]$cleanHealth.disk.build.complete -or [string]$cleanHealth.disk.build_budget_observation -cne 'incomplete-lower-bound') { throw '[mir-development-health-clean-partial-state]' }
   $cleanHookOutput = @(Invoke-HealthNativeHook -ScriptPath $fixtureHook -CheckerRepoRoot $cleanFixture -Payload @{ session_id='clean'; hook_event_name='Stop'; stop_hook_active=$false })
   if ($cleanHookOutput.Count -ne 1) { throw '[mir-development-health-clean-partial-output]' }
   $cleanHook = $cleanHookOutput[0] | ConvertFrom-Json -Depth 8
-  if (@($cleanHook.PSObject.Properties.Name | Where-Object { $_ -ceq 'decision' -or $_ -ceq 'continue' }).Count -ne 0 -or [string]$cleanHook.systemMessage -notmatch 'No workspace checkpoint action is required') { throw '[mir-development-health-clean-partial-pass]' }
+  if ($belowMinimum) {
+    if ([string]$cleanHook.decision -cne 'block' -or [string]$cleanHook.reason -notmatch 'free:\d+-MiB-below-\d+') { throw '[mir-development-health-clean-low-space-checkpoint]' }
+  } elseif (@($cleanHook.PSObject.Properties.Name | Where-Object { $_ -ceq 'decision' -or $_ -ceq 'continue' }).Count -ne 0 -or [string]$cleanHook.systemMessage -notmatch 'No workspace checkpoint action is required') { throw '[mir-development-health-clean-partial-pass]' }
 
   # An all-ours resolution can leave Git waiting for a merge commit while
   # porcelain is empty. The advisory must still identify the unfinished work.
@@ -201,7 +228,8 @@ try {
   & git -C $cleanFixture merge --abort
   if($LASTEXITCODE-ne0){throw '[mir-development-health-merge-abort]'}
   $afterMergeHealth=(& $checker -RepoRoot $cleanFixture -Mode Hook -AsJson|ConvertFrom-Json -Depth 16)
-  if(@($afterMergeHealth.git.dirty.operations).Count-ne0-or[bool]$afterMergeHealth.checkpoint_required){throw '[mir-development-health-completed-merge-still-reported]'}
+  if(@($afterMergeHealth.git.dirty.operations).Count-ne0){throw '[mir-development-health-completed-merge-still-reported]'}
+  $null = Test-HealthFreeSpaceCheckpoint -Report $afterMergeHealth
   $env:GIT_AUTHOR_DATE='2024-01-01T00:00:00Z'
   $env:GIT_COMMITTER_DATE='2024-01-01T00:00:00Z'
   & git -C $cleanFixture checkout --quiet -b stale-unpushed
@@ -226,7 +254,7 @@ try {
   try { & $checker -RepoRoot (Join-Path $fixture 'build') -AsJson | Out-Null } catch { $descendantRejected = $_.Exception.Message -match 'Git worktree root' }
   if (-not $descendantRejected) { throw '[mir-development-health-root-boundary]' }
 
-  [pscustomobject]@{ status='passed'; assertions=41; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
+  [pscustomobject]@{ status='passed'; assertions=42; fixture=$fixture; hook_budget_seconds=[int]$hookReport.scan_limits.max_scan_seconds; mutations='none' } | ConvertTo-Json -Compress
 } finally {
   if ($null -ne $previousAuthorDate) { $env:GIT_AUTHOR_DATE = $previousAuthorDate } else { Remove-Item Env:GIT_AUTHOR_DATE -ErrorAction SilentlyContinue }
   if ($null -ne $previousCommitterDate) { $env:GIT_COMMITTER_DATE = $previousCommitterDate } else { Remove-Item Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue }

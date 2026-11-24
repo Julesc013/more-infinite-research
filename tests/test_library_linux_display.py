@@ -552,6 +552,64 @@ class LinuxLibraryDisplaySchemaTests(unittest.TestCase):
                 self.assertFalse(backend.socket_present)
                 self.assertFalse(backend.lock_present)
 
+    def test_crash_recovery_preserves_the_bound_files_and_can_resume(self):
+        for scenario in ("retired", "live", "listener", "replaced", "wrong-lock", "wrong-hash"):
+            with self.subTest(scenario=scenario):
+                plan, backend, _ = self.validated_backend()
+                stale = {
+                    plan.lock: types.SimpleNamespace(st_mode=stat.S_IFREG | 0o644, st_uid=backend.uid(), st_dev=1, st_ino=21),
+                    plan.socket: types.SimpleNamespace(st_mode=stat.S_IFSOCK | 0o777, st_uid=backend.uid(), st_dev=1, st_ino=22),
+                }
+                plan.ready.write_text(json.dumps({"kind": DISPLAY.READY_KIND, "role": plan.role, "display": plan.display,
+                    "geometry": list(plan.geometry), "display_identity": backend.identity,
+                    "display_binding": {"pid": backend.process.pid, "uid": backend.uid(),
+                                        "lock_device_inode": [1, 21], "socket_device_inode": [1, 22]}}), encoding="utf8")
+                ready_sha = digest(plan.ready)
+                self.assert_refuses(lambda: DISPLAY.validate_plan(plan.raw, plan.checkout), "fresh and empty")
+                with mock.patch.object(DISPLAY, "PINNED_PROBE_DISPLAY_SHA256", plan.raw["probe_display"]["sha256"]):
+                    self.assertEqual(DISPLAY.validate_plan(plan.raw, plan.checkout, recovery=True).ready, plan.ready)
+
+                def pid_gone(_pid):
+                    raise FileNotFoundError()
+
+                fallback_stat = backend.lstat
+                backend.lstat = lambda path: stale[path] if path in stale else fallback_stat(path)
+                backend.lexists = lambda path: path in stale
+                backend.mkdir = lambda path, mode: stale.update({
+                    path: types.SimpleNamespace(st_mode=stat.S_IFDIR | mode, st_uid=backend.uid(), st_dev=1, st_ino=30)
+                })
+                moved = []
+
+                def retain(path, target):
+                    moved.append(path)
+                    stale[target] = stale.pop(path)
+
+                backend.rename = retain
+                backend.read_pid_lock = lambda path, identity, uid: b"another PID" if scenario == "wrong-lock" else str(backend.process.pid).encode()
+                if scenario != "live":
+                    backend.process_identity = pid_gone
+                backend.probe.unix_listeners = lambda _paths: ["listener"] if scenario == "listener" else []
+                if scenario == "replaced":
+                    stale[plan.socket].st_ino += 100
+                with self.linux():
+                    if scenario == "retired":
+                        disposition = DISPLAY.recover_display(plan, ready_sha, backend)
+                        self.assertEqual(disposition["status"], "recovered")
+                        retained = Path(disposition["retained_path"])
+                        self.assertEqual([stale[retained / p.name].st_ino for p in (plan.lock, plan.socket)], [21, 22])
+                        self.assertEqual(DISPLAY.recover_display(plan, ready_sha, backend), disposition)
+                        self.assertEqual(moved, [plan.lock, plan.socket])
+                    else:
+                        expected = {"live": "existing display process", "listener": "existing X listener",
+                                    "replaced": "changed display socket or lock",
+                                    "wrong-lock": "owned PID", "wrong-hash": "receipt changed"}[scenario]
+                        self.assert_refuses(lambda: DISPLAY.recover_display(plan, "0" * 64 if scenario == "wrong-hash" else ready_sha, backend), expected)
+                        self.assertEqual(moved, [])
+                        self.assertIn(plan.lock, stale)
+                        self.assertIn(plan.socket, stale)
+                self.assertEqual(backend.kill_calls, 0)
+                self.assertEqual(backend.terminate_calls, 0)
+
     def test_partial_start_removes_owned_viewer_but_preserves_a_foreign_replacement(self):
         for replacement in (False, True):
             with self.subTest(replacement=replacement):

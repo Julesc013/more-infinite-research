@@ -68,7 +68,7 @@ function Get-MIRDevelopmentHealthBoundedDirectorySize {
   param(
     [Parameter(Mandatory)][string]$Root,
     [Parameter(Mandatory)][Diagnostics.Stopwatch]$Stopwatch,
-    [ValidateRange(1,60)][int]$MaxSeconds,
+    [ValidateRange(1,60000)][int]$MaxMilliseconds,
     [ValidateRange(1,100000)][int]$MaxEntries
   )
   if (-not (Test-Path -LiteralPath $Root -PathType Container)) {
@@ -81,11 +81,11 @@ function Get-MIRDevelopmentHealthBoundedDirectorySize {
   $pending = [Collections.Generic.Stack[string]]::new();$pending.Push($rootItem.FullName)
   [int64]$bytes=0;$entries=0;$reparsePoints=0;$errors=0;$limit=''
   while($pending.Count -gt 0) {
-    if($Stopwatch.Elapsed.TotalSeconds -ge $MaxSeconds){$limit='time-budget';break}
+    if($Stopwatch.ElapsedMilliseconds -ge $MaxMilliseconds){$limit='time-budget';break}
     $directory=$pending.Pop()
     try {
       foreach($childPath in [IO.Directory]::EnumerateFileSystemEntries($directory)) {
-        if($Stopwatch.Elapsed.TotalSeconds -ge $MaxSeconds){$limit='time-budget';break}
+        if($Stopwatch.ElapsedMilliseconds -ge $MaxMilliseconds){$limit='time-budget';break}
         $entries++;if($entries -gt $MaxEntries){$limit='entry-budget';break}
         try {
           $child=Get-Item -LiteralPath $childPath -Force
@@ -198,13 +198,16 @@ if($Mode-eq'Hook'){
   # Hooks sample only; they cannot become another disk-growth source or block Git/GitHub work.
   $MaxScanSeconds=[Math]::Min($MaxScanSeconds,4);$MaxEntriesPerRoot=[Math]::Min($MaxEntriesPerRoot,512);$MaxWorktrees=[Math]::Min($MaxWorktrees,8);$MaxBranches=[Math]::Min($MaxBranches,64)
 }
-$repo=Resolve-MIRDevelopmentHealthRepoRoot -Candidate $RepoRoot;$clock=[Diagnostics.Stopwatch]::StartNew()
+$repo=Resolve-MIRDevelopmentHealthRepoRoot -Candidate $RepoRoot
 $currentBranch=Get-MIRDevelopmentHealthCurrentBranch -Repository $repo;$dirty=Get-MIRDevelopmentHealthDirtyState -Repository $repo;$upstream=Get-MIRDevelopmentHealthUpstream -Repository $repo
 $includeUniqueCommitCounts = $Mode -ne 'Hook'
 $worktrees=Get-MIRDevelopmentHealthWorktrees -Repository $repo -CurrentRoot $repo -Limit $MaxWorktrees -OldDays $OldWorktreeDays -Now $NowUtc -IncludeUniqueCommitCounts $includeUniqueCommitCounts
 $branches=Get-MIRDevelopmentHealthBranches -Repository $repo -CurrentBranch $currentBranch -Limit $MaxBranches -OldDays $OldBranchDays -Now $NowUtc -IncludeUniqueCommitCounts $includeUniqueCommitCounts
-$build=Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'build') -Stopwatch $clock -MaxSeconds $MaxScanSeconds -MaxEntries $MaxEntriesPerRoot
-$dist=Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'dist') -Stopwatch $clock -MaxSeconds $MaxScanSeconds -MaxEntries $MaxEntriesPerRoot
+# Keep the directory budget independent of Git inspection. Scan delivery files
+# first with at most half the budget, then give build the remaining time.
+$directoryScan = [Diagnostics.Stopwatch]::StartNew()
+$dist = Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'dist') -Stopwatch $directoryScan -MaxMilliseconds ($MaxScanSeconds * 500) -MaxEntries $MaxEntriesPerRoot
+$build = Get-MIRDevelopmentHealthBoundedDirectorySize -Root (Join-Path $repo 'build') -Stopwatch $directoryScan -MaxMilliseconds ($MaxScanSeconds * 1000) -MaxEntries $MaxEntriesPerRoot
 $drivePath=if($IsWindows){[IO.Path]::GetPathRoot($repo)}else{$repo}
 $drive=[IO.DriveInfo]::new($drivePath);$freeMiB=[int][Math]::Floor($drive.AvailableFreeSpace/1MB);$buildMiB=[int][Math]::Ceiling($build.bytes/1MB);$distMiB=[int][Math]::Ceiling($dist.bytes/1MB)
 $oldWorktrees=@($worktrees.rows|Where-Object review_needed);$oldBranches=@($branches.rows|Where-Object review_needed);$attention=@()
