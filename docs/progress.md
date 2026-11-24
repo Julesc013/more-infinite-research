@@ -14,7 +14,17 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Checked 5.0.23 promotion (2026-11-24)
+## Current private 5.0.23 promotion (2026-11-25)
+
+The sole promotion draft is [#2371](https://github.com/Julesc013/more-infinite-research/pull/2371) at `6573989ed2ba01dc22b63af143a70d7025070445` with player tree `11fe340cf6afb5ce04e109ddc01438a479e0c257`. All required checks passed. The independently rebuilt inventory SHA-256 `9486272C6890C49567E2DB0A53F10CE09BE919CE6EB0D83FBCCCEB3171F7DC7B` binds all 17 player ZIPs and both checksum files. The primary readback and matching publication text are in `build/qualification/mir523-adopted-promotion-r01`. MIR 5.0.22 remains the public prerelease.
+
+The rebuilt modern ZIPs passed the protected minimum-engine upgrades at Factorio 2.0.77 and 2.1.23, the staged legacy Space Exploration upgrade, the 11-mod Space Age engine update, the 27-mod Solar Productivity addition and the affected archived worker and Imersite cases. The Space Exploration replay retained 200 paid units at the original 5,125-unit price, night vision and the conquest bonuses, then completed ordinary cargo research, refused level 11 and passed both cold loads. A simultaneous legacy MIR and add-on change can hide the old research price. The beta scope decision remains open. [Rebuilt promotion evidence](https://github.com/Julesc013/more-infinite-research/pull/2371) · [Paired price experiment](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7096183506)
+
+Gunmetal reproduced the Editor Extensions startup refusal on Factorio 2.1.24 with the public 5.0.22 ZIP. The exact rebuilt 5.0.23 ZIP launched the same testing scenario, removed one duplicate cargo bonus across all three forces, retained the native research owner, saved and passed two cold loads. The shared library restored. The run used an archive built from the author's Editor Extensions 2.7.1 tag. The reporter's 84-mod selection and separate existing-save failure remain unverified. The 13 copied files and their hashes are under `build/qualification/mir1944-editor271-paired-gunmetal-r01`. [Paired Editor Extensions readback](https://github.com/Julesc013/more-infinite-research/pull/2371#issuecomment-7140556067)
+
+The rebuilt Factorio 2.0 ZIP completed the 27-launch Foundation III save-load and peak-memory schedule, but one identical-build pair differed by 544 ms against the 500 ms calibration limit. The retained measurements carry that adverse verdict. Windows Library timing and memory, remaining stable acceptance and publication are still open. [Foundation III calibration](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7140456547)
+
+## Earlier checked 5.0.23 promotion (2026-11-24)
 
 The checked promotion head `642eccc0611ffe439f0d6c9803982eed577beb9f` has player tree `d47b99f80119a342bc979da09fe8a56320c26f17`. The frozen inventory SHA-256 `2E893EF93C18FB98D78ADAC866120997D282C6D1BCE218CB88105F1CB70EDB39` binds 17 player ZIPs and both checksum files. The primary `build/qualification/mir523-checked-promotion-r01/verified-promotion-inputs.json` records the package and note readback. MIR 5.0.22 is the public prerelease. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2361)
 
