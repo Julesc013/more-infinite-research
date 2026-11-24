@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-22
+last_reviewed: 2026-11-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -91,11 +91,11 @@ On Factorio 2.0.77, MIR 5.0.22 admits a direct upgrade from MIR 5.0.3 that remov
 
 For a save outside that direct route, keep Space Is Fake installed for the first load. An accepted load with the original selection and settings lets MIR record the worker research contract before you remove the mod.
 
-1. Keep the original save. Load a copy with the same Factorio version, enabled mods and startup settings. Use MIR 5.0.18 for the tested upgrade from 5.0.3. If your save already uses 5.0.18 or later, keep its MIR version for the staged loads.
-2. Check the research queue and earned bonuses. Save under a new name and exit.
+1. Keep the original save. Load a copy with the same Factorio version, add-ons and startup settings. If you are upgrading MIR, make that the only mod update in this load.
+2. Check the current research, paid progress, queue and earned bonuses. Save under a new name and exit.
 3. Remove Space Is Fake and load the new save with the MIR version and startup settings from step 1. Keep any shared dependency still required by your other enabled mods. Check the queue and bonuses again before replacing your working save.
 
-This sequence preserved queued mining and plastic research, unfinished progress and earned recipe bonuses in the tested Factorio 2.0.77 save with Space Is Fake 1.0.60.
+The staged upgrade from MIR 5.0.3 to 5.0.18 preserved queued mining and plastic research, unfinished progress and earned recipe bonuses. A separate replay from MIR 5.0.3 to 5.0.23 kept paid worker cargo at its original price and let ordinary labs finish the level after removing Space Is Fake 1.0.60 and cr-commons 1.0.27. Both replays used Factorio 2.0.77. The combined 5.0.23 upgrade and removal on the paid save stopped before saving. [Paid worker cargo replay](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7122084174)
 
 ### Upgrading MIR 4.7.20002 with Space Exploration
 
