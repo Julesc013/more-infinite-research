@@ -672,8 +672,11 @@ function M.configure(maximum, enabled)
   selected_cap, selected_enabled = maximum or 0, enabled ~= false
 end
 
-local function assign_queue(force, frame, queue, moved, destination, activate_remainder, source_id)
-  destination, source_id = destination or recovery.id, source_id or recovery.canonical
+local function assign_queue(force, frame, queue, source_id, destination)
+  if queue == nil then
+    queue = {}
+    for index, name in ipairs(frame.queue) do queue[index] = name == source_id and destination or name end
+  end
   local previous_owner = owned_queue_force
   owned_queue_force = force.index
   local ok, message = pcall(function()
@@ -684,20 +687,15 @@ local function assign_queue(force, frame, queue, moved, destination, activate_re
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
     end
     for name, saved in pairs(frame.queued_saved) do
-      local id = moved and name == source_id and destination or name
-      if not (activate_remainder and queue[1] == id) and force.technologies[id].saved_progress ~= saved then
+      local id = name == source_id and destination or name
+      if force.technologies[id].saved_progress ~= saved then
         force.technologies[id].saved_progress = saved
       end
     end
-    local current = moved and frame.current == source_id and destination or frame.current
+    local current = frame.current == source_id and destination or frame.current
     if current then
       if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
       force.research_progress = frame.current_progress
-    elseif activate_remainder then
-      local first = frame.queue[1]
-      local expected = first and frame.queued_saved[first] or 0
-      if (force.current_research and force.current_research.name or nil) ~= queue[1]
-          or force.research_progress ~= expected then recover_error("native finished queue activation changed work") end
     end
   end)
   owned_queue_force = previous_owner
@@ -1660,12 +1658,8 @@ local function apply_published517_se_paid_bridge(plan)
         if holder.level ~= frame.next_level or holder.researched then holder.level = frame.next_level end
         holder.enabled, holder.visible_when_disabled = frame.enabled, frame.visible
         if retired.level ~= 4 or retired.researched then retired.level = 4 end
-        local queue = {}
-        for index, name in ipairs(frame.queue) do
-          queue[index] = name == recovery.ordinary_default_id and recovery.published517_se_id or name
-        end
         if frame.occurrences > 0 then
-          assign_queue(item.force, frame, queue, true, recovery.published517_se_id, nil, recovery.ordinary_default_id)
+          assign_queue(item.force, frame, nil, recovery.ordinary_default_id, recovery.published517_se_id)
         end
         -- Replacing a current queue entry may cache its in-flight progress on
         -- the retired row. Clear that post-setter residue only after the
@@ -1979,10 +1973,8 @@ function M.apply_default_owner_transfer(plan)
           end
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
           if frame.occurrences > 0 then
-            local queue = {}
             local source_id = fresh.prepared_default and recovery.id or recovery.canonical
-            for index, name in ipairs(frame.queue) do queue[index] = name == source_id and id or name end
-            assign_queue(item.force, frame, queue, true, id, nil, source_id)
+            assign_queue(item.force, frame, nil, source_id, id)
           end
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
           if fresh.prepared_default then frame.technology.saved_progress = 0 end
@@ -2296,9 +2288,7 @@ local function apply_provider_handover(plan)
       frame.technology.enabled, frame.technology.visible_when_disabled = false, false
       frame.technology.saved_progress = 0
       if frame.occurrences > 0 then
-        local queue = {}
-        for index, name in ipairs(frame.queue) do queue[index] = name == recovery.ordinary_default_id and recovery.id or name end
-        assign_queue(item.force, frame, queue, true, recovery.id, false, recovery.ordinary_default_id)
+        assign_queue(item.force, frame, nil, recovery.ordinary_default_id, recovery.id)
       end
       frame.technology.saved_progress, holder.saved_progress = 0, frame.saved_progress
       if frame.current == recovery.ordinary_default_id then item.force.research_progress = frame.current_progress end
@@ -2824,9 +2814,7 @@ local function prepare(route, before_apply)
       recover_error("unfinished default worker work exceeds the current enabled/cap policy")
     end
     requeueable(force, frame, true)
-    local queue = {}
-    for index, name in ipairs(frame.queue) do queue[index] = name == recovery.canonical and recovery.id or name end
-    plans[#plans + 1] = {force=force, source=frame, private=item.technology, queue=queue}
+    plans[#plans + 1] = {force=force, source=frame, private=item.technology}
     next_state.forces[force.index] = {next_level=frame.next_level, limit=frame.next_level + frame.allowance - 1,
       pending=frame.allowance > 0, enabled=frame.allowance > 0 and frame.enabled or false, visible=frame.visible}
   end
@@ -2840,7 +2828,7 @@ local function prepare(route, before_apply)
     frame.technology.level = 4
     frame.technology.enabled, frame.technology.visible_when_disabled = frame.enabled, frame.visible
     frame.technology.saved_progress = 0
-    assign_queue(plan.force, frame, plan.queue, true)
+    assign_queue(plan.force, frame, nil, recovery.canonical, recovery.id)
     -- Cancelling the old current through the final queue setter can cache its
     -- progress on canonical4 again. Only the transferred private row owns it.
     frame.technology.saved_progress = 0
