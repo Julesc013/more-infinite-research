@@ -812,13 +812,14 @@ local function owner_record()
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
   local published_default = value.producer.kind == "published473-default"
+  local archived_default = value.producer.kind == "archived-default" or value.producer.kind == "archived-idle-default"
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
   local published11_empty = value.producer.kind == "published511-empty-default"
   local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default and not published472_se
+      and not older_empty and not older_idle and not published_default and not archived_default and not published472_se
       and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
@@ -834,6 +835,7 @@ local function owner_record()
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
       or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
         and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
+      or archived_default and not recovery.archived_default_profile(value.producer.old_version, edition)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
@@ -888,7 +890,7 @@ local PUBLISHED473_F210_WORKER_ADDONS = {
   ["spider-launcher"] = "2.9.87",
 }
 
-local function published473_worker_has_known_editors()
+local function archived_default_worker_has_known_editors()
   if not prototypes or type(prototypes.get_history) ~= "function" then return false end
   local observed = prototypes.get_history("technology", recovery.canonical)
   if type(observed) ~= "table" or type(observed.changed) ~= "table"
@@ -897,6 +899,37 @@ local function published473_worker_has_known_editors()
     if editor ~= MIR and not ENGINE_MODS[editor] then return false end
   end
   return true
+end
+
+local function archived_default_origin(profile, event, change, active, state, current)
+  if getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
+    default_origin_error("archived default source requires a plain configuration event", event, state, current)
+  end
+  for name in pairs(ENGINE_MODS) do
+    local installed = name == "base" or profile.space_age and (name ~= "recycler" or profile.edition == "f210")
+    local updated = event.mod_changes[name]
+    if active[name] ~= (installed and profile.base or nil)
+        or updated and (getmetatable(updated) ~= nil or updated.old_version ~= updated.new_version) then
+      default_origin_error("archived default source requires the unchanged qualified engine and official mods", event, state, current)
+    end
+  end
+  for name, version in pairs(profile.mods) do
+    if active[name] ~= version then
+      default_origin_error("archived default source requires its qualified mod profile", event, state, current)
+    end
+  end
+  if not archived_default_worker_has_known_editors() then
+    default_origin_error("archived default source has unverified worker prototype editors", event, state, current)
+  end
+  require_archived_default_contract(event, state, current, profile.space_age, "archived default")
+  local kind = "archived-default"
+  for name in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] and not profile.mods[name] then
+      kind = "archived-idle-default"
+      break
+    end
+  end
+  return {kind=kind, old_version=change.old_version, new_version=active[MIR]}
 end
 
 local function published473_space_age_selection(event, change, active)
@@ -936,7 +969,7 @@ local function published473_space_age_selection(event, change, active)
   end
   -- Verify the current prototype too. The caller checks the archived price,
   -- science and native work before any transfer.
-  return not has_other_mods or published473_worker_has_known_editors()
+  return not has_other_mods or archived_default_worker_has_known_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -1219,8 +1252,12 @@ local function default_origin(event, initializing, state, current)
       end
     end
   end
-  if not change or not known_default_origin(change.old_version, target.id) or not engine_patch_valid then
+  local archived_profile = change and recovery.archived_default_profile(change.old_version, target.id)
+  if not change or not engine_patch_valid or not archived_profile and not known_default_origin(change.old_version, target.id) then
     default_origin_error("unrecorded default source has no qualified MIR5 producer", event, state, current)
+  end
+  if archived_profile then
+    return archived_default_origin(archived_profile, event, change, active, state, current)
   end
   for name, version in pairs(active) do
     -- The unchanged-selection check above covers added, removed and updated
@@ -1832,6 +1869,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
           recover_error(producer.kind == "published511-empty-default"
             and "published11 empty default source has invested or queued worker work"
             or "Space Is Fake removal requires every native worker4 to be uninvested")
+        end
+        if not owned and producer.kind == "archived-idle-default"
+            and (source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical) then
+          recover_error("archived default source with additional mods has unfinished worker work")
         end
         if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
           if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
