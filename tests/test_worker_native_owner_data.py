@@ -75,12 +75,11 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                 return ingredients
               end)(),ignore_tech_cost_multiplier=row.ignore_tech_cost_multiplier==true}
           end
-          function refused(source, id)
+          function refused(source)
             local before=deep(source)
-            assert(not pcall(owner.ordinary,source,id or owner.ordinary_provider_id))
-            assert(not pcall(owner.debit,source))
             assert(not pcall(owner.default_owner,source))
             assert(not pcall(owner.head_debit,source))
+            assert(not pcall(owner.published517_se_owner,source))
             same(source,before)
           end
         ''')
@@ -91,40 +90,13 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
         lua.execute(r'''
           assert(owner.id=="mir-worker-storage-preservation-4" and owner.canonical=="worker-robots-storage-4")
           assert(owner.ordinary_default_id=="mir-worker-storage-default-4")
-          assert(owner.ordinary_provider_id=="mir-worker-storage-provider-4")
-          assert(owner.provider_debit_id=="mir-worker-storage-provider-debit-4")
           assert(owner.head_id=="mir-worker-storage-head-4")
+          assert(owner.published517_se_id=="mir-worker-storage-published517-4")
           local seen={}
-          for _,id in ipairs({owner.id,owner.canonical,owner.ordinary_default_id,
-              owner.ordinary_provider_id,owner.provider_debit_id,owner.head_id})do
+          for _,id in ipairs({owner.id,owner.canonical,owner.ordinary_default_id,owner.head_id,owner.published517_se_id})do
             assert(not seen[id]);seen[id]=true
           end
         ''')
-
-    def test_ordinary_provider_preserves_complete_authored_contract_both_targets(self):
-        for target in ("f200", "f210"):
-            with self.subTest(target=target):
-                self.stage(target).execute(r'''
-                  local source=authored();local before=deep(source)
-                  for _,id in ipairs({owner.ordinary_provider_id})do
-                    local expected=deep(before)
-                    expected.name,expected.hidden=id,false
-                    same(owner.ordinary(source,id),expected)
-                  end
-                  same(source,before)
-                ''')
-
-    def test_debit_changes_only_identity_visibility_and_exact_effect_sign(self):
-        for target in ("f200", "f210"):
-            with self.subTest(target=target):
-                self.stage(target).execute(r'''
-                  local source=authored();local before=deep(source);local expected=deep(source)
-                  expected.name="mir-worker-storage-provider-debit-4"
-                  expected.hidden,expected.enabled,expected.visible_when_disabled=true,false,false
-                  expected.effects[1].modifier=-1
-                  same(owner.debit(source),expected);same(source,before)
-                  assert(owner.debit(source).level==4 and owner.debit(source).max_level=="infinite")
-                ''')
 
     def test_default_owner_keeps_absolute_level_prices_and_complete_source_contract(self):
         for target in ("f200", "f210"):
@@ -204,7 +176,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   for _,change in ipairs({
                     function(s,t)t.level=5 end,function(s,t)t.max_level=5 end,
                     function(s,t)s.level=5 end,function(s,t)s.max_level=4 end,
-                    function(s,t)t.name=owner.ordinary_provider_id end,
+                    function(s,t)t.name=owner.published517_se_id end,
                     function(s,t)t.effects[1].modifier=2 end,
                     function(s,t)t.research_unit_count_formula="675*1.5^(L-5)"end,
                     function(s,t)t.research_unit_energy=1 end,
@@ -219,8 +191,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     assert(not owner.matches_default_owner(s,t));same(s,saved_s);same(t,saved_t)
                   end
                   local bad=authored();bad.name="provider-authored-4"
-                  assert(not pcall(owner.default_owner,bad) and not pcall(owner.head_debit,bad))
-                  assert(not pcall(owner.ordinary,authored(),owner.ordinary_default_id))
+                  refused(bad)
                 ''')
 
     def test_every_nested_output_is_detached_from_source_and_other_outputs(self):
@@ -228,7 +199,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
         lua.execute(r'''
           local source=authored();local expected=deep(source)
           local a=owner.default_owner(source)
-          local b=owner.ordinary(source,owner.ordinary_provider_id);local d=owner.debit(source)
+          local b=owner.prototype(source);local d=owner.head_debit(source)
           a.unit.ingredients[1][2]=99;a.unit.time=2;a.prerequisites[1]="changed"
           a.effects[1].modifier=123;a.icons[1].tint.r=1;a.localised_description[3][1]="changed"
           same(source,expected)
@@ -239,43 +210,17 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
           assert(a.unit~=b.unit and b.unit~=d.unit and a.icons[1]~=b.icons[1])
         ''')
 
-    def test_configured_zero_and_two_effects_keep_exact_native_scalar_and_debit(self):
-        for target in ("f200", "f210"):
-            with self.subTest(target=target):
-                self.stage(target).execute(r'''
-                  for _,modifier in ipairs({0,2})do
-                    local source=authored();source.effects[1].modifier=modifier
-                    local before=deep(source)
-                    for _,id in ipairs({owner.ordinary_provider_id})do
-                      local expected=deep(source);expected.name,expected.hidden=id,false
-                      local row=owner.ordinary(source,id);same(row,expected)
-                      assert(row.effects[1].modifier==modifier)
-                    end
-                    local expected=deep(source)
-                    expected.name=owner.provider_debit_id
-                    expected.hidden,expected.enabled,expected.visible_when_disabled=true,false,false
-                    expected.effects[1].modifier=modifier==0 and 0 or -modifier
-                    local debit=owner.debit(source);same(debit,expected)
-                    assert(debit.effects[1].modifier+modifier==0)
-                    if modifier==0 then assert(1/debit.effects[1].modifier==math.huge)end
-                    same(source,before)
-                  end
-                ''')
-
     def test_fixed_count_and_optional_prerequisites_remain_exact(self):
         lua = self.stage()
         lua.execute(r'''
           local source=authored();source.unit.count_formula=nil;source.unit.count=675
           source.prerequisites=nil;source.ignore_tech_cost_multiplier=false
-          local a=owner.ordinary(source,owner.ordinary_provider_id);local d=owner.debit(source)
-          assert(a.unit.count==675 and a.unit.count_formula==nil and a.prerequisites==nil)
-          assert(d.unit.count==675 and d.unit.time==60 and d.ignore_tech_cost_multiplier==false)
           local tail=owner.default_owner(source)
           assert(tail.unit.count==675 and tail.unit.count_formula==nil and tail.prerequisites==nil)
           assert(owner.matches_default_owner(native(source),native(tail)))
         ''')
 
-    def test_ordinary_preserves_authored_enablement_and_disabled_visibility_exactly(self):
+    def test_default_owner_preserves_authored_enablement_and_visibility(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.stage(target).execute(r'''
@@ -287,13 +232,9 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                       -- Explicit false must remain distinguishable from omission.
                       if enabled==false then source.enabled=false end
                       if visible==false then source.visible_when_disabled=false end
-                      for _,id in ipairs({owner.ordinary_provider_id})do
-                        local row=owner.ordinary(source,id)
-                        assert(row.hidden==false and row.enabled==source.enabled)
-                        assert(row.visible_when_disabled==source.visible_when_disabled)
-                      end
                       local tail=owner.default_owner(source)
-                      assert(tail.enabled==source.enabled and tail.visible_when_disabled==source.visible_when_disabled)
+                      assert(tail.hidden==false and tail.enabled==source.enabled)
+                      assert(tail.visible_when_disabled==source.visible_when_disabled)
                     end
                   end
                 ''')
@@ -309,7 +250,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     function(s)s.enabled="yes"end,function(s)s.visible_when_disabled=1 end,
                     function(s)s.ignore_tech_cost_multiplier="false"end,
                     function(s)s.name=owner.id end,function(s)s.name=owner.ordinary_default_id end,
-                    function(s)s.name=owner.ordinary_provider_id end,function(s)s.name=owner.provider_debit_id end,
+                    function(s)s.name=owner.head_id end,function(s)s.name=owner.published517_se_id end,
                     function(s)s.effects={}end,function(s)s.effects[2]=deep(s.effects[1])end,
                     function(s)s.effects[1].modifier=-1 end,function(s)s.effects[1].modifier=math.huge end,
                     function(s)s.effects[1].type="laboratory-speed"end,
@@ -323,14 +264,8 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     function(s)s.prerequisites[1]=s.name end})do
                     local source=authored();change(source);refused(source)
                   end
-                  for _,source in ipairs({false,1,"authored"})do
-                    assert(not pcall(owner.ordinary,source,owner.ordinary_provider_id))
-                    assert(not pcall(owner.debit,source))
-                  end
-                  assert(not pcall(owner.ordinary,nil,owner.ordinary_provider_id))
-                  for _,id in ipairs({owner.id,owner.canonical,owner.ordinary_default_id,owner.provider_debit_id,owner.head_id,"foreign-4"})do
-                    assert(not pcall(owner.ordinary,authored(),id))
-                  end
+                  for _,source in ipairs({false,1,"authored"})do refused(source) end
+                  refused(nil)
                 ''')
 
     def test_first_level_debit_uses_public_scalar_without_scaling_the_default_owner(self):
@@ -340,7 +275,9 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   local source=authored();local before=deep(source)
                   for _,public_scalar in ipairs({0,2})do
                     assert(owner.default_owner(source).effects[1].modifier==1)
-                    assert(owner.head_debit(source,public_scalar).effects[1].modifier==-public_scalar)
+                    local debit=owner.head_debit(source,public_scalar).effects[1].modifier
+                    assert(debit==-public_scalar)
+                    if public_scalar==0 then assert(1/debit==math.huge)end
                     same(source,before)
                   end
                   for _,invalid in ipairs({-1,math.huge,"2",{}})do
@@ -357,19 +294,21 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
     def test_holes_self_prerequisites_and_executable_or_cyclic_data_refuse(self):
         lua = self.stage()
         lua.execute(r'''
-          local source=authored();source.prerequisites[1]=owner.ordinary_provider_id
-          assert(not pcall(owner.ordinary,source,owner.ordinary_provider_id))
-          source=authored();source.prerequisites[1]=owner.provider_debit_id
-          assert(not pcall(owner.debit,source))
+          local source=authored();source.prerequisites[1]=owner.ordinary_default_id
+          assert(not pcall(owner.default_owner,source))
+          source=authored();source.prerequisites[1]=owner.head_id
+          assert(not pcall(owner.head_debit,source))
+          source=authored();source.prerequisites[1]=owner.published517_se_id
+          assert(not pcall(owner.published517_se_owner,source))
           source=authored();source.unit.ingredients[2]=nil;refused(source)
           source=authored();source.icons[1].callback=function()end
-          assert(not pcall(owner.debit,source))
+          refused(source)
           source=authored();source.icons[1].cycle=source
-          assert(not pcall(owner.ordinary,source,owner.ordinary_provider_id))
+          assert(not pcall(owner.default_owner,source))
           source=authored();setmetatable(source.icons[1],{})
-          assert(not pcall(owner.debit,source))
+          refused(source)
           source=authored();source.icons[1].tint.r=0/0
-          assert(not pcall(owner.debit,source))
+          assert(not pcall(owner.head_debit,source))
         ''')
 
     def test_legacy_prepared_constructors_and_default_matching_keep_their_contract(self):
