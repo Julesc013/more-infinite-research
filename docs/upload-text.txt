@@ -1,13 +1,16 @@
-MIR 5.0.22
+MIR 5.0.23
 Channel: GitHub prerelease (beta). Mod Portal publication remains with the maintainer for stable releases.
 
-MIR 5.0.22 fixes localized Availability search and a Space Is Fake upgrade refusal.
+MIR 5.0.23 fixes worker robot storage save upgrades and preserves Space Exploration conquest bonuses alongside existing research.
 
-- Search the Research Library's Availability view by the translated family name. The German client check used Factorio 2.1.24.
-- On Factorio 2.0.77 with the unchanged official Space Age mods, the supported MIR 5.0.3 upgrade can remove Space Is Fake 1.0.60 and its unused dependency while retaining earned recipe effects and queued or unfinished research. This path requires default worker cargo settings and an uninvested repeating worker cargo research row.
+- On Factorio 2.0.77, supported MIR 4.7.3 Space Age saves retain earned worker cargo capacity, paid science and queue order when upgraded with their original worker cargo settings.
+- On Factorio 2.1.24 and 2.1.25, supported Space Age saves retain paid worker cargo research across the matching game and official mod update. Adding Solar Productivity 3.0.0 on Factorio 2.1.24 also preserves recorded worker cargo work.
+- On Factorio 2.1.24 with official Space Age, 4.7.3 saves can upgrade after an unrelated startup settings change when no force has queued, paid for or completed repeating worker cargo research. Keep the original settings for the first upgrade if there is existing cargo work.
+- On Factorio 2.0.77 with Space Exploration 0.7.57, the staged legacy upgrade preserves completed research such as night vision and restores the conquest bonuses. Later supported add-on changes retain those bonuses.
+- Preserve earned productivity and electric or Tesla research credit when the unfinished level is parked outside the research queue.
+- Reopen the Research Library at the selected technology's new position when the list order changes.
+- Reduce work when opening the Research Library's Research, Settings and Queue tabs.
 
-Keep the original save. For invested worker cargo or different settings, use the staged removal in the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md#removing-space-is-fake-on-factorio-20).
+Keep your original save. For legacy Space Exploration saves with earned or unfinished worker cargo research, apply the MIR and add-on changes in separate loads. Follow the [staged upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md#upgrading-mir-4720002-with-space-exploration).
 
-Broader Library, compatibility and performance qualification continues for stable.
-
-See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.22/docs/support.md) for supported editions and installation.
+See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md) for supported editions and installation.
