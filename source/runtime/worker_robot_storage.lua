@@ -518,6 +518,24 @@ local function private_contract()
   return recovery.fingerprint(native_prototype(recovery.id))
 end
 
+local function trace_private_queue(point, event, force, frame, record)
+  if not log or force.name ~= "mir-paid-current" and force.name ~= "mir-paid-parked" then return end
+  local phase = "configuration"
+  if event then
+    phase = tostring(event.name)
+    for _, name in ipairs({"on_research_queued", "on_research_started", "on_research_cancelled", "on_research_finished"}) do
+      if defines.events[name] == event.name then phase = name; break end
+    end
+  end
+  log("[MIR private queue trace] " .. point .. " " .. phase .. " " .. force.name
+    .. " level=" .. frame.next_level .. "/" .. record.next_level
+    .. " enabled=" .. tostring(frame.enabled) .. "/" .. tostring(record.enabled)
+    .. " visible=" .. tostring(frame.visible) .. "/" .. tostring(record.visible)
+    .. " pending=" .. tostring(record.pending) .. " limit=" .. record.limit
+    .. " current=" .. tostring(frame.current) .. " saved=" .. frame.saved_progress
+    .. " queue=" .. table.concat(frame.queue,","))
+end
+
 local function prepared_frames(state)
   if private_contract() ~= state.contract then recover_error("preserved worker effect/cost/science contract changed") end
   local out, seen = {}, {}
@@ -525,6 +543,7 @@ local function prepared_frames(state)
     local record = state.forces[force.index]
     if not record then recover_error("prepared force history is missing") end
     local frame = snapshot(force, recovery.id)
+    trace_private_queue("observe", nil, force, frame, record)
     if frame.next_level ~= record.next_level or frame.enabled ~= record.enabled
         or frame.visible ~= record.visible then recover_error("private worker history or flags changed") end
     seen[force.index] = true
@@ -2952,6 +2971,7 @@ function M.on_research_event(event, finished)
   local finished_context = finished == true and event.research and event.research.force
     and event.research.force.index == force.index
   local frame = snapshot(force, recovery.id, finished_context, queued_observation)
+  trace_private_queue("enter", event, force, frame, record)
   local advanced = finished and event.research and event.research.name == recovery.id
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
       or frame.next_level > record.limit + 1 or frame.enabled ~= record.enabled or frame.visible ~= record.visible then
@@ -2981,6 +3001,7 @@ function M.on_research_event(event, finished)
   owned_queue_force = previous_owner
   if not ok then error(message, 0) end
   local settled = snapshot(force, recovery.id, finished_context and not queue_changed)
+  trace_private_queue("leave", event, force, settled, record)
   if settled.next_level ~= record.next_level or settled.enabled ~= record.enabled or settled.visible ~= record.visible then
     recover_error("private worker frame changed during owned queue mutation")
   end
