@@ -3848,6 +3848,20 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(message:find("current_route=default",1,true)and not message:find("\0",1,true))
         ''')
 
+    def test_current_package_minimum_and_historical_base_floor_are_independent(self):
+        cases = (("2.1.22", "2.1.22", "2.1.25"), ("2.1.25", "2.1.23", "2.1.24"))
+        for minimum, predecessor, active in cases:
+            with self.subTest(minimum=minimum, predecessor=predecessor, active=active):
+                lua = self.older_world("f210")
+                lua.globals().minimum, lua.globals().predecessor, lua.globals().active = minimum, predecessor, active
+                lua.execute(r'''
+                  require("platform.target").minimum_base=minimum
+                  script.active_mods.base=active
+                  local event=older_event("4.7.21003",false)
+                  event.mod_changes.base={old_version=predecessor,new_version=active}
+                  refuse_older(event)
+                ''')
+
     def test_unrecorded_default_first_owner_refusal_keeps_event_state_and_current_context(self):
         lua=self.world("f210")
         lua.execute(r'''
@@ -3878,6 +3892,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ("f210", "4.7.21003", "space-age-unchanged-rows", "2.1.24"),
             ("f210", "4.7.21003", "space-age", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch", "2.1.25"),
+            ("f210", "4.7.21003", "space-age-engine-patch-raised-minimum", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch-with-addons", "2.1.25"),
             ("f210", "4.7.21003", "space-age-engine-patch-with-reported-addons", "2.1.25"),
         )
@@ -3893,6 +3908,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   local event=older_event(old,false)
                   local reported_addons=selection=="space-age-engine-patch-with-reported-addons"
                   local checked_addons=reported_addons or selection=="space-age-engine-patch-with-addons"
+                  local raised_minimum=selection=="space-age-engine-patch-raised-minimum"
+                  if raised_minimum then require("platform.target").minimum_base="2.1.25" end
                   if selection=="base-hop"then
                     event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
                     event.mod_startup_settings_changed=true
@@ -3902,7 +3919,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                         event.mod_changes[name]={old_version=version,new_version=version}
                       end
                     end
-                  elseif selection=="space-age-engine-patch" or checked_addons then
+                  elseif selection=="space-age-engine-patch" or checked_addons or raised_minimum then
                     for name,version in pairs(script.active_mods)do
                       if name~="more-infinite-research"then
                         event.mod_changes[name]={old_version="2.1.24",new_version=version}
