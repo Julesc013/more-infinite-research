@@ -363,10 +363,13 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
       local disabled_record = type(disabled) == "table" and disabled[candidate.name] or nil
       local visibility_record = type(visibility) == "table" and visibility[candidate.name] or nil
       local unowned_record = type(unowned) == "table" and unowned[candidate.name] or nil
-      local technology = native_technology(force, candidate.name)
-      if not policy_matches(policy, candidate, authority) then
+      local matching_policy = policy_matches(policy, candidate, authority)
+      local matching_visibility = matching_policy
+        and visibility_matches(visibility_record, force_index, candidate, authority)
+      local technology = matching_visibility and native_technology(force, candidate.name) or nil
+      if not matching_policy then
         set_decision(facts, index, candidate, "policy_mismatch")
-      elseif not visibility_matches(visibility_record, force_index, candidate, authority) then
+      elseif not matching_visibility then
         set_decision(facts, index, candidate, "visibility_record_mismatch")
       elseif not current_visibility_owned_state(technology, candidate.name) then
         set_decision(facts, index, candidate, "visibility_state_changed")
@@ -447,15 +450,18 @@ function M.import_boolean_for_force(legacy_bucket, force, candidates, current_ow
       local disabled_marker = map_entry(disabled, candidate.name)
       local visibility_marker = map_entry(visibility, candidate.name)
       local unowned_marker = map_entry(unowned, candidate.name)
-      local technology = native_technology(force, candidate.name)
-      if not boolean_policy_matches(policy, candidate) then
+      local matching_policy = boolean_policy_matches(policy, candidate)
+      local valid_visibility = visibility_marker == nil or type(visibility_marker) == "boolean"
+      local owned_disable = disabled_marker == true and unowned_marker == nil
+      local technology = matching_policy and valid_visibility and (visibility_marker ~= nil or owned_disable)
+        and native_technology(force, candidate.name) or nil
+      if not matching_policy then
         set_decision(facts, index, candidate, "policy_mismatch")
-      elseif visibility_marker ~= nil and type(visibility_marker) ~= "boolean" then
+      elseif not valid_visibility then
         set_decision(facts, index, candidate, "visibility_record_mismatch")
       elseif visibility_marker ~= nil and not current_visibility_owned_state(technology, candidate.name) then
         set_decision(facts, index, candidate, "visibility_state_changed")
-      elseif disabled_marker == true and unowned_marker == nil
-          and current_disable_owned_state(technology, candidate.name) then
+      elseif owned_disable and current_disable_owned_state(technology, candidate.name) then
         local row = visibility_marker ~= nil
           and {disabled = true, visible_when_disabled = visibility_marker}
           or {disabled = true}
