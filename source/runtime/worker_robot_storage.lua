@@ -155,6 +155,7 @@ local default_mutating_force
 local default_owner_merge_plans = {}
 local owned_queue_force
 local OWNER_KEY = "mir_worker_storage_native_owner"
+local REMOVAL_KEY = "mir_worker_storage_provider_removal"
 local delegated_provider_preflight, delegated_provider_apply
 local selected_cap, selected_enabled = 0, true
 
@@ -1269,10 +1270,16 @@ local function default_origin(event, initializing, state, current)
   return {kind="unchanged-mir5-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
-local function frame_values(frame)
+local function technology_values(frame)
   return {next_level=frame.next_level, researched=frame.researched, enabled=frame.enabled, visible=frame.visible,
-    saved_progress=frame.saved_progress, count=frame.count, current=frame.current,
-    current_progress=frame.current_progress, queue=clone(frame.queue), queued_saved=clone(frame.queued_saved)}
+    saved_progress=frame.saved_progress, count=frame.count}
+end
+
+local function frame_values(frame)
+  local values = technology_values(frame)
+  values.current, values.current_progress = frame.current, frame.current_progress
+  values.queue, values.queued_saved = clone(frame.queue), clone(frame.queued_saved)
+  return values
 end
 
 local function head_gate_contract(source)
@@ -2334,7 +2341,7 @@ end
 local function retired_provider_current(event, route)
   local state = owner_record()
   local current, contract = finite_provider_contract(route)
-  if state.kind ~= "provider-retired" or not same_fact(state.current, current) or state.contract ~= contract then
+  if not state or state.kind ~= "provider-retired" or not same_fact(state.current, current) or state.contract ~= contract then
     recover_error("retired default provider removal/changed continuation remains unqualified", route)
   end
   for _, stage in ipairs(route.finite) do
@@ -2364,6 +2371,7 @@ local function retired_provider_current(event, route)
     return {kind="default-native-provider-gate-settle", event=clone(event), route=copy(route),
       prior_owner=state, current=current, contract=contract, items=items, changed=true}
   end
+  return nil, state, items
 end
 
 local function apply_retired_gate_settlement(plan)
@@ -2869,6 +2877,94 @@ end
 
 function M.resume(force, route) return resume(force, route) end
 
+local function provider_research_contract(name)
+  local prototype = native_prototype(name)
+  if type(prototype.effects) ~= "table" or type(prototype.research_unit_ingredients) ~= "table"
+      or type(prototype.research_unit_energy) ~= "number" or prototype.research_unit_energy <= 0 then
+    recover_error("provider research contract is unavailable: " .. name)
+  end
+  local prerequisites = {}
+  for key, value in pairs(prototype.prerequisites or {}) do
+    prerequisites[#prerequisites+1] = type(key) == "string" and key or value.name
+  end
+  table.sort(prerequisites)
+  return {first_level=prototype.level, max_level=prototype.max_level, effects=clone(prototype.effects),
+    inputs=clone(prototype.research_unit_ingredients), unit_energy=prototype.research_unit_energy,
+    count=prototype.research_unit_count, formula=prototype.research_unit_count_formula,
+    ignore_tech_cost_multiplier=prototype.ignore_tech_cost_multiplier, prerequisites=prerequisites}
+end
+
+local function prepare_provider_removal(route, before_apply)
+  if not route then recover_error("provider removal preparation requires the provider to be installed") end
+  if storage[REMOVAL_KEY] ~= nil then recover_error("cancel the existing removal preparation before recording another") end
+  local _, owned, items = retired_provider_current(nil, route)
+  local prior = checked_state()
+  if not prior or prior.kind ~= "prepared" or prior.phase ~= "provider"
+      or not same_fact(prior.current, owned.current) or prior.contract ~= owned.contract then
+    recover_error("provider work has no matching native owner and preserved-work record")
+  end
+  prepared_current(prior, owned.current)
+  local active = script.active_mods
+  if active[MIR] ~= target.distribution_version or not engine_patch(active.base) or not tick(game.tick)
+      or type(game.tick_paused) ~= "boolean" or game.tick_paused and game.ticks_to_run ~= 0 then
+    recover_error("cannot record provider work during an unverified package, engine or stepping state")
+  end
+
+  local names, providers, contracts = {}, {}, {}
+  local function record_provider(name)
+    local version = active[name]
+    if type(version) ~= "string" or version == "" then recover_error("provider version is unavailable: " .. name) end
+    providers[name] = version
+  end
+  for _, stage in ipairs(route.finite) do
+    names[#names+1] = stage.name
+    record_provider(stage.provider)
+  end
+  names[#names+1] = route.technology
+  if not route.owned then record_provider(route.provider) end
+  for _, name in ipairs(names) do contracts[name] = provider_research_contract(name) end
+
+  local checkpoint = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=active[MIR], base=active.base,
+    providers=providers, route=copy(route), contract=owned.contract, settings=relevant_worker_configuration(),
+    technologies=contracts, forces={}}
+  for _, item in ipairs(items) do
+    local force, rows = item.force, {}
+    for _, name in ipairs(names) do
+      local frame = name == recovery.canonical and item.public or snapshot(force, name)
+      local count = frame.count
+      if type(count) ~= "number" or count <= 0 or count > 4294967295 or count ~= math.floor(count) then
+        recover_error("provider research price is unavailable: " .. name)
+      end
+      rows[name] = technology_values(frame)
+    end
+    checkpoint.forces[force.index] = {name=force.name, technologies=rows, bonus=item.bonus,
+      gate_paid=item.gate_paid, native_holder=technology_values(item.owner), preserved_holder=technology_values(item.private),
+      current=item.public.current, current_progress=item.public.current_progress,
+      queue=clone(item.public.queue), queued_saved=clone(item.public.queued_saved)}
+  end
+  if not next(checkpoint.forces) then recover_error("no native forces are available for provider preparation") end
+
+  -- The live native frame remains the authority until the save is put aside.
+  -- Stop movement between recording the frame and saving this prepared copy.
+  before_apply()
+  game.tick_paused = true
+  storage[REMOVAL_KEY] = checkpoint
+  return true, "Recorded provider research in this paused copy. Save it under a new name and keep the original."
+end
+
+local function cancel_provider_removal(before_apply)
+  local checkpoint = storage[REMOVAL_KEY]
+  if checkpoint == nil then return false, "There is no provider removal preparation to cancel." end
+  if type(checkpoint) ~= "table" or checkpoint.schema ~= 1 or not tick(checkpoint.tick)
+      or type(checkpoint.was_paused) ~= "boolean" then recover_error("invalid provider removal preparation") end
+  before_apply()
+  storage[REMOVAL_KEY] = nil
+  if game.tick == checkpoint.tick and game.tick_paused and game.ticks_to_run == 0 and not checkpoint.was_paused then
+    game.tick_paused = false
+  end
+  return true, "Cancelled the provider removal preparation."
+end
+
 function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
@@ -2882,11 +2978,13 @@ function M.command(command, route)
   local applying = false
   local function before_apply() applying = true end
   if operation == "prepare" and name == "" then ok, result, message = pcall(prepare, route, before_apply)
+  elseif operation == "prepare-removal" and name == "" then ok, result, message = pcall(prepare_provider_removal, route, before_apply)
+  elseif operation == "cancel-removal" and name == "" then ok, result, message = pcall(cancel_provider_removal, before_apply)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
     ok, result, message = pcall(resume, force, route, before_apply)
-  else reply("Usage: /mir-worker-storage-recovery prepare | resume <force-name>"); return end
+  else reply("Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume <force-name>"); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
       .. " before trying recovery again: " .. tostring(result), 0)

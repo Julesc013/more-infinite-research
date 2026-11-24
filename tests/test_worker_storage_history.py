@@ -3200,6 +3200,101 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(not pcall(history.default_owner_preflight,{mod_changes={provider={old_version="1.0",new_version="2.0"}}},provider_route(5),true))
         ''')
 
+
+    @staticmethod
+    def prepare_removal_world(lua):
+        lua.execute(r'''
+          full_source(1,true);finite_entry(1);handover()
+          game.tick=170000;game.tick_paused=false;game.ticks_to_run=0
+          tier5,tier6="worker-robots-storage-5","worker-robots-storage-6"
+          for _,tier in ipairs{tier5,tier6}do
+            local p=prototypes.technology[tier]
+            p.effects={{type="worker-robot-storage",modifier=2,hidden=false},
+              {type="unlock-recipe",recipe="provider-recipe",hidden=false}}
+            p.research_unit_ingredients={{name="automation-science-pack",amount=1},{name="provider-science",amount=2}}
+            p.research_unit_energy=4800
+            p.prerequisites={["worker-robots-storage-4"]={name="worker-robots-storage-4"}}
+            p.ignore_tech_cost_multiplier=false
+            if tier==tier5 then p.research_unit_count=1012 else p.research_unit_count_formula="1518*1.5^(L-6)" end
+            for _,force in pairs(game.forces)do
+              local row=force.technologies[tier]
+              row.name=tier
+              row.visible_when_disabled=true
+              row.research_unit_count=tier==tier5 and 1012 or 1518
+            end
+          end
+          player.technologies[tier5].saved_progress=.1875
+          player.research_queue={ID,OTHER,tier5};player.research_progress=.375
+          detached.technologies[tier5].researched=true
+          detached.technologies[tier6].saved_progress=.3125
+          removal_key="mir_worker_storage_provider_removal"
+          messages={};log=function(message) messages[#messages+1]=message end
+          writes=0
+        ''')
+
+    def test_prepare_removal_captures_the_provider_terms_and_work_without_moving_native_research(self):
+        lua=self.world()
+        self.prepare_removal_world(lua)
+        lua.execute(r'''
+          local native,foreign=all_frames(),foreign_frames()
+          local owner,quota=storage[OWNER_KEY],storage.mir_worker_storage_route
+          history.command({parameter="prepare-removal"},provider_route(5))
+          local prepared=assert(storage[removal_key],messages[#messages])
+          assert(prepared.schema==1 and prepared.tick==170000 and not prepared.was_paused and game.tick_paused)
+          assert(prepared.providers.provider=="1.0" and prepared.route.technology==tier6)
+          assert(prepared.technologies[tier5].max_level==5 and prepared.technologies[tier5].count==1012)
+          assert(prepared.technologies[tier5].effects[1].modifier==2
+            and prepared.technologies[tier5].effects[2].recipe=="provider-recipe"
+            and prepared.technologies[tier6].formula=="1518*1.5^(L-6)"
+            and prepared.technologies[tier6].inputs[2].name=="provider-science"
+            and prepared.technologies[tier6].inputs[2].amount==2)
+          local current,parked=prepared.forces[player.index],prepared.forces[detached.index]
+          assert(current.current==ID and current.current_progress==.375 and same(current.queue,{ID,OTHER,tier5}))
+          assert(current.technologies[tier5].saved_progress==.1875 and current.technologies[tier5].count==1012)
+          assert(parked.technologies[tier5].researched and parked.technologies[tier5].next_level==6)
+          assert(parked.technologies[tier6].saved_progress==.3125 and parked.technologies[tier6].count==1518)
+          assert(parked.preserved_holder.saved_progress==.23 and parked.preserved_holder.count==detached.technologies[ID].research_unit_count)
+          assert(writes==0 and same(native,all_frames()) and same(foreign,foreign_frames()))
+          assert(storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==quota)
+          prototypes.technology[tier5].effects[2].recipe="changed"
+          assert(prepared.technologies[tier5].effects[2].recipe=="provider-recipe")
+          history.command({parameter="prepare-removal"},provider_route(5))
+          assert(storage[removal_key]==prepared)
+          history.command({parameter="cancel-removal"},provider_route(5))
+          assert(not game.tick_paused and storage[removal_key]==nil and writes==0)
+        ''')
+
+    def test_removal_preparation_fails_before_pause_or_storage_change_if_work_is_unobservable(self):
+        for changed in (
+            'script.active_mods.provider=nil',
+            'game.tick_paused=true;game.ticks_to_run=2',
+            'detached.technologies[tier6].research_unit_count=0',
+            'prototypes.technology[tier6].research_unit_ingredients=nil',
+        ):
+            with self.subTest(changed=changed):
+                lua=self.world()
+                self.prepare_removal_world(lua)
+                lua.execute(changed+r'''
+                  local pause=game.tick_paused
+                  history.command({parameter="prepare-removal"},provider_route(5))
+                  assert(storage[removal_key]==nil and game.tick_paused==pause and writes==0)
+                  assert(messages[#messages]:find("MIR worker storage history",1,true))
+                ''')
+
+    def test_cancel_removal_keeps_a_preexisting_or_newer_pause(self):
+        for initially_paused in (False, True):
+            lua=self.world()
+            self.prepare_removal_world(lua)
+            lua.globals().initially_paused=initially_paused
+            lua.execute(r'''
+              game.tick_paused=initially_paused
+              history.command({parameter="prepare-removal"},provider_route(5))
+              assert(storage[removal_key] and game.tick_paused)
+              if not initially_paused then game.tick=game.tick+1 end
+              history.command({parameter="cancel-removal"},provider_route(5))
+              assert(storage[removal_key]==nil and game.tick_paused and writes==0)
+            ''')
+
     def test_scoped_transfer_guard_restores_on_nested_callback_and_setter_error(self):
         for fail in (False,True):
             lua=self.world();lua.globals().fail=fail;lua.execute(r'''
