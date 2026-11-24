@@ -819,8 +819,9 @@ local function owner_record()
   fields(value.producer, {kind=true, old_version=true, new_version=true})
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
-  local archived_idle = value.producer.kind == "archived-uninvested-default"
-  local archive = recovery.archived_uninvested_defaults[value.producer.old_version]
+  local archived_paid = value.producer.kind == "archived-default"
+  local archived = archived_paid or value.producer.kind == "archived-uninvested-default"
+  local archive = recovery.archived_default_profiles[value.producer.old_version]
   local published_default = value.producer.kind == "published473-default"
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
@@ -828,7 +829,7 @@ local function owner_record()
   local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not archived_idle and not published_default and not published472_se
+      and not older_empty and not older_idle and not archived and not published_default and not published472_se
       and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
@@ -843,7 +844,7 @@ local function owner_record()
   if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
-      or archived_idle and (not archive or edition ~= archive.edition)
+      or archived and (not archive or edition ~= archive.edition or archived_paid and not archive.paid)
       or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
         and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
@@ -1230,7 +1231,7 @@ local function default_origin(event, initializing, state, current)
       end
     end
   end
-  local archive = change and recovery.archived_uninvested_defaults[change.old_version]
+  local archive = change and recovery.archived_default_profiles[change.old_version]
   if archive then
     if not engine_patch_valid or target.id ~= archive.edition or active.base ~= archive.base
         or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
@@ -1250,7 +1251,14 @@ local function default_origin(event, initializing, state, current)
       default_origin_error("archived uninvested default source has unverified prototype history", event, state, current)
     end
     require_archived_default_contract(event, state, current, true, "archived uninvested default")
-    return {kind="archived-uninvested-default", old_version=change.old_version, new_version=active[MIR]}
+    local kind = archive.paid and "archived-default" or "archived-uninvested-default"
+    for name in pairs(active) do
+      if name ~= MIR and not ENGINE_MODS[name] and not archive.mods[name] then
+        kind = "archived-uninvested-default"
+        break
+      end
+    end
+    return {kind=kind, old_version=change.old_version, new_version=active[MIR]}
   end
   local known = DEFAULT_ORIGINS[target.id]
   if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
