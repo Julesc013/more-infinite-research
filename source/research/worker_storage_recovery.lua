@@ -19,6 +19,19 @@ local ARCHIVED_WORKER_SCIENCE = {
   f200_se = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack"},
 }
+-- Historical native worker contracts. Paid admission needs the complete
+-- archived mod selection, because an extra mod could have changed the old price.
+M.archived_default_profiles = {
+  ["4.6.21000"] = {
+    edition="f210", base="2.1.23", paid=true,
+    mods={
+      Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19",
+      Krastorio2Assets="2.1.0", Krastorio2MenuSimulations="2.1.0",
+      ["k2so-assets"]="1.0.7", flib="0.17.2",
+      ["xy-k2so-enhancements-nulls-fork"]="0.8.3",
+    },
+  },
+}
 local PUBLISHED517_SE_PREREQUISITES = {
   -- Preserve the native direct prerequisite set, not the authored row's
   -- redundant earlier level. The retained native saved contract names two.

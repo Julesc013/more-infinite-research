@@ -705,17 +705,12 @@ end
 -- Explicit default-only native ownership; event wiring and caps have separate owners.
 -- Native research remains authoritative after this one-time identity transfer.
 -- The older route/preparation key and legacy private holder keep their meanings.
--- Public MIR5 default C4 has one unchanged native earning/settings contract.
--- This set does not authorize provider routes or new direct engine-hop origins.
-local DEFAULT_ORIGINS = {
-  f200 = {["5.0.20000"]=true, ["5.0.20001"]=true, ["5.0.20002"]=true, ["5.0.20003"]=true,
-    ["5.0.20004"]=true, ["5.0.20005"]=true, ["5.0.20006"]=true, ["5.0.20007"]=true,
-    ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
-  f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
-    ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
-    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
-}
 local PUBLISHED473_DEFAULT_ORIGINS = {f200="4.7.20003", f210="4.7.21003"}
+local UNINVESTED_DEFAULT_PRODUCERS = {
+  ["published511-empty-default"]="published11 empty default source has invested or queued worker work",
+  ["published503-sif-empty-default"]="Space Is Fake removal requires every native worker4 to be uninvested",
+  ["archived-uninvested-default"]="archived default source has earned, queued or unfinished worker work",
+}
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
 -- These exact published11 producers support schema-2/default preparation
 -- and the separately checked, uninvested Base+MIR admission below.
@@ -725,6 +720,13 @@ local function producer_edition(version)
   if type(version) ~= "string" then return nil end
   if version:match("^5%.0%.200%d%d$") then return "f200" end
   if version:match("^5%.0%.210%d%d$") then return "f210" end
+end
+
+-- Both editions used the unrecorded default producer contract through patch 11.
+-- The edition decoder validates the fixed-width version before ordering it.
+local function known_default_origin(version, edition)
+  local last = PUBLISHED11_DEFAULT_ORIGINS[edition]
+  return last ~= nil and producer_edition(version) == edition and version <= last
 end
 
 local function recorded_default_versions_match(old_version, new_version)
@@ -814,6 +816,9 @@ local function owner_record()
   fields(value.producer, {kind=true, old_version=true, new_version=true})
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
+  local archived_paid = value.producer.kind == "archived-default"
+  local archived = archived_paid or value.producer.kind == "archived-uninvested-default"
+  local archive = recovery.archived_default_profiles[value.producer.old_version]
   local published_default = value.producer.kind == "published473-default"
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
@@ -821,7 +826,7 @@ local function owner_record()
   local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default and not published472_se
+      and not older_empty and not older_idle and not archived and not published_default and not published472_se
       and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
@@ -831,17 +836,18 @@ local function owner_record()
   -- Producer facts describe their historical package, not the current
   -- edition. A valid F200-owned native record survives the supported forward
   -- engine hop; it is not rewritten into a fictional F210 producer.
-  local edition, old_edition = producer_edition(value.producer.new_version), producer_edition(value.producer.old_version)
-  local known = DEFAULT_ORIGINS[old_edition]
+  local edition = producer_edition(value.producer.new_version)
   if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
+      or archived and (not archive or edition ~= archive.edition or archived_paid and not archive.paid)
       or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
         and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty)
+        and (not known_default_origin(value.producer.old_version, edition)
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default"
@@ -891,7 +897,7 @@ local PUBLISHED473_F210_WORKER_ADDONS = {
   ["spider-launcher"] = "2.9.87",
 }
 
-local function published473_worker_has_known_editors()
+local function worker_has_known_editors()
   if not prototypes or type(prototypes.get_history) ~= "function" then return false end
   local observed = prototypes.get_history("technology", recovery.canonical)
   if type(observed) ~= "table" or type(observed.changed) ~= "table"
@@ -939,7 +945,7 @@ local function published473_space_age_selection(event, change, active)
   end
   -- Verify the current prototype too. The caller checks the archived price,
   -- science and native work before any transfer.
-  return not has_other_mods or published473_worker_has_known_editors()
+  return not has_other_mods or worker_has_known_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -1222,15 +1228,42 @@ local function default_origin(event, initializing, state, current)
       end
     end
   end
-  local known = DEFAULT_ORIGINS[target.id]
-  if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
+  local archive = change and recovery.archived_default_profiles[change.old_version]
+  if archive then
+    if not engine_patch_valid or target.id ~= archive.edition or active.base ~= archive.base
+        or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
+      default_origin_error("archived uninvested default source requires its qualified engine", event, state, current)
+    end
+    for name in pairs(ENGINE_MODS) do
+      if active[name] ~= archive.base then
+        default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
+      end
+    end
+    for name, version in pairs(archive.mods) do
+      if active[name] ~= version then
+        default_origin_error("archived uninvested default source requires its qualified dependency versions", event, state, current)
+      end
+    end
+    if not worker_has_known_editors() then
+      default_origin_error("archived uninvested default source has unverified prototype history", event, state, current)
+    end
+    require_archived_default_contract(event, state, current, true, "archived uninvested default")
+    local kind = archive.paid and "archived-default" or "archived-uninvested-default"
+    for name in pairs(active) do
+      if name ~= MIR and not ENGINE_MODS[name] and not archive.mods[name] then
+        kind = "archived-uninvested-default"
+        break
+      end
+    end
+    return {kind=kind, old_version=change.old_version, new_version=active[MIR]}
+  end
+  if not change or not known_default_origin(change.old_version, target.id) or not engine_patch_valid then
     default_origin_error("unrecorded default source has no qualified MIR5 producer", event, state, current)
   end
-  local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
   for name, version in pairs(active) do
     -- The unchanged-selection check above covers added, removed and updated
     -- mods. Unrelated unchanged names do not invalidate surviving native work.
-    if official[name] and name ~= MIR and version ~= active.base then
+    if ENGINE_MODS[name] and version ~= active.base then
       default_origin_error("unrecorded default source requires matching official engine versions", event, state, current)
     end
   end
@@ -1830,13 +1863,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
             or source.saved_progress ~= 0 or source.occurrences ~= 0) then
           recover_error("first initialization/new force cannot adopt existing default work")
         end
-        if not owned and (producer.kind == "published511-empty-default"
-              or producer.kind == "published503-sif-empty-default")
+        local uninvested_required = UNINVESTED_DEFAULT_PRODUCERS[producer.kind]
+        if not owned and uninvested_required
             and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
               or source.occurrences ~= 0 or source.current == recovery.canonical) then
-          recover_error(producer.kind == "published511-empty-default"
-            and "published11 empty default source has invested or queued worker work"
-            or "Space Is Fake removal requires every native worker4 to be uninvested")
+          recover_error(uninvested_required)
         end
         if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
           if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then

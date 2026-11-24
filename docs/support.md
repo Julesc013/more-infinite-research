@@ -97,6 +97,24 @@ For a save outside that direct route, keep Space Is Fake installed for the first
 
 The staged upgrade from MIR 5.0.3 to 5.0.18 preserved queued mining and plastic research, unfinished progress and earned recipe bonuses. A separate replay from MIR 5.0.3 to 5.0.23 kept paid worker cargo at its original price and let ordinary labs finish the level after removing Space Is Fake 1.0.60 and cr-commons 1.0.27. Both replays used Factorio 2.0.77. The combined 5.0.23 upgrade and removal on the paid save stopped before saving. [Paid worker cargo replay](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7122084174)
 
+### Upgrading MIR 4.6 with Krastorio 2 Spaced Out
+
+Use a separate copy of the save that ran MIR 4.6.21000 on Factorio 2.1.23. Keep the previous mod selection and copy the startup settings from the working installation. Recreating defaults can change the saved research terms during the upgrade.
+
+The complete tested selection uses the matching official Space Age mods and these versions.
+
+| Mod ID | Version |
+|---|---|
+| Krastorio2 | 2.1.4 |
+| Krastorio2-spaced-out | 2.0.19 |
+| Krastorio2Assets | 2.1.0 |
+| Krastorio2MenuSimulations | 2.1.0 |
+| k2so-assets | 1.0.7 |
+| flib | 0.17.2 |
+| xy-k2so-enhancements-nulls-fork | 0.8.3 |
+
+With additional unchanged mods, the archived worker transfer requires every force's repeating cargo research to be uninvested. A force with earned levels, paid science or queued work needs the complete tested selection. Keep the original save and its working mod selection if the upgrade refuses.
+
 ### Upgrading MIR 4.7.20002 with Space Exploration
 
 On Factorio 2.0.77 with Space Exploration 0.7.57, keep MIR and add-on updates in separate loads when the save has earned or unfinished worker cargo research.

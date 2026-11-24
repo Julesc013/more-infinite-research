@@ -7,6 +7,7 @@ MIR 5.0.23 fixes worker robot storage save upgrades and preserves Space Explorat
 - On Factorio 2.1.24 and 2.1.25, supported Space Age saves retain paid worker cargo research across the matching game and official mod update. Adding Solar Productivity 3.0.0 on Factorio 2.1.24 also preserves recorded worker cargo work.
 - On Factorio 2.1.24 with official Space Age, 4.7.3 saves can upgrade after an unrelated startup settings change when no force has queued, paid for or completed repeating worker cargo research. Keep the original settings for the first upgrade if there is existing cargo work.
 - On Factorio 2.0.77 with Space Exploration 0.7.57, the staged legacy upgrade preserves completed research such as night vision and restores the conquest bonuses. Later supported add-on changes retain those bonuses.
+- On Factorio 2.1.23, supported MIR 4.6 upgrades with Krastorio 2 Spaced Out preserve unfinished Imersite research. Keep the original mods and startup settings. Use the complete [archived profile](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md#upgrading-mir-46-with-krastorio-2-spaced-out) for earned, queued or unfinished repeating worker cargo.
 - Preserve earned productivity and electric or Tesla research credit when the unfinished level is parked outside the research queue.
 - Reopen the Research Library at the selected technology's new position when the list order changes.
 - Reduce work when opening the Research Library's Research, Settings and Queue tabs.
