@@ -147,6 +147,7 @@ end
 local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local target = require("platform.target")
+local provider_archive = target.id == "f210" and require("research.worker_storage_archive")
 local effective_values = require("runtime.configuration")
 local configuration_context = require("runtime.configuration_change_context")
 local pending = false
@@ -2872,22 +2873,23 @@ end
 function M.resume(force, route) return resume(force, route) end
 
 local function archive_profile(route)
-  if route == nil or not route.owned then recover_error("provider removal needs its recorded finite route", route) end
-  local archive = require("research.worker_storage_archive")
-  for _, profile in ipairs(archive.profiles) do
+  if not provider_archive or route == nil or not route.owned then
+    recover_error("provider removal needs its recorded finite route", route)
+  end
+  for _, profile in ipairs(provider_archive.profiles) do
     if target.id == profile.target and script.active_mods[profile.prerequisite_mod]
         and script.active_mods[profile.provider] == profile.version
         and #route.finite == #profile.stages and route.finite[1].provider == profile.provider
         and route.technology == profile.stages[#profile.stages].source then
-      return archive, profile
+      return profile
     end
   end
   recover_error("this provider has no declared removal contract", route)
 end
 
-local function archive_terms(archive, profile, stage)
+local function archive_terms(profile, stage)
   local source, holder, debit = native_prototype(stage.source), native_prototype(stage.holder), native_prototype(stage.debit)
-  local count, formula, seconds, modifier = archive.terms(profile, stage, effective_values.streams["worker-robots-storage"])
+  local count, formula, seconds, modifier = provider_archive.terms(profile, stage, effective_values.streams["worker-robots-storage"])
   local last = stage.last == "infinite" and 4294967295 or stage.last
   local levels = {first=stage.first, last=last}
   if creator(stage.source) ~= (stage.count and profile.provider or MIR)
@@ -2917,10 +2919,10 @@ local function collect_provider_archive(route)
   end
   retired_provider_current(nil, route)
   prepared_current(state, fact(route))
-  local archive, profile = archive_profile(route)
+  local profile = archive_profile(route)
   local contract, replacements, items = {}, {}, {}
   for _, stage in ipairs(profile.stages) do
-    contract[stage.source] = archive_terms(archive, profile, stage)
+    contract[stage.source] = archive_terms(profile, stage)
     replacements[stage.source] = stage.holder
   end
   for _, force in ipairs(forces()) do

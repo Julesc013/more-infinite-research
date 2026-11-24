@@ -1,6 +1,7 @@
 -- Stable native identities for a prepared provider removal. The data-stage
 -- rows alone never claim a force's research or make it available to players.
 local copy_owner = require("research.worker_storage_recovery").copy_owner
+local cost = require("research.cost")
 local M = {}
 
 M.profiles = {
@@ -28,7 +29,7 @@ end
 function M.terms(profile, stage, stream)
   local count_formula
   if stage.count == nil then
-    count_formula = require("research.cost").continuation(stream, stage.first, stage.predecessor_count, stage.previous_count)
+    count_formula = cost.continuation(stream, stage.first, stage.predecessor_count, stage.previous_count)
   end
   return stage.count, count_formula,
     not stage.count and stream.research_time > 0 and stream.research_time or profile.seconds,
