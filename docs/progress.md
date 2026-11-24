@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Current private 5.0.23 freeze (2026-11-24)
+
+Committed source 89f9975e5f98735dea4be0316b72a2a27619baeb built and verified 17 player ZIPs and two checksum files. Inventory SHA-256 F730EA89450B2A26EC2A18E2995AE2FB1CD7B968AEB6A0D86A4F416C7AD0B884 binds the complete set. Fifteen ZIPs differ from the previous integrated freeze only in their generated changelog. The Factorio 2.0 and 2.1 ZIPs also carry the checked Library list and worker startup-settings repairs. The staged release notes match the upload text. The prior freeze and its evidence remain available.
+
+The Windows build job reproduced the exact frozen Factorio 2.1 ZIP ED5984493EBFB6E5C11F8DE52C27CE80806669AD6CCADF58525E77A1593DD31F and handed those bytes to the Linux test job. On Factorio 2.1.24 with official Space Age, the job reused both protected 4.7.3 inputs from run 45296218504 by hash. The startup-settings upgrade preserved the unrelated queue, active and parked research, disablement and native speed effect. Ordinary worker cargo research used 675 of each of six science packs. The two cold loads matched. The separate paid-cargo input refused before saving. All four library activations restored. The raw result rehashed as E76C135EA57556C7786C497A113233B38922392FFB339B85181CD457073358C3. [Exact archive replay](https://github.com/Julesc013/more-infinite-research/actions/runs/45297915681)
+
+The original #1944 save remains unavailable. The manually assigned speed-offset case remains adverse after Factorio reset the value before MIR's callback. The combined legacy Space Exploration change and remaining stable acceptance still hold publication. MIR 5.0.22 remains the public prerelease. [Earlier adverse](https://github.com/Julesc013/more-infinite-research/actions/runs/45295878469) · [Original report](https://github.com/Julesc013/more-infinite-research/issues/1944)
+
 ## Current Library scheduler and client verification (2026-11-24)
 
 The private comparison source `4cad2d22e06caeccbc38fa0076083cce080720b8` projects the two current Library modules onto the guarded 5.0.23 source. Its F210 ZIP `611BF1007425BD38FF1194D16252549714A317BA4F2614AC805161A26D99BEC5` differs from the guarded archive only in `runtime/library.lua` and `runtime/library_translations.lua`. The guarded archive retains its own release evidence.
