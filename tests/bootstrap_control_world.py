@@ -238,7 +238,17 @@ def install_bootstrap_control_world(lua, *, source_root):
               module.on_init = function() library_calls.init = (library_calls.init or 0) + 1 end
               module.on_configuration_changed = function(event) library_calls.configuration = event end
               module.on_load = function() library_calls.load = (library_calls.load or 0) + 1 end
-              module.on_lua_shortcut = function(event) library_calls.shortcut = event end
+              module.has_library_gui_name = function(event)
+                local element = event and event.element
+                local name = element and element.valid ~= false and element.name
+                return name == "mir_research_browser" or type(name) == "string" and name:sub(1, 12) == "mir_library_"
+              end
+              module.on_lua_shortcut = function(event)
+                if event and event.prototype_name == "mir-research-browser" then
+                  library_calls.shortcut = event
+                  return true
+                end
+              end
               module.on_gui_text_changed = function(event) library_calls.text = event end
               module.on_gui_selected_tab_changed = function(event) library_calls.tab = event end
               module.on_gui_selection_state_changed = function(event) library_calls.selection = event end
