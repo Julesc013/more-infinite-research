@@ -260,18 +260,16 @@ class BootstrapTests(unittest.TestCase):
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
-          handlers.events[7]({player_index = 1})
-          handlers.events[8]({player_index = 1})
-          handlers.events[21]({player_index = 1})
-          handlers.events[9]({player_index = 1})
-          handlers.events[10]({player_index = 1})
-          handlers.events[11]({player_index = 1})
+          handlers.events[7]({player_index = 1, prototype_name = "mir-research-browser"})
+          for _, id in ipairs({8, 21, 9, 10, 11}) do
+            handlers.events[id]({player_index = 1, element = {name = "mir_library_control"}})
+          end
           handlers.events[defines.events.on_player_display_scale_changed]({player_index = 1, old_scale = 1})
           assert(library_calls.display_changed.player_index == 1 and library_calls.display_changed.old_scale == 1)
           handlers.events[defines.events.on_player_display_resolution_changed]({player_index = 1,
             old_resolution = {width = 1920, height = 1080}})
           assert(library_calls.display_changed.player_index == 1 and library_calls.display_changed.old_resolution.width == 1920)
-          handlers.events[12]({player_index = 1})
+          handlers.events[12]({player_index = 1, element = {name = "mir_research_browser"}})
           handlers.events[22]({player_index = 1})
           handlers.events[13]({player_index = 1})
           handlers.events[15]({player_index = 1, id = 1, translated = true, result = "Gear"})
@@ -438,6 +436,37 @@ class BootstrapTests(unittest.TestCase):
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
         ''')
 
+    def test_foreign_gui_events_do_not_query_library_subscriptions(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime(); load_control()
+          local browser = require("runtime.library")
+          local subscription_reads = 0
+          browser.subscription_needs = function() subscription_reads = subscription_reads + 1; return false end
+          browser.native_subscription_needs = function()
+            subscription_reads = subscription_reads + 1
+            return false, false
+          end
+          local events = defines.events
+          local gui_events = {events.on_gui_text_changed, events.on_gui_selected_tab_changed,
+            events.on_gui_selection_state_changed, events.on_gui_checked_state_changed,
+            events.on_gui_click, events.on_gui_location_changed, events.on_gui_closed}
+          for _, id in ipairs(gui_events) do
+            local callback = assert(handlers.events[id])
+            callback({player_index = 1, element = {valid = true, name = "another_mod_control"}})
+            callback({player_index = 1, element = {valid = false, name = "mir_library_control"}})
+            callback({player_index = 1})
+          end
+          handlers.events[events.on_lua_shortcut]({player_index = 1, prototype_name = "another-mod-shortcut"})
+          assert(subscription_reads == 0, "foreign GUI input read Library subscriptions")
+          assert(library_calls.click == nil and library_calls.shortcut == nil)
+          for _, id in ipairs(gui_events) do
+            handlers.events[id]({player_index = 1, element = {valid = true, name = "mir_library_control"}})
+          end
+          handlers.events[events.on_lua_shortcut]({player_index = 1, prototype_name = "mir-research-browser"})
+          assert(subscription_reads == 2 * (#gui_events + 1), "owned GUI input lost subscription reconciliation")
+          assert(library_calls.click ~= nil and library_calls.shortcut ~= nil)
+        ''')
+
     def test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload(self):
         self.lua.execute('''
           install_modules(false,false,false,false);install_runtime();load_control()
@@ -449,7 +478,7 @@ class BootstrapTests(unittest.TestCase):
             open,pending=true,true
             handlers.events[15]({player_index=1,id=cycle,translated=false})
             assert(type(handlers.nth[1])=="function")
-            handlers.events[12]({player_index=1})
+            handlers.events[12]({player_index=1, element={name="mir_research_browser"}})
             assert(handlers.nth[1]==nil and handlers.nth[60]==nil and handlers.nth[61]==nil)
           end
           game=setmetatable({}, {__index=function()error("idle/reload world access")end,
@@ -1402,7 +1431,7 @@ class BootstrapTests(unittest.TestCase):
           assert(#headers==2 and headers[1]=="MIR initialization" and headers[2]=="MIR configuration change")
           handlers.load()
           library_pending=true
-          handlers.events[8]({player_index=1})
+          handlers.events[8]({player_index=1, element={name="mir_library_query"}})
           local maintenance=handlers.nth[61]
           assert(type(maintenance)=="function")
           maintenance({tick=61})

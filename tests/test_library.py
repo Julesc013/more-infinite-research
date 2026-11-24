@@ -2177,6 +2177,20 @@ class LibraryTests(unittest.TestCase):
           assert(content["mir_library_detail"].style.minimal_width == 339)
         ''')
 
+    def test_gui_name_filter_handles_the_library_root_widgets_and_invalid_elements(self):
+        self.lua.execute('''
+          boot()
+          local invalid = setmetatable({valid = false}, {
+            __index = function() error("read from an invalid GUI element") end,
+          })
+          assert(library.has_library_gui_name({element = {valid = true, name = "mir_research_browser"}}))
+          assert(library.has_library_gui_name({element = {valid = true, name = "mir_library_query"}}))
+          assert(not library.has_library_gui_name({element = {valid = true, name = "foreign_mir_library_query"}}))
+          assert(not library.has_library_gui_name({element = invalid}))
+          assert(not library.has_library_gui_name({}))
+          assert(not library.has_library_gui_name(nil))
+        ''')
+
     def test_research_library_opens_with_a_selected_split_detail_view(self):
         self.lua.execute(r'''
           boot()
@@ -5599,7 +5613,7 @@ class LibraryTests(unittest.TestCase):
         self.assertNotIn("force.add_research", source)
         self.assertNotIn("force.cancel_current_research", source)
         bootstrap = (ROOT / "source/runtime/bootstrap.lua").read_text()
-        self.assertIn("on_library_tab_changed", bootstrap)
+        self.assertIn("library.has_library_gui_name", bootstrap)
         self.assertIn("on_gui_selected_tab_changed", bootstrap)
 
 
