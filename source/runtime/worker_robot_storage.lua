@@ -178,12 +178,14 @@ end
 local function same_family_engine_patch(event)
   local active = script and script.active_mods or {}
   local changes = type(event) == "table" and event.mod_changes
-  local floor, current = engine_patch(target.minimum_base), engine_patch(active.base)
-  if not floor or not current or current < floor or type(changes) ~= "table" then return false end
+  local floor = engine_patch(recovery.minimum_source_base[target.id])
+  local minimum, current = engine_patch(target.minimum_base), engine_patch(active.base)
+  if not floor or not minimum or not current or current < floor or current < minimum
+      or type(changes) ~= "table" then return false end
   local base = changes.base
-  if base ~= nil and (type(base) ~= "table" or base.new_version ~= active.base
-      or not engine_patch(base.old_version) or engine_patch(base.old_version) < floor
-      or engine_patch(base.old_version) > current) then return false end
+  local previous = type(base) == "table" and engine_patch(base.old_version)
+  if base ~= nil and (not previous or base.new_version ~= active.base or previous < floor
+      or previous > current) then return false end
   for name in pairs(ENGINE_MODS) do
     if active[name] ~= nil and active[name] ~= active.base then return false end
     local change = changes[name]
@@ -746,7 +748,7 @@ local function exact_base_hop(event, old_version, owned)
   local known = old_version == "4.7.20003" or DIRECT_DEFAULT_HOP_ORIGINS[old_version]
     or owned and producer_edition(old_version) == "f200"
       and tonumber(old_version:sub(-2)) <= tonumber(target.distribution_version:sub(-2))
-  if not known or target.id ~= "f210" or target.minimum_base ~= "2.1.23" or active.base ~= "2.1.23"
+  if not known or target.id ~= "f210" or active.base ~= "2.1.23"
       or type(base) ~= "table" or base.old_version ~= "2.0.77" or base.new_version ~= "2.1.23" then return false end
   for name in pairs(active) do if name ~= "base" and name ~= MIR then return false end end
   for name in pairs(changes) do if name ~= "base" and name ~= MIR then return false end end
@@ -949,9 +951,8 @@ local function published473_space_age_selection(event, change, active)
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
-  local same_edition = (target.id == "f200" and change.old_version ~= "4.7.21003" and target.minimum_base == "2.0.77"
-    or target.id == "f210" and change.old_version == "4.7.21003" and target.minimum_base == "2.1.23")
-    and same_family_engine_patch(event)
+  local source_edition = change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f210 and "f210" or "f200"
+  local same_edition = target.id == source_edition and same_family_engine_patch(event)
   if not base_hop and (not same_edition or event.mod_startup_settings_changed ~= false and not empty_source) then
     default_origin_error("older default source requires its qualified Base engine and unchanged settings", event, state, current)
   end
@@ -1007,7 +1008,7 @@ local function published503_sif_removal_origin(event, change, active, current)
   -- The exact predecessor selection kept MIR's canonical worker continuation.
   -- Reconstruct that selection from the two removals and unchanged official
   -- mods; the all-force plan still requires a wholly uninvested worker source.
-  if target.id ~= "f200" or target.minimum_base ~= "2.0.77"
+  if target.id ~= "f200"
       or type(change) ~= "table" or getmetatable(change) ~= nil or change.old_version ~= "5.0.20003"
       or producer_edition(active[MIR]) ~= "f200" or tonumber(active[MIR]:sub(-2)) <= 3
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil then return nil end
@@ -1067,7 +1068,7 @@ local function published472_se_origin(event, change, active, state, current)
   if getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
     default_origin_error("published472 SE source requires a plain package event", event, state, current)
   end
-  if target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
+  if target.id ~= "f200" or active.base ~= "2.0.77"
       or active["space-exploration"] ~= "0.7.57" or active.Krastorio2 ~= nil
       or active["Krastorio2-spaced-out"] ~= nil then
     default_origin_error("published472 SE source requires its observed engine and provider", event, state, current)
@@ -1439,7 +1440,7 @@ local function published517_se_contract(source)
   local active = script and script.active_mods or {}
   local id = recovery.published517_se_id
   local owner = native_prototype(id)
-  if target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
+  if target.id ~= "f200" or active.base ~= "2.0.77"
       or active["space-exploration"] ~= "0.7.57" or active["space-age"] ~= nil
       or active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil
       or not owner or creator(id) ~= MIR or owner.hidden ~= true or owner.enabled ~= false

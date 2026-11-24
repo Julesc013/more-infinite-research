@@ -9,6 +9,9 @@ M.published517_se_id = "mir-worker-storage-published517-4"
 local target = require("platform.target")
 local MAX = 4294967295
 
+-- Old saves can come from a qualified patch below the current package minimum.
+M.minimum_source_base = {f200="2.0.77", f210="2.1.23"}
+
 -- Exact historical vectors. These also constrain the successor prototypes
 -- admitted by the corresponding save transitions.
 local ARCHIVED_WORKER_SCIENCE = {

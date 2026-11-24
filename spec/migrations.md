@@ -20,7 +20,7 @@ A data-stage generator cannot inspect the player's save. Runtime code cannot rel
 
 ## Baseline and upgrade paths
 
-The principal predecessor is the exact published 4.7.3 package for the same engine family, supplemented by the known historical migration boundaries below. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. Never recommend downgrade as the automatic inverse of upgrade.
+The principal predecessor is the exact published 4.7.3 package for the same engine family, supplemented by the known historical migration boundaries below. Preserve prior release variants by their hashes where relevant; version text alone does not identify previously reissued bytes. Distinct older upgrade boundaries retain their previously promised scope or receive an explicit documented bridge decision. The candidate's Base minimum governs the running engine. Each predecessor retains the independently qualified engine bounds for its route. Never recommend downgrade as the automatic inverse of upgrade.
 
 Private incomplete slices use disposable worlds only. Do not load and resave a real full MIR factory with a one-technology replacement package. Full-save migration qualification starts only after all relevant definitions and runtime bridges exist.
 
