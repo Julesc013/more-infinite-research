@@ -86,6 +86,7 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function(event)
+  if script.active_mods[MIR] == "5.0.21022" then return end
   assert(storage.phase == "source" and script.active_mods[MIR] == "5.0.21023", "successor configuration")
   local change = event.mod_changes[MIR]
   assert(change.old_version == "4.7.21003" and change.new_version == "5.0.21023" and
