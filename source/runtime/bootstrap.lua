@@ -453,6 +453,10 @@ local function on_configuration_changed(event)
       -- its work is completely on the private holder, then install its quota.
       worker_robot_storage.default_owner_apply(worker_default_plan)
       worker_robot_storage.apply(worker_storage_plan)
+    elseif worker_storage_plan and worker_storage_plan.retired and worker_default_plan
+        and worker_default_plan.kind == "default-native-provider-gate-settle" then
+      worker_robot_storage.default_owner_apply(worker_default_plan)
+      worker_robot_storage.apply(worker_storage_plan)
     else
       worker_robot_storage.apply(worker_storage_plan)
       worker_robot_storage.default_owner_apply(worker_default_plan)
@@ -641,9 +645,10 @@ local function on_worker_completion_tick(event)
       lifecycle.on_research_finished({research=force.technologies["worker-robots-storage-4"]})
     end
   end
-  -- The handler is installed only for durable schema-4 completion markers.
-  -- Reconcile immediately so a settled or resumed marker removes this exact
-  -- one-shot observation instead of becoming ordinary periodic work.
+  if worker_robot_storage and type(worker_robot_storage.on_prepared_queue_tick) == "function" then
+    worker_robot_storage.on_prepared_queue_tick(event)
+  end
+  -- Release the one-shot subscription after the last durable marker settles.
   reconcile_library_events()
 end
 
@@ -749,6 +754,9 @@ local function bind_runtime_events(library_open)
   local worker_completion_tick = worker_robot_storage
     and type(worker_robot_storage.default_owner_completion_pending_tick) == "function"
     and worker_robot_storage.default_owner_completion_pending_tick() or nil
+  if worker_robot_storage and type(worker_robot_storage.prepared_queue_pending) == "function" then
+    worker_completion_tick = worker_completion_tick or worker_robot_storage.prepared_queue_pending() or nil
+  end
   credit_pending = credit_pending or worker_pending
   if library_events_scheduled == library_open and credit_events_scheduled == credit_pending
       and gun_credit_events_scheduled == gun_credit_pending
