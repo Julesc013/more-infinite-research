@@ -350,7 +350,10 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20023';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
-      mir_archive_sha256='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+      mir_archive_sha256=@(
+        'C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+        '2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
+      )
       paired_arm='mir5'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20023.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
@@ -396,10 +399,12 @@ function Assert-MultiplayerFixtureSelection {
   Assert-Session ($archives.Contains($observer) -and $archives[$observer] -ceq $target.observer_sha256) 'multiplayer fixture observer archive differs'
   if($target.Contains('mir_archive_sha256')){
     $mirArchive='more-infinite-research_'+$target.mir+'.zip'
-    Assert-Session ($target.mir_archive_sha256 -is [string] -and $target.mir_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $archives.Contains($mirArchive) -and $archives[$mirArchive] -ceq $target.mir_archive_sha256) 'multiplayer fixture MIR archive differs'
+    $selectedHash=$archives[$mirArchive]
+    Assert-Session ($selectedHash -is [string] -and $selectedHash -cmatch '^[A-F0-9]{64}$' -and @($target.mir_archive_sha256) -ccontains $selectedHash) 'multiplayer fixture MIR archive differs'
     if($PSBoundParameters.ContainsKey('ExpectedMIRArchiveSha256')){
-      Assert-Session ($ExpectedMIRArchiveSha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$target.mir_archive_sha256) 'multiplayer fixture expected MIR archive differs'
+      Assert-Session ($ExpectedMIRArchiveSha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq $selectedHash) 'multiplayer fixture expected MIR archive differs'
     }
+    $target.mir_archive_sha256=$selectedHash
   }
   if($target.Contains('session_expected_peak_memory_mib')){
     Assert-Session ($Selection.Contains('session_expected_peak_memory_mib') -and ($Selection['session_expected_peak_memory_mib'] -is [int] -or $Selection['session_expected_peak_memory_mib'] -is [long]) -and [int64]$Selection['session_expected_peak_memory_mib'] -eq [int64]$target.session_expected_peak_memory_mib) 'multiplayer fixture session admission differs'

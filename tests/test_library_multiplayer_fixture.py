@@ -1673,18 +1673,21 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return $profile
           }
           $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
-          $players=[ordered]@{
-            '5.0.20023'='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
-            '5.0.20005'='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
-          }
+          $earlier523='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+          $frozen523='2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
+          $players=@(
+            @{version='5.0.20023';sha256=$earlier523}
+            @{version='5.0.20023';sha256=$frozen523}
+            @{version='5.0.20005';sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'}
+          )
           function Refuse($profile,$actualEngine,$expected) {
             try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
             throw 'changed retained comparison input was admitted'
           }
-          foreach($entry in $players.GetEnumerator()) {
-            $version=$entry.Key;$mir=$entry.Value
+          foreach($entry in $players) {
+            $version=$entry.version;$mir=$entry.sha256
             $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192
-            if($target.mir-cne$version-or$target.paired_arm-cne'mir5'){throw 'exact MIR 5 comparison arm was not selected'}
+            if($target.mir-cne$version-or$target.paired_arm-cne'mir5'-or$target.mir_archive_sha256-cne$mir){throw 'exact MIR 5 comparison arm was not selected'}
             $bad=Profile $version $mir;$bad.mods[2].version='5.0.20099';Refuse $bad $engine $mir
             Refuse (Profile $version ('0'*64)) $engine $mir
             Refuse (Profile $version $mir) ('0'*64) $mir
@@ -1692,6 +1695,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $bad=Profile $version $mir;$bad.mods[4].name='mir-fixture-mir5-library-paired-browser-arm-published';Refuse $bad $engine $mir
             $bad=Profile $version $mir;$bad.mods[0].version='2.1.23';Refuse $bad $engine $mir
           }
+          Refuse (Profile '5.0.20023' $earlier523) $engine $frozen523
+          Refuse (Profile '5.0.20023' $frozen523) $engine $earlier523
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
