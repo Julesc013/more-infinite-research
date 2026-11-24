@@ -463,7 +463,9 @@ try {
 
   $plan=& $installer -Mode Compose -PolicyPath $normal.base.path -InstallRoot (Join-Path $normal.root 'install') -UnitDirectory (Join-Path $normal.root 'units')
   Assert-Dispatcher ($plan.files['mir-native-dispatcher.path'].Contains(('PathExists='+$normal.spool+'/state/pending.signal'))) 'edge-triggered-path-consumer-composed'
-  Assert-Dispatcher ($plan.files['mir-native-dispatcher.timer'].Contains('OnUnitInactiveSec=1min')-and$plan.files['mir-native-dispatcher.service'].Contains('NoNewPrivileges=yes')) 'bounded-timer-and-unit-hardening'
+  $timer = $plan.files['mir-native-dispatcher.timer']
+  Assert-Dispatcher ($timer.Contains('OnActiveSec=1min') -and $timer.Contains('OnUnitInactiveSec=1min') -and
+    $plan.files['mir-native-dispatcher.service'].Contains('NoNewPrivileges=yes')) 'bounded-timer-and-unit-hardening'
 
   # A failed enable keeps only this transaction's bytes for a byte-identical
   # resume. Existing unrelated unit data is neither replaced nor removed.
