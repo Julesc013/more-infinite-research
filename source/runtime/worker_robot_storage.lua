@@ -705,16 +705,6 @@ end
 -- Explicit default-only native ownership; event wiring and caps have separate owners.
 -- Native research remains authoritative after this one-time identity transfer.
 -- The older route/preparation key and legacy private holder keep their meanings.
--- Public MIR5 default C4 has one unchanged native earning/settings contract.
--- This set does not authorize provider routes or new direct engine-hop origins.
-local DEFAULT_ORIGINS = {
-  f200 = {["5.0.20000"]=true, ["5.0.20001"]=true, ["5.0.20002"]=true, ["5.0.20003"]=true,
-    ["5.0.20004"]=true, ["5.0.20005"]=true, ["5.0.20006"]=true, ["5.0.20007"]=true,
-    ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
-  f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
-    ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
-    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
-}
 local PUBLISHED473_DEFAULT_ORIGINS = {f200="4.7.20003", f210="4.7.21003"}
 local UNINVESTED_DEFAULT_PRODUCERS = {
   ["published511-empty-default"]="published11 empty default source has invested or queued worker work",
@@ -730,6 +720,13 @@ local function producer_edition(version)
   if type(version) ~= "string" then return nil end
   if version:match("^5%.0%.200%d%d$") then return "f200" end
   if version:match("^5%.0%.210%d%d$") then return "f210" end
+end
+
+-- Both editions used the unrecorded default producer contract through patch 11.
+-- The edition decoder validates the fixed-width version before ordering it.
+local function known_default_origin(version, edition)
+  local last = PUBLISHED11_DEFAULT_ORIGINS[edition]
+  return last ~= nil and producer_edition(version) == edition and version <= last
 end
 
 local function recorded_default_versions_match(old_version, new_version)
@@ -839,8 +836,7 @@ local function owner_record()
   -- Producer facts describe their historical package, not the current
   -- edition. A valid F200-owned native record survives the supported forward
   -- engine hop; it is not rewritten into a fictional F210 producer.
-  local edition, old_edition = producer_edition(value.producer.new_version), producer_edition(value.producer.old_version)
-  local known = DEFAULT_ORIGINS[old_edition]
+  local edition = producer_edition(value.producer.new_version)
   if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
@@ -850,7 +846,8 @@ local function owner_record()
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty)
+        and (not known_default_origin(value.producer.old_version, edition)
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
       or value.producer.kind == "recorded-default"
@@ -1260,15 +1257,13 @@ local function default_origin(event, initializing, state, current)
     end
     return {kind=kind, old_version=change.old_version, new_version=active[MIR]}
   end
-  local known = DEFAULT_ORIGINS[target.id]
-  if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
+  if not change or not known_default_origin(change.old_version, target.id) or not engine_patch_valid then
     default_origin_error("unrecorded default source has no qualified MIR5 producer", event, state, current)
   end
-  local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
   for name, version in pairs(active) do
     -- The unchanged-selection check above covers added, removed and updated
     -- mods. Unrelated unchanged names do not invalidate surviving native work.
-    if official[name] and name ~= MIR and version ~= active.base then
+    if ENGINE_MODS[name] and version ~= active.base then
       default_origin_error("unrecorded default source requires matching official engine versions", event, state, current)
     end
   end
