@@ -18,6 +18,7 @@ on:
         options:
           - none
           - worker-storage-finite-four
+          - worker-storage-legacy-idle
       native_mode:
         description: Compose never starts Factorio; Execute requires the reviewed native assignment
         type: choice
@@ -32,7 +33,7 @@ permissions:
 jobs:
   verification-plan:
     name: verification-plan
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case == 'none'
     runs-on: windows-latest
     outputs:
       plan_artifact: ${{ steps.artifact.outputs.plan_artifact }}
@@ -202,7 +203,7 @@ jobs:
   host-controls:
     name: host-controls
     needs: verification-plan
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case == 'none'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -378,7 +379,7 @@ jobs:
 
   native-tooling-controls:
     name: native-tooling-controls
-    if: github.event_name != 'workflow_dispatch' || inputs.native_case != 'worker-storage-finite-four'
+    if: github.event_name != 'workflow_dispatch' || inputs.native_case == 'none'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -624,5 +625,79 @@ jobs:
             build/tmp/worker-storage-finite-four/*.json
             build/tmp/worker-storage-finite-four/execution
             build/tmp/worker-storage-finite-four/fixture-projections
+          if-no-files-found: error
+          retention-days: 14
+
+  legacy-idle-native:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_case == 'worker-storage-legacy-idle' && inputs.native_mode == 'Execute'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    concurrency:
+      group: mir-legacy-idle-native-replay
+      cancel-in-progress: false
+    env:
+      MIR_LEGACY_REPLAY_ROOT: build/tmp/legacy-idle-native
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Admit bounded public-input preparation
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          . ./tools/lib/validation/NativeProbeResources.ps1
+          $context = New-MIRNativeProbeResourceContext -RepoRoot $PWD -OutputRoot $env:MIR_LEGACY_REPLAY_ROOT -ExpectedPeakMemoryMiB 2048 -MaxNewOutputMiB 1536 -UseExactOutputRoot
+          [IO.Directory]::CreateDirectory($context.root) | Out-Null
+          Write-MIRNativeProbeResult -Context $context -Record @{kind='legacy-idle-native-preparation';native_processes=0;controller=(& git rev-parse HEAD)}
+      - name: Retrieve pinned public inputs and build the exact private player source
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$MIR_LEGACY_REPLAY_ROOT"
+          mkdir "$root/library"
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1463293 --output "$root/library/more-infinite-research_4.7.21003.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v4.7.3/more-infinite-research_4.7.21003.zip
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 180 --max-filesize 1071439 --output "$root/library/more-infinite-research_5.0.21022.zip" https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.22/more-infinite-research_5.0.21022.zip
+          curl --fail --location --proto '=https' --proto-redir '=https' --max-time 300 --max-filesize 61211876 --output "$root/factorio-headless-2.1.24.tar.xz" https://factorio.com/get-download/2.1.24/headless/linux64
+          python3 -B tools/package.py --source source --revision 41952c13dfab4602e0b06ab18f20a8792ab67836 --target f210 --output "$root/library/more-infinite-research_5.0.21023.zip" --record "$root/candidate-package.json" > "$root/package-stdout.json"
+          printf '%s\n' '{"ips-cost-base-research_gears":8000}' > "$root/settings-source.json"
+          printf '%s\n' '{"ips-cost-base-research_gears":8001}' > "$root/settings-upgrade.json"
+          python3 -B tools/write_mod_settings_dat.py --engine 2.1.23 --startup-json "$root/settings-source.json" --output "$root/settings-source.dat"
+          python3 -B tools/write_mod_settings_dat.py --engine 2.1.23 --startup-json "$root/settings-upgrade.json" --output "$root/settings-upgrade.dat"
+      - name: Verify and extract the official engine
+        shell: python
+        run: |
+          from pathlib import Path, PurePosixPath
+          import hashlib, os, tarfile
+          root = Path(os.environ["MIR_LEGACY_REPLAY_ROOT"])
+          archive = root / "factorio-headless-2.1.24.tar.xz"
+          with archive.open("rb") as stream:
+              if archive.stat().st_size != 61211876 or hashlib.file_digest(stream, "sha256").hexdigest().upper() != "C49B66CFF90ACEFF87B30F2973AF0DF7F51712CB2EE3153E0169D9BED46A964F":
+                  raise ValueError("Official Factorio archive differs")
+          engine_root = root / "engine"
+          engine_root.mkdir()
+          with tarfile.open(archive, "r:xz") as stream:
+              members = stream.getmembers()
+              if len({m.name for m in members}) != len(members) or sum(m.size for m in members if m.isfile()) > 1024 ** 3:
+                  raise ValueError("Engine inventory differs")
+              for member in members:
+                  path = PurePosixPath(member.name)
+                  if path.is_absolute() or ".." in path.parts or not path.parts or path.parts[0] != "factorio":
+                      raise ValueError("Unexpected engine member")
+              stream.extractall(engine_root, filter="data")
+      - name: Execute protected native predecessors, upgrade and cold reloads
+        shell: pwsh
+        run: |
+          ./tools/Invoke-WorkerLegacyIdleReplay.ps1 -InputRoot $env:MIR_LEGACY_REPLAY_ROOT
+      - name: Retain original results and the exact private test archive
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: mir-legacy-idle-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            build/tmp/legacy-idle-native/*.json
+            build/tmp/legacy-idle-native/*.dat
+            build/tmp/legacy-idle-native/library/more-infinite-research_5.0.21023.zip
+            build/tmp/legacy-idle-native/execution
           if-no-files-found: error
           retention-days: 14
