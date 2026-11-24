@@ -67,7 +67,7 @@ function Invoke-Leg([string]$Name, [string]$Version, [string[]]$RunArgs, [string
     [string[]]$SaveNames = @(), [string]$ExpectedError = '') {
     $leg = Join-Path $out $Name
     $write = Join-Path $leg 'write-data'
-    [IO.Directory]::CreateDirectory($write) | Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $write 'saves')) | Out-Null
     if ($Version -ceq $source) {
         $directory = Join-Path $write 'scenarios/mir-worker-legacy-idle'
         [IO.Directory]::CreateDirectory($directory) | Out-Null
