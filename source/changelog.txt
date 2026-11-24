@@ -1,4 +1,26 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.23
+Date: 2026-11-23
+
+  Bugfixes:
+
+    - Preserve earned worker cargo and paid, queued or parked research when upgrading the supported MIR 4.7.3 Space Age saves with
+      their original worker cargo settings.
+    - Preserve paid worker cargo and queue order across the Factorio 2.1.24 to 2.1.25 engine update with the supported unchanged
+      Space Age add-ons.
+    - On Factorio 2.1.24 with official Space Age, allow the 4.7.3 upgrade with an unrelated startup change when worker cargo work is
+      empty.
+    - Preserve recorded worker cargo research when adding Solar Productivity 3.0.0 on Factorio 2.1.24.
+    - Preserve recorded default worker cargo research during supported MIR 5 upgrades. Stop the transfer if Factorio cannot supply
+      the complete force research queue.
+    - Keep completed night-vision research and preserve the scripted conquest-force modifiers when upgrading eligible Space
+      Exploration 0.7.57 saves on Factorio 2.0.77.
+    - Preserve the historical credit owed to unfinished productivity and electric or Tesla research while the paid level is outside
+      the queue.
+    - Scroll to the selected technology when reopening the Research list after its results change order.
+    - Reduce work when opening the Research Library's Research, Settings and Queue tabs.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.22
 Date: 2026-11-22
 
