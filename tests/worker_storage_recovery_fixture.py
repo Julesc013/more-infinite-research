@@ -42,6 +42,8 @@ function install_worker_recovery_facts(worlds)
   game=game or {}
   if rawget(game,"forces")==nil then rawset(game,"forces",worlds or {}) end
   for _,force in pairs(worlds or rawget(game,"forces") or {})do
+    -- Ordinary empty native queues are arrays. Preserve custom observations.
+    if getmetatable(force) == nil and force.research_queue == nil then force.research_queue = {} end
     force.technologies=force.technologies or {}
     force.technologies[ID]=force.technologies[ID] or {name=ID,level=4,researched=false,enabled=false,
       visible_when_disabled=false,saved_progress=0,prototype=prototypes.technology[ID],force=force}

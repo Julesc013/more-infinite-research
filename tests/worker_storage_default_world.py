@@ -106,6 +106,18 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         seed();detached.technologies[CANONICAL].level=6;detached.technologies[CANONICAL].saved_progress=.23
         detached.research_queue={OTHER};detached.research_progress=.625;writes=0;queue_writes={};progress_writes={}
       end
+      function after_first_level_write(technology, callback)
+        local metatable = getmetatable(technology)
+        local write = metatable.__newindex
+        local fired = false
+        metatable.__newindex = function(object, key, value)
+          write(object, key, value)
+          if key == "level" and not fired then
+            fired = true
+            callback()
+          end
+        end
+      end
       function tech_frame(t)return{level=t.level,researched=t.researched,enabled=t.enabled,
         visible=t.visible_when_disabled,saved=t.saved_progress,count=t.research_unit_count}end
       function frame(f)

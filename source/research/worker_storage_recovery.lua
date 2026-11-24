@@ -9,9 +9,28 @@ M.published517_se_id = "mir-worker-storage-published517-4"
 local target = require("platform.target")
 local MAX = 4294967295
 
-local PUBLISHED517_SE_SCIENCE = {
-  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
-  "production-science-pack", "utility-science-pack",
+-- Exact historical vectors. These also constrain the successor prototypes
+-- admitted by the corresponding save transitions.
+local ARCHIVED_WORKER_SCIENCE = {
+  base = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+    "production-science-pack", "utility-science-pack"},
+  space_age = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+    "production-science-pack", "utility-science-pack", "electromagnetic-science-pack"},
+  f200_se = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+    "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack"},
+}
+-- Historical native worker contracts. Paid admission needs the complete
+-- archived mod selection, because an extra mod could have changed the old price.
+M.archived_default_profiles = {
+  ["4.6.21000"] = {
+    edition="f210", base="2.1.23", paid=true,
+    mods={
+      Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19",
+      Krastorio2Assets="2.1.0", Krastorio2MenuSimulations="2.1.0",
+      ["k2so-assets"]="1.0.7", flib="0.17.2",
+      ["xy-k2so-enhancements-nulls-fork"]="0.8.3",
+    },
+  },
 }
 local PUBLISHED517_SE_PREREQUISITES = {
   -- Preserve the native direct prerequisite set, not the authored row's
@@ -21,11 +40,6 @@ local PUBLISHED517_SE_PREREQUISITES = {
 local PUBLISHED517_SE_TERMS = {
   formula="675*1.5^(L-4)", seconds=60, modifier=1, ignore_map_price=false,
 }
-local CURRENT_F200_SE_SCIENCE = {
-  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
-  "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack",
-}
-
 local function copy(value)
   if type(value) ~= "table" then return value end
   local out = {}
@@ -126,8 +140,9 @@ function M.fingerprint(prototype)
   return table.concat(out, "|")
 end
 
-local function exact_native_ingredients(value, names)
-  if type(value) ~= "table" or #value ~= #names then return false end
+function M.matches_archived_science(value, profile)
+  local names = ARCHIVED_WORKER_SCIENCE[profile]
+  if not names or type(value) ~= "table" or #value ~= #names then return false end
   local seen = {}
   for _, ingredient in ipairs(value) do
     if type(ingredient) ~= "table" or type(ingredient.name) ~= "string" or ingredient.amount ~= 1
@@ -157,12 +172,12 @@ end
 function M.published517_se_contract(source)
   assert(source and source.name == M.canonical and source.level == 4 and source.max_level == MAX,
     "MIR published517 SE source contract is unavailable")
-  assert(exact_native_ingredients(source.research_unit_ingredients, CURRENT_F200_SE_SCIENCE)
+  assert(M.matches_archived_science(source.research_unit_ingredients, "f200_se")
       and exact_native_prerequisites(source.prerequisites, {"worker-robots-storage-3"}),
     "MIR published517 SE current contract differs")
   M.fingerprint(source) -- Retain validation of the caller's complete current row.
   local ingredients, prerequisites = {}, {}
-  for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do ingredients[index] = {name=name, amount=1} end
+  for index, name in ipairs(ARCHIVED_WORKER_SCIENCE.base) do ingredients[index] = {name=name, amount=1} end
   for _, name in ipairs(PUBLISHED517_SE_PREREQUISITES) do prerequisites[name] = {name=name} end
   return M.fingerprint({level=4, max_level=MAX,
     effects={{type="worker-robot-storage", modifier=PUBLISHED517_SE_TERMS.modifier}},
@@ -298,7 +313,7 @@ function M.published517_se_owner(authored)
   out.effects[1].modifier = PUBLISHED517_SE_TERMS.modifier
   out.ignore_tech_cost_multiplier = PUBLISHED517_SE_TERMS.ignore_map_price
   out.unit.ingredients, out.prerequisites = {}, copy(PUBLISHED517_SE_PREREQUISITES)
-  for index, name in ipairs(PUBLISHED517_SE_SCIENCE) do out.unit.ingredients[index] = {name, 1} end
+  for index, name in ipairs(ARCHIVED_WORKER_SCIENCE.base) do out.unit.ingredients[index] = {name, 1} end
   return out
 end
 

@@ -8,6 +8,7 @@ Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/deve
 - Use authored native technologies and the small deterministic Generator: finite local preflight, stable manifest rows and one publication. No discovery solver, fixed-point planner or recursive technology/recipe traversal. Necessary bounded recipe collection stays outside the Generator. Compatibility policy never mutates prototypes; admitted emission code alone owns generated technology mutation.
 - Preserve technology/settings/API identities, published migration filenames, original request IDs/text/decisions, license notices and complete target histories. Retain the full authored README, including badges, catalogue, settings, examples and troubleshooting.
 - Keep docs, fixtures, tests, tools, SDK, guidance, CI, build and dist outside player ZIPs. No preview or developer tool gains mutation, release or support authority merely by existing.
+- Apply [declarative support and bounded behavior](spec/architecture.md#declarative-support-and-bounded-behavior) to fixes and additions: identify the invariant and affected consumers, prefer declarations for existing semantics, justify new behavior and cost, and verify representative same-class and opposing cases without an unbounded campaign.
 - Source owns implementation, spec owns requirements, tests own independent expectations and docs explain use. Preserve exact historical Git/artifact references; do not keep an obsolete active compiler/framework or a new history estate.
 
 ## Workflow and custody

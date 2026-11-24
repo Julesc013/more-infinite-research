@@ -74,7 +74,11 @@ local se_system_force = target.id == "f200" and active_mods["space-exploration"]
   and require("runtime.space_exploration_system_force")
 if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
-  if target.recipe_productivity == true then native_gun_credits = require("runtime.native_gun_credits") end
+  if target.recipe_productivity == true then
+    native_gun_credits = require("runtime.native_gun_credits")
+    native_gun_credits.set_retirement_policy(lifecycle.reconcile_retired_paid_work)
+    lifecycle.set_retired_work_observer(native_gun_credits.has_retired_work)
+  end
 end
 -- A removed provider is absent from script.active_mods by the time the
 -- configuration callback runs. Keep this finite list aligned with the exact
@@ -174,6 +178,7 @@ local reconcile_translations
 local reconcile_library_events
 local library_events_scheduled
 local credit_events_scheduled
+local gun_credit_events_scheduled
 local worker_events_scheduled
 local worker_completion_tick_scheduled
 local library_refresh_scheduled
@@ -376,6 +381,7 @@ local function on_init()
   library.on_init()
   reconcile_repair()
   reconcile_translations()
+  if se_system_force then se_system_force.observe() end
   if diagnostics then diagnostics.startup("MIR initialization") end
 end
 
@@ -486,7 +492,11 @@ local function on_configuration_changed(event)
   reconcile_translations()
   -- Restore only the separately admitted SE scripted NPC policy, after all
   -- native plans have verified their original zero-contribution frames.
-  if se_system_force then se_system_force.apply(se_system_force_plan) end
+  if se_system_force then
+    if not se_system_force.apply(se_system_force_plan) then se_system_force.observe() end
+  elseif target.id == "f200" then
+    storage.mir_se_conquest_policy_force = nil
+  end
   if diagnostics then diagnostics.startup("MIR configuration change") end
 end
 
@@ -642,6 +652,7 @@ end
 local function on_research_started(event)
   if not (event and event.research) or event.research.valid == false then return end
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
   request_library_refresh(event)
@@ -726,7 +737,6 @@ local function on_forces_merged(event)
     end
   end
   if native_credits then native_credits.on_forces_merged(event, native_credit_plan) end
-  if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if imersite and event and event.destination then
     local state = imersite_state()
     if state then
@@ -737,6 +747,7 @@ local function on_forces_merged(event)
     reconcile_imersite(event.destination)
   end
   lifecycle.on_forces_merged(event, worker_merge_unqualified and "worker-robots-storage" or nil)
+  if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
   if legacy_module_credits and event and event.destination then
@@ -752,6 +763,7 @@ end
 local function on_research_queued(event)
   if not (event and event.research) or event.research.valid == false then return end
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if DISCOVERY_TREE then
     if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_discovery_tree_queue_changed(event) end
     if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
@@ -767,16 +779,19 @@ end
 
 local function bind_runtime_events(library_open)
   local credit_pending = native_credits and native_credits.needs_research_events() or false
-  credit_pending = credit_pending or (native_gun_credits and native_gun_credits.needs_research_events() or false)
+  local gun_credit_pending = native_gun_credits and native_gun_credits.needs_research_events() or false
+  credit_pending = credit_pending or gun_credit_pending
   local worker_pending = worker_robot_storage and worker_robot_storage.needs_research_events() or false
   local worker_completion_tick = worker_robot_storage
     and type(worker_robot_storage.default_owner_completion_pending_tick) == "function"
     and worker_robot_storage.default_owner_completion_pending_tick() or nil
   credit_pending = credit_pending or worker_pending
   if library_events_scheduled == library_open and credit_events_scheduled == credit_pending
+      and gun_credit_events_scheduled == gun_credit_pending
       and worker_events_scheduled == worker_pending and worker_completion_tick_scheduled == worker_completion_tick then return end
   library_events_scheduled = library_open
   credit_events_scheduled = credit_pending
+  gun_credit_events_scheduled = gun_credit_pending
   worker_events_scheduled = worker_pending
   worker_completion_tick_scheduled = worker_completion_tick
   local events = defines and defines.events or {}
@@ -805,7 +820,7 @@ local function bind_runtime_events(library_open)
   -- The Library observes native changes only while a connected owned view is
   -- open. Cap admission and scripted effects retain their independent guards.
   if events.on_research_started then
-    local active = lifecycle.caps_active() or competing_active or library_open or worker_pending
+    local active = lifecycle.caps_active() or competing_active or library_open or worker_pending or gun_credit_pending
     script.on_event(events.on_research_started, active and on_research_started or nil)
   end
   if events.on_research_cancelled then
@@ -826,7 +841,8 @@ local function bind_runtime_events(library_open)
     script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
   if events.on_research_queued then
-    local active = library_open or worker_pending or (DISCOVERY_TREE and (lifecycle.caps_active() or competing_active))
+    local active = library_open or worker_pending or gun_credit_pending
+      or (DISCOVERY_TREE and (lifecycle.caps_active() or competing_active))
     script.on_event(events.on_research_queued, active and on_research_queued or nil)
   end
   if events.on_runtime_mod_setting_changed and DISCOVERY_TREE then
@@ -879,6 +895,7 @@ function M.register()
   schedule_translations(false)
   library_events_scheduled = nil
   credit_events_scheduled = nil
+  gun_credit_events_scheduled = nil
   worker_events_scheduled = nil
   worker_completion_tick_scheduled = nil
   bind_runtime_events(false)

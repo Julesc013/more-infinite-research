@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-11-14
+last_reviewed: 2026-11-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -35,6 +35,8 @@ Documentation-only edits do not trigger the full native matrix unless a change a
 Properties: identical ordered input gives the same intended native output; an unrelated adapter cannot alter a family's output; each emitted effect is authorized; preflight rejection makes no MIR writes; public queries cannot mutate state; settings serialization round trips meaning; directory relocation does not alter player members. Property/mutation/fuzz work is offline, fixed-seed/reproducible where appropriate, and confined to small components. Do not generate an unbounded discovery engine merely to test one.
 
 Test mutations should deliberately remove validation, shift a formula level, change an effect target, alias an array or grant a hidden carrier; the independent oracle must fail. Correct a bad oracle only using independent engine/source evidence, not by copying the candidate's unexpected output.
+
+For each behavioral repair, name the violated invariant and every current consumer of that rule. Reproduce the triggering instance and at least one distinct instance of the same semantics when one exists; use a bounded synthetic instance when it is needed to expose name-specific behavior. Vary irrelevant names, unrelated settings/mods and representation order only where the contract says they are irrelevant. Include the applicable opposing cases: a genuinely changed contract, unavailable history, missing authority, foreign state and invested work. Exercise relevant add/remove/re-add, replacement, no-op, initialization/configuration, completion and save/load boundaries; justify excluded axes rather than requiring their full Cartesian product. At least one independently specified regression must reject the old behavior. Select cheap work-count/ownership checks and native cases by the changed paths, retain applicable unchanged evidence under its original identity, and disclose unresolved resource impact. A passing fixture must not turn its incidental mod list, version or ordering into production policy. See [declarative support and bounded behavior](architecture.md#declarative-support-and-bounded-behavior).
 
 ## Native matrix
 

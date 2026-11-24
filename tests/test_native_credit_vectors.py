@@ -596,6 +596,54 @@ class NativeCreditVectorTests(unittest.TestCase):
           native_credits.on_configuration_changed();check_vector_total(5)
         ''')
 
+    def test_private_retirement_preserves_detached_investment_through_reload(self):
+        self.lua.execute(r'''
+          local f,d=vector_world(97,true)
+          native_credits.on_init();earn_vector_main(4)
+          local main,foreign=f.technologies[d.main_id],f.technologies.foreign
+          main.saved_progress=.27
+          f.current_research=foreign
+          f.research_queue={foreign}
+          vector_mask(false,true)
+          native_credits.on_configuration_changed()
+          check_vector_total(4)
+          native_credits.on_configuration_changed()
+          native_credits.on_load()
+          local saved=record(f,d.family,d.recipe)
+          assert(saved.pending==1 and saved.payable and native_credits.needs_research_events(),
+            "detached work lost its historical credit")
+          assert(main.saved_progress==.27 and f.current_research==foreign and f.research_progress==.42)
+          main.saved_progress=0
+          advance(f,d.main_id,6,false)
+          native_credits.on_research_finished{research=main,by_script=false}
+          check_vector_total(5)
+          advance(f,d.main_id,7,false)
+          native_credits.on_research_finished{research=main,by_script=false}
+          check_vector_total(5)
+        ''')
+
+    def test_private_cancellation_releases_queue_slots_but_keeps_saved_progress(self):
+        for progress, expected in ((.27, 1), (0, 0)):
+            with self.subTest(saved_progress=progress):
+                self.setUp()
+                self.lua.execute(r'''
+                  local progress,expected=...
+                  local f,d=vector_world(1,true)
+                  native_credits.on_init();earn_vector_main(4)
+                  local main,foreign=f.technologies[d.main_id],f.technologies.foreign
+                  f.current_research=foreign
+                  f.research_queue={foreign,main,main}
+                  main.saved_progress=progress
+                  vector_mask(false,true)
+                  native_credits.on_configuration_changed()
+                  assert(record(f,d.family,d.recipe).pending==2, "counted the first queued level twice")
+                  f.research_queue={foreign}
+                  native_credits.on_research_cancelled{force=f,research={[d.main_id]=2}}
+                  assert(record(f,d.family,d.recipe).pending==expected, "lost or invented retained native progress")
+                  assert(native_credits.needs_research_events()==(expected==1))
+                  assert(f.research_queue[1]==foreign and f.current_research==foreign and main.saved_progress==progress)
+                ''', progress, expected)
+
     def test_vector_order_is_semantic_by_recipe_not_effect_index(self):
         self.lua.execute(r'''
           local f,d,r=vector_world(97,true)

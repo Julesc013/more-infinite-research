@@ -414,6 +414,32 @@ local function progress(value)
   return type(value) == "number" and value == value and value >= 0 and value < 1
 end
 
+local function observed_queue(force)
+  local queue = force.research_queue
+  if type(queue) ~= "table" then recover_error("native queue is unavailable") end
+  -- ipairs alone would stop at the first missing entry and hide the remainder.
+  local length, count = #queue, 0
+  for index in pairs(queue) do
+    if not integer(index) or index > length then recover_error("incomplete native queue") end
+    count = count + 1
+  end
+  if count ~= length then recover_error("incomplete native queue") end
+  return queue
+end
+
+local function snapshot_queue(force, id)
+  local native = observed_queue(force)
+  if #native > 1000 then recover_error("unsupported native queue") end
+  local queue, saved, occurrences = {}, {}, 0
+  for index, entry in ipairs(native) do
+    if not entry or type(entry.name) ~= "string" then recover_error("unsupported native queue") end
+    if not progress(entry.saved_progress) then recover_error("invalid queued saved work") end
+    queue[index], saved[entry.name] = entry.name, entry.saved_progress
+    if entry.name == id then occurrences = occurrences + 1 end
+  end
+  return queue, saved, occurrences
+end
+
 local function snapshot(force, id, finished_context, queued_observation)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
@@ -421,14 +447,7 @@ local function snapshot(force, id, finished_context, queued_observation)
       or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
     recover_error("invalid native worker frame for " .. tostring(force.name))
   end
-  local queue, saved, occurrences = {}, {}, 0
-  for _, value in ipairs(force.research_queue or {}) do
-    if #queue >= 1000 or not value or type(value.name) ~= "string" then recover_error("unsupported native queue") end
-    queue[#queue + 1] = value.name
-    if value.name == id then occurrences = occurrences + 1 end
-    if not progress(value.saved_progress) then recover_error("invalid queued saved work") end
-    saved[value.name] = value.saved_progress
-  end
+  local queue, saved, occurrences = snapshot_queue(force, id)
   local current = force.current_research and force.current_research.name or nil
   -- A finished callback can follow removal of its head but precede starting
   -- the queued remainder. Keep that observed nil current and zero progress;
@@ -484,7 +503,7 @@ local function empty_private(include_all)
       recover_error("unrecorded private worker investment")
     end
     if force.current_research and force.current_research.name == recovery.id then recover_error("unrecorded private worker current work") end
-    for _, technology in ipairs(force.research_queue or {}) do
+    for _, technology in ipairs(observed_queue(force)) do
       if technology.name == recovery.id then recover_error("unrecorded private worker queued work") end
     end
     if include_all or value.enabled or value.visible_when_disabled then out[#out + 1] = {force=force, technology=value} end
@@ -657,7 +676,7 @@ local function assign_queue(force, frame, queue, moved, destination, activate_re
   owned_queue_force = force.index
   local ok, message = pcall(function()
     force.research_queue = queue
-    local actual = force.research_queue or {}
+    local actual = observed_queue(force)
     if #actual ~= #queue then recover_error("native queue dropped a prepared entry; reload the original copy") end
     for index, name in ipairs(queue) do
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
@@ -686,15 +705,11 @@ end
 -- Explicit default-only native ownership; event wiring and caps have separate owners.
 -- Native research remains authoritative after this one-time identity transfer.
 -- The older route/preparation key and legacy private holder keep their meanings.
--- Public MIR5 default C4 has one unchanged native earning/settings contract.
--- This set does not authorize provider routes or new direct engine-hop origins.
-local DEFAULT_ORIGINS = {
-  f200 = {["5.0.20000"]=true, ["5.0.20001"]=true, ["5.0.20002"]=true, ["5.0.20003"]=true,
-    ["5.0.20004"]=true, ["5.0.20005"]=true, ["5.0.20006"]=true, ["5.0.20007"]=true,
-    ["5.0.20008"]=true, ["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
-  f210 = {["5.0.21000"]=true, ["5.0.21001"]=true, ["5.0.21002"]=true, ["5.0.21003"]=true,
-    ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
-    ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
+local PUBLISHED473_DEFAULT_ORIGINS = {f200="4.7.20003", f210="4.7.21003"}
+local UNINVESTED_DEFAULT_PRODUCERS = {
+  ["published511-empty-default"]="published11 empty default source has invested or queued worker work",
+  ["published503-sif-empty-default"]="Space Is Fake removal requires every native worker4 to be uninvested",
+  ["archived-uninvested-default"]="archived default source has earned, queued or unfinished worker work",
 }
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
 -- These exact published11 producers support schema-2/default preparation
@@ -705,6 +720,23 @@ local function producer_edition(version)
   if type(version) ~= "string" then return nil end
   if version:match("^5%.0%.200%d%d$") then return "f200" end
   if version:match("^5%.0%.210%d%d$") then return "f210" end
+end
+
+-- Both editions used the unrecorded default producer contract through patch 11.
+-- The edition decoder validates the fixed-width version before ordering it.
+local function known_default_origin(version, edition)
+  local last = PUBLISHED11_DEFAULT_ORIGINS[edition]
+  return last ~= nil and producer_edition(version) == edition and version <= last
+end
+
+local function recorded_default_versions_match(old_version, new_version)
+  local old_edition, new_edition = producer_edition(old_version), producer_edition(new_version)
+  if not old_edition or not new_edition then return false end
+  -- A recorded default route is checked against the surviving native contract.
+  -- The published-origin allowlist is still required when no route was saved.
+  local allowed_edition = old_edition == new_edition or old_edition == "f200" and new_edition == "f210"
+    and DIRECT_DEFAULT_HOP_ORIGINS[old_version] == true
+  return allowed_edition and tonumber(old_version:sub(-2)) <= tonumber(new_version:sub(-2))
 end
 
 local function exact_base_hop(event, old_version, owned)
@@ -784,6 +816,9 @@ local function owner_record()
   fields(value.producer, {kind=true, old_version=true, new_version=true})
   local older_empty = value.producer.kind == "older-mir501-empty-default"
   local older_idle = value.producer.kind == "published473-idle-default"
+  local archived_paid = value.producer.kind == "archived-default"
+  local archived = archived_paid or value.producer.kind == "archived-uninvested-default"
+  local archive = recovery.archived_default_profiles[value.producer.old_version]
   local published_default = value.producer.kind == "published473-default"
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
@@ -791,7 +826,7 @@ local function owner_record()
   local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
-      and not older_empty and not older_idle and not published_default and not published472_se
+      and not older_empty and not older_idle and not archived and not published_default and not published472_se
       and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
@@ -801,25 +836,22 @@ local function owner_record()
   -- Producer facts describe their historical package, not the current
   -- edition. A valid F200-owned native record survives the supported forward
   -- engine hop; it is not rewritten into a fictional F210 producer.
-  local edition, old_edition = producer_edition(value.producer.new_version), producer_edition(value.producer.old_version)
-  local known = DEFAULT_ORIGINS[old_edition]
+  local edition = producer_edition(value.producer.new_version)
   if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
-      or older_idle and value.producer.old_version ~= "4.7.20003"
-      or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
-        or value.producer.old_version == "4.7.21003" and edition ~= "f210")
+      or archived and (not archive or edition ~= archive.edition or archived_paid and not archive.paid)
+      or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
+        and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
-      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty) and (old_edition ~= edition or not known or not known[value.producer.old_version]
+      or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty)
+        and (not known_default_origin(value.producer.old_version, edition)
         or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or (prepared_default or published11_empty) and value.producer.old_version ~= PUBLISHED11_DEFAULT_ORIGINS[edition]
-      or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
-        and (not known or not known[value.producer.old_version]
-          or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
-          or old_edition ~= edition and not (old_edition == "f200" and edition == "f210"
-            and DIRECT_DEFAULT_HOP_ORIGINS[value.producer.old_version])) then
+      or value.producer.kind == "recorded-default"
+        and not recorded_default_versions_match(value.producer.old_version, value.producer.new_version) then
     recover_error("unknown default native-owner producer")
   end
   if type(value.forces) ~= "table" or getmetatable(value.forces) ~= nil then
@@ -852,40 +884,68 @@ local function require_archived_default_contract(event, state, current, space_ag
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
     default_origin_error(label .. " source requires the resolved default worker work contract", event, state, current)
   end
-  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
-    ["production-science-pack"]=1, ["utility-science-pack"]=1}
-  if space_age then packs["electromagnetic-science-pack"] = 1 end
-  local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= (space_age and 6 or 5) then
+  if not recovery.matches_archived_science(prototype.research_unit_ingredients, space_age and "space_age" or "base") then
     default_origin_error(label .. " default science differs", event, state, current)
   end
-  for _, ingredient in ipairs(ingredients) do
-    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
-      default_origin_error(label .. " default science differs", event, state, current)
-    end
-    packs[ingredient.name] = nil
+end
+
+local PUBLISHED473_F210_WORKER_ADDONS = {
+  CleanedConcrete = "2.1.0",
+  ["even-distribution-fork"] = "2.1.2",
+  pump = "2.2.6",
+  ["Return-Inserter"] = "1.0.0",
+  ["spider-launcher"] = "2.9.87",
+}
+
+local function worker_has_known_editors()
+  if not prototypes or type(prototypes.get_history) ~= "function" then return false end
+  local observed = prototypes.get_history("technology", recovery.canonical)
+  if type(observed) ~= "table" or type(observed.changed) ~= "table"
+      or observed.created ~= MIR and not ENGINE_MODS[observed.created] then return false end
+  for _, editor in pairs(observed.changed) do
+    if editor ~= MIR and not ENGINE_MODS[editor] then return false end
   end
-  if next(packs) ~= nil then default_origin_error(label .. " default science differs", event, state, current) end
+  return true
 end
 
 local function published473_space_age_selection(event, change, active)
-  -- A package-only upgrade can reconstruct the prior official selection.
-  -- Additions, removals and other providers require their own source contract.
-  if target.id ~= "f210" or change.old_version ~= "4.7.21003"
-      or (active.base ~= "2.1.23" and active.base ~= "2.1.24")
+  -- The configured official set must have remained installed across an
+  -- admitted engine patch. The caller verifies synchronized official rows.
+  local base = active.base
+  local base_change = event.mod_changes.base
+  local f200 = target.id == "f200" and change.old_version == "4.7.20003" and base == "2.0.77"
+  local f210 = target.id == "f210" and change.old_version == "4.7.21003"
+    and (base == "2.1.23" or base == "2.1.24"
+      or base == "2.1.25" and (not base_change or base_change.old_version == "2.1.24"
+        or base_change.old_version == base))
+  if not (f200 or f210)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
   for name in pairs(ENGINE_MODS) do
-    if active[name] ~= active.base then return false end
+    -- The separate recycler mod exists in the admitted 2.1 selection.
+    local expected = (name ~= "recycler" or f210) and base or nil
+    if active[name] ~= expected then return false end
   end
-  for name in pairs(active) do
-    if name ~= MIR and not ENGINE_MODS[name] then return false end
+  local has_other_mods = false
+  for name, version in pairs(active) do
+    if name ~= MIR and not ENGINE_MODS[name] then
+      -- Current editor history cannot establish the predecessor's price.
+      if not f210 or PUBLISHED473_F210_WORKER_ADDONS[name] ~= version then return false end
+      has_other_mods = true
+    end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (not ENGINE_MODS[name] or type(item) ~= "table" or getmetatable(item) ~= nil
-        or item.old_version ~= active.base or item.new_version ~= active.base) then return false end
+    if name ~= MIR then
+      if type(item) ~= "table" or getmetatable(item) ~= nil
+          or type(item.new_version) ~= "string" or item.new_version ~= active[name] then return false end
+      if ENGINE_MODS[name] then
+        if active[name] ~= base then return false end
+      elseif not f210 or item.old_version ~= item.new_version then return false end
+    end
   end
-  return true
+  -- Verify the current prototype too. The caller checks the archived price,
+  -- science and native work before any transfer.
+  return not has_other_mods or worker_has_known_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -898,7 +958,7 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   local space_age = active["space-age"] ~= nil
   if space_age then
     if not published473_space_age_selection(event, change, active) then
-      default_origin_error("published473 Space Age source requires its unchanged official mod selection", event, state, current)
+      default_origin_error("published473 Space Age worker origin or prototype history is unverified", event, state, current)
     end
   else
     for _, name in ipairs({"quality", "elevated-rails", "recycler"}) do
@@ -1042,20 +1102,9 @@ local function published472_se_origin(event, change, active, state, current)
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 or effect.hidden == true then
     default_origin_error("published472 SE source work contract differs", event, state, current)
   end
-  local packs = {["automation-science-pack"]=1, ["logistic-science-pack"]=1, ["chemical-science-pack"]=1,
-    ["production-science-pack"]=1, ["se-rocket-science-pack"]=1, ["se-material-science-pack-1"]=1,
-    ["space-science-pack"]=1}
-  local ingredients = prototype.research_unit_ingredients
-  if type(ingredients) ~= "table" or #ingredients ~= 7 then
+  if not recovery.matches_archived_science(prototype.research_unit_ingredients, "f200_se") then
     default_origin_error("published472 SE source science differs", event, state, current)
   end
-  for _, ingredient in ipairs(ingredients) do
-    if type(ingredient) ~= "table" or packs[ingredient.name] ~= ingredient.amount then
-      default_origin_error("published472 SE source science differs", event, state, current)
-    end
-    packs[ingredient.name] = nil
-  end
-  if next(packs) ~= nil then default_origin_error("published472 SE source science differs", event, state, current) end
   local prerequisites = 0
   for key, prerequisite in pairs(prototype.prerequisites or {}) do
     local name = type(key) == "string" and key or prerequisite and prerequisite.name
@@ -1100,11 +1149,11 @@ local function default_origin(event, initializing, state, current)
     local empty = published11_empty_origin(event, change, active)
     if empty then return empty end
   end
-  -- The Factorio flag does not identify the edited settings. Admit this
-  -- published F200 route only when the later all-force plan proves that no
-  -- worker research or earned worker level depends on the old contract.
-  if state == nil and target.id == "f200" and active.base == "2.0.77" and not base_hop
-      and change and change.old_version == "4.7.20003" and event.mod_startup_settings_changed == true then
+  -- The settings flag covers every mod. The all-force plan requires
+  -- the predecessor's worker levels, queued work and paid progress to be empty.
+  if state == nil and change and event.mod_startup_settings_changed == true
+      and (target.id == "f200" and active.base == "2.0.77" or target.id == "f210")
+      and change.old_version == PUBLISHED473_DEFAULT_ORIGINS[target.id] then
     return older_default_origin(event, change, active, false, state, current, true)
   end
   if state == nil and change and change.old_version == "5.0.20003" then
@@ -1118,8 +1167,8 @@ local function default_origin(event, initializing, state, current)
   if state == nil and change and change.old_version == "4.7.20002" then
     return published472_se_origin(event, change, active, state, current)
   end
-  if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
-      or change.old_version == "5.0.20001" and new_selection) then
+  if state == nil and change and (change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f200
+      or change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f210 or change.old_version == "5.0.20001" and new_selection) then
     return older_default_origin(event, change, active, base_hop, state, current)
   end
   local engine_patch_valid = same_family_engine_patch(event)
@@ -1158,8 +1207,8 @@ local function default_origin(event, initializing, state, current)
       default_origin_error("recorded default source cannot be a first-install event", event, state, current)
     end
     local old = change and change.old_version or active[MIR]
-    local known = DEFAULT_ORIGINS[base_hop and "f200" or target.id]
-    if type(old) ~= "string" or old ~= active[MIR] and (not known or not known[old]) then
+    if producer_edition(old) ~= (base_hop and "f200" or target.id)
+        or not recorded_default_versions_match(old, active[MIR]) then
       default_origin_error("recorded default source has an inconsistent producer event", event, state, current)
     end
     return {kind=prepared and "prepared-default" or "recorded-default", old_version=old, new_version=active[MIR]}
@@ -1179,15 +1228,42 @@ local function default_origin(event, initializing, state, current)
       end
     end
   end
-  local known = DEFAULT_ORIGINS[target.id]
-  if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
+  local archive = change and recovery.archived_default_profiles[change.old_version]
+  if archive then
+    if not engine_patch_valid or target.id ~= archive.edition or active.base ~= archive.base
+        or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
+      default_origin_error("archived uninvested default source requires its qualified engine", event, state, current)
+    end
+    for name in pairs(ENGINE_MODS) do
+      if active[name] ~= archive.base then
+        default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
+      end
+    end
+    for name, version in pairs(archive.mods) do
+      if active[name] ~= version then
+        default_origin_error("archived uninvested default source requires its qualified dependency versions", event, state, current)
+      end
+    end
+    if not worker_has_known_editors() then
+      default_origin_error("archived uninvested default source has unverified prototype history", event, state, current)
+    end
+    require_archived_default_contract(event, state, current, true, "archived uninvested default")
+    local kind = archive.paid and "archived-default" or "archived-uninvested-default"
+    for name in pairs(active) do
+      if name ~= MIR and not ENGINE_MODS[name] and not archive.mods[name] then
+        kind = "archived-uninvested-default"
+        break
+      end
+    end
+    return {kind=kind, old_version=change.old_version, new_version=active[MIR]}
+  end
+  if not change or not known_default_origin(change.old_version, target.id) or not engine_patch_valid then
     default_origin_error("unrecorded default source has no qualified MIR5 producer", event, state, current)
   end
-  local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
   for name, version in pairs(active) do
     -- The unchanged-selection check above covers added, removed and updated
     -- mods. Unrelated unchanged names do not invalidate surviving native work.
-    if official[name] and name ~= MIR and version ~= active.base then
+    if ENGINE_MODS[name] and version ~= active.base then
       default_origin_error("unrecorded default source requires matching official engine versions", event, state, current)
     end
   end
@@ -1234,7 +1310,7 @@ local function gate_frame(force, configuration)
     recover_error("default head debit native state is invalid")
   end
   if force.current_research and force.current_research.name == recovery.head_id then recover_error("head debit cannot be current research") end
-  for _, entry in ipairs(force.research_queue or {}) do
+  for _, entry in ipairs(observed_queue(force)) do
     if entry.name == recovery.head_id then recover_error("head debit cannot be queued research") end
   end
   return gate
@@ -1410,14 +1486,7 @@ local function default_completion_frame(force, id)
       or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
     recover_error("invalid full default completion technology")
   end
-  local queue, saved, occurrences = {}, {}, 0
-  for _, entry in ipairs(force.research_queue or {}) do
-    if #queue >= 1000 or not entry or type(entry.name) ~= "string" or not progress(entry.saved_progress) then
-      recover_error("invalid full default completion queue")
-    end
-    queue[#queue + 1], saved[entry.name] = entry.name, entry.saved_progress
-    if entry.name == id then occurrences = occurrences + 1 end
-  end
+  local queue, saved, occurrences = snapshot_queue(force, id)
   local value = force.research_progress
   if type(value) ~= "number" or value ~= value or value < 0 or value > 1 then
     recover_error("invalid full default completion progress")
@@ -1480,6 +1549,25 @@ local function native_bonus(force)
     recover_error("default native contribution is unavailable")
   end
   return value -- postcondition only; never used to infer earned levels.
+end
+
+local function require_current_transfer(plan, item, finished, allow_enabled_gate, ...)
+  -- A previous force's setters can run callbacks before the next force's first write.
+  local force = item.force
+  local gate = gate_frame(force, allow_enabled_gate)
+  local message = "native worker work changed during another force's transfer; reload the original copy"
+  if storage[OWNER_KEY] ~= plan.prior_owner or storage[KEY] ~= plan.prior_state
+      or gate_paid(gate) ~= item.gate_paid or gate.enabled ~= item.gate_enabled
+      or native_bonus(force) ~= (item.initial_bonus or item.bonus) then
+    recover_error(message)
+  end
+  for index = 1, select("#", ...) do
+    local expected = select(index, ...)
+    if expected then
+      local current = default_frame(force, expected.technology.name, finished)
+      if not equal_plain(frame_values(expected), frame_values(current)) then recover_error(message) end
+    end
+  end
 end
 
 local function legacy_paid_pair(source, owner, gate, legacy)
@@ -1557,8 +1645,10 @@ local function apply_published517_se_paid_bridge(plan)
       recover_error("published517 SE paid work changed after preflight")
     end
   end
+  local applied = false
   for _, item in ipairs(fresh.items) do
     if item.action == "legacy-transfer" or item.settle_source or item.gate_enabled then
+      if applied then require_current_transfer(fresh, item, false, true, item.source, item.owner, item.legacy) end
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
@@ -1588,6 +1678,7 @@ local function apply_published517_se_paid_bridge(plan)
       end)
       default_mutating_force = previous
       if not ok then error(message, 0) end
+      applied = true
     end
   end
   for _, item in ipairs(fresh.items) do
@@ -1721,8 +1812,23 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
       local refresh = context.created_force == force.index or context.reset_force == force.index
+      -- A scenario can grant both authored aliases before MIR initializes.
+      -- on_init also runs on first install in an existing game. Require the
+      -- observed map-start tick for an automatic debit of the mirrored level.
+      local mirrored_first = initializing and not owned and not refresh and game.tick == 0
+        and source.next_level == 5 and destination.next_level == 5 and source.count == destination.count
+        and not source.researched and not destination.researched and not gate_paid(gate)
+        and source.enabled and source_prototype.enabled and destination.enabled and prototype.enabled
+        and source.visible == source_prototype.visible_when_disabled and destination.visible == prototype.visible_when_disabled
+        and not default_owner_frame_has_unsettled_work(source, recovery.canonical)
+        and not default_owner_frame_has_unsettled_work(destination, id)
       if context.created_force == force.index and prior then recover_error("new default force already has history") end
       local action, next_force = "validate", prior and clone(prior) or nil
+      -- A configuration can re-enable either side of the paid pair. To
+      -- retire the public row again, require MIR's saved retirement right
+      -- and the paid debit. The pair check verifies the work.
+      local settle_source = context.configuration == true and prior and prior.phase == "owned"
+        and prior.retired_flags.disabled_by_mir and source.enabled and gate_paid(gate) or false
       local legacy = legacy_active and default_frame(force, recovery.published517_se_id, finished) or nil
       if legacy_retuned and (not prior or prior.phase ~= "legacy")
           and default_owner_frame_has_invested_work(destination, id) then
@@ -1748,22 +1854,20 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         -- this force's authenticated paid work until its ordinary completion.
       elseif not prior or refresh then
         if owned and not refresh then recover_error("default force history is missing") end
-        if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
+        if not mirrored_first and (destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
             or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
-            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
+            or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate)) then
           recover_error("full default owner/debit is not pristine")
         end
-        if (initializing or refresh) and (source.next_level ~= 4 or source.researched
+        if not mirrored_first and (initializing or refresh) and (source.next_level ~= 4 or source.researched
             or source.saved_progress ~= 0 or source.occurrences ~= 0) then
           recover_error("first initialization/new force cannot adopt existing default work")
         end
-        if not owned and (producer.kind == "published511-empty-default"
-              or producer.kind == "published503-sif-empty-default")
+        local uninvested_required = UNINVESTED_DEFAULT_PRODUCERS[producer.kind]
+        if not owned and uninvested_required
             and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0
               or source.occurrences ~= 0 or source.current == recovery.canonical) then
-          recover_error(producer.kind == "published511-empty-default"
-            and "published11 empty default source has invested or queued worker work"
-            or "Space Is Fake removal requires every native worker4 to be uninvested")
+          recover_error(uninvested_required)
         end
         if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
           if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
@@ -1777,21 +1881,24 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         end
         if source.occurrences > 0 then requeueable(force, source, true, true) end
         if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
-        action, moved = "transfer", true
+        action = mirrored_first and "first-credit" or "transfer"
+        moved = moved or action == "transfer"
         next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
           disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
-      elseif not full_pair(source, destination, gate) then
+      elseif not full_pair(source, destination, gate, settle_source) then
         if finished and source.next_level == 4 and not source.researched and not source.enabled
             and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
             and destination.next_level >= 5 then
           action = "first-credit"
         else recover_error("full default native owner/first-level debit changed") end
       end
-      if action == "validate" and gate.enabled then action = "settle-gate" end
+      if action == "validate" and (gate.enabled or settle_source) then action = "settle-flags" end
       record.forces[force.index] = next_force
+      local initial_bonus = native_bonus(force)
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
-        gate_enabled=gate.enabled,
-        bonus=native_bonus(force), phase=next_force and next_force.phase or "owned", legacy=legacy,
+        gate_enabled=gate.enabled, settle_source=settle_source, initial_bonus=initial_bonus,
+        bonus=initial_bonus - (mirrored_first and source_prototype.effects[1].modifier or 0),
+        phase=next_force and next_force.phase or "owned", legacy=legacy,
         moved=action == "transfer", action=action,
         target_enabled=public.enabled, target_visible=public.visible}
     end
@@ -1819,6 +1926,9 @@ function M.apply_default_owner_transfer(plan)
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
     if not old or old.gate_enabled ~= item.gate_enabled then recover_error("head debit flag changed after default preflight") end
+    if old.action == "settle-flags" and old.source.enabled ~= item.source.enabled then
+      recover_error("retired public worker flag changed after default preflight")
+    end
   end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
@@ -1833,6 +1943,7 @@ function M.apply_default_owner_transfer(plan)
         recover_error("pending completion changed after default preflight")
       end
     elseif old.force.index ~= item.force.index or old.action ~= item.action or old.gate_paid ~= item.gate_paid
+        or old.settle_source ~= item.settle_source
         or old.bonus ~= item.bonus or not equal_plain(frame_values(old.source), frame_values(item.source))
         or not equal_plain(frame_values(old.public), frame_values(item.public))
         or not equal_plain(frame_values(old.destination), frame_values(item.destination))
@@ -1841,8 +1952,14 @@ function M.apply_default_owner_transfer(plan)
     end
   end
   local id = recovery.ordinary_default_id
+  local applied = false
   for _, item in ipairs(fresh.items) do
-    if item.action ~= "pending-unchanged" then
+    if item.action == "transfer" or item.action == "first-credit" or item.action == "settle-flags" then
+      if applied then
+        require_current_transfer(fresh, item, fresh.context.finished_force == item.force.index,
+          fresh.prior_owner ~= nil and fresh.context.configuration == true,
+          item.source, item.destination, item.public ~= item.source and item.public, item.legacy)
+      end
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
@@ -1871,17 +1988,19 @@ function M.apply_default_owner_transfer(plan)
           if frame.current == (fresh.prepared_default and recovery.id or recovery.canonical) then item.force.research_progress = frame.current_progress end
           if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("native full default work price differs") end
         elseif item.action == "first-credit" then
-          -- The paid work is already on T4. Never rewrite its queue or progress
-          -- at completion, including the observed nil-current/queued remainder.
-          canonical.level = 5
+          -- The ordinary owner already holds the credit. Keep its queue and
+          -- progress, including an observed nil-current/queued remainder.
+          if canonical.level ~= 5 then canonical.level = 5 end
           canonical.enabled, canonical.visible_when_disabled = false, frame.visible
           set_gate_paid(gate, true)
-        elseif item.action == "settle-gate" then
-          gate.enabled = false
+        elseif item.action == "settle-flags" then
+          if item.settle_source then canonical.enabled = false end
+          if item.gate_enabled then gate.enabled = false end
         end
       end)
       default_mutating_force = previous
       if not ok then error(message, 0) end
+      applied = true
     end
   end
   for _, item in ipairs(fresh.items) do
@@ -1921,9 +2040,12 @@ function M.apply_default_owner_transfer(plan)
         end
       elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
         recover_error("native full default owner work changed during first-level credit")
-      elseif (item.action == "validate" or item.action == "settle-gate")
-          and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
-        recover_error("validated native public first-level state changed")
+      elseif item.action == "validate" or item.action == "settle-flags" then
+        local expected = frame_values(item.source)
+        if item.settle_source then expected.enabled = false end
+        if not equal_plain(expected, frame_values(actual_source)) then
+          recover_error("validated native public first-level state changed")
+        end
       end
     end
   end
@@ -2160,7 +2282,8 @@ local function apply_provider_handover(plan)
   if authorization.legacy.delegated_handover ~= plan or not equal_plain(authorization.legacy.state, fresh.prepared) then
     recover_error("provider quota delegation changed before native writes")
   end
-  for _, item in ipairs(fresh.items) do
+  for index, item in ipairs(fresh.items) do
+    if index > 1 then require_current_transfer(fresh, item, false, true, item.source, item.destination, item.public) end
     local previous = default_mutating_force
     default_mutating_force = item.force.index
     local ok, message = pcall(function()
@@ -2544,11 +2667,13 @@ end
 function M.default_owner_on_research_finished(event, record_completed_worker_cap)
   local force, research = event and event.research and event.research.force, event and event.research
   if not default_head_pending or not force or M.default_owner_mutating(event) then return false, false end
+  local name = research.name
+  if name ~= recovery.ordinary_default_id and name ~= recovery.published517_se_id then return false, false end
   local state = owner_record()
-  if state and state.schema == 4 and research.name == recovery.published517_se_id then
+  if state and state.schema == 4 and name == recovery.published517_se_id then
     return settle_published517_se_paid_completion(state, force, event, record_completed_worker_cap)
   end
-  if research.name ~= recovery.ordinary_default_id then return false, false end
+  if name ~= recovery.ordinary_default_id then return false, false end
   if not state or not state.forces[force.index] then recover_error("default completion has unknown force history") end
   if event.by_script ~= false then recover_error("full default completion must be ordinary native research") end
   local owner = force.technologies[recovery.ordinary_default_id]
@@ -2562,16 +2687,14 @@ function M.default_owner_on_research_finished(event, record_completed_worker_cap
 end
 
 function M.default_owner_on_force_created(event)
-  local retired = owner_record()
-  if retired and retired.kind == "provider-retired" then return false end
-  if not owner_record() or not event or not event.force then return false end
+  local state = owner_record()
+  if not state or state.kind == "provider-retired" or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {created_force=event.force.index}))
 end
 
 function M.default_owner_on_force_reset(event)
-  local retired = owner_record()
-  if retired and retired.kind == "provider-retired" then return false end
-  if not owner_record() or not event or not event.force then return false end
+  local state = owner_record()
+  if not state or state.kind == "provider-retired" or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {reset_force=event.force.index}))
 end
 
@@ -2799,7 +2922,9 @@ function M.on_force_created(event)
     recover_error("new force has unknown private worker investment")
   end
   if force.current_research and force.current_research.name == recovery.id then recover_error("new force has private current work") end
-  for _, queued in ipairs(force.research_queue or {}) do if queued.name == recovery.id then recover_error("new force has private queued work") end end
+  for _, queued in ipairs(observed_queue(force)) do
+    if queued.name == recovery.id then recover_error("new force has private queued work") end
+  end
   technology.enabled, technology.visible_when_disabled = false, false
   if state and state.schema == 2 and state.kind == "prepared" then state.forces[force.index] = actual_record(force); reconnect(state) end
 end

@@ -217,9 +217,20 @@ function Test-MIRPublicationTextFromRef {
   }
   $uploadBlocks = ($upload -join "`n") -split '\n[ \t]*\n',2
   $notes = (Invoke-Git show "${Ref}:docs/release-notes.md") -join "`n"
-  $notes = ($notes -replace '\A---\n(?s:.*?)\n---(?:\n|\z)', '').Trim()
+  $frontMatter = [regex]::Match($notes, '\A---\n(?<metadata>(?s:.*?))\n---(?:\n|\z)')
+  $notes = $notes.Substring($frontMatter.Length).Trim()
   if ($uploadBlocks.Count -ne 2 -or [string]::IsNullOrWhiteSpace($notes) -or $uploadBlocks[1].Trim() -cne $notes) {
     throw '[mir-release-notes-mismatch] The candidate release notes and upload body must match.'
+  }
+  $declaredTitles = [regex]::Matches(
+    $frontMatter.Groups['metadata'].Value,
+    '(?m)^(?:title|applies_to):[ \t]*["'']?(?<title>MIR [0-9]+\.[0-9]+\.[0-9]+)\b'
+  )
+  foreach ($declaredTitle in $declaredTitles) {
+    $actualTitle = $declaredTitle.Groups['title'].Value
+    if ($actualTitle -cne $title) {
+      throw "[mir-release-notes-version] The candidate release notes name $actualTitle. Expected $title."
+    }
   }
 }
 

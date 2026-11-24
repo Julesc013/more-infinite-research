@@ -477,41 +477,70 @@ local function retained_authored_prototype_disablement(force, name, observed)
   return authored_generated_prototype_disabled(force, row, observed) ~= nil
 end
 
+local retired_work_observer
+
+function M.set_retired_work_observer(observer)
+  retired_work_observer = observer
+end
+
 -- This runs at configuration and rare force/effects-reset boundaries over
 -- the compact authored list. It never enumerates a force's technologies.
 -- A record exists only after this runtime changed an enabled technology to
 -- disabled, so later cap relaxation can restore neither a data-stage default
 -- nor foreign pre-disablement.
+local function disable_authored_prototype(force, name, technology, owned_disabled, imported_reenabled)
+  local owned = owned_disabled[force.index]
+  if type(owned) ~= "table" then
+    owned = {}
+    owned_disabled[force.index] = owned
+  end
+  local record = owned[name]
+  if type(record) ~= "table" then
+    owned[name] = {disabled = true}
+  elseif record.disabled == nil then
+    -- Only a newly imported, exact V3 positive proof can accompany this
+    -- first policy write. Existing visibility-only/negative decisions
+    -- remain foreign; resets cannot manufacture a restoration right.
+    record.disabled = imported_reenabled ~= nil and imported_reenabled[name] == record
+  end
+  technology.enabled = false
+end
+
 local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled, observed, excluded_family)
   if not valid_force(force) then return false end
   for index = 1, #ORDERED_DECLARATIONS do
     local row = ORDERED_DECLARATIONS[index]
     if row.family ~= excluded_family and row.ownership_kind == "authored_generated" then
       local technology = authored_generated_prototype_disabled(force, row, observed)
-      if technology and technology.enabled == true then
+      if technology and technology.enabled == true and not (retired_work_observer and retired_work_observer(force, row.id)) then
         -- The caller probes with nil before allocating durable storage for an
         -- otherwise unlimited save.
         if type(owned_disabled) ~= "table" then return true end
-        local owned = owned_disabled[force.index]
-        if type(owned) ~= "table" then
-          owned = {}
-          owned_disabled[force.index] = owned
-        end
-        local record = owned[row.id]
-        if type(record) ~= "table" then
-          record = {disabled = true}
-          owned[row.id] = record
-        elseif record.disabled == nil then
-          -- Only a newly imported, exact V3 positive proof can accompany this
-          -- first policy write. Existing visibility-only/negative decisions
-          -- remain foreign; resets cannot manufacture a restoration right.
-          record.disabled = imported_reenabled ~= nil and imported_reenabled[row.id] == record
-        end
-        technology.enabled = false
+        disable_authored_prototype(force, row.id, technology, owned_disabled, imported_reenabled)
       end
     end
   end
   return false
+end
+
+function M.reconcile_retired_paid_work(force, name, last_payable_level)
+  local row = DECLARATION_BY_ID[name]
+  if not row or row.ownership_kind ~= "authored_generated" then return end
+  local technology = authored_generated_prototype_disabled(force, row)
+  if not technology then return end
+  reconcile_with_state(function()
+    if last_payable_level ~= nil then
+      -- Release only MIR's recorded disablement while this exact native
+      -- allowance exists. The cap also preserves the ordered queue prefix.
+      local _, result = caps.reconcile(force, {[name] = last_payable_level}, ensure_state().owned_disabled)
+      if result.unresolved_current then error("MIR cannot enforce the retired research allowance: " .. name, 2) end
+    else
+      caps.remove_unavailable_from_queue(force, {[name] = true})
+      if technology.enabled == true then
+        disable_authored_prototype(force, name, technology, ensure_state().owned_disabled)
+      end
+    end
+  end)
 end
 
 local function cancel_unavailable_research(force, observed, excluded_family)

@@ -1,0 +1,503 @@
+{
+  "schema": 1,
+  "status": "verified-official-f200-473-paid-space-age-hotfix",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "profile": [
+    "base",
+    "space-age",
+    "quality",
+    "elevated-rails",
+    "more-infinite-research"
+  ],
+  "published_refusal": {
+    "release": "v5.0.22",
+    "archive_sha256": "89BC559F17C86CDC70133381FD62F7B6C4ADD6BAC27AB7D8186ABA5B4C82EFFB",
+    "evidence": {
+      "path": "build/qualification/f200-space-age-473-paid-origin-r01/verified-upgrade-refusal.json",
+      "bytes": 1592,
+      "sha256": "7482DE740178DB38FFC02FA90C8C5ECBF85A0367C537CD3608354C3636974B92"
+    }
+  },
+  "private_repair": {
+    "commit": "bef15ad93c1be20a18d592d6957b89a6bb72a8d1",
+    "player_tree": "6514ec3d3312a59d66005fa8eb8859347d2ff18f",
+    "archive": {
+      "path": "build/qualification/f200-space-age-473-hotfix-native-r01/library/more-infinite-research_5.0.20022.zip",
+      "bytes": 1071083,
+      "sha256": "E572AA87A9E462F7AD915394F229AB065FF82564CD7BC337390B5F87C8911FE5"
+    },
+    "original_save_sha256": "AA4E7FDBDFA3ABA8798717BFFE3F609B0C5D96457EF289B0C180956678EACEF9",
+    "completed_save_sha256": "B433392A31847DDF8AF5525F44C85E0C153769FA4EC36CCDB33A9AA455F256B6",
+    "cold_loads": 2,
+    "restored_libraries": true,
+    "original_files_rehashed": 181,
+    "receipt": {
+      "path": "build/qualification/f200-space-age-473-hotfix-native-r01/verified-replay.json",
+      "bytes": 37420,
+      "sha256": "60D286D3B1F46ED458558CC1EF29AE930854025D9021C0831E664A018A642356"
+    }
+  },
+  "observed": {
+    "source": {
+      "mods": {
+        "base": "2.0.77",
+        "elevated-rails": "2.0.77",
+        "quality": "2.0.77",
+        "space-age": "2.0.77",
+        "more-infinite-research": "4.7.20003"
+      },
+      "frames": {
+        "mir-paid-current": {
+          "bonus": 4,
+          "current": "worker-robots-storage-4",
+          "progress": 0.3600043917435148,
+          "queue": [
+            "worker-robots-storage-4",
+            "worker-robots-storage-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 1039.3244444444445,
+            "logistic-science-pack": 1039.3244444444445,
+            "chemical-science-pack": 1039.3244444444445,
+            "production-science-pack": 1039.3244444444445,
+            "utility-science-pack": 1039.3244444444445,
+            "electromagnetic-science-pack": 1039.3244444444445
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "completed": {
+        "mir-paid-current": 1,
+        "mir-paid-parked": 1
+      },
+      "first_paid": {
+        "mir-paid-current": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        },
+        "mir-paid-parked": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        }
+      },
+      "phase": "source-ready",
+      "clock": 1,
+      "source": {
+        "mir-paid-current": {
+          "bonus": 4,
+          "current": "worker-robots-storage-4",
+          "progress": 0.3600043917435148,
+          "queue": [
+            "worker-robots-storage-4",
+            "worker-robots-storage-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 1039.3244444444445,
+            "logistic-science-pack": 1039.3244444444445,
+            "chemical-science-pack": 1039.3244444444445,
+            "production-science-pack": 1039.3244444444445,
+            "utility-science-pack": 1039.3244444444445,
+            "electromagnetic-science-pack": 1039.3244444444445
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "map_price": 1
+    },
+    "before_first_new_lab": {
+      "mods": {
+        "base": "2.0.77",
+        "elevated-rails": "2.0.77",
+        "quality": "2.0.77",
+        "space-age": "2.0.77",
+        "more-infinite-research": "5.0.20022"
+      },
+      "frames": {
+        "mir-paid-current": {
+          "bonus": 4,
+          "current": "mir-worker-storage-default-4",
+          "progress": 0.3600043917435148,
+          "queue": [
+            "mir-worker-storage-default-4",
+            "mir-worker-storage-default-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 1039.3244444444445,
+            "logistic-science-pack": 1039.3244444444445,
+            "chemical-science-pack": 1039.3244444444445,
+            "production-science-pack": 1039.3244444444445,
+            "utility-science-pack": 1039.3244444444445,
+            "electromagnetic-science-pack": 1039.3244444444445
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "completed": {
+        "mir-paid-current": 1,
+        "mir-paid-parked": 1
+      },
+      "first_paid": {
+        "mir-paid-current": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        },
+        "mir-paid-parked": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        }
+      },
+      "phase": "source-ready",
+      "clock": 1,
+      "source": {
+        "mir-paid-current": {
+          "bonus": 4,
+          "current": "worker-robots-storage-4",
+          "progress": 0.3600043917435148,
+          "queue": [
+            "worker-robots-storage-4",
+            "worker-robots-storage-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 1039.3244444444445,
+            "logistic-science-pack": 1039.3244444444445,
+            "chemical-science-pack": 1039.3244444444445,
+            "production-science-pack": 1039.3244444444445,
+            "utility-science-pack": 1039.3244444444445,
+            "electromagnetic-science-pack": 1039.3244444444445
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "map_price": 1
+    },
+    "after_first_new_lab": {
+      "mods": {
+        "base": "2.0.77",
+        "elevated-rails": "2.0.77",
+        "quality": "2.0.77",
+        "space-age": "2.0.77",
+        "more-infinite-research": "5.0.20022"
+      },
+      "frames": {
+        "mir-paid-current": {
+          "bonus": 5,
+          "current": "mir-worker-storage-default-4",
+          "progress": 0,
+          "queue": [
+            "mir-worker-storage-default-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 6,
+          "enabled": true,
+          "saved": 0,
+          "price": 1518,
+          "paid": {
+            "automation-science-pack": 1687,
+            "logistic-science-pack": 1687,
+            "chemical-science-pack": 1687,
+            "production-science-pack": 1687,
+            "utility-science-pack": 1687,
+            "electromagnetic-science-pack": 1687
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "completed": {
+        "mir-paid-current": 2,
+        "mir-paid-parked": 1
+      },
+      "first_paid": {
+        "mir-paid-current": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        },
+        "mir-paid-parked": {
+          "automation-science-pack": 675,
+          "logistic-science-pack": 675,
+          "chemical-science-pack": 675,
+          "production-science-pack": 675,
+          "utility-science-pack": 675,
+          "electromagnetic-science-pack": 675
+        }
+      },
+      "phase": "successor-ready",
+      "clock": 1,
+      "source": {
+        "mir-paid-current": {
+          "bonus": 4,
+          "current": "worker-robots-storage-4",
+          "progress": 0.3600043917435148,
+          "queue": [
+            "worker-robots-storage-4",
+            "worker-robots-storage-4",
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 1039.3244444444445,
+            "logistic-science-pack": 1039.3244444444445,
+            "chemical-science-pack": 1039.3244444444445,
+            "production-science-pack": 1039.3244444444445,
+            "utility-science-pack": 1039.3244444444445,
+            "electromagnetic-science-pack": 1039.3244444444445
+          },
+          "lab": 6,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        },
+        "mir-paid-parked": {
+          "bonus": 4,
+          "current": "physical-projectile-damage-1",
+          "progress": 0,
+          "queue": [
+            "physical-projectile-damage-1"
+          ],
+          "level": 5,
+          "enabled": true,
+          "saved": 0.23000439174322565,
+          "price": 1012,
+          "paid": {
+            "automation-science-pack": 907.7644444444445,
+            "logistic-science-pack": 907.7644444444445,
+            "chemical-science-pack": 907.7644444444445,
+            "production-science-pack": 907.7644444444445,
+            "utility-science-pack": 907.7644444444445,
+            "electromagnetic-science-pack": 907.7644444444445
+          },
+          "lab": 7,
+          "lab_disabled": true,
+          "lab_productivity": 0,
+          "lab_speed": 0,
+          "other_level": 1,
+          "other_saved": 0,
+          "mining": 0
+        }
+      },
+      "map_price": 1
+    }
+  },
+  "validation": {
+    "passed_worker_history_controls": 211,
+    "host_log": {
+      "path": "build/qualification/f200-space-age-473-paid-origin-r01/host-worker-history-hotfix-r01.txt",
+      "bytes": 488,
+      "sha256": "E30B0EEB968E6D765CEA7F88EC6DDC08A17B8C85B083568FDADBFE3A10B74EEE"
+    }
+  },
+  "scope": "Exact 4.7.3 official Factorio 2.0.77 Space Age profile and unchanged startup settings. Retained paid science, current and repeated queue entries, parked progress, earned cargo, unrelated research and two cold loads. Release publication remains pending."
+}

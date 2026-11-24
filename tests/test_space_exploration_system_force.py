@@ -29,6 +29,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
             ["space-exploration-graphics-5"]="0.7.3",["space-exploration-menu-simulations"]="0.7.4",
             ["space-exploration-postprocess"]="0.7.5",["more-infinite-research"]="5.0.20018"}
           script={active_mods=active}
+          storage={}
           event={mod_startup_settings_changed=false,mod_changes={
             ["more-infinite-research"]={old_version="4.7.20002",new_version="5.0.20018"}}}
           native_writes={};forbidden_writes=0
@@ -75,14 +76,9 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
           policy=require("runtime.space_exploration_system_force")
         ''')
 
-    def rejected(self, mutation, after_preflight=False):
-        if after_preflight:
-            self.lua.execute("plan=policy.preflight(event)")
+    def skipped(self, mutation):
         self.lua.execute(mutation)
-        ok, message = self.lua.eval("pcall(function() policy.apply(plan);return nil end)" if after_preflight
-                                    else "pcall(function() policy.preflight(event);return nil end)")
-        self.assertFalse(ok, mutation)
-        self.assertTrue(message, mutation)
+        self.lua.execute("assert(policy.preflight(event)==nil);policy.apply(nil)")
         self.assertEqual(self.lua.eval("#native_writes"), 0, mutation)
         self.assertEqual(self.lua.eval("forbidden_writes"), 0, mutation)
 
@@ -142,22 +138,148 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
           assert(policy.preflight(event)==nil and #native_writes==0)
         ''')
 
-    def test_profile_and_configuration_opponents_refuse_before_writes(self):
+    def replay_loaders_addition(self, recovered):
+        if recovered:
+            self.lua.execute('policy.apply(assert(policy.preflight(event)));assert(#native_writes==6)')
+        self.lua.execute('''
+          -- The actual later callback saw all six fields at zero while the
+          -- player's native cargo and queue survived.
+          fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+          fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+          native_writes={}
+          package.loaded["runtime.space_exploration_system_force"]=nil
+          policy=require("runtime.space_exploration_system_force")
+          active["aai-loaders"]="0.2.11"
+          event={mod_startup_settings_changed=true,mod_changes={
+            ["aai-loaders"]={new_version="0.2.11"}}}
+        ''')
+
+    def test_verified_conquest_defaults_survive_a_later_aai_loaders_addition(self):
+        self.replay_loaders_addition(recovered=True)
+        self.lua.execute('''
+          local plan=assert(policy.preflight(event));assert(#native_writes==0)
+          policy.apply(plan)
+          assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
+          assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
+          assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
+          assert(foreign.worker_robots_storage_bonus==8 and foreign.research_progress==.039024390243902)
+          assert(foreign.queue=="worker,worker,tail" and forbidden_writes==0)
+          assert(policy.preflight(event)==nil)
+        ''')
+
+    def test_recorded_conquest_defaults_survive_removing_unrelated_addons(self):
+        for addon, version in (("aai-loaders", "0.2.11"), ("jetpack", "0.4.17")):
+            with self.subTest(addon=addon):
+                self.setUp()
+                self.replay_loaders_addition(recovered=True)
+                self.lua.execute('''
+                  local addon, version = ...
+                  assert(active[addon]==version)
+                  policy.apply(assert(policy.preflight(event)))
+                  fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+                  fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+                  native_writes={}
+                  active[addon]=nil
+                  event={mod_startup_settings_changed=true,mod_changes={
+                    [addon]={old_version=version}}}
+                  local plan=assert(policy.preflight(event))
+                  assert(#native_writes==0)
+                  policy.apply(plan)
+                  assert(fields.worker_robots_speed_modifier==5.65 and fields.worker_robots_storage_bonus==3)
+                  assert(fields.artillery_range_modifier==1.8 and gun["artillery-shell"]==6)
+                  assert(gun.laser==2.2 and ammo.laser==5.1 and #native_writes==6)
+                  assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
+                  assert(foreign.research_progress==.039024390243902 and forbidden_writes==0)
+                ''', addon, version)
+
+    def test_later_configuration_requires_a_recorded_force_and_coherent_changes(self):
+        self.replay_loaders_addition(recovered=False)
+        self.skipped('game=setmetatable({}, {__index=function()error("world access")end})')
+        for mutation in (
+            'storage.mir_se_conquest_policy_force=foreign',
+            'game.forces.conquest=ro(fields);game.forces[4]=game.forces.conquest',
+            'event.mod_changes["aai-loaders"].old_version=""',
+            'event.mod_changes["aai-loaders"].new_version="0.2.12"',
+            'event.mod_changes["aai-loaders"]={old_version="0.2.11",new_version="0.2.11"}',
+            'event.mod_changes["more-infinite-research"]={old_version="5.0.20017",new_version=active["more-infinite-research"]}',
+            'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
+            'event.mod_changes["space-age"]={old_version="2.0.77"}',
+            'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
+            'fields.worker_robots_storage_bonus=4',
+        ):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                self.replay_loaders_addition(recovered=True)
+                self.skipped(mutation)
+
+    def test_native_observation_of_canonical_defaults_records_the_force_without_native_writes(self):
+        self.lua.execute('''
+          fields.worker_robots_speed_modifier=5.65;fields.worker_robots_storage_bonus=3
+          fields.artillery_range_modifier=1.8;gun["artillery-shell"]=6;gun.laser=2.2;ammo.laser=5.1
+          policy.observe()
+          assert(storage.mir_se_conquest_policy_force==force and #native_writes==0)
+          fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+          fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+          event={mod_startup_settings_changed=false,mod_changes={jetpack={old_version="0.4.16",new_version="0.4.17"}}}
+          policy.apply(assert(policy.preflight(event)))
+          assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)
+          assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
+        ''')
+
+    def test_observed_noncanonical_or_unavailable_policy_retires_the_force_reference(self):
+        for mutation in ('gun.laser=.25', 'fields.players={foreign}', 'active["space-exploration"]="0.7.58"'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                self.lua.execute('policy.apply(assert(policy.preflight(event)));native_writes={}')
+                self.lua.execute(mutation + ';policy.observe();assert(next(storage)==nil and #native_writes==0)')
+                self.lua.execute('''
+                  active["space-exploration"]="0.7.57";fields.players={}
+                  fields.worker_robots_speed_modifier=0;fields.worker_robots_storage_bonus=0
+                  fields.artillery_range_modifier=0;gun["artillery-shell"]=0;gun.laser=0;ammo.laser=0
+                  active["aai-loaders"]="0.2.11"
+                  event={mod_changes={["aai-loaders"]={new_version="0.2.11"}}}
+                ''')
+                self.skipped("")
+
+    def test_completed_night_vision_does_not_block_the_se_policy_or_change_research(self):
+        for predecessor, updated_addon in product(("4.7.20002", "5.0.20017"), (False, True)):
+            with self.subTest(predecessor=predecessor, updated_addon=updated_addon):
+                self.setUp()
+                self.lua.globals().predecessor = predecessor
+                self.lua.execute('event.mod_changes["more-infinite-research"].old_version=predecessor')
+                if updated_addon:
+                    self.lua.execute('''
+                      active["space-hall-fix"]="1.0.1"
+                      event.mod_changes["space-hall-fix"]={old_version="1.0.0",new_version="1.0.1"}
+                      event.mod_startup_settings_changed=true
+                    ''')
+                self.lua.execute('''
+                  local night_vision=add_row("night-vision-equipment",1,true)
+                  night_vision.prototype.effects={{type="unlock-recipe",recipe="night-vision-equipment"}}
+                  local plan=policy.preflight(event);assert(plan and #native_writes==0)
+                  policy.apply(plan)
+                  assert(#native_writes==6 and fields.worker_robots_storage_bonus==3)
+                  assert(night_vision.researched and night_vision.level==1 and night_vision.saved_progress==0)
+                  assert(foreign.worker_robots_storage_bonus==8 and foreign.queue=="worker,worker,tail")
+                ''')
+
+    def test_profile_and_configuration_opponents_skip_before_writes(self):
         mutations = ['target.distribution_version=nil', 'target.distribution_version=""',
                      'target.distribution_version="5.0.21018"',
                      'event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active["more-infinite-research"]="5.0.20019";event.mod_changes["more-infinite-research"].new_version="5.0.20019"',
                      'active.base="2.0.78"', 'active.Krastorio2="1.0.0"', 'active["space-age"]="2.0.77"',
                      'event.mod_changes.foreign={old_version="1.0.0"}',
-                     'event.mod_startup_settings_changed=true;'
-                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}',
+                     'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.18"}',
+                     'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
+                     'event.mod_changes["space-exploration"]={old_version="0.7.56",new_version="0.7.57"}',
                      'event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={old_version="0.1.0"}',
                      'active["mir-fixture-mir5-worker-storage-se-cap-ten-native"]="0.1.0";event.mod_changes["mir-fixture-mir5-worker-storage-se-cap-ten-native"]={new_version="0.1.0"}']
         for mutation in mutations:
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute('world_reads=0;game=setmetatable({}, {__index=function()world_reads=world_reads+1;error("unexpected world access")end})')
-                self.rejected(mutation)
+                self.skipped(mutation)
                 self.assertEqual(self.lua.eval("world_reads"), 0, mutation)
 
     def test_mixed_nonfinite_or_unavailable_scripted_values_are_not_absence(self):
@@ -169,9 +291,9 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                          'fields.set_ammo_damage_modifier=nil'):
             with self.subTest(mutation=mutation):
                 self.setUp()
-                self.rejected(mutation)
+                self.skipped(mutation)
 
-    def test_any_native_investment_or_nonstandard_system_force_refuses(self):
+    def test_conflicting_investment_or_nonstandard_system_force_skips_the_optional_repair(self):
         for mutation in ('fields.valid=false', 'fields.name="player"', 'fields.index=1', 'fields.ai_controllable=false',
                          'fields.players={foreign}', 'fields.current_research=rows["worker-robots-storage-4"]',
                          'fields.research_progress=.1', 'fields.research_queue={rows["worker-robots-storage-4"]}',
@@ -180,27 +302,36 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                          'rows["worker-robots-storage-1"].researched=nil', 'rows.artillery.researched=false',
                          'rows.tank=nil', 'rows.artillery.prototype.max_level=4294967295',
                          'rows.artillery.prototype.effects={{type="worker-robot-storage",modifier=3}}',
-                         'rows.artillery.prototype.effects=nil', 'rows["worker-robots-storage-1"].valid=false'):
+                         'rows.artillery.prototype.effects=nil', 'rows["worker-robots-storage-1"].valid=false',
+                         'add_row("extra",1,true).prototype.effects={{type="worker-robot-storage",modifier=3}}',
+                         'add_row("extra",1,true).prototype.max_level=2'):
             with self.subTest(mutation=mutation):
                 self.setUp()
-                self.rejected(mutation)
+                self.skipped(mutation)
 
-    def test_published517_refuses_ambiguous_or_invested_system_force(self):
+    def test_published517_skips_ambiguous_or_invested_system_force(self):
         for mutation in ('gun.laser=.4', 'rows["worker-robots-storage-4"].saved_progress=.12',
-                         'event.mod_changes.jetpack={old_version="0.4.16",new_version="0.4.17"}'):
+                         'event.mod_changes.jetpack={old_version="0.4.16"}'):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute('event.mod_changes["more-infinite-research"].old_version="5.0.20017"')
-                self.rejected(mutation)
+                self.skipped(mutation)
 
-    def test_revalidation_refuses_intervening_foreign_changes(self):
+    def test_revalidation_skips_intervening_foreign_changes_without_blocking_load(self):
         for mutation in ('active.base="2.0.78"', 'event.mod_changes.foreign={new_version="1.0.0"}',
                          'fields.worker_robots_storage_bonus=9', 'ammo.laser=.25',
                          'fields.players={foreign}', 'rows["worker-robots-storage-4"].level=5',
+                         'add_row("foreign-worker",1,true).prototype.effects={{type="worker-robot-storage",modifier=2}}',
                          'game.forces.conquest=foreign'):
             with self.subTest(mutation=mutation):
                 self.setUp()
-                self.rejected(mutation, after_preflight=True)
+                self.lua.execute("plan=assert(policy.preflight(event))")
+                self.lua.execute(mutation)
+                self.lua.execute('''
+                  policy.apply(plan)
+                  assert(plan.used and #native_writes==0 and forbidden_writes==0)
+                  assert(not pcall(function() policy.apply(plan) end))
+                ''')
 
     def test_failed_postcondition_propagates_and_cannot_replay_the_plan(self):
         self.lua.execute('''

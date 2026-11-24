@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "status": "verified-modern-api-and-f110-native-replays",
+  "candidate_tag": "v5.0.22",
+  "candidate_source": "c54534acae88fe5e316aeae35d51e69c8897eb1a",
+  "published_commit": "9e376928407e58f2921baf898a7edc398514a849",
+  "player_tree": "895b973bd99721e1f99110419dd55d1857923b80",
+  "corrected_packet_attribution": {
+    "path": "build/qualification/mir522-stable-input-reconciliation-r01/pending-packets-source-provenance.json",
+    "bytes": 3604,
+    "sha256": "95D5FAB30B52D8652B611BB64C7B71DA44C5EBF9AE74910E6384047448CF032A"
+  },
+  "cases": [
+    {
+      "factorio": "2.0.77",
+      "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+      "archive_sha256": "89BC559F17C86CDC70133381FD62F7B6C4ADD6BAC27AB7D8186ABA5B4C82EFFB",
+      "packet_sha256": "3A6D742735DDE6E753B9A5363196363A9058DC9C4A345B73BE14DEE1E5CE591C",
+      "request": "api522-space-age-f200-r01",
+      "runner_pid": 2351028,
+      "invocation_id": "3ec15f973bd541698ad5ecfb592c0b72",
+      "dispatcher_terminal": {
+        "path": "build/qualification/api522-public-production-r01/f200/originals/dispatcher.json",
+        "bytes": 2052,
+        "sha256": "4A289F3221497451172FBA00B5F156A64FDF455405C0CB0A1D7B205151CD650F"
+      },
+      "native_result": {
+        "path": "build/qualification/api522-public-production-r01/f200/originals/data/result.json",
+        "bytes": 308590,
+        "sha256": "88DDBFFB7FC10482ADEA9F2788D6A01C374D9A3E3F300E3F90A7167F98F2517E"
+      },
+      "originals": 30,
+      "restored_library": true,
+      "verified": {
+        "consumers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA"
+        ],
+        "copper_plates_each": 100,
+        "copper_cables_before_after": [
+          200,
+          202
+        ],
+        "native_recipe_productivity_before_after": [
+          0,
+          0.01
+        ],
+        "crafting_speed_bonus": 0.05,
+        "cold_loads": 2,
+        "protected_save_sha256": "FB417D86A54EF934AE905E328973D30B652A52897614170B90F2473CFEDA8C15",
+        "ordinary_lab": false,
+        "consumer_observations": {
+          "create.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": true,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": false,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "production.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "reload-1.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "reload-2.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        }
+      }
+    },
+    {
+      "factorio": "2.1.24",
+      "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+      "archive_sha256": "847399EE8BCA28E1A893761873E5C8B04E9B0FD168D8669575CC9D080F4E602F",
+      "packet_sha256": "A1CD51595E8595C85E40EA8F069A7928D429CA88A679780577C94ABCE859436A",
+      "request": "api522-space-age-f210-r02",
+      "runner_pid": 2361353,
+      "invocation_id": "cdf99e19eac5486f87f914026f3591e4",
+      "dispatcher_terminal": {
+        "path": "build/qualification/api522-public-production-r01/f210-r02/originals/dispatcher.json",
+        "bytes": 2051,
+        "sha256": "6D1DDFECF088315DAE0481F5190FD90075A1AB3E296E62092838131AD01CA3A5"
+      },
+      "native_result": {
+        "path": "build/qualification/api522-public-production-r01/f210-r02/originals/data/result.json",
+        "bytes": 308914,
+        "sha256": "40FFD25C6601E92C6D45C93BBAAD6DD3B6FB57382C74267BF7403BFD27BB4C30"
+      },
+      "originals": 30,
+      "restored_library": true,
+      "verified": {
+        "consumers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA"
+        ],
+        "copper_plates_each": 100,
+        "copper_cables_before_after": [
+          200,
+          202
+        ],
+        "native_recipe_productivity_before_after": [
+          0,
+          0.01
+        ],
+        "crafting_speed_bonus": 0.05,
+        "cold_loads": 2,
+        "protected_save_sha256": "CF8ADDCD7C7A539362278918218613BFB3A1FC89AE16526889697E7D8A904CD5",
+        "ordinary_lab": false,
+        "consumer_observations": {
+          "create.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": true,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "init",
+              "force_index": 1,
+              "researched": false,
+              "level": 1,
+              "max_level": 1,
+              "manual_crafting_speed_modifier": 0.05,
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "production.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 0,
+              "reload_level": 1,
+              "reload_researched": false,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "reload-1.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          },
+          "reload-2.factorio.log": {
+            "MIR5_API_ALPHA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_researched": true,
+              "reload_level": 1,
+              "reload_manual_crafting_speed_modifier": 0.05
+            },
+            "MIR5_API_BETA": {
+              "stage": "load",
+              "tick": 4803,
+              "reload_level": 1,
+              "reload_researched": true,
+              "reload_manual_crafting_speed_modifier": 0.05
+            }
+          }
+        }
+      }
+    }
+  ],
+  "adjacent_adverses": {
+    "library_viewport_scale": {
+      "original_terminal": {
+        "path": "build/qualification/library522-availability-scroll-r07/native/originals/dispatcher.json",
+        "bytes": 1853,
+        "sha256": "C1B7731CA5E7F833515EE90155D16A018890AE4B5CF5D1BE3011D4E73BEF71DA"
+      },
+      "preserved_originals": 218,
+      "reason": "The controller assumed unity UI scale. At 75%, it refused before wheel input and the native actor exhausted its capture-bound wait."
+    },
+    "startup_teardown": {
+      "original_terminal": {
+        "path": "build/qualification/f200-522-bob-angel-menu/f200-522-bob-angel-menu-comparison-r02/dispatcher.json",
+        "bytes": 1856,
+        "sha256": "BAD51F13A93C3F9D90C9AEA1027549444B2D0C6DA6619CCC8D77405D1F176E34"
+      },
+      "result": {
+        "path": "build/qualification/f200-522-bob-angel-menu/f200-522-bob-angel-menu-comparison-r02/result.json",
+        "bytes": 13760,
+        "sha256": "0212608FCB7BB9ED5811896028DF0B12915841E3E3C85B433AFC91C59B05B0EB"
+      },
+      "clean_completed_launches": 72,
+      "failure": "The owned Factorio menu child required forced shutdown at launch 73."
+    }
+  },
+  "scope": "Two exact Space Age profiles. Public consumer data and runtime queries, signed effects, physical cable outputs, cold loads and unattended next-job dispatch. Multiplayer client adoption, ordinary lab research, matched performance and stable acceptance remain separate. The Factorio 1.1.110 replay covers the exact public same-edition 4.7.3 predecessor and 5.0.22 successor.",
+  "f110_same_edition": {
+    "factorio": "1.1.110",
+    "source_player": "4.7.11003",
+    "successor_player": "5.0.11022",
+    "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+    "archive_sha256": "BDC8D93ABED84EFBE121CCD6FC69666FFBBD40ED655703EA68A265C0338D9D50",
+    "protected_original_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "completed_save_sha256": "DDF71AF4117E2EEE4817488547ACAD7BDFCEC8E329D25846E04A59EE54D8A63B",
+    "native_result": {
+      "path": "build/qualification/f110-473-to-522-r03/originals/result.json",
+      "bytes": 34484,
+      "sha256": "2CC76D01F93074592FA5DFC64D4C1EE0E446932B931859D802D8CE8CCE2C1657"
+    },
+    "terminal": {
+      "path": "build/qualification/f110-473-to-522-r03/terminal.json",
+      "bytes": 15257,
+      "sha256": "4A673F987F8DE5D8364A04A9BD111185AD839978683F1D688993FFB5944AC37F"
+    },
+    "initial": {
+      "case": "f110-f200-transition",
+      "stage": "initial",
+      "status": "passed",
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 1,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "stack_inserter_capacity_bonus": 4,
+      "on_load_read_only": false
+    },
+    "cold_loads": 2,
+    "originals": 72,
+    "resource_retry": {
+      "status": "same-sealed-inputs-resource-estimate-corrected",
+      "old_terminal_sha256": "926BCEC35EDB54D8B99DBF6224AAAF64244E55775BC64FDB97E4D1BF234E0B26",
+      "old_native_result_sha256": "AC2B63E8CB84E7427C03CD51487512281B440DD116A49A3456785D56CCE66D38",
+      "prepared_packet_sha256": "19D8B4F7C2436E3AEEE2D35FDAFC55FC01448B47E7EB9407BBB7235C50ABA544",
+      "protected_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "prior_exact_case_peak_working_set_bytes": 138022912,
+      "prior_memory_ledger_sha256": {
+        "process-1.resources.jsonl": "D8F3BFA6CEA4AE8137AC0BB80E382862D0ECA427FF814FF1F9E5E614987CF912",
+        "process-2.resources.jsonl": "D56F7FC625ECB4BB2F78796F65B8DC3B50D66708165792F4977047FFA1F010CF",
+        "process-3.resources.jsonl": "E9FAFE7084AC5D8645A9517A48886830BC109230CF3D90E2D4EAA2528AB31A23"
+      },
+      "resource_estimate_mib": 1024,
+      "admission_wait_seconds": 60,
+      "retry_controller_sha256": "A0F45979A44E76FFF44FD998B76388713343D122C1EF5D309AD89F74D2E11CAC",
+      "second_refusal_sha256": "F07D79C6DA237243ABD30F571E4371504EFB485F1B880B6B58CF38D2172E402A"
+    },
+    "earlier_refusals": [
+      {
+        "path": "build/qualification/f110-473-to-522-r01/terminal.json",
+        "bytes": 1257,
+        "sha256": "926BCEC35EDB54D8B99DBF6224AAAF64244E55775BC64FDB97E4D1BF234E0B26"
+      },
+      {
+        "path": "build/qualification/f110-473-to-522-r02/terminal.json",
+        "bytes": 438,
+        "sha256": "F07D79C6DA237243ABD30F571E4371504EFB485F1B880B6B58CF38D2172E402A"
+      }
+    ]
+  }
+}

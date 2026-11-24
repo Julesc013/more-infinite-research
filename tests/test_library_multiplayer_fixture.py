@@ -1655,7 +1655,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
-    def test_paired_wrapper_admits_exact_published505_and_refuses_changed_inputs(self):
+    def test_paired_wrapper_admits_exact_retained_comparison_players_and_refuses_changed_inputs(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
           $tokens=$null;$errors=$null
@@ -1665,29 +1665,86 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MultiplayerFixtureSelection'},$true))
           if($node.Count-ne1){throw 'selection function differs'}
           Invoke-Expression $node[0].Extent.Text
-          function Profile {Get-Content -LiteralPath $env:MIR_TEST_505_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
-          $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
-          $mir='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
-          $target=Assert-MultiplayerFixtureSelection (Profile) $engine 'library-paired-browser' $mir 8192
-          if($target.mir-cne'5.0.20005'){throw 'published505 was not selected'}
-          function Refuse($profile,$actualEngine=$engine,$expected=$mir) {
-            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
-            throw 'changed published505 input was admitted'
+          function Profile($version,$hash) {
+            $profile=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+            $profile.mods[2].version=$version
+            $profile.archive_sha256.Remove('more-infinite-research_5.0.20005.zip')
+            $profile.archive_sha256["more-infinite-research_$version.zip"]=$hash
+            return $profile
           }
-          $bad=Profile;$bad.mods[2].version='5.0.20006';Refuse $bad
-          $bad=Profile;$bad.archive_sha256['more-infinite-research_5.0.20005.zip']='0'*64;Refuse $bad
-          Refuse (Profile) ('0'*64)
-          Refuse (Profile) $engine ('0'*64)
-          $bad=Profile;$bad.mods[4].name='mir-fixture-mir5-library-paired-browser-arm-published';Refuse $bad
-          $bad=Profile;$bad.mods[0].version='2.1.23';Refuse $bad
+          $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
+          $earlier523='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+          $frozen523='2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
+          $players=@(
+            @{version='5.0.20023';sha256=$earlier523}
+            @{version='5.0.20023';sha256=$frozen523}
+            @{version='5.0.20005';sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'}
+          )
+          function Refuse($profile,$actualEngine,$expected) {
+            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
+            throw 'changed retained comparison input was admitted'
+          }
+          foreach($entry in $players) {
+            $version=$entry.version;$mir=$entry.sha256
+            $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192
+            if($target.mir-cne$version-or$target.paired_arm-cne'mir5'-or$target.mir_archive_sha256-cne$mir){throw 'exact MIR 5 comparison arm was not selected'}
+            $bad=Profile $version $mir;$bad.mods[2].version='5.0.20099';Refuse $bad $engine $mir
+            Refuse (Profile $version ('0'*64)) $engine $mir
+            Refuse (Profile $version $mir) ('0'*64) $mir
+            Refuse (Profile $version $mir) $engine ('0'*64)
+            $bad=Profile $version $mir;$bad.mods[4].name='mir-fixture-mir5-library-paired-browser-arm-published';Refuse $bad $engine $mir
+            $bad=Profile $version $mir;$bad.mods[0].version='2.1.23';Refuse $bad $engine $mir
+          }
+          Refuse (Profile '5.0.20023' $earlier523) $engine $frozen523
+          Refuse (Profile '5.0.20023' $frozen523) $engine $earlier523
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
             cwd=ROOT, env={**os.environ, 'MIR_TEST_WRAPPER':str(WRAPPER),
-                           'MIR_TEST_505_PROFILE':str(ROOT/'tests/profiles/library-retained-current505-f200-2077.json')},
+                           'MIR_TEST_PAIRED_PROFILE':str(ROOT/'tests/profiles/library-retained-current505-f200-2077.json')},
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_paired_browser_boots_the_frozen_523_arm_and_refuses_another_version(self):
+        paired = ROOT / "tests/fixtures/library-paired-browser"
+        info = json.loads((paired / "arm-mir5/info-523.json").read_text(encoding="utf-8"))
+        self.assertIn("more-infinite-research = 5.0.20023", info["dependencies"])
+        boot = self.lua.eval(r'''
+          function(path, mir_version, selector)
+            local initialize, ready
+            defines = {events = {on_player_joined_game = 1, on_tick = 2}}
+            settings = {startup = { ["mir5-library-paired-browser-arm"] = {value = "mir5"} }}
+            storage = {}
+            game = {surfaces = {{map_gen_settings = {seed = 424242}}}}
+            helpers = {table_to_json = function(marker) ready = marker return "{}" end}
+            log = function() end
+            script = {
+              active_mods = {
+                base = "2.0.77", ["more-infinite-research"] = mir_version,
+                ["mir-fixture-mir5-library-paired-browser"] = "0.1.0",
+                ["mir-fixture-mir5-active-mods-observer"] = "0.1.0", [selector] = "0.1.0"
+              },
+              on_init = function(handler) initialize = handler end,
+              on_load = function() end, on_event = function() end
+            }
+            dofile(path)
+            local ok, err = pcall(initialize)
+            return ok, err, ready and ready.arm
+          end
+        ''')
+        path = (paired / "control.lua").as_posix()
+        for version in ("5.0.20023", "5.0.20005", "5.0.20000"):
+            with self.subTest(version=version):
+                self.assertEqual(boot(path, version, info["name"]), (True, None, "mir5"))
+        ok, diagnostic, arm = boot(path, "5.0.20024", info["name"])
+        self.assertFalse(ok)
+        self.assertIn("active-mod closure differs at more-infinite-research", diagnostic)
+        self.assertIsNone(arm)
+        ok, diagnostic, arm = boot(path, "5.0.20023", "mir-fixture-mir5-library-paired-browser-arm-published")
+        self.assertFalse(ok)
+        self.assertIn("fixture active-mod closure differs", diagnostic)
+        self.assertIsNone(arm)
 
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''

@@ -16,6 +16,10 @@ Remaining limits:
 
 `complete` requires the original report and all four evidence fields above. Give exact failing and corrected inputs/results, regression coverage, applicable native/save preservation, and the delivered remedy. For non-gameplay work, explain native non-applicability as `Not applicable: reason`. The policy checks these fields and closing directives in the PR body/new commit messages; independent review establishes whether the evidence is sufficient. Reporter confirmation is optional.
 
+## Scope and complexity
+
+For behavioral changes, explain the invariant and affected consumers; why the change belongs in declarations or needs a new operation; representative same-class and opposing regressions; and the effect on work, memory, retained state and emitted output. Identify removed duplication and any justified growth. Link existing evidence or state what remains unmeasured. For non-behavioral work, state why these checks do not apply. Follow [ARCH-12](../spec/architecture.md#declarative-support-and-bounded-behavior).
+
 ## Checks performed
 
 List the checks you ran and their results, including anything you could not test.

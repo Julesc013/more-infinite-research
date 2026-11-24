@@ -920,6 +920,49 @@ class LibraryTests(unittest.TestCase):
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
+    def test_new_native_lists_start_with_final_items_without_a_readback(self):
+        for tab, name in (
+            ("research", "mir_library_results"),
+            ("settings", "mir_library_settings_list"),
+            ("queue", "mir_library_queue_list"),
+        ):
+            with self.subTest(tab=tab):
+                self.lua.execute('''
+                  local tab, name = ...
+                  local make_container = gui_container
+                  local created, reads, writes = 0, 0, 0
+                  gui_container = function(parent)
+                    local container = make_container(parent)
+                    local add = container.add
+                    container.add = function(spec)
+                      local element = add(spec)
+                      if spec.name ~= name then return element end
+                      created = created + 1
+                      local items = spec.items
+                      assert(type(items) == "table" and #items > 0 and spec.selected_index == 1,
+                        "create the native list with its actual items and selection")
+                      rawset(element, "items", nil)
+                      local meta = getmetatable(element)
+                      local read, write = meta.__index, meta.__newindex
+                      meta.__index = function(target, key)
+                        if key == "items" then reads = reads + 1; return items end
+                        return read(target, key)
+                      end
+                      meta.__newindex = function(target, key, value)
+                        if key == "items" then writes = writes + 1; items = value; return end
+                        write(target, key, value)
+                      end
+                      return element
+                    end
+                    return container
+                  end
+                  boot()
+                  local root = library.open(player, {tab = tab, selected = gear.name})
+                  gui_container = make_container
+                  assert(root and created == 1 and reads == 0 and writes == 0,
+                    "fresh native lists do not need an items read or write after creation")
+                ''', tab, name)
+
     def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
         self.lua.execute('''
           boot()
@@ -2408,6 +2451,36 @@ class LibraryTests(unittest.TestCase):
             "filter selection must update the retained view without replacing the window or query")
         ''')
 
+    def test_row_selection_reuses_one_catalogue_read_while_the_translation_scope_matches(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {family="all"})
+          local list = research_content(root).mir_library_list_pane.mir_library_results
+          local query = research_filters(root).mir_library_query
+          local queue, current, progress = player.force.research_queue, player.force.current_research,
+            player.force.research_progress
+          local model = require("presentation.library_model")
+          local rows, calls = model.rows, 0
+          model.rows = function(...) calls = calls + 1; return rows(...) end
+
+          list.selected_index = 1
+          library.on_gui_selection_state_changed{player_index=1, element=list}
+          assert(calls == 1, "a settled selection must use one catalogue observation")
+          local selected = storage.mir_library.players[1].selected
+          assert(selected ~= nil and list.selected_index == 1)
+
+          -- A native locale change can precede its event. Retain the clicked
+          -- identity from the displayed view and refresh the localized rows.
+          player.locale = "de"
+          calls = 0
+          library.on_gui_selection_state_changed{player_index=1, element=list}
+          assert(calls == 2 and storage.mir_library.players[1].selected == selected)
+          assert(research_content(root).mir_library_list_pane.mir_library_results == list
+            and research_filters(root).mir_library_query == query)
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress)
+        ''')
+
     def test_retained_filter_labels_follow_resize_within_the_same_column_band(self):
         self.lua.execute(r'''
           boot()
@@ -3257,6 +3330,46 @@ class LibraryTests(unittest.TestCase):
           assert(player.gui.screen["mir_research_browser"] == nil and not player.shortcut_toggled)
         ''')
 
+    def test_reopened_research_scroll_follows_the_selected_technology_after_reordering(self):
+        self.lua.execute('''
+          boot()
+          local gear_row = {id=gear.name, name=gear.localised_name, family="mir"}
+          local other_row = {id=foreign.name, name=foreign.localised_name, family="mir"}
+          library_declarations = {other_row, gear_row}
+          local function result_list(root)
+            return research_content(root).mir_library_list_pane.mir_library_results
+          end
+          local results = result_list(library.open(player))
+          assert(#results.items == 2 and results.items[2][2] == "[img=technology/" .. gear.name .. "] ")
+          results.selected_index = 2
+          library.on_gui_selection_state_changed({player_index=1, element=results})
+          assert(storage.mir_library.players[1].selected == gear.name)
+          assert(storage.mir_library.players[1].scroll == 2)
+          library.close(player)
+
+          local saved_view = storage.mir_library.players[1]
+          local queue = player.force.research_queue
+          library_declarations = {gear_row, other_row}
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          library.on_load()
+          assert(storage.mir_library.players[1] == saved_view)
+          results = result_list(library.open(player))
+          assert(results.selected_index == 1 and results.items[1][2] == "[img=technology/" .. gear.name .. "] ")
+          assert(results.scrolled_to.index == 1, "reopened view must scroll to the selected technology's new row")
+
+          library.close(player)
+          storage.mir_library.players[1].scroll_to_selection = nil
+          results = result_list(library.open(player))
+          assert(results.selected_index == 1 and results.scrolled_to.index == 2,
+            "older saved numeric scroll positions remain valid")
+          library.close(player)
+          results = result_list(library.open(player, {selected=foreign.name}))
+          assert(results.selected_index == 2 and results.scrolled_to.index == 2)
+          assert(player.force.research_queue == queue and player.force.current_research == gear
+            and player.force.research_progress == .5)
+        ''')
+
     def test_filters_and_foreign_events_are_bounded(self):
         self.lua.execute('''
           boot()
@@ -3937,12 +4050,32 @@ class LibraryTests(unittest.TestCase):
           local malformed = {pending = {{request_id = "not-a-native-id"}}}
           local ledger = {schema = 1, next_epoch = 0, active = {[1] = malformed}, retired = {}}
           storage.mir_library = {schema = 1, players = {}, translations = ledger}
+          assert(not library.subscription_needs(), "an invalid issued window cannot drain")
           library.open(player)
           assert(storage.mir_library.translations == ledger and ledger.active[1] == malformed)
-          assert(#player.translation_requests == 0)
+          assert(#player.translation_requests == 0 and not library.subscription_needs())
           library.on_translation_maintenance({tick = 1800})
           assert(ledger.active[1] == malformed and #player.translation_requests == 0)
         ''')
+
+    def test_closed_translation_timer_stops_when_only_preserved_records_remain(self):
+        self.lua.execute('''
+          boot()
+          library.open(player, {family = "all"})
+          assert(#player.translation_requests == 2)
+          library.close(player)
+          local ledger = storage.mir_library.translations
+          local invalid = {pending = {{request_id = "future-record"}}}
+          local unaddressable = ledger.active[1]
+          ledger.retired[2] = invalid
+          ledger.active.unknown_index = unaddressable
+          assert(library.subscription_needs(), "valid native requests still need their expiry")
+          library.on_translation_maintenance({tick = 1000000})
+          assert(ledger.active[1] == nil and not library.subscription_needs())
+          assert(ledger.retired[2] == invalid and ledger.active.unknown_index == unaddressable)
+          assert(#player.translation_requests == 2)
+        ''')
+
     def test_pending_translations_survive_locale_change_close_and_reload(self):
         self.lua.execute('''
           boot()

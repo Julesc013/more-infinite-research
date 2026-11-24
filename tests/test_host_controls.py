@@ -267,15 +267,20 @@ Delivery evidence: exact delivered remedy and readback at evidence/delivery.json
             for branch in ("main", "dev", "legacy", "release/4.0"):
                 git("update-ref", "refs/remotes/origin/" + branch, base)
             event_path = repo / "event.json"
-            (repo / "docs/release-notes.md").write_text(
-                "---\ntitle: MIR 5.0.19 beta release notes\n---\n\nPreserve the Library selection.\n", encoding="utf-8")
-
-            for index, (title, body, expected) in enumerate((
-                ("MIR 5.0.17", "Preserve the Library selection.", "[mir-release-upload-title]"),
-                ("MIR 5.0.19", "Unrelated release copy.", "[mir-release-notes-mismatch]"),
-                ("MIR 5.0.19", "Preserve the Library selection.", None),
+            notes_body = "Preserve the Library selection."
+            for index, (title, notes_version, applies_to, body, expected) in enumerate((
+                ("MIR 5.0.17", "5.0.19", "5.0.19", notes_body, "[mir-release-upload-title]"),
+                ("MIR 5.0.19", "5.0.19", "5.0.19", "Unrelated release copy.", "[mir-release-notes-mismatch]"),
+                ("MIR 5.0.19", "5.0.17", "5.0.19", notes_body, "[mir-release-notes-version]"),
+                ("MIR 5.0.19", "5.0.19", "5.0.17", notes_body, "[mir-release-notes-version]"),
+                ("MIR 5.0.19", "5.0.19", "5.0.19", notes_body, None),
             ), 1):
-                with self.subTest(title=title, body=body):
+                with self.subTest(title=title, notes_version=notes_version, applies_to=applies_to, body=body):
+                    (repo / "docs/release-notes.md").write_text(
+                        f'---\ntitle: "MIR {notes_version} beta release notes"\n'
+                        f"applies_to: MIR {applies_to} GitHub prerelease\n---\n\n{notes_body}\n",
+                        encoding="utf-8",
+                    )
                     (repo / "docs/upload-text.txt").write_text(
                         f"{title}\nChannel: GitHub prerelease.\n\n{body}\n", encoding="utf-8")
                     git("add", "docs")

@@ -44,6 +44,7 @@ local ARMS = {
   mir5 = {
     key = "mir5",
     mir_version = "5.0.20000",
+    other_versions = { ["5.0.20005"] = true, ["5.0.20023"] = true },
     selector = "mir-fixture-mir5-library-paired-browser-arm-mir5",
     shape = {
       filters = "mir_library_filters",
@@ -94,10 +95,9 @@ local function selected_arm()
   local key = setting and setting.value
   local arm = ARMS[key]
   if arm == nil then fail("fixture arm selector is absent or invalid") end
-  -- The public 5.0.5 package uses the same public Library actions and native
-  -- preservation oracle. Admit its exact identity without changing old inputs.
-  if key == "mir5" and script.active_mods["more-infinite-research"] == "5.0.20005" then
-    return {key = arm.key, mir_version = "5.0.20005", selector = arm.selector, shape = arm.shape}
+  local active_version = script.active_mods["more-infinite-research"]
+  if arm.other_versions and arm.other_versions[active_version] then
+    return {key = arm.key, mir_version = active_version, selector = arm.selector, shape = arm.shape}
   end
   return arm
 end
