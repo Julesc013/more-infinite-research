@@ -14,7 +14,19 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current private 5.0.23 freeze (2026-11-24)
+## Checked 5.0.23 promotion (2026-11-24)
+
+The checked promotion head `642eccc0611ffe439f0d6c9803982eed577beb9f` has player tree `d47b99f80119a342bc979da09fe8a56320c26f17`. The frozen inventory SHA-256 `2E893EF93C18FB98D78ADAC866120997D282C6D1BCE218CB88105F1CB70EDB39` binds 17 player ZIPs and both checksum files. The primary `build/qualification/mir523-checked-promotion-r01/verified-promotion-inputs.json` records the package and note readback. MIR 5.0.22 is the public prerelease. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2361)
+
+- The exact Factorio 2.0 and 2.1 ZIPs passed protected MIR 4.7.3 Base upgrades and two cold loads at the declared minimum engines 2.0.77 and 2.1.23. The primary receipts are `mir523-f200-minimum-black-glass-r01/verified.json` and `mir523-f210-minimum-black-glass-r01/verified.json` beneath `build/qualification`.
+- The exact Factorio 2.1 ZIP passed the 11-mod Space Age and 27-mod Solar Productivity 3.0.0 replays, including ordinary lab completion of paid worker cargo, preserved parked work and matching cold loads. The primary receipts are `mir523-cap-official-f210-gunmetal-r01/verified.json` and `mir523-cap-solar-full-gunmetal-r01/readback.json` beneath `build/qualification`. The full reporter saves remain unverified.
+- The exact Factorio 2.0 ZIP passed the staged Space Exploration 0.7.57 upgrade with the historical 5,125-unit worker price, 200 paid units, night vision and six conquest bonuses. Ordinary labs completed levels 9 and 10 and the cap blocked level 11. The primary receipt is `mir523-cap-staged-se-black-glass-r01/verified.json` beneath `build/qualification`. A combined upgrade can erase the price distinction before MIR can observe it, so the proposed beta scope requires the documented two-load procedure. [Upgrade steps](support.md#upgrading-mir-4720002-with-space-exploration) · [Paired historical price evidence](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7096183506)
+- On the exact Factorio 2.0 ZIP, ordinary mining research raised iron output from 45 to 49 per tested drill and core fragments from 160 to 176. The protected Foundation III mean update comparison completed 18 processes and measured −0.104 ms per update against published MIR 4.7.3, with a 95% interval from −0.199 to −0.009 ms. The update-time comparison covers one save and profile. [Extraction](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7130271349) · [Foundation III](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7131118889)
+- Both independent API consumers passed with each exact modern ZIP. Factorio 2.0.77 and 2.1.24 each produced 202 copper cables from the 200-cable control, with two cold loads and restored direct libraries. The interrupted 2.0 attempt and nine-record archive restoration have separate receipts. [API results and custody](https://github.com/Julesc013/more-infinite-research/issues/446#issuecomment-7131432194)
+
+The promotion, anonymous downloads, Library timing and remaining stable acceptance are pending.
+
+## Earlier private 5.0.23 freeze (2026-11-24)
 
 Committed source 89f9975e5f98735dea4be0316b72a2a27619baeb built and verified 17 player ZIPs and two checksum files. Inventory SHA-256 F730EA89450B2A26EC2A18E2995AE2FB1CD7B968AEB6A0D86A4F416C7AD0B884 binds the complete set. Fifteen ZIPs differ from the previous integrated freeze only in their generated changelog. The Factorio 2.0 and 2.1 ZIPs also carry the checked Library list and worker startup-settings repairs. The staged release notes match the upload text. The prior freeze and its evidence remain available.
 
