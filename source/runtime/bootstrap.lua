@@ -521,47 +521,11 @@ local function on_load()
 end
 
 local function on_library_shortcut(event)
-  library.on_lua_shortcut(event)
-  reconcile_translations()
-end
-
-local function on_library_text_changed(event)
-  library.on_gui_text_changed(event)
-  reconcile_translations()
-end
-
-local function on_library_selection_changed(event)
-  library.on_gui_selection_state_changed(event)
-  reconcile_translations()
-end
-
-local function on_library_checked_changed(event)
-  library.on_gui_checked_state_changed(event)
-  reconcile_translations()
-end
-
-local function on_library_tab_changed(event)
-  library.on_gui_selected_tab_changed(event)
-  reconcile_translations()
-end
-
-local function on_library_click(event)
-  library.on_gui_click(event)
-  reconcile_translations()
-end
-
-local function on_library_location_changed(event)
-  library.on_gui_location_changed(event)
-  reconcile_translations()
+  if library.on_lua_shortcut(event) then reconcile_translations() end
 end
 
 local function on_library_display_changed(event)
   if library.on_player_display_changed(event) then reconcile_translations() end
-end
-
-local function on_library_closed(event)
-  library.on_gui_closed(event)
-  reconcile_translations()
 end
 
 local function on_library_player_removed(event)
@@ -910,15 +874,21 @@ function M.register()
     script.on_event(events.on_tower_planted_seed, active and on_tower_planted_seed or nil)
   end
   if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
-  if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, on_library_text_changed) end
-  if events.on_gui_selected_tab_changed then script.on_event(events.on_gui_selected_tab_changed, on_library_tab_changed) end
-  if events.on_gui_selection_state_changed then script.on_event(events.on_gui_selection_state_changed, on_library_selection_changed) end
-  if events.on_gui_checked_state_changed then script.on_event(events.on_gui_checked_state_changed, on_library_checked_changed) end
-  if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
-  if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end
+  for _, name in ipairs{
+    "on_gui_text_changed", "on_gui_selected_tab_changed", "on_gui_selection_state_changed",
+    "on_gui_checked_state_changed", "on_gui_click", "on_gui_location_changed", "on_gui_closed",
+  } do
+    local id = events[name]
+    if id then
+      script.on_event(id, function(event)
+        if not library.has_library_gui_name(event) then return end
+        library[name](event)
+        reconcile_translations()
+      end)
+    end
+  end
   if events.on_player_display_scale_changed then script.on_event(events.on_player_display_scale_changed, on_library_display_changed) end
   if events.on_player_display_resolution_changed then script.on_event(events.on_player_display_resolution_changed, on_library_display_changed) end
-  if events.on_gui_closed then script.on_event(events.on_gui_closed, on_library_closed) end
   if events.on_pre_player_removed then script.on_event(events.on_pre_player_removed, on_library_player_pre_removed) end
   if events.on_player_removed then script.on_event(events.on_player_removed, on_library_player_removed) end
   if events.on_string_translated then script.on_event(events.on_string_translated, on_library_string_translated) end
