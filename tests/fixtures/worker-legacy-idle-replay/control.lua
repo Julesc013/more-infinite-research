@@ -35,7 +35,7 @@ local function unrelated()
   local force = game.forces["unrelated-research"]
   return {queue=queue(force), current=force.current_research.name, progress=force.research_progress,
     parked=technology(force, "logistics"), disabled=technology(force, "worker-robots-speed-4"),
-    bonus=force.worker_robots_speed_modifier}
+    bonus=force.worker_robots_speed_modifier, speed=technology(force,"worker-robots-speed-1")}
 end
 
 local function workers(candidate)
@@ -76,11 +76,18 @@ script.on_init(function()
   foreign.research_progress = .42
   foreign.technologies.logistics.saved_progress = .27
   foreign.technologies["worker-robots-speed-4"].enabled = false
-  foreign.worker_robots_speed_modifier = .5
+  local speed = foreign.technologies["worker-robots-speed-1"]
+  local modifier = 0
+  for _, effect in ipairs(speed.prototype.effects) do
+    if effect.type == "worker-robot-speed" then modifier = modifier + effect.modifier end
+  end
+  assert(modifier > 0, "native speed effect")
+  speed.researched = true
   storage.unrelated = unrelated()
+  assert(equal(storage.unrelated.bonus, modifier), "native speed bonus")
   assert(equal(storage.unrelated.queue, {"automation","logistics"}) and
     equal(storage.unrelated.progress, .42) and equal(storage.unrelated.parked.saved, .27) and
-    storage.unrelated.disabled.enabled == false and storage.unrelated.bonus == .5, "source foreign setup")
+    storage.unrelated.disabled.enabled == false and storage.unrelated.speed.researched == true, "source foreign setup")
   storage.source = workers(false)
   for _, row in pairs(storage.source) do
     idle(row.public)
