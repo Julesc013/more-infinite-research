@@ -1,5 +1,6 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$CandidatePath,[Parameter(Mandatory)][string]$ObserverPath)
+param([Parameter(Mandatory)][string]$CandidatePath,[Parameter(Mandatory)][string]$ObserverPath,
+    [Parameter(Mandatory)][string]$StoragePlanPath,[Parameter(Mandatory)][string]$StoragePlanSha256)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -31,8 +32,11 @@ $hashes = @{
     $candidateName=$candidateSha
     $observerName=(Sha $ObserverPath)
 }
-$out = Join-Path $repo 'build/tmp/editor-cold'
-$context = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $out -ExpectedPeakMemoryMiB 8192 -MaxNewOutputMiB 192 -UseExactOutputRoot
+$control = Join-Path $repo 'build/tmp/editor-cold'
+$storage = @{RepoRoot=$repo;OutputRoot=$control;ExpectedPeakMemoryMiB=8192;MaxNewOutputMiB=192;
+    UseExactOutputRoot=$true;LinuxStoragePlanPath=$StoragePlanPath;LinuxStoragePlanSha256=$StoragePlanSha256;LibraryRoot=$library}
+$context = New-MIRNativeProbeResourceContext @storage
+$out = $context.root
 [IO.Directory]::CreateDirectory($out) | Out-Null
 
 $mods = @('base','elevated-rails','quality','recycler','space-age' | ForEach-Object { @{name=$_;version='2.1.24';enabled=$true} })
@@ -60,7 +64,7 @@ function Invoke-EditorLeg([string]$label,[string[]]$commands,[string]$saveName='
     $config = Join-Path $leg 'config.ini'
     [IO.File]::WriteAllLines($config, @('[path]',"read-data=$engineData","write-data=$write",'','[other]','enable-new-mods=false'))
     $arguments = @('--config',$config,'--mod-directory',$library,'--no-log-rotation') + $commands
-    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+    Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments -WriteStoragePolicy $context.policy
     $completion = $null
     if ($saveName) {
         $save = Join-Path $write "saves/$saveName.zip"
@@ -75,7 +79,7 @@ function Invoke-EditorLeg([string]$label,[string[]]$commands,[string]$saveName='
 
 $report = [ordered]@{kind='MIR523ExactEditorColdReplayV1';status='started';archive_sha256=$candidateSha;
     engine_sha256=$engineHash;archive_hashes=$hashes;archive_cleanup=$false;controls_restored=$false;
-    owner=(& id -un);cold_loads=0}
+    owner=(& id -un);storage_plan_sha256=$StoragePlanSha256;cold_loads=0}
 $created = [Collections.Generic.List[object]]::new()
 $lock = $null
 $activation = $null
