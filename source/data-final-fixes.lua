@@ -304,6 +304,7 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   worker_default_is_head = not unavailable and default_emitted
   local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
   technologies[#technologies + 1] = row
+  technologies[#technologies + 1] = recovery.provider_credit(authored, gear.unit.ingredients[1][1])
   if not unavailable then
     science_family_bindings = science_family_bindings or {}
     science_family_bindings[recovery.id] = require("compatibility.science_bindings").conditions_for("worker-robots-storage")

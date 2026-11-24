@@ -763,7 +763,7 @@ local function equal_plain(left, right)
 end
 
 local function checked_default_force(record, retired, legacy)
-  fields(record, {phase=true, retired_flags=true, completion_tick=true})
+  fields(record, {phase=true, retired_flags=true, completion_tick=true, former_owner_flags=true})
   local valid_phase = retired and record.phase == "retired"
     or not retired and (record.phase == "owned" or legacy and (record.phase == "legacy"
       or record.phase == "legacy-completion-pending"))
@@ -772,6 +772,13 @@ local function checked_default_force(record, retired, legacy)
     if not legacy or not completion_tick(record.completion_tick) then recover_error("invalid pending legacy completion") end
   elseif record.completion_tick ~= nil then
     recover_error("settled default owner has an unexpected completion tick")
+  end
+  if record.former_owner_flags ~= nil then
+    fields(record.former_owner_flags, {enabled=true, visible=true})
+    if not retired or type(record.former_owner_flags.enabled) ~= "boolean"
+        or type(record.former_owner_flags.visible) ~= "boolean" then
+      recover_error("invalid former default owner flags")
+    end
   end
   fields(record.retired_flags, {enabled=true, visible=true, disabled_by_mir=true, visibility_hidden_by_mir=true})
   local flags = record.retired_flags
@@ -1393,7 +1400,7 @@ local function default_contract_failure(predicate, source, owner, current, owner
   recover_error("canonical4/full default4 contract or custody differs [" .. table.concat(details, " ") .. "]")
 end
 
-local function default_contract(prepared)
+local function default_contract(prepared, departing_provider)
   local id = recovery.ordinary_default_id
   if id ~= "mir-worker-storage-default-4" or id == recovery.canonical or id == recovery.id then
     recover_error("ordinary default identity is unavailable")
@@ -1427,7 +1434,8 @@ local function default_contract(prepared)
     if prepared.contract ~= contract then recover_error("prepared/default owner work contracts differ") end
     -- Authenticate every force and the complete native holder before allowing
     -- any invested private row past the ordinary pristine-private guard.
-    for _, item in ipairs(prepared_current(prepared, {kind="default"})) do
+    local frames = departing_provider and prepared_frames(prepared) or prepared_current(prepared, {kind="default"})
+    for _, item in ipairs(frames) do
       if item.frame.allowance > item.record.limit - item.frame.next_level + 1 then
         recover_error("prepared work exceeds its authenticated quota")
       end
@@ -1719,14 +1727,172 @@ local function apply_published517_se_paid_bridge(plan)
   return true
 end
 
+-- The checkpoint owns only work observed while its provider was active. A
+-- configuration event must corroborate the exact removal, and surviving
+-- native work is compared before any ownership setter runs.
+local function provider_removal_checkpoint(event, state, owned)
+  local saved = storage[REMOVAL_KEY]
+  if type(saved) ~= "table" or saved.schema ~= 1 or saved.detached ~= nil
+      or not owned or owned.kind ~= "provider-retired" or not state or state.kind ~= "prepared"
+      or state.phase ~= "provider" or not same_fact(owned.current, state.current)
+      or not equal_plain(owned.current.route, saved.route) or saved.contract ~= owned.contract
+      or saved.contract ~= state.contract then
+    recover_error("finite provider removal requires its prepared research record")
+  end
+  local active = script.active_mods
+  local changes = type(event) == "table" and event.mod_changes
+  -- Saving after a tick command can serialize the next tick even though the
+  -- entity update is paused. Larger gaps cannot prove a frozen preparation.
+  if type(changes) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
+      or not tick(saved.tick) or not tick(game.tick) or game.tick < saved.tick or game.tick - saved.tick > 1
+      or type(saved.was_paused) ~= "boolean" or saved.base ~= active.base
+      or saved.mir ~= active[MIR] or active[MIR] ~= target.distribution_version
+      or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
+    recover_error("finite provider removal changed the prepared tick, worker settings, engine or package")
+  end
+  local required = {}
+  for _, stage in ipairs(owned.current.route.finite) do required[stage.provider] = true end
+  if not owned.current.route.owned then required[owned.current.route.provider] = true end
+  if type(saved.providers) ~= "table" then recover_error("prepared provider versions are unavailable") end
+  for name, version in pairs(saved.providers) do
+    local removed = changes[name]
+    if not required[name] or type(version) ~= "string" or version == "" or active[name] ~= nil
+        or type(removed) ~= "table" or removed.old_version ~= version or removed.new_version ~= nil then
+      recover_error("provider removal does not match its recorded version: " .. name)
+    end
+    required[name] = nil
+  end
+  if next(required) then recover_error("prepared provider identities are incomplete") end
+  if type(saved.forces) ~= "table" or type(saved.technologies) ~= "table" then
+    recover_error("prepared provider forces or contracts are unavailable")
+  end
+  local stages = {[saved.route.technology]={first=saved.route.level, last=4294967295}}
+  for _, stage in ipairs(saved.route.finite) do
+    stages[stage.name] = {first=tonumber(stage.name:match("%-(%d+)$")), last=stage.max_level}
+  end
+  for name, terms in pairs(saved.technologies) do
+    local stage = stages[name]
+    if not stage or type(terms) ~= "table" or terms.first_level ~= stage.first
+        or terms.max_level ~= stage.last or type(terms.effects) ~= "table" then
+      recover_error("prepared provider research contract differs: " .. name)
+    end
+    stages[name] = nil
+  end
+  if next(stages) then recover_error("prepared provider research contracts are incomplete") end
+  return saved
+end
+
+local function provider_credit_frame(force)
+  local id = recovery.provider_credit_id
+  local prototype = native_prototype(id)
+  local effect = prototype and prototype.effects and prototype.effects[1]
+  if not effect or #prototype.effects ~= 1 or effect.type ~= "worker-robot-storage"
+      or effect.modifier ~= 1 or creator(id) ~= MIR or prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or prototype.hidden ~= true or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
+      or prototype.ignore_tech_cost_multiplier ~= true or prototype.research_unit_count ~= 1
+      or next(prototype.prerequisites or {}) ~= nil then
+    recover_error("provider credit prototype changed")
+  end
+  local frame = snapshot(force, id)
+  if frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0
+      or frame.enabled and frame.next_level == 4 or frame.visible then
+    recover_error("provider credit holder gained unrelated work")
+  end
+  return frame
+end
+
+local function provider_removal_force(saved, force, prior, source, public, destination, gate, source_prototype)
+  local old = saved.forces[force.index]
+  if type(old) ~= "table" or old.name ~= force.name
+      or not equal_plain(old.preserved_holder, technology_values(source)) or old.gate_paid ~= gate_paid(gate)
+      or not pristine_default_frame(destination, recovery.ordinary_default_id) or destination.visible then
+    recover_error("surviving MIR holder, force or debit changed after provider removal")
+  end
+  local canonical = recovery.canonical
+  local old_head = old.technologies[canonical]
+  if public.next_level ~= old_head.next_level or public.researched
+      or public.saved_progress ~= old_head.saved_progress
+      or old_head.next_level == 4 and public.count ~= old_head.count
+      or old.gate_paid and not old_head.researched then
+    recover_error("finite provider first-level state changed during removal")
+  end
+  if old_head.researched and not equal_plain(saved.technologies[canonical].effects, source_prototype.effects) then
+    recover_error("finite provider first-level effect changed during removal")
+  end
+
+  local survived, result_queue, results_saved = {}, {}, {}
+  for _, name in ipairs(old.queue) do
+    if name == canonical or saved.technologies[name] == nil then
+      survived[#survived+1] = name
+      if name ~= canonical then
+        result_queue[#result_queue+1] = name
+        results_saved[name] = old.queued_saved[name]
+      end
+    end
+  end
+  if not equal_plain(survived, source.queue) then recover_error("provider removal changed the surviving queue") end
+  local observed_progress = source.current == old.current and old.current_progress
+    or (source.current and old.queued_saved[source.current] or 0)
+  if source.current_progress ~= observed_progress then
+    recover_error("provider removal changed surviving current research progress")
+  end
+  for _, name in ipairs(survived) do
+    local actual = source.queued_saved[name]
+    if actual ~= old.queued_saved[name] and (name ~= source.current or actual ~= 0) then
+      recover_error("provider removal changed surviving queued progress: " .. name)
+    end
+  end
+
+  -- Count each completed level from its own technology and effect vector.
+  -- The aggregate force bonus is only a postcondition on those native writes.
+  local credits, lost_units, added_units = {}, 0, 0
+  for name, terms in pairs(saved.technologies) do
+    local old_tech = old.technologies[name]
+    local completed = old_tech.next_level - terms.first_level
+    if not tick(completed) or completed > terms.max_level - terms.first_level + 1 then
+      recover_error("prepared provider completed level is invalid: " .. name)
+    end
+    if name == canonical and old.gate_paid then completed = completed - 1 end
+    if completed > 0 then
+      local effect = terms.effects[1]
+      if #terms.effects ~= 1 or type(effect) ~= "table"
+          or effect.type ~= "worker-robot-storage" or not tick(effect.modifier) then
+        recover_error("completed provider effects have no matching native holder: " .. name)
+      end
+      local units = completed * effect.modifier
+      credits[name] = {levels=completed, units=units}
+      added_units = added_units + units
+      if name ~= canonical then lost_units = lost_units + units end
+    end
+  end
+  local existing = provider_credit_frame(force)
+  local initial = native_bonus(force)
+  if existing.next_level ~= 4 or initial + lost_units ~= old.bonus or not integer(existing.next_level + added_units) then
+    recover_error("provider removal changed native cargo outside the recorded levels")
+  end
+  local current = result_queue[1]
+  local queued = {queue=result_queue, queued_saved=results_saved, current=current,
+    current_progress=current == source.current and source.current_progress or (current and results_saved[current] or 0)}
+  local flags = prior.former_owner_flags
+  local enabled = flags and flags.enabled or false
+  if flags == nil or source.allowance > 0 then enabled = source.enabled end
+  if source.occurrences > 0 and not enabled then recover_error("prepared MIR work retains a disabled owner") end
+  if source.occurrences > 0 or public.occurrences > 0 then
+    requeueable(force, {queue=result_queue, occurrences=source.occurrences, enabled=source.enabled}, true, true)
+  end
+  return {credits=credits, level=existing.next_level+added_units, credit_frame=existing,
+    queue=queued, initial_bonus=initial, restored_bonus=old.bonus, enabled=enabled, visible=source.visible}
+end
+
 function M.plan_default_owner_transfer(event, route, initializing, context)
   context = context or {}
   if type(initializing) ~= "boolean" or route ~= nil then recover_error("default-only transfer context required") end
   local id, state, owned = recovery.ordinary_default_id, checked_state(), owner_record()
-  local prepared = not owned and state and state.schema == 2 and state.kind == "prepared"
+  local removal = context.provider_removal and provider_removal_checkpoint(event, state, owned) or nil
+  local prepared = removal ~= nil or not owned and state and state.schema == 2 and state.kind == "prepared"
     and state.phase == "default" and state.current.kind == "default" or false
   if prepared and initializing then recover_error("initial default owner cannot consume prepared history") end
-  local source_prototype, prototype, contract, current = default_contract(prepared and state or nil)
+  local source_prototype, prototype, contract, current = default_contract(prepared and state or nil, removal)
   if owned and owned.schema == 3 and owned.contract ~= contract and context.configuration then
     local bridge = plan_published517_se_paid_bridge(event, state, owned, source_prototype, contract, context)
     if bridge then return bridge end
@@ -1772,6 +1938,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   local record = owned and clone(owned) or {schema=3, kind="full-default", owner=id, source=recovery.canonical,
     gate=recovery.head_id, contract=contract, producer=producer, forces={}}
   record.contract, record.settings = contract, current_settings
+  if removal then record.kind, record.current = "full-default", nil end
   local legacy_active, legacy_contract = owned and owned.schema == 4, nil
   local legacy_retuned = legacy_active and owned.contract ~= contract
   if legacy_active then
@@ -1851,7 +2018,14 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
           action = "legacy-validate"
         end
       end
-      if action == "legacy-validate" then
+      local departure
+      if removal then
+        if not prior then recover_error("retired default force has no preparation authority") end
+        departure = provider_removal_force(removal, force, prior, source, public, destination, gate, source_prototype)
+        action, moved = "transfer", true
+        next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
+          disabled_by_mir=public.enabled, visibility_hidden_by_mir=false}}
+      elseif action == "legacy-validate" then
         -- The historical holder, rather than the current full pair, carries
         -- this force's authenticated paid work until its ordinary completion.
       elseif not prior or refresh then
@@ -1896,19 +2070,23 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       end
       if action == "validate" and (gate.enabled or settle_source) then action = "settle-flags" end
       record.forces[force.index] = next_force
-      local initial_bonus = native_bonus(force)
+      local initial_bonus = departure and departure.initial_bonus or native_bonus(force)
+      local target_enabled, target_visible = public.enabled, public.visible
+      if departure then target_enabled, target_visible = departure.enabled, departure.visible end
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled, settle_source=settle_source, initial_bonus=initial_bonus,
-        bonus=initial_bonus - (mirrored_first and source_prototype.effects[1].modifier or 0),
-        phase=next_force and next_force.phase or "owned", legacy=legacy,
-        moved=action == "transfer", action=action,
-        target_enabled=public.enabled, target_visible=public.visible}
+        bonus=departure and departure.restored_bonus or initial_bonus - (mirrored_first and source_prototype.effects[1].modifier or 0),
+        phase=next_force and next_force.phase or "owned", legacy=legacy, departure=departure,
+        moved=action == "transfer", action=action, target_enabled=target_enabled, target_visible=target_visible}
     end
   end
   if local_force and not seen[local_force] then recover_error("default local event force is unavailable") end
   if #items == 0 then recover_error("default transfer requires native force frames") end
   if owned then
     for index in pairs(owned.forces) do if not seen[index] then recover_error("stale default owner force record") end end
+  end
+  if removal then
+    for index in pairs(removal.forces) do if not seen[index] then recover_error("prepared removal has a stale force") end end
   end
   local changed = not owned or not equal_plain(record, owned)
   for _, item in ipairs(items) do
@@ -1917,6 +2095,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   return {kind="default-native-owner-transfer", event=clone(event), context=clone(context), initializing=initializing,
     prior_state=state, prior_owner=owned, contract=contract, cap=selected_cap, enabled=selected_enabled, items=items,
     prepared_default=prepared, prepared_snapshot=prepared and clone(state) or nil,
+    removal=removal, removal_snapshot=removal and clone(removal) or nil,
     already_owned=owned ~= nil and not moved, changed=changed, record=record}
 end
 
@@ -1934,7 +2113,8 @@ function M.apply_default_owner_transfer(plan)
   end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
-      or plan.prepared_default ~= fresh.prepared_default
+      or plan.prepared_default ~= fresh.prepared_default or plan.removal ~= fresh.removal
+      or not equal_plain(plan.removal_snapshot, fresh.removal_snapshot)
       or not equal_plain(plan.prepared_snapshot, fresh.prepared_snapshot)
       or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled or #plan.items ~= #fresh.items
       or not equal_plain(plan.record, fresh.record) then recover_error("stale default transfer plan") end
@@ -1952,6 +2132,15 @@ function M.apply_default_owner_transfer(plan)
         or old.phase ~= item.phase or not equal_plain(old.legacy and frame_values(old.legacy), item.legacy and frame_values(item.legacy)) then
       recover_error("native work changed after default preflight")
     end
+    if item.departure then
+      local prior = old.departure
+      if not prior or prior.level ~= item.departure.level or prior.enabled ~= item.departure.enabled
+          or prior.visible ~= item.departure.visible or not equal_plain(prior.queue, item.departure.queue)
+          or not equal_plain(prior.credits, item.departure.credits)
+          or not equal_plain(frame_values(prior.credit_frame), frame_values(item.departure.credit_frame)) then
+        recover_error("provider departure plan changed after preflight")
+      end
+    end
   end
   local id = recovery.ordinary_default_id
   local applied = false
@@ -1961,6 +2150,11 @@ function M.apply_default_owner_transfer(plan)
         require_current_transfer(fresh, item, fresh.context.finished_force == item.force.index,
           fresh.prior_owner ~= nil and fresh.context.configuration == true,
           item.source, item.destination, item.public ~= item.source and item.public, item.legacy)
+      end
+      local departure = item.departure
+      if departure and (storage[REMOVAL_KEY] ~= fresh.removal or not equal_plain(fresh.removal, fresh.removal_snapshot)
+          or not equal_plain(frame_values(provider_credit_frame(item.force)), frame_values(departure.credit_frame))) then
+        recover_error("provider credit changed before native transfer")
       end
       local previous = default_mutating_force
       default_mutating_force = item.force.index
@@ -1979,9 +2173,14 @@ function M.apply_default_owner_transfer(plan)
             frame.technology.saved_progress = 0
           end
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
-          if frame.occurrences > 0 then
+          if frame.occurrences > 0 or departure and item.public.occurrences > 0 then
             local source_id = fresh.prepared_default and recovery.id or recovery.canonical
-            assign_queue(item.force, frame, nil, source_id, id)
+            assign_queue(item.force, departure and departure.queue or frame, nil, source_id, id)
+          end
+          if departure then
+            local credit = departure.credit_frame.technology
+            if credit.level ~= departure.level then credit.level = departure.level end
+            credit.enabled, credit.visible_when_disabled = false, false
           end
           canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
           if fresh.prepared_default then frame.technology.saved_progress = 0 end
@@ -2015,11 +2214,20 @@ function M.apply_default_owner_transfer(plan)
       local actual_owner, gate = default_frame(item.force, id, finished), gate_frame(item.force)
       if (item.action ~= "legacy-validate" and not full_pair(actual_source, actual_owner, gate))
           or native_bonus(item.force) ~= item.bonus
-          or actual_source.visible ~= item.public.visible then
+          or actual_source.visible ~= item.target_visible then
         recover_error("native full default contribution/first-level state was not preserved; reload the original copy")
       end
       if item.action == "transfer" then
         local expected = frame_values(item.source)
+        if item.departure then
+          local queue = item.departure.queue
+          expected.current, expected.current_progress = queue.current, queue.current_progress
+          expected.queue, expected.queued_saved = clone(queue.queue), clone(queue.queued_saved)
+          local credit = provider_credit_frame(item.force)
+          if credit.next_level ~= item.departure.level or credit.enabled then
+            recover_error("provider removal did not retain the native credit carrier")
+          end
+        end
         local source_id = fresh.prepared_default and recovery.id or recovery.canonical
         expected.researched = false
         expected.enabled, expected.visible = item.target_enabled, item.target_visible
@@ -2029,7 +2237,7 @@ function M.apply_default_owner_transfer(plan)
           expected.queued_saved[id], expected.queued_saved[source_id] = expected.queued_saved[source_id], nil
         end
         if item.source.researched then expected.count = actual_owner.count end
-        if not equal_plain(expected, frame_values(actual_owner)) or actual_source.visible ~= item.public.visible then
+        if not equal_plain(expected, frame_values(actual_owner)) or actual_source.visible ~= item.target_visible then
           recover_error("native full default transfer did not preserve the exact frame; reload the original copy")
         end
       elseif item.action == "legacy-validate" then
@@ -2052,6 +2260,17 @@ function M.apply_default_owner_transfer(plan)
   if fresh.prepared_default then empty_private() end
   if storage[OWNER_KEY] ~= fresh.prior_owner or storage[KEY] ~= fresh.prior_state then
     recover_error("default ownership changed during native mutation; reload the original copy")
+  end
+  if fresh.removal then
+    if storage[REMOVAL_KEY] ~= fresh.removal or not equal_plain(fresh.removal, fresh.removal_snapshot) then
+      recover_error("provider research record changed during native transfer")
+    end
+    local archived = clone(fresh.removal)
+    local credits = {}
+    for _, item in ipairs(fresh.items) do credits[item.force.index] = item.departure.credits end
+    archived.detached = credits
+    storage[REMOVAL_KEY] = archived
+    game.tick_paused = archived.was_paused
   end
   storage[OWNER_KEY] = fresh.record
   if fresh.prepared_default then storage[KEY] = nil; reconnect(nil) end
@@ -2199,7 +2418,9 @@ local function plan_provider_handover(event, route)
     local release = flags.disabled_by_mir and not public.enabled and public_prototype.enabled == true
     prepared.forces[force.index] = {next_level=frame.next_level, limit=limit,
       pending=allowance>0, enabled=allowance>0 and frame.enabled or false, visible=frame.visible}
-    record.forces[force.index].phase = "retired"
+    local authority = record.forces[force.index]
+    authority.phase = "retired"
+    authority.former_owner_flags = {enabled=frame.enabled, visible=frame.visible}
     items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate_paid(gate), gate_enabled=gate.enabled,
       release_public=release, bonus=native_bonus(force), phase="retired", moved=true}
   end
@@ -2433,11 +2654,15 @@ end
 function M.default_owner_preflight(event, route, split_current)
   local owned = owner_record()
   if owned and owned.kind == "provider-retired" then
+    if route == nil and split_current == true and storage[REMOVAL_KEY] ~= nil then
+      return M.plan_default_owner_transfer(event, nil, false, {configuration=true, provider_removal=true})
+    end
     local plan = retired_provider_current(event, route)
     if plan then provider_plans[plan] = {event=clone(plan.event)} end
     return plan
   end
   if owned and route ~= nil then
+    if storage[REMOVAL_KEY] ~= nil then recover_error("return of archived provider work is not qualified") end
     if split_current ~= true then recover_error("provider handover has no admitted owner data") end
     local plan = plan_provider_handover(event, route)
     provider_plans[plan] = {event=clone(plan.event)}
@@ -2957,6 +3182,7 @@ local function cancel_provider_removal(before_apply)
   if checkpoint == nil then return false, "There is no provider removal preparation to cancel." end
   if type(checkpoint) ~= "table" or checkpoint.schema ~= 1 or not tick(checkpoint.tick)
       or type(checkpoint.was_paused) ~= "boolean" then recover_error("invalid provider removal preparation") end
+  if checkpoint.detached ~= nil then recover_error("the checkpoint retains archived research after provider removal") end
   before_apply()
   storage[REMOVAL_KEY] = nil
   if game.tick == checkpoint.tick and game.tick_paused and game.ticks_to_run == 0 and not checkpoint.was_paused then
