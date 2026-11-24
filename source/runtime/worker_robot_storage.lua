@@ -3262,7 +3262,7 @@ function M.on_research_event(event, finished)
   if not pending then return false end
   local force = event and (event.force or event.research and event.research.force)
   if not force then return false end
-  if owned_queue_force ~= nil and owned_queue_force == force.index then return false end
+  if owned_queue_force ~= nil and owned_queue_force == force.index or M.default_owner_mutating(event) then return false end
   local state = checked_state()
   if not state or state.kind ~= "prepared" then return false end
   local record = state.forces[force.index]

@@ -3360,7 +3360,13 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
         lua.execute(r'''
           local plan=history.default_owner_preflight(removal_event,nil,true)
           assert(plan.prepared_default and plan.removal==saved_removal and writes==0 and game.tick_paused)
-          assert(history.default_owner_apply(plan))
+          local observed=0
+          after_first_level_write(player.technologies[ID], function()
+            assert(history.default_owner_mutating{force=player})
+            assert(not history.on_research_event({research=player.technologies[ID],by_script=true},true))
+            observed=observed+1
+          end)
+          assert(history.default_owner_apply(plan) and observed==1 and not history.default_owner_mutating{force=player})
           local archived=storage[removal_key]
           assert(archived.detached[detached.index][tier5].levels==1
              and archived.detached[detached.index][tier5].units==2)
