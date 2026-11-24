@@ -715,6 +715,7 @@ local DEFAULT_ORIGINS = {
     ["5.0.21004"]=true, ["5.0.21005"]=true, ["5.0.21006"]=true, ["5.0.21007"]=true,
     ["5.0.21008"]=true, ["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
+local PUBLISHED473_DEFAULT_ORIGINS = {f200="4.7.20003", f210="4.7.21003"}
 local DIRECT_DEFAULT_HOP_ORIGINS = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true}
 -- These exact published11 producers support schema-2/default preparation
 -- and the separately checked, uninvested Base+MIR admission below.
@@ -835,9 +836,8 @@ local function owner_record()
   if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
       or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
       or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
-      or older_idle and value.producer.old_version ~= "4.7.20003"
-      or published_default and (value.producer.old_version ~= "4.7.20003" and value.producer.old_version ~= "4.7.21003"
-        or value.producer.old_version == "4.7.21003" and edition ~= "f210")
+      or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
+        and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
@@ -1143,11 +1143,11 @@ local function default_origin(event, initializing, state, current)
     local empty = published11_empty_origin(event, change, active)
     if empty then return empty end
   end
-  -- The Factorio flag does not identify the edited settings. Admit this
-  -- published F200 route only when the later all-force plan proves that no
-  -- worker research or earned worker level depends on the old contract.
-  if state == nil and target.id == "f200" and active.base == "2.0.77" and not base_hop
-      and change and change.old_version == "4.7.20003" and event.mod_startup_settings_changed == true then
+  -- The settings flag covers every mod. The all-force plan requires
+  -- the predecessor's worker levels, queued work and paid progress to be empty.
+  if state == nil and change and event.mod_startup_settings_changed == true
+      and (target.id == "f200" and active.base == "2.0.77" or target.id == "f210")
+      and change.old_version == PUBLISHED473_DEFAULT_ORIGINS[target.id] then
     return older_default_origin(event, change, active, false, state, current, true)
   end
   if state == nil and change and change.old_version == "5.0.20003" then
@@ -1161,8 +1161,8 @@ local function default_origin(event, initializing, state, current)
   if state == nil and change and change.old_version == "4.7.20002" then
     return published472_se_origin(event, change, active, state, current)
   end
-  if state == nil and change and (change.old_version == "4.7.20003" or change.old_version == "4.7.21003"
-      or change.old_version == "5.0.20001" and new_selection) then
+  if state == nil and change and (change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f200
+      or change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f210 or change.old_version == "5.0.20001" and new_selection) then
     return older_default_origin(event, change, active, base_hop, state, current)
   end
   local engine_patch_valid = same_family_engine_patch(event)

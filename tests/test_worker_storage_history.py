@@ -3500,30 +3500,68 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
         ''')
 
-    def test_f200_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
-        lua=self.older_world()
-        lua.execute(r'''
-          player.research_queue={OTHER};player.research_progress=.42
-          suspended.technologies[OTHER].saved_progress=.27
-          uninvested.technologies[CANONICAL].enabled=false
-          local event=older_event("4.7.20003",false);event.mod_startup_settings_changed=true
-          script.active_mods["unrelated-updated-mod"]="0.8.0"
-          script.active_mods["unrelated-unchanged-mod"]="1.0.0"
-          event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
-          local before=all_frames();writes=0;queue_writes={};progress_writes={}
-          local plan=history.default_owner_preflight(event,nil,true)
-          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
-          assert(plan.record.producer.kind=="published473-idle-default")
-          assert(history.default_owner_apply(plan))
-          history.default_owner_on_load()
-          for _,force in pairs(game.forces)do
-            local old,now=before[force.index],frame(force)
-            assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
-            assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
-            assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
-            assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
-          end
-        ''')
+    def test_473_startup_change_adopts_empty_workers_and_preserves_unrelated_work(self):
+        for target, legacy_version, base, space_age in (
+            ("f200", "4.7.20003", "2.0.77", False),
+            ("f200", "4.7.20003", "2.0.77", True),
+            ("f210", "4.7.21003", "2.1.24", False),
+            ("f210", "4.7.21003", "2.1.24", True),
+        ):
+            with self.subTest(target=target, space_age=space_age):
+                lua = self.older_world(target)
+                lua.globals().legacy_version = legacy_version
+                lua.globals().test_base = base
+                lua.execute("script.active_mods.base=test_base")
+                if space_age:
+                    self.enable_space_age(lua, base, recycler=target == "f210")
+                lua.execute(r'''
+                  player.research_queue={OTHER};player.research_progress=.42
+                  suspended.technologies[OTHER].saved_progress=.27
+                  uninvested.technologies[CANONICAL].enabled=false
+                  local event=older_event(legacy_version,false);event.mod_startup_settings_changed=true
+                  if not script.active_mods["space-age"] then
+                    script.active_mods["unrelated-updated-mod"]="0.8.0"
+                    script.active_mods["unrelated-unchanged-mod"]="1.0.0"
+                    event.mod_changes["unrelated-updated-mod"]={old_version="0.4.0",new_version="0.8.0"}
+                  end
+                  local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                  local plan=history.default_owner_preflight(event,nil,true)
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                  assert(plan.record.producer.kind=="published473-idle-default")
+                  assert(history.default_owner_apply(plan))
+                  history.default_owner_on_load()
+                  for _,force in pairs(game.forces)do
+                    local old,now=before[force.index],frame(force)
+                    assert(now.owner.level==4 and not now.owner.researched and now.owner.enabled==old.source.enabled)
+                    assert(now.bonus==old.bonus and now.other_saved==old.other_saved)
+                    assert(now.current==old.current and now.progress==old.progress and same(now.queue,old.queue))
+                    assert(queue_writes[force.index]==nil and progress_writes[force.index]==nil)
+                  end
+                ''')
+
+    def test_473_f210_startup_change_refuses_earned_queued_or_paid_cargo(self):
+        for change, expected in (
+            ("detached.technologies[CANONICAL].level=5", "earned worker levels"),
+            ("detached.research_queue={CANONICAL};detached.research_progress=.27",
+             "unfinished native worker work"),
+            ("detached.research_queue={OTHER,CANONICAL}", "unfinished native worker work"),
+            ("detached.technologies[CANONICAL].saved_progress=.27",
+             "unfinished native worker work"),
+            ("detached.technologies[HEAD].level=5;detached.technologies[HEAD].enabled=false",
+             "owner/debit is not pristine"),
+        ):
+            with self.subTest(change=change):
+                lua = self.older_world("f210")
+                self.enable_space_age(lua, "2.1.24")
+                lua.globals().expected_refusal = expected
+                lua.execute(change + r'''
+                  local event=older_event("4.7.21003",false)
+                  event.mod_startup_settings_changed=true
+                  local before=all_frames();writes=0
+                  local ok,reason=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and tostring(reason):find(expected_refusal,1,true),tostring(reason))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
 
     def test_f200_473_startup_change_refuses_worker_investment_or_unavailable_inputs(self):
         opponents=(
@@ -3675,7 +3713,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             'script.active_mods.foreign="1"',
             'script.active_mods.foreign="1";event.mod_changes.foreign={old_version="1",new_version="1"}',
             'event.mod_changes.removed={old_version="1"}',
-            'event.mod_startup_settings_changed=true',
+            'event.mod_startup_settings_changed=true;detached.technologies[CANONICAL].saved_progress=.27',
             'event.mod_changes.base={old_version="2.1.22",new_version="2.1.23"}',
             'script.active_mods["space-age"]="2.1.23";event.mod_changes["space-age"]={new_version="2.1.23"}',
             'event.mod_changes["more-infinite-research"].old_version="4.7.21002"',
@@ -3693,8 +3731,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
 
     def test_first_owner_refusals_report_the_actual_473_event_base_and_current_route(self):
         cases=(
-            ("f210", "4.7.21003", "2.1.24", "2.1.23", "2.1.24", True,
+            ("f210", "4.7.21002", "2.1.24", "2.1.23", "2.1.24", True,
              "unrecorded default source requires unchanged startup settings"),
+            ("f210", "4.7.21003", "2.1.24", "2.1.22", "2.1.24", True,
+             "older default source requires its qualified Base engine and unchanged settings"),
             ("f200", "4.7.20003", "2.0.76", "2.0.77", "2.0.76", False,
              "older default source requires its qualified Base engine and unchanged settings"),
         )
