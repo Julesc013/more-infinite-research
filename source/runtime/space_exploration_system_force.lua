@@ -9,6 +9,7 @@ local target = require("platform.target")
 local MIR = "more-infinite-research"
 local OBSERVED_FORCE = "mir_se_conquest_policy_force"
 local SE = "space-exploration"
+local LEGACY_SOURCES = {["4.7.20002"]=true, ["5.0.20017"]=true, ["5.0.20018"]=true}
 local PROVIDERS = {base=true, [MIR]=true, [SE]=true, Krastorio2=true,
   ["Krastorio2-spaced-out"]=true, ["space-age"]=true}
 local BASIC = {artillery=true, tank=true, radar=true, electronics=true,
@@ -124,7 +125,7 @@ function M.preflight(event)
   if type(changes) ~= "table" then return nil end
   local change = changes[MIR]
   local historical = type(change) == "table" and change.new_version == target.distribution_version
-    and (change.old_version == "4.7.20002" or change.old_version == "5.0.20017")
+    and change.old_version ~= change.new_version and LEGACY_SOURCES[change.old_version] == true
   -- SE authors these fixed NPC values independently of startup settings.
   -- Skip this optional repair when the native frame cannot prove it applies.
   -- An ambiguous NPC configuration must not stop an otherwise valid save.
