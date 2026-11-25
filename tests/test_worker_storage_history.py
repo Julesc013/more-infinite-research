@@ -3513,6 +3513,25 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
                   assert(writes==0 and storage[removal_key]==archived_removal)
                 ''')
 
+    def test_provider_return_retains_a_dependent_behind_its_queued_prerequisite(self):
+        self.returned_provider_world().execute(r'''
+          local old = archived_removal.forces[player.index]
+          old.queue[#old.queue+1] = tier6
+          old.queued_saved[tier6] = 0
+          local parent, child = player.technologies[tier5], player.technologies[tier6]
+          assert(parent.prototype.max_level == 5 and not parent.researched)
+          child.prerequisites = {parent}
+          local plan, legacy = delegate(return_event, provider_route(5))
+          assert(writes == 0 and storage[removal_key] == archived_removal)
+          assert(history.default_owner_apply(plan)); history.apply(legacy)
+          assert(storage[removal_key] == nil, "a legal native chain was parked")
+          assert(player.current_research.name == OTHER and player.research_progress == .41)
+          local queue = player.research_queue
+          assert(#queue == 3 and queue[2].name == tier5 and queue[3].name == tier6)
+          assert(parent.saved_progress == .1875 and parent.research_unit_count == 1012)
+          assert(child.enabled and child.research_unit_count == 1518 and not parent.researched)
+        ''')
+
     def test_provider_return_retains_work_waiting_for_a_provider_prerequisite(self):
         lua = self.returned_provider_world()
         lua.execute(r'''
@@ -3520,6 +3539,9 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           local prerequisites=player.technologies[tier5].prerequisites or {}
           prerequisites[prerequisite.name]=prerequisite
           player.technologies[tier5].prerequisites=prerequisites
+          player.technologies[tier6].prerequisites={player.technologies[tier5]}
+          local archived = archived_removal.forces[player.index]
+          archived.queue[#archived.queue+1], archived.queued_saved[tier6] = tier6, 0
           writes=0
           local plan, legacy=delegate(return_event,provider_route(5))
           assert(writes==0 and storage[removal_key]==archived_removal)
@@ -3527,14 +3549,17 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(player.current_research.name==OTHER and player.research_progress==.41 and #player.research_queue==1)
           assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
           assert(storage[removal_key] and not prerequisite.researched)
+          local waiting = storage[removal_key].forces[player.index].technologies
+          assert(waiting[tier5] and waiting[tier6] and not player.technologies[tier6].enabled)
           history.on_load();history.default_owner_on_load();writes=0
           history.command({parameter="resume player"},provider_route(5))
           assert(writes==0 and storage[removal_key] and messages[#messages]:find("provider-unlock",1,true))
           prerequisite.researched=true
           history.command({parameter="resume player"},provider_route(5))
           assert(storage[removal_key]==nil and player.current_research.name==OTHER and player.research_progress==.41)
-          assert(#player.research_queue==2 and player.research_queue[2].name==tier5)
+          assert(#player.research_queue==3 and player.research_queue[2].name==tier5 and player.research_queue[3].name==tier6)
           assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
+          assert(player.technologies[tier6].enabled and player.technologies[tier6].research_unit_count==1518)
         ''')
 
     def test_provider_return_parks_the_active_fraction_when_only_its_prerequisite_is_missing(self):
