@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.24
+Date: 2026-11-25
+
+  Bugfixes:
+
+    - Preserve active and parked worker cargo research when Factorio replaces the research queue during a supported upgrade.
+    - Keep the recorded source engine version for worker cargo upgrades when the installed MIR package raises its minimum Factorio
+      version.
+    - Preserve earned cargo, prices and unfinished research through prepared Planet Ferrum removal and reinstall on Factorio 2.1.25.
+    - Keep paid worker research and its queue position when a reinstalled provider's prerequisite is unavailable. Resume it once the
+      prerequisite returns.
+    - Read integer startup options without rounding and skip Research Library subscription work for unrelated interface actions.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.23
 Date: 2026-11-23
 
