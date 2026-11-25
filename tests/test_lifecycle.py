@@ -1171,6 +1171,49 @@ class LifecycleTests(unittest.TestCase):
             "ordinary unlimited technology allocated prototype-disablement state")
         ''')
 
+    def test_competing_retirement_preserves_paid_work_and_restores_only_its_flags(self):
+        self.lua.execute(r'''
+          local target=require("platform.target")
+          target.id, target.factorio_version = "f200", "2.0"
+          local name = "recipe-prod-research_gears-1"
+          local active, parked, idle, foreign = technology(name, 2, true), technology(name, 2, true),
+            technology(name, 1, true), technology(name, 1, false)
+          local other = technology("unrelated", 1, true)
+          local f = force(51, {[name]=active,[other.name]=other}, {active,other}, active, .27)
+          local p = force(52, {[name]=parked})
+          local a = force(53, {[name]=idle})
+          local b = force(54, {[name]=foreign})
+          local forces = {[51]=f,[52]=p,[53]=a,[54]=b}
+          active.force, parked.force, parked.saved_progress = f, p, .42
+          local selection={base="2.0.77",ExpandedProductivityResearch="1.3.8"}
+          local transport=require("research.native_adoption")
+          local prototype=transport.prototype()
+          local patch=transport.plan({["mod-data"]={[prototype.name]=prototype}},
+            {}, nil, nil, nil, nil, nil, {[name]=true})
+          transport.apply(patch)
+          boot(forces,0,"",nil,nil,nil,selection,nil,nil,nil,{[prototype.name]=prototype})
+          handlers.init()
+          assert(active.enabled and f.current_research==active and f.research_progress==.27 and #f.research_queue==2)
+          assert(parked.enabled and parked.saved_progress==.42 and not idle.enabled and not foreign.enabled)
+          local owned=storage.mir_caps.owned_disabled
+          assert(owned[53][name].disabled and not owned[51] and not owned[52] and not owned[54])
+
+          f._queue, f.current_research, f.research_progress = {other}, other, 0
+          handlers.events[defines.events.on_research_finished]({research=active})
+          assert(not active.enabled and owned[51][name].disabled and f.research_queue[1]==other)
+          handlers.events[defines.events.on_research_cancelled]({force=p,research={[name]=1}})
+          assert(parked.enabled and parked.saved_progress==.42 and not owned[52])
+          parked.saved_progress = 0
+          handlers.events[defines.events.on_research_cancelled]({force=p,research={[name]=1}})
+          assert(not parked.enabled and owned[52][name].disabled)
+
+          local saved=storage
+          boot(forces,0,"",saved,nil,nil,{base="2.0.77"})
+          handlers.configuration()
+          assert(active.enabled and parked.enabled and idle.enabled and not foreign.enabled)
+          assert(storage.mir_caps==nil and f.research_queue[1]==other)
+        ''')
+
     def test_inactive_caps_discard_restoration_rights_at_force_boundaries(self):
         for boundary in ("created", "reset", "merged"):
             with self.subTest(boundary=boundary):

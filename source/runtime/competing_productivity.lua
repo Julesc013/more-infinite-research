@@ -8,6 +8,7 @@
 local caps = require("runtime.caps")
 local binding = require("compatibility.competing_productivity")
 local target = require("platform.target")
+local retired = require("runtime.catalogue").competing_retirements()
 local effective = require("runtime.configuration")
 
 local M = {}
@@ -106,7 +107,8 @@ local function runtime_replacements_admitted(force, item)
   for _, replacement in ipairs(item.replacements) do
     local technology = technologies and technologies[replacement.id]
     local prototype = technology and technology.prototype
-    if not technology or technology.valid == false or not prototype or prototype.enabled ~= true
+    if (retired and retired[replacement.id])
+        or not technology or technology.valid == false or not prototype or prototype.enabled ~= true
         or prototype.level ~= replacement.first_level or prototype.max_level ~= UINT32_MAX
         or not binding.runtime_effects_include(prototype.effects, replacement.effects) then
       return false

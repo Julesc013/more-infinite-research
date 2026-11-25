@@ -357,11 +357,12 @@ if electric_full then
     end
   end
 end
+local competing_retirements
 if require("platform.target").id == "f200" and type(mods) == "table"
     and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
       or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]
       or mods["crafting-efficiency-2"] or mods.ProductivityResearch) then
-  require("compatibility.competing_productivity").retain_foreign_coverage(
+  competing_retirements = require("compatibility.competing_productivity").retain_foreign_coverage(
     technologies, data.raw, mods, require("platform.target"),
     values.options["mir-prefer-this-mod-for-competing-techs"])
 end
@@ -375,7 +376,7 @@ local _, fixed_native_credit_scalars = require("research.native_credit_definitio
   technologies, data.raw, values, require("platform.target"), native_credit_groups)
 native_adoption_patch = modern and require("research.native_adoption").plan(
   data.raw, native_owner_targets, withheld_native_owners, native_credit_groups, fixed_native_credit_scalars,
-  modern_selection.worker_storage, worker_default_available or nil)
+  modern_selection.worker_storage, worker_default_available or nil, competing_retirements)
 if galore_sulfur_retired then
   if not native_adoption_patch then error("MIR Galore missing private admission facts", 0) end
   native_adoption_patch.galore_sulfur_retired = true

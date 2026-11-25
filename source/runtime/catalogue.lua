@@ -28,6 +28,10 @@ if modern_target then
     native_adoptions, withheld_native_owners, native_credit_groups, native_credit_scalars = native_adoption.read(adopted.data,
       native_owner_definitions, admission_facts)
     worker_storage = admission_facts.worker_storage
+    if admission_facts.competing_retirements then
+      require("compatibility.competing_productivity").validate_retirements(admission_facts.competing_retirements,
+        script and script.active_mods, target)
+    end
   end
   local live_technologies
   if prototypes ~= nil and prototypes.technology ~= nil then
@@ -154,6 +158,10 @@ end
 function M.native_credit_scalars()
   if not modern_target then return {} end
   return native_adoption.fixed_credit_scalars(native_credit_scalars)
+end
+
+function M.competing_retirements()
+  return admission_facts.competing_retirements
 end
 
 function M.galore_sulfur_retired()
