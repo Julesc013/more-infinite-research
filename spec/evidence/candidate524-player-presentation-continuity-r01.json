@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "kind": "MIR524PublishedPresentationContinuityV1",
+  "status": "verified-published-package-presentation",
+  "scope": "Tagged player presentation, authored history, and anonymous release custody",
+  "tag": "v5.0.24",
+  "tag_commit": "93b7f4bf17d3b2d32729c0b937eb9f38386d3125",
+  "player_tree": "ade46f9e65e94faeda4f9b4cbf320ab36a859519",
+  "audited_checkout": "d94b91d33899755ae8d65685679a4e3216c3ce75",
+  "release_id": 457617321,
+  "prerelease": true,
+  "anonymous_inventory_sha256": "6aecae6fb737e8f335f9e6d296cb71809787ba88d4837c8af1563b037971018e",
+  "anonymous_readback_sha256": "6ae4b3025dbb937125ceb31b00ab10ae9ec9c1cda5dc4c55c52a0aa599ae7d87",
+  "master_sha256": "0d1372409d354cafae170df998f9446ace210ab65b373fcd4c60d8dae0d11fef",
+  "projection_sha256": "a47455b03adc3e34a2a016a0b9aa9a8a121bac1d60bb62fc8bbd282fc9970830",
+  "release_notes_sha256": "bf4c68c1334f758e6993ea0addf052f04227b1eb4588e7c1c5ef4195053dedad",
+  "upload_text_sha256": "c21688038d8ed5d43d749b79f1e404539facea9ab6563d8c3069ea1d6920a9bf",
+  "license_sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+  "thumbnail_sha256": "65fdec0b0b30967b0edbc3b340d87b01d6a2e6d971a731734673023c02331fab",
+  "published_473_presentation_inventory_sha256": "5a86b2a720ab5a5f431748276567239eadbee4698f90f237fb21c64601c0653e",
+  "member_count": 1592,
+  "locale_members": 1007,
+  "targets": [
+    {
+      "target": "f006",
+      "archive": "more-infinite-research_5.0.00624.zip",
+      "archive_sha256": "2fc63766668611b9bc170eb464cd6884d1990f99c89af1ce90de6e964a4b71f8",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.6",
+      "minimum_base": "0.6.4",
+      "display_label": "MIR 5.0.24 for Factorio 0.6.4 (zip)"
+    },
+    {
+      "target": "f007",
+      "archive": "more-infinite-research_5.0.00724.zip",
+      "archive_sha256": "04f6e7cc0cc70f01f10e5a40c31297acfc26b86362a82381719595e79f39b3e1",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.7",
+      "minimum_base": "0.7.5",
+      "display_label": "MIR 5.0.24 for Factorio 0.7.5 (zip)"
+    },
+    {
+      "target": "f008",
+      "archive": "more-infinite-research_5.0.00824.zip",
+      "archive_sha256": "3527b1f69a9b3cb23272d421c2f0e86c7d610c22e9276ce4f39beea8141e6e95",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.8",
+      "minimum_base": "0.8.8",
+      "display_label": "MIR 5.0.24 for Factorio 0.8.8 (zip)"
+    },
+    {
+      "target": "f009",
+      "archive": "more-infinite-research_5.0.00924.zip",
+      "archive_sha256": "0033667b22efc69ab3099bd0937ec7f6ddf8fdcd7ed9e38fb8ebfe1ed6bedee0",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.9",
+      "minimum_base": "0.9.8",
+      "display_label": "MIR 5.0.24 for Factorio 0.9.8 (zip)"
+    },
+    {
+      "target": "f010",
+      "archive": "more-infinite-research_5.0.01024.zip",
+      "archive_sha256": "6630d88a8fc788d450163d1d8731f7a88e70fb293e2ef64615a70bf673837acc",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.10",
+      "minimum_base": "0.10.12",
+      "display_label": "MIR 5.0.24 for Factorio 0.10.12 (zip)"
+    },
+    {
+      "target": "f011",
+      "archive": "more-infinite-research_5.0.01124.zip",
+      "archive_sha256": "b6eee3c0bf2ea906de7581338ff4411bfbe42517c1391df59f71c5a9b6e67678",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.11",
+      "minimum_base": "0.11.22",
+      "display_label": "MIR 5.0.24 for Factorio 0.11.22 (zip)"
+    },
+    {
+      "target": "f012",
+      "archive": "more-infinite-research_5.0.01224.zip",
+      "archive_sha256": "bc5d1434c6972eaa1e93b5a4e784ac20ba944de92090323edc96c81e6a6644db",
+      "member_count": 10,
+      "locale_members": 1,
+      "factorio_version": "0.12",
+      "minimum_base": "0.12.35",
+      "display_label": "MIR 5.0.24 for Factorio 0.12.35 (zip)"
+    },
+    {
+      "target": "f013",
+      "archive": "more-infinite-research_5.0.01324.zip",
+      "archive_sha256": "1aac885a36e43b28cb1fee86f7d5dc459483ebf9dd5d12c05ab7b7335021b0bf",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.13",
+      "minimum_base": "0.13.20",
+      "display_label": "MIR 5.0.24 for Factorio 0.13.20 (zip)"
+    },
+    {
+      "target": "f014",
+      "archive": "more-infinite-research_5.0.01424.zip",
+      "archive_sha256": "1aa91476dbe18bb9b3eb2ca47131a7f7260afeaeadf21a2824e34c7b022eb2af",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.14",
+      "minimum_base": "0.14.23",
+      "display_label": "MIR 5.0.24 for Factorio 0.14.23 (zip)"
+    },
+    {
+      "target": "f015",
+      "archive": "more-infinite-research_5.0.01524.zip",
+      "archive_sha256": "6e946dc09bd382402018183b84c34b9d430d3dfd92184fe7a92cf5484262364d",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.15",
+      "minimum_base": "0.15.40",
+      "display_label": "MIR 5.0.24 for Factorio 0.15.40 (zip)"
+    },
+    {
+      "target": "f016",
+      "archive": "more-infinite-research_5.0.01624.zip",
+      "archive_sha256": "cbcdef7bf3a9e6514397dbaed86b4d5d29365b1a0201ba7ec16b19f6b472e786",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.16",
+      "minimum_base": "0.16.51",
+      "display_label": "MIR 5.0.24 for Factorio 0.16.51 (zip)"
+    },
+    {
+      "target": "f017",
+      "archive": "more-infinite-research_5.0.01724.zip",
+      "archive_sha256": "7d95698d2708edba7ac3a4750fca9d5706d06266a4ac05ba2a0431e084c01443",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.17",
+      "minimum_base": "0.17.79",
+      "display_label": "MIR 5.0.24 for Factorio 0.17.79 (zip)"
+    },
+    {
+      "target": "f018",
+      "archive": "more-infinite-research_5.0.01824.zip",
+      "archive_sha256": "a3b481b1da43c3d5f219914e44ff6c8de55656b03c964bbaa7a61054460c6007",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "0.18",
+      "minimum_base": "0.18.47",
+      "display_label": "MIR 5.0.24 for Factorio 0.18.47 (zip)"
+    },
+    {
+      "target": "f100",
+      "archive": "more-infinite-research_5.0.10024.zip",
+      "archive_sha256": "d81589d37d486b7ed7f813d8a4bc2c5fed90a0dc50e3b2b2dfe69edb64e6bdae",
+      "member_count": 127,
+      "locale_members": 100,
+      "factorio_version": "1.0",
+      "minimum_base": "1.0.0",
+      "display_label": "MIR 5.0.24 for Factorio 1.0.0 (zip)"
+    },
+    {
+      "target": "f110",
+      "archive": "more-infinite-research_5.0.11024.zip",
+      "archive_sha256": "07e4912aba32b2e7cb1f9f9a1a385785a3bcd8853fa4e7565687e38ec15e4b9e",
+      "member_count": 128,
+      "locale_members": 100,
+      "factorio_version": "1.1",
+      "minimum_base": "1.1.110",
+      "display_label": "MIR 5.0.24 for Factorio 1.1.110 (zip)"
+    },
+    {
+      "target": "f200",
+      "archive": "more-infinite-research_5.0.20024.zip",
+      "archive_sha256": "f482f073d3a5cfafe715353291b1cd909dc64fa24300f6d63641a42f755cf535",
+      "member_count": 252,
+      "locale_members": 100,
+      "factorio_version": "2.0",
+      "minimum_base": "2.0.77",
+      "display_label": "MIR 5.0.24 for Factorio 2.0.77 (zip)"
+    },
+    {
+      "target": "f210",
+      "archive": "more-infinite-research_5.0.21024.zip",
+      "archive_sha256": "162228c9f581a9d48cb9da0e30cebefcc2de4f4c256fef521cf636c52124f0d6",
+      "member_count": 253,
+      "locale_members": 100,
+      "factorio_version": "2.1",
+      "minimum_base": "2.1.23",
+      "display_label": "MIR 5.0.24 for Factorio 2.1.23 (zip)"
+    }
+  ],
+  "stable_acceptance": false,
+  "published_release": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.24",
+  "raw_package_readback_sha256": "efc56fdb8b233ebe5995160260b6829aea70a9d0fe5237b534c6de329fc3fccc",
+  "anonymous_asset_count": 19,
+  "tagged_release_notes_sha256": "e517e5359496ecbc8cb338dcca8fd2319030c2cc1db0b9149e73ae65e7cf0f44",
+  "tagged_support_guide_sha256": "7291df351a92c42e9ae5860ad75b21993691ae2186f3375f591222f8856d78cb",
+  "tagged_readme_sha256": "70d209729dff969e2038b6f7f29d1df18c9db4d5e1c2468fdb1406d4cb302422",
+  "history_inventory_sha256": "f8de82af4bff0db018f588facc13c2bb0e7ad88e26bc5a0db493cbd8856c57e4",
+  "historical_master_entries": 27,
+  "host_controls": {
+    "status": "passed",
+    "controls": {
+      "tests/test_locale_catalogue.py": 10,
+      "tests/test_package.py": 23,
+      "tests/test_early_package.py": 3,
+      "tests/test_changelog.py": 6,
+      "tests/test_historical_sources.py": 5
+    },
+    "test_count": 47,
+    "plan_sha256": "b9f01743db41935adaaf539c5b83632ac4a59e9432e93cd2d55ba1726be2ca02",
+    "log_sha256": "e7b457185f34c6020f9a7c83ea2ea3028f3a26769cdbfb4058800a9667b74a08",
+    "lua_5_2_wheel_sha256": "b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67",
+    "python": "3.14.7"
+  },
+  "scope_limits": [
+    "The package, changelog, locale and delivery verification applies to the exact published beta. The authored README and support guide are pinned to the tagged source.",
+    "Native rendering, performance and final stable release qualification retain their own acceptance gates."
+  ],
+  "receipt_paths": {
+    "anonymous_readback": "build/qualification/mir524-public-anonymous-aero-r01/anonymous-readback.json",
+    "raw_package_readback": "build/qualification/mir524-presentation-aero-r01/published-readback.json",
+    "host_plan": "build/qualification/mir524-presentation-aero-r01/host-plan.json",
+    "host_log": "build/qualification/mir524-presentation-aero-r01/host-controls-pinned.log"
+  }
+}
