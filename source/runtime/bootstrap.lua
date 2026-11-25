@@ -411,9 +411,11 @@ local function on_configuration_changed(event)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
   local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
+  local worker_owns_quota = worker_prepared_default or
+    worker_default_plan and worker_default_plan.kind == "provider-archive-removal"
   -- The default-owner plan authenticates and consumes this complete prepared
   -- witness. Do not issue a second legacy plan that could reinstall its quota.
-  local worker_storage_plan = not worker_prepared_default and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
+  local worker_storage_plan = not worker_owns_quota and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
     worker_provider_handover and worker_default_plan or nil)
   local worker_default_caps = lifecycle.preflight_worker_storage_split_caps(worker_default_plan)
   if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
@@ -446,7 +448,7 @@ local function on_configuration_changed(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
   if worker_robot_storage then
-    if worker_prepared_default then
+    if worker_owns_quota then
       worker_robot_storage.default_owner_apply(worker_default_plan)
     elseif worker_provider_handover then
       -- Native setters can raise scripted callbacks. Keep the old route until
