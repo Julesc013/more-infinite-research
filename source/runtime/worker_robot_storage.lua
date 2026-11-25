@@ -3086,7 +3086,7 @@ end
 
 local function archived_profile(saved, owned)
   fields(saved, {schema=true, provider=true, version=true, phase=true, contract=true, settings=true, forces=true})
-  if saved.schema ~= 1 and saved.schema ~= 2 or saved.phase ~= "prepared" and saved.phase ~= "suspended"
+  if saved.schema ~= 1 and saved.schema ~= 2 or saved.phase ~= "prepared" and saved.phase ~= "suspended" and saved.phase ~= "returned"
       or type(saved.contract) ~= "table" or type(saved.forces) ~= "table" then
     recover_error("invalid staged provider archive")
   end
@@ -3097,7 +3097,7 @@ local function archived_profile(saved, owned)
           and owned.current.route.finite[1].provider == profile.provider then return profile end
     end
   end
-  recover_error("staged provider removal has a different native route")
+  recover_error("staged provider archive has a different native route")
 end
 
 local function check_suspended_prototypes(profile, stage)
@@ -3157,6 +3157,7 @@ plan_provider_archive_removal = function(event, owned)
   local saved, quota = storage[ARCHIVE_KEY], checked_state()
   local profile = archived_profile(saved, owned)
   local first = saved.phase == "prepared"
+  if saved.phase == "returned" then recover_error("finish restoring the parked provider queue before another removal") end
   local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[profile.provider]
   if script.active_mods[profile.provider] ~= nil or not same_family_engine_patch(event)
       or first and (type(change) ~= "table" or change.old_version ~= profile.version
@@ -3273,28 +3274,31 @@ local function provider_resume_queue(prior, base, work, replacements, by_source)
   if restored == 0 then return end
   if #base.frame.queue + restored > 1000 then recover_error("restored provider queue is too large") end
   requeueable(base.force, base.frame, false, true)
-  local queue = provider_archive.resume_queue(original, base.frame.queue, replacements, base.frame.current_progress > 0)
-  local ready = {}
-  for _, name in ipairs(queue) do
+  local wanted = provider_archive.resume_queue(original, base.frame.queue, replacements, base.frame.current_progress > 0)
+  local ready, queue, waiting = {}, {}, {}
+  for _, name in ipairs(wanted) do
     local item = by_source[name]
     if item then
       if not item.previous.enabled then recover_error("archived provider research was disabled: " .. name) end
       for _, prerequisite in pairs(item.destination.technology.prerequisites or {}) do
         local earlier = by_source[prerequisite.name]
         if prerequisite.researched ~= true and not (earlier and earlier.holder.researched) and not ready[prerequisite.name] then
-          recover_error("archived provider prerequisite is unavailable: " .. name)
+          item.waiting = true
+          waiting[name] = item.previous
         end
       end
-      if item.stage.count then ready[name] = true end
+      if item.stage.count and not item.waiting then ready[name] = true end
     end
+    if not item or not item.waiting then queue[#queue + 1] = name end
   end
   local head_progress
-  if queue[1] ~= base.frame.current then
+  if queue[1] and queue[1] ~= base.frame.current then
     local head = by_source[queue[1]]
     if not head then recover_error("archived provider queue changed unrelated current research") end
     head_progress = head.previous.paid
   end
-  return queue, head_progress
+  local pending = next(waiting) and {queue=wanted, work=waiting}
+  return queue, head_progress, pending
 end
 
 plan_provider_archive_resume = function(event, route, owned)
@@ -3343,7 +3347,7 @@ plan_provider_archive_resume = function(event, route, owned)
       item.work[#item.work + 1], by_source[stage.source] = work, work
       item.bonus = item.bonus + modifiers[stage.source] * previous.earned
     end
-    item.queue, item.head_progress = provider_resume_queue(prior, base, item.work, replacements, by_source)
+    item.queue, item.head_progress, item.pending = provider_resume_queue(prior, base, item.work, replacements, by_source)
     seen[force.index] = true
     items[#items + 1] = item
   end
@@ -3369,7 +3373,7 @@ local function resume_provider_force(item)
         destination.level, holder.level = row.holder.next_level, stage.first
       end
       destination.saved_progress, holder.saved_progress = previous.paid, 0
-      destination.enabled, destination.visible_when_disabled = previous.enabled, previous.visible
+      destination.enabled, destination.visible_when_disabled = not row.waiting and previous.enabled, previous.visible
       holder.enabled, holder.visible_when_disabled = false, false
       set_archive_debit(debit, 0)
     end
@@ -3382,8 +3386,8 @@ local function resume_provider_force(item)
       local paid = actual.current == row.stage.source and actual.current_progress or actual.saved_progress
       local next_level = row.stage.retained and row.destination.next_level or row.holder.next_level
       if actual.next_level ~= next_level or actual.count ~= row.previous.price
-          or paid ~= row.previous.paid or actual.occurrences ~= row.previous.queued
-          or actual.enabled ~= row.previous.enabled or actual.visible ~= row.previous.visible
+          or paid ~= row.previous.paid or actual.occurrences ~= (row.waiting and 0 or row.previous.queued)
+          or actual.enabled ~= (not row.waiting and row.previous.enabled) or actual.visible ~= row.previous.visible
           or holder.level ~= row.stage.first or holder.researched or holder.enabled or holder.saved_progress ~= 0
           or debit and (debit.level ~= 1 or debit.enabled or debit.visible_when_disabled) then
         recover_error("resumption changed retained provider work: " .. row.stage.source)
@@ -3401,11 +3405,76 @@ apply_provider_archive_resume = function(plan)
     recover_error("staged provider authority changed before resumption")
   end
   local quota = clone(current.quota)
-  for _, item in ipairs(current.items) do resume_provider_force(item) end
+  local waiting = {}
+  for _, item in ipairs(current.items) do
+    resume_provider_force(item)
+    if item.pending then waiting[item.force.index] = item.pending end
+  end
+  local archive
+  if next(waiting) then
+    archive = clone(current.saved)
+    archive.phase, archive.forces = "returned", waiting
+    log("[MIR worker recovery] Paid provider research is parked until its prerequisites are available. Then run /mir-worker-storage-recovery resume for the affected force.")
+  end
   quota.phase, quota.current = "provider", clone(current.owned.current)
-  storage[KEY], storage[ARCHIVE_KEY] = quota, nil
+  storage[KEY], storage[ARCHIVE_KEY] = quota, archive
   reconnect(quota)
   return true
+end
+
+local function resume_provider_queue(force, route, before_apply)
+  local saved, owned = storage[ARCHIVE_KEY], owner_record()
+  local profile = archived_profile(saved, owned)
+  local current, contract = finite_provider_contract(route)
+  local quota, pending = checked_state(), saved.forces[force.index]
+  if not quota or quota.phase ~= "provider" or not same_fact(current, owned.current) or contract ~= quota.contract
+      or script.active_mods[profile.provider] ~= profile.version
+      or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
+    recover_error("provider queue resumption changed the recorded research contract")
+  end
+  local frame = snapshot(force, recovery.id)
+  local replacements, rows = {}, {}
+  for _, stage in ipairs(profile.stages) do
+    local previous = pending.work[stage.source]
+    if previous then
+      local row = snapshot(force, stage.source)
+      if archive_terms(profile, stage) ~= saved.contract[stage.source] or row.count ~= previous.price
+          or row.saved_progress ~= previous.paid or row.occurrences ~= 0 then
+        recover_error("parked provider work changed: " .. stage.source)
+      end
+      replacements[stage.source] = stage.source
+      rows[stage.source] = {stage=stage, frame=row, previous=previous}
+    end
+  end
+  requeueable(force, frame, false, true)
+  local queue = provider_archive.resume_queue(pending.queue, frame.queue, replacements, frame.current_progress > 0)
+  if #queue > 1000 then recover_error("restored provider queue is too large") end
+  local ready = {}
+  for _, name in ipairs(queue) do
+    local row = rows[name]
+    if row then
+      for _, prerequisite in pairs(row.frame.technology.prerequisites or {}) do
+        if prerequisite.researched ~= true and not ready[prerequisite.name] then
+          return false, name .. " is still waiting for " .. prerequisite.name .. "."
+        end
+      end
+      if row.stage.count then ready[name] = true end
+    end
+  end
+  local head = queue[1] ~= frame.current and rows[queue[1]]
+  if before_apply then before_apply() end
+  for _, row in pairs(rows) do row.frame.technology.enabled = row.previous.enabled end
+  assign_queue(force, frame, queue, nil, head and head.frame.saved_progress or nil)
+  for name, row in pairs(rows) do
+    local actual = snapshot(force, name)
+    local paid = actual.current == name and actual.current_progress or actual.saved_progress
+    if actual.occurrences ~= row.previous.queued or paid ~= row.previous.paid then
+      recover_error("restored provider queue changed paid research: " .. name)
+    end
+  end
+  saved.forces[force.index] = nil
+  if next(saved.forces) == nil then storage[ARCHIVE_KEY] = nil end
+  return true, "Restored the parked provider research queue."
 end
 
 function M.command(command, route)
@@ -3426,7 +3495,10 @@ function M.command(command, route)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
-    ok, result, message = pcall(resume, force, route, before_apply)
+    local archive = storage[ARCHIVE_KEY]
+    local restore = type(archive) == "table" and archive.phase == "returned"
+      and type(archive.forces) == "table" and archive.forces[force.index]
+    ok, result, message = pcall(restore and resume_provider_queue or resume, force, route, before_apply)
   else reply("Usage: /mir-worker-storage-recovery prepare | prepare-provider-removal | resume <force-name>"); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
