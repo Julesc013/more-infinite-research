@@ -176,7 +176,7 @@ local on_repair_tick
 local translation_scheduled
 local translation_maintenance_callback
 local reconcile_translations
-local reconcile_library_events
+local reconcile_library_events, bind_runtime_events
 local library_events_scheduled
 local credit_events_scheduled
 local gun_credit_events_scheduled
@@ -360,7 +360,7 @@ local function add_command()
       "Administrator/server only: prepare a COPY before adding a finite worker-storage provider, or resume preserved partial work.",
       function(command)
         worker_robot_storage.command(command, worker_storage_route())
-        reconcile_library_events()
+        bind_runtime_events(library_events_scheduled)
       end)
   end
 end
@@ -581,10 +581,10 @@ local function on_research_finished(event)
   if worker_robot_storage then
     worker_default_changed, worker_default_settled =
       worker_robot_storage.default_owner_on_research_finished(event, lifecycle.record_completed_worker_cap)
-    if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
+    if worker_robot_storage.on_research_event(event, true) or worker_default_changed then bind_runtime_events(library_events_scheduled) end
   end
-  if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
-  if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
+  if native_credits and native_credits.on_research_finished(event) then bind_runtime_events(library_events_scheduled) end
+  if native_gun_credits and native_gun_credits.on_research_finished(event) then bind_runtime_events(library_events_scheduled) end
   if (lifecycle.caps_active() or competing_retirements_active(event.research.name)) and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
     if worker_default_settled then
@@ -620,7 +620,7 @@ end
 
 local function on_research_started(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
   if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
@@ -628,9 +628,9 @@ local function on_research_started(event)
 end
 
 local function on_research_cancelled(event)
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
-  if native_credits and native_credits.on_research_cancelled(event) then reconcile_library_events() end
-  if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
+  if native_credits and native_credits.on_research_cancelled(event) then bind_runtime_events(library_events_scheduled) end
+  if native_gun_credits and native_gun_credits.on_research_cancelled(event) then bind_runtime_events(library_events_scheduled) end
   if (lifecycle.caps_active() or competing_retirements_active()) and not worker_storage_mutating(event) then
     lifecycle.on_research_cancelled(event)
   end
@@ -652,7 +652,7 @@ local function on_worker_completion_tick(event)
     worker_robot_storage.on_prepared_queue_tick(event)
   end
   -- Release the one-shot subscription after the last durable marker settles.
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
 end
 
 local function on_tower_planted_seed(event)
@@ -673,7 +673,7 @@ local function on_force_created(event)
   lifecycle.on_force_created(event)
   if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
@@ -689,7 +689,7 @@ local function on_force_reset(event)
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
@@ -728,13 +728,13 @@ local function on_forces_merged(event)
   if legacy_cannon_credits and event and event.destination then
     legacy_cannon_credits.on_technology_effects_reset({force=event.destination})
   end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
 local function on_research_queued(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
   if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if DISCOVERY_TREE then
     if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_discovery_tree_queue_changed(event) end
@@ -749,7 +749,8 @@ local function on_discovery_setting_changed(event)
   request_library_refresh(event)
 end
 
-local function bind_runtime_events(library_open)
+-- Gameplay callbacks reuse the last known Library subscription.
+bind_runtime_events = function(library_open)
   local credit_pending = native_credits and native_credits.needs_research_events() or false
   local gun_credit_pending = native_gun_credits and native_gun_credits.needs_research_events() or false
   credit_pending = credit_pending or gun_credit_pending
