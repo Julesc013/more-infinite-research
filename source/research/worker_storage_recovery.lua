@@ -2,12 +2,14 @@
 -- Data callers supply the ordinary MIR default, never a foreign prototype.
 local M = {id="mir-worker-storage-preservation-4", canonical="worker-robots-storage-4"}
 M.ordinary_default_id = "mir-worker-storage-default-4"
-M.ordinary_provider_id = "mir-worker-storage-provider-4"
-M.provider_debit_id = "mir-worker-storage-provider-debit-4"
 M.head_id = "mir-worker-storage-head-4"
+M.provider_credit_id = "mir-worker-storage-provider-credit-4"
 M.published517_se_id = "mir-worker-storage-published517-4"
 local target = require("platform.target")
 local MAX = 4294967295
+
+-- Old saves can come from a qualified patch below the current package minimum.
+M.minimum_source_base = {f200="2.0.77", f210="2.1.23"}
 
 -- Exact historical vectors. These also constrain the successor prototypes
 -- admitted by the corresponding save transitions.
@@ -67,6 +69,16 @@ function M.uninvested(authored, science)
   local out = M.prototype(authored)
   out.enabled, out.prerequisites = false, {}
   out.unit = {count=1, time=1, ingredients={{science, 1}}}
+  return out
+end
+
+-- This native level owner stays available independently of the provider's
+-- science. Only an authenticated removal may grant a level.
+function M.provider_credit(authored, science)
+  local out = M.uninvested(authored, science)
+  out.name = M.provider_credit_id
+  out.effects = {{type="worker-robot-storage", modifier=1}}
+  out.ignore_tech_cost_multiplier = true
   return out
 end
 
@@ -213,8 +225,6 @@ function M.matches_default(emitted, authored)
   return ok and actual == expected
 end
 
--- Draft constructors only: callers own admission, settings and publication.
--- Neither constructor normalizes a provider's level, price or paid basis.
 local function owner_copy(value, stack)
   local kind = type(value)
   assert(kind == "table" or kind == "string" or kind == "boolean" or kind == "number",
@@ -246,11 +256,9 @@ end
 
 local function owner_source(authored, id)
   assert(type(authored) == "table" and authored.type == "technology"
-    and type(authored.name) == "string" and authored.name:match("%-4$")
-    and authored.name ~= M.id and authored.name ~= M.ordinary_default_id
-    and authored.name ~= M.ordinary_provider_id and authored.name ~= M.provider_debit_id and authored.name ~= M.head_id
+    and authored.name == M.canonical
     and authored.level == 4 and authored.max_level == "infinite",
-    "MIR worker owner requires an authored infinite level4 source")
+    "MIR worker owner requires authored infinite canonical4")
   for _, field in ipairs({"hidden", "enabled", "visible_when_disabled", "ignore_tech_cost_multiplier"}) do
     assert(authored[field] == nil or type(authored[field]) == "boolean", "MIR worker owner boolean is invalid")
   end
@@ -283,16 +291,7 @@ local function owner_source(authored, id)
   return owner_copy(authored)
 end
 
-function M.ordinary(authored, id)
-  assert(id == M.ordinary_provider_id, "MIR worker ordinary identity is invalid")
-  local out = owner_source(authored, id)
-  out.name, out.hidden = id, false
-  return out
-end
-
 function M.default_owner(authored)
-  assert(type(authored) == "table" and authored.name == M.canonical,
-    "MIR worker default owner requires authored canonical4")
   local out = owner_source(authored, M.ordinary_default_id)
   out.name, out.hidden = M.ordinary_default_id, false
   return out
@@ -302,8 +301,6 @@ end
 -- It preserves the old paid Base-five contract; it is hidden and disabled, so
 -- current players cannot select it as a second research route.
 function M.published517_se_owner(authored)
-  assert(type(authored) == "table" and authored.name == M.canonical,
-    "MIR published517 SE owner requires authored canonical4")
   local out = owner_source(authored, M.published517_se_id)
   out.name, out.hidden, out.enabled, out.visible_when_disabled = M.published517_se_id, true, false, false
   out.order = "zz[mir-worker-storage-published517]"
@@ -326,8 +323,6 @@ function M.matches_published517_se_owner(source, owner)
 end
 
 function M.head_debit(authored, modifier)
-  assert(type(authored) == "table" and authored.name == M.canonical,
-    "MIR worker head debit requires authored canonical4")
   local out = owner_source(authored, M.head_id)
   if modifier == nil then modifier = out.effects[1].modifier end
   assert(finite(modifier) and modifier >= 0, "MIR worker head debit requires a nonnegative scalar")
@@ -359,14 +354,6 @@ function M.matches_default_owner(source, owner)
   if not owner_ok then return false, "owner-fingerprint", actual end
   if actual ~= expected then return false, "unequal-fingerprint" end
   return true
-end
-
-function M.debit(authored)
-  local out = owner_source(authored, M.provider_debit_id)
-  out.name, out.hidden, out.enabled, out.visible_when_disabled = M.provider_debit_id, true, false, false
-  local modifier = out.effects[1].modifier
-  out.effects[1].modifier = modifier == 0 and 0 or -modifier
-  return out
 end
 
 return M

@@ -310,6 +310,12 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   end
 end
 science.apply_family(technologies, science_family_bindings, science_environment, science_context)
+if worker_default_authored then
+  -- This disabled native owner records earned work. Player science policy
+  -- must not add research prerequisites or change its mechanism unit.
+  local recovery = require("research.worker_storage_recovery")
+  technologies[#technologies + 1] = recovery.provider_credit(worker_default_authored, gear.unit.ingredients[1][1])
+end
 if worker_default_available then
   local recovery = require("research.worker_storage_recovery")
   -- The detached default follows the same science policy as the legacy

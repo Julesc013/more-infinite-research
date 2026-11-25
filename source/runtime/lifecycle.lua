@@ -259,7 +259,8 @@ function M.preflight_worker_storage_split_caps(plan)
             or type(public.prototype.visible_when_disabled) ~= "boolean" then
           error("MIR incoming worker provider flags are unavailable", 2)
         end
-        items[#items + 1] = {force=item.force, owned=owned, records=records, snapshots=snapshots, public=public}
+        items[#items + 1] = {force=item.force, owned=owned, records=records, snapshots=snapshots,
+          public=public, returned_flags=item.returning ~= nil}
       end
     end
     return {kind="provider-handover", state=state, items=items}
@@ -315,7 +316,7 @@ function M.apply_worker_storage_split_caps(plan)
       -- rights release only additional MIR writes, under incoming policy.
       -- A negative cap baseline may have observed that retired head; it must
       -- not disable the newly admitted provider or enable the retired owner.
-      if record then
+      if record and not item.returned_flags then
         if (record.disabled == true or record.discovery_enabled == true) and public.prototype.enabled then
           public.enabled = true
         end

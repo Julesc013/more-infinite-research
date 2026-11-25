@@ -80,13 +80,23 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
         mt.__newindex=function(object,key,value)
           if key=="research_queue"then
             queue_writes[index]=(queue_writes[index]or 0)+1
-            local admitted={}
+            local admitted,levels,finished={},{},{}
             for _,entry in ipairs(value)do
               local t=force.technologies[type(entry)=="string"and entry or entry.name];local valid=t and t.enabled
               for _,pr in pairs(t and t.prerequisites or{})do local proto=pr.prototype
-                if not pr.researched and not(proto and proto.max_level==4294967295 and pr.level>proto.level)then valid=false end
+                if not pr.researched and not finished[pr]
+                  and not(proto and proto.max_level==4294967295 and pr.level>proto.level)then valid=false end
               end
-              if valid then admitted[#admitted+1]=entry end
+              if valid then
+                admitted[#admitted+1]=entry
+                local max_level=t.prototype and t.prototype.max_level
+                if max_level and max_level<4294967295 then
+                  -- The 2.1.25 queue setter admits a dependent after the
+                  -- finite predecessor's last projected level.
+                  levels[t]=(levels[t] or t.level)+1
+                  finished[t]=levels[t]>max_level
+                end
+              end
             end
             value=admitted
           elseif key=="research_progress"then progress_writes[index]=(progress_writes[index]or 0)+1 end

@@ -2648,16 +2648,27 @@ function M.close(player)
   if destroy_frame(player, view) then discard_translation_cache(player.index) end
 end
 
+-- Native GUI events include elements from other mods. Check the name before
+-- dispatch; each handler still verifies the element's ownership and ancestry.
+function M.has_library_gui_name(event)
+  local element = event and event.element
+  if not valid(element) then return false end
+  local name = element.name
+  return name == ROOT or (type(name) == "string" and name:sub(1, #PREFIX) == PREFIX)
+end
+
 function M.on_lua_shortcut(event)
   if not event or event.prototype_name ~= SHORTCUT then return end
   local player = player_for(event.player_index)
   if not player then return end
   local existing = named_root(player)
   if valid(existing) then
-    if existing == owned_root(player) then M.close(player) end
-    return
+    if existing ~= owned_root(player) then return end
+    M.close(player)
+  else
+    M.open(player)
   end
-  M.open(player)
+  return true
 end
 
 function M.on_gui_text_changed(event)
