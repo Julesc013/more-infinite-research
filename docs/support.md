@@ -72,13 +72,13 @@ source_of_truth_for:
 
 - These routes do not automatically cover different expansion, provider, startup-setting or mod combinations. Older histories and best-effort editions retain their stated limits. A successful load is not proof that every earned effect or queued research state was preserved.
 
-### Moving worker cargo research from Factorio 1.1.110 to 2.0.77
+### Moving a Factorio 1.1 save to 2.0
 
-1. Keep the original save, its mod selection and startup settings. Open a copy in Factorio 1.1.110 with the Factorio 1.1 edition of MIR 5.0.25.
-2. Run `/mir-worker-storage-recovery prepare` as an administrator or from the server console. Save the paused game under a new name and exit. Resuming play expires the preparation.
-3. Open the prepared copy in Factorio 2.0.77 with the matching MIR 5.0.25 edition and matching worker cargo settings. Check cargo, research progress and the queue before adopting the copy.
+Factorio can discard active worker cargo research during this engine conversion. Use the matching Factorio 1.1.110 and 2.0.77 editions of a MIR release whose release notes list the worker research checkpoint. The verified procedure covers the ordinary Worker Robot Cargo Size route with the same research price and science packs.
 
-This path covers the ordinary infinite worker cargo research. Plan separate provider or worker price changes after the engine upgrade. If you decide to continue playing in Factorio 1.1, use `/mir-worker-storage-recovery cancel` or reopen the original copy.
+1. Keep the original save, mod selection and startup settings. Update MIR in Factorio 1.1.110 and open a copy with the existing selection and settings.
+2. Run `/mir-worker-storage-recovery prepare` as an administrator. Save the paused copy under a new name and exit. Advancing a simulation tick expires the preparation. Use `/mir-worker-storage-recovery cancel` to abandon it and restore the previous pause state.
+3. Open that copy with the matching MIR edition in Factorio 2.0.77. Check earned cargo, active and parked research, and the queue before saving under a new name.
 
 ### Productivity providers and preferences
 
