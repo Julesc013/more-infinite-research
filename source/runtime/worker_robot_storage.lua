@@ -149,6 +149,7 @@ local caps = require("runtime.caps")
 local target = require("platform.target")
 local effective_values = require("runtime.configuration")
 local configuration_context = require("runtime.configuration_change_context")
+local provider_queue = require("runtime.worker_storage_provider_queue")
 local pending = false
 local default_head_pending = false
 local default_mutating_force
@@ -2478,7 +2479,7 @@ local function provider_return_force(saved, names, force, frame, public)
   end
   if credit.next_level ~= level then recover_error("native provider credit differs from the archived levels") end
 
-  local queue, progress_by_name = require("runtime.worker_storage_provider_queue").merge(
+  local queue, progress_by_name = provider_queue.merge(
     frame, old, recovery.id, recovery.ordinary_default_id)
   local rows = {}
   for _, name in ipairs(names) do

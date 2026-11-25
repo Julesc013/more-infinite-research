@@ -3474,6 +3474,8 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
         lua.execute(r'''
           local observed_bonus, observed_level=player.worker_robots_storage_bonus,player.technologies[ORDINARY].level
           local parked_bonus=detached.worker_robots_storage_bonus
+          local native_require = require
+          require = function(name) error("Factorio configuration callbacks cannot require " .. name, 2) end
           local plan, legacy=delegate(return_event,provider_route(5))
           assert(plan.archive==archived_removal and storage[removal_key]==archived_removal and writes==0)
           assert(history.default_owner_apply(plan))
@@ -3488,6 +3490,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(detached.technologies[tier6].research_unit_count==1518 and detached.worker_robots_storage_bonus==parked_bonus)
           assert(detached.technologies[CREDIT].level==4 and not detached.technologies[CREDIT].enabled)
           assert(detached.technologies[ID].saved_progress==.23 and detached.current_research.name==OTHER)
+          require = native_require
           history.on_load();history.default_owner_on_load();writes=0
           assert(history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},provider_route(5),true)==nil)
           assert(writes==0 and storage[removal_key]==nil)
