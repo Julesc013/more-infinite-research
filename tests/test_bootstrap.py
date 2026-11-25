@@ -1250,6 +1250,21 @@ class BootstrapTests(unittest.TestCase):
             "completion observation remained scheduled after its marker cleared")
         ''')
 
+    def test_worker_queue_tick_is_restored_from_the_saved_marker_and_then_unbound(self):
+        self.lua.execute(r'''
+          install_modules(false);install_runtime();load_control()
+          local worker=require("runtime.worker_robot_storage")
+          local waiting,calls=true,0
+          worker.prepared_queue_pending=function()return waiting end
+          worker.on_prepared_queue_tick=function(event)
+            assert(event.tick==102);calls=calls+1;waiting=false
+          end
+          handlers.load()
+          assert(type(handlers.events[defines.events.on_tick])=="function")
+          handlers.events[defines.events.on_tick]({tick=102})
+          assert(calls==1 and handlers.events[defines.events.on_tick]==nil)
+        ''')
+
     def test_worker_completion_marker_does_not_publish_until_the_later_settlement(self):
         self.lua.execute(r'''
           install_modules(true);install_runtime();load_control()

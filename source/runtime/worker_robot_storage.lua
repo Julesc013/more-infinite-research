@@ -151,6 +151,7 @@ local effective_values = require("runtime.configuration")
 local configuration_context = require("runtime.configuration_change_context")
 local provider_queue = require("runtime.worker_storage_provider_queue")
 local pending = false
+local queue_settlement_pending = false
 local default_head_pending = false
 local default_mutating_force
 local default_owner_merge_plans = {}
@@ -388,11 +389,12 @@ local function checked_state()
   if type(state.forces) ~= "table" or getmetatable(state.forces) ~= nil then recover_error("invalid prepared force records") end
   for index, row in pairs(state.forces) do
     if not integer(index) then recover_error("invalid prepared force index") end
-    fields(row, {next_level=true, limit=true, pending=true, enabled=true, visible=true})
+    fields(row, {next_level=true, limit=true, pending=true, enabled=true, visible=true, queue_tick=true})
     if not integer(row.next_level) or row.next_level < 4 or not integer(row.limit) or row.limit < 3
         or row.limit < row.next_level - 1 or row.limit - row.next_level >= 1000 or type(row.pending) ~= "boolean"
         or row.pending ~= (row.limit >= row.next_level)
-        or type(row.enabled) ~= "boolean" or type(row.visible) ~= "boolean" then
+        or type(row.enabled) ~= "boolean" or type(row.visible) ~= "boolean"
+        or row.queue_tick ~= nil and not tick(row.queue_tick) then
       recover_error("invalid prepared force history")
     end
   end
@@ -400,9 +402,13 @@ local function checked_state()
 end
 
 local function reconnect(state)
-  pending = false
+  pending, queue_settlement_pending = false, false
   if state and state.schema == 2 and state.kind == "prepared" then
-    for _, row in pairs(state.forces) do if row.pending then pending = true; break end end
+    for _, row in pairs(state.forces) do
+      pending = pending or row.pending
+      queue_settlement_pending = queue_settlement_pending or row.queue_tick ~= nil
+      if pending and queue_settlement_pending then break end
+    end
   end
 end
 
@@ -459,8 +465,7 @@ local function snapshot(force, id, finished_context, queued_observation)
   local default_finished = finished_context == "default-head-finished"
   local waiting_after_finish = (finished_context == true or default_finished) and current == nil and queue[1] ~= nil
     and force.research_progress == 0
-  local unsettled_queue = queued_observation == true and current ~= queue[1]
-  if (current ~= queue[1] and not waiting_after_finish and not unsettled_queue) or not progress(force.research_progress) then
+  if (current ~= queue[1] and not waiting_after_finish and not queued_observation) or not progress(force.research_progress) then
     recover_error("inconsistent native current/queue frame")
   end
   local next_level = technology.level + (technology.researched and 1 or 0)
@@ -520,17 +525,21 @@ local function private_contract()
   return recovery.fingerprint(native_prototype(recovery.id))
 end
 
-local function prepared_frames(state)
+local function prepared_frames(state, configuration)
   if private_contract() ~= state.contract then recover_error("preserved worker effect/cost/science contract changed") end
   local out, seen = {}, {}
   for _, force in ipairs(forces()) do
     local record = state.forces[force.index]
     if not record then recover_error("prepared force history is missing") end
     local frame = snapshot(force, recovery.id)
-    if frame.next_level ~= record.next_level or frame.enabled ~= record.enabled
+    -- Factorio can re-enable an earned prerequisite on configuration. An
+    -- empty retired MIR holder still has no authority for another level.
+    local retire = configuration and state.phase == "provider" and not record.pending
+      and not record.enabled and frame.enabled and frame.allowance == 0 and native_prototype(recovery.id).enabled == false
+    if frame.next_level ~= record.next_level or (frame.enabled ~= record.enabled and not retire)
         or frame.visible ~= record.visible then recover_error("private worker history or flags changed") end
     seen[force.index] = true
-    out[#out + 1] = {force=force, frame=frame, record=record}
+    out[#out + 1] = {force=force, frame=frame, record=record, retire=retire == true}
   end
   for index in pairs(state.forces) do if not seen[index] then recover_error("stale prepared force history") end end
   return out
@@ -545,11 +554,13 @@ local function canonical_empty()
   end
 end
 
-local function prepared_current(state, current)
-  local frames = prepared_frames(state)
+local function prepared_current(state, current, configuration)
+  local frames = prepared_frames(state, configuration)
   local closed = state.phase == "provider"
   for _, item in ipairs(frames) do
-    if item.record.pending or item.frame.allowance > 0 or item.frame.enabled then closed = false; break end
+    if item.record.pending or item.frame.allowance > 0 or (item.frame.enabled and not item.retire) then
+      closed = false; break
+    end
   end
   -- Matching policy protects the preparation and its unfinished work. Once
   -- the admitted provider is active and every private row is retired, public
@@ -609,12 +620,20 @@ function M.preflight(event, route, owner_plan)
   if state and state.schema == 2 then
     local current = fact(route)
     if state.kind == "prepared" then
-      prepared_current(state, current)
+      local configuration = type(event) == "table" and type(event.mod_startup_settings_changed) == "boolean"
+        and type(event.mod_changes) == "table"
+      local retired
+      for _, item in ipairs(prepared_current(state, current, configuration)) do
+        if item.retire then
+          retired = retired or {}
+          retired[item.force.index] = item.frame.technology
+        end
+      end
       local next_state = clone(state)
       next_state.current = clone(current)
       next_state.cap, next_state.family_enabled = selected_cap, selected_enabled
       if current.kind == "finite" then next_state.phase = "provider" end
-      return {recovery=true, state=next_state}
+      return {recovery=true, state=next_state, retired=retired, prior_state=state}
     end
     if not same_fact(state.current, current) then
       recover_error("unprepared worker route changed", route, event, state, current)
@@ -640,6 +659,20 @@ function M.apply(plan)
     -- bootstrap plan must never put it back over the transferred native work.
     if plan.state and plan.state.kind == "prepared" and plan.state.phase == "default"
         and storage[OWNER_KEY] ~= nil then recover_error("retired prepared default quota cannot be reinstalled") end
+    if plan.retired then
+      if storage[KEY] ~= plan.prior_state then recover_error("stale prepared worker retirement plan") end
+      local retirement = {}
+      for _, item in ipairs(prepared_frames(plan.prior_state, true)) do
+        if item.retire then
+          if plan.retired[item.force.index] ~= item.frame.technology then recover_error("stale prepared worker retirement force") end
+          retirement[#retirement + 1] = item.frame.technology
+        end
+      end
+      local count = #retirement
+      for _ in pairs(plan.retired) do count = count - 1 end
+      if count ~= 0 then recover_error("stale prepared worker retirement plan") end
+      for _, technology in ipairs(retirement) do technology.enabled = false end
+    end
     if plan.state then storage[KEY] = plan.state else legacy_apply(plan.legacy) end
     for _, item in ipairs(plan.empty or {}) do
       item.technology.enabled, item.technology.visible_when_disabled = false, false
@@ -3440,35 +3473,16 @@ function M.on_forces_merged(event)
   reconnect(state)
 end
 
-function M.on_research_event(event, finished)
-  -- Native queue setters can emit queued events before current/progress have
-  -- settled. Our caller validates the completed frame after its owned write.
-  if not pending then return false end
-  local force = event and (event.force or event.research and event.research.force)
-  if not force then return false end
-  if owned_queue_force ~= nil and owned_queue_force == force.index or M.default_owner_mutating(event) then return false end
-  local state = checked_state()
-  if not state or state.kind ~= "prepared" then return false end
-  local record = state.forces[force.index]
-  if not record then recover_error("research force has no prepared private history") end
-  -- Other forces can keep the shared hook active after this force retires.
-  -- An unrelated queued research grants this retired force no private rights.
-  if not record.pending and (not event.research or event.research.name ~= recovery.id) then return false end
-  local queued_observation = finished ~= true and defines and defines.events
-    and event.name == defines.events.on_research_queued and event.research
-    and event.research.force == force and (event.force == nil or event.force == force)
-  local finished_context = finished == true and event.research and event.research.force
-    and event.research.force.index == force.index
+local function prepared_work_frame(force, record, finished_context, advanced, queued_observation)
   local frame = snapshot(force, recovery.id, finished_context, queued_observation)
-  local advanced = finished and event.research and event.research.name == recovery.id
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
       or frame.next_level > record.limit + 1 or frame.enabled ~= record.enabled or frame.visible ~= record.visible then
     recover_error("private worker completion/history changed unexpectedly")
   end
-  -- Queue setter observations can precede their new current research. Validate
-  -- the private cursor/flags above, but never write from a queued observation. The
-  -- settled started/cancelled/finished callback enforces the same native quota.
-  if queued_observation then return false end
+  return frame
+end
+
+local function settle_prepared_work(state, force, record, frame, finished_context)
   local remaining = math.min(frame.allowance, math.max(0, record.limit - frame.next_level + 1))
   record.next_level, record.limit, record.pending = frame.next_level, frame.next_level + remaining - 1, remaining > 0
   local previous_owner = owned_queue_force
@@ -3492,8 +3506,70 @@ function M.on_research_event(event, finished)
   if settled.next_level ~= record.next_level or settled.enabled ~= record.enabled or settled.visible ~= record.visible then
     recover_error("private worker frame changed during owned queue mutation")
   end
+  record.queue_tick = nil
   reconnect(state)
   return true
+end
+
+function M.prepared_queue_pending()
+  return queue_settlement_pending
+end
+
+function M.on_prepared_queue_tick(event)
+  if not queue_settlement_pending then return end
+  if not event or not tick(event.tick) then recover_error("private worker queue settlement has no native tick") end
+  local state = checked_state()
+  local items, live = {}, {}
+  for _, force in ipairs(forces()) do
+    local record = state.forces[force.index]
+    live[force.index] = true
+    if record and record.queue_tick and record.queue_tick < event.tick then
+      items[#items + 1] = {force=force, record=record, frame=prepared_work_frame(force, record)}
+    end
+  end
+  for index, record in pairs(state.forces) do
+    if record.queue_tick and not live[index] then recover_error("private worker queue settlement force is missing") end
+  end
+  for index, item in ipairs(items) do
+    if storage[KEY] ~= state or state.forces[item.force.index] ~= item.record then
+      recover_error("private worker history changed before queue settlement")
+    end
+    if item.record.queue_tick and item.record.queue_tick < event.tick then
+      local frame = index == 1 and item.frame or prepared_work_frame(item.force, item.record)
+      settle_prepared_work(state, item.force, item.record, frame)
+    end
+  end
+end
+
+function M.on_research_event(event, finished)
+  if not pending then return false end
+  local force = event and (event.force or event.research and event.research.force)
+  if not force or owned_queue_force == force.index or M.default_owner_mutating(event) then return false end
+  local state = checked_state()
+  if not state or state.kind ~= "prepared" then return false end
+  local record = state.forces[force.index]
+  if not record then recover_error("research force has no prepared private history") end
+  local private = event.research and event.research.name == recovery.id
+  if not record.pending and not private then return false end
+  if finished and not private and record.queue_tick ~= nil then return false end
+  local events = defines and defines.events
+  local queued_observation = not finished and events and event.name ~= nil
+    and event.name == events.on_research_queued and event.research and event.research.force == force
+  local finished_context = finished == true and event.research and event.research.force
+    and event.research.force.index == force.index
+  local frame = prepared_work_frame(force, record, finished_context, finished and private, queued_observation)
+  if queued_observation then return false end
+  if not finished and event.name ~= nil and events
+      and (event.name == events.on_research_started or event.name == events.on_research_cancelled) then
+    -- Factorio starts the first new entry before appending the remaining
+    -- entries of a replaced queue. Retiring a missing holder then prevents
+    -- Factorio from appending it. Read that queue after the native update.
+    if record.queue_tick or frame.allowance == record.limit - record.next_level + 1 then return false end
+    if not tick(event.tick) then recover_error("private worker queue event has no native tick") end
+    record.queue_tick, queue_settlement_pending = event.tick, true
+    return true
+  end
+  return settle_prepared_work(state, force, record, frame, finished_context)
 end
 
 return M
