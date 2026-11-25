@@ -3200,6 +3200,334 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(not pcall(history.default_owner_preflight,{mod_changes={provider={old_version="1.0",new_version="2.0"}}},provider_route(5),true))
         ''')
 
+
+    @staticmethod
+    def prepare_removal_world(lua):
+        lua.execute(r'''
+          full_source(1,true);finite_entry(1);handover()
+          game.tick=170000;game.tick_paused=false;game.ticks_to_run=0
+          tier5,tier6="worker-robots-storage-5","worker-robots-storage-6"
+          for _,tier in ipairs{tier5,tier6}do
+            local p=prototypes.technology[tier]
+            p.effects={{type="worker-robot-storage",modifier=2,hidden=false},
+              {type="unlock-recipe",recipe="provider-recipe",hidden=false}}
+            p.research_unit_ingredients={{name="automation-science-pack",amount=1},{name="provider-science",amount=2}}
+            p.research_unit_energy=4800
+            p.prerequisites={["worker-robots-storage-4"]={name="worker-robots-storage-4"}}
+            p.ignore_tech_cost_multiplier=false
+            if tier==tier5 then p.research_unit_count=1012 else p.research_unit_count_formula="1518*1.5^(L-6)" end
+            for _,force in pairs(game.forces)do
+              local row=force.technologies[tier]
+              row.name=tier
+              row.visible_when_disabled=true
+              row.research_unit_count=tier==tier5 and 1012 or 1518
+            end
+          end
+          player.technologies[tier5].saved_progress=.1875
+          player.research_queue={ID,OTHER,tier5};player.research_progress=.375
+          detached.technologies[tier5].researched=true
+          detached.technologies[tier6].saved_progress=.3125
+          removal_key="mir_worker_storage_provider_removal"
+          messages={};log=function(message) messages[#messages+1]=message end
+          writes=0
+        ''')
+
+    def test_prepare_removal_captures_the_provider_terms_and_work_without_moving_native_research(self):
+        lua=self.world()
+        self.prepare_removal_world(lua)
+        lua.execute(r'''
+          local native,foreign=all_frames(),foreign_frames()
+          local owner,quota=storage[OWNER_KEY],storage.mir_worker_storage_route
+          history.command({parameter="prepare-removal"},provider_route(5))
+          local prepared=assert(storage[removal_key],messages[#messages])
+          assert(prepared.schema==1 and prepared.tick==170000 and not prepared.was_paused and game.tick_paused)
+          assert(prepared.providers.provider=="1.0" and prepared.route.technology==tier6)
+          assert(prepared.technologies[tier5].max_level==5 and prepared.technologies[tier5].count==1012)
+          assert(prepared.technologies[tier5].effects[1].modifier==2
+            and prepared.technologies[tier5].effects[2].recipe=="provider-recipe"
+            and prepared.technologies[tier6].formula=="1518*1.5^(L-6)"
+            and prepared.technologies[tier6].inputs[2].name=="provider-science"
+            and prepared.technologies[tier6].inputs[2].amount==2)
+          local current,parked=prepared.forces[player.index],prepared.forces[detached.index]
+          assert(current.current==ID and current.current_progress==.375 and same(current.queue,{ID,OTHER,tier5}))
+          assert(current.technologies[tier5].saved_progress==.1875 and current.technologies[tier5].count==1012)
+          assert(parked.technologies[tier5].researched and parked.technologies[tier5].next_level==6)
+          assert(parked.technologies[tier6].saved_progress==.3125 and parked.technologies[tier6].count==1518)
+          assert(parked.preserved_holder.saved_progress==.23 and parked.preserved_holder.count==detached.technologies[ID].research_unit_count)
+          assert(writes==0 and same(native,all_frames()) and same(foreign,foreign_frames()))
+          assert(storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==quota)
+          prototypes.technology[tier5].effects[2].recipe="changed"
+          assert(prepared.technologies[tier5].effects[2].recipe=="provider-recipe")
+          history.command({parameter="prepare-removal"},provider_route(5))
+          assert(storage[removal_key]==prepared)
+          history.command({parameter="cancel-removal"},provider_route(5))
+          assert(not game.tick_paused and storage[removal_key]==nil and writes==0)
+        ''')
+
+    def test_removal_preparation_fails_before_pause_or_storage_change_if_work_is_unobservable(self):
+        for changed in (
+            'script.active_mods.provider=nil',
+            'game.tick_paused=true;game.ticks_to_run=2',
+            'detached.technologies[tier6].research_unit_count=0',
+            'prototypes.technology[tier6].research_unit_ingredients=nil',
+        ):
+            with self.subTest(changed=changed):
+                lua=self.world()
+                self.prepare_removal_world(lua)
+                lua.execute(changed+r'''
+                  local pause=game.tick_paused
+                  history.command({parameter="prepare-removal"},provider_route(5))
+                  assert(storage[removal_key]==nil and game.tick_paused==pause and writes==0)
+                  assert(messages[#messages]:find("MIR worker storage history",1,true))
+                ''')
+
+    def test_cancel_removal_keeps_a_preexisting_or_newer_pause(self):
+        for initially_paused in (False, True):
+            lua=self.world()
+            self.prepare_removal_world(lua)
+            lua.globals().initially_paused=initially_paused
+            lua.execute(r'''
+              game.tick_paused=initially_paused
+              history.command({parameter="prepare-removal"},provider_route(5))
+              assert(storage[removal_key] and game.tick_paused)
+              if not initially_paused then game.tick=game.tick+1 end
+              history.command({parameter="cancel-removal"},provider_route(5))
+              assert(storage[removal_key]==nil and game.tick_paused and writes==0)
+            ''')
+
+
+    def removal_world(self):
+        lua=self.world()
+        self.prepare_removal_world(lua)
+        lua.execute(r'''
+          local recovery=require("research.worker_storage_recovery")
+          CREDIT=recovery.provider_credit_id
+          local defined=copy(prototypes.technology[ID])
+          defined.name,defined.enabled,defined.visible_when_disabled=CREDIT,false,false
+          defined.prerequisites,defined.effects={},{{type="worker-robot-storage",modifier=1}}
+          defined.research_unit_count_formula=nil
+          defined.research_unit_count,defined.ignore_tech_cost_multiplier=1,true
+          prototypes.technology[CREDIT],creators[CREDIT]=defined,"more-infinite-research"
+          prototypes.technology[tier5].effects[2]=nil
+          prototypes.technology[tier6].effects[2]=nil
+          prototypes.technology[CANONICAL].research_unit_count=100
+          for _,force in pairs(game.forces)do
+            local t, mt=force.technologies[CANONICAL],getmetatable(force.technologies[CANONICAL])
+            local native_read=mt.__index
+            mt.__index=function(object,key)
+              if key=="research_unit_count"then return math.floor(100*2^(native_read(object,"level")-4))end
+              return native_read(object,key)
+            end
+            force.technologies[CREDIT]={name=CREDIT,level=4,enabled=false,visible_when_disabled=false,
+              researched=false,saved_progress=0,research_unit_count=1,prototype=defined,force=force}
+            local fmt=getmetatable(force)
+            local read=fmt.__index
+            fmt.__index=function(object,key)
+              local current=read(object,key)
+              if key~="worker_robots_storage_bonus"then return current end
+              local row=force.technologies[tier5]
+              if row and row.researched then current=current+2 end
+              return current+force.technologies[CREDIT].level-4
+            end
+          end
+          history.command({parameter="prepare-removal"},provider_route(5))
+          saved_removal=assert(storage[removal_key],messages[#messages])
+          return_prototypes={}
+          for name in pairs(saved_removal.technologies)do
+            return_prototypes[name]=copy(prototypes.technology[name])
+          end
+          local public=prototypes.technology[CANONICAL]
+          for key in pairs(public)do public[key]=nil end
+          for key,value in pairs(copy(prototypes.technology[ORDINARY]))do public[key]=value end
+          public.name=CANONICAL;creators[CANONICAL]="more-infinite-research"
+          for _,force in pairs(game.forces)do
+            local old=saved_removal.forces[force.index]
+            local surviving={}
+            for _,name in ipairs(old.queue)do
+              if name~=tier5 and name~=tier6 then surviving[#surviving+1]=name end
+            end
+            force.technologies[CANONICAL].level=old.technologies[CANONICAL].next_level
+            force.research_queue=surviving
+            force.research_progress=old.current_progress
+            force.technologies[tier5],force.technologies[tier6]=nil,nil
+          end
+          prototypes.technology[tier5],prototypes.technology[tier6]=nil,nil
+          script.active_mods.provider=nil
+          game.tick=saved_removal.tick+1
+          removal_event={mod_startup_settings_changed=true,mod_changes={provider={old_version="1.0"}}}
+          writes=0
+        ''')
+        return lua
+
+    def test_prepared_removal_restores_earned_native_levels_and_separates_unavailable_work(self):
+        lua=self.removal_world()
+        lua.execute(r'''
+          local plan=history.default_owner_preflight(removal_event,nil,true)
+          assert(plan.prepared_default and plan.removal==saved_removal and writes==0 and game.tick_paused)
+          local observed=0
+          after_first_level_write(player.technologies[ID], function()
+            assert(history.default_owner_mutating{force=player})
+            assert(not history.on_research_event({research=player.technologies[ID],by_script=true},true))
+            observed=observed+1
+          end)
+          assert(history.default_owner_apply(plan) and observed==1 and not history.default_owner_mutating{force=player})
+          local archived=storage[removal_key]
+          assert(archived.detached[detached.index][tier5].levels==1
+             and archived.detached[detached.index][tier5].units==2)
+          assert(archived.forces[player.index].queue[3]==tier5)
+          assert(archived.forces[player.index].technologies[tier5].saved_progress==.1875)
+          assert(archived.forces[detached.index].technologies[tier6].saved_progress==.3125)
+          assert(archived.technologies[tier6].inputs[2].name=="provider-science")
+          for _,force in pairs(game.forces)do
+            local old=archived.forces[force.index]
+            assert(force.worker_robots_storage_bonus==old.bonus)
+            assert(force.technologies[ORDINARY].level==old.preserved_holder.next_level)
+            assert(force.technologies[ORDINARY].saved_progress==old.preserved_holder.saved_progress)
+            assert(force.technologies[ORDINARY].enabled==old.preserved_holder.enabled)
+            assert(force.technologies[ID].level==4 and force.technologies[ID].saved_progress==0)
+          end
+          assert(player.current_research.name==ORDINARY and player.research_progress==.375)
+          assert(player.research_queue[2].name==OTHER and player.research_queue[3]==nil)
+          assert(detached.technologies[CREDIT].level==6 and not detached.technologies[CREDIT].enabled)
+          assert(storage[OWNER_KEY].kind=="full-default" and storage.mir_worker_storage_route==nil and not game.tick_paused)
+          history.on_load();history.default_owner_on_load()
+          writes=0
+          local again=history.default_owner_preflight({mod_changes={},mod_startup_settings_changed=false},nil,true)
+          assert(not history.default_owner_apply(again) and writes==0 and storage[removal_key]==archived)
+          history.command({parameter="cancel-removal"},nil)
+          assert(storage[removal_key]==archived and messages[#messages]:find("retains archived research",1,true))
+        ''')
+
+    def test_prepared_removal_refuses_changed_source_or_surviving_native_work(self):
+        for tamper, reason in [
+            ('game.tick=game.tick+1', 'prepared tick'),
+            ('removal_event.mod_changes.provider.old_version="2.0"', 'recorded version'),
+            ('player.research_progress=.4', 'surviving current research progress'),
+            ('foreign_bonus[detached.index]=foreign_bonus[detached.index]+1', 'native cargo outside'),
+            ('saved_removal.technologies[tier5].effects[1].modifier=.5', 'matching native holder'),
+            ('saved_removal.technologies.invented={}', 'research contract differs'),
+        ]:
+            with self.subTest(tamper=tamper):
+                lua=self.removal_world()
+                lua.globals().reason=reason
+                lua.execute(tamper+r'''
+                  local owner=storage[OWNER_KEY];writes=0
+                  local success,message=pcall(history.default_owner_preflight,removal_event,nil,true)
+                  assert(not success and tostring(message):find(reason,1,true),message)
+                  assert(writes==0 and storage[OWNER_KEY]==owner and storage[removal_key]==saved_removal)
+                ''')
+
+    def test_prepared_removal_revalidates_later_forces_before_any_native_write(self):
+        lua=self.removal_world()
+        lua.execute(r'''
+          local plan=history.default_owner_preflight(removal_event,nil,true)
+          detached.technologies[ID].saved_progress=.2
+          local owner,quota=storage[OWNER_KEY],storage.mir_worker_storage_route
+          writes=0
+          assert(not pcall(history.default_owner_apply,plan) and writes==0)
+          assert(storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==quota and storage[removal_key]==saved_removal)
+        ''')
+
+
+    def returned_provider_world(self):
+        lua=self.removal_world()
+        lua.execute(r'''
+          assert(history.default_owner_apply(history.default_owner_preflight(removal_event,nil,true)))
+          retained=saved_removal
+          archived_removal=storage[removal_key]
+          -- The main force finished an ordinary level and advanced the
+          -- unrelated queued job while the finite provider was absent.
+          local main=player.technologies[ORDINARY]
+          main.level=main.level+1
+          player.research_queue={OTHER};player.research_progress=.41
+          finite_entry(1)
+          local public=prototypes.technology[CANONICAL]
+          for key in pairs(public)do public[key]=nil end
+          for key,value in pairs(return_prototypes[CANONICAL])do public[key]=value end
+          for _,name in ipairs{tier5,tier6}do
+            local proto=return_prototypes[name]
+            proto.enabled,proto.visible_when_disabled=true,true
+            prototypes.technology[name]=proto
+            for _,force in pairs(game.forces)do
+              local technology=force.technologies[name]
+              technology.name,technology.prototype,technology.force=name,proto,force
+              technology.enabled,technology.visible_when_disabled=true,true
+              technology.research_unit_count=name==tier5 and 1012 or 1518
+            end
+          end
+          for _,force in pairs(game.forces)do
+            local public_tech=force.technologies[CANONICAL]
+            local mt=getmetatable(public_tech)
+            local old_read=mt.__index
+            mt.__index=function(object,key)
+              if key=="research_unit_count"then return 100 end
+              return old_read(object,key)
+            end
+          end
+          return_event=provider_event()
+          writes=0
+        ''')
+        return lua
+
+    def test_provider_return_reinstates_archived_queue_prices_and_earned_levels_after_ordinary_work(self):
+        lua=self.returned_provider_world()
+        lua.execute(r'''
+          local observed_bonus, observed_level=player.worker_robots_storage_bonus,player.technologies[ORDINARY].level
+          local parked_bonus=detached.worker_robots_storage_bonus
+          local native_require = require
+          require = function(name) error("Factorio configuration callbacks cannot require " .. name, 2) end
+          local plan, legacy=delegate(return_event,provider_route(5))
+          assert(plan.archive==archived_removal and storage[removal_key]==archived_removal and writes==0)
+          assert(history.default_owner_apply(plan))
+          assert(storage[removal_key]==archived_removal)
+          history.apply(legacy)
+          assert(storage[removal_key]==nil and storage[OWNER_KEY].kind=="provider-retired")
+          assert(player.technologies[ID].level==observed_level and player.worker_robots_storage_bonus==observed_bonus)
+          assert(player.current_research.name==OTHER and player.research_progress==.41)
+          assert(player.research_queue[2].name==tier5 and #player.research_queue==2)
+          assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
+          assert(detached.technologies[tier5].researched and detached.technologies[tier6].saved_progress==.3125)
+          assert(detached.technologies[tier6].research_unit_count==1518 and detached.worker_robots_storage_bonus==parked_bonus)
+          assert(detached.technologies[CREDIT].level==4 and not detached.technologies[CREDIT].enabled)
+          assert(detached.technologies[ID].saved_progress==.23 and detached.current_research.name==OTHER)
+          require = native_require
+          history.on_load();history.default_owner_on_load();writes=0
+          assert(history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},provider_route(5),true)==nil)
+          assert(writes==0 and storage[removal_key]==nil)
+        ''')
+
+    def test_provider_return_refuses_unverified_versions_changed_terms_and_stale_native_work(self):
+        for change, reason in (
+            ('script.active_mods.provider="2.0";return_event.mod_changes.provider.new_version="2.0"', 'version differs'),
+            ('prototypes.technology[tier6].research_unit_energy=9000', 'research contract changed'),
+            ('detached.technologies[CREDIT].level=4', 'differs from the archived levels'),
+            ('player.technologies[tier5].saved_progress=.99', 'already has work'),
+        ):
+            with self.subTest(change=change):
+                lua=self.returned_provider_world()
+                lua.globals().reason=reason
+                lua.execute(change+r'''
+                  writes=0
+                  local ok,message=pcall(history.default_owner_preflight,return_event,provider_route(5),true)
+                  assert(not ok and tostring(message):find(reason,1,true),message)
+                  assert(writes==0 and storage[removal_key]==archived_removal)
+                ''')
+
+    def test_provider_return_queue_weaves_saved_positions_without_reordering_current_work(self):
+        self.world().execute(r'''
+          local queue=require("runtime.worker_storage_provider_queue")
+          local live={queue={ORDINARY,ORDINARY,OTHER,"new"},current=ORDINARY,current_progress=.43,
+            queued_saved={[ORDINARY]=0,[OTHER]=.18,new=0}}
+          local old={queue={"t5",ID,ID,ID,OTHER,"t6"},current="t5",current_progress=.31,
+            technologies={t5={saved_progress=0},t6={saved_progress=.27}}}
+          local result,parks=queue.merge(live,old,ID,ORDINARY)
+          assert(same(result.queue,{"t5",ORDINARY,ORDINARY,OTHER,"new","t6"}))
+          assert(result.current=="t5" and result.current_progress==.31)
+          assert(result.queued_saved[ORDINARY]==.43 and result.queued_saved[OTHER]==.18 and parks.t6==.27)
+          local actual=queue.merge({queue={OTHER,"new"},current=OTHER,current_progress=.25,queued_saved={[OTHER]=0,new=0}},old,ID,ORDINARY)
+          assert(same(actual.queue,{"t5",OTHER,"new","t6"}) and actual.queued_saved[OTHER]==.25)
+        ''')
+
     def test_scoped_transfer_guard_restores_on_nested_callback_and_setter_error(self):
         for fail in (False,True):
             lua=self.world();lua.globals().fail=fail;lua.execute(r'''

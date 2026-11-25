@@ -3,6 +3,7 @@
 local M = {id="mir-worker-storage-preservation-4", canonical="worker-robots-storage-4"}
 M.ordinary_default_id = "mir-worker-storage-default-4"
 M.head_id = "mir-worker-storage-head-4"
+M.provider_credit_id = "mir-worker-storage-provider-credit-4"
 M.published517_se_id = "mir-worker-storage-published517-4"
 local target = require("platform.target")
 local MAX = 4294967295
@@ -68,6 +69,16 @@ function M.uninvested(authored, science)
   local out = M.prototype(authored)
   out.enabled, out.prerequisites = false, {}
   out.unit = {count=1, time=1, ingredients={{science, 1}}}
+  return out
+end
+
+-- This native level owner stays available independently of the provider's
+-- science. Only an authenticated removal may grant a level.
+function M.provider_credit(authored, science)
+  local out = M.uninvested(authored, science)
+  out.name = M.provider_credit_id
+  out.effects = {{type="worker-robot-storage", modifier=1}}
+  out.ignore_tech_cost_multiplier = true
   return out
 end
 

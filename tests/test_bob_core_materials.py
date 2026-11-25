@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import unittest
 from repository_paths import reference_path
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -585,7 +585,11 @@ class BobCoreMaterialTests(unittest.TestCase):
                          expected_private_worker_row("automation-science-pack"))
         emitted = {row["name"] for row in installed}
         self.assertTrue(set(self.expected_ids()) <= emitted)
-        self.assertEqual(emitted, set(self.expected_ids()) | {"fixture-gears", "mir-worker-storage-preservation-4"})
+        credit = next(row for row in installed if row["name"] == "mir-worker-storage-provider-credit-4")
+        self.assertEqual(credit, expected_provider_credit_row())
+        self.assertEqual(emitted, set(self.expected_ids()) | {
+            "fixture-gears", "mir-worker-storage-preservation-4", "mir-worker-storage-provider-credit-4",
+        })
         lua.execute(r'''
           data.installed = nil
           fixture_raw.recipe["test-material-return"] = {

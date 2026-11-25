@@ -98,6 +98,20 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
           end
         ''')
 
+    def test_provider_credit_is_a_disabled_native_owner_independent_of_provider_science(self):
+        for target in ("f200", "f210"):
+            self.stage(target).execute(r'''
+              local source=authored();local before=deep(source)
+              local credit=owner.provider_credit(source,"automation-science-pack")
+              assert(credit.name=="mir-worker-storage-provider-credit-4" and credit.max_level=="infinite")
+              assert(credit.hidden and credit.enabled==false and credit.visible_when_disabled==false)
+              assert(credit.level==4 and next(credit.prerequisites)==nil and credit.ignore_tech_cost_multiplier)
+              assert(credit.unit.count==1 and credit.unit.count_formula==nil and credit.unit.time==1)
+              assert(credit.unit.ingredients[1][1]=="automation-science-pack" and #credit.unit.ingredients==1)
+              assert(#credit.effects==1 and credit.effects[1].type=="worker-robot-storage" and credit.effects[1].modifier==1)
+              same(source,before)
+            ''')
+
     def test_default_owner_keeps_absolute_level_prices_and_complete_source_contract(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):

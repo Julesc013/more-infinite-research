@@ -113,8 +113,8 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   if selected then mods["atan-ash"]="2.2.1" else mods["atan-ash"]="2.2.2" end
                   -- Five published Base recipe families add ten signed
                   -- holders to the original 54 public/24 private rows, plus
-                  -- the explicitly validated private worker holder.
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10+1+2)
+                  -- four independently checked worker rows.
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10+4)
                   local science_pack_productivity
                   for _, row in ipairs(environment.emitted) do
                     if row.name == "recipe-prod-research_science_pack_productivity-1" then

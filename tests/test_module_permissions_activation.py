@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import unittest
 from lua_table_values import from_lua as _plain, to_lua as _lua_value
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -207,7 +207,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           end
           package.preload["research.generator"] = function()
             return {install = function(prototypes, stage)
-              assert(#prototypes == 2 and prototypes[1].name == "stub" and stage == data)
+              assert(#prototypes == 3 and prototypes[1].name == "stub" and stage == data)
               module_installed = prototypes
               installs = installs + 1
             end}
@@ -224,6 +224,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
         """)
         installed = _plain(self.lua, self.lua.globals().module_installed)
         self.assertEqual(installed[1], expected_private_worker_row("automation-science-pack"))
+        self.assertEqual(installed[2], expected_provider_credit_row())
 
     def test_raw_true_applies_published_permissions_without_changing_gear_emission(self):
         self.lua.execute(r"""
