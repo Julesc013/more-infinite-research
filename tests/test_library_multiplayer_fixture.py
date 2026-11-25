@@ -1677,7 +1677,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $frozen523='2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
           $promotion523='72F07C0C6B6BFF2D009ECABE3A25FAB0C61BF559D31D308B98C75D37BED7BEB2'
           $prerequisite523='43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
+          $published524='F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535'
           $players=@(
+            @{version='5.0.20024';sha256=$published524}
             @{version='5.0.20023';sha256=$prerequisite523}
             @{version='5.0.20023';sha256=$earlier523}
             @{version='5.0.20023';sha256=$frozen523}
@@ -1703,6 +1705,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Refuse (Profile '5.0.20023' $frozen523) $engine $earlier523
           Refuse (Profile '5.0.20023' $promotion523) $engine $frozen523
           Refuse (Profile '5.0.20023' $prerequisite523) $engine $promotion523
+          Refuse (Profile '5.0.20024' $frozen523) $engine $frozen523
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
@@ -1712,10 +1715,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_paired_browser_boots_the_frozen_523_arm_and_refuses_another_version(self):
+    def test_paired_browser_boots_the_bound_arms_and_refuses_another_version(self):
         paired = ROOT / "tests/fixtures/library-paired-browser"
-        info = json.loads((paired / "arm-mir5/info-523.json").read_text(encoding="utf-8"))
-        self.assertIn("more-infinite-research = 5.0.20023", info["dependencies"])
+        selector = "mir-fixture-mir5-library-paired-browser-arm-mir5"
+        for patch in (23, 24):
+            info = json.loads((paired / f"arm-mir5/info-5{patch}.json").read_text(encoding="utf-8"))
+            self.assertEqual(info["name"], selector)
+            self.assertIn(f"more-infinite-research = 5.0.200{patch}", info["dependencies"])
         boot = self.lua.eval(r'''
           function(path, mir_version, selector)
             local initialize, ready
@@ -1740,10 +1746,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           end
         ''')
         path = (paired / "control.lua").as_posix()
-        for version in ("5.0.20023", "5.0.20005", "5.0.20000"):
+        for version in ("5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
             with self.subTest(version=version):
-                self.assertEqual(boot(path, version, info["name"]), (True, None, "mir5"))
-        ok, diagnostic, arm = boot(path, "5.0.20024", info["name"])
+                self.assertEqual(boot(path, version, selector), (True, None, "mir5"))
+        ok, diagnostic, arm = boot(path, "5.0.20025", selector)
         self.assertFalse(ok)
         self.assertIn("active-mod closure differs at more-infinite-research", diagnostic)
         self.assertIsNone(arm)
