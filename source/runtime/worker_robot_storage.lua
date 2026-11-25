@@ -3333,17 +3333,22 @@ local function resume_provider_force(item)
       destination.saved_progress, holder.saved_progress = previous.paid, 0
       destination.enabled, destination.visible_when_disabled = previous.enabled, previous.visible
       holder.enabled, holder.visible_when_disabled = false, false
-      debit.level, debit.enabled, debit.visible_when_disabled = 1, false, false
+      -- Reversing a level can re-enable the technology. Retire it after the reversal.
+      debit.level = 1
+      debit.enabled, debit.visible_when_disabled = false, false
     end
     if item.queue then assign_queue(force, item.base.frame, item.queue, nil, item.head_progress) end
     item.tail.technology.enabled, force.technologies[recovery.head_id].enabled = false, false
     if item.base.retire then item.base.frame.technology.enabled = false end
     for _, row in ipairs(item.work) do
       local actual = snapshot(force, row.stage.source)
+      local holder, debit = row.holder.technology, row.debit
       local paid = actual.current == row.stage.source and actual.current_progress or actual.saved_progress
       if actual.next_level ~= row.holder.next_level or actual.count ~= row.previous.price
           or paid ~= row.previous.paid or actual.occurrences ~= row.previous.queued
-          or actual.enabled ~= row.previous.enabled or actual.visible ~= row.previous.visible then
+          or actual.enabled ~= row.previous.enabled or actual.visible ~= row.previous.visible
+          or holder.level ~= row.stage.first or holder.researched or holder.enabled or holder.saved_progress ~= 0
+          or debit.level ~= 1 or debit.enabled or debit.visible_when_disabled then
         recover_error("resumption changed retained provider work: " .. row.stage.source)
       end
     end
