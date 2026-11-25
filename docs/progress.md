@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Verified Library personal views and Space Exploration cap raise (2026-11-26)
+
+The reviewed Factorio 2.1.24 ZIP `7B996CE4ED081F293ED7ACE71BEE6BA055AEC62E03CD73CA2625D1F770FA1BDC` passed the 13-step bilingual Library replay. Eight physical inputs exercised separate searches and window sizes. Both clients kept their own query, selection and layout through same-server rejoin and restart from the new save. The force and queue observations matched, the protected input hash verified, and the shared library restored. The primary readback checked 33 original bodies, including both saves and all 26 captures. The receipt is `build/qualification/mir525-promoted-library-personal-gunmetal-r01/verified-personal-evidence.json` at SHA-256 `BEB33261BAB4EE719B834E1913D41E337B990233EBF06C227AFBFDE87B474ECA`.
+
+The private development Factorio 2.0.77 ZIP `6B6FF541CFD11B05D8E33C22A0A3F218075BE4998412821CC682055EB43A50FE` loaded the protected Space Exploration cap-ten successor. Ordinary labs completed levels eleven and twelve using 11,600 and 17,400 of each of seven science packs. Factorio refused level thirteen, both cold loads matched checksum `1356467956`, and the original save and shared library verified. The independently checked frame is `build/qualification/mir525-se-cap12-continuation-gunmetal-r03/independent-frames.json` at SHA-256 `7D4EA1A249328BE5E9E032DD1DEBE2BA012871AC072E7DF65BFE16DFB42F9E2B`. The two earlier launcher and fixture-admission failures remain in custody.
+
 ## Verified 5.0.25 replacement packages (2026-11-26)
 
 The replacement source `98056d27ef63ecc5ba0be28f0602244c109f5d0e` and merged main `f0e64bb2ba24f4479845e7fda007bc7478b17173` have the same checked tree. The inventory `2118768DAC962CB079A71D7268219F00E14BFA011CC1ADC47519B0514F3786B1` verifies 17 player ZIPs and both checksum files. Main passed all four hosted checks. The GitHub beta targets 18:00 AEDT. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2416)
