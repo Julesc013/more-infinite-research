@@ -176,7 +176,7 @@ local on_repair_tick
 local translation_scheduled
 local translation_maintenance_callback
 local reconcile_translations
-local reconcile_library_events, bind_runtime_events
+local bind_runtime_events, on_library_native_refresh
 local library_events_scheduled
 local credit_events_scheduled
 local gun_credit_events_scheduled
@@ -246,9 +246,15 @@ local function schedule_translations(needed)
   translation_scheduled = needed
 end
 
-reconcile_translations = function()
+reconcile_translations = function(open, pending)
   schedule_translations(library.subscription_needs() == true)
-  reconcile_library_events()
+  if open == nil then open, pending = library.native_subscription_needs() end
+  bind_runtime_events(open == true)
+  pending = pending == true
+  if library_refresh_scheduled ~= pending then
+    script.on_nth_tick(library.native_refresh_ticks, pending and on_library_native_refresh or nil)
+    library_refresh_scheduled = pending
+  end
 end
 
 translation_maintenance_callback = function(event)
@@ -570,8 +576,7 @@ end
 
 local function request_library_refresh(event)
   if library_events_scheduled then
-    library.on_native_state_changed(event)
-    reconcile_translations()
+    reconcile_translations(library.on_native_state_changed(event))
   end
 end
 
@@ -832,19 +837,9 @@ bind_runtime_events = function(library_open)
   if events.on_tick then script.on_event(events.on_tick, worker_completion_tick and on_worker_completion_tick or nil) end
 end
 
-local function on_library_native_refresh(event)
+on_library_native_refresh = function(event)
   library.on_native_refresh_tick(event)
   reconcile_translations()
-end
-
-reconcile_library_events = function()
-  local open, pending = library.native_subscription_needs()
-  bind_runtime_events(open == true)
-  pending = pending == true
-  if library_refresh_scheduled ~= pending then
-    script.on_nth_tick(library.native_refresh_ticks, pending and on_library_native_refresh or nil)
-    library_refresh_scheduled = pending
-  end
 end
 
 function M.register()
