@@ -2,7 +2,7 @@
 -- stays in its current order, including work added while the provider was absent.
 local M = {}
 
-function M.merge(live, archived, private_id, ordinary_id)
+function M.merge(live, archived, private_id, ordinary_id, protect_current)
   local positions, insertion_points = {}, {}
   for index, name in ipairs(live.queue) do
     local candidates = positions[name] or {}
@@ -21,7 +21,7 @@ function M.merge(live, archived, private_id, ordinary_id)
       if candidates and #candidates > 0 then boundary = table.remove(candidates) end
     end
   end
-  local insert, last = {}, 1
+  local insert, last = {}, protect_current and live.current_progress > 0 and 2 or 1
   for index, name in ipairs(archived.queue) do
     if insertion_points[index] then
       -- An intervening reorder can reverse two old anchors. Retain both
@@ -58,6 +58,26 @@ function M.merge(live, archived, private_id, ordinary_id)
   if current == live.current then progress = live.current_progress end
   if archived.technologies[current] and current == archived.current then progress = archived.current_progress end
   return {queue=queue, queued_saved=saved, current=current, current_progress=progress}, provider_progress
+end
+
+function M.without_waiting(planned, live, waiting)
+  local queue, saved = {}, {}
+  for _, name in ipairs(planned.queue) do
+    if not waiting[name] then
+      queue[#queue+1] = name
+      saved[name] = planned.queued_saved[name]
+    end
+  end
+  local current, progress = queue[1], 0
+  if current == planned.current then
+    progress = planned.current_progress
+  elseif current and current == live.current then
+    progress = live.current_progress
+    saved[current] = live.queued_saved[current]
+  elseif current then
+    progress = saved[current] or 0
+  end
+  return {queue=queue, queued_saved=saved, current=current, current_progress=progress}
 end
 
 return M
