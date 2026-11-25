@@ -14,9 +14,7 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Gunmetal timing and Library native results (2026-11-26)
-
-The Factorio 2.0.77 Bob/Angel comparison completed 262 launches and restored the direct library. The independent readback checked every launch receipt and engine log, retained the replay archive identities, and recalculated 64 paired blocks. Mean responsive Settings times were 19.214 seconds without MIR, 20.910 with MIR 4.7.3, 19.326 for the replay and 19.429 with the frozen 5.0.25 ZIP. MIR-added time fell from 1.697 to 0.215 seconds, an 87.3% point reduction. The paired interval for the 50% margin was −0.670 to −0.596 seconds. Formal timing acceptance still requires review of the execution owner's exact packet. The readback is `build/qualification/f200-525-bob-angel-menu-r02/verified-observations.json` at SHA-256 `7760CCB82E9EDAB8C3EA28EF484DEC97BF07B834BD7EE6219D639951E854FD2B`.
+## Unattended Library and research-progress results (2026-11-26)
 
 The unattended dispatcher completed the corrected shutdown rehearsal, then the exact frozen 5.0.25 bilingual Library replay, then both engine progress probes. The 32-step Library case verified six exports, eight export files, the protected save and identical library controls. Its readback is `build/qualification/mir525-library-tabs-gunmetal-r01/execution/verified-library-tabs-exports.json` at SHA-256 `C00C2FEC06D4CB78831D193F682A7A68364BC1DB372299E219C25F2048969A3E`. Both Base-only progress probes observed 19% saved work enter the active slot. When the head was displaced, 43% active work moved to the saved slot under both setter orders. The native probe scope is Factorio 2.0.77 and 2.1.24 with two fresh Base saves. The readback is `build/qualification/native-research-progress-probe-gunmetal-r03/execution/verified-native-progress.json` at SHA-256 `434D5CE8831D4966EEE0830C5514B25992B8C90D93D63151E51E4D2B643CBAF9`. [Native shutdown helper](https://github.com/Julesc013/more-infinite-research/pull/2417)
 
