@@ -2240,6 +2240,12 @@
   },
   "exact_native_evidence": [
     {
+      "path": "spec/evidence/mir524-modern-origin-replay-r01.json",
+      "sha256": "7E8F2C72EF61136F9A912ABD009F0DFBE08E3CEABADA39EC6AB7DCEB94AB50F0",
+      "status": "recorded-six-exact-published-5-0-24-legacy-base-replays",
+      "reuse": "The published 5.0.24 archives have Base replay records for MIR 1.0.0 on Factorio 2.0.77, MIR 1.1.0 on 2.0.77 and 2.1.23 with a separate disabled-module case on 2.1.23, and MIR 1.2.0 on both engines. The six records bind the three protected source identities, exact engine binaries, published ZIPs, ordinary lab completion and cold-load results. The MIR 1.0.0 forward replay retains its earlier private package identity. Keep the original receipt and save hashes for every case and review the changed control paths before applying these results to 5.0.25 or another candidate."
+    },
+    {
       "path": "spec/evidence/full-catalogue-473-8f-native-chain.json",
       "sha256": "E52C9BF84969E33D1C7132E97832CFAA29305FFEDBDE08DEC5C61E058997F60F",
       "status": "passed-exact-b6-to-8f-base-and-space-age-only",
