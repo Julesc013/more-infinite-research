@@ -1174,7 +1174,7 @@ if($ComposeOnly){
   Assert-LinuxDisplayPinnedFile -Path $fixtureArchive -Expected ([string]$target.fixture_archive_sha256) -Label 'ComposeOnly current Library fixture archive' -MaximumBytes 64MB|Out-Null
   Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory ([string]$standaloneLibraryFixture.source)
   $declaredHashes[$fixtureArchiveName]=[string]$target.fixture_archive_sha256
-  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version})
+  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version}) -ValidateDependencies
   Assert-Session ($actualHashes.Keys.Count-eq$declaredHashes.Keys.Count) 'ComposeOnly selected archive closure differs'
   foreach($name in $declaredHashes.Keys){Assert-Session ($actualHashes.ContainsKey($name)-and[string]$actualHashes[$name]-ceq[string]$declaredHashes[$name]) "ComposeOnly archive hash differs: $name"}
   Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $selection -EngineIdentity $engineIdentity -ArchiveHashes $actualHashes -ErrorPrefix 'mir5-multiplayer-compose'

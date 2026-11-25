@@ -194,7 +194,7 @@ $captureSettings = Get-MIR5PrototypeCaptureSettingsArguments -ProfileDefinition 
 $baseRows = @(Read-MIRDirectLibraryStartupProfile -Path $profileInput)
 $mir = if ($hasMIRArchive) { Get-MIR5PrototypeCaptureMIRArchive -Archive $MIRArchive -Library $library -ExpectedSha256 $ExpectedMIRArchiveSha256 -EngineLine $engineLine } else { $null }
 $engineIdentity = Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
-$archiveHashes = Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive $mir
+$archiveHashes = Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive $mir -ValidateDependencies
 Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes -ErrorPrefix 'mir5-prototype-capture'
 
 $buildTmp = Join-Path $repo 'build/tmp'

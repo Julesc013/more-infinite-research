@@ -916,7 +916,7 @@ if($laserTransition){Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$
 if($publishedF100Forward){Assert-Fixture ($fixtureBindings.Count -eq 1 -and [string]$fixtureBindings[0].name -ceq $publishedF100Fixture.name -and [string]$fixtureBindings[0].version -ceq $publishedF100Fixture.version -and [string]$fixtureBindings[0].source -ceq $publishedF100Fixture.source) 'published F100 forward fixture selection differs'}
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
 $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
-$archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
+$archiveHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null -ValidateDependencies
 Assert-DeclaredFixtureInputs -ProfileDefinition $profileDefinition -EngineIdentity $engineIdentity -ArchiveHashes $archiveHashes
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -Mode Hook -MaxWorktrees 2 -MaxBranches 4 -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
