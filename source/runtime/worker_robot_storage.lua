@@ -2463,6 +2463,20 @@ local function provider_return_checkpoint(event, route, contract)
   return saved, names
 end
 
+local function unmet_provider_prerequisite(technology, projected, ready)
+  for _, prerequisite in pairs(technology.prerequisites or {}) do
+    local staged = projected and projected[prerequisite.name]
+    local earned = staged and staged.researched or not staged and prerequisite.researched
+    if not earned and not (ready and ready[prerequisite.name]) then
+      local proto = prerequisite.prototype
+      local next_level = staged and staged.next_level or prerequisite.level
+      if not (proto and proto.max_level == 4294967295 and integer(next_level) and next_level > proto.level) then
+        return prerequisite.name
+      end
+    end
+  end
+end
+
 local function provider_return_force(saved, names, force, frame, public)
   local old = saved.forces[force.index]
   local credit = provider_credit_frame(force)
@@ -2520,29 +2534,37 @@ local function provider_return_force(saved, names, force, frame, public)
     row.saved_progress = progress_by_name[name]
     rows[name] = row
   end
-  -- Validate the combined queue before editing it. Prerequisites of returned
-  -- entries use the projected completed levels; other entries use live values.
+  local deferred = {}
   for _, name in ipairs(queue.queue) do
     local technology = force.technologies[name]
     local row = rows[name]
     local enabled = row and row.enabled or not row and technology.enabled
     if not enabled or (row and row.researched) then recover_error("restored queue contains unavailable research: " .. name) end
-    for _, prerequisite in pairs(technology.prerequisites or {}) do
-      local staged = rows[prerequisite.name]
-      local earned = staged and staged.researched or not staged and prerequisite.researched
-      if not earned then
-        local proto = prerequisite.prototype
-        local next_level = staged and staged.next_level or prerequisite.level
-        earned = proto and proto.max_level == 4294967295 and integer(next_level) and next_level > proto.level
-      end
-      if not earned then recover_error("restored queue has an unmet prerequisite: " .. name) end
+    local missing = unmet_provider_prerequisite(technology, rows)
+    if missing then
+      if not row then recover_error("restored queue has an unmet prerequisite: " .. name) end
+      deferred[name] = true
     end
+  end
+  local pending
+  if next(deferred) then
+    pending = {name=force.name, queue={}, technologies={}}
+    for index, name in ipairs(queue.queue) do
+      pending.queue[index] = name == recovery.ordinary_default_id and recovery.id or name
+    end
+    for name in pairs(deferred) do
+      local row = rows[name]
+      if queue.current == name then row.saved_progress = queue.current_progress end
+      pending.technologies[name] = clone(row)
+      row.enabled = false
+    end
+    queue = provider_queue.without_waiting(queue, frame, deferred)
   end
   local holder_saved = frame.saved_progress
   if frame.current == recovery.ordinary_default_id and queue.current ~= frame.current then
     holder_saved = frame.current_progress
   end
-  return {rows=rows, incoming=incoming, queue=queue, credit=technology_values(credit),
+  return {rows=rows, incoming=incoming, queue=queue, pending=pending, credit=technology_values(credit),
     gate_paid=old.gate_paid, holder_saved=holder_saved}
 end
 
@@ -2685,7 +2707,18 @@ delegated_provider_apply = function(legacy)
     verify_returned_provider(item.force, item.returning, gate_frame(item.force))
   end
   storage[KEY] = legacy.state
-  if plan.archive then storage[REMOVAL_KEY] = nil end
+  if plan.archive then
+    local forces_waiting = {}
+    for _, item in ipairs(authorization.settled) do
+      if item.returning and item.returning.pending then forces_waiting[item.force.index] = item.returning.pending end
+    end
+    storage[REMOVAL_KEY] = next(forces_waiting) and {schema=2, route=clone(plan.archive.route),
+      providers=clone(plan.archive.providers), technologies=clone(plan.archive.technologies),
+      settings=clone(plan.archive.settings), forces=forces_waiting} or nil
+    if next(forces_waiting) and log then
+      log("[MIR worker recovery] Provider research is parked until its prerequisite is available. Then run /mir-worker-storage-recovery resume for the affected force.")
+    end
+  end
   reconnect(legacy.state)
   authorization.committed = true
 end
@@ -3338,6 +3371,8 @@ function M.resume(force, route) return resume(force, route) end
 
 local function prepare_provider_removal(route, before_apply)
   if not route then recover_error("provider removal preparation requires the provider to be installed") end
+  local pending = storage[REMOVAL_KEY]
+  if type(pending) == "table" and pending.schema == 2 then recover_error("resume pending provider research before preparing another removal") end
   if storage[REMOVAL_KEY] ~= nil then recover_error("cancel the existing removal preparation before recording another") end
   local _, owned, items = retired_provider_current(nil, route)
   local prior = checked_state()
@@ -3408,6 +3443,62 @@ local function cancel_provider_removal(before_apply)
   return true, "Cancelled the provider removal preparation."
 end
 
+local function resume_provider_queue(force, route, before_apply)
+  local saved = storage[REMOVAL_KEY]
+  local pending = saved.forces[force.index]
+  retired_provider_current(nil, route)
+  if pending.name ~= force.name or not equal_plain(saved.route, copy(route))
+      or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
+    recover_error("parked provider research no longer matches its force or settings")
+  end
+  for name, version in pairs(saved.providers) do
+    if script.active_mods[name] ~= version then recover_error("parked provider version changed: " .. name) end
+  end
+  local live = snapshot(force, recovery.id)
+  local frames = {}
+  for name, previous in pairs(pending.technologies) do
+    local frame = snapshot(force, name)
+    local observed = technology_values(frame)
+    observed.enabled = previous.enabled
+    if frame.occurrences ~= 0 or not equal_plain(observed, previous)
+        or not equal_plain(provider_research_contract(name), saved.technologies[name]) then
+      recover_error("parked provider research changed: " .. name)
+    end
+    frames[name] = frame
+  end
+  local merged = provider_queue.merge(live, pending, nil, nil, true)
+  if #merged.queue > 1000 then recover_error("restored provider queue is too large") end
+  local ready, occurrences = {}, {}
+  for _, name in ipairs(merged.queue) do
+    local technology = force.technologies[name]
+    local frame = frames[name]
+    if frame then
+      local missing = unmet_provider_prerequisite(technology, nil, ready)
+      if missing then return false, name .. " is still waiting for " .. missing .. "." end
+    elseif not technology.enabled then
+      recover_error("native queue contains disabled research: " .. name)
+    end
+    occurrences[name] = (occurrences[name] or 0) + 1
+    local prototype = technology.prototype
+    if prototype and integer(prototype.max_level) and prototype.max_level < 4294967295
+        and technology.level + occurrences[name] > prototype.max_level then ready[name] = true end
+  end
+  if frames[merged.current] then merged.queued_saved[merged.current] = 0 end
+  before_apply()
+  for name, frame in pairs(frames) do frame.technology.enabled = pending.technologies[name].enabled end
+  assign_queue(force, merged)
+  for name, previous in pairs(pending.technologies) do
+    local actual = snapshot(force, name)
+    local paid = actual.current == name and actual.current_progress or actual.saved_progress
+    if paid ~= previous.saved_progress or actual.occurrences ~= occurrences[name] then
+      recover_error("resumed provider queue changed paid work: " .. name)
+    end
+  end
+  saved.forces[force.index] = nil
+  if next(saved.forces) == nil then storage[REMOVAL_KEY] = nil end
+  return true, "Restored the parked provider research queue."
+end
+
 function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
@@ -3426,7 +3517,9 @@ function M.command(command, route)
   elseif operation == "resume" then
     local force = name ~= "" and game.forces[name] or player and player.force
     if not force then reply("Use resume <force-name> on the server."); return end
-    ok, result, message = pcall(resume, force, route, before_apply)
+    local saved = storage[REMOVAL_KEY]
+    local pending = type(saved) == "table" and saved.schema == 2 and type(saved.forces) == "table" and saved.forces[force.index]
+    ok, result, message = pcall(pending and resume_provider_queue or resume, force, route, before_apply)
   else reply("Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume <force-name>"); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"

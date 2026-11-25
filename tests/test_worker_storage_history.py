@@ -3513,6 +3513,50 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
                   assert(writes==0 and storage[removal_key]==archived_removal)
                 ''')
 
+    def test_provider_return_retains_work_waiting_for_a_provider_prerequisite(self):
+        lua = self.returned_provider_world()
+        lua.execute(r'''
+          local prerequisite={name="provider-unlock",researched=false}
+          local prerequisites=player.technologies[tier5].prerequisites or {}
+          prerequisites[prerequisite.name]=prerequisite
+          player.technologies[tier5].prerequisites=prerequisites
+          writes=0
+          local plan, legacy=delegate(return_event,provider_route(5))
+          assert(writes==0 and storage[removal_key]==archived_removal)
+          assert(history.default_owner_apply(plan));history.apply(legacy)
+          assert(player.current_research.name==OTHER and player.research_progress==.41 and #player.research_queue==1)
+          assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
+          assert(storage[removal_key] and not prerequisite.researched)
+          history.on_load();history.default_owner_on_load();writes=0
+          history.command({parameter="resume player"},provider_route(5))
+          assert(writes==0 and storage[removal_key] and messages[#messages]:find("provider-unlock",1,true))
+          prerequisite.researched=true
+          history.command({parameter="resume player"},provider_route(5))
+          assert(storage[removal_key]==nil and player.current_research.name==OTHER and player.research_progress==.41)
+          assert(#player.research_queue==2 and player.research_queue[2].name==tier5)
+          assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
+        ''')
+
+    def test_provider_return_parks_the_active_fraction_when_only_its_prerequisite_is_missing(self):
+        self.returned_provider_world().execute(r'''
+          local capture=archived_removal.forces[player.index]
+          capture.current,capture.current_progress=tier5,.1875
+          capture.queue,capture.queued_saved={tier5},{[tier5]=0}
+          capture.technologies[tier5].saved_progress=0
+          player.research_queue={};player.research_progress=0
+          local prerequisite={name="provider-unlock",researched=false}
+          player.technologies[tier5].prerequisites={prerequisite}
+          local plan,legacy=delegate(return_event,provider_route(5))
+          assert(history.default_owner_apply(plan));history.apply(legacy)
+          assert(not player.current_research and #player.research_queue==0)
+          assert(player.technologies[tier5].saved_progress==.1875 and storage[removal_key])
+          prerequisite.researched=true
+          history.command({parameter="resume player"},provider_route(5))
+          assert(storage[removal_key]==nil and #player.research_queue==1)
+          assert(player.current_research.name==tier5 and player.research_progress==.1875)
+          assert(player.technologies[tier5].saved_progress==0)
+        ''')
+
     def test_provider_return_queue_weaves_saved_positions_without_reordering_current_work(self):
         self.world().execute(r'''
           local queue=require("runtime.worker_storage_provider_queue")
