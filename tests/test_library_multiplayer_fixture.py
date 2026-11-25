@@ -1679,6 +1679,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $prerequisite523='43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
           $published524='F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535'
           $players=@(
+            @{version='5.0.20025';sha256='B941F2E9C084DE3A3C61BE9AC89DDBE25C210E0FBCAE2A9662392D9B6115ECC1'}
             @{version='5.0.20024';sha256=$published524}
             @{version='5.0.20023';sha256=$prerequisite523}
             @{version='5.0.20023';sha256=$earlier523}
@@ -1687,12 +1688,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             @{version='5.0.20005';sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'}
           )
           function Refuse($profile,$actualEngine,$expected) {
-            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
+            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192 -RepoRoot (Get-Location).Path|Out-Null}catch{return}
             throw 'changed retained comparison input was admitted'
           }
           foreach($entry in $players) {
             $version=$entry.version;$mir=$entry.sha256
-            $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192
+            $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192 -RepoRoot (Get-Location).Path
             if($target.mir-cne$version-or$target.paired_arm-cne'mir5'-or$target.mir_archive_sha256-cne$mir){throw 'exact MIR 5 comparison arm was not selected'}
             $bad=Profile $version $mir;$bad.mods[2].version='5.0.20099';Refuse $bad $engine $mir
             Refuse (Profile $version ('0'*64)) $engine $mir
@@ -1706,6 +1707,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Refuse (Profile '5.0.20023' $promotion523) $engine $frozen523
           Refuse (Profile '5.0.20023' $prerequisite523) $engine $promotion523
           Refuse (Profile '5.0.20024' $frozen523) $engine $frozen523
+          $held525='3F0285DBA21D5DD9BC2241270F2ECC1DA39E5D2A975C723E60E258B3E10A7F1E'
+          Refuse (Profile '5.0.20025' $held525) $engine $held525
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
@@ -1718,12 +1721,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
     def test_paired_browser_boots_the_bound_arms_and_refuses_another_version(self):
         paired = ROOT / "tests/fixtures/library-paired-browser"
         selector = "mir-fixture-mir5-library-paired-browser-arm-mir5"
-        for patch in (23, 24):
+        for patch in (23, 24, 25):
             info = json.loads((paired / f"arm-mir5/info-5{patch}.json").read_text(encoding="utf-8"))
             self.assertEqual(info["name"], selector)
             self.assertIn(f"more-infinite-research = 5.0.200{patch}", info["dependencies"])
         boot = self.lua.eval(r'''
-          function(path, mir_version, selector)
+          function(path, pins_path, mir_version, selector)
             local initialize, ready
             defines = {events = {on_player_joined_game = 1, on_tick = 2}}
             settings = {startup = { ["mir5-library-paired-browser-arm"] = {value = "mir5"} }}
@@ -1740,20 +1743,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               on_init = function(handler) initialize = handler end,
               on_load = function() end, on_event = function() end
             }
-            dofile(path)
+            local imports = setmetatable({require = function(name)
+              assert(name == "candidate-archives")
+              return assert(loadfile(pins_path, "t", {}))()
+            end}, {__index = _G})
+            assert(loadfile(path, "t", imports))()
             local ok, err = pcall(initialize)
             return ok, err, ready and ready.arm
           end
         ''')
         path = (paired / "control.lua").as_posix()
-        for version in ("5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
+        pins = (paired / "candidate-archives.lua").as_posix()
+        for version in ("5.0.20025", "5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
             with self.subTest(version=version):
-                self.assertEqual(boot(path, version, selector), (True, None, "mir5"))
-        ok, diagnostic, arm = boot(path, "5.0.20025", selector)
+                self.assertEqual(boot(path, pins, version, selector), (True, None, "mir5"))
+        ok, diagnostic, arm = boot(path, pins, "5.0.20026", selector)
         self.assertFalse(ok)
         self.assertIn("active-mod closure differs at more-infinite-research", diagnostic)
         self.assertIsNone(arm)
-        ok, diagnostic, arm = boot(path, "5.0.20023", "mir-fixture-mir5-library-paired-browser-arm-published")
+        ok, diagnostic, arm = boot(path, pins, "5.0.20023", "mir-fixture-mir5-library-paired-browser-arm-published")
         self.assertFalse(ok)
         self.assertIn("fixture active-mod closure differs", diagnostic)
         self.assertIsNone(arm)
@@ -1919,9 +1927,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($selected.base -cne '2.1.23' -or $selected.mir -cne '5.0.21000' -or $selected.build_version -ne 87750){throw 'F210 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $standaloneF210 -EngineSha256 '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -FixtureCase 'library-multiplayer'
           if($selected.kind -cne 'mir5-library-multiplayer-standalone-f210-native-selection' -or $selected.standalone_f210-ne$true -or $selected.observer_sha256-cne'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'){throw 'standalone F210 selection changed'}
-          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '4.7.20002'){throw 'published paired selection changed'}
-          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '5.0.20000'){throw 'MIR5 paired selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $scriptedEffects -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'scripted-effects-multiplayer'
           if($selected.kind -cne 'mir5-scripted-effects-multiplayer-f200-space-age-native-selection'){throw 'scripted effects selection changed'}
@@ -1929,13 +1937,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $preparedPaired['archive_sha256']['more-infinite-research_4.7.20002.zip']=('A'*64)
           $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('B'*64)
           $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip']=('C'*64)
-          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPaired -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPaired -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.kind -cne 'mir5-library-paired-browser-f200-native-selection'){throw 'prepared paired archive shape changed'}
           $preparedPairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $preparedPairedMir5['archive_sha256']['more-infinite-research_5.0.20000.zip']=('D'*64)
           $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('E'*64)
           $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip']=('F'*64)
-          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '5.0.20000'){throw 'prepared MIR5 paired archive shape changed'}
           function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
             $selection=Get-Content -LiteralPath $ProfilePath -Raw|ConvertFrom-Json -AsHashtable

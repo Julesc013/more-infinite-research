@@ -24,6 +24,11 @@ local MINING = "recipe-prod-research_mining_drill-1"
 local TECHNOLOGIES = {GEAR, MINING}
 local RECIPES = {"iron-gear-wheel", "electric-mining-drill"}
 
+local candidate_versions = {}
+for _, archive in ipairs(require("candidate-archives")) do
+  candidate_versions[archive.version] = true
+end
+
 local ARMS = {
   published = {
     key = "published",
@@ -44,7 +49,7 @@ local ARMS = {
   mir5 = {
     key = "mir5",
     mir_version = "5.0.20000",
-    other_versions = { ["5.0.20005"] = true, ["5.0.20023"] = true, ["5.0.20024"] = true },
+    other_versions = candidate_versions,
     selector = "mir-fixture-mir5-library-paired-browser-arm-mir5",
     shape = {
       filters = "mir_library_filters",
