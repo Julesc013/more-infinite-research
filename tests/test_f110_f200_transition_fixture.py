@@ -41,6 +41,74 @@ def lua(runtime, value):
 
 
 class F110F200TransitionFixtureTests(unittest.TestCase):
+    def test_engine_checkpoint_expires_and_cannot_overwrite_surviving_work(self):
+        checkpoint = ROOT / "source/research/worker_storage_checkpoint.lua"
+        self.lua.execute(r'''
+          local worker_id, follower_id = "worker-robots-storage-4", "braking-force-1"
+          local worker = {name=worker_id, level=4, researched=false, saved_progress=0,
+            research_unit_count=675, research_unit_energy=3600,
+            research_unit_ingredients={{name="automation-science-pack", amount=1}},
+            prototype={max_level=4294967295, effects={{type="worker-robot-storage", modifier=1}}}}
+          local follower = {name=follower_id, saved_progress=0}
+          local force = {name="player", index=1, worker_robots_storage_bonus=2,
+            technologies={[worker_id]=worker, [follower_id]=follower}, current_research=worker,
+            research_progress=.125, research_queue={worker, follower},
+            get_saved_technology_progress=function() return nil end}
+          local command, on_load, tick_handler
+          local game = {tick=100, tick_paused=false, forces={player=force}}
+          local script = {active_mods={base="1.1.110", ["more-infinite-research"]="5.0.11024"},
+            on_load=function(callback) on_load=callback end,
+            on_event=function(id, callback) assert(id==1); tick_handler=callback end}
+          local env = setmetatable({game=game, script=script, global={}, log=function() end,
+            defines={events={on_tick=1}}, commands={add_command=function(name, _, callback)
+              assert(name=="mir-worker-storage-recovery")
+              command=callback
+            end}}, {__index=_G})
+          local checkpoint = assert(loadfile(..., "t", env))()
+          checkpoint.register_source()
+          on_load()
+          assert(tick_handler==nil and env.global[checkpoint.key]==nil)
+          command{parameter="prepare"}
+          local saved = assert(env.global[checkpoint.key])
+          assert(game.tick_paused and force.research_progress==.125 and force.research_queue[2]==follower)
+          assert(saved.forces[1].current_progress==.125 and saved.forces[1].queue[2]==follower_id)
+          command{parameter="cancel"}
+          assert(not game.tick_paused and tick_handler==nil and env.global[checkpoint.key]==nil)
+          command{parameter="prepare"}
+          assert(type(tick_handler)=="function")
+          game.tick_paused=false
+          tick_handler()
+          assert(tick_handler==nil and env.global[checkpoint.key]==nil)
+
+          script.active_mods={base="2.0.77", ["more-infinite-research"]="5.0.20024"}
+          local target = {id="f200", minimum_base="2.0.77", distribution_version="5.0.20024"}
+          local event = {mod_changes={base={old_version="1.1.110", new_version="2.0.77"},
+            ["more-infinite-research"]={old_version="5.0.11024", new_version="5.0.20024"}}}
+          game.tick=101
+          checkpoint.claim(saved, event, target)
+          game.tick=102
+          local valid, message = pcall(checkpoint.claim, saved, event, target)
+          assert(not valid and message:find("preparation expired", 1, true))
+
+          local function equal(a, b)
+            if a==b then return true end
+            if type(a)~="table" or type(b)~="table" then return false end
+            for key, value in pairs(a) do if not equal(value, b[key]) then return false end end
+            for key in pairs(b) do if a[key]==nil then return false end end
+            return true
+          end
+          local native = {technology=worker, next_level=4, researched=false, saved_progress=0,
+            queue={}, queued_saved={}, current_progress=0, occurrences=0}
+          local restored = checkpoint.restore_frame(saved, force, native, equal)
+          assert(restored.current_progress==.125 and restored.queue[1]==worker_id and restored.queue[2]==follower_id)
+          native.queue={worker_id, follower_id}
+          native.current=worker_id
+          native.current_progress=.25
+          valid, message = pcall(checkpoint.restore_frame, saved, force, native, equal)
+          assert(not valid and message:find("surviving active research changed", 1, true))
+          assert(native.current_progress==.25 and worker.saved_progress==0)
+        ''', checkpoint.as_posix())
+
     def f110_effects(self):
         direct = json.loads((ROOT / "tests/fixtures/historical-direct-native-oracle.json").read_text(encoding="utf-8"))
         continuations = json.loads((ROOT / "tests/fixtures/historical-continuation-native-oracle.json").read_text(encoding="utf-8"))

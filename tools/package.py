@@ -364,6 +364,8 @@ def select_edition(files, info, target, editions):
         for entrypoint in ENTRYPOINTS:
             module = "adapters.reduced." + entrypoint[:-4]
             files[entrypoint] = ('require("' + module + '").apply()\n').encode("utf-8")
+        if target == "f110":
+            files["control.lua"] += b'require("research.worker_storage_checkpoint").register_source()\n'
 
     # Follow the actual selected stage/public API imports. A reduced package
     # never ships another edition's unused compiler, GUI or runtime body.

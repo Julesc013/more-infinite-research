@@ -1,0 +1,334 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate524SameEditionSaveFrontierV1",
+  "release_id": 457617321,
+  "tag": "v5.0.24",
+  "tag_commit": "93b7f4bf17d3b2d32729c0b937eb9f38386d3125",
+  "source": "e9866d3de73e61a79f11c4614d60e09fd901bb04",
+  "player_tree": "ade46f9e65e94faeda4f9b4cbf320ab36a859519",
+  "prerelease_verdict_sha256": "770D4CE777154847CDFB460FC740B29C3A969857764F481A9C56ADC74BB627AC",
+  "path_base": "build/qualification for original owner receipts in the primary checkout",
+  "status": "verified-named-same-edition-upgrades-on-published-5.0.24",
+  "predecessor": {
+    "release": "v4.7.3",
+    "release_id": 422732162,
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+  },
+  "cases": {
+    "f013": {
+      "factorio": "0.13.20",
+      "engine_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+      "published_predecessor_version": "4.7.01303",
+      "published_predecessor_sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+      "protected_save_sha256": "B9E2B660907C758412D473675AC1FCFA03879BB3132333469FE95FE48F8FF9EC",
+      "player_archive": "more-infinite-research_5.0.01324.zip",
+      "player_archive_sha256": "1AAC885A36E43B28CB1FEE86F7D5DC459483EBF9DD5D12C05AB7B7335021B0BF",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "E42E2615B4DADC56CEC9DDF5EDE1F57BEC172E60AA417F5525355A3AA24B47EF",
+      "native_result_sha256": "AB2D5F55FA576172FDC063A868E291381E084C155ABF58E309255292E47155B9",
+      "owner_receipt": {
+        "path": "mir524-historical-owned-r02/f013/terminal.json",
+        "sha256": "B04018474BCF189A0EE6FCB396241E55397A4FF89156D2000B75664225B1F331"
+      },
+      "original_files_rehashed": 56,
+      "cold_loads": [
+        {
+          "log_sha256": "7A2A6BFABC3E6494E3E9F00339E32677961277E7BA42EC6667BDE4968DB7D7C2",
+          "save_sha256": "549B46B89D3121FAA91EE09DD75B93BA3536AC2EB4D7D584D44E47147F29F5F1"
+        },
+        {
+          "log_sha256": "33ED16E33AFA52AD85AE99FF42684DBB25DF062C66605F35844EF1CB14FF00E3",
+          "save_sha256": "549B46B89D3121FAA91EE09DD75B93BA3536AC2EB4D7D584D44E47147F29F5F1"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 0,
+        "mining_bonus": 0.05,
+        "current_research": "nil",
+        "research_progress": 0,
+        "queue_api": false
+      }
+    },
+    "f014": {
+      "factorio": "0.14.23",
+      "engine_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+      "published_predecessor_version": "4.7.01403",
+      "published_predecessor_sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+      "protected_save_sha256": "A4DB5ACD358BA2A8DA40D8BA84D19F0C88D84A26B0FA19BBF9303D907FC172C8",
+      "player_archive": "more-infinite-research_5.0.01424.zip",
+      "player_archive_sha256": "1AA91476DBE18BB9B3EB2CA47131A7F7260AFEAEADF21A2824E34C7B022EB2AF",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "569B993BCB833849C689DD86BEAE47740B65AA28C1D2B935D0C0C390B6966EA4",
+      "native_result_sha256": "24D9132E11B19761A2FEAF9542059A2D20BF483568338F8E80E01C5ABD67500F",
+      "owner_receipt": {
+        "path": "mir524-historical-owned-r02/f014/terminal.json",
+        "sha256": "CBD92E099CC3742A8DA36F6124F94B79A43EF0E171D54E387A02D2CC9C07BD39"
+      },
+      "original_files_rehashed": 60,
+      "cold_loads": [
+        {
+          "log_sha256": "872547E0A6BA8E78510065A2703CA2BA080C9AA25EAF88347913EABEB1080484",
+          "save_sha256": "2BF704171445229E20C6732ADE70D7BB93B1376010883255E6FF86682E75ED92"
+        },
+        {
+          "log_sha256": "7A88042416C671BC07BD887283FEFEE1DB0C1DB782EDF58E6AC190404C167FFC",
+          "save_sha256": "2BF704171445229E20C6732ADE70D7BB93B1376010883255E6FF86682E75ED92"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 0,
+        "mining_bonus": 0.05,
+        "current_research": "nil",
+        "research_progress": 0,
+        "queue_api": false
+      }
+    },
+    "f015": {
+      "factorio": "0.15.40",
+      "engine_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+      "published_predecessor_version": "4.7.01503",
+      "published_predecessor_sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
+      "protected_save_sha256": "BD280C04FC61F0F9CC9D52A6EB2A628DD2FFBDC28BC5197F152EFBE3400AD253",
+      "player_archive": "more-infinite-research_5.0.01524.zip",
+      "player_archive_sha256": "6E946DC09BD382402018183B84C34B9D430D3DFD92184FE7A92CF5484262364D",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "C3415EE492604C71D87F54090F57F85723F1896DA0AA84A2F7E7DF2EE0D96F08",
+      "native_result_sha256": "F78CAD142A3F5EA032BBBD7D4EF085FDA7E88B10E322BAA770D98AD64BD20B8C",
+      "owner_receipt": {
+        "path": "mir524-historical-owned-r02/f015/terminal.json",
+        "sha256": "87A27A06874BEB11C5F8C19EED20A4EFCA2281BE8EBA48CB238C3AD7A4AB1546"
+      },
+      "original_files_rehashed": 58,
+      "cold_loads": [
+        {
+          "log_sha256": "E84DE74EF0432C0C833032813779BF933717EB805BAAD2632A6D6231E523289B",
+          "save_sha256": "602E7B7B0EF3376D851B153F5D5CFBB3D1DFECA98B82181EDCA777276084EEF2"
+        },
+        {
+          "log_sha256": "0CBE4298630A1114508375B9408BC5AC4F4E3EE100DC11394FE02987070F7C47",
+          "save_sha256": "602E7B7B0EF3376D851B153F5D5CFBB3D1DFECA98B82181EDCA777276084EEF2"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "mining_bonus": 0.1,
+        "current_research": "nil",
+        "research_progress": 0,
+        "queue_api": false
+      }
+    },
+    "f016": {
+      "factorio": "0.16.51",
+      "engine_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+      "published_predecessor_version": "4.7.01603",
+      "published_predecessor_sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
+      "protected_save_sha256": "00BE9F2D6C0B3FF2B91C7C8B6585B0A15EAF3F9071CED21B91556B969B6BC75C",
+      "player_archive": "more-infinite-research_5.0.01624.zip",
+      "player_archive_sha256": "CBCDEF7BF3A9E6514397DBAED86B4D5D29365B1A0201BA7EC16B19F6B472E786",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "AAFB49B26D2956E7913AF438126376676C5D5CCA8DFBBC8B27E6DA4351A59381",
+      "native_result_sha256": "04C9A4B75B17D24238B12E2E49D4743CA8E5003BADA45CB4B17F16EC20770507",
+      "owner_receipt": {
+        "path": "mir524-historical-owned-r02/f016/terminal.json",
+        "sha256": "8DD0D2488707BD92CBBFEFD7DC4517824D1AEC013CE7E4E617DBC087AB901F94"
+      },
+      "original_files_rehashed": 60,
+      "cold_loads": [
+        {
+          "log_sha256": "5BD41322C02B26C4C81015D60572236F4682B4A303BC894C3DD852E0C3CBD4DC",
+          "save_sha256": "00CCDD35876F9B3A1FD112E2B2428A9BCD05B3BB97BF3CA0D0831909BEDC2D6E"
+        },
+        {
+          "log_sha256": "D0E558896E47CE2B4E67BBBD3FE8BA45959E7FDFF1C3BCDFD6FFDF6DFAC5E128",
+          "save_sha256": "00CCDD35876F9B3A1FD112E2B2428A9BCD05B3BB97BF3CA0D0831909BEDC2D6E"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "mining_bonus": 0.1,
+        "current_research": "nil",
+        "research_progress": 0,
+        "queue_api": false
+      }
+    },
+    "f017": {
+      "factorio": "0.17.79",
+      "engine_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+      "published_predecessor_version": "4.7.01703",
+      "published_predecessor_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+      "protected_save_sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617",
+      "player_archive": "more-infinite-research_5.0.01724.zip",
+      "player_archive_sha256": "7D95698D2708EDBA7AC3A4750FCA9D5706D06266A4AC05BA2A0431E084C01443",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "15EE7A6B923EF47FB4465BEFF6DE4D605F5EFCB148B139AE660333929729F42F",
+      "native_result_sha256": "D35CC1F352B50BFED4F4CB394FCEF86DE32054FDFF1656E408434C2CC2FC77B2",
+      "owner_receipt": {
+        "path": "mir524-historical-native-r01/f017/terminal.json",
+        "sha256": "4D0F95FE786C6742E81F7B043A5FD0DAD7013AB7149121624495193A951EA886"
+      },
+      "original_files_rehashed": 64,
+      "cold_loads": [
+        {
+          "log_sha256": "6D3E542146EE79CE2C04FD4F265F80771FC446098BDE0FB7A13A849DDC4C2A4F",
+          "save_sha256": "AD8F04C20F3AC68644522536B18FDF9E1F14F71AB9D3011D078A00AB16C01C4A"
+        },
+        {
+          "log_sha256": "F2FF6B7E84A7BACE10E5BA87686A8B3BF3590E53877B48FAA5EF20D29939FB2A",
+          "save_sha256": "AD8F04C20F3AC68644522536B18FDF9E1F14F71AB9D3011D078A00AB16C01C4A"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "mining_bonus": 0.1,
+        "current_research": "braking-force-1",
+        "research_progress": 0,
+        "queue_api": true
+      }
+    },
+    "f100": {
+      "factorio": "1.0.0",
+      "engine_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+      "published_predecessor_version": "4.7.10003",
+      "published_predecessor_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+      "protected_save_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+      "player_archive": "more-infinite-research_5.0.10024.zip",
+      "player_archive_sha256": "D81589D37D486B7ED7F813D8A4BC2C5FED90A0DC50E3B2B2DFE69EDB64E6BDAE",
+      "execution_source": "b14033989a7d2a0e932f233541edd5d05d422d3b",
+      "harness_sha256": "7A72A7FF49DA56C9895A894B93DFDC337798E40C9F766C27A6C3998961615FCB",
+      "profile_sha256": "FFA6E52E90B85F05FA25E8C14940157EEC10D06BBF9C5E910354BF62E39DB261",
+      "native_result_sha256": "29902B84C6176BEBF900B87BD7A16EBACA80EC10D0D5A50E187C2493F7E42F60",
+      "owner_receipt": {
+        "path": "mir524-historical-native-r01/f100/terminal.json",
+        "sha256": "D965AE45F6F3509C2376E2F3E742198E263E5FD03C8BD8C6A0534BDD25CE9640"
+      },
+      "original_files_rehashed": 66,
+      "cold_loads": [
+        {
+          "log_sha256": "4C039226FF320921DC4F764DDC9249833B29A77D7E89F3C009777151D12F864A",
+          "save_sha256": "F0A1899DD36D52F6AEE9A3F4D28449982E2590FC6DADDFE7482CAE09A6FB7A42"
+        },
+        {
+          "log_sha256": "4212E672C7691B91425E7B24A14E817E1729847BED65E3222031B4B5160F07F3",
+          "save_sha256": "F0A1899DD36D52F6AEE9A3F4D28449982E2590FC6DADDFE7482CAE09A6FB7A42"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "mining_bonus": 0.1,
+        "current_research": "braking-force-1",
+        "research_progress": 0,
+        "queue_api": true
+      }
+    },
+    "f110": {
+      "factorio": "1.1.110",
+      "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "published_predecessor_version": "4.7.11003",
+      "published_predecessor_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+      "protected_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "player_archive": "more-infinite-research_5.0.11024.zip",
+      "player_archive_sha256": "07E4912ABA32B2E7CB1F9F9A1A385785A3BCD8853FA4E7565687E38EC15E4B9E",
+      "execution_source": "a9bf45bfd84174b6631d48532f98c1b0d7afe0ed",
+      "harness_sha256": "545BFB8F179682079765467F2E0A22BC259E16553C9D3EC79BE4DE12E318867C",
+      "profile_sha256": "8C845F056B515895EA5EF51425BFDD882767DABE13369AB718D25FA6E7E39522",
+      "native_result_sha256": "89DDB3EF1ABF8EF323409B0039881AA82D34DE9C9D057B55D7B86F5A1D7858D9",
+      "owner_receipt": {
+        "path": "f110-473-to-524-r01/verified-native.json",
+        "sha256": "0F0AD3AF8B62169B24AB701D36A2F58AB88D833AEE6E4AE75372B8D32C391880"
+      },
+      "original_files_rehashed": 72,
+      "cold_loads": [
+        {
+          "log_sha256": "32EEC2912D619F4D556B86025CC211B97B219F55A14E622ED869132AFA336455",
+          "save_sha256": "67570FD60F82E1C88565FAC9CECE10CE38B637D26432CA2AF0BD3467D6E0799A"
+        },
+        {
+          "log_sha256": "02C404F6F909271CFFCC84B8327F1AD1FEFB20B2495158257FCE2CA45065CB25",
+          "save_sha256": "67570FD60F82E1C88565FAC9CECE10CE38B637D26432CA2AF0BD3467D6E0799A"
+        }
+      ],
+      "outcome": {
+        "source_direct_lab_completions": 1,
+        "successor_direct_lab_completions": 1,
+        "inserter_stack_size_bonus": 2,
+        "stack_inserter_capacity_bonus": 4,
+        "queued_progress": 0.42,
+        "suspended_progress": 0.27,
+        "retained_catalogue_rows": 17,
+        "foreign_disabled": true
+      }
+    },
+    "f200": {
+      "factorio": "2.0.77",
+      "engine_sha256": "C9AC91D318BDBCCE5AFAAC30D48F4B71DC38AF257712A5D4D4C4FEB625737198",
+      "protected_4_7_3_save_sha256": "162A046790D4F2BA3FF28DA1B6EC4B8998FC9C5789EBC6F573EF5A6FA3B43CDF",
+      "player_archive": "more-infinite-research_5.0.20024.zip",
+      "player_archive_sha256": "F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535",
+      "execution_source": "eb8af9c165879400e662287f767b975c35671f9f",
+      "packet_sha256": "825D6F55BBF2FDBEA8A1F3C7676713A44DA69BB79453D2C5C3ECBAE75882ECB5",
+      "owner_receipt": {
+        "path": "mir524-modern-minimum-gunmetal-r02/verified.json",
+        "sha256": "E3F69F33980F8CBB98BF189C9C87BDB79F1B290415D7B95683CD9CE1D25787CD"
+      },
+      "before_force_count": 1,
+      "after_force_count": 1,
+      "cold_loads": [
+        {
+          "updates": 1200,
+          "checksum": 1783848740,
+          "log_sha256": "677678DDD82EBE2F413DBF22F746B2678159B1167FF6DF9A3AB9022E1D9ABEFC"
+        },
+        {
+          "updates": 1200,
+          "checksum": 1783848740,
+          "log_sha256": "1D073D89972F96C5341AEB8362501FBE14A628A2515A753C88E64E78C71E7701"
+        }
+      ],
+      "saved_successor_sha256": "9F9467E514342104E2475505EFF8B64260FC3033CCF57875636E46285721864A"
+    },
+    "f210": {
+      "factorio": "2.1.23",
+      "engine_sha256": "D6A900050FA17F44AADAD036A0E044043CFF7EF9B72DE8B690DADED3570681BA",
+      "protected_4_7_3_save_sha256": "33304EADB46949673086A417F7E4260FA455E2EA98DFFDEFCB11EFEE2A058876",
+      "player_archive": "more-infinite-research_5.0.21024.zip",
+      "player_archive_sha256": "162228C9F581A9D48CB9DA0E30CEBEFCC2DE4F4C256FEF521CF636C52124F0D6",
+      "execution_source": "eb8af9c165879400e662287f767b975c35671f9f",
+      "packet_sha256": "825D6F55BBF2FDBEA8A1F3C7676713A44DA69BB79453D2C5C3ECBAE75882ECB5",
+      "owner_receipt": {
+        "path": "mir524-modern-minimum-gunmetal-r02/verified.json",
+        "sha256": "E3F69F33980F8CBB98BF189C9C87BDB79F1B290415D7B95683CD9CE1D25787CD"
+      },
+      "before_force_count": 2,
+      "after_force_count": 2,
+      "cold_loads": [
+        {
+          "force_state_sha256": "0C35E48F9897B793911291CE87D2CE37729DE33346710E4932DB7DF77391B1E2",
+          "log_sha256": "4D78CEEBEBD328A926E572BDFA5B88ACFFBC2F61B73E5B1C2227111977D0AE22"
+        },
+        {
+          "force_state_sha256": "0C35E48F9897B793911291CE87D2CE37729DE33346710E4932DB7DF77391B1E2",
+          "log_sha256": "D647FCBA6E5C5900DC88CF0AE60C7D6415DAB0656EFDAA3500E1D30BED0CB349"
+        }
+      ],
+      "saved_successor_sha256": "50FDDED8FC7E16EEABDFC6D2CC3062C551217F7342603C7678B176356BD2230A"
+    }
+  },
+  "excluded_scope": [
+    "The seven selected older-contract groups and four published-origin engine journeys retain their own evidence.",
+    "Additional DLC, provider, settings and client transitions require their applicable cases.",
+    "F018 remains experimental and the exact 0.18.47 engine is unavailable.",
+    "Stable acceptance remains pending."
+  ],
+  "stable_acceptance": false
+}
