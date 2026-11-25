@@ -17,7 +17,10 @@ local INTERNAL_CREDIT_IDS = {
   ["mir-k2-imersite-staged-state-1"] = true,
   ["mir-k2-imersite-continuation-state-4"] = true,
 }
-if target.id == "f200" or target.id == "f210" then INTERNAL_CREDIT_IDS["mir-worker-storage-head-4"] = true end
+if target.id == "f200" or target.id == "f210" then
+  INTERNAL_CREDIT_IDS["mir-worker-storage-head-4"] = true
+  INTERNAL_CREDIT_IDS["mir-worker-storage-provider-credit-4"] = true
+end
 for name in pairs(require("research.native_gun_credit_definitions").private_ids()) do
   INTERNAL_CREDIT_IDS[name] = true
 end

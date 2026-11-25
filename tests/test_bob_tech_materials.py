@@ -9,7 +9,7 @@ import unittest
 import zipfile
 
 from historical_sources import PUBLISHED_COMMIT, read_published_source
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 
@@ -580,7 +580,11 @@ class BobTechMaterialTests(unittest.TestCase):
             "recipe-prod-research_material_invar-4",
         }
         self.assertTrue(expected <= emitted)
-        self.assertEqual(emitted, expected | {"fixture-gears", "mir-worker-storage-preservation-4"})
+        credit = next(row for row in installed if row["name"] == "mir-worker-storage-provider-credit-4")
+        self.assertEqual(credit, expected_provider_credit_row())
+        self.assertEqual(emitted, expected | {
+            "fixture-gears", "mir-worker-storage-preservation-4", "mir-worker-storage-provider-credit-4",
+        })
         self.assertNotIn("recipe-prod-research_material_tin-4", emitted)
 
 
