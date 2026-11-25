@@ -24,6 +24,7 @@ local ARCHIVED_WORKER_SCIENCE = {
 -- Historical native worker contracts. Paid admission needs the complete
 -- archived mod selection, because an extra mod could have changed the old price.
 M.archived_default_profiles = {
+  ["4.7.20002"] = {edition="f200", base="2.0.77", paid=true, mods={}},
   ["4.6.21000"] = {
     edition="f210", base="2.1.23", paid=true,
     mods={

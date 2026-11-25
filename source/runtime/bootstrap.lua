@@ -5,6 +5,7 @@
 -- remains the sole cap-policy owner and the Library owns only its own view
 -- callbacks.
 local lifecycle = require("runtime.lifecycle")
+local competing_retirements_active = lifecycle.competing_retirements_active or function() return false end
 local library = require("runtime.library")
 local catalogue = require("runtime.catalogue")
 local runtime_api = require("api.v1.runtime")
@@ -584,7 +585,7 @@ local function on_research_finished(event)
   end
   if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
-  if lifecycle.caps_active() and not worker_storage_mutating(event) then
+  if (lifecycle.caps_active() or competing_retirements_active(event.research.name)) and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
     if worker_default_settled then
       -- Its first native completion also fulfils the public prerequisite.
@@ -630,7 +631,9 @@ local function on_research_cancelled(event)
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
   if native_credits and native_credits.on_research_cancelled(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
-  if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_cancelled(event) end
+  if (lifecycle.caps_active() or competing_retirements_active()) and not worker_storage_mutating(event) then
+    lifecycle.on_research_cancelled(event)
+  end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
   request_library_refresh(event)
 end
@@ -768,7 +771,9 @@ local function bind_runtime_events(library_open)
   worker_completion_tick_scheduled = worker_completion_tick
   local events = defines and defines.events or {}
   local competing_active = competing_productivity and competing_productivity.active()
+  local retirements_active = competing_retirements_active()
   local force_lifecycle_active = lifecycle.caps_active()
+    or retirements_active
     or native_credits ~= nil
     or native_gun_credits ~= nil
     or competing_active
@@ -796,11 +801,12 @@ local function bind_runtime_events(library_open)
     script.on_event(events.on_research_started, active and on_research_started or nil)
   end
   if events.on_research_cancelled then
-    local active = lifecycle.caps_active() or competing_active or library_open or credit_pending
+    local active = lifecycle.caps_active() or retirements_active or competing_active or library_open or credit_pending
     script.on_event(events.on_research_cancelled, active and on_research_cancelled or nil)
   end
   if events.on_research_finished then
-    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open or credit_pending
+    local active = lifecycle.caps_active() or retirements_active or competing_active
+      or (scripted_effects and scripted_effects.events_active()) or library_open or credit_pending
     script.on_event(events.on_research_finished, active and on_research_finished or nil)
   end
   if events.on_research_reversed then
