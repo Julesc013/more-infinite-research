@@ -14,6 +14,18 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Integrated Factorio 2.0 Space Age and Space Exploration replays (2026-11-26)
+
+The private Factorio 2.0.77 ZIP `CE776D1C9CA8C661FE176EB100BC5B2F67C744646BC431EECE1CA402A71F65DC` from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` contains both the legacy default worker repair and the competing productivity availability repair. It passed three native replays through the normal game entry points.
+
+- The protected MIR 4.7.20002 official Space Age save kept active and parked paid worker progress, earned cargo and the original queue. Ordinary labs finished the 1,012-unit level, cargo rose from four to five on the active force, and the parked force stayed unchanged. Two separate cold processes matched the final force state.
+- The staged Space Exploration 0.7.57 replay kept 200 paid units at the original 5,125-unit price, night vision, six conquest values and unrelated queued research. Ordinary labs finished levels nine and ten, cargo rose from eight to ten, and Factorio refused level eleven at cap ten. Two separate 1,200-update cold loads matched checksum `2237538572`.
+- The reduced Space Exploration extraction profile used 250 automation and 250 logistic science packs in ordinary labs. The burner, electric and area drills each went from 45 to 49 ore, and the core miner went from 160 to 176 fragments. Two separate 1,200-update cold loads matched checksum `3069318716`.
+
+All three restored the shared Factorio 2.0 test library. The original protected saves were preserved. These results cover the stated official Space Age and reduced Space Exploration profiles on the current development archive. The scheduled 5.0.25 beta retains its independently qualified frozen assets.
+
+The respective receipts are `build/qualification/mir5-competing-legacy-space-age-paid-r01/verified-paid-worker.json` at `A8E795616A0EF20AB2C1E2B75D527CC3D7DFB353817345C21E58F159F6EBACDE`, `build/qualification/mir5-competing-availability-verified-r01/f200-staged-space-exploration-work-readback.json` at `6F1D277047C194947E5F20FDAA7BF127C877DB9DF2508988B9EA79103A176EF4`, and `build/qualification/mir5-competing-se-native-extraction-r01/verified-physical-extraction.json` at `46C7A6B17F68F8A7C9555E6469A7102A79777E71A22EAE36CD9EE1B6F5A13A3B`.
+
 ## Published Base save migration and lab completion (2026-11-26)
 
 The exact development archives from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` upgraded the protected published MIR 4.7.20003 Base save `1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF` directly on Factorio 2.0.77 and 2.1.23. Both paths kept 54 research rows, 85 recipe bonuses, 15 force values, seven weapon bonuses, active and parked work, and worker cargo ownership across two forces. Both matched two fresh cold loads. The 2.1 comparison checks exact native representations of the recipe values and retains all 875 prior settings alongside 14 authored defaults for the two new cargo families.
