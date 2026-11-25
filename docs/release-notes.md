@@ -16,6 +16,7 @@ This beta preserves earned worker cargo and unfinished research when a prepared 
 
 - In Factorio 1.1.110, update MIR on a copy of your save. Run `/mir-worker-storage-recovery prepare`, save the paused game under a new name, and open that copy in Factorio 2.0.77 with the matching MIR edition and worker cargo settings.
 - The verified upgrade keeps active and parked worker research at its original science price, preserves the research queue, and lets labs finish the remaining work normally.
+- On Factorio 2.0.77 with Space Age, a tested save from MIR 4.7.20002 still stops at the worker cargo history check. If you see that error, keep your original save and return to your previous mod selection.
 
 [Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.25/docs/support.md#moving-a-factorio-11-save-to-20)
 
