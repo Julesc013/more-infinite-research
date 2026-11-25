@@ -124,7 +124,7 @@ The staged procedure preserved paid worker level 9, completed levels 9 and 10 in
 
 - An already-clamped save cannot prove the lost old level or progress. Return to a protected pre-change original copy; installing MIR and a new provider together does not perform this preparation. Adding MIR to an existing provider or upgrading with the same provider does not grant that provider's finite stages.
 - Only the old queued occurrences or detached partial level may finish at the matching old cost; the supporting research then stops. Use `/mir-worker-storage-recovery resume <force-name>` to append detached partial work while keeping the current unrelated research. Originally disabled work retains its lock and cannot be resumed by this command.
-- Keep the worker cap and enable setting unchanged during preparation, provider entry and while any preserved work remains. After provider entry and retirement of all preserved work, ordinary cap and enable changes are allowed without changing its earned native benefit. Changed research costs, science, effects or prerequisites still refuse. Provider removal, another provider transition and arbitrary overhaul changes remain unqualified. Force merges follow Factorio's native research merge behavior; MIR does not combine independent partial levels.
+- Keep the worker cap and enable setting unchanged during preparation, provider entry and while any preserved work remains. After provider entry and retirement of all preserved work, ordinary cap and enable changes are allowed without changing its earned native benefit. Changed research costs, science, effects or prerequisites still refuse. The prepared procedure below covers the verified provider removal and reinstall. Factorio's native research merge rules determine what survives when forces have independent partial levels.
 
 ### Removing or reinstalling a worker cargo provider
 
@@ -134,6 +134,8 @@ The prepared removal and reinstallation were verified on Factorio 2.1.25 with Pl
 2. Run `/mir-worker-storage-recovery prepare-removal` as an administrator. MIR records the provider's earned cargo, unfinished research and queue positions, then pauses the game. To abandon the preparation while the provider is present, run `/mir-worker-storage-recovery cancel-removal`.
 3. Save the paused copy under a new name and exit. Disable the provider and any dependencies that the remaining mods no longer use. Load the prepared copy with the same MIR version and settings. Check the earned cargo and remaining research queue before saving under a new name.
 4. To resume the provider's unfinished work, reinstall the same provider and dependency versions with the same MIR settings. Load a copy of the latest save. The provider's research returns with its original price and progress alongside research completed while it was absent.
+
+If Factorio cleared a prerequisite during removal, MIR keeps the paid progress parked at its original price. Once the prerequisite is available, run `/mir-worker-storage-recovery resume <force-name>` to restore the pending queue entries. An early attempt reports the prerequisite and leaves the work parked.
 
 If either transition refuses, keep the corresponding pre-change save and its previous mod selection. The protected save is the source of the paid work and earned cargo.
 
