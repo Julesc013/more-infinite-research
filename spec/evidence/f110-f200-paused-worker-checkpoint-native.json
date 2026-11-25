@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "status": "passed exact private two-stage native case",
+  "implementation": "ecd50d3fa570de6aca9b7f39dbd890150930c6e1",
+  "qualification": "The committed packages match the observed bytes. Neither package replaces its published 5.0.24 namesake.",
+  "editions": {
+    "f110": {
+      "factorio": "1.1.110",
+      "distribution_version": "5.0.11024",
+      "archive_sha256": "F14E9DB3D94919D3F7D1195E50EDC364C1EBCB3C8D40B22CB1CDB9B46A1E5A57",
+      "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "build_receipt": {
+        "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/committed/f110.json",
+        "sha256": "4B54B1AE202B66701E3F18C66D110511C67E50699CF2CC3C216E0E2F344D5E6C"
+      }
+    },
+    "f200": {
+      "factorio": "2.0.77",
+      "distribution_version": "5.0.20024",
+      "archive_sha256": "C6B714A6D62D1F6766D489C977B233BFCD96F5EE5D366AEAE58E533AE7CDB554",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "build_receipt": {
+        "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/committed/f200.json",
+        "sha256": "17E9ED4B6D74B8B3906610E4421CAE114E23FD6BFD910DE74928C981938E0BE7"
+      }
+    }
+  },
+  "protected_published_source": {
+    "release_version": "4.7.11003",
+    "source_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+    "source_evidence": "f110-f200-published-source-r05-native-chain.json",
+    "native_precompletion": {
+      "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/original-verified-f200-1.json",
+      "sha256": "CED113E1B2B6AF80CE73DA832B9C84B8013A06D330AF3093BADA938BC7616FB8"
+    },
+    "native_lab_and_reloads": {
+      "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/original-lab-verified-3.json",
+      "sha256": "13DBE1C89275582E88681AEFBBFD5BF84F097B3789F1243830F365F69CEBDE0A"
+    },
+    "cold_checksum": "457038294",
+    "observed": {
+      "case": "f110-f200-transition",
+      "stage": "initial",
+      "status": "passed",
+      "source_direct_lab_completions": 1,
+      "successor_direct_lab_completions": 1,
+      "seeded_catalogue_rows": 16,
+      "retained_catalogue_rows": 17,
+      "queued_progress": 0.42,
+      "suspended_progress": 0.27,
+      "foreign_disabled": true,
+      "inserter_stack_size_bonus": 2,
+      "bulk_inserter_capacity_bonus": 4,
+      "on_load_read_only": false
+    },
+    "source_cargo": 1,
+    "worker_owner_next_level": 5
+  },
+  "controlled_pending_source": {
+    "preparation": "Active 0.125 and parked 0.25 seeded through the native save API. An ordinary uninvested braking item follows the active worker in the queue.",
+    "source_save_sha256": "27D79DC0A8607A9E7830EAC54CA2BF2978B1BAC9B61746A9BBBFCED5571F8837",
+    "native_before_completion": {
+      "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/synthetic-verified-f200-1.json",
+      "sha256": "FE68080F3B4729CB2F3208F4D6A0B6D3AB4CA115C2B0AE2AE79D39AF096419CB"
+    },
+    "ordinary_lab_and_reloads": {
+      "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/synthetic-lab-verified-1.json",
+      "sha256": "A3C9D77868DDC9A05BCC4BF79A92FE93B4446C9E1D5621B6F919068B3E7F1BAA"
+    },
+    "cold_checksum": "4236505197",
+    "level4_price": 675,
+    "observed": {
+      "level": 5,
+      "cargo": 3,
+      "current": "braking-force-1",
+      "next_price": 1012,
+      "parked": 0.25,
+      "packs": {
+        "automation-science-pack": 590,
+        "logistic-science-pack": 590,
+        "chemical-science-pack": 590,
+        "production-science-pack": 590,
+        "utility-science-pack": 590
+      },
+      "stage": "initial"
+    }
+  },
+  "preserved_adverse": {
+    "public_one_step": "mir524-f110-worker-preservation-boundary.json",
+    "old_fixture_canonical_owner_assertion": {
+      "path": "build/tmp/mir524-f110-worker-checkpoint-labs-r03-original-1/process-1.stdout.txt",
+      "sha256": "B9BAAD321AF13FF66559175DC1B6CD3D94C62771789CA9D0B8CB0895448C585D"
+    },
+    "disposition": "The corrected observer reads the native owner and independently verifies the retired row, debit and cargo. Other retained-research expectations are unchanged."
+  },
+  "host_controls": {
+    "controls": 5,
+    "tests": 72,
+    "receipt": {
+      "path": "build/qualification/mir524-f110-worker-cross-engine-checkpoint-r03/host-controls.txt",
+      "sha256": "B0FAC489D0267E458B5F3124728A7DCA1C676EAF13B24EBA621E96CD21BF3102"
+    },
+    "scope": "Source registration without an idle tick subscription, cancellation, tick expiry, paid frame reconstruction and rejection of conflicting surviving work. Existing package and worker cases also pass."
+  },
+  "limits": [
+    "The exact staged Factorio 1.1.110 to 2.0.77 ordinary worker route is covered.",
+    "One-step conversion without a paused source record remains unsafe for active worker research.",
+    "No qualification is claimed for a simultaneous worker price or provider change, other engines, the final published package set, or stable release."
+  ]
+}

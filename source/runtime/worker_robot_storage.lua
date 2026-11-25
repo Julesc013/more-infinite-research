@@ -3,6 +3,7 @@
 -- levels/work before Lua; recovery therefore requires explicit pre-change custody.
 local M = {}
 local KEY, MIR = "mir_worker_storage_route", "more-infinite-research"
+local engine_checkpoint = require("research.worker_storage_checkpoint")
 
 local function refuse(reason, route)
   error("MIR worker storage history: " .. reason .. "; restore the previous mod selection and original save"
@@ -864,10 +865,11 @@ local function owner_record()
   local published_default = value.producer.kind == "published473-default"
   local published472_se = value.producer.kind == "published472-se-default"
   local prepared_default = value.producer.kind == "prepared-default"
+  local prepared_engine = value.producer.kind == "f110-prepared-default"
   local published11_empty = value.producer.kind == "published511-empty-default"
   local sif_removal_empty = value.producer.kind == "published503-sif-empty-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
-      and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default
+      and value.producer.kind ~= "unchanged-mir5-default" and not prepared_default and not prepared_engine
       and not older_empty and not older_idle and not archived and not published_default and not published472_se
       and not published11_empty and not sif_removal_empty)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
@@ -886,6 +888,7 @@ local function owner_record()
       or (older_idle or published_default) and value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f200
         and (edition ~= "f210" or value.producer.old_version ~= PUBLISHED473_DEFAULT_ORIGINS.f210)
       or published472_se and (legacy or value.producer.old_version ~= "4.7.20002" or edition ~= "f200")
+      or prepared_engine and (edition ~= "f200" or not engine_checkpoint.source_version(value.producer.old_version))
       or sif_removal_empty and (value.producer.old_version ~= "5.0.20003" or edition ~= "f200"
         or tonumber(value.producer.new_version:sub(-2)) <= 3)
       or (value.producer.kind == "unchanged-mir5-default" or prepared_default or published11_empty)
@@ -1177,6 +1180,12 @@ local function default_origin(event, initializing, state, current)
   local change = event.mod_changes[MIR]
   if change ~= nil and (type(change) ~= "table" or change.new_version ~= active[MIR]) then
     default_origin_error("default transfer package-change event is inconsistent", event, state, current)
+  end
+  local base_change = event.mod_changes.base
+  if target.id == "f200" and type(base_change) == "table" and base_change.old_version == engine_checkpoint.source_base then
+    default_origin_error("this engine upgrade requires a paused worker checkpoint from the Factorio 1.1 MIR edition. "
+      .. "Open a copy in 1.1, update MIR there, run /mir-worker-storage-recovery prepare and save it under a new name",
+      event, state, current)
   end
   local base_hop = change and exact_base_hop(event, change.old_version)
   local new_selection = false
@@ -1923,6 +1932,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   if type(initializing) ~= "boolean" or route ~= nil then recover_error("default-only transfer context required") end
   local id, state, owned = recovery.ordinary_default_id, checked_state(), owner_record()
   local removal = context.provider_removal and provider_removal_checkpoint(event, state, owned) or nil
+  local checkpoint = storage[engine_checkpoint.key]
+  if checkpoint ~= nil then
+    if initializing or owned or state or removal then recover_error("worker engine checkpoint conflicts with recorded ownership") end
+    engine_checkpoint.claim(checkpoint, event, target)
+  end
   local prepared = removal ~= nil or not owned and state and state.schema == 2 and state.kind == "prepared"
     and state.phase == "default" and state.current.kind == "default" or false
   if prepared and initializing then recover_error("initial default owner cannot consume prepared history") end
@@ -1931,7 +1945,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     local bridge = plan_published517_se_paid_bridge(event, state, owned, source_prototype, contract, context)
     if bridge then return bridge end
   end
-  local producer = owned and owned.producer or default_origin(event, initializing, state, current)
+  local producer = owned and owned.producer
+    or checkpoint and {kind="f110-prepared-default", old_version=checkpoint.mir, new_version=script.active_mods[MIR]}
+    or default_origin(event, initializing, state, current)
   if state and not prepared and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
     recover_error("legacy prepared/finite conversion is not implemented")
   end
@@ -2011,6 +2027,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       items[#items + 1] = {force=force, phase=prior.phase, action="pending-unchanged", pending_record=clone(prior)}
     else
       local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
+      local restored = checkpoint and engine_checkpoint.restore_frame(checkpoint, force, source, equal_plain)
       local public = prepared and default_frame(force, recovery.canonical, finished) or source
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
@@ -2089,8 +2106,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
               or "older MIR501 source requires every native worker4 to be empty")
           end
         end
-        if source.occurrences > 0 then requeueable(force, source, true, true) end
-        if source.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
+        local work = restored or source
+        if work.occurrences > 0 then requeueable(force, work, true, true) end
+        if work.occurrences > 0 and not public.enabled then recover_error("disabled prepared public owner cannot accept queued work") end
         action = mirrored_first and "first-credit" or "transfer"
         moved = moved or action == "transfer"
         next_force = {phase="owned", retired_flags={enabled=public.enabled, visible=public.visible,
@@ -2110,7 +2128,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       items[#items + 1] = {force=force, source=source, public=public, destination=destination, gate=gate, gate_paid=gate_paid(gate),
         gate_enabled=gate.enabled, settle_source=settle_source, initial_bonus=initial_bonus,
         bonus=departure and departure.restored_bonus or initial_bonus - (mirrored_first and source_prototype.effects[1].modifier or 0),
-        phase=next_force and next_force.phase or "owned", legacy=legacy, departure=departure,
+        phase=next_force and next_force.phase or "owned", legacy=legacy, departure=departure, restored=restored,
         moved=action == "transfer", action=action, target_enabled=target_enabled, target_visible=target_visible}
     end
   end
@@ -2122,6 +2140,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   if removal then
     for index in pairs(removal.forces) do if not seen[index] then recover_error("prepared removal has a stale force") end end
   end
+  if checkpoint then
+    for index in pairs(checkpoint.forces) do if not seen[index] then recover_error("worker engine checkpoint has a stale force") end end
+  end
   local changed = not owned or not equal_plain(record, owned)
   for _, item in ipairs(items) do
     if item.action ~= "validate" and item.action ~= "legacy-validate" and item.action ~= "pending-unchanged" then changed = true end
@@ -2130,6 +2151,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     prior_state=state, prior_owner=owned, contract=contract, cap=selected_cap, enabled=selected_enabled, items=items,
     prepared_default=prepared, prepared_snapshot=prepared and clone(state) or nil,
     removal=removal, removal_snapshot=removal and clone(removal) or nil,
+    checkpoint=checkpoint, checkpoint_snapshot=checkpoint and clone(checkpoint) or nil,
     already_owned=owned ~= nil and not moved, changed=changed, record=record}
 end
 
@@ -2149,6 +2171,7 @@ function M.apply_default_owner_transfer(plan)
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
       or plan.prepared_default ~= fresh.prepared_default or plan.removal ~= fresh.removal
       or not equal_plain(plan.removal_snapshot, fresh.removal_snapshot)
+      or plan.checkpoint ~= fresh.checkpoint or not equal_plain(plan.checkpoint_snapshot, fresh.checkpoint_snapshot)
       or not equal_plain(plan.prepared_snapshot, fresh.prepared_snapshot)
       or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled or #plan.items ~= #fresh.items
       or not equal_plain(plan.record, fresh.record) then recover_error("stale default transfer plan") end
@@ -2163,6 +2186,7 @@ function M.apply_default_owner_transfer(plan)
         or old.bonus ~= item.bonus or not equal_plain(frame_values(old.source), frame_values(item.source))
         or not equal_plain(frame_values(old.public), frame_values(item.public))
         or not equal_plain(frame_values(old.destination), frame_values(item.destination))
+        or not equal_plain(old.restored and frame_values(old.restored), item.restored and frame_values(item.restored))
         or old.phase ~= item.phase or not equal_plain(old.legacy and frame_values(old.legacy), item.legacy and frame_values(item.legacy)) then
       recover_error("native work changed after default preflight")
     end
@@ -2193,7 +2217,7 @@ function M.apply_default_owner_transfer(plan)
       local previous = default_mutating_force
       default_mutating_force = item.force.index
       local ok, message = pcall(function()
-        local frame, holder, canonical, gate = item.source, item.destination.technology, item.public.technology, item.gate
+        local frame, holder, canonical, gate = item.restored or item.source, item.destination.technology, item.public.technology, item.gate
         if item.action == "transfer" then
           if holder.level ~= frame.next_level or holder.researched then holder.level = frame.next_level end
           holder.enabled, holder.visible_when_disabled = item.target_enabled, item.target_visible
@@ -2252,7 +2276,7 @@ function M.apply_default_owner_transfer(plan)
         recover_error("native full default contribution/first-level state was not preserved; reload the original copy")
       end
       if item.action == "transfer" then
-        local expected = frame_values(item.source)
+        local expected = frame_values(item.restored or item.source)
         if item.departure then
           local queue = item.departure.queue
           expected.current, expected.current_progress = queue.current, queue.current_progress
@@ -2305,6 +2329,14 @@ function M.apply_default_owner_transfer(plan)
     archived.detached = credits
     storage[REMOVAL_KEY] = archived
     game.tick_paused = archived.was_paused
+  end
+  if fresh.checkpoint then
+    if storage[engine_checkpoint.key] ~= fresh.checkpoint
+        or not equal_plain(fresh.checkpoint, fresh.checkpoint_snapshot) then
+      recover_error("worker engine checkpoint changed during native transfer")
+    end
+    storage[engine_checkpoint.key] = nil
+    game.tick_paused = fresh.checkpoint.was_paused
   end
   storage[OWNER_KEY] = fresh.record
   if fresh.prepared_default then storage[KEY] = nil; reconnect(nil) end
@@ -2934,6 +2966,9 @@ end
 
 function M.default_owner_preflight(event, route, split_current)
   local owned = owner_record()
+  if storage[engine_checkpoint.key] and not default_active(route, split_current) then
+    recover_error("worker engine checkpoint requires the ordinary worker owner")
+  end
   if owned and owned.kind == "provider-retired" then
     if route == nil and split_current == true and storage[REMOVAL_KEY] ~= nil then
       return M.plan_default_owner_transfer(event, nil, false, {configuration=true, provider_removal=true})
