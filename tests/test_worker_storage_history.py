@@ -3332,6 +3332,10 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           end
           history.command({parameter="prepare-removal"},provider_route(5))
           saved_removal=assert(storage[removal_key],messages[#messages])
+          return_prototypes={}
+          for name in pairs(saved_removal.technologies)do
+            return_prototypes[name]=copy(prototypes.technology[name])
+          end
           local public=prototypes.technology[CANONICAL]
           for key in pairs(public)do public[key]=nil end
           for key,value in pairs(copy(prototypes.technology[ORDINARY]))do public[key]=value end
@@ -3422,6 +3426,103 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           writes=0
           assert(not pcall(history.default_owner_apply,plan) and writes==0)
           assert(storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==quota and storage[removal_key]==saved_removal)
+        ''')
+
+
+    def returned_provider_world(self):
+        lua=self.removal_world()
+        lua.execute(r'''
+          assert(history.default_owner_apply(history.default_owner_preflight(removal_event,nil,true)))
+          retained=saved_removal
+          archived_removal=storage[removal_key]
+          -- The main force finished an ordinary level and advanced the
+          -- unrelated queued job while the finite provider was absent.
+          local main=player.technologies[ORDINARY]
+          main.level=main.level+1
+          player.research_queue={OTHER};player.research_progress=.41
+          finite_entry(1)
+          local public=prototypes.technology[CANONICAL]
+          for key in pairs(public)do public[key]=nil end
+          for key,value in pairs(return_prototypes[CANONICAL])do public[key]=value end
+          for _,name in ipairs{tier5,tier6}do
+            local proto=return_prototypes[name]
+            proto.enabled,proto.visible_when_disabled=true,true
+            prototypes.technology[name]=proto
+            for _,force in pairs(game.forces)do
+              local technology=force.technologies[name]
+              technology.name,technology.prototype,technology.force=name,proto,force
+              technology.enabled,technology.visible_when_disabled=true,true
+              technology.research_unit_count=name==tier5 and 1012 or 1518
+            end
+          end
+          for _,force in pairs(game.forces)do
+            local public_tech=force.technologies[CANONICAL]
+            local mt=getmetatable(public_tech)
+            local old_read=mt.__index
+            mt.__index=function(object,key)
+              if key=="research_unit_count"then return 100 end
+              return old_read(object,key)
+            end
+          end
+          return_event=provider_event()
+          writes=0
+        ''')
+        return lua
+
+    def test_provider_return_reinstates_archived_queue_prices_and_earned_levels_after_ordinary_work(self):
+        lua=self.returned_provider_world()
+        lua.execute(r'''
+          local observed_bonus, observed_level=player.worker_robots_storage_bonus,player.technologies[ORDINARY].level
+          local parked_bonus=detached.worker_robots_storage_bonus
+          local plan, legacy=delegate(return_event,provider_route(5))
+          assert(plan.archive==archived_removal and storage[removal_key]==archived_removal and writes==0)
+          assert(history.default_owner_apply(plan))
+          assert(storage[removal_key]==archived_removal)
+          history.apply(legacy)
+          assert(storage[removal_key]==nil and storage[OWNER_KEY].kind=="provider-retired")
+          assert(player.technologies[ID].level==observed_level and player.worker_robots_storage_bonus==observed_bonus)
+          assert(player.current_research.name==OTHER and player.research_progress==.41)
+          assert(player.research_queue[2].name==tier5 and #player.research_queue==2)
+          assert(player.technologies[tier5].saved_progress==.1875 and player.technologies[tier5].research_unit_count==1012)
+          assert(detached.technologies[tier5].researched and detached.technologies[tier6].saved_progress==.3125)
+          assert(detached.technologies[tier6].research_unit_count==1518 and detached.worker_robots_storage_bonus==parked_bonus)
+          assert(detached.technologies[CREDIT].level==4 and not detached.technologies[CREDIT].enabled)
+          assert(detached.technologies[ID].saved_progress==.23 and detached.current_research.name==OTHER)
+          history.on_load();history.default_owner_on_load();writes=0
+          assert(history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},provider_route(5),true)==nil)
+          assert(writes==0 and storage[removal_key]==nil)
+        ''')
+
+    def test_provider_return_refuses_unverified_versions_changed_terms_and_stale_native_work(self):
+        for change, reason in (
+            ('script.active_mods.provider="2.0";return_event.mod_changes.provider.new_version="2.0"', 'version differs'),
+            ('prototypes.technology[tier6].research_unit_energy=9000', 'research contract changed'),
+            ('detached.technologies[CREDIT].level=4', 'differs from the archived levels'),
+            ('player.technologies[tier5].saved_progress=.99', 'already has work'),
+        ):
+            with self.subTest(change=change):
+                lua=self.returned_provider_world()
+                lua.globals().reason=reason
+                lua.execute(change+r'''
+                  writes=0
+                  local ok,message=pcall(history.default_owner_preflight,return_event,provider_route(5),true)
+                  assert(not ok and tostring(message):find(reason,1,true),message)
+                  assert(writes==0 and storage[removal_key]==archived_removal)
+                ''')
+
+    def test_provider_return_queue_weaves_saved_positions_without_reordering_current_work(self):
+        self.world().execute(r'''
+          local queue=require("runtime.worker_storage_provider_queue")
+          local live={queue={ORDINARY,ORDINARY,OTHER,"new"},current=ORDINARY,current_progress=.43,
+            queued_saved={[ORDINARY]=0,[OTHER]=.18,new=0}}
+          local old={queue={"t5",ID,ID,ID,OTHER,"t6"},current="t5",current_progress=.31,
+            technologies={t5={saved_progress=0},t6={saved_progress=.27}}}
+          local result,parks=queue.merge(live,old,ID,ORDINARY)
+          assert(same(result.queue,{"t5",ORDINARY,ORDINARY,OTHER,"new","t6"}))
+          assert(result.current=="t5" and result.current_progress==.31)
+          assert(result.queued_saved[ORDINARY]==.43 and result.queued_saved[OTHER]==.18 and parks.t6==.27)
+          local actual=queue.merge({queue={OTHER,"new"},current=OTHER,current_progress=.25,queued_saved={[OTHER]=0,new=0}},old,ID,ORDINARY)
+          assert(same(actual.queue,{"t5",OTHER,"new","t6"}) and actual.queued_saved[OTHER]==.25)
         ''')
 
     def test_scoped_transfer_guard_restores_on_nested_callback_and_setter_error(self):

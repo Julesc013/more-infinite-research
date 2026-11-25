@@ -10,7 +10,7 @@ import unittest
 
 from historical_sources import read_published_source
 from generator_world import build_generator_world, lua_table
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES,
     captured_public_productivity_recipes,
@@ -276,9 +276,7 @@ def expected_worker_default_split_rows(historical_canonical):
     gate["effects"][0]["modifier"] = -historical_canonical["effects"][0]["modifier"]
     gate["unit"] = {"count": 1, "time": 1,
                     "ingredients": [[historical_canonical["unit"]["ingredients"][0][0], 1]]}
-    credit = expected_private_worker_row(inactive_science="automation-science-pack")
-    credit.update(name="mir-worker-storage-provider-credit-4", ignore_tech_cost_multiplier=True, prerequisites=[],
-                  effects=[{"type": "worker-robot-storage", "modifier": 1}])
+    credit = {**expected_provider_credit_row(), "prerequisites": []}
     return {tail["name"]: tail, gate["name"]: gate, credit["name"]: credit}
 
 
