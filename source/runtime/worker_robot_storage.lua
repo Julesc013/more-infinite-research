@@ -1214,7 +1214,8 @@ local function default_origin(event, initializing, state, current)
       and not (base_hop and change.old_version == "4.7.20003") then
     default_origin_error("unrecorded default source requires unchanged startup settings", event, state, current)
   end
-  if state == nil and change and change.old_version == "4.7.20002" then
+  if state == nil and change and change.old_version == "4.7.20002"
+      and active["space-exploration"] ~= nil then
     return published472_se_origin(event, change, active, state, current)
   end
   if state == nil and change and (change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f200
@@ -1285,7 +1286,8 @@ local function default_origin(event, initializing, state, current)
       default_origin_error("archived uninvested default source requires its qualified engine", event, state, current)
     end
     for name in pairs(ENGINE_MODS) do
-      if active[name] ~= archive.base then
+      local expected = (name ~= "recycler" or archive.edition == "f210") and archive.base or nil
+      if active[name] ~= expected then
         default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
       end
     end
