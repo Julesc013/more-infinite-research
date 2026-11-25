@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.23 beta release notes"
+title: "MIR 5.0.24 beta release notes"
 status: current
-applies_to: "MIR 5.0.23 GitHub prerelease"
+applies_to: "MIR 5.0.24 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,20 +9,15 @@ last_reviewed: 2026-11-25
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-523-release-notes
+  - mir-524-release-notes
 ---
 
-MIR 5.0.23 fixes worker robot storage save upgrades and preserves Space Exploration conquest bonuses alongside existing research.
+This update preserves worker cargo research when Factorio replaces the queue and adds a way to recover paid research through a prepared Planet Ferrum removal and reinstall.
 
-- On Factorio 2.0.77, supported MIR 4.7.3 Space Age saves retain earned worker cargo capacity, paid science and queue order when upgraded with their original worker cargo settings.
-- On Factorio 2.1.24 and 2.1.25, supported Space Age saves retain paid worker cargo research across the matching game and official mod update. Adding Solar Productivity 3.0.0 on Factorio 2.1.24 also preserves recorded worker cargo work.
-- On Factorio 2.1.24 with official Space Age, 4.7.3 saves can upgrade after an unrelated startup settings change when no force has queued, paid for or completed repeating worker cargo research. Keep the original settings for the first upgrade if there is existing cargo work.
-- On Factorio 2.1.23 with Krastorio 2 Spaced Out 2.0.19, the verified MIR 4.6 upgrade preserves Imersite progress. The tested paid worker cargo upgrade requires the matching original mod selection and startup settings.
-- On Factorio 2.0.77 with Space Exploration 0.7.57, the staged legacy upgrade preserves completed research such as night vision and restores the conquest bonuses. Later supported add-on changes retain those bonuses.
-- Preserve earned productivity and electric or Tesla research credit when the unfinished level is parked outside the research queue.
-- Reopen the Research Library at the selected technology's new position when the list order changes.
-- Reduce work when opening the Research Library's Research, Settings and Queue tabs.
+- Keep active and parked worker cargo progress at its recorded price during supported upgrades. Queued research keeps its order when Factorio replaces the native queue.
+- With Factorio 2.1.25, Planet Ferrum 0.1.5 and PlanetsLib 2.4.0, prepare a copy of the save before removing the provider. After reinstall, MIR restores the saved work. If Factorio cleared a prerequisite, the paid research stays parked until it can resume. [Provider removal and resume steps](https://github.com/Julesc013/more-infinite-research/blob/v5.0.24/docs/support.md#removing-or-reinstalling-a-worker-cargo-provider)
+- Read integer startup options without rounding. The Research Library skips subscription checks for unrelated interface actions.
 
-Keep your original save. For legacy Space Exploration saves with earned or unfinished worker cargo research, apply the MIR and add-on changes in separate loads. Follow the [staged upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md#upgrading-mir-4720002-with-space-exploration).
+Keep the original save and its mod selection when changing providers or upgrading from an older MIR version. [Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.24/docs/support.md)
 
-See the [support guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.23/docs/support.md) for supported editions and installation.
+This is a GitHub beta. Full Library and performance qualification remains in progress.
