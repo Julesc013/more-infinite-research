@@ -364,9 +364,31 @@ function Test-MIRGunmetalDispatcherFactorioActive {
 }
 
 function Get-MIRGunmetalDispatcherNativeBlocker {
-  param([string[]]$SharedLibraryRoots)
+  param([string[]]$SharedLibraryRoots,[string]$UserSliceRoot='/sys/fs/cgroup/user.slice')
 
   if (Test-MIRGunmetalDispatcherFactorioActive) { return 'factorio-active' }
+
+  # Each user manager has its own unit namespace. Include controllers that
+  # remain active between Factorio processes in the same measured batch.
+  try {
+    $unit = Get-MIRGunmetalDispatcherExpectedNativeUnit
+    foreach ($slice in [IO.Directory]::EnumerateDirectories($UserSliceRoot,'user-*.slice')) {
+      if ([IO.Path]::GetFileName($slice) -cnotmatch '^user-([0-9]+)\.slice$') { continue }
+      $events = Join-Path $slice "user@$($Matches[1]).service/app.slice/$unit/cgroup.events"
+      try {
+        $population = @([IO.File]::ReadAllLines($events) -clike 'populated *')
+      } catch [IO.FileNotFoundException], [IO.DirectoryNotFoundException] {
+        continue
+      }
+      if ($population.Count -ne 1 -or $population[0] -cnotin @('populated 0','populated 1')) {
+        return 'native-service-state-unavailable'
+      }
+      if ($population[0] -ceq 'populated 1') { return 'native-service-active' }
+    }
+  } catch {
+    return 'native-service-state-unavailable'
+  }
+
   foreach ($root in $SharedLibraryRoots) {
     try {
       $path = Resolve-MIRGunmetalDispatcherPath -Path (Join-Path $root '.mir-library.lock') -Root $root -MayNotExist

@@ -10,6 +10,7 @@ $installer=Join-Path $RepoRoot 'tools/commands/workspace/Install-MIRGunmetalNati
 . $dispatcher
 . $installer
 $readDispatcherJournal = ${function:Get-MIRGunmetalDispatcherJournalTerminal}
+$readNativeBlocker = ${function:Get-MIRGunmetalDispatcherNativeBlocker}
 
 $script:checks=0
 $script:launches=0
@@ -60,6 +61,11 @@ function Invoke-MIRGunmetalDispatcherSystemctl {
 }
 function Test-MIRGunmetalDispatcherFactorioActive {
   return $script:fakeFactorioActive
+}
+
+function Get-MIRGunmetalDispatcherNativeBlocker {
+  param([string[]]$SharedLibraryRoots)
+  & $readNativeBlocker -SharedLibraryRoots $SharedLibraryRoots -UserSliceRoot $script:fakeUserSliceRoot
 }
 
 function Invoke-MIRGunmetalDispatcherLauncher {
@@ -200,6 +206,10 @@ function Remove-DispatcherControl {
 
 $controls=@()
 try {
+  $hostFiles=New-DispatcherControl -Name 'host-files';$controls+=@($hostFiles)
+  $script:fakeUserSliceRoot=Join-Path $hostFiles.root 'user.slice'
+  [IO.Directory]::CreateDirectory($script:fakeUserSliceRoot)|Out-Null
+
   # Gunmetal's real user manager records USER_INVOCATION_ID for a transient
   # unit. Do not silently switch back to the system-manager journal field.
   Assert-Dispatcher ((Get-Content -LiteralPath $dispatcher -Raw).Contains('USER_INVOCATION_ID=$InvocationId')) 'user-manager-journal-field-pinned'
@@ -309,6 +319,33 @@ try {
   $running=Get-MIRGunmetalDispatcherStateRecord -Policy $waiting.base -Name running
   Assert-Dispatcher ($submitted.status -ceq 'submitted' -and $script:launches -eq ($beforeLaunches+1) -and
     $running.packet_sha256 -ceq $waiting.base.approval.packet_sha256 -and -not (Test-Path -LiteralPath $waitingPath)) 'same-pending-launches-once-after-unit-disappears'
+
+  # A controller in another account can remain live between Factorio samples.
+  $peer=New-DispatcherControl -Name 'peer-service';$controls+=@($peer)
+  $peerGroup=Join-Path $script:fakeUserSliceRoot 'user-9002.slice/user@9002.service/app.slice/mir-native.service'
+  [IO.Directory]::CreateDirectory($peerGroup)|Out-Null
+  $events=Join-Path $peerGroup 'cgroup.events'
+  $pending=Join-Path $peer.spool 'state/pending.json'
+  $script:fakeState='gone'
+  $null=Submit-MIRGunmetalDispatcherApproved -Policy $peer.base
+  $pendingHash=(Get-FileHash -LiteralPath $pending).Hash
+  $beforeLaunches=$script:launches
+  foreach($observation in @(
+    @{events="populated 1`nfrozen 0`n";reason='native-service-active'}
+    @{events="frozen 0`n";reason='native-service-state-unavailable'}
+  )) {
+    [IO.File]::WriteAllText($events,$observation.events)
+    $wait=Invoke-MIRGunmetalDispatcherConsume -Policy $peer.base
+    Assert-Dispatcher ($wait.status -ceq 'waiting-for-native-slot' -and $wait.reason -ceq $observation.reason -and
+      $script:launches -eq $beforeLaunches) "peer-$($observation.reason)-defers-launch"
+    Assert-Dispatcher ((Get-FileHash -LiteralPath $pending).Hash -ceq $pendingHash -and
+      -not (Test-Path -LiteralPath (Join-Path $peer.spool 'state/intent.json')) -and
+      -not (Test-Path -LiteralPath (Join-Path $peer.spool 'state/running.json'))) "peer-$($observation.reason)-preserves-pending"
+  }
+  [IO.File]::WriteAllText($events,"populated 0`nfrozen 0`n")
+  $submitted=Invoke-MIRGunmetalDispatcherConsume -Policy $peer.base
+  $null=Invoke-MIRGunmetalDispatcherConsume -Policy $peer.base
+  Assert-Dispatcher ($submitted.status -ceq 'submitted' -and $script:launches -eq ($beforeLaunches+1)) 'peer-pending-launches-once-after-service-drains'
 
   # An external owner may hold a direct-library lease between game processes.
   # The installed policy watches both editions even for a job approved without
