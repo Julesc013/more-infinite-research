@@ -3496,6 +3496,48 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(writes==0 and storage[removal_key]==nil)
         ''')
 
+    def test_provider_return_promotes_paid_work_into_the_active_slot(self):
+        for live_fraction in (0, .25):
+            with self.subTest(live_fraction=live_fraction):
+                lua = self.returned_provider_world()
+                lua.globals().live_fraction = live_fraction
+                lua.execute(r'''
+                  local old = archived_removal.forces[player.index]
+                  old.queue = {ID, tier5, OTHER}
+                  player.research_progress = live_fraction
+                  local saved_row, worker = player.technologies[tier5], {}
+                  -- Factorio consumes parked progress when the row becomes active.
+                  -- Writing a separate parked value to the active row has no effect.
+                  player.technologies[tier5] = setmetatable(worker, {
+                    __index = saved_row,
+                    __newindex = function(_, key, value)
+                      if key == "saved_progress" and value ~= 0 and player.current_research == worker then return end
+                      saved_row[key] = value
+                    end,
+                  })
+                  local bonus, detached_bonus = player.worker_robots_storage_bonus, detached.worker_robots_storage_bonus
+                  local plan, legacy = delegate(return_event, provider_route(5))
+                  assert(history.default_owner_apply(plan)); history.apply(legacy)
+                  assert(storage[removal_key] == nil)
+                  assert(player.current_research == worker and player.research_progress == .1875)
+                  assert(worker.saved_progress == 0 and worker.research_unit_count == 1012)
+                  assert(#player.research_queue == 2 and player.research_queue[2].name == OTHER)
+                  assert(player.technologies[OTHER].saved_progress == live_fraction)
+                  assert(player.worker_robots_storage_bonus == bonus and detached.worker_robots_storage_bonus == detached_bonus)
+                  assert(detached.technologies[tier6].saved_progress == .3125)
+                ''')
+
+    def test_provider_return_refuses_distinct_archived_active_and_parked_work_before_writes(self):
+        self.returned_provider_world().execute(r'''
+          local old = archived_removal.forces[player.index]
+          old.queue, old.current, old.current_progress = {tier5, OTHER}, tier5, .5
+          local owner = storage[OWNER_KEY]
+          writes = 0
+          local ok, message = pcall(history.default_owner_preflight, return_event, provider_route(5), true)
+          assert(not ok and tostring(message):find("active and parked work", 1, true), tostring(message))
+          assert(writes == 0 and storage[OWNER_KEY] == owner and storage[removal_key] == archived_removal)
+        ''')
+
     def test_provider_return_refuses_unverified_versions_changed_terms_and_stale_native_work(self):
         for change, reason in (
             ('script.active_mods.provider="2.0";return_event.mod_changes.provider.new_version="2.0"', 'version differs'),
