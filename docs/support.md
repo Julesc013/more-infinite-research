@@ -72,6 +72,14 @@ source_of_truth_for:
 
 - These routes do not automatically cover different expansion, provider, startup-setting or mod combinations. Older histories and best-effort editions retain their stated limits. A successful load is not proof that every earned effect or queued research state was preserved.
 
+### Moving worker cargo research from Factorio 1.1.110 to 2.0.77
+
+1. Keep the original save, its mod selection and startup settings. Open a copy in Factorio 1.1.110 with the Factorio 1.1 edition of MIR 5.0.25.
+2. Run `/mir-worker-storage-recovery prepare` as an administrator or from the server console. Save the paused game under a new name and exit. Resuming play expires the preparation.
+3. Open the prepared copy in Factorio 2.0.77 with the matching MIR 5.0.25 edition and matching worker cargo settings. Check cargo, research progress and the queue before adopting the copy.
+
+This path covers the ordinary infinite worker cargo research. Plan separate provider or worker price changes after the engine upgrade. If you decide to continue playing in Factorio 1.1, use `/mir-worker-storage-recovery cancel` or reopen the original copy.
+
 ### Productivity providers and preferences
 
 - On Factorio 2.0.77 with the Base-game profile, a 0.01% recipe-productivity reward resolves to zero native bonus. The setting loads successfully; new levels add no productivity at that reward.
