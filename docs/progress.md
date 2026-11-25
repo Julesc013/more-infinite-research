@@ -14,6 +14,10 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Staged worker continuity from Factorio 1.1 to 2.0 (2026-11-25)
+
+Exact private packages rebuilt from `ecd50d3fa570de6aca9b7f39dbd890150930c6e1` matched the tested archive hashes. The paused Factorio 1.1 checkpoint preserved earned cargo, the original save's active mining work at 42%, its queue and its suspended mining work at 27%. In a separate save the worker owner retained 12.5% active and 25% parked progress at the 675-unit five-pack price, plus its unrelated queue follower. Its ordinary lab used 590 of each pack, raised cargo from two to three and started the next queued technology. Two fresh 1,200-update cold loads matched in each case. The original source saves and the public direct-conversion failure remain preserved. Publication and wider stable acceptance are open. [Native evidence and exact inputs](../spec/evidence/f110-f200-paused-worker-checkpoint-native.json)
+
 ## MIR 5.0.24 measured follow-up (2026-11-25)
 
 The published Factorio 2.1 ZIP passed the 38-launch matched Bob/Angel responsive-menu comparison on Factorio 2.1.24. Mean process-to-menu time was 54.558 seconds under 4.7.3 and 51.687 seconds under 5.0.24, with a 51.370-second no-MIR arm. Mean MIR-added time fell from 3.189 to 0.317 seconds. The planned 95 percent interval for the 50 percent objective was entirely below zero. Repeatability and library restoration passed. The exact readback is `build/qualification/f210-524-bob-angel-menu-r03/verified-comparison.json`, SHA-256 `F82A3C52244F0D4AF6BCBCD4A736FF3A15BFACA1C1F3CACD92DE7543ABA58823`. The earlier resource-observer refusal retains 22 native menu receipts in `build/qualification/mir524-linux-observer-rebind-r01`. The successful replay uses the already checked Linux exit-observation repair. [Observer repair](https://github.com/Julesc013/more-infinite-research/pull/2337)
