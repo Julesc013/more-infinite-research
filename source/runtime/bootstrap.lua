@@ -767,7 +767,8 @@ bind_runtime_events = function(library_open)
     worker_completion_tick = worker_completion_tick or worker_robot_storage.prepared_queue_pending() or nil
   end
   credit_pending = credit_pending or worker_pending
-  if library_events_scheduled == library_open and credit_events_scheduled == credit_pending
+  local library_subscription_changed = library_events_scheduled ~= library_open
+  if not library_subscription_changed and credit_events_scheduled == credit_pending
       and gun_credit_events_scheduled == gun_credit_pending
       and worker_events_scheduled == worker_pending and worker_completion_tick_scheduled == worker_completion_tick then return end
   library_events_scheduled = library_open
@@ -776,6 +777,22 @@ bind_runtime_events = function(library_open)
   worker_events_scheduled = worker_pending
   worker_completion_tick_scheduled = worker_completion_tick
   local events = defines and defines.events or {}
+  -- Shortcuts and the remote open interface reconcile after creating a view.
+  if library_subscription_changed then
+    for _, name in ipairs{
+      "on_gui_text_changed", "on_gui_selected_tab_changed", "on_gui_selection_state_changed",
+      "on_gui_checked_state_changed", "on_gui_click", "on_gui_location_changed", "on_gui_closed",
+    } do
+      local id = events[name]
+      if id then
+        script.on_event(id, library_open and function(event)
+          if not library.has_library_gui_name(event) then return end
+          library[name](event)
+          reconcile_translations()
+        end or nil)
+      end
+    end
+  end
   local competing_active = competing_productivity and competing_productivity.active()
   local retirements_active = competing_retirements_active()
   local force_lifecycle_active = lifecycle.caps_active()
@@ -884,19 +901,6 @@ function M.register()
     script.on_event(events.on_tower_planted_seed, active and on_tower_planted_seed or nil)
   end
   if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
-  for _, name in ipairs{
-    "on_gui_text_changed", "on_gui_selected_tab_changed", "on_gui_selection_state_changed",
-    "on_gui_checked_state_changed", "on_gui_click", "on_gui_location_changed", "on_gui_closed",
-  } do
-    local id = events[name]
-    if id then
-      script.on_event(id, function(event)
-        if not library.has_library_gui_name(event) then return end
-        library[name](event)
-        reconcile_translations()
-      end)
-    end
-  end
   if events.on_player_display_scale_changed then script.on_event(events.on_player_display_scale_changed, on_library_display_changed) end
   if events.on_player_display_resolution_changed then script.on_event(events.on_player_display_resolution_changed, on_library_display_changed) end
   if events.on_pre_player_removed then script.on_event(events.on_pre_player_removed, on_library_player_pre_removed) end
