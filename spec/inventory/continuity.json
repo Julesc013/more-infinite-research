@@ -8848,6 +8848,33 @@
         "sha256": "7C3368A231B3F5E59C6B39612D63C8C46949C44DE2F4927F6058C699422C5507"
       }
     },
+    "inter_release_python_review": {
+      "reviewed_on": "2026-11-26",
+      "first_commit": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+      "last_commit": "45328ebf6945d70e55f5761e6add555546c3cbe4",
+      "scope": "Python test declarations on the canonical development history absent by name at the same path from all 25 public MIR5 tags through v5.0.24 and the inspected dev tree. Changed same-name and generated cases remain separate.",
+      "parsed_unique_python_blobs": 1441,
+      "parse_errors": 0,
+      "declarations": 52,
+      "reviewed_declarations": 17,
+      "remaining_declarations": 35,
+      "reviewed_scope": "Signed paid weapon effects, Bob material return routes, native owner cost and paid identity, cap reset ordering, Space Exploration conquest state, the retained K2 fixture, and the source changelog and retired Portal conversion workflow. Nine declarations retain current controls. Eight conversion-only declarations follow the recorded decision to deliver identical GitHub and Portal ZIPs.",
+      "intake": {
+        "path": "build/qualification/mir5-inter-release-tests-r01/intake.json",
+        "sha256": "F38A62E2ABABD98D9FBD929A4E9BC4065A8B582FAF61D9D2C92E7B32A5DE9424"
+      },
+      "review": {
+        "path": "build/qualification/mir5-inter-release-tests-r01/reviewed-intents.json",
+        "sha256": "77BEF6E3166364C5F7B64A3F24A35FBADCD9EE42EEC64E6D7D1541FCBC84E310"
+      },
+      "host_controls": {
+        "path": "build/qualification/mir5-inter-release-tests-r01/host-output.txt",
+        "sha256": "6BDC6111295A6E92B0B0C3D1DC0EB82E94A6358EB93DBD034CA8CE1F933D4D56",
+        "selected_suites_passed": 10,
+        "methods_passed": 155,
+        "native_execution": false
+      }
+    },
     "allowed_dispositions": [
       "retain",
       "port",

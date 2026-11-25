@@ -14,6 +14,10 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Inter-release test preservation (2026-11-26)
+
+The canonical MIR5 development history contains 52 Python test declarations absent by name and path from all public MIR5 tags through 5.0.24 and the inspected `dev`. The first review reconciles 17, including paid weapon and material effects, cap ordering, conquest state and the retirement of the Portal conversion tool. The pinned host batch passed 155 methods across ten selected suites. The [continuity inventory](../spec/inventory/continuity.json) records the original declarations and current controls. Thirty-five identified declarations, changed same-name tests and native qualification remain open.
+
 ## Verified Library personal views and Space Exploration cap raise (2026-11-26)
 
 The reviewed Factorio 2.1.24 ZIP `7B996CE4ED081F293ED7ACE71BEE6BA055AEC62E03CD73CA2625D1F770FA1BDC` passed the 13-step bilingual Library replay. Eight physical inputs exercised separate searches and window sizes. Both clients kept their own query, selection and layout through same-server rejoin and restart from the new save. The force and queue observations matched, the protected input hash verified, and the shared library restored. The primary readback checked 33 original bodies, including both saves and all 26 captures. The receipt is `build/qualification/mir525-promoted-library-personal-gunmetal-r01/verified-personal-evidence.json` at SHA-256 `BEB33261BAB4EE719B834E1913D41E337B990233EBF06C227AFBFDE87B474ECA`.
