@@ -478,7 +478,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
           assert(data.raw.technology["mir-worker-storage-head-4"]==nil)
         ''')
 
-    def test_ferrum_archive_keeps_disappearing_levels_on_stable_dormant_rows(self):
+    def test_ferrum_archive_keeps_work_on_stable_dormant_rows(self):
         inputs = worker_pipeline.finite_chain(5)
         science = [[name, 1] for name in (
             "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -500,6 +500,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
         current, fallback = (lua.globals().data.raw.technology for lua in (active, absent))
         self.assertEqual(inputs["worker-robots-storage-5"], plain(current["worker-robots-storage-5"]))
         for source, holder, debit, first, last, price in (
+            ("worker-robots-storage-4", "mir-worker-storage-ferrum-hold-4", None, 4, 4, "count"),
             ("worker-robots-storage-5", "mir-worker-storage-ferrum-hold-5",
              "mir-worker-storage-ferrum-debit-1", 5, 5, "count"),
             ("worker-robots-storage-6", "mir-worker-storage-ferrum-tail-hold-6",
@@ -519,10 +520,14 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     self.assertFalse(row["enabled"])
                     self.assertFalse(row["visible_when_disabled"])
                     self.assertEqual([{"type": "worker-robot-storage", "modifier": 1}], row["effects"])
-                self.assertEqual(-1, current[debit].effects[1].modifier)
-                self.assertEqual(0, fallback[debit].effects[1].modifier)
-                self.assertFalse(current[debit].enabled)
-                self.assertFalse(fallback[debit].enabled)
+                if debit:
+                    self.assertEqual(-1, current[debit].effects[1].modifier)
+                    self.assertEqual(0, fallback[debit].effects[1].modifier)
+                    self.assertFalse(current[debit].enabled)
+                    self.assertFalse(fallback[debit].enabled)
+        for rows in (current, fallback):
+            self.assertEqual({"mir-worker-storage-ferrum-debit-1", "mir-worker-storage-ferrum-tail-debit-1"},
+                             {name for name in rows if name.startswith("mir-worker-storage-ferrum-") and "-debit-" in name})
 
     def test_provider_resumption_keeps_suspended_work_and_live_queue_intents(self):
         self.stage().execute('''

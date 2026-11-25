@@ -9,6 +9,8 @@ M.profiles = {
     target = "f210", prerequisite_mod = "space-age",
     provider = "planet-ferrum", version = "0.1.5",
     stages = {
+      {source="worker-robots-storage-4", first=4, last=4, count=675, retained=true,
+        holder="mir-worker-storage-ferrum-hold-4"},
       {source="worker-robots-storage-5", first=5, last=5, count=1012,
         holder="mir-worker-storage-ferrum-hold-5", debit="mir-worker-storage-ferrum-debit-1"},
       {source="worker-robots-storage-6", first=6, last="infinite", previous_count=675, predecessor_count=1012,
@@ -49,7 +51,7 @@ local function archive_holder(profile, stage, presentation, stream, source)
     effects=source and source.effects or {{type="worker-robot-storage", modifier=modifier}},
     ignore_tech_cost_multiplier=source and source.ignore_tech_cost_multiplier or false,
   }
-  local debit = {
+  local debit = stage.debit and {
     type="technology", name=stage.debit, level=1, max_level="infinite", upgrade=true,
     hidden=true, enabled=false, visible_when_disabled=false,
     icon=presentation.icon, icon_size=presentation.icon_size, icons=presentation.icons,
@@ -60,7 +62,7 @@ local function archive_holder(profile, stage, presentation, stream, source)
   }
   -- The entries are independent publication inputs. A different mod's
   -- prototype table and the authored default cannot become writable aliases.
-  return copy_owner(holder), copy_owner(debit)
+  return copy_owner(holder), debit and copy_owner(debit)
 end
 
 function M.append(technologies, raw, active, target, presentation, stream, route)
@@ -79,7 +81,7 @@ function M.append(technologies, raw, active, target, presentation, stream, route
         if not work_source(source) then source = nil end
         local holder, debit = archive_holder(profile, stage, presentation, stream, source)
         technologies[#technologies + 1] = holder
-        technologies[#technologies + 1] = debit
+        if debit then technologies[#technologies + 1] = debit end
       end
     end
   end

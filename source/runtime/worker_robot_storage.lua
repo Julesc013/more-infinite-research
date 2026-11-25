@@ -2935,7 +2935,7 @@ local function archive_profile(route)
   for _, profile in ipairs(provider_archive.profiles) do
     if target.id == profile.target and script.active_mods[profile.prerequisite_mod]
         and script.active_mods[profile.provider] == profile.version
-        and #route.finite == #profile.stages and route.finite[1].provider == profile.provider
+        and #route.finite == #profile.stages - 1 and route.finite[1].provider == profile.provider
         and route.technology == profile.stages[#profile.stages].source then
       return profile
     end
@@ -2944,12 +2944,12 @@ local function archive_profile(route)
 end
 
 local function archive_terms(profile, stage)
-  local source, holder, debit = native_prototype(stage.source), native_prototype(stage.holder), native_prototype(stage.debit)
+  local source, holder = native_prototype(stage.source), native_prototype(stage.holder)
   local count, formula, seconds, modifier = provider_archive.terms(profile, stage, effective_values.streams["worker-robots-storage"])
   local last = stage.last == "infinite" and 4294967295 or stage.last
   local levels = {first=stage.first, last=last}
   if creator(stage.source) ~= (stage.count and profile.provider or MIR)
-      or creator(stage.holder) ~= MIR or creator(stage.debit) ~= MIR then
+      or creator(stage.holder) ~= MIR or stage.debit and creator(stage.debit) ~= MIR then
     recover_error("provider archive prototype custody changed: " .. stage.source)
   end
   local contract = recovery.fingerprint(source, levels)
@@ -2960,11 +2960,31 @@ local function archive_terms(profile, stage)
       or not holder.prerequisites[profile.prerequisite] then
     recover_error("provider work differs from its declared archive contract: " .. stage.source)
   end
-  if debit.level ~= 1 or debit.max_level ~= 4294967295 or debit.enabled ~= false or debit.hidden ~= true
-      or #debit.effects ~= 1 or debit.effects[1].type ~= "worker-robot-storage" or debit.effects[1].modifier ~= -modifier then
-    recover_error("provider archive debit contract changed: " .. stage.source)
+  if stage.debit then
+    local debit = native_prototype(stage.debit)
+    if debit.level ~= 1 or debit.max_level ~= 4294967295 or debit.enabled ~= false or debit.hidden ~= true
+        or #debit.effects ~= 1 or debit.effects[1].type ~= "worker-robot-storage" or debit.effects[1].modifier ~= -modifier then
+      recover_error("provider archive debit contract changed: " .. stage.source)
+    end
   end
   return contract
+end
+
+local function archive_debit(force, stage, earned)
+  if not stage.debit then return end
+  local debit = force.technologies[stage.debit]
+  if not debit or debit.level ~= 1 + earned or debit.researched or debit.saved_progress ~= 0 then
+    recover_error("provider archive debit history changed: " .. stage.source)
+  end
+  return debit
+end
+
+local function set_archive_debit(debit, earned)
+  if not debit then return end
+  -- A native level reversal can re-enable the row.
+  local level = 1 + earned
+  if debit.level ~= level then debit.level = level end
+  debit.enabled, debit.visible_when_disabled = false, false
 end
 
 local function collect_provider_archive(route)
@@ -2983,16 +3003,15 @@ local function collect_provider_archive(route)
   end
   for _, force in ipairs(forces()) do
     local public = snapshot(force, recovery.canonical)
-    if public.allowance > 0 then recover_error("provider archive cannot yet transfer unfinished public worker level four", route) end
     local item = {force=force, stages={}, bonus=native_bonus(force), queued=false,
       public_next=public.next_level, public_enabled=public.enabled, public_visible=public.visible,
       head_paid=gate_paid(gate_frame(force))}
     for _, stage in ipairs(profile.stages) do
-      local source, holder = snapshot(force, stage.source), snapshot(force, stage.holder)
-      local debit = force.technologies[stage.debit]
+      local source = stage.source == recovery.canonical and public or snapshot(force, stage.source)
+      local holder = snapshot(force, stage.holder)
+      local debit = archive_debit(force, stage, 0)
       if holder.next_level ~= stage.first or holder.researched or holder.enabled or holder.visible or holder.allowance > 0
-          or not debit or debit.level ~= 1 or debit.researched ~= false or debit.enabled ~= false
-          or debit.saved_progress ~= 0 or debit.visible_when_disabled ~= false
+          or debit and (debit.enabled or debit.visible_when_disabled)
           or source.next_level < stage.first or stage.count and source.next_level > stage.first + 1
           or not stage.count and source.researched then
         recover_error("provider archive requires an intact source and unused holder: " .. stage.source)
@@ -3003,7 +3022,8 @@ local function collect_provider_archive(route)
         end
         item.queued = true
       end
-      item.stages[#item.stages + 1] = {stage=stage, source=source, holder=holder.technology, debit=debit}
+      item.stages[#item.stages + 1] = {stage=stage, source=source, holder=holder.technology, debit=debit,
+        earned=stage.retained and 0 or source.next_level - stage.first}
     end
     if item.queued then requeueable(force, item.stages[1].source, false, true) end
     items[#items + 1] = item
@@ -3018,9 +3038,8 @@ local function apply_provider_archive_force(item, replacements)
     local records = {}
     for _, row in ipairs(item.stages) do
       local stage, source, holder, debit = row.stage, row.source, row.holder, row.debit
-      if stage.count then holder.researched = source.researched else holder.level = source.next_level end
-      debit.level = 1 + source.next_level - stage.first
-      debit.enabled, debit.visible_when_disabled = false, false
+      if stage.count then holder.researched = row.earned > 0 else holder.level = source.next_level end
+      set_archive_debit(debit, row.earned)
       holder.saved_progress = source.saved_progress
       holder.enabled, holder.visible_when_disabled = source.occurrences > 0, false
       if not source.researched and holder.research_unit_count ~= source.count then
@@ -3032,12 +3051,12 @@ local function apply_provider_archive_force(item, replacements)
       local stage, source = row.stage, row.source
       source.technology.saved_progress, source.technology.enabled = 0, false
       local actual = snapshot(item.force, stage.holder)
-      if actual.next_level ~= source.next_level or actual.researched ~= source.researched
+      if actual.next_level ~= stage.first + row.earned or actual.researched ~= (stage.count ~= nil and row.earned > 0)
           or actual.occurrences ~= source.occurrences or actual.saved_progress ~= source.saved_progress
           or source.technology.researched ~= source.researched then
         recover_error("provider archive did not preserve paid or queued work: " .. stage.source)
       end
-      records[stage.source] = {earned=source.next_level-stage.first, enabled=source.enabled,
+      records[stage.source] = {earned=row.earned, enabled=source.enabled,
         visible=source.visible, price=source.count, queued=source.occurrences,
         paid=actual.current == stage.holder and actual.current_progress or actual.saved_progress}
     end
@@ -3053,7 +3072,7 @@ end
 local function prepare_provider_archive(route, before_apply)
   local plan = collect_provider_archive(route)
   if before_apply then before_apply() end
-  local archive = {schema=1, provider=plan.profile.provider, version=plan.profile.version,
+  local archive = {schema=2, provider=plan.profile.provider, version=plan.profile.version,
     phase="prepared", contract=plan.contract, settings=relevant_worker_configuration(), forces={}}
   for _, item in ipairs(plan.items) do
     archive.forces[item.force.index] = apply_provider_archive_force(item, plan.replacements)
@@ -3067,7 +3086,7 @@ end
 
 local function archived_profile(saved, owned)
   fields(saved, {schema=true, provider=true, version=true, phase=true, contract=true, settings=true, forces=true})
-  if saved.schema ~= 1 or saved.phase ~= "prepared" and saved.phase ~= "suspended"
+  if saved.schema ~= 1 and saved.schema ~= 2 or saved.phase ~= "prepared" and saved.phase ~= "suspended"
       or type(saved.contract) ~= "table" or type(saved.forces) ~= "table" then
     recover_error("invalid staged provider archive")
   end
@@ -3082,18 +3101,35 @@ local function archived_profile(saved, owned)
 end
 
 local function check_suspended_prototypes(profile, stage)
-  local holder, debit = native_prototype(stage.holder), native_prototype(stage.debit)
+  local holder = native_prototype(stage.holder)
   local count, formula, seconds, modifier = provider_archive.terms(profile, stage, effective_values.streams["worker-robots-storage"])
   local last = stage.last == "infinite" and 4294967295 or stage.last
-  if native_prototype(stage.source) or creator(stage.holder) ~= MIR or creator(stage.debit) ~= MIR
-      or not holder or not debit then recover_error("provider archive prototype ownership changed: " .. stage.source) end
+  if not stage.retained and native_prototype(stage.source) or creator(stage.holder) ~= MIR or not holder then
+    recover_error("provider archive prototype ownership changed: " .. stage.source)
+  end
   recovery.fingerprint(holder, {first=stage.first, last=last})
   if holder.research_unit_count_formula ~= formula or count and holder.research_unit_count ~= count
       or holder.research_unit_energy ~= seconds * 60 or holder.effects[1].modifier ~= modifier
       or holder.ignore_tech_cost_multiplier or holder.enabled ~= false or holder.hidden ~= true
-      or not holder.prerequisites[profile.prerequisite] or debit.level ~= 1 or debit.max_level ~= 4294967295
-      or debit.enabled ~= false or #debit.effects ~= 1 or debit.effects[1].type ~= "worker-robot-storage"
-      or debit.effects[1].modifier ~= 0 then recover_error("provider archive dormant terms changed: " .. stage.source) end
+      or not holder.prerequisites[profile.prerequisite] then recover_error("provider archive dormant terms changed: " .. stage.source) end
+  if stage.debit then
+    local debit = native_prototype(stage.debit)
+    if not debit or creator(stage.debit) ~= MIR or debit.level ~= 1 or debit.max_level ~= 4294967295
+        or debit.enabled ~= false or #debit.effects ~= 1 or debit.effects[1].type ~= "worker-robot-storage"
+        or debit.effects[1].modifier ~= 0 then recover_error("provider archive dormant debit changed: " .. stage.source) end
+  end
+end
+
+local function archived_stages(saved, profile)
+  local stages = {}
+  for _, stage in ipairs(profile.stages) do
+    if type(saved.contract[stage.source]) == "string" then
+      stages[#stages + 1] = stage
+    elseif not stage.retained or saved.schema ~= 1 or saved.contract[stage.source] ~= nil then
+      recover_error("missing historical provider work terms: " .. stage.source)
+    end
+  end
+  return stages
 end
 
 local function saved_archive_force(saved, index)
@@ -3110,7 +3146,7 @@ end
 local function saved_archive_work(prior, stage)
   local work = prior.stages[stage.source]
   fields(work, {earned=true, enabled=true, visible=true, price=true, queued=true, paid=true})
-  if (work.earned ~= 0 and not integer(work.earned)) or (work.queued ~= 0 and not integer(work.queued))
+  if (work.earned ~= 0 and (stage.retained or not integer(work.earned))) or (work.queued ~= 0 and not integer(work.queued))
       or not progress(work.paid) or type(work.enabled) ~= "boolean" or type(work.visible) ~= "boolean" then
     recover_error("invalid archived provider research history: " .. stage.source)
   end
@@ -3137,8 +3173,8 @@ plan_provider_archive_removal = function(event, owned)
       or not recovery.matches_default_owner(public, ordinary) then recover_error("staged provider removal changed the default owner contract") end
   head_gate_contract(public)
   local holds, items, seen = {}, {}, {}
-  for _, stage in ipairs(profile.stages) do
-    if type(saved.contract[stage.source]) ~= "string" then recover_error("missing historical provider work terms") end
+  local stages = archived_stages(saved, profile)
+  for _, stage in ipairs(stages) do
     check_suspended_prototypes(profile, stage)
     holds[stage.holder] = true
   end
@@ -3152,12 +3188,11 @@ plan_provider_archive_removal = function(event, owned)
       recover_error("staged provider removal changed earned or default work before suspension")
     end
     local item = {force=force, base=base, head=head, tail=tail, bonus=bonus, work={}, queued=false}
-    for _, stage in ipairs(profile.stages) do
+    for _, stage in ipairs(stages) do
       local previous = saved_archive_work(prior, stage)
-      local holder, debit = snapshot(force, stage.holder), force.technologies[stage.debit]
+      local holder, debit = snapshot(force, stage.holder), archive_debit(force, stage, previous.earned)
       local paid = holder.current == stage.holder and holder.current_progress or holder.saved_progress
       if holder.next_level ~= stage.first + previous.earned or holder.count ~= previous.price or holder.visible
-          or not debit or debit.level ~= 1 + previous.earned or debit.saved_progress ~= 0
           or holder.occurrences ~= (first and previous.queued or 0) or paid < previous.paid then
         recover_error("staged provider research did not survive native loading: " .. stage.source)
       end
@@ -3184,7 +3219,7 @@ local function suspend_provider_force(item, unavailable, saved)
     for _, work in ipairs(item.work) do
       local holder = work.holder.technology
       if holder.enabled then holder.enabled = false end
-      if work.debit.enabled then work.debit.enabled = false end
+      if work.debit and work.debit.enabled then work.debit.enabled = false end
       local settled = snapshot(force, work.stage.holder)
       if settled.occurrences ~= 0 or settled.next_level ~= work.holder.next_level
           or settled.count ~= work.holder.count or settled.saved_progress ~= work.paid or settled.enabled then
@@ -3277,7 +3312,8 @@ plan_provider_archive_resume = function(event, route, owned)
     recover_error("provider resumption changed native research ownership")
   end
   local replacements, modifiers, items, seen = {}, {}, {}, {}
-  for _, stage in ipairs(profile.stages) do
+  local stages = archived_stages(saved, profile)
+  for _, stage in ipairs(stages) do
     if archive_terms(profile, stage) ~= saved.contract[stage.source] then
       recover_error("provider resumption changed historical science or price: " .. stage.source)
     end
@@ -3292,14 +3328,15 @@ plan_provider_archive_resume = function(event, route, owned)
         or gate_paid(gate) ~= prior.head_paid then recover_error("provider resumption changed default worker work") end
     local item = {force=force, base=base, head=head, tail=tail, prior=prior, bonus=native_bonus(force), work={}}
     local by_source = {}
-    for _, stage in ipairs(profile.stages) do
+    for _, stage in ipairs(stages) do
       local previous = saved_archive_work(prior, stage)
       local destination, holder = snapshot(force, stage.source), snapshot(force, stage.holder)
-      local debit = force.technologies[stage.debit]
-      if destination.next_level ~= stage.first or destination.researched or destination.allowance ~= 0
+      local debit = archive_debit(force, stage, previous.earned)
+      local next_level = stage.retained and prior.public_next or stage.first
+      if destination.next_level ~= next_level or destination.researched ~= (stage.retained == true and next_level > stage.first)
+          or destination.allowance ~= 0
           or holder.occurrences ~= 0 or holder.next_level ~= stage.first + previous.earned
-          or holder.count ~= previous.price or holder.saved_progress ~= previous.paid or holder.visible
-          or not debit or debit.level ~= 1 + previous.earned or debit.researched or debit.saved_progress ~= 0 then
+          or holder.count ~= previous.price or holder.saved_progress ~= previous.paid or holder.visible then
         recover_error("provider resumption did not find its suspended work and pristine successor: " .. stage.source)
       end
       local work = {stage=stage, previous=previous, destination=destination, holder=holder, debit=debit}
@@ -3326,16 +3363,15 @@ local function resume_provider_force(item)
       local stage, previous = row.stage, row.previous
       local destination, holder, debit = row.destination.technology, row.holder.technology, row.debit
       if stage.count then
-        destination.researched, holder.researched = row.holder.researched, false
+        if not stage.retained then destination.researched = row.holder.researched end
+        holder.researched = false
       else
         destination.level, holder.level = row.holder.next_level, stage.first
       end
       destination.saved_progress, holder.saved_progress = previous.paid, 0
       destination.enabled, destination.visible_when_disabled = previous.enabled, previous.visible
       holder.enabled, holder.visible_when_disabled = false, false
-      -- Reversing a level can re-enable the technology. Retire it after the reversal.
-      debit.level = 1
-      debit.enabled, debit.visible_when_disabled = false, false
+      set_archive_debit(debit, 0)
     end
     if item.queue then assign_queue(force, item.base.frame, item.queue, nil, item.head_progress) end
     item.tail.technology.enabled, force.technologies[recovery.head_id].enabled = false, false
@@ -3344,11 +3380,12 @@ local function resume_provider_force(item)
       local actual = snapshot(force, row.stage.source)
       local holder, debit = row.holder.technology, row.debit
       local paid = actual.current == row.stage.source and actual.current_progress or actual.saved_progress
-      if actual.next_level ~= row.holder.next_level or actual.count ~= row.previous.price
+      local next_level = row.stage.retained and row.destination.next_level or row.holder.next_level
+      if actual.next_level ~= next_level or actual.count ~= row.previous.price
           or paid ~= row.previous.paid or actual.occurrences ~= row.previous.queued
           or actual.enabled ~= row.previous.enabled or actual.visible ~= row.previous.visible
           or holder.level ~= row.stage.first or holder.researched or holder.enabled or holder.saved_progress ~= 0
-          or debit.level ~= 1 or debit.enabled or debit.visible_when_disabled then
+          or debit and (debit.level ~= 1 or debit.enabled or debit.visible_when_disabled) then
         recover_error("resumption changed retained provider work: " .. row.stage.source)
       end
     end
