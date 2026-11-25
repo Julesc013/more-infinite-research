@@ -1092,6 +1092,34 @@ class LifecycleTests(unittest.TestCase):
                     "legitimate missing authored observation was treated as an owned policy")
                 ''')
 
+    def test_competing_productivity_records_its_own_disablement_on_first_load(self):
+        self.lua.execute(r"""
+          local name = "recipe-prod-research_gears-1"
+          local owned = technology(name, 2, true)
+          local foreign = technology(name, 2, false)
+          local queued = technology("unrelated-queued-research", 1, true)
+          owned.saved_progress = .32
+          local player = force(34, {[name]=owned, [queued.name]=queued}, {queued}, queued, .41)
+          local other = force(35, {[name]=foreign})
+          local forces = {[34]=player, [35]=other}
+          local adoption = require("research.native_adoption")
+          local facts = {[adoption.prototype_name]=adoption.prototype()}
+          local raw = {["mod-data"]=facts}
+          adoption.apply(adoption.plan(raw, nil, nil, nil, nil, nil, nil, {[name]=true}))
+          boot(forces, 0, nil, nil, nil, nil, nil, nil, nil, nil, facts)
+          handlers.init()
+          assert(owned.prototype.enabled and not owned.enabled)
+          assert(storage.mir_caps.owned_disabled[34][name].disabled)
+          assert(storage.mir_caps.owned_disabled[35] == nil)
+          local saved = storage
+          boot(forces, 0, nil, saved)
+          handlers.configuration({})
+          assert(owned.enabled and not foreign.enabled and storage.mir_caps == nil)
+          assert(owned.level == 2 and foreign.level == 2)
+          assert(owned.saved_progress == .32 and player.current_research == queued
+            and player.research_progress == .41 and player.research_queue[1] == queued)
+        """)
+
     def test_policy_disabled_generated_prototype_reconciles_only_proven_mir_disablement(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"

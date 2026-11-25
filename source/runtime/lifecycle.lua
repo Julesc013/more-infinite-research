@@ -6,6 +6,7 @@ local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
 local cap_admission = require("runtime.cap_admission")
 local catalogue = require("runtime.catalogue")
+local WITHHELD_COMPETING_PRODUCTIVITY = catalogue.withheld_competing_productivity
 local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local platform_target = require("platform.target")
 
@@ -436,7 +437,11 @@ local function authored_generated_prototype_state(force, row)
     local prototype = technology.prototype
     if not prototype then return technology, nil end
     phase = "prototype enabled"
-    return technology, prototype.enabled
+    local enabled = prototype.enabled
+    if WITHHELD_COMPETING_PRODUCTIVITY and WITHHELD_COMPETING_PRODUCTIVITY[row.id] and enabled == true then
+      enabled = false
+    end
+    return technology, enabled
   end)
   if not ok then
     -- Failed native observations cannot authenticate disappearance and must
@@ -449,10 +454,10 @@ local function authored_generated_prototype_state(force, row)
   return technology, enabled
 end
 
--- Startup settings decide whether a stream may be considered, but the data
--- stage can retain its identity with prototype.enabled=false when science or
--- lab policy rejects it. Only that immutable default distinguishes the latter
--- from a per-force cap disablement, so do not use ForceTechnology.enabled.
+-- Science and lab policy can disable an authored prototype. A fully covered
+-- competing row instead carries the data policy into control, where MIR can
+-- observe and record its own force disablement. ForceTechnology.enabled alone
+-- distinguishes neither case from caps or another mod's disablement.
 local function authored_generated_admitted(force, row, observed)
   if not valid_force(force) then return false end
   if observed then return observed.authored[row.id] == true end

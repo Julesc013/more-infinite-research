@@ -460,6 +460,7 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
       end
     end
   end
+  local withheld
   for _, row in ipairs(technologies) do
     local recipes = excluded[row.name]
     if recipes then
@@ -470,14 +471,18 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
         end
       end
       if #effects == 0 then
-        -- An unresearchable owned row can retain its native effect vector.
-        -- Removing it would also erase the player's previously earned bonus.
-        row.enabled = false
+        -- Keep the native default and earned effect vector. The lifecycle
+        -- owns the force disablement so it can restore the previous state.
+        if row.enabled ~= false then
+          withheld = withheld or {}
+          withheld[row.name] = true
+        end
       else
         row.effects = effects
       end
     end
   end
+  return withheld
 end
 
 return M

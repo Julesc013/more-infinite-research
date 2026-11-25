@@ -236,4 +236,6 @@ function M.worker_storage_route()
   return route
 end
 
+M.withheld_competing_productivity = admission_facts.withheld_competing_productivity
+
 return M

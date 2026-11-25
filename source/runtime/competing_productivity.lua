@@ -9,6 +9,7 @@ local caps = require("runtime.caps")
 local binding = require("compatibility.competing_productivity")
 local target = require("platform.target")
 local effective = require("runtime.configuration")
+local WITHHELD_COMPETING_PRODUCTIVITY = require("runtime.catalogue").withheld_competing_productivity
 
 local M = {}
 
@@ -107,6 +108,7 @@ local function runtime_replacements_admitted(force, item)
     local technology = technologies and technologies[replacement.id]
     local prototype = technology and technology.prototype
     if not technology or technology.valid == false or not prototype or prototype.enabled ~= true
+        or (WITHHELD_COMPETING_PRODUCTIVITY and WITHHELD_COMPETING_PRODUCTIVITY[replacement.id])
         or prototype.level ~= replacement.first_level or prototype.max_level ~= UINT32_MAX
         or not binding.runtime_effects_include(prototype.effects, replacement.effects) then
       return false
