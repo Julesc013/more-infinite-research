@@ -8676,6 +8676,109 @@
         "v5.0.0": "7e77f203859ab9384208c2c673983b1ffea44d2f"
       }
     },
+    "published_mir5_test_tree_intake": {
+      "reviewed_on": "2026-11-26",
+      "scope": "GitHub editions v5.0.0 through v5.0.24 and the tracked tests trees. Source discovery only.",
+      "published_tag_count": 25,
+      "unique_test_tree_blobs": 2441,
+      "unique_test_tree_blobs_absent_from_initial_tag": 1015,
+      "tag_commits": {
+        "v5.0.1": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+        "v5.0.2": "53c5075e94936ea71ab4cbad7a900612eacea67a",
+        "v5.0.3": "536573c20fcf995e94a967c47964d6b82b36ce0f",
+        "v5.0.4": "401d89f67cf71c8fb3ed7a025eff18f0a9d99a28",
+        "v5.0.5": "5d173925bce29ad8917346897706a0fcee4553e4",
+        "v5.0.6": "7b8cba314767da6aa5fcdc6c4d1c1f080c35800f",
+        "v5.0.7": "e296d40924f4d0f1d133eb5710f392b92ac42158",
+        "v5.0.8": "492bbda6249e9b42b1e28ea1db113ac347bcd66b",
+        "v5.0.9": "b86c0262104529e4301386db4e9ce67284a03ce8",
+        "v5.0.10": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+        "v5.0.11": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+        "v5.0.12": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+        "v5.0.13": "f208b853a6e59fdcafd9209219150965576637d7",
+        "v5.0.14": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+        "v5.0.15": "d64318546890f8dfc048ab60262436130dcec5e9",
+        "v5.0.16": "9c3ec803b5a51105507e5c86f29b7e523716f274",
+        "v5.0.17": "7cd3ae1ff4910699eb9ceeb70681f02659f0deec",
+        "v5.0.18": "a7e3045501e0b152e897ef7a2c8d3a6c93f4f4d2",
+        "v5.0.19": "0c3575c29603a36ed656a8dc0c7e1ce286da6d67",
+        "v5.0.20": "04f05596a3455839b5219b0e0abeca76a351c544",
+        "v5.0.21": "c161867920f50ad973581c43625e78a9f2949180",
+        "v5.0.22": "9e376928407e58f2921baf898a7edc398514a849",
+        "v5.0.23": "5134b7efa7e0b2909344c16a1e3869e6de7e993e",
+        "v5.0.24": "93b7f4bf17d3b2d32729c0b937eb9f38386d3125"
+      },
+      "latest_public_release_id": 457617321,
+      "evidence": {
+        "path": "build/qualification/mir5-public-tag-continuity-r01/published-tag-intake.json",
+        "sha256": "36E6DBFBEDA8485C12303316A7652D37F0EA78D41DED8AC821AC7157202B805F"
+      },
+      "remaining": "Semantic obligations, inter-release-only tests, original discussions, and native verification retain their own existing scopes."
+    },
+    "replacement_525_native_evidence": {
+      "reviewed_on": "2026-11-26",
+      "scope": "Apply named exact-package results to existing obligations. Remaining source, test intent and stable qualification stay open.",
+      "source": "98056d27ef63ecc5ba0be28f0602244c109f5d0e",
+      "inventory_sha256": "2118768DAC962CB079A71D7268219F00E14BFA011CC1ADC47519B0514F3786B1",
+      "cases": [
+        {
+          "subjects": [
+            "CONT-05",
+            "CONT-07",
+            "CONT-12"
+          ],
+          "scope": "K2SO paid science and queue continuity through cap and unlock, on Factorio 2.1.24.",
+          "evidence": {
+            "path": "build/qualification/mir525-replacement-k2so-black-glass-r01/verified-k2so-cap-continuity.json",
+            "sha256": "D12FE37502416166F27DB5FE791DE7B7EE2A923876673224A80E8984823E6EA2"
+          }
+        },
+        {
+          "subjects": [
+            "CONT-07",
+            "CONT-12"
+          ],
+          "scope": "Space Exploration extraction, accepted paid merge and refusal of an ambiguous merge, on Factorio 2.0.77.",
+          "evidence": {
+            "path": "build/qualification/mir525-replacement-se-black-glass-r01/verified-se.json",
+            "sha256": "89E71B6F34558DCD78D9732F694CD41A56274E1B8EBD9A4E960AA377C39F3CDF"
+          }
+        },
+        {
+          "subjects": [
+            "CONT-07",
+            "CONT-12"
+          ],
+          "scope": "Reported Space Age upgrade and Solar Productivity addition profiles, with ordinary next research and cold loads.",
+          "evidence": {
+            "path": "build/qualification/mir525-repair-reported-upgrades-gunmetal-r01/verified-reported-replays.json",
+            "sha256": "AC2BB4C6956FF1211C88EFB6378A2ACC53408FF0289191C02BC1D5FDA3B7289A"
+          }
+        },
+        {
+          "subjects": [
+            "CONT-14"
+          ],
+          "scope": "Both physical API consumers on exact Factorio 2.0 and 2.1 packages, including cold reloads.",
+          "evidence": {
+            "path": "build/qualification/mir525-replacement-api-black-glass-r02/verified-native-api.json",
+            "sha256": "DBE661B1E577C826F2C44FA88F219FD9B4BEBDA53357087C9F135D30A99EF04D"
+          }
+        },
+        {
+          "subjects": [
+            "CONT-12",
+            "CONT-17"
+          ],
+          "scope": "Passed matched Foundation III save load and peak RSS comparison on the frozen Factorio 2.0.77 ZIP.",
+          "evidence": {
+            "path": "build/qualification/mir525-replacement-foundation-load-gunmetal-r02/verified-load.json",
+            "sha256": "16F02865B066A60F50145C63E4DB820D1ED5CCC3A21E097A52829FB1B61990EC"
+          }
+        }
+      ],
+      "remaining": "Review outstanding intent in the existing inventory and run affected exact native scenarios. The prior Library rejoin archive changed in lifecycle and catalogue code. Its final-archive replay and current performance gates remain open."
+    },
     "allowed_dispositions": [
       "retain",
       "port",

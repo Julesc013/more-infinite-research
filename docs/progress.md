@@ -26,7 +26,9 @@ Both native API consumers passed on the replacement editions for Factorio 2.0.77
 
 The protected published 5.0.17 K2SO save passed the Factorio 2.1.24 upgrade, finite cap and unlimited restoration sequence. The fixture accelerated laboratory speed and checked the full material and science requirements. Labs used 5,160 space science on upgrade and 3,440 space science plus 20 automation science after relaxing the cap. Each saved phase passed two cold loads. The receipt is `build/qualification/mir525-replacement-k2so-black-glass-r01/verified-k2so-cap-continuity.json` at SHA-256 `D12FE37502416166F27DB5FE791DE7B7EE2A923876673224A80E8984823E6EA2`.
 
-The replacement Factorio 2.0.77 Foundation III soak completed two 144,000-update runs across 57 surfaces. Both matched checksum `3502299908` and preserved the save and direct library controls. The receipt is `build/qualification/mir525-replacement-foundation-soak-gunmetal-r01/verified-soak.json` at SHA-256 `5958ECDE405E31256BF59A9F3E5AE738C8EF1A60A381B2ECE9C63F65A6CFF387`. The matched load comparison, startup timing and retained Library memory verdicts remain open for stable.
+The replacement Factorio 2.0.77 Foundation III soak completed two 144,000-update runs across 57 surfaces. Both matched checksum `3502299908` and preserved the save and direct library controls. The receipt is `build/qualification/mir525-replacement-foundation-soak-gunmetal-r01/verified-soak.json` at SHA-256 `5958ECDE405E31256BF59A9F3E5AE738C8EF1A60A381B2ECE9C63F65A6CFF387`. The startup timing and retained Library memory verdicts remain open for stable.
+
+The matched Foundation III comparison passed all 27 scheduled runs on the frozen Factorio 2.0.77 ZIP. Mean save load increased by 0.056 seconds and mean peak RSS fell by 85.6 MiB against published 4.7.3. The protected save and direct library controls were verified after the run. The receipt is `build/qualification/mir525-replacement-foundation-load-gunmetal-r02/verified-load.json` at SHA-256 `16F02865B066A60F50145C63E4DB820D1ED5CCC3A21E097A52829FB1B61990EC`.
 
 ## 5.0.25 publication hold and Space Exploration cap raise (2026-11-26)
 
