@@ -4721,20 +4721,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $fakeBody=@'
 param([Parameter(ValueFromRemainingArguments=$true)]$rest)
 $encoding=[Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'bad-ready'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,'{"kind":"bad"}',$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding);exit 0}}
 }
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   Start-Sleep -Milliseconds 400
   exit 0
 }
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'success'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
 }
 throw 'unexpected fake display mode'
