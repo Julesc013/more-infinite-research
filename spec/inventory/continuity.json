@@ -8848,6 +8848,63 @@
         "sha256": "7C3368A231B3F5E59C6B39612D63C8C46949C44DE2F4927F6058C699422C5507"
       }
     },
+    "paid_credit_same_name_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "45328ebf6945d70e55f5761e6add555546c3cbe4",
+      "published_range": "v5.0.3 through v5.0.24",
+      "path": "tests/test_native_family_paid_credits.py",
+      "published_tags_containing_file": 22,
+      "distinct_historical_file_blobs": 8,
+      "changed_retained_declarations": 7,
+      "groups": [
+        {
+          "original_tags": [
+            "v5.0.3",
+            "v5.0.7",
+            "v5.0.11"
+          ],
+          "controls": [
+            "test_published_f200_m4_base_direct_upgrade_keeps_only_original_paid_mask",
+            "test_published_f200_base_direct_reader_refuses_unproven_inputs_before_writes",
+            "test_published_m4_base_hop_refuses_unproven_inputs_before_all_mir_writes",
+            "test_published_m4_engine_hop_known_mask_does_not_require_unchanged_settings_flag"
+          ],
+          "disposition": "The real target and shared bootstrap setup preserve the existing assertions. The known old Base mask admits the named engine hop with either Boolean startup event flag. Unknown, malformed and unsupported inputs still refuse before writes."
+        },
+        {
+          "original_tags": [
+            "v5.0.7"
+          ],
+          "controls": [
+            "test_data_only_known_startup_change_matches_staged_module_disable_and_retuning"
+          ],
+          "reference_revision": "2aee484340039949f290c856944f19503cb377d6",
+          "disposition": "Keep the direct-versus-staged earned-state and retuning expectations. The fixture uses the observed native representation for the mock effect values."
+        },
+        {
+          "original_tags": [
+            "v5.0.12"
+          ],
+          "controls": [
+            "test_known_base_origin_with_only_new_mods_preserves_paid_and_unfinished_work"
+          ],
+          "reference_revision": "55cba3560d094f877df1fa537e011b46b0db9d15",
+          "disposition": "Retain the original paid mask, queue, and detached progress assertions. Also complete the detached private research through the ordinary settlement path in the host model."
+        },
+        {
+          "original_tags": [
+            "v5.0.15"
+          ],
+          "controls": [
+            "test_published_f210_m4_base_patch24_reader_refuses_other_inputs_before_writes",
+            "test_published_f210_m4_base_exact_patch24_hop_preserves_only_old_paid_mask"
+          ],
+          "reference_revision": "60add71edfb69319bcca8b24d74530aa350c8821",
+          "disposition": "The authenticated Base policy admits a completely witnessed addition and refuses an existing extra mod update. The F210 patch-hop control exercises both plain Base and the witnessed addition with 5.0.21025. Earned credit, current and parked progress, queue order and zero new-recipe credit survive."
+        }
+      ],
+      "scope": "Same-named assertions changed in the selected published Python tests. This maps their host controls. Native scenarios and the wider historical intent audit retain their own acceptance requirements."
+    },
     "allowed_dispositions": [
       "retain",
       "port",

@@ -1337,21 +1337,26 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
 
     def test_published_f210_m4_base_exact_patch24_hop_preserves_only_old_paid_mask(self):
         """The observed Base patch hop retains its fixed mask for an F210 successor."""
-        for successor in ("5.0.21015", "5.0.21016"):
-            with self.subTest(successor=successor):
+        cases = (("5.0.21015", False), ("5.0.21016", False), ("5.0.21025", False), ("5.0.21025", True))
+        for successor, add_foreign in cases:
+            with self.subTest(successor=successor, add_foreign=add_foreign):
                 self.setUp()
                 self._published_m4_base("f210")
                 self.lua.globals().successor = successor
+                self.lua.globals().add_foreign = add_foreign
                 self.lua.execute('''
           BASE_ACTIVE.base="2.1.24";BASE_ACTIVE["more-infinite-research"]=successor
+          local changes={base={old_version="2.1.23",new_version="2.1.24"},
+            ["more-infinite-research"]={old_version="4.7.21003",new_version=successor}}
+          if add_foreign then
+            BASE_ACTIVE.foreign="1.0.0";changes.foreign={new_version="1.0.0"}
+          end
           reload_credits(BASE_ACTIVE,"f210")
           local force=make_collected_force(1,8,published_base_mask,false)
           local main=force.technologies["recipe-prod-research_steel-1"]
           main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
           force.current_research=main;local queue=force.research_queue
-          native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes={
-            base={old_version="2.1.23",new_version="2.1.24"},
-            ["more-infinite-research"]={old_version="4.7.21003",new_version=successor}}})
+          native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes=changes})
           for family,recipes in pairs(GROUPS) do
             close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
             assert(record(force,family,recipes[1].recipe).offset==0)
