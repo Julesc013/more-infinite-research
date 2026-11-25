@@ -14,6 +14,20 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Verified 5.0.25 replacement packages (2026-11-26)
+
+The replacement source `98056d27ef63ecc5ba0be28f0602244c109f5d0e` and merged main `f0e64bb2ba24f4479845e7fda007bc7478b17173` have the same checked tree. The inventory `2118768DAC962CB079A71D7268219F00E14BFA011CC1ADC47519B0514F3786B1` verifies 17 player ZIPs and both checksum files. Main passed all four hosted checks. The GitHub beta targets 18:00 AEDT. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2416)
+
+The replacement Factorio 2.1 ZIP passed the Space Age patch upgrade and the addition of Solar Productivity 3.0.0 on the reported profiles. Ordinary labs preserved paid work and queue order. Two cold loads passed in each case. The readback is `build/qualification/mir525-repair-reported-upgrades-gunmetal-r01/verified-reported-replays.json` at SHA-256 `AC2BB4C6956FF1211C88EFB6378A2ACC53408FF0289191C02BC1D5FDA3B7289A`. The separate provider preference, removal and return replay passed all six stages and 12 cold loads.
+
+On Factorio 2.0.77, the replacement ZIP passed the mining and paid force-merge replays. Ordinary mining research raised each drill from 45 to 49 ore and the core miner from 160 to 176 fragments. The accepted force merge preserved paid research for ordinary levels nine and ten, and both cold loads matched. The separate ambiguous merge refused before transfer. The original save and direct library controls survived both merge cases. The native custody record is `build/qualification/mir525-replacement-se-black-glass-r01/verified-se.json` at SHA-256 `89E71B6F34558DCD78D9732F694CD41A56274E1B8EBD9A4E960AA377C39F3CDF`.
+
+Both native API consumers passed on the replacement editions for Factorio 2.0.77 and 2.1.24. The paired assemblers delivered 200 and 202 copper cables from 100 plates. Each edition passed two cold loads and restored the direct library state. The receipt is `build/qualification/mir525-replacement-api-black-glass-r02/verified-native-api.json` at SHA-256 `DBE661B1E577C826F2C44FA88F219FD9B4BEBDA53357087C9F135D30A99EF04D`.
+
+The protected published 5.0.17 K2SO save passed the Factorio 2.1.24 upgrade, finite cap and unlimited restoration sequence. The fixture accelerated laboratory speed and checked the full material and science requirements. Labs used 5,160 space science on upgrade and 3,440 space science plus 20 automation science after relaxing the cap. Each saved phase passed two cold loads. The receipt is `build/qualification/mir525-replacement-k2so-black-glass-r01/verified-k2so-cap-continuity.json` at SHA-256 `D12FE37502416166F27DB5FE791DE7B7EE2A923876673224A80E8984823E6EA2`.
+
+The replacement Factorio 2.0.77 Foundation III soak completed two 144,000-update runs across 57 surfaces. Both matched checksum `3502299908` and preserved the save and direct library controls. The receipt is `build/qualification/mir525-replacement-foundation-soak-gunmetal-r01/verified-soak.json` at SHA-256 `5958ECDE405E31256BF59A9F3E5AE738C8EF1A60A381B2ECE9C63F65A6CFF387`. The matched load comparison, startup timing and retained Library memory verdicts remain open for stable.
+
 ## 5.0.25 publication hold and Space Exploration cap raise (2026-11-26)
 
 On Windows Factorio 2.0.77 and Space Exploration 0.7.57, the frozen Factorio 2.0 ZIP lost six conquest values at configuration time while upgrading a protected MIR 5.0.20018 cap-ten save and raising its cap to twelve. The checked 5.0.23 ZIP retained the values on the same engine, save and startup settings. Both restored the shared library. The publisher was stopped before draft staging.
