@@ -513,6 +513,9 @@ class BootstrapTests(unittest.TestCase):
             "ordinary Base upgrade was marked as a competing-provider transition")
           for _, id in ipairs({1, 2, 3, 20}) do assert(type(handlers.events[id]) == "function") end
           for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
+          require("runtime.library").native_subscription_needs=function()
+            error("force lifecycle scanned saved Library views while closed")
+          end
           for _, id in ipairs({1, 2, 3, 20}) do handlers.events[id]({force=player.force}) end
           assert(credit_calls.on_force_created == 1 and credit_calls.on_force_reset == 1
             and credit_calls.on_forces_merged == 1 and credit_calls.on_technology_effects_reset == 1)
@@ -1286,6 +1289,9 @@ class BootstrapTests(unittest.TestCase):
           end
           player.force.technologies["worker-robots-storage-4"]={name="worker-robots-storage-4"}
           handlers.init()
+          require("runtime.library").native_subscription_needs=function()
+            error("worker completion scanned saved Library views while closed")
+          end
           local event={research={valid=true,name="mir-worker-storage-published517-4",force=player.force}}
           handlers.events[defines.events.on_research_finished](event)
           assert(#calls==1 and calls[1]==event,
