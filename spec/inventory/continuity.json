@@ -8804,9 +8804,9 @@
       "reviewed_on": "2026-11-26",
       "source": "61b9140f875fd9309f00f6a8e66e8238618105cd",
       "declarations_missing_under_original_names": 41,
-      "reviewed_declarations": 19,
-      "remaining_named_declarations": 22,
-      "scope": "Library fixture authority, Space Exploration optional restoration, Bob and Angel minimum metadata, and saved worker history. Review compares original and current test source. Existing native receipts retain their scopes.",
+      "reviewed_declarations": 41,
+      "remaining_named_declarations": 0,
+      "scope": "All 41 declarations that lost their original names in the selected public Python test trees are reconciled. Historical inter-release-only tests, other source families and stable native verification have separate remaining work.",
       "evidence": [
         {
           "tests": 9,
@@ -8822,8 +8822,31 @@
           "tests": 6,
           "path": "build/qualification/mir5-public-tag-continuity-r01/worker-history-test-intents.json",
           "sha256": "D31340425D93384830C965E6FADB7EA35F474731AE792BAAA092C8D4B059C168"
+        },
+        {
+          "tests": 5,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/native-descriptor-test-intents.json",
+          "sha256": "0CD8EFCBB0F451955CCC855D54F827DFB9C2CD6A0FD8E3007CF4285A6A5165C8"
+        },
+        {
+          "tests": 5,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/catalogue-and-tail-test-intents.json",
+          "sha256": "AED73C19DEEFC2A52C7742052EC213558BB283617FED3E75F03E9FBCF3CE78A1"
+        },
+        {
+          "tests": 12,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/profile-and-credit-test-intents.json",
+          "sha256": "8670A857B3498CCF161539AD8F9D4F800AF3086505B1DCD8AAEC8EEA2AF01ABA"
         }
-      ]
+      ],
+      "original_zero_carrier_replay": {
+        "path": "build/qualification/mir5-public-tag-continuity-r01/original-zero-carrier-current-host-r01.json",
+        "sha256": "A50B3E41AA3A0A00419B7BE5E96EFC394A872365022F2AC239B6F5BB57B2109E"
+      },
+      "zero_carrier_host_controls": {
+        "path": "build/qualification/mir5-public-tag-continuity-r01/fixed-credit-opponent-host-output.txt",
+        "sha256": "7C3368A231B3F5E59C6B39612D63C8C46949C44DE2F4927F6058C699422C5507"
+      }
     },
     "allowed_dispositions": [
       "retain",

@@ -247,6 +247,20 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           assert(ledger(force,"copper-plate")==nil)
         ''')
 
+    def test_undeclared_zero_fixed_carriers_refuse_before_writes(self):
+        self.lua.execute(r'''
+          GROUPS={};reload_credits()
+          local force=make_force(1,nil,nil,nil,{["copper-plate"]=0});game.forces[1]=force
+          local positive=holder(force,"copper-plate","positive")
+          local negative=holder(force,"copper-plate","negative")
+          local ok, message=pcall(native_credits.on_init)
+          assert(not ok and tostring(message):find("undeclared-fixed-credit-present",1,true))
+          assert(storage.mir_native_credits==nil and positive.level==1 and negative.level==1)
+          for _,state in pairs(force._states)do
+            assert(state.writes.level==0 and state.writes.enabled==0)
+          end
+        ''')
+
     def precision_attempt(self, target, family, authored, actual=None, units=None):
         self.setUp()
         g = self.lua.globals()
