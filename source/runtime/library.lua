@@ -3180,10 +3180,11 @@ function M.on_pre_player_removed(event)
 end
 
 -- Research callbacks can precede the engine's final queue/level transition.
--- Mark only relevant owned open views and refresh once on the following tick.
+-- Mark relevant views for the next tick and return subscriptions in the same pass.
 function M.on_native_state_changed(event)
   local state = existing_state()
-  if not state then return end
+  if not state then return false, false end
+  local open, pending = false, false
   local force = event and (event.force or event.destination or (event.research and event.research.force))
   for index, view in pairs(state.players) do
     if type(view) == "table" and view.open == true then
@@ -3191,11 +3192,15 @@ function M.on_native_state_changed(event)
       if not player or player.connected ~= true or not valid(owned_root(player)) then
         view.open, view.refresh_pending = false, false
         discard_translation_cache(index)
-      elseif force == nil or (player.force and player.force.index == force.index) then
-        view.refresh_pending = true
+      else
+        if force == nil or (player.force and player.force.index == force.index) then view.refresh_pending = true end
+        if whole_number(index, 1) then
+          open, pending = true, pending or view.refresh_pending == true
+        end
       end
     end
   end
+  return open, pending
 end
 
 function M.on_native_refresh_tick()
@@ -3229,14 +3234,14 @@ function M.native_subscription_needs()
   if type(state) ~= "table" or state.schema ~= SCHEMA or type(state.players) ~= "table" then
     return false, false
   end
-  local open, pending = false, false
+  local open = false
   for index, view in pairs(state.players) do
     if whole_number(index, 1) and type(view) == "table" and view.open == true then
+      if view.refresh_pending == true then return true, true end
       open = true
-      pending = pending or view.refresh_pending == true
     end
   end
-  return open, pending
+  return open, false
 end
 
 function M.on_player_removed(event)
