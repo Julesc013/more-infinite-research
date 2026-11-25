@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-25
+last_reviewed: 2026-11-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,14 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Published Base save migration and lab completion (2026-11-26)
+
+The exact development archives from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` upgraded the protected published MIR 4.7.20003 Base save `1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF` directly on Factorio 2.0.77 and 2.1.23. Both paths kept 54 research rows, 85 recipe bonuses, 15 force values, seven weapon bonuses, active and parked work, and worker cargo ownership across two forces. Both matched two fresh cold loads. The 2.1 comparison checks exact native representations of the recipe values and retains all 875 prior settings alongside 14 authored defaults for the two new cargo families.
+
+Each upgraded save separately supplied four original science packs to ordinary labs for the pending 32,000-unit gear level. The saves retained 0.42 units of earlier progress and the 10 percent laboratory productivity bonus. One new level completed on each engine. Gear productivity rose from 20 to 30 percent, and braking-force research stayed current through two cold loads with the same observed progress. The Factorio 2.0 and 2.1 item statistics counted 28,928 and 29,184 whole packs respectively for each science type. Both shared libraries restored, and both protected input saves retained their original hashes.
+
+The full-state receipts are `f200-pure473-full-state.json` and `f210-pure473-forward-full-state.json` under `build/qualification/mir5-competing-availability-verified-r01`. The lab receipts are `f200-pure473-gear-completion.json` at `334D485447BAD1C5A1BB8F75130E11D644EF678A99CDB9588FC68C55649A5483` and `f210-pure473-forward-gear-completion.json` at `A4E69A0E6B104FE5D5E79A45161901DF5A47D06D2C18558F20BBCE15D62BE9F8`. The receipts retain the original diagnostic-mod refusal, timing observation and obsolete verifier assumptions. This result covers the two named development paths from the published Base save.
 
 ## Competing productivity preference and provider round trip (2026-11-26)
 
