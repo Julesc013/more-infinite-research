@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Competing productivity preference and provider round trip (2026-11-26)
+
+The development package `CE776D1C9CA8C661FE176EB100BC5B2F67C744646BC431EECE1CA402A71F65DC` from `dfc3b850e66df51693bcfed6a714e4f26924b9e7` passed a six-stage Factorio 2.0.77 replay. It began on public MIR 4.7.20002 with the plate, science-pack, bioflux and fish productivity providers. The first MIR5 upgrade retained the source settings. The replay then switched preference both ways, removed and reinstalled the four providers, and matched every historical stage witness. Two earlier provider labs and three MIR labs completed. Twelve cold loads matched within their paired saves. Preference and provider changes restored MIR's own disabled flags and preserved the unowned disabled flag on the other force. The protected saves and direct-library controls survived. The verified readback is `build/qualification/mir5-competing-availability-verified-r01/six-stage-chain.json` with SHA-256 `3DCF77B200C8B40A95657F5E0378AC20D10003630B88FA40CC1119ED3569C71C`.
+
+A separate replay used two forces whose ordinary bioflux labs had paid about eight percent at the fixture's unchanged 128-unit price. After switching preference, the active and parked research, queue and lab inventories matched the prior save. The active lab completed the original level, production advanced the queue and retired the finished row, and the other force retained its parked work. Six cold processes matched. The verified receipt is `build/qualification/mir5-competing-availability-verified-r01/paid-work.json` with SHA-256 `7554AC4236FE084DE6B858AB9486F63EEEC1C64D624817209AD965E79638EEFA`. The first attempt stopped during fresh force creation in MIR worker cargo before either lab started. The original failure and successful replay are in the verified evidence custody record.
+
+The repair uses the existing runtime ownership ledger for a bounded data-stage retirement decision. Previously published saves with ambiguous disabled flags retain those flags. This qualification covers the tested staged history, active and parked work, and the independent unowned-disablement sentinel. The reviewed 5.0.25 beta remains on its earlier frozen release tree.
+
 ## Factorio 2.0 Space Age upgrade from MIR 4.7.2 (2026-11-25)
 
 On Factorio 2.0.77, the native replay from published MIR 4.7.20002 with four productivity providers refused the first upgrade when its startup preference changed. The public 5.0.24 and frozen 5.0.25 archives both refused this combination. With the preference held constant, frozen 5.0.25 reached a worker rule specific to Space Exploration and refused the Space Age save. The protected save and library controls remained intact. The paired boundary record is `build/qualification/mir525-fixed-provider-removal-black-glass-r03/terminal.json` with SHA-256 `A85871AC1888FC13966129AFF7EA3669862489D6A96C47D2873DE0EAA07257E9`.
