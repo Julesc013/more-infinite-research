@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-library-paired-browser-arm-mir5",
+  "version": "0.1.0",
+  "title": "MIR paired public Library MIR 5 arm selector",
+  "author": "MIR maintainers",
+  "description": "Selects the MIR 5.0.20025 arm for the retained Library comparison.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 5.0.20025",
+    "mir-fixture-mir5-library-paired-browser = 0.1.0"
+  ]
+}
