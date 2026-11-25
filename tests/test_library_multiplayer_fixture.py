@@ -4721,23 +4721,26 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $fakeBody=@'
 param([Parameter(ValueFromRemainingArguments=$true)]$rest)
 $encoding=[Text.UTF8Encoding]::new($false)
-if($env:MIR_TEST_DISPLAY_MODE -ceq 'bad-ready'){
-  [IO.File]::WriteAllText($env:MIR_TEST_READY,'{"kind":"bad"}',$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
-  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding);exit 0}}
-}
-if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
-  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+$mode=$env:MIR_TEST_DISPLAY_MODE
+if($mode -cnotin @('bad-ready','linger','success')){throw 'unexpected fake display mode'}
+$ready=if($mode -ceq 'bad-ready'){'{"kind":"bad"}'}else{$env:MIR_TEST_VALID_READY}
+[IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
+$temporary=$env:MIR_TEST_READY+'.writing'
+[IO.File]::WriteAllText($temporary,$ready,$encoding)
+[IO.File]::Move($temporary,$env:MIR_TEST_READY)
+if($mode -ceq 'linger'){
   Start-Sleep -Milliseconds 400
   exit 0
 }
-if($env:MIR_TEST_DISPLAY_MODE -ceq 'success'){
-  [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
-  while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
+while($true){
+  $line=[Console]::In.ReadLine()
+  if($null -eq $line){exit 0}
+  if($line -ceq 'stop'){
+    if($mode -ceq 'bad-ready'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding)}
+    else{[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding)}
+    exit 0
+  }
 }
-throw 'unexpected fake display mode'
 '@
           [IO.File]::WriteAllText($fake,$fakeBody,$encoding)
           $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
