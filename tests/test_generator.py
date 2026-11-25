@@ -276,7 +276,10 @@ def expected_worker_default_split_rows(historical_canonical):
     gate["effects"][0]["modifier"] = -historical_canonical["effects"][0]["modifier"]
     gate["unit"] = {"count": 1, "time": 1,
                     "ingredients": [[historical_canonical["unit"]["ingredients"][0][0], 1]]}
-    return {tail["name"]: tail, gate["name"]: gate}
+    credit = expected_private_worker_row(inactive_science="automation-science-pack")
+    credit.update(name="mir-worker-storage-provider-credit-4", ignore_tech_cost_multiplier=True, prerequisites=[],
+                  effects=[{"type": "worker-robot-storage", "modifier": 1}])
+    return {tail["name"]: tail, gate["name"]: gate, credit["name"]: credit}
 
 
 GROWTH_SETTING_MAXIMUM = 1000
@@ -563,7 +566,7 @@ class GeneratorTests(unittest.TestCase):
           -- This selected-source scaffold has no native-owner recipes, so
           -- five empty private mains and four mixed gun holders are added. Full owner/recipe
           -- fixtures independently cover the eleven canonical signed pairs.
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4+1+2 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4+1+2+1 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -1213,7 +1216,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1+2)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1+2+1)
           -- The retained science-pack family uses its existing bounded
           -- lab-input product binding plus the policy pass: no foreign
           -- technology read is introduced.
@@ -1227,12 +1230,13 @@ class GeneratorTests(unittest.TestCase):
               -- the public science policy checked below.
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
                 and #row.unit.ingredients == 1 and row.unit.ingredients[1][1] == "automation-science-pack")
-            elseif row.name == "mir-worker-storage-head-4" then
-              -- The first-level native debit deliberately keeps one
-              -- cheap source pack; it is not a player science-policy row.
+            elseif row.name == "mir-worker-storage-head-4" or row.name == "mir-worker-storage-provider-credit-4" then
+              -- Both native bookkeeping technologies use the same one-pack
+              -- unit, independently of ordinary player science selection.
+              local modifier = row.name == "mir-worker-storage-head-4" and -1 or 1
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
                 and row.max_level == "infinite" and #row.effects == 1
-                and row.effects[1].type == "worker-robot-storage" and row.effects[1].modifier == -1
+                and row.effects[1].type == "worker-robot-storage" and row.effects[1].modifier == modifier
                 and row.ignore_tech_cost_multiplier == true
                 and row.unit.count == 1 and row.unit.time == 1 and #row.unit.ingredients == 1
                 and row.unit.ingredients[1][1] == "automation-science-pack"
@@ -1254,7 +1258,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1+2)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1+2+1)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -1860,13 +1864,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2+3)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1+2+3+1)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5+4+1+2+3)
+          assert(final_count == 106+5+4+1+2+3+1)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -2153,7 +2157,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["compatibility.modern_catalogue.sif_retained"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 78+10+1+2)
+          assert(environment.writes == 1 and #environment.emitted == 78+10+1+2+1)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["compatibility.modern_catalogue.sif_retained"] == nil)
@@ -2359,6 +2363,7 @@ class GeneratorTests(unittest.TestCase):
             split = expected_worker_default_split_rows(expected["worker-robots-storage-4"])
             expected["mir-worker-storage-default-4"] = split["mir-worker-storage-default-4"]
             worker["mir-worker-storage-head-4"] = split["mir-worker-storage-head-4"]
+            worker["mir-worker-storage-provider-credit-4"] = split["mir-worker-storage-provider-credit-4"]
             actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile)
             available = captured_public_productivity_recipes(expected)
@@ -2422,6 +2427,7 @@ class GeneratorTests(unittest.TestCase):
             split = expected_worker_default_split_rows(expected["worker-robots-storage-4"])
             expected["mir-worker-storage-default-4"] = split["mir-worker-storage-default-4"]
             worker["mir-worker-storage-head-4"] = split["mir-worker-storage-head-4"]
+            worker["mir-worker-storage-provider-credit-4"] = split["mir-worker-storage-provider-credit-4"]
             actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile["id"])
             available = captured_public_productivity_recipes(expected)
@@ -2502,7 +2508,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 78+10+1+2)
+          assert(environment.writes == 1 and #environment.emitted == 78+10+1+2+1)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -2518,7 +2524,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 99+5+4+1+2)
+          assert(environment.writes == 1 and #environment.emitted == 99+5+4+1+2+1)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)
