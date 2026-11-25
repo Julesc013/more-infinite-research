@@ -8800,6 +8800,125 @@
       },
       "scope": "Exact profile startup result. Factorio 2.0 startup and Library performance have separate gates."
     },
+    "worker_history_same_name_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
+      "public_tags_through": "v5.0.24",
+      "files": [
+        {
+          "path": "tests/test_worker_storage_history.py",
+          "published_tags": 15,
+          "distinct_historical_blobs": 14,
+          "changed_retained_declarations": 16
+        },
+        {
+          "path": "tests/test_worker_storage_inherited_origin.py",
+          "published_tags": 10,
+          "distinct_historical_blobs": 3,
+          "changed_retained_declarations": 2
+        }
+      ],
+      "changed_retained_declarations": 18,
+      "groups": [
+        {
+          "retained_controls": {
+            "test_changed_endpoint_creator_ownership_and_removal_refuse_without_writes": [
+              "v5.0.10"
+            ],
+            "test_saved_older_producer_kinds_are_strict_and_cold_validation_is_storage_only": [
+              "v5.0.12"
+            ]
+          },
+          "disposition": "Cold load validates durable state without native access. Endpoint, writer and removal decisions run at configuration preflight. Earlier idle-producer storage stays readable.",
+          "reference_revision": "b22963ad589108ac8f02d93c21a6e972e25b49a7"
+        },
+        {
+          "retained_controls": {
+            "test_unknown_prior_save_is_not_inferred_from_current_prototype_or_version": [
+              "v5.0.10",
+              "v5.0.17"
+            ],
+            "test_bootstrap_refuses_before_lifecycle_or_other_credit_writes": [
+              "v5.0.10"
+            ],
+            "test_explicit_unprepared_route_reports_surviving_marker_without_recovery_writes": [
+              "v5.0.12"
+            ],
+            "test_unrecorded_mod_selection_refusal_reports_only_the_rejecting_tuple_without_writes": [
+              "v5.0.16"
+            ],
+            "test_first_owner_refusals_report_the_actual_473_event_base_and_current_route": [
+              "v5.0.18"
+            ]
+          },
+          "disposition": "Keep early refusal and zero writes for unproved owners. Current controls check the rejecting version, engine and route, protect the original save, and distinguish situations that the preparation command cannot repair."
+        },
+        {
+          "retained_controls": {
+            "test_owned_paid_scalar_and_cost_changes_update_only_valid_current_contract": [
+              "v5.0.12"
+            ]
+          },
+          "disposition": "Keep the paid native scalar, price, unfinished work and ownership checks. The fixture resolves the current stream price through configuration as well as the native prototype."
+        },
+        {
+          "retained_controls": {
+            "test_473_paid_idle_preserves_native_levels_and_foreign_work": [
+              "v5.0.12"
+            ],
+            "test_older_previous_profile_engine_event_and_current_route_opponents": [
+              "v5.0.12",
+              "v5.0.13",
+              "v5.0.15"
+            ],
+            "test_exact_473_and_recorded_modern_base_hop_preserve_all_native_work": [
+              "v5.0.12",
+              "v5.0.13"
+            ],
+            "test_hop_is_not_a_new_mod_unknown_engine_downgrade_or_unrecorded_adoption": [
+              "v5.0.12"
+            ],
+            "test_473_f210_rejects_ambiguous_or_unfinished_history_before_writes": [
+              "v5.0.13",
+              "v5.0.15"
+            ],
+            "test_473_matching_contract_transfers_current_repeated_queued_and_detached_work": [
+              "v5.0.13",
+              "v5.0.20",
+              "v5.0.21",
+              "v5.0.23"
+            ],
+            "test_473_f210_space_age_refuses_uncertain_origins_and_different_science": [
+              "v5.0.20",
+              "v5.0.21"
+            ]
+          },
+          "disposition": "Keep the same-source and engine-hop preservation assertions. Named published 4.7.3 Base and official Space Age routes now cover paid work, repeated queues, detached work and foreign state. Refusals distinguish wrong ancestry, unknown editors, changed providers, mismatched science and unsupported engine changes. The newer package minimum leaves the proved predecessor floor intact.",
+          "reference_revision": "e3a1b44f8690749cf4e9275218c82b76020fe4c7"
+        },
+        {
+          "retained_controls": {
+            "test_472_se_admission_rejects_other_events_settings_and_native_contracts_without_writes": [
+              "v5.0.18"
+            ]
+          },
+          "disposition": "Retain the original Space Exploration contract and zero-write refusal. The current opponent controls distinguish exact unchanged Elevated Rails from added, updated, absent or mismatched historical inputs.",
+          "reference_revision": "a0b9d63cb20ddbd8101933a62f51b7ee520a5839"
+        },
+        {
+          "retained_controls": {
+            "test_current_unchanged_upgrade_preserves_the_actual_inherited_shape": [
+              "v5.0.15"
+            ],
+            "test_published11_empty_settings_change_preserves_work_flags_and_cap_rights": [
+              "v5.0.17"
+            ]
+          },
+          "disposition": "Keep the inherited research and cap-rights expectations. The active fixture proves real invested work in the host model before migration. The empty route uses a complete resolved disabled and capped configuration and checks saved visibility, queue, credits and rights."
+        }
+      ],
+      "scope": "Worker storage and inherited-owner controls with changed bodies under the same names. Original tags identify each distinct historical body. Further historical comparisons and exact native acceptance remain open."
+    },
     "paid_credit_same_name_test_intent_review": {
       "reviewed_on": "2026-11-26",
       "reviewed_against": "45328ebf6945d70e55f5761e6add555546c3cbe4",
