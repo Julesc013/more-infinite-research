@@ -72,6 +72,14 @@ source_of_truth_for:
 
 - These routes do not automatically cover different expansion, provider, startup-setting or mod combinations. Older histories and best-effort editions retain their stated limits. A successful load is not proof that every earned effect or queued research state was preserved.
 
+### Moving a Factorio 1.1 save to 2.0
+
+Factorio can discard active worker cargo research during this engine conversion. Use the matching Factorio 1.1.110 and 2.0.77 editions of a MIR release whose release notes list the worker research checkpoint. The verified procedure covers the ordinary Worker Robot Cargo Size route with the same research price and science packs.
+
+1. Keep the original save, mod selection and startup settings. Update MIR in Factorio 1.1.110 and open a copy with the existing selection and settings.
+2. Run `/mir-worker-storage-recovery prepare` as an administrator. Save the paused copy under a new name and exit. Advancing a simulation tick expires the preparation. Use `/mir-worker-storage-recovery cancel` to abandon it and restore the previous pause state.
+3. Open that copy with the matching MIR edition in Factorio 2.0.77. Check earned cargo, active and parked research, and the queue before saving under a new name.
+
 ### Productivity providers and preferences
 
 - On Factorio 2.0.77 with the Base-game profile, a 0.01% recipe-productivity reward resolves to zero native bonus. The setting loads successfully; new levels add no productivity at that reward.
@@ -101,7 +109,7 @@ The staged upgrade from MIR 5.0.3 to 5.0.18 preserved queued mining and plastic 
 
 On Factorio 2.0.77 with Space Exploration 0.7.57, keep MIR and add-on updates in separate loads when the save has earned or unfinished worker cargo research.
 
-1. Keep the original save and its mod selection and startup settings. Work on a separate copy.
+1. Keep the original save, its startup settings and the exact add-on ZIPs. Preserve locally modified add-ons even if their version numbers stayed the same. Work on a separate copy.
 2. If you have already saved the add-on update successfully under MIR 4.7.20002, use a protected copy of that save with its matching mods and settings for the MIR upgrade. Otherwise try the MIR upgrade with the original add-on selection and exact MIR settings.
 3. Check the cargo bonus, current research and queue. If the upgrade succeeds, save the copy under a new name and cold-load it before making a separate add-on change. If the upgrade refuses, keep the original and its previous selection.
 

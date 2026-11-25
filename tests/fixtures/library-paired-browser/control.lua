@@ -44,7 +44,7 @@ local ARMS = {
   mir5 = {
     key = "mir5",
     mir_version = "5.0.20000",
-    other_versions = { ["5.0.20005"] = true, ["5.0.20023"] = true },
+    other_versions = { ["5.0.20005"] = true, ["5.0.20023"] = true, ["5.0.20024"] = true },
     selector = "mir-fixture-mir5-library-paired-browser-arm-mir5",
     shape = {
       filters = "mir_library_filters",

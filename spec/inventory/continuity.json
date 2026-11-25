@@ -4227,6 +4227,18 @@
           "verification": "Existing direct/continuation13 controls plus their3 consuming fixture groups pass with pinnedLua5.2/Lupa2.6. The two unmodified independent oracle controls pass;14 in-memory substitutions of the actual recorded F016 damaged prerequisite/science fields each fail their named independent assertion. No new executable test/player source changes.",
           "disposition": "Consolidate valid current science/prerequisite expectations through existing oracles; retire the old transition-specific allowance module as active transport. There is no source/tests/tools consumer of that retired module in the current tree.",
           "remaining": "Original4.2.0 before-capture provenance stays explicitly unverified and is not substituted or required as an invented new campaign. Preserve existing nine/seven/four selected route identities; review final-candidate consumed inputs and execute genuinely affected supported-profile/state checks. Host projection is not native qualification."
+        },
+        {
+          "id": "public524-nine-same-edition-save-upgrades",
+          "source": [
+            "source/research/historical_direct.lua",
+            "source/research/historical_continuations.lua",
+            "source/runtime/worker_robot_storage.lua"
+          ],
+          "evidence": "spec/evidence/candidate524-same-edition-save-frontier.json",
+          "scope": "The published 5.0.24 ZIPs passed the nine named same-edition upgrades from protected 4.7.3 saves. The owner receipts retain each original engine, controller, protected save, selected effect or queue observation and two cold loads. Factorio 0.13 and 0.14 preserved the earlier lab effects. Factorio 0.15 through 1.1 also completed one successor lab.",
+          "verification": "Rehashed 436 original files for Factorio 0.13 through 1.1 and bound all nine run package hashes to the anonymous release inventory and primary copies. The two modern Base replays ran at 2.0.77 and 2.1.23. The former matched a repeated 1,200-update map checksum and the latter matched saved force state on two fresh loads.",
+          "remaining": "Review consumed inputs for any successor candidate. Keep the selected older-contract groups, published-origin engine journeys and distinct provider/settings/client cases under their own acceptance scopes."
         }
       ],
       "test_subjects": [
@@ -4235,7 +4247,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Apply the exact final-candidate consumed-input review to the named nine4.7.3 same-edition routes, seven selected older-contract groups, four published-forward journeys and five separately recorded transition dispositions; preserve each original scope, protected source and adverse identity.",
+        "The nine named 4.7.3 same-edition upgrades have exact evidence for 5.0.24. Review the affected consumed inputs for later candidates. Independently assess the seven selected older-contract groups, four published-forward journeys and five recorded transition dispositions, preserving their original protected sources and adverse results.",
         "Complete affected current catalogue/settings/ownership/save/client checks beyond the bounded named routes, including the corrected modern braking-creation boundary; direct Imersite/K2SE fixture-owned results do not establish arbitrary removal/readdition or foreign-rights repair.",
         "Qualify affected public5.0.0/5.0.1-to-successor state and final package/API/version identities. Execute specifically admitted engine/DLC/provider changes only with their protected route/oracle; unselected permutations carry no blanket support claim."
       ]
@@ -7473,6 +7485,12 @@
           ],
           "evidence": "spec/evidence/historical-public512-f100-f110-scoped-correspondence-aero-r01.json",
           "scope": "The two named Base-only F100/F110 4.7.3 to 7a2 native observations have scoped consumed-path correspondence with exact public 5.0.12 ZIPs. Keep original engines, archives, protected saves, ordinary versus scripted state, fixtures, controller and cold-load identities. F100 has character mining speed/current/queue observations without detached/foreign work; F110 additionally retains its seeded rows and injected detached/foreign state. This is no new public12 run, other route, API-version, client, GUI, performance or stable verdict."
+        },
+        {
+          "id": "public524-nine-same-edition-save-upgrade-applicability",
+          "evidence": "spec/evidence/candidate524-same-edition-save-frontier.json",
+          "related_record": "CONT-11 public524-nine-same-edition-save-upgrades",
+          "scope": "All nine supported targets have a named save-upgrade result on the exact published 5.0.24 ZIPs. The separate Factorio 0.18.47 experimental load smoke awaits its engine. Additional settings, DLC and mod closures retain their individual qualification scopes."
         }
       ],
       "test_subjects": [
@@ -7481,8 +7499,8 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Review final current-package identities and affected native checks for all nine stable editions, preserving the explicit experimental metadata/load-smoke-only F018 and early best-effort limits.",
-        "Prioritize final F2102.1.23 and F2002.0.77 acceptance while preserving the seven reduced obligations and original named-route evidence; no final candidate or release pass follows from a matching private package.",
+        "Use the exact 5.0.24 named upgrade and cold-load evidence for all nine supported editions. Review its applicability to any later candidate and finish the affected edition-native scopes. Preserve the experimental F018 metadata and load-smoke limit.",
+        "Extend the exact Factorio 2.0.77 and 2.1.23 Base observations to the remaining admitted profile and state changes. Retain the seven reduced-edition obligations and the original named-route evidence.",
         "Close the affected named engine/provider/preference and public-beta-to-successor checks under the existing finite migration matrix. Unselected adjacent/DLC/provider axes remain unverified without a support claim, not additional campaigns or passed routes."
       ],
       "version_transition_coverage": {
@@ -8383,6 +8401,23 @@
       "subject": "Licenses/locales/icons/catalogue/support/changelog content",
       "status": "partial",
       "resolved_records": [
+        {
+          "id": "published-524-player-presentation",
+          "source": [
+            "README.md",
+            "CHANGELOG.md",
+            "source/changelog.txt",
+            "source/locale",
+            "source/LICENSE",
+            "source/thumbnail.png",
+            "docs/support.md",
+            "docs/release-notes.md",
+            "docs/upload-text.txt"
+          ],
+          "evidence": "spec/evidence/candidate524-player-presentation-continuity-r01.json",
+          "evidence_sha256": "DD0887B7FEE741CC0F2C40EF2B525BF81162DBFB53412B0CA03AA459AB4FD254",
+          "scope": "All 17 published 5.0.24 archives matched the exact tagged member paths and bytes. The 19 anonymous assets, public display labels and delivered text matched. Forty-seven selected host tests covered the complete authored history, locale keys, package boundaries and historical source selection. Native presentation and final candidate acceptance still require their applicable evidence."
+        },
         {
           "id": "active-provider-artwork-boundary",
           "source": [

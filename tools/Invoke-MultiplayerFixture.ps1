@@ -335,32 +335,29 @@ function Assert-MultiplayerFixtureSelection {
       fixture_mods=@('elevated-rails@2.0.77','quality@2.0.77','space-age@2.0.77','mir-fixture-mir5-scripted-effects-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
     }
-    [ordered]@{
-      fixture_case='library-paired-browser';target='f200'
-      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20005';build_version=84539
-      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
-      mir_archive_sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
-      paired_arm='mir5'
-      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
-      optional_archives=@('more-infinite-research_5.0.20005.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
-    }
-    [ordered]@{
-      fixture_case='library-paired-browser';target='f200'
-      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20023';build_version=84539
-      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
-      mir_archive_sha256=@(
-        'C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
-        '2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
-        '72F07C0C6B6BFF2D009ECABE3A25FAB0C61BF559D31D308B98C75D37BED7BEB2'
-        '43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
-      )
-      paired_arm='mir5'
-      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
-      optional_archives=@('more-infinite-research_5.0.20023.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
-    }
   )
+  $pairedBrowserArchives=[ordered]@{
+    '5.0.20005'=@('764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D')
+    '5.0.20023'=@(
+      'C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
+      '2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
+      '72F07C0C6B6BFF2D009ECABE3A25FAB0C61BF559D31D308B98C75D37BED7BEB2'
+      '43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
+    )
+    '5.0.20024'=@('F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535')
+  }
+  foreach($version in $pairedBrowserArchives.Keys){
+    $targets+=,[ordered]@{
+      fixture_case='library-paired-browser';target='f200'
+      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir=$version;build_version=84539
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      mir_archive_sha256=$pairedBrowserArchives[$version]
+      paired_arm='mir5'
+      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
+      optional_archives=@("more-infinite-research_$version.zip",'mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+    }
+  }
   # Two explicit disposable positive-state variants reuse the exact corrected
   # player/API/engine inputs, with separately named fixture0.4 metadata.
   foreach($baseKind in @('mir5-library-api-consumers-private-credits-f200-native-selection','mir5-library-api-consumers-private-credits-standalone-f210-native-selection')){

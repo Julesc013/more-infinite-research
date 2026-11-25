@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "kind": "MIR524F110WorkerPreservationBoundaryV1",
+  "status": "direct-upgrade-adverse-source-capture-point-observed",
+  "release_tag": "v5.0.24",
+  "source_engine": "1.1.110",
+  "published_source_version": "4.7.11003",
+  "destination_engine": "2.0.77",
+  "published_destination_version": "5.0.20024",
+  "published_destination_sha256": "F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535",
+  "protected_original_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+  "direct_original": {
+    "terminal": {
+      "path": "build/qualification/mir524-f110-f200-black-glass-r02/execution-record/terminal.json",
+      "sha256": "4D731008E058A00A7BE512EE5455A9C4754A7EAC7A217DB8E045BC9B2C03D78D"
+    },
+    "reason": "unrecorded default source requires unchanged startup settings",
+    "diagnostic": {
+      "path": "build/qualification/mir524-f110-worker-destination-observation-r01/worker-state-readback.json",
+      "sha256": "DFB46D6C88B24BE2F48141BB005452285BF698F15092B41A43BF82C84B0BEB59"
+    },
+    "previously_earned_cargo_and_level_retained": {
+      "player": {
+        "cargo": 1,
+        "next_worker_level": 5
+      },
+      "mir5-f110-f200-transition-suspended": {
+        "cargo": 1,
+        "next_worker_level": 5
+      }
+    }
+  },
+  "synthetic_pending": {
+    "save_sha256": "27D79DC0A8607A9E7830EAC54CA2BF2978B1BAC9B61746A9BBBFCED5571F8837",
+    "direct_observation": {
+      "path": "build/qualification/mir524-f110-worker-paid-destination-r01/pending-visibility-readback.json",
+      "sha256": "5326241D1585F3262390C8538A1C585661398B5F6DA488D91FAA586169299E95"
+    },
+    "same_engine_observation": {
+      "path": "build/qualification/mir524-f110-worker-same-engine-observation-r01/verified-same-engine-worker-state.json",
+      "sha256": "E09F9A90485DE4C56F1715296B26430357250E8D424BBC8536FF2B1DE05787EF"
+    },
+    "force_observations": {
+      "active": {
+        "old_source": {
+          "force": "mir-f110-worker-diagnostic-active",
+          "level": 4,
+          "bonus": 2,
+          "research_progress": 0.125,
+          "current": "worker-robots-storage-4"
+        },
+        "direct_after_engine_conversion": {
+          "cargo": 2,
+          "current": null,
+          "research_progress": 0,
+          "queue": {},
+          "worker": {
+            "level": 4,
+            "max_level": 4294967295,
+            "researched": false,
+            "enabled": true,
+            "saved": 0,
+            "count": 675
+          }
+        },
+        "same_engine_5_0_11024": {
+          "cargo": 2,
+          "current": "worker-robots-storage-4",
+          "research_progress": 0.125,
+          "queue": [
+            "worker-robots-storage-4"
+          ],
+          "worker": {
+            "level": 4,
+            "max_level": 4294967295,
+            "researched": false,
+            "enabled": true
+          }
+        }
+      },
+      "parked": {
+        "old_source": {
+          "force": "mir-f110-worker-diagnostic-parked",
+          "level": 4,
+          "bonus": 2,
+          "research_progress": 0,
+          "saved_progress": 0.25
+        },
+        "direct_after_engine_conversion": {
+          "cargo": 2,
+          "current": null,
+          "research_progress": 0,
+          "queue": {},
+          "worker": {
+            "level": 4,
+            "max_level": 4294967295,
+            "researched": false,
+            "enabled": true,
+            "saved": 0.25,
+            "count": 675
+          }
+        },
+        "same_engine_5_0_11024": {
+          "cargo": 2,
+          "current": null,
+          "research_progress": 0,
+          "queue": {},
+          "worker": {
+            "level": 4,
+            "max_level": 4294967295,
+            "researched": false,
+            "enabled": true,
+            "saved": 0.25
+          }
+        }
+      }
+    }
+  },
+  "obligation": "Use source-side evidence before the engine change. A destination frame with zero progress can represent previously paid active research.",
+  "remaining": "Capture the exact old prices, paid debit and queue before moving engines and verify restoration through the real transfer, ordinary labs and two cold loads.",
+  "staged_upgrade_complete": false,
+  "stable_acceptance": false
+}

@@ -189,6 +189,8 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual("runtime/bootstrap.lua" in files, not reduced)
                 self.assertEqual("research/modern.lua" in files, not reduced)
                 self.assertEqual(any(path.startswith("adapters/") for path in files), reduced)
+                self.assertEqual("research/worker_storage_checkpoint.lua" in files, not reduced or target == "f110")
+                self.assertEqual(b".register_source()" in files["control.lua"], target == "f110")
                 self.assertIn("api/v1/data.lua", files)
                 self.assertIn("api/v1/runtime.lua", files)
                 if target == "f018":
