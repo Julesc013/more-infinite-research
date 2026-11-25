@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-25
+last_reviewed: 2026-11-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,66 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## 5.0.25 publication hold and Space Exploration cap raise (2026-11-26)
+
+On Windows Factorio 2.0.77 and Space Exploration 0.7.57, the frozen Factorio 2.0 ZIP lost six conquest values at configuration time while upgrading a protected MIR 5.0.20018 cap-ten save and raising its cap to twelve. The checked 5.0.23 ZIP retained the values on the same engine, save and startup settings. Both restored the shared library. The publisher was stopped before draft staging.
+
+The recovery rule omitted this published origin. The repair admits the observed 5.0.20018 source through the existing engine, provider and uninvested-force checks. The new origin tests failed before the fix. All 314 focused controls passed after it, including already restored, invested and no-op cases.
+
+The rebuilt Factorio 2.0 ZIP `B941F2E9C084DE3A3C61BE9AC89DDBE25C210E0FBCAE2A9662392D9B6115ECC1` from `48b599900fbb0d7049f003c5e10fecd3121d5c9d` preserved all six conquest values and the rest of the eight-force frame. Ordinary labs finished levels eleven and twelve at the original 11,600 and 17,400 per-pack costs across seven science packs. Factorio refused level thirteen, the unrelated research remained current, and both 1,200-update cold loads matched checksum `3685687603`. The protected source and the shared library matched their original custody records.
+
+Compared with the held beta inventory, the rebuilt inventory changes only the Factorio 2.0 and 2.1 ZIPs. Compared with the previously integrated development packages, those two ZIPs each change only the conquest policy file. Further release qualification of the affected packages and checked promotion remain open.
+
+The release comparison is `build/qualification/mir5-se-cap12-windows-release-controls-r01/verified-comparison.json` at `3FC10A05020DC0976FA26C7AC65D5959AADE565D456BCDAB26B7E12D728B555A`. The publication hold is `build/qualification/mir525-beta-disclose-legacy-space-age/cadence-r03-held-cap12.json` at `C44A32452C0D50D3878144D2034985A714848C6A90F8A3B51B922D55AA8036F9`. The new native replay is `build/qualification/mir5-competing-se-cap12-black-glass-r03/verified-cap12.json` at `37295E071CA86B119967D7479FB84C32A2F62693D55DC111936E22725FA553B8`.
+
+## Integrated Factorio 2.0 Space Age and Space Exploration replays (2026-11-26)
+
+The private Factorio 2.0.77 ZIP `CE776D1C9CA8C661FE176EB100BC5B2F67C744646BC431EECE1CA402A71F65DC` from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` contains both the legacy default worker repair and the competing productivity availability repair. It passed three native replays through the normal game entry points.
+
+- The protected MIR 4.7.20002 official Space Age save kept active and parked paid worker progress, earned cargo and the original queue. Ordinary labs finished the 1,012-unit level, cargo rose from four to five on the active force, and the parked force stayed unchanged. Two separate cold processes matched the final force state.
+- The staged Space Exploration 0.7.57 replay kept 200 paid units at the original 5,125-unit price, night vision, six conquest values and unrelated queued research. Ordinary labs finished levels nine and ten, cargo rose from eight to ten, and Factorio refused level eleven at cap ten. Two separate 1,200-update cold loads matched checksum `2237538572`.
+- The reduced Space Exploration extraction profile used 250 automation and 250 logistic science packs in ordinary labs. The burner, electric and area drills each went from 45 to 49 ore, and the core miner went from 160 to 176 fragments. Two separate 1,200-update cold loads matched checksum `3069318716`.
+
+All three restored the shared Factorio 2.0 test library. The original protected saves were preserved. These results cover the stated official Space Age and reduced Space Exploration profiles on the current development archive. The scheduled 5.0.25 beta retains its independently qualified frozen assets.
+
+The respective receipts are `build/qualification/mir5-competing-legacy-space-age-paid-r01/verified-paid-worker.json` at `A8E795616A0EF20AB2C1E2B75D527CC3D7DFB353817345C21E58F159F6EBACDE`, `build/qualification/mir5-competing-availability-verified-r01/f200-staged-space-exploration-work-readback.json` at `6F1D277047C194947E5F20FDAA7BF127C877DB9DF2508988B9EA79103A176EF4`, and `build/qualification/mir5-competing-se-native-extraction-r01/verified-physical-extraction.json` at `46C7A6B17F68F8A7C9555E6469A7102A79777E71A22EAE36CD9EE1B6F5A13A3B`.
+
+## Published Base save migration and lab completion (2026-11-26)
+
+The exact development archives from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` upgraded the protected published MIR 4.7.20003 Base save `1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF` directly on Factorio 2.0.77 and 2.1.23. Both paths kept 54 research rows, 85 recipe bonuses, 15 force values, seven weapon bonuses, active and parked work, and worker cargo ownership across two forces. Both matched two fresh cold loads. The 2.1 comparison checks exact native representations of the recipe values and retains all 875 prior settings alongside 14 authored defaults for the two new cargo families.
+
+Each upgraded save separately supplied four original science packs to ordinary labs for the pending 32,000-unit gear level. The saves retained 0.42 units of earlier progress and the 10 percent laboratory productivity bonus. One new level completed on each engine. Gear productivity rose from 20 to 30 percent, and braking-force research stayed current through two cold loads with the same observed progress. The Factorio 2.0 and 2.1 item statistics counted 28,928 and 29,184 whole packs respectively for each science type. Both shared libraries restored, and both protected input saves retained their original hashes.
+
+The full-state receipts are `f200-pure473-full-state.json` and `f210-pure473-forward-full-state.json` under `build/qualification/mir5-competing-availability-verified-r01`. The lab receipts are `f200-pure473-gear-completion.json` at `334D485447BAD1C5A1BB8F75130E11D644EF678A99CDB9588FC68C55649A5483` and `f210-pure473-forward-gear-completion.json` at `A4E69A0E6B104FE5D5E79A45161901DF5A47D06D2C18558F20BBCE15D62BE9F8`. The receipts retain the original diagnostic-mod refusal, timing observation and obsolete verifier assumptions. This result covers the two named development paths from the published Base save.
+
+## Competing productivity preference and provider round trip (2026-11-26)
+
+The development package `CE776D1C9CA8C661FE176EB100BC5B2F67C744646BC431EECE1CA402A71F65DC` from `dfc3b850e66df51693bcfed6a714e4f26924b9e7` passed a six-stage Factorio 2.0.77 replay. It began on public MIR 4.7.20002 with the plate, science-pack, bioflux and fish productivity providers. The first MIR5 upgrade retained the source settings. The replay then switched preference both ways, removed and reinstalled the four providers, and matched every historical stage witness. Two earlier provider labs and three MIR labs completed. Twelve cold loads matched within their paired saves. Preference and provider changes restored MIR's own disabled flags and preserved the unowned disabled flag on the other force. The protected saves and direct-library controls survived. The verified readback is `build/qualification/mir5-competing-availability-verified-r01/six-stage-chain.json` with SHA-256 `3DCF77B200C8B40A95657F5E0378AC20D10003630B88FA40CC1119ED3569C71C`.
+
+A separate replay used two forces whose ordinary bioflux labs had paid about eight percent at the fixture's unchanged 128-unit price. After switching preference, the active and parked research, queue and lab inventories matched the prior save. The active lab completed the original level, production advanced the queue and retired the finished row, and the other force retained its parked work. Six cold processes matched. The verified receipt is `build/qualification/mir5-competing-availability-verified-r01/paid-work.json` with SHA-256 `7554AC4236FE084DE6B858AB9486F63EEEC1C64D624817209AD965E79638EEFA`. The first attempt stopped during fresh force creation in MIR worker cargo before either lab started. The original failure and successful replay are in the verified evidence custody record.
+
+The repair uses the existing runtime ownership ledger for a bounded data-stage retirement decision. Previously published saves with ambiguous disabled flags retain those flags. This qualification covers the tested staged history, active and parked work, and the independent unowned-disablement sentinel. The reviewed 5.0.25 beta remains on its earlier frozen release tree.
+
+## Factorio 2.0 Space Age upgrade from MIR 4.7.2 (2026-11-25)
+
+On Factorio 2.0.77, the native replay from published MIR 4.7.20002 with four productivity providers refused the first upgrade when its startup preference changed. The public 5.0.24 and frozen 5.0.25 archives both refused this combination. With the preference held constant, frozen 5.0.25 reached a worker rule specific to Space Exploration and refused the Space Age save. The protected save and library controls remained intact. The paired boundary record is `build/qualification/mir525-fixed-provider-removal-black-glass-r03/terminal.json` with SHA-256 `A85871AC1888FC13966129AFF7EA3669862489D6A96C47D2873DE0EAA07257E9`.
+
+The development repair `2e932ccf8d780a3018ed356bad6cc10471e05d42` applies the existing archived worker contract to the observed Space Age source. Four data captures matched the formula, six science packs, prerequisites and worker cargo effect. The private F200 ZIP `2A0EB47908C48B90474DEA0A561A5BF1AE2B99CD160A27F965FAE16788F50942` preserved earned worker cargo, active and parked paid work and the queue from an official Space Age save. The active lab completed its retained 1,012-unit level, raised cargo from four to five and started the following level. The parked force stayed unchanged, two cold processes matched and the shared library restored. The verified result is `build/qualification/mir5-legacy-space-age-paid-private-r01/verified-paid-worker.json` with SHA-256 `04CFE27CE0352B6FA0C4179FCE0708CA563A39A862FD1CF79C5AA13FE1D1FCAF`.
+
+A separate save with the four providers and uninvested worker research upgraded with its original selection and settings. The two earned productivity bonuses, 27 percent active research, 42 percent parked progress and queue survived two cold loads. In the next stage, the new preference restored the bioflux prototype but its force technology remained disabled. Factorio kept the existing queue and rejected the attempt to add that unavailable research. Preference restoration and the later provider removal and return stages remain open. The saved intermediate and both native failures are retained. The exact queue diagnostic is `build/qualification/mir5-fixed-provider-preference-diagnostic-r01/terminal.json` with SHA-256 `DEC18F6A5BBB8655C9B2AD210AFD0DEE44B17DEBB6DC443A53DD3FDED8B902EA`.
+
+## MIR 5.0.25 prerelease qualification (2026-11-25)
+
+Frozen source `7499d514b36b394e6c544ed06dd840daae7b5428` and checked main `10d27896b1e8f5c35fddfc5a9c501e823c805e30` share the reviewed repository tree. All four required checks passed on main. The verified inventory SHA-256 is `5E63AEFF16929741F000B213FD1C41F46D89ED192343662FDF3D008963635691`. Independent readback checked all 17 archives and their members. Fourteen changed only release metadata, and the remaining changes implement the worker research checkpoint for Factorio 1.1, 2.0 and 2.1. Publication targets 18:00 AEDT on 26 November. Anonymous download readback and delivery to primary `dist` follow publication. [Development integration](https://github.com/Julesc013/more-infinite-research/pull/2400) · [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2401)
+
+Nine same-edition upgrades from protected public 4.7.3 saves passed against the frozen archives, with 18 matching cold loads. The 1.1 checkpoint also preserved paid research and queue order through the staged transition to 2.0. In the separate paid-worker replay the ordinary lab spent 590 of each of the five original science packs, raised cargo from two to three and started the next queued technology. The onward 2.1 replay carried the earned cargo and parked work. The same-edition receipt is `build/qualification/mir525-worker-checkpoint-native-r01/same-edition-native-readback.json` with SHA-256 `78A17AF52F9E6DD08D49561B634CF0C23D4644FFD1C5626EE64861143FDEE94B`. [Checkpoint contract and evidence](../spec/evidence/f110-f200-paused-worker-checkpoint-native.json)
+
+The protected Space Age patch upgrade from Factorio 2.1.24 to 2.1.25 and the Solar Productivity 3.0.0 addition both passed on the same frozen Factorio 2.1 archive. Ordinary labs preserved the paid worker price, raised cargo from four to five and retained other queued and parked work. Each saved result passed two cold loads. The original adverse run retains its outdated test scenario checks. The corrected copies used the same release ZIP. The independent receipt is `build/qualification/mir525-worker-checkpoint-native-r01/reported-upgrade-readiness.json` with SHA-256 `3E6A535C4C0174CB64302F1139018F81A45E233935BDC3F4E99E77CA0A09D05E`. The original reporter saves remain unverified.
+
+Six additional cases passed on the exact Factorio 2.0 or 2.1 release archives. They cover Space Exploration extraction and force merge, Krastorio 2 and Space Exploration science, both physical Cerys processing-unit paths, paid Ferrum research with physical robot delivery, and Krastorio 2 Spaced Out cap changes. Their bounded scopes, exact archives and 16 cold loads are recorded in `build/qualification/mir525-worker-checkpoint-native-r01/supplemental-native-readback.json`, SHA-256 `5DE2FF6402B7E741EECB14D337749D8769D7304125E9F41D57492F6D6D876978`.
+
+Stable qualification remains open. The current exact-package campaign includes the Foundation III load and peak-memory comparison, native Library personal views through rejoin and restart, and Factorio 2.1 responsive-menu timing. Windows Library timing and retained-memory acceptance and the wider historical preservation review remain open.
 
 ## Public MIR 5.0.24 legacy save replays (2026-11-25)
 
@@ -23,6 +83,16 @@ The published 5.0.24 archives passed six direct upgrades from protected MIR 1.0.
 Exact private packages rebuilt from `ecd50d3fa570de6aca9b7f39dbd890150930c6e1` matched the tested archive hashes. The paused Factorio 1.1 checkpoint preserved earned cargo, the original save's active mining work at 42%, its queue and its suspended mining work at 27%. In a separate save the worker owner retained 12.5% active and 25% parked progress at the 675-unit five-pack price, plus its unrelated queue follower. Its ordinary lab used 590 of each pack, raised cargo from two to three and started the next queued technology. Two fresh 1,200-update cold loads matched in each case. The original source saves and the public direct-conversion failure remain preserved. Publication and wider stable acceptance are open. [Native evidence and exact inputs](../spec/evidence/f110-f200-paused-worker-checkpoint-native.json)
 
 An independent rebuild from the reviewed source reproduced both private replay archive hashes. Every member of all 17 published 5.0.24 ZIPs was checked against the tagged source. The checkpoint changes only files in the static control-stage import graphs for Factorio 1.1, 2.0 and 2.1. Settings and data-stage members match. The comparison is in `build/qualification/mir524-checkpoint-package-scope-aero-r01/verified-package-scope.json`, SHA-256 `6E54760A54A870C49DACBA7E0CE268403F3532F60B1CD1AE5BD1A5EC3BCF229C`. Later release versions retain their own applicable native and performance checks.
+
+## MIR 5.0.24 startup and Library native readback (2026-11-25)
+
+The published Factorio 2.0.77 Bob/Angel startup run completed all 262 launches. Each launch receipt matches its recorded hash and the controller reported shared library restoration. Across the 64 observed comparison blocks, mean time to responsive Settings was 19.260 seconds without MIR, 20.880 with 4.7.3, 19.343 with the replay and 19.429 with 5.0.24. Mean MIR-added time moved from 1.620 to 0.168 seconds. The measured groups and exact hashes are in `build/qualification/f200-524-bob-angel-menu-r02/launch-measurement-readback.json`, SHA-256 `338497E404B1995AAE8235ABBD578DC456A429A85EE66AAD35C80EC7FB91D9EB`. Independent scoring bound all 262 launch receipts to the frozen packet and confirmed the 50 percent improvement objective. The 95 percent interval for the paired objective difference is −0.680 to −0.603 seconds. The score and controls are in `build/qualification/f200-524-bob-angel-menu-r02/verified-comparison.json`, SHA-256 `B73269CCD81CA865BD659619F47213DF41FA16D78ABC068CDC648F04475E6FD8`.
+
+The published Factorio 2.1.24 Library replay passed 32 steps, with 31 physical inputs, 16 tab clicks and six exports. Two clients exercised Research, Queue, Settings and Help in English and German. The verifier checked both force frames, the protected save, shared library restoration and 64 captures. The primary receipt is `build/qualification/mir524-library-tabs-gunmetal-r05/verified-tab-evidence.json`, SHA-256 `65B3DF868C3A510714EE7055E8774EFEDC472501135B2CC9F492BAA29AB78E0C`. The adjacent local delivery index names the gallery and original verified files.
+
+A separate two-client replay on the same published ZIP passed 25 queue and scroll steps. The shared library controls restored and the protected save matched its original bytes. The terminal, packet, native actor and controller hashes match `build/qualification/mir524-library-scroll-gunmetal-r01/verified-queue-scroll.json`, SHA-256 `27D79D1A11097A45683D3C58E73F2A24D03305D9CD6BBC382C87587515BA6B1B`. These interaction cases retain their own scope. Windows Library timing and retained-memory acceptance remain open.
+
+Regular betas aim for 6 pm Sydney time each day until stable. A verified emergency hotfix can ship as soon as it qualifies, then the daily cadence resumes.
 
 ## MIR 5.0.24 measured follow-up (2026-11-25)
 

@@ -5,18 +5,20 @@ applies_to: "MIR 5.0.25 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-25
+last_reviewed: 2026-11-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
   - mir-525-release-notes
 ---
 
-This beta preserves earned worker cargo and unfinished research when a prepared save moves from Factorio 1.1.110 to 2.0.77.
+This beta preserves earned worker cargo, unfinished research and Space Exploration conquest bonuses across the tested save upgrades.
 
-- In Factorio 1.1.110, update MIR on a copy of your save. Run `/mir-worker-storage-recovery prepare`, save the paused game under a new name, and open that copy in Factorio 2.0.77 with the matching MIR edition and worker cargo settings.
-- The verified upgrade keeps active and parked worker research at its original science price, preserves the research queue, and lets labs finish the remaining work normally.
-- On Factorio 2.0.77 with Space Age, a tested save from MIR 4.7.20002 still stops at the worker cargo history check. If you see that error, keep your original save and return to your previous mod selection.
+- **Factorio 1.1.110 to 2.0.77.** Update MIR on a copy of your save in Factorio 1.1.110. Run `/mir-worker-storage-recovery prepare`, save the paused game under a new name, and open that copy in 2.0.77 with the matching MIR edition and worker cargo settings. The checkpoint keeps paid research, parked progress and the queue. The tested Base save also carries those values forward to Factorio 2.1.23.
+- **Space Age on Factorio 2.0.77.** Upgrading a MIR 4.7.20002 save with its original official mod selection and startup settings keeps earned cargo and lets ordinary labs finish the original paid level. Parked progress and queued research stay intact.
+- **Space Exploration 0.7.57 on Factorio 2.0.77.** Upgrading a MIR 5.0.20018 save while raising the worker cargo limit from 10 to 12 keeps the six conquest bonuses. Labs complete levels 11 and 12 at their original seven-pack prices. Factorio blocks level 13 at the new limit.
+- **Older Space Exploration saves.** Use the staged upgrade in the support guide. Update MIR with your original startup settings and add-on versions, save to a new file, then change the add-ons.
+- **Factorio 2.1.** The tested Space Age upgrade from 2.1.24 to 2.1.25 preserves paid worker cargo research and the queue. Adding Solar Productivity 3.0.0 on 2.1.24 also preserves the original research price and parked progress.
 
 [Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.25/docs/support.md#moving-a-factorio-11-save-to-20)
 

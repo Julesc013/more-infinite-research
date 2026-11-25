@@ -17,7 +17,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         self.lua.globals().player_root = (ROOT / "source").as_posix()
         self.lua.execute('''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
-          target={id="f200",distribution_version="5.0.20018"};package.loaded["platform.target"]=target
+          target={id="f200",distribution_version="5.0.20025"};package.loaded["platform.target"]=target
           -- Independently transcribed from the retained native profile, not
           -- generated from the production admission table.
           active={base="2.0.77",["aai-containers"]="0.3.2",["aai-industry"]="0.6.16",
@@ -27,11 +27,11 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
             ["space-exploration-graphics"]="0.7.5",["space-exploration-graphics-2"]="0.7.2",
             ["space-exploration-graphics-3"]="0.7.2",["space-exploration-graphics-4"]="0.7.2",
             ["space-exploration-graphics-5"]="0.7.3",["space-exploration-menu-simulations"]="0.7.4",
-            ["space-exploration-postprocess"]="0.7.5",["more-infinite-research"]="5.0.20018"}
+            ["space-exploration-postprocess"]="0.7.5",["more-infinite-research"]="5.0.20025"}
           script={active_mods=active}
           storage={}
           event={mod_startup_settings_changed=false,mod_changes={
-            ["more-infinite-research"]={old_version="4.7.20002",new_version="5.0.20018"}}}
+            ["more-infinite-research"]={old_version="4.7.20002",new_version="5.0.20025"}}}
           native_writes={};forbidden_writes=0
           function ro(values)return setmetatable({}, {__index=values,
             __pairs=function()return next,values,nil end,__newindex=function()
@@ -83,7 +83,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
         self.assertEqual(self.lua.eval("forbidden_writes"), 0, mutation)
 
     def test_source_authored_values_only_on_the_same_production_predicate_with_or_without_observer(self):
-        predecessors = ("4.7.20002", "5.0.20017")
+        predecessors = ("4.7.20002", "5.0.20017", "5.0.20018")
         unchanged_mods = (None, "mir-fixture-mir5-worker-storage-se-cap-ten-native", "unrelated-unchanged-mod")
         for predecessor, extra in product(predecessors, unchanged_mods):
             with self.subTest(predecessor=predecessor, extra=extra):
@@ -110,14 +110,16 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
     def test_inactive_or_unrelated_events_do_not_access_the_world(self):
         for mutation in ('target.id="f210"', 'active["space-exploration"]=nil',
                          'active["space-exploration"]="0.7.58"', 'event=nil', 'event.mod_changes={}',
-                         'event.mod_changes["more-infinite-research"].old_version="4.7.20003"'):
+                         'event.mod_changes["more-infinite-research"].old_version="4.7.20003"',
+                         'target.distribution_version="5.0.20018";active["more-infinite-research"]="5.0.20018";'
+                         'event.mod_changes["more-infinite-research"]={old_version="5.0.20018",new_version="5.0.20018"}'):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 self.lua.execute(mutation + ';game=setmetatable({}, {__index=function()error("world access")end})')
                 self.lua.execute("assert(policy.preflight(event)==nil);policy.apply(nil);assert(#native_writes==0)")
 
     def test_authored_conquest_defaults_do_not_depend_on_the_startup_settings_flag(self):
-        for predecessor, flag in product(("4.7.20002", "5.0.20017"), ("true", "nil")):
+        for predecessor, flag in product(("4.7.20002", "5.0.20017", "5.0.20018"), ("true", "nil")):
             with self.subTest(predecessor=predecessor, flag=flag):
                 self.setUp()
                 self.lua.globals().predecessor = predecessor
@@ -242,7 +244,7 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                 self.skipped("")
 
     def test_completed_night_vision_does_not_block_the_se_policy_or_change_research(self):
-        for predecessor, updated_addon in product(("4.7.20002", "5.0.20017"), (False, True)):
+        for predecessor, updated_addon in product(("4.7.20002", "5.0.20017", "5.0.20018"), (False, True)):
             with self.subTest(predecessor=predecessor, updated_addon=updated_addon):
                 self.setUp()
                 self.lua.globals().predecessor = predecessor
