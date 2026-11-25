@@ -3595,6 +3595,17 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(result.queued_saved[ORDINARY]==.43 and result.queued_saved[OTHER]==.18 and parks.t6==.27)
           local actual=queue.merge({queue={OTHER,"new"},current=OTHER,current_progress=.25,queued_saved={[OTHER]=0,new=0}},old,ID,ORDINARY)
           assert(same(actual.queue,{"t5",OTHER,"new","t6"}) and actual.queued_saved[OTHER]==.25)
+
+          live.queued_saved[ORDINARY]=.19
+          for _, progress in ipairs({.43,0}) do
+            live.current_progress=progress
+            local retained, parked=queue.merge(live,old,ID,ORDINARY)
+            assert(retained.current==ORDINARY and retained.current_progress==progress,
+              "provider return moved the live head with distinct parked work")
+            assert(same(retained.queue,{ORDINARY,"t5",ORDINARY,OTHER,"new","t6"}))
+            assert(retained.queued_saved[ORDINARY]==.19 and retained.queued_saved[OTHER]==.18)
+            assert(parked.t5==.31 and parked.t6==.27)
+          end
         ''')
 
     def test_scoped_transfer_guard_restores_on_nested_callback_and_setter_error(self):

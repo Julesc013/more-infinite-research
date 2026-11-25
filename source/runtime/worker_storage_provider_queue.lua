@@ -21,7 +21,11 @@ function M.merge(live, archived, private_id, ordinary_id, protect_current)
       if candidates and #candidates > 0 then boundary = table.remove(candidates) end
     end
   end
-  local insert, last = {}, protect_current and live.current_progress > 0 and 2 or 1
+  -- Demoting the live head parks its active progress in the same save slot.
+  local head_saved = live.current and live.queued_saved[live.current] or 0
+  local keep_head = protect_current and live.current_progress > 0
+    or head_saved > 0 and head_saved ~= live.current_progress
+  local insert, last = {}, keep_head and 2 or 1
   for index, name in ipairs(archived.queue) do
     if insertion_points[index] then
       -- An intervening reorder can reverse two old anchors. Retain both
