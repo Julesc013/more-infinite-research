@@ -72,6 +72,14 @@ source_of_truth_for:
 
 - These routes do not automatically cover different expansion, provider, startup-setting or mod combinations. Older histories and best-effort editions retain their stated limits. A successful load is not proof that every earned effect or queued research state was preserved.
 
+### Moving a Factorio 1.1 save to 2.0
+
+Factorio can discard active worker cargo research during this engine conversion. Use the matching Factorio 1.1.110 and 2.0.77 editions of a MIR release whose release notes list the worker research checkpoint. The verified procedure covers the ordinary Worker Robot Cargo Size route with the same research price and science packs.
+
+1. Keep the original save, mod selection and startup settings. Update MIR in Factorio 1.1.110 and open a copy with the existing selection and settings.
+2. Run `/mir-worker-storage-recovery prepare` as an administrator. Save the paused copy under a new name and exit. Advancing a simulation tick expires the preparation. Use `/mir-worker-storage-recovery cancel` to abandon it and restore the previous pause state.
+3. Open that copy with the matching MIR edition in Factorio 2.0.77. Check earned cargo, active and parked research, and the queue before saving under a new name.
+
 ### Productivity providers and preferences
 
 - On Factorio 2.0.77 with the Base-game profile, a 0.01% recipe-productivity reward resolves to zero native bonus. The setting loads successfully; new levels add no productivity at that reward.
