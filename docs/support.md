@@ -180,6 +180,12 @@ If either transition refuses, keep the corresponding pre-change save and its pre
 
 - When a route is outside those scopes, preserve the original save and ask for support before changing more than one variable. Do not recreate a historical save or install MIR on an intermediate engine unless Factorio itself requires a bridge.
 
+## Continuing Krastorio 2 Spaced Out material research
+
+With Krastorio 2 Spaced Out and Space Age, silicon, glass and rare metals productivity each have a technology that ends at level 3 and a separate continuation that starts at level 4.
+
+To make a material's research unlimited, enable it and set its maximum level to `0` in MIR's startup settings. Load the save with MIR enabled. After finishing the first three levels and unlocking Space Science Pack, select the level-four continuation in Factorio's research tree.
+
 ## Researched planet still locked
 
 - MIR preserves ambiguous locks rather than deciding that another mod was wrong. If you deliberately need a one-time repair for an official Space Age planet on Factorio 2.1 with Space Age enabled, use a copy of the save and first confirm that no enabled mod intends the lock.
