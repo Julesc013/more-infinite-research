@@ -8913,9 +8913,9 @@
       "parsed_unique_python_blobs": 1441,
       "parse_errors": 0,
       "declarations": 52,
-      "reviewed_declarations": 17,
-      "remaining_declarations": 35,
-      "reviewed_scope": "Signed paid weapon effects, Bob material return routes, native owner cost and paid identity, cap reset ordering, Space Exploration conquest state, the retained K2 fixture, and the source changelog and retired Portal conversion workflow. Nine declarations retain current controls. Eight conversion-only declarations follow the recorded decision to deliver identical GitHub and Portal ZIPs.",
+      "reviewed_declarations": 52,
+      "remaining_declarations": 0,
+      "reviewed_scope": "All declarations in this bounded scan have an original Git locator and a disposition. The reviews preserve paid research, ownership, stateful Library behavior, target science, package identity, and explicitly superseded conversion controls. Changed same-name tests and other historical sources retain their separate obligations.",
       "intake": {
         "path": "build/qualification/mir5-inter-release-tests-r01/intake.json",
         "sha256": "F38A62E2ABABD98D9FBD929A4E9BC4065A8B582FAF61D9D2C92E7B32A5DE9424"
@@ -8930,7 +8930,52 @@
         "selected_suites_passed": 10,
         "methods_passed": 155,
         "native_execution": false
-      }
+      },
+      "additional_reviews": [
+        {
+          "source": "45328ebf6945d70e55f5761e6add555546c3cbe4",
+          "reviewed_declarations": 8,
+          "scope": "Protected discovery and worker queues, Bob oil and alloy witnesses, historical science costs, and K2/K2SO verification.",
+          "path": "build/qualification/mir5-inter-release-tests-r01/save-transition-intent-review.json",
+          "sha256": "0B12E563EF9A142106BF5A6E5D3E28BB72CFA05195F08AE6337D1C08EB6A0DA7",
+          "host_controls": {
+            "path": "build/qualification/mir5-inter-release-tests-r01/save-transition-host-output.txt",
+            "sha256": "850DF42AF2886BC661B83D190A44D39624B4001B4CCF35E2D5DB16D3127AC3D7",
+            "suites": 7,
+            "methods": 99,
+            "native_execution": false
+          }
+        },
+        {
+          "source": "90dd8164d9bdd3df91dbaff4b6b3116767764b76",
+          "reviewed_declarations": 9,
+          "scope": "Historical continuations, satellite science, named target closures, complete package histories, and reproducible freeze.",
+          "path": "build/qualification/mir5-inter-release-tests-r01/target-history-intent-review.json",
+          "sha256": "0008AB4BCFA13CCB514FBF806934795E80D3AE3DB8F828DF2051BF02C54471E4",
+          "host_controls": {
+            "path": "build/qualification/mir5-inter-release-tests-r01/target-history-host-output.txt",
+            "sha256": "577E88168639C60691CD4DDC5500CC3BA8838EAF628A235593A9090798B686E4",
+            "methods": 98,
+            "suites": 5,
+            "native_execution": false
+          }
+        },
+        {
+          "source": "b99a94e9ca9a413815422e0596cbd15c3c78fe89",
+          "reviewed_declarations": 18,
+          "scope": "Exact Library observer inputs and read-only controls, named science and repair fixtures, paid native owner identity, and cross-checkout input preservation.",
+          "path": "build/qualification/mir5-inter-release-tests-r01/remaining-history-intent-review.json",
+          "sha256": "EDE1614D3B0113E3B8AD6A11BB18DBC54D5C92958B1F4C305B237205C7848C17",
+          "host_controls": {
+            "path": "build/qualification/mir5-inter-release-tests-r01/remaining-history-host-output.txt",
+            "sha256": "243F634E5F24FBAB553C8DADAC3596D471CAF9FD72B8DD8715997C13C3A28203",
+            "suites": 11,
+            "methods_passed": 298,
+            "methods_skipped": 6,
+            "native_execution": false
+          }
+        }
+      ]
     },
     "allowed_dispositions": [
       "retain",
