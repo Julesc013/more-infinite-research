@@ -336,20 +336,23 @@ class CompetingProductivityTests(unittest.TestCase):
               max_level="infinite", level=item.first_level, prerequisites={item.predecessor}, effects=native_effects(item.effects)}
             local row = {name=replacement.id, level=replacement.first_level,
               max_level="infinite", enabled=true, effects=native_effects(replacement.effects), marker=17}
-            binding.retain_foreign_coverage({row}, {technology={[item.id]=foreign}}, active, f200_target(), false)
-            return row, foreign
+            local retired = binding.retain_foreign_coverage({row}, {technology={[item.id]=foreign}}, active, f200_target(), false)
+            return row, foreign, retired
           end
-          local captured_output = output(exact_active())
-          local changed_output = output(changed)
-          assert(captured_output.enabled == false and changed_output.enabled == false)
+          local captured_output, _, captured_retired = output(exact_active())
+          local changed_output, _, changed_retired = output(changed)
+          assert(captured_retired[replacement.id] and changed_retired[replacement.id])
+          assert(captured_output.enabled == true and changed_output.enabled == true)
+          binding.validate_retirements(captured_retired, exact_active(), f200_target())
+          assert(not pcall(binding.validate_retirements, {foreign=true}, exact_active(), f200_target()))
           assert(#captured_output.effects == #changed_output.effects and captured_output.marker == 17
             and changed_output.marker == 17)
 
           -- A renamed foreign owner is rejected by the direct identity
           -- guard. Its MIR counterpart remains unchanged; no foreign row is
           -- edited and no ownership is inferred from a provider version.
-          local rejected, foreign = output(changed, "epr-renamed-owner")
-          assert(rejected.enabled == true and #rejected.effects == #replacement.effects and rejected.marker == 17)
+          local rejected, foreign, retired = output(changed, "epr-renamed-owner")
+          assert(retired == nil and rejected.enabled == true and #rejected.effects == #replacement.effects and rejected.marker == 17)
           assert(foreign.name == "epr-renamed-owner")
 
           local function rejected(mods)
@@ -1005,7 +1008,7 @@ class CompetingProductivityTests(unittest.TestCase):
                 raw = lua({"technology": provider["arms"]["upstream"]["provider_rows"]})
                 self.lua.eval('function(raw) setmetatable(raw.technology, {__pairs=function() error("foreign scan") end}) end')(raw)
                 owned = lua(list(rows.values()))
-                adapter.retain_foreign_coverage(owned, raw, active, lua({"id":"f200", "factorio_version":"2.0"}), False)
+                retired = adapter.retain_foreign_coverage(owned, raw, active, lua({"id":"f200", "factorio_version":"2.0"}), False)
                 for index in range(1, len(owned) + 1):
                     row = owned[index]
                     original = rows[row["name"]]
@@ -1014,8 +1017,8 @@ class CompetingProductivityTests(unittest.TestCase):
                     self.assertEqual(original["level"], row["level"])
                     self.assertEqual(original["unit"]["count_formula"], row["unit"]["count_formula"])
                     self.assertEqual(original["max_level"], row["max_level"])
-                    if expected is None:
-                        self.assertFalse(row["enabled"])
+                    self.assertEqual(original.get("enabled"), row["enabled"])
+                    self.assertEqual(expected is None, bool(retired and retired[row["name"]]))
                 for name, original in provider["arms"]["upstream"]["provider_rows"].items():
                     self.assertEqual(original["effects"], effects(raw["technology"][name]))
                 preferred = lua(list(rows.values()))
@@ -1275,7 +1278,7 @@ class CompetingProductivityTests(unittest.TestCase):
                 raw = lua({"technology": {item["id"]: item["foreign_row"] for item in provider["bindings"]}})
                 self.lua.eval('function(raw) setmetatable(raw.technology, {__pairs=function() error("foreign scan") end}) end')(raw)
                 retained = lua(list(rows.values()))
-                adapter.retain_foreign_coverage(retained, raw, active, lua({"id": "f200", "factorio_version": "2.0"}), False)
+                retired = adapter.retain_foreign_coverage(retained, raw, active, lua({"id": "f200", "factorio_version": "2.0"}), False)
                 actual = {retained[index]["name"]: retained[index] for index in range(1, len(retained) + 1)}
                 expected_foreign = {}
                 for item in provider["bindings"]:
@@ -1289,12 +1292,14 @@ class CompetingProductivityTests(unittest.TestCase):
                             productivity_effects(output),
                             "A disabled historical identity must retain its earned native effect vector",
                         )
-                        self.assertFalse(output["enabled"])
+                        self.assertTrue(retired[name])
                     else:
+                        self.assertFalse(retired and retired[name])
                         self.assertEqual(
                             [effect for effect in expected["effects"] if effect["type"] == "change-recipe-productivity"],
                             productivity_effects(output),
                         )
+                    self.assertEqual(original.get("enabled"), output["enabled"])
                     self.assertEqual(original["level"], output["level"])
                     self.assertEqual(original["max_level"], output["max_level"])
                 preferred = lua(list(rows.values()))
@@ -1316,8 +1321,11 @@ class CompetingProductivityTests(unittest.TestCase):
               {type="change-recipe-productivity",recipe="casting-copper",change=.1}}}
           binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,true)
           assert(#row.effects == 2, "preference true retains exact complete MIR coverage")
-          binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false)
-          assert(#row.effects == 2 and row.enabled == false, "disabled owned research retains earned native effects")
+          local retired = binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false)
+          assert(retired[row.name] and #row.effects == 2 and row.enabled == true,
+            "runtime retirement leaves earned effects and the load-time research default intact")
+          row.enabled = false
+          assert(binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false) == nil)
           foreign.prerequisites={"unrelated-prerequisite"}
           row.enabled=true; row.effects={{type="change-recipe-productivity",recipe="copper-plate",change=.1},
             {type="change-recipe-productivity",recipe="casting-copper",change=.1}}

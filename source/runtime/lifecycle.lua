@@ -6,6 +6,7 @@ local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
 local cap_admission = require("runtime.cap_admission")
 local catalogue = require("runtime.catalogue")
+local COMPETING_RETIREMENTS = catalogue.competing_retirements and catalogue.competing_retirements()
 local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local platform_target = require("platform.target")
 
@@ -446,7 +447,18 @@ local function authored_generated_prototype_state(force, row)
     if type(technology) ~= "string" then error(technology, 0) end
     error("MIR authored cap " .. phase .. " failed for " .. row.id .. ": " .. technology, 2)
   end
+  if enabled == true and COMPETING_RETIREMENTS and COMPETING_RETIREMENTS[row.id] then
+    return technology, false, true
+  end
   return technology, enabled
+end
+
+local function queued_competing_names(force)
+  local names = {}
+  local current = force.current_research
+  if current then names[current.name] = true end
+  for _, technology in ipairs(force.research_queue or {}) do names[technology.name] = true end
+  return names
 end
 
 -- Startup settings decide whether a stream may be considered, but the data
@@ -466,8 +478,11 @@ end
 -- state: the latter is also how a finite cap or another mod disables research.
 local function authored_generated_prototype_disabled(force, row, observed)
   if not valid_force(force) then return nil end
-  if observed then return observed.disabled[row.id] end
-  local technology, enabled = authored_generated_prototype_state(force, row)
+  if observed then return observed.disabled[row.id], observed.competing and observed.competing[row.id] end
+  local technology, enabled, competing = authored_generated_prototype_state(force, row)
+  if competing then
+    return technology, (technology.saved_progress or 0) ~= 0 or queued_competing_names(force)[row.id] == true
+  end
   if enabled == false then return technology end
   return nil
 end
@@ -507,19 +522,24 @@ local function disable_authored_prototype(force, name, technology, owned_disable
   technology.enabled = false
 end
 
-local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled, observed, excluded_family)
+local function reconcile_authored_prototype_disablement(force, owned_disabled, imported_reenabled,
+    observed, excluded_family, selected)
   if not valid_force(force) then return false end
-  for index = 1, #ORDERED_DECLARATIONS do
-    local row = ORDERED_DECLARATIONS[index]
-    if row.family ~= excluded_family and row.ownership_kind == "authored_generated" then
-      local technology = authored_generated_prototype_disabled(force, row, observed)
-      if technology and technology.enabled == true and not (retired_work_observer and retired_work_observer(force, row.id)) then
-        -- The caller probes with nil before allocating durable storage for an
-        -- otherwise unlimited save.
-        if type(owned_disabled) ~= "table" then return true end
-        disable_authored_prototype(force, row.id, technology, owned_disabled, imported_reenabled)
-      end
+  local function reconcile(row)
+    if row.family == excluded_family or row.ownership_kind ~= "authored_generated" then return false end
+    local technology, competing_work = authored_generated_prototype_disabled(force, row, observed)
+    if technology and technology.enabled == true and not competing_work
+        and not (retired_work_observer and retired_work_observer(force, row.id)) then
+      -- Probe before allocating state in an otherwise unlimited save. Only
+      -- an actual force write records the right to restore the flag.
+      if type(owned_disabled) ~= "table" then return true end
+      disable_authored_prototype(force, row.id, technology, owned_disabled, imported_reenabled)
     end
+    return false
+  end
+  if selected then return reconcile(selected) end
+  for _, row in ipairs(ORDERED_DECLARATIONS) do
+    if reconcile(row) then return true end
   end
   return false
 end
@@ -554,10 +574,12 @@ local function cancel_unavailable_research(force, observed, excluded_family)
     local name = technology and technology.name
     local row = name and DECLARATION_BY_ID[name]
     if row and row.family ~= excluded_family and row.ownership_kind == "authored_generated"
-        and row.declaration.cancel_queued_when_unavailable == true
-        and authored_generated_prototype_disabled(force, row, observed) then
-      unavailable = unavailable or {}
-      unavailable[name] = true
+        and row.declaration.cancel_queued_when_unavailable == true then
+      local disabled, competing_work = authored_generated_prototype_disabled(force, row, observed)
+      if disabled and competing_work == nil then
+        unavailable = unavailable or {}
+        unavailable[name] = true
+      end
     end
   end
   -- Inspect actual queued/current identities, not every force technology or
@@ -623,14 +645,20 @@ local function preflight_cap_admissions(forces, target_name, legacy, excluded_fa
   for _, force in pairs(forces or {}) do
     if valid_force(force) then
       local observed = {native = {}, authored = {}, disabled = {}}
+      local queued_competing
       local function inspect(row)
         if excluded_family_member(row.id, excluded_family) then return end
         if row.ownership_kind == "nativeowner" then
           observed.native[row.id] = native_owner_admitted(force, row)
         else
-          local technology, enabled = authored_generated_prototype_state(force, row)
+          local technology, enabled, competing = authored_generated_prototype_state(force, row)
           observed.authored[row.id] = enabled == true
           if enabled == false then observed.disabled[row.id] = technology end
+          if competing then
+            queued_competing = queued_competing or queued_competing_names(force)
+            observed.competing = observed.competing or {}
+            observed.competing[row.id] = (technology.saved_progress or 0) ~= 0 or queued_competing[row.id] == true
+          end
         end
       end
       if target_name then
@@ -683,6 +711,10 @@ end
 
 function M.caps_active()
   return CAPS_ACTIVE
+end
+
+function M.competing_retirements_active(name)
+  return COMPETING_RETIREMENTS ~= nil and (name == nil or COMPETING_RETIREMENTS[name] == true)
 end
 
 function M.discovery_visibility(force)
@@ -1090,15 +1122,16 @@ local function clear_force(index, excluded_family)
   discard_empty_state(current)
 end
 
-local function reconcile_event_body(event, research_only, discovery_observed, clear_index, excluded_family)
+local function reconcile_event_body(event, research_only, discovery_observed, clear_index, excluded_family, cancelled_name)
   -- One upstream discovery event can change every technology on its force.
   -- Reconcile only MIR's bounded admitted rows, rather than just the finished ID.
   if DISCOVERY_TREE and discovery_observed then research_only = false end
   local force = event_force(event)
   if not force then return end
   local research = event and event.research
-  local name = research_only and research and research.name or nil
+  local name = research_only and (cancelled_name or research and research.name) or nil
   if research_only and type(name) ~= "string" then return end
+  local selected = name and COMPETING_RETIREMENTS and COMPETING_RETIREMENTS[name] and DECLARATION_BY_ID[name]
   local observed = preflight_cap_admissions({force}, name, false, excluded_family)[force.index]
   -- A failed observation must retain both source and destination rights.
   clear_force(clear_index, excluded_family)
@@ -1107,11 +1140,13 @@ local function reconcile_event_body(event, research_only, discovery_observed, cl
   -- events also enforce authored disabled prototypes, even without a finite
   -- cap or prior ledger. Allocate only when an actual policy write is needed.
   local current = CAPS_ACTIVE and ensure_state() or existing_state()
-  if not research_only then
-    if current == nil and reconcile_authored_prototype_disablement(force, nil, nil, observed, excluded_family) then
+  if not research_only or selected then
+    if current == nil and reconcile_authored_prototype_disablement(force, nil, nil, observed, excluded_family, selected) then
       current = ensure_state()
     end
-    if current then reconcile_authored_prototype_disablement(force, current.owned_disabled, nil, observed, excluded_family) end
+    if current then
+      reconcile_authored_prototype_disablement(force, current.owned_disabled, nil, observed, excluded_family, selected)
+    end
   end
   if not current then return end
   reconcile_force(force, current.owned_disabled, nil, false, name, nil, discovery_observed, observed, excluded_family)
@@ -1183,7 +1218,15 @@ function M.on_research_started(event)
 end
 
 function M.on_research_cancelled(event)
-  if not M.on_discovery_tree_queue_changed(event) then reconcile_event(event, true) end
+  if M.on_discovery_tree_queue_changed(event) then return end
+  local cancelled = event and event.research
+  if COMPETING_RETIREMENTS and type(cancelled) == "table" and type(cancelled.name) ~= "string" then
+    for name in pairs(cancelled) do
+      if COMPETING_RETIREMENTS[name] then reconcile_event(event, true, false, nil, nil, name) end
+    end
+  else
+    reconcile_event(event, true)
+  end
 end
 
 function M.on_discovery_tree_queue_changed(event)

@@ -79,8 +79,20 @@ local function withheld_rows(value, allowed)
   return out
 end
 
-function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, worker_default_split)
+local function competing_rows(value)
+  if value == nil then return nil end
+  if type(value) ~= "table" or getmetatable(value) ~= nil then fail("invalid competing retirements") end
+  local out = {}
+  for name, retired in pairs(value) do
+    if type(name) ~= "string" or retired ~= true then fail("invalid competing retirement") end
+    out[name] = true
+  end
+  if next(out) ~= nil then return out end
+end
+
+function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, worker_default_split, competing_retirements)
   if worker_default_split ~= nil and type(worker_default_split) ~= "boolean" then fail("invalid worker default split") end
+  local retired = competing_rows(competing_retirements)
   local owners = {}
   for _, row in ipairs(targets or {}) do
     if row.extended then
@@ -100,7 +112,7 @@ function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, 
     if owners[name] ~= nil then fail("native owner is both adopted and withheld") end
   end
   if next(owners) == nil and next(withheld_settings) == nil and next(credit_groups) == nil and next(fixed_credit_scalars) == nil
-      and worker_route == nil and worker_default_split == nil then return nil end
+      and worker_route == nil and worker_default_split == nil and retired == nil then return nil end
   local prototype = raw["mod-data"] and raw["mod-data"][M.prototype_name]
   if type(prototype) ~= "table" or prototype.type ~= "mod-data" or prototype.name ~= M.prototype_name
       or type(prototype.data) ~= "table" or prototype.data.schema ~= 1
@@ -121,7 +133,8 @@ function M.plan(raw, targets, withheld, credits, fixed_credits, worker_storage, 
     end
   end
   return {prototype=prototype, owners=owners, withheld=withheld_settings, credits=credit_groups,
-    fixed_credits=fixed_credit_scalars, worker_storage=worker_route, worker_default_split=worker_default_split}
+    fixed_credits=fixed_credit_scalars, worker_storage=worker_route, worker_default_split=worker_default_split,
+    competing_retirements=retired}
 end
 
 function M.apply(patch)
@@ -132,6 +145,7 @@ function M.apply(patch)
     patch.prototype.data.fixed_credits = patch.fixed_credits
     patch.prototype.data.worker_storage = patch.worker_storage
     patch.prototype.data.worker_default_split = patch.worker_default_split
+    patch.prototype.data.competing_retirements = patch.competing_retirements
     if patch.galore_sulfur_retired ~= nil then
       patch.prototype.data.galore_sulfur_retired = patch.galore_sulfur_retired
     end
@@ -146,7 +160,8 @@ function M.read(value, definitions, admission_facts)
   end
   for key in pairs(value) do
     if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits" and key ~= "fixed_credits"
-        and key ~= "galore_sulfur_retired" and key ~= "worker_storage" and key ~= "worker_default_split" then fail("unknown control field") end
+        and key ~= "galore_sulfur_retired" and key ~= "worker_storage" and key ~= "worker_default_split"
+        and key ~= "competing_retirements" then fail("unknown control field") end
   end
   if value.galore_sulfur_retired ~= nil and type(value.galore_sulfur_retired) ~= "boolean" then
     fail("invalid named Galore retirement")
@@ -186,7 +201,9 @@ function M.read(value, definitions, admission_facts)
   local fixed_credits = M.fixed_credit_scalars(value.fixed_credits)
   local worker_storage = value.worker_storage ~= nil
     and worker_robot_storage.copy_route(value.worker_storage) or nil
+  local retired = competing_rows(value.competing_retirements)
   if admission_facts ~= nil then
+    admission_facts.competing_retirements = retired
     admission_facts.galore_sulfur_retired = value.galore_sulfur_retired == true
     admission_facts.worker_storage = worker_storage
     admission_facts.worker_default_split = value.worker_default_split == true

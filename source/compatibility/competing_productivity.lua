@@ -460,6 +460,7 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
       end
     end
   end
+  local retired
   for _, row in ipairs(technologies) do
     local recipes = excluded[row.name]
     if recipes then
@@ -470,13 +471,28 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
         end
       end
       if #effects == 0 then
-        -- An unresearchable owned row can retain its native effect vector.
-        -- Removing it would also erase the player's previously earned bonus.
-        row.enabled = false
+        -- Leave the native default and effects in place so loading preserves
+        -- work. Runtime owns suppression and any eventual restoration.
+        if row.enabled ~= false then
+          retired = retired or {}
+          retired[row.name] = true
+        end
       else
         row.effects = effects
       end
     end
+  end
+  return retired
+end
+
+function M.validate_retirements(retired, active_mods, target)
+  local contract = M.select(active_mods, target)
+  local allowed = {}
+  for _, item in ipairs(contract and contract.bindings or {}) do
+    for _, replacement in ipairs(item.replacements) do allowed[replacement.id] = true end
+  end
+  for name in pairs(retired) do
+    if not allowed[name] then fail_transition("unbound MIR research retirement " .. name) end
   end
 end
 
