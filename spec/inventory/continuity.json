@@ -21993,6 +21993,474 @@
         "next": "Use the existing shared native/release queue: original/current normal-display Library comparison and coherent corrected UI; actual finite8 old-provider state/save/cold qualification; then exact-candidate applicable checks, package/docs and delivery review for the12hour next-prerelease target. Broader stable work remains open; no automatic122-case rerun, added reboot programme, beta mod identity or Portal upload."
       },
       "superseded_summary_next_action": "Obtain full JSON/bundle; verify original audit IDs/counts/source URLs and deduplicate each record against this existing inventory/ledger/cases and exact results. Reuse named evidence only after applicability review, identify genuinely missing executable endpoints, and leave optional/design decisions with their original status. Do not invent122 row dispositions from this summary or set inventory_complete=true."
+    },
+    "runtime_ownership_same_name_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
+      "history_start": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+      "public_tags_through": "v5.0.24",
+      "selected_suites": [
+        "tests/test_native_family_paid_credits.py",
+        "tests/test_native_credit_price_paid.py",
+        "tests/test_worker_storage_history.py",
+        "tests/test_worker_storage_default_native.py",
+        "tests/test_worker_storage_continuation.py",
+        "tests/test_competing_productivity.py",
+        "tests/test_space_exploration_system_force.py"
+      ],
+      "changed_declarations_reviewed": 49,
+      "distinct_historical_bodies_reviewed": 73,
+      "bodies_already_in_worker_history_review": 25,
+      "retained_body_mappings": 48,
+      "groups": [
+        {
+          "path": "tests/test_competing_productivity.py",
+          "retained_controls": {
+            "CompetingProductivityTests.test_independent_f200_binding_inventory_and_captured_facts": {
+              "current_line": 289,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 287
+                }
+              ],
+              "disposition": "The exact source comparison moved its retirement decision into runtime metadata. Positive retirement still requires the authored native effects. The current test preserves raw enablement, confirms named retirements, and rejects a foreign declaration.",
+              "decision_revision": "4a4764fc9ffbc86bb98edfad7a52b12f728397ce"
+            },
+            "CompetingProductivityTests.test_runtime_caps_only_exact_known_foreign_bindings_and_restores_only_its_rights": {
+              "current_line": 373,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 368
+                }
+              ],
+              "disposition": "The original disabled foreign row retains explicit false restoration ownership. The test still checks wrong owner, level, and prerequisite opponents, the unrelated queue, and the native pre-disabled state.",
+              "decision_revision": "d65f68d41af70723e64035be5893969c2a1ac1bf"
+            },
+            "CompetingProductivityTests.test_bootstrap_registers_the_single_named_event_composition": {
+              "current_line": 677,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 464
+                },
+                {
+                  "revision": "ccebe30e07b4bb34342056a354e3dd9ccbd63f81",
+                  "line": 472
+                },
+                {
+                  "revision": "b22963ad589108ac8f02d93c21a6e972e25b49a7",
+                  "line": 474
+                },
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 474
+                },
+                {
+                  "revision": "489356a34a97d510483ff0e31aae19722b6a8639",
+                  "line": 474
+                }
+              ],
+              "disposition": "The registered creation, reset and merge callbacks remain checked. Effect reset and private worker state checks were added."
+            },
+            "CompetingProductivityTests.test_data_preference_preserves_ids_and_matches_captured_remaining_recipe_effects": {
+              "current_line": 991,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 767
+                }
+              ],
+              "disposition": "The projection now retains the original prototype enabled value so Factorio can preserve established research. The test still compares exact identities and effects against the captured inputs.",
+              "decision_revision": "4a4764fc9ffbc86bb98edfad7a52b12f728397ce"
+            },
+            "CompetingProductivityTests.test_dynamic_data_preference_uses_exact_effect_coverage_and_empty_prerequisites_only": {
+              "current_line": 1256,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 1032
+                }
+              ],
+              "disposition": "The data boundary keeps the original enabled value and exact effects, then emits runtime retirement metadata for admitted coverage. The disabled-preference opponent receives no retirement.",
+              "decision_revision": "4a4764fc9ffbc86bb98edfad7a52b12f728397ce"
+            },
+            "CompetingProductivityTests.test_source_stays_fixed_and_non_scanning": {
+              "current_line": 1472,
+              "historical_bodies": [
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 1243
+                }
+              ],
+              "disposition": "The static provider check follows the fixed roster. test_named_productivity_providers_activate_only_the_f200_adapter and test_native_credit_preflight_marks_a_named_removed_provider_relevant assert the activation and removal behavior."
+            }
+          }
+        },
+        {
+          "path": "tests/test_native_family_paid_credits.py",
+          "retained_controls": {
+            "NativeFamilyPaidCreditsTests.test_known_base_origin_with_only_new_mods_preserves_paid_and_unfinished_work": {
+              "current_line": 709,
+              "historical_bodies": [
+                {
+                  "revision": "12854b336976a046c73e05d5a20914e96fc1cd00",
+                  "line": 776
+                }
+              ],
+              "disposition": "The original native credit assertions remain. A detached paid plastic credit now completes through the callback and clears its pending debit."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_data_only_base_preserves_four_paid_families_and_new_zero_steel": {
+              "current_line": 971,
+              "historical_bodies": [
+                {
+                  "revision": "895937a320f99aef492653851584fbfaadb918b1",
+                  "line": 346
+                }
+              ],
+              "disposition": "The paid-family cases now include the initial data-only 1.0.0 predecessor."
+            },
+            "NativeFamilyPaidCreditsTests.test_data_only_known_startup_change_matches_staged_module_disable_and_retuning": {
+              "current_line": 1005,
+              "historical_bodies": [
+                {
+                  "revision": "6929ec3edf54fe6742af18a077dbee7895dffbee",
+                  "line": 380
+                },
+                {
+                  "revision": "cadf7eba4e2de8747a8d1362c0268c68fd4b455f",
+                  "line": 390
+                }
+              ],
+              "disposition": "The staged comparison adds 1.0.0 and rounds synthetic effects to Factorio precision in both arms."
+            },
+            "NativeFamilyPaidCreditsTests.test_data_only_first_mask_refuses_unproven_inputs_and_impossible_steel_investment": {
+              "current_line": 1077,
+              "historical_bodies": [
+                {
+                  "revision": "895937a320f99aef492653851584fbfaadb918b1",
+                  "line": 380
+                }
+              ],
+              "disposition": "A malformed string startup flag remains an adverse case. test_data_only_known_startup_change_matches_staged_module_disable_and_retuning checks a verified boolean change."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_f200_m4_base_direct_upgrade_keeps_only_original_paid_mask": {
+              "current_line": 1115,
+              "historical_bodies": [
+                {
+                  "revision": "36bbcb21b80b60b54d3ab78964c34ccf5d589115",
+                  "line": 303
+                },
+                {
+                  "revision": "2aee484340039949f290c856944f19503cb377d6",
+                  "line": 1006
+                }
+              ],
+              "disposition": "The shared bootstrap fixture reinstalls the actual target and keeps the original paid-mask assertions."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_f200_base_direct_reader_refuses_unproven_inputs_before_writes": {
+              "current_line": 1249,
+              "historical_bodies": [
+                {
+                  "revision": "36bbcb21b80b60b54d3ab78964c34ccf5d589115",
+                  "line": 338
+                },
+                {
+                  "revision": "2aee484340039949f290c856944f19503cb377d6",
+                  "line": 1042
+                }
+              ],
+              "disposition": "The shared bootstrap fixture reinstalls the actual target and keeps the unproven-input write checks."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_f210_m4_base_exact_patch24_hop_preserves_only_old_paid_mask": {
+              "current_line": 1338,
+              "historical_bodies": [
+                {
+                  "revision": "5f8d5ab3d15d6eab07e5e02c567a60aa7df882d6",
+                  "line": 1297
+                }
+              ],
+              "disposition": "The 2.1.23 to 2.1.24 paid mask adds an exact current successor with an observed newly installed unrelated mod."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_f210_m4_base_patch24_reader_refuses_other_inputs_before_writes": {
+              "current_line": 1371,
+              "historical_bodies": [
+                {
+                  "revision": "5f8d5ab3d15d6eab07e5e02c567a60aa7df882d6",
+                  "line": 1325
+                }
+              ],
+              "disposition": "The unrelated addition has a positive case in the paired test. The adverse case now explicitly updates an existing mod and still checks for zero writes."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_m4_engine_hop_known_mask_does_not_require_unchanged_settings_flag": {
+              "current_line": 1422,
+              "historical_bodies": [
+                {
+                  "revision": "b6e47db07e09dd729e1ddfa51bf42b53b47fa355",
+                  "line": 623
+                },
+                {
+                  "revision": "2aee484340039949f290c856944f19503cb377d6",
+                  "line": 1131
+                }
+              ],
+              "disposition": "The shared bootstrap fixture retains the real target and the known-mask startup-change assertion."
+            },
+            "NativeFamilyPaidCreditsTests.test_published_m4_base_hop_refuses_unproven_inputs_before_all_mir_writes": {
+              "current_line": 1463,
+              "historical_bodies": [
+                {
+                  "revision": "289c1d7d7ccb3a8c0afc9777e1944544a8f96b67",
+                  "line": 330
+                },
+                {
+                  "revision": "b6e47db07e09dd729e1ddfa51bf42b53b47fa355",
+                  "line": 663
+                },
+                {
+                  "revision": "2aee484340039949f290c856944f19503cb377d6",
+                  "line": 1172
+                }
+              ],
+              "disposition": "Malformed startup input is refused. Every adverse case now runs with both valid boolean flags under the direct and bootstrap paths."
+            },
+            "NativeFamilyPaidCreditsTests.test_exact_502_sif_origin_preserves_only_its_authored_canonical_mask": {
+              "current_line": 1595,
+              "historical_bodies": [
+                {
+                  "revision": "c930a26e6b4e65869350c3ce18fcbcaf83b81bc8",
+                  "line": 190
+                }
+              ],
+              "disposition": "The published SIF recipient setup was extracted into a shared fixture and the canonical paid-mask assertions remain."
+            },
+            "NativeFamilyPaidCreditsTests.test_credit_parse_does_not_import_the_inactive_sif_adapter": {
+              "current_line": 1859,
+              "historical_bodies": [
+                {
+                  "revision": "88b947727101ec3f8ccd72fbc5f2dcd8478d9d5c",
+                  "line": 336
+                }
+              ],
+              "disposition": "The inactive adapter check remains and now verifies that the published paid-family data is returned as an independent copy."
+            }
+          }
+        },
+        {
+          "path": "tests/test_space_exploration_system_force.py",
+          "retained_controls": {
+            "SpaceExplorationSystemForceTests.test_source_authored_values_only_on_the_same_production_predicate_with_or_without_observer": {
+              "current_line": 85,
+              "historical_bodies": [
+                {
+                  "revision": "8514ad93ef18dc1f0ab9a4c50e4606fa4b3c6742",
+                  "line": 89
+                }
+              ],
+              "disposition": "The authored six-value check now includes the documented 5.0.20018 predecessor."
+            },
+            "SpaceExplorationSystemForceTests.test_inactive_or_unrelated_events_do_not_access_the_world": {
+              "current_line": 110,
+              "historical_bodies": [
+                {
+                  "revision": "8514ad93ef18dc1f0ab9a4c50e4606fa4b3c6742",
+                  "line": 114
+                }
+              ],
+              "disposition": "The no-world-read check adds a same-version 5.0.20018 event."
+            },
+            "SpaceExplorationSystemForceTests.test_authored_conquest_defaults_do_not_depend_on_the_startup_settings_flag": {
+              "current_line": 121,
+              "historical_bodies": [
+                {
+                  "revision": "a0b9d63cb20ddbd8101933a62f51b7ee520a5839",
+                  "line": 123
+                }
+              ],
+              "disposition": "The startup flag opponents also run against the 5.0.20018 predecessor."
+            },
+            "SpaceExplorationSystemForceTests.test_completed_night_vision_does_not_block_the_se_policy_or_change_research": {
+              "current_line": 246,
+              "historical_bodies": [
+                {
+                  "revision": "239e9bc21a2e673fe8f01257d70618c6f2d279cb",
+                  "line": 140
+                }
+              ],
+              "disposition": "Night vision and updated unrelated add-on cases also run against the 5.0.20018 predecessor."
+            },
+            "SpaceExplorationSystemForceTests.test_mixed_nonfinite_or_unavailable_scripted_values_are_not_absence": {
+              "current_line": 287,
+              "historical_bodies": [
+                {
+                  "revision": "8514ad93ef18dc1f0ab9a4c50e4606fa4b3c6742",
+                  "line": 141
+                }
+              ],
+              "disposition": "Optional conquest recovery now skips mixed, nonfinite or unavailable values. The test still checks that no values are written."
+            }
+          }
+        },
+        {
+          "path": "tests/test_worker_storage_default_native.py",
+          "retained_controls": {
+            "WorkerStorageDefaultNativeTests.test_canonical_metadata_supports_same_fixture_version_after_mir": {
+              "current_line": 50,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 50
+                }
+              ],
+              "disposition": "The same-version fixture now explicitly selects its legacy and prepared-default scenarios through startup metadata."
+            }
+          }
+        },
+        {
+          "path": "tests/test_worker_storage_history.py",
+          "retained_controls": {
+            "WorkerDefaultNativeOwnerTransferTests.test_all_force_contract_custody_pristine_and_event_opponents_before_writes": {
+              "current_line": 1239,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 951
+                }
+              ],
+              "disposition": "The explicit false multiplier setting is the adverse counterpart to the fixture's native starting multiplier contract."
+            },
+            "WorkerDefaultNativeOwnerTransferTests.test_malformed_old_split_record_and_native_owner_drift_refuse": {
+              "current_line": 1327,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 981
+                }
+              ],
+              "disposition": "An actually unknown 5.0.21042 replaces the formerly unrecognized prior release in the producer corruption case."
+            },
+            "WorkerDefaultNativeOwnerTransferTests.test_exact_411_raw_runtime_characterizes_false_setting_drift": {
+              "current_line": 1403,
+              "historical_bodies": [
+                {
+                  "revision": "b70e6cd8c54f958401fe131011427bf7bd2b3c39",
+                  "line": 1194
+                }
+              ],
+              "disposition": "Keeps the pinned raw 411 behavior and now refuses science, prerequisite, or research-time drift attributed to an unrelated settings event on both engines. All observed force and storage frames remain equal.",
+              "decision_revision": "8514ad93ef18dc1f0ab9a4c50e4606fa4b3c6742"
+            },
+            "WorkerDefaultNativeOwnerTransferTests.test_automatic_owner_contract_drift_refuses_each_investment_signal": {
+              "current_line": 1450,
+              "historical_bodies": [
+                {
+                  "revision": "b70e6cd8c54f958401fe131011427bf7bd2b3c39",
+                  "line": 1242
+                }
+              ],
+              "disposition": "Keeps the tested paid-work opponents and treats unrelated startup-setting notifications as insufficient authority. The exact refusal reason follows the refined preflight.",
+              "decision_revision": "8514ad93ef18dc1f0ab9a4c50e4606fa4b3c6742"
+            },
+            "WorkerDefaultNativeOwnerTransferTests.test_automatic_owner_contract_investment_disjuncts_are_independent": {
+              "current_line": 1481,
+              "historical_bodies": [
+                {
+                  "revision": "b70e6cd8c54f958401fe131011427bf7bd2b3c39",
+                  "line": 1273
+                }
+              ],
+              "disposition": "The investigation of each independent investment predicate follows the explicit owned argument."
+            },
+            "WorkerFullDefaultProviderHandoverTests.test_provider_return_retains_work_waiting_for_a_provider_prerequisite": {
+              "current_line": 3535,
+              "historical_bodies": [
+                {
+                  "revision": "7a4917eba2ad2abe31afe5e86aa99f03f458c30d",
+                  "line": 3516
+                }
+              ],
+              "disposition": "Retains both original tier-5 progress and the linked tier-6 entry while waiting. After the declared prerequisite completes, the current test verifies original queue order, price, and unaffected active research.",
+              "decision_revision": "cdc21f2872c44093ebae1e970de5359e85e832f0"
+            },
+            "WorkerOlderDefaultAdmissionTests.test_archived_k2_worker_admission_refuses_unverified_history_before_writes": {
+              "current_line": 3997,
+              "historical_bodies": [
+                {
+                  "revision": "686c8259ba2117128cdbc3b8f203ab91c50af57f",
+                  "line": 3546
+                }
+              ],
+              "disposition": "The archived K2 negative mask adds the unknown predecessor, missing official recycler and changed canonical formula."
+            },
+            "WorkerOlderDefaultAdmissionTests.test_473_matching_contract_transfers_current_repeated_queued_and_detached_work": {
+              "current_line": 4332,
+              "historical_bodies": [
+                {
+                  "revision": "437da433006e0342e950e25602b3eefadbfddd52",
+                  "line": 3612
+                },
+                {
+                  "revision": "239e9bc21a2e673fe8f01257d70618c6f2d279cb",
+                  "line": 3612
+                }
+              ],
+              "disposition": "The original F200, F210 and cross-family cases remain. The positive matrix also exercises exact official Space Age patches and unchanged reported add-ons, retaining the paid, queued and detached-transfer checks."
+            },
+            "WorkerOlderDefaultAdmissionTests.test_473_f210_space_age_refuses_uncertain_origins_and_different_science": {
+              "current_line": 4442,
+              "historical_bodies": [
+                {
+                  "revision": "437da433006e0342e950e25602b3eefadbfddd52",
+                  "line": 3665
+                }
+              ],
+              "disposition": "Existing Space Age adverse checks distinguish an unqualified future patch, a missing official patch row and missing or foreign worker-edit evidence. The paired positive test covers the newly admitted exact patch."
+            },
+            "WorkerOlderDefaultAdmissionTests.test_older_previous_profile_engine_event_and_current_route_opponents": {
+              "current_line": 4684,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 1703
+                }
+              ],
+              "disposition": "Changed settings still refuse invested work. Same-line Base handling is now tested separately from an unqualified source, with an exact unchanged-2.0.77 gate for F200 Space Age."
+            },
+            "WorkerRecordedDefaultModChangeTests.test_default_origin_reuses_the_already_observed_native_route": {
+              "current_line": 5172,
+              "historical_bodies": [
+                {
+                  "revision": "92255768ad7f3a466b14f85f9dcae7c16125d372",
+                  "line": 2731
+                }
+              ],
+              "disposition": "The observed native route check also verifies the protected copy message and avoids offering inapplicable preparation."
+            },
+            "WorkerDefaultEditionContinuityTests.test_hop_is_not_a_new_mod_unknown_engine_downgrade_or_unrecorded_adoption": {
+              "current_line": 5452,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 2093
+                }
+              ],
+              "disposition": "Shared old-world setup retains the adverse hop cases. An actually unknown prior package replaces the former unknown literal."
+            },
+            "WorkerSameFamilyEnginePatchTests.test_patch_exclusions_preserve_all_native_frames_before_refusal": {
+              "current_line": 5745,
+              "historical_bodies": [
+                {
+                  "revision": "a245017da5aa15116e514685217b4c93f2b79ef2",
+                  "line": 2332
+                }
+              ],
+              "disposition": "Unknown package opponents use absent releases 42 in both families. All native frames still have to survive refusal."
+            }
+          }
+        }
+      ],
+      "scope": "Changed assertions in the selected ownership suites. The recorded host scope passed 344 controls with one skip at the pinned source. Native acceptance, unavailable original dynamic artifacts and historical sources outside this selection remain separate."
     }
   }
 }
