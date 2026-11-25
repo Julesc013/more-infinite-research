@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Inter-release test preservation (2026-11-26)
 
-The canonical MIR5 development history contains 52 Python test declarations absent by name and path from all public MIR5 tags through 5.0.24 and the inspected `dev`. The reviews now reconcile 34, including paid save upgrades, native cap ordering, historical profiles, and package identity. Three pinned host batches passed 352 methods. The [continuity inventory](../spec/inventory/continuity.json) preserves the original declarations, implementation decisions, and current controls. Eighteen declarations, changed same-name tests, and native qualification remain open.
+All 52 Python test declarations identified between the canonical MIR5 development commits and absent by name and path from the public MIR5 tags through 5.0.24 and the inspected `dev` now have a recorded disposition. The [continuity inventory](../spec/inventory/continuity.json) preserves original test bodies and links to the current controls, including paid upgrades, Library observation, native ownership, historical profiles and package identity. The four pinned host batches passed 650 methods and skipped six Linux-only controls on Windows. Changed same-name tests, historical sources outside this scan, and native qualification remain open.
 
 ## Verified Library personal views and Space Exploration cap raise (2026-11-26)
 
