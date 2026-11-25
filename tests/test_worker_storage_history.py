@@ -5090,7 +5090,7 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
 class WorkerPrivateQueueEventContextTests(unittest.TestCase):
     def world(self,target="f210"):
         lua=build_full_default_provider_handover_world(LuaRuntime, target=target, source_root=ROOT / "source")
-        lua.execute('defines={events={on_research_queued=25,on_research_started=26}}')
+        lua.execute('defines={events={on_research_queued=25,on_research_started=26,on_research_cancelled=27}}')
         return lua
 
     def test_retired_force_ignores_other_queue_event_while_another_force_is_pending(self):
@@ -5113,7 +5113,7 @@ class WorkerPrivateQueueEventContextTests(unittest.TestCase):
               mt.__index=read
             """)
 
-    def test_pending_setter_observation_is_read_only_then_started_enforces_quota_and_finish(self):
+    def test_pending_setter_observation_is_read_only_then_tick_enforces_quota_and_finish(self):
         for target in ("f200","f210"):
             lua=self.world(target);lua.execute(r"""
               full_source(1,true);finite_entry(1);handover()
@@ -5134,12 +5134,66 @@ class WorkerPrivateQueueEventContextTests(unittest.TestCase):
               assert(observed==1 and f.current_research.name==OTHER and #f.research_queue==3)
               local quota=storage.mir_worker_storage_route.forces[f.index]
               assert(quota.next_level==8 and quota.limit==8 and quota.pending)
-              assert(history.on_research_event({research=f.technologies[OTHER],name=26}))
+              assert(history.on_research_event({research=f.technologies[OTHER],name=26,tick=100}))
+              assert(#f.research_queue==3 and history.prepared_queue_pending())
+              history.on_prepared_queue_tick({tick=100})
+              assert(#f.research_queue==3 and quota.queue_tick==100)
+              history.on_prepared_queue_tick({tick=101})
               assert(#f.research_queue==2 and f.research_queue[2].name==ID and quota.limit==8)
+              assert(not history.prepared_queue_pending() and quota.queue_tick==nil)
               mt.__newindex=write;mt.__index=read
               f.research_queue={OTHER};f.research_progress=.23;f.technologies[ID].level=9
               assert(history.on_research_event({research=f.technologies[ID],by_script=false},true))
               assert(not quota.pending and not f.technologies[ID].enabled and f.current_research.name==OTHER and f.research_progress==.23)
+            """)
+
+    def test_start_inside_queue_replacement_keeps_the_private_tail_and_survives_reload(self):
+        for target in ("f200","f210"):
+            lua=self.world(target);lua.execute(r"""
+              full_source(1,true);finite_entry(1);handover()
+              local f=player;local p=f.technologies[ID]
+              local record=storage.mir_worker_storage_route.forces[f.index]
+              local limit=record.limit
+              -- Factorio starts the new head before appending the old private row.
+              f.research_progress=0;p.saved_progress=0
+              f.research_queue={OTHER};f.research_progress=.42
+              writes=0
+              assert(history.on_research_event({research=f.technologies[OTHER],name=26,tick=312}))
+              assert(writes==0 and p.enabled and record.pending and record.limit==limit)
+              f.research_queue={OTHER,ID};f.research_progress=.42
+              local world=game;game=nil;history.on_load();game=world
+              assert(history.prepared_queue_pending())
+              history.on_prepared_queue_tick({tick=313})
+              assert(not history.prepared_queue_pending() and p.enabled and record.pending and record.limit==limit)
+              assert(f.research_queue[1].name==OTHER and f.research_queue[2].name==ID and f.research_progress==.42)
+            """)
+
+    def test_real_cancellation_retires_and_configuration_restores_only_that_owned_flag(self):
+        for opponent in (False,True):
+            lua=self.world();lua.globals().opponent=opponent;lua.execute(r"""
+              full_source(1,true);finite_entry(1);handover()
+              local f=player;local p=f.technologies[ID]
+              f.research_progress=0;p.saved_progress=0
+              f.research_queue={OTHER};f.research_progress=.42
+              local record=storage.mir_worker_storage_route.forces[f.index]
+              assert(history.on_research_event({force=f,research={[ID]=1},name=27,tick=312}))
+              assert(record.pending and p.enabled)
+              history.on_prepared_queue_tick({tick=313})
+              assert(not record.pending and not p.enabled)
+              local cargo,level=f.worker_robots_storage_bonus,p.level
+              prototypes.technology[ID].enabled=false
+              p.enabled=true -- Native configuration can re-enable an earned prerequisite.
+              writes=0
+              local plan=history.preflight({mod_startup_settings_changed=false,mod_changes={}},provider_route(5))
+              assert(writes==0 and plan.retired[f.index]==p)
+              if opponent then
+                p.saved_progress=.25;writes=0
+                assert(not pcall(history.apply,plan) and writes==0 and p.enabled and p.saved_progress==.25)
+              else
+                history.apply(plan)
+                assert(not p.enabled and p.level==level and f.worker_robots_storage_bonus==cargo)
+                assert(f.current_research.name==OTHER and f.research_progress==.42)
+              end
             """)
 
     def test_pending_other_and_private_queue_observations_are_always_read_only(self):
