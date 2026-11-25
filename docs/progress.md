@@ -14,6 +14,18 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## 5.0.25 publication hold and Space Exploration cap raise (2026-11-26)
+
+On Windows Factorio 2.0.77 and Space Exploration 0.7.57, the frozen Factorio 2.0 ZIP lost six conquest values at configuration time while upgrading a protected MIR 5.0.20018 cap-ten save and raising its cap to twelve. The checked 5.0.23 ZIP retained the values on the same engine, save and startup settings. Both restored the shared library. The publisher was stopped before draft staging.
+
+The recovery rule omitted this published origin. The repair admits the observed 5.0.20018 source through the existing engine, provider and uninvested-force checks. The new origin tests failed before the fix. All 314 focused controls passed after it, including already restored, invested and no-op cases.
+
+The rebuilt Factorio 2.0 ZIP `B941F2E9C084DE3A3C61BE9AC89DDBE25C210E0FBCAE2A9662392D9B6115ECC1` from `48b599900fbb0d7049f003c5e10fecd3121d5c9d` preserved all six conquest values and the rest of the eight-force frame. Ordinary labs finished levels eleven and twelve at the original 11,600 and 17,400 per-pack costs across seven science packs. Factorio refused level thirteen, the unrelated research remained current, and both 1,200-update cold loads matched checksum `3685687603`. The protected source and the shared library matched their original custody records.
+
+Compared with the held beta inventory, the rebuilt inventory changes only the Factorio 2.0 and 2.1 ZIPs. Compared with the previously integrated development packages, those two ZIPs each change only the conquest policy file. Further release qualification of the affected packages and checked promotion remain open.
+
+The release comparison is `build/qualification/mir5-se-cap12-windows-release-controls-r01/verified-comparison.json` at `3FC10A05020DC0976FA26C7AC65D5959AADE565D456BCDAB26B7E12D728B555A`. The publication hold is `build/qualification/mir525-beta-disclose-legacy-space-age/cadence-r03-held-cap12.json` at `C44A32452C0D50D3878144D2034985A714848C6A90F8A3B51B922D55AA8036F9`. The new native replay is `build/qualification/mir5-competing-se-cap12-black-glass-r03/verified-cap12.json` at `37295E071CA86B119967D7479FB84C32A2F62693D55DC111936E22725FA553B8`.
+
 ## Integrated Factorio 2.0 Space Age and Space Exploration replays (2026-11-26)
 
 The private Factorio 2.0.77 ZIP `CE776D1C9CA8C661FE176EB100BC5B2F67C744646BC431EECE1CA402A71F65DC` from `32286d6edfb8bc06873a4708f8e7eaf8b0d748e4` contains both the legacy default worker repair and the competing productivity availability repair. It passed three native replays through the normal game entry points.
