@@ -3,12 +3,15 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from http.client import IncompleteRead
 import json
 import os
 from pathlib import Path
 import re
 import subprocess
 import tempfile
+import time
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
@@ -21,6 +24,7 @@ ORIGIN = re.compile(r"(?:https://github\.com/|git@github\.com:|ssh://git@github\
                     + re.escape(REPOSITORY) + r"(?:\.git)?/?", re.IGNORECASE)
 SHA256 = re.compile(r"[0-9a-fA-F]{64}")
 COMMIT = re.compile(r"[0-9a-f]{40}")
+RETRYABLE_HTTP = {404, 429, 500, 502, 503, 504}
 LEGACY_NOTE_NAMES = {"release-notes.md": "RELEASE_NOTES.md", "upload-text.txt": "UPLOAD.txt"}
 RESERVED_NAMES = {name.lower() for name in (*LEGACY_NOTE_NAMES, *LEGACY_NOTE_NAMES.values())} | {".", ".."}
 
@@ -70,12 +74,20 @@ def _text(value):
 
 
 def _read(url, maximum, accept):
-    request = Request(url, headers={"Accept": accept, "User-Agent": "MIR-public-release-readback"})
-    with urlopen(request, timeout=45) as response:
-        data = response.read(maximum + 1)
-        if response.status != 200 or len(data) > maximum:
-            raise ValueError(f"Unexpected response status or size for {url}")
-    return data
+    for attempt in range(1, 4):
+        request = Request(url, headers={"Accept": accept, "User-Agent": "MIR-public-release-readback"})
+        try:
+            with urlopen(request, timeout=45) as response:
+                data = response.read(maximum + 1)
+                if response.status != 200 or len(data) > maximum:
+                    raise ValueError(f"Unexpected response status or size for {url}")
+            return data
+        except (URLError, TimeoutError, ConnectionError, IncompleteRead) as error:
+            if attempt == 3 or (isinstance(error, HTTPError) and error.code not in RETRYABLE_HTTP):
+                raise
+            if isinstance(error, HTTPError):
+                error.close()
+            time.sleep(5 * attempt)
 
 
 def _public_metadata(endpoint, receipt, name):
