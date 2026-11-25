@@ -8779,6 +8779,52 @@
       ],
       "remaining": "Review outstanding intent in the existing inventory and run affected exact native scenarios. The prior Library rejoin archive changed in lifecycle and catalogue code. Its final-archive replay and current performance gates remain open."
     },
+    "replacement_525_factorio21_startup": {
+      "reviewed_on": "2026-11-26",
+      "subjects": [
+        "CONT-12",
+        "CONT-17"
+      ],
+      "case": "Matched Bob/Angel responsive Settings comparison on Factorio 2.1.24",
+      "source": "98056d27ef63ecc5ba0be28f0602244c109f5d0e",
+      "archive_sha256": "7B996CE4ED081F293ED7ACE71BEE6BA055AEC62E03CD73CA2625D1F770FA1BDC",
+      "samples": 38,
+      "added_time_reduction_percent": 94.39076652555578,
+      "evidence": {
+        "path": "build/qualification/f210-525-bob-angel-menu-r02/verified-comparison.json",
+        "sha256": "04C80223F58481D6854CC6AD23C923DE1948F0F2B1DCB7F1074B79DA692E827B"
+      },
+      "library_restoration": {
+        "path": "build/qualification/f210-525-bob-angel-menu-r02/handoff-custody-readback.json",
+        "sha256": "3CF0214EE1F272700A8B458731D5425B25E0406C991F65CACA7D17527377479A"
+      },
+      "scope": "Exact profile startup result. Factorio 2.0 startup and Library performance have separate gates."
+    },
+    "named_python_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "source": "61b9140f875fd9309f00f6a8e66e8238618105cd",
+      "declarations_missing_under_original_names": 41,
+      "reviewed_declarations": 19,
+      "remaining_named_declarations": 22,
+      "scope": "Library fixture authority, Space Exploration optional restoration, Bob and Angel minimum metadata, and saved worker history. Review compares original and current test source. Existing native receipts retain their scopes.",
+      "evidence": [
+        {
+          "tests": 9,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/named-test-intent-reconciliation.json",
+          "sha256": "B33F1AB35F154F2BB367F6032FE6A8E4CE51DE0BB8CB1B04F56954BC1E01A72B"
+        },
+        {
+          "tests": 4,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/bob-angel-minimum-test-intents.json",
+          "sha256": "C09179D76886CC1C5F1DDFF172CE310E24A965BC206B7DA147792DA5A7A820F2"
+        },
+        {
+          "tests": 6,
+          "path": "build/qualification/mir5-public-tag-continuity-r01/worker-history-test-intents.json",
+          "sha256": "D31340425D93384830C965E6FADB7EA35F474731AE792BAAA092C8D4B059C168"
+        }
+      ]
+    },
     "allowed_dispositions": [
       "retain",
       "port",
