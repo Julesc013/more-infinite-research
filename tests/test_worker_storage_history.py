@@ -3812,6 +3812,59 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(writes==0 and same(settled,all_frames()) and storage[OWNER_KEY].settings.max_level==0)
         ''')
 
+    def test_472_space_age_requires_proven_worker_history(self):
+        cases = (
+            ("paid-official", "archived-default"),
+            ("empty-with-addon", "archived-uninvested-default"),
+            ("paid-with-addon", None),
+            ("prototype-editor", None),
+            ("startup-change", None),
+        )
+        for case, producer in cases:
+            with self.subTest(case=case):
+                lua = self.older_world("f200")
+                self.enable_space_age(lua, "2.0.77", recycler=False)
+                lua.globals().admission_case = case
+                lua.globals().expected_producer = producer
+                lua.execute(r'''
+                  local event=older_event("4.7.20002",false)
+                  if admission_case=="paid-official" or admission_case=="paid-with-addon" then
+                    seed_owner();player.research_queue={CANONICAL,OTHER}
+                  end
+                  if admission_case=="empty-with-addon" or admission_case=="paid-with-addon"
+                      or admission_case=="prototype-editor" then
+                    script.active_mods["other-addon"]="1.0.0"
+                  end
+                  if admission_case=="startup-change" then event.mod_startup_settings_changed=true end
+                  local prior_history=prototypes.get_history
+                  prototypes.get_history=function(kind,name)
+                    if kind=="technology" and name==CANONICAL then
+                      return {created="more-infinite-research",changed={
+                        admission_case=="prototype-editor" and "other-addon" or "more-infinite-research"}}
+                    end
+                    return prior_history(kind,name)
+                  end
+                  local before=all_frames();writes=0
+                  local ok,plan=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(writes==0 and same(before,all_frames()))
+                  if expected_producer==nil then
+                    assert(not ok and storage[OWNER_KEY]==nil)
+                    return
+                  end
+                  assert(ok,plan)
+                  assert(plan.record.producer.kind==expected_producer and plan.record.producer.old_version=="4.7.20002")
+                  assert(history.default_owner_apply(plan))
+                  for _,force in pairs(game.forces) do
+                    local after,prior=frame(force),before[force.index]
+                    assert(after.owner.level==prior.source.level and after.owner.saved==prior.source.saved)
+                    assert(after.owner.count==prior.source.count and after.bonus==prior.bonus)
+                    assert(after.progress==prior.progress and after.other_saved==prior.other_saved)
+                  end
+                  if admission_case=="paid-official" then assert(player.research_queue[1].name==ORDINARY) end
+                  local settled=all_frames();writes=0;history.default_owner_on_load()
+                  assert(writes==0 and same(settled,all_frames()))
+                ''')
+
     def test_472_se_transfers_paid_work_with_unchanged_elevated_rails(self):
         for explicit_rail_row in (False, True):
             with self.subTest(explicit_rail_row=explicit_rail_row):
