@@ -2477,6 +2477,17 @@ local function unmet_provider_prerequisite(technology, projected, ready)
   end
 end
 
+-- Factorio accepts a dependent when earlier entries will finish its
+-- prerequisite. Only count entries retained in the planned native queue.
+local function record_queued_completion(technology, next_level, occurrences, ready)
+  local name, prototype = technology.name, technology.prototype
+  local count = (occurrences[name] or 0) + 1
+  occurrences[name] = count
+  if prototype and integer(prototype.max_level) and next_level + count > prototype.max_level then
+    ready[name] = true
+  end
+end
+
 local function provider_return_force(saved, names, force, frame, public)
   local old = saved.forces[force.index]
   local credit = provider_credit_frame(force)
@@ -2534,16 +2545,18 @@ local function provider_return_force(saved, names, force, frame, public)
     row.saved_progress = progress_by_name[name]
     rows[name] = row
   end
-  local deferred = {}
+  local deferred, ready, occurrences = {}, {}, {}
   for _, name in ipairs(queue.queue) do
     local technology = force.technologies[name]
     local row = rows[name]
     local enabled = row and row.enabled or not row and technology.enabled
     if not enabled or (row and row.researched) then recover_error("restored queue contains unavailable research: " .. name) end
-    local missing = unmet_provider_prerequisite(technology, rows)
+    local missing = unmet_provider_prerequisite(technology, rows, ready)
     if missing then
       if not row then recover_error("restored queue has an unmet prerequisite: " .. name) end
       deferred[name] = true
+    else
+      record_queued_completion(technology, row and row.next_level or technology.level, occurrences, ready)
     end
   end
   local pending
@@ -3478,10 +3491,7 @@ local function resume_provider_queue(force, route, before_apply)
     elseif not technology.enabled then
       recover_error("native queue contains disabled research: " .. name)
     end
-    occurrences[name] = (occurrences[name] or 0) + 1
-    local prototype = technology.prototype
-    if prototype and integer(prototype.max_level) and prototype.max_level < 4294967295
-        and technology.level + occurrences[name] > prototype.max_level then ready[name] = true end
+    record_queued_completion(technology, technology.level, occurrences, ready)
   end
   if frames[merged.current] then merged.queued_saved[merged.current] = 0 end
   before_apply()

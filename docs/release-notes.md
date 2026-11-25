@@ -15,7 +15,7 @@ source_of_truth_for:
 This update preserves worker cargo research when Factorio replaces the queue and adds a way to recover paid research through a prepared Planet Ferrum removal and reinstall.
 
 - Keep active and parked worker cargo progress at its recorded price during supported upgrades. Queued research keeps its order when Factorio replaces the native queue.
-- With Factorio 2.1.25, Planet Ferrum 0.1.5 and PlanetsLib 2.4.0, prepare a copy of the save before removing the provider. After reinstall, MIR restores the saved work. If Factorio cleared a prerequisite, the paid research stays parked until it can resume. [Provider removal and resume steps](https://github.com/Julesc013/more-infinite-research/blob/v5.0.24/docs/support.md#removing-or-reinstalling-a-worker-cargo-provider)
+- With Factorio 2.1.25, Planet Ferrum 0.1.5 and PlanetsLib 2.4.0, prepare a copy of the save before removing the provider. After reinstall, MIR restores the saved work. A prerequisite already ahead in the queue can finish normally. If the prerequisite is unavailable, the paid research stays parked at its saved price until it can resume. [Provider removal and resume steps](https://github.com/Julesc013/more-infinite-research/blob/v5.0.24/docs/support.md#removing-or-reinstalling-a-worker-cargo-provider)
 - Read integer startup options without rounding. The Research Library skips subscription checks for unrelated interface actions.
 
 Keep the original save and its mod selection when changing providers or upgrading from an older MIR version. [Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.24/docs/support.md)
