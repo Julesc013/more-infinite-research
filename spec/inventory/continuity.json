@@ -8402,6 +8402,23 @@
       "status": "partial",
       "resolved_records": [
         {
+          "id": "published-524-player-presentation",
+          "source": [
+            "README.md",
+            "CHANGELOG.md",
+            "source/changelog.txt",
+            "source/locale",
+            "source/LICENSE",
+            "source/thumbnail.png",
+            "docs/support.md",
+            "docs/release-notes.md",
+            "docs/upload-text.txt"
+          ],
+          "evidence": "spec/evidence/candidate524-player-presentation-continuity-r01.json",
+          "evidence_sha256": "DD0887B7FEE741CC0F2C40EF2B525BF81162DBFB53412B0CA03AA459AB4FD254",
+          "scope": "All 17 published 5.0.24 archives matched the exact tagged member paths and bytes. The 19 anonymous assets, public display labels and delivered text matched. Forty-seven selected host tests covered the complete authored history, locale keys, package boundaries and historical source selection. Native presentation and final candidate acceptance still require their applicable evidence."
+        },
+        {
           "id": "active-provider-artwork-boundary",
           "source": [
             "source/locale"
