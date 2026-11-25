@@ -85,4 +85,52 @@ function M.append(technologies, raw, active, target, presentation, stream, route
   end
 end
 
+local function queue_prefix(remaining, current, first)
+  if #remaining - first + 1 > #current then return false end
+  for index = first, #remaining do
+    if remaining[index] ~= current[index - first + 1] then return false end
+  end
+  return true
+end
+
+function M.resume_queue(original, current, replacements, protect_current)
+  local remaining, anchors, output = {}, {}, {}
+  for _, name in ipairs(original) do
+    if not replacements[name] then
+      remaining[#remaining + 1] = name
+      if anchors[name] == nil then anchors[name] = #remaining else anchors[name] = false end
+    end
+  end
+  local first = queue_prefix(remaining, current, 1) and 1 or anchors[current[1]]
+  if first and not queue_prefix(remaining, current, first) then first = nil end
+  if not first or #remaining == 0 then
+    -- A reordered or ambiguous live queue keeps its current order. Its
+    -- suspended requests can still resume in their original relative order.
+    for _, name in ipairs(current) do output[#output + 1] = name end
+    for _, name in ipairs(original) do
+      if replacements[name] then output[#output + 1] = replacements[name] end
+    end
+    return output
+  end
+  local index, used, deferred = 0, 0, {}
+  for _, name in ipairs(original) do
+    local destination = replacements[name]
+    if destination then
+      local queue = protect_current and used == 0 and deferred or output
+      queue[#queue + 1] = destination
+    else
+      index = index + 1
+      if index >= first then
+        used = used + 1
+        output[#output + 1] = current[used]
+        if used == 1 then
+          for _, entry in ipairs(deferred) do output[#output + 1] = entry end
+        end
+      end
+    end
+  end
+  for index = used + 1, #current do output[#output + 1] = current[index] end
+  return output
+end
+
 return M

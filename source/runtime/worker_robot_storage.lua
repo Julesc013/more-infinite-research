@@ -160,6 +160,7 @@ local OWNER_KEY = "mir_worker_storage_native_owner"
 local ARCHIVE_KEY = "mir_worker_storage_provider_archive"
 local delegated_provider_preflight, delegated_provider_apply
 local plan_provider_archive_removal, apply_provider_archive_removal
+local plan_provider_archive_resume, apply_provider_archive_resume
 local selected_cap, selected_enabled = 0, true
 
 local function clone(value)
@@ -713,7 +714,7 @@ function M.configure(maximum, enabled)
   selected_cap, selected_enabled = maximum or 0, enabled ~= false
 end
 
-local function assign_queue(force, frame, queue, replacements)
+local function assign_queue(force, frame, queue, replacements, restored_head_progress)
   replacements = replacements or {}
   if queue == nil then
     queue = {}
@@ -735,9 +736,14 @@ local function assign_queue(force, frame, queue, replacements)
       end
     end
     local current = frame.current and (replacements[frame.current] or frame.current)
+    if restored_head_progress ~= nil then
+      current = queue[1]
+      local technology = force.technologies[current]
+      if technology.saved_progress ~= 0 then technology.saved_progress = 0 end
+    end
     if current then
       if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
-      force.research_progress = frame.current_progress
+      force.research_progress = restored_head_progress or frame.current_progress
     end
   end)
   owned_queue_force = previous_owner
@@ -2471,6 +2477,11 @@ function M.default_owner_preflight(event, route, split_current)
       if split_current ~= true then recover_error("provider archive needs the current native default prototypes") end
       return plan_provider_archive_removal(event, owned)
     end
+    local archived = storage[ARCHIVE_KEY]
+    if type(archived) == "table" and archived.phase == "suspended" then
+      if split_current ~= true then recover_error("provider archive needs its original native prototypes") end
+      return plan_provider_archive_resume(event, route, owned)
+    end
     local plan = retired_provider_current(event, route)
     if plan then provider_plans[plan] = {event=clone(plan.event)} end
     return plan
@@ -2493,6 +2504,7 @@ function M.default_owner_apply(plan)
   if type(plan) == "table" and plan.kind == "default-native-provider-handover" then return apply_provider_handover(plan) end
   if type(plan) == "table" and plan.kind == "default-native-provider-gate-settle" then return apply_retired_gate_settlement(plan) end
   if type(plan) == "table" and plan.kind == "provider-archive-removal" then return apply_provider_archive_removal(plan) end
+  if type(plan) == "table" and plan.kind == "provider-archive-resume" then return apply_provider_archive_resume(plan) end
   return M.apply_default_owner_transfer(plan)
 end
 
@@ -2973,7 +2985,8 @@ local function collect_provider_archive(route)
     local public = snapshot(force, recovery.canonical)
     if public.allowance > 0 then recover_error("provider archive cannot yet transfer unfinished public worker level four", route) end
     local item = {force=force, stages={}, bonus=native_bonus(force), queued=false,
-      public_next=public.next_level, head_paid=gate_paid(gate_frame(force))}
+      public_next=public.next_level, public_enabled=public.enabled, public_visible=public.visible,
+      head_paid=gate_paid(gate_frame(force))}
     for _, stage in ipairs(profile.stages) do
       local source, holder = snapshot(force, stage.source), snapshot(force, stage.holder)
       local debit = force.technologies[stage.debit]
@@ -3029,7 +3042,8 @@ local function apply_provider_archive_force(item, replacements)
         paid=actual.current == stage.holder and actual.current_progress or actual.saved_progress}
     end
     if native_bonus(item.force) ~= item.bonus then recover_error("provider archive changed earned worker cargo") end
-    return {cargo=item.bonus, public_next=item.public_next, head_paid=item.head_paid, stages=records}
+    return {cargo=item.bonus, public_next=item.public_next, public_enabled=item.public_enabled,
+      public_visible=item.public_visible, head_paid=item.head_paid, stages=records}
   end)
   default_mutating_force = previous
   if not ok then error(result, 0) end
@@ -3060,7 +3074,7 @@ local function archived_profile(saved, owned)
   if provider_archive then
     for _, profile in ipairs(provider_archive.profiles) do
       if saved.provider == profile.provider and saved.version == profile.version and target.id == profile.target
-          and script.active_mods[profile.prerequisite_mod] and script.active_mods[profile.provider] == nil
+          and script.active_mods[profile.prerequisite_mod]
           and owned.current.route.finite[1].provider == profile.provider then return profile end
     end
   end
@@ -3082,12 +3096,34 @@ local function check_suspended_prototypes(profile, stage)
       or debit.effects[1].modifier ~= 0 then recover_error("provider archive dormant terms changed: " .. stage.source) end
 end
 
+local function saved_archive_force(saved, index)
+  local prior = saved.forces[index]
+  fields(prior, {cargo=true, public_next=true, public_enabled=true, public_visible=true, head_paid=true, stages=true, queue=true})
+  if type(prior.stages) ~= "table" or prior.queue ~= nil and type(prior.queue) ~= "table"
+      or prior.public_enabled ~= nil and type(prior.public_enabled) ~= "boolean"
+      or prior.public_visible ~= nil and type(prior.public_visible) ~= "boolean" then
+    recover_error("invalid archived provider force history")
+  end
+  return prior
+end
+
+local function saved_archive_work(prior, stage)
+  local work = prior.stages[stage.source]
+  fields(work, {earned=true, enabled=true, visible=true, price=true, queued=true, paid=true})
+  if (work.earned ~= 0 and not integer(work.earned)) or (work.queued ~= 0 and not integer(work.queued))
+      or not progress(work.paid) or type(work.enabled) ~= "boolean" or type(work.visible) ~= "boolean" then
+    recover_error("invalid archived provider research history: " .. stage.source)
+  end
+  return work
+end
+
 plan_provider_archive_removal = function(event, owned)
   local saved, quota = storage[ARCHIVE_KEY], checked_state()
   local profile = archived_profile(saved, owned)
   local first = saved.phase == "prepared"
   local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[profile.provider]
-  if not same_family_engine_patch(event) or first and (type(change) ~= "table" or change.old_version ~= profile.version
+  if script.active_mods[profile.provider] ~= nil or not same_family_engine_patch(event)
+      or first and (type(change) ~= "table" or change.old_version ~= profile.version
       or change.new_version ~= nil) or not first and change then
     recover_error("staged provider removal changed more than its recorded route")
   end
@@ -3108,11 +3144,7 @@ plan_provider_archive_removal = function(event, owned)
   end
   for _, base in ipairs(prepared_current(quota, quota.current, true)) do
     local force = base.force
-    local prior = saved.forces[force.index]
-    fields(prior, {cargo=true, public_next=true, head_paid=true, stages=true, queue=true})
-    if type(prior.stages) ~= "table" or prior.queue ~= nil and type(prior.queue) ~= "table" then
-      recover_error("invalid archived provider force history")
-    end
+    local prior = saved_archive_force(saved, force.index)
     local head, tail, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force, true)
     local bonus = native_bonus(force)
     if head.next_level ~= prior.public_next or head.allowance ~= 0 or tail.next_level ~= 4 or tail.allowance ~= 0
@@ -3121,12 +3153,7 @@ plan_provider_archive_removal = function(event, owned)
     end
     local item = {force=force, base=base, head=head, tail=tail, bonus=bonus, work={}, queued=false}
     for _, stage in ipairs(profile.stages) do
-      local previous = prior.stages[stage.source]
-      fields(previous, {earned=true, enabled=true, visible=true, price=true, queued=true, paid=true})
-      if (previous.earned ~= 0 and not integer(previous.earned))
-          or (previous.queued ~= 0 and not integer(previous.queued)) or not progress(previous.paid) then
-        recover_error("invalid archived provider research history: " .. stage.source)
-      end
+      local previous = saved_archive_work(prior, stage)
       local holder, debit = snapshot(force, stage.holder), force.technologies[stage.debit]
       local paid = holder.current == stage.holder and holder.current_progress or holder.saved_progress
       if holder.next_level ~= stage.first + previous.earned or holder.count ~= previous.price or holder.visible
@@ -3185,6 +3212,156 @@ apply_provider_archive_removal = function(plan)
   archive.phase = "suspended"
   quota.phase, quota.current = "archived", {kind="default"}
   storage[ARCHIVE_KEY], storage[KEY] = archive, quota
+  reconnect(quota)
+  return true
+end
+
+local function provider_resume_queue(prior, base, work, replacements, by_source)
+  local original, counts = prior.queue or {}, {}
+  if #original > 1000 then recover_error("archived provider queue is too large") end
+  for index, name in pairs(original) do
+    if not integer(index) or index > #original or type(name) ~= "string" then
+      recover_error("invalid archived provider queue")
+    end
+  end
+  for index = 1, #original do
+    local name = original[index]
+    if not name then recover_error("incomplete archived provider queue") end
+    counts[name] = (counts[name] or 0) + 1
+  end
+  local restored = 0
+  for _, item in ipairs(work) do
+    local count = counts[item.stage.holder] or 0
+    if count ~= item.previous.queued then recover_error("archived worker queue occurrences changed") end
+    restored = restored + count
+  end
+  if restored == 0 then return end
+  if #base.frame.queue + restored > 1000 then recover_error("restored provider queue is too large") end
+  requeueable(base.force, base.frame, false, true)
+  local queue = provider_archive.resume_queue(original, base.frame.queue, replacements, base.frame.current_progress > 0)
+  local ready = {}
+  for _, name in ipairs(queue) do
+    local item = by_source[name]
+    if item then
+      if not item.previous.enabled then recover_error("archived provider research was disabled: " .. name) end
+      for _, prerequisite in pairs(item.destination.technology.prerequisites or {}) do
+        local earlier = by_source[prerequisite.name]
+        if prerequisite.researched ~= true and not (earlier and earlier.holder.researched) and not ready[prerequisite.name] then
+          recover_error("archived provider prerequisite is unavailable: " .. name)
+        end
+      end
+      if item.stage.count then ready[name] = true end
+    end
+  end
+  local head_progress
+  if queue[1] ~= base.frame.current then
+    local head = by_source[queue[1]]
+    if not head then recover_error("archived provider queue changed unrelated current research") end
+    head_progress = head.previous.paid
+  end
+  return queue, head_progress
+end
+
+plan_provider_archive_resume = function(event, route, owned)
+  local saved, quota = storage[ARCHIVE_KEY], checked_state()
+  local profile = archived_profile(saved, owned)
+  local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[profile.provider]
+  if saved.phase ~= "suspended" or script.active_mods[profile.provider] ~= profile.version or not same_family_engine_patch(event)
+      or type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= profile.version
+      or not quota or quota.kind ~= "prepared" or quota.phase ~= "archived"
+      or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
+    recover_error("provider resumption requires the original provider, engine and worker settings")
+  end
+  local current, contract = finite_provider_contract(route)
+  if not same_fact(current, owned.current) or contract ~= quota.contract then
+    recover_error("provider resumption changed native research ownership")
+  end
+  local replacements, modifiers, items, seen = {}, {}, {}, {}
+  for _, stage in ipairs(profile.stages) do
+    if archive_terms(profile, stage) ~= saved.contract[stage.source] then
+      recover_error("provider resumption changed historical science or price: " .. stage.source)
+    end
+    replacements[stage.holder] = stage.source
+    modifiers[stage.source] = native_prototype(stage.source).effects[1].modifier
+  end
+  for _, base in ipairs(prepared_current(quota, quota.current, true)) do
+    local force = base.force
+    local prior = saved_archive_force(saved, force.index)
+    local head, tail, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force, true)
+    if head.next_level ~= prior.public_next or head.allowance ~= 0 or tail.next_level ~= 4 or tail.allowance ~= 0
+        or gate_paid(gate) ~= prior.head_paid then recover_error("provider resumption changed default worker work") end
+    local item = {force=force, base=base, head=head, tail=tail, prior=prior, bonus=native_bonus(force), work={}}
+    local by_source = {}
+    for _, stage in ipairs(profile.stages) do
+      local previous = saved_archive_work(prior, stage)
+      local destination, holder = snapshot(force, stage.source), snapshot(force, stage.holder)
+      local debit = force.technologies[stage.debit]
+      if destination.next_level ~= stage.first or destination.researched or destination.allowance ~= 0
+          or holder.occurrences ~= 0 or holder.next_level ~= stage.first + previous.earned
+          or holder.count ~= previous.price or holder.saved_progress ~= previous.paid or holder.visible
+          or not debit or debit.level ~= 1 + previous.earned or debit.researched or debit.saved_progress ~= 0 then
+        recover_error("provider resumption did not find its suspended work and pristine successor: " .. stage.source)
+      end
+      local work = {stage=stage, previous=previous, destination=destination, holder=holder, debit=debit}
+      item.work[#item.work + 1], by_source[stage.source] = work, work
+      item.bonus = item.bonus + modifiers[stage.source] * previous.earned
+    end
+    item.queue, item.head_progress = provider_resume_queue(prior, base, item.work, replacements, by_source)
+    seen[force.index] = true
+    items[#items + 1] = item
+  end
+  for index in pairs(saved.forces) do if not seen[index] then recover_error("suspended provider archive force is missing") end end
+  return {kind="provider-archive-resume", event=clone(event), route=copy(route), owned=owned, quota=quota, saved=saved, items=items}
+end
+
+local function resume_provider_force(item)
+  local force = item.force
+  local writer, queue_writer = default_mutating_force, owned_queue_force
+  default_mutating_force, owned_queue_force = force.index, force.index
+  local ok, message = pcall(function()
+    local public = item.head.technology
+    if item.prior.public_enabled ~= nil then public.enabled = item.prior.public_enabled end
+    if item.prior.public_visible ~= nil then public.visible_when_disabled = item.prior.public_visible end
+    for _, row in ipairs(item.work) do
+      local stage, previous = row.stage, row.previous
+      local destination, holder, debit = row.destination.technology, row.holder.technology, row.debit
+      if stage.count then
+        destination.researched, holder.researched = row.holder.researched, false
+      else
+        destination.level, holder.level = row.holder.next_level, stage.first
+      end
+      destination.saved_progress, holder.saved_progress = previous.paid, 0
+      destination.enabled, destination.visible_when_disabled = previous.enabled, previous.visible
+      holder.enabled, holder.visible_when_disabled = false, false
+      debit.level, debit.enabled, debit.visible_when_disabled = 1, false, false
+    end
+    if item.queue then assign_queue(force, item.base.frame, item.queue, nil, item.head_progress) end
+    item.tail.technology.enabled, force.technologies[recovery.head_id].enabled = false, false
+    if item.base.retire then item.base.frame.technology.enabled = false end
+    for _, row in ipairs(item.work) do
+      local actual = snapshot(force, row.stage.source)
+      local paid = actual.current == row.stage.source and actual.current_progress or actual.saved_progress
+      if actual.next_level ~= row.holder.next_level or actual.count ~= row.previous.price
+          or paid ~= row.previous.paid or actual.occurrences ~= row.previous.queued
+          or actual.enabled ~= row.previous.enabled or actual.visible ~= row.previous.visible then
+        recover_error("resumption changed retained provider work: " .. row.stage.source)
+      end
+    end
+    if native_bonus(force) ~= item.bonus then recover_error("resumption changed earned worker cargo") end
+  end)
+  default_mutating_force, owned_queue_force = writer, queue_writer
+  if not ok then error(message, 0) end
+end
+
+apply_provider_archive_resume = function(plan)
+  local current = plan_provider_archive_resume(plan.event, plan.route, owner_record())
+  if current.saved ~= plan.saved or current.owned ~= plan.owned or current.quota ~= plan.quota then
+    recover_error("staged provider authority changed before resumption")
+  end
+  local quota = clone(current.quota)
+  for _, item in ipairs(current.items) do resume_provider_force(item) end
+  quota.phase, quota.current = "provider", clone(current.owned.current)
+  storage[KEY], storage[ARCHIVE_KEY] = quota, nil
   reconnect(quota)
   return true
 end

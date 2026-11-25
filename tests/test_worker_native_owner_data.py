@@ -524,6 +524,28 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                 self.assertFalse(current[debit].enabled)
                 self.assertFalse(fallback[debit].enabled)
 
+    def test_provider_resumption_keeps_suspended_work_and_live_queue_intents(self):
+        self.stage().execute('''
+          local resume = require("research.worker_storage_archive").resume_queue
+          local held = {H5="C5", H6="C6"}
+          local cases = {
+            {{"H6", "P", "other"}, {"P", "other"}, false, {"C6", "P", "other"}},
+            {{"H6", "P", "other"}, {"P", "other"}, true, {"P", "C6", "other"}},
+            {{"first", "H6", "other", "H5"}, {"other", "new"}, false, {"C6", "other", "C5", "new"}},
+            {{"other", "H5"}, {"other", "new"}, false, {"other", "C5", "new"}},
+            {{"H6", "P", "other", "H5"}, {"new", "other", "P"}, true, {"new", "other", "P", "C6", "C5"}},
+            {{"P", "H6", "P", "H5"}, {"P", "new"}, false, {"P", "new", "C6", "C5"}},
+            {{"P", "H6", "H6"}, {}, false, {"C6", "C6"}},
+            {{"H5", "H6"}, {"new"}, true, {"new", "C5", "C6"}},
+          }
+          for _, case in ipairs(cases) do
+            local old, live = deep(case[1]), deep(case[2])
+            same(resume(case[1], case[2], held, case[3]), case[4])
+            same(case[1], old)
+            same(case[2], live)
+          end
+        ''')
+
     def test_science_policy_applies_to_tail_but_never_bookkeeping_gate(self):
         for target in ("f200", "f210"):
             for sif in (False, True):

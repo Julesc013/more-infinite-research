@@ -411,8 +411,8 @@ local function on_configuration_changed(event)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
   local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
-  local worker_owns_quota = worker_prepared_default or
-    worker_default_plan and worker_default_plan.kind == "provider-archive-removal"
+  local worker_owns_quota = worker_prepared_default or worker_default_plan and
+    (worker_default_plan.kind == "provider-archive-removal" or worker_default_plan.kind == "provider-archive-resume")
   -- The default-owner plan authenticates and consumes this complete prepared
   -- witness. Do not issue a second legacy plan that could reinstall its quota.
   local worker_storage_plan = not worker_owns_quota and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
