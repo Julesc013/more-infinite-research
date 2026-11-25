@@ -398,9 +398,10 @@ class K2BaseCatalogueTests(unittest.TestCase):
         emitted_rows = {name: _plain(self.lua, actual[name]) for name in emitted_names}
         private_worker = {"mir-worker-storage-preservation-4": expected_private_worker_row()}
         split_worker = expected_worker_default_split_rows(rows["worker-robots-storage-4"])
-        gate = split_worker.pop("mir-worker-storage-head-4")
-        gate["prerequisites"] = {}  # Empty Lua array in this host-table view.
-        private_worker[gate["name"]] = gate
+        for name in ("mir-worker-storage-head-4", "mir-worker-storage-provider-credit-4"):
+            carrier = split_worker.pop(name)
+            carrier["prerequisites"] = {}  # Empty Lua array in this host-table view.
+            private_worker[name] = carrier
         rows.update(split_worker)
         actual_public, actual_credit = split_public_and_native_credit_rows(emitted_rows, private_worker)
         expected_credit = native_credit_carrier_rows(

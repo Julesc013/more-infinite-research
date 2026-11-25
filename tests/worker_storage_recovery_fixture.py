@@ -21,6 +21,14 @@ def expected_private_worker_row(inactive_science=None, space_age=False):
         row["unit"] = {"count": 1, "time": 1, "ingredients": [[inactive_science, 1]]}
     return row
 
+def expected_provider_credit_row():
+    """The disabled native cargo carrier, over the independent Base row."""
+    row = expected_private_worker_row("automation-science-pack")
+    row.update(name="mir-worker-storage-provider-credit-4", ignore_tech_cost_multiplier=True,
+               effects=[{"type": "worker-robot-storage", "modifier": 1}])
+    return row
+
+
 MINIMAL_NATIVE_FACTS = r'''
 function install_worker_recovery_facts(worlds)
   local ID="mir-worker-storage-preservation-4"

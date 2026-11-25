@@ -248,7 +248,7 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
         for field in ("enabled", "visible_when_disabled", "order"):
             canonical.pop(field)
         for name, expected in expected_worker_default_split_rows(canonical).items():
-            if name == "mir-worker-storage-head-4":
+            if name in ("mir-worker-storage-head-4", "mir-worker-storage-provider-credit-4"):
                 expected["prerequisites"] = {}  # Empty Lua array in this host view.
             self.assertEqual(emitted.pop(name), expected)
         public = verified_public_rows(

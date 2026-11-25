@@ -109,6 +109,16 @@ function Get-MIRGunmetalDispatcherPolicy {
   $resultRoot = Resolve-MIRGunmetalDispatcherPath -Path (Assert-MIRGunmetalDispatcherText $policy.allowed_result_root '[mir-gunmetal-dispatcher-policy-result-root]') -Directory -MayNotExist
   $unit = Assert-MIRGunmetalDispatcherText $policy.native_unit '[mir-gunmetal-dispatcher-policy-unit]' 96
   if ($unit -cne (Get-MIRGunmetalDispatcherExpectedNativeUnit)) { throw '[mir-gunmetal-dispatcher-policy-unit]' }
+  $sharedLibraryRoots = @()
+  if ($policy.PSObject.Properties['shared_library_roots']) {
+    if ($policy.shared_library_roots -isnot [array]) {
+      throw '[mir-gunmetal-dispatcher-policy-shared-library-roots]'
+    }
+    $sharedLibraryRoots = @(foreach ($root in $policy.shared_library_roots) {
+      $value = Assert-MIRGunmetalDispatcherText $root '[mir-gunmetal-dispatcher-policy-shared-library-roots]'
+      Resolve-MIRGunmetalDispatcherPath -Path $value -Directory -MayNotExist
+    })
+  }
   $approval = $policy.approval
   if ($null -eq $approval -or @($approval.PSObject.Properties).Count -lt 10) {
     throw '[mir-gunmetal-dispatcher-policy-approval]'
@@ -162,6 +172,7 @@ function Get-MIRGunmetalDispatcherPolicy {
     spool = $spool
     checkout = $checkout
     result_root = $resultRoot
+    shared_library_roots = $sharedLibraryRoots
     unit = $unit
     approval = [pscustomobject][ordered]@{
       request_id = $id
@@ -344,6 +355,29 @@ function Invoke-MIRGunmetalDispatcherLauncher {
   param([Parameter(Mandatory)][string]$Path)
   $lines=@(& /usr/bin/bash $Path 2>&1)
   return [pscustomobject]@{exit_code=$LASTEXITCODE;lines=@($lines|ForEach-Object{[string]$_})}
+}
+
+function Test-MIRGunmetalDispatcherFactorioActive {
+  $processes = @(Get-Process -Name factorio -ErrorAction SilentlyContinue)
+  foreach ($process in $processes) { $process.Dispose() }
+  return $processes.Count -gt 0
+}
+
+function Get-MIRGunmetalDispatcherNativeBlocker {
+  param([string[]]$SharedLibraryRoots)
+
+  if (Test-MIRGunmetalDispatcherFactorioActive) { return 'factorio-active' }
+  foreach ($root in $SharedLibraryRoots) {
+    try {
+      $path = Resolve-MIRGunmetalDispatcherPath -Path (Join-Path $root '.mir-library.lock') -Root $root -MayNotExist
+      $probe = [IO.File]::Open($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::None)
+      $probe.Dispose()
+    } catch [IO.FileNotFoundException] {
+      # Opening an unused library for observation must not create its lock.
+    } catch {
+      return 'shared-library-lease'
+    }
+  }
 }
 
 function Get-MIRGunmetalDispatcherUnit {
@@ -692,7 +726,7 @@ function Reconcile-MIRGunmetalDispatcherRunning {
 }
 
 function Start-MIRGunmetalDispatcherApprovedSubmission {
-  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot)
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot,[string[]]$SharedLibraryRoots)
   if ($Snapshot.request.request_id -cne $Policy.approval.request_id) {
     throw '[mir-gunmetal-dispatcher-submission-not-approved]'
   }
@@ -731,6 +765,16 @@ function Start-MIRGunmetalDispatcherApprovedSubmission {
       side_effects = 'pending-retained'
       request_id = $record.request_id
       unit = $before
+    }
+  }
+
+  $blocker = Get-MIRGunmetalDispatcherNativeBlocker -SharedLibraryRoots $SharedLibraryRoots
+  if ($blocker) {
+    return [pscustomobject]@{
+      status = 'waiting-for-native-slot'
+      side_effects = 'pending-retained'
+      request_id = $record.request_id
+      reason = $blocker
     }
   }
 
@@ -881,7 +925,7 @@ function Invoke-MIRGunmetalDispatcherConsume {
         return [pscustomobject]@{status='held-after-adverse-terminal';side_effects='state-only'}
       }
     }
-    return (Start-MIRGunmetalDispatcherApprovedSubmission -Policy $pending.snapshot.policy -Snapshot $pending.snapshot)
+    return (Start-MIRGunmetalDispatcherApprovedSubmission -Policy $pending.snapshot.policy -Snapshot $pending.snapshot -SharedLibraryRoots $Policy.shared_library_roots)
   } finally {$lock.Dispose()}
 }
 

@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 import unittest
 from native_credit_oracle import legacy_cannon_credit_rows, legacy_module_credit_rows, native_credit_carrier_rows
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 from lua_table_values import from_lua as _plain, to_lua as _lua_value
 
 
@@ -115,6 +115,8 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         )
         legacy_names = {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
         worker_id = "mir-worker-storage-preservation-4"
+        credit_id = "mir-worker-storage-provider-credit-4"
+        self.assertEqual(emitted[credit_id], expected_provider_credit_row())
         worker = emitted[worker_id]
         self.assertEqual(worker, expected_private_worker_row("automation-science-pack"))
         raw = self.context["cases"][case]["raw"]
@@ -125,7 +127,7 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         legacy = {name: row for name, row in emitted.items() if name in legacy_names}
         public = {name: row for name, row in emitted.items()
                   if not name.startswith(("mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-"))
-                  and name not in legacy_names and name != worker_id}
+                  and name not in legacy_names and name not in (worker_id, credit_id)}
         carriers = {name: row for name, row in emitted.items() if name.startswith("mir-native-credit-")}
         module_holders = {name: row for name, row in emitted.items() if name.startswith("mir-legacy-module-credit-")}
         cannon_holders = {name: row for name, row in emitted.items() if name.startswith("mir-legacy-cannon-credit-")}

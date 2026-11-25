@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from worker_storage_recovery_fixture import expected_private_worker_row
+from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES, current_native_credit_rows,
@@ -182,7 +182,8 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         if "cannon-shell" not in raw.get("ammo-category", {}):
             credits.pop("mir-legacy-cannon-credit-rocket-shooting-speed", None)
         return {**self.private_mains, **credits,
-                "mir-worker-storage-preservation-4": expected_private_worker_row("automation-science-pack")}
+                "mir-worker-storage-preservation-4": expected_private_worker_row("automation-science-pack"),
+                "mir-worker-storage-provider-credit-4": expected_provider_credit_row()}
 
     def assert_private_rows(self, emitted, public, raw):
         expected = self.expected_private_rows(public, raw)

@@ -2,6 +2,16 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.24] - 2026-11-25
+
+### Bugfixes
+
+- Preserve active and parked worker cargo research when Factorio replaces the research queue during a supported upgrade.
+- Keep the recorded source engine version for worker cargo upgrades when the installed MIR package raises its minimum Factorio version.
+- Preserve earned cargo, prices and unfinished research through prepared Planet Ferrum removal and reinstall on Factorio 2.1.25.
+- Keep paid worker research and its queue position when a reinstalled provider's prerequisite is unavailable. Resume it once the prerequisite returns.
+- Read integer startup options without rounding and skip Research Library subscription work for unrelated interface actions.
+
 ## [5.0.23] - 2026-11-23
 
 ### Bugfixes

@@ -348,6 +348,7 @@ class LibraryModelTests(unittest.TestCase):
           expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
           expected["mir-worker-storage-preservation-4"] = true
           expected["mir-worker-storage-head-4"] = true
+          expected["mir-worker-storage-provider-credit-4"] = true
           expected["mir-k2-imersite-staged-state-1"] = true
           expected["mir-k2-imersite-continuation-state-4"] = true
           expected["mir-native-credit-research_electric_shooting_speed-electric-positive"] = true
@@ -360,7 +361,7 @@ class LibraryModelTests(unittest.TestCase):
             assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
             count = count + 1
           end
-          assert(count == 12)
+          assert(count == 13)
           for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
           local changed = "mir-legacy-module-credit-speed-module"
           first[changed] = false
@@ -808,6 +809,7 @@ class LibraryModelTests(unittest.TestCase):
           local foreign = technology("foreign-hidden-technology", {order = "a[foreign]"})
           foreign.prototype.hidden = true
           local ids = {
+            "mir-worker-storage-provider-credit-4",
             "mir-legacy-module-credit-speed-module",
             "mir-legacy-module-credit-productivity-module",
             "mir-legacy-module-credit-efficiency-module",

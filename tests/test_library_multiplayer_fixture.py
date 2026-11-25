@@ -1675,9 +1675,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
           $earlier523='C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
           $frozen523='2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
+          $promotion523='72F07C0C6B6BFF2D009ECABE3A25FAB0C61BF559D31D308B98C75D37BED7BEB2'
+          $prerequisite523='43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
           $players=@(
+            @{version='5.0.20023';sha256=$prerequisite523}
             @{version='5.0.20023';sha256=$earlier523}
             @{version='5.0.20023';sha256=$frozen523}
+            @{version='5.0.20023';sha256=$promotion523}
             @{version='5.0.20005';sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'}
           )
           function Refuse($profile,$actualEngine,$expected) {
@@ -1697,6 +1701,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           }
           Refuse (Profile '5.0.20023' $earlier523) $engine $frozen523
           Refuse (Profile '5.0.20023' $frozen523) $engine $earlier523
+          Refuse (Profile '5.0.20023' $promotion523) $engine $frozen523
+          Refuse (Profile '5.0.20023' $prerequisite523) $engine $promotion523
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],

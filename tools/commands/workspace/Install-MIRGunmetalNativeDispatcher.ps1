@@ -92,7 +92,7 @@ WantedBy=default.target
 Description=Reconcile MIR reviewed native terminal records
 
 [Timer]
-OnBootSec=1min
+OnActiveSec=1min
 OnUnitInactiveSec=1min
 AccuracySec=15s
 Persistent=true
