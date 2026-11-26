@@ -80,6 +80,33 @@ class LibraryTests(unittest.TestCase):
           assert(width_writes==1,"new Library window applied frame width "..width_writes.." times")
         ''')
 
+    def test_render_populates_family_choices_on_new_and_retained_controls(self):
+        self.lua.execute(r'''
+          boot()
+          library_declarations={{id=gear.name, name=gear.name, family="research_example"}}
+          local initial_count
+          local function observe_children(parent)
+            local native_add=parent.add
+            parent.add=function(spec)
+              local child=native_add(spec)
+              if spec.name=="mir_library_family" then
+                initial_count=#spec.items
+              else
+                observe_children(child)
+              end
+              return child
+            end
+          end
+          observe_children(screen)
+          local root=library.open(player,{tab="debug"})
+          local grid=research_filters(root).mir_library_filter_grid
+          local family=grid.mir_library_family_field.mir_library_family
+          assert(initial_count==0,"Family choices must be applied by render")
+          assert(family.items[4]==gear.localised_name)
+          gear.localised_name="Updated family"
+          assert(library.open(player)==root and family.items[4]==gear.localised_name)
+        ''')
+
     def test_title_caption_and_handle_share_the_owned_header_drag_target(self):
         self.lua.execute(r'''
           boot()

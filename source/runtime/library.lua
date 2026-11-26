@@ -2322,7 +2322,7 @@ local function sync_titlebar(frame, width)
   end
 end
 
-local function create_filter_grid(filters, player, view, width)
+local function create_filter_grid(filters, view, width)
   local columns, control_width = library_layout.filter_layout(width)
   local grid = add(filters, {type = "table", name = PREFIX .. "filter_grid", column_count = columns})
   grid.style.width, grid.style.horizontal_spacing = math.max(1, width - 64), library_layout.section_gap
@@ -2336,8 +2336,7 @@ local function create_filter_grid(filters, player, view, width)
       selected_index = selected, tooltip = {caption}})
     control.style.width, control.style.height = control_width, library_layout.control_height
   end
-  local families = family_values()
-  choice("family", "mir-browser.filter-scope", family_items(families, player), family_index(families, view.family) or 1)
+  choice("family", "mir-browser.filter-scope", {}, 0)
   choice("status", "mir-browser.filter-status", {{"mir-browser.status-all"}, {"mir-browser.status-ready"},
     {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, view.status)
   choice("mode", "mir-browser.filter-level", {{"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, view.mode)
@@ -2348,7 +2347,7 @@ local function create_filter_grid(filters, player, view, width)
   return grid
 end
 
-local function create_filters(frame, player, view, width)
+local function create_filters(frame, view, width)
   local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "vertical"})
   filters.style.width, filters.style.vertical_spacing = math.max(1, width - 64), library_layout.control_gap
   local search = add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
@@ -2356,7 +2355,7 @@ local function create_filters(frame, player, view, width)
   local query = add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
     tooltip = {"mir-browser.search-label"}})
   query.style.width, query.style.height = math.max(1, width - 64), library_layout.control_height
-  create_filter_grid(filters, player, view, width)
+  create_filter_grid(filters, view, width)
   return filters
 end
 
@@ -2372,7 +2371,7 @@ local function create_tabs(frame, player, view)
       name = PREFIX .. (tab_name == "research" and "research_page" or tab_name .. "_content"),
       horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
     if tab_name == "research" then
-      create_filters(page, player, view, width)
+      create_filters(page, view, width)
       local kind = research_content_type(player, view)
       local spec = {type = kind, name = PREFIX .. "research_content",
         horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
@@ -2421,7 +2420,7 @@ local function sync_frame_layout(player, view, frame)
       -- column_count is native read-only. Keep the query/caret and rebuild
       -- only this small container, restoring choices from the retained view.
       grid.destroy()
-      grid = create_filter_grid(filters, player, view, width)
+      grid = create_filter_grid(filters, view, width)
     end
     if valid(grid) then grid.style.width = math.max(1, width - 64) end
     for _, name in ipairs({"family", "status", "mode", "sort", "visibility"}) do
