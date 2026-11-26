@@ -179,8 +179,9 @@ function Complete-MIROwnedProcessMemoryProcess {
         throw 'peak-process-identity'
       }
       $workingPeak = [int64]$process.PeakWorkingSet64
-      $pagedPeak = [int64]$process.PeakPagedMemorySize64
-      if ($workingPeak -le 0 -or $pagedPeak -lt 0) { throw 'peak-counter-unavailable' }
+      # Linux ProcessInfo exposes the resident high-water mark but has no paged peak.
+      $pagedPeak = if (-not $IsLinux) { [int64]$process.PeakPagedMemorySize64 }
+      if ($workingPeak -le 0 -or ($null -ne $pagedPeak -and $pagedPeak -lt 0)) { throw 'peak-counter-unavailable' }
       # Read the OS high-water values at the existing close boundary. This
       # does not insert a sub-250ms sample into the periodic observations.
       $Registration.lifetime_peak_counters = [pscustomobject][ordered]@{
@@ -249,6 +250,11 @@ function Get-MIROwnedProcessMemoryObservationReceipt {
       working_set_peak_bytes = 'System.Diagnostics.Process.PeakWorkingSet64'
       paged_memory_peak_bytes = 'System.Diagnostics.Process.PeakPagedMemorySize64;not sampled private_bytes'
       changes_periodic_observations = $false
+    }
+    if ($IsLinux) {
+      $receipt.lifetime_peak_observer.platform = 'linux'
+      $receipt.lifetime_peak_observer.paged_memory_peak_bytes = $null
+      $receipt.lifetime_peak_observer.sampled_private_bytes = 'procfs VmData via System.Diagnostics.Process.PrivateMemorySize64'
     }
     $receipt.status = if ($Sampler.incomplete) { 'incomplete-observation' } else { 'complete-observation' }
     $receipt.incomplete_reasons = @($Sampler.incomplete_reasons)
