@@ -2574,9 +2574,9 @@ function M.open(player, options)
   if valid(existing) and existing ~= owned_root(player) then return nil end
   local view = view_for(player.index)
   options = type(options) == "table" and options or {}
-  local reset_page = false
+  local reset_research_position = false
   if options.tab == "availability" then
-    view.tab, view.visibility, reset_page = "research", 3, true
+    view.tab, view.visibility, reset_research_position = "research", 3, true
   elseif TAB_INDEX[options.tab] then
     view.tab = options.tab
   end
@@ -2585,53 +2585,53 @@ function M.open(player, options)
   end
   -- The shipped remote browser's search follows its selected or retained tab.
   -- Keep the explicit internal query fields independent from this legacy input.
-  if type(options.search) == "string" then
+  local legacy_search = type(options.search) == "string"
+  if legacy_search then
     if view.tab == "settings" then
       view.settings_query, view.setting_selected = text(options.search), nil
     else
-      view.query = text(options.search)
+      view.query, reset_research_position = text(options.search), true
     end
-    reset_page = true
   end
   if type(options.settings_search) == "string" then
     view.settings_query, view.setting_selected = text(options.settings_search), nil
   end
   if type(options.query) == "string" then
-    view.query, reset_page = text(options.query), true
+    view.query, reset_research_position = text(options.query), true
   end
   local family = family_option(options.family)
   if family then
-    view.family, reset_page = family, true
+    view.family, reset_research_position = family, true
   end
   local mode = whole_option(options.mode, 1, 3)
-  if mode then view.mode, reset_page = mode, true end
+  if mode then view.mode, reset_research_position = mode, true end
   local status = status_option(options.status)
-  if status then view.status, reset_page = status, true end
+  if status then view.status, reset_research_position = status, true end
   local visibility = visibility_option(options.visibility)
-  if visibility then view.visibility, reset_page = visibility, true end
+  if visibility then view.visibility, reset_research_position = visibility, true end
   local sort = sort_option(options.sort)
   if sort then
-    view.sort, reset_page = sort, true
+    view.sort, reset_research_position = sort, true
     if sort == "progression" or sort == "native" then view.stable_sort = sort end
   end
   local selected = technology_id(options.selected)
   local select_technology = selected and known_technology(player, selected)
   if select_technology then
-    view.selected, reset_page = selected, true
+    view.selected, reset_research_position = selected, true
   end
   if options.hidden ~= nil then
     local hidden = hidden_option(player, options.hidden)
-    if hidden then view.hidden, reset_page = hidden, true end
+    if hidden then view.hidden, reset_research_position = hidden, true end
   end
   local page = whole_option(options.page, 1, MAX_PAGE)
   if page then
     -- The current list remains continuous, as the shipped browser's own GUI
     -- did.  Retaining a valid page preserves remote and saved-view semantics.
     view.page = page
-  elseif reset_page then
+  elseif reset_research_position or legacy_search then
     view.page = 1
   end
-  if reset_page then view.scroll, view.scroll_to_selection = 1, select_technology and true or nil end
+  if reset_research_position then view.scroll, view.scroll_to_selection = 1, select_technology and true or nil end
   local frame = render(player, view)
   -- Factorio routes Esc/E to this target. Only an explicit open may claim
   -- focus; translation/native refreshes must not displace another GUI.
