@@ -95,12 +95,14 @@ end
 
 function M.register_source()
   script.on_load(watch_prepared_copy)
-  commands.add_command("mir-worker-storage-recovery", "Use prepare before upgrading this save to Factorio 2.0, or cancel.", function(command)
+  local help = "Administrator or server. Usage: /mir-worker-storage-recovery <prepare|cancel>."
+    .. " Prepare and save a paused copy before opening it in Factorio 2.0."
+  commands.add_command("mir-worker-storage-recovery", help, function(command)
     local player = command.player_index and game.get_player(command.player_index)
-    if command.player_index and not (player and player.admin) then return end
     local function say(message)
       if player then player.print(message) else log("[MIR worker recovery] " .. message) end
     end
+    if command.player_index and not (player and player.admin) then say(help); return end
     if command.parameter == "cancel" then
       local saved = global[M.key]
       if not saved then say("There is no worker engine upgrade preparation to cancel."); return end
@@ -118,7 +120,7 @@ function M.register_source()
       end
       say("Worker research recorded. Save this paused copy under a new name before opening it in Factorio 2.0.")
     else
-      say("Use /mir-worker-storage-recovery prepare or /mir-worker-storage-recovery cancel.")
+      say(help)
     end
   end)
 end
@@ -162,12 +164,13 @@ function M.register_legacy_preparation(original)
     script.on_configuration_changed(watch_addon_preparation)
   end
   local operation, identity = legacy and "prepare" or "prepare-addon-change", legacy and WORKER or ORDINARY
-  commands.add_command("mir-prepare-legacy-worker", "Prepare the verified worker research copy, or cancel.", function(command)
+  local help = "Administrator or server. Usage: /mir-prepare-legacy-worker <" .. operation .. "|cancel>."
+  commands.add_command("mir-prepare-legacy-worker", help, function(command)
     local player = command.player_index and game.get_player(command.player_index)
-    if command.player_index and not (player and player.admin) then return end
     local function say(message)
       if player then player.print(message) else log("[MIR worker preparation] " .. message) end
     end
+    if command.player_index and not (player and player.admin) then say(help); return end
     local saved = storage[M.key]
     if command.parameter == "cancel" and saved and saved.mir == version then
       game.tick_paused, storage[M.key] = saved.was_paused, nil
@@ -200,7 +203,7 @@ function M.register_legacy_preparation(original)
       if not legacy then watch_addon_preparation() end
       say("Worker research recorded. Save this paused copy under a new name and exit.")
     else
-      say("Use /mir-prepare-legacy-worker " .. operation .. " or /mir-prepare-legacy-worker cancel.")
+      say(help)
     end
   end)
 end
