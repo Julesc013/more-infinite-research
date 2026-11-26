@@ -3042,6 +3042,32 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
                   assert(storage.mir_worker_storage_route.cap==8 and storage.mir_worker_storage_route.family_enabled)
                 ''')
 
+    def test_worker_setting_fields_reject_incomplete_or_nonfinite_contracts_before_writes(self):
+        cases = (
+            ('current.enabled = 1', 'current worker enable configuration is invalid'),
+            ('current.research_time = 0/0', 'current worker startup configuration is invalid'),
+            ('saved.enabled = 1', 'saved worker enable configuration is invalid'),
+            ('saved.research_time = math.huge', 'saved worker startup configuration is invalid'),
+            ('saved.growth_factor = nil', 'saved worker startup configuration is incomplete'),
+            ('saved.other_mod_setting = 1', 'saved worker startup configuration is invalid'),
+        )
+        for change, reason in cases:
+            with self.subTest(change=change):
+                lua = self.world()
+                lua.globals().expected_reason = reason
+                lua.execute(r'''
+                  full_source(1,true)
+                  local owner=storage[OWNER_KEY];local saved=owner.settings
+                  local current=require("runtime.configuration").streams["worker-robots-storage"]
+                ''' + change + r'''
+                  local before=all_frames();local history_record=storage.mir_worker_storage_route;writes=0
+                  local event = {mod_changes={}, mod_startup_settings_changed=false}
+                  local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and tostring(message):find(expected_reason,1,true), tostring(message))
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==owner
+                    and storage.mir_worker_storage_route==history_record)
+                ''')
+
     def test_missing_or_nonboolean_startup_flags_refuse_with_context_before_writes(self):
         for value, label in (("nil", "unknown"), ('"true"', "true"), ('"false"', "false"), ("1", "1")):
             lua=self.world();lua.globals().label=label
