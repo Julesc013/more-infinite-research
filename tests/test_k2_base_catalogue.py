@@ -6,7 +6,7 @@ import gzip
 import json
 from pathlib import Path
 from catalogue_presentation import expected_base_presentation_rows
-from historical_sources import read_captured_source, read_published_source
+from historical_sources import MIR5_SETTINGS_CAPTURE, read_captured_source, read_published_source
 from repository_paths import reference_path
 import sys
 import unittest
@@ -62,9 +62,9 @@ class K2BaseCatalogueTests(unittest.TestCase):
         for source in (cls.facts["authored_selector_evidence"], cls.facts["direct_effect_evidence"]):
             read_published_source(ROOT, source["path"], source["sha256"])
         catalogue_source = cls.facts["catalogue_evidence"]
-        catalogue_revision = "a14dad17b7765122a93578e9f85e307f42f717c2"
+        # The pinned settings capture contains the same original catalogue blobs.
         for name in ("base", "direct"):
-            read_captured_source(ROOT, catalogue_revision, catalogue_source[f"{name}_path"],
+            read_captured_source(ROOT, MIR5_SETTINGS_CAPTURE, catalogue_source[f"{name}_path"],
                                  catalogue_source[f"{name}_sha256"])
         if cls.f210_facts["engine"] != {
                 "target": "f210", "version": "2.1.23",
