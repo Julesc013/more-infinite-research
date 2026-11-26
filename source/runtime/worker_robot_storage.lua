@@ -1362,7 +1362,7 @@ local function head_gate_contract(source)
   end
 end
 
-local function gate_frame(force, configuration, queue_frame)
+local function gate_frame(force, queue_frame, configuration)
   local id = recovery.head_id
   local gate = force.technologies[id]
   -- Configuration can re-enable an already-paid native infinite level5 even
@@ -1374,18 +1374,8 @@ local function gate_frame(force, configuration, queue_frame)
       or gate.visible_when_disabled ~= false or gate.saved_progress ~= 0 then
     recover_error("default head debit native state is invalid")
   end
-  local current, queued
-  if queue_frame then
-    current, queued = queue_frame.current, queue_frame.queued_saved[id] ~= nil
-  else
-    local research = force.current_research
-    current = research and research.name
-    for _, entry in ipairs(observed_queue(force)) do
-      if entry.name == id then queued = true; break end
-    end
-  end
-  if current == id then recover_error("head debit cannot be current research") end
-  if queued then recover_error("head debit cannot be queued research") end
+  if queue_frame.current == id then recover_error("head debit cannot be current research") end
+  if queue_frame.queued_saved[id] ~= nil then recover_error("head debit cannot be queued research") end
   return gate
 end
 
@@ -1549,9 +1539,9 @@ end
 -- A full-owner finish never transfers work. Its native queue/current may
 -- still be in the callback representation, including progress1. Capture it
 -- exactly for readback, without applying transfer/settled-queue assumptions.
-local function default_frame(force, id, finished)
-  if not finished then return snapshot(force, id) end
-  local frame = observe_worker(force, id)
+local function default_frame(force, id, finished, queue_frame)
+  if not finished then return snapshot(force, id, queue_frame) end
+  local frame = observe_worker(force, id, queue_frame)
   local value = frame.current_progress
   if type(value) ~= "number" or value ~= value or value < 0 or value > 1 then
     recover_error("invalid full default completion progress")
@@ -1591,7 +1581,7 @@ local function automatic_owner_contract_has_invested_work(owned)
       return true
     end
     if legacy_id then
-      local legacy = snapshot(force, legacy_id)
+      local legacy = snapshot(force, legacy_id, frame)
       if default_owner_frame_has_invested_work(legacy, legacy_id) then return true end
     end
   end
@@ -1606,20 +1596,22 @@ local function native_bonus(force)
   return value -- postcondition only; never used to infer earned levels.
 end
 
-local function require_current_transfer(plan, item, finished, allow_enabled_gate, ...)
+local function require_current_transfer(plan, item, finished, allow_enabled_gate, source, ...)
   -- A previous force's setters can run callbacks before the next force's first write.
   local force = item.force
-  local gate = gate_frame(force, allow_enabled_gate)
+  local observed = default_frame(force, source.technology.name, finished)
+  local gate = gate_frame(force, observed, allow_enabled_gate)
   local message = "native worker work changed during another force's transfer; reload the original copy"
   if storage[OWNER_KEY] ~= plan.prior_owner or storage[KEY] ~= plan.prior_state
       or gate_paid(gate) ~= item.gate_paid or gate.enabled ~= item.gate_enabled
-      or native_bonus(force) ~= (item.initial_bonus or item.bonus) then
+      or native_bonus(force) ~= (item.initial_bonus or item.bonus)
+      or not equal_plain(frame_values(source), frame_values(observed)) then
     recover_error(message)
   end
   for index = 1, select("#", ...) do
     local expected = select(index, ...)
     if expected then
-      local current = default_frame(force, expected.technology.name, finished)
+      local current = default_frame(force, expected.technology.name, finished, observed)
       if not equal_plain(frame_values(expected), frame_values(current)) then recover_error(message) end
     end
   end
@@ -1676,9 +1668,9 @@ local function plan_legacy_paid_bridge(event, state, owned, source_prototype, cu
     local prior = owned.forces[force.index]
     if not prior or prior.phase ~= "owned" then recover_error(label .. " force history differs") end
     local source = default_frame(force, recovery.canonical)
-    local owner = default_frame(force, recovery.ordinary_default_id)
-    local legacy = default_frame(force, id)
-    local gate = gate_frame(force, true)
+    local owner = default_frame(force, recovery.ordinary_default_id, false, source)
+    local legacy = default_frame(force, id, false, source)
+    local gate = gate_frame(force, source, true)
     -- Configuration can re-enable both native halves of an already-paid
     -- shelf. Settle only this observed frame with MIR's own recorded right.
     local settle_source = source.enabled and gate_paid(gate) and prior.retired_flags.disabled_by_mir
@@ -1775,9 +1767,9 @@ local function apply_legacy_paid_bridge(plan)
   end
   for _, item in ipairs(fresh.items) do
     local actual_source = default_frame(item.force, recovery.canonical)
-    local actual_owner = default_frame(item.force, recovery.ordinary_default_id)
-    local actual_legacy = default_frame(item.force, fresh.legacy_id)
-    local actual_gate = gate_frame(item.force)
+    local actual_owner = default_frame(item.force, recovery.ordinary_default_id, false, actual_source)
+    local actual_legacy = default_frame(item.force, fresh.legacy_id, false, actual_source)
+    local actual_gate = gate_frame(item.force, actual_source)
     if native_bonus(item.force) ~= item.bonus then recover_error(fresh.label .. " contribution changed") end
     if item.action == "legacy-transfer" then
       local expected = frame_values(item.work)
@@ -2095,9 +2087,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
       local restored = checkpoint and engine_checkpoint.restore_frame(checkpoint, force, source, equal_plain,
         context.worker_checkpoint_bonus)
-      local public = prepared and default_frame(force, recovery.canonical, finished) or source
-      local destination = default_frame(force, id, finished)
-      local gate = gate_frame(force, owned ~= nil and context.configuration == true)
+      local public = prepared and default_frame(force, recovery.canonical, finished, source) or source
+      local destination = default_frame(force, id, finished, source)
+      local gate = gate_frame(force, source, owned ~= nil and context.configuration == true)
       local refresh = context.created_force == force.index or context.reset_force == force.index
       -- A scenario can grant both authored aliases before MIR initializes.
       -- on_init also runs on first install in an existing game. Require the
@@ -2116,7 +2108,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       -- and the paid debit. The pair check verifies the work.
       local settle_source = context.configuration == true and prior and prior.phase == "owned"
         and prior.retired_flags.disabled_by_mir and source.enabled and gate_paid(gate) or false
-      local legacy = legacy_active and default_frame(force, legacy_id, finished) or nil
+      local legacy = legacy_active and default_frame(force, legacy_id, finished, source) or nil
       if legacy_retuned and (not prior or prior.phase ~= "legacy")
           and default_owner_frame_has_invested_work(destination, id) then
         recover_error("published517 SE future contract cannot replace invested current worker work")
@@ -2339,7 +2331,7 @@ function M.apply_default_owner_transfer(plan)
     else
       local finished = fresh.context.finished_force == item.force.index
       local actual_source = default_frame(item.force, recovery.canonical, finished)
-      local actual_owner, gate = default_frame(item.force, id, finished), gate_frame(item.force)
+      local actual_owner, gate = default_frame(item.force, id, finished, actual_source), gate_frame(item.force, actual_source)
       if (item.action ~= "legacy-validate" and not full_pair(actual_source, actual_owner, gate))
           or native_bonus(item.force) ~= item.bonus
           or actual_source.visible ~= item.target_visible then
@@ -2351,7 +2343,7 @@ function M.apply_default_owner_transfer(plan)
           local queue = item.departure.queue
           expected.current, expected.current_progress = queue.current, queue.current_progress
           expected.queue, expected.queued_saved = clone(queue.queue), clone(queue.queued_saved)
-          local credit = provider_credit_frame(item.force)
+          local credit = provider_credit_frame(item.force, actual_source)
           if credit.next_level ~= item.departure.level or credit.enabled then
             recover_error("provider removal did not retain the native credit carrier")
           end
@@ -2369,7 +2361,7 @@ function M.apply_default_owner_transfer(plan)
           recover_error("native full default transfer did not preserve the exact frame; reload the original copy")
         end
       elseif item.action == "legacy-validate" then
-        local actual_legacy = default_frame(item.force, fresh.record.legacy.owner, finished)
+        local actual_legacy = default_frame(item.force, fresh.record.legacy.owner, finished, actual_source)
         if not legacy_paid_pair(actual_source, actual_owner, gate, actual_legacy)
             or not equal_plain(frame_values(item.legacy), frame_values(actual_legacy)) then
           recover_error("validated published517 SE paid worker changed")
@@ -2713,7 +2705,7 @@ local function plan_provider_handover(event, route)
     seen[force.index] = true
     local frame = snapshot(force, recovery.ordinary_default_id)
     local destination = snapshot(force, recovery.id, frame)
-    local public, gate = snapshot(force, recovery.canonical, frame), gate_frame(force, true, frame)
+    local public, gate = snapshot(force, recovery.canonical, frame), gate_frame(force, frame, true)
     local paid = frame.next_level >= 5
     if public.next_level ~= (paid and 5 or 4) or public.researched ~= paid or public.saved_progress ~= 0
         or public.occurrences ~= 0 or public.current == recovery.canonical or gate_paid(gate) ~= paid then
@@ -2798,9 +2790,9 @@ delegated_provider_preflight = function(event, route, plan)
   return authorization.legacy
 end
 
-local function verify_returned_provider(force, returning, gate)
+local function verify_returned_provider(force, returning, gate, queue_frame)
   if not returning then return end
-  local credit = provider_credit_frame(force)
+  local credit = provider_credit_frame(force, queue_frame)
   for name, row in pairs(returning.rows) do
     if not equal_plain(row, technology_values(snapshot(force, name, credit))) then
       recover_error("returned provider work or price changed: " .. name)
@@ -2822,13 +2814,15 @@ delegated_provider_apply = function(legacy)
   end
   prepared_frames(legacy.state)
   for _, item in ipairs(authorization.settled) do
-    if not equal_plain(item.private, frame_values(snapshot(item.force, recovery.id)))
-        or not equal_plain(item.public, frame_values(snapshot(item.force, recovery.canonical)))
-        or not equal_plain(item.owner, frame_values(snapshot(item.force, recovery.ordinary_default_id)))
-        or gate_paid(gate_frame(item.force)) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
+    local private = snapshot(item.force, recovery.id)
+    local gate = gate_frame(item.force, private)
+    if not equal_plain(item.private, frame_values(private))
+        or not equal_plain(item.public, frame_values(snapshot(item.force, recovery.canonical, private)))
+        or not equal_plain(item.owner, frame_values(snapshot(item.force, recovery.ordinary_default_id, private)))
+        or gate_paid(gate) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
       recover_error("native provider frame changed before quota commit")
     end
-    verify_returned_provider(item.force, item.returning, gate_frame(item.force))
+    verify_returned_provider(item.force, item.returning, gate, private)
   end
   storage[KEY] = legacy.state
   if plan.archive then
@@ -2909,8 +2903,9 @@ local function apply_provider_handover(plan)
   end
   local settled = {}
   for _, item in ipairs(fresh.items) do
-    local owner, private = snapshot(item.force, recovery.ordinary_default_id), snapshot(item.force, recovery.id)
-    local public, gate = snapshot(item.force, recovery.canonical), gate_frame(item.force)
+    local owner = snapshot(item.force, recovery.ordinary_default_id)
+    local private = snapshot(item.force, recovery.id, owner)
+    local public, gate = snapshot(item.force, recovery.canonical, owner), gate_frame(item.force, owner)
     local expected = frame_values(item.source)
     local returning = item.returning
     if returning then
@@ -2918,7 +2913,7 @@ local function apply_provider_handover(plan)
       expected.current, expected.current_progress = queue.current, queue.current_progress
       expected.queue, expected.queued_saved = clone(queue.queue), clone(queue.queued_saved)
       expected.saved_progress = returning.holder_saved
-      verify_returned_provider(item.force, returning, gate)
+      verify_returned_provider(item.force, returning, gate, owner)
     end
     expected.researched = false
     expected.enabled = fresh.prepared.forces[item.force.index].enabled
@@ -2970,7 +2965,7 @@ local function retired_provider_current(event, route)
     if frame.next_level ~= 4 or frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0 or frame.enabled or frame.visible then
       recover_error("retired default owner gained unrecorded work", route)
     end
-    local gate = gate_frame(force, true, frame)
+    local gate = gate_frame(force, frame, true)
     if gate.enabled and not state.forces[force.index] then recover_error("retired head has no recorded force authority", route) end
     changed = changed or gate.enabled
     items[#items+1] = {force=force, owner=frame, public=snapshot(force, recovery.canonical, frame),
@@ -3018,11 +3013,11 @@ local function apply_retired_gate_settlement(plan)
     end
   end
   for _, item in ipairs(fresh.items) do
-    local gate = gate_frame(item.force)
-    if gate_paid(gate) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus
-        or not equal_plain(frame_values(item.owner), frame_values(snapshot(item.force, recovery.ordinary_default_id)))
-        or not equal_plain(frame_values(item.public), frame_values(snapshot(item.force, recovery.canonical)))
-        or not equal_plain(frame_values(item.private), frame_values(snapshot(item.force, recovery.id))) then
+    local owner = snapshot(item.force, recovery.ordinary_default_id)
+    if gate_paid(gate_frame(item.force, owner)) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus
+        or not equal_plain(frame_values(item.owner), frame_values(owner))
+        or not equal_plain(frame_values(item.public), frame_values(snapshot(item.force, recovery.canonical, owner)))
+        or not equal_plain(frame_values(item.private), frame_values(snapshot(item.force, recovery.id, owner))) then
       recover_error("retired head flag settlement changed native work/contribution")
     end
   end
@@ -3091,9 +3086,9 @@ end
 
 local function legacy_completion_frame(force, id, finished)
   local source = default_frame(force, recovery.canonical, finished)
-  local owner = default_frame(force, recovery.ordinary_default_id, finished)
-  local legacy = default_frame(force, id, finished)
-  local gate = gate_frame(force)
+  local owner = default_frame(force, recovery.ordinary_default_id, finished, source)
+  local legacy = default_frame(force, id, finished, source)
+  local gate = gate_frame(force, source)
   if not legacy_paid_pair(source, owner, gate, legacy) then
     recover_error("published517 SE paid completion frame differs")
   end
@@ -3185,9 +3180,9 @@ local function apply_published517_completion_transition(state, items, record_com
   for _, item in ipairs(items) do
     if item.action == "settle" then
       local actual_source = default_frame(item.force, recovery.canonical)
-      local actual_owner = default_frame(item.force, recovery.ordinary_default_id)
-      local actual_legacy = default_frame(item.force, state.legacy.owner)
-      local actual_gate = gate_frame(item.force)
+      local actual_owner = default_frame(item.force, recovery.ordinary_default_id, false, actual_source)
+      local actual_legacy = default_frame(item.force, state.legacy.owner, false, actual_source)
+      local actual_gate = gate_frame(item.force, actual_source)
       if not full_pair(actual_source, actual_owner, actual_gate)
           or not pristine_default_frame(actual_legacy, state.legacy.owner) or actual_legacy.visible
           or native_bonus(item.force) ~= item.bonus then
@@ -3335,9 +3330,10 @@ end
 local function default_owner_merge_frame(state, force)
   local prior = state.forces[force.index]
   if not prior then recover_error("default native merge has unknown force identity") end
-  local source, owner, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force)
+  local source = snapshot(force, recovery.canonical)
+  local owner, gate = snapshot(force, recovery.ordinary_default_id, source), gate_frame(force, source)
   if state.schema == 4 and prior.phase == "legacy" then
-    local legacy = snapshot(force, state.legacy.owner)
+    local legacy = snapshot(force, state.legacy.owner, source)
     if not legacy_paid_pair(source, owner, gate, legacy) then
       recover_error("published517 SE paid merge frame differs")
     end
@@ -3416,8 +3412,8 @@ function M.default_owner_on_forces_merged(event)
   for _, force in ipairs(forces()) do
     if force.index == source_index or not next_state.forces[force.index] then return false, "unqualified-native-merge-frame" end
     seen[force.index] = true
-    local head, owner, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force)
-    if not full_pair(head, owner, gate) then return false, "unqualified-native-merge-frame" end
+    local head = snapshot(force, recovery.canonical)
+    if not full_pair(head, snapshot(force, recovery.ordinary_default_id, head), gate_frame(force, head)) then return false, "unqualified-native-merge-frame" end
   end
   for index in pairs(next_state.forces) do if not seen[index] then return false, "unqualified-native-merge-frame" end end
   -- Preserve existing destination rights. Merged native levels/work alone do
@@ -3636,13 +3632,15 @@ local function resume_provider_queue(force, route, before_apply)
   return true, "Restored the parked provider research queue."
 end
 
-M.command_help = "Administrator or server. Usage: /mir-worker-storage-recovery <prepare|prepare-removal|cancel-removal|resume [force-name]>."
-  .. " The server must name a force for resume. In game, resume defaults to your current force."
+M.command_help = {"mir-command.worker-storage-recovery"}
 
 function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
-  local function reply(text) if player then player.print(text) elseif log then log("[MIR worker recovery] " .. text) end end
+  local function reply(text)
+    if player then player.print(text)
+    elseif log then log(type(text) == "string" and "[MIR worker recovery] " .. text or text) end
+  end
   if command.player_index and (not player or player.admin ~= true) then reply("Only an administrator or server may change worker research."); return end
   local operation, name = tostring(command.parameter or ""):match("^%s*(%S+)%s*(.-)%s*$")
   local ok, result, message

@@ -95,12 +95,11 @@ end
 
 function M.register_source()
   script.on_load(watch_prepared_copy)
-  local help = "Administrator or server. Usage: /mir-worker-storage-recovery <prepare|cancel>."
-    .. " Prepare and save a paused copy before opening it in Factorio 2.0."
+  local help = {"mir-command.worker-engine-upgrade"}
   commands.add_command("mir-worker-storage-recovery", help, function(command)
     local player = command.player_index and game.get_player(command.player_index)
     local function say(message)
-      if player then player.print(message) else log("[MIR worker recovery] " .. message) end
+      if player then player.print(message) else log(type(message) == "string" and "[MIR worker recovery] " .. message or message) end
     end
     if command.player_index and not (player and player.admin) then say(help); return end
     if command.parameter == "cancel" then

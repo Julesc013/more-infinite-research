@@ -60,8 +60,8 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             on_load=function(callback) on_load=callback end,
             on_event=function(id, callback) assert(id==1); tick_handler=callback end}
           local env = setmetatable({game=game, script=script, global={}, log=function() end,
-            defines={events={on_tick=1}}, commands={add_command=function(name, _, callback)
-              assert(name=="mir-worker-storage-recovery")
+            defines={events={on_tick=1}}, commands={add_command=function(name, help, callback)
+              assert(name=="mir-worker-storage-recovery" and help[1]=="mir-command.worker-engine-upgrade")
               command=callback
             end}}, {__index=_G})
           local checkpoint = assert(loadfile(..., "t", env))()
