@@ -10,6 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
+from catalogue_presentation import expected_base_presentation_rows
 from lua_table_values import from_lua as _plain, to_lua as _lua_value
 from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, NATIVE_FAMILY_RECIPES, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
 from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
@@ -17,21 +18,6 @@ from worker_storage_recovery_fixture import expected_private_worker_row, expecte
 SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
 SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
 GROWTH_MAXIMUM = 1000
-BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
-    # Retain the independent B6 rows unchanged, then apply the two separately
-    # reviewed F210 Base locale repairs. Both enclosing MIR keys are literal
-    # titles in the shipped locale catalogue; the nested item keys are absent.
-    "recipe-prod-research_mining_drill-1": {
-        "captured": ["technology-name.more-infinite-research.research_mining_drill",
-                     ["item-name.electric-mining-drill"]],
-        "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
-    },
-    "recipe-prod-research_walls-1": {
-        "captured": ["technology-name.more-infinite-research.research_walls",
-                     ["item-name.stone-wall"]],
-        "emitted": ["technology-name.more-infinite-research.research_walls"],
-    },
-}
 
 
 def sha256(path):
@@ -41,17 +27,6 @@ def sha256(path):
 def canonical_row_sha256(row):
     text = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     return hashlib.sha256(text.encode("utf-8")).hexdigest().upper()
-
-
-def repair_base_literal_name_presentation(data):
-    """Apply only the two independently pinned successor presentation fields."""
-    repaired = deepcopy(data)
-    for technology, expected in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
-        actual = repaired["technology"].get(technology, {}).get("localised_name")
-        if actual != expected["captured"]:
-            raise AssertionError(f"captured Bob/Angel presentation changed: {technology}")
-        repaired["technology"][technology]["localised_name"] = deepcopy(expected["emitted"])
-    return repaired
 
 
 class BobAngelCatalogueTests(unittest.TestCase):
@@ -108,7 +83,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         # captured recipes, independently of candidate or player code.
         public_review = [row for row in reviewed if not row["name"].startswith("mir-native-credit-")]
         catalogue._apply_reviewed(cls.expected_data, public_review, "data")
-        cls.expected_data = repair_base_literal_name_presentation(cls.expected_data)
+        cls.expected_data["technology"] = expected_base_presentation_rows(cls.expected_data["technology"])
         # r02 remains an immutable twenty-carrier historical intent. Verify
         # it separately before adding the independently derived family pairs.
         original_credits = native_credit_carrier_rows(

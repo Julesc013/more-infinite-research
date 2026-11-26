@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 
+from catalogue_presentation import expected_base_presentation_rows
 from historical_sources import read_published_source
 from generator_world import build_generator_world, lua_table
 from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
@@ -42,46 +43,6 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
   "space_age": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
   "k2so": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-enriched-iron","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-iron-ore","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}}
 }''')
-
-
-# The immutable 4.7 inventories retain two invalid Base presentation children.
-# Every shipped MIR title for these IDs is a literal, while the F200/F210 Base
-# locale exposes only entity-name (not item-name) for each subject. Preserve
-# the captured rows as evidence, but compare current generated output against
-# the bounded display repair rather than reintroducing unresolved locale keys.
-BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
-    "recipe-prod-research_mining_drill-1": {
-        "captured": ["technology-name.more-infinite-research.research_mining_drill",
-                     ["item-name.electric-mining-drill"]],
-        "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
-    },
-    "recipe-prod-research_walls-1": {
-        "captured": ["technology-name.more-infinite-research.research_walls",
-                     ["item-name.stone-wall"]],
-        "emitted": ["technology-name.more-infinite-research.research_walls"],
-    },
-}
-
-
-def expected_base_presentation_rows(expected):
-    """Apply the reviewed LocalisedString corrections to captured Base rows."""
-    for name, repair in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
-        row = expected.get(name)
-        if row is None:
-            raise AssertionError(f"published oracle lacks repaired Base row: {name}")
-        if row.get("localised_name") != repair["captured"]:
-            raise AssertionError(f"published oracle changed outside captured Base name shape: {name}")
-        expected[name] = {**row, "localised_name": repair["emitted"]}
-
-    drill_id = "recipe-prod-research_mining_drill-1"
-    drill = expected[drill_id]
-    generic_description = ["technology-description.more-infinite-research.recipe_productivity"]
-    if drill.get("localised_description") != generic_description:
-        raise AssertionError("published oracle changed its captured mining drill description")
-    expected[drill_id] = {**drill, "localised_description": [
-        "", generic_description, " ", ["technology-description.more-infinite-research.mining_drill_extraction"],
-    ]}
-    return expected
 
 
 # These are the only permitted additions to the published 4.7.2 K2SO
