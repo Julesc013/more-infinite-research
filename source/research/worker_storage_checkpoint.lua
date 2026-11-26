@@ -116,19 +116,28 @@ function M.register_source()
 end
 
 function M.claim(saved, event, target)
-  require_frame(type(saved) == "table", "invalid preparation")
+  require_frame(type(saved) == "table" and getmetatable(saved) == nil, "invalid preparation")
   local active = script.active_mods
   local changes = type(event) == "table" and event.mod_changes
   local base = type(changes) == "table" and changes.base
   local mir = type(changes) == "table" and changes[MIR]
-  require_frame(target.id == "f200" and type(base) == "table" and base.old_version == M.source_base
-    and base.new_version == active.base and active.base == target.minimum_base
+  local matching_package = target.id == "f200" and active.base == target.minimum_base
     and type(mir) == "table" and mir.old_version == saved.mir and mir.new_version == active[MIR]
-    and active[MIR] == target.distribution_version and M.source_version(saved.mir),
-    "open the prepared copy with its matching Factorio 2.0 edition")
+    and active[MIR] == target.distribution_version
+  if saved.formula ~= nil then
+    require_frame(matching_package and saved.mir == "4.7.20002" and active["space-exploration"] == "0.7.57"
+      and event.mod_startup_settings_changed == false and type(saved.formula) == "string"
+      and #saved.formula > 0 and #saved.formula <= 1024,
+      "open the prepared Space Exploration copy with its previous mod selection and settings")
+  else
+    require_frame(matching_package and type(base) == "table" and base.old_version == M.source_base
+      and base.new_version == active.base and M.source_version(saved.mir),
+      "open the prepared copy with its matching Factorio 2.0 edition")
+  end
   require_frame(saved.schema == 1 and type(saved.tick) == "number" and game.tick >= saved.tick
     and game.tick - saved.tick <= 1 and type(saved.was_paused) == "boolean"
     and type(saved.forces) == "table", "the preparation expired")
+  return saved.formula
 end
 
 -- Only zero or absent work may be supplied by the paused source. Any surviving
@@ -143,6 +152,13 @@ function M.restore_frame(saved, force, native, equal)
     and type(row.paid) == "table" and #row.queue <= 1000
     and progress(row.current_progress) and progress(row.saved_progress),
     "invalid prepared queue or progress on " .. force.name)
+  if saved.formula ~= nil then
+    -- The same engine can corroborate the entire checkpoint. Missing work
+    -- does not get the restoration allowance used across the 1.1 boundary.
+    require_frame(native.saved_progress == row.saved_progress and native.current_progress == row.current_progress
+      and equal(row.queue, native.queue) and equal(row.queued_saved, native.queued_saved),
+      "same-engine checkpoint progress or queue changed on " .. force.name)
+  end
   require_frame(native.saved_progress == 0 or native.saved_progress == row.saved_progress,
     "surviving worker progress changed on " .. force.name)
   local index, occurrences = 1, 0
@@ -173,6 +189,7 @@ function M.restore_frame(saved, force, native, equal)
     require_frame(not queue_changed and native.current_progress == row.current_progress
       and equal(native.queued_saved, row.queued_saved), "unrelated native research changed on " .. force.name)
   end
+  if saved.formula ~= nil then return native end
   local restored = {}
   for key, value in pairs(native) do restored[key] = value end
   restored.saved_progress, restored.occurrences = row.saved_progress, occurrences

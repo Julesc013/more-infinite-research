@@ -1105,7 +1105,7 @@ local function published11_empty_origin(event, change, active)
   return {kind="published511-empty-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
-local function published472_se_origin(event, change, active, state, current)
+local function published472_se_origin(event, change, active, state, current, prepared_formula)
   -- F394/151772B0 native data captured this SE-seven contract under the seven
   -- typed 149E settings. It is not the Base-five contract of published517.
   if getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
@@ -1141,7 +1141,8 @@ local function published472_se_origin(event, change, active, state, current)
   local prototype = native_prototype(recovery.canonical)
   local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
   if prototype.level ~= 4 or prototype.max_level ~= 4294967295
-      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
+      or prototype.research_unit_count_formula ~= (prepared_formula or "675*1.5^(L-4)")
+      or prototype.research_unit_energy ~= 3600
       or prototype.ignore_tech_cost_multiplier ~= false
       or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 or effect.hidden == true then
     default_origin_error("published472 SE source work contract differs", event, state, current)
@@ -1161,7 +1162,7 @@ local function published472_se_origin(event, change, active, state, current)
   return {kind="published472-se-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
-local function default_origin(event, initializing, state, current)
+local function default_origin(event, initializing, state, current, prepared_formula)
   local active = script and script.active_mods or {}
   if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
     default_origin_error("default transfer requires the declared MIR package version", event, state, current)
@@ -1216,7 +1217,7 @@ local function default_origin(event, initializing, state, current)
   end
   if state == nil and change and change.old_version == "4.7.20002"
       and active["space-exploration"] ~= nil then
-    return published472_se_origin(event, change, active, state, current)
+    return published472_se_origin(event, change, active, state, current, prepared_formula)
   end
   if state == nil and change and (change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f200
       or change.old_version == PUBLISHED473_DEFAULT_ORIGINS.f210 or change.old_version == "5.0.20001" and new_selection) then
@@ -1935,9 +1936,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   local id, state, owned = recovery.ordinary_default_id, checked_state(), owner_record()
   local removal = context.provider_removal and provider_removal_checkpoint(event, state, owned) or nil
   local checkpoint = storage[engine_checkpoint.key]
+  local prepared_formula
   if checkpoint ~= nil then
     if initializing or owned or state or removal then recover_error("worker engine checkpoint conflicts with recorded ownership") end
-    engine_checkpoint.claim(checkpoint, event, target)
+    prepared_formula = engine_checkpoint.claim(checkpoint, event, target)
   end
   local prepared = removal ~= nil or not owned and state and state.schema == 2 and state.kind == "prepared"
     and state.phase == "default" and state.current.kind == "default" or false
@@ -1948,8 +1950,9 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     if bridge then return bridge end
   end
   local producer = owned and owned.producer
-    or checkpoint and {kind="f110-prepared-default", old_version=checkpoint.mir, new_version=script.active_mods[MIR]}
-    or default_origin(event, initializing, state, current)
+    or checkpoint and not prepared_formula
+      and {kind="f110-prepared-default", old_version=checkpoint.mir, new_version=script.active_mods[MIR]}
+    or default_origin(event, initializing, state, current, prepared_formula)
   if state and not prepared and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
     recover_error("legacy prepared/finite conversion is not implemented")
   end

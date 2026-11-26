@@ -3865,6 +3865,79 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           assert(writes==0 and same(settled,all_frames()) and storage[OWNER_KEY].settings.max_level==0)
         ''')
 
+    def test_472_se_checkpoint_authenticates_the_paid_native_frame(self):
+        for case in ("matching", "same-version wrong price", "missing active work", "changed queue"):
+            with self.subTest(case=case):
+                lua = self.published472_se_world()
+                lua.globals().checkpoint_case = case
+                lua.execute(r'''
+                  local checkpoint = require("research.worker_storage_checkpoint")
+                  local mir = "more-infinite-research"
+                  local successor = script.active_mods[mir]
+                  local factor = 1350
+                  local formula = "1350*1.5^(L-4)"
+                  for _,id in ipairs{CANONICAL,ORDINARY}do
+                    local prototype = prototypes.technology[id]
+                    prototype.research_unit_count_formula = formula
+                    for _,force in pairs(game.forces)do
+                      local metatable = getmetatable(force.technologies[id])
+                      local read = metatable.__index
+                      metatable.__index = function(object,key)
+                        if key == "research_unit_count" then return math.floor(factor*1.5^(read(object,"level")-4)) end
+                        if key == "research_unit_energy" or key == "research_unit_ingredients" then
+                          return prototype[key]
+                        end
+                        return read(object,key)
+                      end
+                    end
+                  end
+                  game.tick,game.tick_paused = 210,false
+                  player.technologies[CANONICAL].level = 9
+                  player.research_queue = {CANONICAL,CANONICAL,OTHER}
+                  player.research_progress = 200/10251
+                  detached.technologies[CANONICAL].saved_progress = .23
+                  script.active_mods[mir] = "4.7.20002"
+                  local saved = checkpoint.capture(function(_,technology) return technology.saved_progress end)
+                  saved.formula = formula
+                  storage[checkpoint.key] = saved
+                  script.active_mods[mir] = successor
+                  if checkpoint_case == "same-version wrong price" then
+                    factor = 675
+                    for _,id in ipairs{CANONICAL,ORDINARY}do
+                      prototypes.technology[id].research_unit_count_formula = "675*1.5^(L-4)"
+                    end
+                    player.research_progress = 200/5125
+                  elseif checkpoint_case == "missing active work" then
+                    player.research_progress = 0
+                  elseif checkpoint_case == "changed queue" then
+                    player.research_queue = {CANONICAL,OTHER,CANONICAL}
+                  end
+                  local before = all_frames()
+                  writes = 0
+                  local ok,plan = pcall(history.default_owner_preflight,older_event("4.7.20002"),nil,true)
+                  assert(writes == 0 and same(before,all_frames()) and storage[checkpoint.key] == saved)
+                  if checkpoint_case ~= "matching" then
+                    local reason = checkpoint_case == "same-version wrong price" and "work contract differs"
+                      or "same-engine checkpoint progress or queue changed"
+                    assert(not ok and tostring(plan):find(reason,1,true),tostring(plan))
+                    assert(storage[OWNER_KEY] == nil)
+                    return
+                  end
+                  assert(ok,plan)
+                  assert(plan.record.producer.kind == "published472-se-default")
+                  assert(history.default_owner_apply(plan))
+                  assert(storage[checkpoint.key] == nil and storage[OWNER_KEY] ~= nil)
+                  assert(player.current_research.name == ORDINARY and player.current_research.research_unit_count == 10251)
+                  assert(player.research_progress == 200/10251 and player.research_queue[2].name == ORDINARY)
+                  assert(player.research_queue[3].name == OTHER)
+                  assert(player.worker_robots_storage_bonus == before[player.index].bonus)
+                  assert(detached.technologies[ORDINARY].saved_progress == .23)
+                  local settled = all_frames()
+                  writes = 0
+                  history.default_owner_on_load()
+                  assert(writes == 0 and same(settled,all_frames()))
+                ''')
+
     def test_472_space_age_requires_proven_worker_history(self):
         cases = (
             ("paid-official", "archived-default"),
