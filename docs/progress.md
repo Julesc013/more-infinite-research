@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Library timing repeatability (2026-11-26)
+
+Gunmetal completed both warmups and both identical-package controls on Factorio 2.0.77. Eight Library profiler endpoints exceeded the predeclared repeatability limits. The run stopped before scoring the published 4.7.3 and current development comparison. The independent readback rehashed 907 original files and verified shared-library restoration. The receipt is `build/qualification/library-current-matched-gunmetal-r01/verified-native-timing.json` at SHA-256 `2C7863A7C6C39B766BD637362A41C86977D2D9BAD4D8370B02C71F72D3241980`.
+
+The Linux clients used Mesa LLVMpipe. A separate matched batch started with two software-rendering workers per client and the original workload and tolerances. The changed setting tests whether drawing contention contributed to the observed variation. Scoring depends on fresh identical-package controls. The launch receipt is `build/qualification/library-current-matched-gunmetal-r02/direct-timing-ack.json`. [Mesa software rendering controls](https://docs.mesa3d.org/envvars.html#llvmpipe-driver-environment-variables)
+
 ## Unattended Library and research-progress results (2026-11-26)
 
 The unattended dispatcher completed the corrected shutdown rehearsal, then the exact frozen 5.0.25 bilingual Library replay, then both engine progress probes. The 32-step Library case verified six exports, eight export files, the protected save and identical library controls. Its readback is `build/qualification/mir525-library-tabs-gunmetal-r01/execution/verified-library-tabs-exports.json` at SHA-256 `C00C2FEC06D4CB78831D193F682A7A68364BC1DB372299E219C25F2048969A3E`. Both Base-only progress probes observed 19% saved work enter the active slot. When the head was displaced, 43% active work moved to the saved slot under both setter orders. The native probe scope is Factorio 2.0.77 and 2.1.24 with two fresh Base saves. The readback is `build/qualification/native-research-progress-probe-gunmetal-r03/execution/verified-native-progress.json` at SHA-256 `434D5CE8831D4966EEE0830C5514B25992B8C90D93D63151E51E4D2B643CBAF9`. [Native shutdown helper](https://github.com/Julesc013/more-infinite-research/pull/2417)
