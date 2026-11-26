@@ -438,38 +438,51 @@ local function observed_queue(force)
   return queue
 end
 
-local function snapshot_queue(force, id)
+-- A completed observation can serve other identities on the same force
+-- until the next native write.
+local function snapshot_queue(force, id, queue_frame)
+  if queue_frame then
+    local occurrences = 0
+    if queue_frame.queued_saved[id] ~= nil then
+      for _, name in ipairs(queue_frame.queue) do
+        if name == id then occurrences = occurrences + 1 end
+      end
+    end
+    return queue_frame.queue, queue_frame.queued_saved, occurrences, queue_frame.current, queue_frame.current_progress
+  end
   local native = observed_queue(force)
   if #native > 1000 then recover_error("unsupported native queue") end
   local queue, saved, occurrences = {}, {}, 0
   for index, entry in ipairs(native) do
-    if not entry or type(entry.name) ~= "string" then recover_error("unsupported native queue") end
-    if not progress(entry.saved_progress) then recover_error("invalid queued saved work") end
-    queue[index], saved[entry.name] = entry.name, entry.saved_progress
-    if entry.name == id then occurrences = occurrences + 1 end
+    local name = entry and entry.name
+    if type(name) ~= "string" then recover_error("unsupported native queue") end
+    local work = entry.saved_progress
+    if not progress(work) then recover_error("invalid queued saved work") end
+    queue[index], saved[name] = name, work
+    if name == id then occurrences = occurrences + 1 end
   end
-  return queue, saved, occurrences
+  local current = force.current_research
+  return queue, saved, occurrences, current and current.name, force.research_progress
 end
 
-local function observe_worker(force, id)
+local function observe_worker(force, id, queue_frame)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
       or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean"
       or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
     recover_error("invalid native worker frame for " .. tostring(force.name))
   end
-  local queue, saved, occurrences = snapshot_queue(force, id)
+  local queue, saved, occurrences, current, current_progress = snapshot_queue(force, id, queue_frame)
   local next_level = technology.level + (technology.researched and 1 or 0)
   if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
   return {technology=technology, next_level=next_level, researched=technology.researched,
     enabled=technology.enabled, visible=technology.visible_when_disabled,
     saved_progress=technology.saved_progress, count=technology.research_unit_count,
-    queue=queue, queued_saved=saved, current=force.current_research and force.current_research.name or nil,
-    current_progress=force.research_progress, occurrences=occurrences}
+    queue=queue, queued_saved=saved, current=current, current_progress=current_progress, occurrences=occurrences}
 end
 
-local function snapshot(force, id, finished_context, queued_observation)
-  local frame = observe_worker(force, id)
+local function snapshot(force, id, queue_frame, finished_context, queued_observation)
+  local frame = observe_worker(force, id, queue_frame)
   local current, head, value = frame.current, frame.queue[1], frame.current_progress
   -- A finished callback can follow removal of its head but precede starting
   -- the queued remainder. Keep that observed nil current and zero progress;
@@ -1365,8 +1378,9 @@ local function head_gate_contract(source)
   end
 end
 
-local function gate_frame(force, configuration)
-  local gate = force.technologies[recovery.head_id]
+local function gate_frame(force, configuration, queue_frame)
+  local id = recovery.head_id
+  local gate = force.technologies[id]
   -- Configuration can re-enable an already-paid native infinite level5 even
   -- though its MIR prototype is disabled. Only that exact flag is settleable;
   -- fresh/ordinary-event frames still require the debit to remain disabled.
@@ -1376,10 +1390,18 @@ local function gate_frame(force, configuration)
       or gate.visible_when_disabled ~= false or gate.saved_progress ~= 0 then
     recover_error("default head debit native state is invalid")
   end
-  if force.current_research and force.current_research.name == recovery.head_id then recover_error("head debit cannot be current research") end
-  for _, entry in ipairs(observed_queue(force)) do
-    if entry.name == recovery.head_id then recover_error("head debit cannot be queued research") end
+  local current, queued
+  if queue_frame then
+    current, queued = queue_frame.current, queue_frame.queued_saved[id] ~= nil
+  else
+    local research = force.current_research
+    current = research and research.name
+    for _, entry in ipairs(observed_queue(force)) do
+      if entry.name == id then queued = true; break end
+    end
   end
+  if current == id then recover_error("head debit cannot be current research") end
+  if queued then recover_error("head debit cannot be queued research") end
   return gate
 end
 
@@ -1875,7 +1897,7 @@ local function provider_removal_checkpoint(event, state, owned)
   return saved
 end
 
-local function provider_credit_frame(force)
+local function provider_credit_frame(force, queue_frame)
   local id = recovery.provider_credit_id
   local prototype = native_prototype(id)
   local effect = prototype and prototype.effects and prototype.effects[1]
@@ -1886,7 +1908,7 @@ local function provider_credit_frame(force)
       or next(prototype.prerequisites or {}) ~= nil then
     recover_error("provider credit prototype changed")
   end
-  local frame = snapshot(force, id)
+  local frame = snapshot(force, id, queue_frame)
   if frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0
       or frame.enabled and frame.next_level == 4 or frame.visible then
     recover_error("provider credit holder gained unrelated work")
@@ -1958,7 +1980,7 @@ local function provider_removal_force(saved, force, prior, source, public, desti
       if name ~= canonical then lost_units = lost_units + units end
     end
   end
-  local existing = provider_credit_frame(force)
+  local existing = provider_credit_frame(force, source)
   local initial = native_bonus(force)
   if existing.next_level ~= 4 or initial + lost_units ~= old.bonus or not integer(existing.next_level + added_units) then
     recover_error("provider removal changed native cargo outside the recorded levels")
@@ -2590,7 +2612,7 @@ end
 
 local function provider_return_force(saved, names, force, frame, public)
   local old = saved.forces[force.index]
-  local credit = provider_credit_frame(force)
+  local credit = provider_credit_frame(force, frame)
   if old == nil then
     if credit.next_level ~= 4 or saved.detached[force.index] ~= nil then
       recover_error("native provider credit has no archived force")
@@ -2606,7 +2628,7 @@ local function provider_return_force(saved, names, force, frame, public)
   local level, incoming = 4, {}
   for _, name in ipairs(names) do
     local terms, row = saved.technologies[name], old.technologies[name]
-    local current = name == recovery.canonical and public or snapshot(force, name)
+    local current = name == recovery.canonical and public or snapshot(force, name, frame)
     incoming[name] = technology_values(current)
     if type(row) ~= "table" or not integer(row.next_level) or row.next_level < terms.first_level
         or row.next_level > terms.max_level + 1 or type(row.researched) ~= "boolean" or type(row.enabled) ~= "boolean"
@@ -2709,8 +2731,9 @@ local function plan_provider_handover(event, route)
     local prior = owned.forces[force.index]
     if not prior then recover_error("provider handover force authority is missing", route) end
     seen[force.index] = true
-    local frame, destination = snapshot(force, recovery.ordinary_default_id), snapshot(force, recovery.id)
-    local public, gate = snapshot(force, recovery.canonical), gate_frame(force, true)
+    local frame = snapshot(force, recovery.ordinary_default_id)
+    local destination = snapshot(force, recovery.id, frame)
+    local public, gate = snapshot(force, recovery.canonical, frame), gate_frame(force, true, frame)
     local paid = frame.next_level >= 5
     if public.next_level ~= (paid and 5 or 4) or public.researched ~= paid or public.saved_progress ~= 0
         or public.occurrences ~= 0 or public.current == recovery.canonical or gate_paid(gate) ~= paid then
@@ -2797,12 +2820,12 @@ end
 
 local function verify_returned_provider(force, returning, gate)
   if not returning then return end
+  local credit = provider_credit_frame(force)
   for name, row in pairs(returning.rows) do
-    if not equal_plain(row, technology_values(snapshot(force, name))) then
+    if not equal_plain(row, technology_values(snapshot(force, name, credit))) then
       recover_error("returned provider work or price changed: " .. name)
     end
   end
-  local credit = provider_credit_frame(force)
   if credit.next_level ~= 4 or credit.enabled or gate_paid(gate) ~= returning.gate_paid then
     recover_error("returned native provider credit was not settled")
   end
@@ -2967,11 +2990,11 @@ local function retired_provider_current(event, route)
     if frame.next_level ~= 4 or frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0 or frame.enabled or frame.visible then
       recover_error("retired default owner gained unrecorded work", route)
     end
-    local gate = gate_frame(force, true)
+    local gate = gate_frame(force, true, frame)
     if gate.enabled and not state.forces[force.index] then recover_error("retired head has no recorded force authority", route) end
     changed = changed or gate.enabled
-    items[#items+1] = {force=force, owner=frame, public=snapshot(force, recovery.canonical),
-      private=snapshot(force, recovery.id), gate_paid=gate_paid(gate), gate_enabled=gate.enabled, bonus=native_bonus(force)}
+    items[#items+1] = {force=force, owner=frame, public=snapshot(force, recovery.canonical, frame),
+      private=snapshot(force, recovery.id, frame), gate_paid=gate_paid(gate), gate_enabled=gate.enabled, bonus=native_bonus(force)}
   end
   if changed then
     if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
@@ -3542,7 +3565,7 @@ local function prepare_provider_removal(route, before_apply)
   for _, item in ipairs(items) do
     local force, rows = item.force, {}
     for _, name in ipairs(names) do
-      local frame = name == recovery.canonical and item.public or snapshot(force, name)
+      local frame = name == recovery.canonical and item.public or snapshot(force, name, item.public)
       local count = frame.count
       if type(count) ~= "number" or count <= 0 or count > 4294967295 or count ~= math.floor(count) then
         recover_error("provider research price is unavailable: " .. name)
@@ -3592,7 +3615,7 @@ local function resume_provider_queue(force, route, before_apply)
   local live = snapshot(force, recovery.id)
   local frames = {}
   for name, previous in pairs(pending.technologies) do
-    local frame = snapshot(force, name)
+    local frame = snapshot(force, name, live)
     local observed = technology_values(frame)
     observed.enabled = previous.enabled
     if frame.occurrences ~= 0 or not equal_plain(observed, previous)
@@ -3619,8 +3642,10 @@ local function resume_provider_queue(force, route, before_apply)
   before_apply()
   for name, frame in pairs(frames) do frame.technology.enabled = pending.technologies[name].enabled end
   assign_queue(force, merged)
+  local settled
   for name, previous in pairs(pending.technologies) do
-    local actual = snapshot(force, name)
+    local actual = snapshot(force, name, settled)
+    settled = actual
     local paid = actual.current == name and actual.current_progress or actual.saved_progress
     if paid ~= previous.saved_progress or actual.occurrences ~= occurrences[name] then
       recover_error("resumed provider queue changed paid work: " .. name)
@@ -3705,7 +3730,7 @@ function M.on_forces_merged(event)
 end
 
 local function prepared_work_frame(force, record, finished_context, advanced, queued_observation)
-  local frame = snapshot(force, recovery.id, finished_context, queued_observation)
+  local frame = snapshot(force, recovery.id, nil, finished_context, queued_observation)
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
       or frame.next_level > record.limit + 1 or frame.enabled ~= record.enabled or frame.visible ~= record.visible then
     recover_error("private worker completion/history changed unexpectedly")
@@ -3733,7 +3758,7 @@ local function settle_prepared_work(state, force, record, frame, finished_contex
   end)
   owned_queue_force = previous_owner
   if not ok then error(message, 0) end
-  local settled = snapshot(force, recovery.id, finished_context and not queue_changed)
+  local settled = snapshot(force, recovery.id, nil, finished_context and not queue_changed)
   if settled.next_level ~= record.next_level or settled.enabled ~= record.enabled or settled.visible ~= record.visible then
     recover_error("private worker frame changed during owned queue mutation")
   end

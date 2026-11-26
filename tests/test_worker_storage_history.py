@@ -3214,7 +3214,16 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
         lua=self.world();lua.execute(r'''
           full_source(1,true);finite_entry(1);handover();player.technologies[CANONICAL].enabled=false
           local b=all_frames();writes=0
+          local mt=getmetatable(player)
+          local read=mt.__index
+          local queue_reads=0
+          mt.__index=function(force,key)
+            if key=="research_queue" then queue_reads=queue_reads+1 end
+            return read(force,key)
+          end
           assert(history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},provider_route(5),true)==nil)
+          mt.__index=read
+          assert(queue_reads==1, "expected one native queue observation, saw " .. queue_reads)
           history.apply(history.preflight({},provider_route(5)));assert(writes==0 and same(b,all_frames())and not player.technologies[CANONICAL].enabled)
           for _,route in ipairs{provider_route(6),provider_route(8)}do assert(not pcall(history.default_owner_preflight,{},route,true))end
           assert(not pcall(history.default_owner_preflight,{},nil,true))
