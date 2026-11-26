@@ -1713,7 +1713,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $linuxEngine='09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
           $published=Get-Content -LiteralPath 'tests/profiles/library-paired-browser-published-f200-2077.json' -Raw|ConvertFrom-Json -AsHashtable
           $current=Profile '5.0.20025' '3383B2D7D51A5DDF53022341CC6EDFA702716B3CC08A805027861E47039A64E7'
-          foreach($row in @(@{profile=$published;arm='published'},@{profile=$current;arm='mir5'})){
+          $development=Profile '5.0.20025' '90AF4803D4D7A693CFE92840C282C0815D104DA6ADB30548AA0B6FBDEE07101D'
+          foreach($row in @(@{profile=$published;arm='published'},@{profile=$current;arm='mir5'},@{profile=$development;arm='mir5'})){
             $profile=$row.profile
             $version=$profile.mods[2].version
             $hash=$profile.archive_sha256["more-infinite-research_$version.zip"]
