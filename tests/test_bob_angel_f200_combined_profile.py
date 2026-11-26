@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from catalogue_presentation import expected_drill_extraction_row
 from worker_storage_recovery_fixture import expected_private_worker_row, expected_provider_credit_row
 
 from native_credit_oracle import (
@@ -157,7 +158,10 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         base = next(profile for profile in inventory["profiles"] if profile["id"] == "base-f200")
         base_rows = {row["name"]: row["row"] for row in base["published_output"]["data"]["additions"]
                      if row["type"] == "technology"}
-        public_names = set(cls.oracle["technology"]["added"])
+        cls.expected_public = {name: captured["row"] for name, captured in cls.oracle["technology"]["added"].items()}
+        drill_id = "recipe-prod-research_mining_drill-1"
+        cls.expected_public[drill_id] = expected_drill_extraction_row(cls.expected_public[drill_id])
+        public_names = set(cls.expected_public)
         cls.private_mains = {name: row for name, row in native_family_preservation_rows(base_rows).items()
                              if name not in public_names}
         if set(cls.private_mains) != {
@@ -399,10 +403,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
     def test_actual_data_final_matches_the_independent_complete_public_contract_at_raised_minimum(self):
         lua = self.data_final_stage(minimum_base="2.0.78")
         emitted = plain(lua.globals().emitted)
-        expected = {
-            name: captured["row"]
-            for name, captured in self.oracle["technology"]["added"].items()
-        }
+        expected = self.expected_public
         public = {name: emitted[name] for name in expected}
         self.assertEqual(set(public), set(expected))
         self.assertEqual(public, expected)
@@ -430,7 +431,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertEqual(lua.globals().technology_publications, 1)
 
     def test_recipe_activation_keeps_complete_authored_output_and_foreign_state(self):
-        expected = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}
+        expected = self.expected_public
         for enabled in (False, True, None):
             with self.subTest(enabled=enabled):
                 raw = deepcopy(self.context["raw"])
