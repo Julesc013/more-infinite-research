@@ -121,8 +121,8 @@ The staged procedure preserved paid worker level 9, completed levels 9 and 10 in
 If an add-on changes the price while worker cargo research is paid or queued, keep the old add-on active until you have prepared the copy. The witnessed procedure records the old price while Factorio still exposes it.
 
 1. Create the preparation mod with the exact original archive selection, saved mod checksums and observed formula. Follow the [preparation commands](development.md#prepare-a-witnessed-legacy-worker-save).
-2. On a copy in MIR 4.7.20002, enable the preparation mod, run \`/mir-prepare-legacy-worker prepare\`, save under a new name and exit. Open that copy in MIR5 with the same preparation mod, old add-on and startup settings.
-3. With the old add-on still enabled in MIR5, run \`/mir-prepare-legacy-worker prepare-addon-change\`. Save another copy and exit. Open that copy with the new add-on and the same preparation mod.
+2. On a copy in MIR 4.7.20002, enable the preparation mod, run `/mir-prepare-legacy-worker prepare`, save under a new name and exit. Open that copy in MIR5 with the same preparation mod, old add-on and startup settings.
+3. With the old add-on still enabled in MIR5, run `/mir-prepare-legacy-worker prepare-addon-change`. Save another copy and exit. Open that copy with the new add-on and the same preparation mod.
 4. Keep the preparation mod enabled until the old-priced work has finished and ordinary worker cargo owns the earned levels again. Check the price, cargo and queue before replacing your working copy.
 
 ### Preparing worker cargo research before adding a provider
