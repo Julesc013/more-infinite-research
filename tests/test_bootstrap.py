@@ -254,12 +254,12 @@ class BootstrapTests(unittest.TestCase):
             "worker pre-merge capture was not bound alongside the post-merge lifecycle")
           handlers.events[defines.events.on_forces_merging]({})
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
-          for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
-          assert(type(handlers.events[21]) == "function")
+          assert(type(handlers.events[7]) == "function" and type(handlers.events[13]) == "function")
           assert(type(handlers.events[22]) == "function")
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
+          require("runtime.library").native_subscription_needs = function() return library_calls.closed == nil, false end
           handlers.events[7]({player_index = 1, prototype_name = "mir-research-browser"})
           for _, id in ipairs({8, 21, 9, 10, 11}) do
             handlers.events[id]({player_index = 1, element = {name = "mir_library_control"}})
@@ -420,6 +420,8 @@ class BootstrapTests(unittest.TestCase):
     def test_report_checkbox_event_has_one_bootstrap_registration_owner(self):
         self.lua.execute('''
           install_modules(false); install_runtime(); load_control()
+          require("runtime.library").native_subscription_needs = function() return true, false end
+          handlers.load()
           local event={player_index=1,element={valid=true,name="mir_library_report_settings",state=true}}
           assert(type(handlers.events[24])=="function")
           handlers.events[24](event)
@@ -432,7 +434,7 @@ class BootstrapTests(unittest.TestCase):
           for id = 1, 3 do assert(type(handlers.events[id]) == "function") end
           for id = 4, 6 do assert(handlers.events[id] == nil) end
           assert(handlers.events[19] == nil and handlers.events[20] == nil)
-          for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
+          assert(type(handlers.events[7]) == "function" and type(handlers.events[13]) == "function")
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
         ''')
 
@@ -444,9 +446,12 @@ class BootstrapTests(unittest.TestCase):
           browser.subscription_needs = function() subscription_reads = subscription_reads + 1; return false end
           browser.native_subscription_needs = function()
             subscription_reads = subscription_reads + 1
-            return false, false
+            return true, false
           end
           local events = defines.events
+          handlers.events[events.on_lua_shortcut]({player_index = 1, prototype_name = "mir-research-browser"})
+          assert(subscription_reads == 2 and library_calls.shortcut ~= nil)
+          subscription_reads, library_calls.shortcut = 0, nil
           local gui_events = {events.on_gui_text_changed, events.on_gui_selected_tab_changed,
             events.on_gui_selection_state_changed, events.on_gui_checked_state_changed,
             events.on_gui_click, events.on_gui_location_changed, events.on_gui_closed}
@@ -462,9 +467,8 @@ class BootstrapTests(unittest.TestCase):
           for _, id in ipairs(gui_events) do
             handlers.events[id]({player_index = 1, element = {valid = true, name = "mir_library_control"}})
           end
-          handlers.events[events.on_lua_shortcut]({player_index = 1, prototype_name = "mir-research-browser"})
-          assert(subscription_reads == 2 * (#gui_events + 1), "owned GUI input lost subscription reconciliation")
-          assert(library_calls.click ~= nil and library_calls.shortcut ~= nil)
+          assert(subscription_reads == 2 * #gui_events, "owned GUI input lost subscription reconciliation")
+          assert(library_calls.click ~= nil)
         ''')
 
     def test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload(self):
@@ -473,18 +477,35 @@ class BootstrapTests(unittest.TestCase):
           local browser=require("runtime.library")
           local open,pending=false,false
           browser.native_subscription_needs=function()return open,pending end
-          browser.on_gui_closed=function()open,pending=false,false end
+          browser.on_gui_closed=function(event)
+            if event.player_index == 1 then open,pending=false,false end
+          end
+          local function assert_gui(expected)
+            for _, id in ipairs({8, 9, 10, 11, 12, 21, 24}) do
+              assert((handlers.events[id] ~= nil) == expected, "unexpected Library GUI subscription " .. id)
+            end
+          end
+          assert_gui(false)
           for cycle=1,100 do
             open,pending=true,true
             handlers.events[15]({player_index=1,id=cycle,translated=false})
             assert(type(handlers.nth[1])=="function")
+            assert_gui(true)
+            handlers.events[12]({player_index=2, element={name="mir_research_browser"}})
+            assert_gui(true)
             handlers.events[12]({player_index=1, element={name="mir_research_browser"}})
+            assert_gui(false)
             assert(handlers.nth[1]==nil and handlers.nth[60]==nil and handlers.nth[61]==nil)
           end
           game=setmetatable({}, {__index=function()error("idle/reload world access")end,
             __newindex=function()error("idle/reload world write")end})
           assert(handlers.events[defines.events.on_tick]==nil, "settled server has an ordinary on_tick handler")
+          open = true
           handlers.load()
+          assert_gui(true)
+          open = false
+          handlers.load()
+          assert_gui(false)
           assert(handlers.events[defines.events.on_tick]==nil, "on_load added an ordinary on_tick handler")
           assert(next(handlers.nth)==nil)
           for _,id in ipairs({4,5,6,19,20})do assert(handlers.events[id]==nil)end
@@ -513,6 +534,9 @@ class BootstrapTests(unittest.TestCase):
             "ordinary Base upgrade was marked as a competing-provider transition")
           for _, id in ipairs({1, 2, 3, 20}) do assert(type(handlers.events[id]) == "function") end
           for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
+          require("runtime.library").native_subscription_needs=function()
+            error("force lifecycle scanned saved Library views while closed")
+          end
           for _, id in ipairs({1, 2, 3, 20}) do handlers.events[id]({force=player.force}) end
           assert(credit_calls.on_force_created == 1 and credit_calls.on_force_reset == 1
             and credit_calls.on_forces_merged == 1 and credit_calls.on_technology_effects_reset == 1)
@@ -1286,6 +1310,9 @@ class BootstrapTests(unittest.TestCase):
           end
           player.force.technologies["worker-robots-storage-4"]={name="worker-robots-storage-4"}
           handlers.init()
+          require("runtime.library").native_subscription_needs=function()
+            error("worker completion scanned saved Library views while closed")
+          end
           local event={research={valid=true,name="mir-worker-storage-published517-4",force=player.force}}
           handlers.events[defines.events.on_research_finished](event)
           assert(#calls==1 and calls[1]==event,
@@ -1444,6 +1471,7 @@ class BootstrapTests(unittest.TestCase):
           assert(#headers==0)
           handlers.init();handlers.configuration({mod_changes={}})
           assert(#headers==2 and headers[1]=="MIR initialization" and headers[2]=="MIR configuration change")
+          require("runtime.library").native_subscription_needs = function() return true, false end
           handlers.load()
           library_pending=true
           handlers.events[8]({player_index=1, element={name="mir_library_query"}})

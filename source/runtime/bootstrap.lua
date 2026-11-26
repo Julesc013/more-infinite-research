@@ -176,7 +176,7 @@ local on_repair_tick
 local translation_scheduled
 local translation_maintenance_callback
 local reconcile_translations
-local reconcile_library_events
+local bind_runtime_events, on_library_native_refresh
 local library_events_scheduled
 local credit_events_scheduled
 local gun_credit_events_scheduled
@@ -246,9 +246,15 @@ local function schedule_translations(needed)
   translation_scheduled = needed
 end
 
-reconcile_translations = function()
+reconcile_translations = function(open, pending)
   schedule_translations(library.subscription_needs() == true)
-  reconcile_library_events()
+  if open == nil then open, pending = library.native_subscription_needs() end
+  bind_runtime_events(open == true)
+  pending = pending == true
+  if library_refresh_scheduled ~= pending then
+    script.on_nth_tick(library.native_refresh_ticks, pending and on_library_native_refresh or nil)
+    library_refresh_scheduled = pending
+  end
 end
 
 translation_maintenance_callback = function(event)
@@ -360,7 +366,7 @@ local function add_command()
       "Administrator/server only: prepare a COPY before adding a finite worker-storage provider, or resume preserved partial work.",
       function(command)
         worker_robot_storage.command(command, worker_storage_route())
-        reconcile_library_events()
+        bind_runtime_events(library_events_scheduled)
       end)
   end
 end
@@ -408,7 +414,8 @@ local function on_configuration_changed(event)
   local mir = type(changes) == "table" and changes["more-infinite-research"]
   local secretas = type(changes) == "table" and changes.secretas
   local worker_default_plan = worker_robot_storage
-    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT)
+    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT,
+      se_system_force_plan and se_system_force_plan.worker_storage_bonus)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
   local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
@@ -498,7 +505,10 @@ local function on_configuration_changed(event)
   -- Restore only the separately admitted SE scripted NPC policy, after all
   -- native plans have verified their original zero-contribution frames.
   if se_system_force then
-    if not se_system_force.apply(se_system_force_plan) then se_system_force.observe() end
+    local worker_checkpoint_bonus = worker_default_plan and (worker_default_plan.checkpoint or worker_default_plan.addon_preparation)
+      and worker_default_plan.context
+      and worker_default_plan.context.worker_checkpoint_bonus
+    if not se_system_force.apply(se_system_force_plan, worker_checkpoint_bonus ~= nil) then se_system_force.observe() end
   elseif target.id == "f200" then
     storage.mir_se_conquest_policy_force = nil
   end
@@ -570,8 +580,7 @@ end
 
 local function request_library_refresh(event)
   if library_events_scheduled then
-    library.on_native_state_changed(event)
-    reconcile_translations()
+    reconcile_translations(library.on_native_state_changed(event))
   end
 end
 
@@ -581,10 +590,10 @@ local function on_research_finished(event)
   if worker_robot_storage then
     worker_default_changed, worker_default_settled =
       worker_robot_storage.default_owner_on_research_finished(event, lifecycle.record_completed_worker_cap)
-    if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
+    if worker_robot_storage.on_research_event(event, true) or worker_default_changed then bind_runtime_events(library_events_scheduled) end
   end
-  if native_credits and native_credits.on_research_finished(event) then reconcile_library_events() end
-  if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
+  if native_credits and native_credits.on_research_finished(event) then bind_runtime_events(library_events_scheduled) end
+  if native_gun_credits and native_gun_credits.on_research_finished(event) then bind_runtime_events(library_events_scheduled) end
   if (lifecycle.caps_active() or competing_retirements_active(event.research.name)) and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
     if worker_default_settled then
@@ -620,7 +629,7 @@ end
 
 local function on_research_started(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
   if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
@@ -628,9 +637,9 @@ local function on_research_started(event)
 end
 
 local function on_research_cancelled(event)
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
-  if native_credits and native_credits.on_research_cancelled(event) then reconcile_library_events() end
-  if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
+  if native_credits and native_credits.on_research_cancelled(event) then bind_runtime_events(library_events_scheduled) end
+  if native_gun_credits and native_gun_credits.on_research_cancelled(event) then bind_runtime_events(library_events_scheduled) end
   if (lifecycle.caps_active() or competing_retirements_active()) and not worker_storage_mutating(event) then
     lifecycle.on_research_cancelled(event)
   end
@@ -652,7 +661,7 @@ local function on_worker_completion_tick(event)
     worker_robot_storage.on_prepared_queue_tick(event)
   end
   -- Release the one-shot subscription after the last durable marker settles.
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
 end
 
 local function on_tower_planted_seed(event)
@@ -673,7 +682,7 @@ local function on_force_created(event)
   lifecycle.on_force_created(event)
   if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
@@ -689,7 +698,7 @@ local function on_force_reset(event)
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
@@ -728,13 +737,13 @@ local function on_forces_merged(event)
   if legacy_cannon_credits and event and event.destination then
     legacy_cannon_credits.on_technology_effects_reset({force=event.destination})
   end
-  reconcile_library_events()
+  bind_runtime_events(library_events_scheduled)
   request_library_refresh(event)
 end
 
 local function on_research_queued(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
+  if worker_robot_storage and worker_robot_storage.on_research_event(event) then bind_runtime_events(library_events_scheduled) end
   if native_gun_credits then native_gun_credits.on_research_queue_event(event) end
   if DISCOVERY_TREE then
     if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_discovery_tree_queue_changed(event) end
@@ -749,7 +758,8 @@ local function on_discovery_setting_changed(event)
   request_library_refresh(event)
 end
 
-local function bind_runtime_events(library_open)
+-- Gameplay callbacks reuse the last known Library subscription.
+bind_runtime_events = function(library_open)
   local credit_pending = native_credits and native_credits.needs_research_events() or false
   local gun_credit_pending = native_gun_credits and native_gun_credits.needs_research_events() or false
   credit_pending = credit_pending or gun_credit_pending
@@ -761,7 +771,8 @@ local function bind_runtime_events(library_open)
     worker_completion_tick = worker_completion_tick or worker_robot_storage.prepared_queue_pending() or nil
   end
   credit_pending = credit_pending or worker_pending
-  if library_events_scheduled == library_open and credit_events_scheduled == credit_pending
+  local library_subscription_changed = library_events_scheduled ~= library_open
+  if not library_subscription_changed and credit_events_scheduled == credit_pending
       and gun_credit_events_scheduled == gun_credit_pending
       and worker_events_scheduled == worker_pending and worker_completion_tick_scheduled == worker_completion_tick then return end
   library_events_scheduled = library_open
@@ -770,6 +781,22 @@ local function bind_runtime_events(library_open)
   worker_events_scheduled = worker_pending
   worker_completion_tick_scheduled = worker_completion_tick
   local events = defines and defines.events or {}
+  -- Shortcuts and the remote open interface reconcile after creating a view.
+  if library_subscription_changed then
+    for _, name in ipairs{
+      "on_gui_text_changed", "on_gui_selected_tab_changed", "on_gui_selection_state_changed",
+      "on_gui_checked_state_changed", "on_gui_click", "on_gui_location_changed", "on_gui_closed",
+    } do
+      local id = events[name]
+      if id then
+        script.on_event(id, library_open and function(event)
+          if not library.has_library_gui_name(event) then return end
+          library[name](event)
+          reconcile_translations()
+        end or nil)
+      end
+    end
+  end
   local competing_active = competing_productivity and competing_productivity.active()
   local retirements_active = competing_retirements_active()
   local force_lifecycle_active = lifecycle.caps_active()
@@ -831,19 +858,9 @@ local function bind_runtime_events(library_open)
   if events.on_tick then script.on_event(events.on_tick, worker_completion_tick and on_worker_completion_tick or nil) end
 end
 
-local function on_library_native_refresh(event)
+on_library_native_refresh = function(event)
   library.on_native_refresh_tick(event)
   reconcile_translations()
-end
-
-reconcile_library_events = function()
-  local open, pending = library.native_subscription_needs()
-  bind_runtime_events(open == true)
-  pending = pending == true
-  if library_refresh_scheduled ~= pending then
-    script.on_nth_tick(library.native_refresh_ticks, pending and on_library_native_refresh or nil)
-    library_refresh_scheduled = pending
-  end
 end
 
 function M.register()
@@ -888,19 +905,6 @@ function M.register()
     script.on_event(events.on_tower_planted_seed, active and on_tower_planted_seed or nil)
   end
   if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
-  for _, name in ipairs{
-    "on_gui_text_changed", "on_gui_selected_tab_changed", "on_gui_selection_state_changed",
-    "on_gui_checked_state_changed", "on_gui_click", "on_gui_location_changed", "on_gui_closed",
-  } do
-    local id = events[name]
-    if id then
-      script.on_event(id, function(event)
-        if not library.has_library_gui_name(event) then return end
-        library[name](event)
-        reconcile_translations()
-      end)
-    end
-  end
   if events.on_player_display_scale_changed then script.on_event(events.on_player_display_scale_changed, on_library_display_changed) end
   if events.on_player_display_resolution_changed then script.on_event(events.on_player_display_resolution_changed, on_library_display_changed) end
   if events.on_pre_player_removed then script.on_event(events.on_pre_player_removed, on_library_player_pre_removed) end

@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.25 beta release notes"
+title: "MIR 5.0.26 beta release notes"
 status: current
-applies_to: "MIR 5.0.25 GitHub prerelease"
+applies_to: "MIR 5.0.26 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,19 +9,15 @@ last_reviewed: 2026-11-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-525-release-notes
+  - mir-526-release-notes
 ---
 
-This beta preserves earned worker cargo, unfinished research and Space Exploration conquest bonuses across the tested save upgrades.
+This beta preserves paid worker cargo research at its original science price through a prepared Space Exploration add-on change.
 
-- **Factorio 1.1.110 to 2.0.77.** Update MIR on a copy of your save in Factorio 1.1.110. Run `/mir-worker-storage-recovery prepare`, save the paused game under a new name, and open that copy in 2.0.77 with the matching MIR edition and worker cargo settings. The checkpoint keeps paid research, parked progress and the queue. The tested Base save also carries those values forward to Factorio 2.1.23.
-- **Space Age on Factorio 2.0.77.** Upgrading a MIR 4.7.20002 save with its original official mod selection and startup settings keeps earned cargo and lets ordinary labs finish the original paid level. Parked progress and queued research stay intact.
-- **Space Exploration 0.7.57 on Factorio 2.0.77.** Upgrading a MIR 5.0.20018 save while raising the worker cargo limit from 10 to 12 keeps the six conquest bonuses. Labs complete levels 11 and 12 at their original seven-pack prices. Factorio blocks level 13 at the new limit.
-- **Older Space Exploration saves.** Use the staged upgrade in the support guide. Update MIR with your original startup settings and add-on versions, save to a new file, then change the add-ons. Combining the changes can stop the save from loading.
-- **Factorio 2.1.** The tested Space Age upgrade from 2.1.24 to 2.1.25 preserves paid worker cargo research and the queue. Adding Solar Productivity 3.0.0 on 2.1.24 also preserves the original research price and parked progress.
-- **Ferrum on Factorio 2.1.25.** Returning Ferrum to a save made after its removal keeps the paid worker cargo research, cargo bonuses and the queue. The restored research can become active at its original price.
-- **Removing Space Is Fake on Factorio 2.0.77.** Update MIR with the add-on still enabled, then save a copy and remove the add-on in a separate load. The staged upgrade keeps paid worker cargo research and lets labs finish at the original price.
+- On Factorio 2.0.77 with Space Exploration 0.7.57, keep the original save and exact old add-on archives. Use the witnessed preparation procedure while the original worker price is still present.
+- Prepare a copy before moving from Factorio 1.1.110 to 2.0.77 to carry earned cargo, unfinished research and queue order into the newer edition.
+- The Research Library listens for its interface events while a Library view is open.
 
-[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.25/docs/support.md#moving-a-factorio-11-save-to-20)
+[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.26/docs/support.md#upgrading-mir-4720002-with-space-exploration)
 
-This is a GitHub beta. Library memory and performance qualification remains in progress.
+This is a GitHub beta. The full Library performance comparison remains in progress.

@@ -60,7 +60,8 @@ function Assert-MultiplayerFixtureSelection {
     [Parameter(Mandatory)][string]$FixtureCase,
     [string]$ExpectedMIRArchiveSha256,
     [int]$SessionExpectedPeakMemoryMiB=0,
-    [switch]$StandaloneIdentityDiscovery
+    [switch]$StandaloneIdentityDiscovery,
+    [string]$RepoRoot
   )
   # These are the only fixed two-client selections admitted by this harness.
   # Profile kind and fixture case bind each row: F210 remains functional
@@ -336,26 +337,41 @@ function Assert-MultiplayerFixtureSelection {
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
     }
   )
-  $pairedBrowserArchives=[ordered]@{
-    '5.0.20005'=@('764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D')
-    '5.0.20023'=@(
-      'C5B3F559241E32F829D0BF71E104FB210E76984132EA9BB3D53F9A3E31C08AFE'
-      '2B665729B43EB64C43357BFE6A462B83A41584F00EBE147ED030BEF0890FAD5F'
-      '72F07C0C6B6BFF2D009ECABE3A25FAB0C61BF559D31D308B98C75D37BED7BEB2'
-      '43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
-    )
-    '5.0.20024'=@('F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535')
-  }
-  foreach($version in $pairedBrowserArchives.Keys){
-    $targets+=,[ordered]@{
-      fixture_case='library-paired-browser';target='f200'
-      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir=$version;build_version=84539
-      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
-      mir_archive_sha256=$pairedBrowserArchives[$version]
-      paired_arm='mir5'
-      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
-      optional_archives=@("more-infinite-research_$version.zip",'mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+  if ($FixtureCase -ceq 'library-paired-browser') {
+    Assert-Session (-not [string]::IsNullOrWhiteSpace($RepoRoot)) 'paired Library archive register requires the repository root'
+    $pins = @(Get-Content -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/library-paired-browser/candidate-archives.lua'))
+    Assert-Session ($pins.Count -ge 3 -and $pins[0] -ceq 'return {' -and $pins[-1] -ceq '}') 'paired Library archive register shape differs'
+    $pairedBrowserArchives = [ordered]@{}
+    foreach ($line in $pins[1..($pins.Count - 2)]) {
+      Assert-Session ($line -cmatch '^  \{ version = "(5\.0\.200[0-9]{2})", sha256 = "([A-F0-9]{64})" \},$') 'paired Library archive register row differs'
+      $version, $sha256 = $Matches[1], $Matches[2]
+      $hashes = @($pairedBrowserArchives[$version] | Where-Object { $null -ne $_ })
+      Assert-Session ($hashes -cnotcontains $sha256) 'duplicate paired Library archive binding'
+      $pairedBrowserArchives[$version] = $hashes + $sha256
+    }
+    foreach($version in $pairedBrowserArchives.Keys){
+      $targets+=,[ordered]@{
+        fixture_case='library-paired-browser';target='f200'
+        kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+        engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir=$version;build_version=84539
+        observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+        mir_archive_sha256=$pairedBrowserArchives[$version]
+        paired_arm='mir5'
+        fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
+        optional_archives=@("more-infinite-research_$version.zip",'mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+      }
+    }
+    if ($Selection['kind'] -ceq 'mir5-library-paired-browser-linux-f200-native-selection') {
+      foreach ($paired in @($targets | Where-Object {
+        $_.fixture_case -ceq $FixtureCase -and ($_.paired_arm -ceq 'published' -or $_.Contains('mir_archive_sha256'))
+      })) {
+        $paired.kind = [string]$Selection['kind']
+        $paired.engine_sha256 = '09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+        $paired.linux_private_displays = $true
+        if ($paired.paired_arm -ceq 'published') {
+          $paired.mir_archive_sha256 = 'F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7'
+        }
+      }
     }
   }
   # Two explicit disposable positive-state variants reuse the exact corrected
@@ -1083,7 +1099,7 @@ if($StandaloneIdentityDiscovery){
   $profile=Join-Path $output 'standalone-identity-selection.json'
   [IO.File]::WriteAllText($profile,($selection|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
 }
-$target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -SessionExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery
+$target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -SessionExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -RepoRoot $repo
 $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
@@ -1170,7 +1186,7 @@ if($ComposeOnly){
   Assert-LinuxDisplayPinnedFile -Path $fixtureArchive -Expected ([string]$target.fixture_archive_sha256) -Label 'ComposeOnly current Library fixture archive' -MaximumBytes 64MB|Out-Null
   Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory ([string]$standaloneLibraryFixture.source)
   $declaredHashes[$fixtureArchiveName]=[string]$target.fixture_archive_sha256
-  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version})
+  $actualHashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $baseRows -MirArchive ([pscustomobject]@{version=[string]$mirRows[0].version}) -ValidateDependencies
   Assert-Session ($actualHashes.Keys.Count-eq$declaredHashes.Keys.Count) 'ComposeOnly selected archive closure differs'
   foreach($name in $declaredHashes.Keys){Assert-Session ($actualHashes.ContainsKey($name)-and[string]$actualHashes[$name]-ceq[string]$declaredHashes[$name]) "ComposeOnly archive hash differs: $name"}
   Assert-MIRDirectLibraryStartupDeclaredInputs -ProfileDefinition $selection -EngineIdentity $engineIdentity -ArchiveHashes $actualHashes -ErrorPrefix 'mir5-multiplayer-compose'
@@ -1255,11 +1271,10 @@ try {
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
-    if($usesLinuxPrivateDisplays){
-      # The caller envelope was schema-checked before CreateOnly.  The session
-      # receives only context-local role roots and their freshly bound plans.
-      $spec.linux_private_displays=$linuxDisplayRuntime
-    }
+  }
+  if($usesLinuxPrivateDisplays){
+    # Pass the checked role roots and their freshly bound plans to the session.
+    $spec.linux_private_displays=$linuxDisplayRuntime
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){

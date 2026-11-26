@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.26
+Date: 2026-11-26
+
+  Bugfixes:
+
+    - Preserve the original science price for witnessed worker cargo research through a prepared Space Exploration add-on change.
+    - Resume ordinary worker cargo research at the new price after the saved work is complete.
+    - Subscribe to Research Library interface events only while a Library view is open.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.25
 Date: 2026-11-25
 

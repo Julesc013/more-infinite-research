@@ -24,6 +24,11 @@ local MINING = "recipe-prod-research_mining_drill-1"
 local TECHNOLOGIES = {GEAR, MINING}
 local RECIPES = {"iron-gear-wheel", "electric-mining-drill"}
 
+local candidate_versions = {}
+for _, archive in ipairs(require("candidate-archives")) do
+  candidate_versions[archive.version] = true
+end
+
 local ARMS = {
   published = {
     key = "published",
@@ -44,7 +49,7 @@ local ARMS = {
   mir5 = {
     key = "mir5",
     mir_version = "5.0.20000",
-    other_versions = { ["5.0.20005"] = true, ["5.0.20023"] = true, ["5.0.20024"] = true },
+    other_versions = candidate_versions,
     selector = "mir-fixture-mir5-library-paired-browser-arm-mir5",
     shape = {
       filters = "mir_library_filters",
@@ -275,8 +280,18 @@ local function assert_shape(player, arm, view)
       filters, content = child(root, shape.filters), child(tabs, shape.content)
     end
     query = child(filters, shape.query)
-    family = child(filters, shape.family)
-    results, detail = child(content, shape.results), child(content, shape.detail)
+    local grid = child(filters, "mir_library_filter_grid")
+    if grid ~= nil then
+      family = child(child(grid, "mir_library_family_field"), shape.family)
+    else
+      family = child(filters, shape.family)
+    end
+    local list_pane = child(content, "mir_library_list_pane")
+    if list_pane ~= nil and (not valid(list_pane) or list_pane.type ~= "flow"
+        or (list_pane.get_mod and list_pane.get_mod() ~= "more-infinite-research")) then
+      fail("MIR5 research list pane is malformed or foreign")
+    end
+    results, detail = child(list_pane or content, shape.results), child(content, shape.detail)
     if not valid(content) or not valid(results) then
       fail("MIR5 public browser research panes are absent")
     end

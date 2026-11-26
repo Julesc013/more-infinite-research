@@ -58,6 +58,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().control_path = CONTROL.as_posix()
+        self.lua.globals().archive_pins_path = (FIXTURE / "candidate-archives.lua").as_posix()
         self.lua.globals().saved_state_fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.globals().settings_path = SETTINGS.as_posix()
         self.lua.globals().published_selector = (ARMS["published"]["selector"] / "settings-updates.lua").as_posix()
@@ -81,6 +82,11 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             return {ok=ok, message=tostring(message), raw=raw}
           end
 
+          local function require_candidate_archives(name)
+            assert(name == "candidate-archives", "unexpected fixture import")
+            return assert(loadfile(archive_pins_path, "t", {}))()
+          end
+
           function paired_browser_parse(path)
             local callbacks, reads = {events = {}}, {}
             local env = {
@@ -92,6 +98,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               },
               defines = {events = {on_player_joined_game = 1, on_tick = 2}}
             }
+            env.require = require_candidate_archives
             env._G = env
             setmetatable(env, {__index = function(_, key)
               if key == "game" or key == "storage" or key == "settings" or key == "remote" or key == "helpers" then
@@ -296,6 +303,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             if opponent == "wrong-map-seed" then env.game.surfaces[1].map_gen_settings.seed=424243 end
             if opponent == "missing-map-surface" then env.game.surfaces={} end
             if opponent == "missing-map-settings" then env.game.surfaces[1].map_gen_settings=nil end
+            env.require = require_candidate_archives
             env._G=env
             setmetatable(env,{__index=function(_, key) return _G[key] end})
             local function invoke(callback, event)
@@ -614,7 +622,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                         self.assertFalse(refused["ok"])
                         self.assertIn("fixed map", refused["message"])
 
-    def test_control_registers_without_runtime_access_or_imports(self):
+    def test_control_registers_with_only_its_archive_data_and_no_runtime_access(self):
         result = plain(self.lua.globals().paired_browser_parse(self.lua.globals().control_path))
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual(result["reads"], {})
@@ -622,7 +630,8 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
         self.assertTrue(result["callbacks"]["init"])
         self.assertTrue(result["callbacks"]["load"])
         source = CONTROL.read_text(encoding="utf-8")
-        self.assertNotIn("require(", source)
+        self.assertEqual(source.count("require("), 1)
+        self.assertIn('require("candidate-archives")', source)
         self.assertNotIn("remote.add_interface", source)
         self.assertNotIn("on_research_finished", source)
 

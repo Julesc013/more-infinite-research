@@ -1679,6 +1679,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $prerequisite523='43A3A6B12E267DBCEA76228376DC45A3CEE14F818840629BE88D7A9C6692BBC0'
           $published524='F482F073D3A5CFAFE715353291B1CD909DC64FA24300F6D63641A42F755CF535'
           $players=@(
+            @{version='5.0.20025';sha256='B941F2E9C084DE3A3C61BE9AC89DDBE25C210E0FBCAE2A9662392D9B6115ECC1'}
             @{version='5.0.20024';sha256=$published524}
             @{version='5.0.20023';sha256=$prerequisite523}
             @{version='5.0.20023';sha256=$earlier523}
@@ -1687,12 +1688,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             @{version='5.0.20005';sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'}
           )
           function Refuse($profile,$actualEngine,$expected) {
-            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
+            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192 -RepoRoot (Get-Location).Path|Out-Null}catch{return}
             throw 'changed retained comparison input was admitted'
           }
           foreach($entry in $players) {
             $version=$entry.version;$mir=$entry.sha256
-            $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192
+            $target=Assert-MultiplayerFixtureSelection (Profile $version $mir) $engine 'library-paired-browser' $mir 8192 -RepoRoot (Get-Location).Path
             if($target.mir-cne$version-or$target.paired_arm-cne'mir5'-or$target.mir_archive_sha256-cne$mir){throw 'exact MIR 5 comparison arm was not selected'}
             $bad=Profile $version $mir;$bad.mods[2].version='5.0.20099';Refuse $bad $engine $mir
             Refuse (Profile $version ('0'*64)) $engine $mir
@@ -1706,6 +1707,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Refuse (Profile '5.0.20023' $promotion523) $engine $frozen523
           Refuse (Profile '5.0.20023' $prerequisite523) $engine $promotion523
           Refuse (Profile '5.0.20024' $frozen523) $engine $frozen523
+          $held525='3F0285DBA21D5DD9BC2241270F2ECC1DA39E5D2A975C723E60E258B3E10A7F1E'
+          Refuse (Profile '5.0.20025' $held525) $engine $held525
+
+          $linuxEngine='09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+          $published=Get-Content -LiteralPath 'tests/profiles/library-paired-browser-published-f200-2077.json' -Raw|ConvertFrom-Json -AsHashtable
+          $current=Profile '5.0.20025' '3383B2D7D51A5DDF53022341CC6EDFA702716B3CC08A805027861E47039A64E7'
+          $development=Profile '5.0.20025' '90AF4803D4D7A693CFE92840C282C0815D104DA6ADB30548AA0B6FBDEE07101D'
+          foreach($row in @(@{profile=$published;arm='published'},@{profile=$current;arm='mir5'},@{profile=$development;arm='mir5'})){
+            $profile=$row.profile
+            $version=$profile.mods[2].version
+            $hash=$profile.archive_sha256["more-infinite-research_$version.zip"]
+            $profile.engine.sha256=$linuxEngine
+            Refuse $profile $linuxEngine $hash
+            $profile.kind='mir5-library-paired-browser-linux-f200-native-selection'
+            $bound=Assert-MultiplayerFixtureSelection $profile $linuxEngine 'library-paired-browser' $hash 8192 -RepoRoot (Get-Location).Path
+            if(-not$bound.linux_private_displays-or$bound.paired_arm-cne$row.arm-or$bound.mir_archive_sha256-cne$hash){throw 'exact Linux paired arm differs'}
+            Refuse $profile $engine $hash
+            Refuse $profile $linuxEngine ('0'*64)
+          }
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
@@ -1718,12 +1738,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
     def test_paired_browser_boots_the_bound_arms_and_refuses_another_version(self):
         paired = ROOT / "tests/fixtures/library-paired-browser"
         selector = "mir-fixture-mir5-library-paired-browser-arm-mir5"
-        for patch in (23, 24):
+        for patch in (23, 24, 25):
             info = json.loads((paired / f"arm-mir5/info-5{patch}.json").read_text(encoding="utf-8"))
             self.assertEqual(info["name"], selector)
             self.assertIn(f"more-infinite-research = 5.0.200{patch}", info["dependencies"])
         boot = self.lua.eval(r'''
-          function(path, mir_version, selector)
+          function(path, pins_path, mir_version, selector)
             local initialize, ready
             defines = {events = {on_player_joined_game = 1, on_tick = 2}}
             settings = {startup = { ["mir5-library-paired-browser-arm"] = {value = "mir5"} }}
@@ -1740,23 +1760,66 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               on_init = function(handler) initialize = handler end,
               on_load = function() end, on_event = function() end
             }
-            dofile(path)
+            local imports = setmetatable({require = function(name)
+              assert(name == "candidate-archives")
+              return assert(loadfile(pins_path, "t", {}))()
+            end}, {__index = _G})
+            assert(loadfile(path, "t", imports))()
             local ok, err = pcall(initialize)
             return ok, err, ready and ready.arm
           end
         ''')
         path = (paired / "control.lua").as_posix()
-        for version in ("5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
+        pins = (paired / "candidate-archives.lua").as_posix()
+        for version in ("5.0.20025", "5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
             with self.subTest(version=version):
-                self.assertEqual(boot(path, version, selector), (True, None, "mir5"))
-        ok, diagnostic, arm = boot(path, "5.0.20025", selector)
+                self.assertEqual(boot(path, pins, version, selector), (True, None, "mir5"))
+        ok, diagnostic, arm = boot(path, pins, "5.0.20026", selector)
         self.assertFalse(ok)
         self.assertIn("active-mod closure differs at more-infinite-research", diagnostic)
         self.assertIsNone(arm)
-        ok, diagnostic, arm = boot(path, "5.0.20023", "mir-fixture-mir5-library-paired-browser-arm-published")
+        ok, diagnostic, arm = boot(path, pins, "5.0.20023", "mir-fixture-mir5-library-paired-browser-arm-published")
         self.assertFalse(ok)
         self.assertIn("fixture active-mod closure differs", diagnostic)
         self.assertIsNone(arm)
+
+    def test_paired_browser_reads_the_authored_filter_grid_and_results_pane(self):
+        observe = self.lua.eval(r'''
+          function(path)
+            local file = assert(io.open(path, "r"))
+            local text = file:read("*a")
+            file:close()
+            local boundary = assert(text:find("\nlocal function open(", 1, true))
+            local chunk = assert(load(text:sub(1, boundary - 1)
+              .. "\nreturn function(player, view) assert_shape(player, ARMS.mir5, view) end",
+              "@paired-shape", "t", setmetatable({require=function() return {} end}, {__index=_G})))
+            return chunk()
+          end
+        ''')((ROOT / "tests/fixtures/library-paired-browser/control.lua").as_posix())
+        run = self.lua.eval(r'''
+          function(observe, scope, owner)
+            local query = {valid=true,type="textfield",text="gears"}
+            local family = {valid=true,type="drop-down",items={{scope}},selected_index=1}
+            local results = {valid=true,type="list-box",items={"gears"},selected_index=1,style={minimal_width=280}}
+            local detail = {valid=true,type="scroll-pane",style={minimal_width=340}}
+            local content = {valid=true,type="table",column_count=2,style={maximal_width=660},
+              mir_library_list_pane={valid=true,type="flow",get_mod=function() return owner end,mir_library_results=results},
+              mir_library_detail=detail}
+            local filters = {valid=true,mir_library_query=query,
+              mir_library_filter_grid={valid=true,mir_library_family_field={valid=true,mir_library_family=family}}}
+            local page = {valid=true,type="scroll-pane",mir_library_filters=filters,mir_library_research_content=content}
+            local root = {valid=true,type="frame",visible=true,
+              mir_library_tabs={valid=true,type="tabbed-pane",mir_library_research_page=page}}
+            return pcall(observe, {gui={screen={mir_research_browser=root}}}, {query="gears"})
+          end
+        ''')
+        self.assertTrue(run(observe, "mir-browser.scope-all", "more-infinite-research"))
+        ok, detail = run(observe, "mir-browser.scope-mir", "more-infinite-research")
+        self.assertFalse(ok)
+        self.assertIn("scope differs", detail)
+        ok, detail = run(observe, "mir-browser.scope-all", "other")
+        self.assertFalse(ok)
+        self.assertIn("pane is malformed or foreign", detail)
 
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''
@@ -1919,9 +1982,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($selected.base -cne '2.1.23' -or $selected.mir -cne '5.0.21000' -or $selected.build_version -ne 87750){throw 'F210 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $standaloneF210 -EngineSha256 '8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -FixtureCase 'library-multiplayer'
           if($selected.kind -cne 'mir5-library-multiplayer-standalone-f210-native-selection' -or $selected.standalone_f210-ne$true -or $selected.observer_sha256-cne'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'){throw 'standalone F210 selection changed'}
-          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '4.7.20002'){throw 'published paired selection changed'}
-          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '5.0.20000'){throw 'MIR5 paired selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $scriptedEffects -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'scripted-effects-multiplayer'
           if($selected.kind -cne 'mir5-scripted-effects-multiplayer-f200-space-age-native-selection'){throw 'scripted effects selection changed'}
@@ -1929,13 +1992,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $preparedPaired['archive_sha256']['more-infinite-research_4.7.20002.zip']=('A'*64)
           $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('B'*64)
           $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip']=('C'*64)
-          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPaired -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPaired -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.kind -cne 'mir5-library-paired-browser-f200-native-selection'){throw 'prepared paired archive shape changed'}
           $preparedPairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $preparedPairedMir5['archive_sha256']['more-infinite-research_5.0.20000.zip']=('D'*64)
           $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('E'*64)
           $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip']=('F'*64)
-          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser' -RepoRoot (Get-Location).Path
           if($selected.mir -cne '5.0.20000'){throw 'prepared MIR5 paired archive shape changed'}
           function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
             $selection=Get-Content -LiteralPath $ProfilePath -Raw|ConvertFrom-Json -AsHashtable
@@ -4378,7 +4441,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($receipt.status-cne'complete-observation'-or$receipt.performance_acceptance-or$receipt.observations.Count-ne1-or$receipt.lifetime_peak_counters.Count-ne1){throw 'opted-in close changed sampling or duplicated counters'}
             $peak=$receipt.lifetime_peak_counters[0]
             if($peak.phase-cne'initial'-or$peak.role-cne'server'-or$peak.pid-ne$process.Id-or$peak.start_utc-cne$registration.start_utc){throw 'peak identity differs'}
-            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.paged_memory_peak_bytes-lt0-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            $observer=$receipt.lifetime_peak_observer
+            if($IsLinux){
+              if($null-ne$peak.paged_memory_peak_bytes-or$null-ne$observer.paged_memory_peak_bytes-or
+                  $observer.platform-cne'linux'-or$observer.sampled_private_bytes-cne'procfs VmData via System.Diagnostics.Process.PrivateMemorySize64'){
+                throw 'Linux paged peak or private-byte provenance differs'
+              }
+            }elseif($peak.paged_memory_peak_bytes-isnot[long]-or$peak.paged_memory_peak_bytes-lt0-or$observer.Contains('platform')){
+              throw 'Windows paged peak or receipt shape differs'
+            }
             if([datetime]::Parse($peak.observed_utc).ToUniversalTime()-lt$process.StartTime.ToUniversalTime()){throw 'peak UTC precedes process creation'}
             if($receipt.lifetime_peak_observer.changes_periodic_observations-ne$false-or$process.HasExited){throw 'observer changed process lifetime or periodic semantics'}
 
@@ -4713,20 +4785,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $fakeBody=@'
 param([Parameter(ValueFromRemainingArguments=$true)]$rest)
 $encoding=[Text.UTF8Encoding]::new($false)
+[IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'bad-ready'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,'{"kind":"bad"}',$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_STOPPED,'stopped',$encoding);exit 0}}
 }
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'linger'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   Start-Sleep -Milliseconds 400
   exit 0
 }
 if($env:MIR_TEST_DISPLAY_MODE -ceq 'success'){
   [IO.File]::WriteAllText($env:MIR_TEST_READY,$env:MIR_TEST_VALID_READY,$encoding)
-  [IO.File]::WriteAllText($env:MIR_TEST_PID,$PID,$encoding)
   while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-ceq'stop'){[IO.File]::WriteAllText($env:MIR_TEST_RESULT,$env:MIR_TEST_VALID_RESULT,$encoding);exit 0}}
 }
 throw 'unexpected fake display mode'

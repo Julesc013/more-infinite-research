@@ -3,6 +3,7 @@
 These controls exercise the hash-bound actor's public leaf functions only.  They
 do not open X, start Factorio, inspect /proc, or mutate a mod library.
 """
+import ctypes as C
 import importlib.util
 import hashlib
 import io
@@ -147,6 +148,60 @@ class MockBackend:
         self.close_calls += 1
         if self.close_error is not None:
             raise self.close_error
+
+
+
+class OwnedMenuCloseTests(unittest.TestCase):
+    def test_close_checks_the_exact_owned_window_before_sending(self):
+        spec = valid_spec("click")
+        binding = valid_binding(spec)
+        guard = mock.Mock()
+        for changed in ({}, {"pid": 17}, {"mapped": False}, {"bounds": [0, 0, 640, 480]}):
+            with self.subTest(changed=changed):
+                backend = mock.Mock()
+                backend.window.return_value = {
+                    "pid": spec["process_id"], "mapped": True, "bounds": binding["bounds"], "title": "Factorio 2.1"
+                } | changed
+                if changed:
+                    with self.assertRaisesRegex(ValueError, "owned window differs"):
+                        ACTOR.request_owned_window_close(spec, binding, backend, guard)
+                    backend.request_close.assert_not_called()
+                else:
+                    receipt = ACTOR.request_owned_window_close(spec, binding, backend, guard)
+                    backend.request_close.assert_called_once_with(binding["window"])
+                    self.assertEqual(receipt["protocol"], "WM_DELETE_WINDOW")
+
+    def test_close_sends_the_advertised_client_message_only(self):
+        backend = ACTOR.LinuxX11.__new__(ACTOR.LinuxX11)
+        backend.x = mock.Mock()
+        backend.d, backend.window_id, backend.x_error = 123, 7001, False
+        backend.x.XInternAtom.side_effect = lambda _display, name, _exists: {b"WM_PROTOCOLS": 8, b"WM_DELETE_WINDOW": 11}[name]
+        announced = (C.c_ulong * 1)(11)
+
+        def protocols(_display, _window, pointer, count):
+            C.cast(pointer, C.POINTER(C.POINTER(C.c_ulong)))[0] = C.cast(announced, C.POINTER(C.c_ulong))
+            C.cast(count, C.POINTER(C.c_int))[0] = 1
+            return 1
+
+        def delivered(display, window, propagate, mask, event):
+            self.assertEqual((display, window, propagate, mask), (123, 7001, 0, 0))
+            wire = C.cast(event, C.POINTER(ACTOR.XEvent)).contents.client_message
+            self.assertEqual((wire.type, wire.window, wire.message_type, wire.format), (33, 7001, 8, 32))
+            self.assertEqual(list(wire.data), [11, 0, 0, 0, 0])
+            return 1
+
+        backend.x.XGetWMProtocols.side_effect = protocols
+        backend.x.XSendEvent.side_effect = delivered
+        backend.request_close(7001)
+        backend.x.XSendEvent.assert_called_once()
+        backend.x.XSync.assert_called_once_with(123, 0)
+        backend.x.XFree.assert_called_once()
+
+        backend.x.XSendEvent.reset_mock()
+        announced[0] = 22
+        with self.assertRaisesRegex(ValueError, "did not advertise"):
+            backend.request_close(7001)
+        backend.x.XSendEvent.assert_not_called()
 
 
 class LibraryNativeInputLinuxTests(unittest.TestCase):
