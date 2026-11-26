@@ -556,10 +556,12 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           end
           local state=storage.mir_worker_storage_route
           local before=suspended.research_queue
-          history.command({player_index=1,parameter="resume suspneded"},nil)
+          assert(not history.command({player_index=1},nil))
+          assert(replies[1]==history.command_help)
+          assert(not history.command({player_index=1,parameter="resume suspneded"},nil))
           assert(writes==0 and storage.mir_worker_storage_route==state and suspended.research_queue==before)
-          assert(replies[1]:find("Unknown force: suspneded",1,true))
-          history.command({player_index=1,parameter="resume"},nil)
+          assert(replies[2]:find("Unknown force: suspneded",1,true))
+          assert(history.command({player_index=1,parameter="resume"},nil))
           assert(suspended.research_queue[2].name==ID and suspended.research_progress==.42)
           assert(suspended.technologies[ID].saved_progress==.27)
         ''')

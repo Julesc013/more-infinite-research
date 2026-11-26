@@ -3631,6 +3631,9 @@ local function resume_provider_queue(force, route, before_apply)
   return true, "Restored the parked provider research queue."
 end
 
+M.command_help = "Administrator or server. Usage: /mir-worker-storage-recovery <prepare|prepare-removal|cancel-removal|resume [force-name]>."
+  .. " The server must name a force for resume. In game, resume defaults to your current force."
+
 function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
@@ -3654,12 +3657,13 @@ function M.command(command, route)
     local saved = storage[REMOVAL_KEY]
     local pending = type(saved) == "table" and saved.schema == 2 and type(saved.forces) == "table" and saved.forces[force.index]
     ok, result, message = pcall(pending and resume_provider_queue or resume, force, route, before_apply)
-  else reply("Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume [force-name]"); return end
+  else reply(M.command_help); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
       .. " before trying recovery again: " .. tostring(result), 0)
   end
   reply(ok and message or tostring(result))
+  return applying
 end
 
 local function actual_record(force)

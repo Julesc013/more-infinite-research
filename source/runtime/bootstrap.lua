@@ -362,12 +362,11 @@ local function add_command()
       function(command) diagnostics.export(command and command.player_index) end)
   end
   if worker_robot_storage then
-    commands.add_command("mir-worker-storage-recovery",
-      "Administrator or server. Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume [force-name]",
-      function(command)
-        worker_robot_storage.command(command, worker_storage_route())
+    commands.add_command("mir-worker-storage-recovery", worker_robot_storage.command_help, function(command)
+      if worker_robot_storage.command(command, worker_storage_route()) then
         bind_runtime_events(library_events_scheduled)
-      end)
+      end
+    end)
   end
 end
 
