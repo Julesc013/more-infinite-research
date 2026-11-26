@@ -14,6 +14,16 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## MIR 5.0.26 private draft qualification (2026-11-26)
+
+GitHub draft `458998750` holds 17 player ZIPs and two checksum files for `v5.0.26`. The four required checks passed on `main` commit `964159230dbbd153e3c2d26cd2d4725ca393e2a3`. All 19 GitHub asset digests match the independently rebuilt inventory, and the notes match the reviewed source. The metadata receipt is `build/qualification/mir526-draft-readback-aero-r01/verified-private-draft-metadata.json` at SHA-256 `8323713D51B00E5EDEE10DAD82E7263E504A1D5AE4EC30C4A1D50BFB4F7EB3DC`. Anonymous download verification and primary `dist` delivery follow qualified publication. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2453)
+
+The exact draft Factorio 2.0 ZIP `0F75AF507CA9C2D3350D822C6149C59912FB77C0C130DABD12920EB5A6EACF08` replayed the protected cap-ten save on Factorio 2.0.77 with Space Exploration 0.7.57. The cap raise retained all eight forces, the six conquest values and the unrelated queue. Ordinary labs completed levels 11 and 12 at 11,600 and 17,400 units of each of seven science packs, and the cap blocked level 13. Two 1,200-update cold loads matched checksum `2906139010`. The source and successor saves rehashed and the shared library restored. The native readback is `build/qualification/mir526-cap12-exact-gunmetal-r01/verified-cap12-draft.json` at SHA-256 `8FB74DFFFBBD6714AE5A79980C68A07CFCFFD1722F157B3ADB6A704C7783178C`.
+
+The reviewed integration records the witnessed Space Exploration add-on transfer and ordinary paid-work settlement, both Factorio 2.1 report replays for the Space Age patch upgrade and Solar Productivity addition, and both staged Factorio 1.1 to 2.0 worker research transitions. Their reviewed receipt identities remain attached to the source integration. [Exact-package upgrade records](https://github.com/Julesc013/more-infinite-research/pull/2452)
+
+The checked paired Library timing fixture admits this same Factorio 2.0 ZIP and retains the wrong-edition test. The required Windows timing and retained-memory verdict still awaits admission and measurement. The exact Factorio 2.1 two-client Library replay is staged and awaits the native lane. [Checked fixture binding](https://github.com/Julesc013/more-infinite-research/pull/2455)
+
 ## MIR 5.0.25 publication hold (2026-11-26)
 
 The frozen Factorio 2.0 beta refused the staged upgrade of the protected Space Exploration save with a 10,251-unit worker storage price. The 5,125-unit control preserved all 200 paid science units. The pending publisher was stopped. Release 458825037 remains a draft with all 19 assets, and the last public prerelease is 5.0.24. [Release decision and original failure](https://github.com/Julesc013/more-infinite-research/pull/2439#issuecomment-7180016583)
