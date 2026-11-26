@@ -2477,7 +2477,6 @@ local function create_frame(player, view)
   icon_button(title, "close", "utility/close", {"mir-browser.close"})
 
   create_tabs(frame, player, view)
-  sync_frame_layout(player, view, frame)
   return frame
 end
 
