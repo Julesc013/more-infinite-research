@@ -1782,6 +1782,44 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("fixture active-mod closure differs", diagnostic)
         self.assertIsNone(arm)
 
+    def test_paired_browser_reads_the_authored_filter_grid_and_results_pane(self):
+        observe = self.lua.eval(r'''
+          function(path)
+            local file = assert(io.open(path, "r"))
+            local text = file:read("*a")
+            file:close()
+            local boundary = assert(text:find("\nlocal function open(", 1, true))
+            local chunk = assert(load(text:sub(1, boundary - 1)
+              .. "\nreturn function(player, view) assert_shape(player, ARMS.mir5, view) end",
+              "@paired-shape", "t", setmetatable({require=function() return {} end}, {__index=_G})))
+            return chunk()
+          end
+        ''')((ROOT / "tests/fixtures/library-paired-browser/control.lua").as_posix())
+        run = self.lua.eval(r'''
+          function(observe, scope, owner)
+            local query = {valid=true,type="textfield",text="gears"}
+            local family = {valid=true,type="drop-down",items={{scope}},selected_index=1}
+            local results = {valid=true,type="list-box",items={"gears"},selected_index=1,style={minimal_width=280}}
+            local detail = {valid=true,type="scroll-pane",style={minimal_width=340}}
+            local content = {valid=true,type="table",column_count=2,style={maximal_width=660},
+              mir_library_list_pane={valid=true,type="flow",get_mod=function() return owner end,mir_library_results=results},
+              mir_library_detail=detail}
+            local filters = {valid=true,mir_library_query=query,
+              mir_library_filter_grid={valid=true,mir_library_family_field={valid=true,mir_library_family=family}}}
+            local page = {valid=true,type="scroll-pane",mir_library_filters=filters,mir_library_research_content=content}
+            local root = {valid=true,type="frame",visible=true,
+              mir_library_tabs={valid=true,type="tabbed-pane",mir_library_research_page=page}}
+            return pcall(observe, {gui={screen={mir_research_browser=root}}}, {query="gears"})
+          end
+        ''')
+        self.assertTrue(run(observe, "mir-browser.scope-all", "more-infinite-research"))
+        ok, detail = run(observe, "mir-browser.scope-mir", "more-infinite-research")
+        self.assertFalse(ok)
+        self.assertIn("scope differs", detail)
+        ok, detail = run(observe, "mir-browser.scope-all", "other")
+        self.assertFalse(ok)
+        self.assertIn("pane is malformed or foreign", detail)
+
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest

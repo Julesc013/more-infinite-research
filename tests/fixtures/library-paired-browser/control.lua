@@ -280,7 +280,12 @@ local function assert_shape(player, arm, view)
       filters, content = child(root, shape.filters), child(tabs, shape.content)
     end
     query = child(filters, shape.query)
-    family = child(filters, shape.family)
+    local grid = child(filters, "mir_library_filter_grid")
+    if grid ~= nil then
+      family = child(child(grid, "mir_library_family_field"), shape.family)
+    else
+      family = child(filters, shape.family)
+    end
     local list_pane = child(content, "mir_library_list_pane")
     if list_pane ~= nil and (not valid(list_pane) or list_pane.type ~= "flow"
         or (list_pane.get_mod and list_pane.get_mod() ~= "more-infinite-research")) then
