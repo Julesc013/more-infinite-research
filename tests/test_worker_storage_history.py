@@ -3425,6 +3425,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
             ('foreign_bonus[detached.index]=foreign_bonus[detached.index]+1', 'native cargo outside'),
             ('saved_removal.technologies[tier5].effects[1].modifier=.5', 'matching native holder'),
             ('saved_removal.technologies.invented={}', 'research contract differs'),
+            ('saved_removal.technologies[tier6]=nil', 'research contracts are incomplete'),
         ]:
             with self.subTest(tamper=tamper):
                 lua=self.removal_world()
@@ -3561,6 +3562,8 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
         for change, reason in (
             ('script.active_mods.provider="2.0";return_event.mod_changes.provider.new_version="2.0"', 'version differs'),
             ('prototypes.technology[tier6].research_unit_energy=9000', 'research contract changed'),
+            ('archived_removal.technologies.invented={}', 'archive contains an unknown technology'),
+            ('archived_removal.providers.provider=nil', 'archive is incomplete'),
             ('detached.technologies[CREDIT].level=4', 'differs from the archived levels'),
             ('player.technologies[tier5].saved_progress=.99', 'already has work'),
         ):
