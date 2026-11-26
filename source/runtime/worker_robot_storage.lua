@@ -1813,6 +1813,19 @@ local function apply_legacy_paid_bridge(plan)
   return true
 end
 
+local function provider_checkpoint_scope(route)
+  local names, providers, max_levels = {}, {}, {}
+  for _, stage in ipairs(route.finite) do
+    names[#names+1] = stage.name
+    providers[stage.provider] = true
+    max_levels[stage.name] = stage.max_level
+  end
+  names[#names+1] = route.technology
+  max_levels[route.technology] = 4294967295
+  if not route.owned then providers[route.provider] = true end
+  return names, providers, max_levels
+end
+
 -- The checkpoint owns only work observed while its provider was active. A
 -- configuration event must corroborate the exact removal, and surviving
 -- native work is compared before any ownership setter runs.
@@ -1836,9 +1849,7 @@ local function provider_removal_checkpoint(event, state, owned)
       or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
     recover_error("finite provider removal changed the prepared tick, worker settings, engine or package")
   end
-  local required = {}
-  for _, stage in ipairs(owned.current.route.finite) do required[stage.provider] = true end
-  if not owned.current.route.owned then required[owned.current.route.provider] = true end
+  local _, required, max_levels = provider_checkpoint_scope(owned.current.route)
   if type(saved.providers) ~= "table" then recover_error("prepared provider versions are unavailable") end
   for name, version in pairs(saved.providers) do
     local removed = changes[name]
@@ -1852,19 +1863,15 @@ local function provider_removal_checkpoint(event, state, owned)
   if type(saved.forces) ~= "table" or type(saved.technologies) ~= "table" then
     recover_error("prepared provider forces or contracts are unavailable")
   end
-  local stages = {[saved.route.technology]={first=saved.route.level, last=4294967295}}
-  for _, stage in ipairs(saved.route.finite) do
-    stages[stage.name] = {first=tonumber(stage.name:match("%-(%d+)$")), last=stage.max_level}
-  end
   for name, terms in pairs(saved.technologies) do
-    local stage = stages[name]
-    if not stage or type(terms) ~= "table" or terms.first_level ~= stage.first
-        or terms.max_level ~= stage.last or type(terms.effects) ~= "table" then
+    local maximum = max_levels[name]
+    if not maximum or type(terms) ~= "table" or terms.first_level ~= tonumber(name:match("%-(%d+)$"))
+        or terms.max_level ~= maximum or type(terms.effects) ~= "table" then
       recover_error("prepared provider research contract differs: " .. name)
     end
-    stages[name] = nil
+    max_levels[name] = nil
   end
-  if next(stages) then recover_error("prepared provider research contracts are incomplete") end
+  if next(max_levels) then recover_error("prepared provider research contracts are incomplete") end
   return saved
 end
 
@@ -2535,12 +2542,7 @@ local function provider_return_checkpoint(event, route, contract)
       or not same_worker_configuration(checked_worker_configuration(saved.settings), relevant_worker_configuration()) then
     recover_error("returning provider does not match the archived worker route and settings", route)
   end
-  local providers, names = {}, {}
-  for _, stage in ipairs(route.finite) do
-    names[#names+1], providers[stage.provider] = stage.name, true
-  end
-  names[#names+1] = route.technology
-  if not route.owned then providers[route.provider] = true end
+  local names, providers, max_levels = provider_checkpoint_scope(route)
   for name, version in pairs(saved.providers) do
     local change = event.mod_changes[name]
     if not providers[name] or type(version) ~= "string" or script.active_mods[name] ~= version
@@ -2556,9 +2558,7 @@ local function provider_return_checkpoint(event, route, contract)
     end
   end
   for name in pairs(saved.technologies) do
-    local present = false
-    for _, id in ipairs(names) do if id == name then present = true; break end end
-    if not present then recover_error("returning provider archive contains an unknown technology: " .. name) end
+    if not max_levels[name] then recover_error("returning provider archive contains an unknown technology: " .. name) end
   end
   return saved, names
 end
@@ -3527,18 +3527,13 @@ local function prepare_provider_removal(route, before_apply)
     recover_error("cannot record provider work during an unverified package, engine or stepping state")
   end
 
-  local names, providers, contracts = {}, {}, {}
-  local function record_provider(name)
+  local names, providers = provider_checkpoint_scope(route)
+  for name in pairs(providers) do
     local version = active[name]
     if type(version) ~= "string" or version == "" then recover_error("provider version is unavailable: " .. name) end
     providers[name] = version
   end
-  for _, stage in ipairs(route.finite) do
-    names[#names+1] = stage.name
-    record_provider(stage.provider)
-  end
-  names[#names+1] = route.technology
-  if not route.owned then record_provider(route.provider) end
+  local contracts = {}
   for _, name in ipairs(names) do contracts[name] = provider_research_contract(name) end
 
   local checkpoint = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=active[MIR], base=active.base,
