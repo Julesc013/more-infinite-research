@@ -1771,10 +1771,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         ''')
         path = (paired / "control.lua").as_posix()
         pins = (paired / "candidate-archives.lua").as_posix()
-        for version in ("5.0.20025", "5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
+        for version in ("5.0.20026", "5.0.20025", "5.0.20024", "5.0.20023", "5.0.20005", "5.0.20000"):
             with self.subTest(version=version):
                 self.assertEqual(boot(path, pins, version, selector), (True, None, "mir5"))
-        ok, diagnostic, arm = boot(path, pins, "5.0.20026", selector)
+        ok, diagnostic, arm = boot(path, pins, "5.0.21026", selector)
         self.assertFalse(ok)
         self.assertIn("active-mod closure differs at more-infinite-research", diagnostic)
         self.assertIsNone(arm)
