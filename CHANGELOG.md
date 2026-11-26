@@ -2,6 +2,14 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.26] - 2026-11-26
+
+### Bugfixes
+
+- Preserve the original science price for witnessed worker cargo research through a prepared Space Exploration add-on change.
+- Resume ordinary worker cargo research at the new price after the saved work is complete.
+- Subscribe to Research Library interface events only while a Library view is open.
+
 ## [5.0.25] - 2026-11-25
 
 ### Bugfixes
