@@ -14,6 +14,14 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## MIR 5.0.27 checked draft and Foundation III update comparison (2026-11-26)
+
+Checked `main` commit `30e2f04abd5e49d4efb7497e289335dd1434c698` and promotion head `df6e0d54a8a8f95215516848f52b217e1aadb443` share the complete repository tree. The two full rebuilds match all 17 ZIPs, two checksum files and the tagged notes and upload text. All four required checks passed on merged `main`. The authenticated draft readback for release `459314915` verified its tag, notes, prerelease flag and 19 asset names, sizes, SHA-256 hashes and player ZIP labels. Local records are `build/qualification/mir527-checked-main-aero-r01/verified-main-freeze.json` at `A3FA271E5C5C181EA5648CAD3C833E566182DAC675967EAD199C18D7ACBE6C64` and `verified-draft.json` in the same directory at `FAEAD296FB8C749AD9AA2A0ABFEB243712732B5AC1D6C33312E50F84DF59C56D`. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2470)
+
+Factorio 2.0.77 completed all 18 matched Foundation III launches of 601 updates each with the exact 5.0.27 archive `D1BEEAA18CD2CFEBFF5466DD44B3B5A34A12D7C1156E8DDF7E41F7C43A523146`. Mean update times were 11.055 ms with published MIR 4.7.3 and 11.021 ms with 5.0.27. The paired mean difference was −0.034 ms, with a 95 percent interval from −0.173 to +0.105 ms. The upper interval bound passed the predeclared +1.0 ms limit. The same-build controls differed by 0.193, 0.017 and 0.131 ms and passed their repeatability limit. The protected save retained its hash and the direct library restored. After independent native readback, both byte-identical working copies were removed, recovering 217,096,524 bytes. The receipt is `build/qualification/mir527-foundation-update-gunmetal-r01/verified-foundation-update.json` at `4C920D1002A5E15CBB76810999605B4EC4D62F65F87D4B109F9A33E108FA533D`.
+
+The draft was private at readback. A one-shot Windows task is scheduled for 18:00 Australia/Sydney on 27 November to wait for the public release ID, then verify anonymous downloads and deliver the identical files to primary `dist`. Windows Library timing and retained-memory acceptance remain open.
+
 ## Current Space Exploration force-merge replay (2026-11-26)
 
 Gunmetal replayed two protected saves from published MIR 5.0.20017 on Factorio 2.0.77 with Space Exploration 0.7.57. The private Factorio 2.0 archive SHA-256 `B18344761487822A7D1FDC10F3A100EA359672E9F0946414E02643F6FED00A24` came from dev commit `b08944c903946e7eb06369646ff205af4d178ba5`. The permitted merge transferred the source chest and ordinary labs completed cargo levels 9 and 10 using 12,800 of each of the five original science packs. Both cold loads matched checksum `3898225767`.
