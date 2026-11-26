@@ -58,6 +58,28 @@ class LibraryTests(unittest.TestCase):
             "refresh must portably restyle old live chrome and retain the query/caret")
         ''')
 
+    def test_new_window_applies_frame_layout_once(self):
+        self.lua.execute(r'''
+          boot()
+          local width_writes=0
+          local native_add=screen.add
+          screen.add=function(spec)
+            local element=native_add(spec)
+            if spec.name=="mir_research_browser" then
+              local meta=getmetatable(element.style)
+              local native_write=meta.__newindex
+              meta.__newindex=function(style,key,value)
+                if key=="width" then width_writes=width_writes+1 end
+                native_write(style,key,value)
+              end
+            end
+            return element
+          end
+          local root=library.open(player,{query="gear",selected=gear.name})
+          assert(root.valid and research_filters(root).mir_library_query.text=="gear")
+          assert(width_writes==1,"new Library window applied frame width "..width_writes.." times")
+        ''')
+
     def test_title_caption_and_handle_share_the_owned_header_drag_target(self):
         self.lua.execute(r'''
           boot()
