@@ -361,6 +361,18 @@ function Assert-MultiplayerFixtureSelection {
         optional_archives=@("more-infinite-research_$version.zip",'mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
       }
     }
+    if ($Selection['kind'] -ceq 'mir5-library-paired-browser-linux-f200-native-selection') {
+      foreach ($paired in @($targets | Where-Object {
+        $_.fixture_case -ceq $FixtureCase -and ($_.paired_arm -ceq 'published' -or $_.Contains('mir_archive_sha256'))
+      })) {
+        $paired.kind = [string]$Selection['kind']
+        $paired.engine_sha256 = '09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+        $paired.linux_private_displays = $true
+        if ($paired.paired_arm -ceq 'published') {
+          $paired.mir_archive_sha256 = 'F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7'
+        }
+      }
+    }
   }
   # Two explicit disposable positive-state variants reuse the exact corrected
   # player/API/engine inputs, with separately named fixture0.4 metadata.
@@ -1259,11 +1271,10 @@ try {
     if($spaceAgeLibrary){$spec.space_age_library=$true}
     if($privateCreditChecks){$spec.private_credit_checks=$true}
     if($positivePrivateStateChecks){$spec.positive_private_state_checks=$true}
-    if($usesLinuxPrivateDisplays){
-      # The caller envelope was schema-checked before CreateOnly.  The session
-      # receives only context-local role roots and their freshly bound plans.
-      $spec.linux_private_displays=$linuxDisplayRuntime
-    }
+  }
+  if($usesLinuxPrivateDisplays){
+    # Pass the checked role roots and their freshly bound plans to the session.
+    $spec.linux_private_displays=$linuxDisplayRuntime
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){
