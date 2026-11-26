@@ -557,7 +557,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           local state=storage.mir_worker_storage_route
           local before=suspended.research_queue
           assert(not history.command({player_index=1},nil))
-          assert(replies[1]==history.command_help)
+          assert(replies[1]==history.command_help and replies[1][1]=="mir-command.worker-storage-recovery")
           assert(not history.command({player_index=1,parameter="resume suspneded"},nil))
           assert(writes==0 and storage.mir_worker_storage_route==state and suspended.research_queue==before)
           assert(replies[2]:find("Unknown force: suspneded",1,true))
@@ -2318,6 +2318,38 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
               for _,id in ipairs{CANONICAL,ORDINARY,ID}do prototypes.technology[id].research_unit_energy=7200 end
             ''')
         return lua
+
+    def test_default_owner_checks_share_queue_reads_without_changing_paid_work(self):
+        lua = self.world()
+        lua.execute(r'''
+          init_default()
+          player.research_queue={ORDINARY,ORDINARY,OTHER}
+          player.research_progress=.125
+          suspended.technologies[ORDINARY].saved_progress=.25
+          local before, owner=all_frames(),storage[OWNER_KEY]
+          local readers, counts={},{}
+          for _,force in pairs(game.forces) do
+            local mt=getmetatable(force)
+            local read=mt.__index
+            local index=force.index
+            readers[index]=read
+            counts[index]=0
+            mt.__index=function(object,key)
+              if key=="research_queue" then counts[index]=counts[index]+1 end
+              return read(object,key)
+            end
+          end
+          writes=0
+          assert(history.default_owner_preflight({mod_startup_settings_changed=false,mod_changes={}},nil,true))
+          for _,force in pairs(game.forces) do
+            local index=force.index
+            -- Keep the separate pristine-private guard. The public
+            -- source, ordinary owner and debit share the second read.
+            assert(counts[index]==2, "unexpected queue reads for " .. force.name .. ": " .. counts[index])
+            getmetatable(force).__index=readers[index]
+          end
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==owner)
+        ''')
 
     def test_legacy_work_survives_explicit_future_price_time_changes_and_later_handover(self):
         for price, time in ((True, False), (False, True), (True, True)):

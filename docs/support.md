@@ -237,7 +237,7 @@ To make a material's research unlimited, enable it and set its maximum level to 
 
 - On Factorio 2.0/2.1, Library **Export Settings** creates a full settings profile that can help with configuration problems. If the game fails before MIR loads, send the engine log or error text instead.
 - **Export Compact** omits defaults; it can behave differently after defaults change in a later version.
-- Use `/mir-settings-export` or `/mir-settings-export --compact` for the same exports through chat/console.
+- Use `/mir-settings-export` or `/mir-settings-export compact` for the same exports in Factorio’s console. Enter `/help mir-settings-export` for syntax.
 - Find the settings file at `script-output/more-infinite-research/settings/mir-settings-profile.txt` in Factorio's user-data folder.
 - Check a shared string with `/mir-settings-import-check <profile-string>` before choosing to use it.
 - To apply it, paste the string into the `mir-settings-profile-import` startup setting and restart Factorio.

@@ -240,6 +240,8 @@ class BootstrapTests(unittest.TestCase):
           assert(library_calls.profile_export.parameter == "--compact")
           assert(library_calls.profile_validate.parameter == "valid-profile")
           assert(commands.registered["mir-research"].help[1] == "mir-browser.command")
+          assert(commands.registered["mir-settings-export"].help[1] == "mir-command.settings-export")
+          assert(commands.registered["mir-settings-import-check"].help[1] == "mir-command.settings-import-check")
 
           assert(type(handlers.init) == "function" and type(handlers.configuration) == "function"
             and type(handlers.load) == "function")
@@ -1479,6 +1481,7 @@ class BootstrapTests(unittest.TestCase):
           assert(type(maintenance)=="function")
           maintenance({tick=61})
           assert(#headers==2)
+          assert(commands.registered["mir-diagnostics-export"].help[1] == "mir-command.diagnostics-export")
           commands.registered["mir-diagnostics-export"].callback({player_index=1})
           assert(diagnostic_exports==1 and diagnostic_player==1)
           commands.registered["mir-diagnostics-export"].callback({})

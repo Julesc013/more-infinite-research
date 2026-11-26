@@ -351,14 +351,10 @@ local function add_command()
     if player then library.open(player) end
     reconcile_translations()
   end)
-  commands.add_command("mir-settings-export",
-    "Export the current effective MIR startup settings to script-output/more-infinite-research/settings/<name>.txt. Use --compact to omit defaults.",
-    settings_commands.export)
-  commands.add_command("mir-settings-import-check",
-    "Validate a MIR settings profile string before pasting it into the mir-settings-profile-import startup setting.",
-    settings_commands.validate)
+  commands.add_command("mir-settings-export", {"mir-command.settings-export"}, settings_commands.export)
+  commands.add_command("mir-settings-import-check", {"mir-command.settings-import-check"}, settings_commands.validate)
   if diagnostics then
-    commands.add_command("mir-diagnostics-export", "Replace the bounded MIR report and export full MIR settings; attach factorio-current.log separately.",
+    commands.add_command("mir-diagnostics-export", {"mir-command.diagnostics-export"},
       function(command) diagnostics.export(command and command.player_index) end)
   end
   if worker_robot_storage then
