@@ -22193,6 +22193,182 @@
       ],
       "scope": "The two selected host suites passed with pinned Lua. Broader Library controller history and native acceptance require separate evidence."
     },
+    "library_native_event_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for the selected controller methods.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library.py",
+          "distinct_test_blobs": 51,
+          "retained_controls": {
+            "LibraryTests.test_authored_catalogue_builds_lazily_once_until_configuration_changes": {
+              "current_line": 1798,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 502,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "2B4E9AFC5DDAE5FDD16D53365776FA3401D348B8CD212DA07462EAFD4CE0F6B7"
+                }
+              ],
+              "disposition": "The query control follows the authored Research layout. The test keeps the independent lazy-build count and its invalidation at configuration change.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh": {
+              "current_line": 3276,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 802,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "61643E1D08144BC1F799347D0CD8FD17EC5A4BB25D0B6E06388A9B7417E8CF6D"
+                }
+              ],
+              "disposition": "The query control follows the authored Research layout. The test still exercises parse-time selection and a refresh with runtime profile resolution forbidden.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_cap_provider_is_configured_without_force_extension_or_periodic_work": {
+              "current_line": 4744,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1593,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "10FC3DA4E864B2D390B7ACC8CA5253301A48CF196C9BDC9A42E4BB300F1C5F39"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 2062,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "B7B8BEF97472DBA642710308C3250D2F3D97956DFDAC3691AE468732080DEDD2"
+                }
+              ],
+              "disposition": "The accepted Library interaction restores the first-open finite cap explanation. The current test still checks zero provider calls on load, the per-render count, the declared limit and setting ID, and invalid-provider rejection.",
+              "decision_revision": "cfeac3e8a6583576f6d0165a9f5cf6a9087b441e"
+            },
+            "LibraryTests.test_configuration_invalidates_a_saved_open_working_cache_without_prior_on_load": {
+              "current_line": 4247,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1357,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "0F87E056D9388D107AF08A9D7F235033EB0EF809FE80D30D6FEC999E0745A62B"
+                }
+              ],
+              "disposition": "The test follows the retained results pane and reads the caption of the icon-bearing row. The configuration change still replaces the stale saved cache and retains the selected open view.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_native_events_refresh_the_actual_library_model_and_selected_detail": {
+              "current_line": 1639,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 343,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "4BA3BFA67C5930151C74DAF91991248E06ED9AEF12604DE100D832EECD42FDC7"
+                }
+              ],
+              "disposition": "The updated fixture reads the level caption from the authored Research facts pane. The native level before and after refresh and the retained selection keep their original expectations.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_native_refresh_ignores_other_forces_and_foreign_frames_and_rejoins_live_views": {
+              "current_line": 1708,
+              "historical_bodies": [
+                {
+                  "revision": "8aec3e68e5179ff88765e08efbb82035e64a3212",
+                  "line": 379,
+                  "blob": "17c94842ea06aab113c844a48c2bcd02baf67c72",
+                  "body_sha256": "3825312EA93791B3F3263524C60B4BA7B961A1304BDD518837BEED7A63D4ED18"
+                }
+              ],
+              "disposition": "Foreign-force and foreign-frame isolation remain under the original native route. The current rejoin case additionally verifies that the saved open flag survives the subscription change."
+            },
+            "LibraryTests.test_native_research_events_refresh_once_after_engine_state_settles_and_unsubscribe_on_close": {
+              "current_line": 1575,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 298,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "B3C97A91C960A572752233482DF0BD14F7D3C2102859FAA5B4C20826280FB1C5"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 320,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "5427927739F9820CFBC273E3F791603FDF722D2DB6B4F12B071E3455C10A3F34"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 1021,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "82A326F32A0761F1B51B9C013FF38C4FC25C512AC6A2B69F3BC59DD9B30AA18B"
+                }
+              ],
+              "disposition": "The current burst case adds call counts for the deferred rebuild, closes the tick subscription after the view settles, and challenges a foreign-force move. The queue and force boundary test separately sends the original same-force move through its native event route.",
+              "decision_revision": "b99a94e9ca9a413815422e0596cbd15c3c78fe89"
+            },
+            "LibraryTests.test_queue_reversal_effect_reset_and_force_boundaries_route_live_native_views": {
+              "current_line": 1678,
+              "historical_bodies": [
+                {
+                  "revision": "61bc49e55cee121db75f300d5ae954d3f8488105",
+                  "line": 374,
+                  "blob": "3b47db676532371fdba3b5d821a101da751ebc24",
+                  "body_sha256": "43B2CA753AFAF367AEE511A6263BAD1FBEB0E7A6DD5E080DEFEE65B27B28A9A9"
+                }
+              ],
+              "disposition": "The current case still drives the same-force queued, moved and reset events through the real model. It adds a check that independent prototype policy cleanup receives the effects reset."
+            },
+            "LibraryTests.test_real_catalogue_library_handoff_keeps_the_default_worker_tail_literal": {
+              "current_line": 4815,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.13",
+                  "line": 3948,
+                  "blob": "53ee79ae8366124b71485c518759f651e07b7d1b",
+                  "body_sha256": "2B94359D293353063C7F4E1E2119618A1E6DD738FBF0DBCB984367403BB9B7D8"
+                }
+              ],
+              "disposition": "The original literal stage identities and native handoff remain covered. The current case adds identical native captions, finite and continuing stage display, effective cap overrides and ready-only and completed-only filtering under the original name sort.",
+              "decision_revision": "52208ad5ea1cbc43d1937a06de445b5c50db20b0"
+            },
+            "LibraryTests.test_source_keeps_event_registration_and_old_compiler_outside_the_slice": {
+              "current_line": 5610,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 2148,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "8DCF103E5195F29A7BDEE2A54E71F683DD4BD4082365B5BBC1C5515277726384"
+                }
+              ],
+              "disposition": "The event prefilter now uses the Library's own GUI-name predicate. The host source contract keeps registration in bootstrap and retains the compiler and host-mutation boundaries."
+            },
+            "LibraryTests.test_status_filter_persists_read_only_queue_context_and_cap_explanation": {
+              "current_line": 4403,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1513,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "D615070330C2347B7DBECB1670E2137EC30ACC1C4D942E69B72AD7CF7100AB45"
+                }
+              ],
+              "disposition": "The authored layout moves queue guidance to the native research handoff tooltip. The current case still checks persistent queue filtering, the actual selected row, the finite limit explanation and native queue custody.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            }
+          }
+        }
+      ],
+      "scope": "Selected controller expectations cover event coalescing, saved views, named queue and cap reads, and presentation boundaries. The full controller host suite passed with pinned Lua. Further controller history and native acceptance require separate evidence."
+    },
     "runtime_ownership_same_name_test_intent_review": {
       "reviewed_on": "2026-11-26",
       "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
