@@ -29,6 +29,17 @@ function Assert-Session([bool]$Condition, [string]$Message) {
 function Get-SessionHash([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
+function Set-PairedBrowserCalibrationRestart([string]$RestartPath,[string]$GeneratedSha256,[hashtable]$Calibration) {
+  $anchor=Resolve-BuildInput $Calibration.path 'Leaf' 'calibration restart input'
+  Assert-Session (Test-SaveReady $anchor) 'calibration restart is not a readable save'
+  Assert-Session ((Get-SessionHash $anchor) -ceq $Calibration.sha256) 'calibration restart input hash differs'
+  Assert-Session ((Get-SessionHash $RestartPath) -ceq $GeneratedSha256) 'generated restart changed before calibration'
+  $generated=Join-Path (Split-Path -Parent $RestartPath) 'calibration-generated-restart.zip'
+  [IO.File]::Move($RestartPath,$generated,$false)
+  [IO.File]::Copy($anchor,$RestartPath,$false)
+  Assert-Session ((Get-SessionHash $generated) -ceq $GeneratedSha256 -and (Get-SessionHash $RestartPath) -ceq $Calibration.sha256) 'calibration restart copies differ'
+  return [ordered]@{generated_save=$generated;generated_sha256=$GeneratedSha256;input_sha256=$Calibration.sha256}
+}
 function Get-ProcessMemoryObservationOptIn([hashtable]$Spec,[string]$FixtureCase) {
   $collect = $false
   if ($Spec.ContainsKey('process_memory_observations')) {
@@ -1324,6 +1335,12 @@ try {
     }
     $initialProfiler = Get-PairedBrowserProfilerMarkers $initialText @('first_open','search','refresh')
     Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
+    $calibration=$null
+    if($spec.ContainsKey('calibration_restart')){
+      Assert-Session ($pairedArm -ceq 'published' -and $spec.calibration_restart -is [hashtable]) 'invalid paired Browser calibration input'
+      $calibration=Set-PairedBrowserCalibrationRestart $restartSave $restartHash $spec.calibration_restart
+      $restartHash=$calibration.input_sha256
+    }
     $beforeRestartServerLog = $initialText
     $server = Start-Server 'server-restart' $restartSave
     [void](Wait-For 'paired Browser restarted server listener log' {
@@ -1368,6 +1385,10 @@ try {
       clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
       client_graphics_arguments=$clientGraphics
       screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
+    }
+    if($null -ne $calibration){
+      Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $calibration.generated_save) -ceq $calibration.generated_sha256) 'calibration restart custody changed'
+      $result.calibration_restart=$calibration
     }
   } else {
 

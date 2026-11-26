@@ -4559,6 +4559,59 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_fixed_restart_calibration_preserves_the_generated_restart(self):
+        from zipfile import ZipFile
+
+        script = r'''
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          $buildRoot=$env:MIR_TEST_ROOT
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          foreach($name in @('Assert-Session','Get-SessionHash','Test-Within','Assert-NoReparse',
+            'Resolve-Existing','Resolve-BuildInput','Test-SaveReady','Set-PairedBrowserCalibrationRestart')){
+            $match=@($ast.FindAll({param($node)
+              $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name
+            },$false))
+            if($match.Count -ne 1){throw "missing definition: $name"}
+            . ([scriptblock]::Create($match[0].Extent.Text))
+          }
+          $restart=Join-Path $buildRoot 'restart.zip'
+          $anchor=Join-Path $buildRoot 'anchor.zip'
+          $backup=Join-Path $buildRoot 'calibration-generated-restart.zip'
+          $generated=Get-SessionHash $restart
+          $pinned=Get-SessionHash $anchor
+          $invalid=$false
+          try {
+            Set-PairedBrowserCalibrationRestart $restart $generated @{path=$anchor;sha256=('0'*64)} | Out-Null
+          } catch {
+            if($_.Exception.Message -notmatch 'calibration restart input hash differs'){throw}
+            $invalid=$true
+          }
+          if(-not $invalid -or (Test-Path -LiteralPath $backup) -or (Get-SessionHash $restart) -cne $generated){
+            throw 'a mismatched calibration input changed the generated restart'
+          }
+          $applied=Set-PairedBrowserCalibrationRestart $restart $generated @{path=$anchor;sha256=$pinned}
+          if((Get-SessionHash $backup) -cne $generated -or (Get-SessionHash $restart) -cne $pinned -or
+            (Get-SessionHash $anchor) -cne $pinned -or $applied.input_sha256 -cne $pinned){
+            throw 'calibration failed to retain both exact restart archives'
+          }
+          'PASS pinned restart calibration'
+        '''
+        with tempfile.TemporaryDirectory() as working:
+            root = Path(working)
+            for filename, content in (("restart.zip", "generated"), ("anchor.zip", "fixed input")):
+                with ZipFile(root / filename, "w") as archive:
+                    archive.writestr("save/level.dat", content)
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_ROOT=str(root)), check=False,
+            )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("PASS pinned restart calibration", result.stdout)
+
     def test_paired_browser_session_reader_requires_exact_server_protocol(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -5930,7 +5983,7 @@ while($true){$line=[Console]::In.ReadLine();if($null-eq$line){exit 0};if($line-c
               $script:sessionPath=Join-Path $output 'session.json'
               $script:records=[Collections.Generic.List[object]]::new()
               $script:stops=[Collections.Generic.List[string]]::new()
-              $sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
+              $spec=@{};$sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
               $script:memoryWrites=0;$script:memoryReasons.Clear();$script:peerCompletionObserved=$false
               $processMemorySampler=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){[pscustomobject]@{}}else{$null}
               $processMemoryObservationPath=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){Join-Path $output 'process-memory-observations.json'}else{$null}
