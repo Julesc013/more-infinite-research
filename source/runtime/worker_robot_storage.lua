@@ -250,20 +250,24 @@ end
 -- unrelated startup change. It is evidence of the observed current work
 -- contract, not a reconstruction of an older setting table.
 local WORKER_CONFIGURATION_FIELDS = {
-  "enabled", "base_cost", "linear_increment", "growth_factor", "max_level", "research_time", "effect_percent",
+  enabled="boolean", base_cost="number", linear_increment="number", growth_factor="number",
+  max_level="number", research_time="number", effect_percent="number",
 }
+
+local function require_worker_setting(key, value, source)
+  local kind = WORKER_CONFIGURATION_FIELDS[key]
+  if type(value) == kind and (kind == "boolean" or value > -math.huge and value < math.huge) then return end
+  local contract = key == "enabled" and "enable" or "startup"
+  recover_error(source .. " worker " .. contract .. " configuration is invalid")
+end
 
 local function relevant_worker_configuration()
   local stream = effective_values.streams and effective_values.streams["worker-robots-storage"]
   if type(stream) ~= "table" then recover_error("current worker startup configuration is unavailable") end
   local result = {}
-  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
+  for key in pairs(WORKER_CONFIGURATION_FIELDS) do
     local value = stream[key]
-    if key == "enabled" then
-      if type(value) ~= "boolean" then recover_error("current worker enable configuration is invalid") end
-    elseif type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge then
-      recover_error("current worker startup configuration is invalid")
-    end
+    require_worker_setting(key, value, "current")
     result[key] = value
   end
   return result
@@ -273,26 +277,18 @@ local function checked_worker_configuration(value)
   if type(value) ~= "table" or getmetatable(value) ~= nil then
     recover_error("saved worker startup configuration is invalid")
   end
-  local seen = {}
   for key, item in pairs(value) do
     if type(key) ~= "string" then recover_error("saved worker startup configuration has an invalid key") end
-    seen[key] = true
-    if key == "enabled" then
-      if type(item) ~= "boolean" then recover_error("saved worker enable configuration is invalid") end
-    elseif (key ~= "base_cost" and key ~= "linear_increment" and key ~= "growth_factor"
-        and key ~= "max_level" and key ~= "research_time" and key ~= "effect_percent")
-        or type(item) ~= "number" or item ~= item or item == math.huge or item == -math.huge then
-      recover_error("saved worker startup configuration is invalid")
-    end
+    require_worker_setting(key, item, "saved")
   end
-  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
-    if not seen[key] then recover_error("saved worker startup configuration is incomplete") end
+  for key in pairs(WORKER_CONFIGURATION_FIELDS) do
+    if value[key] == nil then recover_error("saved worker startup configuration is incomplete") end
   end
   return value
 end
 
 local function same_worker_configuration(left, right)
-  for _, key in ipairs(WORKER_CONFIGURATION_FIELDS) do
+  for key in pairs(WORKER_CONFIGURATION_FIELDS) do
     if left[key] ~= right[key] then return false end
   end
   return true

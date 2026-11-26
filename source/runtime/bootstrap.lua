@@ -374,8 +374,9 @@ local function on_init()
   local native_credit_plan = native_credits and native_credits.preflight_family_transition(nil, true)
   local cap_plan = lifecycle.preflight(false)
   if worker_robot_storage then
-    worker_robot_storage.on_init(worker_storage_route())
-    worker_robot_storage.default_owner_on_init(worker_storage_route(), WORKER_DEFAULT_SPLIT)
+    local route = worker_storage_route()
+    worker_robot_storage.on_init(route)
+    worker_robot_storage.default_owner_on_init(route, WORKER_DEFAULT_SPLIT)
   end
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
@@ -412,15 +413,16 @@ local function on_configuration_changed(event)
   local muria = type(changes) == "table" and changes.Muria
   local mir = type(changes) == "table" and changes["more-infinite-research"]
   local secretas = type(changes) == "table" and changes.secretas
+  local worker_route = worker_storage_route()
   local worker_default_plan = worker_robot_storage
-    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT,
+    and worker_robot_storage.default_owner_preflight(event, worker_route, WORKER_DEFAULT_SPLIT,
       se_system_force_plan and se_system_force_plan.worker_storage_bonus)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
   local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
   -- The default-owner plan authenticates and consumes this complete prepared
   -- witness. Do not issue a second legacy plan that could reinstall its quota.
-  local worker_storage_plan = not worker_prepared_default and worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route(),
+  local worker_storage_plan = not worker_prepared_default and worker_robot_storage and worker_robot_storage.preflight(event, worker_route,
     worker_provider_handover and worker_default_plan or nil)
   local worker_default_caps = lifecycle.preflight_worker_storage_split_caps(worker_default_plan)
   if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
