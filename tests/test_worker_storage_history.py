@@ -3867,7 +3867,8 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
 
     def test_472_se_checkpoint_authenticates_the_paid_native_frame(self):
         cases = ("matching", "same-version wrong price", "missing active work", "changed queue",
-                 "planned conquest bonus", "different conquest bonus", "missing conquest plan")
+                 "planned conquest bonus", "different conquest bonus", "missing conquest plan",
+                 "preparation mod", "missing preparation", "changed preparation selection")
         for case in cases:
             with self.subTest(case=case):
                 lua = self.published472_se_world()
@@ -3899,13 +3900,31 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   player.research_progress = 200/10251
                   detached.technologies[CANONICAL].saved_progress = .23
                   local check_conquest = checkpoint_case:find("conquest",1,true) ~= nil
+                    or checkpoint_case == "preparation mod"
                   if check_conquest then
                     foreign_bonus[uninvested.index] = checkpoint_case == "different conquest bonus" and 4 or 3
                   end
                   script.active_mods[mir] = "4.7.20002"
                   local saved = checkpoint.capture(function(_,technology) return technology.saved_progress end)
                   saved.formula = formula
-                  storage[checkpoint.key] = saved
+                  local from_preparation = checkpoint_case:find("preparation",1,true) ~= nil
+                  local reads = 0
+                  if from_preparation then
+                    saved.source_mods = copy(script.active_mods)
+                    local name = checkpoint.preparation_mod
+                    script.active_mods[name] = checkpoint.preparation_version
+                    remote = {
+                      interfaces={[name]={checkpoint=true}},
+                      call=function(interface, method)
+                        assert(interface == name and method == "checkpoint")
+                        reads = reads + 1
+                        if checkpoint_case ~= "missing preparation" then return copy(saved) end
+                      end,
+                    }
+                    if checkpoint_case == "changed preparation selection" then script.active_mods.editor = "0.1.1" end
+                  else
+                    storage[checkpoint.key] = saved
+                  end
                   script.active_mods[mir] = successor
                   if checkpoint_case == "same-version wrong price" then
                     factor = 675
@@ -3926,12 +3945,15 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                     end
                   end
                   local before = all_frames()
+                  local stored = storage[checkpoint.key]
                   writes = 0
                   local ok,plan = pcall(history.default_owner_preflight,older_event("4.7.20002"),nil,true,planned)
-                  assert(writes == 0 and same(before,all_frames()) and storage[checkpoint.key] == saved)
-                  if checkpoint_case ~= "matching" and checkpoint_case ~= "planned conquest bonus" then
+                  assert(writes == 0 and same(before,all_frames()) and storage[checkpoint.key] == stored)
+                  if checkpoint_case ~= "matching" and checkpoint_case ~= "planned conquest bonus"
+                      and checkpoint_case ~= "preparation mod" then
                     local reason = checkpoint_case == "same-version wrong price" and "work contract differs"
                       or check_conquest and "worker cargo changed"
+                      or from_preparation and "the worker preparation is missing or its mod selection changed"
                       or "same-engine checkpoint progress or queue changed"
                     assert(not ok and tostring(plan):find(reason,1,true),tostring(plan))
                     assert(storage[OWNER_KEY] == nil)
@@ -3948,9 +3970,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   assert(detached.technologies[ORDINARY].saved_progress == .23)
                   if planned then assert(uninvested.worker_robots_storage_bonus == 0) end
                   local settled = all_frames()
+                  local reads_after_apply = reads
                   writes = 0
                   history.default_owner_on_load()
-                  assert(writes == 0 and same(settled,all_frames()))
+                  assert(writes == 0 and same(settled,all_frames()) and reads == reads_after_apply)
                 ''')
 
     def test_472_space_age_requires_proven_worker_history(self):

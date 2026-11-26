@@ -1936,6 +1936,11 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
   local id, state, owned = recovery.ordinary_default_id, checked_state(), owner_record()
   local removal = context.provider_removal and provider_removal_checkpoint(event, state, owned) or nil
   local checkpoint = storage[engine_checkpoint.key]
+  local from_preparation_mod = false
+  if checkpoint == nil then
+    checkpoint = engine_checkpoint.read_legacy_preparation(event, target)
+    from_preparation_mod = checkpoint ~= nil
+  end
   local prepared_formula
   if checkpoint ~= nil then
     if initializing or owned or state or removal then recover_error("worker engine checkpoint conflicts with recorded ownership") end
@@ -2157,7 +2162,8 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     prior_state=state, prior_owner=owned, contract=contract, cap=selected_cap, enabled=selected_enabled, items=items,
     prepared_default=prepared, prepared_snapshot=prepared and clone(state) or nil,
     removal=removal, removal_snapshot=removal and clone(removal) or nil,
-    checkpoint=checkpoint, checkpoint_snapshot=checkpoint and clone(checkpoint) or nil,
+    checkpoint=checkpoint, from_preparation_mod=from_preparation_mod,
+    checkpoint_snapshot=checkpoint and clone(checkpoint) or nil,
     already_owned=owned ~= nil and not moved, changed=changed, record=record}
 end
 
@@ -2177,7 +2183,9 @@ function M.apply_default_owner_transfer(plan)
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
       or plan.prepared_default ~= fresh.prepared_default or plan.removal ~= fresh.removal
       or not equal_plain(plan.removal_snapshot, fresh.removal_snapshot)
-      or plan.checkpoint ~= fresh.checkpoint or not equal_plain(plan.checkpoint_snapshot, fresh.checkpoint_snapshot)
+      or plan.from_preparation_mod ~= fresh.from_preparation_mod
+      or not fresh.from_preparation_mod and plan.checkpoint ~= fresh.checkpoint
+      or not equal_plain(plan.checkpoint_snapshot, fresh.checkpoint_snapshot)
       or not equal_plain(plan.prepared_snapshot, fresh.prepared_snapshot)
       or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled or #plan.items ~= #fresh.items
       or not equal_plain(plan.record, fresh.record) then recover_error("stale default transfer plan") end
@@ -2337,11 +2345,17 @@ function M.apply_default_owner_transfer(plan)
     game.tick_paused = archived.was_paused
   end
   if fresh.checkpoint then
-    if storage[engine_checkpoint.key] ~= fresh.checkpoint
-        or not equal_plain(fresh.checkpoint, fresh.checkpoint_snapshot) then
+    local current = storage[engine_checkpoint.key]
+    if fresh.from_preparation_mod then
+      if current ~= nil then recover_error("worker preparation conflicts with a saved engine checkpoint") end
+      current = engine_checkpoint.read_legacy_preparation(fresh.event, target)
+    elseif current ~= fresh.checkpoint then
       recover_error("worker engine checkpoint changed during native transfer")
     end
-    storage[engine_checkpoint.key] = nil
+    if not equal_plain(current, fresh.checkpoint_snapshot) then
+      recover_error("worker engine checkpoint changed during native transfer")
+    end
+    if not fresh.from_preparation_mod then storage[engine_checkpoint.key] = nil end
     game.tick_paused = fresh.checkpoint.was_paused
   end
   storage[OWNER_KEY] = fresh.record
@@ -2980,8 +2994,8 @@ end
 
 function M.default_owner_preflight(event, route, split_current, planned_bonus)
   local owned = owner_record()
-  local checkpoint = storage[engine_checkpoint.key]
-  if checkpoint and not default_active(route, split_current) then
+  if (storage[engine_checkpoint.key] or engine_checkpoint.read_legacy_preparation(event, target))
+      and not default_active(route, split_current) then
     recover_error("worker engine checkpoint requires the ordinary worker owner")
   end
   if owned and owned.kind == "provider-retired" then
@@ -2999,7 +3013,7 @@ function M.default_owner_preflight(event, route, split_current, planned_bonus)
     return plan
   end
   if not default_active(route, split_current) then return nil end
-  local context = owned and {configuration=true} or checkpoint and planned_bonus
+  local context = owned and {configuration=true} or planned_bonus
     and {worker_checkpoint_bonus=planned_bonus} or nil
   return M.plan_default_owner_transfer(event, route, false, context)
 end
