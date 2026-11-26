@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-26
+last_reviewed: 2026-11-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -31,6 +31,18 @@ The draft Factorio 2.0 ZIP `D1BEEAA18CD2CFEBFF5466DD44B3B5A34A12D7C1156E8DDF7E41
 On Black Glass, both native API consumers passed against the exact staged 5.0.27 ZIPs on Factorio 2.0.77 and 2.1.24. In each engine, two assemblers made 200 and 202 copper cables from 100 copper plates each. Each case passed two cold loads, restored the direct library and had 24 original files rehashed. The receipt is `build/qualification/mir527-native-api-black-glass-r01/verified-native-api.json` at SHA-256 `F8FFCAA198BF5CFC0B6B19EC87EA57CA276390523B6165AC24B2E417606DE6E0`.
 
 The draft was private at readback. A one-shot Windows task is scheduled for 18:00 Australia/Sydney on 27 November to wait for the public release ID, then verify anonymous downloads and deliver the identical files to primary `dist`. Windows Library timing and retained-memory acceptance remain open.
+
+## Shared worker queue and native command help (2026-11-27)
+
+The shared queue and command help change merged after all four required checks passed. The merged player source, target manifests, changelog and packaging tool match reviewed commit `7950387e48002c544c1455b3b91a56e8ceb1ebd6`. On Factorio 2.1.25 with Ferrum 0.1.5, the exact development ZIP preserved 1,012-unit active and 1,518-unit parked work through removal, return and resume. Ordinary labs spent 823 of each of six packs, cargo reached seven and two cold loads matched. The verified readback is `build/qualification/mir-worker-shared-queue-ferrum-gunmetal-r01/verified-provider-round-trip.json` at SHA-256 `D5FE368B9EB7E95CA421D60B50082AFF14B645BD40D670C8F927C1D8F6DA66CE`. [Checked change](https://github.com/Julesc013/more-infinite-research/pull/2494)
+
+On Factorio 2.0.77 with Space Exploration 0.7.57 and Elevated Rails, the exact development ZIP upgraded the protected MIR 4.7.20002 save and finished cargo levels 9 and 10 in ordinary labs. The queue follower and tested conquest effects survived. Both 1,200-update cold loads matched at checksum `3693155732`, all six original files rehashed and the shared library restored. The verified readback is `build/qualification/mir-worker-shared-queue-se-gunmetal-r01/verified-readback.json` at SHA-256 `894595BF8387EE67C9E5BFD34130F9E57356D42AA75193EC838E12A828FCA73A`.
+
+Aero replayed the exact staged Factorio 1.1.110 to 2.0.77 upgrade with the new help strings. Native `/help mir-worker-storage-recovery` displayed the preparation and cancellation syntax. The transfer retained 12.5 percent active and 25 percent parked work at the 675-unit price and kept the unrelated follower queued. An ordinary lab spent 591 of each of five packs and raised cargo from three to four. Both cold loads matched at checksum `870951987` and the original save and ten evidence files rehashed. The verified readback is `build/qualification/mir-worker-shared-queue-cross-engine-aero-r01/verified-readback.json` at SHA-256 `71AE509C18B7BA39E1A0E5D9868C20BB1DC45BC33A2EBD25A3C3440DA8947978`. These replays cover their exact selections and development packages.
+
+## Paired Library server memory calibration (2026-11-27)
+
+The two published Factorio 2.0 Library controls started with the same initial save bytes and cold-loaded the same restart archive. Peak server RSS differed by 76.508 MiB during their initial sessions and 1.043 MiB at the restart. Gunmetal then loaded the exact initial seed twice and restart archive twice in isolation. Pre-join RSS differed by 1,176 KiB within the initial pair and 116 KiB within the restart pair. Those samples narrow the next comparison to the full client session. The paired analysis is `build/qualification/mir-library-fixed-restart-controls-gunmetal-r01/paired-input-memory-analysis.json` at SHA-256 `A7AF40B71E0CAA8BA1D880A6A473F415A18D4E93CD70C063CD29C1AEE163EEE7`. The isolated readback is `build/qualification/mir-library-initial-seed-mapping-gunmetal-r01/verified-readback.json` at SHA-256 `AC5A997F099424A2202532CB254BC61E020A5AEB58841407890B982EE96EF694`. Scored Library performance and retained-memory acceptance remain open.
 
 ## Cross-engine worker save replay on development source (2026-11-27)
 
