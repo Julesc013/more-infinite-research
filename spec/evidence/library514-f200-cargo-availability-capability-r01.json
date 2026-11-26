@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryCargoCapabilityAvailabilityBoundaryV1",
+  "reviewed_on": "2026-11-15",
+  "status": "source-grounded-boundary-fixture; native-unqualified",
+  "scope": "Bounded PARITY-AVAIL-02 follow-up to #1948: distinguish a deliberately omitted unsupported-engine capability from a false claim about missing or lost player research",
+  "baseline": {
+    "repository": "Julesc013/more-infinite-research",
+    "dev_commit": "b45ffd980edcceceac3a0065cd1d342e4ddce00d",
+    "release": "v5.0.14",
+    "release_class": "prerelease",
+    "inputs": [
+      {
+        "path": "targets/editions.json",
+        "git_blob_sha": "89eaab12dbd130322eb1269083ed8fcfb2f21c50"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue.lua",
+        "git_blob_sha": "61b170e233919a4039160d66b333dd62f67a8859"
+      },
+      {
+        "path": "source/compatibility/modern_catalogue/space_age.lua",
+        "git_blob_sha": "dd876a2f67146d52af2a591286eced5d8e686951"
+      },
+      {
+        "path": "source/presentation/availability.lua",
+        "git_blob_sha": "8f645818aa57940610c5861f866df078b1c225f7"
+      },
+      {
+        "path": "source/research/catalogue.lua",
+        "git_blob_sha": "7f028a2f44ac5b28a38df6e99bb34450c46fd794"
+      }
+    ]
+  },
+  "exact_test_profile": {
+    "f200": {
+      "id": "f200",
+      "factorio_version": "2.0",
+      "minimum_base": "2.0.77",
+      "recipe_productivity": true,
+      "cargo_research": false,
+      "active_mods": {
+        "base": "2.0.77",
+        "space-age": "2.0.77"
+      },
+      "force": null,
+      "effective_streams": {}
+    },
+    "f210_opponent": {
+      "id": "f210",
+      "factorio_version": "2.1",
+      "minimum_base": "2.1.23",
+      "recipe_productivity": true,
+      "cargo_research": true,
+      "active_mods": {
+        "base": "2.1.23",
+        "space-age": "2.1.23"
+      },
+      "force": null,
+      "effective_streams": {}
+    }
+  },
+  "families": [
+    {
+      "key": "research_cargo_bay_unloading_distance",
+      "source": "compatibility.modern_catalogue.space_age.additions",
+      "f200": "rejected-by-target-cargo_research-capability-filter",
+      "f210": "eligible-for-normal-definition-selection-not-proof-of-native-emission"
+    },
+    {
+      "key": "research_cargo_landing_pad_count",
+      "source": "compatibility.modern_catalogue.space_age.additions",
+      "f200": "rejected-by-target-cargo_research-capability-filter",
+      "f210": "eligible-for-normal-definition-selection-not-proof-of-native-emission"
+    }
+  ],
+  "source_path": {
+    "space_age_delta": "modern_catalogue.select applies the Space Age additions for active space-age, before applying supported_definitions",
+    "f200_gate": "targets/editions.json f200.cargo_research=false; supports_family excludes exactly both listed cargo keys; setting_definitions uses the same filter",
+    "f210_gate": "targets/editions.json f210.cargo_research=true, so this specific filter does not exclude either key; other admission/generator effects are not inferred",
+    "library": "research.catalogue uses selected.definitions as its authored public descriptor list, not as an omission ledger",
+    "availability": "presentation.availability.rows with Space Age present, no captured native owner and no Bob closure returns no explanations for these two F200 engine-gated families"
+  },
+  "expected_pure_projection": {
+    "f200": {
+      "candidate_definition_keys_before_capability_filter": [
+        "research_cargo_bay_unloading_distance",
+        "research_cargo_landing_pad_count"
+      ],
+      "selected_definition_keys_after_filter": [],
+      "availability_families_matching_cargo": [],
+      "availability_rows_for_empty_query": 0
+    },
+    "f210": {
+      "selected_definition_keys_after_this_filter": [
+        "research_cargo_bay_unloading_distance",
+        "research_cargo_landing_pad_count"
+      ],
+      "availability_families_matching_cargo": [],
+      "interpretation": "No not-added explanation is expected merely because two source definitions are supported; presence/emission must be independently established"
+    }
+  },
+  "classification": {
+    "fact": "This is a concrete bounded F200 capability exclusion not described in the finite Availability explanations, even when Space Age is active.",
+    "nonfinding": "The 2.0 engine lacks these 2.1 native modifiers; this omission is intentional and is NOT evidence that a user was promised cargo research, that MIR deleted an earned technology, or that MIR4 itself supported these 2.1-specific families.",
+    "product_decision": "Specify whether Availability intentionally excludes unsupported-engine capabilities from its not-added explanations; if so retain an explicit scope exception. Do not claim a complete omitted-stream ledger or add a misleading not-added row that implies a missing user entitlement.",
+    "acceptance": "If capability exclusions are in scope, introduce a separately designed, source-grounded reason distinct from user-disabled/foreign-owner/absent-DLC; qualify actual F200/F210 native display and client/UI state without touching historical saves."
+  },
+  "verification": {
+    "method": "Read-only exact GitHub blob inspection and fixed structural predicates; no Lua or Factorio engine execution",
+    "structural_predicates": {
+      "f200_has_space_age_optional_dependency": true,
+      "f200_recipe_productivity": true,
+      "f200_no_cargo_capability": true,
+      "f210_has_cargo_capability": true,
+      "space_age_defines_both_cargo": true,
+      "base_f200_filters_exact_cargo": true,
+      "space_age_is_profile_gated": true,
+      "space_age_additions_selected": true,
+      "selected_definitions_pass_capability_filter": true,
+      "catalogue_consumes_selected_definitions": true,
+      "availability_only_absent_DLC_when_no_space_age": true,
+      "availability_has_no_cargo_explanation": true,
+      "availability_bob_requires_full_profiles": true
+    },
+    "passed": 13,
+    "total": 13,
+    "assertions_about_gameplay": 0,
+    "native_runs": 0,
+    "protected_saves_touched": 0,
+    "production_files_changed": 0,
+    "release_assets_changed": 0
+  },
+  "ownership": {
+    "changes": "One additive evidence JSON only; no changes to player code or claimed implementation",
+    "retained": "Black Glass owns integration/native/publication/worker-history. Aero owns Linux adapter/probe. Existing published 5.0.14, accepted Angel/agriculture/A612 and native migration evidence are reused without reruns."
+  },
+  "gates_open": [
+    "PARITY-AVAIL-01 product coverage decision",
+    "PARITY-AVAIL-03 actual Library native UI/search/locale/client",
+    "MIR4 Library design and tab geometry",
+    "settings input/export/client lifecycle",
+    "whole-product performance",
+    "historical earned/partial/queue/bonus preservation with ordinary completion/save/two colds where applicable",
+    "stable promotion/delivery verification"
+  ]
+}
