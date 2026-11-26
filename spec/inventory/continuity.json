@@ -22369,6 +22369,244 @@
       ],
       "scope": "Selected controller expectations cover event coalescing, saved views, named queue and cap reads, and presentation boundaries. The full controller host suite passed with pinned Lua. Further controller history and native acceptance require separate evidence."
     },
+    "library_localization_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for the selected controller methods.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library.py",
+          "distinct_test_blobs": 51,
+          "retained_controls": {
+            "LibraryTests.test_actual_discovery_transport_and_callback_failures_warn_without_changing_research": {
+              "current_line": 2984,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1404,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "6D1C0415A842A1F1188AAA7E2DEE4C5B88B17DD035138E723DD696E65D5260D0"
+                }
+              ],
+              "disposition": "The warning is read from the authored result count. The current case still challenges transport and callback failures through the production Library view and verifies the original research state.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_all_view_scans_native_identities_once_and_family_change_invalidates_unissued_work": {
+              "current_line": 3865,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 999,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "EFDF8BA3AF0A6E7A7AAE6CADA5E7806758164D44BAB13B17804C99D034DEFCAC"
+                }
+              ],
+              "disposition": "The authored family field and icon-bearing list are used directly. The test retains the bounded native identity reads, the family change, discarded unissued work and the translated row assertion.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_base_literal_translation_names_reach_the_real_library_list_and_detail": {
+              "current_line": 3505,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 914,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "D52806291BD7E6EE9D3D9E7545883C71E38981D05A42AE8CD50E15C3F2478D0E"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 1366,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "E5062A24CDFAA0E2B65F517FA1EB616A9675B5F7318BC9AD6E439F6F4D906229"
+                }
+              ],
+              "disposition": "The current mock handles concatenated and fallback translations, refuses unresolved Base keys and substitutes literal percent signs safely. The same two German names must resolve in the list and selected heading.",
+              "decision_revision": "cfeac3e8a6583576f6d0165a9f5cf6a9087b441e"
+            },
+            "LibraryTests.test_completed_open_translation_work_survives_load_and_is_retired_on_close": {
+              "current_line": 4181,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1291,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "4AAC8D3B408C3CEC29EF1BE43CBC596928C758CB72CC908C63D23431BA2CA886"
+                }
+              ],
+              "disposition": "The result assertion follows the authored list pane. It continues to require the translated caption after loading and disposal of completed open-view work when the player closes it.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_completed_or_closed_player_keeps_peer_translation_maintenance_until_its_reply": {
+              "current_line": 3424,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1691,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "AF2EAE22B69ADC650E0C1CC64710A399D692FC4E1017C6FD46542360318E036E"
+                }
+              ],
+              "disposition": "The peer's query and translated row are read from the authored controls. The original multi-player test still requires independent root custody and an active subscription through the peer's outstanding reply.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_discovery_queue_uses_anonymous_labels_without_changing_native_entries": {
+              "current_line": 1176,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 12,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "CF5ED78DC4B759F97832A663C3F69ED43955B3F4EF9C024A029B810FEDE7EC57"
+                }
+              ],
+              "disposition": "The queue row now contains its caption beside an icon. The test still verifies anonymity before discovery, the native caption afterward and custody of the original research queue.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms": {
+              "current_line": 3809,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1912,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "1F579BCCB9BFA74644088C51D0E6D8AA0219EBA7DE42DB16566E3D82A7AC8A35"
+                }
+              ],
+              "disposition": "The authored list and query supply the same zero-result and exact follow-up row checks. Each late localized recipe, item and fluid term remains discoverable without replacing the query element.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_limited_discovery_warning_is_personal_retained_and_uses_the_existing_count": {
+              "current_line": 2929,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1349,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "31D8040D54DEC729E5159B59A0584F0ADAF469A9BD9A1F58918705FFCF7EECC6"
+                }
+              ],
+              "disposition": "The discovery warning remains on the existing result count in its new list pane. Two player states, retained query element, dismissal and the localized warning are still tested.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_malformed_translation_sidecar_and_active_window_are_preserved_without_new_requests": {
+              "current_line": 4061,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1191,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "F027D4281F599E9B96F20577FF5AF488A3359071724D9D933BFF875BC2F932EF"
+                }
+              ],
+              "disposition": "The earlier malformed persisted sidecar and issued window stay intact. The repaired controller also proves that either undrainable record leaves its maintenance subscription inactive and issues zero new requests.",
+              "decision_revision": "44103354cf01b40cc148d8654b936f52f5ce4afa"
+            },
+            "LibraryTests.test_missing_or_invalid_native_detail_names_keep_identity_fallbacks": {
+              "current_line": 1876,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 580,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "62477647A1612AC25792227FB66E1C5ADA11283715D9B90A13CC2231EF723B54"
+                }
+              ],
+              "disposition": "The current pane retains fallback technology, science and prerequisite identities on the authored controls. The duplicate family line follows the revised Research layout.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_native_names_render_before_search_translation_and_in_selected_details": {
+              "current_line": 1842,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 546,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "2E9E25E8FAAB7F334211890EE6E0BAEEA16FF67DC66B8FAA5A6FA6376C417C91"
+                }
+              ],
+              "disposition": "The authored layout keeps the native title and list caption, with science and prerequisite names on their icon tooltips. The duplicate family line was removed. The current case still proves names render before search translations and refresh when a native prerequisite label changes.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_older_discovery_cache_renews_only_on_open_and_retains_issued_request_rights": {
+              "current_line": 3010,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1430,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "F2ADD1FA02AD44E28007762617CA110C4D8D3D278B262FD6D2436C0416279BCC"
+                }
+              ],
+              "disposition": "The result count lookup follows the authored pane. Reopening still triggers renewal at the original boundary while prior issued requests retain their accounting rights.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_pending_translations_survive_locale_change_close_and_reload": {
+              "current_line": 4099,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1209,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "EA6D76246020B3EE3E85363ABE6ED6CC8F25B9C2A8A1C4E69A594F80200397BD"
+                }
+              ],
+              "disposition": "The German caption is read from the icon-bearing row. The original issued requests and the user's locale transition, close and reload still exercise the same lifecycle and accounting.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_retired_translation_callbacks_resume_an_open_reused_player_without_publishing_old_labels": {
+              "current_line": 4364,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1474,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "36A96FE050208BD05284728B00320CC5F1D1459C49B118256C3827ACDAF440B9"
+                }
+              ],
+              "disposition": "The authored list pane still proves the replacement player sees the original native caption while stale replies release old reservations and allow the new live view to resume.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_translation_callback_checks_live_scope_and_discards_vanished_root": {
+              "current_line": 4009,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1139,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "0F87750108C1B058FFEDE1C1C4CBECAD78CEA5C51912F4DE3BDE12B0EDCC142C"
+                },
+                {
+                  "revision": "f4abc849a27032cf4232488a26f0dd6d0e0f9c6f",
+                  "line": 885,
+                  "blob": "001de79cefaeb92c9bad7a9362760fdce49eaa55",
+                  "body_sha256": "27EB8B4B42F8C90BCC82A9E9138BCEC0CA2A975E04B91ADE18B48756D8B7CF44"
+                }
+              ],
+              "disposition": "The last known caption remains visible across stale locale or force callbacks. A vanished root now also proves its saved open and pending flags are retired and its native subscription drains.",
+              "decision_revision": "60d10b53ae56ee1865d4003ba65d87843671b820"
+            },
+            "LibraryTests.test_translation_stale_scope_reload_and_reused_index_never_publish_old_labels": {
+              "current_line": 4282,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1392,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "391E1B83B610DE4941980D241A3D50280C10DE4F973B162E49DA1D3BE4385AE3"
+                }
+              ],
+              "disposition": "All old and new captions are compared through the authored list pane. The changed scope, stale responses, reload and recycled player slot retain their original independent assertions.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            }
+          }
+        }
+      ],
+      "scope": "Selected controller expectations cover localized names, discovery, issued replies and player lifecycle. The 148-test controller run used identical inputs for these controls. Remaining controller history and native acceptance require separate evidence."
+    },
     "runtime_ownership_same_name_test_intent_review": {
       "reviewed_on": "2026-11-26",
       "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
