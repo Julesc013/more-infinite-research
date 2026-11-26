@@ -172,6 +172,8 @@ Lua implements the mod and Factorio fixtures. Use Python for portable developer 
 
 Use the governed native fixture runner with an exact engine, profile and archives for new gameplay work. The original private gear-slice command pinned to the first MIR5 build remains available in Git with its historical evidence. [Current fixture runner](../tools/Invoke-NativeFixture.ps1) · [Original gear-slice script](https://github.com/Julesc013/more-infinite-research/blob/c7c815d831c434a45d1965fe7e4acc1f0de3786d/tools/Invoke-NativeSlice.ps1)
 
+A protected Factorio 2.0.77 save can be checked against a previously witnessed configuration before replay. Run `python -B tools/read_save_mod_checksums.py <save.zip> --witness <witness.json>`. The witness is a JSON object keyed by mod name, with `version` and `data_checksum` in each row. Record the save SHA-256 from the result, verify the actual archive bytes against the original SHA-256 inventory and replay the predecessor to establish the historical research price.
+
 ## Test selection
 
 For a bounded host batch, use `-ControlPath` with exact paths from the driver. For example, `./tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir $luaRuntime -ControlPath 'tests/test_library.py','tests/test_library_model.py'` runs those two scripts in plan order. Adding `-Plan` prints the selected rows. Invoking the driver with only the pinned Lua directory runs the full host gate. It uses `python3` when the system provides Python under that name alone.
