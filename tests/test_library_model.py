@@ -1374,6 +1374,22 @@ class LibraryModelTests(unittest.TestCase):
           assert(effects[1].recipe == "recipe-1" and ingredients[1].name == "pack-1")
         ''')
 
+    def test_selected_detail_reads_only_matching_declarations(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local force = {technologies = {[id] = technology(id)}, research_queue = {}}
+          local unrelated = setmetatable({id = "unrelated"}, {__index = function(_, field)
+            error("detail read an unrelated declaration field: " .. field)
+          end})
+          local invalid = {id = id, settings = {false}}
+          local authored = {id = id, family = "research_gears", settings = {"gear-cap"}}
+          local duplicate = {id = id, family = "later-duplicate"}
+          local detail = model.detail(force, {unrelated, invalid, authored, duplicate}, {selected = id}, {})
+          assert(detail.family == "research_gears" and detail.settings[1] == "gear-cap")
+          detail.settings[1] = "changed"
+          assert(authored.settings[1] == "gear-cap")
+        ''')
+
     def test_selected_detail_keeps_named_native_modifier_fields_without_catalogue_scan(self):
         self.lua.execute('''
           local id = "weapon-shooting-speed-7"
