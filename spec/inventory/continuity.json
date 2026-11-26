@@ -21994,6 +21994,205 @@
       },
       "superseded_summary_next_action": "Obtain full JSON/bundle; verify original audit IDs/counts/source URLs and deduplicate each record against this existing inventory/ledger/cases and exact results. Reuse named evidence only after applicability review, identify genuinely missing executable endpoints, and leave optional/design decisions with their original status. Do not invent122 row dispositions from this summary or set inventory_complete=true."
     },
+    "library_model_translation_same_name_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for these two suites.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library_model.py",
+          "distinct_test_blobs": 25,
+          "retained_controls": {
+            "LibraryModelTests.test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation": {
+              "current_line": 583,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 204,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "EC5E5DB0EDDD1BEC80845FF8D6A48AA9CC5A6649216267EC2DD03BE1855A2274"
+                }
+              ],
+              "disposition": "The target line and named BobTech closure govern eligibility. The current assertion covers an increased declared minimum and rejects a different Factorio line. The original read-only omitted-material behavior remains covered.",
+              "decision_revision": "09a92b96a7dabb3182f869cbece491ea4f22d43f"
+            },
+            "LibraryModelTests.test_availability_never_claims_named_present_research_was_omitted": {
+              "current_line": 501,
+              "historical_bodies": [
+                {
+                  "revision": "e4a82996cf547a4acfe3999a531c5a85858740f1",
+                  "line": 406,
+                  "blob": "6c93f26aab40ccb37b30c8f2b74e8ce4a5228fa3",
+                  "body_sha256": "9E722B1656F4E556257AFE9415BE1E0787CCE441F6FF04BBDA1179330F0B70E8"
+                }
+              ],
+              "disposition": "The original present-technology and native-owner cases remain covered. The current test adds invalid and unreadable objects, distinguishes missing evidence from an observed omission, and checks the original state after the read.",
+              "decision_revision": "e9a73c355bb4844d402f3bd5c7c9f6ccfc73aa61"
+            },
+            "LibraryModelTests.test_bob_core_gate_and_availability_preserve_named_selection_cases": {
+              "current_line": 12,
+              "historical_bodies": [
+                {
+                  "revision": "819fd7167e4befe17035576b5f60203b1c7c6a4f",
+                  "line": 12,
+                  "blob": "3c2efaaeb7d1f472ebbe0a0bd9814978db4898c0",
+                  "body_sha256": "AE9A4EA5076DFE8E2DA0BE712F0B399639B0BB6C19E7DABFFEE041F7C8364B88"
+                }
+              ],
+              "disposition": "The recorded floor amendment keeps the declared minimum as metadata. The current fixtures retain the accepted and excluded mod selections and preserve the distinct unsupported-overhaul result.",
+              "decision_revision": "09a92b96a7dabb3182f869cbece491ea4f22d43f"
+            },
+            "LibraryModelTests.test_catalogue_is_complete_base_metadata_and_detached": {
+              "current_line": 318,
+              "historical_bodies": [
+                {
+                  "revision": "1ebe09cf01df508e9c4b3e2a7c74770a43deac7a",
+                  "line": 102,
+                  "blob": "fdc65a54ba117edd3c49f97f895bcfda7b0d3a94",
+                  "body_sha256": "780DA84744171D5D06E26575695325A3C7715FEB89F541CF5BE6F79099227DB7"
+                }
+              ],
+              "disposition": "The catalogue grows by the preserved science-pack productivity subject. The current test verifies its canonical setting IDs and count alongside the original gear metadata and detached reads.",
+              "decision_revision": "8aec3e68e5179ff88765e08efbb82035e64a3212"
+            },
+            "LibraryModelTests.test_exact_private_credits_stay_out_of_library_views_and_detail": {
+              "current_line": 805,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 421,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "DF227F5DEE1893E166B2EF68AC539B41AD6B48460765E7331F1526C1DBB9EC2F"
+                },
+                {
+                  "revision": "v5.0.2",
+                  "line": 441,
+                  "blob": "3a6312f468b4e318a5bd1424e2dd5d65256dc0a0",
+                  "body_sha256": "99F453E0140516954E3EFA6716AAD50BBC1126C55E67D4A5887248AE9FB1B582"
+                }
+              ],
+              "disposition": "The hidden set grows to cover the worker provider credit and both staged imersite records. Every original private ID still stays outside the catalogue, filter results and selected detail."
+            },
+            "LibraryModelTests.test_internal_credit_id_metadata_is_exact_and_detached": {
+              "current_line": 342,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 126,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "F262066678226778F5C6B9FAC4833F6749626241BF7A056E11ADCE3A4942938D"
+                },
+                {
+                  "revision": "v5.0.2",
+                  "line": 144,
+                  "blob": "3a6312f468b4e318a5bd1424e2dd5d65256dc0a0",
+                  "body_sha256": "42A23A5E1AD917737587E86A6FEF94AEEE865713A2DCCCEAFC5C3953EF26AAE8"
+                },
+                {
+                  "revision": "v5.0.4",
+                  "line": 144,
+                  "blob": "82a5bf6b04e6cba3352ed9adc709ee6f98315186",
+                  "body_sha256": "5B0B257FFFF38AB8685AFA5674F47E6AB7854501E52B9081120B78BE2E9BBAB9"
+                },
+                {
+                  "revision": "v5.0.11",
+                  "line": 248,
+                  "blob": "42208bb44dfd8c76b93ccbdc24e9e975b2d1b7e0",
+                  "body_sha256": "0DF439457B473D8871C92EFB61B50FD32BE894DC015947AC1F203549790CE138"
+                },
+                {
+                  "revision": "v5.0.12",
+                  "line": 248,
+                  "blob": "c8b6949c9b0e2f2d5c47ddbf70091160a474217b",
+                  "body_sha256": "CD446D34F76BDE42EAC9306E2C7D80F081425F4FEFDA7411FAA0A10A5130CAC5"
+                }
+              ],
+              "disposition": "The registry retains the original IDs and adds the authored worker preservation, continuation and carrier IDs as they appeared. The current inventory still requires the exact set and a detached return value."
+            },
+            "LibraryModelTests.test_model_does_not_import_generator_or_touch_host_globals": {
+              "current_line": 1457,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 589,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "AB901A3E8B4E926CE23E76CECCF71EB8BC4CCF4FEAE53CA16942F2F6E58D9EDA"
+                }
+              ],
+              "disposition": "Availability shares the pure Bob Core selection facts. The current test permits that single import and checks both sides for dependencies on the Generator and Factorio state.",
+              "decision_revision": "09a92b96a7dabb3182f869cbece491ea4f22d43f"
+            },
+            "LibraryModelTests.test_native_style_proxies_reject_unsupported_member_reads": {
+              "current_line": 1414,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 546,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "1D71F3CF24F03505B979D11D49319114B060A62A2A954B6363233ECACDE18CFF"
+                },
+                {
+                  "revision": "v5.0.2",
+                  "line": 952,
+                  "blob": "3a6312f468b4e318a5bd1424e2dd5d65256dc0a0",
+                  "body_sha256": "B19D391BD772C6E4F69759E9D426E41B812643455ACADFA1DDF46BCDE65C427B"
+                }
+              ],
+              "disposition": "The native-shaped mock adds the technology and force validity fields and the technology prototype's hidden flag. The proxies still raise on unsupported members and preserve the queue and effect expectations."
+            },
+            "LibraryModelTests.test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse": {
+              "current_line": 238,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 22,
+                  "blob": "8b6c67dab7165460d38f84fab2400d115a59e0df",
+                  "body_sha256": "178FFC9AA6FF51BEAA61029D00F059BBD9D77A50C67B9EF3710AC37A6F0B1DEF"
+                }
+              ],
+              "disposition": "The runtime catalogue import follows the control-stage adapter. The guards against late imports and reselection are identical."
+            },
+            "LibraryModelTests.test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations": {
+              "current_line": 181,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 22,
+                  "blob": "c866a61a21c3abd28beb043a4715a8662a0f199b",
+                  "body_sha256": "7A3EBDE547E79FCA781D6375B7462C9FD884E1B18E311F0E3C4066423BD5537A"
+                }
+              ],
+              "disposition": "The named foreign continuation stays excluded even if MIR later changes it. The mock supplies the creation history used by the repaired adapter. The Generator creator controls separately exercise missing and malformed history.",
+              "decision_revision": "9c983668d7d3e42315f4a24ce35fea187299ea1b"
+            }
+          }
+        },
+        {
+          "path": "tests/test_library_translations.py",
+          "distinct_test_blobs": 4,
+          "retained_controls": {
+            "LibraryTranslationTests.test_dispatch_label_and_catalogue_bounds": {
+              "current_line": 306,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 257,
+                  "blob": "99a0cc64762bf6f13363e616e0688885193a4638",
+                  "body_sha256": "CABB9AA849818DCB5C1A1B7A33B25B695C55861E85FCA1B61EEF862628C30A7F"
+                }
+              ],
+              "disposition": "Restored Library search retains translated labels above the old 1,024-byte limit. The current case verifies 1,025 bytes, rejects a label beyond the declared limit, and keeps the per-cache byte accounting and dispatch and catalogue boundaries.",
+              "decision_revision": "cfeac3e8a6583576f6d0165a9f5cf6a9087b441e"
+            }
+          }
+        }
+      ],
+      "scope": "The two selected host suites passed with pinned Lua. Broader Library controller history and native acceptance require separate evidence."
+    },
     "runtime_ownership_same_name_test_intent_review": {
       "reviewed_on": "2026-11-26",
       "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
