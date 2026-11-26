@@ -297,7 +297,7 @@ Prepare a new source version only for a new public release: align the canonical 
 
 GitHub's `prerelease` flag is the maturity decision. Select and review it explicitly before publication; no beta counter, RC suffix or minimum prerelease sequence exists. Prereleases stay GitHub-only and disclose the actual acceptance scope and unresolved gates. Stable releases still need complete applicable stable acceptance. Stable Portal uploads use the identical tested GitHub ZIPs and checksums for the nine Portal editions, without metadata conversion or rebuild. The maintainer owns those uploads; F018 and early best-effort editions remain GitHub-only.
 
-Until MIR5 reaches stable, aim to publish a qualified GitHub beta each day at 18:00 Australia/Sydney. Skip the slot if the candidate has outstanding prerelease checks.
+Until MIR5 reaches stable, aim to publish a qualified GitHub beta each day at 18:00 Australia/Sydney. Skip the slot if the candidate has outstanding prerelease checks. Publish a qualified emergency hotfix as soon as its checks pass, then resume the daily beta schedule.
 
 Never replace a published version's ZIPs with different contents or move its tag. A corrected public package set needs a new source release. GitHub releases remain mutable for administration, while package bytes, original records and hashes are preserved. Numeric tags do not encode prerelease maturity: consumers must check GitHub release metadata. Historical MIR4 versions and prior inventories keep their exact original refs and mappings.
 
