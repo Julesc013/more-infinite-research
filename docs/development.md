@@ -225,6 +225,16 @@ For a pinned headless engine, pass `-Headless` to `tools/Invoke-PrototypeCapture
 
 Probes claiming the complete loaded-mod selection check its observability before launching the engine. A selected mod without a Lua settings or data-stage entry requires an explicitly selected, hash-bound `-ActiveModsObserver` whose reporting script is present. Use the existing read-only active-mods fixture when needed. The shared launch guard serves prototype captures, replay captures, ordinary-menu measurements and modern fixture stages; historical process modes retain their established log protocol. A successful preflight does not prove the loaded selection: the actual native log must still supply the complete, consistent names and versions, including asset-only mods.
 
+## Prepare a witnessed legacy worker save
+
+The preparation command covers the published MIR 4.7.20002 and Space Exploration 0.7.57 combination on Factorio 2.0.77. Keep the original save, exact original archives and startup settings. Record each old mod's version and native data checksum in the witness JSON accepted by `tools/read_save_mod_checksums.py`. The data checksums bind the configuration. Retain exact archive SHA-256 values for the source package and dependencies.
+
+```powershell
+python -B tools/build_worker_storage_preparation.py path/to/original-save.zip --witness path/to/original-mods.json --output-directory build/worker-preparation
+```
+
+Enable the generated preparation mod when opening a copy with the verified original selection. Compare the loaded native checksum roster with the witness before invoking `/mir-prepare-legacy-worker prepare` as an administrator. Save the paused copy under a new name and exit. Load it with the candidate MIR5 archive, the same preparation mod and the same old add-ons and settings. Verify the preserved research, then save the successor separately. The results of later add-on or settings changes have their own acceptance cases.
+
 ## Recover an exact published catalogue
 
 `tools/recover_modern_catalogue.py recover` accepts `--published-version` for an exact same-target MIR4.7 numeric distribution, such as `4.7.21003` or `4.7.20003`. Omitting it retains the original `4.7.21000`/`4.7.20000` recovery contract. Every supplied published arm, including optional K2SO, must match that version; engine, archive, capture-hash and paired-input checks still apply. MIR5 is never admitted as the published oracle.
