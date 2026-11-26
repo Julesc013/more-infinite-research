@@ -2579,6 +2579,10 @@ local function provider_return_force(saved, names, force, frame, public)
     row.saved_progress = progress_by_name[name]
     rows[name] = row
   end
+  local planned_head = rows[queue.current]
+  if planned_head and planned_head.saved_progress ~= 0 and planned_head.saved_progress ~= queue.current_progress then
+    recover_error("archived provider has distinct active and parked work: " .. queue.current)
+  end
   local deferred, ready, occurrences = {}, {}, {}
   for _, name in ipairs(queue.queue) do
     local technology = force.technologies[name]
@@ -2606,6 +2610,10 @@ local function provider_return_force(saved, names, force, frame, public)
       row.enabled = false
     end
     queue = provider_queue.without_waiting(queue, frame, deferred)
+  end
+  -- A restored provider promoted to the head has only active progress.
+  if rows[queue.current] then
+    rows[queue.current].saved_progress, queue.queued_saved[queue.current] = 0, 0
   end
   local holder_saved = frame.saved_progress
   if frame.current == recovery.ordinary_default_id and queue.current ~= frame.current then
@@ -2810,7 +2818,7 @@ local function apply_provider_handover(plan)
           if technology.level ~= level then technology.level = level end
           if technology.researched ~= row.researched then technology.researched = row.researched end
           technology.enabled, technology.visible_when_disabled = row.enabled, row.visible
-          technology.saved_progress = row.saved_progress
+          technology.saved_progress = name == queue_frame.current and queue_frame.current_progress or row.saved_progress
         end
         set_gate_paid(item.force.technologies[recovery.head_id], returning.gate_paid)
         local credit = item.force.technologies[recovery.provider_credit_id]
