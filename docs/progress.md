@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## MIR 5.0.25 publication hold (2026-11-26)
+
+The frozen Factorio 2.0 beta refused the staged upgrade of the protected Space Exploration save with a 10,251-unit worker storage price. The 5,125-unit control preserved all 200 paid science units. The pending publisher was stopped. Release 458825037 remains a draft with all 19 assets, and the last public prerelease is 5.0.24. [Release decision and original failure](https://github.com/Julesc013/more-infinite-research/pull/2439#issuecomment-7180016583)
+
+The private preparation work recorded both original prices before the engine could discard their difference. Both prepared saves preserved their 200 paid units through transfer and cold reload. The later add-on change and ordinary seven-pack lab completion have separate native acceptance. [Preparation and successor evidence](https://github.com/Julesc013/more-infinite-research/pull/2442)
+
 ## Current development Library and API packages (2026-11-26)
 
 The private development package comparison at commit `2c897eaf4d7f291518b68a30ec569f9b162da5ec` found 15 of the 17 player ZIPs byte-identical to the frozen 5.0.25 beta. The Base 2.0 and 2.1 editions changed only the runtime bootstrap and Library members. The input comparison is `E:/mir5-freeze/mir525-development-library-comparison-r01/beta-package-applicability.json` at SHA-256 `058C62EFBE044738B6AAFBF1DFE572E2C4E3A6A9E3588309C7DE69F7E443229B`.
@@ -22,11 +28,13 @@ Both native API consumers passed on those two changed ZIPs in Factorio 2.0.77 an
 
 The same development 2.1 ZIP `A0973CAD0F3DF508D2711DE36DFEB58E3B35A241669A8A7D69EE0EE373E8F789` passed the thirteen-step native Library replay on Factorio 2.1.24. It preserved independent English and German searches and widths through individual rejoins and a saved server restart, with the shared library and protected research intact. The readback checked 26 screenshots and 356 original files. It is `build/qualification/mir525-development-library-personal-gunmetal-r02/verified-personal-views.json` at SHA-256 `7C804A3BD1B00FB1FBD6D2FB4401D33F15EF6CCF89D34CD43961F951A020A223`.
 
+A second native run on the same Factorio 2.1 development ZIP exercised 30 bilingual Library steps, including 16 tab clicks and six exports that wrote eight files. The verifier rehashed 593 originals and checked the protected save and restored library. The controller's observation window expired while its request was held in the queue, so the coordinator resumed input on the same acknowledged service after composition. The receipt is `build/qualification/mir525-development-library-exports-gunmetal-r01/verified-tabs-and-exports.json` at SHA-256 `B1A86C51E07FF0D6A4C8384085AC2C4ED8973EB700A5032FDBBC486F0A1716DE`.
+
 ## Library timing repeatability (2026-11-26)
 
 Gunmetal completed both warmups and both identical-package controls on Factorio 2.0.77. Eight Library profiler endpoints exceeded the predeclared repeatability limits. The run stopped before scoring the published 4.7.3 and current development comparison. The independent readback rehashed 907 original files and verified shared-library restoration. The receipt is `build/qualification/library-current-matched-gunmetal-r01/verified-native-timing.json` at SHA-256 `2C7863A7C6C39B766BD637362A41C86977D2D9BAD4D8370B02C71F72D3241980`.
 
-The Linux clients used Mesa LLVMpipe. A separate matched batch started with two software-rendering workers per client and the original workload and tolerances. The changed setting tests whether drawing contention contributed to the observed variation. Scoring depends on fresh identical-package controls. The launch receipt is `build/qualification/library-current-matched-gunmetal-r02/direct-timing-ack.json`. [Mesa software rendering controls](https://docs.mesa3d.org/envvars.html#llvmpipe-driver-environment-variables)
+The Linux clients used two Mesa LLVMpipe workers each in a fresh retry with the original workload and tolerances. Both warmups and both identical-package controls completed. Three Library profiler checks and three server memory checks exceeded their repeatability limits, so the candidate comparison still has zero scored sessions. The readback rehashed 907 originals and verified library restoration. It is `build/qualification/library-current-matched-gunmetal-r02/verified-native-timing.json` at SHA-256 `8679C94C8AE4149E19EA29B6AC859621992E0AD982A54CE214D71EBFE5F8FAA3`. [Mesa software rendering controls](https://docs.mesa3d.org/envvars.html#llvmpipe-driver-environment-variables)
 
 ## Native preparation for legacy Space Exploration worker research (2026-11-26)
 
