@@ -14,6 +14,16 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## MIR 5.0.27 Space Age and Solar Productivity upgrade replays (2026-11-26)
+
+Both retained reproducer saves passed on the Factorio 2.1 archive `4A21C53F3271D24E2B6EECBF1EEFA2D0566F502182ADFC21EFB554F7EB83C605` from promotion head `df6e0d54a8a8f95215516848f52b217e1aadb443`. All 17 private archives rebuilt and verified. Each native test used a copy of its protected save with only the scenario observer's expected MIR version updated. The protected sources retained their original hashes. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2470)
+
+The 11-mod Space Age profile upgraded from Factorio 2.1.24 to 2.1.25 with the original 1,012-unit price, the active and parked worker research and the unrelated queue tail. Ordinary labs consumed 647 of each of six science packs, advanced cargo from four to five and retained the second force's parked work. Two 1,200-update cold loads matched at checksum `2307552426`.
+
+The 27-mod Solar Productivity 3.0.0 profile on Factorio 2.1.24 kept the same 1,012-unit price and both paid-work frames. Ordinary labs consumed 647 of each of five packs, advanced cargo from four to five and kept the unrelated queue entry. Two 1,200-update cold loads matched at checksum `1969058280`.
+
+The second job started through the installed dispatcher after the first finished. Both result and shared-library restoration records verified. The readback covers 152 original native files and is retained at `build/qualification/mir527-reported-upgrade-gunmetal-r01/verified-report-replay.json`, SHA-256 `5F2A9FAEDA7A78754AA99A17C24CA3096F7FB6FA6BA0E33910CA1E9AE7BE079E`.
+
 ## MIR 5.0.26 public delivery (2026-11-26)
 
 GitHub lists MIR 5.0.26 as a prerelease published at 18:02 AEDT. The primary checkout fast-forwarded through the latest documentation merge before the publication retry. The public tag resolves to `964159230dbbd153e3c2d26cd2d4725ca393e2a3`. All four required checks passed before tagging. The administration and release-mutability probes passed immediately before publication. [GitHub prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.26)
