@@ -22607,6 +22607,696 @@
       ],
       "scope": "Selected controller expectations cover localized names, discovery, issued replies and player lifecycle. The 148-test controller run used identical inputs for these controls. Remaining controller history and native acceptance require separate evidence."
     },
+    "library_view_state_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for the selected controller methods.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library.py",
+          "distinct_test_blobs": 51,
+          "retained_controls": {
+            "LibraryTests.test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields": {
+              "current_line": 5256,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1943,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "BBE138C6D33B38D7ABE5E6A1D0A25CA023278180ACABDD416362E78E517EBE4C"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 2412,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "A3CDEC252600A65395EEDF924C2EFD7B02AB8618759BB4E5E6AD2DC68D26F245"
+                }
+              ],
+              "disposition": "The saved view keeps its 900 by 700 size and carries the old live frame position into viewport fitting. The accepted fitting change places the bottom edge inside the display, while original filters, selected tab, query and rebuilt view remain covered.",
+              "decision_revision": "cfeac3e8a6583576f6d0165a9f5cf6a9087b441e"
+            },
+            "LibraryTests.test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild": {
+              "current_line": 3305,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 831,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "49E28676123C9586AA411637AFABA2C841C079EDDB0F29F95D14D6CD99AF8D04"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 1266,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "AA85A068535FDB7A7D71F9EFC20BA0BDC604088410FD239E5E0D09753868BBDE"
+                }
+              ],
+              "disposition": "The authored controls retain the initial closed state, query and root identity, native handoff, selected row, scroll position and reconstructed window after reload. The current case also checks the native technology button icon.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_filters_and_foreign_events_are_bounded": {
+              "current_line": 3393,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 877,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "94C39150CE3DC82FB6956C477A2557435910AED0CC21E7D49F839D49FA7638BD"
+                }
+              ],
+              "disposition": "Family selection and the results count follow the authored filter and list panes. The original foreign element and bounded model reads keep their asserted behavior.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_hide_show_and_restore_actions_are_personal_and_keep_native_research_unchanged": {
+              "current_line": 2818,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 1099,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "E9A087C929A9CEFE8EDA107A7F27E44B67AF355780604FC76AB9FD415BE68BE8"
+                }
+              ],
+              "disposition": "The original hide, show and restore-all actions route through the authored buttons and visibility field. The test still covers selected row and tooltip changes and verifies untouched native research and queue state.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state": {
+              "current_line": 5092,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1779,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "72A208E162D9E00376C14A62827E8F1D684807909132C4E655E0759DA556B147"
+                },
+                {
+                  "revision": "7a2f93224c846b86261b2da709f50ea683fc708d",
+                  "line": 1719,
+                  "blob": "230f087a14acd3055b39b11f87813c3a1242f0a5",
+                  "body_sha256": "50B81543F9C97E0E601161014DE2C2D6A2E294002A92F30ADFCB337EB2D54CBB"
+                }
+              ],
+              "disposition": "Historical option values still drive sort order, visibility, selection and authored page state. The updated test resolves the same rows through the current grid and uses their native localized captions.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_level_modes_filter_real_native_rows_and_preserve_owned_personal_state": {
+              "current_line": 5040,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1727,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "29D4A6D0FF4DE450C0A34A7A69A0D4770066CBE85ECB511667CECA60AAE62C23"
+                },
+                {
+                  "revision": "7a2f93224c846b86261b2da709f50ea683fc708d",
+                  "line": 1667,
+                  "blob": "230f087a14acd3055b39b11f87813c3a1242f0a5",
+                  "body_sha256": "BDBBE2910C97D9A3CE2DB0137330115D671D3FB9247EC99742ADFCD6EB4E38C8"
+                }
+              ],
+              "disposition": "The authored mode selector and list show the same fixed and continuing native subjects. The current result assertions use native localized names and retain the separate selection, query element and saved mode.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_private_credit_holders_stay_out_of_library_selection_translation_and_native_open": {
+              "current_line": 3896,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1030,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "1351D6E5ABD5C4E97E237FA18828E11780F83B6E3DB99B2C257046DD86DB44A9"
+                },
+                {
+                  "revision": "v5.0.4",
+                  "line": 1999,
+                  "blob": "4b924288aa40382fe47df29284876d079be4ba48",
+                  "body_sha256": "595EAA483567FFCDDAF80AEA232CF902B259834BCD7536C5E57ED53F4DEA1721"
+                },
+                {
+                  "revision": "7a2f93224c846b86261b2da709f50ea683fc708d",
+                  "line": 970,
+                  "blob": "230f087a14acd3055b39b11f87813c3a1242f0a5",
+                  "body_sha256": "49E9B5468B86773EE3F6180DB5949305AE7F39EB975A0CF82636AA29E529B7F0"
+                }
+              ],
+              "disposition": "The current test extends the original private credit set with both signed electric and tesla carriers. It checks their native captions and IDs across the list, translation, queue and native handoff while preserving ordinary and foreign research rows.",
+              "decision_revision": "7a2f93224c846b86261b2da709f50ea683fc708d"
+            },
+            "LibraryTests.test_real_model_host_preserves_hidden_visibility_and_full_family_callbacks": {
+              "current_line": 5161,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1848,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "EAA1183184B295AA38E2F43734D2CEC9AD333546A7E74E778633C2EF42D36BF7"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 3629,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "C65C6E16F2FFB91E92E13915AD4F5217C926C8D8C00406C967036BE1C512AE06"
+                },
+                {
+                  "revision": "v5.0.12",
+                  "line": 4023,
+                  "blob": "7911fd5ea6709270fa1e33aa81e973df4d17595c",
+                  "body_sha256": "B4305EC27D2ECAE4E9877F995338525BCBDF5885D890939F4F5D38E15A01726A"
+                },
+                {
+                  "revision": "7a2f93224c846b86261b2da709f50ea683fc708d",
+                  "line": 1788,
+                  "blob": "230f087a14acd3055b39b11f87813c3a1242f0a5",
+                  "body_sha256": "1564390D65D4D6A2021A91437EBC887ED9C5568CC73A9B871FD761C059060581"
+                },
+                {
+                  "revision": "ccebe30e07b4bb34342056a354e3dd9ccbd63f81",
+                  "line": 1687,
+                  "blob": "36c49bcfa97c3fe7ac718997cc201c99c175d9b8",
+                  "body_sha256": "AF6F1775E792A6CDFECBA8D93423C9CDC76567AC186A9EF77C600D5448218D35"
+                }
+              ],
+              "disposition": "The declaration mock now provides the prepare and private-identity hooks used by the controller. The same real model, historical family options, personal hide/show behavior and two Availability entries remain observable through the authored UI.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_two_players_reject_malformed_hidden_replacements_without_changing_views_or_research": {
+              "current_line": 2862,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1282,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "40DBACE5E2E65604632941E855C5DAA86E9EBED5F18B3B13EEFA5A26A2895337"
+                }
+              ],
+              "disposition": "The authored list pane preserves both players' separate rows and hide actions. The invalid replacements still refuse without losing the original views, selections or force research.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            }
+          }
+        }
+      ],
+      "scope": "Selected controller expectations cover view migration, private research rows, native handoff, sorting, visibility and individual player state. The 148-test controller run used identical inputs for these controls. Remaining controller history and native acceptance require separate evidence."
+    },
+    "library_layout_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for the selected controller methods.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library.py",
+          "distinct_test_blobs": 51,
+          "retained_controls": {
+            "LibraryTests.test_all_shipped_locales_cover_the_recovered_library_tab_surface": {
+              "current_line": 3079,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 724,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "9ECB682BED815F00C5DD3B16CC6618D86F8DD3AF481709B87A22C60232B23A21"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 1156,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "060DC976AD702F82822A6835F505464B50F61A79B2FF6F08A223B6B89CBD2F37"
+                },
+                {
+                  "revision": "48b0badace8c9b7893dd8219af6329b3803e3213",
+                  "line": 1264,
+                  "blob": "bcb999e6527594e38ccae50c0f8e3a42989dd01b",
+                  "body_sha256": "8B25872236144AC077EA18727E32878A954E96446000371988DAE8AEFBCF1C43"
+                }
+              ],
+              "disposition": "The current locale inventory preserves the original tab and feature keys and adds later report, cap, discovery, debug, visibility and layout controls. Every shipped locale remains part of the check."
+            },
+            "LibraryTests.test_authored_research_presentation_uses_compact_facts_and_independent_recipes": {
+              "current_line": 636,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 301,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "B9F79FD3BB2789E1A1279AD16C96897AF70E39F212D8C63092C7BF47591BD3AD"
+                }
+              ],
+              "disposition": "The common section style updates the divider's top margin to twelve. The authored compact fact grouping and independent affected-recipes pane keep their existing checks.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_filter_click_is_inert_and_native_selection_updates_the_retained_window": {
+              "current_line": 2441,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 954,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "6EDCE779C1199D36A27026FD80097587A1AE33EBA39358FE29A74E01E05CC1CA"
+                }
+              ],
+              "disposition": "The status selector follows the authored grid. Opening the selector still leaves the view and query intact, while native selection applies the filter through the actual retained controls.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_fractional_display_scale_writes_only_int32_gui_dimensions": {
+              "current_line": 2163,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 691,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "C60239F6C53190ED10E6AAF599CA0418876B6B7BBF6E37BBAD9272AD68F8C481"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 776,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "6AB2D0BA7AE34B4005BE2D2AA4AFDDC7430C26365220A1C61740ECB3083B3305"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 1525,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "2BAA1FCBD29D1F31772C5A16510390D6525907E967D8251ECE0C084DB6215A93"
+                }
+              ],
+              "disposition": "The authored compact sizes and grid columns change the exact expected integer dimensions. The same strict style proxy rejects fractional writes and checks the root, tabs, both panes and family selector.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_layout_tables_recreate_for_column_changes_and_never_mutate_column_count": {
+              "current_line": 2739,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 1034,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "6C313B68AFE0FDE2BBD45D56FEDEC3E47800E6CD341F77881E93F5231B7E0D89"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 1906,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "1DC072074EABA61D9FD84320ADDB6F22F558E7CBC5682C110AF7E086A1E4492A"
+                }
+              ],
+              "disposition": "The accepted responsive layout rebuilds the read-only filter grid at a column breakpoint. The current case verifies three and five columns, unchanged mode, status and sort values, and the same root, navigation and query element.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_narrow_display_uses_a_scrollable_stacked_library": {
+              "current_line": 2415,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 928,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "40DF34626FD4236EE2F726E547C2C92AB52AFF6BD0A7642605942E3954A6A5CC"
+                }
+              ],
+              "disposition": "The authored split breakpoint uses a narrower displayed width for its stacked fallback. The test still requires scrollable research, retained actions and result dimensions within the available width.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_normal_research_details_use_full_height_without_a_toolbar_or_unlimited_cap_paragraph": {
+              "current_line": 119,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 12,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "2A4983B18817D2D3E2F29C208CFDCFE82ED07B93430A50A0E781F929C87CB9D6"
+                }
+              ],
+              "disposition": "The older Lua body differs by whitespace. The current test retains the full-height layout, toolbar location and default unlimited-cap presentation assertions."
+            },
+            "LibraryTests.test_queue_restores_the_original_numbered_full_height_native_projection": {
+              "current_line": 180,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 72,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "41B2AD6499BC9F97E348FC6136C249A149DD64020C8F7672E3892E90E847389A"
+                }
+              ],
+              "disposition": "The original numbered projection and full-height list stay covered. The current test adds an engine-side transition to an empty queue and verifies message visibility, retained list identity and custody of queue, active research and progress.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks": {
+              "current_line": 1898,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 602,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "694C80B4C25868F087395C47E2045392486DF0A4CCE8228631D43F338F7AD21D"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 637,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "7BA323F9BB2F93668A253F771BC79A71D47D192CFBE56DFCEF3747C8A610A065"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 1338,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "882D247DEA8CC908238BC0DBC636BE89D4582742FEF9A829C7619B3E5C43D00B"
+                },
+                {
+                  "revision": "2020d022515cf6f524a45b92c51e0fa2ae355a5d",
+                  "line": 513,
+                  "blob": "6277670221aae4d8e91aa8c9f75d3fee45cfb508",
+                  "body_sha256": "9672E0EA8A00CDAF7C011D870D3BCEFF6DAD4A424CE9E4054222A12588DC1608"
+                },
+                {
+                  "revision": "5f19f3e86fca26d5540fb817e2f2812c370fb1f9",
+                  "line": 464,
+                  "blob": "29954a0a2dc011c2b8ae8437b7b654243903f3b9",
+                  "body_sha256": "A131F8CBCB5D07628E47CFA20E3A5CD2FCC2C09F8814A358436DDF3726937968"
+                }
+              ],
+              "disposition": "The authored layout fits the scaled viewport with a split at the tested width and a fallback at the smaller width. The current control retains autosizing, wrapping of long native captions, native tick conversion, a saved drag location and the authored centering behavior.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_research_controls_match_the_original_full_width_search_and_upper_labels": {
+              "current_line": 328,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 112,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "00ECB0FADF7E8A319A48309A65F3CDD5F43784A0B27447C9C90591E09BC932DA"
+                }
+              ],
+              "disposition": "The accepted wide layout now places all five selectors in one row. The original full-width search and authored labels remain verified.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_research_library_opens_with_a_selected_split_detail_view": {
+              "current_line": 2200,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 799,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "17BCAD91318242AB46C24B85D1912DB661CB4B9C4F7D24B1800B3477EC0066BD"
+                }
+              ],
+              "disposition": "The selected title, icon and native actions follow their authored panes. The same split geometry, selected row and direct handoff remain visible in the current case.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_research_refresh_retains_list_controls_without_repositioning_unchanged_items": {
+              "current_line": 966,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 500,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "80F77AA69BD30303EB674C7647AE91B0487A8785697B9A0E46763FCA1525310D"
+                }
+              ],
+              "disposition": "The current mock models Factorio's textual readback of numeric and Boolean caption parameters. The case still retains list identity and scroll during an equivalent refresh, then requires writes when a numeric parameter or display name actually changes.",
+              "decision_revision": "fcd0f815c86ef17f4b3e02a89d1dea95e3cf0f02"
+            }
+          }
+        }
+      ],
+      "scope": "Selected controller expectations cover responsive dimensions, compact native details, queue display, filter controls and retained rows. The 148-test controller run used identical inputs for these controls. Remaining controller history and native acceptance require separate evidence."
+    },
+    "library_projection_test_intent_review": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "history_start": "v5.0.0",
+      "public_tags_through": "v5.0.24",
+      "source_selection": "Published Git tags and exact changed first-parent commits for the selected controller methods.",
+      "changed_declarations_reviewed": 11,
+      "distinct_historical_variants_reviewed": 17,
+      "groups": [
+        {
+          "path": "tests/test_library.py",
+          "distinct_test_blobs": 51,
+          "retained_controls": {
+            "LibraryTests.test_affected_recipe_selection_opens_factoriopedia_and_production_check_reads_flow_stats": {
+              "current_line": 2234,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 833,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "40ACA9FF074E68F59AB67D1064767F2B52CC01A75C33CEDF52116D7ECD583465"
+                },
+                {
+                  "revision": "v5.0.2",
+                  "line": 864,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "BAE058F65896769FA13A1DAC406AEB404B6A7DE6F3607D9CD7E7A492B8B154D7"
+                }
+              ],
+              "disposition": "The same native recipe handoff and flow output are required. The current control adds compact-view navigation, rejects foreign same-named actions and checks that only the explicit production action reads the two selected rates while preserving root and query.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_availability_mode_searches_authored_rows_without_native_actions": {
+              "current_line": 3120,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 759,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "2920972F1094F9B2669F1B910737BBE223DF1722950B1A9B37ED698401415A79"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 2273,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "89245628405980F1DB084B3750C7BA8266ED5F01ECD271A9611BDDED68DD7316"
+                },
+                {
+                  "revision": "v5.0.12",
+                  "line": 2573,
+                  "blob": "7911fd5ea6709270fa1e33aa81e973df4d17595c",
+                  "body_sha256": "D7F4E5ED57BD4574088BFA2C1CE43FFC569A86A9E6B1E081BFD3841177BC5DDE"
+                }
+              ],
+              "disposition": "The current control clears the model mock and locates the authored projection. It retains the same matching and empty searches, authored omission rows and prohibition on native actions.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_delivered_tabs_show_effective_startup_settings_and_keep_native_queue_authoritative": {
+              "current_line": 5317,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 2003,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "86CEDB3579399F3AE8E0830B378CE5C685331DE57714BDAA52E9D53879B5499B"
+                },
+                {
+                  "revision": "v5.0.1",
+                  "line": 2473,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "8EE7CBB60EF3134207AA1D2BF00EBF70FDA9C8A80BD6861E216B47860BD3682B"
+                },
+                {
+                  "revision": "v5.0.8",
+                  "line": 3785,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "9EE4A241E2245B7FB4BDD4A54F53A79F29483A9657B03A4F4004FDDD75B0276D"
+                },
+                {
+                  "revision": "debd58b388f8f4c70241fc211dbe1322588321fe",
+                  "line": 4063,
+                  "blob": "8055c7d12db87cbb67089870f1c7d5407735237d",
+                  "body_sha256": "ECCFE634253F2A3A0E0C903D5A0364693BD7C1A93049830209E3B69D055EF7BD"
+                }
+              ],
+              "disposition": "Current Settings show the effective startup value and default together, with direct provenance available on the value. The test adds translated labels for Settings search, the Debug version readback and both scope switches while preserving Availability and the original queue, active research and paid progress.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_existing_beta_help_pane_gains_report_controls_and_configuration_syncs_its_choices": {
+              "current_line": 5709,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 3332,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "13F3732198CE6B74A082333C392325A32BA6CAAA6146A915BE9F03430BBFDC4E"
+                }
+              ],
+              "disposition": "The imported beta view gains the authored report panes and restores saved choices. The current test retains the expected preview encoding count, original preview identity and zero file writes on refresh.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_help_report_choices_are_owned_personal_retained_and_do_not_export_on_refresh": {
+              "current_line": 5626,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 3252,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "A81F62DD1DB91501797D1659751C09EE59CCC2039BF90E6587099F0C81DFEDE8"
+                }
+              ],
+              "disposition": "The settings and omissions controls and their preview follow the authored Debug panes. Existing ownership, choice retention and explicit export checks remain covered. The current test also checks that the exported profile fits within the retained pane.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_imported_finite_cap_keeps_zero_default_and_direct_provenance": {
+              "current_line": 3607,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 1874,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "4BD4BB95AFD9B55B55B3EDF951DCB7E3D02D7FB1E670BB93621FA45B49F6B361"
+                }
+              ],
+              "disposition": "The imported finite limit stays visible in Research and Settings. The current value includes its paired default while retaining the old zero-as-unlimited and direct-source assertions on the Setting tooltip.",
+              "decision_revision": "debd58b388f8f4c70241fc211dbe1322588321fe"
+            },
+            "LibraryTests.test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names": {
+              "current_line": 2366,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.1",
+                  "line": 879,
+                  "blob": "74d42a581fb496dad7320a09dfcaf498d7794029",
+                  "body_sha256": "CF98E0AB6EA491A5B0C2C6F6768162183666081202960C2F318052A9C4133ECD"
+                }
+              ],
+              "disposition": "The authored Research facts pane receives the same recipe, item and production values from legacy prototype collections. The original fallback engine setup and action assertions remain covered.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_real_catalogue_and_model_handoff_filters_the_native_gear_row": {
+              "current_line": 4791,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 1640,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "76CFC82D1B98AB8F6BBB2D0FB08A71434992AEEE0E4C198CEA6C73C14BA3F0AD"
+                },
+                {
+                  "revision": "7a2f93224c846b86261b2da709f50ea683fc708d",
+                  "line": 1580,
+                  "blob": "230f087a14acd3055b39b11f87813c3a1242f0a5",
+                  "body_sha256": "4DC1BCB5E5681A1768BB900562053DEC10401F481C91911BDF3802E28B99D8B5"
+                },
+                {
+                  "revision": "c7c815d831c434a45d1965fe7e4acc1f0de3786d",
+                  "line": 1178,
+                  "blob": "7d5adb4142df303a8a84a0f51da450cd05d81902",
+                  "body_sha256": "46764294537C184435F50D9619A1D8983114D291412775859F0718E9E70A182E"
+                }
+              ],
+              "disposition": "The current result reads the native localized caption from the authored list. The test still uses the real catalogue and model, retains the gear row selection and now rejects callback imports."
+            },
+            "LibraryTests.test_real_model_readiness_uses_completed_disabled_and_trigger_explanations": {
+              "current_line": 4534,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 2612,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "800C98706C11FD02AA25152A330B81330390E1B23F4B077588843AD16248E1D4"
+                }
+              ],
+              "disposition": "Readiness uses the same actual completed, disabled and trigger conditions. Their explanations now belong to the authored Research facts pane.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_report_choices_and_previews_stay_separate_for_players_sharing_a_force": {
+              "current_line": 5686,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 3309,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "56FEDA2C663FF88A234687D59D77344398E6B4BF75611CEFA887C5BEC85122F7"
+                }
+              ],
+              "disposition": "Both players use the authored report and tools panes. The current test keeps their choices, previews and cross-player rejection independent on the same force.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_returning_from_availability_removes_its_projection_before_research": {
+              "current_line": 851,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 429,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "D5352B0741483900F06B0C99A408C93B28709974E54993558DCC3626A5A86529"
+                }
+              ],
+              "disposition": "The current check destroys the authored Availability viewport and its child before Research is shown. A residual standalone projection is still retired through the original recovery case.",
+              "decision_revision": "12854b336976a046c73e05d5a20914e96fc1cd00"
+            },
+            "LibraryTests.test_selected_live_productivity_limits_and_saturation_render_without_stale_values": {
+              "current_line": 2313,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.2",
+                  "line": 928,
+                  "blob": "02451c6e347f06588cbd92152f97de2dfba3cd6d",
+                  "body_sha256": "E3AB09746E01574730026242F0D72EB8D1598426421B5F5EE2B1A9D21C8CF6C2"
+                }
+              ],
+              "disposition": "The current control reads the authored Research facts pane. It still verifies actual productivity limit and saturation values before and after live state changes.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            },
+            "LibraryTests.test_settings_use_authored_short_field_names_and_honest_compact_numbers": {
+              "current_line": 1065,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.8",
+                  "line": 577,
+                  "blob": "753e3694ffbdfba99c31d6896ea7d7fcb7557da6",
+                  "body_sha256": "FA3A4A45FEBE32466DA35FD66F5411353D94C59DB65C15F2EB11855F87FFE61F"
+                }
+              ],
+              "disposition": "The authored effect percentage field joins the short-label coverage. The original setting names and independent compact numeric value assertions are still present.",
+              "decision_revision": "5185480192fc9a5117e81d0089ad8d100359a80a"
+            },
+            "LibraryTests.test_support_exports_are_owned_local_and_inactive_on_research_views": {
+              "current_line": 5788,
+              "historical_bodies": [
+                {
+                  "revision": "v5.0.0",
+                  "line": 2164,
+                  "blob": "0f64f261fc3b421d3282fb7aec07859422d49d17",
+                  "body_sha256": "348B9254D3FF7FDA3CA69DA9EE408BB4CBB05C04495A8581B0B201275B549AFD"
+                }
+              ],
+              "disposition": "The explicit export action follows the authored report pane. The original local ownership and rejection of Research-view and foreign actions retain their checks.",
+              "decision_revision": "8e8359c894d60732acd88d253433afe583ba4d87"
+            }
+          }
+        }
+      ],
+      "scope": "Selected controller expectations cover Availability, Settings, actual effects, native queue custody and private report actions. The 148-test controller run used identical inputs for these controls. Remaining controller history and native acceptance require separate evidence."
+    },
+    "library_core_same_name_test_intent_readback": {
+      "reviewed_on": "2026-11-26",
+      "reviewed_against": "26aa2b5ad1e4c75594cac0bbca05f5f3a360b1b8",
+      "suite_paths": [
+        "tests/test_library.py",
+        "tests/test_library_model.py",
+        "tests/test_library_translations.py"
+      ],
+      "public_tags_through": "v5.0.24",
+      "changed_declarations": 73,
+      "distinct_historical_variants": 111,
+      "reviewed_groups": [
+        "library_model_translation_same_name_test_intent_review",
+        "library_native_event_test_intent_review",
+        "library_localization_test_intent_review",
+        "library_view_state_test_intent_review",
+        "library_layout_test_intent_review",
+        "library_projection_test_intent_review"
+      ],
+      "intake_sha256": "6853653C09CEA44A71853B82B3636664AA53C2410D6EDDABA666EBD0F3D259CF",
+      "scope": "Reopened exact published and changed first-parent Git bodies for all same-name changed test declarations in these three Library host suites. These mappings cover the stated test bodies and prior decisions. Other historical sources and stable native acceptance have separate records."
+    },
     "runtime_ownership_same_name_test_intent_review": {
       "reviewed_on": "2026-11-26",
       "reviewed_against": "92437ba16da973a2661c42b26d750c5480efea09",
