@@ -1,23 +1,23 @@
 ---
-title: "MIR 5.0.25 beta release notes"
+title: "MIR 5.0.26 beta release notes"
 status: current
-applies_to: "MIR 5.0.25 GitHub prerelease"
+applies_to: "MIR 5.0.26 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-25
+last_reviewed: 2026-11-26
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-525-release-notes
+  - mir-526-release-notes
 ---
 
-This beta preserves earned worker cargo and unfinished research when a prepared save moves from Factorio 1.1.110 to 2.0.77.
+This beta preserves paid worker cargo research at its original science price through a prepared Space Exploration add-on change.
 
-- In Factorio 1.1.110, update MIR on a copy of your save. Run `/mir-worker-storage-recovery prepare`, save the paused game under a new name, and open that copy in Factorio 2.0.77 with the matching MIR edition and worker cargo settings.
-- The verified upgrade keeps active and parked worker research at its original science price, preserves the research queue, and lets labs finish the remaining work normally.
-- On Factorio 2.0.77 with Space Age, a tested save from MIR 4.7.20002 still stops at the worker cargo history check. If you see that error, keep your original save and return to your previous mod selection.
+- On Factorio 2.0.77 with Space Exploration 0.7.57, keep the original save and exact old add-on archives. Use the witnessed preparation procedure while the original worker price is still present.
+- Prepare a copy before moving from Factorio 1.1.110 to 2.0.77 to carry earned cargo, unfinished research and queue order into the newer edition.
+- The Research Library listens for its interface events while a Library view is open.
 
-[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.25/docs/support.md#moving-a-factorio-11-save-to-20)
+[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.26/docs/support.md#upgrading-mir-4720002-with-space-exploration)
 
-This is a GitHub beta. Library memory and performance qualification remains in progress.
+This is a GitHub beta. The full Library performance comparison remains in progress.
