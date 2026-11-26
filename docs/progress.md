@@ -14,6 +14,20 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## MIR 5.0.26 public delivery (2026-11-26)
+
+GitHub lists MIR 5.0.26 as a prerelease published at 18:02 AEDT. The primary checkout fast-forwarded through the latest documentation merge before the publication retry. The public tag resolves to `964159230dbbd153e3c2d26cd2d4725ca393e2a3`. All four required checks passed before tagging. The administration and release-mutability probes passed immediately before publication. [GitHub prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.26)
+
+Anonymous downloads verified all 17 ZIPs and both checksum files against frozen inventory SHA-256 `D5784216D67F5471EF1D1E21C3A9654A8FE1EF4C6F2EF24E911CCE88543883B1`. The primary `dist/v5.0.26` contains the identical files and matching notes and upload text. The clean primary checkout matched remote `dev` at `c8e1577b4f4fb505b13e1e9c965585c5d4e0592d` during delivery. The anonymous receipt is `build/qualification/mir526-release-cadence-r01/public-delivery-458998750-20261126T070130979/anonymous-readback.json` at SHA-256 `DF1A3DCC53CF27B59F1E897B8C3B8169BF67E55285978D1BE1CA59771D5ECE70`.
+
+The exact published Factorio 2.0 and 2.1 ZIPs upgraded protected Base saves on Factorio 2.0.77 and 2.1.23 and passed two cold loads apiece. The 2.1 replay retained the current research, the unrelated queue entry and the saved cargo bonus. The verifier matched the protected inputs and rehashed the two newly written successors. Its receipt is `build/qualification/mir526-modern-minimum-gunmetal-r03/source-and-custody.json` at SHA-256 `455BEB5B107D676353020AEB2378AA963D9B8EBE72B3C3CF1DCD29ABCF579A84`.
+
+The matched Library timing and retained-memory verdict remains open.
+
+On Factorio 2.1.24, the source-tag build of Editor Extensions 2.7.1 reproduced the fresh-map refusal with published 5.0.21022 in the reduced Space Age testing scenario. The same scenario started with published 5.0.21026, saved and passed two cold loads with checksum `2248638990`. The shared library restored and 66 original files rehashed. The Editor Extensions archive has a different checksum from the reporter’s archive. The original #1944 save and startup settings remain unavailable. The receipt is `build/qualification/mir526-editor271-gunmetal-r01/verified-editor-native.json` at SHA-256 `287B8B811AEFEE0B7E391218D7555FB4FEC34287F4763EDDB35D0A3DECF963AA`. [Original report](https://github.com/Julesc013/more-infinite-research/issues/1944)
+
+Both native API consumers passed on the exact published 5.0.26 archives under Factorio 2.0.77 and 2.1.24. Each paired assembler measurement produced 200 and 202 copper cables from equal inputs. Each engine passed two cold loads, restored the direct library and had 24 original output files rehashed. The receipt is `build/qualification/mir526-native-api-black-glass-r01/verified-native-api.json` at SHA-256 `32BDFC76BB9C0CD48CC8CF3774E5551C12980ED8670C9DB0AA9BCD047B057EC7`.
+
 ## MIR 5.0.26 private draft qualification (2026-11-26)
 
 GitHub draft `458998750` holds 17 player ZIPs and two checksum files for `v5.0.26`. The four required checks passed on `main` commit `964159230dbbd153e3c2d26cd2d4725ca393e2a3`. All 19 GitHub asset digests match the independently rebuilt inventory, and the notes match the reviewed source. The metadata receipt is `build/qualification/mir526-draft-readback-aero-r01/verified-private-draft-metadata.json` at SHA-256 `8323713D51B00E5EDEE10DAD82E7263E504A1D5AE4EC30C4A1D50BFB4F7EB3DC`. Anonymous download verification and primary `dist` delivery follow qualified publication. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2453)
