@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "F110F200WorkerPrerequisiteAndPriceBoundary",
+  "status": "native-diagnostic-completed",
+  "source": {
+    "base": "1.1.110",
+    "mir": "4.7.11003",
+    "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+    "archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "default_price_save_sha256": "7F532C8C7883EFEBC97D83ABF2E99AF977F0135CB2F3983F07DD138C918CEEC6",
+    "custom_price_save_sha256": "863025ECAE14AED0329890F9C005AC5F81E676C02C4CF18813CB123CC357DD88",
+    "default_price": [
+      675,
+      0.125,
+      0.25
+    ],
+    "custom_price": [
+      1350,
+      0.0625,
+      0.125
+    ],
+    "price_field_order": [
+      "units",
+      "active_fraction",
+      "parked_fraction"
+    ],
+    "cargo": 3,
+    "queue": [
+      "worker-robots-storage-4",
+      "mir-probe-follower"
+    ]
+  },
+  "destination": {
+    "base": "2.0.77",
+    "mir": "5.0.20026",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "archive_sha256": "0F75AF507CA9C2D3350D822C6149C59912FB77C0C130DABD12920EB5A6EACF08",
+    "disabled_official_mods": [
+      "elevated-rails",
+      "quality",
+      "space-age"
+    ],
+    "observation_phase": "Test-only Lua migration, before MIR on_configuration_changed"
+  },
+  "observations": {
+    "published_base": {
+      "log_member": "worker-engine-conversion-r05/current-contract/stdout.log",
+      "log_sha256": "64E26F7ED8348ED69851E8259F3ACC59398D6F8F44A6AF478D1833AF4925AF05",
+      "exit_code": 1,
+      "added_direct_prerequisite": "automation-science-pack",
+      "current_research": "mir-probe-follower",
+      "active_fraction": 0,
+      "parked_worker_fraction": 0.25,
+      "cargo": 3,
+      "later_result": "published checkpoint refusal"
+    },
+    "only_old_source_prerequisites": {
+      "log_member": "worker-engine-conversion-r05/old-prerequisites-only/stdout.log",
+      "log_sha256": "1B88F2842A653BC27A67C802BFE5B7BF557ED20E61D05009483561DCE01463D0",
+      "exit_code": 1,
+      "current_research": "worker-robots-storage-4",
+      "active_fraction": 0.125,
+      "parked_worker_fraction": 0.25,
+      "unrelated_queue_follower_retained": true,
+      "later_result": "published source/owner contract refusal"
+    },
+    "both_owner_prerequisites_matched": {
+      "default_source": {
+        "log_member": "worker-engine-conversion-r06/destination-old-price-675/stdout.log",
+        "log_sha256": "B0A56ABB22210A5F5F5C00F78A3ED9763EA13787BB85E7892E5A148602C26BAD",
+        "exit_code": 1
+      },
+      "custom_source_same_paid_units": {
+        "log_member": "worker-engine-conversion-r07/destination-custom-price-same-credit/stdout.log",
+        "log_sha256": "B066FD3CE4AAF067BAC88F328980EAF91E200C9D4D0B9ED85F0EA30446DE1828",
+        "exit_code": 1
+      },
+      "destination_price_and_fractions": [
+        675,
+        0.125,
+        0.25
+      ],
+      "destination_observations_identical": true,
+      "later_result": "published checkpoint refusal in both arms"
+    },
+    "json_rename_with_official_dlc": {
+      "log_member": "worker-engine-conversion-r03/json-rename/stdout.log",
+      "log_sha256": "E5D61854BC13D2F922AC98806ED032B223D17F0EDC8B3B8DB838946BC3BCB40A",
+      "exit_code": 1,
+      "parked_progress_renamed": true,
+      "active_worker_work_missing": true
+    }
+  },
+  "custody": {
+    "path": "build/qualification/worker-conversion-prerequisite-aero-r01/engine-probes.zip",
+    "sha256": "8CA20D61FF8897FCE47ACB240BA996361C9AAD76A13746B44E0A9E00BFD85AB2",
+    "readback_sha256": "6BAAA78FF67F3928B275DF4B759993FFBD96726F65A4F8DDD21EAEA417727734",
+    "member_count": 125
+  },
+  "limits": [
+    "Controlled synthetic saves with ordinary native MIR prototypes and exact published packages. The prerequisite variants exist only in the test add-on.",
+    "No player save, replacement upgrade, lab completion, cold reload or stable acceptance is claimed by these probes.",
+    "The engine preserved already-paid units in the controlled price comparison. The destination observations no longer distinguished the original prices."
+  ]
+}

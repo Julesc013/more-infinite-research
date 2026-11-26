@@ -1,6 +1,6 @@
 # Serial activation over the existing archive library. No archive staging.
-# FactorioRunner supplies the existing immutable-input identity helpers.
 . (Join-Path $PSScriptRoot 'ModPortal.ps1')
+. (Join-Path $PSScriptRoot '../validation/ImmutableInputStaging.ps1')
 
 function Assert-MIRLibraryPath {
   param([string]$Path)
