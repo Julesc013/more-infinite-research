@@ -3702,6 +3702,43 @@
           "source_reconciliation_complete": false,
           "test_intent_reconciliation_complete": false,
           "release_qualification": false
+        },
+        {
+          "id": "published-526-f210-library-personal-tabs-and-exports",
+          "source": [
+            "source/runtime/library.lua",
+            "source/presentation/library_model.lua",
+            "source/runtime/diagnostics.lua"
+          ],
+          "evidence": "docs/progress.md#mir-5026-private-draft-qualification-2026-11-26",
+          "integration": "https://github.com/Julesc013/more-infinite-research/pull/2458",
+          "published_release": "v5.0.26",
+          "source_commit": "964159230dbbd153e3c2d26cd2d4725ca393e2a3",
+          "engine": "Factorio 2.1.24",
+          "engine_sha256": "1CD21159CB48B92C7258407ECD9D52CFE900F276A52D4DDA9577DCDB27AFC0CF",
+          "archive": "more-infinite-research_5.0.21026.zip",
+          "archive_sha256": "D0C8AECE90E8957364FA9A9255108702C7104AFB3600468944A96B7FBD88576B",
+          "scope": "The published archive matches the two frozen native client runs. English and German clients retained independent search and view state across rejoin and saved-host restart. The separate tab run used 30 physical inputs across Research, Queue, Settings and Help, and produced eight files through six native exports. Both cases preserved the protected research and queue.",
+          "personal_views": {
+            "path": "build/qualification/mir526-draft-library-personal-gunmetal-r03/primary-readback.json",
+            "sha256": "EF26F0F54D2010551CCAB322F98352D26AE9A05224C80F52ECFEAE0DCC09B9DA",
+            "native_receipt_sha256": "399C5CA7DBAB0300EE911B8234E9A528AD3915F8CCD54B3D7DF530C332201E31",
+            "native_steps": 13,
+            "physical_inputs": 7,
+            "captures": 26
+          },
+          "tabs_and_exports": {
+            "path": "build/qualification/mir526-draft-library-tabs-gunmetal-r02/primary-readback.json",
+            "sha256": "67F9E8B528C339DB66014DAC44DD7591014234C76F7EBE989CB1A2014B6C9E2C",
+            "native_receipt_sha256": "0563161698E60A9146A1760EDB2C09E23DFD5439A0024685ABB7DD27F703550D",
+            "native_steps": 32,
+            "physical_inputs": 30,
+            "native_tab_clicks": 16,
+            "verified_native_exports": 6,
+            "verified_export_files": 8,
+            "captures": 64
+          },
+          "remaining_verification": "The Factorio 2.0 interaction matrix, other listed lifecycle and detail cases, paired UI timing and retained memory keep their own acceptance requirements. The historical and stable gates remain open."
         }
       ],
       "test_subjects": [
