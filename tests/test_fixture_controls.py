@@ -45,12 +45,11 @@ class FixtureControlHostStageTests(unittest.TestCase):
     @staticmethod
     def fixture_archive_preflight(archive: Path, source: Path) -> subprocess.CompletedProcess:
         environment = dict(os.environ,
-                           MIR_TEST_IDENTITY=str(ROOT / "tools/lib/validation/ImmutableInputStaging.ps1"),
                            MIR_TEST_LIBRARY=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
                            MIR_TEST_ARCHIVE=str(archive), MIR_TEST_SOURCE=str(source))
         return subprocess.run(
             ["pwsh", "-NoLogo", "-NoProfile", "-Command",
-             ('$ErrorActionPreference="Stop";. $env:MIR_TEST_IDENTITY;. $env:MIR_TEST_LIBRARY;'
+             ('$ErrorActionPreference="Stop";. $env:MIR_TEST_LIBRARY;'
               'Assert-MIRLibraryFixtureArchive -Archive $env:MIR_TEST_ARCHIVE -SourceDirectory $env:MIR_TEST_SOURCE')],
             cwd=ROOT, env=environment, text=True, capture_output=True, check=False,
         )
