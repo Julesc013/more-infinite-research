@@ -229,6 +229,8 @@ Probes claiming the complete loaded-mod selection check its observability before
 
 The preparation command covers the published MIR 4.7.20002 and Space Exploration 0.7.57 combination on Factorio 2.0.77. Keep the original save, exact original archives and startup settings. Record each old mod's version and native data checksum in the witness JSON accepted by `tools/read_save_mod_checksums.py`. The data checksums bind the configuration. Retain exact archive SHA-256 values for the source package and dependencies.
 
+The builder packages `tools/worker_storage_preparation.lua` as the private mod's `control.lua`. The player editions share the checkpoint reader, and the Factorio 1.1 edition registers its own engine-upgrade command. Keep earlier preparation archives with their original witness and hash.
+
 ```powershell
 python -B tools/build_worker_storage_preparation.py path/to/original-save.zip --witness path/to/original-mods.json --output-directory build/worker-preparation
 ```

@@ -109,6 +109,66 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
           assert(native.current_progress==.25 and worker.saved_progress==0)
         ''', checkpoint.as_posix())
 
+    def test_private_preparation_entry_point_preserves_each_supported_checkpoint(self):
+        checkpoint = ROOT / "source/research/worker_storage_checkpoint.lua"
+        control = ROOT / "tools/worker_storage_preparation.lua"
+        self.lua.execute(r'''
+          local checkpoint_path, control_path = ...
+          local mir, helper = "more-infinite-research", "mir-worker-storage-preparation"
+          local original = {base="2.0.77", [mir]="4.7.20002", ["space-exploration"]="0.7.57"}
+          local formula = "675*1.5^(L-4)"
+          for _, mode in ipairs{{"4.7.20002", "prepare", "worker-robots-storage-4"},
+                               {"5.0.20027", "prepare-addon-change", "mir-worker-storage-default-4"}} do
+            local version, operation, identity = mode[1], mode[2], mode[3]
+            local worker = {name=identity, level=9, researched=false, saved_progress=.25,
+              enabled=true, visible_when_disabled=true, research_unit_count=5125, research_unit_energy=3600,
+              research_unit_ingredients={{name="automation-science-pack", amount=1}},
+              prototype={max_level=4294967295, effects={{type="worker-robot-storage", modifier=1}}}}
+            local force = {name="player", index=1, worker_robots_storage_bonus=8,
+              technologies={[identity]=worker}, current_research=worker, research_progress=.125, research_queue={worker}}
+            local game = {tick=100, tick_paused=false, forces={player=force},
+              get_player=function() return {admin=false, print=function() end} end}
+            local callback, inspect, tick_handler
+            local env = setmetatable({game=game, storage={}, log=function() end,
+              defines={events={on_tick=1}},
+              script={active_mods={base=original.base, [mir]=version, ["space-exploration"]="0.7.57", [helper]="0.1.0"},
+                on_load=function() end, on_configuration_changed=function() end,
+                on_event=function(_, event) tick_handler=event end},
+              prototypes={technology={[identity]={research_unit_count_formula=formula},
+                ["mir-worker-storage-prepared-paid-4"]={research_unit_count_formula=formula}}},
+              remote={add_interface=function(name, data) assert(name==helper); inspect=data.checkpoint end},
+              commands={add_command=function(name, help, run)
+                assert(name=="mir-prepare-legacy-worker" and help:find(operation,1,true)); callback=run
+              end}}, {__index=_G})
+            local checkpoint = assert(loadfile(checkpoint_path, "t", env))()
+            assert(inspect==nil and callback==nil)
+            env.require = function(name)
+              if name=="profile" then return original end
+              assert(name=="research.worker_storage_checkpoint"); return checkpoint
+            end
+            assert(loadfile(control_path, "t", env))()
+            callback{parameter=operation, player_index=1}
+            assert(inspect()==nil and not game.tick_paused)
+            env.script.active_mods.extra="1.0.0"
+            callback{parameter=operation}
+            assert(inspect()==nil and not game.tick_paused)
+            env.script.active_mods.extra=nil
+            callback{parameter=operation}
+            local state = assert(inspect())
+            assert(game.tick_paused and state.mir==version and state.formula==formula)
+            assert(state.forces[1].current_progress==.125 and state.forces[1].saved_progress==.25)
+            assert(state.forces[1].queue[1]==identity and state.forces[1].bonus==8)
+            if operation=="prepare" then
+              assert(state.source_mods==original and state.purpose==nil and not tick_handler)
+            else
+              assert(state.source_mods[helper]=="0.1.0" and state.purpose=="addon-change" and type(tick_handler)=="function")
+            end
+            callback{parameter="cancel"}
+            assert(inspect()==nil and not game.tick_paused and tick_handler==nil)
+            assert(force.research_queue[1]==worker and force.research_progress==.125 and worker.saved_progress==.25)
+          end
+        ''', checkpoint.as_posix(), control.as_posix())
+
     def f110_effects(self):
         direct = json.loads((ROOT / "tests/fixtures/historical-direct-native-oracle.json").read_text(encoding="utf-8"))
         continuations = json.loads((ROOT / "tests/fixtures/historical-continuation-native-oracle.json").read_text(encoding="utf-8"))

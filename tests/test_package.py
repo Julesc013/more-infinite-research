@@ -189,7 +189,11 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual("runtime/bootstrap.lua" in files, not reduced)
                 self.assertEqual("research/modern.lua" in files, not reduced)
                 self.assertEqual(any(path.startswith("adapters/") for path in files), reduced)
-                self.assertEqual("research/worker_storage_checkpoint.lua" in files, not reduced or target == "f110")
+                checkpoint = "research/worker_storage_checkpoint.lua"
+                self.assertEqual(checkpoint in files, not reduced or target == "f110")
+                if checkpoint in files:
+                    self.assertNotIn(b"mir-prepare-legacy-worker", files[checkpoint])
+                self.assertFalse(any(path.rsplit("/", 1)[-1] == "worker_storage_preparation.lua" for path in files))
                 self.assertEqual(b".register_source()" in files["control.lua"], target == "f110")
                 self.assertIn("api/v1/data.lua", files)
                 self.assertIn("api/v1/runtime.lua", files)
