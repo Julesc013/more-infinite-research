@@ -187,6 +187,18 @@ class WindowAttributes(C.Structure):
         ('do_not_propagate_mask', C.c_long), ('override_redirect', C.c_int), ('screen', C.c_void_p)]
 
 
+class ClientMessage(C.Structure):
+    _fields_ = [
+        ('type', C.c_int), ('serial', C.c_ulong), ('send_event', C.c_int),
+        ('display', C.c_void_p), ('window', C.c_ulong), ('message_type', C.c_ulong),
+        ('format', C.c_int), ('data', C.c_long * 5),
+    ]
+
+
+class XEvent(C.Union):
+    _fields_ = [('client_message', ClientMessage), ('pad', C.c_long * 24)]
+
+
 class LinuxX11:
     def __init__(self, binding):
         self.x = C.CDLL('libX11.so.6')
@@ -206,6 +218,9 @@ class LinuxX11:
         function(self.x, 'XGetWindowProperty', C.c_int, pointer, window, window, C.c_long, C.c_long,
                  C.c_int, window, C.POINTER(window), C.POINTER(C.c_int), C.POINTER(window),
                  C.POINTER(window), C.POINTER(C.c_void_p))
+        function(self.x, 'XGetWMProtocols', C.c_int, pointer, window, C.POINTER(C.POINTER(window)),
+                 C.POINTER(C.c_int))
+        function(self.x, 'XSendEvent', C.c_int, pointer, window, C.c_int, C.c_long, C.POINTER(XEvent))
         function(self.x, 'XSetInputFocus', C.c_int, pointer, window, C.c_int, window)
         function(self.x, 'XGetInputFocus', C.c_int, pointer, C.POINTER(window), C.POINTER(C.c_int))
         function(self.x, 'XSync', C.c_int, pointer, C.c_int)
@@ -317,6 +332,30 @@ class LinuxX11:
         self.x.XSync(self.d, 0)
         require(not self.x_error, 'private X request failed')
 
+    def request_close(self, window):
+        require(window == self.window_id, 'close request targets a different window')
+        protocols_atom = self.x.XInternAtom(self.d, b'WM_PROTOCOLS', 1)
+        delete_atom = self.x.XInternAtom(self.d, b'WM_DELETE_WINDOW', 1)
+        require(protocols_atom != 0 and delete_atom != 0, 'window close protocol unavailable')
+        protocols, count = C.POINTER(C.c_ulong)(), C.c_int()
+        try:
+            advertised = self.x.XGetWMProtocols(self.d, window, C.byref(protocols), C.byref(count))
+            require(advertised != 0 and bool(protocols) and 0 < count.value <= 64
+                    and any(protocols[index] == delete_atom for index in range(count.value)),
+                    'window did not advertise the close protocol')
+        finally:
+            if protocols:
+                self.x.XFree(protocols)
+
+        # ICCCM ClientMessage format 32 with native long storage in Xlib.
+        # Post-measurement cleanup uses CurrentTime when there is no input timestamp.
+        event = XEvent()
+        message = event.client_message
+        message.type, message.display, message.window = 33, self.d, window
+        message.message_type, message.format, message.data[0] = protocols_atom, 32, delete_atom
+        require(self.x.XSendEvent(self.d, window, 0, 0, C.byref(event)) != 0, 'window close request refused')
+        self.sync()
+
     def close(self):
         try:
             self.x.XCloseDisplay(self.d)
@@ -324,16 +363,28 @@ class LinuxX11:
             self.x.XSetErrorHandler(self.previous_error_handler)
 
 
+def verify_owned_window(spec, binding, backend, guard):
+    guard()
+    observed = backend.window(binding, spec)
+    require(observed['pid'] == spec['process_id'] and observed['bounds'] == binding['bounds']
+            and observed['mapped'] is True and 'factorio' in observed['title'].casefold(),
+            'owned window differs')
+
+
+def request_owned_window_close(spec, binding, backend, guard):
+    validate_spec(spec)
+    validate_binding(spec, binding)
+    verify_owned_window(spec, binding, backend, guard)
+    backend.request_close(binding['window'])
+    return {'protocol': 'WM_DELETE_WINDOW', 'process_id': binding['process_id'], 'window': binding['window']}
+
+
 def perform(spec, binding, backend, guard, pause=time.sleep):
     validate_spec(spec)
     validate_binding(spec, binding)
     trace, held, held_button = [], [], None
     def checked_window(focused=True):
-        guard()
-        observed = backend.window(binding, spec)
-        require(observed['pid'] == spec['process_id'] and observed['bounds'] == binding['bounds']
-                and observed['mapped'] is True and 'factorio' in observed['title'].casefold(),
-                'owned window differs')
+        verify_owned_window(spec, binding, backend, guard)
         if focused:
             require(backend.focused() == binding['window'], 'owned window lost focus')
     def emit(api, call, **facts):

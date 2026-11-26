@@ -19,11 +19,12 @@ _HISTORICAL_MODULES = (
 )
 
 
-def build_default_native_owner_world(runtime_factory, *, target, source_root):
+def build_default_native_owner_world(runtime_factory, *, target, source_root, historical_owner=None):
     """Return the ordinary default-owner world using the caller's Lua factory."""
     lua = runtime_factory(unpack_returned_tuples=True)
     lua.globals().player_root = Path(source_root).as_posix()
     lua.globals().package_family = target
+    lua.globals().historical_owner = historical_owner
     lua.execute(r'''
       package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
       local f200=package_family=="f200"
@@ -34,7 +35,7 @@ def build_default_native_owner_world(runtime_factory, *, target, source_root):
     lua.execute(r'''
       local target=require("platform.target")
       script.active_mods.base=target.minimum_base;script.active_mods["more-infinite-research"]=target.distribution_version
-      ORDINARY="mir-worker-storage-default-4";HEAD="mir-worker-storage-head-4";LEGACY517="mir-worker-storage-published517-4";OWNER_KEY="mir_worker_storage_native_owner"
+      ORDINARY="mir-worker-storage-default-4";HEAD="mir-worker-storage-head-4";LEGACY517=historical_owner or "mir-worker-storage-published517-4";OWNER_KEY="mir_worker_storage_native_owner"
       function copy(v)if type(v)~="table"then return v end local o={}for k,x in pairs(v)do o[k]=copy(x)end return o end
       function same(a,b)if type(a)~=type(b)then return false end;if type(a)~="table"then return a==b end
         for k,v in pairs(a)do if not same(v,b[k])then return false end end;for k in pairs(b)do if a[k]==nil then return false end end;return true end
@@ -291,9 +292,11 @@ def build_full_default_provider_handover_world(runtime_factory, *, target, sourc
     return lua
 
 
-def build_older_default_admission_world(runtime_factory, *, target, source_root):
+def build_older_default_admission_world(runtime_factory, *, target, source_root, historical_owner=None):
     """Construct the caller-owned older default admission world."""
-    lua = build_default_native_owner_world(runtime_factory, target=target, source_root=source_root)
+    lua = build_default_native_owner_world(
+        runtime_factory, target=target, source_root=source_root, historical_owner=historical_owner
+    )
     lua.execute(r'''
           for _,id in ipairs({CANONICAL,ORDINARY,ID})do
             prototypes.technology[id].research_unit_count_formula="675*1.5^(L-4)"

@@ -2136,7 +2136,257 @@
       "line": 44,
       "rule": "Lua members are selectable package members; JSON migration members are additionally selected only from the migrations directory."
     },
-    "retention_decision": "Retain every published migration filename/body history. Missing Lua migration members do not prove the corresponding historical runtime state has no obligation; source_state_producer_boundaries names the current and MIR4 runtime-ledger/carrier owners to inspect before source-save creation."
+    "retention_decision": "Retain every published migration filename/body history. Missing Lua migration members do not prove the corresponding historical runtime state has no obligation; source_state_producer_boundaries names the current and MIR4 runtime-ledger/carrier owners to inspect before source-save creation.",
+    "published_mir5_archive_readback": {
+      "review_date": "2026-11-26",
+      "published_releases": [
+        {
+          "tag": "v5.0.0",
+          "source": "7e77f203859ab9384208c2c673983b1ffea44d2f",
+          "release_id": 429799579,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.1",
+          "source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+          "release_id": 430311801,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.2",
+          "source": "53c5075e94936ea71ab4cbad7a900612eacea67a",
+          "release_id": 432331175,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.3",
+          "source": "536573c20fcf995e94a967c47964d6b82b36ce0f",
+          "release_id": 434060556,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.4",
+          "source": "401d89f67cf71c8fb3ed7a025eff18f0a9d99a28",
+          "release_id": 434617359,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.5",
+          "source": "5d173925bce29ad8917346897706a0fcee4553e4",
+          "release_id": 434857344,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.6",
+          "source": "7b8cba314767da6aa5fcdc6c4d1c1f080c35800f",
+          "release_id": 435897548,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.7",
+          "source": "e296d40924f4d0f1d133eb5710f392b92ac42158",
+          "release_id": 436222708,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.8",
+          "source": "492bbda6249e9b42b1e28ea1db113ac347bcd66b",
+          "release_id": 437224420,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.9",
+          "source": "b86c0262104529e4301386db4e9ce67284a03ce8",
+          "release_id": 437425238,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.10",
+          "source": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+          "release_id": 438263107,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.11",
+          "source": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+          "release_id": 438952550,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.12",
+          "source": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
+          "release_id": 441736666,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.13",
+          "source": "f208b853a6e59fdcafd9209219150965576637d7",
+          "release_id": 443040851,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.14",
+          "source": "32d3faddfe26ff6e944ea67bf8cd9b953d6dcc1a",
+          "release_id": 443666966,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.15",
+          "source": "d64318546890f8dfc048ab60262436130dcec5e9",
+          "release_id": 446196178,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.16",
+          "source": "9c3ec803b5a51105507e5c86f29b7e523716f274",
+          "release_id": 446951554,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.17",
+          "source": "7cd3ae1ff4910699eb9ceeb70681f02659f0deec",
+          "release_id": 448678916,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.18",
+          "source": "a7e3045501e0b152e897ef7a2c8d3a6c93f4f4d2",
+          "release_id": 453787905,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.19",
+          "source": "0c3575c29603a36ed656a8dc0c7e1ce286da6d67",
+          "release_id": 454066946,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.20",
+          "source": "04f05596a3455839b5219b0e0abeca76a351c544",
+          "release_id": 454302334,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.21",
+          "source": "c161867920f50ad973581c43625e78a9f2949180",
+          "release_id": 454349239,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.22",
+          "source": "9e376928407e58f2921baf898a7edc398514a849",
+          "release_id": 454462897,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.23",
+          "source": "5134b7efa7e0b2909344c16a1e3869e6de7e993e",
+          "release_id": 457367424,
+          "archives": 17
+        },
+        {
+          "tag": "v5.0.24",
+          "source": "93b7f4bf17d3b2d32729c0b937eb9f38386d3125",
+          "release_id": 457617321,
+          "archives": 17
+        }
+      ],
+      "published_archives": 425,
+      "published_member_instances": 600,
+      "fresh_anonymous_archives": 17,
+      "official_asset_hash_checks": 425,
+      "members": [
+        {
+          "member": "migrations/more-infinite-research_2.0.5.json",
+          "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+          "editions": [
+            "013",
+            "014",
+            "015",
+            "016",
+            "017",
+            "018",
+            "100",
+            "110",
+            "200",
+            "210"
+          ],
+          "editable_path": "source/migrations/more-infinite-research_2.0.5.json",
+          "technology_renames": [
+            [
+              "recipe-prod-research_character_trash_slots-1",
+              "recipe-prod-research_inventory_capacity-1"
+            ]
+          ]
+        },
+        {
+          "member": "migrations/more-infinite-research_2.1.0.json",
+          "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+          "editions": [
+            "013",
+            "014",
+            "015",
+            "016",
+            "017",
+            "018",
+            "100",
+            "110",
+            "200",
+            "210"
+          ],
+          "editable_path": "source/migrations/more-infinite-research_2.1.0.json",
+          "technology_renames": [
+            [
+              "recipe-prod-research_stone_products-1",
+              "recipe-prod-research_landfill-1"
+            ]
+          ]
+        },
+        {
+          "member": "migrations/more-infinite-research_4.7.0.json",
+          "sha256": "0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379",
+          "editions": [
+            "210"
+          ],
+          "editable_path": "source/migrations/more-infinite-research_4.7.0.json",
+          "technology_renames": [
+            [
+              "recipe-prod-research_material_imersite-1",
+              "mir-k2-imersite-staged-state-1"
+            ],
+            [
+              "recipe-prod-research_material_imersite-4",
+              "mir-k2-imersite-continuation-state-4"
+            ]
+          ]
+        },
+        {
+          "member": "migrations/more-infinite-research_5.0.11000.json",
+          "sha256": "C26C6B21D777F3C20410C9C9ECDAFFE8ADF8DDDEAE556FE8B044146CEC40117D",
+          "editions": [
+            "110",
+            "200",
+            "210"
+          ],
+          "editable_path": "source/migrations/more-infinite-research_5.0.0.json",
+          "technology_renames": [
+            [
+              "laser-turret-speed-8",
+              "laser-shooting-speed-8"
+            ]
+          ]
+        }
+      ],
+      "private_frozen_source": "98056d27ef63ecc5ba0be28f0602244c109f5d0e",
+      "private_frozen_inventory_sha256": "2118768DAC962CB079A71D7268219F00E14BFA011CC1ADC47519B0514F3786B1",
+      "private_frozen_archives": 17,
+      "original_readback_sha256": "3EC6FCA9258A3B7F80EB076E2A2C80D3D43AE5BF43981187B5D5B4C412EAD83F",
+      "verified_readback": {
+        "path": "build/qualification/mir5-published-migration-members-r01/edition-migration-readback.json",
+        "sha256": "BB83813E1159CD75DE51ECB5976DD7525EB97E97F704961AF032698210897546"
+      },
+      "scope": "Published migration filenames and body bytes by Factorio edition. The 5.0.0 editable name emits the published 5.0.11000 filename where applicable. Native migration outcomes require their original protected-save replays."
+    }
   },
   "published_mir4_7_3": {
     "tag": "v4.7.3",

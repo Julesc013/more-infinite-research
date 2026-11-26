@@ -97,15 +97,21 @@ function Write-MIRDirectLibraryStartupProfile {
 }
 
 function Get-MIRDirectLibraryStartupArchiveHashes {
-  param([Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,[Parameter(Mandatory)][object[]]$BaseRows,[AllowNull()]$MirArchive)
+  param([Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
+    [Parameter(Mandatory)][object[]]$BaseRows,[AllowNull()]$MirArchive,[switch]$ValidateDependencies)
   $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory)
   $wanted=@($BaseRows|Where-Object enabled)
   if($null -ne $MirArchive){$wanted+=,[pscustomobject]@{name='more-infinite-research';version=[string]$MirArchive.version;enabled=$true}}
-  $hashes=@{}
-  foreach($row in $wanted){
+  $selected=@(foreach($row in $wanted){
     $matches=@($inventory|Where-Object {$_.name -ceq [string]$row.name -and $_.version -ceq [string]$row.version})
     Assert-MIRDirectLibraryStartupMeasurement ($matches.Count -eq 1) 'selected-archive-missing'
-    if(-not $matches[0].builtin){$hashes[[IO.Path]::GetFileName([string]$matches[0].path)]=Get-MIRImmutableInputSha256 -Path ([string]$matches[0].path)}
+    $matches[0]
+  })
+  # Comparison callers can collect the shared archive hashes before choosing an arm.
+  if($ValidateDependencies){Assert-MIRLibraryDependencies -Selected $selected}
+  $hashes=@{}
+  foreach($row in $selected){
+    if(-not $row.builtin){$hashes[[IO.Path]::GetFileName([string]$row.path)]=Get-MIRImmutableInputSha256 -Path ([string]$row.path)}
   }
   return $hashes
 }

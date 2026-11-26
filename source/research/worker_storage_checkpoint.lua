@@ -2,6 +2,9 @@
 -- Record its native terms and queue while the source copy is still paused in 1.1.
 local M = {key="mir_worker_storage_engine_checkpoint", source_base="1.1.110"}
 local MIR, WORKER = "more-infinite-research", "worker-robots-storage-4"
+local ORDINARY, PREPARED_HOLDER = "mir-worker-storage-default-4", "mir-worker-storage-prepared-paid-4"
+M.preparation_mod, M.preparation_version = "mir-worker-storage-preparation", "0.1.0"
+local LEGACY_MIR, LEGACY_BASE, LEGACY_SE = "4.7.20002", "2.0.77", "0.7.57"
 
 local function require_frame(condition, reason)
   if not condition then error("MIR worker engine upgrade: " .. reason .. ". Keep the original save.", 0) end
@@ -43,12 +46,11 @@ local function worker_terms(technology)
   return terms
 end
 
-local function prepare()
-  local active = script.active_mods
-  require_frame(active.base == M.source_base and M.source_version(active[MIR]), "prepare in the Factorio 1.1 edition")
-  local saved = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=active[MIR], forces={}}
+function M.capture(read_saved_progress, identity)
+  identity = identity or WORKER
+  local saved = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=script.active_mods[MIR], forces={}}
   for _, force in pairs(game.forces) do
-    local worker = force.technologies[WORKER]
+    local worker = force.technologies[identity]
     local terms = worker_terms(worker)
     local queue, parked, paid = {}, {}, {}
     local current = force.current_research
@@ -56,22 +58,32 @@ local function prepare()
     for index, technology in ipairs(force.research_queue or {}) do
       local name = technology.name
       require_frame(index <= 1000, "native queue exceeds its supported length")
-      local prior = force.get_saved_technology_progress(technology) or 0
+      local prior = read_saved_progress(force, technology) or 0
       require_frame(progress(prior), "invalid native queued progress")
       queue[index], parked[name] = name, prior
-      if name ~= WORKER and (prior > 0 or current and current.name == name and fraction > 0) then
+      if name ~= identity and (prior > 0 or current and current.name == name and fraction > 0) then
         paid[name] = {level=technology.level, terms=work_terms(technology)}
       end
     end
-    local worker_progress = force.get_saved_technology_progress(worker) or 0
+    local worker_progress = read_saved_progress(force, worker) or 0
     require_frame(queue[1] == (current and current.name) and progress(fraction) and progress(worker_progress),
       "current native research or progress differs from the queue")
     saved.forces[force.index] = {name=force.name, bonus=force.worker_robots_storage_bonus,
       level=worker.level, terms=terms, saved_progress=worker_progress,
       queue=queue, queued_saved=parked, current_progress=fraction, paid=paid}
+    if identity == ORDINARY then
+      saved.forces[force.index].enabled = worker.enabled
+      saved.forces[force.index].visible = worker.visible_when_disabled
+    end
   end
   require_frame(next(saved.forces) ~= nil, "no force research was observed")
   return saved
+end
+
+local function prepare()
+  local active = script.active_mods
+  require_frame(active.base == M.source_base and M.source_version(active[MIR]), "prepare in the Factorio 1.1 edition")
+  return M.capture(function(force, technology) return force.get_saved_technology_progress(technology) end)
 end
 
 local function watch_prepared_copy()
@@ -111,34 +123,193 @@ function M.register_source()
   end)
 end
 
-function M.claim(saved, event, target)
-  require_frame(type(saved) == "table", "invalid preparation")
-  local active = script.active_mods
+local function matches_selection(active, original)
+  if type(original) ~= "table" then return false end
+  for name, version in pairs(original) do
+    if name ~= MIR and active[name] ~= version then return false end
+  end
+  for name, version in pairs(active) do
+    if name ~= MIR and name ~= M.preparation_mod and original[name] ~= version then return false end
+  end
+  return original[MIR] == LEGACY_MIR and original.base == LEGACY_BASE
+    and original["space-exploration"] == LEGACY_SE and original[M.preparation_mod] == nil
+end
+
+function M.register_legacy_preparation(original)
+  remote.add_interface(M.preparation_mod, {checkpoint=function() return storage[M.key] end})
+  local version = script.active_mods[MIR]
+  local legacy = version == LEGACY_MIR
+  if not legacy and not (type(version) == "string" and version:match("^5%.0%.200%d%d$")) then return end
+  local function watch_addon_preparation()
+    local saved = storage[M.key]
+    script.on_event(defines.events.on_tick, saved and saved.purpose == "addon-change" and function(event)
+      if event.tick - saved.tick <= 1 then return end
+      storage[M.key] = nil
+      script.on_event(defines.events.on_tick, nil)
+    end or nil)
+  end
+  if legacy then
+    script.on_configuration_changed(function(event)
+      if event.mod_startup_settings_changed then storage.mir_preparation_configuration_changed = true end
+      for name, change in pairs(event.mod_changes) do
+        if name ~= M.preparation_mod and change.old_version ~= change.new_version then
+          storage.mir_preparation_configuration_changed = true
+        end
+      end
+    end)
+  else
+    script.on_load(watch_addon_preparation)
+    script.on_configuration_changed(watch_addon_preparation)
+  end
+  local operation, identity = legacy and "prepare" or "prepare-addon-change", legacy and WORKER or ORDINARY
+  commands.add_command("mir-prepare-legacy-worker", "Prepare the verified worker research copy, or cancel.", function(command)
+    local player = command.player_index and game.get_player(command.player_index)
+    if command.player_index and not (player and player.admin) then return end
+    local function say(message)
+      if player then player.print(message) else log("[MIR worker preparation] " .. message) end
+    end
+    local saved = storage[M.key]
+    if command.parameter == "cancel" and saved and saved.mir == version then
+      game.tick_paused, storage[M.key] = saved.was_paused, nil
+      if not legacy then watch_addon_preparation() end
+      say("Cancelled the worker preparation.")
+    elseif command.parameter == operation then
+      if storage.mir_preparation_configuration_changed or not matches_selection(script.active_mods, original) then
+        say("The old mod selection or startup settings changed. Return to the verified original copy.")
+        return
+      end
+      local ok, state = pcall(M.capture, function(_, technology) return technology.saved_progress end, identity)
+      if not ok then say(state); return end
+      local formula = prototypes.technology[identity].research_unit_count_formula
+      if type(formula) ~= "string" or formula == "" or #formula > 1024 then
+        say("The original infinite worker research formula is unavailable.")
+        return
+      end
+      state.formula, state.source_mods = formula, original
+      if not legacy then
+        local holder = prototypes.technology[PREPARED_HOLDER]
+        if not holder or holder.research_unit_count_formula ~= formula then
+          say("The worker preparation archive must include the previous research price.")
+          return
+        end
+        state.purpose, state.source_mods = "addon-change", {}
+        for name, active_version in pairs(script.active_mods) do state.source_mods[name] = active_version end
+      end
+      if saved and saved.mir == version then state.was_paused = saved.was_paused end
+      game.tick_paused, storage[M.key] = true, state
+      if not legacy then watch_addon_preparation() end
+      say("Worker research recorded. Save this paused copy under a new name and exit.")
+    else
+      say("Use /mir-prepare-legacy-worker " .. operation .. " or /mir-prepare-legacy-worker cancel.")
+    end
+  end)
+end
+
+local function preparation_snapshot(active)
+  require_frame(active[M.preparation_mod] == M.preparation_version and remote.interfaces[M.preparation_mod]
+    and remote.interfaces[M.preparation_mod].checkpoint, "the worker preparation mod is incompatible")
+  return remote.call(M.preparation_mod, "checkpoint")
+end
+
+function M.read_legacy_preparation(event, target)
   local changes = type(event) == "table" and event.mod_changes
-  local base = type(changes) == "table" and changes.base
-  local mir = type(changes) == "table" and changes[MIR]
-  require_frame(target.id == "f200" and type(base) == "table" and base.old_version == M.source_base
-    and base.new_version == active.base and active.base == target.minimum_base
-    and type(mir) == "table" and mir.old_version == saved.mir and mir.new_version == active[MIR]
-    and active[MIR] == target.distribution_version and M.source_version(saved.mir),
-    "open the prepared copy with its matching Factorio 2.0 edition")
+  local change = type(changes) == "table" and changes[MIR]
+  if target.id ~= "f200" or type(change) ~= "table" or change.old_version ~= LEGACY_MIR then return nil end
+  local active = script.active_mods
+  if active[M.preparation_mod] == nil then return nil end
+  local saved = preparation_snapshot(active)
+  require_frame(type(saved) == "table" and saved.formula ~= nil and matches_selection(active, saved.source_mods),
+    "the worker preparation is missing or its mod selection changed")
+  return saved
+end
+
+local function require_fresh(saved)
   require_frame(saved.schema == 1 and type(saved.tick) == "number" and game.tick >= saved.tick
     and game.tick - saved.tick <= 1 and type(saved.was_paused) == "boolean"
     and type(saved.forces) == "table", "the preparation expired")
 end
 
+function M.read_addon_change_preparation(event, target)
+  local active = script.active_mods
+  if target.id ~= "f200" or active[M.preparation_mod] == nil or active.base ~= LEGACY_BASE
+      or active["space-exploration"] ~= LEGACY_SE then return nil end
+  local saved = preparation_snapshot(active)
+  if type(saved) ~= "table" or saved.purpose ~= "addon-change" then return nil end
+  require_fresh(saved)
+  local previous, changes = saved.source_mods, type(event) == "table" and event.mod_changes
+  require_frame(saved.mir == active[MIR] and active[MIR] == target.distribution_version
+    and type(previous) == "table" and type(changes) == "table" and event.mod_startup_settings_changed == false
+    and type(saved.formula) == "string" and #saved.formula > 0 and #saved.formula <= 1024,
+    "the prepared add-on change does not match this game")
+  for _, retained in ipairs{"base", MIR, "space-exploration", M.preparation_mod} do
+    require_frame(previous[retained] == active[retained], "the worker preparation requires its retained engine and providers")
+  end
+  local function reported(name)
+    if previous[name] == active[name] then return true end
+    local row = changes[name]
+    return type(row) == "table" and row.old_version == previous[name] and row.new_version == active[name]
+  end
+  for name in pairs(previous) do require_frame(reported(name), "the previous mod selection differs from the preparation") end
+  for name in pairs(active) do require_frame(reported(name), "the current mod selection differs from the preparation") end
+  for name, row in pairs(changes) do
+    require_frame(type(row) == "table" and row.old_version == previous[name] and row.new_version == active[name],
+      "the reported mod change differs from the preparation")
+  end
+  return saved
+end
+
+function M.claim(saved, event, target)
+  require_frame(type(saved) == "table" and getmetatable(saved) == nil, "invalid preparation")
+  local active = script.active_mods
+  local changes = type(event) == "table" and event.mod_changes
+  local base = type(changes) == "table" and changes.base
+  local mir = type(changes) == "table" and changes[MIR]
+  local matching_package = target.id == "f200" and active.base == target.minimum_base
+    and type(mir) == "table" and mir.old_version == saved.mir and mir.new_version == active[MIR]
+    and active[MIR] == target.distribution_version
+  if saved.formula ~= nil then
+    require_frame(matching_package and saved.mir == LEGACY_MIR and active["space-exploration"] == LEGACY_SE
+      and event.mod_startup_settings_changed == false and type(saved.formula) == "string"
+      and #saved.formula > 0 and #saved.formula <= 1024,
+      "open the prepared Space Exploration copy with its previous mod selection and settings")
+  else
+    require_frame(matching_package and type(base) == "table" and base.old_version == M.source_base
+      and base.new_version == active.base and M.source_version(saved.mir),
+      "open the prepared copy with its matching Factorio 2.0 edition")
+  end
+  require_fresh(saved)
+  return saved.formula
+end
+
+local function observed_bonus(saved, force, planned_bonus)
+  local bonus = force.worker_robots_storage_bonus
+  if saved.formula and planned_bonus and planned_bonus.force_index == force.index
+      and planned_bonus.before == bonus then
+    bonus = planned_bonus.after
+  end
+  return bonus
+end
+
 -- Only zero or absent work may be supplied by the paused source. Any surviving
 -- nonzero progress, force state or queue order has to corroborate that source.
-function M.restore_frame(saved, force, native, equal)
+function M.restore_frame(saved, force, native, equal, planned_bonus)
   local row = saved.forces[force.index]
   require_frame(type(row) == "table" and row.name == force.name
-    and row.bonus == force.worker_robots_storage_bonus and row.level == native.next_level
-    and not native.researched and equal(row.terms, worker_terms(native.technology)),
-    "worker level, cargo or science changed on " .. force.name)
+    and row.level == native.next_level and not native.researched,
+    "worker force or level changed on " .. force.name)
+  require_frame(row.bonus == observed_bonus(saved, force, planned_bonus), "worker cargo changed on " .. force.name)
+  require_frame(equal(row.terms, worker_terms(native.technology)), "worker price or science changed on " .. force.name)
   require_frame(type(row.queue) == "table" and type(row.queued_saved) == "table"
     and type(row.paid) == "table" and #row.queue <= 1000
     and progress(row.current_progress) and progress(row.saved_progress),
     "invalid prepared queue or progress on " .. force.name)
+  if saved.formula ~= nil then
+    -- The same engine can corroborate the entire checkpoint. Missing work
+    -- does not get the restoration allowance used across the 1.1 boundary.
+    require_frame(native.saved_progress == row.saved_progress and native.current_progress == row.current_progress
+      and equal(row.queue, native.queue) and equal(row.queued_saved, native.queued_saved),
+      "same-engine checkpoint progress or queue changed on " .. force.name)
+  end
   require_frame(native.saved_progress == 0 or native.saved_progress == row.saved_progress,
     "surviving worker progress changed on " .. force.name)
   local index, occurrences = 1, 0
@@ -169,12 +340,60 @@ function M.restore_frame(saved, force, native, equal)
     require_frame(not queue_changed and native.current_progress == row.current_progress
       and equal(native.queued_saved, row.queued_saved), "unrelated native research changed on " .. force.name)
   end
+  if saved.formula ~= nil then return native end
   local restored = {}
   for key, value in pairs(native) do restored[key] = value end
   restored.saved_progress, restored.occurrences = row.saved_progress, occurrences
   restored.queue, restored.queued_saved = row.queue, row.queued_saved
   restored.current, restored.current_progress = row.queue[1], row.current_progress
   restored.allowance = math.max(occurrences, row.saved_progress > 0 and 1 or 0)
+  return restored
+end
+
+function M.restore_addon_change_frame(saved, force, native, holder, equal, planned_bonus)
+  local row = saved.forces[force.index]
+  require_frame(type(row) == "table" and row.name == force.name and not native.researched
+    and row.level == native.next_level and row.bonus == observed_bonus(saved, force, planned_bonus),
+    "the prepared worker force, level or cargo changed on " .. force.name)
+  require_frame(type(row.terms) == "table" and type(row.terms[1]) == "number"
+    and row.terms[1] > 0 and row.terms[1] < math.huge and type(row.queue) == "table"
+    and type(row.paid) == "table" and type(row.queued_saved) == "table"
+    and type(row.enabled) == "boolean" and type(row.visible) == "boolean"
+    and progress(row.saved_progress) and progress(row.current_progress),
+    "the prepared worker work is invalid on " .. force.name)
+  local terms = worker_terms(holder)
+  local previous_count = row.terms[1]
+  terms[1] = previous_count -- Read the level-specific count after native transfer.
+  require_frame(equal(row.terms, terms), "the retained worker science or effect differs on " .. force.name)
+  require_frame(equal(row.queue, native.queue) and native.current == row.queue[1],
+    "the prepared worker queue changed on " .. force.name)
+  local function same_paid(current, previous)
+    return progress(current) and progress(previous)
+      and math.abs(current * native.count - previous * previous_count) <= 1e-6
+  end
+  require_frame(native.saved_progress == row.saved_progress or same_paid(native.saved_progress, row.saved_progress),
+    "the prepared parked worker work changed on " .. force.name)
+  require_frame((native.current == ORDINARY and same_paid(native.current_progress, row.current_progress))
+    or (native.current ~= ORDINARY and native.current_progress == row.current_progress),
+    "the prepared active research changed on " .. force.name)
+  for name, parked in pairs(native.queued_saved) do
+    local before = row.queued_saved[name]
+    require_frame(parked == before or name == ORDINARY and same_paid(parked, before),
+      "prepared queue progress changed on " .. force.name)
+    local paid = row.paid[name]
+    if name ~= ORDINARY and (parked > 0 or native.current == name and native.current_progress > 0) then
+      local technology = force.technologies[name]
+      require_frame(type(paid) == "table" and technology and technology.level == paid.level
+        and equal(paid.terms, work_terms(technology)),
+        "prepared queued research terms changed on " .. force.name .. ": " .. name)
+    end
+  end
+  local restored = {}
+  for key, value in pairs(native) do restored[key] = value end
+  restored.count, restored.saved_progress, restored.current_progress = previous_count, row.saved_progress, row.current_progress
+  restored.queued_saved = row.queued_saved
+  restored.enabled, restored.visible = row.enabled, row.visible
+  restored.allowance = math.max(native.occurrences, row.saved_progress > 0 and 1 or 0)
   return restored
 end
 

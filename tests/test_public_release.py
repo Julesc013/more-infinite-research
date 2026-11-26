@@ -8,6 +8,7 @@ import sys
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import release
@@ -124,6 +125,40 @@ class PublicReleaseTests(unittest.TestCase):
         self.assertEqual({path.name: path.read_bytes() for path in self.destination.iterdir()},
                          {**self.assets, "release-notes.md": self.body, "upload-text.txt": self.upload})
         self.assertEqual(list(self.destination.parent.iterdir()), [self.destination])
+
+    def test_transient_failures_during_asset_download_retry_anonymously(self):
+        url = self.public["assets"][0]["browser_download_url"]
+        faults = [HTTPError(url, 503, "temporary", None, None), ConnectionResetError()]
+        fake_http = self.fake_http
+        attempts = []
+
+        def flaky_http(request, timeout):
+            if request.full_url == url:
+                self.assertIsNone(request.get_header("Authorization"))
+                attempts.append(request)
+                if faults:
+                    raise faults.pop(0)
+            return fake_http(request, timeout)
+
+        with patch.object(self, "fake_http", flaky_http), patch("time.sleep") as delay:
+            result = self.verify()
+        self.assertEqual(len(attempts), 3)
+        self.assertEqual(len({id(request) for request in attempts}), 3)
+        self.assertEqual([call.args for call in delay.call_args_list], [(5,), (10,)])
+        self.assertEqual({row["name"] for row in result["verified_assets"]}, set(self.assets))
+        self.assertFalse(result["authorization_header_sent"])
+
+    def test_read_stops_on_permanent_http_error_and_exhausted_retries(self):
+        url = readback.API + "releases/34"
+        for status, attempts, delays in ((403, 1, []), (503, 3, [(5,), (10,)])):
+            with self.subTest(status=status):
+                failure = HTTPError(url, status, "injected failure", None, None)
+                with patch.object(readback, "urlopen", side_effect=failure) as fetch, patch("time.sleep") as delay:
+                    with self.assertRaises(HTTPError) as raised:
+                        readback._read(url, 128, "application/vnd.github+json")
+                self.assertEqual(raised.exception.code, status)
+                self.assertEqual(fetch.call_count, attempts)
+                self.assertEqual([call.args for call in delay.call_args_list], delays)
 
     def test_stale_github_body_or_tagged_note_version_stops_before_downloads(self):
         self.public["body"] = "Old release."

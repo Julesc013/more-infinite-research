@@ -172,6 +172,8 @@ Lua implements the mod and Factorio fixtures. Use Python for portable developer 
 
 Use the governed native fixture runner with an exact engine, profile and archives for new gameplay work. The original private gear-slice command pinned to the first MIR5 build remains available in Git with its historical evidence. [Current fixture runner](../tools/Invoke-NativeFixture.ps1) · [Original gear-slice script](https://github.com/Julesc013/more-infinite-research/blob/c7c815d831c434a45d1965fe7e4acc1f0de3786d/tools/Invoke-NativeSlice.ps1)
 
+A protected Factorio 2.0.77 save can be checked against a previously witnessed configuration before replay. Run `python -B tools/read_save_mod_checksums.py <save.zip> --witness <witness.json>`. The witness is a JSON object keyed by mod name, with `version` and `data_checksum` in each row. Record the save SHA-256 from the result, verify the actual archive bytes against the original SHA-256 inventory and replay the predecessor to establish the historical research price.
+
 ## Test selection
 
 For a bounded host batch, use `-ControlPath` with exact paths from the driver. For example, `./tests/Test-MIR5HostControls.ps1 -LuaRuntimeDir $luaRuntime -ControlPath 'tests/test_library.py','tests/test_library_model.py'` runs those two scripts in plan order. Adding `-Plan` prints the selected rows. Invoking the driver with only the pinned Lua directory runs the full host gate. It uses `python3` when the system provides Python under that name alone.
@@ -222,6 +224,18 @@ The F200 profile-native witness is the narrowly admitted alternate-metadata case
 For a pinned headless engine, pass `-Headless` to `tools/Invoke-PrototypeCapture.ps1` or `tools/Invoke-NativeFixture.ps1`. Both use the shared CLI selector to omit the graphical audio option and record the declared selection; prototype captures also record the full argument vector. The default graphical arguments and existing historical0.13/0.14 audio exclusions remain unchanged. Select the actual distribution explicitly alongside its exact engine/profile hashes; the operating system and executable filename do not establish CLI capabilities.
 
 Probes claiming the complete loaded-mod selection check its observability before launching the engine. A selected mod without a Lua settings or data-stage entry requires an explicitly selected, hash-bound `-ActiveModsObserver` whose reporting script is present. Use the existing read-only active-mods fixture when needed. The shared launch guard serves prototype captures, replay captures, ordinary-menu measurements and modern fixture stages; historical process modes retain their established log protocol. A successful preflight does not prove the loaded selection: the actual native log must still supply the complete, consistent names and versions, including asset-only mods.
+
+## Prepare a witnessed legacy worker save
+
+The preparation command covers the published MIR 4.7.20002 and Space Exploration 0.7.57 combination on Factorio 2.0.77. Keep the original save, exact original archives and startup settings. Record each old mod's version and native data checksum in the witness JSON accepted by `tools/read_save_mod_checksums.py`. The data checksums bind the configuration. Retain exact archive SHA-256 values for the source package and dependencies.
+
+```powershell
+python -B tools/build_worker_storage_preparation.py path/to/original-save.zip --witness path/to/original-mods.json --output-directory build/worker-preparation
+```
+
+Enable the generated preparation mod when opening a copy with the verified original selection. Compare the loaded native checksum roster with the witness before invoking `/mir-prepare-legacy-worker prepare` as an administrator. Save the paused copy under a new name and exit. Load it with the candidate MIR5 archive, the same preparation mod and the same old add-ons and settings. Verify the preserved research, then save the successor separately. The results of later add-on or settings changes have their own acceptance cases.
+
+For a later add-on change that affects the worker price, the qualification build accepts `--previous-formula` with the exact formula observed in the witnessed predecessor. Use that preparation archive from the beginning. With MIR5 and the old add-on still loaded, run `/mir-prepare-legacy-worker prepare-addon-change` and save another paused copy. Keep the same engine, MIR5 archive, Space Exploration, preparation mod and startup settings for the add-on change. Retain the preparation mod until the old-priced work has finished and the ordinary worker owns the earned levels again. Verify the pack cost, earned cargo, remaining queue and cold loads in this case before offering the procedure to players.
 
 ## Recover an exact published catalogue
 
@@ -283,7 +297,7 @@ Prepare a new source version only for a new public release: align the canonical 
 
 GitHub's `prerelease` flag is the maturity decision. Select and review it explicitly before publication; no beta counter, RC suffix or minimum prerelease sequence exists. Prereleases stay GitHub-only and disclose the actual acceptance scope and unresolved gates. Stable releases still need complete applicable stable acceptance. Stable Portal uploads use the identical tested GitHub ZIPs and checksums for the nine Portal editions, without metadata conversion or rebuild. The maintainer owns those uploads; F018 and early best-effort editions remain GitHub-only.
 
-Until MIR5 reaches stable, aim to publish a qualified GitHub beta each day at 18:00 Australia/Sydney. Skip the slot if the candidate has outstanding prerelease checks.
+Until MIR5 reaches stable, aim to publish a qualified GitHub beta each day at 18:00 Australia/Sydney. Skip the slot if the candidate has outstanding prerelease checks. Publish a qualified emergency hotfix as soon as its checks pass, then resume the daily beta schedule.
 
 Never replace a published version's ZIPs with different contents or move its tag. A corrected public package set needs a new source release. GitHub releases remain mutable for administration, while package bytes, original records and hashes are preserved. Numeric tags do not encode prerelease maturity: consumers must check GitHub release metadata. Historical MIR4 versions and prior inventories keep their exact original refs and mappings.
 

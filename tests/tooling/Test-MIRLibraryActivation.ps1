@@ -433,6 +433,17 @@ try {
   $preflightDependency=New-TestArchive -Library $preflightLibrary -Name 'controlled' -Version '1.0.0' -Payload '-- same-version repack'
   Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $preflightLibrary -EngineDataDirectory $preflightData -ProfilePath $preflightProfile -ArchiveHashes $capturedHashes -SettingsMode Defaults} '[mir-library-hash-mismatch]'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  # Check the real runner's input boundary with an otherwise valid, byte-pinned
+  # profile. Exact MIR and ordinary-provider version constraints both matter.
+  Set-PreflightProfile (New-PreflightProfile -Engine $validEngine -ArchiveHashes @{($dependencyName)=(Get-MIRImmutableInputSha256 $preflightDependency)})
+  foreach($constraint in @('more-infinite-research = 5.0.21001','controlled >= 2.0.0')){
+    $fixtureInfo=@{name='mir-fixture-preflight';version='0.1.0';factorio_version='2.1';dependencies=@('base',$constraint)}|ConvertTo-Json -Compress
+    [IO.File]::WriteAllText((Join-Path $fixtureSource 'info.json'),$fixtureInfo,[Text.UTF8Encoding]::new($false))
+    Remove-Item -LiteralPath $preflightFixture -Force
+    $preflightFixture=New-TestArchive -Library $preflightLibrary -Name 'mir-fixture-preflight' -Version '0.1.0' -SourceDirectory $fixtureSource
+    Refuses-Library {& $preflightRunner @runnerArguments} "[mir-library-dependency-version] mir-fixture-preflight: $constraint"
+    Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
+  }
   [pscustomobject]@{status='passed';checks=$checks;native_execution=$false;package_materialization=$false;controlled_pre_json_restore_leaves_generated_json=$true}|ConvertTo-Json -Compress
 } finally {
   if(Test-Path -LiteralPath $root){Remove-MIR441ContainedTree -AdmittedRoot (Join-Path $repo 'build/tmp') -Path $root}

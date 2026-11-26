@@ -1587,10 +1587,16 @@ class LibraryTests(unittest.TestCase):
           local initial_rows = row_calls
           assert(type(native_handlers.events[1]) == "function", "open Library did not subscribe to native research")
           local query = research_filters(root)["mir_library_query"]
+          local subscription_needs, subscription_reads = library.native_subscription_needs, 0
+          library.native_subscription_needs = function()
+            subscription_reads = subscription_reads + 1
+            return subscription_needs()
+          end
           -- The callback can precede the final native queue transition.
           native_handlers.events[1]({research=gear})
           native_handlers.events[3]({research=gear})
-          native_handlers.events[7]({force=player.force})
+          native_handlers.events[7]({force={index=2}})
+          assert(subscription_reads == 0, "native events re-read view subscriptions after visiting open views")
           assert(queued_rows() == 1 and type(native_ticks[1]) == "function")
           assert(row_calls == initial_rows,
             "research-event bursts must defer catalogue work until the coalesced refresh tick")

@@ -138,7 +138,8 @@ function M.preflight(event)
   -- The native reference survives saves and identifies the observed force.
   if not historical and force ~= storage[OBSERVED_FORCE] then return nil end
   if not canonical_force(force) or not fields_match(force, RESET) or not uninvested(force) then return nil end
-  return {force=force, event=event, used=false}
+  return {force=force, event=event, used=false,
+    worker_storage_bonus={force_index=force.index, before=RESET[2], after=DEFAULTS[2]}}
 end
 
 function M.observe()
@@ -149,12 +150,18 @@ function M.observe()
   storage[OBSERVED_FORCE] = observed
 end
 
-function M.apply(plan)
+function M.apply(plan, required)
   if plan == nil then return end
   require_policy(type(plan) == "table" and plan.used == false, "plan is invalid or already consumed")
   local current = M.preflight(plan.event)
   plan.used = true
-  if not current or current.force ~= plan.force then return end
+  if not current or current.force ~= plan.force then
+    if required then
+      require_policy(canonical_force(plan.force) and fields_match(plan.force, DEFAULTS),
+        "the conquest restoration required by the worker checkpoint changed")
+    end
+    return
+  end
   local force = plan.force
   force.worker_robots_speed_modifier, force.worker_robots_storage_bonus, force.artillery_range_modifier =
     DEFAULTS[1], DEFAULTS[2], DEFAULTS[3]
