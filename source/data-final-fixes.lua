@@ -246,7 +246,7 @@ local electric_full
 if modern_selection then electric_full = modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
 local science_family_bindings
 local worker_storage = modern_selection and modern_selection.worker_storage
-local worker_default_authored, worker_default_available, worker_default_is_head
+local worker_default_authored, worker_default_available, worker_default_public
 if worker_storage and worker_storage.owned then
   local binding = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
   binding.inherit_worker_storage_prerequisites = not modern_catalogue.has_secretas(mods)
@@ -278,9 +278,12 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   -- Capture the full MIR work contract before constructing or adapting any
   -- split identities. The foreign finite provider is never its producer.
   assert(recovery.matches_default(authored, authored), "MIR worker authored default contract is invalid")
-  local default_emitted = false
+  local public_default
   for _, row in ipairs(technologies) do
-    if row.name == recovery.canonical then default_emitted = recovery.matches_default(row, authored); break end
+    if row.name == recovery.canonical then
+      if recovery.matches_default(row, authored) then public_default = row end
+      break
+    end
   end
   local finite_available = worker_storage and worker_storage.finite and #worker_storage.finite > 0
   if finite_available then
@@ -299,9 +302,9 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   end
   -- A same-name SE/overhaul row can have a different work contract; settings
   -- identity or its mere emission does not establish an available default4.
-  local unavailable = missing_stream or not default_emitted and not finite_available
+  local unavailable = missing_stream or not public_default and not finite_available
   worker_default_authored, worker_default_available = authored, not unavailable
-  worker_default_is_head = not unavailable and default_emitted
+  worker_default_public = not unavailable and public_default or nil
   local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
   technologies[#technologies + 1] = row
   if not unavailable then
@@ -331,7 +334,11 @@ if worker_default_available then
     technologies[#technologies + 1] = recovery.published517_se_owner(worker_default_authored)
   end
   local owner = recovery.default_owner(worker_default_authored)
-  if not worker_default_is_head then
+  if worker_default_public then
+    -- Both identities offer the same work. A later edit to their public unit
+    -- must reach the ordinary owner before Factorio freezes the prototypes.
+    owner.unit = worker_default_public.unit
+  else
     -- Current finite profiles retain the old contract without offering a
     -- second ordinary infinite route. Runtime retirement remains explicit.
     owner.hidden, owner.enabled, owner.visible_when_disabled = true, false, false
@@ -339,7 +346,7 @@ if worker_default_available then
   technologies[#technologies + 1] = owner
   local head_scalar = worker_default_authored.effects[1].modifier
   local public_head = data.raw.technology[recovery.canonical]
-  if not worker_default_is_head and public_head then
+  if not worker_default_public and public_head then
     for _, effect in ipairs(public_head.effects or {}) do
       if effect.type == "worker-robot-storage" then head_scalar = effect.modifier end
     end

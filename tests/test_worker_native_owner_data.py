@@ -458,6 +458,12 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   assert(gate.effects[1].modifier==-public.effects[1].modifier and next(gate.prerequisites)==nil)
                   assert(data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.worker_default_split==true)
                   assert(data.writes==1)
+                  local history=data.raw.technology["mir-worker-storage-preservation-4"]
+                  public.unit.count_formula="1350*1.5^(L-4)"
+                  assert(tail.unit.count_formula==public.unit.count_formula,
+                    "a later edit to the public worker price left its ordinary owner behind")
+                  assert(history.unit.count_formula=="675*1.5^(L-4)")
+                  assert(gate.unit.count==1)
                 ''')
 
     def test_finite_profile_retains_hidden_default_contract_without_new_free_research(self):
