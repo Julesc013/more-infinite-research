@@ -74,7 +74,7 @@ source_of_truth_for:
 
 ### Moving a Factorio 1.1 save to 2.0
 
-Use the normal save-loading procedure for ordinary MIR updates within the same Factorio engine. When moving an existing save from Factorio 1.1.110 to 2.0.77, a new research prerequisite can remove active worker cargo research before MIR can read it. MIR 5.0.26 includes the checkpoint in both editions. This procedure covers the verified Worker Robot Cargo Size route with unchanged research prices and science packs.
+Use the normal save-loading procedure for ordinary MIR updates within the same Factorio engine. When moving a save from Factorio 1.1.110 to 2.0.77, Factorio can clear active Worker Robot Cargo Size research before MIR reads the save. The preparation command records the original queue, price and unfinished work in the 1.1 copy. MIR restores them automatically on the verified route with unchanged research prices and science packs. MIR 5.0.26 includes this procedure in both editions.
 
 1. Keep the original save, mod selection and startup settings. Update MIR in Factorio 1.1.110 and open a copy with the existing selection and settings.
 2. Run `/mir-worker-storage-recovery prepare` as an administrator. Save the paused copy under a new name and exit. Advancing a simulation tick expires the preparation. Use `/mir-worker-storage-recovery cancel` to abandon it and restore the previous pause state.

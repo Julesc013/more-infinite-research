@@ -54,12 +54,12 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
             technologies={[worker_id]=worker, [follower_id]=follower}, current_research=worker,
             research_progress=.125, research_queue={worker, follower},
             get_saved_technology_progress=function() return nil end}
-          local command, on_load, tick_handler
+          local command, on_load, tick_handler, reply
           local game = {tick=100, tick_paused=false, forces={player=force}}
           local script = {active_mods={base="1.1.110", ["more-infinite-research"]="5.0.11024"},
             on_load=function(callback) on_load=callback end,
             on_event=function(id, callback) assert(id==1); tick_handler=callback end}
-          local env = setmetatable({game=game, script=script, global={}, log=function() end,
+          local env = setmetatable({game=game, script=script, global={}, log=function(message) reply=message end,
             defines={events={on_tick=1}}, commands={add_command=function(name, help, callback)
               assert(name=="mir-worker-storage-recovery" and help[1]=="mir-command.worker-engine-upgrade")
               command=callback
@@ -68,6 +68,21 @@ class F110F200TransitionFixtureTests(unittest.TestCase):
           checkpoint.register_source()
           on_load()
           assert(tick_handler==nil and env.global[checkpoint.key]==nil)
+
+          local original_queue = force.research_queue
+          for _, case in ipairs{
+            {queue={[1]=worker, [3]=follower}, current=worker, fraction=.125, reason="incomplete native queue"},
+            {fraction=0, reason="native queue is unavailable"},
+          } do
+            force.research_queue, force.current_research, force.research_progress = case.queue, case.current, case.fraction
+            command{parameter="prepare"}
+            assert(reply:find(case.reason, 1, true), reply)
+            assert(not game.tick_paused and tick_handler==nil and env.global[checkpoint.key]==nil)
+            assert(force.research_queue==case.queue and force.current_research==case.current
+              and force.research_progress==case.fraction and force.worker_robots_storage_bonus==2)
+          end
+          force.research_queue, force.current_research, force.research_progress = original_queue, worker, .125
+
           command{parameter="prepare"}
           local saved = assert(env.global[checkpoint.key])
           assert(game.tick_paused and force.research_progress==.125 and force.research_queue[2]==follower)

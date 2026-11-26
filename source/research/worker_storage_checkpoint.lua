@@ -1,5 +1,5 @@
--- Factorio 1.1 can discard current worker research when it converts a save to 2.0.
--- Record its native terms and queue while the source copy is still paused in 1.1.
+-- Validate native worker queue observations and retain research terms while
+-- the source copy is available. Factorio can discard work during conversion.
 local M = {key="mir_worker_storage_engine_checkpoint", source_base="1.1.110",
   legacy_mir="4.7.20002", canonical_worker="worker-robots-storage-4", ordinary_worker="mir-worker-storage-default-4"}
 local MIR, WORKER, ORDINARY = "more-infinite-research", M.canonical_worker, M.ordinary_worker
@@ -14,8 +14,24 @@ function M.source_version(version)
   return type(version) == "string" and version:match("^5%.0%.110%d%d$") ~= nil
 end
 
-local function progress(value)
+function M.valid_progress(value)
   return type(value) == "number" and value >= 0 and value < 1
+end
+
+-- A short read must never be saved or applied as an empty or truncated queue.
+function M.native_queue(force)
+  local queue = force.research_queue
+  if type(queue) ~= "table" then return nil, "native queue is unavailable" end
+  local length, count = #queue, 0
+  if length > 1000 then return nil, "unsupported native queue" end
+  for index in pairs(queue) do
+    if type(index) ~= "number" or index < 1 or index > length or index % 1 ~= 0 then
+      return nil, "incomplete native queue"
+    end
+    count = count + 1
+  end
+  if count ~= length then return nil, "incomplete native queue" end
+  return queue
 end
 
 local function work_terms(technology)
@@ -55,18 +71,19 @@ function M.capture(read_saved_progress, identity)
     local queue, parked, paid = {}, {}, {}
     local current = force.current_research
     local fraction = force.research_progress
-    for index, technology in ipairs(force.research_queue or {}) do
+    local native, reason = M.native_queue(force)
+    require_frame(native, reason)
+    for index, technology in ipairs(native) do
       local name = technology.name
-      require_frame(index <= 1000, "native queue exceeds its supported length")
       local prior = read_saved_progress(force, technology) or 0
-      require_frame(progress(prior), "invalid native queued progress")
+      require_frame(M.valid_progress(prior), "invalid native queued progress")
       queue[index], parked[name] = name, prior
       if name ~= identity and (prior > 0 or current and current.name == name and fraction > 0) then
         paid[name] = {level=technology.level, terms=work_terms(technology)}
       end
     end
     local worker_progress = read_saved_progress(force, worker) or 0
-    require_frame(queue[1] == (current and current.name) and progress(fraction) and progress(worker_progress),
+    require_frame(queue[1] == (current and current.name) and M.valid_progress(fraction) and M.valid_progress(worker_progress),
       "current native research or progress differs from the queue")
     saved.forces[force.index] = {name=force.name, bonus=force.worker_robots_storage_bonus,
       level=worker.level, terms=terms, saved_progress=worker_progress,
@@ -232,7 +249,7 @@ function M.restore_frame(saved, force, native, equal, planned_bonus)
   require_frame(equal(row.terms, worker_terms(native.technology)), "worker price or science changed on " .. force.name)
   require_frame(type(row.queue) == "table" and type(row.queued_saved) == "table"
     and type(row.paid) == "table" and #row.queue <= 1000
-    and progress(row.current_progress) and progress(row.saved_progress),
+    and M.valid_progress(row.current_progress) and M.valid_progress(row.saved_progress),
     "invalid prepared queue or progress on " .. force.name)
   if saved.formula ~= nil then
     -- The same engine can corroborate the entire checkpoint. Missing work
@@ -249,7 +266,7 @@ function M.restore_frame(saved, force, native, equal, planned_bonus)
   for _, name in ipairs(row.queue) do
     local technology = force.technologies[name]
     local parked = row.queued_saved[name]
-    require_frame(technology and progress(parked), "prepared queued technology is unavailable on " .. force.name)
+    require_frame(technology and M.valid_progress(parked), "prepared queued technology is unavailable on " .. force.name)
     if name == native.queue[index] then index = index + 1 end
     if name == WORKER then occurrences = occurrences + 1 end
     local active = name == row.queue[1] and row.current_progress or parked
@@ -290,7 +307,7 @@ function M.restore_addon_change_frame(saved, force, native, holder, equal, plann
     and row.terms[1] > 0 and row.terms[1] < math.huge and type(row.queue) == "table"
     and type(row.paid) == "table" and type(row.queued_saved) == "table"
     and type(row.enabled) == "boolean" and type(row.visible) == "boolean"
-    and progress(row.saved_progress) and progress(row.current_progress),
+    and M.valid_progress(row.saved_progress) and M.valid_progress(row.current_progress),
     "the prepared worker work is invalid on " .. force.name)
   local terms = worker_terms(holder)
   local previous_count = row.terms[1]
@@ -299,7 +316,7 @@ function M.restore_addon_change_frame(saved, force, native, holder, equal, plann
   require_frame(equal(row.queue, native.queue) and native.current == row.queue[1],
     "the prepared worker queue changed on " .. force.name)
   local function same_paid(current, previous)
-    return progress(current) and progress(previous)
+    return M.valid_progress(current) and M.valid_progress(previous)
       and math.abs(current * native.count - previous * previous_count) <= 1e-6
   end
   require_frame(native.saved_progress == row.saved_progress or same_paid(native.saved_progress, row.saved_progress),

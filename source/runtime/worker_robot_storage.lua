@@ -417,20 +417,11 @@ local function forces()
   return out
 end
 
-local function progress(value)
-  return type(value) == "number" and value == value and value >= 0 and value < 1
-end
+local progress = engine_checkpoint.valid_progress
 
 local function observed_queue(force)
-  local queue = force.research_queue
-  if type(queue) ~= "table" then recover_error("native queue is unavailable") end
-  -- ipairs alone would stop at the first missing entry and hide the remainder.
-  local length, count = #queue, 0
-  for index in pairs(queue) do
-    if not integer(index) or index > length then recover_error("incomplete native queue") end
-    count = count + 1
-  end
-  if count ~= length then recover_error("incomplete native queue") end
+  local queue, reason = engine_checkpoint.native_queue(force)
+  if not queue then recover_error(reason) end
   return queue
 end
 
@@ -447,7 +438,6 @@ local function snapshot_queue(force, id, queue_frame)
     return queue_frame.queue, queue_frame.queued_saved, occurrences, queue_frame.current, queue_frame.current_progress
   end
   local native = observed_queue(force)
-  if #native > 1000 then recover_error("unsupported native queue") end
   local queue, saved, occurrences = {}, {}, 0
   for index, entry in ipairs(native) do
     local name = entry and entry.name
@@ -1333,11 +1323,21 @@ local function technology_values(frame)
     saved_progress=frame.saved_progress, count=frame.count}
 end
 
-local function frame_values(frame)
+local function frame_values(frame, queue_frame)
   local values = technology_values(frame)
-  values.current, values.current_progress = frame.current, frame.current_progress
-  values.queue, values.queued_saved = clone(frame.queue), clone(frame.queued_saved)
+  queue_frame = queue_frame or frame
+  values.current, values.current_progress = queue_frame.current, queue_frame.current_progress
+  values.queue, values.queued_saved = clone(queue_frame.queue), clone(queue_frame.queued_saved)
   return values
+end
+
+local function replace_queue_identity(frame, source, destination)
+  if frame.current == source then frame.current = destination end
+  for index, name in ipairs(frame.queue) do
+    if name == source then frame.queue[index] = destination end
+  end
+  local parked = frame.queued_saved[source]
+  if parked ~= nil then frame.queued_saved[destination], frame.queued_saved[source] = parked, nil end
 end
 
 local function head_gate_contract(source)
@@ -1773,15 +1773,8 @@ local function apply_legacy_paid_bridge(plan)
     if native_bonus(item.force) ~= item.bonus then recover_error(fresh.label .. " contribution changed") end
     if item.action == "legacy-transfer" then
       local expected = frame_values(item.work)
-      expected.researched, expected.current = false,
-        expected.current == recovery.ordinary_default_id and fresh.legacy_id or expected.current
-      for index, name in ipairs(expected.queue) do
-        if name == recovery.ordinary_default_id then expected.queue[index] = fresh.legacy_id end
-      end
-      if expected.queued_saved[recovery.ordinary_default_id] ~= nil then
-        expected.queued_saved[fresh.legacy_id], expected.queued_saved[recovery.ordinary_default_id]
-          = expected.queued_saved[recovery.ordinary_default_id], nil
-      end
+      expected.researched = false
+      replace_queue_identity(expected, recovery.ordinary_default_id, fresh.legacy_id)
       if item.owner.researched then expected.count = actual_legacy.count end
       if not equal_plain(expected, frame_values(actual_legacy))
           or not pristine_default_frame(actual_owner, recovery.ordinary_default_id) or actual_owner.visible
@@ -2338,11 +2331,8 @@ function M.apply_default_owner_transfer(plan)
         recover_error("native full default contribution/first-level state was not preserved; reload the original copy")
       end
       if item.action == "transfer" then
-        local expected = frame_values(item.restored or item.source)
+        local expected = frame_values(item.restored or item.source, item.departure and item.departure.queue)
         if item.departure then
-          local queue = item.departure.queue
-          expected.current, expected.current_progress = queue.current, queue.current_progress
-          expected.queue, expected.queued_saved = clone(queue.queue), clone(queue.queued_saved)
           local credit = provider_credit_frame(item.force, actual_source)
           if credit.next_level ~= item.departure.level or credit.enabled then
             recover_error("provider removal did not retain the native credit carrier")
@@ -2351,11 +2341,7 @@ function M.apply_default_owner_transfer(plan)
         local source_id = fresh.prepared_default and recovery.id or recovery.canonical
         expected.researched = false
         expected.enabled, expected.visible = item.target_enabled, item.target_visible
-        expected.current = expected.current == source_id and id or expected.current
-        for index, name in ipairs(expected.queue) do if name == source_id then expected.queue[index] = id end end
-        if expected.queued_saved[source_id] ~= nil then
-          expected.queued_saved[id], expected.queued_saved[source_id] = expected.queued_saved[source_id], nil
-        end
+        replace_queue_identity(expected, source_id, id)
         if item.source.researched then expected.count = actual_owner.count end
         if not equal_plain(expected, frame_values(actual_owner)) or actual_source.visible ~= item.target_visible then
           recover_error("native full default transfer did not preserve the exact frame; reload the original copy")
@@ -2906,22 +2892,15 @@ local function apply_provider_handover(plan)
     local owner = snapshot(item.force, recovery.ordinary_default_id)
     local private = snapshot(item.force, recovery.id, owner)
     local public, gate = snapshot(item.force, recovery.canonical, owner), gate_frame(item.force, owner)
-    local expected = frame_values(item.source)
     local returning = item.returning
+    local expected = frame_values(item.source, returning and returning.queue)
     if returning then
-      local queue = returning.queue
-      expected.current, expected.current_progress = queue.current, queue.current_progress
-      expected.queue, expected.queued_saved = clone(queue.queue), clone(queue.queued_saved)
       expected.saved_progress = returning.holder_saved
       verify_returned_provider(item.force, returning, gate, owner)
     end
     expected.researched = false
     expected.enabled = fresh.prepared.forces[item.force.index].enabled
-    expected.current = expected.current == recovery.ordinary_default_id and recovery.id or expected.current
-    for index, name in ipairs(expected.queue) do if name == recovery.ordinary_default_id then expected.queue[index] = recovery.id end end
-    if expected.queued_saved[recovery.ordinary_default_id] ~= nil then
-      expected.queued_saved[recovery.id], expected.queued_saved[recovery.ordinary_default_id] = expected.queued_saved[recovery.ordinary_default_id], nil
-    end
+    replace_queue_identity(expected, recovery.ordinary_default_id, recovery.id)
     if item.source.researched then expected.count = private.count end
     local public_expected = returning and clone(returning.rows[recovery.canonical]) or frame_values(item.public)
     if not returning then public_expected.enabled = item.release_public or public_expected.enabled end
