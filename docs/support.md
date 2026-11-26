@@ -93,6 +93,10 @@ Use the normal save-loading procedure for ordinary MIR updates within the same F
 
 - MIR can refuse this first upgrade when it cannot determine a safe productivity preference. Do not remove a provider or change settings merely to force an upgrade through.
 
+### Mining-drill productivity
+
+**Mining-drill manufacturing productivity** produces extra drill items when you craft the listed recipes. For the resource output of a placed drill or pump, check **Mining productivity** and the rules of the installed mods. In Space Exploration, core miners and core-miner add-ons can have their own extraction rules.
+
 ### Removing Space Is Fake on Factorio 2.0
 
 On Factorio 2.0.77, MIR 5.0.22 admits a direct upgrade from MIR 5.0.3 that removes Space Is Fake 1.0.60 and its unused cr-commons 1.0.27 dependency. This requires the unchanged official Space Age mods, default worker cargo settings and no earned, current, queued or parked repeating worker cargo research on any force.

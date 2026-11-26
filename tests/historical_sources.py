@@ -10,14 +10,14 @@ MIR5_SETTINGS_CAPTURE = "6776d2c749e99a8c75d7cf36470dfc800c85e661"
 
 
 def read_published_source(repository, path, expected_sha256):
-    return _read_source(repository, PUBLISHED_COMMIT, path, expected_sha256)
+    return read_captured_source(repository, PUBLISHED_COMMIT, path, expected_sha256)
 
 
 def read_captured_settings(repository, path, expected_sha256):
-    return _read_source(repository, MIR5_SETTINGS_CAPTURE, path, expected_sha256)
+    return read_captured_source(repository, MIR5_SETTINGS_CAPTURE, path, expected_sha256)
 
 
-def _read_source(repository, revision, path, expected_sha256):
+def read_captured_source(repository, revision, path, expected_sha256):
     if (not isinstance(path, str) or not path or "\\" in path or ":" in path
             or PurePosixPath(path).is_absolute()
             or any(part in {"", ".", ".."} for part in path.split("/"))):
