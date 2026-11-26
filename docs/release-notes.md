@@ -1,23 +1,22 @@
 ---
-title: "MIR 5.0.26 beta release notes"
+title: "MIR 5.0.27 beta release notes"
 status: current
-applies_to: "MIR 5.0.26 GitHub prerelease"
+applies_to: "MIR 5.0.27 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-26
+last_reviewed: 2026-11-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-526-release-notes
+  - mir-527-release-notes
 ---
 
-This beta preserves paid worker cargo research at its original science price through a prepared Space Exploration add-on change.
+This beta keeps saved worker cargo research on the intended force when an administrator resumes it.
 
-- On Factorio 2.0.77 with Space Exploration 0.7.57, keep the original save and exact old add-on archives. Use the witnessed preparation procedure while the original worker price is still present.
-- Prepare a copy before moving from Factorio 1.1.110 to 2.0.77 to carry earned cargo, unfinished research and queue order into the newer edition.
-- The Research Library listens for its interface events while a Library view is open.
+- A misspelled force name reports an error and leaves the research queue untouched.
+- An in-game administrator can omit the name to use their current force. On a server console, include the force name.
 
-[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.26/docs/support.md#upgrading-mir-4720002-with-space-exploration)
+[Supported editions and upgrade instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.27/docs/support.md)
 
-This is a GitHub beta. The full Library performance comparison remains in progress.
+This is a GitHub beta. Matched Research Library timing and retained-memory verification are still in progress.
