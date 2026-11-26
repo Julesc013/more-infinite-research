@@ -63,8 +63,8 @@ BASE_LITERAL_NAME_PRESENTATION_REPAIRS = {
 }
 
 
-def repaired_base_literal_name_rows(expected):
-    """Apply only the two reviewed Base LocalisedString presentation repairs."""
+def expected_base_presentation_rows(expected):
+    """Apply the reviewed LocalisedString corrections to captured Base rows."""
     for name, repair in BASE_LITERAL_NAME_PRESENTATION_REPAIRS.items():
         row = expected.get(name)
         if row is None:
@@ -72,6 +72,15 @@ def repaired_base_literal_name_rows(expected):
         if row.get("localised_name") != repair["captured"]:
             raise AssertionError(f"published oracle changed outside captured Base name shape: {name}")
         expected[name] = {**row, "localised_name": repair["emitted"]}
+
+    drill_id = "recipe-prod-research_mining_drill-1"
+    drill = expected[drill_id]
+    generic_description = ["technology-description.more-infinite-research.recipe_productivity"]
+    if drill.get("localised_description") != generic_description:
+        raise AssertionError("published oracle changed its captured mining drill description")
+    expected[drill_id] = {**drill, "localised_description": [
+        "", generic_description, " ", ["technology-description.more-infinite-research.mining_drill_extraction"],
+    ]}
     return expected
 
 
@@ -2332,7 +2341,7 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.globals().published_emitted.values()
             }
-            expected = repaired_base_literal_name_rows(dict(expected_profiles[profile]))
+            expected = expected_base_presentation_rows(dict(expected_profiles[profile]))
             if profile == "base-f210":
                 # F210 Base deliberately carries the exact F200 Base public row
                 # so engine loading retains an earned cross-target technology.
@@ -2415,7 +2424,7 @@ class GeneratorTests(unittest.TestCase):
               published_input_recipes={};for name in pairs(data.raw.recipe) do published_input_recipes[name]=true end
               assert(dofile(data_final_path) == nil)
             ''')
-            expected = repaired_base_literal_name_rows({
+            expected = expected_base_presentation_rows({
                 row["name"]: host_row(row["row"])
                 for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"
             })
