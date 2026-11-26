@@ -414,7 +414,8 @@ local function on_configuration_changed(event)
   local mir = type(changes) == "table" and changes["more-infinite-research"]
   local secretas = type(changes) == "table" and changes.secretas
   local worker_default_plan = worker_robot_storage
-    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT)
+    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT,
+      se_system_force_plan and se_system_force_plan.worker_storage_bonus)
   local worker_provider_handover = worker_robot_storage
     and worker_robot_storage.default_owner_delegated(worker_default_plan)
   local worker_prepared_default = worker_default_plan and worker_default_plan.prepared_default == true
@@ -504,7 +505,10 @@ local function on_configuration_changed(event)
   -- Restore only the separately admitted SE scripted NPC policy, after all
   -- native plans have verified their original zero-contribution frames.
   if se_system_force then
-    if not se_system_force.apply(se_system_force_plan) then se_system_force.observe() end
+    local worker_checkpoint_bonus = worker_default_plan and (worker_default_plan.checkpoint or worker_default_plan.addon_preparation)
+      and worker_default_plan.context
+      and worker_default_plan.context.worker_checkpoint_bonus
+    if not se_system_force.apply(se_system_force_plan, worker_checkpoint_bonus ~= nil) then se_system_force.observe() end
   elseif target.id == "f200" then
     storage.mir_se_conquest_policy_force = nil
   end

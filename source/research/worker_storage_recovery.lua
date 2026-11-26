@@ -5,6 +5,7 @@ M.ordinary_default_id = "mir-worker-storage-default-4"
 M.head_id = "mir-worker-storage-head-4"
 M.provider_credit_id = "mir-worker-storage-provider-credit-4"
 M.published517_se_id = "mir-worker-storage-published517-4"
+M.prepared_paid_id = "mir-worker-storage-prepared-paid-4"
 local target = require("platform.target")
 local MAX = 4294967295
 
@@ -298,20 +299,29 @@ function M.default_owner(authored)
   return out
 end
 
--- The private holder is emitted only for the exact F200 non-K2 SE data path.
--- It preserves the old paid Base-five contract; it is hidden and disabled, so
--- current players cannot select it as a second research route.
-function M.published517_se_owner(authored)
-  local out = owner_source(authored, M.published517_se_id)
-  out.name, out.hidden, out.enabled, out.visible_when_disabled = M.published517_se_id, true, false, false
-  out.order = "zz[mir-worker-storage-published517]"
-  -- The admitted historical producer has one literal paid-work contract.
-  -- Authored presentation remains detached from its immutable work terms.
-  out.unit.count, out.unit.count_formula, out.unit.time = nil, PUBLISHED517_SE_TERMS.formula, PUBLISHED517_SE_TERMS.seconds
+local function historical_se_owner(authored, id, formula, science, prerequisites)
+  local out = owner_source(authored, id)
+  out.name, out.hidden, out.enabled, out.visible_when_disabled = id, true, false, false
+  out.unit.count, out.unit.count_formula, out.unit.time = nil, formula, PUBLISHED517_SE_TERMS.seconds
   out.effects[1].modifier = PUBLISHED517_SE_TERMS.modifier
   out.ignore_tech_cost_multiplier = PUBLISHED517_SE_TERMS.ignore_map_price
-  out.unit.ingredients, out.prerequisites = {}, copy(PUBLISHED517_SE_PREREQUISITES)
-  for index, name in ipairs(ARCHIVED_WORKER_SCIENCE.base) do out.unit.ingredients[index] = {name, 1} end
+  out.unit.ingredients, out.prerequisites = {}, copy(prerequisites)
+  for index, name in ipairs(science) do out.unit.ingredients[index] = {name, 1} end
+  return out
+end
+
+function M.published517_se_owner(authored)
+  local out = historical_se_owner(authored, M.published517_se_id, PUBLISHED517_SE_TERMS.formula,
+    ARCHIVED_WORKER_SCIENCE.base, PUBLISHED517_SE_PREREQUISITES)
+  out.order = "zz[mir-worker-storage-published517]"
+  return out
+end
+
+function M.prepared_paid_owner(authored, formula)
+  assert(type(formula) == "string" and #formula > 0 and #formula <= 1024, "MIR prepared worker price is unavailable")
+  local out = historical_se_owner(authored, M.prepared_paid_id, formula,
+    ARCHIVED_WORKER_SCIENCE.f200_se, {"worker-robots-storage-3"})
+  out.order = "zz[mir-worker-storage-prepared-paid]"
   return out
 end
 

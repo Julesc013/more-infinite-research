@@ -458,6 +458,12 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   assert(gate.effects[1].modifier==-public.effects[1].modifier and next(gate.prerequisites)==nil)
                   assert(data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.worker_default_split==true)
                   assert(data.writes==1)
+                  local history=data.raw.technology["mir-worker-storage-preservation-4"]
+                  public.unit.count_formula="1350*1.5^(L-4)"
+                  assert(tail.unit.count_formula==public.unit.count_formula,
+                    "a later edit to the public worker price left its ordinary owner behind")
+                  assert(history.unit.count_formula=="675*1.5^(L-4)")
+                  assert(gate.unit.count==1)
                 ''')
 
     def test_finite_profile_retains_hidden_default_contract_without_new_free_research(self):
@@ -478,6 +484,28 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   assert(data.raw.technology["worker-robots-storage-6"].hidden~=true)
                   assert(data.writes==1)
                 ''')
+
+    def test_only_the_preparation_mod_emits_the_retained_se_price(self):
+        mods = {"space-exploration": "0.7.57", "mir-worker-storage-preparation": "0.1.0"}
+        marker = '''data.raw["mod-data"]["mir-worker-storage-preparation"] = {
+          type="mod-data", name="mir-worker-storage-preparation", data={formula="1350*1.5^(L-4)"}
+        }'''
+        _, lua = self.pipeline("f200", extra_mods=mods, before=marker)
+        lua.execute('''
+          local rows = data.raw.technology
+          local holder = rows["mir-worker-storage-prepared-paid-4"]
+          assert(holder.hidden and holder.enabled == false and holder.visible_when_disabled == false)
+          assert(holder.level == 4 and holder.max_level == "infinite" and holder.effects[1].modifier == 1)
+          assert(holder.unit.count_formula == "1350*1.5^(L-4)" and holder.unit.count == nil and holder.unit.time == 60)
+          assert(#holder.unit.ingredients == 7 and holder.unit.ingredients[6][1] == "se-material-science-pack-1")
+          assert(#holder.prerequisites == 1 and holder.prerequisites[1] == "worker-robots-storage-3")
+          assert(rows["mir-worker-storage-published517-4"].unit.count_formula == "675*1.5^(L-4)")
+          assert(rows["mir-worker-storage-default-4"].unit.count_formula ~= holder.unit.count_formula)
+          assert(data.writes == 1)
+        ''')
+        for extra, before in ((mods, None), ({"space-exploration": "0.7.57"}, marker)):
+            _, lua = self.pipeline("f200", extra_mods=extra, before=before)
+            self.assertIsNone(lua.globals().data.raw.technology["mir-worker-storage-prepared-paid-4"])
 
     def test_unavailable_default_contract_is_not_admitted_as_split(self):
         _, lua = self.pipeline(rows=worker_pipeline.finite_chain(5),

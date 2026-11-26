@@ -118,6 +118,17 @@ class SpaceExplorationSystemForceTests(unittest.TestCase):
                 self.lua.execute(mutation + ';game=setmetatable({}, {__index=function()error("world access")end})')
                 self.lua.execute("assert(policy.preflight(event)==nil);policy.apply(nil);assert(#native_writes==0)")
 
+    def test_worker_checkpoint_requires_the_planned_conquest_restoration(self):
+        self.lua.execute('''
+          local plan=assert(policy.preflight(event))
+          local projected=plan.worker_storage_bonus
+          assert(projected.force_index==force.index and projected.before==0 and projected.after==3)
+          fields.worker_robots_storage_bonus=4
+          local ok,message=pcall(policy.apply,plan,true)
+          assert(not ok and message:find("conquest restoration required by the worker checkpoint",1,true))
+          assert(#native_writes==0 and fields.worker_robots_storage_bonus==4)
+        ''')
+
     def test_authored_conquest_defaults_do_not_depend_on_the_startup_settings_flag(self):
         for predecessor, flag in product(("4.7.20002", "5.0.20017", "5.0.20018"), ("true", "nil")):
             with self.subTest(predecessor=predecessor, flag=flag):
