@@ -14,6 +14,12 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Native preparation for legacy Space Exploration worker research (2026-11-26)
+
+The named preparation command ran in published MIR 4.7.20002 on Factorio 2.0.77 with Space Exploration 0.7.57. Each protected original matched its 21-mod checksum roster before capture. The normal MIR5 loader transferred both saves at their original 5,125- and 10,251-unit prices, with 200 paid units each, cargo capacity, queue order and the six conquest values. Both saved successors matched on cold load. The wrong same-version add-on refused before transfer.
+
+The private successor archive is `CEE376D09D19FB6C11AF19E54FCC642FE2CC691A8F613396267310AF102FCC98`. The native readback is `build/qualification/mir525-se-preparation-command-gunmetal-r01/verified-preparation-command.json` at SHA-256 `B9D55118869A4BE5D299C9636F6BDD98A1C752D9A7F4C29D25BBE69BD5177215`. The normal transfers retained each original add-on. Later add-on changes and ordinary lab completion have separate qualification cases. [Repair tracking](https://github.com/Julesc013/more-infinite-research/pull/2442)
+
 ## Unattended Library and research-progress results (2026-11-26)
 
 The unattended dispatcher completed the corrected shutdown rehearsal, then the exact frozen 5.0.25 bilingual Library replay, then both engine progress probes. The 32-step Library case verified six exports, eight export files, the protected save and identical library controls. Its readback is `build/qualification/mir525-library-tabs-gunmetal-r01/execution/verified-library-tabs-exports.json` at SHA-256 `C00C2FEC06D4CB78831D193F682A7A68364BC1DB372299E219C25F2048969A3E`. Both Base-only progress probes observed 19% saved work enter the active slot. When the head was displaced, 43% active work moved to the saved slot under both setter orders. The native probe scope is Factorio 2.0.77 and 2.1.24 with two fresh Base saves. The readback is `build/qualification/native-research-progress-probe-gunmetal-r03/execution/verified-native-progress.json` at SHA-256 `434D5CE8831D4966EEE0830C5514B25992B8C90D93D63151E51E4D2B643CBAF9`. [Native shutdown helper](https://github.com/Julesc013/more-infinite-research/pull/2417)
