@@ -675,18 +675,25 @@ function M.detail(force, catalogue, view, translations, context)
   local id = normalized.selected
   if id == nil then return nil, "no_selection" end
   if private_credit(context, id) then return nil, "technology_not_found" end
-  local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
   local observed, technology = pcall(technology_for, force, id)
   if not observed then return nil, "research_unavailable" end
   if technology == nil or not M.technology_visible(technology, id, context) then return nil, "technology_not_found" end
-  local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
+  local declaration
+  for index = 1, type(catalogue) == "table" and #catalogue or 0 do
+    local entry = catalogue[index]
+    if type(entry) == "table" and entry.id == id then
+      declaration = copy_declaration(entry)
+      if declaration then break end
+    end
+  end
+  local row = row_for(force, declaration, id, technology, queue_count, queue_index, current, translations, context)
   local effects, effects_complete = copy_effects(technology)
   local cost, ingredients_complete = copy_cost(technology)
   row.effects, row.effects_complete = effects, effects_complete
   row.cost, row.ingredients_complete = cost, ingredients_complete
   row.recipe_targets, row.recipe_targets_complete = copy_recipe_targets(technology)
-  if by_id[id] ~= nil then
+  if declaration then
     row.recipe_benefits, row.recipe_benefits_state, row.next_level_eligible,
       row.next_level_has_effective_benefit, row.recipe_benefits_only_effects =
       recipe_benefits(force, technology, row, context)
