@@ -545,6 +545,25 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(f.technologies[ID].saved_progress==.27)
         ''')
 
+    def test_resume_command_requires_an_existing_explicit_force(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27
+          assert(history.prepare(nil));writes=0
+          local replies={}
+          game.get_player=function()
+            return {admin=true,force=suspended,print=function(text) replies[#replies+1]=text end}
+          end
+          local state=storage.mir_worker_storage_route
+          local before=suspended.research_queue
+          history.command({player_index=1,parameter="resume suspneded"},nil)
+          assert(writes==0 and storage.mir_worker_storage_route==state and suspended.research_queue==before)
+          assert(replies[1]:find("Unknown force: suspneded",1,true))
+          history.command({player_index=1,parameter="resume"},nil)
+          assert(suspended.research_queue[2].name==ID and suspended.research_progress==.42)
+          assert(suspended.technologies[ID].saved_progress==.27)
+        ''')
+
     def test_owned_resume_defers_reentrant_transient_queue_frames_until_stable(self):
         for transient in ("current_research", "research_progress"):
             with self.subTest(transient=transient):
