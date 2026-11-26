@@ -363,7 +363,7 @@ local function add_command()
   end
   if worker_robot_storage then
     commands.add_command("mir-worker-storage-recovery",
-      "Administrator/server only: prepare a COPY before adding a finite worker-storage provider, or resume preserved partial work.",
+      "Administrator or server. Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume [force-name]",
       function(command)
         worker_robot_storage.command(command, worker_storage_route())
         bind_runtime_events(library_events_scheduled)

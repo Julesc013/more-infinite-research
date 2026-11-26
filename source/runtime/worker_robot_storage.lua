@@ -451,7 +451,7 @@ local function snapshot_queue(force, id)
   return queue, saved, occurrences
 end
 
-local function snapshot(force, id, finished_context, queued_observation)
+local function observe_worker(force, id)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
       or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean"
@@ -459,28 +459,32 @@ local function snapshot(force, id, finished_context, queued_observation)
     recover_error("invalid native worker frame for " .. tostring(force.name))
   end
   local queue, saved, occurrences = snapshot_queue(force, id)
-  local current = force.current_research and force.current_research.name or nil
+  local next_level = technology.level + (technology.researched and 1 or 0)
+  if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
+  return {technology=technology, next_level=next_level, researched=technology.researched,
+    enabled=technology.enabled, visible=technology.visible_when_disabled,
+    saved_progress=technology.saved_progress, count=technology.research_unit_count,
+    queue=queue, queued_saved=saved, current=force.current_research and force.current_research.name or nil,
+    current_progress=force.research_progress, occurrences=occurrences}
+end
+
+local function snapshot(force, id, finished_context, queued_observation)
+  local frame = observe_worker(force, id)
+  local current, head, value = frame.current, frame.queue[1], frame.current_progress
   -- A finished callback can follow removal of its head but precede starting
   -- the queued remainder. Keep that observed nil current and zero progress;
   -- do not promote queued saved work into current research inside the event.
   local default_finished = finished_context == "default-head-finished"
-  local waiting_after_finish = (finished_context == true or default_finished) and current == nil and queue[1] ~= nil
-    and force.research_progress == 0
-  if (current ~= queue[1] and not waiting_after_finish and not queued_observation) or not progress(force.research_progress) then
+  local waiting_after_finish = (finished_context == true or default_finished) and current == nil and head ~= nil and value == 0
+  if (current ~= head and not waiting_after_finish and not queued_observation) or not progress(value) then
     recover_error("inconsistent native current/queue frame")
   end
-  local next_level = technology.level + (technology.researched and 1 or 0)
-  if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
-  if technology.researched and (occurrences > 0 or technology.saved_progress > 0)
-      and not (default_finished and waiting_after_finish and technology.saved_progress == 0) then
+  if frame.researched and (frame.occurrences > 0 or frame.saved_progress > 0)
+      and not (default_finished and waiting_after_finish and frame.saved_progress == 0) then
     recover_error("completed worker row has ambiguous unfinished work")
   end
-  return {technology=technology, next_level=next_level, researched=technology.researched,
-    enabled=technology.enabled, visible=technology.visible_when_disabled,
-    saved_progress=technology.saved_progress, count=technology.research_unit_count,
-    queue=queue, queued_saved=saved, current=current, current_progress=force.research_progress,
-    occurrences=occurrences,
-    allowance=math.max(occurrences, (technology.saved_progress > 0 or current == id and force.research_progress > 0) and 1 or 0)}
+  frame.allowance = math.max(frame.occurrences, (frame.saved_progress > 0 or current == id and value > 0) and 1 or 0)
+  return frame
 end
 
 local function requeueable(force, frame, moved, infinite_first)
@@ -1543,30 +1547,14 @@ end
 -- A full-owner finish never transfers work. Its native queue/current may
 -- still be in the callback representation, including progress1. Capture it
 -- exactly for readback, without applying transfer/settled-queue assumptions.
-local function default_completion_frame(force, id)
-  local technology = force.technologies[id]
-  if not technology or not integer(technology.level) or technology.level < 4
-      or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean"
-      or type(technology.visible_when_disabled) ~= "boolean" or not progress(technology.saved_progress) then
-    recover_error("invalid full default completion technology")
-  end
-  local queue, saved, occurrences = snapshot_queue(force, id)
-  local value = force.research_progress
+local function default_frame(force, id, finished)
+  if not finished then return snapshot(force, id) end
+  local frame = observe_worker(force, id)
+  local value = frame.current_progress
   if type(value) ~= "number" or value ~= value or value < 0 or value > 1 then
     recover_error("invalid full default completion progress")
   end
-  local next_level = technology.level + (technology.researched and 1 or 0)
-  if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
-  return {technology=technology, next_level=next_level, researched=technology.researched,
-    enabled=technology.enabled, visible=technology.visible_when_disabled, saved_progress=technology.saved_progress,
-    count=technology.research_unit_count, queue=queue, queued_saved=saved,
-    current=force.current_research and force.current_research.name or nil, current_progress=value,
-    occurrences=occurrences}
-end
-
-local function default_frame(force, id, finished)
-  if finished then return default_completion_frame(force, id) end
-  return snapshot(force, id)
+  return frame
 end
 
 local function full_pair(source, owner, gate, settle_source)
@@ -3652,7 +3640,7 @@ function M.command(command, route)
   command = command or {}
   local player = command.player_index and game.get_player(command.player_index)
   local function reply(text) if player then player.print(text) elseif log then log("[MIR worker recovery] " .. text) end end
-  if command.player_index and (not player or player.admin ~= true) then reply("Only an administrator or server may prepare recovery."); return end
+  if command.player_index and (not player or player.admin ~= true) then reply("Only an administrator or server may change worker research."); return end
   local operation, name = tostring(command.parameter or ""):match("^%s*(%S+)%s*(.-)%s*$")
   local ok, result, message
   -- A refusal before application is a normal command reply. Native setters
@@ -3664,12 +3652,14 @@ function M.command(command, route)
   elseif operation == "prepare-removal" and name == "" then ok, result, message = pcall(prepare_provider_removal, route, before_apply)
   elseif operation == "cancel-removal" and name == "" then ok, result, message = pcall(cancel_provider_removal, before_apply)
   elseif operation == "resume" then
-    local force = name ~= "" and game.forces[name] or player and player.force
-    if not force then reply("Use resume <force-name> on the server."); return end
+    local force_name = name ~= "" and name or player and player.force.name
+    if not force_name then reply("Use /mir-worker-storage-recovery resume <force-name> on the server."); return end
+    local force = game.forces[force_name]
+    if not force then reply("Unknown force: " .. force_name); return end
     local saved = storage[REMOVAL_KEY]
     local pending = type(saved) == "table" and saved.schema == 2 and type(saved.forces) == "table" and saved.forces[force.index]
     ok, result, message = pcall(pending and resume_provider_queue or resume, force, route, before_apply)
-  else reply("Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume <force-name>"); return end
+  else reply("Usage: /mir-worker-storage-recovery prepare | prepare-removal | cancel-removal | resume [force-name]"); return end
   if not ok and applying then
     error("MIR worker recovery failed after native changes began; reload the original protected save COPY"
       .. " before trying recovery again: " .. tostring(result), 0)
