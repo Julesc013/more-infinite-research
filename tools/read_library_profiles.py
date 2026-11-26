@@ -52,13 +52,15 @@ class LibraryProfileError(ValueError):
     """A profiler input is absent, malformed, or outside this narrow contract."""
 
 
-def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
+def read_retained_windows(memory: dict, logs: dict[str, str], arm: str, *, platform: str = "windows") -> dict:
     """Read the explicitly opted-in paired fixture windows; never score them.
 
     Logs are the three exact restart peer stdout bodies. The caller retains
     their hashes and the complete collector body alongside this observation.
     Native elapsed timestamps are aligned to the existing owned process start
-    and sampler reference, with the protocol's fixed boundary trims.
+    and sampler reference, with the protocol's fixed boundary trims. The
+    caller selects Linux explicitly because its sampled private bytes are
+    VmData and it cannot supply an OS paged memory peak.
     """
     def require(condition: bool, message: str) -> None:
         if not condition:
@@ -90,6 +92,14 @@ def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
     observer = memory.get("lifetime_peak_observer")
     require(type(observer) is dict and observer.get("changes_periodic_observations") is False,
             "owned collector clock is absent")
+    require(platform in ("windows", "linux"), "unsupported collector platform")
+    linux = platform == "linux"
+    require(observer.get("platform") == ("linux" if linux else None), "collector platform differs")
+    if linux:
+        require("paged_memory_peak_bytes" in observer and observer["paged_memory_peak_bytes"] is None
+                and observer.get("sampled_private_bytes") ==
+                "procfs VmData via System.Diagnostics.Process.PrivateMemorySize64",
+                "Linux counter provenance differs")
     reference = utc(observer.get("utc_reference_before_stopwatch_start"))
     observations, peaks = memory.get("observations"), memory.get("lifetime_peak_counters")
     require(type(observations) is list and 1 <= len(observations) <= 12000,
@@ -113,9 +123,14 @@ def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
         elapsed = peak.get("elapsed_monotonic_milliseconds")
         require(type(elapsed) in (int, float) and 0 <= elapsed <= 900000 and math.isfinite(elapsed),
                 "invalid peak clock")
-        require(type(peak.get("working_set_peak_bytes")) is int and 0 < peak["working_set_peak_bytes"] < 2**63
-                and type(peak.get("paged_memory_peak_bytes")) is int and 0 <= peak["paged_memory_peak_bytes"] < 2**63,
-                "invalid peak memory endpoint")
+        require(type(peak.get("working_set_peak_bytes")) is int and 0 < peak["working_set_peak_bytes"] < 2**63,
+                "invalid peak working set")
+        paged_peak = peak.get("paged_memory_peak_bytes")
+        if linux:
+            require("paged_memory_peak_bytes" in peak and paged_peak is None,
+                    "Linux paged memory peak must be unavailable")
+        else:
+            require(type(paged_peak) is int and 0 <= paged_peak < 2**63, "invalid paged memory peak")
     require(slots == {(phase, role) for phase in ("initial", "restart") for role in roles},
             "owned peak closure differs")
     stages = ["baseline-start", "baseline-end", "post-refresh-start", "post-refresh-end"]
@@ -198,8 +213,11 @@ def read_retained_windows(memory: dict, logs: dict[str, str], arm: str) -> dict:
             growth[f"retained_growth/{role}/{key}"] = windows["post_refresh"]["medians"][key] - windows["baseline"]["medians"][key]
         results.append({"role": role, "phase": "restart", "pid": peak["pid"], "start_utc": peak["start_utc"],
                         "markers": markers, "windows": windows})
-    return {"kind": "MIRLibraryRetainedWindowObservationV1", "complete": True, "arm": arm,
-            "roles": results, "metrics": metrics, "growth": growth, "performance_acceptance": False}
+    result = {"kind": "MIRLibraryRetainedWindowObservationV1", "complete": True, "arm": arm,
+              "roles": results, "metrics": metrics, "growth": growth, "performance_acceptance": False}
+    if linux:
+        result["platform"] = platform
+    return result
 
 
 @dataclass(frozen=True)

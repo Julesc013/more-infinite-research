@@ -704,6 +704,32 @@ class RetainedWindowReaderTests(unittest.TestCase):
                 with self.assertRaises(reader.LibraryProfileError):
                     reader.read_retained_windows(memory, logs, "published")
 
+    def test_linux_retained_windows_require_declared_provenance_and_an_unavailable_paged_peak(self):
+        memory, logs = self.inputs()
+        with self.assertRaisesRegex(reader.LibraryProfileError, "collector platform differs"):
+            reader.read_retained_windows(memory, logs, "published", platform="linux")
+
+        observer = memory["lifetime_peak_observer"]
+        observer.update(platform="linux", paged_memory_peak_bytes=None,
+                        sampled_private_bytes="procfs VmData via System.Diagnostics.Process.PrivateMemorySize64")
+        peaks = memory["lifetime_peak_counters"]
+        for peak in peaks:
+            peak["paged_memory_peak_bytes"] = None
+        result = reader.read_retained_windows(memory, logs, "published", platform="linux")
+        self.assertEqual(result["platform"], "linux")
+        self.assertTrue(result["complete"])
+        self.assertFalse(result["performance_acceptance"])
+        with self.assertRaisesRegex(reader.LibraryProfileError, "collector platform differs"):
+            reader.read_retained_windows(memory, logs, "published")
+
+        for value in (0, 2000):
+            peaks[0]["paged_memory_peak_bytes"] = value
+            with self.assertRaisesRegex(reader.LibraryProfileError, "Linux paged memory peak must be unavailable"):
+                reader.read_retained_windows(memory, logs, "published", platform="linux")
+        del peaks[0]["paged_memory_peak_bytes"]
+        with self.assertRaisesRegex(reader.LibraryProfileError, "Linux paged memory peak must be unavailable"):
+            reader.read_retained_windows(memory, logs, "published", platform="linux")
+
     def test_requires_every_initial_and_restart_os_peak_endpoint_before_pending_arm(self):
         for opponent in ("unknown-phase", "unknown-role", "duplicate-slot", "missing-working-set",
                          "nonfinite-working-set", "boolean-paged", "negative-paged", "missing-utc",

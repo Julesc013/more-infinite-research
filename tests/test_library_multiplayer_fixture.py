@@ -4386,7 +4386,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($receipt.status-cne'complete-observation'-or$receipt.performance_acceptance-or$receipt.observations.Count-ne1-or$receipt.lifetime_peak_counters.Count-ne1){throw 'opted-in close changed sampling or duplicated counters'}
             $peak=$receipt.lifetime_peak_counters[0]
             if($peak.phase-cne'initial'-or$peak.role-cne'server'-or$peak.pid-ne$process.Id-or$peak.start_utc-cne$registration.start_utc){throw 'peak identity differs'}
-            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.paged_memory_peak_bytes-lt0-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            $observer=$receipt.lifetime_peak_observer
+            if($IsLinux){
+              if($null-ne$peak.paged_memory_peak_bytes-or$null-ne$observer.paged_memory_peak_bytes-or
+                  $observer.platform-cne'linux'-or$observer.sampled_private_bytes-cne'procfs VmData via System.Diagnostics.Process.PrivateMemorySize64'){
+                throw 'Linux paged peak or private-byte provenance differs'
+              }
+            }elseif($peak.paged_memory_peak_bytes-isnot[long]-or$peak.paged_memory_peak_bytes-lt0-or$observer.Contains('platform')){
+              throw 'Windows paged peak or receipt shape differs'
+            }
             if([datetime]::Parse($peak.observed_utc).ToUniversalTime()-lt$process.StartTime.ToUniversalTime()){throw 'peak UTC precedes process creation'}
             if($receipt.lifetime_peak_observer.changes_periodic_observations-ne$false-or$process.HasExited){throw 'observer changed process lifetime or periodic semantics'}
 
