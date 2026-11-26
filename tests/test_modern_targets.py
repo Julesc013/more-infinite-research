@@ -62,6 +62,22 @@ class ModernTargetTests(unittest.TestCase):
           end
         ''')
 
+    def test_drill_manufacturing_tooltip_keeps_extraction_guidance_across_profiles(self):
+        self.lua.execute('''
+          local function check(active)
+            local drill = names(catalogue.select(active).definitions).research_mining_drill
+            local description = drill.localised_description
+            assert(description[1] == "" and
+              description[2][1] == "technology-description.more-infinite-research.recipe_productivity" and
+              description[4][1] == "technology-description.more-infinite-research.mining_drill_extraction")
+            for _, effect in ipairs(drill.effects) do assert(type(effect.recipe) == "string") end
+          end
+          check({})
+          check({["space-age"]="2.1.23"})
+          f200()
+          check({base="2.0.77", ["space-exploration"]="0.7.57"})
+        ''')
+
     def test_base_literal_names_do_not_keep_absent_f210_item_children(self):
         locale_files = sorted((ROOT / "source" / "locale").glob("*/more-infinite-research.cfg"))
         self.assertEqual(len(locale_files), 50)

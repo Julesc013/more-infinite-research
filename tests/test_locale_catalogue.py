@@ -231,6 +231,10 @@ ACCEPTED_POST_B6_CORRECTIONS = {
             'Produktivität von Raketen für Gefangennahme',
             'Erfassen Sie die Produktivität von Bot-Raketen',
         ),
+        'technology-name.more-infinite-research.research_mining_drill': (
+            'Produktivität bei der Herstellung von Erzförderern',
+            'Erzförderer-Produktivität',
+        ),
         'technology-description.more-infinite-research.direct_effect': (
             "Fügt einen unendlich wiederholbaren Bonus hinzu.", "Fügt einen unendlich wiederholbaren Bonus hinzu. Wissenschaftspakete werden aus aktiven Laboren ausgewählt, damit die Technologie mit kompatiblen Mod-Sätzen erforschbar bleibt.",
         ),
@@ -690,6 +694,7 @@ class LocaleCatalogueTests(unittest.TestCase):
         }
         expected.add(f"technology-name.{NEW_ENGLISH_ONLY_KEY}")
         expected.add("technology-description.more-infinite-research.material_process_unavailable")
+        expected.add("technology-description.more-infinite-research.mining_drill_extraction")
         self.assertEqual(active_source_references(), expected)
 
     def test_all_locales_restore_the_pinned_b6_projection_without_duplicates(self) -> None:
@@ -711,7 +716,7 @@ class LocaleCatalogueTests(unittest.TestCase):
             ).hexdigest().upper()
             self.assertEqual(actual, EXPECTED_RETAINED_PROJECTION_SHA256[language], language)
 
-    def test_mining_drill_and_material_family_labels_have_independent_historical_values(self) -> None:
+    def test_drill_manufacturing_labels_distinguish_extracting_resources(self) -> None:
         english = parse_cfg(LOCALE_ROOT / "en" / "more-infinite-research.cfg")
         german = parse_cfg(LOCALE_ROOT / "de" / "more-infinite-research.cfg")
         self.assertEqual(
@@ -720,8 +725,13 @@ class LocaleCatalogueTests(unittest.TestCase):
         )
         self.assertEqual(
             german["technology-name"]["more-infinite-research.research_mining_drill"],
-            "Erzförderer-Produktivität",
+            "Produktivität bei der Herstellung von Erzförderern",
         )
+        guidance = "more-infinite-research.mining_drill_extraction"
+        self.assertIn("placed drills", english["technology-description"][guidance])
+        self.assertIn("Mining productivity", english["technology-description"][guidance])
+        self.assertIn("platzierter Erzförderer", german["technology-description"][guidance])
+        self.assertIn("Bergbau-Produktivität", german["technology-description"][guidance])
         self.assertEqual(
             english["technology-name"]["more-infinite-research.research_steel"],
             "Steel plate productivity",

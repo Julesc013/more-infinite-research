@@ -846,7 +846,8 @@ return {
       icon_size = 64,
       overlay = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
       localised_name = {"technology-name.more-infinite-research.research_mining_drill"},
-      localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+      localised_description = {"", {"technology-description.more-infinite-research.recipe_productivity"}, " ",
+        {"technology-description.more-infinite-research.mining_drill_extraction"}},
       order = "p[research_mining_drill]",
       tuning = {
         base_cost = 8000,

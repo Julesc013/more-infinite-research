@@ -5,9 +5,9 @@ import hashlib
 import gzip
 import json
 from pathlib import Path
-from historical_sources import read_published_source
+from catalogue_presentation import expected_base_presentation_rows
+from historical_sources import MIR5_SETTINGS_CAPTURE, read_captured_source, read_published_source
 from repository_paths import reference_path
-import subprocess
 import sys
 import unittest
 from worker_storage_recovery_fixture import expected_private_worker_row
@@ -27,76 +27,15 @@ sys.path.insert(0, str(ROOT / "tools"))
 import compare_k2_base
 
 
-BASE_LITERAL_NAME_PRESENTATION_REPAIR = {
-    # The K2 facts retain their captured Base source hash.  Only these two
-    # nested children were invalid F210 Base locale requests: their enclosing
-    # MIR keys are already complete literal titles in every shipped locale.
-    "captured_source_sha256": "48448C8BF3B6ED64B6DAF03D8C4E4CB2DCE04762D2255AB1D9F03C668F76B2CF",
-    "current_source_sha256": "3D4B72D02863F84A27D3C7A57711FB534BCDC64D48B949669C77670519348782",
-    "rows": {
-        "recipe-prod-research_mining_drill-1": {
-            "captured": ["technology-name.more-infinite-research.research_mining_drill",
-                         ["item-name.electric-mining-drill"]],
-            "emitted": ["technology-name.more-infinite-research.research_mining_drill"],
-        "source_current": '      localised_name = {"technology-name.more-infinite-research.research_mining_drill"},\n',
-        "source_captured": (
-            "      localised_name = {\n"
-            '        "technology-name.more-infinite-research.research_mining_drill",\n'
-            '        {"item-name.electric-mining-drill"},\n'
-            "      },\n"
-        ),
-        },
-        "recipe-prod-research_walls-1": {
-            "captured": ["technology-name.more-infinite-research.research_walls",
-                         ["item-name.stone-wall"]],
-            "emitted": ["technology-name.more-infinite-research.research_walls"],
-        "source_current": '      localised_name = {"technology-name.more-infinite-research.research_walls"},\n',
-        "source_captured": (
-            "      localised_name = {\n"
-            '        "technology-name.more-infinite-research.research_walls",\n'
-            '        {"item-name.stone-wall"},\n'
-            "      },\n"
-        ),
-        },
-    },
-}
-
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
-
-
-def _repair_literal_name_presentation(rows: dict[str, dict]) -> dict[str, dict]:
-    """Allow exactly the independently pinned locale-only successor rows."""
-    repaired = deepcopy(rows)
-    for technology, expected in BASE_LITERAL_NAME_PRESENTATION_REPAIR["rows"].items():
-        if repaired.get(technology, {}).get("localised_name") != expected["captured"]:
-            raise AssertionError(f"captured Base presentation changed: {technology}")
-        repaired[technology]["localised_name"] = deepcopy(expected["emitted"])
-    return repaired
-
-
-def _assert_exact_base_presentation_successor(source: bytes) -> None:
-    """Prove the current hash differs only by the two independently pinned arrays."""
-    repair = BASE_LITERAL_NAME_PRESENTATION_REPAIR
-    text = source.decode("utf-8")
-    restored = text
-    for technology, expected in repair["rows"].items():
-        current, captured = expected["source_current"], expected["source_captured"]
-        if text.count(current) != 1 or text.count(captured) != 0:
-            raise AssertionError(f"unexpected Base source presentation shape: {technology}")
-        restored = restored.replace(current, captured)
-    if hashlib.sha256(restored.encode("utf-8")).hexdigest().upper() != repair["captured_source_sha256"]:
-        raise AssertionError("Base source successor changes more than the two captured literal-name arrays")
 
 
 def _captured_f210_profile(relative: str, expected_sha256: str) -> bytes:
     # These native captures belong to the immutable 5c51 input selection.
     # Current profiles may legitimately rebind their observer/package inputs.
     revision = "5c51ed46d1762b4fca7480f05a057482bbbedb0a"
-    data = subprocess.check_output(["git", "-C", str(ROOT), "show", revision + ":" + relative], stderr=subprocess.PIPE)
-    if hashlib.sha256(data).hexdigest().upper() != expected_sha256:
-        raise AssertionError(f"captured F210 K2 profile changed: {revision}:{relative}")
-    return data
+    return read_captured_source(ROOT, revision, relative, expected_sha256)
 
 
 class K2BaseCatalogueTests(unittest.TestCase):
@@ -122,19 +61,11 @@ class K2BaseCatalogueTests(unittest.TestCase):
             raise AssertionError("captured native subset has the wrong raw provenance")
         for source in (cls.facts["authored_selector_evidence"], cls.facts["direct_effect_evidence"]):
             read_published_source(ROOT, source["path"], source["sha256"])
+        catalogue_source = cls.facts["catalogue_evidence"]
+        # The pinned settings capture contains the same original catalogue blobs.
         for name in ("base", "direct"):
-            source = cls.facts["catalogue_evidence"]
-            path = reference_path(source[f"{name}_path"])
-            actual_sha256 = _sha256(path)
-            if name == "base" and actual_sha256 != source[f"{name}_sha256"]:
-                repair = BASE_LITERAL_NAME_PRESENTATION_REPAIR
-                if (source["base_sha256"] != repair["captured_source_sha256"]
-                        or actual_sha256 != repair["current_source_sha256"]):
-                    raise AssertionError(f"catalogue evidence changed: {source['base_path']}")
-                _assert_exact_base_presentation_successor(path.read_bytes())
-                continue
-            if actual_sha256 != source[f"{name}_sha256"]:
-                raise AssertionError(f"catalogue evidence changed: {source[f'{name}_path']}")
+            read_captured_source(ROOT, MIR5_SETTINGS_CAPTURE, catalogue_source[f"{name}_path"],
+                                 catalogue_source[f"{name}_sha256"])
         if cls.f210_facts["engine"] != {
                 "target": "f210", "version": "2.1.23",
                 "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}:
@@ -388,7 +319,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         # Whole independent published rows: this catches omitted fields, tuning,
         # presentation, progression and targets beyond the mechanism assertions.
         expected = compare_k2_base.intended_output()
-        rows = _repair_literal_name_presentation({
+        rows = expected_base_presentation_rows({
             row["name"]: row["row"] for row in expected["data"]["additions"]
             if row["type"] == "technology"
         })
