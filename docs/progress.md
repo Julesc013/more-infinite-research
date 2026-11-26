@@ -14,6 +14,20 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Current development Library and API packages (2026-11-26)
+
+The private development package comparison at commit `2c897eaf4d7f291518b68a30ec569f9b162da5ec` found 15 of the 17 player ZIPs byte-identical to the frozen 5.0.25 beta. The Base 2.0 and 2.1 editions changed only the runtime bootstrap and Library members. The input comparison is `E:/mir5-freeze/mir525-development-library-comparison-r01/beta-package-applicability.json` at SHA-256 `058C62EFBE044738B6AAFBF1DFE572E2C4E3A6A9E3588309C7DE69F7E443229B`.
+
+Both native API consumers passed on those two changed ZIPs in Factorio 2.0.77 and 2.1.24. The paired assemblers produced 200 and 202 copper cables from 100 copper plates each. Each edition passed two cold loads, restored the shared library and had 24 original files rehashed. The receipt is `build/qualification/mir525-development-api-direct-black-glass-r01/verified-native-api.json` at SHA-256 `E80D974FD34D3B77B01DAA37DBDC6DB8DE1C37B204793BFE283A65271CB7BF4E`.
+
+The same development 2.1 ZIP `A0973CAD0F3DF508D2711DE36DFEB58E3B35A241669A8A7D69EE0EE373E8F789` passed the thirteen-step native Library replay on Factorio 2.1.24. It preserved independent English and German searches and widths through individual rejoins and a saved server restart, with the shared library and protected research intact. The readback checked 26 screenshots and 356 original files. It is `build/qualification/mir525-development-library-personal-gunmetal-r02/verified-personal-views.json` at SHA-256 `7C804A3BD1B00FB1FBD6D2FB4401D33F15EF6CCF89D34CD43961F951A020A223`.
+
+## Library timing repeatability (2026-11-26)
+
+Gunmetal completed both warmups and both identical-package controls on Factorio 2.0.77. Eight Library profiler endpoints exceeded the predeclared repeatability limits. The run stopped before scoring the published 4.7.3 and current development comparison. The independent readback rehashed 907 original files and verified shared-library restoration. The receipt is `build/qualification/library-current-matched-gunmetal-r01/verified-native-timing.json` at SHA-256 `2C7863A7C6C39B766BD637362A41C86977D2D9BAD4D8370B02C71F72D3241980`.
+
+The Linux clients used Mesa LLVMpipe. A separate matched batch started with two software-rendering workers per client and the original workload and tolerances. The changed setting tests whether drawing contention contributed to the observed variation. Scoring depends on fresh identical-package controls. The launch receipt is `build/qualification/library-current-matched-gunmetal-r02/direct-timing-ack.json`. [Mesa software rendering controls](https://docs.mesa3d.org/envvars.html#llvmpipe-driver-environment-variables)
+
 ## Native preparation for legacy Space Exploration worker research (2026-11-26)
 
 The named preparation command ran in published MIR 4.7.20002 on Factorio 2.0.77 with Space Exploration 0.7.57. Each protected original matched its 21-mod checksum roster before capture. The normal MIR5 loader transferred both saves at their original 5,125- and 10,251-unit prices, with 200 paid units each, cargo capacity, queue order and the six conquest values. Both saved successors matched on cold load. The wrong same-version add-on refused before transfer.

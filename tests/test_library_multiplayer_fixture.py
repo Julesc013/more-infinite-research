@@ -1709,6 +1709,23 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Refuse (Profile '5.0.20024' $frozen523) $engine $frozen523
           $held525='3F0285DBA21D5DD9BC2241270F2ECC1DA39E5D2A975C723E60E258B3E10A7F1E'
           Refuse (Profile '5.0.20025' $held525) $engine $held525
+
+          $linuxEngine='09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+          $published=Get-Content -LiteralPath 'tests/profiles/library-paired-browser-published-f200-2077.json' -Raw|ConvertFrom-Json -AsHashtable
+          $current=Profile '5.0.20025' '3383B2D7D51A5DDF53022341CC6EDFA702716B3CC08A805027861E47039A64E7'
+          $development=Profile '5.0.20025' '90AF4803D4D7A693CFE92840C282C0815D104DA6ADB30548AA0B6FBDEE07101D'
+          foreach($row in @(@{profile=$published;arm='published'},@{profile=$current;arm='mir5'},@{profile=$development;arm='mir5'})){
+            $profile=$row.profile
+            $version=$profile.mods[2].version
+            $hash=$profile.archive_sha256["more-infinite-research_$version.zip"]
+            $profile.engine.sha256=$linuxEngine
+            Refuse $profile $linuxEngine $hash
+            $profile.kind='mir5-library-paired-browser-linux-f200-native-selection'
+            $bound=Assert-MultiplayerFixtureSelection $profile $linuxEngine 'library-paired-browser' $hash 8192 -RepoRoot (Get-Location).Path
+            if(-not$bound.linux_private_displays-or$bound.paired_arm-cne$row.arm-or$bound.mir_archive_sha256-cne$hash){throw 'exact Linux paired arm differs'}
+            Refuse $profile $engine $hash
+            Refuse $profile $linuxEngine ('0'*64)
+          }
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
@@ -1765,6 +1782,44 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("fixture active-mod closure differs", diagnostic)
         self.assertIsNone(arm)
+
+    def test_paired_browser_reads_the_authored_filter_grid_and_results_pane(self):
+        observe = self.lua.eval(r'''
+          function(path)
+            local file = assert(io.open(path, "r"))
+            local text = file:read("*a")
+            file:close()
+            local boundary = assert(text:find("\nlocal function open(", 1, true))
+            local chunk = assert(load(text:sub(1, boundary - 1)
+              .. "\nreturn function(player, view) assert_shape(player, ARMS.mir5, view) end",
+              "@paired-shape", "t", setmetatable({require=function() return {} end}, {__index=_G})))
+            return chunk()
+          end
+        ''')((ROOT / "tests/fixtures/library-paired-browser/control.lua").as_posix())
+        run = self.lua.eval(r'''
+          function(observe, scope, owner)
+            local query = {valid=true,type="textfield",text="gears"}
+            local family = {valid=true,type="drop-down",items={{scope}},selected_index=1}
+            local results = {valid=true,type="list-box",items={"gears"},selected_index=1,style={minimal_width=280}}
+            local detail = {valid=true,type="scroll-pane",style={minimal_width=340}}
+            local content = {valid=true,type="table",column_count=2,style={maximal_width=660},
+              mir_library_list_pane={valid=true,type="flow",get_mod=function() return owner end,mir_library_results=results},
+              mir_library_detail=detail}
+            local filters = {valid=true,mir_library_query=query,
+              mir_library_filter_grid={valid=true,mir_library_family_field={valid=true,mir_library_family=family}}}
+            local page = {valid=true,type="scroll-pane",mir_library_filters=filters,mir_library_research_content=content}
+            local root = {valid=true,type="frame",visible=true,
+              mir_library_tabs={valid=true,type="tabbed-pane",mir_library_research_page=page}}
+            return pcall(observe, {gui={screen={mir_research_browser=root}}}, {query="gears"})
+          end
+        ''')
+        self.assertTrue(run(observe, "mir-browser.scope-all", "more-infinite-research"))
+        ok, detail = run(observe, "mir-browser.scope-mir", "more-infinite-research")
+        self.assertFalse(ok)
+        self.assertIn("scope differs", detail)
+        ok, detail = run(observe, "mir-browser.scope-all", "other")
+        self.assertFalse(ok)
+        self.assertIn("pane is malformed or foreign", detail)
 
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''
@@ -4386,7 +4441,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($receipt.status-cne'complete-observation'-or$receipt.performance_acceptance-or$receipt.observations.Count-ne1-or$receipt.lifetime_peak_counters.Count-ne1){throw 'opted-in close changed sampling or duplicated counters'}
             $peak=$receipt.lifetime_peak_counters[0]
             if($peak.phase-cne'initial'-or$peak.role-cne'server'-or$peak.pid-ne$process.Id-or$peak.start_utc-cne$registration.start_utc){throw 'peak identity differs'}
-            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.paged_memory_peak_bytes-lt0-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            if($peak.working_set_peak_bytes-lt$firstWorkingSet-or$peak.elapsed_monotonic_milliseconds-lt$receipt.observations[0].elapsed_monotonic_milliseconds){throw 'invalid native high-water values'}
+            $observer=$receipt.lifetime_peak_observer
+            if($IsLinux){
+              if($null-ne$peak.paged_memory_peak_bytes-or$null-ne$observer.paged_memory_peak_bytes-or
+                  $observer.platform-cne'linux'-or$observer.sampled_private_bytes-cne'procfs VmData via System.Diagnostics.Process.PrivateMemorySize64'){
+                throw 'Linux paged peak or private-byte provenance differs'
+              }
+            }elseif($peak.paged_memory_peak_bytes-isnot[long]-or$peak.paged_memory_peak_bytes-lt0-or$observer.Contains('platform')){
+              throw 'Windows paged peak or receipt shape differs'
+            }
             if([datetime]::Parse($peak.observed_utc).ToUniversalTime()-lt$process.StartTime.ToUniversalTime()){throw 'peak UTC precedes process creation'}
             if($receipt.lifetime_peak_observer.changes_periodic_observations-ne$false-or$process.HasExited){throw 'observer changed process lifetime or periodic semantics'}
 
