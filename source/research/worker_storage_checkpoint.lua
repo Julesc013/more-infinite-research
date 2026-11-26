@@ -43,10 +43,8 @@ local function worker_terms(technology)
   return terms
 end
 
-local function prepare()
-  local active = script.active_mods
-  require_frame(active.base == M.source_base and M.source_version(active[MIR]), "prepare in the Factorio 1.1 edition")
-  local saved = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=active[MIR], forces={}}
+function M.capture(read_saved_progress)
+  local saved = {schema=1, tick=game.tick, was_paused=game.tick_paused, mir=script.active_mods[MIR], forces={}}
   for _, force in pairs(game.forces) do
     local worker = force.technologies[WORKER]
     local terms = worker_terms(worker)
@@ -56,14 +54,14 @@ local function prepare()
     for index, technology in ipairs(force.research_queue or {}) do
       local name = technology.name
       require_frame(index <= 1000, "native queue exceeds its supported length")
-      local prior = force.get_saved_technology_progress(technology) or 0
+      local prior = read_saved_progress(force, technology) or 0
       require_frame(progress(prior), "invalid native queued progress")
       queue[index], parked[name] = name, prior
       if name ~= WORKER and (prior > 0 or current and current.name == name and fraction > 0) then
         paid[name] = {level=technology.level, terms=work_terms(technology)}
       end
     end
-    local worker_progress = force.get_saved_technology_progress(worker) or 0
+    local worker_progress = read_saved_progress(force, worker) or 0
     require_frame(queue[1] == (current and current.name) and progress(fraction) and progress(worker_progress),
       "current native research or progress differs from the queue")
     saved.forces[force.index] = {name=force.name, bonus=force.worker_robots_storage_bonus,
@@ -72,6 +70,12 @@ local function prepare()
   end
   require_frame(next(saved.forces) ~= nil, "no force research was observed")
   return saved
+end
+
+local function prepare()
+  local active = script.active_mods
+  require_frame(active.base == M.source_base and M.source_version(active[MIR]), "prepare in the Factorio 1.1 edition")
+  return M.capture(function(force, technology) return force.get_saved_technology_progress(technology) end)
 end
 
 local function watch_prepared_copy()
