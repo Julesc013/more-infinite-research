@@ -108,6 +108,64 @@ class PublicReleaseTests(unittest.TestCase):
             return readback.verify_delivery(self.primary, self.frozen, self.inventory_sha256, self.commit,
                                             34, prerelease, receipt)
 
+    def verify_draft(self, draft=True):
+        self.public.update(draft=draft, published_at=None if draft else self.public["published_at"])
+        for asset in self.public["assets"]:
+            name = asset["name"]
+            asset["digest"] = "sha256:" + release.digest(self.assets[name])
+            if name == "SHA256SUMS.txt":
+                asset["label"] = "SHA256 checksums"
+            if name == "SHA256SUMS-early.txt":
+                asset["label"] = "SHA256 checksums (early editions)"
+
+        def metadata(endpoint, path):
+            return {"object": self.tag_object} if endpoint.startswith("git/") else self.public
+
+        def download(command, *, stdout, **options):
+            asset_id = int(command[-1].rsplit("/", 1)[-1])
+            name = next(asset["name"] for asset in self.public["assets"] if asset["id"] == asset_id)
+            self.requests.append(name)
+            stdout.write(self.downloads[name])
+
+        receipt = self.frozen / "draft-receipt"
+        with (patch.object(readback, "_git", self.fake_git),
+              patch.object(readback, "_confirm_draft_account") as account,
+              patch.object(readback, "_draft_metadata", metadata),
+              patch.object(readback.subprocess, "run", download)):
+            try:
+                return readback.verify_draft(self.primary, self.frozen, self.inventory_sha256, self.commit,
+                                             34, True, receipt)
+            finally:
+                account.assert_called_once_with(self.primary)
+
+    def test_private_draft_verifies_fresh_bytes_without_installing(self):
+        result = self.verify_draft()
+        self.assertEqual(result["status"], "complete-draft-bytes-verified")
+        self.assertEqual(result["assets"], len(self.assets))
+        self.assertEqual({path.name: path.read_bytes() for path in Path(result["downloads"]).iterdir()}, self.assets)
+        self.assertFalse(self.destination.exists())
+
+    def test_private_draft_requires_draft_state_before_download(self):
+        with self.assertRaisesRegex(ValueError, "draft identity"):
+            self.verify_draft(draft=False)
+        self.assertEqual(self.requests, [])
+
+    def test_same_size_draft_byte_mismatch_has_no_verified_receipt(self):
+        self.downloads[next(iter(self.assets))] = b"fail"
+        with self.assertRaisesRegex(ValueError, "private download bytes"):
+            self.verify_draft()
+        self.assertFalse((self.frozen / "draft-receipt/verified-draft.json").exists())
+        self.assertFalse(self.destination.exists())
+
+    def test_draft_checks_windows_identity_before_github_access(self):
+        with (patch.object(readback.os, "name", "nt"),
+              patch.object(readback.subprocess, "check_output", return_value=b"INVALID-EXECUTION-ACCOUNT") as probe,
+              patch.object(readback.subprocess, "run") as auth):
+            with self.assertRaisesRegex(ValueError, "Checked INVALID-EXECUTION-ACCOUNT"):
+                readback._confirm_draft_account(self.primary)
+        self.assertEqual(probe.call_args.args[0][0], "pwsh")
+        auth.assert_not_called()
+
     def assert_no_asset_downloads(self):
         self.assertTrue(all(url.startswith(readback.API) for url in self.requests))
         self.assertFalse(self.destination.exists())

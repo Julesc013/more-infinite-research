@@ -159,10 +159,7 @@ def _install(stage, destination, files):
     return installed_files
 
 
-def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prerelease, receipt):
-    if not COMMIT.fullmatch(commit) or not SHA256.fullmatch(inventory_sha256) or release_id <= 0:
-        raise ValueError("A full reviewed commit, frozen inventory digest and valid release ID are required")
-    inventory_sha256 = inventory_sha256.lower()
+def _frozen_inventory(frozen, inventory_sha256):
     frozen_bytes = (frozen / release.INVENTORY_NAME).read_bytes()
     if release.digest(frozen_bytes) != inventory_sha256:
         raise ValueError("Frozen release inventory digest differs")
@@ -174,6 +171,14 @@ def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prere
         raise ValueError("Frozen release inventory is not canonical or its self-digest differs")
     if inventory.get("schema") != 1 or inventory.get("kind") != release.KIND:
         raise ValueError("Unsupported frozen release inventory")
+    return inventory
+
+
+def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prerelease, receipt):
+    if not COMMIT.fullmatch(commit) or not SHA256.fullmatch(inventory_sha256) or release_id <= 0:
+        raise ValueError("A full reviewed commit, frozen inventory digest and valid release ID are required")
+    inventory_sha256 = inventory_sha256.lower()
+    inventory = _frozen_inventory(frozen, inventory_sha256)
     source = inventory["source"]
     identity = release._release_identity(source["source_distribution_version"])
     if identity != inventory["release"]:
@@ -231,6 +236,107 @@ def verify_delivery(primary, frozen, inventory_sha256, commit, release_id, prere
     return result
 
 
+def _confirm_draft_account(primary):
+    if os.name != "nt":
+        raise ValueError("Draft readback requires the maintainer Windows context")
+    identity = subprocess.check_output([
+        "pwsh", "-NoProfile", "-NonInteractive", "-Command",
+        "[System.Security.Principal.WindowsIdentity]::GetCurrent().Name",
+    ], cwd=primary, timeout=20).decode("utf-8").strip()
+    if identity != r"BLACKGLASS-WIN1\Jules":
+        raise ValueError(f"Draft readback requires the maintainer Windows context. Checked {identity}")
+    status = subprocess.run(["gh", "auth", "status", "--hostname", "github.com"], cwd=primary, timeout=20,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    account = subprocess.check_output(["gh", "api", "--hostname", "github.com", "user", "--jq", ".login"], cwd=primary, timeout=20,
+                                      stderr=subprocess.DEVNULL).decode("utf-8").strip()
+    if status.returncode or account != "Julesc013":
+        raise ValueError("Maintainer GitHub authentication could not be verified")
+
+
+def _draft_metadata(endpoint, receipt):
+    raw = subprocess.check_output(["gh", "api", "--hostname", "github.com", f"repos/{REPOSITORY}/{endpoint}"], timeout=30,
+                                  stderr=subprocess.DEVNULL)
+    receipt.write_bytes(raw)
+    return json.loads(raw)
+
+
+def _draft_assets(metadata, release_id, tag, title, prerelease, notes, expected):
+    if (metadata["id"], metadata["tag_name"], metadata["name"], metadata["draft"], metadata["prerelease"],
+        metadata.get("immutable"), metadata["published_at"]) != (release_id, tag, title, True, prerelease, False, None):
+        raise ValueError("The private draft identity, maturity or state differs")
+    if _text(metadata["body"].encode("utf-8")) != _text(notes):
+        raise ValueError("The GitHub draft body differs from the tagged notes")
+    assets = {item["name"]: item for item in metadata["assets"]}
+    if len(metadata["assets"]) != len(expected) or assets.keys() != expected.keys():
+        raise ValueError("The staged asset inventory differs")
+    labels = {"SHA256SUMS.txt": "SHA256 checksums", "SHA256SUMS-early.txt": "SHA256 checksums (early editions)"}
+    result = {}
+    seen_ids = set()
+    for name, row in expected.items():
+        remote = assets[name]
+        digest = row.get("archive_sha256", row.get("sha256"))
+        asset_id = remote["id"]
+        if (type(asset_id) is not int or asset_id <= 0 or asset_id in seen_ids
+                or remote["state"] != "uploaded" or remote["size"] != row["bytes"]
+                or remote["label"] != row.get("label", labels.get(name))
+                or remote.get("digest", "").lower() != f"sha256:{digest}"):
+            raise ValueError(f"Unexpected draft metadata for {name}")
+        seen_ids.add(asset_id)
+        result[name] = {"name": name, "id": asset_id, "bytes": row["bytes"], "sha256": digest}
+    return result
+
+
+def verify_draft(primary, frozen, inventory_sha256, commit, release_id, prerelease, receipt):
+    """Verify private draft metadata and fresh asset bytes without installing a release."""
+    if not COMMIT.fullmatch(commit) or not SHA256.fullmatch(inventory_sha256) or release_id <= 0:
+        raise ValueError("A full reviewed commit, frozen inventory digest and valid release ID are required")
+    inventory_sha256 = inventory_sha256.lower()
+    inventory = _frozen_inventory(frozen, inventory_sha256)
+    source = inventory["source"]
+    identity = release._release_identity(source["source_distribution_version"])
+    if identity != inventory["release"]:
+        raise ValueError("Release identity differs from the frozen player version")
+    primary = primary.resolve(strict=True)
+    _primary_revision(primary)
+    if _git_text(primary, "rev-parse", commit + "^{tree}") != source["tree"]:
+        raise ValueError("The reviewed tag commit differs from the frozen tree")
+    tag, title = identity["tag"], identity["title"]
+    notes, _, _ = _notes(primary, commit, title)
+    expected = _public_assets(inventory)
+    _confirm_draft_account(primary)
+    receipt.mkdir(parents=True, exist_ok=False)
+    target = _draft_metadata("git/ref/tags/" + tag, receipt / "draft-tag.json")["object"]
+    if target["type"] == "tag":
+        annotation = _draft_metadata("git/tags/" + target["sha"], receipt / "draft-tag-annotation.json")
+        target = annotation["object"]
+    if target["type"] != "commit" or target["sha"] != commit:
+        raise ValueError("The draft tag does not point to the reviewed commit")
+
+    endpoint = f"releases/{release_id}"
+    before = _draft_metadata(endpoint, receipt / "draft-release-before.json")
+    assets = _draft_assets(before, release_id, tag, title, prerelease, notes, expected)
+    downloads = receipt / "downloads"
+    downloads.mkdir()
+    for name, row in assets.items():
+        path = downloads / name
+        with path.open("xb") as stream:
+            subprocess.run(["gh", "api", "--hostname", "github.com",
+                            "-H", "Accept: application/octet-stream", f"repos/{REPOSITORY}/releases/assets/{row['id']}"],
+                           check=True, timeout=60, stdout=stream, stderr=subprocess.DEVNULL)
+        if path.stat().st_size != row["bytes"] or release.digest(path.read_bytes()) != row["sha256"]:
+            raise ValueError(f"Unexpected private download bytes for {name}")
+    after = _draft_metadata(endpoint, receipt / "draft-release-after.json")
+    if assets != _draft_assets(after, release_id, tag, title, prerelease, notes, expected):
+        raise ValueError("The draft assets changed during verification")
+    result = {
+        "status": "complete-draft-bytes-verified", "id": release_id, "tag": tag, "source": commit,
+        "inventory_sha256": inventory_sha256, "assets": len(assets), "verified_assets": list(assets.values()),
+        "verified_at": datetime.now(timezone.utc).isoformat(), "downloads": str(downloads.resolve()),
+    }
+    (receipt / "verified-draft.json").write_bytes(release.canonical_json(result))
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--primary", type=Path, default=Path.cwd(), help="Primary checkout")
@@ -239,8 +345,14 @@ def main():
     parser.add_argument("--tag-commit", required=True)
     parser.add_argument("--release-id", required=True, type=int)
     parser.add_argument("--maturity", required=True, choices=("prerelease", "stable"))
-    parser.add_argument("--receipt", required=True, type=Path, help="New directory for the anonymous readback")
+    parser.add_argument("--receipt", required=True, type=Path, help="New directory for the release readback")
+    parser.add_argument("--draft", action="store_true", help="Verify an authenticated private draft without installing files")
     args = parser.parse_args()
+    if args.draft:
+        result = verify_draft(args.primary, args.frozen, args.inventory_sha256, args.tag_commit,
+                              args.release_id, args.maturity == "prerelease", args.receipt)
+        print(f"{result['tag']} private draft verified with {result['assets']} complete assets")
+        return
     result = verify_delivery(args.primary, args.frozen, args.inventory_sha256, args.tag_commit,
                              args.release_id, args.maturity == "prerelease", args.receipt)
     print(f"{result['tag']} verified anonymously and delivered {len(result['verified_assets'])} assets "
