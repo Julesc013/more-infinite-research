@@ -93,6 +93,14 @@ class SaveModChecksumControls(unittest.TestCase):
             self.assertEqual(package.read(f"{root}/LICENSE"), (ROOT / "source/LICENSE").read_bytes())
             self.assertEqual(package.read(f"{root}/research/worker_storage_checkpoint.lua"),
                              (ROOT / "source/research/worker_storage_checkpoint.lua").read_bytes())
+            self.assertNotIn(f"{root}/data.lua", package.namelist())
+        priced = build(self.path, witness_path, self.path.parent / "priced", "1350*1.5^(L-4)")
+        with zipfile.ZipFile(priced["archive"]) as package:
+            script = package.read(f"{root}/data.lua")
+            self.assertIn(b'formula="1350*1.5^(L-4)"', script)
+            self.assertIn(b'type="mod-data"', script)
+        with self.assertRaisesRegex(ValueError, "formula"):
+            build(self.path, witness_path, self.path.parent / "invalid", "113\n")
         with self.assertRaises(FileExistsError):
             build(self.path, witness_path, output)
         self.assertEqual(self.path.read_bytes(), original)

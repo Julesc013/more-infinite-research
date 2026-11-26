@@ -505,7 +505,8 @@ local function on_configuration_changed(event)
   -- Restore only the separately admitted SE scripted NPC policy, after all
   -- native plans have verified their original zero-contribution frames.
   if se_system_force then
-    local worker_checkpoint_bonus = worker_default_plan and worker_default_plan.checkpoint and worker_default_plan.context
+    local worker_checkpoint_bonus = worker_default_plan and (worker_default_plan.checkpoint or worker_default_plan.addon_preparation)
+      and worker_default_plan.context
       and worker_default_plan.context.worker_checkpoint_bonus
     if not se_system_force.apply(se_system_force_plan, worker_checkpoint_bonus ~= nil) then se_system_force.observe() end
   elseif target.id == "f200" then

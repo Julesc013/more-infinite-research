@@ -3788,9 +3788,9 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             LuaRuntime, target=target, source_root=ROOT / "source"
         )
 
-    def older_world(self, target="f200"):
+    def older_world(self, target="f200", historical_owner=None):
         return build_older_default_admission_world(
-            LuaRuntime, target=target, source_root=ROOT / "source"
+            LuaRuntime, target=target, source_root=ROOT / "source", historical_owner=historical_owner
         )
 
     def enable_space_age(self, lua, engine_version="2.1.23", recycler=True):
@@ -3808,10 +3808,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           end
         ''')
 
-    def published472_se_world(self):
+    def published472_se_world(self, historical_owner=None):
         # Exact F394 data observation: 151772B05E30D288EC3CD85E62A6B7E3313B6C5F9D89A66EAF0FD66D635A1104.
         # These are native-frame doubles, not an earned source save.
-        lua=self.older_world("f200")
+        lua=self.older_world("f200", historical_owner=historical_owner)
         lua.execute(r'''
           current_se_contract();script.active_mods["space-exploration"]="0.7.57"
           require("runtime.configuration").streams["worker-robots-storage"].max_level=10
@@ -3974,6 +3974,128 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   writes = 0
                   history.default_owner_on_load()
                   assert(writes == 0 and same(settled,all_frames()) and reads == reads_after_apply)
+                ''')
+
+    def test_prepared_addon_change_preserves_old_price_and_refuses_unverified_work(self):
+        cases = {"repriced": None, "unchanged": None, "missing paid tail": "queued research terms changed",
+                 "wrong holder": "does not retain the previous research contract",
+                 "changed paid work": "active research changed", "different add-on": "selection differs"}
+        for case, refusal in cases.items():
+            with self.subTest(case=case):
+                lua = self.published472_se_world("mir-worker-storage-prepared-paid-4")
+                lua.globals().addon_case, lua.globals().expected_refusal = case, refusal
+                lua.execute(r'''
+                  local checkpoint = require("research.worker_storage_checkpoint")
+                  local mir, addon = "more-infinite-research", "research-price-addon"
+                  local successor = script.active_mods[mir]
+                  local old_base_price, new_base_price = 1350, 1350
+                  local ordinary = prototypes.technology[ORDINARY]
+                  local history_prototype = copy(ordinary)
+                  history_prototype.name, history_prototype.hidden = LEGACY517, true
+                  history_prototype.enabled, history_prototype.visible_when_disabled = false, false
+                  prototypes.technology[LEGACY517] = history_prototype
+                  for _,id in ipairs{CANONICAL,ORDINARY,LEGACY517}do
+                    local prototype = prototypes.technology[id]
+                    prototype.research_unit_count_formula = "1350*1.5^(L-4)"
+                    for _,force in pairs(game.forces)do
+                      local technology = force.technologies[id]
+                      local mt = getmetatable(technology)
+                      local read = mt.__index
+                      mt.__index = function(object,key)
+                        if key == "research_unit_count" then
+                          local price = id == LEGACY517 and old_base_price or new_base_price
+                          return math.floor(price*1.5^(read(object,"level")-4))
+                        end
+                        if key == "prototype" then return prototype end
+                        if key == "research_unit_energy" or key == "research_unit_ingredients" then return prototype[key] end
+                        return read(object,key)
+                      end
+                    end
+                  end
+                  game.tick,game.tick_paused = 210,false
+                  script.active_mods[addon] = "1.0.0"
+                  script.active_mods[mir] = "4.7.20002"
+                  player.technologies[CANONICAL].level = 9
+                  player.research_queue = {CANONICAL,CANONICAL,OTHER}
+                  player.research_progress = 200/10251
+                  local read = function(_,technology) return technology.saved_progress end
+                  local original = checkpoint.capture(read)
+                  original.formula = "1350*1.5^(L-4)"
+                  storage[checkpoint.key] = original
+                  script.active_mods[mir] = successor
+                  assert(history.default_owner_apply(history.default_owner_preflight(older_event("4.7.20002"),nil,true)))
+                  local prior = storage[OWNER_KEY]
+                  local helper = checkpoint.preparation_mod
+                  script.active_mods[helper] = checkpoint.preparation_version
+                  if addon_case == "missing paid tail" then
+                    local tail = player.technologies[OTHER]
+                    tail.research_unit_count,tail.research_unit_energy = 2000,3600
+                    tail.research_unit_ingredients = {{name="automation-science-pack",amount=1}}
+                    tail.saved_progress = .25
+                  end
+                  local saved = checkpoint.capture(read, ORDINARY)
+                  saved.formula, saved.source_mods, saved.purpose = original.formula,copy(script.active_mods),"addon-change"
+                  if addon_case == "missing paid tail" then saved.forces[player.index].paid[OTHER] = nil end
+                  remote = {interfaces={[helper]={checkpoint=true}},call=function() return copy(saved) end}
+                  game.tick_paused = true
+                  script.active_mods[addon] = "1.0.1"
+                  local event={mod_startup_settings_changed=false,mod_changes={[addon]={old_version="1.0.0",new_version="1.0.1"}}}
+                  if addon_case ~= "unchanged" then
+                    new_base_price = 675
+                    for _,id in ipairs{CANONICAL,ORDINARY}do
+                      prototypes.technology[id].research_unit_count_formula = "675*1.5^(L-4)"
+                    end
+                    player.research_progress = 200/5125
+                  end
+                  if addon_case == "wrong holder" then history_prototype.research_unit_count_formula = "675*1.5^(L-4)" end
+                  if addon_case == "changed paid work" then player.research_progress = 199/5125 end
+                  if addon_case == "different add-on" then event.mod_changes[addon].old_version = "0.9.0" end
+                  local before = all_frames()
+                  writes = 0
+                  local ok,plan = pcall(history.default_owner_preflight,event,nil,true)
+                  assert(writes == 0 and same(before,all_frames()) and storage[OWNER_KEY] == prior)
+                  if expected_refusal then
+                    assert(not ok and tostring(plan):find(expected_refusal,1,true),tostring(plan))
+                    return
+                  end
+                  assert(ok,plan)
+                  assert(history.default_owner_apply(plan) and game.tick_paused == false)
+                  local changed = addon_case == "repriced"
+                  local owner = changed and LEGACY517 or ORDINARY
+                  local record = storage[OWNER_KEY]
+                  assert(record.schema == (changed and 4 or 3))
+                  if changed then
+                    assert(record.legacy.owner == LEGACY517 and record.legacy.contract == prior.contract)
+                    assert(record.contract ~= prior.contract and not player.technologies[ORDINARY].enabled)
+                  end
+                  assert(player.current_research.name == owner and player.current_research.research_unit_count == 10251)
+                  assert(player.research_progress == 200/10251 and player.research_queue[2].name == owner)
+                  assert(player.research_queue[3].name == OTHER and player.worker_robots_storage_bonus == before[player.index].bonus)
+                  local successor_frame = all_frames()
+                  writes = 0
+                  history.default_owner_on_load()
+                  assert(writes == 0 and same(successor_frame,all_frames()))
+                  if changed then
+                    local legacy = player.technologies[LEGACY517]
+                    legacy.level = 10
+                    player.research_queue = {LEGACY517,OTHER}; player.research_progress = 0
+                    assert(legacy.research_unit_count == 15377)
+                    assert(not history.default_owner_on_research_finished{research=legacy,by_script=false,tick=211})
+                    legacy.level = 11
+                    player.research_queue = {OTHER}; player.research_progress = 0
+                    gaps[player.index] = true
+                    local earned = player.worker_robots_storage_bonus
+                    assert(history.default_owner_on_research_finished{research=legacy,by_script=false,tick=212})
+                    gaps[player.index] = false
+                    local applied,settled = history.default_owner_on_completion_tick{tick=213}
+                    assert(applied and #settled == 1 and settled[1] == player)
+                    local normal = player.technologies[ORDINARY]
+                    assert(storage[OWNER_KEY].schema == 3 and storage[OWNER_KEY].legacy == nil)
+                    assert(legacy.level == 4 and not legacy.enabled and not normal.enabled)
+                    assert(normal.level == 11 and normal.research_unit_count == 11533)
+                    assert(player.current_research.name == OTHER and player.worker_robots_storage_bonus == earned)
+                    history.default_owner_on_load()
+                  end
                 ''')
 
     def test_472_space_age_requires_proven_worker_history(self):

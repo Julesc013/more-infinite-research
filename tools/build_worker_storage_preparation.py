@@ -16,7 +16,7 @@ VERSION = "0.1.0"
 CHECKPOINT = "research/worker_storage_checkpoint.lua"
 
 
-def build(save, witness_path, output):
+def build(save, witness_path, output, previous_formula=None):
     witness_bytes = witness_path.read_bytes()
     proof = verify_save(save, json.loads(witness_bytes.decode("utf-8-sig")))
     selection = {name: row["version"] for name, row in proof["mods"].items()}
@@ -26,6 +26,8 @@ def build(save, witness_path, output):
         raise ValueError("start with the original save before worker preparation")
     if not all(name.isprintable() and version.isprintable() for name, version in selection.items()):
         raise ValueError("the original mod selection cannot be serialized")
+    if previous_formula is not None and (not previous_formula.isprintable() or len(previous_formula.encode("utf-8")) > 1024):
+        raise ValueError("the observed worker formula cannot be serialized")
     profile = "return {\n" + "".join(
         f"  [{json.dumps(name, ensure_ascii=False)}] = {json.dumps(version)},\n"
         for name, version in sorted(selection.items())
@@ -45,6 +47,13 @@ def build(save, witness_path, output):
             CHECKPOINT: (ROOT / "source" / CHECKPOINT).read_bytes(),
             "LICENSE": (ROOT / "source/LICENSE").read_bytes(),
         }
+        if previous_formula is not None:
+            formula = json.dumps(previous_formula, ensure_ascii=False)
+            members["data.lua"] = (
+                'if mods["more-infinite-research"]:match("^5%.0%.200%d%d$") then\n'
+                f'  data:extend{{{{type="mod-data", name="{NAME}", data={{formula={formula}}}}}}}\n'
+                'end\n'
+            )
         for name, value in members.items():
             package.writestr(zipfile.ZipInfo(f"{root}/{name}"), value, compress_type=zipfile.ZIP_DEFLATED)
     payload = buffer.getvalue()
@@ -65,9 +74,10 @@ def main():
     parser.add_argument("save", type=Path, help="Protected Factorio 2.0.77 predecessor")
     parser.add_argument("--witness", type=Path, required=True, help="Mod versions and data checksums from the original native setup")
     parser.add_argument("--output-directory", type=Path, required=True, help="Private output outside the active mod library")
+    parser.add_argument("--previous-formula", help="Exact worker price formula observed in the verified predecessor")
     args = parser.parse_args()
     try:
-        result = build(args.save, args.witness, args.output_directory)
+        result = build(args.save, args.witness, args.output_directory, args.previous_formula)
     except (OSError, ValueError, zipfile.BadZipFile) as error:
         parser.exit(1, f"{error}\n")
     print(json.dumps(result, sort_keys=True))

@@ -332,6 +332,11 @@ if worker_default_available then
     -- contract. Runtime admission still requires the exact published517
     -- record and frame; emitting this row does not migrate any save by itself.
     technologies[#technologies + 1] = recovery.published517_se_owner(worker_default_authored)
+    local prepared = worker_default_public and mods["mir-worker-storage-preparation"] == "0.1.0"
+      and data.raw["mod-data"] and data.raw["mod-data"]["mir-worker-storage-preparation"]
+    if prepared then
+      technologies[#technologies + 1] = recovery.prepared_paid_owner(worker_default_authored, prepared.data.formula)
+    end
   end
   local owner = recovery.default_owner(worker_default_authored)
   if worker_default_public then
