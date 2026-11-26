@@ -91,6 +91,8 @@ class SaveModChecksumControls(unittest.TestCase):
             root = "mir-worker-storage-preparation_0.1.0"
             self.assertIn(b'["space-exploration"] = "0.7.57"', package.read(f"{root}/profile.lua"))
             self.assertEqual(package.read(f"{root}/LICENSE"), (ROOT / "source/LICENSE").read_bytes())
+            self.assertEqual(package.read(f"{root}/control.lua"),
+                             (ROOT / "tools/worker_storage_preparation.lua").read_text(encoding="utf-8").encode())
             self.assertEqual(package.read(f"{root}/research/worker_storage_checkpoint.lua"),
                              (ROOT / "source/research/worker_storage_checkpoint.lua").read_bytes())
             self.assertNotIn(f"{root}/data.lua", package.namelist())

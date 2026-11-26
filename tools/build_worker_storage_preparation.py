@@ -42,7 +42,7 @@ def build(save, witness_path, output, previous_formula=None):
     with zipfile.ZipFile(buffer, "w") as package:
         members = {
             "info.json": json.dumps(info, indent=2) + "\n",
-            "control.lua": 'require("research.worker_storage_checkpoint").register_legacy_preparation(require("profile"))\n',
+            "control.lua": (ROOT / "tools/worker_storage_preparation.lua").read_text(encoding="utf-8"),
             "profile.lua": profile,
             CHECKPOINT: (ROOT / "source" / CHECKPOINT).read_bytes(),
             "LICENSE": (ROOT / "source/LICENSE").read_bytes(),

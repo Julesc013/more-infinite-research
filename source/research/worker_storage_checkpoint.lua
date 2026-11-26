@@ -1,10 +1,10 @@
 -- Factorio 1.1 can discard current worker research when it converts a save to 2.0.
 -- Record its native terms and queue while the source copy is still paused in 1.1.
-local M = {key="mir_worker_storage_engine_checkpoint", source_base="1.1.110"}
-local MIR, WORKER = "more-infinite-research", "worker-robots-storage-4"
-local ORDINARY, PREPARED_HOLDER = "mir-worker-storage-default-4", "mir-worker-storage-prepared-paid-4"
+local M = {key="mir_worker_storage_engine_checkpoint", source_base="1.1.110",
+  legacy_mir="4.7.20002", canonical_worker="worker-robots-storage-4", ordinary_worker="mir-worker-storage-default-4"}
+local MIR, WORKER, ORDINARY = "more-infinite-research", M.canonical_worker, M.ordinary_worker
 M.preparation_mod, M.preparation_version = "mir-worker-storage-preparation", "0.1.0"
-local LEGACY_MIR, LEGACY_BASE, LEGACY_SE = "4.7.20002", "2.0.77", "0.7.57"
+local LEGACY_BASE, LEGACY_SE = "2.0.77", "0.7.57"
 
 local function require_frame(condition, reason)
   if not condition then error("MIR worker engine upgrade: " .. reason .. ". Keep the original save.", 0) end
@@ -125,7 +125,7 @@ function M.register_source()
   end)
 end
 
-local function matches_selection(active, original)
+function M.matches_preparation_selection(active, original)
   if type(original) ~= "table" then return false end
   for name, version in pairs(original) do
     if name ~= MIR and active[name] ~= version then return false end
@@ -133,79 +133,8 @@ local function matches_selection(active, original)
   for name, version in pairs(active) do
     if name ~= MIR and name ~= M.preparation_mod and original[name] ~= version then return false end
   end
-  return original[MIR] == LEGACY_MIR and original.base == LEGACY_BASE
+  return original[MIR] == M.legacy_mir and original.base == LEGACY_BASE
     and original["space-exploration"] == LEGACY_SE and original[M.preparation_mod] == nil
-end
-
-function M.register_legacy_preparation(original)
-  remote.add_interface(M.preparation_mod, {checkpoint=function() return storage[M.key] end})
-  local version = script.active_mods[MIR]
-  local legacy = version == LEGACY_MIR
-  if not legacy and not (type(version) == "string" and version:match("^5%.0%.200%d%d$")) then return end
-  local function watch_addon_preparation()
-    local saved = storage[M.key]
-    script.on_event(defines.events.on_tick, saved and saved.purpose == "addon-change" and function(event)
-      if event.tick - saved.tick <= 1 then return end
-      storage[M.key] = nil
-      script.on_event(defines.events.on_tick, nil)
-    end or nil)
-  end
-  if legacy then
-    script.on_configuration_changed(function(event)
-      if event.mod_startup_settings_changed then storage.mir_preparation_configuration_changed = true end
-      for name, change in pairs(event.mod_changes) do
-        if name ~= M.preparation_mod and change.old_version ~= change.new_version then
-          storage.mir_preparation_configuration_changed = true
-        end
-      end
-    end)
-  else
-    script.on_load(watch_addon_preparation)
-    script.on_configuration_changed(watch_addon_preparation)
-  end
-  local operation, identity = legacy and "prepare" or "prepare-addon-change", legacy and WORKER or ORDINARY
-  local help = "Administrator or server. Usage: /mir-prepare-legacy-worker <" .. operation .. "|cancel>."
-  commands.add_command("mir-prepare-legacy-worker", help, function(command)
-    local player = command.player_index and game.get_player(command.player_index)
-    local function say(message)
-      if player then player.print(message) else log("[MIR worker preparation] " .. message) end
-    end
-    if command.player_index and not (player and player.admin) then say(help); return end
-    local saved = storage[M.key]
-    if command.parameter == "cancel" and saved and saved.mir == version then
-      game.tick_paused, storage[M.key] = saved.was_paused, nil
-      if not legacy then watch_addon_preparation() end
-      say("Cancelled the worker preparation.")
-    elseif command.parameter == operation then
-      if storage.mir_preparation_configuration_changed or not matches_selection(script.active_mods, original) then
-        say("The old mod selection or startup settings changed. Return to the verified original copy.")
-        return
-      end
-      local ok, state = pcall(M.capture, function(_, technology) return technology.saved_progress end, identity)
-      if not ok then say(state); return end
-      local formula = prototypes.technology[identity].research_unit_count_formula
-      if type(formula) ~= "string" or formula == "" or #formula > 1024 then
-        say("The original infinite worker research formula is unavailable.")
-        return
-      end
-      state.formula, state.source_mods = formula, original
-      if not legacy then
-        local holder = prototypes.technology[PREPARED_HOLDER]
-        if not holder or holder.research_unit_count_formula ~= formula then
-          say("The worker preparation archive must include the previous research price.")
-          return
-        end
-        state.purpose, state.source_mods = "addon-change", {}
-        for name, active_version in pairs(script.active_mods) do state.source_mods[name] = active_version end
-      end
-      if saved and saved.mir == version then state.was_paused = saved.was_paused end
-      game.tick_paused, storage[M.key] = true, state
-      if not legacy then watch_addon_preparation() end
-      say("Worker research recorded. Save this paused copy under a new name and exit.")
-    else
-      say(help)
-    end
-  end)
 end
 
 local function preparation_snapshot(active)
@@ -217,11 +146,11 @@ end
 function M.read_legacy_preparation(event, target)
   local changes = type(event) == "table" and event.mod_changes
   local change = type(changes) == "table" and changes[MIR]
-  if target.id ~= "f200" or type(change) ~= "table" or change.old_version ~= LEGACY_MIR then return nil end
+  if target.id ~= "f200" or type(change) ~= "table" or change.old_version ~= M.legacy_mir then return nil end
   local active = script.active_mods
   if active[M.preparation_mod] == nil then return nil end
   local saved = preparation_snapshot(active)
-  require_frame(type(saved) == "table" and saved.formula ~= nil and matches_selection(active, saved.source_mods),
+  require_frame(type(saved) == "table" and saved.formula ~= nil and M.matches_preparation_selection(active, saved.source_mods),
     "the worker preparation is missing or its mod selection changed")
   return saved
 end
@@ -271,7 +200,7 @@ function M.claim(saved, event, target)
     and type(mir) == "table" and mir.old_version == saved.mir and mir.new_version == active[MIR]
     and active[MIR] == target.distribution_version
   if saved.formula ~= nil then
-    require_frame(matching_package and saved.mir == LEGACY_MIR and active["space-exploration"] == LEGACY_SE
+    require_frame(matching_package and saved.mir == M.legacy_mir and active["space-exploration"] == LEGACY_SE
       and event.mod_startup_settings_changed == false and type(saved.formula) == "string"
       and #saved.formula > 0 and #saved.formula <= 1024,
       "open the prepared Space Exploration copy with its previous mod selection and settings")
