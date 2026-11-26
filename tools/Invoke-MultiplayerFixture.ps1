@@ -14,6 +14,8 @@ param(
   [ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192,
   [switch]$CollectProcessMemoryObservations,
   [switch]$CollectProcessLifetimePeaks,
+  [string]$CalibrationRestartSave,
+  [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$CalibrationRestartSha256,
   # This is an environment-only stop after the fixture's real 120-tick
   # two-client predicate.  It is deliberately opt-in so the qualified Library
   # session continues to use its original profile, identities and GUI path.
@@ -41,6 +43,14 @@ function Assert-Session([bool]$Condition,[string]$Message) {
 }
 $useSessionStorage=$LinuxSessionStoragePlanPath -or $LinuxSessionStoragePlanSha256
 $usePreparationStorage=$LinuxPreparationStoragePlanPath -or $LinuxPreparationStoragePlanSha256
+$calibrationSource=$null
+if($CalibrationRestartSave -or $CalibrationRestartSha256){
+  Assert-Session ($FixtureCase -ceq 'library-paired-browser' -and $CalibrationRestartSave -and $CalibrationRestartSha256) 'calibration requires a paired Browser restart file and SHA-256'
+  $calibrationSource=Get-Item -LiteralPath $CalibrationRestartSave
+  Assert-Session ($calibrationSource -is [IO.FileInfo] -and -not $calibrationSource.LinkType) 'calibration restart input must be an ordinary file'
+  $CalibrationRestartSha256=$CalibrationRestartSha256.ToUpperInvariant()
+  Assert-Session ((Get-FileHash -LiteralPath $calibrationSource.FullName).Hash -ceq $CalibrationRestartSha256) 'calibration restart hash differs'
+}
 if($useSessionStorage -or $usePreparationStorage){
   Assert-Session ($IsLinux -and $null-ne$LinuxPrivateDisplays) 'write-destination plans require the Linux private-display route'
   Assert-Session ($LinuxSessionStoragePlanPath -and $LinuxSessionStoragePlanSha256) 'the session storage plan and SHA-256 must be supplied together'
@@ -1100,6 +1110,7 @@ if($StandaloneIdentityDiscovery){
   [IO.File]::WriteAllText($profile,($selection|ConvertTo-Json -Depth 8)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
 }
 $target=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 (Get-FileHash -LiteralPath $engine).Hash -FixtureCase $FixtureCase -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -SessionExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -StandaloneIdentityDiscovery:$StandaloneIdentityDiscovery -RepoRoot $repo
+if($null -ne $calibrationSource){Assert-Session ($target.paired_arm -ceq 'published') 'fixed restart calibration requires the published Browser arm'}
 $standaloneF210=($target.PSObject.Properties['standalone_f210'] -and $target.standalone_f210 -eq $true)
 $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.space_age_library -eq $true)
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
@@ -1277,6 +1288,12 @@ try {
     $spec.linux_private_displays=$linuxDisplayRuntime
   }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
+  if($null -ne $calibrationSource){
+    $anchor=Join-Path $serverWrite 'calibration-restart-input.zip'
+    [IO.File]::Copy($calibrationSource.FullName,$anchor,$false)
+    Assert-Session ((Get-FileHash -LiteralPath $anchor).Hash -ceq $CalibrationRestartSha256) 'calibration restart copy differs'
+    $spec.calibration_restart=@{path=$anchor;sha256=$CalibrationRestartSha256}
+  }
   if($CollectProcessMemoryObservations){
     Assert-Session ($FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
     $spec.process_memory_observations=$true
