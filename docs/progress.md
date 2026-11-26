@@ -22,6 +22,18 @@ Factorio 2.0.77 completed all 18 matched Foundation III launches of 601 updates 
 
 The draft was private at readback. A one-shot Windows task is scheduled for 18:00 Australia/Sydney on 27 November to wait for the public release ID, then verify anonymous downloads and deliver the identical files to primary `dist`. Windows Library timing and retained-memory acceptance remain open.
 
+## Base save upgrades at Factorio 2.0.77 and 2.1.23 (2026-11-26)
+
+Gunmetal loaded protected saves from the published MIR 4.7.3 Base editions with the private MIR5 packages from `b08944c903946e7eb06369646ff205af4d178ba5`. On headless Factorio 2.0.77, the `4.7.20003` save retained the measured force values, gear recipe productivity and worker level and price. Its original research queue was empty. The new save passed two independent 1,200-update cold loads at checksum `3500596698`. Its tested MIR5 archive is `B18344761487822A7D1FDC10F3A100EA359672E9F0946414E02643F6FED00A24`.
+
+On headless Factorio 2.1.23, the `4.7.21003` save retained cargo capacity five and the paused force's approximately 12.5% paid progress at level six and the 1,518-unit price. Both worker queue entries and the gear research tail retained their order. The player force's active gear research and braking-force tail also survived. Two cold loads of the resulting save matched both forces' recorded state. Its tested MIR5 archive is `76A2131133D2DCA52F19338807EE5DE429CCD461A03DC2F90C53E066EC22ADCE`.
+
+The protected originals retained their SHA-256 hashes. The coordinator reconciled the terminal dispatcher outcome and rehashed all 63 retained native files. The result is `build/qualification/mir5-current-modern-minimum-gunmetal-r01/verified.json` at SHA-256 `66D8E81BC4172DC6CEBBF5033212E21C1237656B223973AADD542F5F246EB32E`. These verdicts cover the two named Base profiles and exact archives.
+
+## Existing Library cold-load diagnostic reused (2026-11-26)
+
+The four retained Gunmetal benchmark loads used the same two restart ZIPs as the failed published controls, with the same Factorio binary, profile and published MIR ZIP. Both loads of each save completed 120 updates and agreed on that save's checksum. Peak RSS varied by 4.37 MiB for the first save and 50.70 MiB for the second. The median difference between the two saves was 43.35 MiB. The same-save spread makes a single load per save insufficient to diagnose the multiplayer memory gap. The retained diagnostic is `build/qualification/mir526-library-restart-diagnostic-gunmetal-r02/verified-restart-diagnostic.json` at SHA-256 `5E1F9EE8F743E086760DDF9AF54A835BE98DC79AA39F85EAE07BC6D5F7AF674B`. The Library comparison still needs repeatable measurements with clients attached.
+
 ## Current Space Exploration force-merge replay (2026-11-26)
 
 Gunmetal replayed two protected saves from published MIR 5.0.20017 on Factorio 2.0.77 with Space Exploration 0.7.57. The private Factorio 2.0 archive SHA-256 `B18344761487822A7D1FDC10F3A100EA359672E9F0946414E02643F6FED00A24` came from dev commit `b08944c903946e7eb06369646ff205af4d178ba5`. The permitted merge transferred the source chest and ordinary labs completed cargo levels 9 and 10 using 12,800 of each of the five original science packs. Both cold loads matched checksum `3898225767`.
