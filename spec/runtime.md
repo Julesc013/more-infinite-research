@@ -61,6 +61,8 @@ Two real clients with different views/languages must join, rejoin and reconnect 
 
 Read-only remote functions must not initialize/repair storage or silently run missing migrations. Return exact native meanings or unavailable data. Observability is bounded: concise reason counts and an explicit support export when requested; no permanent per-event logs or profiler. Deterministic gameplay budgets use ticks/work counts, not wall-clock time.
 
+Register optional MIR commands with Factorio's `commands.add_command` and preserve published names and accepted syntax. Use the `mir-` prefix and positional arguments for new commands. Describe arguments, operations and any administrator or server requirement in native `/help`. Diagnostics may display observed facts or export a requested report without changing gameplay state. An explicit recovery action uses the same ownership and paid-work checks as automatic reconciliation. Supported routine upgrades handle reconciliation during configuration changes. Command registration adds no periodic work. [Factorio console commands](https://wiki.factorio.com/Console) · [Command registration](https://lua-api.factorio.com/latest/classes/LuaCommandProcessor.html)
+
 ## Deterministic execution and saved-state restoration
 
 `RUN-05` — Apply [determinism](determinism.md), especially fixed tick/work scheduling, reconstruction of conditional handlers, presentation isolation and reproducible state transitions. Runtime must not import the Generator. Do not use machine-time budgets to choose which entities receive an effect. Cleanup on disable is explicit one-time work; steady-state inactivity is measured after it.
