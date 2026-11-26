@@ -2676,19 +2676,25 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute(r'''
           boot()
           library.open(player, {query="gear", page=7})
+          local view = storage.mir_library.players[1]
+          view.scroll, view.scroll_to_selection = 7, true
           local before_level, before_queue = gear.level, player.force.research_queue
           local options = {tab="settings", settings_scope="options", search="repair"}
           library.open(player, options)
-          local view = storage.mir_library.players[1]
+          view = storage.mir_library.players[1]
           assert(view.settings_query == "repair" and view.query == "gear",
             "legacy settings search must leave the research query unchanged")
           assert(view.page == 1, "legacy search must retain its published remote page reset")
+          assert(view.scroll == 7 and view.scroll_to_selection == true,
+            "explicit Settings search must retain Research scroll state")
           assert(options.search == "repair" and options.query == nil,
             "legacy search options must remain caller-owned")
           library.open(player, {search="default"})
           view = storage.mir_library.players[1]
           assert(view.tab == "settings" and view.settings_query == "default" and view.query == "gear",
             "legacy search without a tab must use the retained settings tab")
+          assert(view.scroll == 7 and view.scroll_to_selection == true,
+            "retained Settings search must retain Research scroll state")
           library.open(player, {search=""})
           view = storage.mir_library.players[1]
           assert(view.settings_query == "" and view.query == "gear",
@@ -2697,6 +2703,8 @@ class LibraryTests(unittest.TestCase):
           view = storage.mir_library.players[1]
           assert(view.query == "copper" and view.settings_query == "",
             "legacy research search must leave the settings query unchanged")
+          assert(view.scroll == 1 and view.scroll_to_selection == nil,
+            "Research search must still reset the Research scroll state")
           library.open(player, {tab="settings", search=string.rep("x", 161)})
           view = storage.mir_library.players[1]
           assert(view.settings_query == string.rep("x", 160) and view.query == "copper",
