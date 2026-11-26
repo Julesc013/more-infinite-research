@@ -933,21 +933,38 @@ local function default_origin_error(reason, event, state, current, rejected, adv
   recover_error(reason, nil, event, state, current, rejected, advice)
 end
 
-local function require_archived_default_contract(event, state, current, space_age, label)
+local archived_default_work = recovery.archived_default_work
+
+local function matches_archived_worker_settings(values, cap)
+  if type(values) ~= "table" or values.max_level ~= cap or selected_cap ~= cap
+      or selected_enabled ~= archived_default_work.settings.enabled then return false end
+  for key, expected in pairs(archived_default_work.settings) do
+    if values[key] ~= expected then return false end
+  end
+  return true
+end
+
+local function require_archived_default_contract(event, state, current, science, label, formula)
+  local profile = archived_default_work.profiles[science]
   local values = effective_values.streams and effective_values.streams["worker-robots-storage"]
+  if not matches_archived_worker_settings(values, profile.cap) then
+    default_origin_error(label .. " source worker settings differ", event, state, current)
+  end
   local prototype = native_prototype(recovery.canonical)
   local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
-  if type(values) ~= "table" or values.base_cost ~= 200 or values.growth_factor ~= 1.5
-      or values.linear_increment ~= 0 or values.research_time ~= 60 or values.effect_percent ~= 1
-      or values.max_level ~= 0 or values.enabled ~= true or selected_cap ~= 0 or selected_enabled ~= true
-      or prototype.level ~= 4 or prototype.max_level ~= 4294967295
-      or prototype.research_unit_count_formula ~= "675*1.5^(L-4)" or prototype.research_unit_energy ~= 3600
-      or prototype.ignore_tech_cost_multiplier ~= false
-      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
-    default_origin_error(label .. " source requires the resolved default worker work contract", event, state, current)
+  if prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or prototype.research_unit_count_formula ~= (formula or archived_default_work.formula)
+      or prototype.research_unit_energy ~= archived_default_work.energy
+      or prototype.ignore_tech_cost_multiplier ~= archived_default_work.ignore_map_price
+      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= archived_default_work.modifier
+      or profile.visible_effect and effect.hidden == true then
+    default_origin_error(label .. " source worker work contract differs", event, state, current)
   end
-  if not recovery.matches_archived_science(prototype.research_unit_ingredients, space_age and "space_age" or "base") then
-    default_origin_error(label .. " default science differs", event, state, current)
+  if not recovery.matches_archived_science(prototype.research_unit_ingredients, science) then
+    default_origin_error(label .. " source worker science differs", event, state, current)
+  end
+  if profile.prerequisites and not recovery.matches_native_prerequisites(prototype.prerequisites, profile.prerequisites) then
+    default_origin_error(label .. " source worker prerequisites differ", event, state, current)
   end
 end
 
@@ -970,6 +987,14 @@ local function worker_has_known_editors()
   return true
 end
 
+local function matches_official_space_age(active, edition, base)
+  for name in pairs(ENGINE_MODS) do
+    local expected = (name ~= "recycler" or edition == "f210") and base or nil
+    if active[name] ~= expected then return false end
+  end
+  return true
+end
+
 local function published473_space_age_selection(event, change, active)
   -- The configured official set must have remained installed across an
   -- admitted engine patch. The caller verifies synchronized official rows.
@@ -980,14 +1005,9 @@ local function published473_space_age_selection(event, change, active)
     and (base == "2.1.23" or base == "2.1.24"
       or base == "2.1.25" and (not base_change or base_change.old_version == "2.1.24"
         or base_change.old_version == base))
-  if not (f200 or f210)
+  if not (f200 or f210) or not matches_official_space_age(active, target.id, base)
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
       or getmetatable(change) ~= nil then return false end
-  for name in pairs(ENGINE_MODS) do
-    -- The separate recycler mod exists in the admitted 2.1 selection.
-    local expected = (name ~= "recycler" or f210) and base or nil
-    if active[name] ~= expected then return false end
-  end
   local has_other_mods = false
   for name, version in pairs(active) do
     if name ~= MIR and not ENGINE_MODS[name] then
@@ -1057,7 +1077,7 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   if change.old_version == "5.0.20001" then
     return {kind="older-mir501-empty-default", old_version=change.old_version, new_version=active[MIR]}
   end
-  require_archived_default_contract(event, state, current, space_age, "published473")
+  require_archived_default_contract(event, state, current, space_age and "space_age" or "base", "published473")
   -- The exact default tuple has the same native earning/work contract. Keep
   -- pending work in the ordinary transfer path, not the older empty-only path.
   return {kind=empty_source and "published473-idle-default" or "published473-default",
@@ -1072,12 +1092,9 @@ local function published503_sif_removal_origin(event, change, active, current)
       or type(change) ~= "table" or getmetatable(change) ~= nil or change.old_version ~= "5.0.20003"
       or producer_edition(active[MIR]) ~= "f200" or tonumber(active[MIR]:sub(-2)) <= 3
       or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil then return nil end
-  local official = {base=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true}
-  for name in pairs(official) do
-    if active[name] ~= "2.0.77" then return nil end
-  end
+  if not matches_official_space_age(active, "f200", "2.0.77") then return nil end
   for name in pairs(active) do
-    if name ~= MIR and not official[name] then return nil end
+    if name ~= MIR and not ENGINE_MODS[name] then return nil end
   end
   local removed = {["space-is-fake"]="1.0.60", ["cr-commons"]="1.0.27"}
   for name, version in pairs(removed) do
@@ -1086,10 +1103,10 @@ local function published503_sif_removal_origin(event, change, active, current)
         or item.new_version ~= nil then return nil end
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and not removed[name] and (not official[name] or type(item) ~= "table"
+    if name ~= MIR and not removed[name] and (not ENGINE_MODS[name] or active[name] ~= "2.0.77" or type(item) ~= "table"
         or getmetatable(item) ~= nil or item.old_version ~= "2.0.77" or item.new_version ~= "2.0.77") then return nil end
   end
-  require_archived_default_contract(event, nil, current, true, "published503 Space Is Fake")
+  require_archived_default_contract(event, nil, current, "space_age", "published503 Space Is Fake")
   return {kind="published503-sif-empty-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
@@ -1149,33 +1166,7 @@ local function published472_se_origin(event, change, active, state, current, pre
       default_origin_error("published472 SE source requires the unchanged mod selection", event, state, current)
     end
   end
-  if not same_worker_configuration(relevant_worker_configuration(), {
-      enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
-      max_level=10, research_time=60, effect_percent=1,
-    }) or selected_cap ~= 10 or selected_enabled ~= true then
-    default_origin_error("published472 SE source requires its observed worker settings", event, state, current)
-  end
-  local prototype = native_prototype(recovery.canonical)
-  local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
-  if prototype.level ~= 4 or prototype.max_level ~= 4294967295
-      or prototype.research_unit_count_formula ~= (prepared_formula or "675*1.5^(L-4)")
-      or prototype.research_unit_energy ~= 3600
-      or prototype.ignore_tech_cost_multiplier ~= false
-      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 or effect.hidden == true then
-    default_origin_error("published472 SE source work contract differs", event, state, current)
-  end
-  if not recovery.matches_archived_science(prototype.research_unit_ingredients, "f200_se") then
-    default_origin_error("published472 SE source science differs", event, state, current)
-  end
-  local prerequisites = 0
-  for key, prerequisite in pairs(prototype.prerequisites or {}) do
-    local name = type(key) == "string" and key or prerequisite and prerequisite.name
-    if name ~= "worker-robots-storage-3" then
-      default_origin_error("published472 SE source prerequisite differs", event, state, current)
-    end
-    prerequisites = prerequisites + 1
-  end
-  if prerequisites ~= 1 then default_origin_error("published472 SE source prerequisite differs", event, state, current) end
+  require_archived_default_contract(event, state, current, "f200_se", "published472 SE", prepared_formula)
   return {kind="published472-se-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
@@ -1303,11 +1294,8 @@ local function default_origin(event, initializing, state, current, prepared_form
         or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
       default_origin_error("archived uninvested default source requires its qualified engine", event, state, current)
     end
-    for name in pairs(ENGINE_MODS) do
-      local expected = (name ~= "recycler" or archive.edition == "f210") and archive.base or nil
-      if active[name] ~= expected then
-        default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
-      end
+    if not matches_official_space_age(active, archive.edition, archive.base) then
+      default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
     end
     for name, version in pairs(archive.mods) do
       if active[name] ~= version then
@@ -1317,7 +1305,7 @@ local function default_origin(event, initializing, state, current, prepared_form
     if not worker_has_known_editors() then
       default_origin_error("archived uninvested default source has unverified prototype history", event, state, current)
     end
-    require_archived_default_contract(event, state, current, true, "archived uninvested default")
+    require_archived_default_contract(event, state, current, "space_age", "archived uninvested default")
     local kind = archive.paid and "archived-default" or "archived-uninvested-default"
     for name in pairs(active) do
       if name ~= MIR and not ENGINE_MODS[name] and not archive.mods[name] then
@@ -1537,13 +1525,9 @@ end
 
 local function published517_se_configuration()
   local current = relevant_worker_configuration()
-  if current.max_level ~= selected_cap or current.enabled ~= selected_enabled then return false end
   -- A cap limits future admission; it does not change the historical paid
   -- unit contract. Preserve its native work at unlimited and finite caps.
-  return same_worker_configuration(current, {
-    enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5,
-    max_level=current.max_level, research_time=60, effect_percent=1,
-  })
+  return matches_archived_worker_settings(current, current.max_level)
 end
 
 local function published517_se_event(event, owned)

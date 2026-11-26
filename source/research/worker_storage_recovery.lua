@@ -22,6 +22,17 @@ local ARCHIVED_WORKER_SCIENCE = {
   f200_se = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "production-science-pack", "se-rocket-science-pack", "se-material-science-pack-1", "space-science-pack"},
 }
+-- These observed startup values recur in the historical default contracts.
+-- Keep them independent of the current settings defaults.
+M.archived_default_work = {
+  settings={enabled=true, base_cost=200, linear_increment=0, growth_factor=1.5, research_time=60, effect_percent=1},
+  formula="675*1.5^(L-4)", energy=3600, modifier=1, ignore_map_price=false,
+  profiles={
+    base={cap=0},
+    space_age={cap=0},
+    f200_se={cap=10, visible_effect=true, prerequisites={"worker-robots-storage-3"}},
+  },
+}
 -- Historical native worker contracts. Paid admission needs the complete
 -- archived mod selection, because an extra mod could have changed the old price.
 M.archived_default_profiles = {
@@ -167,7 +178,7 @@ function M.matches_archived_science(value, profile)
   return true
 end
 
-local function exact_native_prerequisites(value, names)
+function M.matches_native_prerequisites(value, names)
   local seen, count = {}, 0
   for key, prerequisite in pairs(value or {}) do
     local name = type(key) == "string" and key or type(prerequisite) == "table" and prerequisite.name
@@ -187,7 +198,7 @@ function M.published517_se_contract(source)
   assert(source and source.name == M.canonical and source.level == 4 and source.max_level == MAX,
     "MIR published517 SE source contract is unavailable")
   assert(M.matches_archived_science(source.research_unit_ingredients, "f200_se")
-      and exact_native_prerequisites(source.prerequisites, {"worker-robots-storage-3"}),
+      and M.matches_native_prerequisites(source.prerequisites, M.archived_default_work.profiles.f200_se.prerequisites),
     "MIR published517 SE current contract differs")
   M.fingerprint(source) -- Retain validation of the caller's complete current row.
   local ingredients, prerequisites = {}, {}
@@ -320,7 +331,7 @@ end
 function M.prepared_paid_owner(authored, formula)
   assert(type(formula) == "string" and #formula > 0 and #formula <= 1024, "MIR prepared worker price is unavailable")
   local out = historical_se_owner(authored, M.prepared_paid_id, formula,
-    ARCHIVED_WORKER_SCIENCE.f200_se, {"worker-robots-storage-3"})
+    ARCHIVED_WORKER_SCIENCE.f200_se, M.archived_default_work.profiles.f200_se.prerequisites)
   out.order = "zz[mir-worker-storage-prepared-paid]"
   return out
 end
