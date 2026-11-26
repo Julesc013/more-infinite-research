@@ -38,11 +38,17 @@ def _git_text(primary, *arguments):
     return _git(primary, *arguments).decode("utf-8").strip()
 
 
-def _primary_revision(primary):
+def _require_canonical_checkout(primary):
     root = _git_text(primary, "rev-parse", "--show-toplevel")
     origin = _git_text(primary, "remote", "get-url", "origin")
+    if Path(root).resolve() != primary or not ORIGIN.fullmatch(origin):
+        raise ValueError("The checkout must be from the canonical repository")
+
+
+def _primary_revision(primary):
+    _require_canonical_checkout(primary)
     branch = _git_text(primary, "branch", "--show-current")
-    if Path(root).resolve() != primary or not ORIGIN.fullmatch(origin) or not branch:
+    if not branch:
         raise ValueError("The primary checkout must be on a branch of the canonical repository")
     head = _git_text(primary, "rev-parse", "HEAD")
     ref = f"refs/heads/{branch}"
@@ -297,7 +303,7 @@ def verify_draft(primary, frozen, inventory_sha256, commit, release_id, prerelea
     if identity != inventory["release"]:
         raise ValueError("Release identity differs from the frozen player version")
     primary = primary.resolve(strict=True)
-    _primary_revision(primary)
+    _require_canonical_checkout(primary)
     if _git_text(primary, "rev-parse", commit + "^{tree}") != source["tree"]:
         raise ValueError("The reviewed tag commit differs from the frozen tree")
     tag, title = identity["tag"], identity["title"]

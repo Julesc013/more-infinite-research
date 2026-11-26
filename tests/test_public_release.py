@@ -139,6 +139,7 @@ class PublicReleaseTests(unittest.TestCase):
                 account.assert_called_once_with(self.primary)
 
     def test_private_draft_verifies_fresh_bytes_without_installing(self):
+        self.remote_head = "4" * 40
         result = self.verify_draft()
         self.assertEqual(result["status"], "complete-draft-bytes-verified")
         self.assertEqual(result["assets"], len(self.assets))
@@ -158,13 +159,19 @@ class PublicReleaseTests(unittest.TestCase):
         self.assertFalse(self.destination.exists())
 
     def test_draft_checks_windows_identity_before_github_access(self):
+        receipt = self.frozen / "draft-receipt"
         with (patch.object(readback.os, "name", "nt"),
+              patch.object(readback, "_git", self.fake_git),
+              patch.object(readback, "_primary_revision") as remote_checkout,
               patch.object(readback.subprocess, "check_output", return_value=b"INVALID-EXECUTION-ACCOUNT") as probe,
               patch.object(readback.subprocess, "run") as auth):
             with self.assertRaisesRegex(ValueError, "Checked INVALID-EXECUTION-ACCOUNT"):
-                readback._confirm_draft_account(self.primary)
+                readback.verify_draft(self.primary, self.frozen, self.inventory_sha256, self.commit,
+                                      34, True, receipt)
         self.assertEqual(probe.call_args.args[0][0], "pwsh")
         auth.assert_not_called()
+        remote_checkout.assert_not_called()
+        self.assertFalse(receipt.exists())
 
     def assert_no_asset_downloads(self):
         self.assertTrue(all(url.startswith(readback.API) for url in self.requests))
