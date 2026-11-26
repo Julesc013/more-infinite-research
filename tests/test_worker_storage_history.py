@@ -3866,7 +3866,9 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
         ''')
 
     def test_472_se_checkpoint_authenticates_the_paid_native_frame(self):
-        for case in ("matching", "same-version wrong price", "missing active work", "changed queue"):
+        cases = ("matching", "same-version wrong price", "missing active work", "changed queue",
+                 "planned conquest bonus", "different conquest bonus", "missing conquest plan")
+        for case in cases:
             with self.subTest(case=case):
                 lua = self.published472_se_world()
                 lua.globals().checkpoint_case = case
@@ -3896,6 +3898,10 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   player.research_queue = {CANONICAL,CANONICAL,OTHER}
                   player.research_progress = 200/10251
                   detached.technologies[CANONICAL].saved_progress = .23
+                  local check_conquest = checkpoint_case:find("conquest",1,true) ~= nil
+                  if check_conquest then
+                    foreign_bonus[uninvested.index] = checkpoint_case == "different conquest bonus" and 4 or 3
+                  end
                   script.active_mods[mir] = "4.7.20002"
                   local saved = checkpoint.capture(function(_,technology) return technology.saved_progress end)
                   saved.formula = formula
@@ -3912,12 +3918,20 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   elseif checkpoint_case == "changed queue" then
                     player.research_queue = {CANONICAL,OTHER,CANONICAL}
                   end
+                  local planned
+                  if check_conquest then
+                    foreign_bonus[uninvested.index] = 0
+                    if checkpoint_case ~= "missing conquest plan" then
+                      planned = {force_index=uninvested.index,before=0,after=3}
+                    end
+                  end
                   local before = all_frames()
                   writes = 0
-                  local ok,plan = pcall(history.default_owner_preflight,older_event("4.7.20002"),nil,true)
+                  local ok,plan = pcall(history.default_owner_preflight,older_event("4.7.20002"),nil,true,planned)
                   assert(writes == 0 and same(before,all_frames()) and storage[checkpoint.key] == saved)
-                  if checkpoint_case ~= "matching" then
+                  if checkpoint_case ~= "matching" and checkpoint_case ~= "planned conquest bonus" then
                     local reason = checkpoint_case == "same-version wrong price" and "work contract differs"
+                      or check_conquest and "worker cargo changed"
                       or "same-engine checkpoint progress or queue changed"
                     assert(not ok and tostring(plan):find(reason,1,true),tostring(plan))
                     assert(storage[OWNER_KEY] == nil)
@@ -3932,6 +3946,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   assert(player.research_queue[3].name == OTHER)
                   assert(player.worker_robots_storage_bonus == before[player.index].bonus)
                   assert(detached.technologies[ORDINARY].saved_progress == .23)
+                  if planned then assert(uninvested.worker_robots_storage_bonus == 0) end
                   local settled = all_frames()
                   writes = 0
                   history.default_owner_on_load()

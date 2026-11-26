@@ -142,12 +142,18 @@ end
 
 -- Only zero or absent work may be supplied by the paused source. Any surviving
 -- nonzero progress, force state or queue order has to corroborate that source.
-function M.restore_frame(saved, force, native, equal)
+function M.restore_frame(saved, force, native, equal, planned_bonus)
   local row = saved.forces[force.index]
+  local bonus = force.worker_robots_storage_bonus
+  if saved.formula and planned_bonus and planned_bonus.force_index == force.index
+      and planned_bonus.before == bonus then
+    bonus = planned_bonus.after
+  end
   require_frame(type(row) == "table" and row.name == force.name
-    and row.bonus == force.worker_robots_storage_bonus and row.level == native.next_level
-    and not native.researched and equal(row.terms, worker_terms(native.technology)),
-    "worker level, cargo or science changed on " .. force.name)
+    and row.level == native.next_level and not native.researched,
+    "worker force or level changed on " .. force.name)
+  require_frame(row.bonus == bonus, "worker cargo changed on " .. force.name)
+  require_frame(equal(row.terms, worker_terms(native.technology)), "worker price or science changed on " .. force.name)
   require_frame(type(row.queue) == "table" and type(row.queued_saved) == "table"
     and type(row.paid) == "table" and #row.queue <= 1000
     and progress(row.current_progress) and progress(row.saved_progress),

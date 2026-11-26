@@ -2032,7 +2032,8 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       items[#items + 1] = {force=force, phase=prior.phase, action="pending-unchanged", pending_record=clone(prior)}
     else
       local source = default_frame(force, prepared and recovery.id or recovery.canonical, finished)
-      local restored = checkpoint and engine_checkpoint.restore_frame(checkpoint, force, source, equal_plain)
+      local restored = checkpoint and engine_checkpoint.restore_frame(checkpoint, force, source, equal_plain,
+        context.worker_checkpoint_bonus)
       local public = prepared and default_frame(force, recovery.canonical, finished) or source
       local destination = default_frame(force, id, finished)
       local gate = gate_frame(force, owned ~= nil and context.configuration == true)
@@ -2977,9 +2978,10 @@ function M.default_owner_on_init(route, split_current)
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, route, true))
 end
 
-function M.default_owner_preflight(event, route, split_current)
+function M.default_owner_preflight(event, route, split_current, planned_bonus)
   local owned = owner_record()
-  if storage[engine_checkpoint.key] and not default_active(route, split_current) then
+  local checkpoint = storage[engine_checkpoint.key]
+  if checkpoint and not default_active(route, split_current) then
     recover_error("worker engine checkpoint requires the ordinary worker owner")
   end
   if owned and owned.kind == "provider-retired" then
@@ -2997,7 +2999,9 @@ function M.default_owner_preflight(event, route, split_current)
     return plan
   end
   if not default_active(route, split_current) then return nil end
-  return M.plan_default_owner_transfer(event, route, false, owner_record() and {configuration=true} or nil)
+  local context = owned and {configuration=true} or checkpoint and planned_bonus
+    and {worker_checkpoint_bonus=planned_bonus} or nil
+  return M.plan_default_owner_transfer(event, route, false, context)
 end
 
 function M.default_owner_apply(plan)
