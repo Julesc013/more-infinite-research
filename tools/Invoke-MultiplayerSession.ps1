@@ -1098,8 +1098,12 @@ if($standaloneIdentityDiscovery){
   Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'MIR5Deutsch,MIR5English') 'two client identities must be MIR5English and MIR5Deutsch'
 }
 $linuxPrivateDisplays=$null
+$linuxPairedBrowser = $IsLinux -and $fixtureCase -ceq 'library-paired-browser' -and
+  $engineSha -ceq '09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+Assert-Session (-not $linuxPairedBrowser -or $spec.ContainsKey('linux_private_displays')) 'Linux paired Browser requires private displays'
 if($spec.ContainsKey('linux_private_displays')){
-  Assert-Session ($fixtureCase-ceq'library-multiplayer'-and$apiClientConsumers-and-not$standaloneIdentityDiscovery) 'private displays differ from the current Library route'
+  Assert-Session ($linuxPairedBrowser -or
+    ($fixtureCase-ceq'library-multiplayer'-and$apiClientConsumers-and-not$standaloneIdentityDiscovery)) 'private displays differ from the current Library route'
   Assert-Session ($spec.linux_private_displays-is[System.Collections.IDictionary]) 'private display binding differs'
   $linuxPrivateDisplays=$spec.linux_private_displays
   Assert-Session ($linuxPrivateDisplays.Keys.Count-eq8-and$linuxPrivateDisplays.Contains('python')-and$linuxPrivateDisplays.Contains('display_cli')-and$linuxPrivateDisplays.Contains('display_cli_sha256')-and$linuxPrivateDisplays.Contains('display_module_sha256')-and$linuxPrivateDisplays.Contains('checkout')-and$linuxPrivateDisplays.Contains('probe_display')-and$linuxPrivateDisplays.Contains('probe_display_sha256')-and$linuxPrivateDisplays.Contains('roles')) 'private display binding shape differs'

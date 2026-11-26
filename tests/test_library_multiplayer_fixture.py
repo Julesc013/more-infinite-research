@@ -1709,6 +1709,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Refuse (Profile '5.0.20024' $frozen523) $engine $frozen523
           $held525='3F0285DBA21D5DD9BC2241270F2ECC1DA39E5D2A975C723E60E258B3E10A7F1E'
           Refuse (Profile '5.0.20025' $held525) $engine $held525
+
+          $linuxEngine='09D06EE8543BE7363DD7B061A943D377121D7941E6D3552F32E341D13AFD80A3'
+          $published=Get-Content -LiteralPath 'tests/profiles/library-paired-browser-published-f200-2077.json' -Raw|ConvertFrom-Json -AsHashtable
+          $current=Profile '5.0.20025' '3383B2D7D51A5DDF53022341CC6EDFA702716B3CC08A805027861E47039A64E7'
+          foreach($row in @(@{profile=$published;arm='published'},@{profile=$current;arm='mir5'})){
+            $profile=$row.profile
+            $version=$profile.mods[2].version
+            $hash=$profile.archive_sha256["more-infinite-research_$version.zip"]
+            $profile.engine.sha256=$linuxEngine
+            Refuse $profile $linuxEngine $hash
+            $profile.kind='mir5-library-paired-browser-linux-f200-native-selection'
+            $bound=Assert-MultiplayerFixtureSelection $profile $linuxEngine 'library-paired-browser' $hash 8192 -RepoRoot (Get-Location).Path
+            if(-not$bound.linux_private_displays-or$bound.paired_arm-cne$row.arm-or$bound.mir_archive_sha256-cne$hash){throw 'exact Linux paired arm differs'}
+            Refuse $profile $engine $hash
+            Refuse $profile $linuxEngine ('0'*64)
+          }
         '''
         result = subprocess.run(
             ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
