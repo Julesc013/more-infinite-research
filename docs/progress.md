@@ -22,6 +22,19 @@ Factorio 2.0.77 completed all 18 matched Foundation III launches of 601 updates 
 
 The draft was private at readback. A one-shot Windows task is scheduled for 18:00 Australia/Sydney on 27 November to wait for the public release ID, then verify anonymous downloads and deliver the identical files to primary `dist`. Windows Library timing and retained-memory acceptance remain open.
 
+## Current Space Exploration force-merge replay (2026-11-26)
+
+Gunmetal replayed two protected saves from published MIR 5.0.20017 on Factorio 2.0.77 with Space Exploration 0.7.57. The private Factorio 2.0 archive SHA-256 `B18344761487822A7D1FDC10F3A100EA359672E9F0946414E02643F6FED00A24` came from dev commit `b08944c903946e7eb06369646ff205af4d178ba5`. The permitted merge transferred the source chest and ordinary labs completed cargo levels 9 and 10 using 12,800 of each of the five original science packs. Both cold loads matched checksum `3898225767`.
+
+The ambiguous paid merge was refused during `on_forces_merging`, before the merged event. Its protected input and the shared mod library verified. The dispatcher retained the request through a local observer timeout. The resumed readback verified 92 original files across both cases. The combined receipt is `build/qualification/mir5-current-force-merge-gunmetal-r01/verified-native.json` at SHA-256 `88234B0C17D443BC395732803C1C3E3F2B91DC621573F6269B77BF3C3A1B9514`.
+
+
+## Current Space Is Fake staged provider removal (2026-11-26)
+
+The same private Factorio 2.0 archive replayed a protected paid MIR 5.0.20003 save on Factorio 2.0.77. The two-load path upgraded with Space Is Fake 1.0.60 and cr-commons 1.0.27 installed, then removed both. The saved 1,012-unit price, unfinished worker research and queue order survived. Ordinary labs completed the next cargo level, raising capacity from four to five. Both cold loads matched the saved research frame. The single-load route refused the unrecorded paid removal before writing a successor.
+
+The first run reached its timeout because the observer still expected 5.0.20023. The retry changed that observer version and retained the package and protected inputs. The dispatcher restored the shared library for all five stages. The readback verified 145 original files and retained the first outcome separately. The receipt is `build/qualification/mir5-current-sif-staged-gunmetal-r02/verified-sif-staged-removal.json` at SHA-256 `C1F6CE15E34CADDE81B51F3E2AE4D1CE64807C9FC34A5F757926F9430BC22AAD`.
+
 ## MIR 5.0.27 Space Age and Solar Productivity upgrade replays (2026-11-26)
 
 Both retained reproducer saves passed on the Factorio 2.1 archive `4A21C53F3271D24E2B6EECBF1EEFA2D0566F502182ADFC21EFB554F7EB83C605` from promotion head `df6e0d54a8a8f95215516848f52b217e1aadb443`. All 17 private archives rebuilt and verified. Each native test used a copy of its protected save with only the scenario observer's expected MIR version updated. The protected sources retained their original hashes. [Checked promotion](https://github.com/Julesc013/more-infinite-research/pull/2470)
