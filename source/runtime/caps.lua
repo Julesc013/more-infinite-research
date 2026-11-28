@@ -89,15 +89,13 @@ local function filter_queue(force, limits, unavailable)
   end
   force.research_queue = filtered
   local retained = force.current_research
-  if unavailable then
-    -- The native setter may silently reject an unresearchable remainder. Do
-    -- not report that as preserved foreign/eligible queue state.
-    local actual = force.research_queue or {}
-    if #actual ~= #filtered then error("MIR native queue dropped unselected research", 3) end
-    for index, technology in ipairs(filtered) do
-      if not actual[index] or actual[index].name ~= technology.name then
-        error("MIR native queue changed unselected research order", 3)
-      end
+  -- The native setter may silently reject an unresearchable remainder. Do
+  -- not report that as preserved foreign/eligible queue state on either path.
+  local actual = force.research_queue or {}
+  if #actual ~= #filtered then error("MIR native queue dropped unselected research", 3) end
+  for index, technology in ipairs(filtered) do
+    if not actual[index] or actual[index].name ~= technology.name then
+      error("MIR native queue changed unselected research order", 3)
     end
   end
   if current_name and retained and retained.name == current_name and progress ~= nil then
