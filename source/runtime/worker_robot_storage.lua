@@ -967,12 +967,21 @@ local PUBLISHED473_F210_WORKER_ADDONS = {
 }
 
 local function worker_has_known_editors()
-  if not prototypes or type(prototypes.get_history) ~= "function" then return false end
+  if not prototypes or type(prototypes.get_history) ~= "function" then
+    return false, "worker editor history API is unavailable"
+  end
   local observed = prototypes.get_history("technology", recovery.canonical)
-  if type(observed) ~= "table" or type(observed.changed) ~= "table"
-      or observed.created ~= MIR and not ENGINE_MODS[observed.created] then return false end
+  if type(observed) ~= "table" then return false, "worker editor history is unavailable: " .. type(observed) end
+  if type(observed.changed) ~= "table" then
+    return false, "worker editor history is unavailable: changed=" .. configuration_context.rejected_value(observed.changed)
+  end
+  if observed.created ~= MIR and not ENGINE_MODS[observed.created] then
+    return false, "worker creator is unverified: " .. configuration_context.rejected_value(observed.created)
+  end
   for _, editor in pairs(observed.changed) do
-    if editor ~= MIR and not ENGINE_MODS[editor] then return false end
+    if editor ~= MIR and not ENGINE_MODS[editor] then
+      return false, "worker editor is unverified: " .. configuration_context.rejected_value(editor)
+    end
   end
   return true
 end
@@ -980,7 +989,10 @@ end
 local function matches_official_space_age(active, edition, base)
   for name in pairs(ENGINE_MODS) do
     local expected = (name ~= "recycler" or edition == "f210") and base or nil
-    if active[name] ~= expected then return false end
+    if active[name] ~= expected then
+      return false, "official selection differs: " .. configuration_context.value(name) .. "="
+        .. configuration_context.rejected_value(active[name]) .. " expected=" .. configuration_context.rejected_value(expected)
+    end
   end
   return true
 end
@@ -995,29 +1007,40 @@ local function published473_space_age_selection(event, change, active)
     and (base == "2.1.23" or base == "2.1.24"
       or base == "2.1.25" and (not base_change or base_change.old_version == "2.1.24"
         or base_change.old_version == base))
-  if not (f200 or f210) or not matches_official_space_age(active, target.id, base)
-      or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
-      or getmetatable(change) ~= nil then return false end
+  if not (f200 or f210) then return false, "predecessor and engine are outside the qualified Space Age route" end
+  local official, reason = matches_official_space_age(active, target.id, base)
+  if not official then return false, reason end
+  if getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil
+      or getmetatable(change) ~= nil then return false, "configuration event is not a plain table" end
   local has_other_mods = false
   for name, version in pairs(active) do
     if name ~= MIR and not ENGINE_MODS[name] then
       -- Current editor history cannot establish the predecessor's price.
-      if not f210 or PUBLISHED473_F210_WORKER_ADDONS[name] ~= version then return false end
+      if not f210 or PUBLISHED473_F210_WORKER_ADDONS[name] ~= version then
+        return false, "addon predecessor is unverified: " .. configuration_context.value(name) .. "="
+          .. configuration_context.rejected_value(version)
+      end
       has_other_mods = true
     end
   end
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR then
       if type(item) ~= "table" or getmetatable(item) ~= nil
-          or type(item.new_version) ~= "string" or item.new_version ~= active[name] then return false end
+          or type(item.new_version) ~= "string" or item.new_version ~= active[name] then
+        return false, "mod change is inconsistent: " .. configuration_context.row_pair(name, item)
+          .. " active=" .. configuration_context.rejected_value(active[name])
+      end
       if ENGINE_MODS[name] then
-        if active[name] ~= base then return false end
-      elseif not f210 or item.old_version ~= item.new_version then return false end
+        if active[name] ~= base then return false, "official mod change differs: " .. configuration_context.row_pair(name, item) end
+      elseif not f210 or item.old_version ~= item.new_version then
+        return false, "addon selection changed: " .. configuration_context.row_pair(name, item)
+      end
     end
   end
   -- Verify the current prototype too. The caller checks the archived price,
   -- science and native work before any transfer.
-  return not has_other_mods or worker_has_known_editors()
+  if not has_other_mods then return true end
+  return worker_has_known_editors()
 end
 
 local function older_default_origin(event, change, active, base_hop, state, current, empty_source)
@@ -1028,8 +1051,10 @@ local function older_default_origin(event, change, active, base_hop, state, curr
   end
   local space_age = active["space-age"] ~= nil
   if space_age then
-    if not published473_space_age_selection(event, change, active) then
-      default_origin_error("published473 Space Age worker origin or prototype history is unverified", event, state, current)
+    local admitted, reason = published473_space_age_selection(event, change, active)
+    if not admitted then
+      default_origin_error("published473 Space Age worker origin or prototype history is unverified: " .. reason,
+        event, state, current)
     end
   else
     for _, name in ipairs({"quality", "elevated-rails", "recycler"}) do
@@ -1284,16 +1309,20 @@ local function default_origin(event, initializing, state, current, prepared_form
         or getmetatable(event) ~= nil or getmetatable(event.mod_changes) ~= nil or getmetatable(change) ~= nil then
       default_origin_error("archived uninvested default source requires its qualified engine", event, state, current)
     end
-    if not matches_official_space_age(active, archive.edition, archive.base) then
-      default_origin_error("archived uninvested default source requires its official mod selection", event, state, current)
+    local official, selection_reason = matches_official_space_age(active, archive.edition, archive.base)
+    if not official then
+      default_origin_error("archived uninvested default source requires its official mod selection: " .. selection_reason,
+        event, state, current)
     end
     for name, version in pairs(archive.mods) do
       if active[name] ~= version then
         default_origin_error("archived uninvested default source requires its qualified dependency versions", event, state, current)
       end
     end
-    if not worker_has_known_editors() then
-      default_origin_error("archived uninvested default source has unverified prototype history", event, state, current)
+    local known_editors, editor_reason = worker_has_known_editors()
+    if not known_editors then
+      default_origin_error("archived uninvested default source has unverified prototype history: " .. editor_reason,
+        event, state, current)
     end
     require_archived_default_contract(event, state, current, "space_age", "archived uninvested default")
     local kind = archive.paid and "archived-default" or "archived-uninvested-default"

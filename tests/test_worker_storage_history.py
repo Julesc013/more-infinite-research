@@ -4382,12 +4382,12 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
             ('script.active_mods["Krastorio2-spaced-out"]="2.0.18"', "qualified dependency versions"),
             ('archived_event.mod_changes["more-infinite-research"].old_version="4.6.21001"',
              "unrecorded default source has no qualified MIR5 producer"),
-            ('script.active_mods.recycler=nil', "requires its official mod selection"),
+            ('script.active_mods.recycler=nil', "official selection differs: recycler=absent expected=2.1.23"),
             ('prototypes.technology[CANONICAL].research_unit_count_formula="676*1.5^(L-4)"',
              "canonical4/full default4 contract or custody differs"),
             ('local prior=prototypes.get_history;prototypes.get_history=function(kind,name) '
              'local observed=prior(kind,name);if name==CANONICAL then observed.changed={"unknown-worker-editor"} end;'
-             'return observed end', "unverified prototype history"),
+             'return observed end', "unverified prototype history: worker editor is unverified: unknown-worker-editor"),
         ):
             with self.subTest(change=change):
                 lua = self.archived_k2_worker_world()
@@ -4892,6 +4892,43 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
                   local before=all_frames();writes=0
                   assert(not pcall(history.default_owner_preflight,event,nil,true))
                   assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                ''')
+
+    def test_473_space_age_refusal_names_the_failed_observation_without_writes(self):
+        cases = (
+            ('script.active_mods["unreviewed-addon"]="1.0.0"',
+             "addon predecessor is unverified: unreviewed-addon=1.0.0"),
+            ('script.active_mods["Return-Inserter"]="1.0.1"',
+             "addon predecessor is unverified: Return-Inserter=1.0.1"),
+            ('script.active_mods["Return-Inserter"]="1.0.0"; '
+             'event.mod_changes["Return-Inserter"]={old_version="0.9.9",new_version="1.0.0"}',
+             "addon selection changed: Return-Inserter=0.9.9->1.0.0"),
+            ('event.mod_changes.removed={old_version="1.0.0"}',
+             "mod change is inconsistent: removed=1.0.0->unknown active=absent"),
+            ('script.active_mods["Return-Inserter"]="1.0.0"',
+             "worker editor history is unavailable: changed=absent"),
+            ('script.active_mods["Return-Inserter"]="1.0.0"; '
+             'local read=prototypes.get_history;prototypes.get_history=function(kind,id) '
+             'local result=read(kind,id);if id==CANONICAL then result.changed={"foreign-editor"} end;return result end',
+             "worker editor is unverified: foreign-editor"),
+            ('script.active_mods.recycler=nil',
+             "official selection differs: recycler=absent expected=2.1.24"),
+            ('script.active_mods["unreviewed-addon"]=string.char(10).."version"',
+             "addon predecessor is unverified: unreviewed-addon=\\x0Aversion"),
+        )
+        for change, expected in cases:
+            with self.subTest(expected=expected):
+                lua = self.older_world("f210")
+                self.enable_space_age(lua, "2.1.24")
+                lua.globals().expected = expected
+                lua.execute(r'''
+                  seed_owner()
+                  local event=older_event("4.7.21003",false)
+                ''' + change + r'''
+                  local before=all_frames();writes=0
+                  local ok,message=pcall(history.default_owner_preflight,event,nil,true)
+                  assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                  assert(tostring(message):find(expected,1,true),tostring(message))
                 ''')
 
     def test_473_f200_space_age_only_admits_unchanged_official_2077(self):
