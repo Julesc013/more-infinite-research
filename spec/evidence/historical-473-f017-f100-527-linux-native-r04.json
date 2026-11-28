@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "kind": "MIR527HistoricalSameEditionIndependentReadbackV1",
+  "status": "passed",
+  "input_kind": "new protected fixture saves earned with exact published MIR 4.7.3 archives",
+  "candidate_revision": "30e2f04abd5e49d4efb7497e289335dd1434c698",
+  "controller_revision": "30ec6a72a10a653268a86eeeb28c815b51a46f50",
+  "packet_sha256": "2EB43DA6716F7656C5AF90C31C7F053870D554D61907152C93D399379C8E835A",
+  "dispatcher_terminal_sha256": "46D99B764181771B7C2E266D4AD88A1180AFD07E579BD59EF5352BC77DCFB737",
+  "lab_completions": 4,
+  "cold_loads": 8,
+  "native_processes": 14,
+  "cases": [
+    {
+      "target": "f017",
+      "stage": "published",
+      "engine": "0.17.79",
+      "engine_sha256": "D5C1C716EAFAECEB1CE64F0AC7B2191F5E9E11521B802DE11276FCBCD26C499C",
+      "archive_sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+      "input_save_sha256": null,
+      "save_sha256": "CC69C5637C32841B24012D3E65A0FF8F47F6FF121374EA2B7FD24B54823199F6",
+      "lab_completions": 1,
+      "mining_bonus": 0.05,
+      "active_research": "recipe-prod-research_character_mining_speed-1",
+      "research_progress": 0.42,
+      "cold_loads": 2,
+      "native_processes": 4,
+      "direct_library_restored": true
+    },
+    {
+      "target": "f017",
+      "stage": "mir5",
+      "engine": "0.17.79",
+      "engine_sha256": "D5C1C716EAFAECEB1CE64F0AC7B2191F5E9E11521B802DE11276FCBCD26C499C",
+      "archive_sha256": "9C1AD25A861ED47E42AB6BD5FEE68833D901483A453ADE933B9A7BEC01495939",
+      "input_save_sha256": "CC69C5637C32841B24012D3E65A0FF8F47F6FF121374EA2B7FD24B54823199F6",
+      "save_sha256": "A67B180719AF8D3918A87D79166EEBB5AD526B2102DD559F1C6FC0D693341F47",
+      "lab_completions": 1,
+      "mining_bonus": 0.1,
+      "active_research": "braking-force-1",
+      "research_progress": 0,
+      "cold_loads": 2,
+      "native_processes": 3,
+      "direct_library_restored": true
+    },
+    {
+      "target": "f100",
+      "stage": "published",
+      "engine": "1.0.0",
+      "engine_sha256": "E4BB738FA201F3199AB150F9D782C938643CFD7DC5252D56275A4569750D589B",
+      "archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+      "input_save_sha256": null,
+      "save_sha256": "2E79D62116CAF6C59A146703CD2CAB828120CA659D5F663DC12B14BD3C934B71",
+      "lab_completions": 1,
+      "mining_bonus": 0.05,
+      "active_research": "recipe-prod-research_character_mining_speed-1",
+      "research_progress": 0.42,
+      "cold_loads": 2,
+      "native_processes": 4,
+      "direct_library_restored": true
+    },
+    {
+      "target": "f100",
+      "stage": "mir5",
+      "engine": "1.0.0",
+      "engine_sha256": "E4BB738FA201F3199AB150F9D782C938643CFD7DC5252D56275A4569750D589B",
+      "archive_sha256": "6AF80BEAB3FCF8291432A2A5E09CCA28B746E2F957757F573AA78F01833B55F9",
+      "input_save_sha256": "2E79D62116CAF6C59A146703CD2CAB828120CA659D5F663DC12B14BD3C934B71",
+      "save_sha256": "D3642A0599663B659E9F22C2DD6197E9353A28D7A24D648033D91E6CAE278275",
+      "lab_completions": 1,
+      "mining_bonus": 0.1,
+      "active_research": "braking-force-1",
+      "research_progress": 0,
+      "cold_loads": 2,
+      "native_processes": 3,
+      "direct_library_restored": true
+    }
+  ],
+  "stable_acceptance": false,
+  "release_tag": "v5.0.27",
+  "published_predecessor_tag": "v4.7.3",
+  "fixture_oracles": "spec/evidence/historical-473-f017-f100-7a2-native-chain-r01.json",
+  "custody": {
+    "archive": "build/qualification/mir527-historical-linux-r04/verified-native-readback.zip",
+    "archive_sha256": "C7659C5E08D8C8B9B9CD38608748C04BD07E0BC0AD396E1356EE976E2273645E",
+    "archive_bytes": 2575583,
+    "archive_members": 27,
+    "readback_sha256": "02EE36DF033F97A7D05765928FA0A1EECF92274495CE00D5A9ED81F7735FE755"
+  },
+  "prior_refusals": [
+    {
+      "request": "mir527-historical-gunmetal-r01",
+      "factorio_processes": 0,
+      "cause": "Actor ZIP absent before launch",
+      "terminal_sha256": "2BB8D03E48D5ABBCFF963EBB5CEDFCD7D5F3B9B044D933DC76D2AA39A9A8FF23"
+    },
+    {
+      "request": "mir527-historical-gunmetal-r02",
+      "factorio_processes": 0,
+      "cause": "Linux plan used text for the numeric mount identity",
+      "terminal_sha256": "0B0EFD81DB160382EECE648AA61A756F17034F0C81C3159FB7367D5117365D10"
+    },
+    {
+      "request": "mir527-historical-gunmetal-r03",
+      "factorio_processes": 0,
+      "cause": "Storage precheck caught the unwrapped observation before submission",
+      "packet_sha256": "CE7415F25212AF48FAD80568F5FCF6D13DF94B38DB0D4E99185988B8AB6B7DD1"
+    }
+  ],
+  "limits": [
+    "Same-edition controlled save transitions on Linux, with newly earned source saves and the exact published predecessor and frozen candidate archives.",
+    "The unchanged lab, queue and read-only load oracles exercised the direct character-mining family and the queued braking-force follower.",
+    "The complete raw local capsule contains the synthetic saves, controller receipts and native stage logs. Performance, other editions, other migrations, and stable publication require their own evidence."
+  ]
+}
