@@ -267,6 +267,44 @@ class CapsTests(unittest.TestCase):
           assert(foreign.level == 1 and not foreign.enabled and not foreign.researched)
         ''')
 
+    def test_ordinary_cap_keeps_foreign_duplicate_queue_and_work(self):
+        self.lua.execute('''
+          local capped = technology("bronze", 5, true)
+          local first, second = technology("foreign-first", 1, true), technology("foreign-second", 1, true)
+          first.saved_progress, second.saved_progress = .17, .27
+          local f = force(1, {bronze=capped, [first.name]=first, [second.name]=second},
+            {first, capped, second, first}, first, .42)
+          local _, result = caps.reconcile(f, {bronze=4}, {})
+          assert(result.queue_changed and result.removed_current == nil and result.unresolved_current == nil)
+          assert(#f.research_queue == 3 and f.research_queue[1] == first
+            and f.research_queue[2] == second and f.research_queue[3] == first)
+          assert(f.current_research == first and f.research_progress == .42)
+          assert(first.saved_progress == .17 and second.saved_progress == .27)
+        ''')
+
+    def test_ordinary_cap_rejects_native_loss_or_reordering_of_retained_queue(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"drop", "duplicate", "reorder"}) do
+            local capped = technology("bronze", 5, true)
+            local first, second = technology("foreign-first", 1, true), technology("foreign-second", 1, true)
+            first.saved_progress, second.saved_progress = .17, .27
+            local f = force(1, {bronze=capped, [first.name]=first, [second.name]=second},
+              {capped, first, second, first}, capped, .42)
+            local native_set = getmetatable(f).__newindex
+            getmetatable(f).__newindex = function(self, key, value)
+              if key == "research_queue" then
+                if mode == "drop" then value = {} end
+                if mode == "duplicate" then value = {first, second} end
+                if mode == "reorder" then value = {second, first, first} end
+              end
+              native_set(self, key, value)
+            end
+            local ok, message = pcall(caps.reconcile, f, {bronze=4}, {})
+            assert(not ok and tostring(message):find("unselected research", 1, true), mode)
+            assert(first.saved_progress == .17 and second.saved_progress == .27)
+          end
+        ''')
+
     def test_unrepresentable_current_work_refuses_before_queue_cancellation(self):
         self.lua.execute('''
           for _, progress in ipairs({-1, 1, math.huge, 0/0}) do
