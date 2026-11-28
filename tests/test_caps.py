@@ -18,7 +18,7 @@ class CapsTests(unittest.TestCase):
 
           function technology(name, level, enabled)
             return {name = name, level = level, enabled = enabled ~= false,
-              researched = false, visible_when_disabled = false}
+              researched = false, visible_when_disabled = false, saved_progress = 0}
           end
 
           function force(index, technologies, queue, current, progress)
@@ -44,6 +44,19 @@ class CapsTests(unittest.TestCase):
                 end
               end
             })
+          end
+
+          function park_on_cancellation(world)
+            local mt = getmetatable(world)
+            local native_set = mt.__newindex
+            mt.__newindex = function(self, key, value)
+              local current = self.current_research
+              local progress = self.research_progress
+              native_set(self, key, value)
+              if key == "research_queue" and current and self.current_research ~= current then
+                current.saved_progress = progress
+              end
+            end
           end
         ''')
 
@@ -140,10 +153,49 @@ class CapsTests(unittest.TestCase):
         self.lua.execute('''
           local speed = technology("worker-robots-speed-6", 11, true)
           local f = force(5, {[speed.name] = speed}, {speed}, speed, .8)
+          park_on_cancellation(f)
           local _, result = caps.reconcile(f, {[speed.name] = 10}, {})
           assert(result.queue_changed and result.removed_current == speed.name
             and result.unresolved_current == nil)
           assert(#f.research_queue == 0 and f.current_research == nil and f.research_progress == nil)
+          assert(speed.saved_progress == .8 and speed.level == 11)
+        ''')
+
+    def test_over_cap_cancellation_checks_parked_work_and_refuses_conflicting_work(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"parks-active", "drops-active", "distinct-slots"}) do
+            local capped = technology("capped", 11, true)
+            local next_job = technology("next-job", 1, true)
+            next_job.saved_progress = .27
+            if mode == "distinct-slots" then capped.saved_progress = .19 end
+            local queue = {capped, next_job}
+            local f = force(5, {capped=capped, [next_job.name]=next_job}, queue, capped, .42)
+            local mt = getmetatable(f)
+            local native_set = mt.__newindex
+            local queue_writes = 0
+            mt.__newindex = function(self, key, value)
+              if key ~= "research_queue" then native_set(self, key, value); return end
+              queue_writes = queue_writes + 1
+              if mode == "parks-active" then capped.saved_progress = self.research_progress end
+              native_set(self, key, value)
+              rawset(self, "research_progress", next_job.saved_progress)
+              next_job.saved_progress = 0
+            end
+            local owned = {}
+            local ok, value, result = pcall(caps.reconcile, f, {capped=10}, owned)
+            if mode == "parks-active" then
+              assert(ok and result.removed_current == "capped" and queue_writes == 1)
+              assert(capped.saved_progress == .42 and capped.level == 11 and not capped.enabled)
+              assert(f.current_research == next_job and f.research_progress == .27 and next_job.saved_progress == 0)
+            elseif mode == "drops-active" then
+              assert(not ok and tostring(value):find("did not retain suspended research progress", 1, true), mode)
+              assert(queue_writes == 1 and capped.enabled and next(owned) == nil)
+            else
+              assert(not ok and tostring(value):find("distinct suspended research", 1, true), mode)
+              assert(queue_writes == 0 and f.research_queue == queue and f.research_progress == .42)
+              assert(capped.saved_progress == .19 and next(owned) == nil)
+            end
+          end
         ''')
 
     def test_unqueued_over_cap_current_is_reported_without_guessing_a_native_write(self):
@@ -203,12 +255,14 @@ class CapsTests(unittest.TestCase):
           local braking = technology("braking-force-8", 8, true)
           local f = force(8, {[belts.name] = belts, [braking.name] = braking},
             {belts, braking}, belts, .33)
+          park_on_cancellation(f)
           local _, result = caps.reconcile(f, {[belts.name] = 4, [braking.name] = 7}, {},
             {[belts.name] = true})
           assert(result.queue_changed and #f.research_queue == 1
             and f.research_queue[1] == braking)
           assert(f.current_research == braking and f.research_progress == 0,
             "the native queue replacement owns cancellation of only the selected current research")
+          assert(belts.saved_progress == .33)
           assert(not belts.enabled and braking.enabled,
             "a named reconciliation changed another family")
         ''')
@@ -302,6 +356,131 @@ class CapsTests(unittest.TestCase):
             local ok, message = pcall(caps.reconcile, f, {bronze=4}, {})
             assert(not ok and tostring(message):find("unselected research", 1, true), mode)
             assert(first.saved_progress == .17 and second.saved_progress == .27)
+          end
+        ''')
+
+    def test_queue_rewrite_requires_readback_even_when_retained_queue_is_empty(self):
+        self.lua.execute('''
+          local capped = technology("bronze", 5, true)
+          local f = force(1, {bronze=capped}, {capped}, capped, .42)
+          local mt = getmetatable(f)
+          local native_set = mt.__newindex
+          mt.__newindex = function(self, key, value)
+            native_set(self, key, value)
+            if key == "research_queue" then rawset(self, "_queue", nil) end
+          end
+          local ok, message = pcall(caps.reconcile, f, {bronze=4}, {})
+          assert(not ok and tostring(message):find("queue readback unavailable", 1, true), tostring(message))
+        ''')
+
+    def test_retained_progress_is_checked_after_the_native_write(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"ok", "ignored", "queue-change", "parked-change"}) do
+            local capped = technology("bronze", 5, true)
+            local first = technology("foreign-first", 1, true)
+            local follower = technology("foreign-follower", 1, true)
+            follower.saved_progress = .27
+            local f = force(1, {bronze=capped, [first.name]=first, [follower.name]=follower},
+              {first, capped, follower, first}, first, .42)
+            local mt = getmetatable(f)
+            local native_get, native_set = mt.__index, mt.__newindex
+            local progress, writes = .42, 0
+            rawset(f, "research_progress", nil)
+            mt.__index = function(self, key)
+              if key == "research_progress" then return progress end
+              return native_get(self, key)
+            end
+            mt.__newindex = function(self, key, value)
+              if key == "research_progress" then
+                writes = writes + 1
+                assert(value == .42 and self.current_research == first)
+                if mode ~= "ignored" then progress = value end
+                if mode == "queue-change" then rawset(self, "_queue", {first, follower}) end
+                if mode == "parked-change" then follower.saved_progress = .19 end
+                return
+              end
+              native_set(self, key, value)
+              if key == "research_queue" then progress = 0 end
+            end
+            local ok, message = pcall(caps.reconcile, f, {bronze=4}, {})
+            assert(writes == 1 and f.current_research == first)
+            if mode == "ok" then
+              assert(ok and progress == .42 and #f.research_queue == 3 and f.research_queue[3] == first)
+            else
+              local expected = ({ignored="did not retain current research progress", ["queue-change"]="dropped unselected research",
+                ["parked-change"]="changed suspended research work"})[mode]
+              assert(not ok and tostring(message):find(expected, 1, true), mode .. ": " .. tostring(message))
+            end
+          end
+        ''')
+
+    def test_research_level_or_head_change_refuses_before_reusing_progress(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"new-level", "different-head"}) do
+            local capped = technology("bronze", 5, true)
+            local first = technology("foreign-first", 3, true)
+            local follower = technology("foreign-follower", 1, true)
+            local f = force(1, {bronze=capped, [first.name]=first, [follower.name]=follower},
+              {first, capped, follower, first}, first, .42)
+            local mt = getmetatable(f)
+            local native_set = mt.__newindex
+            local unexpected_write = false
+            mt.__newindex = function(self, key, value)
+              if key == "research_progress" then unexpected_write = true; return end
+              native_set(self, key, value)
+              if key == "research_queue" then
+                rawset(self, "research_progress", nil)
+                if mode == "new-level" then first.level = 4
+                else rawset(self, "current_research", follower) end
+              end
+            end
+            local ok, message = pcall(caps.reconcile, f, {bronze=4}, {})
+            assert(not ok and tostring(message):find("changed current research", 1, true), mode .. ": " .. tostring(message))
+            assert(not unexpected_write and f.research_progress == nil)
+          end
+        ''')
+
+    def test_parking_removed_current_preserves_new_current_and_suspended_followers(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"preserve", "retain-existing-parked", "change-new-current", "overwrite-existing-work"}) do
+            local unavailable = technology("bronze", 5, false)
+            local next_research = technology("foreign-next", 1, true)
+            local follower = technology("foreign-follower", 1, true)
+            next_research.saved_progress, follower.saved_progress = .27, .19
+            local original = {unavailable, next_research, follower}
+            local f = force(1, {bronze=unavailable, [next_research.name]=next_research, [follower.name]=follower},
+              original, unavailable, mode == "retain-existing-parked" and 0 or .42)
+            local mt = getmetatable(f)
+            local native_set = mt.__newindex
+            mt.__newindex = function(self, key, value)
+              native_set(self, key, value)
+              if key == "research_queue" then
+                rawset(self, "research_progress", next_research.saved_progress)
+                next_research.saved_progress = 0
+              end
+            end
+            local saved = (mode == "retain-existing-parked" or mode == "overwrite-existing-work") and .17 or 0
+            rawset(unavailable, "saved_progress", nil)
+            setmetatable(unavailable, {
+              __index = function(_, key) if key == "saved_progress" then return saved end end,
+              __newindex = function(self, key, value)
+                if key ~= "saved_progress" then rawset(self, key, value); return end
+                saved = value
+                if mode == "change-new-current" then f.research_progress = .13 end
+              end
+            })
+            local ok, result = pcall(caps.remove_unavailable_from_queue, f, {bronze=true})
+            if mode == "preserve" or mode == "retain-existing-parked" then
+              local expected_saved = mode == "preserve" and .42 or .17
+              assert(ok and result.removed_current == "bronze" and saved == expected_saved, tostring(result))
+              assert(f.current_research == next_research and f.research_progress == .27 and follower.saved_progress == .19)
+              assert(#f.research_queue == 2 and f.research_queue[2] == follower)
+            elseif mode == "overwrite-existing-work" then
+              assert(not ok and tostring(result):find("distinct suspended research", 1, true), tostring(result))
+              assert(f.research_queue == original and saved == .17 and f.research_progress == .42)
+            else
+              assert(not ok and tostring(result):find("changed current research while suspending", 1, true), tostring(result))
+            end
           end
         ''')
 

@@ -154,7 +154,7 @@ class CompetingProductivityTests(unittest.TestCase):
             for _, item in ipairs(contract.bindings) do
               force.technologies[item.id] = {
                 name=item.id, valid=true, force=force, level=item.first_level, researched=false,
-                enabled=true, visible_when_disabled=false,
+                enabled=true, visible_when_disabled=false, saved_progress=0,
                 prototype={enabled=true, level=item.first_level, max_level=4294967295, effects={},
                   prerequisites={}}}
               if item.predecessor ~= false then
@@ -416,8 +416,10 @@ class CompetingProductivityTests(unittest.TestCase):
           force.technologies[first.id].enabled = false
           force.technologies[first.id].visible_when_disabled = false
           force.technologies[first.id].prototype.effects[1].change = .10000000149
-          local unrelated = {name="automation", valid=true}
-          force.research_queue = {force.technologies[first.id], unrelated}
+          local unrelated = {name="automation", valid=true, level=1, saved_progress=0}
+          force.technologies[unrelated.name] = unrelated
+          force.research_queue = {unrelated, force.technologies[first.id]}
+          force.current_research, force.research_progress = unrelated, .42
           local runtime = install_competing(true, force)
           assert(runtime.active())
           runtime.on_init()
@@ -634,7 +636,9 @@ class CompetingProductivityTests(unittest.TestCase):
               outer_state = storage.mir_competing_productivity
               assert(outer_state and next(outer_state.owned_disabled) == nil)
               assert(value[1] == retained)
-              t.current_research = value[1]
+              t.current_research.saved_progress = t.research_progress
+              t.current_research, t.research_progress = value[1], value[1].saved_progress
+              value[1].saved_progress = 0
               starts = starts + 1
               if fail_nested then
                 retained.prototype = nil
@@ -658,6 +662,7 @@ class CompetingProductivityTests(unittest.TestCase):
           runtime.on_configuration_changed()
           assert(starts == 1 and #queue == 2 and queue[1] == retained and queue[2] == retained)
           assert(capped.level == 7 and not capped.enabled and retained.enabled)
+          assert(capped.saved_progress == .42)
           assert(storage.mir_competing_productivity == outer_state, "outer restoration ledger detached")
           local rights = outer_state.owned_disabled[force.index]
           assert(rights[capped.name].disabled == true and rights[foreign.name].disabled == false)

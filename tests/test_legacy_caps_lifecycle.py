@@ -1754,8 +1754,8 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           local name="recipe-prod-research_material_bronze-4"
           local bronze=technology(name)
           bronze.level,bronze.enabled,bronze.saved_progress,bronze.prototype.enabled=5,true,0,false
-          local capped=worker("worker-robots-speed-6");capped.level,capped.enabled=11,true
-          local eligible=technology("automation");eligible.level,eligible.enabled=1,true
+          local capped=worker("worker-robots-speed-6");capped.level,capped.enabled,capped.saved_progress=11,true,0
+          local eligible=technology("automation");eligible.level,eligible.enabled,eligible.saved_progress=1,true,0
           local f=modern_queued_force(1,{[name]=bronze,[capped.name]=capped,automation=eligible},
             {bronze,bronze,capped,eligible},bronze,.42,true)
           local selected={base="2.1.23",['space-age']="2.1.23",boblibrary="3.0.1",
