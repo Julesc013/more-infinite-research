@@ -33,8 +33,10 @@ local function same_names(left, right)
 end
 
 local function queue_names(force)
+  local queue = force.research_queue
+  if type(queue) ~= "table" then error("MIR Imersite queue unavailable on force " .. force.index, 2) end
   local out = {}
-  for _, technology in ipairs(force.research_queue or {}) do out[#out+1] = technology.name end
+  for _, technology in ipairs(queue) do out[#out+1] = technology.name end
   return out
 end
 
@@ -135,9 +137,13 @@ local function assert_queue_readback(force, names, current, progress)
   if force.research_progress ~= (current and progress or 0) then error("MIR Imersite progress readback differs", 2) end
 end
 
-local function set_queue(force, names, current, progress)
+local function queue_rows(technologies, names)
   local rows = {}
-  for _, id in ipairs(names) do rows[#rows+1] = assert(force.technologies[id], "MIR missing queued technology " .. id) end
+  for _, id in ipairs(names) do rows[#rows+1] = assert(technologies[id], "MIR missing queued technology " .. id) end
+  return rows
+end
+
+local function set_queue(force, rows, names, current, progress)
   force.research_queue = rows
   assert_queue_identity(force,names,current)
   -- Native progress has no setter when no technology is being researched.
@@ -187,7 +193,7 @@ end
 -- The legacy record is read-only evidence of an already held queue. It is
 -- used only when the current queue is still exactly the recorded removal;
 -- intervening player choices take precedence and are never overwritten.
-function M.reconcile_force(force, change, records, legacy)
+local function reconcile_force(force, change, records, legacy, preflight_only)
   local technologies = assert(force.technologies, "MIR missing force technologies")
   local ok, reason = admitted(technologies,change)
   if not ok then
@@ -207,11 +213,14 @@ function M.reconcile_force(force, change, records, legacy)
   local early, tail = before[HOLDERS[1]], before[HOLDERS[2]]
   if not valid_state(early,1) or not valid_state(tail,4) then error("MIR invalid Imersite carrier state",2) end
   if not active(early,1,queue,current,HOLDERS[1]) and not active(tail,4,queue,current,HOLDERS[2]) then
-    M.initialize_force(force,change)
+    if not preflight_only then M.initialize_force(force,change) end
     return false
   end
   if records[force.index] ~= nil then error("MIR Imersite carriers became active after completed handoff",2) end
-  local checkpoint_progress = force.research_progress or 0
+  local checkpoint_progress = force.research_progress
+  if not finite(checkpoint_progress) or checkpoint_progress < 0 or checkpoint_progress > 1 then
+    error("MIR invalid Imersite research progress on force " .. force.index,2)
+  end
   local source_queue, source_current, source_progress = queue, current, checkpoint_progress
   if legacy ~= nil then
     local retry_safe = type(legacy) == "table" and (legacy.phase == "tail-held-no-continuation"
@@ -245,19 +254,25 @@ function M.reconcile_force(force, change, records, legacy)
     local empty = state.level == first and not state.researched and state.saved_progress == 0
     local equal = state.level == target.level and state.researched == target.researched
       and state.saved_progress == target.saved_progress
-    if not empty and not equal then error("MIR conflicting public Imersite state: " .. row[1],2) end
+    if not empty and not equal then
+      error("MIR conflicting public Imersite state: " .. row[1] .. " on force " .. force.index,2)
+    end
   end
+  local destination_rows = queue_rows(technologies,plan.queue)
+  local checkpoint_rows = queue_rows(technologies,queue)
   local bonus = force.recipes[contract.effect.recipe].productivity_bonus
+  if not finite(bonus) then error("MIR invalid Imersite powder bonus on force " .. force.index,2) end
+  if preflight_only then return end
   local applied, failure = pcall(function()
     set_state(technologies[EARLY],plan.early)
     set_state(technologies[TAIL],plan.tail)
-    set_queue(force,plan.queue,plan.current,plan.progress)
+    set_queue(force,destination_rows,plan.queue,plan.current,plan.progress)
     restore_public_flags(technologies,before,plan,source_queue)
     clear(technologies[HOLDERS[1]],1)
     clear(technologies[HOLDERS[2]],4)
     assert_queue_readback(force,plan.queue,plan.current,plan.progress)
     local after = force.recipes[contract.effect.recipe].productivity_bonus
-    if not finite(bonus) or not finite(after) or math.abs(after-bonus) > 0.0000001 then
+    if not finite(after) or math.abs(after-bonus) > 0.0000001 then
       error("MIR Imersite handoff changed the earned powder bonus")
     end
   end)
@@ -269,13 +284,30 @@ function M.reconcile_force(force, change, records, legacy)
       technologies[id].enabled = before[id].enabled
       technologies[id].visible_when_disabled = before[id].visible_when_disabled
     end
-    set_queue(force,queue,current,checkpoint_progress)
+    set_queue(force,checkpoint_rows,queue,current,checkpoint_progress)
     error(tostring(failure),2)
   end
   records[force.index] = {schema=1,status="completed",earned=plan.earned,
     source_early=early,source_tail=tail,queue_before=source_queue,current_before=source_current,
     progress_before=source_progress}
   return true
+end
+
+function M.reconcile_force(force, change, records, legacy)
+  return reconcile_force(force,change,records,legacy,false)
+end
+
+function M.reconcile_forces(forces, change, records, legacy)
+  local checked = {}
+  for _, force in pairs(forces) do
+    reconcile_force(force,change,records,legacy and legacy[force.index] or nil,true)
+    checked[#checked+1] = force
+  end
+  -- Native setters can raise callbacks. Observe and validate each force again
+  -- before applying its handoff instead of writing from a stale preflight.
+  for _, force in ipairs(checked) do
+    M.reconcile_force(force,change,records,legacy and legacy[force.index] or nil)
+  end
 end
 
 return M

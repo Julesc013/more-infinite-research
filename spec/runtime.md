@@ -61,6 +61,8 @@ Two real clients with different views/languages must join, rejoin and reconnect 
 
 Read-only remote functions must not initialize/repair storage or silently run missing migrations. Return exact native meanings or unavailable data. Observability is bounded: concise reason counts and an explicit support export when requested; no permanent per-event logs or profiler. Deterministic gameplay budgets use ticks/work counts, not wall-clock time.
 
+A diagnostic roster emits complete mod-name and version rows in deterministic order up to the report limits and gives the listed and omitted counts. An unavailable queue or roster is reported distinctly from an empty observation.
+
 Supported save transitions with available historical inputs reconcile during Factorio's configuration change. Provide on-demand diagnostics through Factorio's console using `commands.add_command`. Preserve published command names and accepted syntax. For new commands use the `mir-` prefix, positional arguments and localised usage in `/help <command>`. Reply to the issuer. Inspection reads current state, writes a report only on request and schedules no periodic work. An explicit repair requires an administrator or the server console, a known force for force-scoped changes and the same ownership and paid-work checks as automatic reconciliation. When historical evidence is missing, report the required source save or qualified bridge without changing the observed research. [Factorio console commands](https://wiki.factorio.com/Console) · [Command registration](https://lua-api.factorio.com/latest/classes/LuaCommandProcessor.html)
 
 ## Deterministic execution and saved-state restoration

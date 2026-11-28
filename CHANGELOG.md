@@ -11,6 +11,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Check that retained research queue entries survive ordinary cap enforcement.
 - Require a complete native research queue before transferring worker cargo research.
 - Identify the failed check when MIR refuses an older worker cargo upgrade.
+- Check every force before transferring Imersite research after a mod change in Factorio 2.1.
 - Restore descriptions for startup dropdown options.
 - Preserve Research scroll when searching Settings in the Research Library.
 
