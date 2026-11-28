@@ -4,6 +4,25 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 **Development documentation — 2026-11-28:** Adopted the [MIR5 completion plan](docs/implementation/mir5-completion-plan.md), [next-work list](docs/todo.md) and [roadmap](docs/roadmap.md), with architecture, saved-state, API and portable-tooling contracts. These are planning and documentation changes, not released gameplay fixes. Runtime implementation and qualification remain in [progress](docs/progress.md). No source version is consumed and the historical player changelog remains unchanged.
 
+## [5.0.28] - 2026-11-28
+
+### Bugfixes
+
+- Check that retained research queue entries survive ordinary cap enforcement.
+- Require a complete native research queue before transferring worker cargo research.
+- Identify the failed check when MIR refuses an older worker cargo upgrade.
+- Restore descriptions for startup dropdown options.
+- Preserve Research scroll when searching Settings in the Research Library.
+
+### Changes
+
+- Use localized Factorio help for worker cargo recovery and settings commands.
+- Explain that the mining drill research improves manufacturing, while Mining productivity applies to placed drills.
+
+### Optimizations
+
+- Populate family options once per Research Library render and read only the selected declaration for research details.
+
 ## [5.0.27] - 2026-11-27
 
 ### Bugfixes
