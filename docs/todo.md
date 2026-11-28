@@ -18,10 +18,10 @@ Start here, then read the selected work package in the [completion plan](impleme
 
 ## First bounded batch
 
-- [ ] **WP-02 — Advance the remaining cap and queue cases.** The [5.0.28 cap, bridge, Ferrum and Space Exploration checks](progress.md#exact-5028-preservation-checks-2026-11-28) passed in their scoped routes. Observe the protected K2SO successor directly on the candidate and verify its finite and relaxed boundaries with their own native inputs.
+- [ ] **WP-02 — Qualify Imersite preflight on the repaired candidate.** The [earlier 5.0.28 K2SO material continuation](progress.md#k2so-material-caps-and-startup-help-2026-11-28) passed the direct, finite and relaxed boundaries. The repaired Imersite ZIP passed the matching-selection paid-work, lab and cold-load route. Exercise a later-force conflict and recover the exact earlier runner for the separate ADD995 replay.
 - [ ] **WP-03 — Advance the next original incident with available inputs.** Select one discriminating operation from the plan's incident table. For unavailable originals record the missing input and support boundary, then take another ready task. A diagnostic improvement does not close a save case.
-- [ ] **WP-08 — Qualify the merged dropdown-help restoration.** #2502 is integrated; check native rendering of all current option keys and representative localized/fallback text. Preserve the distinction between untranslated new copy and absent help.
-- [ ] **WP-10 — Make the Library comparison valid.** The exact 5.0.28 Windows packet passed offline input checks. Wait for native memory admission and resolve same-build repeatability and restart/client attribution before scoring retained memory or latency. Coordinate through #1768 and the existing native owner.
+- [ ] **WP-09 — Replay the repaired Library archive in two native clients.** Rebind the protected Availability scroll and filter route to the repaired Factorio 2.1 ZIP. Check the normal and narrow views, then observe the affected family choice and retained Research position with their own inputs.
+- [ ] **WP-10 — Make the Library comparison valid.** The repaired 5.0.28 Windows packet passed offline input checks and its governed watcher is live. Wait for native memory admission and resolve same-build repeatability and restart/client attribution before scoring retained memory or latency. Coordinate through #1768 and the existing native owner.
 
 Do these as separate reviewed units. One implementation owner, one independent reviewer and one bounded native worker fit the existing root-plus-two capacity. Ready documentation, source review and narrow host work may continue during an owned native run; builds and host suites must not compete with accepted same-machine timing.
 
