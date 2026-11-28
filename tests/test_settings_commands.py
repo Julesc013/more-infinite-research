@@ -175,12 +175,102 @@ class SettingsCommandsTests(unittest.TestCase):
           local preview=diagnostics.preview(1,nil,{report_omissions=true,availability_rows=rows})
           assert(#preview<=65536 and preview:find("family-250: reason-250",1,true))
           assert(not preview:find("family-251:",1,true) and preview:find("omitted after 250",1,true))
+          local wide=string.rep("x",256)
+          for i=1,250 do rows[i]={family=wide,reason=wide} end
+          script.active_mods={[wide]=wide}
+          local full=diagnostics.preview(1,nil,{report_omissions=true,availability_rows=rows})
+          assert(#full<=65536 and full:find("Report truncated at the 64 KiB limit.",1,true))
+          assert(full:find("Active mods: 0 listed, 1 omitted",1,true))
           assert(#writes==0 and #messages==0)
           helpers.encode_string=function() error("encoding refused") end
           local failed,reason=diagnostics.preview(1,nil,{report_settings=true})
           assert(failed==nil and type(reason)=="string")
           assert(#writes==0 and #messages==0)
         ''')
+
+    def test_startup_roster_retains_the_same_sorted_prefix_in_either_iteration_order(self):
+        first, second = self.lua.execute('''
+          local diagnostics=require("runtime.diagnostics")
+          local versions={base="2.1.23",["more-infinite-research"]="5.0.21000"}
+          local names={"base","more-infinite-research"}
+          for i=1,1050 do
+            local name=string.format("a-pack-%04d",i)
+            versions[name]="1.2.3"
+            names[#names+1]=name
+          end
+          local function snapshot(index,step)
+            script.active_mods=setmetatable(versions,{__pairs=function()
+              return function()
+                index=index+step
+                local name=names[index]
+                if name then return name,versions[name] end
+              end
+            end})
+            diagnostics.startup("initialization")
+            return writes[#writes].data
+          end
+          return snapshot(0,1),snapshot(#names+1,-1)
+        ''')
+        self.assertEqual(first, second)
+        self.assertIn("Active mods: 512 listed, 540 omitted\n", first)
+        self.assertIn("Base: 2.1.23\n", first)
+        self.assertIn("MIR: 5.0.21000\n", first)
+        self.assertEqual(
+            [line for line in first.splitlines() if line.startswith("Mod ")],
+            [f"Mod a-pack-{index:04d}: 1.2.3" for index in range(1, 513)],
+        )
+
+    def test_byte_limited_roster_keeps_complete_rows_and_support_context(self):
+        report = self.lua.execute(r'''
+          local diagnostics=require("runtime.diagnostics")
+          player.force={name="witnessed-force",index=7,research_queue={"unrelated","unrelated"}}
+          helpers.encode_string=function() return string.rep("p",32760) end
+          local versions={}
+          for i=1,400 do
+            versions["m-"..string.rep("\195\169",125)..string.format("%03d",i)]="1.2.3"
+          end
+          versions["a-"..string.rep("x",256)]="1.2.3"
+          versions["b-too-wide"]=string.rep("9",257)
+          script.active_mods=versions
+          local encoded,filename,report=diagnostics.export(1,nil,{report_settings=true})
+          assert(encoded and #writes==2 and writes[2].data==report)
+          assert(writes[1].data==encoded.."\n" and writes[1].path==filename)
+          return report
+        ''')
+        lines = report.splitlines()
+        rows = [line for line in lines if line.startswith("Mod ")]
+        self.assertTrue("Force: witnessed-force" in lines, "roster hid the force observation")
+        self.assertIn("Queue 1: unrelated", lines)
+        self.assertIn("Queue 2: unrelated", lines)
+        self.assertIn("Settings file: script-output/more-infinite-research/settings/mir-settings-profile.txt", lines)
+        self.assertTrue("MIRSET1:" + "p" * 32760 in lines, "selected inline profile was lost")
+        self.assertIn(f"Active mods: {len(rows)} listed, {402 - len(rows)} omitted", lines)
+        self.assertGreater(len(rows), 100)
+        self.assertEqual(rows, [f"Mod m-{'é' * 125}{index:03d}: 1.2.3" for index in range(1, len(rows) + 1)])
+        self.assertLessEqual(len(report.encode("utf-8")), 65536)
+
+    def test_missing_roster_and_queue_are_distinct_from_empty_observations(self):
+        empty, missing, unreadable = self.lua.execute('''
+          local diagnostics=require("runtime.diagnostics")
+          local function preview()
+            return diagnostics.preview(1,nil,{report_settings=false})
+          end
+          script.active_mods={}
+          player.force={research_queue={}}
+          local empty=preview()
+          script.active_mods=nil
+          player.force.research_queue=nil
+          local missing=preview()
+          player.force=setmetatable({},{__index=function() error("unreadable force") end})
+          local unreadable=preview()
+          assert(#writes==0 and #messages==0)
+          return empty,missing,unreadable
+        ''')
+        self.assertIn("Active mods: 0 listed, 0 omitted\n", empty)
+        self.assertIn("Queue: empty\n", empty)
+        for report in (missing, unreadable):
+            self.assertIn("Active mods: unavailable\n", report)
+            self.assertIn("Queue: unavailable\n", report)
 
     def test_diagnostics_are_bounded_local_overwrites_with_exact_false_state(self):
         self.lua.execute('''
@@ -207,21 +297,16 @@ class SettingsCommandsTests(unittest.TestCase):
           diagnostics.startup("configuration")
           assert(#writes==3 and writes[3].player_index==0 and writes[3].append==false)
           assert(not writes[3].data:find("MIRSET1 profile:",1,true))
-          for i=1,512 do script.active_mods[string.rep("m",170)..i]="1.2.3" end
-          diagnostics.startup("initialization")
-          assert(#writes[4].data<=65536 and writes[4].data:find("list omitted",1,true))
-          script.active_mods={}
-          for i=1,512 do script.active_mods[string.rep("m",170)..i]=string.rep("1",60) end
-          diagnostics.startup("initialization")
-          assert(#writes[5].data<=65536 and writes[5].data:find("Report truncated",1,true))
+          assert(writes[3].data:find("Active mods: 1 listed, 0 omitted",1,true))
+          assert(writes[3].data:find("Mod more-infinite-research: 5.0.21000",1,true))
           assert(settings.startup["ips-cost-base-research_gears"].value==before)
           diagnostics.export(nil)
-          assert(writes[6].player_index==0 and writes[7].player_index==0)
+          assert(writes[4].player_index==0 and writes[5].player_index==0)
           local bob={name="Bob",force=player.force,print=player.print}
           game.get_player=function(index) return index==1 and player or index==2 and bob end
           diagnostics.export(2,original.name)
-          assert(writes[8].player_index==2 and writes[9].player_index==2)
-          assert(writes[8].data:find('"exported_by":"Bob"',1,true))
+          assert(writes[6].player_index==2 and writes[7].player_index==2)
+          assert(writes[6].data:find('"exported_by":"Bob"',1,true))
         ''')
 
     def test_diagnostics_report_failure_retains_full_settings_without_native_writes(self):

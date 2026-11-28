@@ -18,7 +18,7 @@ Start here, then read the selected work package in the [completion plan](impleme
 
 ## First bounded batch
 
-- [ ] **WP-01 — Refresh and adopt current work.** Fetch actual `dev`; inspect clean/dirty state, active assignments and #2499/#2500/#2501/#2502/#2503. Identify which changes are now merged, which still have unique work and which exact native scenarios already have an owner. Preserve their original commits and evidence; do not start competing repairs.
+- [ ] **WP-01 — Refresh and adopt current work.** Fetch actual `dev` and check active ownership again before the next batch. #2498 through #2505 are integrated. Check the exact cap replay and remaining bridge and provider applicability with the [5.0.28 candidate owner](https://github.com/Julesc013/more-infinite-research/pull/2506) before scheduling further release-native work.
 - [ ] **WP-02 — Bind the merged ordinary-cap correction and advance the next writer.** #2501 merged at `2719c285`; retain its old-source counterexample and common retained-queue readback. Use the [recorded native case](progress.md#ordinary-cap-queue-preservation-2026-11-28) and its exact private receipt to establish applicability to the next candidate before scheduling any changed or uncertain queue/save case. Keep #2498's changed worker transition replay separate.
 - [ ] **WP-03 — Advance the next original incident with available inputs.** Select one discriminating operation from the plan's incident table. For unavailable originals record the missing input and support boundary, then take another ready task. A diagnostic improvement does not close a save case.
 - [ ] **WP-08 — Qualify the merged dropdown-help restoration.** #2502 is integrated; check native rendering of all current option keys and representative localized/fallback text. Preserve the distinction between untranslated new copy and absent help.
@@ -28,7 +28,7 @@ Do these as separate reviewed units. One implementation owner, one independent r
 
 ## Next independent improvements
 
-- [ ] **WP-04 — Correct bounded large-modpack diagnostics.** Keep complete roster rows, deterministic limits and listed/omitted counts; cover required internal hooks and honest unavailable observations with focused controls.
+- [ ] **WP-04 — Check required internal diagnostic and restoration interfaces.** After the [bounded report repair](progress.md#bounded-support-diagnostics-on-development-source-2026-11-28), check a required missing hook against an absent optional integration. Verify catalogue lifetime and any claimed malformed spoilage-state path at their actual entry points.
 - [ ] **WP-05 — Preserve a future compatible minor transition.** Add the authentic current-record/future-minor regression, classify fixed historical producer checks, then implement one current version/edition decoder. Do this before selecting 5.1; no runtime or package-version change is implied by this plan.
 - [ ] **WP-06 — Extract one worker responsibility.** Begin with frozen readers versus current observation/application or command facade, whichever has the clearest independent contract. Include provider-absent force merge/reset/return ownership in the design; preserve the known failing and opposing histories before moving code.
 - [ ] **WP-07 — Remove one duplicated current policy.** Choose a real shared default/identity/validator or provider-binding consumer. Compare exact semantics and independent history first; show reduced edit spread and bounded work.
