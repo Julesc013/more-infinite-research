@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,7 +18,7 @@ source_of_truth_for:
 
 Settings select the effective configuration and integrations. Authored research modules construct native technology tables. The Generator validates and publishes those tables. Factorio then owns ordinary research and its native effects; MIR's runtime handles caps, earned-credit reconciliation, repair, agriculture, spoilage and the Research Library.
 
-Start with the [source map](#where-to-change-a-feature) to find a feature. The [offline visual atlas](diagrams/index.html) offers additional lifecycle diagrams with editable Mermaid source, SVG and PNG. Exact Factorio observations and remaining qualification are recorded in [progress](progress.md).
+Start with the [source map](#where-to-change-a-feature) to find a feature and the [completion plan](implementation/mir5-completion-plan.md) for the ordered remaining work. The [offline visual atlas](diagrams/index.html) offers additional lifecycle diagrams with editable Mermaid source, SVG and PNG. Exact Factorio observations and remaining qualification are recorded in [progress](progress.md).
 
 ![The whole mod](diagrams/01_overview.png)
 
@@ -91,7 +91,7 @@ The data interface lives at `__more-infinite-research__.api.v1.data`; the runtim
 
 A data caller can create a native technology or finite family through the thin helper. Native `data:extend` remains valid. A runtime consumer queries bounded native state in a game-available callback and owns its own effect handlers/storage. It cannot create technology prototypes at runtime. The SDK is optional examples/annotations/conformance, never a player dependency.
 
-The [API guide](api.md) describes the frozen API 1.0 modern subset and its independently tested consumers. Its recorded scope does not establish support on every engine or complete stable acceptance of MIR.
+The [API guide](api.md) describes the frozen API 1.0 modern subset and its independently tested consumers. That subset does not accept formula costs, maximum levels or caller presentation, and creating a technology does not automatically enroll MIR cap/Library/history services. A real external infinite family is an accepted extension goal under [API-07](../spec/api.md#planned-infinite-family-capability), with implementation and qualification still separate. Existing subset evidence does not establish support on every engine or complete stable acceptance of MIR.
 
 ## 9. Determinism is an input contract
 
@@ -109,6 +109,27 @@ History supplies obligations and regression evidence, not an excuse to retain th
 
 The [player source](../source/README.md) implements the Generator, authored modern and historical catalogues, compatibility bindings, settings, runtime effects, migrations, Library and API. The [continuity inventory](../spec/inventory/continuity.json) records retained obligations and remaining qualification. Exact native catalogue, lab, save and client observations are linked from [progress](progress.md); earlier receipts retain their original source identities. The diagrams describe responsibilities, while final-source, performance, layout and publication acceptance remain separate work.
 
+## Intended responsibility improvements
+
+The [architecture contract](../spec/architecture.md#cohesive-features-and-preservation-boundaries) keeps the native lifecycle at the top level and groups private implementation by feature ownership. The following are planned cuts within existing responsibilities, not files created or runtime changes completed by this documentation update.
+
+| Area | Current concentration | Intended separation |
+|---|---|---|
+| Worker cargo | `runtime/worker_robot_storage.lua` combines history, observations, transition selection/application, force lifecycle and commands | Frozen origin readers; current observation/admission; explicit native operations; event/command facade. Keep stable saved keys and callbacks. |
+| Shared research boundary | Queue/progress observations and readback are spread across caps, worker and credit consumers | Share bounded operations with equal semantics; keep repeated-queue counting, membership and callback-specific frames explicit. |
+| Current declarations | Defaults, provider identities and recipe validation have multiple consumers | One current fact owner where values must change together; frozen historical facts and independent test oracles remain separate. |
+| Compatibility | Central selection mixes composition, bindings and presentation | Explicit composition rules and cohesive provider declarations; inactive providers do not load full mappings. Cosmetic equivalence requires evidence before relaxing economic admission. |
+| Library | GUI/input/view state remains concentrated despite separate model/layout/translation modules | Use the grouping direction below when a responsibility warrants relocation; keep the mechanical move separate, then extract coherent rendering/interaction responsibilities and remove measured repeated work. |
+| Public API | The qualified numeric-cost subset exposes less than internal native construction | Add only the supported capabilities proved by an independent infinite-family consumer; preserve API1.0 behavior. |
+
+Worker cargo complexity largely concerns preserving research through changed ownership and historical prices. It is not a per-robot inventory loop. Current `research/worker_storage_checkpoint.lua` and `runtime/worker_storage_provider_queue.lua` already hold reusable pieces; the target is fewer independently maintained decisions, not another framework or one file per function. The affected force should bound ordinary completion work where possible, while configuration-wide preflight and immediate revalidation remain when required.
+
+For a preservation operation, read the supported history, observe the relevant native frame, admit the transition, revalidate before each affected write, then verify its postconditions. A queue setter can produce a different result from its input. Owned paid work, unrelated queued/current/parked work, native effects and foreign disablement therefore need explicit comparisons. A failed read is not an empty queue, and a post-mutation failure is not safe success. The detailed requirements and failure boundary are in [MIG-07](../spec/migrations.md#observation-application-and-preservation).
+
+Product version, edition, public API version and saved-record schema serve different purposes. Compatible MIR5 minor releases can retain old record schemas and API-major paths. The current worker producer reader still has fixed `5.0` parsing and patch-suffix ordering; the planned correction must preserve exact historical admission while supporting the full source-version tuple. No old paid work may be inferred from a newer version label. See [MIG-08](../spec/migrations.md#record-schemas-and-compatible-version-evolution).
+
+Review each extraction by the ownership it clarifies, policy duplication it removes and work it avoids. Record source size/import changes as evidence, not a quota: moving lines is not reducing complexity, and a necessary preservation check may add code. Separate mechanical moves from semantic changes so that unchanged behavior and the intended repair can be reviewed independently.
+
 ## Where to change a feature
 
 These are the current paths. Entrypoints compose feature modules; feature modules use small helpers and engine adapters. Runtime code must not import modules that require the prototype-stage `data` object.
@@ -125,6 +146,7 @@ These are the current paths. Entrypoints compose feature modules; feature module
 | Register runtime handlers and compose lifecycle operations | [control.lua](../source/control.lua), [runtime/bootstrap.lua](../source/runtime/bootstrap.lua) |
 | Apply cap policy and preserve its disablement rights | [runtime/lifecycle.lua](../source/runtime/lifecycle.lua), [runtime/caps.lua](../source/runtime/caps.lua), [runtime/cap_admission.lua](../source/runtime/cap_admission.lua) |
 | Preserve earned contributions across ownership changes | [runtime/native_credits.lua](../source/runtime/native_credits.lua), [runtime/native_gun_credits.lua](../source/runtime/native_gun_credits.lua) and their authored `research/` contracts |
+| Preserve worker cargo history, paid work and provider transitions | [runtime/worker_robot_storage.lua](../source/runtime/worker_robot_storage.lua), [research/worker_storage_recovery.lua](../source/research/worker_storage_recovery.lua), [research/worker_storage_checkpoint.lua](../source/research/worker_storage_checkpoint.lua), [runtime/worker_storage_provider_queue.lua](../source/runtime/worker_storage_provider_queue.lua) |
 | Run repair, agriculture and spoilage | [runtime/passive_repair.lua](../source/runtime/passive_repair.lua), [runtime/scripted_effects.lua](../source/runtime/scripted_effects.lua), [runtime/agriculture.lua](../source/runtime/agriculture.lua), [runtime/spoilage.lua](../source/runtime/spoilage.lua) |
 | Change Library rendering, input or personal state | [runtime/library.lua](../source/runtime/library.lua), `runtime/library_translations.lua`, `runtime/library_production.lua`, and the `presentation/library_*` modules |
 | Query shared research metadata | [runtime/catalogue.lua](../source/runtime/catalogue.lua); the Library reads this state rather than owning force research |
@@ -136,19 +158,24 @@ Some implementation is still split across directories. The move map below descri
 
 Factorio owns raw settings, technology prototypes, force research, progress, queues and native bonuses. Startup Lua tables and module-local caches are not a persistent MIR database. Persistent MIR bookkeeping uses `storage` on modern engines; historical adapters use the engine's earlier `global` facility.
 
-| Saved key | Owning module | Schema | Created or updated by |
+| Saved key | Reader/writer owner | Accepted schema | Lifecycle, retention and cleanup |
 |---|---|---|---|
-| `storage.mir_library` | `runtime/library.lua` | 1, including a versioned translation ledger | Library open and relevant player/GUI callbacks; configuration imports the applicable legacy `storage.mir.research_browser` view |
-| `storage.mir_caps` | `runtime/lifecycle.lua` | 1 | Cap reconciliation when bookkeeping is needed; configuration imports admitted legacy `storage.mir.maximum_level_control` rights |
-| `storage.mir_finite_research_speed` | `runtime/finite_research_speed.lua` | 1 | Init or admitted configuration for the finite level-7 to MIR level-8 variant; records the provider and identities, without copying research levels, bonuses or work |
-| `storage.mir_native_credits` | `runtime/native_credits.lua` | 1 | Init/configuration and affected research/force callbacks; retains per-force earned recipe history |
-| `storage.mir_native_gun_credits` | `runtime/native_gun_credits.lua` | 1 | Init/configuration and affected research/force callbacks; retains the authored electric/Tesla contribution masks and holder counts |
+| `storage.mir_library` | `runtime/library.lua`, with the translation helper | 1, including a versioned translation ledger | Open/player/GUI callbacks; configuration imports applicable legacy views. Removal clears the player's live view and retires issued translation identities; closing is not permission to erase preserved personal choices. |
+| `storage.mir_caps` | `runtime/lifecycle.lua` | 1 | Cap reconciliation and admitted legacy-rights import; force creation/reset removes obsolete rights for reused indices. Merge reconciliation preserves explicitly excluded/unqualified family rights. |
+| `storage.mir_finite_research_speed` | `runtime/finite_research_speed.lua` | 1 | Init/admitted configuration records finite level-7 to MIR level-8 provenance. Retained provider identity is checked on load/configuration; unexplained disappearance does not authorize deleting history. |
+| `storage.mir_native_credits` | `runtime/native_credits.lua` | 1 | Init/configuration/research callbacks retain per-force recipe history; force reset/merge preflights and reconciles the affected records before replacing them. |
+| `storage.mir_native_gun_credits` | `runtime/native_gun_credits.lua` | 1 | Init/configuration/research callbacks retain electric/Tesla masks and holders; creation/reset/merge reconciles the affected force records and pending work. |
+| `storage.mir_worker_storage_route` | `runtime/worker_robot_storage.lua` | 1 finite route; 2 route/prepared state | Init/configuration/recovery and paid-work settlement. Retire prepared quota only after the admitted owner handover; schema readers preserve the original route/contract. |
+| `storage.mir_worker_storage_native_owner` | `runtime/worker_robot_storage.lua` | 3 and 4 | Validated owner provenance, current/native-holder terms and per-force rights; written by admitted transfers and affected research/force operations. File moves and version changes do not authorize clearing it. |
+| `storage.mir_worker_storage_provider_removal` | `runtime/worker_robot_storage.lua` | 1 preparation/archive; 2 pending restored queue | Explicit prepare/cancel, admitted removal/return and resume. Cancel removes only an unapplied preparation; retained pending records clear after their force work is restored. |
+| `storage.mir_worker_storage_engine_checkpoint` | `research/worker_storage_checkpoint.lua` on the source; `runtime/worker_robot_storage.lua` on the destination | 1 | Source command records a paused copy in historical `global`; cancellation or resumed ticks invalidate it. Destination consumes and clears its own checkpoint only after admitted transfer. External preparation-mod custody remains separate. |
+| `storage.mir_se_conquest_policy_force` | `runtime/space_exploration_system_force.lua` | Unversioned native force reference | `observe` records a proved supported NPC frame or clears the observation; admitted `apply` revalidates/writes and retains the force reference. It grants no general foreign-force restoration right. |
 | `storage.mir_competing_productivity` | `runtime/competing_productivity.lua` | 1 | Applicable suppression reconciliation; removed when its owned-disablement records become empty |
 | `storage.mir_k2_imersite_state` | `runtime/bootstrap.lua` with `runtime/k2_imersite_migration.lua` | 1 | Selected K2SO lifecycle reconciliation; imports the retained historical staged-migration record |
 | `storage.mir.passive_repair` | `runtime/bootstrap.lua` with `runtime/passive_repair.lua` | Historical, unversioned | Repair lifecycle and scheduled work when the feature needs state |
 | `storage.mir.agricultural_growth_speed` and `storage.mir.spoilage_preservation` | `runtime/scripted_effects.lua` | Historical, unversioned | Named lifecycle/research/force callbacks; calculation modules receive these buckets explicitly |
 
-These are the main saved bookkeeping keys; historical migration readers retain additional original fields. Init/configuration and the named event handlers may change their owned state. Load callbacks reconnect subscriptions and caches without writing saved state. Moving a Lua file must preserve these keys, schema readers and published migration filenames.
+These are the main saved bookkeeping keys; historical migration readers retain additional original fields. The named owners read/validate these records and alone perform their admitted updates or cleanup. `bootstrap` coordinates order but does not acquire blanket ownership. Source-side checkpoint handling uses the earlier engine's `global` name for the same persisted key. Init/configuration and named event handlers may change owned state; load callbacks reconnect subscriptions/caches and validate permitted observations without writing saved state. Moving a Lua file must preserve keys, schema readers and published migration filenames.
 
 ## First source move: keep the Library together
 

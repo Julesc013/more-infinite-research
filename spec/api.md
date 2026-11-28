@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -58,6 +58,22 @@ Capabilities describe implemented target operations, not claimed modpack compati
 `add_productivity` takes an admitted technology declaration with no caller effects, a dense ordered list of distinct recipe names, and a positive native `change` no greater than `1`. It appends the fresh productivity effects itself. Its supported engine/effect range is advertised; it does not emulate unavailable native productivity on old targets. The extension resolves its own settings before the call. Both inputs and returned queries are isolated from internal mutable state.
 
 The API1.0.0 declaration subset is deliberately not a general native prototype pass-through: it accepts only `type="technology"`, control-byte-free native IDs, optional ordered prerequisites, a `unit` with positive numeric `count`, nonempty distinct ingredients and finite positive `time`, and (for ordinary creation) exact bounded `character-crafting-speed` effects. F200 ingredients must name existing `ToolPrototype`s. F210 ingredients may name existing entries in the explicit concrete `ItemPrototype` categories `ammo`, `armor`, `blueprint`, `blueprint-book`, `capsule`, `copy-paste-tool`, `deconstruction-item`, `gun`, `item`, `item-with-entity-data`, `item-with-inventory`, `item-with-label`, `item-with-tags`, `module`, `rail-planner`, `repair-tool`, `selection-tool`, `space-platform-starter-pack`, `spidertron-remote`, `tool`, or `upgrade-item`. Its count is a lossless Lua integer at most `9007199254740991`; ingredient amounts are `1..65535`; time is `1/60..3600000` seconds; effect values are in `(0, 1]`. It rejects formulas, caller icons/localization/triggers/flags, arbitrary fields and every other effect before intended writes. MIR supplies its own packaged thumbnail, so caller asset paths cannot reach the generated prototype. The subset is qualified only within the exact modern scope of the linked decision; other engines and arbitrary consumers retain their own obligations. This is a safety admission contract, not a reimplementation of Factorio's full schema or a new declaration DSL.
+
+## Planned infinite-family capability
+
+`API-07` — The accepted extension goal is an independent mod declaring a useful infinite research family through supported shared semantics, without private MIR imports or core edits. This is planned work in the [completion plan](../docs/implementation/mir5-completion-plan.md), not an expansion of the currently implemented API1.0.0 allowlist or qualification. Do not advertise a new method, field or capability until its implementation and acceptance exist.
+
+Use a real consumer to define the smallest additive surface. It must exercise a native `count_formula`, finite/infinite `max_level` semantics, authored science/costs, its own stable namespace and presentation, and the admitted native effect. Document explicitly which MIR services it uses: settings resolved in the correct stage, cap meaning, Library family/details presentation and any continuation/provider behavior. Native prototype creation alone does not enroll a family in those services. Reuse the internal constructor where the contracts match; keep public admission, copying, work budgets and error behavior explicit rather than exposing every native field.
+
+| Acceptance boundary | Required result |
+|---|---|
+| Independent consumers | The new companion installs and operates without private imports or MIR edits; a distinct same-class declaration exercises the shared operation. The existing two API1.0 consumers retain their documented behavior. |
+| Stage and ownership | Immediate finite publication, required and optional dependency paths, settings resolved before data calls, duplicate/collision refusals before intended writes, and detached inputs/results. No implicit authority over foreign technology, cap rights or saved history. |
+| Useful research | Ordinary labs pay the authored cost and advance the expected finite/infinite boundary; physical output verifies the intended effect. A native setter-only demonstration cannot substitute for this new acceptance. |
+| Presentation and limits | The declared name/icon/localization, science, native level meaning, cap and intended Library behavior agree with actual native state; unsupported target/services are explicit capabilities or documented exclusions. |
+| Evolution and absence | Save, independent cold reloads, companion upgrade and applicable MIR upgrade preserve owned state and foreign work. Optional absence and supported removal/return are explicit; unsupported loss-before-callback cases retain their preservation boundary. Include actual client lifecycle when shared runtime/UI state is affected. |
+
+Freeze the added capability and its combined bounds in this contract and the SDK before publication. Compatible additions retain the API-major path and existing behavior; changed meaning or removal requires the documented major transition. Product source version, encoded edition version and each persisted record schema remain separate. Do not add callbacks, a plugin registry or a migration language to make an external family possible. A declaration can request a documented service; historical recovery authority requires its own proven contract under [migrations](migrations.md).
 
 ## Deliberately not part of the initial general API
 

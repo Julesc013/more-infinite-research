@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-14
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,9 +14,11 @@ source_of_truth_for:
 
 # Development guide
 
+Use the [completion plan](implementation/mir5-completion-plan.md) for the agreed design and work packages, [TODO](todo.md) for the next ready work, [roadmap](roadmap.md) for milestone outcomes, and [progress](progress.md) for dated implementation, qualification and delivery evidence. These pages reference the existing requirements and incident IDs; they do not create another request ledger or make planned behavior available in the product.
+
 ## Build a local ZIP
 
-Install Git and Python 3 and make both available in your terminal. The packager uses Python's standard library; building a ZIP does not need Factorio, a private worker or release credentials. From a new checkout:
+Install Git and Python 3 and make both available in your terminal. The packager uses Python's standard library; building a ZIP does not need Factorio, a private worker or release credentials. The following example uses a PowerShell terminal; the packager itself is portable. From a new checkout:
 
 ```powershell
 git clone --branch dev https://github.com/Julesc013/more-infinite-research.git
@@ -25,6 +27,13 @@ git switch -c fix/my-change
 $mirLocalVersion = (Get-Content -LiteralPath source/info.json -Raw | ConvertFrom-Json).version
 python -B tools/package.py --source source --target f210 --output "build/packages/local/more-infinite-research_$mirLocalVersion.zip"
 if ($LASTEXITCODE -ne 0) { throw "MIR package build failed." }
+```
+
+After cloning and selecting your task branch in a POSIX shell, the equivalent build commands are:
+
+```sh
+mir_local_version=$(python3 -c 'import json; print(json.load(open("source/info.json"))["version"])')
+python3 -B tools/package.py --source source --target f210 --output "build/packages/local/more-infinite-research_$mir_local_version.zip"
 ```
 
 This builds the Factorio 2.1 edition from your working tree. The ZIP is under `build/packages/local`; an existing file is preserved rather than overwritten. It keeps MIR's official mod identity and replaces the installed MIR when selected in Factorio. Back up your save and matching mods/settings, then test a copy. A successful build checks packaging, not gameplay or upgrade safety.
@@ -168,7 +177,22 @@ Code should be concise enough to follow, not minified. Prefer ordinary arrays/ma
 
 ## Development tools
 
-Lua implements the mod and Factorio fixtures. Use Python for portable developer work such as packaging, release verification and host assertions. The existing PowerShell entry points run the host plan and own native process, workspace and GitHub administration where they are already in use. When consolidating a tool, carry its behavior and checks into the shared implementation before retiring its old entry point.
+Python is the primary implementation language for portable developer automation; Lua remains the player and native-fixture language. The existing PowerShell entry points still run the host plan and own substantial native process, workspace and GitHub administration. Their presence is not evidence of duplicate behavior. Consolidate overlapping responsibilities through a staged replacement, preserving working commands and qualified process/save custody until their replacements are reviewed.
+
+| Responsibility | Current executable owner | Consolidation direction |
+| --- | --- | --- |
+| Package construction, release freeze/readback, changelog formatting and offline analysis | The existing Python tools, including `package.py`, `release.py`, `verify_public_release.py` and `changelog.py` | Share matching mechanics and keep their distinct mutation and provenance boundaries. |
+| Ordered host-control selection and invocation | `tests/Test-MIR5HostControls.ps1`, with `-Plan` and `-ControlPath` | Move portable selection/execution to Python in one bounded cutover; retain one ordered control declaration and delegate from compatible PowerShell entry points. This replacement is planned, not available yet. |
+| Native execution, archive-library ownership, storage admission and evidence collection | Existing governed PowerShell runners and their platform helpers | Extract only mechanics with the same contract; keep Windows/Linux process and display differences explicit. |
+| Fixture construction and independent assertions | Python host controls and Lua native fixtures | Use ordinary helper modules for shared builders; keep independently specified prices, histories and expected results separate from production declarations. |
+
+Before each tooling extraction, name its real callers, current command, replacement boundary and observable benefit: less repeated policy, a simpler contributor command or measured setup/execution savings. Transfer selection order, argument and exit behavior, runtime pins, cancellation, deadlines, output limits and preserved adverse records before retiring the old implementation. Update actual callers and this guide in the same reviewable unit. Do not maintain two independently edited control lists, create a second scheduler or require a language rewrite before continuing ready product work. There is no implemented `mir test` command.
+
+Consolidate the repeated exact historical-source fetch declarations in CI into one maintained developer-only input list consumed by local setup and CI when that tooling slice lands. Preserve the full immutable commits, paths, hashes and consumers; readers such as `tests/historical_sources.py` remain offline and reject unavailable or changed evidence. A missing historical object is an input failure, not permission to use current source, a moving branch or a newly generated expectation. Until that cutover, the [existing workflow fetch block](../.github/workflows/validate.yml) remains the executable setup procedure.
+
+Do not add executable sibling `test_*.py` imports as reusable libraries. When touching an existing coupled test, move its shared world/build/conversion operation into an ordinary helper with explicit inputs and migrate its actual consumers together. Preserve meaningful differences such as sparse Lua tables, `nil` versus `false`, mutation isolation and historical provenance. Sharing a builder must not make a candidate's output the authority for its own expected result.
+
+Bound subprocess lifetime and output at the owning runner, including cancellation and child-process cleanup. Retain ownership checks, library restoration, original saves and failed/partial receipts. New shared launch or collection helpers must preserve those guarantees and must not infer native acceptance from a successful launch or an infrastructure receipt. Record preparation, execution and collection time separately when evaluating a tooling optimization; raw file or language counts are not elapsed-time evidence.
 
 Use the governed native fixture runner with an exact engine, profile and archives for new gameplay work. The original private gear-slice command pinned to the first MIR5 build remains available in Git with its historical evidence. [Current fixture runner](../tools/Invoke-NativeFixture.ps1) · [Original gear-slice script](https://github.com/Julesc013/more-infinite-research/blob/c7c815d831c434a45d1965fe7e4acc1f0de3786d/tools/Invoke-NativeSlice.ps1)
 

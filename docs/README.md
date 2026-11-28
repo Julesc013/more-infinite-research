@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,6 +18,7 @@ This is the current MIR5 implementation and qualification documentation for the 
 
 | Need | Read |
 |---|---|
+| Continue the agreed MIR5 programme | [Next work](todo.md), [complete design and work packages](implementation/mir5-completion-plan.md), and [roadmap](roadmap.md) |
 | Understand the whole lifecycle visually | [Architecture explainer](architecture.md) and [offline atlas](diagrams/index.html) |
 | Editable/rendered diagrams | [Diagram index](diagrams/README.md) |
 | Why this design and what was changed | [Design summary](design.md) |

@@ -2,6 +2,8 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+**Development documentation — 2026-11-28:** Adopted the [MIR5 completion plan](docs/implementation/mir5-completion-plan.md), [next-work list](docs/todo.md) and [roadmap](docs/roadmap.md), with architecture, saved-state, API and portable-tooling contracts. These are planning and documentation changes, not released gameplay fixes. Runtime implementation and qualification remain in [progress](docs/progress.md). No source version is consumed and the historical player changelog remains unchanged.
+
 ## [5.0.28] - 2026-11-28
 
 ### Bugfixes

@@ -14,6 +14,8 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+The [completion plan](implementation/mir5-completion-plan.md) defines the consolidated 16 work packages; [TODO](todo.md) selects next actions and [roadmap](roadmap.md) orders stable completion and compatible 5.x development. This page owns current execution and exact evidence. Existing request and continuity IDs retain their decisions, and a planned capability is not implemented or qualified merely because its specification is adopted.
+
 ## Current release and qualification (2026-11-28)
 
 MIR 5.0.27 was published as a GitHub prerelease on 27 November at 18:01 AEDT under release ID `459314915`. Its tag resolves to checked main commit `30e2f04abd5e49d4efb7497e289335dd1434c698`. The anonymous readback verified 17 ZIPs and two checksum files. All 21 files in `dist/v5.0.27` rehashed against that receipt, including the matching notes and upload text. The original receipt is `build/qualification/mir527-release-cadence-r02/public-delivery-459314915-20261127T070048900/anonymous-readback.json` at SHA-256 `36776554B401538D98687BDEA6A9B5DD6DE5DE993342B829D7DE3D3CA4ADAC9D`. [GitHub release](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.27)

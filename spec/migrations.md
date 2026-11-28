@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -109,6 +109,24 @@ Prefer preserving an unchanged native identity to renaming it. Where a rename is
 Every future release reviews its identity, schema and setting changes against the retained origin matrix. Add a new stable migration filename only when a new transformation is necessary; do not add empty files per release or repurpose an already applied name for work that existing saves must execute again. Keep independent package-membership/rename-chain/schema controls and native direct-upgrade fixtures. Record source-save, candidate-save and reload hashes in the existing evidence chain. Historical source and large save custody stay outside player packages; only required live migration code and mappings ship.
 
 Establish the historical recovery inventory, saved-state expectations and protected origin-save baseline for 5.0.0 once, then maintain them incrementally. Later releases add their actual identity/schema changes and new origin saves; they do not repeat tag archaeology or regenerate unchanged predecessors. Reuse exact trusted source stages and apply `VER-06` to prior results, executing the new transition and older direct-origin regressions affected by changed consumed paths. Skipped-release upgrades remain supported and tested within the required engine-valid scope; incremental maintenance does not mean testing only the immediately previous MIR release. Keep these checks in existing package/schema/native tools rather than introducing a separate migration framework or recurring player maintenance.
+
+## Observation, application and preservation
+
+`MIG-07` — Each paid-work transition names its historical reader, native observation, admission predicate, owned writes and postconditions. Preflight every force whose state can be affected before beginning the coordinated change; revalidate each affected frame immediately before its writes. Command and event entrypoints use the same transition. Native setters and synchronous callbacks can invalidate an earlier observation; successful assignment is not proof that the requested state survived.
+
+Every queue-writing route, including ordinary cap reconciliation, must verify the intended retained identities, order and repeated entries, plus the applicable current and parked work. Preserve foreign research and MIR-owned restoration rights. Where costs change, compare earned/unfinished work under authenticated original price, science and effect terms; equal fractions at different prices are insufficient. The operation must explain any intentional changed field and leave unrelated native state unchanged. Empty complete observations, unavailable observations and explicitly supported event-transition frames are different inputs; a malformed host double does not by itself establish native reachability.
+
+Share observation/readback or work arithmetic only when the contracts agree. Worker ownership history, recipe/gun effect vectors and provider identity mapping remain specific. Preserve no-write refusal before mutation where required; a post-write mismatch must follow the existing fatal/protected-copy boundary rather than reporting preservation success or promising generic rollback. Repeated reconciliation and cold loads must not duplicate credits or invent new rights. Optional foreign-policy repair can be skipped when authority is absent; required owned-history preservation cannot be skipped merely to make loading succeed.
+
+Focused acceptance covers the changed route, a distinct same-class route and opposing ownership/history cases. Include setter omission/reordering, repeated queue entries, active versus parked paid work, foreign disablement, relevant nested/event frames and later-force preflight failure when those boundaries are consumed. Establish disputed native behavior with the smallest relevant native scenario; do not add broad machinery only to satisfy an impossible fixture. Apply `MIG-03` and `VER-06` to affected saved-state qualification and evidence reuse.
+
+## Record schemas and compatible version evolution
+
+`MIG-08` — Product release, edition, public API version and each saved-record schema are independent axes. Decode current source/edition versions according to [the distribution codec](targets.md) and compare the full numeric source tuple; a two-digit patch suffix or a fixed `5.0` prefix is not a general ordering rule. Classify each fixed-version check before changing it: a current-version parser must support the accepted product evolution, while an exact archived predecessor selector retains its historical evidence boundary. Version text alone never grants saved-state authority.
+
+Keep supported schema readers and stable keys when reorganizing modules. A compatible minor release with unchanged record semantics must not require clearing research or bookkeeping merely because the source minor changed. Unknown future schemas/producers retain explicit refusal or the existing documented safe nonmutation behavior; do not accept every MIR5 record indiscriminately. Introduce a new record schema only for an actual semantic change, preserving a bounded forward reader/transformation and the prior paid-work authority. Do not add a migration file or rewrite every record for each package version.
+
+Before crossing a source-minor boundary, exercise actual current-reader cold-load and configuration paths with authentic records from supported previous producers, including edition/patch ordering boundaries and unknown/malformed future opponents. Preserve effects, original paid terms, queues and restoration rights; complete affected exact native save/cold-load qualification before shipping. A simulated future-version host probe is a regression lead, not an executed future release. The [completion plan](../docs/implementation/mir5-completion-plan.md) tracks the existing worker decoder correction; this specification edit does not implement it.
 
 ## Independent observation
 
