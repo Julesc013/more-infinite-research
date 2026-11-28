@@ -18,7 +18,7 @@ Start here, then read the selected work package in the [completion plan](impleme
 
 ## First bounded batch
 
-- [ ] **WP-02 — Finish the exact-candidate provider check.** The [5.0.28 cap and bridge cases](progress.md#exact-5028-preservation-checks-2026-11-28) passed. Reuse the verified Ferrum removal save for the return and resume check, then verify the affected remaining queue writers against their own native state and cold loads.
+- [ ] **WP-02 — Advance the remaining cap and queue cases.** The [5.0.28 cap, bridge, Ferrum and Space Exploration checks](progress.md#exact-5028-preservation-checks-2026-11-28) passed in their scoped routes. Observe the protected K2SO successor directly on the candidate and verify its finite and relaxed boundaries with their own native inputs.
 - [ ] **WP-03 — Advance the next original incident with available inputs.** Select one discriminating operation from the plan's incident table. For unavailable originals record the missing input and support boundary, then take another ready task. A diagnostic improvement does not close a save case.
 - [ ] **WP-08 — Qualify the merged dropdown-help restoration.** #2502 is integrated; check native rendering of all current option keys and representative localized/fallback text. Preserve the distinction between untranslated new copy and absent help.
 - [ ] **WP-10 — Make the Library comparison valid.** The exact 5.0.28 Windows packet passed offline input checks. Wait for native memory admission and resolve same-build repeatability and restart/client attribution before scoring retained memory or latency. Coordinate through #1768 and the existing native owner.
