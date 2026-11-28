@@ -614,7 +614,49 @@ STANDALONE_SETTING_KEYS = (
 )
 
 
+# Independent current visible option identities, reviewed against v4.7.3.
+OPTION_VALUES = {
+    "mir-adjust-vanilla-weapon-speed-techs": "off only-when-dedicated-tech-enabled always",
+    "mir-automatic-productivity-action": "disabled preview apply",
+    "mir-lab-incompatibility-policy": "reduce skip engine-default",
+    "mir-science-pack-ingredient-policy": "configured space space-and-promethium space-age-progression official-progression mod-progression all-official all",
+    "mir-prototype-productivity-cap": "engine-default percent-25 percent-50 percent-75 percent-100 percent-125 percent-150 percent-200 percent-250 percent-400 percent-500 percent-750 percent-1000 percent-2500 percent-5000 percent-10000 percent-25000 percent-100000",
+    "mir-recycling-return-chance": "engine-default match-productivity-cap percent-20 percent-15 percent-12-5 percent-10 percent-7-5 percent-5 percent-2-5 percent-1 percent-0-5 percent-0-1",
+}
+for _name in ("mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-floor"):
+    OPTION_VALUES[_name] = "engine-default saving-25 saving-50 saving-75 saving-90 saving-95 saving-99 saving-999 saving-9999"
+for _name in ("mir-prototype-speed-cap", "mir-prototype-quality-cap"):
+    OPTION_VALUES[_name] = "engine-default bonus-25 bonus-50 bonus-75 bonus-100 bonus-125 bonus-150 bonus-200 bonus-250 bonus-300 bonus-400 bonus-500 bonus-750 bonus-1000 bonus-2500 bonus-5000 bonus-10000 bonus-25000"
+
+
 class LocaleCatalogueTests(unittest.TestCase):
+    def test_current_option_help_restores_applicable_historical_values(self) -> None:
+        keys = {f"{name}-{value}" for name, values in OPTION_VALUES.items() for value in values.split()}
+        self.assertEqual(len(keys), 110)
+        english = parse_cfg(LOCALE_ROOT / "en" / "more-infinite-research.cfg")["string-mod-setting-description"]
+        self.assertEqual(set(english), keys)
+        self.assertTrue(all(english[key].strip() for key in keys))
+        self.assertIn("declared", english["mir-science-pack-ingredient-policy-mod-progression"])
+        self.assertNotIn("Discovers", english["mir-automatic-productivity-action-apply"])
+        self.assertIn("eligible", english["mir-prototype-productivity-cap-percent-25"])
+        # Changed meanings use English fallback until separately translated.
+        translated = {key for key in keys if not key.startswith("mir-automatic-productivity-action-")
+                      and key != "mir-science-pack-ingredient-policy-mod-progression"
+                      and not key.startswith("mir-prototype-productivity-cap-percent-")}
+        self.assertEqual(len(translated), 89)
+        projection = {}
+        for path in sorted(LOCALE_ROOT.glob("*/more-infinite-research.cfg")):
+            if path.parent.name == "en":
+                continue
+            section = parse_cfg(path)["string-mod-setting-description"]
+            self.assertEqual(set(section), translated, path.parent.name)
+            self.assertTrue(all(section[key].strip() for key in translated), path.parent.name)
+            projection[path.parent.name] = section
+        # Exact v4.7.3 wording for the unchanged 89-option intersection.
+        encoded = json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        self.assertEqual(hashlib.sha256(encoded).hexdigest(),
+                         "3b036066d1377350927cc405a05585e12a5c2e9197b5e018d03b76067571877f")
+
     def test_library_effect_labels_restore_the_authored_fifty_language_projection(self) -> None:
         # Published v4.7.3 mir-browser values, recovered unchanged. Keep the
         # original unit distinction without inventing new translations.
