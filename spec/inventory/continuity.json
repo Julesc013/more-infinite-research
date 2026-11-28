@@ -8559,7 +8559,9 @@
     ],
     "scope": "Reconcile this named science-binding delta explicitly. Older broad comparisons retain their exact predecessor/package/source scope; reuse requires a reviewed unaffected-input argument, not relabelling as4.7.3 execution."
   },
+  "current_delivery_progress": "docs/progress.md#current-release-and-qualification-2026-11-28",
   "current_candidate": {
+    "status": "retained-historical-checkpoint",
     "source": "0b20bc472562ee22cb32393afab29f2a43c0c8ec",
     "source_tag": "v5.0.12",
     "source_version": "5.0.12",
