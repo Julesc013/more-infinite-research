@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: contributor
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -15,6 +15,8 @@ source_of_truth_for:
 # Contributing
 
 MIR development happens on `dev`. Start with a small fix or improvement, check the affected behavior and open a pull request against `dev`.
+
+Choose a ready action from [next work](docs/todo.md) and its [completion-plan package](docs/implementation/mir5-completion-plan.md), or bring a focused correction with its existing requirement/incident. Check [progress](docs/progress.md) and active PR ownership before duplicating work. The [roadmap](docs/roadmap.md) explains dependencies without replacing task-specific acceptance.
 
 ## Build or change a feature
 

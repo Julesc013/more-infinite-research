@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -26,6 +26,26 @@ Keep `AGENTS.md` short. It routes a contributor to this index and a task-specifi
 
 Use the current front-matter convention for specifications and documentation. One logical line per prose paragraph. Avoid maintaining a second generated docs-governance estate solely for the replacement. Retire obsolete required readers through an explicit reviewed cutover, not by disabling branch protection after a failure.
 
+### Documentation authority and current work
+
+`REPO-06` — Keep one owner for each kind of maintained information. The [completion plan](../docs/implementation/mir5-completion-plan.md) synthesizes the accepted programme and refers to those owners; it does not duplicate their writable requirements, request statuses or execution records.
+
+| Information | Maintained owner |
+| --- | --- |
+| Required behavior, invariants and acceptance rules | The relevant `spec/` contract, reached through `spec/README.md`. |
+| Original request identity, text and accepted/declined/deferred decision | `spec/programmes/community-requests.json` and its existing linked records. |
+| Cross-cutting historical continuity and outstanding subject coverage | `spec/inventory/continuity.json`, preserving its existing subject IDs. |
+| Current implementation/qualification/delivery facts and dated evidence | The current summary and historical entries in `docs/progress.md`, linked to exact incidents and receipts. |
+| Agreed design, dependencies and work-package acceptance | `docs/implementation/mir5-completion-plan.md`. |
+| Next ready assignments and blockers | `docs/todo.md`, referencing plan work packages and original requirement/incident IDs. |
+| Milestone outcomes and sequencing | `docs/roadmap.md`, referencing the same work packages rather than maintaining another item-status ledger. |
+| Executable contributor procedures | `docs/development.md`; proposed commands are labelled unavailable until implemented. |
+| Authored release history | Root `CHANGELOG.md`; `source/changelog.txt` is its formatter-owned projection. |
+
+Historical audits, source atlases and imported conversations are evidence or proposals with dates and scope. Reconcile their findings against current source before scheduling a claimed defect. Retain adverse observations and original decisions; mark superseded current-state instructions historical instead of erasing them or treating every old proposal as operative. A generated overview is a read-only projection with identified inputs, never another editable authority or a Factorio runtime input.
+
+Update the relevant existing owner with each completed slice: implemented source, host checks, exact native scope, delivery and original-case resolution remain separate claims. Link subsequent evidence to the same obligation instead of creating a new request ID. A doc-only plan cannot close an incident, qualify a new engine, alter release permissions or declare future tooling/API behavior implemented. Do not introduce a new automated gate merely to enforce document shape when the existing repository check and review cover the actual risk.
+
 ## Change contract
 
 `REPO-02` — A nontrivial task states: observable outcome; applicable requirement IDs; exact inputs; permitted files; simplest approach; reads/copies/retained state and work bound; independent expected result; executable tests; stop condition. A short PR description is sufficient for ordinary work.
@@ -37,6 +57,12 @@ After a bounded batch return source/package identities, observed behavior/tests,
 ## Portable build/test operations
 
 Reuse qualified existing native tools if they fit. Read their actual parameters. Do not invent a `mir test` command until it is implemented. A future small project entrypoint may compose real commands, but a universal orchestration system is not a prerequisite for the first slice.
+
+`REPO-07` — Python owns new portable automation. Move existing portable PowerShell responsibilities through bounded replacements that preserve documented callers, ordered selection, exit/cancellation semantics, runtime pins, custody and actual observations. Keep justified platform-specific adapters and freeze older controllers with the evidence that consumes them. At every cutover there is one authoritative host-control plan; a compatibility wrapper delegates rather than maintaining a second selection policy. Until a replacement exists, `tests/Test-MIR5HostControls.ps1 -Plan` and `-ControlPath` remain the current host-selection interface.
+
+One maintained developer input declaration should supply shared exact historical-source setup to local tooling and CI when consolidated. Historical readers remain offline and hash-check the captured source. Do not substitute current implementation for missing historical inputs. Reusable test builders belong in ordinary helper modules, not executable sibling test suites; independent expected behavior and frozen historical facts remain independent of the implementation being checked.
+
+Share native mechanics only where ownership, process identity, resource admission, archive-library exclusivity, save preservation and collection semantics match. Subprocesses need finite deadlines and bounded output with owned-child cleanup and preserved failure records. Consolidation must remove or delegate the displaced implementation, account for all real consumers and demonstrate preserved behavior at the changed boundary. A reduction in files or lines alone is not proof of a simpler or faster system, and unchanged native campaigns need not be repeated solely for a documentation edit.
 
 Packaging, performance and test receipts belong outside player source. Raw native logs/saves/mod archives remain local or in approved durable artifact storage, with compact portable references in Git. Never redistribute third-party/proprietary game or mod bytes just because a fixture uses them. Keep licenses and provenance.
 

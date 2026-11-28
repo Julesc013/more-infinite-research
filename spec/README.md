@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-27
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,6 +21,8 @@ The maintainer adopted this specification set for replacement development on 202
 Use this order to resolve conflicts: explicit current maintainer decisions and preserved player obligations; actual target-engine constraints; this specification; implementation and independent tests; explanatory documentation and agent task packets. Engine facts constrain feasibility, not product priority. When obligations conflict with an engine restriction, expose the conflict and obtain a documented decision. Never erase a user obligation by editing a test or an architectural slogan.
 
 Historical source is evidence, not the current implementation design. Known historical bugs are not a parity requirement. Observed native behavior is evidence, not permission to invent a requirement. The request ledger retains its existing IDs and decisions; the seed continuity inventory below is not a second feature-request ledger.
+
+The [28 November completion plan](../docs/implementation/mir5-completion-plan.md) consolidates accepted engineering direction and work-package acceptance; [TODO](../docs/todo.md) selects current actions and [roadmap](../docs/roadmap.md) orders milestones. These do not replace the contracts, original request decisions or exact execution evidence. New architecture/schema/API refinements state target behavior explicitly; adoption of text is not implementation or qualification.
 
 ## Task routing
 

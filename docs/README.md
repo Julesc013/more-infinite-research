@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,10 +14,11 @@ source_of_truth_for:
 
 # MIR documentation
 
-This is the current MIR5 implementation and qualification documentation for the canonical dev tree. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../source/README.md). [MIR5.0.12 beta](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.12) is delivered; MIR5 stable acceptance remains incomplete. The [progress record](progress.md) names the next fixed candidate, applicable evidence and remaining release work.
+This is the current MIR5 implementation and qualification documentation for the canonical dev tree. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../source/README.md). MIR5 stable acceptance remains open. The [progress record](progress.md) names the current GitHub release, applicable evidence and remaining release work.
 
 | Need | Read |
 |---|---|
+| Continue the agreed MIR5 programme | [Next work](todo.md), [complete design and work packages](implementation/mir5-completion-plan.md), and [roadmap](roadmap.md) |
 | Understand the whole lifecycle visually | [Architecture explainer](architecture.md) and [offline atlas](diagrams/index.html) |
 | Editable/rendered diagrams | [Diagram index](diagrams/README.md) |
 | Why this design and what was changed | [Design summary](design.md) |

@@ -140,5 +140,139 @@
       "evidence_class": "user_supplied_material_inspected_here"
     }
   ],
-  "revision": "deterministic-visual-contract-2"
+  "revision": "deterministic-visual-contract-2",
+  "completion_plan_intake_2026_11_28": {
+    "review_date": "2026-11-28",
+    "implementation_plan": "docs/implementation/mir5-completion-plan.md",
+    "repo_intake_commit": "cf9403eccd42192b4049a3ada4634f5aba4b98d0",
+    "principal_audit_commit": "7a61a657bfc61f10a57ff6e4434ee8db2c070bde",
+    "published_source_commit": "30e2f04abd5e49d4efb7497e289335dd1434c698",
+    "scope": "Supplied documents read and reconciled against current repository, selected live GitHub state and official documentation. No native execution, complete original-conversation retrieval or original-save qualification by this intake. Source/requirement/current-state distinctions remain in the plan. Original attachment bytes remain unchanged outside the repository.",
+    "inputs": [
+      {
+        "filename": "MIR5-Continuity-and-Architecture-Review-2026-11-28.md",
+        "bytes": 51846,
+        "sha256": "34b8dae14bea3d1061e315aa1969b44cdd49e894f5ebb09c9f65e30c14fc7f39",
+        "evidence_class": "supplied_audit_report_with_dated_source_scope_not_fresh_native_verification"
+      },
+      {
+        "filename": "MIR5-Question-Reconciliation-2026-11-28.csv",
+        "bytes": 31540,
+        "sha256": "c353ba551bd69dff0459e56e4e2f33ce9f482536a3fd3e17f26b194b251202a5",
+        "evidence_class": "supplied_question_reconciliation_projection_not_new_request_authority"
+      },
+      {
+        "filename": "MIR5-Source-Atlas-2026-11-28.html",
+        "bytes": 1837744,
+        "sha256": "aeaf3090ee39726d658807ec84cf348432bc8e337531f9647c50d6df70f8469a",
+        "evidence_class": "supplied_explanatory_source_atlas_pinned_snapshot_not_runtime_authority"
+      },
+      {
+        "filename": "MIR5-comprehensive-audit-2026-11-28(1).md",
+        "bytes": 69403,
+        "sha256": "3a82cf58848e8d8b65f35ab592963d737d22d58def2525848229c245bf2a0015",
+        "evidence_class": "supplied_audit_report_with_dated_source_scope_not_fresh_native_verification"
+      },
+      {
+        "filename": "MIR5-refreshed-engineering-assessment-2026-11-28(1).md",
+        "bytes": 123808,
+        "sha256": "882f8d2f66935986a6bab095bdba78630d7d5b47dc21bb955c3e1fdb4fc1abc6",
+        "evidence_class": "supplied_audit_report_with_dated_source_scope_not_fresh_native_verification"
+      },
+      {
+        "filename": "MIR5_Comprehensive_Reassessment_2026-11-28(1).md",
+        "bytes": 168213,
+        "sha256": "ebffa3a7453a2616100bc160297427b9cbbe45f75bed7fec8810a2e179890e0a",
+        "evidence_class": "supplied_audit_report_with_dated_source_scope_not_fresh_native_verification"
+      },
+      {
+        "filename": "MIR5_Refresh_Audit_2026-11-28.md",
+        "bytes": 67455,
+        "sha256": "f76704b53a9f38389050b557d61b51100b320a2b866681c22b75a3c8ec2010e1",
+        "evidence_class": "supplied_audit_report_with_dated_source_scope_not_fresh_native_verification"
+      },
+      {
+        "filename": "Pasted text (10).txt",
+        "bytes": 32408,
+        "sha256": "f65d33ce4cbc47c5b90aa19ec7f5d37b27f14d72ca663a61acabe218ecfa4e01",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (11).txt",
+        "bytes": 41006,
+        "sha256": "a6e23d2283d4a187558fc6a234caa4f1accc170c05a013de1bc6d9712c7cf7e1",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (12).txt",
+        "bytes": 31834,
+        "sha256": "8b8a6d1fba99ec2babddef8115ed1c953d9dc597d4a627086af7fb12fc6d4efa",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (2)(20261128-085746).txt",
+        "bytes": 35062,
+        "sha256": "93a14f11583dd4f8d0f3b181de7f89db2c952a176b9788b1948addfb12e7df03",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (3)(20261128-085753).txt",
+        "bytes": 18383,
+        "sha256": "0c7868dc634a94aa72c894ae8f6d935d08705ff65d44d85efab0ead7ce92a7e7",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (4)(7).txt",
+        "bytes": 28287,
+        "sha256": "00a7c8dc0bb011f20ffc2dda96db580d4d75bffb20e17f969a0f27d41250c800",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (5)(2).txt",
+        "bytes": 17224,
+        "sha256": "2d4bde3efe396d370bb8655e0a98f8ef5ed5ccde0314fffd21f466ddb7fd9909",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (6)(3).txt",
+        "bytes": 31830,
+        "sha256": "9fd517c4d8d5694794c35f2b2ad831bbcd3c4c70c1092967311e5c68dfed0127",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (7)(1).txt",
+        "bytes": 31971,
+        "sha256": "e54d9f40b0cb506e9b7aabdcc2244218172ef9b1a8fe2d6cfe983d96f620a2ec",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (8).txt",
+        "bytes": 35063,
+        "sha256": "40c6ccee824117a0f87599150819c52ea02b1c765b4a69f5d829f659799b9201",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text (9).txt",
+        "bytes": 30364,
+        "sha256": "24ff1fa5fab860012ce1d78c7c4d3e044d82297545dd6d1075e50f9f151bbe13",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      },
+      {
+        "filename": "Pasted text(20261128-085726).txt",
+        "bytes": 19064,
+        "sha256": "8c45cec2ba560b0661a4e6b897cdafc244bf5a8e2544d8c81dadda69c3fe0494",
+        "evidence_class": "supplied_prior_assistant_report_not_raw_transcript_or_independent_verification"
+      }
+    ],
+    "official_documentation_observation": {
+      "date": "2026-11-28",
+      "served_version": "2.1.25",
+      "native_execution": false,
+      "urls": [
+        "https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html",
+        "https://lua-api.factorio.com/latest/classes/LuaForce.html#research_queue",
+        "https://wiki.factorio.com/Mod_portal_API#Result_Entry"
+      ]
+    }
+  }
 }

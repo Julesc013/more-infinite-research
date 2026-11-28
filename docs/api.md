@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-11
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -73,6 +73,20 @@ Creation is qualified for the documented subset on Factorio 2.0.77 and 2.1.23. U
 Factorio 2.0 science inputs must name existing `ToolPrototype`s. Factorio 2.1 also accepts the explicit `ItemPrototype` categories in the contract. Formula costs, caller assets/localization/triggers, arbitrary native fields and caller-supplied productivity effects are rejected before intended writes. A family receives complete local preflight before publication; later foreign references need a call in a suitable later data-stage round.
 
 The combined limits are **64 family rows, 512 traversed definition entries, nesting depth 16, 4096 bytes per string/key and 64 recipe targets**. All apply together: a populated 64-row family may exceed the entry budget. Native Factorio validation still applies. The [host boundary measurement](../spec/evidence/api-boundary-host-aero-measurement-r01.json) checks bounded admission work; it does not measure native game speed or change these limits.
+
+## Planned support for an external infinite family
+
+The [completion plan](implementation/mir5-completion-plan.md) includes a real companion mod that adds an infinite family without editing MIR. The accepted [API extension contract](../spec/api.md#planned-infinite-family-capability) defines its acceptance. This work is planned; the current API1.0 methods, admitted fields and capability results above remain the usable surface.
+
+| Need | Available now | Planned acceptance |
+|---|---|---|
+| Create research | Finite batch of admitted numeric-cost technologies | A real infinite family using native formulas and defined finite/infinite limits |
+| Effects and presentation | Bounded crafting-speed or helper-authored recipe productivity; MIR thumbnail | The consumer's admitted effect, name, icon and localization |
+| Settings | Extension declares and resolves its own native settings | The same stage-correct ownership, with any additional MIR service explicitly documented |
+| Caps and Library | Native research queries; creation alone does not enroll MIR family services | Defined cap semantics and intended family/details presentation, proved against actual research state |
+| Saves and upgrades | Existing qualified subset and literal native-name queries | Ordinary paid research, physical effect, save/cold reload and applicable extension/MIR upgrade; explicit absence/removal limits |
+
+Use native Factorio definitions for needs outside the current helper subset; they remain a valid integration route, but do not automatically obtain MIR-owned caps, presentation or migrations. The new capability will reuse supported construction semantics and preserve existing API consumers. An extension continues to own its namespace, settings, event handlers and saved fields. Neither a dependency nor a declaration grants permission to repair foreign state. The SDK will publish working examples and exact capability checks when implementation is accepted; no proposed method name is a current API promise.
 
 ## Tested scope and remaining limits
 
