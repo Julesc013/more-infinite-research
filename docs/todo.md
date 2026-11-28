@@ -27,7 +27,7 @@ Do these as separate reviewed units. One implementation owner, one independent r
 
 ## Next independent improvements
 
-- [ ] **WP-04 — Correct bounded large-modpack diagnostics.** Keep complete roster rows, deterministic limits and listed/omitted counts; cover required internal hooks and honest unavailable observations with focused controls.
+- [ ] **WP-04 — Check required internal diagnostic and restoration interfaces.** After the [bounded report repair](progress.md#bounded-support-diagnostics-on-development-source-2026-11-28), check a required missing hook against an absent optional integration. Verify catalogue lifetime and any claimed malformed spoilage-state path at their actual entry points.
 - [ ] **WP-05 — Preserve a future compatible minor transition.** Add the authentic current-record/future-minor regression, classify fixed historical producer checks, then implement one current version/edition decoder. Do this before selecting 5.1; no runtime or package-version change is implied by this plan.
 - [ ] **WP-06 — Extract one worker responsibility.** Begin with frozen readers versus current observation/application or command facade, whichever has the clearest independent contract. Include provider-absent force merge/reset/return ownership in the design; preserve the known failing and opposing histories before moving code.
 - [ ] **WP-07 — Remove one duplicated current policy.** Choose a real shared default/identity/validator or provider-binding consumer. Compare exact semantics and independent history first; show reduced edit spread and bounded work.

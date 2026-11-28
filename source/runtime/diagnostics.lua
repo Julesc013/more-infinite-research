@@ -2,11 +2,14 @@
 local output = require("runtime.settings_commands")
 local target = require("platform.target")
 local M = {filename = "more-infinite-research/mir.log"}
-local MAX_BYTES, MAX_MODS, MAX_QUEUE = 65536, 512, 32
+local MAX_BYTES, MAX_MODS, MAX_QUEUE, MAX_TEXT_BYTES = 65536, 512, 32, 256
+local TRUNCATION_NOTICE = "Report truncated at the 64 KiB limit.\n"
+local MOD_SUMMARY_BYTES = 64
+local BODY_BYTES = MAX_BYTES - MOD_SUMMARY_BYTES - #TRUNCATION_NOTICE
 
 local function scalar(value)
   if type(value) == "string" then
-    if #value > 256 then return "[text exceeds 256 bytes]" end
+    if #value > MAX_TEXT_BYTES then return "[text exceeds 256 bytes]" end
     return value:gsub("[%z\1-\31\127]", " ")
   end
   if type(value) == "number" or type(value) == "boolean" then return tostring(value) end
@@ -18,38 +21,64 @@ local function read(object, key)
   if ok then return value end
 end
 
+local function append_mod_roster(lines, versions, remaining_bytes)
+  local summary = #lines + 1
+  if versions == nil then
+    lines[summary] = "Active mods: unavailable\n"
+    return
+  end
+
+  local names, total = {}, 0
+  for name, version in pairs(versions) do
+    total = total + 1
+    if type(name) == "string" and #name <= MAX_TEXT_BYTES
+        and type(version) == "string" and #version <= MAX_TEXT_BYTES then
+      names[#names + 1] = name
+      -- Keep the sorted prefix and limit scratch space independently of roster size.
+      if #names == 2 * MAX_MODS then
+        table.sort(names)
+        for index = #names, MAX_MODS + 1, -1 do names[index] = nil end
+      end
+    end
+  end
+  table.sort(names)
+
+  local listed = 0
+  for index = 1, math.min(#names, MAX_MODS) do
+    local name = names[index]
+    local row = "Mod " .. scalar(name) .. ": " .. scalar(versions[name]) .. "\n"
+    if #row > remaining_bytes then break end
+    lines[summary + index] = row
+    remaining_bytes = remaining_bytes - #row
+    listed = index
+  end
+  lines[summary] = "Active mods: " .. listed .. " listed, " .. (total - listed) .. " omitted\n"
+end
+
 local function report(stage, player, selected, profile, profile_file, options)
   local lines, bytes, truncated = {}, 0, false
   local function add(key, value)
     if truncated then return end
     local line = key .. ": " .. scalar(value) .. "\n"
-    if bytes + #line > MAX_BYTES - 64 then
-      lines[#lines + 1], truncated = "Report truncated at the 64 KiB limit.\n", true
+    if bytes + #line > BODY_BYTES then
+      truncated = true
       return
     end
     lines[#lines + 1], bytes = line, bytes + #line
   end
+  local versions = read(script, "active_mods")
+  if type(versions) ~= "table" then versions = nil end
   add("MIR diagnostic report", "latest snapshot; not a complete engine log")
   add("Written after", stage)
-  add("MIR", script and script.active_mods and script.active_mods["more-infinite-research"])
+  add("MIR", versions and versions["more-infinite-research"])
   add("Edition", target.id)
   add("Engine", helpers and helpers.game_version)
+  add("Base", versions and versions.base)
   add("Sharing", "Metadata/settings exports can include your username. Engine logs may include local paths.")
   add("Full session/startup/crash evidence", "attach factorio-current.log separately; this mod cannot read it")
-  local names, versions = {}, script and script.active_mods or {}
-  for name in pairs(versions) do
-    names[#names + 1] = name
-    if #names > MAX_MODS then break end
-  end
-  if #names > MAX_MODS then
-    add("Active mods", "over 512; list omitted at the report bound")
-  else
-    table.sort(names)
-    for _, name in ipairs(names) do add("Mod " .. scalar(name), versions[name]) end
-  end
   if player then
     add("Requested by", player.name)
-    local force = player.force
+    local force = read(player, "force")
     add("Force", read(force, "name"))
     add("Force index", read(force, "index"))
     add("Current research", read(read(force, "current_research"), "name"))
@@ -65,11 +94,29 @@ local function report(stage, player, selected, profile, profile_file, options)
       add("Selected " .. field, read(technology, field))
     end
     local queue = read(force, "research_queue")
-    if queue then
+    if type(queue) ~= "table" then
+      add("Queue", "unavailable")
+    elseif next(queue) == nil then
+      add("Queue", "empty")
+    else
       for index, entry in ipairs(queue) do
         if index > MAX_QUEUE then add("Queue", "remaining entries omitted after 32"); break end
         add("Queue " .. index, type(entry) == "string" and entry or read(entry, "name"))
       end
+    end
+  end
+  if profile then
+    add("Effective MIR settings", "full MIRSET1 profile; other mods/map/research are separate")
+    add("Settings file", "script-output/" .. profile_file)
+    local heading = "MIRSET1 profile:\n"
+    -- The existing exporter retains the complete string in its own file.
+    if options and options.report_settings ~= true then
+      add("Profile text", "omitted by personal choice; the full settings file is exported separately")
+    elseif not truncated and #profile <= 32768 and bytes + #heading + #profile + 1 <= BODY_BYTES then
+      local block = heading .. profile .. "\n"
+      lines[#lines + 1], bytes = block, bytes + #block
+    else
+      add("Profile text", "see the complete settings file; omitted here to keep this report bounded")
     end
   end
   if options and options.report_omissions == true then
@@ -89,18 +136,11 @@ local function report(stage, player, selected, profile, profile_file, options)
       if count == 0 then add("Availability", "no current authored explanations in this context") end
     end
   end
-  if profile then
-    add("Effective MIR settings", "full MIRSET1 profile; other mods/map/research are separate")
-    add("Settings file", "script-output/" .. profile_file)
-    -- The existing exporter retains the complete string in its own file.
-    if options and options.report_settings ~= true then
-      add("Profile text", "omitted by personal choice; the full settings file is exported separately")
-    elseif not truncated and #profile <= 32768 and bytes + #profile < MAX_BYTES - 64 then
-      lines[#lines + 1] = "MIRSET1 profile:\n" .. profile .. "\n"
-    else
-      add("Profile text", "see the complete settings file; omitted here to keep this report bounded")
-    end
+  if truncated then
+    lines[#lines + 1] = TRUNCATION_NOTICE
+    bytes = bytes + #TRUNCATION_NOTICE
   end
+  append_mod_roster(lines, versions, MAX_BYTES - MOD_SUMMARY_BYTES - bytes)
   return table.concat(lines)
 end
 

@@ -244,6 +244,7 @@ To make a material's research unlimited, enable it and set its maximum level to 
 - Exporting and checking a profile never applies settings or changes research. Profiles do not back up other mods, map settings or research.
 
 - **Export Diagnostics** or `/mir-diagnostics-export` replaces the latest support report at `script-output/more-infinite-research/mir.log` and exports the full settings profile.
+- Diagnostics list active mod names and versions up to the report limit and show how many entries were omitted.
 - In Library **Help**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
 - Attach `factorio-current.log` separately for startup or crash problems; MIR cannot copy the engine log.
 - File-write errors leave gameplay unchanged. A partial export may still leave its already-written settings file.
