@@ -147,11 +147,12 @@ local function reconcile_imersite(selected_force)
   local namespace = storage.mir
   local adoption = type(namespace) == "table" and namespace.productivity_family_adoption
   local legacy = type(adoption) == "table" and adoption.k2_imersite_staged_migration
-  local function reconcile(force)
-    imersite.reconcile_force(force,imersite_change,state.forces,type(legacy) == "table" and legacy[force.index] or nil)
+  if type(legacy) ~= "table" then legacy = nil end
+  if selected_force then
+    imersite.reconcile_force(selected_force,imersite_change,state.forces,legacy and legacy[selected_force.index] or nil)
+  else
+    imersite.reconcile_forces(game.forces,imersite_change,state.forces,legacy)
   end
-  if selected_force then reconcile(selected_force)
-  else for _, force in pairs(game.forces) do reconcile(force) end end
   if next(state.forces) ~= nil then storage[imersite_contract.storage_key] = state end
 end
 

@@ -1413,6 +1413,47 @@ class BootstrapTests(unittest.TestCase):
             "callable absent worker results lost the ordinary lifecycle route")
         ''')
 
+    def test_k2_configuration_rejects_a_conflicting_force_before_carrier_writes(self):
+        self.lua.execute('''
+          install_modules(false,false,false)
+          install_runtime({}, {base="2.1.25",["space-age"]="2.1.25",Krastorio2="2.1.4",
+            ["Krastorio2-spaced-out"]="2.0.19",Krastorio2Assets="2.0.0",["k2so-assets"]="1.0.0"})
+          package.preload["research.settings"] = function()
+            return {resolve=function() return {passive_repair_enabled=false,
+              streams={research_material_imersite={effect_percent=2}}} end}
+          end
+          local contract=require("research.k2_imersite")
+          local early,tail=contract.early.id,contract.continuation.id
+          local holder,continuation=contract.carriers[1].id,contract.carriers[2].id
+          local function paid_force(index, public_early)
+            local technologies={}
+            for _, id in ipairs({early,tail,holder,continuation}) do
+              local level = id == early and public_early or id == holder and 6 or 4
+              local row={name=id,level=level,researched=false,saved_progress=id == holder and .42 or 0,
+                enabled=true,visible_when_disabled=false,research_unit_energy=1800,
+                prototype={max_level=id == early and 3 or 4294967295,hidden=id == holder or id == continuation,
+                  effects={{type="change-recipe-productivity",recipe="kr-imersite-powder",change=.02}},
+                  prerequisites=id == tail and {{name=early}} or {}}}
+              technologies[id]=setmetatable({}, {__index=row,__newindex=function()
+                error("carrier write before all forces passed preflight")
+              end})
+            end
+            local force={index=index,technologies=technologies,research_queue={technologies[holder]},
+              current_research=technologies[holder],research_progress=.42,
+              recipes={["kr-imersite-powder"]={productivity_bonus=.10}}}
+            return force
+          end
+          local admitted,conflicting=paid_force(1,1),paid_force(2,2)
+          game.forces=setmetatable({admitted,conflicting},{__pairs=ipairs})
+          local records={schema=1,forces={}}
+          storage[contract.storage_key]=records
+          load_control()
+          local ok,message=pcall(handlers.configuration,{mod_changes={}})
+          assert(not ok and tostring(message):find("conflicting public Imersite state: "..early.." on force 2",1,true),message)
+          assert(storage[contract.storage_key]==records and next(records.forces)==nil)
+          assert(admitted.current_research.name==holder and admitted.research_progress==.42)
+        ''')
+
     def test_k2_carrier_lifecycle_is_independent_of_caps_and_scripted_features(self):
         self.lua.execute('''
           install_modules(false,false,false)
@@ -1424,13 +1465,18 @@ class BootstrapTests(unittest.TestCase):
           end
           local initialized,reconciled = {},{}
           package.preload["runtime.k2_imersite_migration"] = function()
+            local function reconcile(force,change,records)
+              assert(change == .06); reconciled[#reconciled+1]=force.index
+              records[force.index]={status="completed"}
+            end
             return {
               initialize_force=function(force,change)
                 assert(change == .06); initialized[#initialized+1]=force.index
               end,
-              reconcile_force=function(force,change,records)
-                assert(change == .06); reconciled[#reconciled+1]=force.index
-                records[force.index]={status="completed"}
+              reconcile_force=reconcile,
+              reconcile_forces=function(forces,change,records)
+                assert(forces == game.forces)
+                for _,force in pairs(forces) do reconcile(force,change,records) end
               end
             }
           end

@@ -65,6 +65,7 @@ class ImersiteMigrationTests(unittest.TestCase):
                     values.corrupt_queue_current_once=nil
                   end
                   if value[1] == nil then values.research_progress=0 end
+                  if values.after_queue_write then values.after_queue_write() end
                 elseif key == "research_progress" then
                   if values.current_research == nil then error("No research in progress") end
                   values.progress_writes=(values.progress_writes or 0)+1
@@ -138,6 +139,43 @@ class ImersiteMigrationTests(unittest.TestCase):
             assert(not migration.reconcile_force(force,.02,records))
             assert(values.progress_writes == nil)
           end
+        ''')
+
+    def test_unavailable_queue_cannot_authorize_a_detached_handoff(self):
+        self.lua.execute('''
+          local force,rows,values=world(5)
+          force.research_queue={}
+          values.research_queue=nil
+          local records={}
+          local ok,message=pcall(migration.reconcile_force,force,.02,records)
+          assert(not ok and tostring(message):find("Imersite queue unavailable",1,true),tostring(message))
+          assert(next(records)==nil and rows[H].level==6 and rows[H].saved_progress==.42)
+          assert(rows[E].level==1 and rows[T].level==4 and values.progress_writes==nil)
+        ''')
+
+    def test_batch_uses_current_work_after_an_earlier_native_setter(self):
+        self.lua.execute('''
+          local first,_,first_values=world(2)
+          local second,second_rows,second_values=world(5)
+          second_values.index=2
+          local foreign={name="foreign-research"}
+          second_values.technologies[foreign.name]=foreign
+          local callbacks=0
+          first_values.after_queue_write=function()
+            -- A synchronous listener changes the next force between admission
+            -- and application. Its new progress and repeated queue entries win.
+            callbacks=callbacks+1
+            second_values.research_progress=.31
+            second_rows[H].saved_progress=.31
+            second_values.research_queue={second_values.technologies[H],foreign,foreign}
+          end
+          local records={}
+          migration.reconcile_forces(setmetatable({first,second},{__pairs=ipairs}),.02,records)
+          assert(callbacks==1 and records[1].earned==2 and records[2].earned==5)
+          assert(first.current_research.name==E and first.research_progress==.42)
+          assert(second.current_research.name==T and second.research_progress==.31 and second_rows[T].saved_progress==.31)
+          assert(#second.research_queue==3 and second.research_queue[2]==foreign and second.research_queue[3]==foreign)
+          assert(records[2].progress_before==.31 and #records[2].queue_before==3)
         ''')
 
     def test_handoff_preserves_unqueued_public_disablement_and_visibility(self):
