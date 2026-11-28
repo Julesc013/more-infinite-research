@@ -21,7 +21,7 @@ class LifecycleTests(unittest.TestCase):
           function technology(name, level, enabled)
             return {name = name, level = level, researched = false,
               enabled = enabled ~= false, visible_when_disabled = false,
-              prototype = {enabled = true}}
+              prototype = {enabled = true}, saved_progress = 0}
           end
 
           function force(index, technologies, queue, current, progress)
@@ -574,7 +574,8 @@ class LifecycleTests(unittest.TestCase):
                                 effects={{type="train-braking-force-bonus",modifier=.1}}}
                               local prototype = setmetatable({}, {__index=prototype_fields,
                                 __newindex=function() error("cap mutated a prototype") end})
-                              local native = {name=name,valid=true,level=11,researched=false,prototype=prototype}
+                              local native = {name=name,valid=true,level=11,researched=false,
+                                prototype=prototype,saved_progress=0}
                               local braking = setmetatable({enabled=originally_enabled,visible_when_disabled=false},
                                 {__index=native,__newindex=function(_,key) error("cap wrote native research "..key) end})
                               local current, other = technology("foreign-current",1,true), technology("foreign-other",1,true)

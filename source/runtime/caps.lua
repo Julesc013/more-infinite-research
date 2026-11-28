@@ -43,13 +43,85 @@ local function valid_level(technology)
   return technology and positive_integer(technology.level) and technology.level or nil
 end
 
+local function assert_retained_queue(force, expected)
+  local actual = force.research_queue
+  if type(actual) ~= "table" then error("MIR native queue readback unavailable", 3) end
+  if #actual ~= #expected then error("MIR native queue dropped unselected research", 3) end
+  for index, technology in ipairs(expected) do
+    if not actual[index] or actual[index].name ~= technology.name then
+      error("MIR native queue changed unselected research order", 3)
+    end
+  end
+end
+
+local function same_research(technology, name, level)
+  return technology and technology.name == name and level ~= nil and valid_level(technology) == level
+end
+
+local function assert_current_head(current, queue)
+  local first = queue[1]
+  if (current and current.name or nil) ~= (first and first.name or nil) then
+    error("MIR inconsistent native current/queue frame after cap rewrite", 3)
+  end
+end
+
+local function valid_progress(progress)
+  return type(progress) == "number" and progress >= 0 and progress <= 1
+end
+
+local function same_progress(actual, expected)
+  return valid_progress(actual) and math.abs(actual - expected) <= 0.000000001
+end
+
+local function suspended_progress(technology)
+  local progress = technology.saved_progress
+  if not valid_progress(progress) or progress >= 1 then
+    error("MIR cannot observe suspended research progress: " .. technology.name, 3)
+  end
+  return progress
+end
+
+local function observe_suspended_work(queue, excluded)
+  -- Only Factorio 2.x packages use this runtime. Each queued technology has
+  -- one native saved fraction even when its identity occurs several times.
+  local rows, seen = {}, {}
+  for _, technology in ipairs(queue) do
+    local name = technology.name
+    if name ~= excluded and not seen[name] then
+      local level = valid_level(technology)
+      if not level then error("MIR cannot observe queued research level: " .. name, 3) end
+      rows[#rows + 1] = {technology=technology, name=name, level=level,
+        progress=suspended_progress(technology)}
+      seen[name] = true
+    end
+  end
+  return rows
+end
+
+local function assert_suspended_work(force, rows, previous_current)
+  local active = force.current_research
+  for _, row in ipairs(rows) do
+    local saved = suspended_progress(row.technology)
+    local kept = same_progress(saved, row.progress)
+    if active and active.name == row.name and row.name ~= previous_current then
+      -- A newly selected follower may have started with its saved fraction,
+      -- or its paid work may still be parked while active work is zero.
+      local progress = force.research_progress
+      kept = (kept and same_progress(progress, 0))
+        or (same_progress(progress, row.progress) and (kept or same_progress(saved, 0)))
+    end
+    if not kept or not same_research(row.technology, row.name, row.level) then
+      error("MIR native queue changed suspended research work: " .. row.name, 3)
+    end
+  end
+end
+
 local function filter_queue(force, limits, unavailable)
   local queue = force.research_queue
   local current = force.current_research
   local current_name = current and current.name or nil
   local current_limit = current_name and limits[current_name]
-  local current_level = current_name and force.technologies
-    and valid_level(force.technologies[current_name]) or nil
+  local current_level = valid_level(current)
   local current_over_cap = current_limit and current_limit > 0
     and current_level and current_level > current_limit
   local current_unavailable = current_name and unavailable and unavailable[current_name] == true
@@ -79,40 +151,69 @@ local function filter_queue(force, limits, unavailable)
   -- technology remains current, so valid fractional progress is preserved and
   -- removed research does not leak progress into another queue entry.
   local progress = current and force.research_progress or nil
+  local head_retained = current_name and queue[1] and queue[1].name == current_name
+    and filtered[1] and filtered[1].name == current_name
+  if head_retained and (not current_level or not valid_progress(progress)) then
+    error("MIR cannot observe retained current research work: " .. current_name, 3)
+  end
+  local progress_to_suspend
   if current_unavailable then
     -- Modern native saved_progress accepts [0,1). Refuse an unsupported
     -- snapshot before cancellation rather than discarding invested work.
-    if not queue[1] or queue[1].name ~= current_name or type(progress) ~= "number"
-        or progress ~= progress or progress < 0 or progress >= 1 then
+    if not queue[1] or queue[1].name ~= current_name or not current_level
+        or not valid_progress(progress) or progress >= 1 then
       error("MIR cannot preserve unavailable current research progress: " .. current_name, 3)
     end
+    local saved = suspended_progress(current)
+    if progress ~= 0 and saved ~= 0 and not same_progress(saved, progress) then
+      error("MIR cannot replace distinct suspended research work: " .. current_name, 3)
+    end
+    progress_to_suspend = progress ~= 0 and progress or saved
   end
+  local excluded = not head_retained and current_name or nil
+  local suspended = observe_suspended_work(queue, excluded)
   force.research_queue = filtered
-  local retained = force.current_research
   -- The native setter may silently reject an unresearchable remainder. Do
   -- not report that as preserved foreign/eligible queue state on either path.
-  local actual = force.research_queue or {}
-  if #actual ~= #filtered then error("MIR native queue dropped unselected research", 3) end
-  for index, technology in ipairs(filtered) do
-    if not actual[index] or actual[index].name ~= technology.name then
-      error("MIR native queue changed unselected research order", 3)
-    end
-  end
-  if current_name and retained and retained.name == current_name and progress ~= nil then
-    force.research_progress = progress
-  end
+  assert_retained_queue(force, filtered)
+  local retained = force.current_research
   local current_retained = current_name and retained and retained.name == current_name
+  if (head_retained or current_retained) and not same_research(retained, current_name, current_level) then
+    error("MIR native queue changed current research: " .. current_name, 3)
+  end
+  -- A completion may arrive during an intermediate frame. A rewrite still
+  -- has to produce a settled queue before any old progress can be reused.
+  assert_current_head(retained, filtered)
   local removed_current = nil
   if current_name and not current_retained then removed_current = current_name end
-  if current_unavailable and removed_current then
+  if current_retained and progress ~= nil then
+    force.research_progress = progress
+    if not same_research(force.current_research, current_name, current_level)
+        or not same_progress(force.research_progress, progress) then
+      error("MIR native force did not retain current research progress: " .. current_name, 3)
+    end
+    assert_retained_queue(force, filtered)
+  elseif current_unavailable and removed_current then
     -- Keep investment on its native technology, never in a MIR queue journal.
     -- This path is admitted only by modern-engine lifecycle callers.
-    current.saved_progress = progress
-    local saved = current.saved_progress
-    if type(saved) ~= "number" or saved ~= saved or math.abs(saved - progress) > 0.000000001 then
+    local next_name = retained and retained.name
+    local next_level = retained and valid_level(retained)
+    local next_progress = retained and force.research_progress
+    if retained and (not next_level or not valid_progress(next_progress)) then
+      error("MIR cannot observe current research before suspending: " .. next_name, 3)
+    end
+    current.saved_progress = progress_to_suspend
+    if not same_progress(suspended_progress(current), progress_to_suspend) then
       error("MIR native technology did not retain suspended research progress: " .. current_name, 3)
     end
+    local active = force.current_research
+    if (retained and (not same_research(active, next_name, next_level)
+        or not same_progress(force.research_progress, next_progress))) or (not retained and active) then
+      error("MIR native force changed current research while suspending: " .. current_name, 3)
+    end
+    assert_retained_queue(force, filtered)
   end
+  assert_suspended_work(force, suspended, current_name)
   local unresolved_current = nil
   if current_disallowed and current_retained then unresolved_current = current_name end
   return true, removed_current, unresolved_current
