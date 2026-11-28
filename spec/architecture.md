@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-11-23
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -17,6 +17,8 @@ source_of_truth_for:
 ## Decision
 
 Use direct Factorio definitions with a small Generator. Remove general research discovery, factory-acquisition proof, whole-world snapshots, generic transformation plans and routine identity/serialization chains from player execution. Preserve the product contract rather than every old internal representation.
+
+The [completion plan](../docs/implementation/mir5-completion-plan.md) sequences implementation of this architecture. Requirements below describe the accepted target; updating this contract does not establish that responsibility extraction, shared preservation operations or expanded API capabilities are implemented or qualified. Current paths and saved-state owners are mapped in the [architecture guide](../docs/architecture.md).
 
 `ARCH-01` — Production research MUST come from authored identities, explicit progression and approved effect/binding rules. Selecting recipes for an existing authored family is not permission to invent new families or science progression.
 
@@ -97,6 +99,26 @@ Local validation is not a sandbox: data-stage mods share prototype access and ca
 `ARCH-10` — A new ordinary family should change its declaration and focused test; a new integration should change its adapter, one activation entry and relevant tests/docs. Changes to many infrastructure authorities require design review before proceeding.
 
 Readable compact code is preferred over compressed code. Core LOC/import growth, output size and tooling latency are review signals, not numerical substitutes for maintainability. No dependency-injection container, universal event bus, plugin registry or schema platform without a demonstrated consumer that cannot be served directly.
+
+## Cohesive features and preservation boundaries
+
+`ARCH-13` — Keep engine lifecycle entrypoints visible and thin; group private implementation by feature ownership below them. Extract a module when its responsibility, state or change cadence is distinct, not to meet an arbitrary line limit. Separate mechanical relocation, semantic extraction and behavior changes into reviewable units. Preserve public imports, prototype/settings IDs, saved keys and migration filenames; module movement alone grants no compatibility exception.
+
+Worker cargo must distinguish the following responsibilities. Other preservation features reuse only operations with the same semantics; they do not inherit worker history or provider policy merely by sharing a queue helper.
+
+| Responsibility | Contract |
+|---|---|
+| Frozen origins and readers | Decode supported historical records and authenticated predecessor facts; perform no native writes and never regenerate old prices/effects from current defaults. |
+| Native observation | Read a bounded frame for the actual callback/force; distinguish an established empty value from unavailable or incomplete state. |
+| Admission and planning | Prove saved authority and select a supported transition, its exact owned fields and required order. No writes; unknown history stays unknown. |
+| Native application | Revalidate immediately before affected writes, apply the admitted operation, compare required postconditions and release temporary guards. Preserve the existing failure boundary after mutation. |
+| Lifecycle and commands | Invoke those same operations with explicit force/event scope; diagnostics and command policy do not implement another transition. |
+
+The [migration contract](migrations.md#observation-application-and-preservation) owns the queue/work and foreign-state invariants. A shared observer is a small boundary operation, not a serialized plan, generic transaction engine or global rollback guarantee. Different event frames, repeated-queue counting and membership queries retain their distinct contracts. An ordinary single-force event should not build all-force plans unless the invariant actually requires them; configuration-wide preflight and immediate revalidation remain where needed.
+
+The Research Library has one owner for each player's saved view and translation lifetime, separate from force research authority. Keep model, rendering/interaction, layout, translation and export responsibilities cohesive. Preserve the accepted interaction design during extraction. Reuse immutable metadata only with an explicit lifetime; live force/queue/cap facts must remain current. Measure remaining repeated work and retained memory before claiming an improvement.
+
+`ARCH-14` — Review reduction in independently maintained decisions and unnecessary work, not only file or line counts. For an affected family/provider change, name the declaration owner, shared operation, activation point, owned state and focused acceptance cases. Consolidate current defaults, provider identities and validators only when they express the same contract; historical expectations stay independent. A second instance of an existing semantic class should use the same operation without another core policy branch. A new semantic class needs the bounded operation and evidence required by `ARCH-12`.
 
 ## Declarative support and bounded behavior
 

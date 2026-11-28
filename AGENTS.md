@@ -2,6 +2,8 @@
 
 Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/development.md](docs/development.md) owns current commands and coordination; [docs/progress.md](docs/progress.md) records exact evidence and remaining release work. MIR5 is incomplete until its acceptance and publication gates pass.
 
+For the consolidated completion programme, start with [docs/todo.md](docs/todo.md), select one bounded work package from [the completion plan](docs/implementation/mir5-completion-plan.md), and use [the roadmap](docs/roadmap.md) for dependencies. Preserve existing request/continuity IDs; planned architecture or API capabilities are not implemented or qualified merely because their specification is adopted.
+
 ## Source and architecture
 
 - `source/` is the sole canonical editable player source. Compose the nine stable editions and separately identified best-effort historical builds, including F018, from shared components and narrow capability adapters. Do not create whole-version source copies.
