@@ -45,6 +45,19 @@ class CapsTests(unittest.TestCase):
               end
             })
           end
+
+          function park_on_cancellation(world)
+            local mt = getmetatable(world)
+            local native_set = mt.__newindex
+            mt.__newindex = function(self, key, value)
+              local current = self.current_research
+              local progress = self.research_progress
+              native_set(self, key, value)
+              if key == "research_queue" and current and self.current_research ~= current then
+                current.saved_progress = progress
+              end
+            end
+          end
         ''')
 
     def test_cap_ten_keeps_level_ten_and_removes_level_eleven_queue_entry(self):
@@ -140,10 +153,49 @@ class CapsTests(unittest.TestCase):
         self.lua.execute('''
           local speed = technology("worker-robots-speed-6", 11, true)
           local f = force(5, {[speed.name] = speed}, {speed}, speed, .8)
+          park_on_cancellation(f)
           local _, result = caps.reconcile(f, {[speed.name] = 10}, {})
           assert(result.queue_changed and result.removed_current == speed.name
             and result.unresolved_current == nil)
           assert(#f.research_queue == 0 and f.current_research == nil and f.research_progress == nil)
+          assert(speed.saved_progress == .8 and speed.level == 11)
+        ''')
+
+    def test_over_cap_cancellation_checks_parked_work_and_refuses_conflicting_work(self):
+        self.lua.execute('''
+          for _, mode in ipairs({"parks-active", "drops-active", "distinct-slots"}) do
+            local capped = technology("capped", 11, true)
+            local next_job = technology("next-job", 1, true)
+            next_job.saved_progress = .27
+            if mode == "distinct-slots" then capped.saved_progress = .19 end
+            local queue = {capped, next_job}
+            local f = force(5, {capped=capped, [next_job.name]=next_job}, queue, capped, .42)
+            local mt = getmetatable(f)
+            local native_set = mt.__newindex
+            local queue_writes = 0
+            mt.__newindex = function(self, key, value)
+              if key ~= "research_queue" then native_set(self, key, value); return end
+              queue_writes = queue_writes + 1
+              if mode == "parks-active" then capped.saved_progress = self.research_progress end
+              native_set(self, key, value)
+              rawset(self, "research_progress", next_job.saved_progress)
+              next_job.saved_progress = 0
+            end
+            local owned = {}
+            local ok, value, result = pcall(caps.reconcile, f, {capped=10}, owned)
+            if mode == "parks-active" then
+              assert(ok and result.removed_current == "capped" and queue_writes == 1)
+              assert(capped.saved_progress == .42 and capped.level == 11 and not capped.enabled)
+              assert(f.current_research == next_job and f.research_progress == .27 and next_job.saved_progress == 0)
+            elseif mode == "drops-active" then
+              assert(not ok and tostring(value):find("did not retain suspended research progress", 1, true), mode)
+              assert(queue_writes == 1 and capped.enabled and next(owned) == nil)
+            else
+              assert(not ok and tostring(value):find("distinct suspended research", 1, true), mode)
+              assert(queue_writes == 0 and f.research_queue == queue and f.research_progress == .42)
+              assert(capped.saved_progress == .19 and next(owned) == nil)
+            end
+          end
         ''')
 
     def test_unqueued_over_cap_current_is_reported_without_guessing_a_native_write(self):
@@ -203,12 +255,14 @@ class CapsTests(unittest.TestCase):
           local braking = technology("braking-force-8", 8, true)
           local f = force(8, {[belts.name] = belts, [braking.name] = braking},
             {belts, braking}, belts, .33)
+          park_on_cancellation(f)
           local _, result = caps.reconcile(f, {[belts.name] = 4, [braking.name] = 7}, {},
             {[belts.name] = true})
           assert(result.queue_changed and #f.research_queue == 1
             and f.research_queue[1] == braking)
           assert(f.current_research == braking and f.research_progress == 0,
             "the native queue replacement owns cancellation of only the selected current research")
+          assert(belts.saved_progress == .33)
           assert(not belts.enabled and braking.enabled,
             "a named reconciliation changed another family")
         ''')

@@ -48,6 +48,10 @@ class LifecycleTests(unittest.TestCase):
                   if item == current_research then retained = true; break end
                 end
                 if not retained then
+                  local progress = rawget(self, "research_progress")
+                  if current_research and type(progress) == "number" and progress > 0 and progress < 1 then
+                    current_research.saved_progress = progress
+                  end
                   rawset(self, "current_research", replacement[1])
                   rawset(self, "research_progress", replacement[1] and 0 or nil)
                 end
@@ -171,6 +175,7 @@ class LifecycleTests(unittest.TestCase):
           assert(state == before and state.owned_disabled[1][name].disabled == true,
             "native disablement lost its durable restoration right")
           assert(not gear.enabled and gear.visible_when_disabled and gear.level == 6 and not gear.researched)
+          assert(gear.saved_progress == .42)
           assert(f.current_research == probe and #f.research_queue == 1 and f.research_queue[1] == probe)
 
           -- A later independent force starts disabled by another owner. Its
@@ -861,7 +866,7 @@ class LifecycleTests(unittest.TestCase):
             local effects=paid.prototype.effects
             local foreign=technology("foreign-research",2,false)
             local queue={paid,foreign}
-            local f=force(47,{[name]=paid,[foreign.name]=foreign},queue,paid,.42)
+            local f=force(47,{[name]=paid,[foreign.name]=foreign},{},nil,0)
             paid.force,foreign.force=f,f
             boot({[47]=f},0,"",nil,nil,0,nil,nil,
               {["ips-max-level-research_rocket_shooting_speed"]=3})
@@ -871,6 +876,7 @@ class LifecycleTests(unittest.TestCase):
             -- A later data stage retains this exact paid vector but delegates
             -- future research to its admitted external owner. Native resets
             -- can re-enable the row before MIR's configuration callback.
+            -- Supply the distinct fractions only for the no-queue-write route.
             paid.prototype.enabled,paid.enabled=false,true
             f._queue,f.current_research,f.research_progress=queue,paid,.42
             boot({[47]=f},0,"",saved,nil,0,nil,nil,
@@ -1686,6 +1692,7 @@ class LifecycleTests(unittest.TestCase):
             and f.research_queue[2] == unrelated_second, "unrelated queue order changed")
           assert(f.current_research == unrelated_first and f.research_progress == 0,
             "removed current research transferred progress")
+          assert(gear.saved_progress == .65)
           assert(not gear.enabled and gear.level == 11 and gear.researched == false)
 
           local unresolved = technology(name, 11, true)

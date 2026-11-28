@@ -636,6 +636,7 @@ class CompetingProductivityTests(unittest.TestCase):
               outer_state = storage.mir_competing_productivity
               assert(outer_state and next(outer_state.owned_disabled) == nil)
               assert(value[1] == retained)
+              t.current_research.saved_progress = t.research_progress
               t.current_research, t.research_progress = value[1], value[1].saved_progress
               value[1].saved_progress = 0
               starts = starts + 1
@@ -661,6 +662,7 @@ class CompetingProductivityTests(unittest.TestCase):
           runtime.on_configuration_changed()
           assert(starts == 1 and #queue == 2 and queue[1] == retained and queue[2] == retained)
           assert(capped.level == 7 and not capped.enabled and retained.enabled)
+          assert(capped.saved_progress == .42)
           assert(storage.mir_competing_productivity == outer_state, "outer restoration ledger detached")
           local rights = outer_state.owned_disabled[force.index]
           assert(rights[capped.name].disabled == true and rights[foreign.name].disabled == false)
