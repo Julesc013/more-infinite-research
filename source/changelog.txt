@@ -1,4 +1,26 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.28
+Date: 2026-11-28
+
+  Bugfixes:
+
+    - Check that retained research queue entries survive ordinary cap enforcement.
+    - Require a complete native research queue before transferring worker cargo research.
+    - Identify the failed check when MIR refuses an older worker cargo upgrade.
+    - Check every force before transferring Imersite research after a mod change in Factorio 2.1.
+    - Restore descriptions for startup dropdown options.
+    - Preserve Research scroll when searching Settings in the Research Library.
+
+  Changes:
+
+    - Use localized Factorio help for worker cargo recovery and settings commands.
+    - Explain that the mining drill research improves manufacturing, while Mining productivity applies to placed drills.
+
+  Optimizations:
+
+    - Populate family options once per Research Library render and read only the selected declaration for research details.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.27
 Date: 2026-11-27
 
