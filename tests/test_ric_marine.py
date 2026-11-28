@@ -244,7 +244,7 @@ class RicMarineTests(unittest.TestCase):
           prototype.max_level=4294967295
           local tech={name=id,valid=true,level=4,researched=false,enabled=true,
             saved_progress=.27,visible_when_disabled=false,prototype=prototype}
-          local foreign={name="foreign-current",valid=true,level=2,enabled=true}
+          local foreign={name="foreign-current",valid=true,level=2,enabled=true,saved_progress=0}
           local force={index=1,valid=true,technologies={[id]=tech,[foreign.name]=foreign},
             research_queue={foreign,tech},current_research=foreign,research_progress=.42}
           tech.force,foreign.force=force,force

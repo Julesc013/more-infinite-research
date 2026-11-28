@@ -619,7 +619,7 @@ class WorkerStorageContinuationTests(unittest.TestCase):
                         prototype=native_prototypes["worker-robots-storage-4"]}
                       local infinite={name=selected,valid=true,level=8,researched=false,
                         enabled=true,visible_when_disabled=false,saved_progress=.27,prototype=native_prototypes[selected]}
-                      local current={name="foreign-current",valid=true,level=2,enabled=true}
+                      local current={name="foreign-current",valid=true,level=2,enabled=true,saved_progress=0}
                       local world={index=1,valid=true,technologies={[finite.name]=finite,[selected]=infinite,
                         [current.name]=current},research_queue={current,infinite},current_research=current,research_progress=.42}
                       finite.force,infinite.force,current.force=world,world,world
