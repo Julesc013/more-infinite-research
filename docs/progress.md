@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-27
+last_reviewed: 2026-11-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,19 @@ source_of_truth_for:
 ---
 
 # MIR 5 release progress
+
+## Current release and qualification (2026-11-28)
+
+MIR 5.0.27 was published as a GitHub prerelease on 27 November at 18:01 AEDT under release ID `459314915`. Its tag resolves to checked main commit `30e2f04abd5e49d4efb7497e289335dd1434c698`. The anonymous readback verified 17 ZIPs and two checksum files. All 21 files in `dist/v5.0.27` rehashed against that receipt, including the matching notes and upload text. The original receipt is `build/qualification/mir527-release-cadence-r02/public-delivery-459314915-20261127T070048900/anonymous-readback.json` at SHA-256 `36776554B401538D98687BDEA6A9B5DD6DE5DE993342B829D7DE3D3CA4ADAC9D`. [GitHub release](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.27)
+
+MIR 5.0.25 remains a held draft after its upgrade failure. The next changed public source version is 5.0.28. Select its candidate after reviewing the affected package and upgrade evidence. Use the exact `origin/dev` revision for integration and the recorded commit and ZIP hashes for each native result.
+
+| Area | Current qualification work |
+| --- | --- |
+| Worker migration | The legacy refusal now names the failed predicate. All 249 selected Windows host checks passed. The original reporter's input is unavailable. The integrated worker queue change still needs its affected native replays on the next candidate. [Diagnostic](https://github.com/Julesc013/more-infinite-research/pull/2500) · [Shared queue change](https://github.com/Julesc013/more-infinite-research/pull/2498) |
+| Research caps and setting help | Host controls reproduce the missed ordinary cap readback and verify its correction. Native queue preservation and dropdown rendering have separate acceptance cases. [Cap readback](https://github.com/Julesc013/more-infinite-research/pull/2501) · [Dropdown help](https://github.com/Julesc013/more-infinite-research/pull/2502) |
+| Research Library | Saved views, input and exports have scoped native evidence. The prepared Windows comparison uses an older package and awaits rebinding. Matched first-open and search timing, retained memory and affected final-package interactions remain open. [Library tracker](https://github.com/Julesc013/more-infinite-research/issues/1768) |
+| Stable verdict | Reconcile historical obligations and consumed inputs, then close the affected supported-profile, save, client, performance and exact-package gates. [Verification contract](../spec/verification.md) · [Acceptance tracker](https://github.com/Julesc013/more-infinite-research/issues/446) |
 
 ## MIR 5.0.27 checked draft and Foundation III update comparison (2026-11-26)
 
@@ -32,7 +45,7 @@ The draft Factorio 2.0 ZIP `D1BEEAA18CD2CFEBFF5466DD44B3B5A34A12D7C1156E8DDF7E41
 
 On Black Glass, both native API consumers passed against the exact staged 5.0.27 ZIPs on Factorio 2.0.77 and 2.1.24. In each engine, two assemblers made 200 and 202 copper cables from 100 copper plates each. Each case passed two cold loads, restored the direct library and had 24 original files rehashed. The receipt is `build/qualification/mir527-native-api-black-glass-r01/verified-native-api.json` at SHA-256 `F8FFCAA198BF5CFC0B6B19EC87EA57CA276390523B6165AC24B2E417606DE6E0`.
 
-The draft was private at readback. A one-shot Windows task is scheduled for 18:00 Australia/Sydney on 27 November to wait for the public release ID, then verify anonymous downloads and deliver the identical files to primary `dist`. Windows Library timing and retained-memory acceptance remain open.
+The authenticated draft readback preceded the scheduled publication and anonymous delivery recorded above. Windows Library timing and retained-memory acceptance remain open.
 
 ## Shared worker queue and native command help (2026-11-27)
 
@@ -2008,7 +2021,9 @@ The [current005D R05 discovery inputs](../spec/evidence/discovery-recovery-curre
 
 ## Ordered remaining work
 
-| Release decision | Current rule |
+This historical worklist retains the 5.0.4 checkpoint, original obligations and input identities. See [current release and qualification](#current-release-and-qualification-2026-11-28) for the active release decision.
+
+| Release decision | Checkpoint rule |
 |---|---|
 | Next source version | 5.0.4 is published; next changed public package is5.0.5. Preserve all published5.0.0–5.0.4 bytes. Private qualification archives remain distinct inputs and consume no version. |
 | Maturity | 5.0.4 is the delivered GitHub prerelease; stable still requires every applicable acceptance verdict, independent review, exact-head checks and exact artifact delivery. A prerelease flag does not waive a known save-safety defect. |
