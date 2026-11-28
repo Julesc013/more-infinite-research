@@ -372,7 +372,7 @@ class SecretasContinuationTests(unittest.TestCase):
               prototype.max_level,prototype.enabled=4294967295,true
               local native={name=prototype.name,valid=true,level=12,researched=false,
                 enabled=true,visible_when_disabled=false,saved_progress=.27,prototype=prototype}
-              local current={name="foreign-current",valid=true,level=3,enabled=true}
+              local current={name="foreign-current",valid=true,level=3,enabled=true,saved_progress=0}
               local world={index=1,valid=true,technologies={[native.name]=native,[current.name]=current},
                 research_queue={current,native},current_research=current,research_progress=.42}
               current.force,native.force=world,world

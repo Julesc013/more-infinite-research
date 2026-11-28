@@ -364,7 +364,7 @@ class ContinuationOwnershipTests(unittest.TestCase):
           local eight={name="research-speed-8",valid=true,level=10,enabled=true,researched=false,
             visible_when_disabled=false,saved_progress=.27,
             prototype={name="research-speed-8",max_level=4294967295,enabled=true}}
-          local other={name="foreign-current",valid=true}
+          local other={name="foreign-current",valid=true,level=1,saved_progress=0}
           local world={index=1,valid=true,technologies={[seven.name]=seven,[eight.name]=eight,[other.name]=other},
             research_queue={other,eight},current_research=other,research_progress=.42}
           seven.force,eight.force,other.force=world,world,world
@@ -708,7 +708,7 @@ class ContinuationOwnershipTests(unittest.TestCase):
                 settings.startup[settings_names[name]].value=10
                 local native={name=name,valid=true,level=11,enabled=enabled,researched=false,
                   visible_when_disabled=false,saved_progress=.27,prototype={enabled=true}}
-                local current={name="foreign-current",valid=true}
+                local current={name="foreign-current",valid=true,level=1,saved_progress=0}
                 local world={index=1,valid=true,technologies={[name]=native,[current.name]=current},
                   research_queue={current,native},current_research=current,research_progress=.42}
                 current.force,native.force=world,world
